@@ -10,28 +10,31 @@ package org.alfresco.repo.cmis.ws;
 public class GetAllVersions  implements java.io.Serializable {
     private java.lang.String repositoryId;
 
-    private java.lang.String versionSeriesId;
+    private java.lang.String objectId;
 
     private java.lang.String filter;
 
     private java.lang.Boolean includeAllowableActions;
 
-    private org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships;
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public GetAllVersions() {
     }
 
     public GetAllVersions(
            java.lang.String repositoryId,
-           java.lang.String versionSeriesId,
+           java.lang.String objectId,
            java.lang.String filter,
            java.lang.Boolean includeAllowableActions,
-           org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships) {
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
-           this.versionSeriesId = versionSeriesId;
+           this.objectId = objectId;
            this.filter = filter;
            this.includeAllowableActions = includeAllowableActions;
-           this.includeRelationships = includeRelationships;
+           this.extension = extension;
     }
 
 
@@ -56,22 +59,22 @@ public class GetAllVersions  implements java.io.Serializable {
 
 
     /**
-     * Gets the versionSeriesId value for this GetAllVersions.
+     * Gets the objectId value for this GetAllVersions.
      * 
-     * @return versionSeriesId
+     * @return objectId
      */
-    public java.lang.String getVersionSeriesId() {
-        return versionSeriesId;
+    public java.lang.String getObjectId() {
+        return objectId;
     }
 
 
     /**
-     * Sets the versionSeriesId value for this GetAllVersions.
+     * Sets the objectId value for this GetAllVersions.
      * 
-     * @param versionSeriesId
+     * @param objectId
      */
-    public void setVersionSeriesId(java.lang.String versionSeriesId) {
-        this.versionSeriesId = versionSeriesId;
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
     }
 
 
@@ -116,22 +119,26 @@ public class GetAllVersions  implements java.io.Serializable {
 
 
     /**
-     * Gets the includeRelationships value for this GetAllVersions.
+     * Gets the extension value for this GetAllVersions.
      * 
-     * @return includeRelationships
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
      */
-    public org.alfresco.repo.cmis.ws.EnumIncludeRelationships getIncludeRelationships() {
-        return includeRelationships;
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
     }
 
 
     /**
-     * Sets the includeRelationships value for this GetAllVersions.
+     * Sets the extension value for this GetAllVersions.
      * 
-     * @param includeRelationships
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
      */
-    public void setIncludeRelationships(org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships) {
-        this.includeRelationships = includeRelationships;
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -149,18 +156,18 @@ public class GetAllVersions  implements java.io.Serializable {
             ((this.repositoryId==null && other.getRepositoryId()==null) || 
              (this.repositoryId!=null &&
               this.repositoryId.equals(other.getRepositoryId()))) &&
-            ((this.versionSeriesId==null && other.getVersionSeriesId()==null) || 
-             (this.versionSeriesId!=null &&
-              this.versionSeriesId.equals(other.getVersionSeriesId()))) &&
+            ((this.objectId==null && other.getObjectId()==null) || 
+             (this.objectId!=null &&
+              this.objectId.equals(other.getObjectId()))) &&
             ((this.filter==null && other.getFilter()==null) || 
              (this.filter!=null &&
               this.filter.equals(other.getFilter()))) &&
             ((this.includeAllowableActions==null && other.getIncludeAllowableActions()==null) || 
              (this.includeAllowableActions!=null &&
               this.includeAllowableActions.equals(other.getIncludeAllowableActions()))) &&
-            ((this.includeRelationships==null && other.getIncludeRelationships()==null) || 
-             (this.includeRelationships!=null &&
-              this.includeRelationships.equals(other.getIncludeRelationships())));
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -175,8 +182,8 @@ public class GetAllVersions  implements java.io.Serializable {
         if (getRepositoryId() != null) {
             _hashCode += getRepositoryId().hashCode();
         }
-        if (getVersionSeriesId() != null) {
-            _hashCode += getVersionSeriesId().hashCode();
+        if (getObjectId() != null) {
+            _hashCode += getObjectId().hashCode();
         }
         if (getFilter() != null) {
             _hashCode += getFilter().hashCode();
@@ -184,8 +191,8 @@ public class GetAllVersions  implements java.io.Serializable {
         if (getIncludeAllowableActions() != null) {
             _hashCode += getIncludeAllowableActions().hashCode();
         }
-        if (getIncludeRelationships() != null) {
-            _hashCode += getIncludeRelationships().hashCode();
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -196,37 +203,37 @@ public class GetAllVersions  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetAllVersions.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getAllVersions"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getAllVersions"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("versionSeriesId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "versionSeriesId"));
+        elemField.setFieldName("objectId");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objectId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("filter");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "filter"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "filter"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeAllowableActions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeAllowableActions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeAllowableActions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeRelationships");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRelationships"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumIncludeRelationships"));
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

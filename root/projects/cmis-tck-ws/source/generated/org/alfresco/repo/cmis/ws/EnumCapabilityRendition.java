@@ -58,7 +58,7 @@ public class EnumCapabilityRendition implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumCapabilityRendition.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityRendition"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityRendition"));
     }
     /**
      * Return type metadata object

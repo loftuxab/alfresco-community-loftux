@@ -23,10 +23,8 @@ public class EnumPropertyType implements java.io.Serializable {
     public static final java.lang.String _value4 = "datetime";
     public static final java.lang.String _value5 = "decimal";
     public static final java.lang.String _value6 = "html";
-    public static final java.lang.String _value7 = "xhtml";
-    public static final java.lang.String _value8 = "string";
-    public static final java.lang.String _value9 = "uri";
-    public static final java.lang.String _value10 = "xml";
+    public static final java.lang.String _value7 = "string";
+    public static final java.lang.String _value8 = "uri";
     public static final EnumPropertyType value1 = new EnumPropertyType(_value1);
     public static final EnumPropertyType value2 = new EnumPropertyType(_value2);
     public static final EnumPropertyType value3 = new EnumPropertyType(_value3);
@@ -35,8 +33,6 @@ public class EnumPropertyType implements java.io.Serializable {
     public static final EnumPropertyType value6 = new EnumPropertyType(_value6);
     public static final EnumPropertyType value7 = new EnumPropertyType(_value7);
     public static final EnumPropertyType value8 = new EnumPropertyType(_value8);
-    public static final EnumPropertyType value9 = new EnumPropertyType(_value9);
-    public static final EnumPropertyType value10 = new EnumPropertyType(_value10);
     public java.lang.String getValue() { return _value_;}
     public static EnumPropertyType fromValue(java.lang.String value)
           throws java.lang.IllegalArgumentException {
@@ -74,7 +70,7 @@ public class EnumPropertyType implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumPropertyType.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumPropertyType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumPropertyType"));
     }
     /**
      * Return type metadata object

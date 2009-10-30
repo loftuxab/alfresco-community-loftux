@@ -8,7 +8,7 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisACLCapabilityType  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.EnumACLPropagation setType;
+    private org.alfresco.repo.cmis.ws.EnumACLPropagation propagation;
 
     private org.alfresco.repo.cmis.ws.CmisPermissionDefinition[] permissions;
 
@@ -18,32 +18,32 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
     }
 
     public CmisACLCapabilityType(
-           org.alfresco.repo.cmis.ws.EnumACLPropagation setType,
+           org.alfresco.repo.cmis.ws.EnumACLPropagation propagation,
            org.alfresco.repo.cmis.ws.CmisPermissionDefinition[] permissions,
            org.alfresco.repo.cmis.ws.CmisPermissionMapping[] mapping) {
-           this.setType = setType;
+           this.propagation = propagation;
            this.permissions = permissions;
            this.mapping = mapping;
     }
 
 
     /**
-     * Gets the setType value for this CmisACLCapabilityType.
+     * Gets the propagation value for this CmisACLCapabilityType.
      * 
-     * @return setType
+     * @return propagation
      */
-    public org.alfresco.repo.cmis.ws.EnumACLPropagation getSetType() {
-        return setType;
+    public org.alfresco.repo.cmis.ws.EnumACLPropagation getPropagation() {
+        return propagation;
     }
 
 
     /**
-     * Sets the setType value for this CmisACLCapabilityType.
+     * Sets the propagation value for this CmisACLCapabilityType.
      * 
-     * @param setType
+     * @param propagation
      */
-    public void setSetType(org.alfresco.repo.cmis.ws.EnumACLPropagation setType) {
-        this.setType = setType;
+    public void setPropagation(org.alfresco.repo.cmis.ws.EnumACLPropagation propagation) {
+        this.propagation = propagation;
     }
 
 
@@ -114,9 +114,9 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.setType==null && other.getSetType()==null) || 
-             (this.setType!=null &&
-              this.setType.equals(other.getSetType()))) &&
+            ((this.propagation==null && other.getPropagation()==null) || 
+             (this.propagation!=null &&
+              this.propagation.equals(other.getPropagation()))) &&
             ((this.permissions==null && other.getPermissions()==null) || 
              (this.permissions!=null &&
               java.util.Arrays.equals(this.permissions, other.getPermissions()))) &&
@@ -134,8 +134,8 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getSetType() != null) {
-            _hashCode += getSetType().hashCode();
+        if (getPropagation() != null) {
+            _hashCode += getPropagation().hashCode();
         }
         if (getPermissions() != null) {
             for (int i=0;
@@ -168,24 +168,24 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(CmisACLCapabilityType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisACLCapabilityType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisACLCapabilityType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("setType");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "setType"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumACLPropagation"));
+        elemField.setFieldName("propagation");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propagation"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumACLPropagation"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("permissions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "permissions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPermissionDefinition"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "permissions"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPermissionDefinition"));
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("mapping");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "mapping"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPermissionMapping"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "mapping"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPermissionMapping"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);

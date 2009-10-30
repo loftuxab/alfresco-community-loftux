@@ -25,24 +25,22 @@
 package org.alfresco.cmis.test.ws;
 
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.repo.cmis.ws.CancelCheckOut;
-import org.alfresco.repo.cmis.ws.CheckIn;
 import org.alfresco.repo.cmis.ws.CheckInResponse;
-import org.alfresco.repo.cmis.ws.CheckOut;
 import org.alfresco.repo.cmis.ws.CheckOutResponse;
-import org.alfresco.repo.cmis.ws.CmisContentStreamType;
 import org.alfresco.repo.cmis.ws.CmisObjectType;
 import org.alfresco.repo.cmis.ws.CmisPropertiesType;
+import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
 import org.alfresco.repo.cmis.ws.DiscoveryServicePortBindingStub;
-import org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds;
 import org.alfresco.repo.cmis.ws.EnumCapabilityChanges;
 import org.alfresco.repo.cmis.ws.EnumCapabilityQuery;
-import org.alfresco.repo.cmis.ws.EnumPropertiesBase;
+import org.alfresco.repo.cmis.ws.EnumIncludeRelationships;
+import org.alfresco.repo.cmis.ws.EnumServiceException;
 import org.alfresco.repo.cmis.ws.GetContentChanges;
 import org.alfresco.repo.cmis.ws.GetContentChangesResponse;
-import org.alfresco.repo.cmis.ws.GetProperties;
-import org.alfresco.repo.cmis.ws.GetPropertiesResponse;
 import org.alfresco.repo.cmis.ws.Query;
 import org.alfresco.repo.cmis.ws.QueryResponse;
 import org.apache.commons.logging.Log;
@@ -93,9 +91,9 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         Query request = new Query();
         request.setRepositoryId(getAndAssertRepositoryId());
         request.setMaxItems(BigInteger.valueOf(10));
-        request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1);
+        request.setStatement("SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue());
         discoveryServicePort.query(request);
-        discoveryServicePort.getContentChanges(new GetContentChanges(getAndAssertRepositoryId(), null, BigInteger.TEN, true, true, "*"));
+        discoveryServicePort.getContentChanges(new GetContentChanges(getAndAssertRepositoryId(), null, false, "*", false, false, BigInteger.TEN, null));
     }
 
     @Override
@@ -149,26 +147,20 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testQueryAll()
+    public void testQueryAll() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryAll was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryAll() was skipped: Metadata query isn't supported");
         }
         else
         {
-            Query request = new Query();
-            request.setRepositoryId(getAndAssertRepositoryId());
-            request.setMaxItems(BigInteger.valueOf(10));
-            request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1);
+            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue();
             try
             {
-                LOGGER.info("[DiscoveryService->query]");
-                QueryResponse queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                assertNotNull("Query response is NULL", queryResponse);
-                assertNotNull("Query response is NULL", queryResponse.getObject());
-                assertTrue("Query response contains more objects than was expected", queryResponse.getObject().length <= 10);
+                QueryResponse queryResponse = queryAndAssert(statement, false, false, null, null, 10L, null);
+                assertTrue("Query response contains more objects than was expected", queryResponse.getObjects().getObjects().length <= 10);
             }
             catch (Exception e)
             {
@@ -177,28 +169,22 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testQueryOrder()
+    public void testQueryOrder() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryOrder was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryOrder() was skipped: Metadata query isn't supported");
         }
         else
         {
-            Query request = new Query();
-            request.setRepositoryId(getAndAssertRepositoryId());
-            request.setMaxItems(BigInteger.valueOf(10));
-            request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1 + " ORDER BY " + EnumPropertiesBase._value1 + " ASC");
+            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " ORDER BY " + PROP_NAME + " ASC";
             try
             {
-                LOGGER.info("[DiscoveryService->query]");
-                QueryResponse queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                assertNotNull("Query response is NULL", queryResponse);
-                assertNotNull("Query response is NULL", queryResponse.getObject());
-                assertTrue("Query response contains more objects than was expected", queryResponse.getObject().length <= 10);
-                String name1 = getStringProperty(queryResponse.getObject()[0].getProperties(), EnumPropertiesBase._value1);
-                String name2 = getStringProperty(queryResponse.getObject()[queryResponse.getObject().length - 1].getProperties(), EnumPropertiesBase._value1);
+                QueryResponse queryResponse = queryAndAssert(statement, false, false, EnumIncludeRelationships.none, null, 10L, null);
+                assertTrue("Query response contains more objects than was expected", queryResponse.getObjects().getObjects().length <= 10);
+                String name1 = getStringProperty(queryResponse.getObjects().getObjects()[0].getProperties(), PROP_NAME);
+                String name2 = getStringProperty(queryResponse.getObjects().getObjects()[queryResponse.getObjects().getObjects().length - 1].getProperties(), PROP_NAME);
                 assertTrue("Query response objects are not ordered", name1.compareTo(name2) <= 0);
             }
             catch (Exception e)
@@ -208,68 +194,73 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testQueryField()
+    private QueryResponse queryAndAssert(String statement, boolean searchAllVersions, boolean includeAllowableActions, EnumIncludeRelationships includeRelationships,
+            String renditionFilter, Long maxItems, Long skipCount) throws Exception
+    {
+        QueryResponse queryResponse = null;
+        try
+        {
+            LOGGER.info("[DiscoveryService->query]");
+            queryResponse = getServicesFactory().getDiscoveryService().query(
+                    new Query(getAndAssertRepositoryId(), statement, searchAllVersions, includeAllowableActions, includeRelationships, renditionFilter, BigInteger
+                            .valueOf(maxItems), BigInteger.valueOf(skipCount), null));
+        }
+        catch (Exception e)
+        {
+            fail(e.toString());
+        }
+        assertNotNull("Query response is NULL", queryResponse);
+        assertNotNull("Query response is NULL", queryResponse.getObjects());
+        assertNotNull("Query response is NULL", queryResponse.getObjects().getObjects());
+        return queryResponse;
+    }
+
+    public void testQueryField() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryField was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryField() was skipped: Metadata query isn't supported");
         }
         else
         {
-            Query request = new Query();
-            request.setRepositoryId(getAndAssertRepositoryId());
-            request.setMaxItems(BigInteger.valueOf(10));
-            request.setStatement("SELECT " + EnumPropertiesBase._value1 + " FROM " + EnumBaseObjectTypeIds._value1);
-            try
+            String statement = "SELECT " + PROP_NAME + " FROM " + BASE_TYPE_DOCUMENT.getValue();
+            QueryResponse queryResponse = queryAndAssert(statement, false, false, null, null, 10L, null);
+            assertTrue("Query response contains more objects than was expected", queryResponse.getObjects().getObjects().length <= 10);
+            for (CmisObjectType object : queryResponse.getObjects().getObjects())
             {
-                LOGGER.info("[DiscoveryService->query]");
-                QueryResponse queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                assertNotNull("Query response is NULL", queryResponse);
-                assertNotNull("Query response is NULL", queryResponse.getObject());
-                assertTrue("Query response contains more objects than was expected", queryResponse.getObject().length <= 10);
-            }
-            catch (Exception e)
-            {
-                fail(e.toString());
+                assertNotNull("Invalid Query response: one of the result Objects is in 'not set' state solely", object);
+                CmisPropertiesType properties = object.getProperties();
+                assertNotNull("Object Properties are undefined", properties);
+                int amount = properties.getPropertyBoolean().length + properties.getPropertyDateTime().length + properties.getPropertyDecimal().length
+                        + properties.getPropertyHtml().length + properties.getPropertyId().length + properties.getPropertyInteger().length + properties.getPropertyString().length
+                        + properties.getPropertyUri().length;
+                assertEquals(1, amount);
             }
         }
     }
 
-    public void testQueryOffset()
+    public void testQueryPagination() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryOffset was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryOffset() was skipped: Metadata query isn't supported");
         }
         else
         {
             CmisObjectType objectType1 = null;
             CmisObjectType objectType2 = null;
-            Query request = new Query();
-            request.setRepositoryId(getAndAssertRepositoryId());
-            request.setMaxItems(BigInteger.valueOf(2));
-            request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1);
+            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue();
             try
             {
-                LOGGER.info("[DiscoveryService->query]");
-                QueryResponse queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                assertNotNull("Query response is NULL", queryResponse);
-                assertNotNull("Query response is NULL", queryResponse.getObject());
-                assertTrue("Query response contains more objects than was expected", queryResponse.getObject().length <= 2);
-                objectType1 = queryResponse.getObject(1);
-
-                request.setSkipCount(BigInteger.valueOf(1));
-                request.setMaxItems(BigInteger.valueOf(1));
-                LOGGER.info("[DiscoveryService->query]");
-                queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                assertNotNull("Query response is NULL", queryResponse);
-                assertNotNull("Query response is NULL", queryResponse.getObject());
-                assertTrue("Query response contains more objects than was expected", queryResponse.getObject().length <= 1);
-                objectType2 = queryResponse.getObject(0);
-
-                assertEquals("Offset value changes doesn't affect query result", objectType1, objectType2);
+                QueryResponse queryResponse = queryAndAssert(statement, false, false, null, null, 2L, null);
+                assertTrue("Query response contains more objects than was expected", queryResponse.getObjects().getObjects().length <= 2);
+                objectType1 = queryResponse.getObjects().getObjects(1);
+                queryResponse = queryAndAssert(statement, false, false, null, null, 1L, 1L);
+                assertTrue("Query response contains more objects than was expected", queryResponse.getObjects().getObjects().length <= 1);
+                objectType2 = queryResponse.getObjects().getObjects(0);
+                assertEquals("Unexpected Object in Query response after Offsetting", objectType1, objectType2);
             }
             catch (Exception e)
             {
@@ -278,45 +269,23 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testQueryWhere()
+    // TODO: renditionFilter
+
+    public void testQueryWhere() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryWhere was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryWhere() was skipped: Metadata query isn't supported");
         }
         else
         {
-            String name = null;
-            try
-            {
-                GetPropertiesResponse response = null;
-                try
-                {
-                    LOGGER.info("[ObjectService->getProperties]");
-                    response = getServicesFactory().getObjectService().getProperties(new GetProperties(getAndAssertRepositoryId(), documentsIds[0], null, null, null, null));
-                }
-                catch (Exception e)
-                {
-                    fail(e.toString());
-                }
-                name = getStringProperty(response.getObject().getProperties(), EnumPropertiesBase._value1);
-
-                Query request = new Query();
-                request.setRepositoryId(getAndAssertRepositoryId());
-                request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1 + " WHERE " + EnumPropertiesBase._value1 + "='" + name + "'");
-                LOGGER.info("[DiscoveryService->query]");
-                QueryResponse queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                assertNotNull("Query response is NULL", queryResponse);
-                assertNotNull("Query response is NULL", queryResponse.getObject());
-                String resultId = getIdProperty(queryResponse.getObject()[0].getProperties(), EnumPropertiesBase._value2);
-
-                assertEquals("'WHERE' clause doesn't affect query result", documentsIds[0], resultId);
-            }
-            catch (Exception e)
-            {
-                fail(e.toString());
-            }
+            CmisPropertiesType response = getAndAssertObjectProperties(documentsIds[0], PROP_NAME);
+            String name = getStringProperty(response, PROP_NAME);
+            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE " + PROP_NAME + "='" + name + "'";
+            QueryResponse queryResponse = queryAndAssert(statement, false, false, null, null, null, null);
+            String resultId = getIdProperty(queryResponse.getObjects().getObjects()[0].getProperties(), PROP_OBJECT_ID);
+            assertEquals("'WHERE' clause was resulted with invalid Object", documentsIds[0], resultId);
         }
     }
 
@@ -325,22 +294,25 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testNonValidQuery was skipped: Metadata query isn't supported");
+            LOGGER.warn("testNonValidQuery() was skipped: Metadata query isn't supported");
         }
         else
         {
             Query request = new Query();
             request.setRepositoryId(getAndAssertRepositoryId());
-            request.setStatement("SELECT * FROM NonValidType");
+            request.setStatement("SELECT * FROM InvalidTypeId");
             try
             {
                 LOGGER.info("[DiscoveryService->query]");
                 getServicesFactory().getDiscoveryService().query(request);
-                fail("No Exception was thrown");
+                fail("No Exception was thrown during executing Query with wrong Statement");
             }
             catch (Exception e)
             {
-                // expected
+                Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
+                expectedExceptions.add(EnumServiceException.invalidArgument);
+                expectedExceptions.add(EnumServiceException.runtime);
+                assertException("Executing Query with wrong Statement", e, expectedExceptions);
             }
         }
     }
@@ -350,111 +322,95 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryPWCSearchable was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryPWCSearchable() was skipped: Metadata query isn't supported");
         }
         else
         {
             if (isVersioningAllowed())
             {
                 String documentId = createAndAssertDocument();
-                LOGGER.info("[VersioningService->checkOut]");
-                CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId));
-                Query request = new Query();
-                request.setRepositoryId(getAndAssertRepositoryId());
-                request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1 + " WHERE " + EnumPropertiesBase._value2 + "='" + checkOutResponse.getDocumentId() + "'");
+                CheckOutResponse checkOutResponse = checkOutAndAssert(documentId);
+                String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE " + PROP_OBJECT_ID + "='" + checkOutResponse.getDocumentId() + "'";
                 QueryResponse queryResponse = null;
                 try
                 {
-                    LOGGER.info("[DiscoveryService->query]");
-                    queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                }
-                catch (Exception e)
-                {
-                    fail(e.toString());
+                    queryResponse = queryAndAssert(statement, false, false, null, null, null, null);
                 }
                 finally
                 {
                     LOGGER.info("[VersioningService->cancelCheckOut]");
-                    getServicesFactory().getVersioningService().cancelCheckOut(new CancelCheckOut(getAndAssertRepositoryId(), checkOutResponse.getDocumentId()));
+                    getServicesFactory().getVersioningService().cancelCheckOut(new CancelCheckOut(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), null));
                     deleteAndAssertObject(documentId);
                 }
                 if (getAndAssertCapabilities().isCapabilityPWCSearchable())
                 {
-                    assertNotNull("Query response is NULL", queryResponse);
-                    assertNotNull("Query response is NULL", queryResponse.getObject());
-                    assertTrue("PWC was not found", queryResponse.getObject().length == 1);
+                    assertEquals("PWC was not found", 1, queryResponse.getObjects().getObjects().length);
                 }
                 else
                 {
-                    assertTrue("PWC is not searchable, but was found", queryResponse == null || queryResponse.getObject() == null || queryResponse.getObject().length == 0);
+                    assertTrue("PWC is not searchable but was found", queryResponse.getObjects().getObjects().length < 1);
                 }
             }
             else
             {
-                LOGGER.info("testQueryPWCSearchable was skipped: Versioning isn't supported");
+                LOGGER.warn("testQueryPWCSearchable() was skipped: Versioning isn't supported");
             }
         }
     }
 
     public void testQueryAllVersionsSearchable() throws Exception
     {
-        if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
-                || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
+        CmisRepositoryCapabilitiesType capabilities = getAndAssertCapabilities();
+        if (EnumCapabilityQuery.none.equals(capabilities.getCapabilityQuery()) || EnumCapabilityQuery.fulltextonly.equals(capabilities.getCapabilityQuery()))
         {
-            LOGGER.info("testQueryAllVersionsSearchable was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryAllVersionsSearchable() was skipped: Metadata querying isn't supported");
         }
         else
         {
             if (isVersioningAllowed())
             {
-                String name = generateTestFileName();
-                String documentId = createAndAssertDocument(name, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null);
-                LOGGER.info("[VersioningService->checkOut]");
-                CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId));
-                LOGGER.info("[VersioningService->checkIn]");
-                CheckInResponse checkInResponse = getServicesFactory().getVersioningService().checkIn(
-                        new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0),
-                                "text/plain", name, null, "Test content".getBytes(), null), "", null, null, null));
-                LOGGER.info("[VersioningService->checkOut]");
-                checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), checkInResponse.getDocumentId()));
-                LOGGER.info("[VersioningService->checkIn]");
-                documentId = getServicesFactory().getVersioningService().checkIn(
-                        new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0),
-                                "text/plain", name, null, "Test content".getBytes(), null), "", null, null, null)).getDocumentId();
-                Query request = new Query();
-                request.setRepositoryId(getAndAssertRepositoryId());
-                request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1 + " WHERE " + EnumPropertiesBase._value2 + "='" + checkInResponse.getDocumentId() + "'");
-                request.setSearchAllVersions(true);
+                String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null);
+                CheckInResponse checkInResponse = new CheckInResponse(documentId, null);
+                for (int i = 0; i < 2; i++)
+                {
+                    CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getDocumentId());
+                    checkInResponse = checkInAndAssert(checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), createUniqueContentStream(), "");
+                }
+                CmisObjectType[] allVersions = getAndAssertAllVersions(checkInResponse.getDocumentId(), "*", false);
+                String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE " + PROP_PARENT_ID + "='" + getAndAssertRootFolderId() + "'";
                 QueryResponse queryResponse = null;
                 try
                 {
-                    LOGGER.info("[DiscoveryService->query]");
-                    queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                }
-                catch (Exception e)
-                {
-                    fail(e.toString());
+                    queryResponse = queryAndAssert(statement, true, false, null, null, null, null);
                 }
                 finally
                 {
-                    deleteAndAssertObject(documentId);
+                    deleteAndAssertObject(documentId, true);
                 }
-                if (getAndAssertCapabilities().isCapabilityAllVersionsSearchable())
+                Set<String> responseIds = new HashSet<String>();
+                for (CmisObjectType object : queryResponse.getObjects().getObjects())
                 {
-                    assertNotNull("Query response is NULL", queryResponse);
-                    assertNotNull("Query response is NULL", queryResponse.getObject());
-                    assertEquals("Particular version of the document was not found", getIdProperty(queryResponse.getObject()[0].getProperties(), EnumPropertiesBase._value2),
-                            checkOutResponse.getDocumentId());
+                    assertNotNull("Invalid Query response: one of the Objects is in 'not set' state solely", object);
+                    responseIds.add(getIdProperty(object.getProperties(), PROP_OBJECT_ID));
                 }
-                else
+                for (CmisObjectType object : allVersions)
                 {
-                    assertTrue("All versions is not searchable, but not latest version of document was found", queryResponse == null || queryResponse.getObject() == null
-                            || queryResponse.getObject().length == 0);
+                    assertNotNull("Invalid Version Objects collection: one of the Version Objects is in 'not set' state solely", object);
+                    if (capabilities.isCapabilityAllVersionsSearchable())
+                    {
+                        assertTrue("All Versions Searchable capability is supported but Version Objects was not returned", responseIds.contains(getIdProperty(object
+                                .getProperties(), PROP_OBJECT_ID)));
+                    }
+                    else
+                    {
+                        assertFalse("All Versions Searchable capability is not supported but Version Objects was returned", responseIds.contains(getIdProperty(object
+                                .getProperties(), PROP_OBJECT_ID)));
+                    }
                 }
             }
             else
             {
-                LOGGER.info("testQueryAllVersionsSearchable was skipped: Versioning isn't supported");
+                LOGGER.warn("testQueryAllVersionsSearchable() was skipped: Versioning isn't supported");
             }
         }
     }
@@ -464,85 +420,130 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.metadataonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryFullText was skipped: Full text query isn't supported");
+            LOGGER.info("testQueryFullText() was skipped: Full Text querying isn't supported");
         }
         else
         {
             if (isContentStreamAllowed())
             {
-                String content = "Test cnt" + System.currentTimeMillis();
+                String content = createTestContnet();
                 String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, content, null);
-
-                Query request = new Query();
-                request.setRepositoryId(getAndAssertRepositoryId());
-                request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1 + " WHERE CONTAINS('" + content + "')");
+                String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT + " WHERE CONTAINS('" + content + "')";
                 QueryResponse queryResponse = null;
                 try
                 {
-                    LOGGER.info("[DiscoveryService->query]");
-                    queryResponse = getServicesFactory().getDiscoveryService().query(request);
-                }
-                catch (Exception e)
-                {
-                    fail(e.toString());
+                    queryResponse = queryAndAssert(statement, false, false, null, null, null, null);
                 }
                 finally
                 {
                     deleteAndAssertObject(documentId);
                 }
-                assertNotNull("Query response is NULL", queryResponse);
-                assertNotNull("Query response is NULL", queryResponse.getObject());
                 boolean found = false;
-                for (int i = 0; !found && i < queryResponse.getObject().length; i++)
+                for (int i = 0; !found && (i < queryResponse.getObjects().getObjects().length); i++)
                 {
-                    found = documentId.equals(getIdProperty(queryResponse.getObject()[0].getProperties(), EnumPropertiesBase._value2));
+                    found = documentId.equals(getIdProperty(queryResponse.getObjects().getObjects()[i].getProperties(), PROP_OBJECT_ID));
                 }
-                assertTrue("Fulltext search is supported, but document was not found", found);
+                assertTrue("Full Text Search is supported but Document was not found by content", found);
             }
             else
             {
-                LOGGER.info("testQueryFullText was skipped: Content stream isn't allowed");
+                LOGGER.info("testQueryFullText() was skipped: Content stream isn't allowed");
             }
         }
     }
 
-    public void testQueryAllowableActions()
+    public void testQueryAllowableActions() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
         {
-            LOGGER.info("testQueryAllowableActions was skipped: Metadata query isn't supported");
+            LOGGER.warn("testQueryAllowableActions() was skipped: Metadata query isn't supported");
         }
-        Query request = new Query();
-        request.setRepositoryId(getAndAssertRepositoryId());
-        request.setMaxItems(BigInteger.valueOf(10));
-        request.setIncludeAllowableActions(true);
-        request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1);
-        try
+        else
         {
-            LOGGER.info("[DiscoveryService->query]");
-            QueryResponse queryResponse = getServicesFactory().getDiscoveryService().query(request);
-            assertNotNull("Query response is NULL", queryResponse);
-            assertNotNull("Query response is NULL", queryResponse.getObject());
-            assertTrue("Query response contains more objects than was expected", queryResponse.getObject().length <= 10);
-            assertTrue("No allowable actions were returned", queryResponse.getObject()[0].getAllowableActions() != null);
-        }
-        catch (Exception e)
-        {
-            fail(e.toString());
+            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue();
+            QueryResponse queryResponse = queryAndAssert(statement, false, true, null, null, null, null);
+            for (CmisObjectType object : queryResponse.getObjects().getObjects())
+            {
+                assertNotNull("Invalid Query response: one of the Objects is in 'not set' state solely", object);
+                assertNotNull("Allowable Actions were not returned in Query response", object.getAllowableActions());
+                assertTrue("It is denied Getting Properties for Current User Principals", object.getAllowableActions().getCanGetProperties());
+            }
         }
     }
 
-    public void testGetContentChanges()
+    // TODO: (in the next version of tests) selecting properties from several different tables with incldueAllowableActions equal to 'true' and 'false'
+
+    public void testQueryRelationships() throws Exception
     {
-        if (!getAndAssertCapabilities().getCapabilityChanges().equals(EnumCapabilityChanges.none))
+        if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
+                || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
+        {
+            LOGGER.warn("testQueryRelationships() was skipped: Metadata query isn't supported");
+        }
+        else
+        {
+            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue();
+            EnumIncludeRelationships[] relationshipInclusionRules = new EnumIncludeRelationships[] { EnumIncludeRelationships.none, EnumIncludeRelationships.both,
+                    EnumIncludeRelationships.source, EnumIncludeRelationships.target };
+            for (EnumIncludeRelationships rule : relationshipInclusionRules)
+            {
+                QueryResponse queryResponse = queryAndAssert(statement, false, false, rule, null, null, null);
+                assertRelationships(queryResponse, rule);
+            }
+        }
+    }
+
+    private void assertRelationships(QueryResponse queryResponse, EnumIncludeRelationships includeRelationships) throws Exception
+    {
+        for (CmisObjectType object : queryResponse.getObjects().getObjects())
+        {
+            assertNotNull("Invalid Query response: one of the Objects is in 'not set' state solely", object);
+            if (EnumIncludeRelationships.none.equals(includeRelationships))
+            {
+                assertNull("Relationships were returned for one of the Objects with includeRelationships parameter equal to 'NONE'", object.getRelationship());
+            }
+            else
+            {
+                assertNotNull("Relationships were not returned for one of the Objects", object.getRelationship());
+                String objectId = getIdProperty(object.getProperties(), PROP_OBJECT_ID);
+                for (CmisObjectType relationship : object.getRelationship())
+                {
+                    assertNotNull("Invalid Relationships collection in Query response: one of the Relationship Objects in 'not set' state solely", relationship);
+                    String sourceId = getIdProperty(relationship.getProperties(), PROP_SOURCE_ID);
+                    String targetId = getIdProperty(relationship.getProperties(), PROP_TARGET_ID);
+                    if (EnumIncludeRelationships.source.equals(includeRelationships))
+                    {
+                        assertEquals(objectId, sourceId);
+                    }
+                    else
+                    {
+                        if (EnumIncludeRelationships.target.equals(includeRelationships))
+                        {
+                            assertEquals(objectId, targetId);
+                        }
+                        else
+                        {
+                            assertTrue(("Object with Id='" + objectId + "' MUST be either Source or Target Object of each Relationship Object"), objectId.equals(sourceId)
+                                    || objectId.equals(targetId));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void testGetContentChanges() throws Exception
+    {
+        if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()))
         {
             try
             {
                 LOGGER.info("[DiscoveryService->getContentChanges]");
+                // TODO: changeLogToken
                 GetContentChangesResponse response = getServicesFactory().getDiscoveryService().getContentChanges(
-                        new GetContentChanges(getAndAssertRepositoryId(), null, null, null, null, null));
-                assertNotNull("getContentChanges response is NULL", response);
+                        new GetContentChanges(getAndAssertRepositoryId(), null, false, "*", false, false, null, null));
+                assertNotNull("Get Content Changes response is undefined", response);
             }
             catch (Exception e)
             {
@@ -551,7 +552,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
         else
         {
-            LOGGER.info("testGetContentChanges was skipped: Capability changes not supported");
+            LOGGER.warn("testGetContentChanges() was skipped: Changes capability is not supported");
         }
     }
 }

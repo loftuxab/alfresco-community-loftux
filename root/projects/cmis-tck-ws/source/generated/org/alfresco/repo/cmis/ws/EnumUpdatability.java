@@ -20,9 +20,11 @@ public class EnumUpdatability implements java.io.Serializable {
     public static final java.lang.String _readonly = "readonly";
     public static final java.lang.String _readwrite = "readwrite";
     public static final java.lang.String _whencheckedout = "whencheckedout";
+    public static final java.lang.String _oncreate = "oncreate";
     public static final EnumUpdatability readonly = new EnumUpdatability(_readonly);
     public static final EnumUpdatability readwrite = new EnumUpdatability(_readwrite);
     public static final EnumUpdatability whencheckedout = new EnumUpdatability(_whencheckedout);
+    public static final EnumUpdatability oncreate = new EnumUpdatability(_oncreate);
     public java.lang.String getValue() { return _value_;}
     public static EnumUpdatability fromValue(java.lang.String value)
           throws java.lang.IllegalArgumentException {
@@ -60,7 +62,7 @@ public class EnumUpdatability implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumUpdatability.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumUpdatability"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumUpdatability"));
     }
     /**
      * Return type metadata object

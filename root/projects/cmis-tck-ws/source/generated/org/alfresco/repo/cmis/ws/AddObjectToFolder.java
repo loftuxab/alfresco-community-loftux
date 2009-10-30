@@ -14,16 +14,27 @@ public class AddObjectToFolder  implements java.io.Serializable {
 
     private java.lang.String folderId;
 
+    private java.lang.Boolean allVersions;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
+
     public AddObjectToFolder() {
     }
 
     public AddObjectToFolder(
            java.lang.String repositoryId,
            java.lang.String objectId,
-           java.lang.String folderId) {
+           java.lang.String folderId,
+           java.lang.Boolean allVersions,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.objectId = objectId;
            this.folderId = folderId;
+           this.allVersions = allVersions;
+           this.extension = extension;
     }
 
 
@@ -86,6 +97,50 @@ public class AddObjectToFolder  implements java.io.Serializable {
         this.folderId = folderId;
     }
 
+
+    /**
+     * Gets the allVersions value for this AddObjectToFolder.
+     * 
+     * @return allVersions
+     */
+    public java.lang.Boolean getAllVersions() {
+        return allVersions;
+    }
+
+
+    /**
+     * Sets the allVersions value for this AddObjectToFolder.
+     * 
+     * @param allVersions
+     */
+    public void setAllVersions(java.lang.Boolean allVersions) {
+        this.allVersions = allVersions;
+    }
+
+
+    /**
+     * Gets the extension value for this AddObjectToFolder.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this AddObjectToFolder.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof AddObjectToFolder)) return false;
@@ -106,7 +161,13 @@ public class AddObjectToFolder  implements java.io.Serializable {
               this.objectId.equals(other.getObjectId()))) &&
             ((this.folderId==null && other.getFolderId()==null) || 
              (this.folderId!=null &&
-              this.folderId.equals(other.getFolderId())));
+              this.folderId.equals(other.getFolderId()))) &&
+            ((this.allVersions==null && other.getAllVersions()==null) || 
+             (this.allVersions!=null &&
+              this.allVersions.equals(other.getAllVersions()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -127,6 +188,12 @@ public class AddObjectToFolder  implements java.io.Serializable {
         if (getFolderId() != null) {
             _hashCode += getFolderId().hashCode();
         }
+        if (getAllVersions() != null) {
+            _hashCode += getAllVersions().hashCode();
+        }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -136,24 +203,38 @@ public class AddObjectToFolder  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(AddObjectToFolder.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">addObjectToFolder"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">addObjectToFolder"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("objectId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "objectId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objectId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("folderId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "folderId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "folderId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("allVersions");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "allVersions"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

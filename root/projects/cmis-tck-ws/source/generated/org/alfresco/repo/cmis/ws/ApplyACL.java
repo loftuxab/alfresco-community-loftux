@@ -16,7 +16,12 @@ public class ApplyACL  implements java.io.Serializable {
 
     private org.alfresco.repo.cmis.ws.CmisAccessControlListType removeACEs;
 
-    private org.alfresco.repo.cmis.ws.EnumACLPropagation propogationType;
+    private org.alfresco.repo.cmis.ws.EnumACLPropagation ACLPropagation;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public ApplyACL() {
     }
@@ -26,12 +31,14 @@ public class ApplyACL  implements java.io.Serializable {
            java.lang.String objectId,
            org.alfresco.repo.cmis.ws.CmisAccessControlListType addACEs,
            org.alfresco.repo.cmis.ws.CmisAccessControlListType removeACEs,
-           org.alfresco.repo.cmis.ws.EnumACLPropagation propogationType) {
+           org.alfresco.repo.cmis.ws.EnumACLPropagation ACLPropagation,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.objectId = objectId;
            this.addACEs = addACEs;
            this.removeACEs = removeACEs;
-           this.propogationType = propogationType;
+           this.ACLPropagation = ACLPropagation;
+           this.extension = extension;
     }
 
 
@@ -116,22 +123,46 @@ public class ApplyACL  implements java.io.Serializable {
 
 
     /**
-     * Gets the propogationType value for this ApplyACL.
+     * Gets the ACLPropagation value for this ApplyACL.
      * 
-     * @return propogationType
+     * @return ACLPropagation
      */
-    public org.alfresco.repo.cmis.ws.EnumACLPropagation getPropogationType() {
-        return propogationType;
+    public org.alfresco.repo.cmis.ws.EnumACLPropagation getACLPropagation() {
+        return ACLPropagation;
     }
 
 
     /**
-     * Sets the propogationType value for this ApplyACL.
+     * Sets the ACLPropagation value for this ApplyACL.
      * 
-     * @param propogationType
+     * @param ACLPropagation
      */
-    public void setPropogationType(org.alfresco.repo.cmis.ws.EnumACLPropagation propogationType) {
-        this.propogationType = propogationType;
+    public void setACLPropagation(org.alfresco.repo.cmis.ws.EnumACLPropagation ACLPropagation) {
+        this.ACLPropagation = ACLPropagation;
+    }
+
+
+    /**
+     * Gets the extension value for this ApplyACL.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this ApplyACL.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -158,9 +189,12 @@ public class ApplyACL  implements java.io.Serializable {
             ((this.removeACEs==null && other.getRemoveACEs()==null) || 
              (this.removeACEs!=null &&
               this.removeACEs.equals(other.getRemoveACEs()))) &&
-            ((this.propogationType==null && other.getPropogationType()==null) || 
-             (this.propogationType!=null &&
-              this.propogationType.equals(other.getPropogationType())));
+            ((this.ACLPropagation==null && other.getACLPropagation()==null) || 
+             (this.ACLPropagation!=null &&
+              this.ACLPropagation.equals(other.getACLPropagation()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -184,8 +218,11 @@ public class ApplyACL  implements java.io.Serializable {
         if (getRemoveACEs() != null) {
             _hashCode += getRemoveACEs().hashCode();
         }
-        if (getPropogationType() != null) {
-            _hashCode += getPropogationType().hashCode();
+        if (getACLPropagation() != null) {
+            _hashCode += getACLPropagation().hashCode();
+        }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -196,35 +233,44 @@ public class ApplyACL  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(ApplyACL.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">applyACL"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">applyACL"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("objectId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "objectId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objectId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("addACEs");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "addACEs"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlListType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "addACEs"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAccessControlListType"));
+        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("removeACEs");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "removeACEs"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlListType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "removeACEs"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAccessControlListType"));
+        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("propogationType");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "propogationType"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumACLPropagation"));
+        elemField.setFieldName("ACLPropagation");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "ACLPropagation"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumACLPropagation"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

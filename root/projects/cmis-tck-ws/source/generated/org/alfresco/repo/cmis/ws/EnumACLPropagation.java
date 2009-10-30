@@ -17,12 +17,12 @@ public class EnumACLPropagation implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _value1 = "repository-determined";
-    public static final java.lang.String _value2 = "object-only";
-    public static final java.lang.String _value3 = "propagate";
-    public static final EnumACLPropagation value1 = new EnumACLPropagation(_value1);
-    public static final EnumACLPropagation value2 = new EnumACLPropagation(_value2);
-    public static final EnumACLPropagation value3 = new EnumACLPropagation(_value3);
+    public static final java.lang.String _repositorydetermined = "repositorydetermined";
+    public static final java.lang.String _objectonly = "objectonly";
+    public static final java.lang.String _propagate = "propagate";
+    public static final EnumACLPropagation repositorydetermined = new EnumACLPropagation(_repositorydetermined);
+    public static final EnumACLPropagation objectonly = new EnumACLPropagation(_objectonly);
+    public static final EnumACLPropagation propagate = new EnumACLPropagation(_propagate);
     public java.lang.String getValue() { return _value_;}
     public static EnumACLPropagation fromValue(java.lang.String value)
           throws java.lang.IllegalArgumentException {
@@ -60,7 +60,7 @@ public class EnumACLPropagation implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumACLPropagation.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumACLPropagation"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumACLPropagation"));
     }
     /**
      * Return type metadata object

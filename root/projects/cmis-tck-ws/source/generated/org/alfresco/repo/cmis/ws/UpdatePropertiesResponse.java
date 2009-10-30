@@ -12,14 +12,21 @@ public class UpdatePropertiesResponse  implements java.io.Serializable {
 
     private java.lang.String changeToken;
 
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
+
     public UpdatePropertiesResponse() {
     }
 
     public UpdatePropertiesResponse(
            java.lang.String objectId,
-           java.lang.String changeToken) {
+           java.lang.String changeToken,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.objectId = objectId;
            this.changeToken = changeToken;
+           this.extension = extension;
     }
 
 
@@ -62,6 +69,30 @@ public class UpdatePropertiesResponse  implements java.io.Serializable {
         this.changeToken = changeToken;
     }
 
+
+    /**
+     * Gets the extension value for this UpdatePropertiesResponse.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this UpdatePropertiesResponse.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof UpdatePropertiesResponse)) return false;
@@ -79,7 +110,10 @@ public class UpdatePropertiesResponse  implements java.io.Serializable {
               this.objectId.equals(other.getObjectId()))) &&
             ((this.changeToken==null && other.getChangeToken()==null) || 
              (this.changeToken!=null &&
-              this.changeToken.equals(other.getChangeToken())));
+              this.changeToken.equals(other.getChangeToken()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -97,6 +131,9 @@ public class UpdatePropertiesResponse  implements java.io.Serializable {
         if (getChangeToken() != null) {
             _hashCode += getChangeToken().hashCode();
         }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -106,19 +143,26 @@ public class UpdatePropertiesResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(UpdatePropertiesResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">updatePropertiesResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">updatePropertiesResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("objectId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "objectId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objectId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("changeToken");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "changeToken"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "changeToken"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

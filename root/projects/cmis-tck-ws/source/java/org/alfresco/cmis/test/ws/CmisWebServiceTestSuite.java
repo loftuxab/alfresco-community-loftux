@@ -193,8 +193,8 @@ public class CmisWebServiceTestSuite extends TestSuite
         protected void printFooter(TestResult result)
         {
             LOGGER.info("----------------------------");
-            LOGGER.info("Passed: " + (result.runCount() - result.failureCount() - result.errorCount()));
-            LOGGER.info("Failed: " + (result.failureCount() + result.errorCount()));
+            LOGGER.info("Passed:   " + (result.runCount() - result.failureCount() - result.errorCount()));
+            LOGGER.info("Failed:   " + (result.failureCount() + result.errorCount()));
             LOGGER.info("Executed: " + result.runCount());
             LOGGER.info("----------------------------");
             LOGGER.info("");

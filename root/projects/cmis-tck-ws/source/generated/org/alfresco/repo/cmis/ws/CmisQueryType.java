@@ -14,15 +14,15 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
 
     private java.lang.Boolean searchAllVersions;
 
-    private java.math.BigInteger maxItems;
-
-    private java.math.BigInteger skipCount;
-
     private java.lang.Boolean includeAllowableActions;
 
     private org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships;
 
-    private java.lang.Boolean includeRenditions;
+    private java.lang.String renditionFilter;
+
+    private java.math.BigInteger maxItems;
+
+    private java.math.BigInteger skipCount;
 
     private org.apache.axis.message.MessageElement [] _any;
 
@@ -33,20 +33,20 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
            java.lang.String repositoryId,
            java.lang.String statement,
            java.lang.Boolean searchAllVersions,
-           java.math.BigInteger maxItems,
-           java.math.BigInteger skipCount,
            java.lang.Boolean includeAllowableActions,
            org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships,
-           java.lang.Boolean includeRenditions,
+           java.lang.String renditionFilter,
+           java.math.BigInteger maxItems,
+           java.math.BigInteger skipCount,
            org.apache.axis.message.MessageElement [] _any) {
            this.repositoryId = repositoryId;
            this.statement = statement;
            this.searchAllVersions = searchAllVersions;
-           this.maxItems = maxItems;
-           this.skipCount = skipCount;
            this.includeAllowableActions = includeAllowableActions;
            this.includeRelationships = includeRelationships;
-           this.includeRenditions = includeRenditions;
+           this.renditionFilter = renditionFilter;
+           this.maxItems = maxItems;
+           this.skipCount = skipCount;
            this._any = _any;
     }
 
@@ -112,46 +112,6 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
 
 
     /**
-     * Gets the maxItems value for this CmisQueryType.
-     * 
-     * @return maxItems
-     */
-    public java.math.BigInteger getMaxItems() {
-        return maxItems;
-    }
-
-
-    /**
-     * Sets the maxItems value for this CmisQueryType.
-     * 
-     * @param maxItems
-     */
-    public void setMaxItems(java.math.BigInteger maxItems) {
-        this.maxItems = maxItems;
-    }
-
-
-    /**
-     * Gets the skipCount value for this CmisQueryType.
-     * 
-     * @return skipCount
-     */
-    public java.math.BigInteger getSkipCount() {
-        return skipCount;
-    }
-
-
-    /**
-     * Sets the skipCount value for this CmisQueryType.
-     * 
-     * @param skipCount
-     */
-    public void setSkipCount(java.math.BigInteger skipCount) {
-        this.skipCount = skipCount;
-    }
-
-
-    /**
      * Gets the includeAllowableActions value for this CmisQueryType.
      * 
      * @return includeAllowableActions
@@ -192,22 +152,62 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
 
 
     /**
-     * Gets the includeRenditions value for this CmisQueryType.
+     * Gets the renditionFilter value for this CmisQueryType.
      * 
-     * @return includeRenditions
+     * @return renditionFilter
      */
-    public java.lang.Boolean getIncludeRenditions() {
-        return includeRenditions;
+    public java.lang.String getRenditionFilter() {
+        return renditionFilter;
     }
 
 
     /**
-     * Sets the includeRenditions value for this CmisQueryType.
+     * Sets the renditionFilter value for this CmisQueryType.
      * 
-     * @param includeRenditions
+     * @param renditionFilter
      */
-    public void setIncludeRenditions(java.lang.Boolean includeRenditions) {
-        this.includeRenditions = includeRenditions;
+    public void setRenditionFilter(java.lang.String renditionFilter) {
+        this.renditionFilter = renditionFilter;
+    }
+
+
+    /**
+     * Gets the maxItems value for this CmisQueryType.
+     * 
+     * @return maxItems
+     */
+    public java.math.BigInteger getMaxItems() {
+        return maxItems;
+    }
+
+
+    /**
+     * Sets the maxItems value for this CmisQueryType.
+     * 
+     * @param maxItems
+     */
+    public void setMaxItems(java.math.BigInteger maxItems) {
+        this.maxItems = maxItems;
+    }
+
+
+    /**
+     * Gets the skipCount value for this CmisQueryType.
+     * 
+     * @return skipCount
+     */
+    public java.math.BigInteger getSkipCount() {
+        return skipCount;
+    }
+
+
+    /**
+     * Sets the skipCount value for this CmisQueryType.
+     * 
+     * @param skipCount
+     */
+    public void setSkipCount(java.math.BigInteger skipCount) {
+        this.skipCount = skipCount;
     }
 
 
@@ -251,21 +251,21 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
             ((this.searchAllVersions==null && other.getSearchAllVersions()==null) || 
              (this.searchAllVersions!=null &&
               this.searchAllVersions.equals(other.getSearchAllVersions()))) &&
-            ((this.maxItems==null && other.getMaxItems()==null) || 
-             (this.maxItems!=null &&
-              this.maxItems.equals(other.getMaxItems()))) &&
-            ((this.skipCount==null && other.getSkipCount()==null) || 
-             (this.skipCount!=null &&
-              this.skipCount.equals(other.getSkipCount()))) &&
             ((this.includeAllowableActions==null && other.getIncludeAllowableActions()==null) || 
              (this.includeAllowableActions!=null &&
               this.includeAllowableActions.equals(other.getIncludeAllowableActions()))) &&
             ((this.includeRelationships==null && other.getIncludeRelationships()==null) || 
              (this.includeRelationships!=null &&
               this.includeRelationships.equals(other.getIncludeRelationships()))) &&
-            ((this.includeRenditions==null && other.getIncludeRenditions()==null) || 
-             (this.includeRenditions!=null &&
-              this.includeRenditions.equals(other.getIncludeRenditions()))) &&
+            ((this.renditionFilter==null && other.getRenditionFilter()==null) || 
+             (this.renditionFilter!=null &&
+              this.renditionFilter.equals(other.getRenditionFilter()))) &&
+            ((this.maxItems==null && other.getMaxItems()==null) || 
+             (this.maxItems!=null &&
+              this.maxItems.equals(other.getMaxItems()))) &&
+            ((this.skipCount==null && other.getSkipCount()==null) || 
+             (this.skipCount!=null &&
+              this.skipCount.equals(other.getSkipCount()))) &&
             ((this._any==null && other.get_any()==null) || 
              (this._any!=null &&
               java.util.Arrays.equals(this._any, other.get_any())));
@@ -289,20 +289,20 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
         if (getSearchAllVersions() != null) {
             _hashCode += getSearchAllVersions().hashCode();
         }
-        if (getMaxItems() != null) {
-            _hashCode += getMaxItems().hashCode();
-        }
-        if (getSkipCount() != null) {
-            _hashCode += getSkipCount().hashCode();
-        }
         if (getIncludeAllowableActions() != null) {
             _hashCode += getIncludeAllowableActions().hashCode();
         }
         if (getIncludeRelationships() != null) {
             _hashCode += getIncludeRelationships().hashCode();
         }
-        if (getIncludeRenditions() != null) {
-            _hashCode += getIncludeRenditions().hashCode();
+        if (getRenditionFilter() != null) {
+            _hashCode += getRenditionFilter().hashCode();
+        }
+        if (getMaxItems() != null) {
+            _hashCode += getMaxItems().hashCode();
+        }
+        if (getSkipCount() != null) {
+            _hashCode += getSkipCount().hashCode();
         }
         if (get_any() != null) {
             for (int i=0;
@@ -324,61 +324,61 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
         new org.apache.axis.description.TypeDesc(CmisQueryType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisQueryType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisQueryType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("statement");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "statement"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "statement"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("searchAllVersions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "searchAllVersions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "searchAllVersions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("includeAllowableActions");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "includeAllowableActions"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("includeRelationships");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "includeRelationships"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumIncludeRelationships"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("renditionFilter");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "renditionFilter"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("maxItems");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "maxItems"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "maxItems"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("skipCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "skipCount"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "skipCount"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeAllowableActions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "includeAllowableActions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeRelationships");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "includeRelationships"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumIncludeRelationships"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeRenditions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "includeRenditions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

@@ -10,32 +10,43 @@ package org.alfresco.repo.cmis.ws;
 public class GetContentChanges  implements java.io.Serializable {
     private java.lang.String repositoryId;
 
-    private java.lang.String changeToken;
-
-    private java.math.BigInteger maxItems;
-
-    private java.lang.Boolean includeACL;
+    private java.lang.String changeLogToken;
 
     private java.lang.Boolean includeProperties;
 
     private java.lang.String filter;
+
+    private java.lang.Boolean includePolicyIds;
+
+    private java.lang.Boolean includeACL;
+
+    private java.math.BigInteger maxItems;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public GetContentChanges() {
     }
 
     public GetContentChanges(
            java.lang.String repositoryId,
-           java.lang.String changeToken,
-           java.math.BigInteger maxItems,
-           java.lang.Boolean includeACL,
+           java.lang.String changeLogToken,
            java.lang.Boolean includeProperties,
-           java.lang.String filter) {
+           java.lang.String filter,
+           java.lang.Boolean includePolicyIds,
+           java.lang.Boolean includeACL,
+           java.math.BigInteger maxItems,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
-           this.changeToken = changeToken;
-           this.maxItems = maxItems;
-           this.includeACL = includeACL;
+           this.changeLogToken = changeLogToken;
            this.includeProperties = includeProperties;
            this.filter = filter;
+           this.includePolicyIds = includePolicyIds;
+           this.includeACL = includeACL;
+           this.maxItems = maxItems;
+           this.extension = extension;
     }
 
 
@@ -60,62 +71,22 @@ public class GetContentChanges  implements java.io.Serializable {
 
 
     /**
-     * Gets the changeToken value for this GetContentChanges.
+     * Gets the changeLogToken value for this GetContentChanges.
      * 
-     * @return changeToken
+     * @return changeLogToken
      */
-    public java.lang.String getChangeToken() {
-        return changeToken;
+    public java.lang.String getChangeLogToken() {
+        return changeLogToken;
     }
 
 
     /**
-     * Sets the changeToken value for this GetContentChanges.
+     * Sets the changeLogToken value for this GetContentChanges.
      * 
-     * @param changeToken
+     * @param changeLogToken
      */
-    public void setChangeToken(java.lang.String changeToken) {
-        this.changeToken = changeToken;
-    }
-
-
-    /**
-     * Gets the maxItems value for this GetContentChanges.
-     * 
-     * @return maxItems
-     */
-    public java.math.BigInteger getMaxItems() {
-        return maxItems;
-    }
-
-
-    /**
-     * Sets the maxItems value for this GetContentChanges.
-     * 
-     * @param maxItems
-     */
-    public void setMaxItems(java.math.BigInteger maxItems) {
-        this.maxItems = maxItems;
-    }
-
-
-    /**
-     * Gets the includeACL value for this GetContentChanges.
-     * 
-     * @return includeACL
-     */
-    public java.lang.Boolean getIncludeACL() {
-        return includeACL;
-    }
-
-
-    /**
-     * Sets the includeACL value for this GetContentChanges.
-     * 
-     * @param includeACL
-     */
-    public void setIncludeACL(java.lang.Boolean includeACL) {
-        this.includeACL = includeACL;
+    public void setChangeLogToken(java.lang.String changeLogToken) {
+        this.changeLogToken = changeLogToken;
     }
 
 
@@ -158,6 +129,90 @@ public class GetContentChanges  implements java.io.Serializable {
         this.filter = filter;
     }
 
+
+    /**
+     * Gets the includePolicyIds value for this GetContentChanges.
+     * 
+     * @return includePolicyIds
+     */
+    public java.lang.Boolean getIncludePolicyIds() {
+        return includePolicyIds;
+    }
+
+
+    /**
+     * Sets the includePolicyIds value for this GetContentChanges.
+     * 
+     * @param includePolicyIds
+     */
+    public void setIncludePolicyIds(java.lang.Boolean includePolicyIds) {
+        this.includePolicyIds = includePolicyIds;
+    }
+
+
+    /**
+     * Gets the includeACL value for this GetContentChanges.
+     * 
+     * @return includeACL
+     */
+    public java.lang.Boolean getIncludeACL() {
+        return includeACL;
+    }
+
+
+    /**
+     * Sets the includeACL value for this GetContentChanges.
+     * 
+     * @param includeACL
+     */
+    public void setIncludeACL(java.lang.Boolean includeACL) {
+        this.includeACL = includeACL;
+    }
+
+
+    /**
+     * Gets the maxItems value for this GetContentChanges.
+     * 
+     * @return maxItems
+     */
+    public java.math.BigInteger getMaxItems() {
+        return maxItems;
+    }
+
+
+    /**
+     * Sets the maxItems value for this GetContentChanges.
+     * 
+     * @param maxItems
+     */
+    public void setMaxItems(java.math.BigInteger maxItems) {
+        this.maxItems = maxItems;
+    }
+
+
+    /**
+     * Gets the extension value for this GetContentChanges.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this GetContentChanges.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof GetContentChanges)) return false;
@@ -173,21 +228,27 @@ public class GetContentChanges  implements java.io.Serializable {
             ((this.repositoryId==null && other.getRepositoryId()==null) || 
              (this.repositoryId!=null &&
               this.repositoryId.equals(other.getRepositoryId()))) &&
-            ((this.changeToken==null && other.getChangeToken()==null) || 
-             (this.changeToken!=null &&
-              this.changeToken.equals(other.getChangeToken()))) &&
-            ((this.maxItems==null && other.getMaxItems()==null) || 
-             (this.maxItems!=null &&
-              this.maxItems.equals(other.getMaxItems()))) &&
-            ((this.includeACL==null && other.getIncludeACL()==null) || 
-             (this.includeACL!=null &&
-              this.includeACL.equals(other.getIncludeACL()))) &&
+            ((this.changeLogToken==null && other.getChangeLogToken()==null) || 
+             (this.changeLogToken!=null &&
+              this.changeLogToken.equals(other.getChangeLogToken()))) &&
             ((this.includeProperties==null && other.getIncludeProperties()==null) || 
              (this.includeProperties!=null &&
               this.includeProperties.equals(other.getIncludeProperties()))) &&
             ((this.filter==null && other.getFilter()==null) || 
              (this.filter!=null &&
-              this.filter.equals(other.getFilter())));
+              this.filter.equals(other.getFilter()))) &&
+            ((this.includePolicyIds==null && other.getIncludePolicyIds()==null) || 
+             (this.includePolicyIds!=null &&
+              this.includePolicyIds.equals(other.getIncludePolicyIds()))) &&
+            ((this.includeACL==null && other.getIncludeACL()==null) || 
+             (this.includeACL!=null &&
+              this.includeACL.equals(other.getIncludeACL()))) &&
+            ((this.maxItems==null && other.getMaxItems()==null) || 
+             (this.maxItems!=null &&
+              this.maxItems.equals(other.getMaxItems()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -202,20 +263,26 @@ public class GetContentChanges  implements java.io.Serializable {
         if (getRepositoryId() != null) {
             _hashCode += getRepositoryId().hashCode();
         }
-        if (getChangeToken() != null) {
-            _hashCode += getChangeToken().hashCode();
-        }
-        if (getMaxItems() != null) {
-            _hashCode += getMaxItems().hashCode();
-        }
-        if (getIncludeACL() != null) {
-            _hashCode += getIncludeACL().hashCode();
+        if (getChangeLogToken() != null) {
+            _hashCode += getChangeLogToken().hashCode();
         }
         if (getIncludeProperties() != null) {
             _hashCode += getIncludeProperties().hashCode();
         }
         if (getFilter() != null) {
             _hashCode += getFilter().hashCode();
+        }
+        if (getIncludePolicyIds() != null) {
+            _hashCode += getIncludePolicyIds().hashCode();
+        }
+        if (getIncludeACL() != null) {
+            _hashCode += getIncludeACL().hashCode();
+        }
+        if (getMaxItems() != null) {
+            _hashCode += getMaxItems().hashCode();
+        }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -226,47 +293,61 @@ public class GetContentChanges  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetContentChanges.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getContentChanges"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getContentChanges"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("changeToken");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "changeToken"));
+        elemField.setFieldName("changeLogToken");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "changeLogToken"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("maxItems");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "maxItems"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeACL");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeACL"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeProperties");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeProperties"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeProperties"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("filter");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "filter"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "filter"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
-        elemField.setNillable(false);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("includePolicyIds");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includePolicyIds"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("includeACL");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeACL"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("maxItems");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "maxItems"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

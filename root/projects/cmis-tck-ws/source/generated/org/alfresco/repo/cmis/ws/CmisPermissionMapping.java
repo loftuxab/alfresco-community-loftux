@@ -10,7 +10,11 @@ package org.alfresco.repo.cmis.ws;
 public class CmisPermissionMapping  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
     private org.alfresco.repo.cmis.ws.EnumAllowableActionsKey key;
 
-    private java.lang.String permission;
+    /* Multiple entries are OR'ed together. Any
+     * 						permission that specified is
+     * 						sufficient to provide rights required
+     * 						in key */
+    private java.lang.String[] permission;
 
     private org.apache.axis.message.MessageElement [] _any;
 
@@ -19,7 +23,7 @@ public class CmisPermissionMapping  implements java.io.Serializable, org.apache.
 
     public CmisPermissionMapping(
            org.alfresco.repo.cmis.ws.EnumAllowableActionsKey key,
-           java.lang.String permission,
+           java.lang.String[] permission,
            org.apache.axis.message.MessageElement [] _any) {
            this.key = key;
            this.permission = permission;
@@ -50,9 +54,12 @@ public class CmisPermissionMapping  implements java.io.Serializable, org.apache.
     /**
      * Gets the permission value for this CmisPermissionMapping.
      * 
-     * @return permission
+     * @return permission   * Multiple entries are OR'ed together. Any
+     * 						permission that specified is
+     * 						sufficient to provide rights required
+     * 						in key
      */
-    public java.lang.String getPermission() {
+    public java.lang.String[] getPermission() {
         return permission;
     }
 
@@ -60,10 +67,21 @@ public class CmisPermissionMapping  implements java.io.Serializable, org.apache.
     /**
      * Sets the permission value for this CmisPermissionMapping.
      * 
-     * @param permission
+     * @param permission   * Multiple entries are OR'ed together. Any
+     * 						permission that specified is
+     * 						sufficient to provide rights required
+     * 						in key
      */
-    public void setPermission(java.lang.String permission) {
+    public void setPermission(java.lang.String[] permission) {
         this.permission = permission;
+    }
+
+    public java.lang.String getPermission(int i) {
+        return this.permission[i];
+    }
+
+    public void setPermission(int i, java.lang.String _value) {
+        this.permission[i] = _value;
     }
 
 
@@ -103,7 +121,7 @@ public class CmisPermissionMapping  implements java.io.Serializable, org.apache.
               this.key.equals(other.getKey()))) &&
             ((this.permission==null && other.getPermission()==null) || 
              (this.permission!=null &&
-              this.permission.equals(other.getPermission()))) &&
+              java.util.Arrays.equals(this.permission, other.getPermission()))) &&
             ((this._any==null && other.get_any()==null) || 
              (this._any!=null &&
               java.util.Arrays.equals(this._any, other.get_any())));
@@ -122,7 +140,15 @@ public class CmisPermissionMapping  implements java.io.Serializable, org.apache.
             _hashCode += getKey().hashCode();
         }
         if (getPermission() != null) {
-            _hashCode += getPermission().hashCode();
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getPermission());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getPermission(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         if (get_any() != null) {
             for (int i=0;
@@ -144,18 +170,19 @@ public class CmisPermissionMapping  implements java.io.Serializable, org.apache.
         new org.apache.axis.description.TypeDesc(CmisPermissionMapping.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPermissionMapping"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPermissionMapping"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("key");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "key"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumAllowableActionsKey"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "key"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumAllowableActionsKey"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("permission");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "permission"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "permission"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
+        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
     }
 

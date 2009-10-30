@@ -14,17 +14,17 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
 
     private org.alfresco.repo.cmis.ws.EnumCapabilityChanges capabilityChanges;
 
-    private org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds[] capabilityChangesOnType;
-
     private org.alfresco.repo.cmis.ws.EnumCapabilityContentStreamUpdates capabilityContentStreamUpdatability;
 
     private boolean capabilityGetDescendants;
+
+    private boolean capabilityGetFolderTree;
 
     private boolean capabilityMultifiling;
 
     private boolean capabilityPWCSearchable;
 
-    private boolean capabilityPWCUpdateable;
+    private boolean capabilityPWCUpdatable;
 
     private org.alfresco.repo.cmis.ws.EnumCapabilityQuery capabilityQuery;
 
@@ -45,12 +45,12 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
            org.alfresco.repo.cmis.ws.EnumCapabilityACL capabilityACL,
            boolean capabilityAllVersionsSearchable,
            org.alfresco.repo.cmis.ws.EnumCapabilityChanges capabilityChanges,
-           org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds[] capabilityChangesOnType,
            org.alfresco.repo.cmis.ws.EnumCapabilityContentStreamUpdates capabilityContentStreamUpdatability,
            boolean capabilityGetDescendants,
+           boolean capabilityGetFolderTree,
            boolean capabilityMultifiling,
            boolean capabilityPWCSearchable,
-           boolean capabilityPWCUpdateable,
+           boolean capabilityPWCUpdatable,
            org.alfresco.repo.cmis.ws.EnumCapabilityQuery capabilityQuery,
            org.alfresco.repo.cmis.ws.EnumCapabilityRendition capabilityRenditions,
            boolean capabilityUnfiling,
@@ -60,12 +60,12 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
            this.capabilityACL = capabilityACL;
            this.capabilityAllVersionsSearchable = capabilityAllVersionsSearchable;
            this.capabilityChanges = capabilityChanges;
-           this.capabilityChangesOnType = capabilityChangesOnType;
            this.capabilityContentStreamUpdatability = capabilityContentStreamUpdatability;
            this.capabilityGetDescendants = capabilityGetDescendants;
+           this.capabilityGetFolderTree = capabilityGetFolderTree;
            this.capabilityMultifiling = capabilityMultifiling;
            this.capabilityPWCSearchable = capabilityPWCSearchable;
-           this.capabilityPWCUpdateable = capabilityPWCUpdateable;
+           this.capabilityPWCUpdatable = capabilityPWCUpdatable;
            this.capabilityQuery = capabilityQuery;
            this.capabilityRenditions = capabilityRenditions;
            this.capabilityUnfiling = capabilityUnfiling;
@@ -136,34 +136,6 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
 
 
     /**
-     * Gets the capabilityChangesOnType value for this CmisRepositoryCapabilitiesType.
-     * 
-     * @return capabilityChangesOnType
-     */
-    public org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds[] getCapabilityChangesOnType() {
-        return capabilityChangesOnType;
-    }
-
-
-    /**
-     * Sets the capabilityChangesOnType value for this CmisRepositoryCapabilitiesType.
-     * 
-     * @param capabilityChangesOnType
-     */
-    public void setCapabilityChangesOnType(org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds[] capabilityChangesOnType) {
-        this.capabilityChangesOnType = capabilityChangesOnType;
-    }
-
-    public org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds getCapabilityChangesOnType(int i) {
-        return this.capabilityChangesOnType[i];
-    }
-
-    public void setCapabilityChangesOnType(int i, org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds _value) {
-        this.capabilityChangesOnType[i] = _value;
-    }
-
-
-    /**
      * Gets the capabilityContentStreamUpdatability value for this CmisRepositoryCapabilitiesType.
      * 
      * @return capabilityContentStreamUpdatability
@@ -200,6 +172,26 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
      */
     public void setCapabilityGetDescendants(boolean capabilityGetDescendants) {
         this.capabilityGetDescendants = capabilityGetDescendants;
+    }
+
+
+    /**
+     * Gets the capabilityGetFolderTree value for this CmisRepositoryCapabilitiesType.
+     * 
+     * @return capabilityGetFolderTree
+     */
+    public boolean isCapabilityGetFolderTree() {
+        return capabilityGetFolderTree;
+    }
+
+
+    /**
+     * Sets the capabilityGetFolderTree value for this CmisRepositoryCapabilitiesType.
+     * 
+     * @param capabilityGetFolderTree
+     */
+    public void setCapabilityGetFolderTree(boolean capabilityGetFolderTree) {
+        this.capabilityGetFolderTree = capabilityGetFolderTree;
     }
 
 
@@ -244,22 +236,22 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
 
 
     /**
-     * Gets the capabilityPWCUpdateable value for this CmisRepositoryCapabilitiesType.
+     * Gets the capabilityPWCUpdatable value for this CmisRepositoryCapabilitiesType.
      * 
-     * @return capabilityPWCUpdateable
+     * @return capabilityPWCUpdatable
      */
-    public boolean isCapabilityPWCUpdateable() {
-        return capabilityPWCUpdateable;
+    public boolean isCapabilityPWCUpdatable() {
+        return capabilityPWCUpdatable;
     }
 
 
     /**
-     * Sets the capabilityPWCUpdateable value for this CmisRepositoryCapabilitiesType.
+     * Sets the capabilityPWCUpdatable value for this CmisRepositoryCapabilitiesType.
      * 
-     * @param capabilityPWCUpdateable
+     * @param capabilityPWCUpdatable
      */
-    public void setCapabilityPWCUpdateable(boolean capabilityPWCUpdateable) {
-        this.capabilityPWCUpdateable = capabilityPWCUpdateable;
+    public void setCapabilityPWCUpdatable(boolean capabilityPWCUpdatable) {
+        this.capabilityPWCUpdatable = capabilityPWCUpdatable;
     }
 
 
@@ -401,16 +393,14 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
             ((this.capabilityChanges==null && other.getCapabilityChanges()==null) || 
              (this.capabilityChanges!=null &&
               this.capabilityChanges.equals(other.getCapabilityChanges()))) &&
-            ((this.capabilityChangesOnType==null && other.getCapabilityChangesOnType()==null) || 
-             (this.capabilityChangesOnType!=null &&
-              java.util.Arrays.equals(this.capabilityChangesOnType, other.getCapabilityChangesOnType()))) &&
             ((this.capabilityContentStreamUpdatability==null && other.getCapabilityContentStreamUpdatability()==null) || 
              (this.capabilityContentStreamUpdatability!=null &&
               this.capabilityContentStreamUpdatability.equals(other.getCapabilityContentStreamUpdatability()))) &&
             this.capabilityGetDescendants == other.isCapabilityGetDescendants() &&
+            this.capabilityGetFolderTree == other.isCapabilityGetFolderTree() &&
             this.capabilityMultifiling == other.isCapabilityMultifiling() &&
             this.capabilityPWCSearchable == other.isCapabilityPWCSearchable() &&
-            this.capabilityPWCUpdateable == other.isCapabilityPWCUpdateable() &&
+            this.capabilityPWCUpdatable == other.isCapabilityPWCUpdatable() &&
             ((this.capabilityQuery==null && other.getCapabilityQuery()==null) || 
              (this.capabilityQuery!=null &&
               this.capabilityQuery.equals(other.getCapabilityQuery()))) &&
@@ -443,24 +433,14 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
         if (getCapabilityChanges() != null) {
             _hashCode += getCapabilityChanges().hashCode();
         }
-        if (getCapabilityChangesOnType() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getCapabilityChangesOnType());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getCapabilityChangesOnType(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
         if (getCapabilityContentStreamUpdatability() != null) {
             _hashCode += getCapabilityContentStreamUpdatability().hashCode();
         }
         _hashCode += (isCapabilityGetDescendants() ? Boolean.TRUE : Boolean.FALSE).hashCode();
+        _hashCode += (isCapabilityGetFolderTree() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         _hashCode += (isCapabilityMultifiling() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         _hashCode += (isCapabilityPWCSearchable() ? Boolean.TRUE : Boolean.FALSE).hashCode();
-        _hashCode += (isCapabilityPWCUpdateable() ? Boolean.TRUE : Boolean.FALSE).hashCode();
+        _hashCode += (isCapabilityPWCUpdatable() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         if (getCapabilityQuery() != null) {
             _hashCode += getCapabilityQuery().hashCode();
         }
@@ -492,91 +472,89 @@ public class CmisRepositoryCapabilitiesType  implements java.io.Serializable, or
         new org.apache.axis.description.TypeDesc(CmisRepositoryCapabilitiesType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisRepositoryCapabilitiesType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisRepositoryCapabilitiesType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityACL");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityACL"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityACL"));
-        elemField.setMinOccurs(0);
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityACL"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityACL"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityAllVersionsSearchable");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityAllVersionsSearchable"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityAllVersionsSearchable"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityChanges");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityChanges"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityChanges"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityChanges"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityChanges"));
         elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("capabilityChangesOnType");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityChangesOnType"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumBaseObjectTypeIds"));
-        elemField.setNillable(false);
-        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityContentStreamUpdatability");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityContentStreamUpdatability"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityContentStreamUpdates"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityContentStreamUpdatability"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityContentStreamUpdates"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityGetDescendants");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityGetDescendants"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityGetDescendants"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("capabilityGetFolderTree");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityGetFolderTree"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityMultifiling");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityMultifiling"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityMultifiling"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityPWCSearchable");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityPWCSearchable"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityPWCSearchable"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("capabilityPWCUpdateable");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityPWCUpdateable"));
+        elemField.setFieldName("capabilityPWCUpdatable");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityPWCUpdatable"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityQuery");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityQuery"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityQuery"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityQuery"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityQuery"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityRenditions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityRenditions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityRendition"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityRenditions"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityRendition"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityUnfiling");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityUnfiling"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityUnfiling"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityVersionSpecificFiling");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityVersionSpecificFiling"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityVersionSpecificFiling"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("capabilityJoin");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "capabilityJoin"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityJoin"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "capabilityJoin"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityJoin"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

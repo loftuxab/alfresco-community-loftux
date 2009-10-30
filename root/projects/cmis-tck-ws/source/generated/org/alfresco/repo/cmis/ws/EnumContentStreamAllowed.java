@@ -60,7 +60,7 @@ public class EnumContentStreamAllowed implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumContentStreamAllowed.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumContentStreamAllowed"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumContentStreamAllowed"));
     }
     /**
      * Return type metadata object

@@ -17,9 +17,11 @@ public class EnumVersioningState implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
+    public static final java.lang.String _none = "none";
     public static final java.lang.String _checkedout = "checkedout";
     public static final java.lang.String _minor = "minor";
     public static final java.lang.String _major = "major";
+    public static final EnumVersioningState none = new EnumVersioningState(_none);
     public static final EnumVersioningState checkedout = new EnumVersioningState(_checkedout);
     public static final EnumVersioningState minor = new EnumVersioningState(_minor);
     public static final EnumVersioningState major = new EnumVersioningState(_major);
@@ -60,7 +62,7 @@ public class EnumVersioningState implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumVersioningState.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumVersioningState"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumVersioningState"));
     }
     /**
      * Return type metadata object

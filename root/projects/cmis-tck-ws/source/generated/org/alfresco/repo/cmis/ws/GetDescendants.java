@@ -20,9 +20,14 @@ public class GetDescendants  implements java.io.Serializable {
 
     private org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships;
 
-    private java.lang.Boolean includeRenditions;
+    private java.lang.String renditionFilter;
 
-    private java.lang.String orderBy;
+    private java.lang.Boolean includePathSegments;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public GetDescendants() {
     }
@@ -34,16 +39,18 @@ public class GetDescendants  implements java.io.Serializable {
            java.lang.String filter,
            java.lang.Boolean includeAllowableActions,
            org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships,
-           java.lang.Boolean includeRenditions,
-           java.lang.String orderBy) {
+           java.lang.String renditionFilter,
+           java.lang.Boolean includePathSegments,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.folderId = folderId;
            this.depth = depth;
            this.filter = filter;
            this.includeAllowableActions = includeAllowableActions;
            this.includeRelationships = includeRelationships;
-           this.includeRenditions = includeRenditions;
-           this.orderBy = orderBy;
+           this.renditionFilter = renditionFilter;
+           this.includePathSegments = includePathSegments;
+           this.extension = extension;
     }
 
 
@@ -168,42 +175,66 @@ public class GetDescendants  implements java.io.Serializable {
 
 
     /**
-     * Gets the includeRenditions value for this GetDescendants.
+     * Gets the renditionFilter value for this GetDescendants.
      * 
-     * @return includeRenditions
+     * @return renditionFilter
      */
-    public java.lang.Boolean getIncludeRenditions() {
-        return includeRenditions;
+    public java.lang.String getRenditionFilter() {
+        return renditionFilter;
     }
 
 
     /**
-     * Sets the includeRenditions value for this GetDescendants.
+     * Sets the renditionFilter value for this GetDescendants.
      * 
-     * @param includeRenditions
+     * @param renditionFilter
      */
-    public void setIncludeRenditions(java.lang.Boolean includeRenditions) {
-        this.includeRenditions = includeRenditions;
+    public void setRenditionFilter(java.lang.String renditionFilter) {
+        this.renditionFilter = renditionFilter;
     }
 
 
     /**
-     * Gets the orderBy value for this GetDescendants.
+     * Gets the includePathSegments value for this GetDescendants.
      * 
-     * @return orderBy
+     * @return includePathSegments
      */
-    public java.lang.String getOrderBy() {
-        return orderBy;
+    public java.lang.Boolean getIncludePathSegments() {
+        return includePathSegments;
     }
 
 
     /**
-     * Sets the orderBy value for this GetDescendants.
+     * Sets the includePathSegments value for this GetDescendants.
      * 
-     * @param orderBy
+     * @param includePathSegments
      */
-    public void setOrderBy(java.lang.String orderBy) {
-        this.orderBy = orderBy;
+    public void setIncludePathSegments(java.lang.Boolean includePathSegments) {
+        this.includePathSegments = includePathSegments;
+    }
+
+
+    /**
+     * Gets the extension value for this GetDescendants.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this GetDescendants.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -236,12 +267,15 @@ public class GetDescendants  implements java.io.Serializable {
             ((this.includeRelationships==null && other.getIncludeRelationships()==null) || 
              (this.includeRelationships!=null &&
               this.includeRelationships.equals(other.getIncludeRelationships()))) &&
-            ((this.includeRenditions==null && other.getIncludeRenditions()==null) || 
-             (this.includeRenditions!=null &&
-              this.includeRenditions.equals(other.getIncludeRenditions()))) &&
-            ((this.orderBy==null && other.getOrderBy()==null) || 
-             (this.orderBy!=null &&
-              this.orderBy.equals(other.getOrderBy())));
+            ((this.renditionFilter==null && other.getRenditionFilter()==null) || 
+             (this.renditionFilter!=null &&
+              this.renditionFilter.equals(other.getRenditionFilter()))) &&
+            ((this.includePathSegments==null && other.getIncludePathSegments()==null) || 
+             (this.includePathSegments!=null &&
+              this.includePathSegments.equals(other.getIncludePathSegments()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -271,11 +305,14 @@ public class GetDescendants  implements java.io.Serializable {
         if (getIncludeRelationships() != null) {
             _hashCode += getIncludeRelationships().hashCode();
         }
-        if (getIncludeRenditions() != null) {
-            _hashCode += getIncludeRenditions().hashCode();
+        if (getRenditionFilter() != null) {
+            _hashCode += getRenditionFilter().hashCode();
         }
-        if (getOrderBy() != null) {
-            _hashCode += getOrderBy().hashCode();
+        if (getIncludePathSegments() != null) {
+            _hashCode += getIncludePathSegments().hashCode();
+        }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -286,60 +323,67 @@ public class GetDescendants  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetDescendants.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getDescendants"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getDescendants"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("folderId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "folderId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "folderId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("depth");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "depth"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "depth"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("filter");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "filter"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "filter"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeAllowableActions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeAllowableActions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeAllowableActions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeRelationships");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRelationships"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumIncludeRelationships"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeRelationships"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumIncludeRelationships"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeRenditions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRenditions"));
+        elemField.setFieldName("renditionFilter");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "renditionFilter"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("includePathSegments");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includePathSegments"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("orderBy");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "orderBy"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
-        elemField.setNillable(false);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

@@ -24,18 +24,12 @@
  */
 package org.alfresco.cmis.test.ws;
 
-import java.math.BigInteger;
-
 import org.alfresco.repo.cmis.ws.AddObjectToFolder;
-import org.alfresco.repo.cmis.ws.CheckIn;
 import org.alfresco.repo.cmis.ws.CheckInResponse;
-import org.alfresco.repo.cmis.ws.CheckOut;
 import org.alfresco.repo.cmis.ws.CheckOutResponse;
-import org.alfresco.repo.cmis.ws.CmisContentStreamType;
-import org.alfresco.repo.cmis.ws.CmisFaultType;
 import org.alfresco.repo.cmis.ws.CmisPropertiesType;
 import org.alfresco.repo.cmis.ws.CmisPropertyId;
-import org.alfresco.repo.cmis.ws.EnumPropertiesFolder;
+import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
 import org.alfresco.repo.cmis.ws.EnumServiceException;
 import org.alfresco.repo.cmis.ws.MultiFilingServicePort;
 import org.alfresco.repo.cmis.ws.RemoveObjectFromFolder;
@@ -50,8 +44,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class CmisMultifilingServiceClient extends AbstractServiceClient
 {
     private static Log LOGGER = LogFactory.getLog(CmisMultifilingServiceClient.class);
-
-    private static final String INVALID_REPOSITORY_ID = "Wrong Repository Id";
 
     private String folderId;
 
@@ -92,10 +84,8 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             LOGGER.info("Invoking client...");
         }
         MultiFilingServicePort multiFilingServicePort = getServicesFactory().getMultiFilingServicePort(getProxyUrl() + getService().getPath());
-
-        multiFilingServicePort.addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId));
-
-        multiFilingServicePort.removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, folderId));
+        multiFilingServicePort.addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId, true, null));
+        multiFilingServicePort.removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, folderId, null));
     }
 
     /**
@@ -148,70 +138,199 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
     protected void onTearDown() throws Exception
     {
         deleteAndAssertObject(documentId);
-        deleteAndAssertObject(folderId);
+        if (objectExists(documentId))
+        {
+            deleteAndAssertObject(folderId);
+        }
         super.onTearDown();
     }
 
     public void testAddObjectToFolder() throws Exception
     {
+        if (getAndAssertCapabilities().isCapabilityMultifiling())
+        {
+            addAndAssertObjectToFolder(documentId, folderId, false);
+        }
+        else
+        {
+            try
+            {
+                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId, false, null));
+                fail("Multi-filing is not supported but Object was Added to another Folder");
+            }
+            catch (Exception e)
+            {
+                assertException("Adding Object To Folder when Multi-Filling capability is not supported", e, EnumServiceException.notSupported);
+            }
+        }
+    }
+
+    private void addAndAssertObjectToFolder(String objectId, String folderId, boolean allVersions) throws Exception
+    {
         try
         {
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
-            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId));
-            if (!getAndAssertCapabilities().isCapabilityMultifiling())
-            {
-                fail("Object is already in another folder, and multi-filing is not supported");
-            }
+            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId, allVersions, null));
         }
         catch (Exception e)
         {
-            if (getAndAssertCapabilities().isCapabilityMultifiling())
-            {
-                fail(e.toString());
-            }
-            else
-            {
-                assertTrue("Invalid exception was thrown during adding object to folder while capability multi-filing is not supported", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
-            }
+            fail(e.toString());
         }
-        assertTrue("Document was not added to folder", isDocumentInFolder(documentId, folderId));
+        assertTrue("Document was not Added to Folder", isDocumentInFolder(documentId, folderId));
     }
 
-    public void testAddObjectToFolderNotAllowed() throws Exception
+    public void testDeletingOfMultiFilledObject() throws Exception
+    {
+        if (getAndAssertCapabilities().isCapabilityMultifiling())
+        {
+            addAndAssertObjectToFolder(documentId, folderId, false);
+            deleteAndAssertObject(documentId);
+            assertFalse("Multi-Filled Document Object was not Deleted", objectExists(documentId));
+        }
+        else
+        {
+            LOGGER.warn("testDeletingOfMultiFilledObject() was skipped: Multi-Filling capability is not supported");
+        }
+    }
+
+    public void testAddObjectToNotAllowedFolder() throws Exception
     {
         if (getAndAssertCapabilities().isCapabilityMultifiling())
         {
             CmisPropertiesType properties = new CmisPropertiesType();
-            properties.setPropertyId(new CmisPropertyId[] { new CmisPropertyId(EnumPropertiesFolder._value2, null, null, null, new String[] { getAndAssertFolderTypeId() }) });
-            String folderId1 = createAndAssertFolder(generateTestFolderName(), getAndAssertFolderTypeId(), getAndAssertRootFolderId(), properties);
+            properties.setPropertyId(new CmisPropertyId[] { new CmisPropertyId(PROP_ALLOWED_CHILD_OBJECT_TYPE_IDS, null, null, null, new String[] { getAndAssertFolderTypeId() }) });
+            String folderWithRestriction = createAndAssertFolder(generateTestFolderName(), getAndAssertFolderTypeId(), getAndAssertRootFolderId(), properties);
             try
             {
                 LOGGER.info("[MultiFilingService->addObjectToFolder]");
-                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId1));
-                fail("No Exception was thrown during adding object to folder with typeId is NOT in the list of AllowedChildObjectTypeIds of the parent-folder specified by folderId");
+                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderWithRestriction, false, null));
+                fail("No Exception was thrown during Adding Object to Folder that cantains no Object Type Id in the list of Allowed Child Object Type Ids");
             }
             catch (Exception e)
             {
-                assertTrue("Invalid exception was thrown during adding object to folder with typeId is NOT in the list of AllowedChildObjectTypeIds of the parent-folder specified by folderId",
-                        e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+                assertException("Adding Not Allowed Object to Folder", e, EnumServiceException.constraint);
             }
         }
         else
         {
-            LOGGER.info("testAddObjectToFolderNotAllowed was skipped: Capability multi-filing is not supported");
+            LOGGER.warn("testAddObjectToFolderNotAllowed() was skipped: Multi-Filing capability is not supported");
         }
 
     }
 
+    public void testAddObjectToFolderWithInvalidObjectId() throws Exception
+    {
+        if (getAndAssertCapabilities().isCapabilityMultifiling())
+        {
+            try
+            {
+                LOGGER.info("[MultiFilingService->addObjectToFolder]");
+                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), "Wrong Object Id", folderId, false, null));
+                fail("Inexistent Object was Added to Folder");
+            }
+            catch (Exception e)
+            {
+                assertException("Adding Inexistent Object to Folder", e, EnumServiceException.invalidArgument);
+            }
+        }
+        else
+        {
+            LOGGER.warn("testAddObjectToFolderWithInvalidObjectId() was skipped: Multi-Filling capability is not supported");
+        }
+    }
+
+    public void testAddObjectToInvalidFolder() throws Exception
+    {
+        if (getAndAssertCapabilities().isCapabilityMultifiling())
+        {
+            try
+            {
+                LOGGER.info("[MultiFilingService->addObjectToFolder]");
+                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, "Wrong Object Id", false, null));
+                fail("Object was Added to Inexistent Folder");
+            }
+            catch (Exception e)
+            {
+                assertException("Adding Object to Inexistent Folder", e, EnumServiceException.invalidArgument);
+            }
+        }
+        else
+        {
+            LOGGER.warn("testAddObjectToInvalidFolder() was skipped: Multi-Filling capability is not supported");
+        }
+    }
+
+    public void testAddObjectToFolderAgainstAllVersionsParameter() throws Exception
+    {
+        if (isVersioningAllowed())
+        {
+            CheckInResponse checkInResponse = new CheckInResponse(documentId, null);
+            for (int i = 0; i < 2; i++)
+            {
+                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getDocumentId());
+                checkInAndAssert(checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), createUniqueContentStream(), "");
+            }
+            try
+            {
+                LOGGER.info("[MultiFilingService->addObjectToFolder]");
+                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(
+                        new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getDocumentId(), folderId, true, null));
+            }
+            catch (Exception e)
+            {
+                fail(e.toString());
+            }
+            if (getAndAssertCapabilities().isCapabilityVersionSpecificFiling())
+            {
+                assertTrue("Document was not added to folder", isDocumentInFolder(documentId, folderId));
+            }
+            else
+            {
+                assertFalse("Version specific filing is not supported, but document was added to folder", isDocumentInFolder(documentId, folderId));
+            }
+        }
+        else
+        {
+            LOGGER.warn("testCapabilityVersionSpecificFiling() was skipped: Versioning isn't supported");
+        }
+    }
+
     public void testRemoveObjectFromFolder() throws Exception
+    {
+        if (getAndAssertCapabilities().isCapabilityMultifiling())
+        {
+            addAndAssertObjectToFolder(documentId, folderId, false);
+            try
+            {
+                LOGGER.info("[MultiFilingService->removeObjectFromFolder]");
+                getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, folderId, null));
+            }
+            catch (Exception e)
+            {
+                fail(e.toString());
+            }
+            assertFalse("Object was not Removed from Folder", isDocumentInFolder(documentId, folderId));
+        }
+        else
+        {
+            LOGGER.warn("testRemoveObjectFromFolder() was skipped: Multi-Filling capability is not supported");
+        }
+    }
+
+    public void testRemovingObjectFromPrimaryParentFolder() throws Exception
     {
         try
         {
             LOGGER.info("[MultiFilingService->removeObjectFromFolder]");
-            getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, getAndAssertRootFolderId()));
+            getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(
+                    new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, getAndAssertRootFolderId(), null));
             if (!getAndAssertCapabilities().isCapabilityUnfiling())
             {
-                fail("Unfiling is not supported, but an object was removed from the last folder");
+                fail("Unfiling is not supported but an Object was Removed from the Primary Parent Folder");
+            }
+            else
+            {
+                assertTrue("Document Object was not Unfilled", isDocumentInFolder(documentId, getAndAssertRootFolderId()));
             }
         }
         catch (Exception e)
@@ -222,75 +341,61 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             }
             else
             {
-                assertTrue("Invalid exception was thrown during removing object from last folder while capability unfiling is not supported", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.notSupported));
+                assertException("Removing Not Multi-Filled Document from Primary Parent Folder", e, EnumServiceException.notSupported);
             }
         }
-        boolean found = isDocumentInFolder(documentId, getAndAssertRootFolderId());
-        assertTrue((found && !getAndAssertCapabilities().isCapabilityUnfiling()) || (!found && getAndAssertCapabilities().isCapabilityUnfiling()));
+        assertTrue("Unfilling attempting was resulted with Object Deletion", objectExists(documentId));
+    }
 
-        if (getAndAssertCapabilities().isCapabilityMultifiling())
+    public void testRemoveInvalidObjectFromFolder() throws Exception
+    {
+        try
         {
-            if (!found)
-            {
-                LOGGER.info("[MultiFilingService->addObjectToFolder]");
-                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, getAndAssertRootFolderId()));
-            }
-            LOGGER.info("[MultiFilingService->addObjectToFolder]");
-            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId));
+            LOGGER.info("[MultiFilingService->removeObjectFromFolder]");
+            getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), "Wrong Object Id", folderId, null));
+            fail("Inexistent Object was Removed from Folder");
+        }
+        catch (Exception e)
+        {
+            assertException("Removing Inexistent Object from Folder", e, EnumServiceException.invalidArgument);
+        }
+    }
 
+    public void testRemoveObjectFromInvalidFolder() throws Exception
+    {
+        try
+        {
+            LOGGER.info("[MultiFilingService->removeObjectFromFolder]");
+            getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, "Wrong Object Id", null));
+            fail("Object was Removed from Inexistent Folder");
+        }
+        catch (Exception e)
+        {
+            assertException("Removing Object from Inexistent Folder", e, EnumServiceException.invalidArgument);
+        }
+    }
+
+    public void testUnfileMultiFilledObject() throws Exception
+    {
+        CmisRepositoryCapabilitiesType capabilities = getAndAssertCapabilities();
+        if (capabilities.isCapabilityMultifiling() && capabilities.isCapabilityUnfiling())
+        {
+            addAndAssertObjectToFolder(documentId, folderId, false);
             try
             {
-                LOGGER.info("[MultiFilingService->removeObjectFromFolder]");
-                getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, folderId));
+                getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, null, null));
             }
             catch (Exception e)
             {
                 fail(e.toString());
             }
-            assertFalse("Object was not removed from folder", isDocumentInFolder(documentId, folderId));
-        }
-    }
-
-    public void testCapabilityVersionSpecificFiling() throws Exception
-    {
-        if (isVersioningAllowed())
-        {
-            String name = System.currentTimeMillis() + ".txt";
-            LOGGER.info("[VersioningService->checkOut]");
-            CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId));
-            LOGGER.info("[VersioningService->checkIn]");
-            CheckInResponse checkInResponse = getServicesFactory().getVersioningService().checkIn(
-                    new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0),
-                            "text/plain", name, null, "Test content 1".getBytes(), null), "", null, null, null));
-            checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), checkInResponse.getDocumentId()));
-            LOGGER.info("[VersioningService->checkIn]");
-            documentId = getServicesFactory().getVersioningService().checkIn(
-                    new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0),
-                            "text/plain", name, null, "Test content 2".getBytes(), null), "", null, null, null)).getDocumentId();
-            try
-            {
-                LOGGER.info("[MultiFilingService->addObjectToFolder]");
-                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getDocumentId(), folderId));
-            }
-            catch (Exception e)
-            {
-                if (getAndAssertCapabilities().isCapabilityVersionSpecificFiling())
-                {
-                    fail(e.toString());
-                }
-            }
-            if (getAndAssertCapabilities().isCapabilityVersionSpecificFiling())
-            {
-                assertTrue("Document was not added to folder", isDocumentInFolder(checkOutResponse.getDocumentId(), folderId));
-            }
-            else
-            {
-                assertFalse("Version specific filing is not supported, but document was added to folder", isDocumentInFolder(checkOutResponse.getDocumentId(), folderId));
-            }
+            assertTrue("Unfilling attempting was resulted with Object Deletion", objectExists(documentId));
+            assertFalse("Object was not Removed from Root Folder", isDocumentInFolder(documentId, getAndAssertRootFolderId()));
+            assertFalse("Object was not Removed from Folder", isDocumentInFolder(documentId, folderId));
         }
         else
         {
-            LOGGER.info("testCapabilityVersionSpecificFiling was skipped: Versioning isn't supported");
+            LOGGER.warn("testUnfileMultiFilledObject() was skipped: Multi-Filling or Un-Filling capability(s) is(are) not supported");
         }
     }
 
@@ -299,20 +404,22 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
-            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(INVALID_REPOSITORY_ID, documentId, folderId));
+            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(INVALID_REPOSITORY_ID, documentId, folderId, true, null));
             fail("Repository with specified Id was not described with RepositoryService");
         }
         catch (Exception e)
         {
+            assertException("Adding Object To Folder with Invalid Repository Id", e, EnumServiceException.invalidArgument);
         }
         try
         {
             LOGGER.info("[MultiFilingService->removeObjectFromFolder]");
-            getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(INVALID_REPOSITORY_ID, documentId, folderId));
+            getServicesFactory().getMultiFilingServicePort().removeObjectFromFolder(new RemoveObjectFromFolder(INVALID_REPOSITORY_ID, documentId, folderId, null));
             fail("Repository with specified Id was not described with RepositoryService");
         }
         catch (Exception e)
         {
+            assertException("Removing Object From Folder with Invalid Repository Id", e, EnumServiceException.invalidArgument);
         }
     }
 }

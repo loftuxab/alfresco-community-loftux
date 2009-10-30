@@ -17,20 +17,20 @@ public class EnumPropertiesDocument implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _value1 = "cmis:IsImmutable";
-    public static final java.lang.String _value2 = "cmis:IsLatestVersion";
-    public static final java.lang.String _value3 = "cmis:IsMajorVersion";
-    public static final java.lang.String _value4 = "cmis:IsLatestMajorVersion";
-    public static final java.lang.String _value5 = "cmis:VersionLabel";
-    public static final java.lang.String _value6 = "cmis:VersionSeriesId";
-    public static final java.lang.String _value7 = "cmis:IsVersionSeriesCheckedOut";
-    public static final java.lang.String _value8 = "cmis:VersionSeriesCheckedOutBy";
-    public static final java.lang.String _value9 = "cmis:VersionSeriesCheckedOutId";
-    public static final java.lang.String _value10 = "cmis:CheckinComment";
-    public static final java.lang.String _value11 = "cmis:ContentStreamLength";
-    public static final java.lang.String _value12 = "cmis:ContentStreamMimeType";
-    public static final java.lang.String _value13 = "cmis:ContentStreamFileName";
-    public static final java.lang.String _value14 = "cmis:ContentStreamId";
+    public static final java.lang.String _value1 = "cmis:isImmutable";
+    public static final java.lang.String _value2 = "cmis:isLatestVersion";
+    public static final java.lang.String _value3 = "cmis:isMajorVersion";
+    public static final java.lang.String _value4 = "cmis:isLatestMajorVersion";
+    public static final java.lang.String _value5 = "cmis:versionLabel";
+    public static final java.lang.String _value6 = "cmis:versionSeriesId";
+    public static final java.lang.String _value7 = "cmis:isVersionSeriesCheckedOut";
+    public static final java.lang.String _value8 = "cmis:versionSeriesCheckedOutBy";
+    public static final java.lang.String _value9 = "cmis:versionSeriesCheckedOutId";
+    public static final java.lang.String _value10 = "cmis:checkinComment";
+    public static final java.lang.String _value11 = "cmis:contentStreamLength";
+    public static final java.lang.String _value12 = "cmis:contentStreamMimeType";
+    public static final java.lang.String _value13 = "cmis:contentStreamFileName";
+    public static final java.lang.String _value14 = "cmis:contentStreamId";
     public static final EnumPropertiesDocument value1 = new EnumPropertiesDocument(_value1);
     public static final EnumPropertiesDocument value2 = new EnumPropertiesDocument(_value2);
     public static final EnumPropertiesDocument value3 = new EnumPropertiesDocument(_value3);
@@ -82,7 +82,7 @@ public class EnumPropertiesDocument implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumPropertiesDocument.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumPropertiesDocument"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumPropertiesDocument"));
     }
     /**
      * Return type metadata object

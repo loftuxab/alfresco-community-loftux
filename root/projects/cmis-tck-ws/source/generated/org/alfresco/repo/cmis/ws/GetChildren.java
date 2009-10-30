@@ -14,19 +14,24 @@ public class GetChildren  implements java.io.Serializable {
 
     private java.lang.String filter;
 
+    private java.lang.String orderBy;
+
     private java.lang.Boolean includeAllowableActions;
 
     private org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships;
 
-    private java.lang.Boolean includeRenditions;
+    private java.lang.String renditionFilter;
 
-    private java.lang.Boolean includeACL;
+    private java.lang.Boolean includePathSegments;
 
     private java.math.BigInteger maxItems;
 
     private java.math.BigInteger skipCount;
 
-    private java.lang.String orderBy;
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public GetChildren() {
     }
@@ -35,23 +40,25 @@ public class GetChildren  implements java.io.Serializable {
            java.lang.String repositoryId,
            java.lang.String folderId,
            java.lang.String filter,
+           java.lang.String orderBy,
            java.lang.Boolean includeAllowableActions,
            org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships,
-           java.lang.Boolean includeRenditions,
-           java.lang.Boolean includeACL,
+           java.lang.String renditionFilter,
+           java.lang.Boolean includePathSegments,
            java.math.BigInteger maxItems,
            java.math.BigInteger skipCount,
-           java.lang.String orderBy) {
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.folderId = folderId;
            this.filter = filter;
+           this.orderBy = orderBy;
            this.includeAllowableActions = includeAllowableActions;
            this.includeRelationships = includeRelationships;
-           this.includeRenditions = includeRenditions;
-           this.includeACL = includeACL;
+           this.renditionFilter = renditionFilter;
+           this.includePathSegments = includePathSegments;
            this.maxItems = maxItems;
            this.skipCount = skipCount;
-           this.orderBy = orderBy;
+           this.extension = extension;
     }
 
 
@@ -116,6 +123,26 @@ public class GetChildren  implements java.io.Serializable {
 
 
     /**
+     * Gets the orderBy value for this GetChildren.
+     * 
+     * @return orderBy
+     */
+    public java.lang.String getOrderBy() {
+        return orderBy;
+    }
+
+
+    /**
+     * Sets the orderBy value for this GetChildren.
+     * 
+     * @param orderBy
+     */
+    public void setOrderBy(java.lang.String orderBy) {
+        this.orderBy = orderBy;
+    }
+
+
+    /**
      * Gets the includeAllowableActions value for this GetChildren.
      * 
      * @return includeAllowableActions
@@ -156,42 +183,42 @@ public class GetChildren  implements java.io.Serializable {
 
 
     /**
-     * Gets the includeRenditions value for this GetChildren.
+     * Gets the renditionFilter value for this GetChildren.
      * 
-     * @return includeRenditions
+     * @return renditionFilter
      */
-    public java.lang.Boolean getIncludeRenditions() {
-        return includeRenditions;
+    public java.lang.String getRenditionFilter() {
+        return renditionFilter;
     }
 
 
     /**
-     * Sets the includeRenditions value for this GetChildren.
+     * Sets the renditionFilter value for this GetChildren.
      * 
-     * @param includeRenditions
+     * @param renditionFilter
      */
-    public void setIncludeRenditions(java.lang.Boolean includeRenditions) {
-        this.includeRenditions = includeRenditions;
+    public void setRenditionFilter(java.lang.String renditionFilter) {
+        this.renditionFilter = renditionFilter;
     }
 
 
     /**
-     * Gets the includeACL value for this GetChildren.
+     * Gets the includePathSegments value for this GetChildren.
      * 
-     * @return includeACL
+     * @return includePathSegments
      */
-    public java.lang.Boolean getIncludeACL() {
-        return includeACL;
+    public java.lang.Boolean getIncludePathSegments() {
+        return includePathSegments;
     }
 
 
     /**
-     * Sets the includeACL value for this GetChildren.
+     * Sets the includePathSegments value for this GetChildren.
      * 
-     * @param includeACL
+     * @param includePathSegments
      */
-    public void setIncludeACL(java.lang.Boolean includeACL) {
-        this.includeACL = includeACL;
+    public void setIncludePathSegments(java.lang.Boolean includePathSegments) {
+        this.includePathSegments = includePathSegments;
     }
 
 
@@ -236,22 +263,26 @@ public class GetChildren  implements java.io.Serializable {
 
 
     /**
-     * Gets the orderBy value for this GetChildren.
+     * Gets the extension value for this GetChildren.
      * 
-     * @return orderBy
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
      */
-    public java.lang.String getOrderBy() {
-        return orderBy;
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
     }
 
 
     /**
-     * Sets the orderBy value for this GetChildren.
+     * Sets the extension value for this GetChildren.
      * 
-     * @param orderBy
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
      */
-    public void setOrderBy(java.lang.String orderBy) {
-        this.orderBy = orderBy;
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -275,27 +306,30 @@ public class GetChildren  implements java.io.Serializable {
             ((this.filter==null && other.getFilter()==null) || 
              (this.filter!=null &&
               this.filter.equals(other.getFilter()))) &&
+            ((this.orderBy==null && other.getOrderBy()==null) || 
+             (this.orderBy!=null &&
+              this.orderBy.equals(other.getOrderBy()))) &&
             ((this.includeAllowableActions==null && other.getIncludeAllowableActions()==null) || 
              (this.includeAllowableActions!=null &&
               this.includeAllowableActions.equals(other.getIncludeAllowableActions()))) &&
             ((this.includeRelationships==null && other.getIncludeRelationships()==null) || 
              (this.includeRelationships!=null &&
               this.includeRelationships.equals(other.getIncludeRelationships()))) &&
-            ((this.includeRenditions==null && other.getIncludeRenditions()==null) || 
-             (this.includeRenditions!=null &&
-              this.includeRenditions.equals(other.getIncludeRenditions()))) &&
-            ((this.includeACL==null && other.getIncludeACL()==null) || 
-             (this.includeACL!=null &&
-              this.includeACL.equals(other.getIncludeACL()))) &&
+            ((this.renditionFilter==null && other.getRenditionFilter()==null) || 
+             (this.renditionFilter!=null &&
+              this.renditionFilter.equals(other.getRenditionFilter()))) &&
+            ((this.includePathSegments==null && other.getIncludePathSegments()==null) || 
+             (this.includePathSegments!=null &&
+              this.includePathSegments.equals(other.getIncludePathSegments()))) &&
             ((this.maxItems==null && other.getMaxItems()==null) || 
              (this.maxItems!=null &&
               this.maxItems.equals(other.getMaxItems()))) &&
             ((this.skipCount==null && other.getSkipCount()==null) || 
              (this.skipCount!=null &&
               this.skipCount.equals(other.getSkipCount()))) &&
-            ((this.orderBy==null && other.getOrderBy()==null) || 
-             (this.orderBy!=null &&
-              this.orderBy.equals(other.getOrderBy())));
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -316,17 +350,20 @@ public class GetChildren  implements java.io.Serializable {
         if (getFilter() != null) {
             _hashCode += getFilter().hashCode();
         }
+        if (getOrderBy() != null) {
+            _hashCode += getOrderBy().hashCode();
+        }
         if (getIncludeAllowableActions() != null) {
             _hashCode += getIncludeAllowableActions().hashCode();
         }
         if (getIncludeRelationships() != null) {
             _hashCode += getIncludeRelationships().hashCode();
         }
-        if (getIncludeRenditions() != null) {
-            _hashCode += getIncludeRenditions().hashCode();
+        if (getRenditionFilter() != null) {
+            _hashCode += getRenditionFilter().hashCode();
         }
-        if (getIncludeACL() != null) {
-            _hashCode += getIncludeACL().hashCode();
+        if (getIncludePathSegments() != null) {
+            _hashCode += getIncludePathSegments().hashCode();
         }
         if (getMaxItems() != null) {
             _hashCode += getMaxItems().hashCode();
@@ -334,8 +371,8 @@ public class GetChildren  implements java.io.Serializable {
         if (getSkipCount() != null) {
             _hashCode += getSkipCount().hashCode();
         }
-        if (getOrderBy() != null) {
-            _hashCode += getOrderBy().hashCode();
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -346,74 +383,81 @@ public class GetChildren  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetChildren.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getChildren"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getChildren"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("folderId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "folderId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "folderId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("filter");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "filter"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "filter"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("orderBy");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "orderBy"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeAllowableActions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeAllowableActions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeAllowableActions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeRelationships");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRelationships"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumIncludeRelationships"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeRelationships"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumIncludeRelationships"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeRenditions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRenditions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setFieldName("renditionFilter");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "renditionFilter"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeACL");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeACL"));
+        elemField.setFieldName("includePathSegments");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includePathSegments"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("maxItems");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "maxItems"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "maxItems"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("skipCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "skipCount"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "skipCount"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("orderBy");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "orderBy"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
-        elemField.setNillable(false);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

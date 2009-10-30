@@ -8,66 +8,58 @@
 package org.alfresco.repo.cmis.ws;
 
 public class GetContentChangesResponse  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.CmisObjectType[] changedObject;
+    private org.alfresco.repo.cmis.ws.CmisObjectListType objects;
 
-    private java.lang.String changeToken;
+    private java.lang.String changeLogToken;
 
     public GetContentChangesResponse() {
     }
 
     public GetContentChangesResponse(
-           org.alfresco.repo.cmis.ws.CmisObjectType[] changedObject,
-           java.lang.String changeToken) {
-           this.changedObject = changedObject;
-           this.changeToken = changeToken;
+           org.alfresco.repo.cmis.ws.CmisObjectListType objects,
+           java.lang.String changeLogToken) {
+           this.objects = objects;
+           this.changeLogToken = changeLogToken;
     }
 
 
     /**
-     * Gets the changedObject value for this GetContentChangesResponse.
+     * Gets the objects value for this GetContentChangesResponse.
      * 
-     * @return changedObject
+     * @return objects
      */
-    public org.alfresco.repo.cmis.ws.CmisObjectType[] getChangedObject() {
-        return changedObject;
+    public org.alfresco.repo.cmis.ws.CmisObjectListType getObjects() {
+        return objects;
     }
 
 
     /**
-     * Sets the changedObject value for this GetContentChangesResponse.
+     * Sets the objects value for this GetContentChangesResponse.
      * 
-     * @param changedObject
+     * @param objects
      */
-    public void setChangedObject(org.alfresco.repo.cmis.ws.CmisObjectType[] changedObject) {
-        this.changedObject = changedObject;
-    }
-
-    public org.alfresco.repo.cmis.ws.CmisObjectType getChangedObject(int i) {
-        return this.changedObject[i];
-    }
-
-    public void setChangedObject(int i, org.alfresco.repo.cmis.ws.CmisObjectType _value) {
-        this.changedObject[i] = _value;
+    public void setObjects(org.alfresco.repo.cmis.ws.CmisObjectListType objects) {
+        this.objects = objects;
     }
 
 
     /**
-     * Gets the changeToken value for this GetContentChangesResponse.
+     * Gets the changeLogToken value for this GetContentChangesResponse.
      * 
-     * @return changeToken
+     * @return changeLogToken
      */
-    public java.lang.String getChangeToken() {
-        return changeToken;
+    public java.lang.String getChangeLogToken() {
+        return changeLogToken;
     }
 
 
     /**
-     * Sets the changeToken value for this GetContentChangesResponse.
+     * Sets the changeLogToken value for this GetContentChangesResponse.
      * 
-     * @param changeToken
+     * @param changeLogToken
      */
-    public void setChangeToken(java.lang.String changeToken) {
-        this.changeToken = changeToken;
+    public void setChangeLogToken(java.lang.String changeLogToken) {
+        this.changeLogToken = changeLogToken;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -82,12 +74,12 @@ public class GetContentChangesResponse  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.changedObject==null && other.getChangedObject()==null) || 
-             (this.changedObject!=null &&
-              java.util.Arrays.equals(this.changedObject, other.getChangedObject()))) &&
-            ((this.changeToken==null && other.getChangeToken()==null) || 
-             (this.changeToken!=null &&
-              this.changeToken.equals(other.getChangeToken())));
+            ((this.objects==null && other.getObjects()==null) || 
+             (this.objects!=null &&
+              this.objects.equals(other.getObjects()))) &&
+            ((this.changeLogToken==null && other.getChangeLogToken()==null) || 
+             (this.changeLogToken!=null &&
+              this.changeLogToken.equals(other.getChangeLogToken())));
         __equalsCalc = null;
         return _equals;
     }
@@ -99,19 +91,11 @@ public class GetContentChangesResponse  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getChangedObject() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getChangedObject());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getChangedObject(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
+        if (getObjects() != null) {
+            _hashCode += getObjects().hashCode();
         }
-        if (getChangeToken() != null) {
-            _hashCode += getChangeToken().hashCode();
+        if (getChangeLogToken() != null) {
+            _hashCode += getChangeLogToken().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -122,18 +106,16 @@ public class GetContentChangesResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetContentChangesResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getContentChangesResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getContentChangesResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("changedObject");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "changedObject"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisObjectType"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(true);
-        elemField.setMaxOccursUnbounded(true);
+        elemField.setFieldName("objects");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objects"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisObjectListType"));
+        elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("changeToken");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "changeToken"));
+        elemField.setFieldName("changeLogToken");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "changeLogToken"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

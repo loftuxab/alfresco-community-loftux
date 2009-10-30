@@ -8,66 +8,34 @@
 package org.alfresco.repo.cmis.ws;
 
 public class QueryResponse  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.CmisObjectType[] object;
-
-    private boolean hasMoreItems;
+    private org.alfresco.repo.cmis.ws.CmisObjectListType objects;
 
     public QueryResponse() {
     }
 
     public QueryResponse(
-           org.alfresco.repo.cmis.ws.CmisObjectType[] object,
-           boolean hasMoreItems) {
-           this.object = object;
-           this.hasMoreItems = hasMoreItems;
+           org.alfresco.repo.cmis.ws.CmisObjectListType objects) {
+           this.objects = objects;
     }
 
 
     /**
-     * Gets the object value for this QueryResponse.
+     * Gets the objects value for this QueryResponse.
      * 
-     * @return object
+     * @return objects
      */
-    public org.alfresco.repo.cmis.ws.CmisObjectType[] getObject() {
-        return object;
+    public org.alfresco.repo.cmis.ws.CmisObjectListType getObjects() {
+        return objects;
     }
 
 
     /**
-     * Sets the object value for this QueryResponse.
+     * Sets the objects value for this QueryResponse.
      * 
-     * @param object
+     * @param objects
      */
-    public void setObject(org.alfresco.repo.cmis.ws.CmisObjectType[] object) {
-        this.object = object;
-    }
-
-    public org.alfresco.repo.cmis.ws.CmisObjectType getObject(int i) {
-        return this.object[i];
-    }
-
-    public void setObject(int i, org.alfresco.repo.cmis.ws.CmisObjectType _value) {
-        this.object[i] = _value;
-    }
-
-
-    /**
-     * Gets the hasMoreItems value for this QueryResponse.
-     * 
-     * @return hasMoreItems
-     */
-    public boolean isHasMoreItems() {
-        return hasMoreItems;
-    }
-
-
-    /**
-     * Sets the hasMoreItems value for this QueryResponse.
-     * 
-     * @param hasMoreItems
-     */
-    public void setHasMoreItems(boolean hasMoreItems) {
-        this.hasMoreItems = hasMoreItems;
+    public void setObjects(org.alfresco.repo.cmis.ws.CmisObjectListType objects) {
+        this.objects = objects;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -82,10 +50,9 @@ public class QueryResponse  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.object==null && other.getObject()==null) || 
-             (this.object!=null &&
-              java.util.Arrays.equals(this.object, other.getObject()))) &&
-            this.hasMoreItems == other.isHasMoreItems();
+            ((this.objects==null && other.getObjects()==null) || 
+             (this.objects!=null &&
+              this.objects.equals(other.getObjects())));
         __equalsCalc = null;
         return _equals;
     }
@@ -97,18 +64,9 @@ public class QueryResponse  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getObject() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getObject());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getObject(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
+        if (getObjects() != null) {
+            _hashCode += getObjects().hashCode();
         }
-        _hashCode += (isHasMoreItems() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -118,19 +76,11 @@ public class QueryResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(QueryResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">queryResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">queryResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("object");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "object"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisObjectType"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        elemField.setMaxOccursUnbounded(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("hasMoreItems");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "hasMoreItems"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setFieldName("objects");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objects"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisObjectListType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

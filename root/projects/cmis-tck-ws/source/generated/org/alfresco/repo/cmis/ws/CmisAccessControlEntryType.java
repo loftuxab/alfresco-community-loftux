@@ -10,7 +10,7 @@ package org.alfresco.repo.cmis.ws;
 public class CmisAccessControlEntryType  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
     private org.alfresco.repo.cmis.ws.CmisAccessControlPrincipalType principal;
 
-    private java.lang.String permission;
+    private java.lang.String[] permission;
 
     private boolean direct;
 
@@ -21,7 +21,7 @@ public class CmisAccessControlEntryType  implements java.io.Serializable, org.ap
 
     public CmisAccessControlEntryType(
            org.alfresco.repo.cmis.ws.CmisAccessControlPrincipalType principal,
-           java.lang.String permission,
+           java.lang.String[] permission,
            boolean direct,
            org.apache.axis.message.MessageElement [] _any) {
            this.principal = principal;
@@ -56,7 +56,7 @@ public class CmisAccessControlEntryType  implements java.io.Serializable, org.ap
      * 
      * @return permission
      */
-    public java.lang.String getPermission() {
+    public java.lang.String[] getPermission() {
         return permission;
     }
 
@@ -66,8 +66,16 @@ public class CmisAccessControlEntryType  implements java.io.Serializable, org.ap
      * 
      * @param permission
      */
-    public void setPermission(java.lang.String permission) {
+    public void setPermission(java.lang.String[] permission) {
         this.permission = permission;
+    }
+
+    public java.lang.String getPermission(int i) {
+        return this.permission[i];
+    }
+
+    public void setPermission(int i, java.lang.String _value) {
+        this.permission[i] = _value;
     }
 
 
@@ -127,7 +135,7 @@ public class CmisAccessControlEntryType  implements java.io.Serializable, org.ap
               this.principal.equals(other.getPrincipal()))) &&
             ((this.permission==null && other.getPermission()==null) || 
              (this.permission!=null &&
-              this.permission.equals(other.getPermission()))) &&
+              java.util.Arrays.equals(this.permission, other.getPermission()))) &&
             this.direct == other.isDirect() &&
             ((this._any==null && other.get_any()==null) || 
              (this._any!=null &&
@@ -147,7 +155,15 @@ public class CmisAccessControlEntryType  implements java.io.Serializable, org.ap
             _hashCode += getPrincipal().hashCode();
         }
         if (getPermission() != null) {
-            _hashCode += getPermission().hashCode();
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getPermission());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getPermission(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         _hashCode += (isDirect() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         if (get_any() != null) {
@@ -170,22 +186,23 @@ public class CmisAccessControlEntryType  implements java.io.Serializable, org.ap
         new org.apache.axis.description.TypeDesc(CmisAccessControlEntryType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlEntryType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAccessControlEntryType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("principal");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "principal"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlPrincipalType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "principal"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAccessControlPrincipalType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("permission");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "permission"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "permission"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
+        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("direct");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "direct"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "direct"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

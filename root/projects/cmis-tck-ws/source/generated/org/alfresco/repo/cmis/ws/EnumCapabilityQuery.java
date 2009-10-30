@@ -64,7 +64,7 @@ public class EnumCapabilityQuery implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumCapabilityQuery.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityQuery"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityQuery"));
     }
     /**
      * Return type metadata object

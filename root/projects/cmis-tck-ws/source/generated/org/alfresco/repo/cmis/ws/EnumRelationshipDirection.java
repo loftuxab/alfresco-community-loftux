@@ -60,7 +60,7 @@ public class EnumRelationshipDirection implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumRelationshipDirection.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumRelationshipDirection"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumRelationshipDirection"));
     }
     /**
      * Return type metadata object

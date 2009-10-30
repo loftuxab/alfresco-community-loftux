@@ -7,19 +7,23 @@
 
 package org.alfresco.repo.cmis.ws;
 
-public class CmisTypeContainer  implements java.io.Serializable {
+public class CmisTypeContainer  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
     private org.alfresco.repo.cmis.ws.CmisTypeDefinitionType type;
 
     private org.alfresco.repo.cmis.ws.CmisTypeContainer[] children;
+
+    private org.apache.axis.message.MessageElement [] _any;
 
     public CmisTypeContainer() {
     }
 
     public CmisTypeContainer(
            org.alfresco.repo.cmis.ws.CmisTypeDefinitionType type,
-           org.alfresco.repo.cmis.ws.CmisTypeContainer[] children) {
+           org.alfresco.repo.cmis.ws.CmisTypeContainer[] children,
+           org.apache.axis.message.MessageElement [] _any) {
            this.type = type;
            this.children = children;
+           this._any = _any;
     }
 
 
@@ -70,6 +74,26 @@ public class CmisTypeContainer  implements java.io.Serializable {
         this.children[i] = _value;
     }
 
+
+    /**
+     * Gets the _any value for this CmisTypeContainer.
+     * 
+     * @return _any
+     */
+    public org.apache.axis.message.MessageElement [] get_any() {
+        return _any;
+    }
+
+
+    /**
+     * Sets the _any value for this CmisTypeContainer.
+     * 
+     * @param _any
+     */
+    public void set_any(org.apache.axis.message.MessageElement [] _any) {
+        this._any = _any;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof CmisTypeContainer)) return false;
@@ -87,7 +111,10 @@ public class CmisTypeContainer  implements java.io.Serializable {
               this.type.equals(other.getType()))) &&
             ((this.children==null && other.getChildren()==null) || 
              (this.children!=null &&
-              java.util.Arrays.equals(this.children, other.getChildren())));
+              java.util.Arrays.equals(this.children, other.getChildren()))) &&
+            ((this._any==null && other.get_any()==null) || 
+             (this._any!=null &&
+              java.util.Arrays.equals(this._any, other.get_any())));
         __equalsCalc = null;
         return _equals;
     }
@@ -113,6 +140,17 @@ public class CmisTypeContainer  implements java.io.Serializable {
                 }
             }
         }
+        if (get_any() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(get_any());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(get_any(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -122,17 +160,17 @@ public class CmisTypeContainer  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(CmisTypeContainer.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "cmisTypeContainer"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisTypeContainer"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("type");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "type"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisTypeDefinitionType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "type"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisTypeDefinitionType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("children");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "children"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "cmisTypeContainer"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "children"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisTypeContainer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);

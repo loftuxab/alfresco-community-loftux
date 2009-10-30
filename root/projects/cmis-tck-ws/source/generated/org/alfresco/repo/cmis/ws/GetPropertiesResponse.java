@@ -8,34 +8,34 @@
 package org.alfresco.repo.cmis.ws;
 
 public class GetPropertiesResponse  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.CmisObjectType object;
+    private org.alfresco.repo.cmis.ws.CmisPropertiesType properties;
 
     public GetPropertiesResponse() {
     }
 
     public GetPropertiesResponse(
-           org.alfresco.repo.cmis.ws.CmisObjectType object) {
-           this.object = object;
+           org.alfresco.repo.cmis.ws.CmisPropertiesType properties) {
+           this.properties = properties;
     }
 
 
     /**
-     * Gets the object value for this GetPropertiesResponse.
+     * Gets the properties value for this GetPropertiesResponse.
      * 
-     * @return object
+     * @return properties
      */
-    public org.alfresco.repo.cmis.ws.CmisObjectType getObject() {
-        return object;
+    public org.alfresco.repo.cmis.ws.CmisPropertiesType getProperties() {
+        return properties;
     }
 
 
     /**
-     * Sets the object value for this GetPropertiesResponse.
+     * Sets the properties value for this GetPropertiesResponse.
      * 
-     * @param object
+     * @param properties
      */
-    public void setObject(org.alfresco.repo.cmis.ws.CmisObjectType object) {
-        this.object = object;
+    public void setProperties(org.alfresco.repo.cmis.ws.CmisPropertiesType properties) {
+        this.properties = properties;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -50,9 +50,9 @@ public class GetPropertiesResponse  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.object==null && other.getObject()==null) || 
-             (this.object!=null &&
-              this.object.equals(other.getObject())));
+            ((this.properties==null && other.getProperties()==null) || 
+             (this.properties!=null &&
+              this.properties.equals(other.getProperties())));
         __equalsCalc = null;
         return _equals;
     }
@@ -64,8 +64,8 @@ public class GetPropertiesResponse  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getObject() != null) {
-            _hashCode += getObject().hashCode();
+        if (getProperties() != null) {
+            _hashCode += getProperties().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -76,11 +76,11 @@ public class GetPropertiesResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetPropertiesResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getPropertiesResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getPropertiesResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("object");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "object"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisObjectType"));
+        elemField.setFieldName("properties");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "properties"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertiesType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

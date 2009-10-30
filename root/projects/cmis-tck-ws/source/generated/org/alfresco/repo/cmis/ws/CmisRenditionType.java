@@ -14,9 +14,9 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
 
     private java.math.BigInteger length;
 
-    private java.lang.String title;
-
     private java.lang.String kind;
+
+    private java.lang.String title;
 
     private java.math.BigInteger height;
 
@@ -33,8 +33,8 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
            java.lang.String streamId,
            java.lang.String mimetype,
            java.math.BigInteger length,
-           java.lang.String title,
            java.lang.String kind,
+           java.lang.String title,
            java.math.BigInteger height,
            java.math.BigInteger width,
            java.lang.String renditionDocumentId,
@@ -42,8 +42,8 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
            this.streamId = streamId;
            this.mimetype = mimetype;
            this.length = length;
-           this.title = title;
            this.kind = kind;
+           this.title = title;
            this.height = height;
            this.width = width;
            this.renditionDocumentId = renditionDocumentId;
@@ -112,26 +112,6 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
 
 
     /**
-     * Gets the title value for this CmisRenditionType.
-     * 
-     * @return title
-     */
-    public java.lang.String getTitle() {
-        return title;
-    }
-
-
-    /**
-     * Sets the title value for this CmisRenditionType.
-     * 
-     * @param title
-     */
-    public void setTitle(java.lang.String title) {
-        this.title = title;
-    }
-
-
-    /**
      * Gets the kind value for this CmisRenditionType.
      * 
      * @return kind
@@ -148,6 +128,26 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
      */
     public void setKind(java.lang.String kind) {
         this.kind = kind;
+    }
+
+
+    /**
+     * Gets the title value for this CmisRenditionType.
+     * 
+     * @return title
+     */
+    public java.lang.String getTitle() {
+        return title;
+    }
+
+
+    /**
+     * Sets the title value for this CmisRenditionType.
+     * 
+     * @param title
+     */
+    public void setTitle(java.lang.String title) {
+        this.title = title;
     }
 
 
@@ -251,12 +251,12 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
             ((this.length==null && other.getLength()==null) || 
              (this.length!=null &&
               this.length.equals(other.getLength()))) &&
-            ((this.title==null && other.getTitle()==null) || 
-             (this.title!=null &&
-              this.title.equals(other.getTitle()))) &&
             ((this.kind==null && other.getKind()==null) || 
              (this.kind!=null &&
               this.kind.equals(other.getKind()))) &&
+            ((this.title==null && other.getTitle()==null) || 
+             (this.title!=null &&
+              this.title.equals(other.getTitle()))) &&
             ((this.height==null && other.getHeight()==null) || 
              (this.height!=null &&
               this.height.equals(other.getHeight()))) &&
@@ -289,11 +289,11 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
         if (getLength() != null) {
             _hashCode += getLength().hashCode();
         }
-        if (getTitle() != null) {
-            _hashCode += getTitle().hashCode();
-        }
         if (getKind() != null) {
             _hashCode += getKind().hashCode();
+        }
+        if (getTitle() != null) {
+            _hashCode += getTitle().hashCode();
         }
         if (getHeight() != null) {
             _hashCode += getHeight().hashCode();
@@ -324,58 +324,55 @@ public class CmisRenditionType  implements java.io.Serializable, org.apache.axis
         new org.apache.axis.description.TypeDesc(CmisRenditionType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisRenditionType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisRenditionType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("streamId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "streamId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "streamId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("mimetype");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "mimetype"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "mimetype"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("length");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "length"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "length"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("title");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "title"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("kind");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "kind"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "kind"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("title");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "title"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("height");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "height"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "height"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("width");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "width"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "width"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("renditionDocumentId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "renditionDocumentId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "renditionDocumentId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

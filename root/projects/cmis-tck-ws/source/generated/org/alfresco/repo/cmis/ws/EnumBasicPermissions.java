@@ -19,12 +19,10 @@ public class EnumBasicPermissions implements java.io.Serializable {
 
     public static final java.lang.String _value1 = "cmis:read";
     public static final java.lang.String _value2 = "cmis:write";
-    public static final java.lang.String _value3 = "cmis:delete";
-    public static final java.lang.String _value4 = "cmis:all";
+    public static final java.lang.String _value3 = "cmis:all";
     public static final EnumBasicPermissions value1 = new EnumBasicPermissions(_value1);
     public static final EnumBasicPermissions value2 = new EnumBasicPermissions(_value2);
     public static final EnumBasicPermissions value3 = new EnumBasicPermissions(_value3);
-    public static final EnumBasicPermissions value4 = new EnumBasicPermissions(_value4);
     public java.lang.String getValue() { return _value_;}
     public static EnumBasicPermissions fromValue(java.lang.String value)
           throws java.lang.IllegalArgumentException {
@@ -62,7 +60,7 @@ public class EnumBasicPermissions implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumBasicPermissions.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumBasicPermissions"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumBasicPermissions"));
     }
     /**
      * Return type metadata object

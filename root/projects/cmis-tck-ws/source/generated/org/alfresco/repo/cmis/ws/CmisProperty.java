@@ -8,82 +8,106 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisProperty  implements java.io.Serializable {
-    private java.lang.String pdid;  // attribute
+    private java.lang.String propertyDefinitionId;  // attribute
 
-    private java.lang.String localname;  // attribute
+    private java.lang.String localName;  // attribute
 
-    private java.lang.String displayname;  // attribute
+    private java.lang.String displayName;  // attribute
+
+    private java.lang.String queryName;  // attribute
 
     public CmisProperty() {
     }
 
     public CmisProperty(
-           java.lang.String pdid,
-           java.lang.String localname,
-           java.lang.String displayname) {
-           this.pdid = pdid;
-           this.localname = localname;
-           this.displayname = displayname;
+           java.lang.String propertyDefinitionId,
+           java.lang.String localName,
+           java.lang.String displayName,
+           java.lang.String queryName) {
+           this.propertyDefinitionId = propertyDefinitionId;
+           this.localName = localName;
+           this.displayName = displayName;
+           this.queryName = queryName;
     }
 
 
     /**
-     * Gets the pdid value for this CmisProperty.
+     * Gets the propertyDefinitionId value for this CmisProperty.
      * 
-     * @return pdid
+     * @return propertyDefinitionId
      */
-    public java.lang.String getPdid() {
-        return pdid;
+    public java.lang.String getPropertyDefinitionId() {
+        return propertyDefinitionId;
     }
 
 
     /**
-     * Sets the pdid value for this CmisProperty.
+     * Sets the propertyDefinitionId value for this CmisProperty.
      * 
-     * @param pdid
+     * @param propertyDefinitionId
      */
-    public void setPdid(java.lang.String pdid) {
-        this.pdid = pdid;
+    public void setPropertyDefinitionId(java.lang.String propertyDefinitionId) {
+        this.propertyDefinitionId = propertyDefinitionId;
     }
 
 
     /**
-     * Gets the localname value for this CmisProperty.
+     * Gets the localName value for this CmisProperty.
      * 
-     * @return localname
+     * @return localName
      */
-    public java.lang.String getLocalname() {
-        return localname;
+    public java.lang.String getLocalName() {
+        return localName;
     }
 
 
     /**
-     * Sets the localname value for this CmisProperty.
+     * Sets the localName value for this CmisProperty.
      * 
-     * @param localname
+     * @param localName
      */
-    public void setLocalname(java.lang.String localname) {
-        this.localname = localname;
+    public void setLocalName(java.lang.String localName) {
+        this.localName = localName;
     }
 
 
     /**
-     * Gets the displayname value for this CmisProperty.
+     * Gets the displayName value for this CmisProperty.
      * 
-     * @return displayname
+     * @return displayName
      */
-    public java.lang.String getDisplayname() {
-        return displayname;
+    public java.lang.String getDisplayName() {
+        return displayName;
     }
 
 
     /**
-     * Sets the displayname value for this CmisProperty.
+     * Sets the displayName value for this CmisProperty.
      * 
-     * @param displayname
+     * @param displayName
      */
-    public void setDisplayname(java.lang.String displayname) {
-        this.displayname = displayname;
+    public void setDisplayName(java.lang.String displayName) {
+        this.displayName = displayName;
+    }
+
+
+    /**
+     * Gets the queryName value for this CmisProperty.
+     * 
+     * @return queryName
+     */
+    public java.lang.String getQueryName() {
+        return queryName;
+    }
+
+
+    /**
+     * Sets the queryName value for this CmisProperty.
+     * 
+     * @param queryName
+     */
+    public void setQueryName(java.lang.String queryName) {
+        this.queryName = queryName;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -98,15 +122,18 @@ public class CmisProperty  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.pdid==null && other.getPdid()==null) || 
-             (this.pdid!=null &&
-              this.pdid.equals(other.getPdid()))) &&
-            ((this.localname==null && other.getLocalname()==null) || 
-             (this.localname!=null &&
-              this.localname.equals(other.getLocalname()))) &&
-            ((this.displayname==null && other.getDisplayname()==null) || 
-             (this.displayname!=null &&
-              this.displayname.equals(other.getDisplayname())));
+            ((this.propertyDefinitionId==null && other.getPropertyDefinitionId()==null) || 
+             (this.propertyDefinitionId!=null &&
+              this.propertyDefinitionId.equals(other.getPropertyDefinitionId()))) &&
+            ((this.localName==null && other.getLocalName()==null) || 
+             (this.localName!=null &&
+              this.localName.equals(other.getLocalName()))) &&
+            ((this.displayName==null && other.getDisplayName()==null) || 
+             (this.displayName!=null &&
+              this.displayName.equals(other.getDisplayName()))) &&
+            ((this.queryName==null && other.getQueryName()==null) || 
+             (this.queryName!=null &&
+              this.queryName.equals(other.getQueryName())));
         __equalsCalc = null;
         return _equals;
     }
@@ -118,14 +145,17 @@ public class CmisProperty  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getPdid() != null) {
-            _hashCode += getPdid().hashCode();
+        if (getPropertyDefinitionId() != null) {
+            _hashCode += getPropertyDefinitionId().hashCode();
         }
-        if (getLocalname() != null) {
-            _hashCode += getLocalname().hashCode();
+        if (getLocalName() != null) {
+            _hashCode += getLocalName().hashCode();
         }
-        if (getDisplayname() != null) {
-            _hashCode += getDisplayname().hashCode();
+        if (getDisplayName() != null) {
+            _hashCode += getDisplayName().hashCode();
+        }
+        if (getQueryName() != null) {
+            _hashCode += getQueryName().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -136,20 +166,25 @@ public class CmisProperty  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(CmisProperty.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisProperty"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisProperty"));
         org.apache.axis.description.AttributeDesc attrField = new org.apache.axis.description.AttributeDesc();
-        attrField.setFieldName("pdid");
-        attrField.setXmlName(new javax.xml.namespace.QName("", "pdid"));
+        attrField.setFieldName("propertyDefinitionId");
+        attrField.setXmlName(new javax.xml.namespace.QName("", "propertyDefinitionId"));
         attrField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         typeDesc.addFieldDesc(attrField);
         attrField = new org.apache.axis.description.AttributeDesc();
-        attrField.setFieldName("localname");
-        attrField.setXmlName(new javax.xml.namespace.QName("", "localname"));
+        attrField.setFieldName("localName");
+        attrField.setXmlName(new javax.xml.namespace.QName("", "localName"));
         attrField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         typeDesc.addFieldDesc(attrField);
         attrField = new org.apache.axis.description.AttributeDesc();
-        attrField.setFieldName("displayname");
-        attrField.setXmlName(new javax.xml.namespace.QName("", "displayname"));
+        attrField.setFieldName("displayName");
+        attrField.setXmlName(new javax.xml.namespace.QName("", "displayName"));
+        attrField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        typeDesc.addFieldDesc(attrField);
+        attrField = new org.apache.axis.description.AttributeDesc();
+        attrField.setFieldName("queryName");
+        attrField.setXmlName(new javax.xml.namespace.QName("", "queryName"));
         attrField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         typeDesc.addFieldDesc(attrField);
     }

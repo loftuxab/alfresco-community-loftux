@@ -14,14 +14,16 @@ public class CmisPropertyUri  extends org.alfresco.repo.cmis.ws.CmisProperty  im
     }
 
     public CmisPropertyUri(
-           java.lang.String pdid,
-           java.lang.String localname,
-           java.lang.String displayname,
+           java.lang.String propertyDefinitionId,
+           java.lang.String localName,
+           java.lang.String displayName,
+           java.lang.String queryName,
            org.apache.axis.types.URI[] value) {
         super(
-            pdid,
-            localname,
-            displayname);
+            propertyDefinitionId,
+            localName,
+            displayName,
+            queryName);
         this.value = value;
     }
 
@@ -99,10 +101,10 @@ public class CmisPropertyUri  extends org.alfresco.repo.cmis.ws.CmisProperty  im
         new org.apache.axis.description.TypeDesc(CmisPropertyUri.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyUri"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyUri"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("value");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "value"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "value"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

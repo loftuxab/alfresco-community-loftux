@@ -60,7 +60,7 @@ public class EnumUnfileObject implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumUnfileObject.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumUnfileObject"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumUnfileObject"));
     }
     /**
      * Return type metadata object
