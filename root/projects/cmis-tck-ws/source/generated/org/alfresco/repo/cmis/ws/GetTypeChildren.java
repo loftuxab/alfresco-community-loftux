@@ -18,6 +18,11 @@ public class GetTypeChildren  implements java.io.Serializable {
 
     private java.math.BigInteger skipCount;
 
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
+
     public GetTypeChildren() {
     }
 
@@ -26,12 +31,14 @@ public class GetTypeChildren  implements java.io.Serializable {
            java.lang.String typeId,
            java.lang.Boolean includePropertyDefinitions,
            java.math.BigInteger maxItems,
-           java.math.BigInteger skipCount) {
+           java.math.BigInteger skipCount,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.typeId = typeId;
            this.includePropertyDefinitions = includePropertyDefinitions;
            this.maxItems = maxItems;
            this.skipCount = skipCount;
+           this.extension = extension;
     }
 
 
@@ -134,6 +141,30 @@ public class GetTypeChildren  implements java.io.Serializable {
         this.skipCount = skipCount;
     }
 
+
+    /**
+     * Gets the extension value for this GetTypeChildren.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this GetTypeChildren.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof GetTypeChildren)) return false;
@@ -160,7 +191,10 @@ public class GetTypeChildren  implements java.io.Serializable {
               this.maxItems.equals(other.getMaxItems()))) &&
             ((this.skipCount==null && other.getSkipCount()==null) || 
              (this.skipCount!=null &&
-              this.skipCount.equals(other.getSkipCount())));
+              this.skipCount.equals(other.getSkipCount()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -187,6 +221,9 @@ public class GetTypeChildren  implements java.io.Serializable {
         if (getSkipCount() != null) {
             _hashCode += getSkipCount().hashCode();
         }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -196,38 +233,45 @@ public class GetTypeChildren  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetTypeChildren.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getTypeChildren"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getTypeChildren"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("typeId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "typeId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "typeId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includePropertyDefinitions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includePropertyDefinitions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includePropertyDefinitions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("maxItems");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "maxItems"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "maxItems"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("skipCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "skipCount"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "skipCount"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

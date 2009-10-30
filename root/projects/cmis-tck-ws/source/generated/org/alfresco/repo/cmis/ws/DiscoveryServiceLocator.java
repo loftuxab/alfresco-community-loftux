@@ -105,7 +105,7 @@ public class DiscoveryServiceLocator extends org.apache.axis.client.Service impl
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "DiscoveryService");
+        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "DiscoveryService");
     }
 
     private java.util.HashSet ports = null;
@@ -113,7 +113,7 @@ public class DiscoveryServiceLocator extends org.apache.axis.client.Service impl
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "DiscoveryServicePort"));
+            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "DiscoveryServicePort"));
         }
         return ports.iterator();
     }

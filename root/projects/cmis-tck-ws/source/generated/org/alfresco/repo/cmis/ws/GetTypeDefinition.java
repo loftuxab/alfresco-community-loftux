@@ -12,14 +12,21 @@ public class GetTypeDefinition  implements java.io.Serializable {
 
     private java.lang.String typeId;
 
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
+
     public GetTypeDefinition() {
     }
 
     public GetTypeDefinition(
            java.lang.String repositoryId,
-           java.lang.String typeId) {
+           java.lang.String typeId,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.typeId = typeId;
+           this.extension = extension;
     }
 
 
@@ -62,6 +69,30 @@ public class GetTypeDefinition  implements java.io.Serializable {
         this.typeId = typeId;
     }
 
+
+    /**
+     * Gets the extension value for this GetTypeDefinition.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this GetTypeDefinition.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof GetTypeDefinition)) return false;
@@ -79,7 +110,10 @@ public class GetTypeDefinition  implements java.io.Serializable {
               this.repositoryId.equals(other.getRepositoryId()))) &&
             ((this.typeId==null && other.getTypeId()==null) || 
              (this.typeId!=null &&
-              this.typeId.equals(other.getTypeId())));
+              this.typeId.equals(other.getTypeId()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -97,6 +131,9 @@ public class GetTypeDefinition  implements java.io.Serializable {
         if (getTypeId() != null) {
             _hashCode += getTypeId().hashCode();
         }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -106,18 +143,25 @@ public class GetTypeDefinition  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetTypeDefinition.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getTypeDefinition"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getTypeDefinition"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("typeId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "typeId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "typeId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

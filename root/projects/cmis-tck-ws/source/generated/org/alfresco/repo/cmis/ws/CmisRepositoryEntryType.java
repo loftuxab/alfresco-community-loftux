@@ -8,13 +8,9 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisRepositoryEntryType  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
-    private java.lang.String id;
+    private java.lang.String repositoryId;
 
-    private java.lang.String name;
-
-    private java.lang.String relationship;
-
-    private org.apache.axis.types.URI thinClientURI;
+    private java.lang.String repositoryName;
 
     private org.apache.axis.message.MessageElement [] _any;
 
@@ -22,96 +18,52 @@ public class CmisRepositoryEntryType  implements java.io.Serializable, org.apach
     }
 
     public CmisRepositoryEntryType(
-           java.lang.String id,
-           java.lang.String name,
-           java.lang.String relationship,
-           org.apache.axis.types.URI thinClientURI,
+           java.lang.String repositoryId,
+           java.lang.String repositoryName,
            org.apache.axis.message.MessageElement [] _any) {
-           this.id = id;
-           this.name = name;
-           this.relationship = relationship;
-           this.thinClientURI = thinClientURI;
+           this.repositoryId = repositoryId;
+           this.repositoryName = repositoryName;
            this._any = _any;
     }
 
 
     /**
-     * Gets the id value for this CmisRepositoryEntryType.
+     * Gets the repositoryId value for this CmisRepositoryEntryType.
      * 
-     * @return id
+     * @return repositoryId
      */
-    public java.lang.String getId() {
-        return id;
+    public java.lang.String getRepositoryId() {
+        return repositoryId;
     }
 
 
     /**
-     * Sets the id value for this CmisRepositoryEntryType.
+     * Sets the repositoryId value for this CmisRepositoryEntryType.
      * 
-     * @param id
+     * @param repositoryId
      */
-    public void setId(java.lang.String id) {
-        this.id = id;
+    public void setRepositoryId(java.lang.String repositoryId) {
+        this.repositoryId = repositoryId;
     }
 
 
     /**
-     * Gets the name value for this CmisRepositoryEntryType.
+     * Gets the repositoryName value for this CmisRepositoryEntryType.
      * 
-     * @return name
+     * @return repositoryName
      */
-    public java.lang.String getName() {
-        return name;
+    public java.lang.String getRepositoryName() {
+        return repositoryName;
     }
 
 
     /**
-     * Sets the name value for this CmisRepositoryEntryType.
+     * Sets the repositoryName value for this CmisRepositoryEntryType.
      * 
-     * @param name
+     * @param repositoryName
      */
-    public void setName(java.lang.String name) {
-        this.name = name;
-    }
-
-
-    /**
-     * Gets the relationship value for this CmisRepositoryEntryType.
-     * 
-     * @return relationship
-     */
-    public java.lang.String getRelationship() {
-        return relationship;
-    }
-
-
-    /**
-     * Sets the relationship value for this CmisRepositoryEntryType.
-     * 
-     * @param relationship
-     */
-    public void setRelationship(java.lang.String relationship) {
-        this.relationship = relationship;
-    }
-
-
-    /**
-     * Gets the thinClientURI value for this CmisRepositoryEntryType.
-     * 
-     * @return thinClientURI
-     */
-    public org.apache.axis.types.URI getThinClientURI() {
-        return thinClientURI;
-    }
-
-
-    /**
-     * Sets the thinClientURI value for this CmisRepositoryEntryType.
-     * 
-     * @param thinClientURI
-     */
-    public void setThinClientURI(org.apache.axis.types.URI thinClientURI) {
-        this.thinClientURI = thinClientURI;
+    public void setRepositoryName(java.lang.String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 
 
@@ -146,18 +98,12 @@ public class CmisRepositoryEntryType  implements java.io.Serializable, org.apach
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.id==null && other.getId()==null) || 
-             (this.id!=null &&
-              this.id.equals(other.getId()))) &&
-            ((this.name==null && other.getName()==null) || 
-             (this.name!=null &&
-              this.name.equals(other.getName()))) &&
-            ((this.relationship==null && other.getRelationship()==null) || 
-             (this.relationship!=null &&
-              this.relationship.equals(other.getRelationship()))) &&
-            ((this.thinClientURI==null && other.getThinClientURI()==null) || 
-             (this.thinClientURI!=null &&
-              this.thinClientURI.equals(other.getThinClientURI()))) &&
+            ((this.repositoryId==null && other.getRepositoryId()==null) || 
+             (this.repositoryId!=null &&
+              this.repositoryId.equals(other.getRepositoryId()))) &&
+            ((this.repositoryName==null && other.getRepositoryName()==null) || 
+             (this.repositoryName!=null &&
+              this.repositoryName.equals(other.getRepositoryName()))) &&
             ((this._any==null && other.get_any()==null) || 
              (this._any!=null &&
               java.util.Arrays.equals(this._any, other.get_any())));
@@ -172,17 +118,11 @@ public class CmisRepositoryEntryType  implements java.io.Serializable, org.apach
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getId() != null) {
-            _hashCode += getId().hashCode();
+        if (getRepositoryId() != null) {
+            _hashCode += getRepositoryId().hashCode();
         }
-        if (getName() != null) {
-            _hashCode += getName().hashCode();
-        }
-        if (getRelationship() != null) {
-            _hashCode += getRelationship().hashCode();
-        }
-        if (getThinClientURI() != null) {
-            _hashCode += getThinClientURI().hashCode();
+        if (getRepositoryName() != null) {
+            _hashCode += getRepositoryName().hashCode();
         }
         if (get_any() != null) {
             for (int i=0;
@@ -204,31 +144,17 @@ public class CmisRepositoryEntryType  implements java.io.Serializable, org.apach
         new org.apache.axis.description.TypeDesc(CmisRepositoryEntryType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "cmisRepositoryEntryType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisRepositoryEntryType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("id");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "id"));
+        elemField.setFieldName("repositoryId");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("name");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "name"));
+        elemField.setFieldName("repositoryName");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryName"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("relationship");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "relationship"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("thinClientURI");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "thinClientURI"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

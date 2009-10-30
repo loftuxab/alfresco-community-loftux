@@ -17,7 +17,7 @@ public class EnumPropertiesPolicy implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _value1 = "cmis:PolicyText";
+    public static final java.lang.String _value1 = "cmis:policyText";
     public static final EnumPropertiesPolicy value1 = new EnumPropertiesPolicy(_value1);
     public java.lang.String getValue() { return _value_;}
     public static EnumPropertiesPolicy fromValue(java.lang.String value)
@@ -56,7 +56,7 @@ public class EnumPropertiesPolicy implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumPropertiesPolicy.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumPropertiesPolicy"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumPropertiesPolicy"));
     }
     /**
      * Return type metadata object

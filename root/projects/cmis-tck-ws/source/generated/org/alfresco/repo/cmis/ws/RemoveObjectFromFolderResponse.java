@@ -8,7 +8,41 @@
 package org.alfresco.repo.cmis.ws;
 
 public class RemoveObjectFromFolderResponse  implements java.io.Serializable {
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
+
     public RemoveObjectFromFolderResponse() {
+    }
+
+    public RemoveObjectFromFolderResponse(
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+           this.extension = extension;
+    }
+
+
+    /**
+     * Gets the extension value for this RemoveObjectFromFolderResponse.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this RemoveObjectFromFolderResponse.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -22,7 +56,10 @@ public class RemoveObjectFromFolderResponse  implements java.io.Serializable {
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true;
+        _equals = true && 
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -34,6 +71,9 @@ public class RemoveObjectFromFolderResponse  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -43,7 +83,14 @@ public class RemoveObjectFromFolderResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(RemoveObjectFromFolderResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">removeObjectFromFolderResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">removeObjectFromFolderResponse"));
+        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
     }
 
     /**

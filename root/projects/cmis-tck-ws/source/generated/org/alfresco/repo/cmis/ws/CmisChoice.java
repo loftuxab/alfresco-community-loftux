@@ -8,13 +8,13 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisChoice  implements java.io.Serializable {
-    private java.lang.Object displayName;  // attribute
+    private java.lang.String displayName;  // attribute
 
     public CmisChoice() {
     }
 
     public CmisChoice(
-           java.lang.Object displayName) {
+           java.lang.String displayName) {
            this.displayName = displayName;
     }
 
@@ -24,7 +24,7 @@ public class CmisChoice  implements java.io.Serializable {
      * 
      * @return displayName
      */
-    public java.lang.Object getDisplayName() {
+    public java.lang.String getDisplayName() {
         return displayName;
     }
 
@@ -34,7 +34,7 @@ public class CmisChoice  implements java.io.Serializable {
      * 
      * @param displayName
      */
-    public void setDisplayName(java.lang.Object displayName) {
+    public void setDisplayName(java.lang.String displayName) {
         this.displayName = displayName;
     }
 
@@ -76,7 +76,7 @@ public class CmisChoice  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(CmisChoice.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisChoice"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisChoice"));
         org.apache.axis.description.AttributeDesc attrField = new org.apache.axis.description.AttributeDesc();
         attrField.setFieldName("displayName");
         attrField.setXmlName(new javax.xml.namespace.QName("", "displayName"));

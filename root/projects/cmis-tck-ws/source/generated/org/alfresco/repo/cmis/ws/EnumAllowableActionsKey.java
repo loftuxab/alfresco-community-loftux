@@ -47,7 +47,7 @@ public class EnumAllowableActionsKey implements java.io.Serializable {
     public static final java.lang.String _value28 = "canCancelCheckout.Document";
     public static final java.lang.String _value29 = "canCheckin.Document";
     public static final java.lang.String _value30 = "canGetAllVersions.VersionSeries";
-    public static final java.lang.String _value31 = "canGetRelationship.Object";
+    public static final java.lang.String _value31 = "canGetObjectRelationships.Object";
     public static final java.lang.String _value32 = "canAddPolicy.Object";
     public static final java.lang.String _value33 = "canAddPolicy.Policy";
     public static final java.lang.String _value34 = "canRemovePolicy.Object";
@@ -130,7 +130,7 @@ public class EnumAllowableActionsKey implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumAllowableActionsKey.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumAllowableActionsKey"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumAllowableActionsKey"));
     }
     /**
      * Return type metadata object

@@ -17,8 +17,8 @@ public class EnumPropertiesRelationship implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _value1 = "cmis:SourceId";
-    public static final java.lang.String _value2 = "cmis:TargetId";
+    public static final java.lang.String _value1 = "cmis:sourceId";
+    public static final java.lang.String _value2 = "cmis:targetId";
     public static final EnumPropertiesRelationship value1 = new EnumPropertiesRelationship(_value1);
     public static final EnumPropertiesRelationship value2 = new EnumPropertiesRelationship(_value2);
     public java.lang.String getValue() { return _value_;}
@@ -58,7 +58,7 @@ public class EnumPropertiesRelationship implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumPropertiesRelationship.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumPropertiesRelationship"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumPropertiesRelationship"));
     }
     /**
      * Return type metadata object

@@ -27,7 +27,6 @@ package org.alfresco.cmis.test.ws;
 import java.math.BigInteger;
 import java.util.LinkedList;
 
-import org.alfresco.repo.cmis.ws.CmisFaultType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryEntryType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryInfoType;
@@ -60,11 +59,8 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
 
     private static final String WRONG_TYPE_ID = "Wrong TypeId Parameter";
 
-    private static final String INVALID_REPOSITORY_ID = "Wrong Repository Id";
-
     private static final String PROPERTY_DEFINITIONS_NOT_RETURNED_MESSAGE_PATTERN = "Property Definitions for \"%s\" Type Definitions was not returned in request with returnPropertyDefinitions=TRUE";
     private static final String PROPERTY_DEFINITIONS_RETURNED_MESSAGE_PATTERN = "Property Definitions for \"%s\" Type Definitions was not returned in request with returnPropertyDefinitions=FALSE";
-    private static final String INVALID_EXCEPTION_MESSAGE = "Invalid exception was thrown. Expected: invalidArgument, was: ";
     private static final String BASE_DOCUMENT_TYPE_NOT_FOUND_MESSAGE = "Base Document type definition was not found";
 
     public CmisRepositoryServiceClient()
@@ -96,17 +92,13 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
             LOGGER.info("Invoking client...");
         }
         RepositoryServicePortBindingStub repositoryService = getServicesFactory().getRepositoryService(getProxyUrl() + getService().getPath());
-
         CmisRepositoryEntryType[] repositories = repositoryService.getRepositories(new GetRepositories());
-
-        GetRepositoryInfo getRepositoryInfo = new GetRepositoryInfo();
-        getRepositoryInfo.setRepositoryId(repositories[0].getId());
+        String repositoryId = repositories[0].getRepositoryId();
+        GetRepositoryInfo getRepositoryInfo = new GetRepositoryInfo(repositoryId, null);
         repositoryService.getRepositoryInfo(getRepositoryInfo);
-
-        String typeId = repositoryService.getTypeDescendants(new GetTypeDescendants(repositories[0].getId(), null, BigInteger.valueOf(-1), true))[0].getType().getId();
-        repositoryService.getTypeChildren(new GetTypeChildren(repositories[0].getId(), typeId, true, BigInteger.ZERO, BigInteger.ZERO)).getType()[0].getId();
-
-        repositoryService.getTypeDefinition(new GetTypeDefinition(repositories[0].getId(), typeId));
+        String typeId = repositoryService.getTypeDescendants(new GetTypeDescendants(repositoryId, null, BigInteger.valueOf(-1), true, null))[0].getType().getId();
+        repositoryService.getTypeChildren(new GetTypeChildren(repositoryId, typeId, true, BigInteger.ZERO, BigInteger.ZERO, null)).getTypes().getTypes()[0].getId();
+        repositoryService.getTypeDefinition(new GetTypeDefinition(repositoryId, typeId, null));
     }
 
     @Override
@@ -164,7 +156,7 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
         {
             fail(e.toString());
         }
-        assertNotNull("GetRepositories response is NULL", repositories);
+        assertNotNull("GetRepositories response is undefined", repositories);
         assertTrue("GetRepositories response is empty", repositories.length > 0);
         assertNotNull("GetRepositories response is empty", repositories[0]);
     }
@@ -175,69 +167,69 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[RepositoryService->getRepositoryInfo]");
-            getInfo = getServicesFactory().getRepositoryService().getRepositoryInfo(new GetRepositoryInfo(getAndAssertRepositoryId()));
+            getInfo = getServicesFactory().getRepositoryService().getRepositoryInfo(new GetRepositoryInfo(getAndAssertRepositoryId(), null));
         }
         catch (Exception e)
         {
             fail(e.toString());
         }
-        assertNotNull("GetRepositoryInfo response is NULL", getInfo);
+        assertNotNull("GetRepositoryInfo response is undefined", getInfo);
         CmisRepositoryInfoType repositoryInfo = getInfo.getRepositoryInfo();
-        assertEquals("Repository id is not valid", getAndAssertRepositoryId(), repositoryInfo.getRepositoryId());
-        assertNotNull("Repository name is NULL", repositoryInfo.getRepositoryName());
-        assertNotNull("Repository relationship is NULL", repositoryInfo.getRepositoryRelationship());
-        assertNotNull("Repository description is NULL", repositoryInfo.getRepositoryDescription());
-        assertNotNull("Repository product name is NULL", repositoryInfo.getProductName());
-        assertNotNull("Repository vendor name is NULL", repositoryInfo.getVendorName());
-        assertNotNull("Repository product version is NULL", repositoryInfo.getProductVersion());
-        assertNotNull("Repository root folder id is NULL", repositoryInfo.getRootFolderId());
-        assertFalse("Repository root folder id is empty", "".equals(repositoryInfo.getRootFolderId()));
+        assertEquals("Repository Id is not valid", getAndAssertRepositoryId(), repositoryInfo.getRepositoryId());
+        assertNotNull("Repository Name is undefined", repositoryInfo.getRepositoryName());
+        assertNotNull("Repository Description is undefined", repositoryInfo.getRepositoryDescription());
+        assertNotNull("Repository Product Name is undefined", repositoryInfo.getProductName());
+        assertNotNull("Repository Vendor Name is undefined", repositoryInfo.getVendorName());
+        assertNotNull("Repository Product Version is undefined", repositoryInfo.getProductVersion());
+        assertNotNull("Repository Root Folder Id is undefined", repositoryInfo.getRootFolderId());
+        assertFalse("Repository Root Folder Id is empty", "".equals(repositoryInfo.getRootFolderId()));
         // FIXME: uncomment this when changeToken concept will be resolved
         // assertNotNull(repositoryInfo.getLatestChangeToken());
-        assertNotNull("Repository version supported is NULL", repositoryInfo.getCmisVersionSupported());
-        assertNotNull("Repository thin client URI is NULL", repositoryInfo.getThinClientURI());
+        assertNotNull("Repository CMIS Version Supported is undefined", repositoryInfo.getCmisVersionSupported());
+        assertNotNull("Repository Thin Client URI is undefined", repositoryInfo.getThinClientURI());
         // FIXME: uncomment this when changesIncomplete retrieving API will be added
         // assertNotNull(repositoryInfo.getChangesIncomplete());
         // FIXME: uncomment this when aclCapability will be added
         // assertNotNull(repositoryInfo.getAclCapability());
+        assertNotNull("Changes On Type are undefined", repositoryInfo.getChangesOnType());
+        assertNotNull("Repository Principal Anonymous is undefined", repositoryInfo.getPrincipalAnonymous());
+        assertNotNull("Repository Principal Anyone is undefined", repositoryInfo.getPrincipalAnyone());
 
         CmisRepositoryCapabilitiesType capabilities = repositoryInfo.getCapabilities();
-        assertNotNull("Repository capabilities are NULL", capabilities);
-        assertNotNull("Repository capabilityACL is NULL", capabilities.getCapabilityACL());
-        assertNotNull("Repository capabilityChanges is NULL", capabilities.getCapabilityChanges());
-        // FIXME: uncomment this when capabilityChangesOnType capability will be added
-        // assertNotNull(capabilities.getCapabilityChangesOnType());
-        assertNotNull("Repository capabilityContentStreamUpdatability is NULL", capabilities.getCapabilityContentStreamUpdatability());
-        assertNotNull("Repository capabilityJoin is NULL", capabilities.getCapabilityJoin());
-        assertNotNull("Repository capabilityQuery is NULL", capabilities.getCapabilityQuery());
-        assertNotNull("Repository capabilityRenditions is NULL", capabilities.getCapabilityRenditions());
+        assertNotNull("Repository capabilities are undefined", capabilities);
+        assertNotNull("Repository capabilityACL is undefined", capabilities.getCapabilityACL());
+        assertNotNull("Repository capabilityChanges is undefined", capabilities.getCapabilityChanges());
+        assertNotNull("Repository capabilityContentStreamUpdatability is undefined", capabilities.getCapabilityContentStreamUpdatability());
+        assertNotNull("Repository capabilityJoin is undefined", capabilities.getCapabilityJoin());
+        assertNotNull("Repository capabilityQuery is undefined", capabilities.getCapabilityQuery());
+        assertNotNull("Repository capabilityRenditions is undefined", capabilities.getCapabilityRenditions());
     }
 
     public void testGetTypeChildren()
     {
-        getAndAssertTypeChildren(null, true, 0, 0);
+        getAndAssertTypeChildren(null, true, 0L, 0L);
     }
 
     public void testGetTypeChildrenWithTypeIdInNotSetAndSetState()
     {
-        GetTypeChildrenResponse response = getAndAssertTypeChildren(null, false, 0, 0);
-        assertEquals("Invalid type amount was returned", 4, response.getType().length);
+        GetTypeChildrenResponse response = getAndAssertTypeChildren(null, false, 0L, 0L);
+        assertEquals("Invalid type amount was returned", 4, response.getTypes().getTypes().length);
         String typeId = getBaseDocumentTypeId(response);
         assertNotNull(BASE_DOCUMENT_TYPE_NOT_FOUND_MESSAGE, typeId);
-        response = getAndAssertTypeChildren(typeId, false, 10, 0);
+        response = getAndAssertTypeChildren(typeId, false, 10L, 0L);
     }
 
     public void testGetTypeChildrenPagination()
     {
-        GetTypeChildrenResponse response = getAndAssertTypeChildren(null, false, 3, 0);
-        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.isHasMoreItems());
-        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", response.isHasMoreItems() && (3 == response.getType().length));
+        GetTypeChildrenResponse response = getAndAssertTypeChildren(null, false, 4L, 0L);
+        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.getTypes().isHasMoreItems());
+        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", response.getTypes().isHasMoreItems() && (3 == response.getTypes().getTypes().length));
 
-        response = getAndAssertTypeChildren(null, false, 0, 0);
-        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.isHasMoreItems());
-        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", !response.isHasMoreItems() && (4 == response.getType().length));
+        response = getAndAssertTypeChildren(null, false, 0L, 0L);
+        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.getTypes().isHasMoreItems());
+        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", !response.getTypes().isHasMoreItems() && (4 == response.getTypes().getTypes().length));
         String typeId = null;
-        for (CmisTypeDefinitionType typeDef : response.getType())
+        for (CmisTypeDefinitionType typeDef : response.getTypes().getTypes())
         {
             if (!(typeDef instanceof CmisTypePolicyDefinitionType) && !(typeDef instanceof CmisTypeRelationshipDefinitionType))
             {
@@ -247,49 +239,50 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
         }
         assertNotNull("Type id is NULL", typeId);
 
-        response = getAndAssertTypeChildren(null, false, 0, 1);
-        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.isHasMoreItems());
-        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", !response.isHasMoreItems() && (3 == response.getType().length));
+        response = getAndAssertTypeChildren(null, false, 0L, 1L);
+        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.getTypes().isHasMoreItems());
+        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", !response.getTypes().isHasMoreItems() && (3 == response.getTypes().getTypes().length));
 
-        response = getAndAssertTypeChildren(null, false, 2, 1);
-        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.isHasMoreItems());
-        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", response.isHasMoreItems() && (2 == response.getType().length));
+        response = getAndAssertTypeChildren(null, false, 2L, 1L);
+        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.getTypes().isHasMoreItems());
+        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", response.getTypes().isHasMoreItems() && (2 == response.getTypes().getTypes().length));
 
-        response = getAndAssertTypeChildren(typeId, false, 10, 0);
-        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.isHasMoreItems());
-        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", (response.isHasMoreItems() && (10 == response.getType().length)) || (!response.isHasMoreItems() && (response.getType().length <= 10)));
+        response = getAndAssertTypeChildren(typeId, false, 10L, 0L);
+        assertNotNull("GetTypeChildren response property 'hasMoreItems' is NULL", response.getTypes().isHasMoreItems());
+        assertTrue("GetTypeChildren response property 'hasMoreItems' is invalid", (response.getTypes().isHasMoreItems() && (10 == response.getTypes().getTypes().length))
+                || (!response.getTypes().isHasMoreItems() && (response.getTypes().getTypes().length <= 10)));
     }
 
     public void testGetTypeChildrenWithPropertyDefinitions() throws Exception
     {
-        validateAllTypesOnValidProperties(getAndAssertTypeChildren(null, true, 0, 0), true);
-        validateAllTypesOnValidProperties(getAndAssertTypeChildren(null, false, 0, 0), false);
+        validateAllTypesOnValidProperties(getAndAssertTypeChildren(null, true, 0L, 0L), true);
+        validateAllTypesOnValidProperties(getAndAssertTypeChildren(null, false, 0L, 0L), false);
     }
 
-    public void testGetTypeChildrenWrongTypeId()
+    private void validateAllTypesOnValidProperties(GetTypeChildrenResponse response, boolean propertiesAreExpected)
+    {
+        for (CmisTypeDefinitionType typeDef : response.getTypes().getTypes())
+        {
+            if (propertiesAreExpected != propertiesDefinitionIsValid(typeDef, propertiesAreExpected))
+            {
+                fail(String.format(((propertiesAreExpected) ? (PROPERTY_DEFINITIONS_NOT_RETURNED_MESSAGE_PATTERN) : (PROPERTY_DEFINITIONS_RETURNED_MESSAGE_PATTERN)), typeDef
+                        .getId()));
+            }
+        }
+    }
+
+    public void testGetTypeChildrenForWrongTypeId()
     {
         try
         {
             LOGGER.info("[RepositoryService->getTypeChildren]");
             getServicesFactory().getRepositoryService().getTypeChildren(
-                    new GetTypeChildren(getAndAssertRepositoryId(), "Wrong Type id", false, BigInteger.valueOf(10), BigInteger.valueOf(0)));
-            fail("No Exception was thrown during getting type children for wrong typeI");
+                    new GetTypeChildren(getAndAssertRepositoryId(), WRONG_TYPE_ID, false, BigInteger.valueOf(10), BigInteger.valueOf(0), null));
+            fail("No one Exception was thrown during Getting Type Children for wrong Type Id");
         }
         catch (Exception e)
         {
-            assertTrue("Invalid exception was thrown during getting type children for wrong typeId", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.invalidArgument));
-        }
-    }
-
-    private void validateAllTypesOnValidProperties(GetTypeChildrenResponse response, boolean expectedConditionValue)
-    {
-        for (CmisTypeDefinitionType typeDef : response.getType())
-        {
-            if (expectedConditionValue != propertiesDefinitionIsValid(typeDef, expectedConditionValue))
-            {
-                fail(String.format(((expectedConditionValue) ? (PROPERTY_DEFINITIONS_NOT_RETURNED_MESSAGE_PATTERN) : (PROPERTY_DEFINITIONS_RETURNED_MESSAGE_PATTERN)), typeDef
-                        .getId()));
-            }
+            assertException("Type Children Receiving for wrong Type Id", e, EnumServiceException.invalidArgument);
         }
     }
 
@@ -307,9 +300,7 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
                 && ((null == typeDef.getPropertyIdDefinition()) || (typeDef.getPropertyIdDefinition().length < 1))
                 && ((null == typeDef.getPropertyIntegerDefinition()) || (typeDef.getPropertyIntegerDefinition().length < 1))
                 && ((null == typeDef.getPropertyStringDefinition()) || (typeDef.getPropertyStringDefinition().length < 1))
-                && ((null == typeDef.getPropertyUriDefinition()) || (typeDef.getPropertyUriDefinition().length < 1))
-                && ((null == typeDef.getPropertyXhtmlDefinition()) || (typeDef.getPropertyXhtmlDefinition().length < 1))
-                && ((null == typeDef.getPropertyXmlDefinition()) || (typeDef.getPropertyXmlDefinition().length < 1)))
+                && ((null == typeDef.getPropertyUriDefinition()) || (typeDef.getPropertyUriDefinition().length < 1)))
         {
             return false;
         }
@@ -356,7 +347,7 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
     public void testGetTypeDescendantsDepthing() throws Exception
     {
         long allTypesAmount = calculateTypesAmount(getAndAssertTypeDescendants(null, -1, false));
-        String typeId = getBaseDocumentTypeId(getAndAssertTypeChildren(null, false, 0, 0));
+        String typeId = getBaseDocumentTypeId(getAndAssertTypeChildren(null, false, 0L, 0L));
         assertNotNull(typeId);
         long documentTypesAmount = calculateTypesAmount(getAndAssertTypeDescendants(typeId, -1, false));
         long toConcreateDepthDocumentTypesAmount = calculateTypesAmount(getAndAssertTypeDescendants(typeId, 2, false));
@@ -395,7 +386,7 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
 
     public void testGetTypeDescendantsWithTypeIdNotSetAndSetParameterState() throws Exception
     {
-        String typeId = getBaseDocumentTypeId(getAndAssertTypeChildren(null, true, 0, 0));
+        String typeId = getBaseDocumentTypeId(getAndAssertTypeChildren(null, true, 0L, 0L));
         assertNotNull("Base document type id is NULL");
         CmisTypeContainer[] documentTypes = getAndAssertTypeDescendants(typeId, -1, true);
 
@@ -411,9 +402,9 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
 
             CmisTypeDefinitionType type = container.getType();
             assertNotNull("One of returned type definition type is NULL", type);
-            if (!typeId.equals(type.getBaseTypeId().getValue()))
+            if (!typeId.equals(type.getBaseId().getValue()))
             {
-                fail("Type Children Response with concreate TypeId contains odd Type Definition. Expected: \"" + typeId + "\", actual: \"" + type.getBaseTypeId() + "\"");
+                fail("Type Children Response with concreate TypeId contains odd Type Definition. Expected: \"" + typeId + "\", actual: \"" + type.getBaseId() + "\"");
             }
 
             if (null != container.getChildren())
@@ -428,36 +419,26 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[RepositoryService->getTypeDescendants]");
-            getServicesFactory().getRepositoryService().getTypeDescendants(new GetTypeDescendants(getAndAssertRepositoryId(), WRONG_TYPE_ID, BigInteger.valueOf(-1), false));
-            fail("Get Type Descendants service has processed Invalid TypeId as valid TypeId");
+            getServicesFactory().getRepositoryService().getTypeDescendants(new GetTypeDescendants(getAndAssertRepositoryId(), WRONG_TYPE_ID, BigInteger.valueOf(-1), false, null));
+            fail("Get Type Descendants service has processed Invalid Type Id as Valid Type Id");
         }
         catch (Exception e)
         {
-            if (!(e instanceof CmisFaultType) || (null == ((CmisFaultType) e).getType()) || (null == ((CmisFaultType) e).getType().getValue()))
-            {
-                fail(INVALID_EXCEPTION_MESSAGE + e.toString());
-            }
-            assertTrue((INVALID_EXCEPTION_MESSAGE + ((CmisFaultType) e).getType().getValue()), EnumServiceException.invalidArgument.getValue().equals(
-                    ((CmisFaultType) e).getType().getValue()));
+            assertException("Type Descendants Receiving for Invalid Type Id", e, EnumServiceException.invalidArgument);
         }
     }
 
-    public void testGetTypeDefinitionWithWrongTypeId()
+    public void testGetTypeDescentantsWithDepthEqualToZero() throws Exception
     {
         try
         {
-            LOGGER.info("[RepositoryService->getTypeDefinition]");
-            getServicesFactory().getRepositoryService().getTypeDefinition(new GetTypeDefinition(getAndAssertRepositoryId(), WRONG_TYPE_ID));
-            fail("Get Type Definition service has processed Invalid TypeId as valid TypeId");
+            LOGGER.info("[RepositoryService->getTypeDescendants]");
+            getAndAssertTypeDescendants(null, 0, false);
+            fail("Type Descentants can't be received for Depth equal to '0'");
         }
         catch (Exception e)
         {
-            if (!(e instanceof CmisFaultType) || (null == ((CmisFaultType) e).getType()) || (null == ((CmisFaultType) e).getType().getValue()))
-            {
-                fail(INVALID_EXCEPTION_MESSAGE + e.toString());
-            }
-            assertTrue((INVALID_EXCEPTION_MESSAGE + ((CmisFaultType) e).getType().getValue()), EnumServiceException.invalidArgument.getValue().equals(
-                    ((CmisFaultType) e).getType().getValue()));
+            assertException("Type Descentans Receiving with Depth equal to '0'", e, EnumServiceException.invalidArgument);
         }
     }
 
@@ -467,47 +448,66 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
         getAndAssertTypeDefinition(getTypesResponse[0].getType().getId());
     }
 
+    public void testGetTypeDefinitionWithWrongTypeId()
+    {
+        try
+        {
+            LOGGER.info("[RepositoryService->getTypeDefinition]");
+            getServicesFactory().getRepositoryService().getTypeDefinition(new GetTypeDefinition(getAndAssertRepositoryId(), WRONG_TYPE_ID, null));
+            fail("Get Type Definition service has processed Invalid TypeId as valid TypeId");
+        }
+        catch (Exception e)
+        {
+            assertException("Type Definition Receiving for Invalid Type Id", e, EnumServiceException.invalidArgument);
+        }
+    }
+
     public void testWrongRepositoryIdUsing() throws Exception
     {
         try
         {
             LOGGER.info("[RepositoryService->getRepositoryInfo]");
-            getServicesFactory().getRepositoryService().getRepositoryInfo(new GetRepositoryInfo(INVALID_REPOSITORY_ID));
+            getServicesFactory().getRepositoryService().getRepositoryInfo(new GetRepositoryInfo(INVALID_REPOSITORY_ID, null));
             fail("Repository with specified Id was not described with RepositoryService");
         }
         catch (Exception e)
         {
+            assertException("Repository Info Receiving for Invalid Repository Id", e, EnumServiceException.invalidArgument);
         }
 
         try
         {
             LOGGER.info("[RepositoryService->getTypeChildren]");
-            getServicesFactory().getRepositoryService().getTypeChildren(new GetTypeChildren(INVALID_REPOSITORY_ID, null, false, BigInteger.valueOf(10), BigInteger.valueOf(0)));
+            getServicesFactory().getRepositoryService().getTypeChildren(
+                    new GetTypeChildren(INVALID_REPOSITORY_ID, null, false, BigInteger.valueOf(10), BigInteger.valueOf(0), null));
             fail("Repository with specified Id was not described with RepositoryService");
         }
         catch (Exception e)
         {
+            assertException("Type Children Receiving with Invalid Repository Id", e, EnumServiceException.invalidArgument);
         }
 
         try
         {
             LOGGER.info("[RepositoryService->getTypeDescendants]");
-            getServicesFactory().getRepositoryService().getTypeDescendants(new GetTypeDescendants(INVALID_REPOSITORY_ID, null, BigInteger.valueOf(1), true));
+            getServicesFactory().getRepositoryService().getTypeDescendants(new GetTypeDescendants(INVALID_REPOSITORY_ID, null, BigInteger.valueOf(1), true, null));
             fail("Repository with specified Id was not described with RepositoryService");
         }
         catch (Exception e)
         {
+            assertException("Type Descendants Receiving with Invalid Repository Id", e, EnumServiceException.invalidArgument);
         }
 
         try
         {
             CmisTypeContainer[] getTypesResponse = getAndAssertTypeDescendants(null, 1, true);
             LOGGER.info("[RepositoryService->getTypeDefinition]");
-            getServicesFactory().getRepositoryService().getTypeDefinition(new GetTypeDefinition(INVALID_REPOSITORY_ID, getTypesResponse[0].getType().getId()));
+            getServicesFactory().getRepositoryService().getTypeDefinition(new GetTypeDefinition(INVALID_REPOSITORY_ID, getTypesResponse[0].getType().getId(), null));
             fail("Repository with specified Id was not described with RepositoryService");
         }
         catch (Exception e)
         {
+            assertException("Type Definition Receiving with Invalid Repository Id", e, EnumServiceException.invalidArgument);
         }
     }
 }

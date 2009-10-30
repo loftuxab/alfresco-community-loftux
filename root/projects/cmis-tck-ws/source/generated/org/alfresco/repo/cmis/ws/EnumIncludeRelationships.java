@@ -62,7 +62,7 @@ public class EnumIncludeRelationships implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumIncludeRelationships.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumIncludeRelationships"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumIncludeRelationships"));
     }
     /**
      * Return type metadata object

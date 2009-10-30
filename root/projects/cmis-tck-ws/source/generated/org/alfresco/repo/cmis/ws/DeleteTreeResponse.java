@@ -8,13 +8,13 @@
 package org.alfresco.repo.cmis.ws;
 
 public class DeleteTreeResponse  implements java.io.Serializable {
-    private java.lang.String[] failedToDelete;
+    private org.alfresco.repo.cmis.ws.DeleteTreeResponseFailedToDelete failedToDelete;
 
     public DeleteTreeResponse() {
     }
 
     public DeleteTreeResponse(
-           java.lang.String[] failedToDelete) {
+           org.alfresco.repo.cmis.ws.DeleteTreeResponseFailedToDelete failedToDelete) {
            this.failedToDelete = failedToDelete;
     }
 
@@ -24,7 +24,7 @@ public class DeleteTreeResponse  implements java.io.Serializable {
      * 
      * @return failedToDelete
      */
-    public java.lang.String[] getFailedToDelete() {
+    public org.alfresco.repo.cmis.ws.DeleteTreeResponseFailedToDelete getFailedToDelete() {
         return failedToDelete;
     }
 
@@ -34,7 +34,7 @@ public class DeleteTreeResponse  implements java.io.Serializable {
      * 
      * @param failedToDelete
      */
-    public void setFailedToDelete(java.lang.String[] failedToDelete) {
+    public void setFailedToDelete(org.alfresco.repo.cmis.ws.DeleteTreeResponseFailedToDelete failedToDelete) {
         this.failedToDelete = failedToDelete;
     }
 
@@ -52,7 +52,7 @@ public class DeleteTreeResponse  implements java.io.Serializable {
         _equals = true && 
             ((this.failedToDelete==null && other.getFailedToDelete()==null) || 
              (this.failedToDelete!=null &&
-              java.util.Arrays.equals(this.failedToDelete, other.getFailedToDelete())));
+              this.failedToDelete.equals(other.getFailedToDelete())));
         __equalsCalc = null;
         return _equals;
     }
@@ -65,15 +65,7 @@ public class DeleteTreeResponse  implements java.io.Serializable {
         __hashCodeCalc = true;
         int _hashCode = 1;
         if (getFailedToDelete() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getFailedToDelete());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getFailedToDelete(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
+            _hashCode += getFailedToDelete().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -84,13 +76,12 @@ public class DeleteTreeResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(DeleteTreeResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">deleteTreeResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">deleteTreeResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("failedToDelete");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "failedToDelete"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "failedToDelete"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">>deleteTreeResponse>failedToDelete"));
         elemField.setNillable(false);
-        elemField.setItemQName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "objectId"));
         typeDesc.addFieldDesc(elemField);
     }
 

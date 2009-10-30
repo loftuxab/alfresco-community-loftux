@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="source/java"/>
-	<classpathentry kind="src" path="config"/>
 	<classpathentry kind="src" path="source/generated"/>
+	<classpathentry kind="src" path="config"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk15"/>
+	<classpathentry kind="lib" path="lib/axis-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/geronimo-activation_1.0.2_spec-1.1.jar"/>
@@ -22,9 +24,5 @@
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="lib/xmlsec-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/axis-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/axis-ant.jar"/>
-	<classpathentry kind="lib" path="lib/one-jar-ant-task-0.96.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

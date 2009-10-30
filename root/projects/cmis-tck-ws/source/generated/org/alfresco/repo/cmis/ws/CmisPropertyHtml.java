@@ -8,20 +8,22 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisPropertyHtml  extends org.alfresco.repo.cmis.ws.CmisProperty  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.CmisPropertyHtmlValue[] value;
+    private java.lang.String[] value;
 
     public CmisPropertyHtml() {
     }
 
     public CmisPropertyHtml(
-           java.lang.String pdid,
-           java.lang.String localname,
-           java.lang.String displayname,
-           org.alfresco.repo.cmis.ws.CmisPropertyHtmlValue[] value) {
+           java.lang.String propertyDefinitionId,
+           java.lang.String localName,
+           java.lang.String displayName,
+           java.lang.String queryName,
+           java.lang.String[] value) {
         super(
-            pdid,
-            localname,
-            displayname);
+            propertyDefinitionId,
+            localName,
+            displayName,
+            queryName);
         this.value = value;
     }
 
@@ -31,7 +33,7 @@ public class CmisPropertyHtml  extends org.alfresco.repo.cmis.ws.CmisProperty  i
      * 
      * @return value
      */
-    public org.alfresco.repo.cmis.ws.CmisPropertyHtmlValue[] getValue() {
+    public java.lang.String[] getValue() {
         return value;
     }
 
@@ -41,15 +43,15 @@ public class CmisPropertyHtml  extends org.alfresco.repo.cmis.ws.CmisProperty  i
      * 
      * @param value
      */
-    public void setValue(org.alfresco.repo.cmis.ws.CmisPropertyHtmlValue[] value) {
+    public void setValue(java.lang.String[] value) {
         this.value = value;
     }
 
-    public org.alfresco.repo.cmis.ws.CmisPropertyHtmlValue getValue(int i) {
+    public java.lang.String getValue(int i) {
         return this.value[i];
     }
 
-    public void setValue(int i, org.alfresco.repo.cmis.ws.CmisPropertyHtmlValue _value) {
+    public void setValue(int i, java.lang.String _value) {
         this.value[i] = _value;
     }
 
@@ -99,11 +101,11 @@ public class CmisPropertyHtml  extends org.alfresco.repo.cmis.ws.CmisProperty  i
         new org.apache.axis.description.TypeDesc(CmisPropertyHtml.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyHtml"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyHtml"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("value");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "value"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", ">cmisPropertyHtml>value"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "value"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);

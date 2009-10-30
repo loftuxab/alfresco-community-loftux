@@ -8,34 +8,34 @@
 package org.alfresco.repo.cmis.ws;
 
 public class GetACLResponse  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.CmisAccessControlListType acl;
+    private org.alfresco.repo.cmis.ws.CmisACLType ACL;
 
     public GetACLResponse() {
     }
 
     public GetACLResponse(
-           org.alfresco.repo.cmis.ws.CmisAccessControlListType acl) {
-           this.acl = acl;
+           org.alfresco.repo.cmis.ws.CmisACLType ACL) {
+           this.ACL = ACL;
     }
 
 
     /**
-     * Gets the acl value for this GetACLResponse.
+     * Gets the ACL value for this GetACLResponse.
      * 
-     * @return acl
+     * @return ACL
      */
-    public org.alfresco.repo.cmis.ws.CmisAccessControlListType getAcl() {
-        return acl;
+    public org.alfresco.repo.cmis.ws.CmisACLType getACL() {
+        return ACL;
     }
 
 
     /**
-     * Sets the acl value for this GetACLResponse.
+     * Sets the ACL value for this GetACLResponse.
      * 
-     * @param acl
+     * @param ACL
      */
-    public void setAcl(org.alfresco.repo.cmis.ws.CmisAccessControlListType acl) {
-        this.acl = acl;
+    public void setACL(org.alfresco.repo.cmis.ws.CmisACLType ACL) {
+        this.ACL = ACL;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -50,9 +50,9 @@ public class GetACLResponse  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.acl==null && other.getAcl()==null) || 
-             (this.acl!=null &&
-              this.acl.equals(other.getAcl())));
+            ((this.ACL==null && other.getACL()==null) || 
+             (this.ACL!=null &&
+              this.ACL.equals(other.getACL())));
         __equalsCalc = null;
         return _equals;
     }
@@ -64,8 +64,8 @@ public class GetACLResponse  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getAcl() != null) {
-            _hashCode += getAcl().hashCode();
+        if (getACL() != null) {
+            _hashCode += getACL().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -76,11 +76,11 @@ public class GetACLResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetACLResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getACLResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getACLResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("acl");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "acl"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlListType"));
+        elemField.setFieldName("ACL");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "ACL"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisACLType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

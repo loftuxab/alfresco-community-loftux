@@ -7,22 +7,12 @@
 
 package org.alfresco.repo.cmis.ws;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axis.description.TypeDesc;
-import org.apache.axis.encoding.DeserializationContext;
-import org.apache.axis.message.SOAPHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 public class CmisContentStreamType  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
     private java.math.BigInteger length;
 
     private java.lang.String mimeType;
 
     private java.lang.String filename;
-
-    private org.apache.axis.types.URI uri;
 
     private byte[] stream;
 
@@ -35,13 +25,11 @@ public class CmisContentStreamType  implements java.io.Serializable, org.apache.
            java.math.BigInteger length,
            java.lang.String mimeType,
            java.lang.String filename,
-           org.apache.axis.types.URI uri,
            byte[] stream,
            org.apache.axis.message.MessageElement [] _any) {
            this.length = length;
            this.mimeType = mimeType;
            this.filename = filename;
-           this.uri = uri;
            this.stream = stream;
            this._any = _any;
     }
@@ -108,26 +96,6 @@ public class CmisContentStreamType  implements java.io.Serializable, org.apache.
 
 
     /**
-     * Gets the uri value for this CmisContentStreamType.
-     * 
-     * @return uri
-     */
-    public org.apache.axis.types.URI getUri() {
-        return uri;
-    }
-
-
-    /**
-     * Sets the uri value for this CmisContentStreamType.
-     * 
-     * @param uri
-     */
-    public void setUri(org.apache.axis.types.URI uri) {
-        this.uri = uri;
-    }
-
-
-    /**
      * Gets the stream value for this CmisContentStreamType.
      * 
      * @return stream
@@ -187,9 +155,6 @@ public class CmisContentStreamType  implements java.io.Serializable, org.apache.
             ((this.filename==null && other.getFilename()==null) || 
              (this.filename!=null &&
               this.filename.equals(other.getFilename()))) &&
-            ((this.uri==null && other.getUri()==null) || 
-             (this.uri!=null &&
-              this.uri.equals(other.getUri()))) &&
             ((this.stream==null && other.getStream()==null) || 
              (this.stream!=null &&
               java.util.Arrays.equals(this.stream, other.getStream()))) &&
@@ -215,9 +180,6 @@ public class CmisContentStreamType  implements java.io.Serializable, org.apache.
         }
         if (getFilename() != null) {
             _hashCode += getFilename().hashCode();
-        }
-        if (getUri() != null) {
-            _hashCode += getUri().hashCode();
         }
         if (getStream() != null) {
             for (int i=0;
@@ -250,37 +212,31 @@ public class CmisContentStreamType  implements java.io.Serializable, org.apache.
         new org.apache.axis.description.TypeDesc(CmisContentStreamType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "cmisContentStreamType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisContentStreamType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("length");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "length"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "length"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("mimeType");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "mimeType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "mimeType"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("filename");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "filename"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "filename"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("uri");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "uri"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("stream");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "stream"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "stream"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
@@ -308,27 +264,13 @@ public class CmisContentStreamType  implements java.io.Serializable, org.apache.
     /**
      * Get Custom Deserializer
      */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(java.lang.String mechType, java.lang.Class _javaType, javax.xml.namespace.QName _xmlType)
-    {
-        return new CustomBeanDeserializer(_javaType, _xmlType, typeDesc);
-    }
-
-    private static class CustomBeanDeserializer extends org.apache.axis.encoding.ser.BeanDeserializer
-    {
-        public CustomBeanDeserializer(Class<?> javaType, QName xmlType, TypeDesc typeDesc)
-        {
-            super(javaType, xmlType, typeDesc);
-        }
-
-        public SOAPHandler onStartChild(String namespace, String localName, String prefix, Attributes attributes, DeserializationContext context) throws SAXException
-        {
-            if ("stream".equals(localName))
-            {
-                return null;
-            }
-            return super.onStartChild(namespace, localName, prefix, attributes, context);
-        }
-        private static final long serialVersionUID = 2774907596442770814L;
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+           java.lang.String mechType, 
+           java.lang.Class _javaType,  
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanDeserializer(
+            _javaType, _xmlType, typeDesc);
     }
 
 }

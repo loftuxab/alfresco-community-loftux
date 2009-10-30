@@ -60,7 +60,7 @@ public class EnumCapabilityACL implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumCapabilityACL.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityACL"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityACL"));
     }
     /**
      * Return type metadata object

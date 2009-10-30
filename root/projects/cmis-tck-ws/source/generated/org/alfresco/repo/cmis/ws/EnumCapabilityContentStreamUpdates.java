@@ -17,10 +17,12 @@ public class EnumCapabilityContentStreamUpdates implements java.io.Serializable 
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _value1 = "anytime";
-    public static final java.lang.String _value2 = "pwc-only";
-    public static final EnumCapabilityContentStreamUpdates value1 = new EnumCapabilityContentStreamUpdates(_value1);
-    public static final EnumCapabilityContentStreamUpdates value2 = new EnumCapabilityContentStreamUpdates(_value2);
+    public static final java.lang.String _anytime = "anytime";
+    public static final java.lang.String _pwconly = "pwconly";
+    public static final java.lang.String _none = "none";
+    public static final EnumCapabilityContentStreamUpdates anytime = new EnumCapabilityContentStreamUpdates(_anytime);
+    public static final EnumCapabilityContentStreamUpdates pwconly = new EnumCapabilityContentStreamUpdates(_pwconly);
+    public static final EnumCapabilityContentStreamUpdates none = new EnumCapabilityContentStreamUpdates(_none);
     public java.lang.String getValue() { return _value_;}
     public static EnumCapabilityContentStreamUpdates fromValue(java.lang.String value)
           throws java.lang.IllegalArgumentException {
@@ -58,7 +60,7 @@ public class EnumCapabilityContentStreamUpdates implements java.io.Serializable 
         new org.apache.axis.description.TypeDesc(EnumCapabilityContentStreamUpdates.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityContentStreamUpdates"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityContentStreamUpdates"));
     }
     /**
      * Return type metadata object

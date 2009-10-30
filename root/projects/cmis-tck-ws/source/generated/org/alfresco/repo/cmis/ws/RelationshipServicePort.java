@@ -8,5 +8,5 @@
 package org.alfresco.repo.cmis.ws;
 
 public interface RelationshipServicePort extends java.rmi.Remote {
-    public org.alfresco.repo.cmis.ws.GetRelationshipsResponse getRelationships(org.alfresco.repo.cmis.ws.GetRelationships parameters) throws java.rmi.RemoteException, org.alfresco.repo.cmis.ws.CmisFaultType;
+    public org.alfresco.repo.cmis.ws.GetObjectRelationshipsResponse getObjectRelationships(org.alfresco.repo.cmis.ws.GetObjectRelationships parameters) throws java.rmi.RemoteException, org.alfresco.repo.cmis.ws.CmisFaultType;
 }

@@ -105,7 +105,7 @@ public class RepositoryServiceLocator extends org.apache.axis.client.Service imp
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "RepositoryService");
+        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "RepositoryService");
     }
 
     private java.util.HashSet ports = null;
@@ -113,7 +113,7 @@ public class RepositoryServiceLocator extends org.apache.axis.client.Service imp
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "RepositoryServicePort"));
+            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "RepositoryServicePort"));
         }
         return ports.iterator();
     }

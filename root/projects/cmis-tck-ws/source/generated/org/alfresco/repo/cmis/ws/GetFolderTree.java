@@ -12,13 +12,22 @@ public class GetFolderTree  implements java.io.Serializable {
 
     private java.lang.String folderId;
 
-    private java.lang.String filter;
-
     private java.math.BigInteger depth;
+
+    private java.lang.String filter;
 
     private java.lang.Boolean includeAllowableActions;
 
     private org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships;
+
+    private java.lang.String renditionFilter;
+
+    private java.lang.Boolean includePathSegments;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public GetFolderTree() {
     }
@@ -26,16 +35,22 @@ public class GetFolderTree  implements java.io.Serializable {
     public GetFolderTree(
            java.lang.String repositoryId,
            java.lang.String folderId,
-           java.lang.String filter,
            java.math.BigInteger depth,
+           java.lang.String filter,
            java.lang.Boolean includeAllowableActions,
-           org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships) {
+           org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships,
+           java.lang.String renditionFilter,
+           java.lang.Boolean includePathSegments,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.folderId = folderId;
-           this.filter = filter;
            this.depth = depth;
+           this.filter = filter;
            this.includeAllowableActions = includeAllowableActions;
            this.includeRelationships = includeRelationships;
+           this.renditionFilter = renditionFilter;
+           this.includePathSegments = includePathSegments;
+           this.extension = extension;
     }
 
 
@@ -80,26 +95,6 @@ public class GetFolderTree  implements java.io.Serializable {
 
 
     /**
-     * Gets the filter value for this GetFolderTree.
-     * 
-     * @return filter
-     */
-    public java.lang.String getFilter() {
-        return filter;
-    }
-
-
-    /**
-     * Sets the filter value for this GetFolderTree.
-     * 
-     * @param filter
-     */
-    public void setFilter(java.lang.String filter) {
-        this.filter = filter;
-    }
-
-
-    /**
      * Gets the depth value for this GetFolderTree.
      * 
      * @return depth
@@ -116,6 +111,26 @@ public class GetFolderTree  implements java.io.Serializable {
      */
     public void setDepth(java.math.BigInteger depth) {
         this.depth = depth;
+    }
+
+
+    /**
+     * Gets the filter value for this GetFolderTree.
+     * 
+     * @return filter
+     */
+    public java.lang.String getFilter() {
+        return filter;
+    }
+
+
+    /**
+     * Sets the filter value for this GetFolderTree.
+     * 
+     * @param filter
+     */
+    public void setFilter(java.lang.String filter) {
+        this.filter = filter;
     }
 
 
@@ -158,6 +173,70 @@ public class GetFolderTree  implements java.io.Serializable {
         this.includeRelationships = includeRelationships;
     }
 
+
+    /**
+     * Gets the renditionFilter value for this GetFolderTree.
+     * 
+     * @return renditionFilter
+     */
+    public java.lang.String getRenditionFilter() {
+        return renditionFilter;
+    }
+
+
+    /**
+     * Sets the renditionFilter value for this GetFolderTree.
+     * 
+     * @param renditionFilter
+     */
+    public void setRenditionFilter(java.lang.String renditionFilter) {
+        this.renditionFilter = renditionFilter;
+    }
+
+
+    /**
+     * Gets the includePathSegments value for this GetFolderTree.
+     * 
+     * @return includePathSegments
+     */
+    public java.lang.Boolean getIncludePathSegments() {
+        return includePathSegments;
+    }
+
+
+    /**
+     * Sets the includePathSegments value for this GetFolderTree.
+     * 
+     * @param includePathSegments
+     */
+    public void setIncludePathSegments(java.lang.Boolean includePathSegments) {
+        this.includePathSegments = includePathSegments;
+    }
+
+
+    /**
+     * Gets the extension value for this GetFolderTree.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this GetFolderTree.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof GetFolderTree)) return false;
@@ -176,18 +255,27 @@ public class GetFolderTree  implements java.io.Serializable {
             ((this.folderId==null && other.getFolderId()==null) || 
              (this.folderId!=null &&
               this.folderId.equals(other.getFolderId()))) &&
-            ((this.filter==null && other.getFilter()==null) || 
-             (this.filter!=null &&
-              this.filter.equals(other.getFilter()))) &&
             ((this.depth==null && other.getDepth()==null) || 
              (this.depth!=null &&
               this.depth.equals(other.getDepth()))) &&
+            ((this.filter==null && other.getFilter()==null) || 
+             (this.filter!=null &&
+              this.filter.equals(other.getFilter()))) &&
             ((this.includeAllowableActions==null && other.getIncludeAllowableActions()==null) || 
              (this.includeAllowableActions!=null &&
               this.includeAllowableActions.equals(other.getIncludeAllowableActions()))) &&
             ((this.includeRelationships==null && other.getIncludeRelationships()==null) || 
              (this.includeRelationships!=null &&
-              this.includeRelationships.equals(other.getIncludeRelationships())));
+              this.includeRelationships.equals(other.getIncludeRelationships()))) &&
+            ((this.renditionFilter==null && other.getRenditionFilter()==null) || 
+             (this.renditionFilter!=null &&
+              this.renditionFilter.equals(other.getRenditionFilter()))) &&
+            ((this.includePathSegments==null && other.getIncludePathSegments()==null) || 
+             (this.includePathSegments!=null &&
+              this.includePathSegments.equals(other.getIncludePathSegments()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -205,17 +293,26 @@ public class GetFolderTree  implements java.io.Serializable {
         if (getFolderId() != null) {
             _hashCode += getFolderId().hashCode();
         }
-        if (getFilter() != null) {
-            _hashCode += getFilter().hashCode();
-        }
         if (getDepth() != null) {
             _hashCode += getDepth().hashCode();
+        }
+        if (getFilter() != null) {
+            _hashCode += getFilter().hashCode();
         }
         if (getIncludeAllowableActions() != null) {
             _hashCode += getIncludeAllowableActions().hashCode();
         }
         if (getIncludeRelationships() != null) {
             _hashCode += getIncludeRelationships().hashCode();
+        }
+        if (getRenditionFilter() != null) {
+            _hashCode += getRenditionFilter().hashCode();
+        }
+        if (getIncludePathSegments() != null) {
+            _hashCode += getIncludePathSegments().hashCode();
+        }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -226,44 +323,65 @@ public class GetFolderTree  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetFolderTree.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getFolderTree"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getFolderTree"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("folderId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "folderId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "folderId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("filter");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "filter"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("depth");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "depth"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "depth"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("filter");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "filter"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeAllowableActions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeAllowableActions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeAllowableActions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeRelationships");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRelationships"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumIncludeRelationships"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeRelationships"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumIncludeRelationships"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("renditionFilter");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "renditionFilter"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("includePathSegments");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includePathSegments"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

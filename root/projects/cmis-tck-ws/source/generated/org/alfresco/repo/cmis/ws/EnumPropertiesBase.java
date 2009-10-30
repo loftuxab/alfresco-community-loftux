@@ -17,15 +17,15 @@ public class EnumPropertiesBase implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _value1 = "cmis:Name";
-    public static final java.lang.String _value2 = "cmis:ObjectId";
-    public static final java.lang.String _value3 = "cmis:ObjectTypeId";
-    public static final java.lang.String _value4 = "cmis:BaseTypeId";
-    public static final java.lang.String _value5 = "cmis:CreatedBy";
-    public static final java.lang.String _value6 = "cmis:CreationDate";
-    public static final java.lang.String _value7 = "cmis:LastModifiedBy";
-    public static final java.lang.String _value8 = "cmis:LastModificationDate";
-    public static final java.lang.String _value9 = "cmis:ChangeToken";
+    public static final java.lang.String _value1 = "cmis:name";
+    public static final java.lang.String _value2 = "cmis:objectId";
+    public static final java.lang.String _value3 = "cmis:objectTypeId";
+    public static final java.lang.String _value4 = "cmis:baseTypeId";
+    public static final java.lang.String _value5 = "cmis:createdBy";
+    public static final java.lang.String _value6 = "cmis:creationDate";
+    public static final java.lang.String _value7 = "cmis:lastModifiedBy";
+    public static final java.lang.String _value8 = "cmis:lastModificationDate";
+    public static final java.lang.String _value9 = "cmis:changeToken";
     public static final EnumPropertiesBase value1 = new EnumPropertiesBase(_value1);
     public static final EnumPropertiesBase value2 = new EnumPropertiesBase(_value2);
     public static final EnumPropertiesBase value3 = new EnumPropertiesBase(_value3);
@@ -72,7 +72,7 @@ public class EnumPropertiesBase implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumPropertiesBase.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumPropertiesBase"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumPropertiesBase"));
     }
     /**
      * Return type metadata object

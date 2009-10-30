@@ -293,9 +293,9 @@ WsiProfiler targets:
 
 	<target name="generate-stubs">
 		<wsdl2java url="${source.wsdl}/CMISWS-Service.wsdl" output="${source.generated}" nowrapped="true">
-			<mapping namespace="http://docs.oasis-open.org/ns/cmis/ws/200901" package="org.alfresco.repo.cmis.ws" />
-			<mapping namespace="http://docs.oasis-open.org/ns/cmis/messaging/200901" package="org.alfresco.repo.cmis.ws" />
-			<mapping namespace="http://docs.oasis-open.org/ns/cmis/core/200901" package="org.alfresco.repo.cmis.ws" />
+			<mapping namespace="http://docs.oasis-open.org/ns/cmis/ws/200908/" package="org.alfresco.repo.cmis.ws" />
+			<mapping namespace="http://docs.oasis-open.org/ns/cmis/messaging/200908/" package="org.alfresco.repo.cmis.ws" />
+			<mapping namespace="http://docs.oasis-open.org/ns/cmis/core/200908/" package="org.alfresco.repo.cmis.ws" />
 		</wsdl2java>
 	</target>
 

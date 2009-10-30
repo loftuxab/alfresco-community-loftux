@@ -14,15 +14,20 @@ public class Query  implements java.io.Serializable {
 
     private java.lang.Boolean searchAllVersions;
 
-    private java.math.BigInteger maxItems;
-
-    private java.math.BigInteger skipCount;
-
     private java.lang.Boolean includeAllowableActions;
 
     private org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships;
 
-    private java.lang.Boolean includeRenditions;
+    private java.lang.String renditionFilter;
+
+    private java.math.BigInteger maxItems;
+
+    private java.math.BigInteger skipCount;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public Query() {
     }
@@ -31,19 +36,21 @@ public class Query  implements java.io.Serializable {
            java.lang.String repositoryId,
            java.lang.String statement,
            java.lang.Boolean searchAllVersions,
-           java.math.BigInteger maxItems,
-           java.math.BigInteger skipCount,
            java.lang.Boolean includeAllowableActions,
            org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships,
-           java.lang.Boolean includeRenditions) {
+           java.lang.String renditionFilter,
+           java.math.BigInteger maxItems,
+           java.math.BigInteger skipCount,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.statement = statement;
            this.searchAllVersions = searchAllVersions;
-           this.maxItems = maxItems;
-           this.skipCount = skipCount;
            this.includeAllowableActions = includeAllowableActions;
            this.includeRelationships = includeRelationships;
-           this.includeRenditions = includeRenditions;
+           this.renditionFilter = renditionFilter;
+           this.maxItems = maxItems;
+           this.skipCount = skipCount;
+           this.extension = extension;
     }
 
 
@@ -108,46 +115,6 @@ public class Query  implements java.io.Serializable {
 
 
     /**
-     * Gets the maxItems value for this Query.
-     * 
-     * @return maxItems
-     */
-    public java.math.BigInteger getMaxItems() {
-        return maxItems;
-    }
-
-
-    /**
-     * Sets the maxItems value for this Query.
-     * 
-     * @param maxItems
-     */
-    public void setMaxItems(java.math.BigInteger maxItems) {
-        this.maxItems = maxItems;
-    }
-
-
-    /**
-     * Gets the skipCount value for this Query.
-     * 
-     * @return skipCount
-     */
-    public java.math.BigInteger getSkipCount() {
-        return skipCount;
-    }
-
-
-    /**
-     * Sets the skipCount value for this Query.
-     * 
-     * @param skipCount
-     */
-    public void setSkipCount(java.math.BigInteger skipCount) {
-        this.skipCount = skipCount;
-    }
-
-
-    /**
      * Gets the includeAllowableActions value for this Query.
      * 
      * @return includeAllowableActions
@@ -188,22 +155,86 @@ public class Query  implements java.io.Serializable {
 
 
     /**
-     * Gets the includeRenditions value for this Query.
+     * Gets the renditionFilter value for this Query.
      * 
-     * @return includeRenditions
+     * @return renditionFilter
      */
-    public java.lang.Boolean getIncludeRenditions() {
-        return includeRenditions;
+    public java.lang.String getRenditionFilter() {
+        return renditionFilter;
     }
 
 
     /**
-     * Sets the includeRenditions value for this Query.
+     * Sets the renditionFilter value for this Query.
      * 
-     * @param includeRenditions
+     * @param renditionFilter
      */
-    public void setIncludeRenditions(java.lang.Boolean includeRenditions) {
-        this.includeRenditions = includeRenditions;
+    public void setRenditionFilter(java.lang.String renditionFilter) {
+        this.renditionFilter = renditionFilter;
+    }
+
+
+    /**
+     * Gets the maxItems value for this Query.
+     * 
+     * @return maxItems
+     */
+    public java.math.BigInteger getMaxItems() {
+        return maxItems;
+    }
+
+
+    /**
+     * Sets the maxItems value for this Query.
+     * 
+     * @param maxItems
+     */
+    public void setMaxItems(java.math.BigInteger maxItems) {
+        this.maxItems = maxItems;
+    }
+
+
+    /**
+     * Gets the skipCount value for this Query.
+     * 
+     * @return skipCount
+     */
+    public java.math.BigInteger getSkipCount() {
+        return skipCount;
+    }
+
+
+    /**
+     * Sets the skipCount value for this Query.
+     * 
+     * @param skipCount
+     */
+    public void setSkipCount(java.math.BigInteger skipCount) {
+        this.skipCount = skipCount;
+    }
+
+
+    /**
+     * Gets the extension value for this Query.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this Query.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -227,21 +258,24 @@ public class Query  implements java.io.Serializable {
             ((this.searchAllVersions==null && other.getSearchAllVersions()==null) || 
              (this.searchAllVersions!=null &&
               this.searchAllVersions.equals(other.getSearchAllVersions()))) &&
-            ((this.maxItems==null && other.getMaxItems()==null) || 
-             (this.maxItems!=null &&
-              this.maxItems.equals(other.getMaxItems()))) &&
-            ((this.skipCount==null && other.getSkipCount()==null) || 
-             (this.skipCount!=null &&
-              this.skipCount.equals(other.getSkipCount()))) &&
             ((this.includeAllowableActions==null && other.getIncludeAllowableActions()==null) || 
              (this.includeAllowableActions!=null &&
               this.includeAllowableActions.equals(other.getIncludeAllowableActions()))) &&
             ((this.includeRelationships==null && other.getIncludeRelationships()==null) || 
              (this.includeRelationships!=null &&
               this.includeRelationships.equals(other.getIncludeRelationships()))) &&
-            ((this.includeRenditions==null && other.getIncludeRenditions()==null) || 
-             (this.includeRenditions!=null &&
-              this.includeRenditions.equals(other.getIncludeRenditions())));
+            ((this.renditionFilter==null && other.getRenditionFilter()==null) || 
+             (this.renditionFilter!=null &&
+              this.renditionFilter.equals(other.getRenditionFilter()))) &&
+            ((this.maxItems==null && other.getMaxItems()==null) || 
+             (this.maxItems!=null &&
+              this.maxItems.equals(other.getMaxItems()))) &&
+            ((this.skipCount==null && other.getSkipCount()==null) || 
+             (this.skipCount!=null &&
+              this.skipCount.equals(other.getSkipCount()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -262,20 +296,23 @@ public class Query  implements java.io.Serializable {
         if (getSearchAllVersions() != null) {
             _hashCode += getSearchAllVersions().hashCode();
         }
-        if (getMaxItems() != null) {
-            _hashCode += getMaxItems().hashCode();
-        }
-        if (getSkipCount() != null) {
-            _hashCode += getSkipCount().hashCode();
-        }
         if (getIncludeAllowableActions() != null) {
             _hashCode += getIncludeAllowableActions().hashCode();
         }
         if (getIncludeRelationships() != null) {
             _hashCode += getIncludeRelationships().hashCode();
         }
-        if (getIncludeRenditions() != null) {
-            _hashCode += getIncludeRenditions().hashCode();
+        if (getRenditionFilter() != null) {
+            _hashCode += getRenditionFilter().hashCode();
+        }
+        if (getMaxItems() != null) {
+            _hashCode += getMaxItems().hashCode();
+        }
+        if (getSkipCount() != null) {
+            _hashCode += getSkipCount().hashCode();
+        }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -286,59 +323,65 @@ public class Query  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(Query.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">query"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">query"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("statement");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "statement"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "statement"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("searchAllVersions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "searchAllVersions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "searchAllVersions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("maxItems");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "maxItems"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("skipCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "skipCount"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeAllowableActions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeAllowableActions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeAllowableActions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("includeRelationships");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRelationships"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumIncludeRelationships"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includeRelationships"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumIncludeRelationships"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includeRenditions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "includeRenditions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setFieldName("renditionFilter");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "renditionFilter"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("maxItems");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "maxItems"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("skipCount");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "skipCount"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

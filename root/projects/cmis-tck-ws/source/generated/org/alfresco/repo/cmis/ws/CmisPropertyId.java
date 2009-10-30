@@ -10,22 +10,20 @@ package org.alfresco.repo.cmis.ws;
 public class CmisPropertyId  extends org.alfresco.repo.cmis.ws.CmisProperty  implements java.io.Serializable {
     private java.lang.String[] value;
 
-    private org.apache.axis.types.URI href;  // attribute
-
     public CmisPropertyId() {
     }
 
     public CmisPropertyId(
-           java.lang.String pdid,
-           java.lang.String localname,
-           java.lang.String displayname,
-           org.apache.axis.types.URI href,
+           java.lang.String propertyDefinitionId,
+           java.lang.String localName,
+           java.lang.String displayName,
+           java.lang.String queryName,
            java.lang.String[] value) {
         super(
-            pdid,
-            localname,
-            displayname);
-        this.href = href;
+            propertyDefinitionId,
+            localName,
+            displayName,
+            queryName);
         this.value = value;
     }
 
@@ -57,26 +55,6 @@ public class CmisPropertyId  extends org.alfresco.repo.cmis.ws.CmisProperty  imp
         this.value[i] = _value;
     }
 
-
-    /**
-     * Gets the href value for this CmisPropertyId.
-     * 
-     * @return href
-     */
-    public org.apache.axis.types.URI getHref() {
-        return href;
-    }
-
-
-    /**
-     * Sets the href value for this CmisPropertyId.
-     * 
-     * @param href
-     */
-    public void setHref(org.apache.axis.types.URI href) {
-        this.href = href;
-    }
-
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof CmisPropertyId)) return false;
@@ -91,10 +69,7 @@ public class CmisPropertyId  extends org.alfresco.repo.cmis.ws.CmisProperty  imp
         _equals = super.equals(obj) && 
             ((this.value==null && other.getValue()==null) || 
              (this.value!=null &&
-              java.util.Arrays.equals(this.value, other.getValue()))) &&
-            ((this.href==null && other.getHref()==null) || 
-             (this.href!=null &&
-              this.href.equals(other.getHref())));
+              java.util.Arrays.equals(this.value, other.getValue())));
         __equalsCalc = null;
         return _equals;
     }
@@ -117,9 +92,6 @@ public class CmisPropertyId  extends org.alfresco.repo.cmis.ws.CmisProperty  imp
                 }
             }
         }
-        if (getHref() != null) {
-            _hashCode += getHref().hashCode();
-        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -129,15 +101,10 @@ public class CmisPropertyId  extends org.alfresco.repo.cmis.ws.CmisProperty  imp
         new org.apache.axis.description.TypeDesc(CmisPropertyId.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyId"));
-        org.apache.axis.description.AttributeDesc attrField = new org.apache.axis.description.AttributeDesc();
-        attrField.setFieldName("href");
-        attrField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "href"));
-        attrField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
-        typeDesc.addFieldDesc(attrField);
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyId"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("value");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "value"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "value"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

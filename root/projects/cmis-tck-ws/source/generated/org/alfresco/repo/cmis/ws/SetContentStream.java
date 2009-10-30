@@ -18,6 +18,11 @@ public class SetContentStream  implements java.io.Serializable {
 
     private org.alfresco.repo.cmis.ws.CmisContentStreamType contentStream;
 
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
+
     public SetContentStream() {
     }
 
@@ -26,12 +31,14 @@ public class SetContentStream  implements java.io.Serializable {
            java.lang.String documentId,
            java.lang.Boolean overwriteFlag,
            java.lang.String changeToken,
-           org.alfresco.repo.cmis.ws.CmisContentStreamType contentStream) {
+           org.alfresco.repo.cmis.ws.CmisContentStreamType contentStream,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.documentId = documentId;
            this.overwriteFlag = overwriteFlag;
            this.changeToken = changeToken;
            this.contentStream = contentStream;
+           this.extension = extension;
     }
 
 
@@ -134,6 +141,30 @@ public class SetContentStream  implements java.io.Serializable {
         this.contentStream = contentStream;
     }
 
+
+    /**
+     * Gets the extension value for this SetContentStream.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this SetContentStream.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof SetContentStream)) return false;
@@ -160,7 +191,10 @@ public class SetContentStream  implements java.io.Serializable {
               this.changeToken.equals(other.getChangeToken()))) &&
             ((this.contentStream==null && other.getContentStream()==null) || 
              (this.contentStream!=null &&
-              this.contentStream.equals(other.getContentStream())));
+              this.contentStream.equals(other.getContentStream()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -187,6 +221,9 @@ public class SetContentStream  implements java.io.Serializable {
         if (getContentStream() != null) {
             _hashCode += getContentStream().hashCode();
         }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -196,38 +233,45 @@ public class SetContentStream  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(SetContentStream.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">setContentStream"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">setContentStream"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("documentId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "documentId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "documentId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("overwriteFlag");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "overwriteFlag"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "overwriteFlag"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("changeToken");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "changeToken"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "changeToken"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
-        elemField.setNillable(false);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("contentStream");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "contentStream"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "cmisContentStreamType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "contentStream"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisContentStreamType"));
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

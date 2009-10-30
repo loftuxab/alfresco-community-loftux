@@ -62,7 +62,7 @@ public class EnumDecimalPrecision implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumDecimalPrecision.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumDecimalPrecision"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumDecimalPrecision"));
     }
     /**
      * Return type metadata object

@@ -105,7 +105,7 @@ public class MultiFilingServiceLocator extends org.apache.axis.client.Service im
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "MultiFilingService");
+        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "MultiFilingService");
     }
 
     private java.util.HashSet ports = null;
@@ -113,7 +113,7 @@ public class MultiFilingServiceLocator extends org.apache.axis.client.Service im
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "MultiFilingServicePort"));
+            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "MultiFilingServicePort"));
         }
         return ports.iterator();
     }

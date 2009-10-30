@@ -12,14 +12,21 @@ public class CheckOutResponse  implements java.io.Serializable {
 
     private boolean contentCopied;
 
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
+
     public CheckOutResponse() {
     }
 
     public CheckOutResponse(
            java.lang.String documentId,
-           boolean contentCopied) {
+           boolean contentCopied,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.documentId = documentId;
            this.contentCopied = contentCopied;
+           this.extension = extension;
     }
 
 
@@ -62,6 +69,30 @@ public class CheckOutResponse  implements java.io.Serializable {
         this.contentCopied = contentCopied;
     }
 
+
+    /**
+     * Gets the extension value for this CheckOutResponse.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this CheckOutResponse.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof CheckOutResponse)) return false;
@@ -77,7 +108,10 @@ public class CheckOutResponse  implements java.io.Serializable {
             ((this.documentId==null && other.getDocumentId()==null) || 
              (this.documentId!=null &&
               this.documentId.equals(other.getDocumentId()))) &&
-            this.contentCopied == other.isContentCopied();
+            this.contentCopied == other.isContentCopied() &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -93,6 +127,9 @@ public class CheckOutResponse  implements java.io.Serializable {
             _hashCode += getDocumentId().hashCode();
         }
         _hashCode += (isContentCopied() ? Boolean.TRUE : Boolean.FALSE).hashCode();
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -102,18 +139,25 @@ public class CheckOutResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(CheckOutResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">checkOutResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">checkOutResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("documentId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "documentId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "documentId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("contentCopied");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "contentCopied"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "contentCopied"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

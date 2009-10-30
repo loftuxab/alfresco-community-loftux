@@ -105,7 +105,7 @@ public class ACLServiceLocator extends org.apache.axis.client.Service implements
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "ACLService");
+        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "ACLService");
     }
 
     private java.util.HashSet ports = null;
@@ -113,7 +113,7 @@ public class ACLServiceLocator extends org.apache.axis.client.Service implements
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "ACLServicePort"));
+            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "ACLServicePort"));
         }
         return ports.iterator();
     }

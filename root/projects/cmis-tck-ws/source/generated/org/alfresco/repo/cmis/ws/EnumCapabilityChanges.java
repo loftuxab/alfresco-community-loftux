@@ -18,11 +18,11 @@ public class EnumCapabilityChanges implements java.io.Serializable {
     }
 
     public static final java.lang.String _none = "none";
-    public static final java.lang.String _objectIdsOnly = "objectIdsOnly";
+    public static final java.lang.String _objectidsonly = "objectidsonly";
     public static final java.lang.String _properties = "properties";
     public static final java.lang.String _all = "all";
     public static final EnumCapabilityChanges none = new EnumCapabilityChanges(_none);
-    public static final EnumCapabilityChanges objectIdsOnly = new EnumCapabilityChanges(_objectIdsOnly);
+    public static final EnumCapabilityChanges objectidsonly = new EnumCapabilityChanges(_objectidsonly);
     public static final EnumCapabilityChanges properties = new EnumCapabilityChanges(_properties);
     public static final EnumCapabilityChanges all = new EnumCapabilityChanges(_all);
     public java.lang.String getValue() { return _value_;}
@@ -62,7 +62,7 @@ public class EnumCapabilityChanges implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumCapabilityChanges.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCapabilityChanges"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCapabilityChanges"));
     }
     /**
      * Return type metadata object

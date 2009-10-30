@@ -105,7 +105,7 @@ public class RelationshipServiceLocator extends org.apache.axis.client.Service i
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "RelationshipService");
+        return new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "RelationshipService");
     }
 
     private java.util.HashSet ports = null;
@@ -113,7 +113,7 @@ public class RelationshipServiceLocator extends org.apache.axis.client.Service i
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200901", "RelationshipServicePort"));
+            ports.add(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/ws/200908/", "RelationshipServicePort"));
         }
         return ports.iterator();
     }

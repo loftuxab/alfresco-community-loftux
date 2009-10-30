@@ -14,17 +14,13 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
 
     private org.alfresco.repo.cmis.ws.CmisObjectType[] relationship;
 
-    /* This holds the children objects of this folder. This is used
-     * only in
-     * 						the Web Service binding. In the REST/AtomPub binding, an atom
-     * 						extension element is used. */
-    private org.alfresco.repo.cmis.ws.CmisObjectType[] child;
-
     private org.alfresco.repo.cmis.ws.CmisChangeEventType changeEventInfo;
 
     private org.alfresco.repo.cmis.ws.CmisAccessControlListType acl;
 
     private java.lang.Boolean exactACL;
+
+    private org.alfresco.repo.cmis.ws.CmisListOfIdsType policyIds;
 
     private org.alfresco.repo.cmis.ws.CmisRenditionType[] rendition;
 
@@ -37,19 +33,19 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
            org.alfresco.repo.cmis.ws.CmisPropertiesType properties,
            org.alfresco.repo.cmis.ws.CmisAllowableActionsType allowableActions,
            org.alfresco.repo.cmis.ws.CmisObjectType[] relationship,
-           org.alfresco.repo.cmis.ws.CmisObjectType[] child,
            org.alfresco.repo.cmis.ws.CmisChangeEventType changeEventInfo,
            org.alfresco.repo.cmis.ws.CmisAccessControlListType acl,
            java.lang.Boolean exactACL,
+           org.alfresco.repo.cmis.ws.CmisListOfIdsType policyIds,
            org.alfresco.repo.cmis.ws.CmisRenditionType[] rendition,
            org.apache.axis.message.MessageElement [] _any) {
            this.properties = properties;
            this.allowableActions = allowableActions;
            this.relationship = relationship;
-           this.child = child;
            this.changeEventInfo = changeEventInfo;
            this.acl = acl;
            this.exactACL = exactACL;
+           this.policyIds = policyIds;
            this.rendition = rendition;
            this._any = _any;
     }
@@ -124,40 +120,6 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
 
 
     /**
-     * Gets the child value for this CmisObjectType.
-     * 
-     * @return child   * This holds the children objects of this folder. This is used
-     * only in
-     * 						the Web Service binding. In the REST/AtomPub binding, an atom
-     * 						extension element is used.
-     */
-    public org.alfresco.repo.cmis.ws.CmisObjectType[] getChild() {
-        return child;
-    }
-
-
-    /**
-     * Sets the child value for this CmisObjectType.
-     * 
-     * @param child   * This holds the children objects of this folder. This is used
-     * only in
-     * 						the Web Service binding. In the REST/AtomPub binding, an atom
-     * 						extension element is used.
-     */
-    public void setChild(org.alfresco.repo.cmis.ws.CmisObjectType[] child) {
-        this.child = child;
-    }
-
-    public org.alfresco.repo.cmis.ws.CmisObjectType getChild(int i) {
-        return this.child[i];
-    }
-
-    public void setChild(int i, org.alfresco.repo.cmis.ws.CmisObjectType _value) {
-        this.child[i] = _value;
-    }
-
-
-    /**
      * Gets the changeEventInfo value for this CmisObjectType.
      * 
      * @return changeEventInfo
@@ -214,6 +176,26 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
      */
     public void setExactACL(java.lang.Boolean exactACL) {
         this.exactACL = exactACL;
+    }
+
+
+    /**
+     * Gets the policyIds value for this CmisObjectType.
+     * 
+     * @return policyIds
+     */
+    public org.alfresco.repo.cmis.ws.CmisListOfIdsType getPolicyIds() {
+        return policyIds;
+    }
+
+
+    /**
+     * Sets the policyIds value for this CmisObjectType.
+     * 
+     * @param policyIds
+     */
+    public void setPolicyIds(org.alfresco.repo.cmis.ws.CmisListOfIdsType policyIds) {
+        this.policyIds = policyIds;
     }
 
 
@@ -285,9 +267,6 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
             ((this.relationship==null && other.getRelationship()==null) || 
              (this.relationship!=null &&
               java.util.Arrays.equals(this.relationship, other.getRelationship()))) &&
-            ((this.child==null && other.getChild()==null) || 
-             (this.child!=null &&
-              java.util.Arrays.equals(this.child, other.getChild()))) &&
             ((this.changeEventInfo==null && other.getChangeEventInfo()==null) || 
              (this.changeEventInfo!=null &&
               this.changeEventInfo.equals(other.getChangeEventInfo()))) &&
@@ -297,6 +276,9 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
             ((this.exactACL==null && other.getExactACL()==null) || 
              (this.exactACL!=null &&
               this.exactACL.equals(other.getExactACL()))) &&
+            ((this.policyIds==null && other.getPolicyIds()==null) || 
+             (this.policyIds!=null &&
+              this.policyIds.equals(other.getPolicyIds()))) &&
             ((this.rendition==null && other.getRendition()==null) || 
              (this.rendition!=null &&
               java.util.Arrays.equals(this.rendition, other.getRendition()))) &&
@@ -331,17 +313,6 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
                 }
             }
         }
-        if (getChild() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getChild());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getChild(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
         if (getChangeEventInfo() != null) {
             _hashCode += getChangeEventInfo().hashCode();
         }
@@ -350,6 +321,9 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
         }
         if (getExactACL() != null) {
             _hashCode += getExactACL().hashCode();
+        }
+        if (getPolicyIds() != null) {
+            _hashCode += getPolicyIds().hashCode();
         }
         if (getRendition() != null) {
             for (int i=0;
@@ -382,62 +356,61 @@ public class CmisObjectType  implements java.io.Serializable, org.apache.axis.en
         new org.apache.axis.description.TypeDesc(CmisObjectType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisObjectType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisObjectType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("properties");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "properties"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertiesType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "properties"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertiesType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("allowableActions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "allowableActions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAllowableActionsType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "allowableActions"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAllowableActionsType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("relationship");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "relationship"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisObjectType"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        elemField.setMaxOccursUnbounded(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("child");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "child"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisObjectType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "relationship"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisObjectType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("changeEventInfo");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "changeEventInfo"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisChangeEventType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "changeEventInfo"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisChangeEventType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("acl");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "acl"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlListType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "acl"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAccessControlListType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("exactACL");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "exactACL"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "exactACL"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("policyIds");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "policyIds"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisListOfIdsType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("rendition");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "rendition"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisRenditionType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "rendition"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisRenditionType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);

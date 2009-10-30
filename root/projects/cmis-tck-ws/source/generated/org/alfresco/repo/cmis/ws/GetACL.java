@@ -12,7 +12,12 @@ public class GetACL  implements java.io.Serializable {
 
     private java.lang.String objectId;
 
-    private boolean onlyBasicPermissions;
+    private java.lang.Boolean onlyBasicPermissions;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public GetACL() {
     }
@@ -20,10 +25,12 @@ public class GetACL  implements java.io.Serializable {
     public GetACL(
            java.lang.String repositoryId,
            java.lang.String objectId,
-           boolean onlyBasicPermissions) {
+           java.lang.Boolean onlyBasicPermissions,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.objectId = objectId;
            this.onlyBasicPermissions = onlyBasicPermissions;
+           this.extension = extension;
     }
 
 
@@ -72,7 +79,7 @@ public class GetACL  implements java.io.Serializable {
      * 
      * @return onlyBasicPermissions
      */
-    public boolean isOnlyBasicPermissions() {
+    public java.lang.Boolean getOnlyBasicPermissions() {
         return onlyBasicPermissions;
     }
 
@@ -82,8 +89,32 @@ public class GetACL  implements java.io.Serializable {
      * 
      * @param onlyBasicPermissions
      */
-    public void setOnlyBasicPermissions(boolean onlyBasicPermissions) {
+    public void setOnlyBasicPermissions(java.lang.Boolean onlyBasicPermissions) {
         this.onlyBasicPermissions = onlyBasicPermissions;
+    }
+
+
+    /**
+     * Gets the extension value for this GetACL.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this GetACL.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -104,7 +135,12 @@ public class GetACL  implements java.io.Serializable {
             ((this.objectId==null && other.getObjectId()==null) || 
              (this.objectId!=null &&
               this.objectId.equals(other.getObjectId()))) &&
-            this.onlyBasicPermissions == other.isOnlyBasicPermissions();
+            ((this.onlyBasicPermissions==null && other.getOnlyBasicPermissions()==null) || 
+             (this.onlyBasicPermissions!=null &&
+              this.onlyBasicPermissions.equals(other.getOnlyBasicPermissions()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -122,7 +158,12 @@ public class GetACL  implements java.io.Serializable {
         if (getObjectId() != null) {
             _hashCode += getObjectId().hashCode();
         }
-        _hashCode += (isOnlyBasicPermissions() ? Boolean.TRUE : Boolean.FALSE).hashCode();
+        if (getOnlyBasicPermissions() != null) {
+            _hashCode += getOnlyBasicPermissions().hashCode();
+        }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -132,24 +173,32 @@ public class GetACL  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetACL.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getACL"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getACL"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("objectId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "objectId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objectId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("onlyBasicPermissions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "onlyBasicPermissions"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "onlyBasicPermissions"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
-        elemField.setNillable(false);
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

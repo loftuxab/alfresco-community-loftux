@@ -56,7 +56,7 @@ public class EnumRenditionKind implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumRenditionKind.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumRenditionKind"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumRenditionKind"));
     }
     /**
      * Return type metadata object

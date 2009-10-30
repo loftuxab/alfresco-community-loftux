@@ -12,15 +12,16 @@ public class CreateRelationship  implements java.io.Serializable {
 
     private org.alfresco.repo.cmis.ws.CmisPropertiesType properties;
 
-    private java.lang.String sourceObjectId;
-
-    private java.lang.String targetObjectId;
-
-    private java.lang.String[] applyPolicies;
+    private java.lang.String[] policies;
 
     private org.alfresco.repo.cmis.ws.CmisAccessControlListType addACEs;
 
     private org.alfresco.repo.cmis.ws.CmisAccessControlListType removeACEs;
+
+    /* This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions */
+    private org.alfresco.repo.cmis.ws.CmisExtensionType extension;
 
     public CreateRelationship() {
     }
@@ -28,18 +29,16 @@ public class CreateRelationship  implements java.io.Serializable {
     public CreateRelationship(
            java.lang.String repositoryId,
            org.alfresco.repo.cmis.ws.CmisPropertiesType properties,
-           java.lang.String sourceObjectId,
-           java.lang.String targetObjectId,
-           java.lang.String[] applyPolicies,
+           java.lang.String[] policies,
            org.alfresco.repo.cmis.ws.CmisAccessControlListType addACEs,
-           org.alfresco.repo.cmis.ws.CmisAccessControlListType removeACEs) {
+           org.alfresco.repo.cmis.ws.CmisAccessControlListType removeACEs,
+           org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.properties = properties;
-           this.sourceObjectId = sourceObjectId;
-           this.targetObjectId = targetObjectId;
-           this.applyPolicies = applyPolicies;
+           this.policies = policies;
            this.addACEs = addACEs;
            this.removeACEs = removeACEs;
+           this.extension = extension;
     }
 
 
@@ -84,70 +83,30 @@ public class CreateRelationship  implements java.io.Serializable {
 
 
     /**
-     * Gets the sourceObjectId value for this CreateRelationship.
+     * Gets the policies value for this CreateRelationship.
      * 
-     * @return sourceObjectId
+     * @return policies
      */
-    public java.lang.String getSourceObjectId() {
-        return sourceObjectId;
+    public java.lang.String[] getPolicies() {
+        return policies;
     }
 
 
     /**
-     * Sets the sourceObjectId value for this CreateRelationship.
+     * Sets the policies value for this CreateRelationship.
      * 
-     * @param sourceObjectId
+     * @param policies
      */
-    public void setSourceObjectId(java.lang.String sourceObjectId) {
-        this.sourceObjectId = sourceObjectId;
+    public void setPolicies(java.lang.String[] policies) {
+        this.policies = policies;
     }
 
-
-    /**
-     * Gets the targetObjectId value for this CreateRelationship.
-     * 
-     * @return targetObjectId
-     */
-    public java.lang.String getTargetObjectId() {
-        return targetObjectId;
+    public java.lang.String getPolicies(int i) {
+        return this.policies[i];
     }
 
-
-    /**
-     * Sets the targetObjectId value for this CreateRelationship.
-     * 
-     * @param targetObjectId
-     */
-    public void setTargetObjectId(java.lang.String targetObjectId) {
-        this.targetObjectId = targetObjectId;
-    }
-
-
-    /**
-     * Gets the applyPolicies value for this CreateRelationship.
-     * 
-     * @return applyPolicies
-     */
-    public java.lang.String[] getApplyPolicies() {
-        return applyPolicies;
-    }
-
-
-    /**
-     * Sets the applyPolicies value for this CreateRelationship.
-     * 
-     * @param applyPolicies
-     */
-    public void setApplyPolicies(java.lang.String[] applyPolicies) {
-        this.applyPolicies = applyPolicies;
-    }
-
-    public java.lang.String getApplyPolicies(int i) {
-        return this.applyPolicies[i];
-    }
-
-    public void setApplyPolicies(int i, java.lang.String _value) {
-        this.applyPolicies[i] = _value;
+    public void setPolicies(int i, java.lang.String _value) {
+        this.policies[i] = _value;
     }
 
 
@@ -190,6 +149,30 @@ public class CreateRelationship  implements java.io.Serializable {
         this.removeACEs = removeACEs;
     }
 
+
+    /**
+     * Gets the extension value for this CreateRelationship.
+     * 
+     * @return extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public org.alfresco.repo.cmis.ws.CmisExtensionType getExtension() {
+        return extension;
+    }
+
+
+    /**
+     * Sets the extension value for this CreateRelationship.
+     * 
+     * @param extension   * This is an extension element to hold any
+     * 							repository or
+     * 							vendor-specific extensions
+     */
+    public void setExtension(org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
+        this.extension = extension;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof CreateRelationship)) return false;
@@ -208,21 +191,18 @@ public class CreateRelationship  implements java.io.Serializable {
             ((this.properties==null && other.getProperties()==null) || 
              (this.properties!=null &&
               this.properties.equals(other.getProperties()))) &&
-            ((this.sourceObjectId==null && other.getSourceObjectId()==null) || 
-             (this.sourceObjectId!=null &&
-              this.sourceObjectId.equals(other.getSourceObjectId()))) &&
-            ((this.targetObjectId==null && other.getTargetObjectId()==null) || 
-             (this.targetObjectId!=null &&
-              this.targetObjectId.equals(other.getTargetObjectId()))) &&
-            ((this.applyPolicies==null && other.getApplyPolicies()==null) || 
-             (this.applyPolicies!=null &&
-              java.util.Arrays.equals(this.applyPolicies, other.getApplyPolicies()))) &&
+            ((this.policies==null && other.getPolicies()==null) || 
+             (this.policies!=null &&
+              java.util.Arrays.equals(this.policies, other.getPolicies()))) &&
             ((this.addACEs==null && other.getAddACEs()==null) || 
              (this.addACEs!=null &&
               this.addACEs.equals(other.getAddACEs()))) &&
             ((this.removeACEs==null && other.getRemoveACEs()==null) || 
              (this.removeACEs!=null &&
-              this.removeACEs.equals(other.getRemoveACEs())));
+              this.removeACEs.equals(other.getRemoveACEs()))) &&
+            ((this.extension==null && other.getExtension()==null) || 
+             (this.extension!=null &&
+              this.extension.equals(other.getExtension())));
         __equalsCalc = null;
         return _equals;
     }
@@ -240,17 +220,11 @@ public class CreateRelationship  implements java.io.Serializable {
         if (getProperties() != null) {
             _hashCode += getProperties().hashCode();
         }
-        if (getSourceObjectId() != null) {
-            _hashCode += getSourceObjectId().hashCode();
-        }
-        if (getTargetObjectId() != null) {
-            _hashCode += getTargetObjectId().hashCode();
-        }
-        if (getApplyPolicies() != null) {
+        if (getPolicies() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getApplyPolicies());
+                 i<java.lang.reflect.Array.getLength(getPolicies());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getApplyPolicies(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getPolicies(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -263,6 +237,9 @@ public class CreateRelationship  implements java.io.Serializable {
         if (getRemoveACEs() != null) {
             _hashCode += getRemoveACEs().hashCode();
         }
+        if (getExtension() != null) {
+            _hashCode += getExtension().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -272,34 +249,22 @@ public class CreateRelationship  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(CreateRelationship.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">createRelationship"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">createRelationship"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "repositoryId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "repositoryId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("properties");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "properties"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertiesType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "properties"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertiesType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("sourceObjectId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "sourceObjectId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("targetObjectId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "targetObjectId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("applyPolicies");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "applyPolicies"));
+        elemField.setFieldName("policies");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "policies"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
@@ -307,15 +272,22 @@ public class CreateRelationship  implements java.io.Serializable {
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("addACEs");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "addACEs"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlListType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "addACEs"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAccessControlListType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("removeACEs");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "removeACEs"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlListType"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "removeACEs"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisAccessControlListType"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("extension");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "extension"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisExtensionType"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

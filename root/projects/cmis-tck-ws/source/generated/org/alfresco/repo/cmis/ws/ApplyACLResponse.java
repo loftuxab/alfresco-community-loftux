@@ -8,18 +8,14 @@
 package org.alfresco.repo.cmis.ws;
 
 public class ApplyACLResponse  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.CmisAccessControlListType[] ACL;
-
-    private boolean exact;
+    private org.alfresco.repo.cmis.ws.CmisACLType ACL;
 
     public ApplyACLResponse() {
     }
 
     public ApplyACLResponse(
-           org.alfresco.repo.cmis.ws.CmisAccessControlListType[] ACL,
-           boolean exact) {
+           org.alfresco.repo.cmis.ws.CmisACLType ACL) {
            this.ACL = ACL;
-           this.exact = exact;
     }
 
 
@@ -28,7 +24,7 @@ public class ApplyACLResponse  implements java.io.Serializable {
      * 
      * @return ACL
      */
-    public org.alfresco.repo.cmis.ws.CmisAccessControlListType[] getACL() {
+    public org.alfresco.repo.cmis.ws.CmisACLType getACL() {
         return ACL;
     }
 
@@ -38,36 +34,8 @@ public class ApplyACLResponse  implements java.io.Serializable {
      * 
      * @param ACL
      */
-    public void setACL(org.alfresco.repo.cmis.ws.CmisAccessControlListType[] ACL) {
+    public void setACL(org.alfresco.repo.cmis.ws.CmisACLType ACL) {
         this.ACL = ACL;
-    }
-
-    public org.alfresco.repo.cmis.ws.CmisAccessControlListType getACL(int i) {
-        return this.ACL[i];
-    }
-
-    public void setACL(int i, org.alfresco.repo.cmis.ws.CmisAccessControlListType _value) {
-        this.ACL[i] = _value;
-    }
-
-
-    /**
-     * Gets the exact value for this ApplyACLResponse.
-     * 
-     * @return exact
-     */
-    public boolean isExact() {
-        return exact;
-    }
-
-
-    /**
-     * Sets the exact value for this ApplyACLResponse.
-     * 
-     * @param exact
-     */
-    public void setExact(boolean exact) {
-        this.exact = exact;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -84,8 +52,7 @@ public class ApplyACLResponse  implements java.io.Serializable {
         _equals = true && 
             ((this.ACL==null && other.getACL()==null) || 
              (this.ACL!=null &&
-              java.util.Arrays.equals(this.ACL, other.getACL()))) &&
-            this.exact == other.isExact();
+              this.ACL.equals(other.getACL())));
         __equalsCalc = null;
         return _equals;
     }
@@ -98,17 +65,8 @@ public class ApplyACLResponse  implements java.io.Serializable {
         __hashCodeCalc = true;
         int _hashCode = 1;
         if (getACL() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getACL());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getACL(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
+            _hashCode += getACL().hashCode();
         }
-        _hashCode += (isExact() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -118,18 +76,11 @@ public class ApplyACLResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(ApplyACLResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">applyACLResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">applyACLResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("ACL");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "ACL"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisAccessControlListType"));
-        elemField.setNillable(false);
-        elemField.setMaxOccursUnbounded(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("exact");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "exact"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "ACL"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisACLType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

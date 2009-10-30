@@ -17,10 +17,8 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
     private org.alfresco.repo.cmis.ws.CmisPropertyDateTime[] propertyDateTime;
     private org.alfresco.repo.cmis.ws.CmisPropertyDecimal[] propertyDecimal;
     private org.alfresco.repo.cmis.ws.CmisPropertyHtml[] propertyHtml;
-    private org.alfresco.repo.cmis.ws.CmisPropertyXhtml[] propertyXhtml;
     private org.alfresco.repo.cmis.ws.CmisPropertyString[] propertyString;
     private org.alfresco.repo.cmis.ws.CmisPropertyUri[] propertyUri;
-    private org.alfresco.repo.cmis.ws.CmisPropertyXml[] propertyXml;
 
     private org.apache.axis.message.MessageElement [] _any;
 
@@ -34,10 +32,8 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
            org.alfresco.repo.cmis.ws.CmisPropertyDateTime[] propertyDateTime,
            org.alfresco.repo.cmis.ws.CmisPropertyDecimal[] propertyDecimal,
            org.alfresco.repo.cmis.ws.CmisPropertyHtml[] propertyHtml,
-           org.alfresco.repo.cmis.ws.CmisPropertyXhtml[] propertyXhtml,
            org.alfresco.repo.cmis.ws.CmisPropertyString[] propertyString,
            org.alfresco.repo.cmis.ws.CmisPropertyUri[] propertyUri,
-           org.alfresco.repo.cmis.ws.CmisPropertyXml[] propertyXml,
            org.apache.axis.message.MessageElement [] _any) {
            this.propertyBoolean = propertyBoolean;
            this.propertyId = propertyId;
@@ -45,10 +41,8 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
            this.propertyDateTime = propertyDateTime;
            this.propertyDecimal = propertyDecimal;
            this.propertyHtml = propertyHtml;
-           this.propertyXhtml = propertyXhtml;
            this.propertyString = propertyString;
            this.propertyUri = propertyUri;
-           this.propertyXml = propertyXml;
            this._any = _any;
     }
 
@@ -82,11 +76,6 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
         this.propertyHtml = propertyHtml;
     }
     
-    public void setPropertyXHtml(org.alfresco.repo.cmis.ws.CmisPropertyXhtml[] propertyXhtml)
-    {
-        this.propertyXhtml = propertyXhtml;
-    }
-
     public void setPropertyString(org.alfresco.repo.cmis.ws.CmisPropertyString[] propertyString)
     {
         this.propertyString = propertyString;
@@ -95,11 +84,6 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
     public void setPropertyUri(org.alfresco.repo.cmis.ws.CmisPropertyUri[] propertyUri)
     {
         this.propertyUri = propertyUri;
-    }
-
-    public void setPropertyXml(org.alfresco.repo.cmis.ws.CmisPropertyXml[] propertyXml)
-    {
-        this.propertyXml = propertyXml;
     }
 
     public org.alfresco.repo.cmis.ws.CmisPropertyBoolean[] getPropertyBoolean()
@@ -137,21 +121,11 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
         return propertyUri;
     }
 
-    public org.alfresco.repo.cmis.ws.CmisPropertyXml[] getPropertyXml()
-    {
-        return propertyXml;
-    }
-
     public org.alfresco.repo.cmis.ws.CmisPropertyHtml[] getPropertyHtml()
     {
         return propertyHtml;
     }
     
-    public org.alfresco.repo.cmis.ws.CmisPropertyXhtml[] getPropertyXhtml()
-    {
-        return propertyXhtml;
-    }
-
     /**
      * Gets the propertyBoolean value for this CmisPropertiesType.
      * 
@@ -367,44 +341,6 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
         }
     }
 
-
-    /**
-     * Gets the propertyHtml value for this CmisPropertiesType.
-     * 
-     * @return propertyHtml
-     */
-    public org.alfresco.repo.cmis.ws.CmisPropertyXhtml getPropertyXhtml(int index)
-    {
-        return propertyXhtml[index];
-    }
-
-
-    /**
-     * Sets the propertyHtml value for this CmisPropertiesType.
-     * 
-     * @param propertyHtml
-     */
-    public void setPropertyXhtml(int index, org.alfresco.repo.cmis.ws.CmisPropertyXhtml propertyXhtml)
-    {
-        if (this.propertyXhtml == null || this.propertyXhtml.length == 0)
-        {
-            this.propertyXhtml = new CmisPropertyXhtml[] { propertyXhtml };
-        }
-        else if (this.propertyXhtml[this.propertyXhtml.length - 1] != null)
-        {
-            CmisPropertyXhtml[] tmp = new CmisPropertyXhtml[this.propertyXhtml.length + 1];
-            System.arraycopy(this.propertyXhtml, 0, tmp, 0, this.propertyXhtml.length);
-            tmp[this.propertyXhtml.length] = propertyXhtml;
-            this.propertyXhtml = tmp;
-        }
-        else
-        {
-            this.propertyXhtml[this.propertyHtml.length - 1] = propertyXhtml;
-        }
-    }
-
-
-
     /**
      * Gets the propertyString value for this CmisPropertiesType.
      * 
@@ -476,43 +412,6 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
         }
     }
 
-
-    /**
-     * Gets the propertyXml value for this CmisPropertiesType.
-     * 
-     * @return propertyXml
-     */
-    public org.alfresco.repo.cmis.ws.CmisPropertyXml getPropertyXml(int index)
-    {
-        return propertyXml[index];
-    }
-
-
-    /**
-     * Sets the propertyXml value for this CmisPropertiesType.
-     * 
-     * @param propertyXml
-     */
-    public void setPropertyXml(int index, org.alfresco.repo.cmis.ws.CmisPropertyXml propertyXml)
-    {
-        if (this.propertyXml == null || this.propertyXml.length == 0)
-        {
-            this.propertyXml = new CmisPropertyXml[] { propertyXml };
-        }
-        else if (this.propertyXml[this.propertyXml.length - 1] != null)
-        {
-            CmisPropertyXml[] tmp = new CmisPropertyXml[this.propertyXml.length + 1];
-            System.arraycopy(this.propertyXml, 0, tmp, 0, this.propertyXml.length);
-            tmp[this.propertyXml.length] = propertyXml;
-            this.propertyXml = tmp;
-        }
-        else
-        {
-            this.propertyXml[this.propertyXml.length - 1] = propertyXml;
-        }
-    }
-
-
     /**
      * Gets the _any value for this CmisPropertiesType.
      * 
@@ -565,7 +464,6 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
                 && ((this.propertyString == null && other.getPropertyString() == null) || (this.propertyString != null && Arrays.equals(this.propertyString, other
                         .getPropertyString())))
                 && ((this.propertyUri == null && other.getPropertyUri() == null) || (this.propertyUri != null && Arrays.equals(this.propertyUri, other.getPropertyUri())))
-                && ((this.propertyXml == null && other.getPropertyXml() == null) || (this.propertyXml != null && Arrays.equals(this.propertyXml, other.getPropertyXml())))
                 && ((this._any == null && other.get_any() == null) || (this._any != null && java.util.Arrays.equals(this._any, other.get_any())));
         __equalsCalc = null;
         return _equals;
@@ -596,17 +494,11 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
         if (getPropertyHtml() != null) {
             _hashCode += getPropertyHtml().hashCode();
         }
-        if (getPropertyXhtml() != null) {
-            _hashCode += getPropertyXhtml().hashCode();
-        }
         if (getPropertyString() != null) {
             _hashCode += getPropertyString().hashCode();
         }
         if (getPropertyUri() != null) {
             _hashCode += getPropertyUri().hashCode();
-        }
-        if (getPropertyXml() != null) {
-            _hashCode += getPropertyXml().hashCode();
         }
         if (get_any() != null) {
             for (int i=0;
@@ -628,75 +520,67 @@ public class CmisPropertiesType  implements java.io.Serializable, org.apache.axi
         new org.apache.axis.description.TypeDesc(CmisPropertiesType.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertiesType"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertiesType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyBoolean");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyBoolean"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyBoolean"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyBoolean"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyBoolean"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyId"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyId"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyId"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyInteger");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyInteger"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyInteger"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyInteger"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyInteger"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyDateTime");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyDateTime"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyDateTime"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyDateTime"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyDateTime"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyDecimal");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyDecimal"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyDecimal"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyDecimal"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyDecimal"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyHtml");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyHtml"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyHtml"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyHtml"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyHtml"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyString");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyString"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyString"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyString"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyString"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propertyUri");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyUri"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyUri"));
-        elemField.setMinOccurs(0);
-        elemField.setMaxOccursUnbounded(true);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("propertyXml");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "propertyXml"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisPropertyXml"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propertyUri"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyUri"));
         elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         elemField.setNillable(false);

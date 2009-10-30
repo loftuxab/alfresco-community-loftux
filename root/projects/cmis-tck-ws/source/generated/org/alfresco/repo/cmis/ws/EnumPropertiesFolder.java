@@ -17,10 +17,12 @@ public class EnumPropertiesFolder implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _value1 = "cmis:ParentId";
-    public static final java.lang.String _value2 = "cmis:AllowedChildObjectTypeNames";
+    public static final java.lang.String _value1 = "cmis:parentId";
+    public static final java.lang.String _value2 = "cmis:allowedChildObjectTypeIds";
+    public static final java.lang.String _value3 = "cmis:path";
     public static final EnumPropertiesFolder value1 = new EnumPropertiesFolder(_value1);
     public static final EnumPropertiesFolder value2 = new EnumPropertiesFolder(_value2);
+    public static final EnumPropertiesFolder value3 = new EnumPropertiesFolder(_value3);
     public java.lang.String getValue() { return _value_;}
     public static EnumPropertiesFolder fromValue(java.lang.String value)
           throws java.lang.IllegalArgumentException {
@@ -58,7 +60,7 @@ public class EnumPropertiesFolder implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumPropertiesFolder.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumPropertiesFolder"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumPropertiesFolder"));
     }
     /**
      * Return type metadata object

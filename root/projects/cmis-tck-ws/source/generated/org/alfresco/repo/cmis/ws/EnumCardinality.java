@@ -58,7 +58,7 @@ public class EnumCardinality implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumCardinality.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumCardinality"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumCardinality"));
     }
     /**
      * Return type metadata object

@@ -62,7 +62,7 @@ public class EnumTypeOfChanges implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumTypeOfChanges.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "enumTypeOfChanges"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumTypeOfChanges"));
     }
     /**
      * Return type metadata object

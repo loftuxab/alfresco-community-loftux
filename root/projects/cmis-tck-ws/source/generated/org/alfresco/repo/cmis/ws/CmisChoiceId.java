@@ -10,19 +10,19 @@ package org.alfresco.repo.cmis.ws;
 public class CmisChoiceId  extends org.alfresco.repo.cmis.ws.CmisChoice  implements java.io.Serializable {
     private java.lang.String[] value;
 
-    private org.apache.axis.types.URI href;  // attribute
+    private org.alfresco.repo.cmis.ws.CmisChoiceId[] choice;
 
     public CmisChoiceId() {
     }
 
     public CmisChoiceId(
-           java.lang.Object displayName,
-           org.apache.axis.types.URI href,
-           java.lang.String[] value) {
+           java.lang.String displayName,
+           java.lang.String[] value,
+           org.alfresco.repo.cmis.ws.CmisChoiceId[] choice) {
         super(
             displayName);
-        this.href = href;
         this.value = value;
+        this.choice = choice;
     }
 
 
@@ -55,22 +55,30 @@ public class CmisChoiceId  extends org.alfresco.repo.cmis.ws.CmisChoice  impleme
 
 
     /**
-     * Gets the href value for this CmisChoiceId.
+     * Gets the choice value for this CmisChoiceId.
      * 
-     * @return href
+     * @return choice
      */
-    public org.apache.axis.types.URI getHref() {
-        return href;
+    public org.alfresco.repo.cmis.ws.CmisChoiceId[] getChoice() {
+        return choice;
     }
 
 
     /**
-     * Sets the href value for this CmisChoiceId.
+     * Sets the choice value for this CmisChoiceId.
      * 
-     * @param href
+     * @param choice
      */
-    public void setHref(org.apache.axis.types.URI href) {
-        this.href = href;
+    public void setChoice(org.alfresco.repo.cmis.ws.CmisChoiceId[] choice) {
+        this.choice = choice;
+    }
+
+    public org.alfresco.repo.cmis.ws.CmisChoiceId getChoice(int i) {
+        return this.choice[i];
+    }
+
+    public void setChoice(int i, org.alfresco.repo.cmis.ws.CmisChoiceId _value) {
+        this.choice[i] = _value;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -88,9 +96,9 @@ public class CmisChoiceId  extends org.alfresco.repo.cmis.ws.CmisChoice  impleme
             ((this.value==null && other.getValue()==null) || 
              (this.value!=null &&
               java.util.Arrays.equals(this.value, other.getValue()))) &&
-            ((this.href==null && other.getHref()==null) || 
-             (this.href!=null &&
-              this.href.equals(other.getHref())));
+            ((this.choice==null && other.getChoice()==null) || 
+             (this.choice!=null &&
+              java.util.Arrays.equals(this.choice, other.getChoice())));
         __equalsCalc = null;
         return _equals;
     }
@@ -113,8 +121,16 @@ public class CmisChoiceId  extends org.alfresco.repo.cmis.ws.CmisChoice  impleme
                 }
             }
         }
-        if (getHref() != null) {
-            _hashCode += getHref().hashCode();
+        if (getChoice() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getChoice());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getChoice(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -125,16 +141,19 @@ public class CmisChoiceId  extends org.alfresco.repo.cmis.ws.CmisChoice  impleme
         new org.apache.axis.description.TypeDesc(CmisChoiceId.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisChoiceId"));
-        org.apache.axis.description.AttributeDesc attrField = new org.apache.axis.description.AttributeDesc();
-        attrField.setFieldName("href");
-        attrField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "href"));
-        attrField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
-        typeDesc.addFieldDesc(attrField);
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisChoiceId"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("value");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "value"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "value"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        elemField.setMaxOccursUnbounded(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("choice");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "choice"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisChoiceId"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);

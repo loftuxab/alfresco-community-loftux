@@ -18,6 +18,7 @@ public class EnumServiceException implements java.io.Serializable {
     }
 
     public static final java.lang.String _constraint = "constraint";
+    public static final java.lang.String _nameConstraintViolation = "nameConstraintViolation";
     public static final java.lang.String _contentAlreadyExists = "contentAlreadyExists";
     public static final java.lang.String _filterNotValid = "filterNotValid";
     public static final java.lang.String _invalidArgument = "invalidArgument";
@@ -27,10 +28,10 @@ public class EnumServiceException implements java.io.Serializable {
     public static final java.lang.String _runtime = "runtime";
     public static final java.lang.String _storage = "storage";
     public static final java.lang.String _streamNotSupported = "streamNotSupported";
-    public static final java.lang.String _type = "type";
     public static final java.lang.String _updateConflict = "updateConflict";
     public static final java.lang.String _versioning = "versioning";
     public static final EnumServiceException constraint = new EnumServiceException(_constraint);
+    public static final EnumServiceException nameConstraintViolation = new EnumServiceException(_nameConstraintViolation);
     public static final EnumServiceException contentAlreadyExists = new EnumServiceException(_contentAlreadyExists);
     public static final EnumServiceException filterNotValid = new EnumServiceException(_filterNotValid);
     public static final EnumServiceException invalidArgument = new EnumServiceException(_invalidArgument);
@@ -40,7 +41,6 @@ public class EnumServiceException implements java.io.Serializable {
     public static final EnumServiceException runtime = new EnumServiceException(_runtime);
     public static final EnumServiceException storage = new EnumServiceException(_storage);
     public static final EnumServiceException streamNotSupported = new EnumServiceException(_streamNotSupported);
-    public static final EnumServiceException type = new EnumServiceException(_type);
     public static final EnumServiceException updateConflict = new EnumServiceException(_updateConflict);
     public static final EnumServiceException versioning = new EnumServiceException(_versioning);
     public java.lang.String getValue() { return _value_;}
@@ -80,7 +80,7 @@ public class EnumServiceException implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(EnumServiceException.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "enumServiceException"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "enumServiceException"));
     }
     /**
      * Return type metadata object

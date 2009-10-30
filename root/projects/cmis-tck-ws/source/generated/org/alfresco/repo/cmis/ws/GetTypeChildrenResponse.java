@@ -8,66 +8,34 @@
 package org.alfresco.repo.cmis.ws;
 
 public class GetTypeChildrenResponse  implements java.io.Serializable {
-    private org.alfresco.repo.cmis.ws.CmisTypeDefinitionType[] type;
-
-    private boolean hasMoreItems;
+    private org.alfresco.repo.cmis.ws.CmisTypeDefinitionListType types;
 
     public GetTypeChildrenResponse() {
     }
 
     public GetTypeChildrenResponse(
-           org.alfresco.repo.cmis.ws.CmisTypeDefinitionType[] type,
-           boolean hasMoreItems) {
-           this.type = type;
-           this.hasMoreItems = hasMoreItems;
+           org.alfresco.repo.cmis.ws.CmisTypeDefinitionListType types) {
+           this.types = types;
     }
 
 
     /**
-     * Gets the type value for this GetTypeChildrenResponse.
+     * Gets the types value for this GetTypeChildrenResponse.
      * 
-     * @return type
+     * @return types
      */
-    public org.alfresco.repo.cmis.ws.CmisTypeDefinitionType[] getType() {
-        return type;
+    public org.alfresco.repo.cmis.ws.CmisTypeDefinitionListType getTypes() {
+        return types;
     }
 
 
     /**
-     * Sets the type value for this GetTypeChildrenResponse.
+     * Sets the types value for this GetTypeChildrenResponse.
      * 
-     * @param type
+     * @param types
      */
-    public void setType(org.alfresco.repo.cmis.ws.CmisTypeDefinitionType[] type) {
-        this.type = type;
-    }
-
-    public org.alfresco.repo.cmis.ws.CmisTypeDefinitionType getType(int i) {
-        return this.type[i];
-    }
-
-    public void setType(int i, org.alfresco.repo.cmis.ws.CmisTypeDefinitionType _value) {
-        this.type[i] = _value;
-    }
-
-
-    /**
-     * Gets the hasMoreItems value for this GetTypeChildrenResponse.
-     * 
-     * @return hasMoreItems
-     */
-    public boolean isHasMoreItems() {
-        return hasMoreItems;
-    }
-
-
-    /**
-     * Sets the hasMoreItems value for this GetTypeChildrenResponse.
-     * 
-     * @param hasMoreItems
-     */
-    public void setHasMoreItems(boolean hasMoreItems) {
-        this.hasMoreItems = hasMoreItems;
+    public void setTypes(org.alfresco.repo.cmis.ws.CmisTypeDefinitionListType types) {
+        this.types = types;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -82,10 +50,9 @@ public class GetTypeChildrenResponse  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.type==null && other.getType()==null) || 
-             (this.type!=null &&
-              java.util.Arrays.equals(this.type, other.getType()))) &&
-            this.hasMoreItems == other.isHasMoreItems();
+            ((this.types==null && other.getTypes()==null) || 
+             (this.types!=null &&
+              this.types.equals(other.getTypes())));
         __equalsCalc = null;
         return _equals;
     }
@@ -97,18 +64,9 @@ public class GetTypeChildrenResponse  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getType() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getType());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getType(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
+        if (getTypes() != null) {
+            _hashCode += getTypes().hashCode();
         }
-        _hashCode += (isHasMoreItems() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -118,19 +76,11 @@ public class GetTypeChildrenResponse  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(GetTypeChildrenResponse.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", ">getTypeChildrenResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">getTypeChildrenResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("type");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "type"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200901", "cmisTypeDefinitionType"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        elemField.setMaxOccursUnbounded(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("hasMoreItems");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200901", "hasMoreItems"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setFieldName("types");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "types"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "cmisTypeDefinitionListType"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }
