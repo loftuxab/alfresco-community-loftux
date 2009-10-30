@@ -81,7 +81,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             LOGGER.info("Initializing client...");
         }
         documentId = createAndAssertDocument();
-        documentIdHolder = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null)).getDocumentId();
+        documentIdHolder = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null)).getObjectId();
     }
 
     /**
@@ -98,7 +98,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
 
         versioningService.cancelCheckOut(new CancelCheckOut(getAndAssertRepositoryId(), documentIdHolder, null));
 
-        documentIdHolder = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null)).getDocumentId();
+        documentIdHolder = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null)).getObjectId();
 
         versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), documentIdHolder, true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0),
                 MIMETYPE_TEXT_PLAIN, generateTestFileName(), new byte[0], null), TEST_CHECK_IN_COMMENT_MESSAGE, null, null, null, null));
@@ -185,7 +185,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             response = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             assertNotNull("CheckOut response is NULL", response);
-            documentIdHolder = response.getDocumentId();
+            documentIdHolder = response.getObjectId();
             assertNotNull("Checked out document id is NULL", documentIdHolder);
             if (!isVersioningAllowed())
             {
@@ -196,7 +196,8 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
         {
             if (!isVersioningAllowed())
             {
-                assertTrue("Invalid exception was thrown during checkOut while the Document’s Object-Type definition’s versionable attribute is FALSE", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+                assertTrue("Invalid exception was thrown during checkOut while the Document’s Object-Type definition’s versionable attribute is FALSE", e instanceof CmisFaultType
+                        && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
             }
             else
             {
@@ -205,14 +206,14 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testCheckOutCheckInDefault()
+    public void testCheckOutCheckIn()
     {
         try
         {
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             assertNotNull("Checkout response is NULL", checkOutResponse);
-            documentIdHolder = checkOutResponse.getDocumentId();
+            documentIdHolder = checkOutResponse.getObjectId();
             assertTrue("Content was not copied", checkOutResponse.isContentCopied());
             assertFalse("Checked out document id is equal to document id", documentId.equals(documentIdHolder));
             if (!isVersioningAllowed())
@@ -224,7 +225,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             CheckInResponse checkInResponse = getServicesFactory().getVersioningService().checkIn(
                     new CheckIn(getAndAssertRepositoryId(), documentIdHolder, null, null, null, null, null, null, null, null));
             assertNotNull("checkin response is NULL", checkInResponse);
-            documentId = checkInResponse.getDocumentId();
+            documentId = checkInResponse.getObjectId();
             if (!isVersioningAllowed())
             {
                 fail("No Exception was thrown during checkIn while the Document’s Object-Type definition’s versionable attribute is FALSE");
@@ -234,7 +235,8 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
         {
             if (!isVersioningAllowed())
             {
-                assertTrue("Invalid exception was thrown during checkOut/checkIn while the Document’s Object-Type definition’s versionable attribute is FALSE", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+                assertTrue("Invalid exception was thrown during checkOut/checkIn while the Document’s Object-Type definition’s versionable attribute is FALSE",
+                        e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
             }
             else
             {
@@ -250,7 +252,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             assertNotNull("Checkout response is NULL", checkOutResponse);
-            documentIdHolder = checkOutResponse.getDocumentId();
+            documentIdHolder = checkOutResponse.getObjectId();
             if (!isVersioningAllowed())
             {
                 fail("No Exception was thrownduring checkOut while the Document’s Object-Type definition’s versionable attribute is FALSE");
@@ -271,7 +273,8 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
         {
             if (!isVersioningAllowed())
             {
-                assertTrue("Invalid exception was thrown during checkOut/cancelCheckOut while the Document’s Object-Type definition’s versionable attribute is FALSE", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+                assertTrue("Invalid exception was thrown during checkOut/cancelCheckOut while the Document’s Object-Type definition’s versionable attribute is FALSE",
+                        e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
             }
             else
             {
@@ -285,8 +288,8 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
         if (isVersioningAllowed())
         {
             VersioningServicePort versioningServicePort = getServicesFactory().getVersioningService();
-            String docTypeWithNoContentAllowed = searchAndAssertDocumentTypeWithNoContentAlowed();
-            if (docTypeWithNoContentAllowed != null && !docTypeWithNoContentAllowed.equals(""))
+            String docTypeWithNoContentAllowed = searchAndAssertDocumentTypeWithContentNotAllowed();
+            if ((null != docTypeWithNoContentAllowed) && !"".equals(docTypeWithNoContentAllowed))
             {
                 String documentId = createAndAssertDocument(generateTestFileName(), docTypeWithNoContentAllowed, getAndAssertRootFolderId(), null, null, null);
                 CheckOutResponse response = null;
@@ -295,7 +298,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
                     LOGGER.info("[VersioningService->checkOut]");
                     response = versioningServicePort.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
                     assertNotNull("CheckOut response is NULL", response);
-                    documentIdHolder = response.getDocumentId();
+                    documentIdHolder = response.getObjectId();
                     assertNotNull("Checked out document id is NULL", documentIdHolder);
                     assertFalse("The content-stream of the Private Working Copy is “not set”, but 'contentCopied' value is TRUE", response.isContentCopied());
                 }
@@ -308,10 +311,14 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
                 LOGGER.info("[ObjectService->deleteObject]");
                 getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, true, null));
             }
+            else
+            {
+                LOGGER.warn("testCheckOutNotSetContentStream() was skipped: Document Type with Not Allowed Content was not found");
+            }
         }
         else
         {
-            LOGGER.info("testCheckOutNotSetContentStream was skipped: Versioning isn't supported");
+            LOGGER.warn("testCheckOutNotSetContentStream() was skipped: Versioning isn't supported");
         }
     }
 
@@ -361,10 +368,22 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testGetPropertiesOfLatestVersionDefault() throws Exception
+    public void testGetPropertiesOfLatestVersion() throws Exception
     {
         if (isVersioningAllowed())
         {
+            CheckInResponse checkInResponse = new CheckInResponse(documentId, null);
+            for (int i = 0; i < 2; i++)
+            {
+                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
+                checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), false, new CmisPropertiesType(), null, "");
+            }
+            checkInResponse = checkInAndAssert(checkOutAndAssert(checkInResponse.getObjectId()).getObjectId(), true, new CmisPropertiesType(), null, "");
+            for (int i = 0; i < 2; i++)
+            {
+                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
+                checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), false, new CmisPropertiesType(), null, "");
+            }
             GetPropertiesOfLatestVersionResponse response = null;
             String versionSeriesId = getIdProperty(documentId, PROP_VERSION_SERIES_ID);
             assertNotNull("'" + PROP_VERSION_SERIES_ID + "' property is NULL", versionSeriesId);
@@ -392,15 +411,28 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
     {
         if (isVersioningAllowed())
         {
+            CheckInResponse checkInResponse = new CheckInResponse(documentId, null);
+            for (int i = 0; i < 2; i++)
+            {
+                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
+                checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), false, new CmisPropertiesType(), null, "");
+            }
+            checkInResponse = checkInAndAssert(checkOutAndAssert(checkInResponse.getObjectId()).getObjectId(), true, new CmisPropertiesType(), null, "");
+            for (int i = 0; i < 2; i++)
+            {
+                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
+                checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), false, new CmisPropertiesType(), null, "");
+            }
             GetPropertiesOfLatestVersionResponse response = null;
             String versionSeriesId = getIdProperty(documentId, PROP_VERSION_SERIES_ID);
             assertNotNull("'" + PROP_VERSION_SERIES_ID + "' property is NULL", versionSeriesId);
             try
             {
                 LOGGER.info("[VersioningService->getPropertiesOfLatestVersion]");
-                response = getServicesFactory().getVersioningService().getPropertiesOfLatestVersion(
-                        new GetPropertiesOfLatestVersion(getAndAssertRepositoryId(), versionSeriesId, true, PROP_NAME + ", " + PROP_OBJECT_ID + ", "
-                                + PROP_IS_LATEST_VERSION, null));
+                response = getServicesFactory().getVersioningService()
+                        .getPropertiesOfLatestVersion(
+                                new GetPropertiesOfLatestVersion(getAndAssertRepositoryId(), versionSeriesId, true, PROP_NAME + ", " + PROP_OBJECT_ID + ", "
+                                        + PROP_IS_LATEST_VERSION, null));
             }
             catch (Exception e)
             {
@@ -453,20 +485,22 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             }
             catch (Exception e)
             {
-                assertTrue("Invalid exception was thrown during getting properties of latest version while the input parameter major is TRUE and the Version Series contains no major versions", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.objectNotFound));
+                assertTrue(
+                        "Invalid exception was thrown during getting properties of latest version while the input parameter major is TRUE and the Version Series contains no major versions",
+                        e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.objectNotFound));
             }
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = versioningServicePort.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             assertNotNull("Checkout response is NULL", checkOutResponse);
             LOGGER.info("[VersioningService->checkIn]");
-            CheckInResponse checkInResponse = versioningServicePort.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true,
+            CheckInResponse checkInResponse = versioningServicePort.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true,
                     new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0), MIMETYPE_TEXT_PLAIN, generateTestFileName(), TEST_CONTENT.getBytes(), null),
                     "Major", null, null, null, null));
             LOGGER.info("[VersioningService->checkOut]");
-            checkOutResponse = versioningServicePort.checkOut(new CheckOut(getAndAssertRepositoryId(), checkInResponse.getDocumentId(), null));
+            checkOutResponse = versioningServicePort.checkOut(new CheckOut(getAndAssertRepositoryId(), checkInResponse.getObjectId(), null));
             assertNotNull("Checkout response is NULL", checkOutResponse);
             LOGGER.info("[VersioningService->checkIn]");
-            checkInResponse = versioningServicePort.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), false, new CmisPropertiesType(),
+            checkInResponse = versioningServicePort.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), false, new CmisPropertiesType(),
                     new CmisContentStreamType(BigInteger.valueOf(0), MIMETYPE_TEXT_PLAIN, generateTestFileName(), TEST_CONTENT.getBytes(), null), "Minor", null, null, null, null));
 
             try
@@ -502,7 +536,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             assertFalse("'" + PROP_IS_LATEST_MAJOR_VERSION + "' property value is TRUE", (Boolean) getBooleanProperty(response.getProperties(), PROP_IS_LATEST_MAJOR_VERSION));
             assertEquals("Minor", getStringProperty(response.getProperties(), PROP_CHECKIN_COMMENT));
             LOGGER.info("[ObjectService->deleteObject]");
-            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), checkInResponse.getDocumentId(), true, null));
+            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), checkInResponse.getObjectId(), true, null));
 
         }
         else
@@ -511,7 +545,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testGetAllVersionsDefault() throws Exception
+    public void testGetAllVersions() throws Exception
     {
         if (isVersioningAllowed())
         {
@@ -520,13 +554,13 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             assertNotNull("Checkout response is NULL", checkOutResponse);
-            documentIdHolder = checkOutResponse.getDocumentId();
+            documentIdHolder = checkOutResponse.getObjectId();
             LOGGER.info("[VersioningService->checkIn]");
             CheckInResponse checkInResponse = getServicesFactory().getVersioningService().checkIn(
                     new CheckIn(getAndAssertRepositoryId(), documentIdHolder, true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0), MIMETYPE_TEXT_PLAIN,
                             generateTestFileName(), TEST_CONTENT.getBytes(), null), checkinComment, null, null, null, null));
             assertNotNull("Checkin response is NULL", checkInResponse);
-            documentId = checkInResponse.getDocumentId();
+            documentId = checkInResponse.getObjectId();
 
             CmisObjectType[] response = null;
             String versionSeriesId = getIdProperty(documentId, PROP_VERSION_SERIES_ID);
@@ -560,13 +594,13 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             assertNotNull("Checkout response is NULL", checkOutResponse);
-            documentIdHolder = checkOutResponse.getDocumentId();
+            documentIdHolder = checkOutResponse.getObjectId();
             LOGGER.info("[VersioningService->checkIn]");
             CheckInResponse checkInResponse = getServicesFactory().getVersioningService().checkIn(
                     new CheckIn(getAndAssertRepositoryId(), documentIdHolder, true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger.valueOf(0), MIMETYPE_TEXT_PLAIN,
                             generateTestFileName(), TEST_CONTENT.getBytes(), null), checkinComment, null, null, null, null));
             assertNotNull("Checkin response is NULL", checkInResponse);
-            documentId = checkInResponse.getDocumentId();
+            documentId = checkInResponse.getObjectId();
 
             CmisObjectType[] response = null;
             String versionSeriesId = getIdProperty(documentId, PROP_VERSION_SERIES_ID);
@@ -645,7 +679,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             assertNotNull("Checkout response is NULL", checkOutResponse);
-            documentIdHolder = checkOutResponse.getDocumentId();
+            documentIdHolder = checkOutResponse.getObjectId();
 
             CmisObjectType[] response = null;
             String versionSeriesId = getIdProperty(documentId, PROP_VERSION_SERIES_ID);
@@ -671,7 +705,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
                     pwcFound = getIdProperty(cmisObjectType.getProperties(), PROP_OBJECT_ID).equals(documentIdHolder);
                 }
             }
-            assertTrue("No private working copy version found", pwcFound);
+            assertTrue("No private working copy found", pwcFound);
         }
         else
         {
@@ -695,7 +729,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             try
             {
                 LOGGER.info("[VersioningService->checkOut]");
-                documentIdHolder = getServicesFactory().getVersioningService().checkOut(new CheckOut(INVALID_REPOSITORY_ID, documentId, null)).getDocumentId();
+                documentIdHolder = getServicesFactory().getVersioningService().checkOut(new CheckOut(INVALID_REPOSITORY_ID, documentId, null)).getObjectId();
                 fail("Repository with specified Id was not described with RepositoryService");
             }
             catch (Exception e)
@@ -732,7 +766,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             }
             catch (Exception e)
             {
-            }            
+            }
         }
         else
         {

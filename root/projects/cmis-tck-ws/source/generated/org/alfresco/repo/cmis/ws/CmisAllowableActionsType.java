@@ -12,6 +12,8 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
 
     private java.lang.Boolean canUpdateProperties;
 
+    private java.lang.Boolean canGetFolderTree;
+
     private java.lang.Boolean canGetProperties;
 
     private java.lang.Boolean canGetObjectRelationships;
@@ -74,6 +76,7 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
     public CmisAllowableActionsType(
            java.lang.Boolean canDeleteObject,
            java.lang.Boolean canUpdateProperties,
+           java.lang.Boolean canGetFolderTree,
            java.lang.Boolean canGetProperties,
            java.lang.Boolean canGetObjectRelationships,
            java.lang.Boolean canGetObjectParents,
@@ -104,6 +107,7 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
            org.apache.axis.message.MessageElement [] _any) {
            this.canDeleteObject = canDeleteObject;
            this.canUpdateProperties = canUpdateProperties;
+           this.canGetFolderTree = canGetFolderTree;
            this.canGetProperties = canGetProperties;
            this.canGetObjectRelationships = canGetObjectRelationships;
            this.canGetObjectParents = canGetObjectParents;
@@ -174,7 +178,16 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
         this.canUpdateProperties = canUpdateProperties;
     }
 
+    public java.lang.Boolean getCanGetFolderTree()
+    {
+        return canGetFolderTree;
+    }
 
+    public void setCanGetFolderTree(java.lang.Boolean canGetFolderTree)
+    {
+        this.canGetFolderTree = canGetFolderTree;
+    }
+    
     /**
      * Gets the canGetProperties value for this CmisAllowableActionsType.
      * 
@@ -853,6 +866,9 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
         if (getCanUpdateProperties() != null) {
             _hashCode += getCanUpdateProperties().hashCode();
         }
+        if (getCanGetFolderTree() != null) {
+            _hashCode += getCanGetFolderTree().hashCode();
+        }
         if (getCanGetProperties() != null) {
             _hashCode += getCanGetProperties().hashCode();
         }
@@ -965,6 +981,13 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("canUpdateProperties");
         elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "canUpdateProperties"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("canGetFolderTree");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "canGetFolderTree"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

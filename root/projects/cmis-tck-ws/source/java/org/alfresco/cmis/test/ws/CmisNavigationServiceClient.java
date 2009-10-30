@@ -89,7 +89,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
 
     private static final int TEST_TREE_DEPTH = 3;
 
-    private static final int PAGING_STEP = 5;
+    private static final int PAGING_STEP = 3;
 
     private static final int CHILDREN_TEST_OBJECTS_AMOUNT = 6;
 
@@ -100,7 +100,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
     private static final String INVALID_WRONG_FILTER_PROCESSING_MESSAGE = "Wrong filter was not processed as correct filter";
     private static final String INVALID_OBJECTS_INTEGRITY_MESSAGE = "Not all Objects or odd Objects were returned in Response from ";
     private static final String INVALID_OBJECTS_LAYERS_DESCRIPTION_MESSAGE = "Objects layers description and actual Objects list are not compliant";
-    
+
     private static final String TEST_FOLDER_NAME_PATTERN = "Test Folder(%d.%d)";
     private static final String TEST_DOCUMENT_NAME_PATTERN = "Test Document(%d.%d).txt";
 
@@ -222,7 +222,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
     {
         versioningState = isVersioningAllowed() ? EnumVersioningState.major : EnumVersioningState.none;
         folderId = createAndAssertFolder();
-        documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), folderId, null, TEST_CONTENT, null);
+        documentId = createAndAssertDocument();
         getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
         super.onSetUp();
     }
@@ -240,8 +240,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
 
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
         LOGGER.info("[NavigationService->getFolderTree]");
-        CmisObjectInFolderContainerType[] foldersTreeResponse = navigationService.getFolderTree(new GetFolderTree(getAndAssertRepositoryId(), folderId, null, "*",
-                false, EnumIncludeRelationships.none, null, null, null));
+        CmisObjectInFolderContainerType[] foldersTreeResponse = navigationService.getFolderTree(new GetFolderTree(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1),
+                "*", false, EnumIncludeRelationships.none, null, null, null));
 
         assertNotNull("Folder tree response is NULL", foldersTreeResponse);
         assertObjectsTree(foldersTreeResponse, expectedTree);
@@ -266,8 +266,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         String filter = PROP_NAME + ", " + PROP_OBJECT_ID + ", " + PROP_CREATION_DATE;
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
         LOGGER.info("[NavigationService->getFolderTree]");
-        CmisObjectInFolderContainerType[] foldersTreeResponse = navigationService.getFolderTree(new GetFolderTree(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(3), filter,
-                false, EnumIncludeRelationships.none, null, null, null));
+        CmisObjectInFolderContainerType[] foldersTreeResponse = navigationService.getFolderTree(new GetFolderTree(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(3),
+                filter, false, EnumIncludeRelationships.none, null, null, null));
 
         assertNotNull("Folder tree response is NULL", foldersTreeResponse);
         assertObjectsTree(foldersTreeResponse, expectedTree);
@@ -303,8 +303,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
 
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
         LOGGER.info("[NavigationService->getDescendants]");
-        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1), "*", false,
-                EnumIncludeRelationships.none, null, null, null));
+        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1),
+                "*", false, EnumIncludeRelationships.none, null, null, null));
 
         assertNotNull("GetDescendants response is NULL", descendantsResponse);
         assertObjectsTree(descendantsResponse, expectedTree);
@@ -316,8 +316,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
 
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
         LOGGER.info("[NavigationService->getDescendants]");
-        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(2), "*", false,
-                EnumIncludeRelationships.none, null, null, null));
+        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(2),
+                "*", false, EnumIncludeRelationships.none, null, null, null));
 
         assertNotNull("GetDescendants response is NULL", descendantsResponse);
         assertObjectsTree(descendantsResponse, expectedTree);
@@ -330,13 +330,13 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
         String filter = PROP_NAME + ", " + PROP_OBJECT_ID + ", " + PROP_CREATION_DATE;
         LOGGER.info("[NavigationService->getDescendants]");
-        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(3), filter, false,
-                EnumIncludeRelationships.none, null, null, null));
+        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1),
+                filter, false, EnumIncludeRelationships.none, null, null, null));
 
         assertNotNull("GetDescendants response is NULL", descendantsResponse);
         assertObjectsTree(descendantsResponse, expectedTree);
-        List<CmisObjectInFolderContainerType> resultList = convertTreeToObjectsList(descendantsResponse);        
-        
+        List<CmisObjectInFolderContainerType> resultList = convertTreeToObjectsList(descendantsResponse);
+
         for (CmisObjectInFolderContainerType object : resultList)
         {
             CmisPropertiesType properties = object.getObjectInFolder().getObject().getProperties();
@@ -366,7 +366,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         if (getAndAssertCapabilities().isCapabilityMultifiling())
         {
             CmisObjectInFolderContainerType[] descendantsResponse = null;
-            NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();            
+            NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
             String documentId = createAndAssertDocument();
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
             getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId, false, null));
@@ -408,22 +408,23 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
     {
         if (isVersioningAllowed() && getAndAssertCapabilities().isCapabilityVersionSpecificFiling())
         {
-            CmisObjectInFolderContainerType[] descendantsResponse = null;            
+            CmisObjectInFolderContainerType[] descendantsResponse = null;
             String documentId = createAndAssertDocument();
             VersioningServicePortBindingStub versioningService = getServicesFactory().getVersioningService();
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             LOGGER.info("[VersioningService->checkIn]");
-            CheckInResponse checkInResponse = versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(),
+            CheckInResponse checkInResponse = versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(),
                     new CmisContentStreamType(BigInteger.valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
             LOGGER.info("[VersioningService->checkOut]");
             checkOutResponse = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             LOGGER.info("[VersioningService->checkIn]");
-            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), new CmisContentStreamType(
+            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(), new CmisContentStreamType(
                     BigInteger.valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
 
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
-            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getDocumentId(), folderId, true, null));
+            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(
+                    new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getObjectId(), folderId, true, null));
 
             try
             {
@@ -441,9 +442,9 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             for (CmisObjectInFolderContainerType objectType : descendantsResponse)
             {
                 assertTrue("Object in descedants response is null", objectType != null && objectType.getObjectInFolder() != null
-                        && objectType.getObjectInFolder().getObject() != null);                
+                        && objectType.getObjectInFolder().getObject() != null);
                 CmisPropertiesType properties = objectType.getObjectInFolder().getObject().getProperties();
-                if (!found && checkInResponse.getDocumentId().equals(getIdProperty(properties, PROP_OBJECT_ID)))
+                if (!found && checkInResponse.getObjectId().equals(getIdProperty(properties, PROP_OBJECT_ID)))
                 {
                     found = true;
                     break;
@@ -475,7 +476,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
 
     public void testGetChildrenPaigingFunctionality() throws Exception
     {
-        TreeNode<String> expectedTree = createObjectsTree(folderId, versioningState, EnumTypesOfFileableObjects.BOTH, 2, 1, CHILDREN_TEST_OBJECTS_AMOUNT, 2);
+        TreeNode<String> expectedTree = createObjectsTree(folderId, versioningState, EnumTypesOfFileableObjects.BOTH, 1, CHILDREN_TEST_OBJECTS_AMOUNT,
+                CHILDREN_TEST_OBJECTS_AMOUNT, 1);
         Set<String> expectedObjects = expectedTree.getChildren().keySet();
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
 
@@ -493,7 +495,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             assertNotNull("Returned Response Objects are null", childrenResponse.getObjects().getObjects());
             assertObjectsFromResponse(childrenResponse.getObjects().getObjects(), 0, childrenResponse.getObjects().getObjects().length);
 
-            assertTrue("Paging for GetChildren service works wrongly", (childrenResponse.getObjects().getObjects().length == PAGING_STEP) || (childrenResponse.getObjects().getObjects().length == 1));
+            assertTrue("Paging for GetChildren service works wrongly", (childrenResponse.getObjects().getObjects().length == PAGING_STEP)
+                    || (childrenResponse.getObjects().getObjects().length == 1));
             actualChildrenResponse.addAll(Arrays.asList(childrenResponse.getObjects().getObjects()));
 
             skipCount += PAGING_STEP;
@@ -512,23 +515,24 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             LOGGER.info("[VersioningService->checkIn]");
-            CheckInResponse checkInResponse = versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(),
+            CheckInResponse checkInResponse = versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(),
                     new CmisContentStreamType(BigInteger.valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
             LOGGER.info("[VersioningService->checkOut]");
             checkOutResponse = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             LOGGER.info("[VersioningService->checkIn]");
-            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), new CmisContentStreamType(
+            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(), new CmisContentStreamType(
                     BigInteger.valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
 
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
             getServicesFactory().getMultiFilingServicePort().addObjectToFolder(
-                    new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getDocumentId(), folderId, true, null));
+                    new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getObjectId(), folderId, true, null));
 
             try
             {
                 LOGGER.info("[NavigationService->getChildren]");
-                getChildrenResponse = getServicesFactory().getNavigationService().getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, true, EnumIncludeRelationships.both, null, null,
-                        BigInteger.valueOf(0), BigInteger.valueOf(0), null));       
+                getChildrenResponse = getServicesFactory().getNavigationService().getChildren(
+                        new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, true, EnumIncludeRelationships.both, null, null, BigInteger.valueOf(0), BigInteger
+                                .valueOf(0), null));
             }
             catch (Exception e)
             {
@@ -540,7 +544,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             boolean found = false;
             for (CmisObjectInFolderType objectType : getChildrenResponse.getObjects().getObjects())
             {
-                if (!found && checkInResponse.getDocumentId().equals(getIdProperty(objectType.getObject().getProperties(), PROP_OBJECT_ID)))
+                if (!found && checkInResponse.getObjectId().equals(getIdProperty(objectType.getObject().getProperties(), PROP_OBJECT_ID)))
                 {
                     found = true;
                     break;
@@ -601,7 +605,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             try
             {
                 LOGGER.info("[NavigationService->getObjectParents]");
-                parentsResponse = getServicesFactory().getNavigationService().getObjectParents(new GetObjectParents(getAndAssertRepositoryId(), documentId, "*", false, EnumIncludeRelationships.none, null, null, null));
+                parentsResponse = getServicesFactory().getNavigationService().getObjectParents(
+                        new GetObjectParents(getAndAssertRepositoryId(), documentId, "*", false, EnumIncludeRelationships.none, null, null, null));
             }
             catch (Exception e)
             {
@@ -640,62 +645,76 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             try
             {
                 LOGGER.info("[NavigationService->getObjectParents]");
-                getServicesFactory().getNavigationService().getObjectParents(new GetObjectParents(getAndAssertRepositoryId(), objectId, "*", false, EnumIncludeRelationships.none, null, null, null));
+                getServicesFactory().getNavigationService().getObjectParents(
+                        new GetObjectParents(getAndAssertRepositoryId(), objectId, "*", false, EnumIncludeRelationships.none, null, null, null));
                 fail("No Exception was thrown during getting object parents for not fileable object");
             }
             catch (Exception e)
             {
-                assertTrue("Invalid exception was thrown during getting object parents for not fileable object", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+                assertTrue("Invalid exception was thrown during getting object parents for not fileable object", e instanceof CmisFaultType
+                        && ((CmisFaultType) e).getType().equals(EnumServiceException.invalidArgument));
             }
             LOGGER.info("[ObjectService->deleteObject]");
             getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), objectId, true, null));
         }
 
     }
-    
+
     public void testPathSegments() throws Exception
     {
         String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), folderId, null, TEST_CONTENT, versioningState);
-        CmisObjectParentsType[] parentsResponse = null;
-        
-        LOGGER.info("[NavigationService->getObjectParents]");
-        parentsResponse = getServicesFactory().getNavigationService().getObjectParents(
-               new GetObjectParents(getAndAssertRepositoryId(), folderId, "*", false, EnumIncludeRelationships.none, null, true, null));
-        assertNotNull("GetObjectParents response is NULL", parentsResponse);
-        assertTrue("GetObjectParents response is empty", parentsResponse.length > 0);
-        String folderPathSegment = parentsResponse[0].getRelativePathSegment();
+
+        LOGGER.info("[NavigationService->getChildren]");
+        GetChildrenResponse childrenResponse = getServicesFactory().getNavigationService().getChildren(
+                new GetChildren(getAndAssertRepositoryId(), getAndAssertRootFolderId(), "*", null, false, EnumIncludeRelationships.none, null, true, BigInteger.valueOf(200),
+                        BigInteger.valueOf(0), null));
+        assertTrue("GetChildren response is NULL", childrenResponse.getObjects() != null && childrenResponse.getObjects().getObjects() != null);
+
+        String folderPathSegment = null;
+        for (CmisObjectInFolderType objectInFolder : childrenResponse.getObjects().getObjects())
+        {
+            assertNotNull("CmisObjectInFolder is NULL", objectInFolder);
+            assertNotNull("pathSegment is NULL", objectInFolder.getPathSegment());
+            assertNotNull("CmisObject is NULL", objectInFolder.getObject());
+            if (folderId.equals(getIdProperty(objectInFolder.getObject().getProperties(), PROP_OBJECT_ID)))
+            {
+                folderPathSegment = objectInFolder.getPathSegment();
+            }
+        }
+
         assertNotNull("pathSegment is NULL", folderPathSegment);
-        
+
         LOGGER.info("[NavigationService->getObjectParents]");
+        CmisObjectParentsType[] parentsResponse = null;
         parentsResponse = getServicesFactory().getNavigationService().getObjectParents(
-               new GetObjectParents(getAndAssertRepositoryId(), documentId, "*", false, EnumIncludeRelationships.none, null, true, null));
+                new GetObjectParents(getAndAssertRepositoryId(), documentId, "*", false, EnumIncludeRelationships.none, null, true, null));
         assertNotNull("GetObjectParents response is NULL", parentsResponse);
         assertTrue("GetObjectParents response is empty", parentsResponse.length > 0);
         String documentPathSegment = parentsResponse[0].getRelativePathSegment();
         assertNotNull("pathSegment is NULL", documentPathSegment);
-        
+
         String folderPath = "/" + folderPathSegment;
         String documentPath = "/" + folderPathSegment + "/" + documentPathSegment;
-        
+
         LOGGER.info("[ObjectService->getObjectByPath]");
         GetObjectByPathResponse objectByPathResponse = getServicesFactory().getObjectService().getObjectByPath(
                 new GetObjectByPath(getAndAssertRepositoryId(), folderPath, PROP_OBJECT_ID, false, EnumIncludeRelationships.none, null, null, null, null));
         assertTrue("GetObjectByPath response is NULL", objectByPathResponse != null && objectByPathResponse.getObject() != null);
         String folderIdByPath = getAndAssertIdPropertyValue(objectByPathResponse.getObject().getProperties(), PROP_OBJECT_ID);
         assertEquals("Returned by path objectId is not equal to expected", folderId, folderIdByPath);
-        
+
         LOGGER.info("[ObjectService->getObjectByPath]");
         objectByPathResponse = getServicesFactory().getObjectService().getObjectByPath(
                 new GetObjectByPath(getAndAssertRepositoryId(), documentPath, PROP_OBJECT_ID, false, EnumIncludeRelationships.none, null, null, null, null));
         assertTrue("GetObjectByPath response is NULL", objectByPathResponse != null && objectByPathResponse.getObject() != null);
         String documentIdByPath = getAndAssertIdPropertyValue(objectByPathResponse.getObject().getProperties(), PROP_OBJECT_ID);
         assertEquals("Returned by path objectId is not equal to expected", documentId, documentIdByPath);
-        
+
         LOGGER.info("[NavigationService->getDescedants]");
         CmisObjectInFolderContainerType[] descendantsResponse = getServicesFactory().getNavigationService().getDescendants(
-                new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(2), "*", false, EnumIncludeRelationships.none, null, null, null));
+                new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(2), "*", false, EnumIncludeRelationships.none, null, true, null));
         assertNotNull("GetDescendants response is NULL", descendantsResponse);
-        
+
         for (CmisObjectInFolderContainerType objectInFolderContainer : descendantsResponse)
         {
             assertNotNull("CmisObjectInFolderContainer is NULL", objectInFolderContainer);
@@ -705,41 +724,27 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             if (documentId.equals(getIdProperty(objectInFolderContainer.getObjectInFolder().getObject().getProperties(), PROP_OBJECT_ID)))
             {
                 assertEquals("Returned by path objectId is not equal to expected", documentPathSegment, objectInFolderContainer.getObjectInFolder().getPathSegment());
-
             }
         }
-        
-        LOGGER.info("[NavigationService->getChildren]");
-        GetChildrenResponse childrenResponse = getServicesFactory().getNavigationService().getChildren(
-                new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, false, EnumIncludeRelationships.none, null, null, BigInteger.valueOf(100), BigInteger.valueOf(0), null));
-        assertTrue("GetChildren response is NULL", childrenResponse.getObjects() != null && childrenResponse.getObjects().getObjects() != null);
 
-        for (CmisObjectInFolderType objectInFolder : childrenResponse.getObjects().getObjects())
-        {
-            assertNotNull("CmisObjectInFolder is NULL", objectInFolder);
-            assertNotNull("pathSegment is NULL", objectInFolder.getPathSegment());
-            assertNotNull("CmisObject is NULL", objectInFolder.getObject());
-            if (documentId.equals(getIdProperty(objectInFolder.getObject().getProperties(), PROP_OBJECT_ID)))
-            {
-                assertEquals("Returned by path objectId is not equal to expected", documentPathSegment, objectInFolder.getPathSegment());
-            }
-        }
-        
     }
 
     public void testRelationshipsAndAllowableActionsReceiving() throws Exception
     {
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
+        String relationshipId = createAndAssertRelationship();
+        LOGGER.info("[MultiFilingService->addObjectToFolder]");
+        getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), relationshipId, folderId, false, null));
 
         LOGGER.info("[NavigationService->getChildren]");
-        GetChildrenResponse childrenResponse = navigationService.getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, false, EnumIncludeRelationships.none,
-                null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), null));
+        GetChildrenResponse childrenResponse = navigationService.getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, true, EnumIncludeRelationships.both,
+                null, null, BigInteger.valueOf(1000), BigInteger.valueOf(0), null));
         LOGGER.info("[NavigationService->getDescendants]");
-        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1), "*", false,
-                EnumIncludeRelationships.none, null, null, null));
+        CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1),
+                "*", true, EnumIncludeRelationships.both, null, null, null));
         LOGGER.info("[NavigationService->getObjectParents]");
         CmisObjectParentsType[] objectParentsResponse = getServicesFactory().getNavigationService().getObjectParents(
-                new GetObjectParents(getAndAssertRepositoryId(), documentId, "*", false, EnumIncludeRelationships.none, null, null, null));
+                new GetObjectParents(getAndAssertRepositoryId(), documentId, "*", true, EnumIncludeRelationships.both, null, null, null));
 
         List<CmisObjectType> objects = new LinkedList<CmisObjectType>();
         assertAndAddObjectsToList(objects, childrenResponse.getObjects(), "GetChildren service");
@@ -783,9 +788,9 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[NavigationService->GetChildren]");
-            navigationService.getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, INVALID_FILTER, null, false, EnumIncludeRelationships.none,
-                    null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), null));
-            
+            navigationService.getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, INVALID_FILTER, null, false, EnumIncludeRelationships.none, null, null, BigInteger
+                    .valueOf(0), BigInteger.valueOf(0), null));
+
             fail(INVALID_WRONG_FILTER_PROCESSING_MESSAGE);
         }
         catch (Throwable e)
@@ -796,8 +801,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[NavigationService->GetDescendants]");
-            navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1), INVALID_FILTER, false, EnumIncludeRelationships.none, null,
-                    null, null));
+            navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1), INVALID_FILTER, false, EnumIncludeRelationships.none,
+                    null, null, null));
 
             fail(INVALID_WRONG_FILTER_PROCESSING_MESSAGE);
         }
@@ -811,8 +816,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             if (isVersioningAllowed())
             {
                 LOGGER.info("[NavigationService->getCheckedOutDocs]");
-                navigationService.getCheckedOutDocs(new GetCheckedOutDocs(getAndAssertRepositoryId(), folderId, INVALID_FILTER, null, false, EnumIncludeRelationships.none,
-                        null, BigInteger.valueOf(0), BigInteger.valueOf(0), null));
+                navigationService.getCheckedOutDocs(new GetCheckedOutDocs(getAndAssertRepositoryId(), folderId, INVALID_FILTER, null, false, EnumIncludeRelationships.none, null,
+                        BigInteger.valueOf(0), BigInteger.valueOf(0), null));
                 fail(INVALID_WRONG_FILTER_PROCESSING_MESSAGE);
             }
         }
@@ -831,8 +836,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             if (isVersioningAllowed())
             {
                 LOGGER.info("[NavigationService->getCheckedOutDocs]");
-                navigationService.getCheckedOutDocs(new GetCheckedOutDocs(INVALID_REPOSITORY_ID, folderId, "*", null, false, EnumIncludeRelationships.none,
-                        null, BigInteger.valueOf(0), BigInteger.valueOf(0), null));
+                navigationService.getCheckedOutDocs(new GetCheckedOutDocs(INVALID_REPOSITORY_ID, folderId, "*", null, false, EnumIncludeRelationships.none, null, BigInteger
+                        .valueOf(0), BigInteger.valueOf(0), null));
                 fail("Repository with specified Id was not described with RepositoryService");
             }
         }
@@ -843,8 +848,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[NavigationService->getChildren]");
-            navigationService.getChildren(new GetChildren(INVALID_REPOSITORY_ID, folderId, "*", null, false, EnumIncludeRelationships.none,
-                    null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), null));
+            navigationService.getChildren(new GetChildren(INVALID_REPOSITORY_ID, folderId, "*", null, false, EnumIncludeRelationships.none, null, null, BigInteger.valueOf(0),
+                    BigInteger.valueOf(0), null));
 
             fail("Repository with specified Id was not described with RepositoryService");
         }
@@ -886,7 +891,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testGetCheckedoutDocsFolder() throws Exception
+    public void testGetCheckedoutDocs() throws Exception
     {
         if (isVersioningAllowed())
         {
@@ -897,7 +902,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             {
                 LOGGER.info("[NavigationService->getCheckedOutDocs]");
                 response = getServicesFactory().getNavigationService().getCheckedOutDocs(
-                        new GetCheckedOutDocs(getAndAssertRepositoryId(), null, "*", null, false, EnumIncludeRelationships.none, null, null, null, null));
+                        new GetCheckedOutDocs(getAndAssertRepositoryId(), folderId, "*", null, false, EnumIncludeRelationships.none, null, null, null, null));
             }
             catch (Exception e)
             {
@@ -952,7 +957,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             LOGGER.warn("testGetCheckedoutDocsFolder was skipped: Versioning isn't supported");
         }
     }
-  
+
     private void assertAndAddObjectsToList(List<CmisObjectType> targetList, CmisObjectInFolderContainerType[] objects, String responseType)
     {
         List<CmisObjectInFolderContainerType> listObjectInFolderContainers = convertTreeToObjectsList(objects);
@@ -964,7 +969,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
         assertAndAddObjectsToList(targetList, cmisObjecs.toArray(new CmisObjectType[0]), responseType);
     }
-    
+
     private void assertAndAddObjectsToList(List<CmisObjectType> targetList, CmisObjectInFolderListType objects, String responseType)
     {
         List<CmisObjectType> cmisObjecs = new ArrayList<CmisObjectType>();
@@ -976,7 +981,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
         assertAndAddObjectsToList(targetList, cmisObjecs.toArray(new CmisObjectType[0]), responseType);
     }
-    
+
     private void assertAndAddObjectsToList(List<CmisObjectType> targetList, CmisObjectParentsType[] objects, String responseType)
     {
         List<CmisObjectType> cmisObjecs = new ArrayList<CmisObjectType>();
@@ -987,7 +992,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
         assertAndAddObjectsToList(targetList, cmisObjecs.toArray(new CmisObjectType[0]), responseType);
     }
-    
+
     private void assertAndAddObjectsToList(List<CmisObjectType> targetList, CmisObjectType[] objects, String responseType)
     {
         assertNotNull("Response Objects are null for " + responseType, objects);
@@ -1010,7 +1015,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             targetList.add(object);
         }
     }
-  
+
     private void assertChildren(Collection<String> expectedTree, CmisObjectInFolderType[] objects, boolean hasNoneFolderObjects, String sourceName) throws Exception
     {
         CmisObjectType[] cmisObjects = new CmisObjectType[objects.length];
@@ -1021,7 +1026,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
         assertChildren(expectedTree, cmisObjects, hasNoneFolderObjects, sourceName);
     }
-    
+
     private void assertChildren(Collection<String> expectedTree, CmisObjectType[] objects, boolean hasNoneFolderObjects, String sourceName) throws Exception
     {
         assertNotNull("Some Expected Object was not found in Response", objects);
@@ -1071,7 +1076,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
         return null;
     }
-    
+
     private void assertObjectsFromResponse(Object[] objects, int startIndex, int length) throws Exception
     {
         assertNotNull("Objects from response are null", objects);
@@ -1146,7 +1151,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
         return null;
     }
-    
+
     protected TreeNode<String> createObjectsTree(String rootFolderId, EnumVersioningState documentsInitialVersion, EnumTypesOfFileableObjects returnObjectTypes, int depth,
             int minLayerSize, int maxLayerSize, int returnToLevel) throws Exception
     {
@@ -1181,7 +1186,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
                     {
                         element.getChildren().put(newFolderId, child);
                     }
-                    if (element.getLevel() < depth)
+                    if (element.getLevel() < depth - 1)
                     {
                         foldersStack.push(child);
                     }
@@ -1216,11 +1221,9 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             assertNotNull("Expected tree element not found", element.getLeft());
             assertNotNull("Received tree element not found", element.getRight());
             currentTreeNode = element.getRight();
-            assertFalse("Returned tree childs are not equal to expected childs", ((element.getLeft().getChildren() == null && currentTreeNode.getChildren() != null) || (element
-                    .getLeft().getChildren() != null && currentTreeNode.getChildren() == null)));
+            assertTrue("Count of returned childs are not equal to expected count of childs", getSize(element.getLeft().getChildren()) == getSize(currentTreeNode.getChildren()));
             if (element.getLeft().getChildren() != null && currentTreeNode.getChildren() != null)
             {
-                assertTrue("Count of returned childs are not equal to expected count of childs", currentTreeNode.getChildren().size() == element.getLeft().getChildren().length);
                 Set<String> receivedIds = new HashSet<String>();
                 for (CmisObjectInFolderContainerType objectInFolderContainer : element.getLeft().getChildren())
                 {
@@ -1234,7 +1237,30 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         }
     }
 
-    private static class Pair<FirstType, SecondType> {
+    @SuppressWarnings("unchecked")
+    private int getSize(Object obj)
+    {
+        if (obj == null)
+        {
+            return 0;
+        }
+        if (obj instanceof Object[])
+        {
+            return ((Object[]) obj).length;
+        }
+        if (obj instanceof Collection)
+        {
+            return ((Collection) obj).size();
+        }
+        if (obj instanceof Map)
+        {
+            return ((Map) obj).size();
+        }
+        return 0;
+    }
+
+    private static class Pair<FirstType, SecondType>
+    {
         private FirstType left;
         private SecondType right;
 

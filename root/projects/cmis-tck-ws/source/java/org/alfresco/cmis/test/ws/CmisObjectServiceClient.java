@@ -142,14 +142,13 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         CmisPropertyId idProperty = new CmisPropertyId();
         idProperty.setPropertyDefinitionId(PROP_OBJECT_TYPE_ID);
         idProperty.setValue(new String[] { getAndAssertDocumentTypeId() });
-        properties.setPropertyString(new CmisPropertyString[]{cmisPropertyName});
-        properties.setPropertyId(new CmisPropertyId[]{idProperty});
+        properties.setPropertyString(new CmisPropertyString[] { cmisPropertyName });
+        properties.setPropertyId(new CmisPropertyId[] { idProperty });
         CmisContentStreamType cmisStream = new CmisContentStreamType();
         cmisStream.setFilename(generateTestFileName());
         cmisStream.setMimeType(MIMETYPE_TEXT_PLAIN);
         cmisStream.setStream(TEST_CONTENT.getBytes(ENCODING));
-        CreateDocument createDocumentParameters = 
-            new CreateDocument(getAndAssertRepositoryId(), properties, getAndAssertRootFolderId(), cmisStream, EnumVersioningState
+        CreateDocument createDocumentParameters = new CreateDocument(getAndAssertRepositoryId(), properties, getAndAssertRootFolderId(), cmisStream, EnumVersioningState
                 .fromString(EnumVersioningState._major), null, null, null, null);
         String documentId = objectServicePort.createDocument(createDocumentParameters).getObjectId();
 
@@ -160,8 +159,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         idProperty = new CmisPropertyId();
         idProperty.setPropertyDefinitionId(PROP_OBJECT_TYPE_ID);
         idProperty.setValue(new String[] { getAndAssertFolderTypeId() });
-        properties.setPropertyString(new CmisPropertyString[]{cmisPropertyName});
-        properties.setPropertyId(new CmisPropertyId[]{idProperty});
+        properties.setPropertyString(new CmisPropertyString[] { cmisPropertyName });
+        properties.setPropertyId(new CmisPropertyId[] { idProperty });
         CreateFolder createFolderParameters = new CreateFolder(getAndAssertRepositoryId(), properties, getAndAssertRootFolderId(), null, null, null, null);
         String folderId = objectServicePort.createFolder(createFolderParameters).getObjectId();
 
@@ -174,7 +173,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         cmisPropertyName = new CmisPropertyString();
         cmisPropertyName.setPropertyDefinitionId(PROP_NAME);
         cmisPropertyName.setValue(new String[] { UPDATE_FILE_NAME });
-        properties.setPropertyString(new CmisPropertyString[]{cmisPropertyName});
+        properties.setPropertyString(new CmisPropertyString[] { cmisPropertyName });
         UpdateProperties updatePropertiesParameters = new UpdateProperties(getAndAssertRepositoryId(), documentId, "", properties, null);
         documentId = objectServicePort.updateProperties(updatePropertiesParameters).getObjectId();
 
@@ -191,7 +190,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         viewStream.read(streamBytes);
         contentStream.setStream(streamBytes);
         SetContentStream setContentStreamParameters = new SetContentStream(getAndAssertRepositoryId(), documentId, true, "", contentStream, null);
-        documentId = objectServicePort.setContentStream(setContentStreamParameters).getDocumentId();
+        documentId = objectServicePort.setContentStream(setContentStreamParameters).getObjectId();
 
         // TODO WSDL does not correspond to specification
         // objectServicePort.deleteContentStream(new DeleteContentStream(getAndAssertRepositoryId(), documentId));
@@ -293,7 +292,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 largeAppender.append("A");
             }
             CmisPropertiesType properties = new CmisPropertiesType();
-            properties.setPropertyString(new CmisPropertyString[] { new CmisPropertyString(propertyDefinition.getId(), null, null, null, new String[] { largeAppender.toString() }) });
+            properties
+                    .setPropertyString(new CmisPropertyString[] { new CmisPropertyString(propertyDefinition.getId(), null, null, null, new String[] { largeAppender.toString() }) });
             assertDocumentConstraitException(("Creating Document with outing from bounds Max Length of '" + propertyDefinition.getId() + "' property"),
                     EnumServiceException.constraint, generateTestFileName(), documentTypeId, getAndAssertRootFolderId(), properties, TEST_CONTENT, null);
         }
@@ -311,7 +311,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             String customFolderTypeId = searchAndAssertFolderFromNotBaseType();
             CmisPropertiesType properties = new CmisPropertiesType();
-            properties.setPropertyId(new CmisPropertyId[] { new CmisPropertyId(PROP_ALLOWED_CHILD_OBJECT_TYPE_IDS, null, null, null, new String[] { getAndAssertDocumentTypeId() }) });
+            properties
+                    .setPropertyId(new CmisPropertyId[] { new CmisPropertyId(PROP_ALLOWED_CHILD_OBJECT_TYPE_IDS, null, null, null, new String[] { getAndAssertDocumentTypeId() }) });
             folderId = createAndAssertFolder(generateTestFolderName(), customFolderTypeId, getAndAssertRootFolderId(), properties);
             constrainedTypeId = searchAndAssertNotAllowedForFolderObjectTypeId(folderId, document);
         }
@@ -437,23 +438,22 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     // TODO: <Array> policies parameter for createDocument testing
     // TODO: <Array> ACE addACEs parameter for createDocument testing
     // TODO: <Array> ACE removeACEs parameter for createDocument testing
-    
+
     public void testDocumentFromSourceCreation() throws Exception
     {
         String sourceDocumentId = createAndAssertDocument();
         String targetFolderId = createAndAssertFolder();
-        
-        String newName = "FROM_SOURCE" + generateTestFileName();        
+
+        String newName = "FROM_SOURCE" + generateTestFileName();
         CmisPropertiesType properties = new CmisPropertiesType();
         CmisPropertyString cmisPropertyName = new CmisPropertyString();
         cmisPropertyName.setPropertyDefinitionId(PROP_NAME);
         cmisPropertyName.setValue(new String[] { newName });
-        properties.setPropertyString(new CmisPropertyString[]{cmisPropertyName});
-        
-        EnumVersioningState versioningState = isVersioningAllowed() ? EnumVersioningState.major : EnumVersioningState.none; 
+        properties.setPropertyString(new CmisPropertyString[] { cmisPropertyName });
+
+        EnumVersioningState versioningState = isVersioningAllowed() ? EnumVersioningState.major : EnumVersioningState.none;
         String documentId = getServicesFactory().getObjectService().createDocumentFromSource(
-                new CreateDocumentFromSource(getAndAssertRepositoryId(), sourceDocumentId, properties, targetFolderId, versioningState, null, null, null, null))
-                .getObjectId();
+                new CreateDocumentFromSource(getAndAssertRepositoryId(), sourceDocumentId, properties, targetFolderId, versioningState, null, null, null, null)).getObjectId();
         assertEquals("Name was not set", newName, getStringProperty(documentId, PROP_NAME));
         GetContentStreamResponse response = null;
         isDocumentInFolder(documentId, targetFolderId);
@@ -470,8 +470,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             }
             assertTrue("No content stream was returned", response != null && response.getContentStream() != null);
             assertTrue("Invalid content stream was set to document", Arrays.equals(TEST_CONTENT.getBytes(), response.getContentStream().getStream()));
-            LOGGER.info("[ObjectService->deleteObject]");      
-        }        
+            LOGGER.info("[ObjectService->deleteObject]");
+        }
         getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, true, null));
         getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), targetFolderId, false, null));
         getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), sourceDocumentId, true, null));
@@ -492,14 +492,12 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     public void testFolderCreationWithDifferentlyInvalidParentId() throws Exception
     {
         String folderTypeId = getAndAssertFolderTypeId();
-        assertFolderConstraitException("Folder Creation with undefined 'parent folder id' input parameter", EnumServiceException.invalidArgument, generateTestFolderName(),
-                folderTypeId, null, null);
         String documentId = createAndAssertDocument();
-        assertFolderConstraitException("Folder Creation with none Folder 'parent folder id' input parameter", EnumServiceException.invalidArgument, generateTestFolderName(),
+        assertFolderConstraitException("Folder Creation with none Folder 'parent folder id' input parameter", EnumServiceException.constraint, generateTestFolderName(),
                 folderTypeId, documentId, null);
         deleteAndAssertObject(documentId);
-        assertFolderConstraitException("Folder Creation with invalid 'parent folder id' input parameter", EnumServiceException.invalidArgument, generateTestFolderName(),
-                folderTypeId, "Invalid Parent Folder Id", null);
+        assertFolderConstraitException("Folder Creation with invalid 'parent folder id' input parameter", EnumServiceException.constraint, generateTestFolderName(), folderTypeId,
+                "Invalid Parent Folder Id", null);
     }
 
     public void testFolderCreationConstraintsObservance() throws Exception
@@ -565,8 +563,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
 
     public void testRelationshipCreationConstraintsObservance() throws Exception
     {
-        assertRelationshipConstraitException("Relationship Creation with typeId is not an Object-Type whose baseType is Relationship", EnumServiceException.constraint, null, null,
-                getAndAssertFolderTypeId());
+        assertRelationshipConstraitException("Relationship Creation with typeId is not an Object-Type whose baseType is Relationship", EnumServiceException.invalidArgument, null,
+                null, getAndAssertFolderTypeId());
 
         String relationshipTypeId = searchAndAssertRelationshipTypeWithAllowedSourceTypes();
         if (relationshipTypeId != null)
@@ -574,7 +572,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             String notAllowdSourceTypeId = searchAndAssertNotAllowedSourceForRelationshipTypeId(relationshipTypeId);
             assertRelationshipConstraitException(
                     "Relationship Creation with the sourceObjectId’s ObjectType is not in the list of “allowedSourceTypes” specified by the Object-Type definition specified by typeId",
-                    EnumServiceException.constraint, notAllowdSourceTypeId, null, relationshipTypeId);
+                    EnumServiceException.objectNotFound, notAllowdSourceTypeId, null, relationshipTypeId);
         }
 
         relationshipTypeId = searchAndAssertRelationshipTypeWithAllowedTargetTypes();
@@ -583,7 +581,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             String notAllowdTargetTypeId = searchAndAssertNotAllowedSourceForRelationshipTypeId(relationshipTypeId);
             assertRelationshipConstraitException(
                     "Relationship Creation with the sourceObjectId’s ObjectType is not in the list of “allowedTargetTypes” specified by the Object-Type definition specified by typeId",
-                    EnumServiceException.constraint, null, notAllowdTargetTypeId, relationshipTypeId);
+                    EnumServiceException.objectNotFound, null, notAllowdTargetTypeId, relationshipTypeId);
         }
 
         // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
@@ -593,89 +591,107 @@ public class CmisObjectServiceClient extends AbstractServiceClient
 
     public void testCreatePolicy() throws Exception
     {
-        String policyId = null;
-        try
+        String policyTypeId = getAndAssertPolicyTypeId();
+        if (policyTypeId != null)
         {
-            policyId = createAndAssertPolicy();
+            String policyId = null;
+            try
+            {
+                policyId = createAndAssertPolicy();
+            }
+            catch (Exception e)
+            {
+                fail(e.toString());
+            }
+            LOGGER.info("[ObjectService->deleteObject]");
+            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), policyId, false, null));
         }
-        catch (Exception e)
+        else
         {
-            fail(e.toString());
+            LOGGER.info("testCreatePolicy was skipped: Policy type is not found");
         }
-        LOGGER.info("[ObjectService->deleteObject]");
-        getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), policyId, false, null));
     }
 
     public void testCreatePolicyConstraintsObservance() throws Exception
     {
-        try
+        String policyTypeId = getAndAssertPolicyTypeId();
+        if (policyTypeId != null)
         {
-            createAndAssertPolicy(generateTestPolicyName(), getAndAssertFolderTypeId(), null, getAndAssertRootFolderId());
-            fail("No Exception was thrown during Policy creation with typeId is not an Object-Type whose baseType is Policy");
-        }
-        catch (Exception e)
-        {
-            assertTrue("Invalid exception was thrown during Policy creation with typeId is not an Object-Type whose baseType is Policy", e instanceof CmisFaultType
-                    && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
-        }
-        CmisTypeDefinitionType typeDef = getAndAssertTypeDefinition(getAndAssertPolicyTypeId());
-        CmisPropertyStringDefinitionType propertyDefinition = null;
-        for (CmisPropertyStringDefinitionType propDef : typeDef.getPropertyStringDefinition())
-        {    
-            if (null != propDef.getMaxLength() && propDef.getMaxLength().longValue() > 0)
-            {
-                propertyDefinition = propDef;
-                break;
-            }
-        }
-        if (null != propertyDefinition)
-        {
-            StringBuilder largeAppender = new StringBuilder("");
-            long boundary = propertyDefinition.getMaxLength().longValue();
-            for (long i = 0; i <= (boundary + 5); i++)
-            {
-                largeAppender.append("A");
-            }
-            CmisPropertiesType properties = new CmisPropertiesType();
-            properties.setPropertyString(new CmisPropertyString[]{new CmisPropertyString(propertyDefinition.getId(), null, null, null, new String[] { largeAppender.toString() })});
-            if (!propertyDefinition.getId().equals(PROP_NAME))
-            {
-                CmisPropertyString cmisPropertyString = new CmisPropertyString();
-                cmisPropertyString.setPropertyDefinitionId(PROP_NAME);
-                cmisPropertyString.setValue(new String[] { generateTestPolicyName() });
-                properties.setPropertyString(new CmisPropertyString[]{cmisPropertyString});
-            }
-            CmisPropertyId idProperty = new CmisPropertyId();
-            idProperty.setPropertyDefinitionId(PROP_OBJECT_TYPE_ID);
-            idProperty.setValue(new String[] { getAndAssertPolicyTypeId() });
-            properties.setPropertyId(new CmisPropertyId[]{idProperty});
-
             try
             {
-                createAndAssertPolicy(null, null, properties, getAndAssertRootFolderId());
-                fail("No Exception was thrown during Policy creation with '" + propertyDefinition.getId() + "' value length greater than MAX length");
+                createAndAssertPolicy(generateTestPolicyName(), getAndAssertFolderTypeId(), null, getAndAssertRootFolderId());
+                fail("No Exception was thrown during Policy creation with typeId is not an Object-Type whose baseType is Policy");
             }
             catch (Exception e)
             {
-                assertTrue("Invalid exception was thrown during Policy creation with '" + propertyDefinition.getId() + "' value length greater than MAX length",
+                assertTrue("Invalid exception was thrown during Policy creation with typeId is not an Object-Type whose baseType is Policy", e instanceof CmisFaultType
+                        && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+            }
+            CmisTypeDefinitionType typeDef = getAndAssertTypeDefinition(getAndAssertPolicyTypeId());
+            CmisPropertyStringDefinitionType propertyDefinition = null;
+            for (CmisPropertyStringDefinitionType propDef : typeDef.getPropertyStringDefinition())
+            {
+                if (null != propDef.getMaxLength() && propDef.getMaxLength().longValue() > 0)
+                {
+                    propertyDefinition = propDef;
+                    break;
+                }
+            }
+            if (null != propertyDefinition)
+            {
+                StringBuilder largeAppender = new StringBuilder("");
+                long boundary = propertyDefinition.getMaxLength().longValue();
+                for (long i = 0; i <= (boundary + 5); i++)
+                {
+                    largeAppender.append("A");
+                }
+                CmisPropertiesType properties = new CmisPropertiesType();
+                properties.setPropertyString(new CmisPropertyString[] { new CmisPropertyString(propertyDefinition.getId(), null, null, null, new String[] { largeAppender
+                        .toString() }) });
+                if (!propertyDefinition.getId().equals(PROP_NAME))
+                {
+                    CmisPropertyString cmisPropertyString = new CmisPropertyString();
+                    cmisPropertyString.setPropertyDefinitionId(PROP_NAME);
+                    cmisPropertyString.setValue(new String[] { generateTestPolicyName() });
+                    properties.setPropertyString(new CmisPropertyString[] { cmisPropertyString });
+                }
+                CmisPropertyId idProperty = new CmisPropertyId();
+                idProperty.setPropertyDefinitionId(PROP_OBJECT_TYPE_ID);
+                idProperty.setValue(new String[] { getAndAssertPolicyTypeId() });
+                properties.setPropertyId(new CmisPropertyId[] { idProperty });
+
+                try
+                {
+                    createAndAssertPolicy(null, null, properties, getAndAssertRootFolderId());
+                    fail("No Exception was thrown during Policy creation with '" + propertyDefinition.getId() + "' value length greater than MAX length");
+                }
+                catch (Exception e)
+                {
+                    assertTrue("Invalid exception was thrown during Policy creation with '" + propertyDefinition.getId() + "' value length greater than MAX length",
+                            e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+                }
+            }
+
+            String customFolderTypeId = searchAndAssertFolderFromNotBaseType();
+            CmisPropertiesType properties = new CmisPropertiesType();
+            properties
+                    .setPropertyId(new CmisPropertyId[] { new CmisPropertyId(PROP_ALLOWED_CHILD_OBJECT_TYPE_IDS, null, null, null, new String[] { getAndAssertDocumentTypeId() }) });
+            String folderId = createAndAssertFolder(generateTestFolderName(), customFolderTypeId, getAndAssertRootFolderId(), properties);
+            try
+            {
+                createAndAssertPolicy(generateTestPolicyName(), getAndAssertPolicyTypeId(), null, folderId);
+                fail("No Exception was thrown during Policy creation with 'typeId' value not in the list of AllowedChildObjectTypeIds of the parent-folder specified by folderId");
+            }
+            catch (Exception e)
+            {
+                assertTrue(
+                        "Invalid exception was thrown during Policy creation with 'typeId' value not in the list of AllowedChildObjectTypeIds of the parent-folder specified by folderId",
                         e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
             }
         }
-
-        String customFolderTypeId = searchAndAssertFolderFromNotBaseType();
-        CmisPropertiesType properties = new CmisPropertiesType();
-        properties.setPropertyId(new CmisPropertyId[]{new CmisPropertyId(PROP_ALLOWED_CHILD_OBJECT_TYPE_IDS, null, null, null, new String[] { getAndAssertDocumentTypeId() })});
-        String folderId = createAndAssertFolder(generateTestFolderName(), customFolderTypeId, getAndAssertRootFolderId(), properties);
-        try
+        else
         {
-            createAndAssertPolicy(generateTestPolicyName(), getAndAssertPolicyTypeId(), null, folderId);
-            fail("No Exception was thrown during Policy creation with 'typeId' value not in the list of AllowedChildObjectTypeIds of the parent-folder specified by folderId");
-        }
-        catch (Exception e)
-        {
-            assertTrue(
-                    "Invalid exception was thrown during Policy creation with 'typeId' value not in the list of AllowedChildObjectTypeIds of the parent-folder specified by folderId",
-                    e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+            LOGGER.info("testCreatePolicy was skipped: Policy type is not found");
         }
 
         // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
@@ -763,7 +779,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         assertTrue("No properties were returned", response != null && response.getObject() != null && response.getObject().getProperties() != null);
         assertNotNull("No 'Name' property was returned", getStringProperty(response.getObject().getProperties(), PROP_NAME));
     }
-    
+
     public void testGetObjectIncludeAllowableActionsAndRelationships() throws Exception
     {
         GetObjectResponse response = null;
@@ -782,12 +798,13 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         assertNotNull("Allowable actions were not returned", response.getObject().getAllowableActions());
         assertNotNull("No action 'getProperties' was returned", response.getObject().getAllowableActions().getCanGetProperties());
 
-        String relationshipId = createAndAssertRelationship();
+        String sourceId = createRelationshipSourceObject(getAndAssertRootFolderId());
+        String relationshipId = createAndAssertRelationship(sourceId, null);
         try
         {
             LOGGER.info("[ObjectService->getObject]");
             response = getServicesFactory().getObjectService().getObject(
-                    new GetObject(getAndAssertRepositoryId(), getAndAssertRootFolderId(), PROP_NAME, false, EnumIncludeRelationships.both, null, null, null, null));
+                    new GetObject(getAndAssertRepositoryId(), sourceId, PROP_NAME, false, EnumIncludeRelationships.both, null, null, null, null));
         }
         catch (Exception e)
         {
@@ -823,7 +840,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             assertEquals("Wrong folder was found", folder1Id, getIdProperty(response.getObject().getProperties(), PROP_OBJECT_ID));
 
             LOGGER.info("[ObjectService->getFolderByPath]");
-            response = getServicesFactory().getObjectService().getObjectByPath(new GetObjectByPath(getAndAssertRepositoryId(), pathToFolder2, "*", false, null, null, null, null, null));
+            response = getServicesFactory().getObjectService().getObjectByPath(
+                    new GetObjectByPath(getAndAssertRepositoryId(), pathToFolder2, "*", false, null, null, null, null, null));
             assertTrue("Folder was not found", response != null && response.getObject() != null && response.getObject().getProperties() != null);
             assertEquals("Wrong folder was found", folder2Id, getIdProperty(response.getObject().getProperties(), PROP_OBJECT_ID));
         }
@@ -864,7 +882,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("testGetContentStream was skipped: Content stream isn't allowed");
         }
     }
-    
+
     public void testGetContentStreamPortioned() throws Exception
     {
         if (isContentStreamAllowed())
@@ -874,10 +892,10 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             byte[] byteContent = TEST_CONTENT.getBytes();
             //firstPortion offset=2, length=7  
             byte[] firstPortion = new byte[7];
-            System.arraycopy(byteContent, 3, firstPortion, 0, 7);
+            System.arraycopy(byteContent, 2, firstPortion, 0, 7);
             //secondPortion offset=content.length-5
-            byte[] secondPortion = new byte[5];
-            System.arraycopy(byteContent, byteContent.length - 6, secondPortion, 0, 5);
+            byte[] secondPortion = new byte[6];
+            System.arraycopy(byteContent, byteContent.length - 6, secondPortion, 0, 6);
             try
             {
                 LOGGER.info("[ObjectService->getContentStream]");
@@ -910,7 +928,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("testGetContentStream was skipped: Content stream isn't allowed");
         }
     }
-    
+
     public void testGetContentStreamConstraintsObservance() throws Exception
     {
         String docTypeWithNoContentAllowed = searchAndAssertDocumentTypeWithNoContentAlowed();
@@ -932,24 +950,26 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testUpdatePropertiesDefault() throws Exception
+    public void testUpdateProperties() throws Exception
     {
         String documentName = generateTestFileName();
-        String documentId = createAndAssertDocument(documentName, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null);
+        String documentId = createAndAssertDocument(documentName, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, EnumVersioningState.none);
 
         String documentNameNew = generateTestFileName("_new");
         try
         {
             CmisPropertiesType properties = fillProperties(documentNameNew, null);
             LOGGER.info("[ObjectService->updateProperties]");
-            documentId = getServicesFactory().getObjectService().updateProperties(new UpdateProperties(getAndAssertRepositoryId(), documentId, null, properties, null)).getObjectId();
+            documentId = getServicesFactory().getObjectService().updateProperties(new UpdateProperties(getAndAssertRepositoryId(), documentId, null, properties, null))
+                    .getObjectId();
         }
         catch (Exception e)
         {
             fail(e.toString());
         }
 
-        assertEquals("Properties was not updated", documentNameNew, getStringProperty(documentId, PROP_NAME));
+        String receivedPropertyName = getStringProperty(documentId, PROP_NAME);
+        assertTrue("Properties was not updated", documentNameNew.equals(receivedPropertyName));
 
         LOGGER.info("[ObjectService->deleteObject]");
         getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
@@ -957,7 +977,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
 
     public void testMoveObjectDefault() throws Exception
     {
-        String documentId = createAndAssertDocument();
+        String documentName = generateTestFileName();
+        String documentId = createAndAssertDocument(documentName, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, EnumVersioningState.none);
         String folderId = createAndAssertFolder();
         try
         {
@@ -1104,7 +1125,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             String documentId = createAndAssertDocument();
             LOGGER.info("[VersioningService->checkOut]");
-            String checkedOutId = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null)).getDocumentId();
+            String checkedOutId = getServicesFactory().getVersioningService().checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null)).getObjectId();
             try
             {
                 LOGGER.info("[ObjectService->deleteObject]");
@@ -1159,7 +1180,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             try
             {
                 LOGGER.info("[ObjectService->deleteTree]");
-                response = getServicesFactory().getObjectService().deleteTree(new DeleteTree(getAndAssertRepositoryId(), folderId, true, EnumUnfileObject.delete, false, null));
+                response = getServicesFactory().getObjectService().deleteTree(new DeleteTree(getAndAssertRepositoryId(), folderId, true, EnumUnfileObject.delete, true, null));
             }
             catch (Exception e)
             {
@@ -1167,7 +1188,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             }
             assertTrue("Objects tree was not deleted", response == null || response.getFailedToDelete() == null || response.getFailedToDelete().getObjectIds() == null
                     || response.getFailedToDelete().getObjectIds().length == 0);
-            assertFalse("Multifiled document was not removed", isDocumentInFolder(documentId, getAndAssertRootFolderId()));
+            assertTrue("Multifiled document was not removed", isDocumentInFolder(documentId, getAndAssertRootFolderId()));
 
             folderId = createAndAssertFolder();
             documentId = createAndAssertDocument();
@@ -1180,7 +1201,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             try
             {
                 LOGGER.info("[ObjectService->deleteTree]");
-                response = getServicesFactory().getObjectService().deleteTree(new DeleteTree(getAndAssertRepositoryId(), folderId, true, EnumUnfileObject.deletesinglefiled, false, null));
+                response = getServicesFactory().getObjectService().deleteTree(
+                        new DeleteTree(getAndAssertRepositoryId(), folderId, true, EnumUnfileObject.deletesinglefiled, false, null));
             }
             catch (Exception e)
             {
@@ -1233,7 +1255,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("testDeleteTreeWithAllVersions was skipped: Versioning isn't supported");
         }
     }
-    
+
     public void testDeleteTreeWithoutAllVersions() throws Exception
     {
         if (isVersioningAllowed())
@@ -1245,8 +1267,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("testDeleteTreeWithoutAllVersions was skipped: Versioning isn't supported");
         }
     }
-    
-    private void assertDeleteTreeAllVersions(boolean deleteAllVersion) throws Exception 
+
+    private void assertDeleteTreeAllVersions(boolean deleteAllVersion) throws Exception
     {
         String folderId = createAndAssertFolder();
         String folder2Id = createAndAssertFolder(generateTestFolderName(), getAndAssertFolderTypeId(), folderId, null);
@@ -1259,12 +1281,12 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             CheckOutResponse checkOutResponse = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             LOGGER.info("[VersioningService->checkIn]");
-            CheckInResponse checkInResponse = versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getDocumentId(), true, new CmisPropertiesType(),
-                new CmisContentStreamType(BigInteger.valueOf(12), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
-            documentId = checkInResponse.getDocumentId();
+            CheckInResponse checkInResponse = versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(),
+                    new CmisContentStreamType(BigInteger.valueOf(12), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
+            documentId = checkInResponse.getObjectId();
         }
         LOGGER.info("[VersioningService->getAllVersions]");
-        CmisObjectType[] response = getServicesFactory().getVersioningService().getAllVersions(new GetAllVersions(getAndAssertRepositoryId(), documentId, null, null, null));        
+        CmisObjectType[] response = getServicesFactory().getVersioningService().getAllVersions(new GetAllVersions(getAndAssertRepositoryId(), documentId, null, null, null));
         List<String> versionsIds = new ArrayList<String>();
         for (CmisObjectType cmisObjectType : response)
         {
@@ -1275,18 +1297,18 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         }
         DeleteTreeResponse deleteTreeResponse = null;
         try
-        {            
+        {
             LOGGER.info("[ObjectService->deleteTree]");
             deleteTreeResponse = getServicesFactory().getObjectService().deleteTree(
-                    new DeleteTree(getAndAssertRepositoryId(), folderId, deleteAllVersion, EnumUnfileObject.delete, true, null));           
+                    new DeleteTree(getAndAssertRepositoryId(), folderId, deleteAllVersion, EnumUnfileObject.delete, true, null));
         }
         catch (Exception e)
         {
             fail(e.toString());
         }
-        assertTrue("Objects tree was not deleted", deleteTreeResponse == null || deleteTreeResponse.getFailedToDelete() == null || deleteTreeResponse.getFailedToDelete().getObjectIds() == null
-                || deleteTreeResponse.getFailedToDelete().getObjectIds().length == 0);
-        
+        assertTrue("Objects tree was not deleted", deleteTreeResponse == null || deleteTreeResponse.getFailedToDelete() == null
+                || deleteTreeResponse.getFailedToDelete().getObjectIds() == null || deleteTreeResponse.getFailedToDelete().getObjectIds().length == 0);
+
         for (String versionId : versionsIds)
         {
             if (deleteAllVersion)
@@ -1296,14 +1318,14 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             else
             {
                 assertObjectExist(versionId);
-            }                
+            }
         }
         assertObjectNotExist(folderId);
         assertObjectNotExist(folder2Id);
         assertObjectNotExist(documentId);
         assertObjectNotExist(document2Id);
     }
-    
+
     private void assertObjectExist(String objectId) throws Exception
     {
         GetPropertiesResponse propResponse = null;
@@ -1312,15 +1334,14 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("[ObjectService->getProperties]");
             propResponse = getServicesFactory().getObjectService().getProperties(new GetProperties(getAndAssertRepositoryId(), objectId, "*", null));
             assertTrue("Version was removed while flag deleteAllVersions is FALSE", propResponse != null && propResponse.getProperties() != null
-                && propResponse.getProperties().getPropertyId().length > 0);
+                    && propResponse.getProperties().getPropertyId().length > 0);
         }
         catch (Exception e)
-        {            
+        {
         }
-        assertTrue("Object does not exist", propResponse != null && propResponse.getProperties() != null
-                && propResponse.getProperties().getPropertyId().length > 0);
+        assertTrue("Object does not exist", propResponse != null && propResponse.getProperties() != null && propResponse.getProperties().getPropertyId().length > 0);
     }
-    
+
     private void assertObjectNotExist(String objectId) throws Exception
     {
         GetPropertiesResponse propResponse = null;
@@ -1329,14 +1350,14 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("[ObjectService->getProperties]");
             propResponse = getServicesFactory().getObjectService().getProperties(new GetProperties(getAndAssertRepositoryId(), objectId, "*", null));
             assertTrue("Version was removed while flag deleteAllVersions is FALSE", propResponse != null && propResponse.getProperties() != null
-                && propResponse.getProperties().getPropertyId().length > 0);
+                    && propResponse.getProperties().getPropertyId().length > 0);
         }
         catch (Exception e)
-        {            
+        {
         }
         assertTrue("Object exists", propResponse == null || propResponse.getProperties() == null);
     }
-    
+
     //Uncomment this when specification will describe rootFolder deletion
     /*
     public void testDeleteTreeRootFolder()
@@ -1353,21 +1374,21 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                     && ((CmisFaultType) e).getType().equals(EnumServiceException.notSupported));
         }
     }
-    */
+     */
 
     public void testSetContentStream() throws Exception
     {
         if (isContentStreamAllowed())
         {
             String documentName = generateTestFileName();
-            String documentId = createAndAssertDocument(documentName, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null);
+            String documentId = createAndAssertDocument(documentName, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, EnumVersioningState.none);
             String newTestCOntent = TEST_CONTENT + System.currentTimeMillis();
             try
             {
                 LOGGER.info("[ObjectService->setContentStream]");
                 documentId = getServicesFactory().getObjectService().setContentStream(
                         new SetContentStream(getAndAssertRepositoryId(), documentId, true, null, new CmisContentStreamType(BigInteger.valueOf(newTestCOntent.length()),
-                                MIMETYPE_TEXT_PLAIN, documentName, newTestCOntent.getBytes(ENCODING), null), null)).getDocumentId();
+                                MIMETYPE_TEXT_PLAIN, documentName, newTestCOntent.getBytes(ENCODING), null), null)).getObjectId();
             }
             catch (Exception e)
             {
@@ -1389,14 +1410,14 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         if (isContentStreamAllowed())
         {
             String documentName = generateTestFileName();
-            String documentId = createAndAssertDocument();
+            String documentId = createAndAssertDocument(documentName, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, EnumVersioningState.none);
             String newTestCOntent = TEST_CONTENT + System.currentTimeMillis();
             try
             {
                 LOGGER.info("[ObjectService->setContentStream]");
                 documentId = getServicesFactory().getObjectService().setContentStream(
                         new SetContentStream(getAndAssertRepositoryId(), documentId, false, null, new CmisContentStreamType(BigInteger.valueOf(newTestCOntent.length()),
-                                MIMETYPE_TEXT_PLAIN, documentName, newTestCOntent.getBytes(ENCODING), null), null)).getDocumentId();
+                                MIMETYPE_TEXT_PLAIN, documentName, newTestCOntent.getBytes(ENCODING), null), null)).getObjectId();
                 fail("No Exception was thrown during setting content stream while input parameter overwriteFlag is FALSE and the Object already has a content-stream");
             }
             catch (Exception e)
@@ -1409,7 +1430,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 LOGGER.info("[ObjectService->setContentStream]");
                 documentId = getServicesFactory().getObjectService().setContentStream(
                         new SetContentStream(getAndAssertRepositoryId(), documentId, true, null, new CmisContentStreamType(BigInteger.valueOf(newTestCOntent.length()),
-                                MIMETYPE_TEXT_PLAIN, documentName, newTestCOntent.getBytes(ENCODING), null), null)).getDocumentId();
+                                MIMETYPE_TEXT_PLAIN, documentName, newTestCOntent.getBytes(ENCODING), null), null)).getObjectId();
             }
             catch (Exception e)
             {
@@ -1439,7 +1460,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 LOGGER.info("[ObjectService->setContentStream]");
                 getServicesFactory().getObjectService().setContentStream(
                         new SetContentStream(getAndAssertRepositoryId(), documentId, true, null, new CmisContentStreamType(BigInteger.valueOf(TEST_CONTENT.length()),
-                                MIMETYPE_TEXT_PLAIN, generateTestFileName(), TEST_CONTENT.getBytes(ENCODING), null), null)).getDocumentId();
+                                MIMETYPE_TEXT_PLAIN, generateTestFileName(), TEST_CONTENT.getBytes(ENCODING), null), null)).getObjectId();
                 fail("No Exception was thrown during setting content stream while Object-Type definition specified by the typeId parameter’s “contentStreamAllowed” attribute is set to “not allowed”");
             }
             catch (Exception e)
@@ -1460,15 +1481,16 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     {
         if (isContentStreamAllowed())
         {
-            String documentId = createAndAssertDocument();
+            String documentName = generateTestFileName();
+            String documentId = createAndAssertDocument(documentName, getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, EnumVersioningState.none);
             try
             {
                 LOGGER.info("[ObjectService->deleteContentStream]");
                 DeleteContentStreamResponse response = getServicesFactory().getObjectService().deleteContentStream(
                         new DeleteContentStream(getAndAssertRepositoryId(), documentId, null, null));
                 assertNotNull("DeleteContentStream response is NULL", response);
-                assertNotNull("DeleteContentStream response is empty", response.getDocumentId());
-                documentId = response.getDocumentId();
+                assertNotNull("DeleteContentStream response is empty", response.getObjectId());
+                documentId = response.getObjectId();
             }
             catch (Exception e)
             {
@@ -1508,7 +1530,9 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             }
             catch (Exception e)
             {
-                assertTrue("Invalid exception was thrown during deleting content stream while Object’s Object-Type definition “contentStreamAllowed” attribute is set to “required”", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+                assertTrue(
+                        "Invalid exception was thrown during deleting content stream while Object’s Object-Type definition “contentStreamAllowed” attribute is set to “required”",
+                        e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
             }
             LOGGER.info("[ObjectService->deleteObject]");
             getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, true, null));

@@ -7,6 +7,13 @@
 
 package org.alfresco.repo.cmis.ws;
 
+import javax.xml.namespace.QName;
+import org.apache.axis.description.TypeDesc;
+import org.apache.axis.encoding.DeserializationContext;
+import org.apache.axis.message.SOAPHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
 public class CmisContentStreamType  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
     private java.math.BigInteger length;
 
@@ -261,16 +268,27 @@ public class CmisContentStreamType  implements java.io.Serializable, org.apache.
             _javaType, _xmlType, typeDesc);
     }
 
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public static org.apache.axis.encoding.Deserializer getDeserializer(java.lang.String mechType, java.lang.Class _javaType, javax.xml.namespace.QName _xmlType)
+    {
+        return new CustomBeanDeserializer(_javaType, _xmlType, typeDesc);
+    }
+
+    private static class CustomBeanDeserializer extends org.apache.axis.encoding.ser.BeanDeserializer
+    {
+        public CustomBeanDeserializer(Class<?> javaType, QName xmlType, TypeDesc typeDesc)
+        {
+            super(javaType, xmlType, typeDesc);
+        }
+
+        public SOAPHandler onStartChild(String namespace, String localName, String prefix, Attributes attributes, DeserializationContext context) throws SAXException
+        {
+            if ("stream".equals(localName))
+            {
+                return null;
+            }
+            return super.onStartChild(namespace, localName, prefix, attributes, context);
+        }
+        private static final long serialVersionUID = 2774907596442770814L;
     }
 
 }

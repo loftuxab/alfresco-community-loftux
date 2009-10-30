@@ -8,7 +8,7 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CheckOutResponse  implements java.io.Serializable {
-    private java.lang.String documentId;
+    private java.lang.String objectId;
 
     private boolean contentCopied;
 
@@ -24,29 +24,29 @@ public class CheckOutResponse  implements java.io.Serializable {
            java.lang.String documentId,
            boolean contentCopied,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
-           this.documentId = documentId;
+           this.objectId = documentId;
            this.contentCopied = contentCopied;
            this.extension = extension;
     }
 
 
     /**
-     * Gets the documentId value for this CheckOutResponse.
+     * Gets the objectId value for this CheckOutResponse.
      * 
-     * @return documentId
+     * @return objectId
      */
-    public java.lang.String getDocumentId() {
-        return documentId;
+    public java.lang.String getObjectId() {
+        return objectId;
     }
 
 
     /**
-     * Sets the documentId value for this CheckOutResponse.
+     * Sets the objectId value for this CheckOutResponse.
      * 
-     * @param documentId
+     * @param objectId
      */
-    public void setDocumentId(java.lang.String documentId) {
-        this.documentId = documentId;
+    public void setObjectId(java.lang.String documentId) {
+        this.objectId = documentId;
     }
 
 
@@ -105,9 +105,9 @@ public class CheckOutResponse  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.documentId==null && other.getDocumentId()==null) || 
-             (this.documentId!=null &&
-              this.documentId.equals(other.getDocumentId()))) &&
+            ((this.objectId==null && other.getObjectId()==null) || 
+             (this.objectId!=null &&
+              this.objectId.equals(other.getObjectId()))) &&
             this.contentCopied == other.isContentCopied() &&
             ((this.extension==null && other.getExtension()==null) || 
              (this.extension!=null &&
@@ -123,8 +123,8 @@ public class CheckOutResponse  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getDocumentId() != null) {
-            _hashCode += getDocumentId().hashCode();
+        if (getObjectId() != null) {
+            _hashCode += getObjectId().hashCode();
         }
         _hashCode += (isContentCopied() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         if (getExtension() != null) {
@@ -141,8 +141,8 @@ public class CheckOutResponse  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">checkOutResponse"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("documentId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "documentId"));
+        elemField.setFieldName("objectId");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objectId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

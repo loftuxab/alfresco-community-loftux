@@ -24,11 +24,13 @@
  */
 package org.alfresco.cmis.test.ws;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.alfresco.repo.cmis.ws.AddObjectToFolder;
 import org.alfresco.repo.cmis.ws.CheckInResponse;
 import org.alfresco.repo.cmis.ws.CheckOutResponse;
 import org.alfresco.repo.cmis.ws.CmisPropertiesType;
-import org.alfresco.repo.cmis.ws.CmisPropertyId;
 import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
 import org.alfresco.repo.cmis.ws.EnumServiceException;
 import org.alfresco.repo.cmis.ws.MultiFilingServicePort;
@@ -129,16 +131,19 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
     protected void onSetUp() throws Exception
     {
         assertNotNull("Root Folder Id is NULL", getAndAssertRootFolderId());
-        folderId = createAndAssertFolder();
         documentId = createAndAssertDocument();
+        folderId = createAndAssertFolder();
         super.onSetUp();
     }
 
     @Override
     protected void onTearDown() throws Exception
     {
-        deleteAndAssertObject(documentId);
         if (objectExists(documentId))
+        {
+            deleteAndAssertObject(documentId);
+        }
+        if (objectExists(folderId))
         {
             deleteAndAssertObject(folderId);
         }
@@ -170,7 +175,7 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
-            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId, allVersions, null));
+            getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), objectId, folderId, allVersions, null));
         }
         catch (Exception e)
         {
@@ -193,30 +198,10 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testAddObjectToNotAllowedFolder() throws Exception
-    {
-        if (getAndAssertCapabilities().isCapabilityMultifiling())
-        {
-            CmisPropertiesType properties = new CmisPropertiesType();
-            properties.setPropertyId(new CmisPropertyId[] { new CmisPropertyId(PROP_ALLOWED_CHILD_OBJECT_TYPE_IDS, null, null, null, new String[] { getAndAssertFolderTypeId() }) });
-            String folderWithRestriction = createAndAssertFolder(generateTestFolderName(), getAndAssertFolderTypeId(), getAndAssertRootFolderId(), properties);
-            try
-            {
-                LOGGER.info("[MultiFilingService->addObjectToFolder]");
-                getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderWithRestriction, false, null));
-                fail("No Exception was thrown during Adding Object to Folder that cantains no Object Type Id in the list of Allowed Child Object Type Ids");
-            }
-            catch (Exception e)
-            {
-                assertException("Adding Not Allowed Object to Folder", e, EnumServiceException.constraint);
-            }
-        }
-        else
-        {
-            LOGGER.warn("testAddObjectToFolderNotAllowed() was skipped: Multi-Filing capability is not supported");
-        }
-
-    }
+    // TODO: How to set property ALLOWED_CHILD_OBJECT_TYPE_IDS if it is not updatable?
+    /*
+     * testAddObjectToNotAllowedFolder()
+     */
 
     public void testAddObjectToFolderWithInvalidObjectId() throws Exception
     {
@@ -230,7 +215,10 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             }
             catch (Exception e)
             {
-                assertException("Adding Inexistent Object to Folder", e, EnumServiceException.invalidArgument);
+                Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
+                expectedExceptions.add(EnumServiceException.invalidArgument);
+                expectedExceptions.add(EnumServiceException.objectNotFound);
+                assertException("Adding Inexistent Object to Folder", e, expectedExceptions);
             }
         }
         else
@@ -251,7 +239,10 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             }
             catch (Exception e)
             {
-                assertException("Adding Object to Inexistent Folder", e, EnumServiceException.invalidArgument);
+                Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
+                expectedExceptions.add(EnumServiceException.invalidArgument);
+                expectedExceptions.add(EnumServiceException.objectNotFound);
+                assertException("Adding Object to Inexistent Folder", e, expectedExceptions);
             }
         }
         else
@@ -260,6 +251,7 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
     }
 
+    // FIXME: this test fails because of transaction problem
     public void testAddObjectToFolderAgainstAllVersionsParameter() throws Exception
     {
         if (isVersioningAllowed())
@@ -267,14 +259,14 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             CheckInResponse checkInResponse = new CheckInResponse(documentId, null);
             for (int i = 0; i < 2; i++)
             {
-                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getDocumentId());
-                checkInAndAssert(checkOutResponse.getDocumentId(), true, new CmisPropertiesType(), createUniqueContentStream(), "");
+                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
+                checkInAndAssert(checkOutResponse.getObjectId(), true, new CmisPropertiesType(), createUniqueContentStream(), "");
             }
             try
             {
                 LOGGER.info("[MultiFilingService->addObjectToFolder]");
                 getServicesFactory().getMultiFilingServicePort().addObjectToFolder(
-                        new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getDocumentId(), folderId, true, null));
+                        new AddObjectToFolder(getAndAssertRepositoryId(), checkInResponse.getObjectId(), folderId, true, null));
             }
             catch (Exception e)
             {
@@ -357,7 +349,10 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
         catch (Exception e)
         {
-            assertException("Removing Inexistent Object from Folder", e, EnumServiceException.invalidArgument);
+            Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
+            expectedExceptions.add(EnumServiceException.invalidArgument);
+            expectedExceptions.add(EnumServiceException.objectNotFound);
+            assertException("Removing Inexistent Object from Folder", e, expectedExceptions);
         }
     }
 
@@ -371,7 +366,11 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
         catch (Exception e)
         {
-            assertException("Removing Object from Inexistent Folder", e, EnumServiceException.invalidArgument);
+            Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
+            expectedExceptions.add(EnumServiceException.invalidArgument);
+            expectedExceptions.add(EnumServiceException.objectNotFound);
+            expectedExceptions.add(EnumServiceException.notSupported);
+            assertException("Removing Object from Inexistent Folder", e, expectedExceptions);
         }
     }
 
