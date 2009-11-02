@@ -9,81 +9,12 @@
       <property name="locations">
          <list>
             <value>classpath:cmis.properties</value>
-            <value>classpath:wsi.properties</value>
          </list>
       </property>
    </bean>
 
    <bean id="cmisTestsExecutor" class="org.alfresco.cmis.test.ws.CmisWebServiceTestSuite">
       <property name="testableServiceNames" value="${cmis.testable.services}" />
-   </bean>
-
-   <bean id="originalDictionaryServiceClient"
-      class="org.alfresco.original.test.ws.OriginalDictionaryServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalDictionaryService" />
-      <property name="authenticationService" ref="originalAuthenticationService" />
-   </bean>
-
-   <bean id="originalAccessControlServiceClient"
-      class="org.alfresco.original.test.ws.OriginalAccessControlServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalAccessControlService" />
-      <property name="repositoryService" ref="originalRepositoryService" />
-   </bean>
-
-   <bean id="originalAuthenticationServiceClient"
-      class="org.alfresco.original.test.ws.OriginalAuthenticationServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalAuthenticationService" />
-   </bean>
-
-   <bean id="originalRepositoryServiceClient"
-      class="org.alfresco.original.test.ws.OriginalRepositoryServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalRepositoryService" />
-      <property name="contentService" ref="originalContentService" />
-   </bean>
-
-   <bean id="originalContentServiceClient"
-      class="org.alfresco.original.test.ws.OriginalContentServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalContentService" />
-      <property name="repositoryService" ref="originalRepositoryService" />
-
-      <property name="testDocumentResource" value="classpath:resources/testDocument.doc" />
-      <!--
-         <property name="testImageResource"
-         value="classpath:resources/testImage.jpg" />
-      -->
-   </bean>
-
-   <bean id="originalActionServiceClient"
-      class="org.alfresco.original.test.ws.OriginalActionServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalActionService" />
-      <property name="repositoryService" ref="originalRepositoryService" />
-   </bean>
-
-   <bean id="originalAuthoringServiceClient"
-      class="org.alfresco.original.test.ws.OriginalAuthoringServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalAuthoringService" />
-      <property name="contentService" ref="originalContentService" />
-      <property name="repositoryService" ref="originalRepositoryService" />
-   </bean>
-
-   <bean id="originalAdministrationServiceClient"
-      class="org.alfresco.original.test.ws.OriginalAdministrationServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalAdministrationService" />
-   </bean>
-
-   <bean id="originalClassificationServiceClient"
-      class="org.alfresco.original.test.ws.OriginalClassificationServiceClient"
-      parent="abstractOriginalServiceClient">
-      <constructor-arg ref="originalClassificationService" />
-      <property name="repositoryService" ref="originalRepositoryService" />
    </bean>
 
    <!--
@@ -127,18 +58,16 @@
       parent="abstractServiceClient">
       <constructor-arg ref="cmisRelationshipService" />
    </bean>
+   
    <!--
       =========================================================================================================
    -->
 
-   <bean id="abstractOriginalServiceClient" parent="abstractServiceClient"
-      abstract="true">
-      <property name="authenticationService" ref="originalAuthenticationService" />
-   </bean>
+   <bean id="abstractOriginalServiceClient" parent="abstractServiceClient" abstract="true"></bean>
 
    <bean id="abstractServiceClient" class="org.alfresco.cmis.test.ws.AbstractServiceClient"
       abstract="true">
-      <property name="proxyUrl" value="${wsi.proxy.host}:${wsi.proxy.port}" />
+      <property name="proxyUrl" value="${cmis.proxy.host}:${cmis.proxy.port}" />
       <property name="serverUrl" value="${cmis.server.host}:${cmis.server.port}" />
       <property name="username" value="${cmis.username}" />
       <property name="password" value="${cmis.password}" />
@@ -157,83 +86,9 @@
    </bean>
 
    <!--
-      =========================================================================================================
-   -->
-
-   <bean id="originalActionService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="ActionService" />
-      <constructor-arg value="ActionService" />
-      <constructor-arg value="http://www.alfresco.org/ws/service/action/1.0" />
-      <constructor-arg value="/alfresco/api/ActionService" />
-   </bean>
-
-   <bean id="originalAdministrationService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="AdministrationService" />
-      <constructor-arg value="AdministrationService" />
-      <constructor-arg
-         value="http://www.alfresco.org/ws/service/administration/1.0" />
-      <constructor-arg value="/alfresco/api/AdministrationService" />
-   </bean>
-
-   <bean id="originalAuthenticationService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="AuthenticationService" />
-      <constructor-arg value="AuthenticationService" />
-      <constructor-arg
-         value="http://www.alfresco.org/ws/service/authentication/1.0" />
-      <constructor-arg value="/alfresco/api/AuthenticationService" />
-   </bean>
-
-   <bean id="originalAuthoringService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="AuthoringService" />
-      <constructor-arg value="AuthoringService" />
-      <constructor-arg
-         value="http://www.alfresco.org/ws/service/authoring/1.0" />
-      <constructor-arg value="/alfresco/api/AuthoringService" />
-   </bean>
-
-   <bean id="originalClassificationService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="ClassificationService" />
-      <constructor-arg value="ClassificationService" />
-      <constructor-arg
-         value="http://www.alfresco.org/ws/service/classification/1.0" />
-      <constructor-arg value="/alfresco/api/ClassificationService" />
-   </bean>
-
-   <bean id="originalContentService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="ContentService" />
-      <constructor-arg value="ContentService" />
-      <constructor-arg value="http://www.alfresco.org/ws/service/content/1.0" />
-      <constructor-arg value="/alfresco/api/ContentService" />
-   </bean>
-
-   <bean id="originalDictionaryService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="DictionaryService" />
-      <constructor-arg value="DictionaryService" />
-      <constructor-arg
-         value="http://www.alfresco.org/ws/service/dictionary/1.0" />
-      <constructor-arg value="/alfresco/api/DictionaryService" />
-   </bean>
-
-   <bean id="originalRepositoryService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="RepositoryService" />
-      <constructor-arg value="RepositoryService" />
-      <constructor-arg
-         value="http://www.alfresco.org/ws/service/repository/1.0" />
-      <constructor-arg value="/alfresco/api/RepositoryService" />
-   </bean>
-
-   <bean id="originalAccessControlService" class="org.alfresco.cmis.test.ws.AbstractService">
-      <constructor-arg value="AccessControlService" />
-      <constructor-arg value="AccessControlService" />
-      <constructor-arg
-         value="http://www.alfresco.org/ws/service/accesscontrol/1.0" />
-      <constructor-arg value="/alfresco/api/AccessControlService" />
-   </bean>
-
-
-   <!--
       =========================================================================================
    -->
+   
    <bean id="cmisRepositoryService" class="org.alfresco.cmis.test.ws.AbstractService">
       <constructor-arg value="RepositoryServicePort" />
       <constructor-arg value="RepositoryService" />

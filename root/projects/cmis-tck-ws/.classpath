@@ -19,7 +19,6 @@
 	<classpathentry kind="lib" path="lib/spring-mock.jar"/>
 	<classpathentry kind="lib" path="lib/uddi4j.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
-	<classpathentry kind="lib" path="lib/wsi-test-tools.jar"/>
 	<classpathentry kind="lib" path="lib/wss4j.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xmlParserAPIs.jar"/>
