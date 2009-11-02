@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="wsi-tools" default="jar" basedir=".">
+<project name="cmis-tck-ws" default="jar" basedir=".">
 	<property file="build.properties" />
 
 	<property name="source.path" value="${basedir}/source" />
@@ -59,35 +59,17 @@
 		<echo>
 WsiProfiler targets:
 	help - prints current help;
-	clear - clears WsiProfiler classes;
-	build - builds WsiProfiler application;
+	clear - clears cmis-tck-ws classes;
+	build - builds cmis-tck-ws application;
     jar - packs all classes, configs, libraries etc resources to single self executable jar.
-
-	runWsiProfiler - runs automatic conformance analyzing;
 
 	runCmisRepositoryServiceClient, runCmisDiscoveryServiceClient,
 	runCmisMultifilingServiceClient, runCmisNavigationServiceClient, runCmisObjectServiceClient,
 	runCmisVersioningServiceClient - CMIS services test clients run targets;
 
-	runOriginalAccessControlServiceClient, runOriginalActionServiceClient, runOriginalAdministrationServiceClient,
-	runOriginalAuthenticationServiceClient, runOriginalAuthoringServiceClient,
-	runOriginalClassificationServiceClient, runOriginalContentServiceClient, runOriginalDictionaryServiceClient,
-	runOriginalRepositoryServiceClient - Alfresco's native services test clients run targets
 		</echo>
 	</target>
 
-	<!-- ================================================================================================ -->
-	<!-- ================================= WS-I Profiler run target ===================================== -->
-
-	<target name="runWsiProfiler">
-		<java classname="org.alfresco.cmis.test.ws.wsi.Profiler">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
 
 	<!-- ================================================================================================ -->
 	<!-- ================================= CMIS services run targets ==================================== -->
@@ -149,142 +131,6 @@ WsiProfiler targets:
 				<path refid="classpath.ref" />
 			</classpath>
 		</java>
-	</target>
-
-	<!-- ================================================================================================ -->
-	<!-- ================================= Original services run targets ================================ -->
-
-	<target name="runOriginalAccessControlServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalAccessControlServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalActionServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalActionServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalAdministrationServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalAdministrationServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalAuthenticationServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalAuthenticationServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalAuthoringServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalAuthoringServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalClassificationServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalClassificationServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalContentServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalContentServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalDictionaryServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalDictionaryServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="runOriginalRepositoryServiceClient">
-		<java classname="org.alfresco.original.test.ws.OriginalRepositoryServiceClient">
-			<classpath>
-				<path location="${basedir}/${wsi.tools.classes}" />
-				<path location="${build.config.path}" />
-				<path refid="classpath.ref" />
-			</classpath>
-		</java>
-	</target>
-
-	<taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" onerror="report">
-		<classpath refid="classpath.ref" />
-	</taskdef>
-
-	<target name="jar" depends="build">
-		<mkdir dir="${destination.path}" />
-		<mkdir dir="${destination.path}/wsi-test-tools" />
-
-		<unjar dest="${destination.path}/wsi-test-tools" src="${lib.path}/wsi-test-tools.jar" />
-		<copy todir="${destination.path}/wsi-test-tools/org/wsi/test/monitor" file="${classes.path}/org/wsi/test/monitor/Monitor.class" overwrite="true" />
-		<jar destfile="${destination.path}/wsi-test-tools.jar" compress="true">
-			<fileset dir="${destination.path}/wsi-test-tools" includes="**/*.*" />
-		</jar>
-
-		<jar jarfile="${destination.path}/WsiProfiler.jar" compress="true">
-			<fileset dir="${classes.path}">
-				<include name="**/*.*" />
-				<exclude name="**/Monitor.class" />
-			</fileset>
-			<manifest>
-				<attribute name="Main-Class" value="org.alfresco.cmis.test.ws.CmisWebServiceTestSuite" />
-			</manifest>
-		</jar>
-
-		<one-jar destfile="${destination.path}/cmis-tests-harness.jar">
-	        <main jar="${destination.path}/WsiProfiler.jar" />
-	        <lib>
-	            <fileset dir="${lib.path}" includes="*.jar" excludes="wsi-test-tools.jar" />
-	        	<fileset dir="${destination.path}" includes="*wsi-test-tools.jar" />
-	        </lib>
-			<fileset dir="${build.config.path}">
-				<include name="**/*.*" />
-			</fileset>
-			<fileset dir="${classes.path}">
-				<include name="log4j.properties" />
-			</fileset>
-	    </one-jar>
-
-		<delete dir="${destination.path}/wsi-test-tools" includeemptydirs="true" failonerror="false" />
-		<delete file="${destination.path}/wsi-test-tools.jar" failonerror="false" />
-		<delete file="${destination.path}/WsiProfiler.jar" failonerror="false" />
 	</target>
 
 	<taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">

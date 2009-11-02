@@ -26,7 +26,6 @@ package org.alfresco.cmis.test.ws;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.rmi.RemoteException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,7 +37,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
-import javax.xml.rpc.ServiceException;
 
 import org.alfresco.repo.cmis.ws.CancelCheckOut;
 import org.alfresco.repo.cmis.ws.CheckIn;
@@ -93,10 +91,6 @@ import org.alfresco.repo.cmis.ws.GetTypeDefinition;
 import org.alfresco.repo.cmis.ws.GetTypeDefinitionResponse;
 import org.alfresco.repo.cmis.ws.GetTypeDescendants;
 import org.alfresco.repo.cmis.ws.ObjectServicePortBindingStub;
-import org.alfresco.repo.webservice.authentication.AuthenticationFault;
-import org.alfresco.repo.webservice.authentication.AuthenticationResult;
-import org.alfresco.repo.webservice.authentication.AuthenticationServiceLocator;
-import org.alfresco.repo.webservice.authentication.AuthenticationServiceSoapBindingStub;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.transport.http.HTTPSender;
@@ -178,7 +172,6 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
     private String ticket;
     private SimpleProvider engineConfiguration;
-    private AuthenticationServiceSoapBindingStub authenticationService;
 
     private CmisServicesFactory servicesFactory;
 
@@ -313,45 +306,6 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             engineConfiguration.setGlobalRequest(wsDoAllSender);
         }
         return engineConfiguration;
-    }
-
-    public void setAuthenticationService(AbstractService authenticationService)
-    {
-        AuthenticationServiceLocator locator = new AuthenticationServiceLocator();
-        locator.setAuthenticationServiceEndpointAddress(serverUrl + authenticationService.getPath());
-        try
-        {
-            this.authenticationService = (AuthenticationServiceSoapBindingStub) locator.getAuthenticationService();
-            this.authenticationService.setTimeout(TIMEOUT);
-        }
-        catch (ServiceException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Starts session for original clients
-     * 
-     * @throws AuthenticationFault
-     * @throws RemoteException
-     */
-    public void startSession() throws AuthenticationFault, RemoteException
-    {
-        AuthenticationResult result = authenticationService.startSession(username, password);
-        ticket = result.getTicket();
-    }
-
-    /**
-     * Ends session for original clients
-     * 
-     * @throws AuthenticationFault
-     * @throws RemoteException
-     */
-    public void endSession() throws AuthenticationFault, RemoteException
-    {
-        authenticationService.endSession(ticket);
-        ticket = null;
     }
 
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
