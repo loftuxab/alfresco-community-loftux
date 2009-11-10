@@ -704,7 +704,7 @@
          {
             site: this.options.siteId,
             container: this.options.containerId,
-            topicId: topicId
+            topicId: encodeURIComponent(topicId)
          });
          
          // execute the request

@@ -439,7 +439,7 @@
          {
             site: this.options.siteId,
             container: this.options.containerId,
-            postId: postId,
+            postId: encodeURIComponent(postId),
             page: "blog-postlist"
          });
          

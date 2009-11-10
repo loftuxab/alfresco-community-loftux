@@ -430,7 +430,7 @@
          {
             site : this.options.siteId,
             container: this.options.containerId,
-            topicId: this.options.topicId
+            topicId: encodeURIComponent(this.options.topicId)
          });
          
          // perform the ajax request to delete the topic
