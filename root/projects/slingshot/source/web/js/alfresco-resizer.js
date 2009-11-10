@@ -203,8 +203,11 @@ Alfresco.widget.Resizer.prototype =
       
       if (YAHOO.env.ua.ie === 6)
       {
-         var hd = Dom.get("alf-hd"), tmpHeight = -5;
-         tmpHeight = hd.childNodes[0].offsetHeight + hd.childNodes[1].offsetHeight + hd.childNodes[2].offsetHeight;
+         var hd = Dom.get("alf-hd"), tmpHeight = 0;
+         for (var i = 0, il = hd.childNodes.length; i < il; i++)
+         {
+            tmpHeight += hd.childNodes[i].offsetHeight;
+         }
          h = Dom.get("alf-ft").parentNode.offsetTop - tmpHeight; 
       }
       if (h < this.MIN_FILTER_PANEL_HEIGHT)
