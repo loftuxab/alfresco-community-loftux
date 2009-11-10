@@ -492,9 +492,9 @@
             site: this.options.siteId,
             container: this.options.containerId,
             nodeRef: data.nodeRef.replace(":/", ""),
-            itemTitle: this.options.activityTitle,
-            page: this.options.activityPage,
-            pageParams: YAHOO.lang.JSON.stringify(this.options.activityPageParams)
+            itemTitle: encodeURIComponent(this.options.activityTitle),
+            page: encodeURIComponent(this.options.activityPage),
+            pageParams: encodeURIComponent(YAHOO.lang.JSON.stringify(this.options.activityPageParams))
          });
          
          // execute ajax request

@@ -847,7 +847,7 @@
          // make ajax call to site service to request joining
          Alfresco.util.Ajax.jsonRequest(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + siteId + "/invitations/" + this.pendingInvites[siteId],
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + siteId + "/invitations/" + encodeURIComponent(this.pendingInvites[siteId]),
             method: "DELETE",
             successCallback:
             {
