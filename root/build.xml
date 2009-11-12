@@ -346,7 +346,6 @@
                     package-avmcompare-extension,
                     package-blog-extension,
                     package-fb-doclib-extension,
-                    package-kb-extension,
                     package-php-extension,
                     package-rm-extension, 
                     package-truncatemalformedxml-extension" />
@@ -533,7 +532,6 @@
            depends="clean-avmcompare,
                     clean-blog,
                     clean-fb-doclib,
-                    clean-kb,
                     clean-mediawiki,
                     clean-php,
                     clean-rm, 
