@@ -104,12 +104,15 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
         if (storeId == null)
         {
             String userId = context.getUserId();
-            int idx = userId.indexOf('@');
-            if (idx != -1)
+            if (userId != null)
             {
-                // assume MT Share so partition by user domain
-                // TODO alternatively Share could pass "alfStoreId" in each request
-                storeId = userId.substring(idx);
+                int idx = userId.indexOf('@');
+                if (idx != -1)
+                {
+                    // assume MT Share so partition by user domain
+                    // TODO alternatively Share could pass "alfStoreId" in each request
+                    storeId = userId.substring(idx);
+                }
             }
         }
         

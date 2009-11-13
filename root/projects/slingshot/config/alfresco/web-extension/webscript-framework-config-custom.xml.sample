@@ -41,6 +41,7 @@
    <!-- NOTE: For NTLM, the NTLM Authentication Filter must also be enabled in share web.xml -->
    <!-- NOTE: if utilising a load balancer between web-tier and repository cluster, the "sticky -->
    <!--       sessions" feature of your load balancer must be used -->
+   <!--
    <config evaluator="string-compare" condition="Remote">
         <remote>
             <!-- SSL client certificate + trusted CAs. Optionally used to authenticate share to an external SSO system such as CAS -->
