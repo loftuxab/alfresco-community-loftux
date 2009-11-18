@@ -323,11 +323,9 @@
       <sequential>
       <echo file="@{classfile}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+   <classpathentry kind="src" path="source"/>
    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
    <classpathentry exported="true" kind="lib" path="]]></echo>
-<!--
-   <classpathentry exported="true" kind="lib" path="alfresco"/>
--->
      <pathconvert pathsep="@@@" dirsep="/" property="@{classprop}">
        <path>
             <fileset dir="@{libdir}" includes="**/*.jar"/>
@@ -342,7 +340,7 @@
       </replace>
 
       <echo file="@{classfile}" append="true"><![CDATA["/>
-   <classpathentry kind="output" path=""/>
+   <classpathentry kind="output" path="build"/>
 </classpath>
 ]]></echo>
        </sequential>

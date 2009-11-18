@@ -1150,23 +1150,30 @@
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/dependencies" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server/dependencies">
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="**/*.jar" excludes="devenv/**, optional/**, jboss/**, virtual-tomcat/**"/>
+                  includes="**/*.jar" excludes="${dir.name.devenv}/**, jboss/**, virtual-tomcat/**"/>
       </copy>
-      <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/alfresco/desktop" />
-      <copy todir="${dir.continuous.assemble.sdk}/lib/server/alfresco/desktop">
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server/dependencies">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${dir.name.devenv}/${file.name.jar.mysql.connector}"/>
+      </copy>
+      <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/source/alfresco/desktop" />
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server/source/alfresco/desktop">
          <fileset dir="${dir.project.repository.config}/alfresco/desktop" />
       </copy>
-      <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/alfresco/alfresco" />
-      <copy todir="${dir.continuous.assemble.sdk}/lib/server/alfresco/alfresco">
+      <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/source/alfresco" />
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server/source/alfresco">
          <fileset dir="${dir.project.repository.config}/alfresco" 
                   includes="alfresco-jmxrmi.*" />
       </copy>
+      <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/build" />
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/remote/dependencies" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/remote/dependencies" 
             flatten="true">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.sdk.remote.jars}" />
       </copy>
+      <mkdir dir="${dir.continuous.assemble.sdk}/lib/remote/source" />
+      <mkdir dir="${dir.continuous.assemble.sdk}/lib/remote/build" />
 
       <!-- -->
       <!-- Source -->
