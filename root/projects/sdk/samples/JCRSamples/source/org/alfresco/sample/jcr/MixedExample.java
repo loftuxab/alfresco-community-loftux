@@ -30,13 +30,13 @@ import javax.jcr.Repository;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
+import org.alfresco.config.FixedClassPathXmlApplicationContext;
 import org.alfresco.jcr.api.JCRNodeRef;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 
@@ -52,7 +52,7 @@ public class MixedExample
         throws Exception
     {
         // Setup Spring and Transaction Service
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+        ApplicationContext context = new FixedClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
         ServiceRegistry registry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
         NodeService nodeService = (NodeService)registry.getNodeService();
         

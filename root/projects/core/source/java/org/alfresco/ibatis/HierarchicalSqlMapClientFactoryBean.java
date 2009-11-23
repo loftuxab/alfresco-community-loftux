@@ -30,17 +30,23 @@ import java.util.Properties;
 
 import org.alfresco.util.PropertyCheck;
 import org.alfresco.util.resource.HierarchicalResourceLoader;
+import org.springframework.core.NestedIOException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
+import org.springframework.util.ObjectUtils;
 
+import com.ibatis.common.xml.NodeletException;
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.SqlMapClientBuilder;
+import com.ibatis.sqlmap.engine.builder.xml.SqlMapConfigParser;
+import com.ibatis.sqlmap.engine.builder.xml.SqlMapParser;
 
 /**
- * Extends Spring's support for iBatis by allowing a choice of {@link ResourceLoader}.  The
- * {@link #setResourceLoader(HierarchicalResourceLoader) ResourceLoader} will be used to load
- * the <b>SqlMapConfig</b> file, but will also be injected into a {@link HierarchicalSqlMapConfigParser}
- * that will read the individual iBatis resources.
+ * Extends Spring's support for iBatis by allowing a choice of {@link ResourceLoader}. The
+ * {@link #setResourceLoader(HierarchicalResourceLoader) ResourceLoader} will be used to load the <b>SqlMapConfig</b>
+ * file, but will also be injected into a {@link HierarchicalSqlMapConfigParser} that will read the individual iBatis
+ * resources.
  * 
  * @author Derek Hulley
  * @since 3.2 (Mobile)
@@ -48,19 +54,20 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class HierarchicalSqlMapClientFactoryBean extends SqlMapClientFactoryBean
 {
     private HierarchicalResourceLoader resourceLoader;
-    
+
     /**
      * Default constructor
      */
     public HierarchicalSqlMapClientFactoryBean()
     {
     }
-    
+
     /**
-     * Set the resource loader to use.  To use the <b>&#35;resource.dialect&#35</b> placeholder,
-     * use the {@link HierarchicalResourceLoader}.
+     * Set the resource loader to use. To use the <b>&#35;resource.dialect&#35</b> placeholder, use the
+     * {@link HierarchicalResourceLoader}.
      * 
-     * @param resourceLoader            the resource loader to use
+     * @param resourceLoader
+     *            the resource loader to use
      */
     public void setResourceLoader(HierarchicalResourceLoader resourceLoader)
     {
@@ -73,17 +80,48 @@ public class HierarchicalSqlMapClientFactoryBean extends SqlMapClientFactoryBean
         PropertyCheck.mandatory(this, "resourceLoader", resourceLoader);
         super.afterPropertiesSet();
     }
-    
-    protected SqlMapClient buildSqlMapClient(Resource configLocation, Properties properties) throws IOException
+
+    @Override
+    protected SqlMapClient buildSqlMapClient(Resource[] configLocations, Resource[] mappingLocations,
+            Properties properties) throws IOException
     {
-        InputStream is = configLocation.getInputStream();
-        if (properties != null)
+
+        if (ObjectUtils.isEmpty(configLocations))
         {
-            return new HierarchicalSqlMapConfigParser(resourceLoader).parse(is, properties);
+            throw new IllegalArgumentException("At least 1 'configLocation' entry is required");
         }
-        else
+
+        SqlMapClient client = null;
+        HierarchicalSqlMapConfigParser configParser = new HierarchicalSqlMapConfigParser(resourceLoader);
+        for (Resource configLocation : configLocations)
         {
-            return new HierarchicalSqlMapConfigParser(resourceLoader).parse(is);
+            InputStream is = configLocation.getInputStream();
+            try
+            {
+                client = properties == null ? configParser.parse(is) : configParser.parse(is, properties);
+            }
+            catch (RuntimeException ex)
+            {
+                throw new NestedIOException("Failed to parse config resource: " + configLocation, ex.getCause());
+            }
         }
+
+        if (mappingLocations != null)
+        {
+            SqlMapParser mapParser = new SqlMapParser(configParser.state);
+            for (Resource mappingLocation : mappingLocations)
+            {
+                try
+                {
+                    mapParser.parse(mappingLocation.getInputStream());
+                }
+                catch (NodeletException ex)
+                {
+                    throw new NestedIOException("Failed to parse mapping resource: " + mappingLocation, ex);
+                }
+            }
+        }
+
+        return client;
     }
 }

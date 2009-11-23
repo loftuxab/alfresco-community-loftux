@@ -140,7 +140,7 @@
          	<exclude name= "**/sample*" />
          </fileset>
          <fileset dir="${dir.project.3rdparty.lib}">
-            <include name="spring-*.jar" />
+            <include name="org.springframework*.jar" />
             <include name="jug-*.jar" />
          </fileset> 
         <fileset dir="${dir.project.3rdparty.lib}/optional">

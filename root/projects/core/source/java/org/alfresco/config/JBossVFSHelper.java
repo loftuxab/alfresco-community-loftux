@@ -259,7 +259,6 @@ public class JBossVFSHelper implements PathMatchingHelper
          * (non-Javadoc)
          * @see org.springframework.core.io.AbstractResource#getDescription()
          */
-        @Override
         public String getDescription()
         {
             return this.file.toString();

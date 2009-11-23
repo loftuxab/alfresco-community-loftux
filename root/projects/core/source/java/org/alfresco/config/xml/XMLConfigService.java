@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +52,8 @@ import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.core.Constants;
 import org.springframework.core.io.Resource;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 
 /**
  * XML based configuration service.
@@ -121,12 +122,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         propertyConfigurer = null;
         if (propertyLocations != null)
         {
-           PropertyConfigurer configurer = new PropertyConfigurer();
-           configurer.setLocations(propertyLocations);
-           configurer.setIgnoreUnresolvablePlaceholders(true);
-           configurer.setSystemPropertiesMode(systemPropertiesMode);
-           configurer.init();
-           propertyConfigurer = configurer;
+           propertyConfigurer = new PropertyConfigurer();
         }
 
         // initialise the element readers map with built-in readers
@@ -486,15 +482,19 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     /**
      * Provides access to property values 
      */
-    public static class PropertyConfigurer extends PropertyPlaceholderConfigurer
+    public class PropertyConfigurer extends PropertyPlaceholderConfigurer implements PlaceholderResolver
     {
         private Properties properties;
+        private PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}", ":", true);                
         
         /**
          * Initialise
          */
-        /*package*/ void init()
+        public PropertyConfigurer()
         {
+            setLocations(propertyLocations);
+            setSystemPropertiesMode(systemPropertiesMode);
+            setIgnoreUnresolvablePlaceholders(true);
             try
             {
                 properties = mergeProperties();
@@ -505,6 +505,13 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             }
         }
 
+
+        public String resolvePlaceholder(String placeholderName)
+        {
+            return resolvePlaceholder(placeholderName, properties, systemPropertiesMode);
+        }
+
+
         /**
          * Replace placeholders with values
          * 
@@ -513,7 +520,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
          */
         public String resolveValue(String val)
         {
-            return parseStringValue(val, properties, new HashSet<Object>());
+            return helper.replacePlaceholders(val, this);
         }
     }
     

@@ -73,7 +73,7 @@ public class HierarchicalSqlMapConfigParser
     final private HierarchicalResourceLoader resourceLoader;
 
     protected final NodeletParser parser = new NodeletParser();
-    private XmlParserState state = new XmlParserState();
+    protected XmlParserState state = new XmlParserState();
 
     /**
      * @param resourceLoader the resource loader that supports the

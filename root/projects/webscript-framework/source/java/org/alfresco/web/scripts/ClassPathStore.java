@@ -282,7 +282,7 @@ public class ClassPathStore implements ApplicationContextAware, Store
     public long lastModified(String documentPath)
         throws IOException
     {
-        Resource document = createRelative(storeResource, documentPath);
+        Resource document = createRelative(documentPath);
         return document.getURL().openConnection().getLastModified();
     }
 
@@ -294,7 +294,7 @@ public class ClassPathStore implements ApplicationContextAware, Store
         boolean exists = false;
         try
         {
-            Resource document = createRelative(storeResource, documentPath);
+            Resource document = createRelative(documentPath);
             exists = document.exists();
         }
         catch(IOException e)
@@ -309,7 +309,7 @@ public class ClassPathStore implements ApplicationContextAware, Store
     public InputStream getDocument(String documentPath)      
         throws IOException
     {
-        Resource document = createRelative(storeResource, documentPath);
+        Resource document = createRelative(documentPath);
         if (logger.isTraceEnabled())
             logger.trace("getDocument: documentPath: " + documentPath + " , storePath: " + document.getURL().toExternalForm());
         
@@ -413,17 +413,18 @@ public class ClassPathStore implements ApplicationContextAware, Store
      * @return  relative resource
      * @throws IOException
      */
-    private Resource createRelative(Resource resource, String path)
+    private Resource createRelative(String path)
         throws IOException
     {
+        // Special handling for directory resource URLs (these end in a slash)
         if (storeResourcePath.endsWith("/"))
         {
-            return resource.createRelative(path);
+            return storeResource.createRelative(storeResource.getFilename() + "/" + path);
         }
         
         int prefixIdx = storeResourcePath.lastIndexOf("/");
         String prefix = (prefixIdx != -1) ? storeResourcePath.substring(prefixIdx) : "";
-        return resource.createRelative(prefix + "/" + path);
+        return storeResource.createRelative(prefix + "/" + path);
     }
     
     /* (non-Javadoc)
@@ -452,7 +453,7 @@ public class ClassPathStore implements ApplicationContextAware, Store
             ScriptContent location = null;
             try
             {
-                Resource script = createRelative(storeResource, path);
+                Resource script = createRelative(path);
                 if (script.exists())
                 {
                     location = new ClassPathScriptLocation(storeResource, path, script);
