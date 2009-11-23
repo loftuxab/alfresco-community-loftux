@@ -189,8 +189,19 @@ public class SpringAwareUserTransaction
     public TransactionAttribute getTransactionAttribute(Method method, Class targetClass)
     {
         return this;
-    }
+    }        
     
+    /**
+     * Return a qualifier value associated with this transaction attribute. This is not used as the transaction manager
+     * has been selected for us.
+     * 
+     * @return null always
+     */
+    public String getQualifier()
+    {
+        return null;
+    }
+
     /**
      * The {@link UserTransaction } must rollback regardless of the error.  The
      * {@link #rollback() rollback} behaviour is implemented by simulating a caught

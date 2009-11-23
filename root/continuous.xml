@@ -885,7 +885,7 @@
       <copy todir="${dir.continuous.assemble.bm-remote}/lib" 
             flatten="false">
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="**/spring-2.0.8.jar" />
+                  includes="org.springframework*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="**/ehcache-1.4.1-patched.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 

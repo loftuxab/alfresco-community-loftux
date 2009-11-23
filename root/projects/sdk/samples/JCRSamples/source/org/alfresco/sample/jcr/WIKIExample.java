@@ -45,6 +45,7 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
 
+import org.alfresco.config.FixedClassPathXmlApplicationContext;
 import org.alfresco.jcr.api.JCRNodeRef;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
@@ -54,7 +55,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 
 
@@ -78,7 +78,7 @@ public class WIKIExample
         
         // access the Alfresco JCR Repository (here it's via programmatic approach, but it could also be injected)
         System.out.println("Initialising Repository...");
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/alfresco/sample/jcr/wiki-context.xml");
+        ApplicationContext context = new FixedClassPathXmlApplicationContext("classpath:org/alfresco/sample/jcr/wiki-context.xml");
         Repository repository = (Repository)context.getBean("JCR.Repository");
 
         // display information about the repository

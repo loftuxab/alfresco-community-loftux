@@ -10,7 +10,9 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/myfaces-impl-1.1.5.jar" sourcepath="/3rd Party/src/myfaces_src.zip"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/j2ee/jsp.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-fileupload-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/devenv/spring-mock-2.0.2.jar" sourcepath="/3rd Party/src/spring-mock-2.0.2-src.zip"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/org.springframework.context-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.context-sources-3.0.0.RC2.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/org.springframework.web-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.web-sources-3.0.0.RC2.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/devenv/org.springframework.test-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.test-sources-3.0.0.RC2.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/portlet-api-lib.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/facebook_070716.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-io-1.1.jar"/>
