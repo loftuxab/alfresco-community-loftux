@@ -40,7 +40,6 @@ import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
-import org.alfresco.config.FixedClassPathXmlApplicationContext;
 import org.alfresco.util.URLDecoder;
 import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.ServerProperties;
@@ -51,6 +50,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -220,7 +220,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             "classpath:alfresco/webscript-framework-application-context.xml", 
             "classpath:alfresco/webscript-framework-application-context-test.xml"
         };
-        ApplicationContext context = new FixedClassPathXmlApplicationContext(CONFIG_LOCATIONS);
+        ApplicationContext context = new ClassPathXmlApplicationContext(CONFIG_LOCATIONS);
         TestWebScriptServer testServer = (TestWebScriptServer)context.getBean("webscripts.test");
         
         return testServer;

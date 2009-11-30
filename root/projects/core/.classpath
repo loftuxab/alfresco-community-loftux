@@ -9,13 +9,13 @@
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/guessencoding-1.0.jar" sourcepath="/3rd Party/src/guessencoding-1.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jug-lgpl-2.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.core-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.core-sources-3.0.0.RC2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.beans-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.beans-sources-3.0.0.RC2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.context-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.context-sources-3.0.0.RC2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.context.support-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.context.support-sources-3.0.0.RC2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.transaction-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.transaction-sources-3.0.0.RC2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.orm-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.orm-sources-3.0.0.RC2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.web-3.0.0.RC2.jar" sourcepath="/3rd Party/src/org.springframework.web-sources-3.0.0.RC2.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.core-3.0.0.CI-477.jar" sourcepath="/3rd Party/src/org.springframework.core-sources-3.0.0.CI-477.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.beans-3.0.0.CI-477.jar" sourcepath="/3rd Party/src/org.springframework.beans-sources-3.0.0.CI-477.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.context-3.0.0.CI-477.jar" sourcepath="/3rd Party/src/org.springframework.context-sources-3.0.0.CI-477.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.context.support-3.0.0.CI-477.jar" sourcepath="/3rd Party/src/org.springframework.context.support-sources-3.0.0.CI-477.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.transaction-3.0.0.CI-477.jar" sourcepath="/3rd Party/src/org.springframework.transaction-sources-3.0.0.CI-477.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.orm-3.0.0.CI-477.jar" sourcepath="/3rd Party/src/org.springframework.orm-sources-3.0.0.CI-477.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/org.springframework.web-3.0.0.CI-477.jar" sourcepath="/3rd Party/src/org.springframework.web-sources-3.0.0.CI-477.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/ibatis-2.3.4.726-patched.jar" sourcepath="/3rd Party/src/ibatis-2.3.4.726-patched-src.zip"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/j2ee/servlet.jar"/>

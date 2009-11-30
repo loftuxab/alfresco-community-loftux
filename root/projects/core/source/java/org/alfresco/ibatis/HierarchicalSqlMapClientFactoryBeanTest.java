@@ -33,7 +33,6 @@ import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
-import org.alfresco.config.FixedClassPathXmlApplicationContext;
 import org.alfresco.util.resource.HierarchicalResourceLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,7 +109,7 @@ public class HierarchicalSqlMapClientFactoryBeanTest extends TestCase
                 logger.error("Failed to neatly close application context", e);
             }
         }
-        ctx = new FixedClassPathXmlApplicationContext("ibatis/hierarchy-test/hierarchy-test-context.xml");
+        ctx = new ClassPathXmlApplicationContext("ibatis/hierarchy-test/hierarchy-test-context.xml");
         return (SqlMapClient) ctx.getBean("sqlMapClient");
     }
     
