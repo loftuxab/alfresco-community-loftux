@@ -29,7 +29,6 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import org.alfresco.config.FixedClassPathXmlApplicationContext;
 import org.alfresco.util.exec.RuntimeExec.ExecutionResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,7 +61,7 @@ public class RuntimeExecBeansTest extends TestCase
     public void testBootstrapAndShutdown() throws Exception
     {
         // now bring up the bootstrap
-        ApplicationContext ctx = new FixedClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        ApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         
         // the folder should be gone
         assertFalse("Folder was not deleted by bootstrap", dir.exists());
@@ -80,7 +79,7 @@ public class RuntimeExecBeansTest extends TestCase
     
     public void testSimpleSuccess() throws Exception
     {
-        ClassPathXmlApplicationContext ctx = new FixedClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         try
         {
             RuntimeExec dirRootExec = (RuntimeExec) ctx.getBean("commandListRootDir");
@@ -96,7 +95,7 @@ public class RuntimeExecBeansTest extends TestCase
     
     public void testDeprecatedSetCommandMap() throws Exception
     {
-        ClassPathXmlApplicationContext ctx = new FixedClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         try
         {
             RuntimeExec deprecatedExec = (RuntimeExec) ctx.getBean("commandCheckDeprecatedSetCommandMap");
@@ -114,7 +113,7 @@ public class RuntimeExecBeansTest extends TestCase
     
     public void testSplitArguments() throws Exception
     {
-        ClassPathXmlApplicationContext ctx = new FixedClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         try
         {
             RuntimeExec splitExec = (RuntimeExec) ctx.getBean("commandSplitArguments");
@@ -132,7 +131,7 @@ public class RuntimeExecBeansTest extends TestCase
     
     public void testSplitArgumentsAsSingleValue() throws Exception
     {
-        ClassPathXmlApplicationContext ctx = new FixedClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         try
         {
             RuntimeExec splitExec = (RuntimeExec) ctx.getBean("commandSplitArgumentsAsSingleValue");
@@ -154,7 +153,7 @@ public class RuntimeExecBeansTest extends TestCase
         dir.mkdir();
         assertTrue("Directory not created", dir.exists());
         
-        ClassPathXmlApplicationContext ctx = new FixedClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         try
         {
             RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandFailureGuaranteed");
@@ -217,7 +216,7 @@ public class RuntimeExecBeansTest extends TestCase
         dir.mkdir();
         assertTrue("Directory not created", dir.exists());
         
-        ClassPathXmlApplicationContext ctx = new FixedClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         try
         {
             RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandNeverEnding");

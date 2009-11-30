@@ -30,7 +30,6 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
-import org.alfresco.config.FixedClassPathXmlApplicationContext;
 import org.alfresco.jcr.api.JCRNodeRef;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
@@ -39,6 +38,7 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 
@@ -61,7 +61,7 @@ public class FirstJCRClient
 	    throws Exception
 	{
 	    // access the Alfresco JCR Repository (here it's via programmatic approach, but it could also be injected)
-	    ApplicationContext context = new FixedClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+	    ApplicationContext context = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
 	    Repository repository = (Repository)context.getBean("JCR.Repository");
 	
 	    // login to workspace (here we rely on the default workspace defined by JCR.Repository bean)

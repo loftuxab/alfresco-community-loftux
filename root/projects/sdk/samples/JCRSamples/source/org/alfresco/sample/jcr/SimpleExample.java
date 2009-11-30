@@ -32,8 +32,8 @@ import javax.jcr.Repository;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
-import org.alfresco.config.FixedClassPathXmlApplicationContext;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 
@@ -50,7 +50,7 @@ public class SimpleExample
         throws Exception
     {
         // Setup Spring and Transaction Service
-        ApplicationContext context = new FixedClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
         
         // Retrieve Repository
         Repository repository = (Repository)context.getBean("JCR.Repository");

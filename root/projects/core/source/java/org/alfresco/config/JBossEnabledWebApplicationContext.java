@@ -24,14 +24,11 @@
  */
 package org.alfresco.config;
 
-
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 /**
- * A specialized {@link XmlWebApplicationContext} that uses a {@link JBossEnabledResourcePatternResolver}. Also works
- * around http://jira.springframework.org/browse/SPR-6411.
+ * A specialized {@link XmlWebApplicationContext} that uses a {@link JBossEnabledResourcePatternResolver}.
  * 
  * @author dward
  */
@@ -47,19 +44,6 @@ public class JBossEnabledWebApplicationContext extends XmlWebApplicationContext
     protected ResourcePatternResolver getResourcePatternResolver()
     {
         return new JBossEnabledResourcePatternResolver(this);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.springframework.web.context.support.XmlWebApplicationContext#initBeanDefinitionReader(org.springframework
-     * .beans.factory.xml.XmlBeanDefinitionReader)
-     */
-    @Override
-    protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader)
-    {
-        super.initBeanDefinitionReader(reader);
-        reader.setDocumentReaderClass(FixedClassPathXmlApplicationContext.FixedBeanDefinitionDocumentReader.class);
     }
 
 }
