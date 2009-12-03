@@ -1890,6 +1890,8 @@
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
+         <fileset dir="${dir.project.linkvalidation.config}"
+                  excludes="**/extension/**" />
          <fileset dir="${dir.project.repository.config}"
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.config}"
@@ -1908,13 +1910,6 @@
          <fileset dir="${dir.project.repository.config}"
                   includes="**/extension/dev-context.xml"/>
       </copy>
-      <!-- 
-           Temporary measure to help Eclipse users deal with 
-           link validation dependencies.  This should be cleaned
-           up when the build is transformed into a single project.
-      -->
-      <copy file="${dir.project.linkvalidation.config}/alfresco/alfresco-link-validation-bootstrap-context.xml"
-            todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/extension"/>
             
       <!-- explicitly copy the bootstrap file for remote api to get round dependency issue. -->
       <copy file="${dir.project.remoteapi.config}/alfresco/extension/bootstrap/remote-api-context.xml"
