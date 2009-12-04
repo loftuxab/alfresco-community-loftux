@@ -56,6 +56,7 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.TransactionListenerAdapter;
 import org.alfresco.repo.transaction.TransactionalResourceHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.audit.AuditQueryParameters;
 import org.alfresco.service.cmr.audit.AuditService;
 import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -892,31 +893,20 @@ public class RecordsManagementAuditServiceImpl
         {
             logger.debug("RM Audit: Issuing query: " + params);
         }
-        
+
+        // Build audit query parameters
+        AuditQueryParameters auditQueryParams = new AuditQueryParameters();
+        auditQueryParams.setForward(forward);
+        auditQueryParams.setApplicationName(RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME);
+        auditQueryParams.setUser(user);
+        auditQueryParams.setFromTime(fromTime);
+        auditQueryParams.setToTime(toTime);
         if (nodeRef != null)
         {
-            auditService.auditQuery(
-                    callback,
-                    forward,
-                    RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
-                    user,
-                    fromTime,
-                    toTime,
-                    RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF, nodeRef,
-                    maxEntries);
+            auditQueryParams.addSearchKey(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF, nodeRef);
         }
-        else
-        {
-            auditService.auditQuery(
-                    callback,
-                    forward,
-                    RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
-                    user,
-                    fromTime,
-                    toTime,
-                    null, null,
-                    maxEntries);
-        }
+        // Get audit entries
+        auditService.auditQuery(callback, auditQueryParams, maxEntries);
         
         // finish off the audit trail report
         writeAuditTrailFooter(writer, reportFormat);
