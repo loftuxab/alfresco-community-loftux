@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Web Components Tree</shortname>
-  <description>Web Components Tree</description>
-  <url>/tree/components</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

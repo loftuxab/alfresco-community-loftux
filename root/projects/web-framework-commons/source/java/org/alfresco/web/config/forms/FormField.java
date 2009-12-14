@@ -30,9 +30,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.extensions.config.ConfigException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.config.ConfigException;
 
 /**
  * This class represents a &lt;field&gt; element within the &lt;appearance&gt; tag in

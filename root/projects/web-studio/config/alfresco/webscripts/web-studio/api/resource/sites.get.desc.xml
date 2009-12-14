@@ -1,8 +1,0 @@
-<webscript kind="site">
-  <shortname>Web Studio Fetch for Sites</shortname>
-  <description>Web Studio Fetch for Sites</description>
-  <url>/api/resource/site/{endpoint}/{siteId}/{storeType}/{storeId}/{nodeId}</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

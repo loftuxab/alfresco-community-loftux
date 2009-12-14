@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.ConfigException;
 import org.springframework.extensions.config.element.ConfigElementAdapter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This config element represents form values for the client. Note the distinction

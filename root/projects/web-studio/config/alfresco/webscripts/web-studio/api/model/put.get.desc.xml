@@ -1,8 +1,0 @@
-<webscript kind="site">
-  <shortname>Web Framework Model Object API - PUT</shortname>
-  <description>Web Framework Model Object API - PUT</description>
-  <url>/api/model/put</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

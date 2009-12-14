@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,25 +31,27 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.extensions.config.Config;
 import org.springframework.extensions.config.ConfigElement;
-import org.alfresco.connector.AlfrescoAuthenticator;
-import org.alfresco.connector.ConnectorSession;
-import org.alfresco.error.AlfrescoRuntimeException;
+import org.springframework.extensions.config.WebFrameworkConfigElement;
+import org.springframework.extensions.surf.FrameworkUtil;
+import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.WebFrameworkConstants;
+import org.springframework.extensions.surf.WebFrameworkServiceRegistry;
+import org.springframework.extensions.surf.exception.PageMapperException;
+import org.springframework.extensions.surf.exception.PlatformRuntimeException;
+import org.springframework.extensions.surf.support.AbstractPageMapper;
+import org.springframework.extensions.surf.types.Page;
+import org.springframework.extensions.surf.types.Theme;
+import org.springframework.extensions.surf.uri.UriTemplateListIndex;
 import org.springframework.extensions.surf.util.URLDecoder;
-import org.alfresco.web.framework.model.Page;
-import org.alfresco.web.framework.model.Theme;
-import org.alfresco.web.scripts.ProcessorModelHelper;
-import org.alfresco.web.scripts.URLHelper;
-import org.alfresco.web.scripts.WebScriptProcessor;
-import org.alfresco.web.site.exception.PageMapperException;
-import org.alfresco.web.uri.UriTemplateListIndex;
+import org.springframework.extensions.webscripts.ProcessorModelHelper;
+import org.springframework.extensions.webscripts.URLHelper;
+import org.springframework.extensions.webscripts.WebScriptProcessor;
 
 /**
- * This is a Page Mapper class which serves to interpret URLs at dispatch
+ * This PageMapper implementation serves to interpret URLs at dispatch
  * time for the Slingshot project.
  * 
- * Requests are received in the style defined for Slingshot.
- * 
- * Requests arrive in the form:
+ * Requests are received in the style defined for Slingshot:
  * 
  * 		/page
  * 		/page/<pageId>
@@ -62,43 +64,44 @@ import org.alfresco.web.uri.UriTemplateListIndex;
  * The <pageId> identifier could be the id of the page object.
  * It could also be a relative path to the page object:
  * 
- * 		For example:  /page/collaboration/dashboard
+ * 		For example:  /page/user/kevinr/dashboard
  * 
  * Everything from the original request is available downstream to
  * all rendering components and templates.
  * 
- * @author muzquiano
- * @author kevinr
+ * @author Kevin Roast
  */
 public class SlingshotPageMapper extends AbstractPageMapper
 {
-    private static final String URI_PAGEID = "pageid";
+    /*package*/ static final String URI_PAGEID = "pageid";
     
-    /** URI Template index - page url mappings */
-    private static final UriTemplateListIndex uriTemplateIndex;
+    /** URI Template index - slingshot page url mappings */
+    private static UriTemplateListIndex uriTemplateIndex = null;
     
     
     /**
-     * Empty constructor - for instantiation via reflection 
+     * Constructor
+     * 
+     * @param serviceRegistry   The WebFrameworkServiceRegistry
      */
-    public SlingshotPageMapper()
+    public SlingshotPageMapper(WebFrameworkServiceRegistry serviceRegistry)
     {
-        super();
+        super(serviceRegistry);
     }
     
-    /**
-     * Process a page request.
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.AbstractPageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
      */
-    public void executeMapper(RequestContext context,
-        ServletRequest request) throws PageMapperException
+    public void executeMapper(RequestContext context, ServletRequest request)
+        throws PageMapperException
     {
     	if (request instanceof HttpServletRequest == false)
     	{
-    		throw new PageMapperException("The slingshot page mapper must be given an HttpServletRequest to execute.");
+    		throw new PageMapperException("The Slingshot PageMapper must be given an HttpServletRequest to execute.");
     	}
     	
     	// The request URI string.  This comes in as something like:
-    	//    /slingshot/page/user-profile
+    	//    /share/page/user-profile
         // Strip off the webapp name (if any - may be ROOT i.e. "/")
         HttpServletRequest req = ((HttpServletRequest)request);
     	String requestURI = req.getRequestURI().substring(req.getContextPath().length());
@@ -111,13 +114,8 @@ public class SlingshotPageMapper extends AbstractPageMapper
         Map<String, String> uriTokens = null;
         int pathIndex = requestURI.indexOf('/', 1);
         
-        // Test to see if any elements are provided beyond the servlet name.
-        // Optimization to ignore webscript /service requests when processing page URIs -
-        // this is because a RequestContext is created manually for service requests
-        // that pass through the web-framework webscript runtime - we know those requests
-        // are not related to pages or page types so we can skip some processing.
-        if (pathIndex != -1 && requestURI.length() > (pathIndex + 1) &&
-            !WebScriptProcessor.WEBSCRIPT_SERVICE_SERVLET.equals(requestURI.substring(0, pathIndex)))
+        // Test to see if any elements are provided beyond the view resolver name.
+        if (pathIndex != -1 && requestURI.length() > (pathIndex + 1))
         {
             pageId = requestURI.substring(pathIndex + 1);
             context.setUri(pageId);
@@ -154,6 +152,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
          * Finally, if nothing can be determined, a generic page is
          * bound into the request context.
          */
+        final WebFrameworkConfigElement config = FrameworkUtil.getConfig();
         String pageTypeId = (String) request.getParameter("pt");
         if (pageTypeId != null && pageTypeId.length() != 0)
         {
@@ -171,13 +170,13 @@ public class SlingshotPageMapper extends AbstractPageMapper
             // Consider whether a system default has been set up
             if (pageId == null)
             {
-                pageId = getPageId(context, pageTypeId);
+                pageId = config.getDefaultPageTypeInstanceId(pageTypeId);
             }
             
             // Worst case, pick a generic page
             if (pageId == null)
             {
-                pageId = getPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
+                pageId = config.getDefaultPageTypeInstanceId(WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
             }
         }
         
@@ -192,13 +191,9 @@ public class SlingshotPageMapper extends AbstractPageMapper
             }
         }
         
-        /**
-         * At present, the Slingshot project doesn't do much with formats.
-         * 
-         * Note that if we didn't set it, it would still automatically
-         * pick up the default format.
-         */
-        context.setFormatId(FrameworkHelper.getConfig().getDefaultFormatId());
+        // the Slingshot project doesn't do much with formats.
+        // so pick up the default format.
+        context.setFormatId(config.getDefaultFormatId());
     }
     
     /**
@@ -209,23 +204,24 @@ public class SlingshotPageMapper extends AbstractPageMapper
      * 
      * @return map of tokens to values or null if no match found 
      */
-    private static Map<String, String> matchUriTemplate(String pageId)
+    private Map<String, String> matchUriTemplate(String pageId)
     {
+        if (uriTemplateIndex == null)
+        {
+            Config config = this.getServiceRegistry().getConfigService().getConfig("UriTemplate");
+            if (config == null)
+            {
+                throw new PlatformRuntimeException("Cannot find required config element 'UriTemplate'.");
+            }
+            ConfigElement uriConfig = config.getConfigElement("uri-templates");
+            if (uriConfig == null)
+            {
+                throw new PlatformRuntimeException("Missing required config element 'uri-templates' under 'UriTemplate'.");
+            }
+            // NOTE: this update to a static field is not synchronized - it does not matter if
+            //       multiple threads set it - the end result will be the same data
+            uriTemplateIndex = new UriTemplateListIndex(uriConfig);
+        }
         return uriTemplateIndex.findMatch(pageId);
-    }
-    
-    static
-    {
-        Config config = FrameworkHelper.getConfigService().getConfig("UriTemplate");
-        if (config == null)
-        {
-            throw new AlfrescoRuntimeException("Cannot find required config element 'UriTemplate'.");
-        }
-        ConfigElement uriConfig = config.getConfigElement("uri-templates");
-        if (uriConfig == null)
-        {
-            throw new AlfrescoRuntimeException("Missing required config element 'uri-templates' under 'UriTemplate'.");
-        }
-        uriTemplateIndex = new UriTemplateListIndex(uriConfig);
     }
 }

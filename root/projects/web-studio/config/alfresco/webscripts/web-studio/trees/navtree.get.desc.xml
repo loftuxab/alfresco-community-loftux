@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Navigation Tree</shortname>
-  <description>Navigation Tree</description>
-  <url>/tree/navigation</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

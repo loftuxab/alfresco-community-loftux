@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Set Context</shortname>
-  <description>Set Context</description>
-  <url>/api/context/set</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

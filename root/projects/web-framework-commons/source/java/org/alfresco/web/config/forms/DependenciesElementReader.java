@@ -27,11 +27,11 @@ package org.alfresco.web.config.forms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.ConfigException;
 import org.springframework.extensions.config.xml.elementreader.ConfigElementReader;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
 
 /**
  * This class is a custom element reader to parse the config file for

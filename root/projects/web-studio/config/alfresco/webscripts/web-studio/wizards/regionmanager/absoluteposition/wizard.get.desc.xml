@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Absolute Position Region</shortname>
-  <description>Absolute Position Region Layout Manager</description>
-  <url>/wizard/regionmanager/absoluteposition</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

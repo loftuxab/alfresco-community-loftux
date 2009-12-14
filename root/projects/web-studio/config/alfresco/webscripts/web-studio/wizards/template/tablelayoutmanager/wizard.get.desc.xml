@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Table Layout Manager</shortname>
-  <description>Table Layout Manager</description>
-  <url>/wizard/template/tablelayoutmanager</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

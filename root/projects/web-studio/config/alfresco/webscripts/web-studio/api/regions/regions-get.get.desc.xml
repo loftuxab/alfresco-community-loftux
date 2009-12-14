@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Load Regions for Source Binding</shortname>
-  <description>Load Region for Source Binding</description>
-  <url>/api/regions/get</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

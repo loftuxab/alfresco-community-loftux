@@ -142,10 +142,14 @@
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="org.springframework*.jar" />
             <include name="jug-*.jar" />
-         </fileset> 
-        <fileset dir="${dir.project.3rdparty.lib}/optional">
+         </fileset>
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf">
+            <filename name="spring-surf-core-*.jar" />
+            <filename name="spring-surf-core-configservice-*.jar" />
+         </fileset>
+         <fileset dir="${dir.project.3rdparty.lib}/optional">
             <include name="log4j-*.jar" />
-        </fileset> 
+         </fileset> 
          <fileset dir="${dir.project.3rdparty.lib}/commons">
             <filename name="commons-logging-*.jar" />
          </fileset>
@@ -480,6 +484,8 @@
          <lib dir="${dir.project.3rdparty.lib}/jmagick" 
               includes="*.jar" />
          <lib dir="${dir.project.3rdparty.lib}/commons" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/spring-surf" 
               includes="*.jar" />
          <lib dir="${dir.project.3rdparty.lib}/jgroups" 
               includes="*.jar" />
@@ -1461,6 +1467,8 @@
                   includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional" 
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
@@ -1544,6 +1552,8 @@
       <copy todir="${dir.project.webframework.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional" 
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
@@ -1635,6 +1645,8 @@
       <copy todir="${dir.project.webframeworkcommons.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional" 
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
@@ -1714,8 +1726,6 @@
       </copy>
       <!-- next copy all required files from webscript, web framework and web framework commons projects -->
       <copy todir="${dir.project.slingshot.assemble}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
@@ -1724,8 +1734,6 @@
       </copy>
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
          <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
       </copy>
 
@@ -1733,6 +1741,8 @@
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional" 
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
@@ -1743,10 +1753,6 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.jlan.dist}" 
                   includes="${file.name.jar.jlan}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
          <fileset dir="${dir.project.webframeworkcommons.dist}" 
                   includes="${file.name.jar.webframeworkcommons}" />
          <fileset dir="${dir.project.slingshot.dist}" 
@@ -1934,6 +1940,8 @@
          <fileset dir="${dir.project.3rdparty.lib}/openoffice" 
                   includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jmagick" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
                   includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="*.jar" />
@@ -3217,212 +3225,6 @@
                          windowtitle="Alfresco JLAN API" 
                          projectdir="${dir.project.jlan}"/>
    </target>
-   
-   
-   <!-- ************************ -->
-   <!-- ** Web Studio Project ** -->
-   <!-- ************************ -->
-   
-   <target name="incremental-webstudio" 
-           depends="incremental-surfauthoring,package-webstudio" />
-      
-   <target name="build-webstudio" 
-           depends="clean-webstudio, 
-                    incremental-webstudio" />
-   
-   <target name="clean-webstudio" 
-           depends="init">
-      <clean projectdir="${dir.project.webstudio}" />
-      <delete dir="${dir.project.webstudio}/build/js" />
-   </target>
-   
-   <target name="compile-webstudio" 
-           depends="init">
-      <compile-java projectdir="${dir.project.webstudio}" />
-   </target>
-   
-   <target name="package-webstudio" 
-           depends="package-webstudio-war" />
-   
-   <target name="package-webstudio-jar"
-           depends="compile-webstudio">
-      <mkdir dir="${dir.project.webstudio.dist}" />
-      <jar jarfile="${dir.project.webstudio.dist}/${file.name.jar.webstudio}" 
-           basedir="${dir.project.webstudio.classes}" />
-   </target>
-
-   <target name="package-webstudio-war" 
-           depends="assemble-webstudio-war,ant17orHigherCheck,validate-webstudio-javascript,minimize-webstudio-javascript">
-      <war warfile="${dir.project.webstudio.dist}/${file.name.war.webstudio}" 
-           webxml="${dir.project.webstudio.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webstudio.assemble}" />
-      </war>
-   </target>
-
-   <target name="assemble-webstudio-war" 
-           depends="package-webstudio-jar">
-      <mkdir dir="${dir.project.webstudio.assemble}" />
-      
-      <!-- copy all required files from Surf Preview assembly -->
-      <copy todir="${dir.project.webstudio.assemble}" overwrite="true">
-         <fileset dir="${dir.project.webframework.assemble}" excludes="WEB-INF/web.xml" />
-      </copy>      
-      
-      <!-- copy all required files from project: web-framework-samples -->
-      <copy todir="${dir.project.webstudio.assemble}" overwrite="true">
-         <fileset dir="${dir.projects}/web-framework-samples/source/web" excludes="WEB-INF/web.xml" />
-      </copy>
-      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes" overwrite="true">
-         <fileset dir="${dir.projects}/web-framework-samples/config" excludes="**/web-extension/**" />
-      </copy>
-      
-      <!-- copy all required files from Web Studio inclusions -->      
-      <copy todir="${dir.project.webstudio.assemble}" overwrite="true">
-         <fileset dir="${dir.project.webstudio.src.web}" excludes="WEB-INF/web.xml" />
-      </copy>      
-      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes" overwrite="true">
-         <fileset dir="${dir.project.webstudio.config}" excludes="**/web-extension/**" />
-      </copy>      
-
-      <!-- add all JAR to WEB-INF/lib -->
-      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/lib" overwrite="true">
-         <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webscriptframework.libs}" />
-         <fileset dir="${dir.project.3rdparty.lib}/optional" 
-                  includes="${includes.webscriptframework.libs.optional}" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
-                  includes="${includes.webscriptframework.libs.abdera}" />
-         <fileset dir="${dir.project.core.dist}" 
-                  includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
-         <fileset dir="${dir.project.webframeworkcommons.dist}" 
-                  includes="${file.name.jar.webframeworkcommons}" />                  
-         <fileset dir="${dir.project.webstudio.dist}" 
-                  includes="${file.name.jar.webstudio}" />
-      </copy>
-      
-      <!-- Auto Expand YUI into the Assembly -->
-      <unzip src="${file.zip.webstudio.yui}"
-             dest="${dir.project.webstudio.assemble}" />
-      
-      <!-- placeholder site-webscripts and templates folders are required -->
-      <mkdir dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-webscripts" />
-      <mkdir dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/templates" />
-
-   </target>  
-   
-   <target name="ant17orHigherCheck">
-	<condition property="isJsLintCompatible">
-		<contains string="${ant.version}" substring="1.7" />
-	</condition>
-   </target>
-   
-   <target name="validate-webstudio-javascript" if="isJsLintCompatible">
-
-	<mkdir dir="${dir.project.webstudio}/build/js" />
-	
-	<taskdef name="jslint"
-	     classname="net.happygiraffe.jslint.ant.JSLintTask"
-             classpath="${dir.project.webstudio}/lib/jslint4java-1.2.1+rhino.jar" />
-
-	<echo>Validating the Web Studio Javascript files</echo>
-	<jslint options="browser,widget,evil,sub,passfail">
-		<formatter type="plain" />
-		<formatter type="xml" destfile="${dir.project.webstudio}/build/js/validation.xml" />
-		<fileset dir="${dir.project.webstudio}/source/web/overlay/default">
-			<include name="**/*.js" />
-			<exclude name="**/yui/**" />
-			<exclude name="**/jquery/**" />
-			<exclude name="**/mootools/**" />
-			<exclude name="**/htmlparser/**" />
-			<exclude name="**/*-min.js" />
-		</fileset>
-	</jslint>
-
-   </target>
-   
-   <target name="minimize-webstudio-javascript">
-   
-   	<mkdir dir="${dir.project.webstudio}/build/js" />
-   	<mkdir dir="${dir.project.webstudio.assemble}/overlay/default/minimized" />
-
-	<echo>Merging Web Studio Javascript to single file</echo>
-	<concat destfile="${dir.project.webstudio}/build/js/alf-web-studio.js" force="yes" binary="yes">
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/alf.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/web-studio.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/alfresco.utils.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/abstract-templater.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/stretcher.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/YAHOOExtends.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/wizard.class.js" />
-		
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/abstract.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/dynamic-template.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/row.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/column.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/region.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/drop-down-list/drop-down-list.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/forms/forms.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/menu/menu.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/menu-new/menu-new.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/panel/panel.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/region/region.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/sliders-sector/sliders-sector.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/splitter/splitter.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/tree-view/tree-view.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/window/window.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/page-editor/page-editor.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/templates-view/templates-view.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template-designer.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/renderers/absolute.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/renderers/table.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/pageblocker/pageblocker.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/content-view/content-view.class.js" />
-		
-
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/login-dialog.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/sandbox-dialog.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/cta-dialog.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/pta-dialog.class.js" />
-		
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/container/container.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/applications/abstract-application.class.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/applets/abstract-applet.class.js" />
-	</concat>
-	
-	<echo>Compressing Web Studio Javascript</echo>
-	<apply executable="java" parallel="false">
-		<fileset dir="${dir.project.webstudio}/build/js" includes="alf-web-studio.js"/>
-		<arg line="-jar"/>
-		<arg path="${dir.project.webstudio}/lib/yuicompressor-2.4.2.jar"/>
-		<srcfile/>
-		<arg line="-o"/>
-		<arg path="${dir.project.webstudio}/build/js/alf-web-studio.min.js"/>
-		<mapper type="glob" from="*.js" to="*-min.js"/>
-		<targetfile/>
-	</apply>
-	
-	<echo>Copy Compressed Web Studio Javascript to assembly</echo>
-	<copy file="${dir.project.webstudio}/build/js/alf-web-studio.min.js" todir="${dir.project.webstudio}/build/assemble/overlay/default/minimized"/>
-   
-   </target>
-   
-   <target name="test-webstudio" 
-           depends="compile-webstudio">
-      <run-tests projectdir="${dir.project.webstudio}" />
-   </target>
-   
-   <target name="generate-javadocs-webstudio" 
-           depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Studio" 
-                         windowtitle="Alfresco Web Studio" 
-                         projectdir="${dir.project.webstudio}"/>
-   </target>
 
    
    <!-- ************************************* -->
@@ -3579,6 +3381,8 @@
       <copy todir="${dir.project.mobile.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional" 
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 

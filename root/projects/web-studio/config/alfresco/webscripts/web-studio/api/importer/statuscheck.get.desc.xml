@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Alfresco Web Studio Importer - Status</shortname>
-  <description>Alfresco Web Studio Importer - Status</description>
-  <url>/api/importer/statuscheck</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

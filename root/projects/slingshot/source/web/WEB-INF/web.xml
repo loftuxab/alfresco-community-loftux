@@ -10,19 +10,6 @@
       <param-name>org.jboss.jbossfaces.WAR_BUNDLES_JSF_IMPL</param-name>
       <param-value>true</param-value>
    </context-param>
-
-   <context-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>
-         classpath:alfresco/webscript-framework-application-context.xml
-         classpath:alfresco/web-framework-model-context.xml
-         classpath:alfresco/web-framework-application-context.xml
-         classpath*:alfresco/web-extension/custom-web-framework-application-context.xml
-         classpath:alfresco/slingshot-application-context.xml
-         classpath*:alfresco/web-extension/custom-slingshot-application-context.xml
-      </param-value>
-      <description>Spring config file locations</description>
-   </context-param>
    
    <context-param>
       <param-name>contextClass</param-name>
@@ -41,6 +28,12 @@
       </init-param>
    </filter>
    
+   <!-- Enables clean URLs with JSP views e.g. /welcome instead of /page/welcome -->
+   <filter>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+   </filter>
+   
    <!-- For NTLM authentication support use the following filter and the mappings below -->
    <!--
    <filter>
@@ -52,7 +45,22 @@
       </init-param>
    </filter>
    -->
-
+   
+   <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/proxy/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/service/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/res/*</url-pattern>
+   </filter-mapping>
+   
    <filter-mapping>
       <filter-name>CacheExpiresFilter</filter-name>
       <url-pattern>*.jpg</url-pattern>
@@ -73,7 +81,7 @@
       <filter-name>CacheExpiresFilter</filter-name>
       <url-pattern>*.js</url-pattern>
    </filter-mapping>
-      
+   
    <!-- For NTLM authentication support enable the following mappings -->
    <!-- after enabling the NTLMAuthenticationFilter filter class above -->
    <!--
@@ -93,10 +101,26 @@
    </filter-mapping>
    -->
    
-   <listener>
-      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-   </listener>
+   <servlet>
+      <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <init-param>
+         <param-name>contextConfigLocation</param-name>
+         <param-value>/WEB-INF/classes/web-application-config.xml</param-value>
+      </init-param>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
    
+   <servlet-mapping>
+      <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
+      <url-pattern>/page/*</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
+      <url-pattern>/p/*</url-pattern>
+   </servlet-mapping>
+   
+   <!-- TODO: remove after spring-surf changes - NOTE: feedApiServlet?
    <servlet>
       <servlet-name>apiServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
@@ -104,12 +128,6 @@
          <param-name>container</param-name>
          <param-value>webframework.webscripts.container</param-value>
       </init-param>
-      <!--
-      <init-param>
-         <param-name>authenticator</param-name>
-         <param-value>webscripts.authenticator.basic</param-value>
-      </init-param>
-      -->
    </servlet>
    
    <servlet>
@@ -125,82 +143,10 @@
       </init-param>
    </servlet>
 
-   <servlet>
-      <servlet-name>proxyServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.EndPointProxyServlet</servlet-class>
-   </servlet>
-
-   <servlet>
-      <servlet-name>uriTemplateServlet</servlet-name>
-      <servlet-class>org.alfresco.web.uri.UriTemplateServlet</servlet-class>
-   </servlet>
-
-   <!-- The Web Framework Dispatcher Servlet -->
-   <servlet>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
-      <load-on-startup>1</load-on-startup>
-   </servlet>
-   
-   <servlet>
-      <servlet-name>frameworkControlServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.FrameworkControlServlet</servlet-class>
-   </servlet>
-   
-   <servlet>
-      <servlet-name>loginServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.LoginServlet</servlet-class>
-   </servlet> 
-
-   <servlet>
-      <servlet-name>logoutServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.LogoutServlet</servlet-class>
-   </servlet> 
-
-   <servlet-mapping>
-      <servlet-name>logoutServlet</servlet-name>
-      <url-pattern>/logout</url-pattern>
-   </servlet-mapping>
-
-   <servlet-mapping>
-      <servlet-name>loginServlet</servlet-name>
-      <url-pattern>/login/*</url-pattern>
-   </servlet-mapping>
-
-   <servlet-mapping>
-      <servlet-name>apiServlet</servlet-name>
-      <url-pattern>/service/*</url-pattern>
-   </servlet-mapping>
-   
    <servlet-mapping>
       <servlet-name>feedApiServlet</servlet-name>
       <url-pattern>/feedservice/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>proxyServlet</servlet-name>
-      <url-pattern>/proxy/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <url-pattern>/page/*</url-pattern>
-   </servlet-mapping>
-
-   <servlet-mapping>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <url-pattern>/p/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>uriTemplateServlet</servlet-name>
-      <url-pattern>/s/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>frameworkControlServlet</servlet-name>
-      <url-pattern>/control/*</url-pattern>
-   </servlet-mapping>
+   </servlet-mapping>-->
    
    <session-config>
       <session-timeout>60</session-timeout>

@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Edit Region Wizard</shortname>
-  <description>Edit Region Wizard</description>
-  <url>/wizard/editregion</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

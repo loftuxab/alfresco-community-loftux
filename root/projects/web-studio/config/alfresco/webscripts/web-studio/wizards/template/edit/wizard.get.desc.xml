@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Edit Template Wizard</shortname>
-  <description>Edit Template Wizard</description>
-  <url>/wizard/template/edit</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

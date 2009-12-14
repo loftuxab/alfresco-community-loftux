@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Delete an Absolute Layout Type Region</shortname>
-  <description>Delete an Absolute Layout Type Region</description>
-  <url>/api/template/absolutelayout/region/delete/get</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

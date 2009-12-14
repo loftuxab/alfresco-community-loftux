@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Add New Template Wizard</shortname>
-  <description>Add New Template Wizard</description>
-  <url>/wizard/template/add</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

@@ -31,15 +31,15 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
-import org.springframework.extensions.config.evaluator.Evaluator;
-import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorService;
-import org.alfresco.connector.Response;
-import org.alfresco.connector.exception.ConnectorServiceException;
-import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.ThreadLocalRequestContext;
 import org.apache.commons.logging.Log;
+import org.springframework.extensions.config.evaluator.Evaluator;
+import org.springframework.extensions.surf.FrameworkUtil;
+import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.exception.ConnectorServiceException;
+import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
+import org.springframework.extensions.webscripts.connector.Connector;
+import org.springframework.extensions.webscripts.connector.ConnectorService;
+import org.springframework.extensions.webscripts.connector.Response;
 
 /**
  * This class provides common behaviour for the evaluators which use node-based
@@ -115,7 +115,7 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
             return (String)cachedResult;
         }
 
-        ConnectorService connService = FrameworkHelper.getConnectorService();
+        ConnectorService connService = FrameworkUtil.getConnectorService();
         
         RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
         String currentUserId = requestContext.getUserId();

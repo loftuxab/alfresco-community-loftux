@@ -1,8 +1,0 @@
-<webscript kind="site">
-  <shortname>Web Framework Model Object API - LIST</shortname>
-  <description>Web Framework Model Object API - LIST</description>
-  <url>/api/model/list</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

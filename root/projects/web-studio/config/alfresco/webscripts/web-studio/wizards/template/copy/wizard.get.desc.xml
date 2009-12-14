@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Copy Template Wizard</shortname>
-  <description>Copy Template Wizard</description>
-  <url>/wizard/template/copy</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

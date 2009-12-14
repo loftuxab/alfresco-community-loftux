@@ -1,8 +1,0 @@
-<webscript kind="site">
-  <shortname>Web Studio Fetch for Spaces - Metadata</shortname>
-  <description>Web Studio Fetch for Spaces - Metadata</description>
-  <url>/api/resource/space/{endpoint}/{storeType}/{storeId}/{nodeId}</url>
-  <format default="html">extension</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

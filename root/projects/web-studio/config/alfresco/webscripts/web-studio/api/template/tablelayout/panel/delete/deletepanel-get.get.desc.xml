@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Delete a Table Layout Type Template Panel</shortname>
-  <description>Delete a Panel from a Table Layout Type Template</description>
-  <url>/api/template/tablelayout/panel/delete/get</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

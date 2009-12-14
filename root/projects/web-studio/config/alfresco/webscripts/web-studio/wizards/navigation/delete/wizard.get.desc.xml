@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Remove Child Navigation Node Wizard</shortname>
-  <description>Remove Child Navigation Node Wizard</description>
-  <url>/wizard/navigation/delete</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>
