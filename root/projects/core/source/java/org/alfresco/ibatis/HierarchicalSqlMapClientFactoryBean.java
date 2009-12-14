@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.alfresco.util.PropertyCheck;
+import org.springframework.extensions.surf.util.PropertyCheck;
 import org.alfresco.util.resource.HierarchicalResourceLoader;
 import org.springframework.core.NestedIOException;
 import org.springframework.core.io.Resource;

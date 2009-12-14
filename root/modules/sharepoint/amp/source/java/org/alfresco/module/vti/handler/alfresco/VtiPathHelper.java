@@ -46,8 +46,8 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.AbstractLifecycleBean;
-import org.alfresco.util.Pair;
+import org.springframework.extensions.surf.util.AbstractLifecycleBean;
+import org.springframework.extensions.surf.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
@@ -475,7 +475,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     }
     
     /**
-     * @see org.alfresco.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
+     * @see org.springframework.extensions.surf.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
      */
 	protected void onBootstrap(ApplicationEvent event) 
 	{
@@ -527,7 +527,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
 	}
 
 	/**
-     * @see org.alfresco.util.AbstractLifecycleBean#onShutdown(org.springframework.context.ApplicationEvent)
+     * @see org.springframework.extensions.surf.util.AbstractLifecycleBean#onShutdown(org.springframework.context.ApplicationEvent)
      */
 	protected void onShutdown(ApplicationEvent event) {
 		// do nothing

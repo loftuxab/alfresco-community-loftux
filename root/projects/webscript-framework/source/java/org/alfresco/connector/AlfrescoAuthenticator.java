@@ -27,7 +27,7 @@ package org.alfresco.connector;
 import java.text.MessageFormat;
 
 import org.alfresco.connector.exception.AuthenticationException;
-import org.alfresco.util.URLEncoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 import org.alfresco.web.scripts.json.JSONUtils;
 import org.alfresco.web.scripts.json.JSONWriter;
 import org.apache.commons.logging.Log;

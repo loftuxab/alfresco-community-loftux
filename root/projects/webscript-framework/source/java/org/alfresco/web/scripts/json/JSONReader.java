@@ -27,7 +27,7 @@ package org.alfresco.web.scripts.json;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.util.Content;
+import org.springframework.extensions.surf.util.Content;
 import org.alfresco.web.scripts.Format;
 import org.alfresco.web.scripts.FormatReader;
 import org.alfresco.web.scripts.WebScriptException;

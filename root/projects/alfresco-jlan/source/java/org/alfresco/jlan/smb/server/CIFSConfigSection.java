@@ -27,7 +27,7 @@ package org.alfresco.jlan.smb.server;
 
 import java.net.InetAddress;
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
 import org.alfresco.jlan.server.auth.CifsAuthenticator;
 import org.alfresco.jlan.server.auth.ICifsAuthenticator;

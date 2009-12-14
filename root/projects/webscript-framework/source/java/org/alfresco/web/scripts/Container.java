@@ -26,7 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.util.Map;
 
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.ConfigService;
 
 
 /**

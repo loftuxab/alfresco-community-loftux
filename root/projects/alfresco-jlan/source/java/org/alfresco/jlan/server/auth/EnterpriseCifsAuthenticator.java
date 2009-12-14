@@ -72,7 +72,7 @@ import org.alfresco.jlan.smb.server.SMBSrvSession;
 import org.alfresco.jlan.smb.server.VirtualCircuit;
 import org.alfresco.jlan.util.DataPacker;
 import org.alfresco.jlan.util.HexDump;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 import org.ietf.jgss.Oid;
 
 /**

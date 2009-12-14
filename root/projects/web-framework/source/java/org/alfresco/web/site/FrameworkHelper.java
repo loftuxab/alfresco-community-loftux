@@ -28,15 +28,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.ConnectorSession;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.connector.exception.CredentialVaultProviderException;
-import org.alfresco.util.ReflectionHelper;
+import org.springframework.extensions.surf.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;

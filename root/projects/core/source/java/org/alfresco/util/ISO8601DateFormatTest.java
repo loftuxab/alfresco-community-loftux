@@ -28,6 +28,8 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.springframework.extensions.surf.util.ISO8601DateFormat;
+
 public class ISO8601DateFormatTest extends TestCase
 {
     public void testConversion()

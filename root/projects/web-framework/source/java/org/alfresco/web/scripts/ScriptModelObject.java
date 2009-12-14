@@ -27,7 +27,7 @@ package org.alfresco.web.scripts;
 import java.io.Serializable;
 import java.util.Iterator;
 
-import org.alfresco.util.ParameterCheck;
+import org.springframework.extensions.surf.util.ParameterCheck;
 import org.alfresco.web.framework.ModelHelper;
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.site.RequestContext;

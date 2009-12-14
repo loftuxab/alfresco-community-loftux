@@ -29,7 +29,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
-import org.alfresco.util.URLEncoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 
 /**
  * Implementation of a WebScript Response object for WebScript Component type.

@@ -38,9 +38,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigService;
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigService;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;

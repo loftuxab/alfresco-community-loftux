@@ -42,8 +42,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.ScriptConfigModel;
 import org.alfresco.config.TemplateConfigModel;
-import org.alfresco.i18n.I18NUtil;
-import org.alfresco.util.StringBuilderWriter;
+import org.springframework.extensions.surf.util.I18NUtil;
+import org.springframework.extensions.surf.util.StringBuilderWriter;
 import org.alfresco.web.scripts.json.JSONWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

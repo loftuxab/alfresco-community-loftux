@@ -27,7 +27,7 @@ package org.alfresco.web.scripts.servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;

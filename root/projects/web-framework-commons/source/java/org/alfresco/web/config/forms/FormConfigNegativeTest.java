@@ -24,9 +24,9 @@
  */
 package org.alfresco.web.config.forms;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.xml.XMLConfigService;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
 
 /**

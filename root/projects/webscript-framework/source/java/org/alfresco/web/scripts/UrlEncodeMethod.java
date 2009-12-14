@@ -26,7 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.util.List;
 
-import org.alfresco.util.URLEncoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;

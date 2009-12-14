@@ -3,7 +3,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.event;
 
-import org.alfresco.i18n.I18NUtil;
+import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**

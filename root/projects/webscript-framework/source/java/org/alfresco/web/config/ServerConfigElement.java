@@ -26,9 +26,9 @@ package org.alfresco.web.config;
 
 import java.util.List;
 
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.ConfigException;
-import org.alfresco.config.element.ConfigElementAdapter;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.ConfigException;
+import org.springframework.extensions.config.element.ConfigElementAdapter;
 
 /**
  * @author David Caruana
@@ -60,7 +60,7 @@ public class ServerConfigElement extends ConfigElementAdapter implements ServerP
    }
    
    /**
-    * @see org.alfresco.config.element.ConfigElementAdapter#getChildren()
+    * @see org.springframework.extensions.config.element.ConfigElementAdapter#getChildren()
     */
    public List<ConfigElement> getChildren()
    {
@@ -68,7 +68,7 @@ public class ServerConfigElement extends ConfigElementAdapter implements ServerP
    }
    
    /**
-    * @see org.alfresco.config.element.ConfigElementAdapter#combine(org.alfresco.config.ConfigElement)
+    * @see org.springframework.extensions.config.element.ConfigElementAdapter#combine(org.alfresco.config.ConfigElement)
     */
    public ConfigElement combine(ConfigElement configElement)
    {

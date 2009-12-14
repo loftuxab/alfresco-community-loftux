@@ -34,7 +34,7 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Match;

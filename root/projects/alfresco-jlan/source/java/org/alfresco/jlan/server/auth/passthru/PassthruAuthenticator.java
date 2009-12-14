@@ -31,7 +31,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.server.SessionListener;
 import org.alfresco.jlan.server.SrvSession;

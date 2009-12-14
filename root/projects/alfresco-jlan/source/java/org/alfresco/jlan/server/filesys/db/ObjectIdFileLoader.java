@@ -58,7 +58,7 @@ import org.alfresco.jlan.server.filesys.loader.SingleFileRequest;
 import org.alfresco.jlan.util.NameValue;
 import org.alfresco.jlan.util.NameValueList;
 import org.alfresco.jlan.util.StringList;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Object Id File Loader Class

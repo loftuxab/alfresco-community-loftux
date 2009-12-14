@@ -41,7 +41,7 @@ import org.alfresco.jlan.server.filesys.loader.FileLoader;
 import org.alfresco.jlan.server.filesys.loader.FileRequestQueue;
 import org.alfresco.jlan.server.filesys.quota.QuotaManagerException;
 import org.alfresco.jlan.util.MemorySize;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Database Device Context Class

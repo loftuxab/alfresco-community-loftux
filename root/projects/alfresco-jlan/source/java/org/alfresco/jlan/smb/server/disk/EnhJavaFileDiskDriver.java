@@ -52,7 +52,7 @@ import org.alfresco.jlan.server.filesys.TreeConnection;
 import org.alfresco.jlan.server.locking.FileLockingInterface;
 import org.alfresco.jlan.server.locking.LockManager;
 import org.alfresco.jlan.smb.server.SMBSrvSession;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 
 /**

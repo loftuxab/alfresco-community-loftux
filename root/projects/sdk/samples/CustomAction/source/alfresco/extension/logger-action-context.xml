@@ -7,7 +7,7 @@
     <bean id="logger-action" class="org.alfresco.sample.LoggerActionExecuter" parent="action-executer"/>
    
    	<!-- Load the Logger Action Messages -->   
-   	<bean id="logger-action-messages" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+   	<bean id="logger-action-messages" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
     	<property name="resourceBundles">
     		<list>
     			<value>org.alfresco.sample.logger-action-messages</value>

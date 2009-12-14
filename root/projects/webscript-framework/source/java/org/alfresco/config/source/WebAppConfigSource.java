@@ -35,6 +35,8 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.config.source.BaseConfigSource;
+import org.springframework.extensions.config.source.FileConfigSource;
 import org.springframework.web.context.ServletContextAware;
 
 /**
@@ -80,7 +82,7 @@ public class WebAppConfigSource extends BaseConfigSource implements ServletConte
     }
 
     /**
-     * @see org.alfresco.config.source.BaseConfigSource#getInputStream(java.lang.String)
+     * @see org.springframework.extensions.config.source.BaseConfigSource#getInputStream(java.lang.String)
      */
     public InputStream getInputStream(String sourceString)
     {

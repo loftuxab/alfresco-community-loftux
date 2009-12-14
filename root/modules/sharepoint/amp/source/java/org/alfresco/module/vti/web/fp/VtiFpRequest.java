@@ -49,7 +49,7 @@ import org.alfresco.module.vti.metadata.model.DocMetaInfo;
 import org.alfresco.module.vti.metadata.model.DocsMetaInfo;
 import org.alfresco.module.vti.metadata.model.Document;
 import org.alfresco.module.vti.web.VtiRequestDispatcher;
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLDecoder;
 
 
 /**

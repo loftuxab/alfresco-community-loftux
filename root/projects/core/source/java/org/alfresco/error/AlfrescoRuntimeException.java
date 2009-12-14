@@ -27,7 +27,7 @@ package org.alfresco.error;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.alfresco.i18n.I18NUtil;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 /**
  * I18n'ed runtime exception thrown by Alfresco code.

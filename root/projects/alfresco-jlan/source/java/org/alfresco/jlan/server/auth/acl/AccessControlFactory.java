@@ -27,7 +27,7 @@ package org.alfresco.jlan.server.auth.acl;
 
 import java.util.Hashtable;
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Access Control Factoy Class

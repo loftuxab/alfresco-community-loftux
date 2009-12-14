@@ -70,11 +70,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.AbstractLifecycleBean;
-import org.alfresco.util.ISO8601DateFormat;
-import org.alfresco.util.Pair;
-import org.alfresco.util.ParameterCheck;
-import org.alfresco.util.PropertyCheck;
+import org.springframework.extensions.surf.util.AbstractLifecycleBean;
 import org.alfresco.util.PropertyMap;
 import org.alfresco.util.TempFileProvider;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -84,6 +80,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.extensions.surf.util.ISO8601DateFormat;
+import org.springframework.extensions.surf.util.Pair;
+import org.springframework.extensions.surf.util.ParameterCheck;
+import org.springframework.extensions.surf.util.PropertyCheck;
 
 /**
  * Records Management Audit Service Implementation.

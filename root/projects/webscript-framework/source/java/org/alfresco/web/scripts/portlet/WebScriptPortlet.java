@@ -39,7 +39,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Description;

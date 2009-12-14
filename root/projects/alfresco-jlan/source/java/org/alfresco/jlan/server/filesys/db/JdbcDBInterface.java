@@ -40,7 +40,7 @@ import org.alfresco.jlan.server.filesys.loader.SingleFileRequest;
 import org.alfresco.jlan.util.MemorySize;
 import org.alfresco.jlan.util.db.DBConnectionPool;
 import org.alfresco.jlan.util.db.DBConnectionPoolListener;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * JDBC Database Interface Abstract Class

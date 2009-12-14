@@ -29,7 +29,7 @@ import javax.servlet.Filter;
 import javax.servlet.http.HttpServlet;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.util.AbstractLifecycleBean;
+import org.springframework.extensions.surf.util.AbstractLifecycleBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Connector;
@@ -108,7 +108,7 @@ public class VtiServer extends AbstractLifecycleBean
 
    /**
     * Method starts the server.  
-    * @see org.alfresco.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
+    * @see org.springframework.extensions.surf.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
     */
    @Override
    protected void onBootstrap(ApplicationEvent event) 
@@ -138,7 +138,7 @@ public class VtiServer extends AbstractLifecycleBean
 
    /**
      * Method stops the server.  
-     * @see org.alfresco.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
+     * @see org.springframework.extensions.surf.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
      */
 	@Override
 	protected void onShutdown(ApplicationEvent event) 

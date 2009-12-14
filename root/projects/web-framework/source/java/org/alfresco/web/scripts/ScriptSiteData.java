@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
 import org.alfresco.tools.EncodingUtil;
-import org.alfresco.util.ParameterCheck;
+import org.springframework.extensions.surf.util.ParameterCheck;
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.framework.model.Chrome;
 import org.alfresco.web.framework.model.Component;

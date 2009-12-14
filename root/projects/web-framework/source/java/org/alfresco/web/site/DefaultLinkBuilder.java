@@ -26,7 +26,7 @@ package org.alfresco.web.site;
 
 import java.util.Map;
 
-import org.alfresco.util.URLEncoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 
 /**
  * @author muzquiano

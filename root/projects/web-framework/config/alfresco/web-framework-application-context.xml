@@ -8,7 +8,7 @@
    <!--                       -->
 
    <bean id="webframework.configsource"
-         class="org.alfresco.config.source.UrlConfigSource">
+         class="org.springframework.extensions.config.source.UrlConfigSource">
       <constructor-arg>
          <list>
             <!-- Web Script Framework -->
@@ -36,7 +36,7 @@
 
    <!-- override the web config bean -->
    <bean id="web.config"
-         class="org.alfresco.config.xml.XMLConfigService" init-method="init">
+         class="org.springframework.extensions.config.xml.XMLConfigService" init-method="init">
       <constructor-arg>
          <ref bean="webframework.configsource" />
       </constructor-arg>

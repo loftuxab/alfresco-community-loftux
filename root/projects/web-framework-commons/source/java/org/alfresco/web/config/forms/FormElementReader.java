@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.ConfigException;
-import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.ConfigException;
+import org.springframework.extensions.config.xml.elementreader.ConfigElementReader;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
@@ -63,7 +63,7 @@ class FormElementReader implements ConfigElementReader
     public static final String ELEMENT_SHOW = "show";
 
     /**
-     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
+     * @see org.springframework.extensions.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
      */
     public ConfigElement parse(Element formElement)
     {

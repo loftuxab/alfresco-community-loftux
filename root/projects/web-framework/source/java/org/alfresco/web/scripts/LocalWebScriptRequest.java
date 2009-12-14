@@ -28,7 +28,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.util.Content;
+import org.springframework.extensions.surf.util.Content;
 import org.alfresco.web.config.ServerProperties;
 
 /**

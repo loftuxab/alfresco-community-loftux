@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.element.ConfigElementAdapter;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.element.ConfigElementAdapter;
 import org.dom4j.Element;
 
 /**
@@ -104,7 +104,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.config.element.GenericConfigElement#combine(org.alfresco.config.ConfigElement)
+     * @see org.springframework.extensions.config.element.GenericConfigElement#combine(org.alfresco.config.ConfigElement)
      */
     public ConfigElement combine(ConfigElement element)
     {

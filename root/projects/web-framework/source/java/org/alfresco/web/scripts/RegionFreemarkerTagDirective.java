@@ -29,7 +29,7 @@ import java.util.Map;
 
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
-import org.alfresco.util.StringBuilderWriter;
+import org.springframework.extensions.surf.util.StringBuilderWriter;
 import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.site.taglib.RegionTag;
 

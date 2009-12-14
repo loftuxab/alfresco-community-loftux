@@ -35,7 +35,7 @@ import org.alfresco.jlan.server.filesys.FileInfo;
 import org.alfresco.jlan.server.filesys.FileOpenParams;
 import org.alfresco.jlan.smb.server.ntfs.StreamInfo;
 import org.alfresco.jlan.smb.server.ntfs.StreamInfoList;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 
 /**

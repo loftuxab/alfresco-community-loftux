@@ -4,7 +4,7 @@
 <beans>
    
    <!-- Override WebScript Messages - add slingshot application messages -->
-   <bean id="webscripts.resources" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+   <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
          <list>
             <value>alfresco.messages.webscripts</value>
@@ -14,7 +14,7 @@
       </property>
    </bean>
    
-   <bean id="dod5015.custom.config" class="org.alfresco.config.ConfigBootstrap" init-method="register">
+   <bean id="dod5015.custom.config" class="org.springframework.extensions.config.ConfigBootstrap" init-method="register">
       <property name="configService" ref="web.config" />
       <property name="configs">
          <list>

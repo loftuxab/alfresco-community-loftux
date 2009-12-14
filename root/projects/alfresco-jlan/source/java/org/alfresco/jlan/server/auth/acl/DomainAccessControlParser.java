@@ -25,7 +25,7 @@
 
 package org.alfresco.jlan.server.auth.acl;
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Domain Name Access Control Parser Class

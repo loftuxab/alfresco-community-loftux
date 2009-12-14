@@ -121,7 +121,7 @@
     
     <!-- Event types -->
     
-    <bean id="rmEventResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+    <bean id="rmEventResourceBundles" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
         <property name="resourceBundles">
             <list>
                 <value>alfresco.module.org_alfresco_module_dod5015.rm-events</value>

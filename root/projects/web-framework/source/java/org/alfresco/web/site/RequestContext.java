@@ -356,7 +356,7 @@ public interface RequestContext extends Serializable
      * 
      * @return content
      */
-    public org.alfresco.util.Content getRequestContent();
+    public org.springframework.extensions.surf.util.Content getRequestContent();
     
     /**
      * Returns the HTTP Servlet Request bound to this request

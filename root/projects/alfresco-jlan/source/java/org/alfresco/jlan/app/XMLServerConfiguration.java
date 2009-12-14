@@ -36,7 +36,7 @@ import org.alfresco.jlan.ftp.FTPSiteInterface;
 import org.alfresco.jlan.ftp.InvalidPathException;
 import org.alfresco.jlan.oncrpc.nfs.NFSConfigSection;
 import org.alfresco.jlan.server.config.InvalidConfigurationException;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

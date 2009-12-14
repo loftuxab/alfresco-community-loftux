@@ -25,7 +25,7 @@
 
 package org.alfresco.jlan.server.core;
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * <p>The device context is passed to the methods of a device interface. Each shared device has a

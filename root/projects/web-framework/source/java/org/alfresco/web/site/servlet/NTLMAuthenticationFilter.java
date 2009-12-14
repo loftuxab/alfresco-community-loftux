@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.ConnectorService;
@@ -51,7 +51,7 @@ import org.alfresco.jlan.server.auth.ntlm.NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type1NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type2NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type3NTLMMessage;
-import org.alfresco.util.Base64;
+import org.springframework.extensions.surf.util.Base64;
 import org.alfresco.util.log.NDC;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.framework.model.Page;

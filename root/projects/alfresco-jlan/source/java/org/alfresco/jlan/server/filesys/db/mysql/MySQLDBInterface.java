@@ -79,7 +79,7 @@ import org.alfresco.jlan.util.MemorySize;
 import org.alfresco.jlan.util.StringList;
 import org.alfresco.jlan.util.WildCard;
 import org.alfresco.jlan.util.db.DBConnectionPool;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * mySQL Database Interface Class

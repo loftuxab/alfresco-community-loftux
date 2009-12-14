@@ -30,9 +30,9 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;

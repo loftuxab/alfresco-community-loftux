@@ -34,8 +34,8 @@ import java.util.List;
 
 import javax.net.ssl.KeyManagerFactory;
 
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.element.ConfigElementAdapter;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.element.ConfigElementAdapter;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.apache.abdera.protocol.client.util.ClientAuthSSLProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -78,7 +78,7 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.config.element.GenericConfigElement#combine(org.alfresco.config.ConfigElement)
+     * @see org.springframework.extensions.config.element.GenericConfigElement#combine(org.alfresco.config.ConfigElement)
      */
     public ConfigElement combine(ConfigElement element)
     {

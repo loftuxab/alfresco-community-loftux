@@ -25,7 +25,7 @@
 
 package org.alfresco.jlan.debug;
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Debug Output Interface

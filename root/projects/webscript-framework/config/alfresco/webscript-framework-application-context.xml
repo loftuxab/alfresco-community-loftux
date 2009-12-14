@@ -7,7 +7,7 @@
    <!--  Configuration  -->
    <!--                 -->
    
-   <bean id="web.configsource" class="org.alfresco.config.source.UrlConfigSource">
+   <bean id="web.configsource" class="org.springframework.extensions.config.source.UrlConfigSource">
       <constructor-arg>
          <list>
             <value>classpath:alfresco/webscript-framework-config.xml</value>
@@ -17,7 +17,7 @@
       </constructor-arg>
    </bean>
    
-   <bean id="web.config" class="org.alfresco.config.xml.XMLConfigService">
+   <bean id="web.config" class="org.springframework.extensions.config.xml.XMLConfigService">
        <constructor-arg>
          <ref bean="web.configsource" />
       </constructor-arg>
@@ -163,7 +163,7 @@
    <!--  Web Script Messages -->
    <!--                      -->
 
-   <bean id="webscripts.resources" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+   <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
          <list>
             <value>alfresco.messages.webscripts</value>

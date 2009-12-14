@@ -26,6 +26,7 @@ package org.alfresco.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.config.ConfigService;
 
 /**
  * Model representation of configuration for use in scripts.

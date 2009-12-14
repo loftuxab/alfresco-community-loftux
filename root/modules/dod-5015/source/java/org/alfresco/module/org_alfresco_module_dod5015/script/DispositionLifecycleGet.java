@@ -36,7 +36,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.util.ISO8601DateFormat;
+import org.springframework.extensions.surf.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;

@@ -4,7 +4,7 @@
 <beans>
 
    <bean id="webframework.configsource"
-         class="org.alfresco.config.source.UrlConfigSource">
+         class="org.springframework.extensions.config.source.UrlConfigSource">
       <constructor-arg>
          <list>
          

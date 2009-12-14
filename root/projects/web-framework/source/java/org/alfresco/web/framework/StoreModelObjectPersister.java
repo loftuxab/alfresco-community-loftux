@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.tools.XMLUtil;
-import org.alfresco.util.ReflectionHelper;
+import org.springframework.extensions.surf.util.ReflectionHelper;
 import org.alfresco.web.framework.cache.ModelObjectCache;
 import org.alfresco.web.framework.cache.ModelObjectCache.ModelObjectSentinel;
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;

@@ -28,7 +28,7 @@ package org.alfresco.jlan.ftp;
 import java.io.IOException;
 
 import org.alfresco.jlan.server.config.ServerConfiguration;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * FTP SITE Command Interface

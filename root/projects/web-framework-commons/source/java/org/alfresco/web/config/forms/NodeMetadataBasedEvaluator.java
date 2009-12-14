@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.config.evaluator.Evaluator;
+import org.springframework.extensions.config.evaluator.Evaluator;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.Response;
@@ -66,7 +66,7 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
      * Determines whether the given node type matches the path of the given
      * object
      * 
-     * @see org.alfresco.config.evaluator.Evaluator#applies(java.lang.Object,
+     * @see org.springframework.extensions.config.evaluator.Evaluator#applies(java.lang.Object,
      *      java.lang.String)
      */
     public boolean applies(Object obj, String condition)

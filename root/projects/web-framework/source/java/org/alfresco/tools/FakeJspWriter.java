@@ -31,7 +31,7 @@ import java.io.Writer;
 
 import javax.servlet.jsp.JspWriter;
 
-import org.alfresco.util.StringBuilderWriter;
+import org.springframework.extensions.surf.util.StringBuilderWriter;
 
 /**
  * akeJspWriter.

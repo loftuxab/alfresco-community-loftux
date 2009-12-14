@@ -141,7 +141,7 @@ public class AtomService
      * @param entry
      * @return
      */
-    public Element toAtom(org.alfresco.util.Content atom)
+    public Element toAtom(org.springframework.extensions.surf.util.Content atom)
     {
         return abderaService.parse(atom.getInputStream(), null);
     }
@@ -163,7 +163,7 @@ public class AtomService
      * @param entry
      * @return
      */
-    public Service toService(org.alfresco.util.Content entry)
+    public Service toService(org.springframework.extensions.surf.util.Content entry)
     {
         return abderaService.parseService(entry.getInputStream(), null);
     }
@@ -185,7 +185,7 @@ public class AtomService
      * @param entry
      * @return
      */
-    public Entry toEntry(org.alfresco.util.Content entry)
+    public Entry toEntry(org.springframework.extensions.surf.util.Content entry)
     {
         return abderaService.parseEntry(entry.getInputStream(), null);
     }
@@ -207,7 +207,7 @@ public class AtomService
      * @param feed
      * @return
      */
-    public Feed toFeed(org.alfresco.util.Content feed)
+    public Feed toFeed(org.springframework.extensions.surf.util.Content feed)
     {
         return abderaService.parseFeed(feed.getInputStream(), null);
     }

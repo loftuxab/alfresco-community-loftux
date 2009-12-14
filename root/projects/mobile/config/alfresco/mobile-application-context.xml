@@ -4,7 +4,7 @@
 <beans>
    
    <!-- Override WebScript Messages - add Mobile application messages -->
-   <bean id="webscripts.resources" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+   <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
          <list>
             <value>alfresco.messages.webscripts</value>

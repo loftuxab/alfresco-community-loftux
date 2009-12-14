@@ -7,7 +7,7 @@
    <!--  Test Server -->
    <!--              -->
       
-   <bean id="web.configsource" class="org.alfresco.config.source.UrlConfigSource">
+   <bean id="web.configsource" class="org.springframework.extensions.config.source.UrlConfigSource">
       <constructor-arg>
          <list>
             <value>classpath:alfresco/webscript-framework-config.xml</value>

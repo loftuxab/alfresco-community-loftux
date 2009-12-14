@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.AlfrescoAuthenticator;
 import org.alfresco.connector.ConnectorSession;
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.framework.exception.ContentLoaderException;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;

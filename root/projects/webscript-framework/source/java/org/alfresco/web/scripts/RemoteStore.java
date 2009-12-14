@@ -46,7 +46,7 @@ import org.alfresco.connector.Response;
 import org.alfresco.connector.exception.ConnectorProviderException;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.util.URLEncoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -28,11 +28,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.util.Content;
+import org.springframework.extensions.surf.util.Content;
 
 
 /**
- * Convert request stream to class org.alfresco.util.Content
+ * Convert request stream to class org.springframework.extensions.surf.util.Content
  * 
  * @author davidc
  */ 

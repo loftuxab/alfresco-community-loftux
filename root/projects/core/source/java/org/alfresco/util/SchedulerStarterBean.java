@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.extensions.surf.util.AbstractLifecycleBean;
 
 public class SchedulerStarterBean extends AbstractLifecycleBean
 {

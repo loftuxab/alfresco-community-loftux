@@ -26,7 +26,7 @@
 package org.alfresco.jlan.server.auth.acl;
 
 import org.alfresco.jlan.util.IPAddress;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Ip Address Access Control Parser Class

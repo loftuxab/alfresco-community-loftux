@@ -24,7 +24,7 @@
  */
 package org.alfresco.connector;
 
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.connector.exception.CredentialVaultProviderException;
 
 /**

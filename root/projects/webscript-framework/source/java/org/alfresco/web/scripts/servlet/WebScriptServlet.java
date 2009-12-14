@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigService;
-import org.alfresco.i18n.I18NUtil;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigService;
+import org.springframework.extensions.surf.util.I18NUtil;
 import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.RuntimeContainer;
