@@ -6,7 +6,7 @@
 <@templateBody>
    <div id="alflogin" class="login-panel">
       <div class="login-logo"></div>
-      <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/login" onsubmit="return alfLogin();">
+      <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/page/dologin" onsubmit="return alfLogin();">
          <fieldset>
             <div style="padding-top:96px">
                <label id="txt-username" for="username"></label>
@@ -29,7 +29,7 @@
                </span>
             </div>
             <input type="hidden" id="success" name="success" value="${successUrl}"/>
-            <input type="hidden" name="failure" value="<#assign link><@pagelink pageType='login'/></#assign>${url.servletContext}${link?html}&amp;error=true"/>
+            <input type="hidden" name="failure" value="<#assign link>${url.context}/page/type/login</#assign>${link?html}?error=true"/>
          </fieldset>
       </form>
    </div>

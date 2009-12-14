@@ -44,7 +44,7 @@
          <#if !user.isGuest>
          <span class="menu-item-separator">&nbsp;</span>
          <#if !context.externalAuthentication>
-         <span class="menu-item"><a href="${url.context}/logout" title="${msg("link.logout.tooltip", user.name?html)}">${msg("link.logout")}</a></span>
+         <span class="menu-item"><a href="${url.context}/page/dologout" title="${msg("link.logout.tooltip", user.name?html)}">${msg("link.logout")}</a></span>
          <span class="menu-item-separator">&nbsp;</span>
          </#if>
          <span class="menu-item">

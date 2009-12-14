@@ -1,8 +1,0 @@
-<webscript kind="site">
-  <shortname>Web Studio Fetch for Webapps</shortname>
-  <description>Web Studio Fetch for Webapps</description>
-  <url>/api/resources/webapp/{path}</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

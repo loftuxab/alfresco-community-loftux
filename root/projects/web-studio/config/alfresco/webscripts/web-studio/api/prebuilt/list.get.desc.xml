@@ -1,8 +1,0 @@
-<webscript kind="site">
-  <shortname>Prebuilt Listing</shortname>
-  <description>Prebuild Listing</description>
-  <url>/api/prebuilt/list</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

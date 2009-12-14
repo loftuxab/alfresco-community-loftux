@@ -3,28 +3,65 @@
 
 <beans>
    
-   <bean id="share.custom.config" class="org.springframework.extensions.config.ConfigBootstrap" init-method="register">
-      <property name="configService" ref="web.config" />
-      <property name="configs">
+   <!-- Override the config source to include Web Framework Commons and Share config -->
+   <bean id="webframework.configsource" class="org.springframework.extensions.config.source.UrlConfigSource">
+      <constructor-arg>
          <list>
+            <!-- Spring Web Scripts -->
+            <value>classpath:org/springframework/extensions/webscripts/spring-webscripts-config.xml</value>
+            <value>classpath:META-INF/spring-webscripts-config-custom.xml</value>
+            <value>jar:*!/META-INF/spring-webscripts-config-custom.xml</value>
+            
+            <!-- Spring Surf -->
+            <value>classpath:org/springframework/extensions/surf/spring-surf-config.xml</value>
+            <value>classpath:org/springframework/extensions/surf/spring-surf-config-remote.xml</value>
+            <value>classpath:META-INF/spring-surf-config-custom.xml</value>
+            <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
+            
+            <!-- Web Framework Commons -->
+            <value>classpath:alfresco/web-framework-config-commons.xml</value>
+            
+            <!-- Share custom config -->
             <value>classpath:alfresco/web-extension/share-config-custom.xml</value>
+            
+            <!-- Surf Autowire Support -->
+            <value>webapp:WEB-INF/surf.xml</value>
          </list>
-      </property>
+      </constructor-arg>
    </bean>
-    
+   
    <!-- Override WebScript Messages - add slingshot application messages -->
    <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
          <list>
-            <value>alfresco.messages.webscripts</value>
+            <value>webscripts.messages.webscripts</value>
             <value>alfresco.messages.slingshot</value>
          </list>
       </property>
    </bean>
    
+   <!-- Override Web Framework Abstract Handler Mappings -->
+   <bean id="webframeworkHandlerMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" abstract="true">
+      <property name="interceptors">
+         <list>
+            <ref bean="requestContextInterceptor"/>
+            <ref bean="themeInterceptor"/>
+         </list>
+      </property>
+      <property name="mappings">
+         <value>
+            /system/**=remoteController
+            /proxy/**=endpointController
+            /resource/**=resourceController
+            /dologin/**=loginController
+            /dologout/**=logoutController
+         </value>
+      </property>
+   </bean>
+   
    <!-- Override and configure the remote store for Slingshot -->
    <!-- Point to a specific store on the Alfresco instance -->
-   <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
+   <bean id="webframework.store.remote.abstract" parent="webscripts.remotestore" abstract="true" init-method="init">
       <property name="endpoint">
          <value>alfresco</value>
       </property>
@@ -34,164 +71,50 @@
       <property name="storeId">
          <value>sitestore</value>
       </property>
+      <property name="webappPathPrefix">
+         <value></value>
+      </property>
       <property name="connectorService" ref="connector.service" />
-      <property name="connectorProvider" ref="webframework.connector.provider" />      
+      <property name="connectorProvider" ref="webframework.connector.provider" />
    </bean>
    
+   <bean id="webframework.slingshot.persister.remote" class="org.springframework.extensions.surf.persister.PathStoreObjectPersister" parent="webframework.sitedata.persister.abstract">
+      <property name="store" ref="webframework.webapp.store.remote" />
+      <property name="pathPrefix"><value>alfresco/site-data/${objectTypeIds}</value></property>
+   </bean>
    
-   <!-- uncomment this section (or override bean def in custom app context) for remote component deploy -->
-   <!-- Override WebScripts searchpath - to include remote store -->
-   <!--
-   <bean id="webframework.searchpath" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
+   <!-- Surf Model Object Persisters -->
+   <bean id="webframework.objects.persister" class="org.springframework.extensions.surf.persister.MultiObjectPersister">
+      <property name="serviceRegistry" ref="webframework.service.registry" />
+      <property name="persisters">
          <list>
-            <ref bean="webframework.remotestore.webscripts" />
-            <ref bean="webframework.store.webscripts.custom" />
-            <ref bean="webframework.store.webscripts" />
-            <ref bean="webscripts.store" />
+            <!-- Slingshot remote store persisters -->
+            <ref bean="webframework.slingshot.persister.remote" />
+            
+            <!-- Alfresco Legacy Persisters -->
+            <ref bean="webframework.sitedata.persister.classpath.alfresco-custom" />
+            <ref bean="webframework.sitedata.persister.alfresco-classpath" />
+            
+            <!-- Classpath Persister -->
+            <ref bean="webframework.sitedata.persister.classpath" />
+            
+            <!-- System Persister -->
+            <ref bean="webframework.sitedata.persister.system" />
          </list>
       </property>
-   </bean>
-   -->
-   
-   <!-- uncomment this section (or override bean def in custom app context) for remote component deploy -->
-   <!-- Override Templates and Scripts searchpath - to include remote store -->
-   <!--
-   <bean id="webframework.templates.searchpath" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-            <ref bean="webframework.remotestore.webscripts" />
-            <ref bean="webframework.store.webscripts.custom" />
-            <ref bean="webframework.store.system-templates" />
-            <ref bean="webframework.store.templates" />
-            <ref bean="webframework.store.webscripts" />
-         </list>
-      </property>
-   </bean>
-   -->
-   
-   <!-- Override of all model object search paths - to include remote store -->
-   <bean id="webframework.searchpath.chrome" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.chrome" />
-         	<ref bean="webframework.classpathstore.chrome.custom" />
-            <ref bean="webframework.classpathstore.chrome" />
-         </list>
+      <property name="defaultPersister">
+         <ref bean="webframework.slingshot.persister.remote" />
       </property>
    </bean>
    
-   <bean id="webframework.searchpath.component" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.component" />
-         	<ref bean="webframework.classpathstore.component.custom" />
-            <ref bean="webframework.classpathstore.component" />
-         </list>
-      </property>
-   </bean>
+   <!-- Slingshot Factory beans -->
+   <bean id="webframework.factory.pagemapper.slingshot" class="org.alfresco.web.site.SlingshotPageMapperFactory" parent="webframework.factory.base" />
+   <bean id="webframework.factory.user.slingshot" class="org.alfresco.web.site.SlingshotUserFactory" parent="webframework.factory.base" />
    
-   <bean id="webframework.searchpath.componenttype" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.componenttype" />
-         	<ref bean="webframework.classpathstore.componenttype.custom" />
-            <ref bean="webframework.classpathstore.componenttype" />
-         </list>
-      </property>
-   </bean>
+   <!-- "no-component" processor -->
+   <bean id="webframework.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
    
-   <bean id="webframework.searchpath.configuration" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.configuration" />
-         	<ref bean="webframework.classpathstore.configuration.custom" />
-            <ref bean="webframework.classpathstore.configuration" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.searchpath.contentassociation" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.contentassociation" />
-         	<ref bean="webframework.classpathstore.contentassociation.custom" />
-            <ref bean="webframework.classpathstore.contentassociation" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.searchpath.page" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.page" />
-         	<ref bean="webframework.classpathstore.page.custom" />
-            <ref bean="webframework.classpathstore.page" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.searchpath.pageassociation" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.pageassociation" />
-         	<ref bean="webframework.classpathstore.pageassociation.custom" />
-            <ref bean="webframework.classpathstore.pageassociation" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.searchpath.pagetype" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.pagetype" />
-         	<ref bean="webframework.classpathstore.pagetype.custom" />
-			   <ref bean="webframework.classpathstore.pagetype" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.searchpath.templateinstance" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-         	<ref bean="webframework.remotestore.templateinstance" />
-         	<ref bean="webframework.classpathstore.templateinstance.custom" />
-			   <ref bean="webframework.classpathstore.templateinstance" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.searchpath.templatetype" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-	         <ref bean="webframework.remotestore.templatetype" />
-	         <ref bean="webframework.classpathstore.templatetype.custom" />
-            <ref bean="webframework.classpathstore.templatetype" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.searchpath.theme" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-            <ref bean="webframework.remotestore.theme" />
-            <ref bean="webframework.classpathstore.theme.custom" />
-            <ref bean="webframework.classpathstore.theme" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="webframework.presets.searchpath" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-            <ref bean="webframework.remotestore.presets" />
-            <ref bean="webframework.classpathstore.presets.custom" />
-            <ref bean="webframework.classpathstore.presets" />
-         </list>
-      </property>
-   </bean>
-   
-   <!-- Slingshot "no-component" processor -->
-   <bean id="webframework.processor.nocomponent" class="org.alfresco.web.site.EmptyRegionRenderer" />   
+   <!-- override the view resolver to handle Slingshot template URI driven page IDs -->
+   <bean id="pageViewResolver" class="org.alfresco.web.site.SlingshotPageViewResolver" parent="abstractWebFrameworkViewResolver" />
    
 </beans>

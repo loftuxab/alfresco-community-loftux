@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Remove Content Association Wizard</shortname>
-  <description>Remove Content Association Wizard</description>
-  <url>/wizard/content/associations/remove</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

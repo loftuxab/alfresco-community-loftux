@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Content Tree Functions</shortname>
-  <description>Content Tree Functions</description>
-  <url>/tree/content</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

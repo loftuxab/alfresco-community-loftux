@@ -243,9 +243,6 @@
                                virtual_alf.bat" />
          <zipfileset dir="${dir.project.installer}/extras-wcm" 
                      prefix="extras/wcm" />
-         <zipfileset dir="${dir.project.webstudio.dist}"
-                     includes="${file.name.war.webstudio}"
-                     fullpath="tomcat/webapps/${file.name.war.webstudio}.off" />
       </zip>
    </target>
 
@@ -269,9 +266,6 @@
                      mode="755" />
          <tarfileset dir="${dir.project.installer}/extras-wcm"
                      prefix="extras/wcm" />
-         <tarfileset dir="${dir.project.webstudio.dist}"
-                     includes="${file.name.war.webstudio}"
-                     fullpath="tomcat/webapps/${file.name.war.webstudio}.off" />
       </tar>
    </target>
 

@@ -128,6 +128,10 @@
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-lang-2.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-logging-1.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-pool-1.4.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-core-1.0.0.CI-SNAPSHOT.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-core-configservice-1.0.0.CI-SNAPSHOT.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/devenv/mysql-connector-java-5.1.7-bin.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/j2ee/servlet.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/mockito-all-1.8.0.jar" />
@@ -343,8 +347,7 @@
                     incremental-webframework,
                     incremental-webframeworkcommons,
                     incremental-slingshot,
-                    incremental-mobile,
-                    incremental-webstudio" />
+                    incremental-mobile" />
 
    <target name="build-modules"
            description="Performs a clean build of all modules"
@@ -431,46 +434,18 @@
                    deploy-mobile-tomcat-exploded,
                    minimize-mobile-deployed-javascript" />
 
-   <target name="incremental-slingshot-tomcat" 
+   <target name="incremental-slingshot-tomcat"
            description="Performs an incremental build and deployment of the slingshot WAR"
-           depends="incremental-core, 
-                    package-webscriptframework-jar, 
-                    package-webframework-jar, 
-                    package-webframeworkcommons-jar,
+           depends="package-webframeworkcommons-jar,
                     incremental-slingshot,
                     deploy-slingshot-tomcat" />
 
-   <target name="incremental-slingshot-tomcat-exploded" 
-           depends="incremental-core, 
-                    package-webscriptframework-jar, 
-                    package-webframework-jar, 
-                    package-webframeworkcommons-jar,
+   <target name="incremental-slingshot-tomcat-exploded"
+           depends="package-webframeworkcommons-jar,
                     package-slingshot-jar,
                     deploy-slingshot-tomcat-exploded,
                     minimize-slingshot-deployed-javascript" />
 
-   <target name="incremental-webstudio-tomcat" 
-           description="Performs an incremental build and deployment of the webstudio WAR"
-           depends="clean-surf,
-                    incremental-core, 
-                    package-webscriptframework-jar, 
-                    package-webframework-jar,
-                    package-webframeworkcommons-jar,
-                    incremental-webstudio,
-                    deploy-webstudio-tomcat" />
-   
-   <!--
-   <target name="build-jboss" 
-           description="Performs a clean build for JBoss and deploys the WAR file"
-           depends="clean, 
-                    incremental-jboss" />
-
-   <target name="incremental-jboss" 
-           description="Performs an incremental build for JBoss and deploys the WAR file"
-           depends="package-webclient-war-jboss, 
-                    deploy-jboss" />
-   -->
-   
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"
            depends="generate-javadocs-core, 
@@ -504,8 +479,7 @@
            depends="clean-webclient-projects,
                     clean-slingshot-projects,
                     clean-mobile-projects,
-                    clean-webserviceclient,
-                    clean-webstudio" />
+                    clean-webserviceclient" />
                     
    <target name="clean-webclient-projects" 
            description="Cleans all projects related to the webclient project" 
@@ -524,10 +498,7 @@
                     
    <target name="clean-slingshot-projects" 
            description="Cleans all projects related to the slingshot project" 
-           depends="clean-core,
-                    clean-webscriptframework,
-                    clean-webframework,
-                    clean-webframeworkcommons,
+           depends="clean-webframeworkcommons,
                     clean-slingshot" />
                     
    <target name="clean-mobile-projects" 
@@ -568,12 +539,6 @@
    <target name="clean-application-tomcat-deploy" 
            description="Cleans all apps from the application Tomcat server" 
            depends="init">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webscriptframework}" />
-      <delete dir="${dir.deploy.tomcat.application.webscriptframework}" 
-              includeEmptyDirs="true" quiet="yes" />
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframework}" />
-      <delete dir="${dir.deploy.tomcat.application.webframework}" 
-              includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframeworkcommons}" />
       <delete dir="${dir.deploy.tomcat.application.webframeworkcommons}" 
               includeEmptyDirs="true" quiet="yes" />
@@ -582,9 +547,6 @@
               includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.mobile}" />
       <delete dir="${dir.deploy.tomcat.application.mobile}" 
-              includeEmptyDirs="true" quiet="yes" />
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webstudio}" />
-      <delete dir="${dir.deploy.tomcat.application.webstudio}" 
               includeEmptyDirs="true" quiet="yes" />
    </target>
 
@@ -729,6 +691,7 @@
          <fileset dir="${dir.project.3rdparty.lib}/openoffice" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jmagick" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jgroups" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jbpm" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/fop" includes="*.jar"/>
@@ -807,8 +770,6 @@
       </copy>
       <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
       <!-- copy config files, ensuring slingshot project files are copied first -->
@@ -816,9 +777,6 @@
          <fileset dir="${dir.project.slingshot.config}" excludes="**/extension/**" />
       </copy>
       <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
-         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
          <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
       </copy>
       
@@ -827,10 +785,7 @@
          <fileset dir="${dir.project.slingshot.classes}" />
       </copy>
       <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.core.classes}" />
          <fileset dir="${dir.project.jlan.classes}" />
-         <fileset dir="${dir.project.webscriptframework.classes}" />
-         <fileset dir="${dir.project.webframework.classes}" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" />
       </copy>
       
@@ -842,6 +797,8 @@
                  includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
@@ -926,6 +883,8 @@
                  includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
@@ -951,17 +910,6 @@
          <mapper type="glob" from="*.js" to="*-min.js"/>
       </apply>
    </target>
-   
-   <target name="deploy-webstudio-tomcat" depends="init" 
-           description="Deploys the web studio WAR to the application Tomcat server">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webstudio}" />
-      <delete dir="${dir.deploy.tomcat.application.webstudio}" 
-              includeEmptyDirs="true" quiet="yes" />
-
-      <!-- copy the web studio WAR file to application Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.application}" 
-            file="${dir.project.webstudio.dist}/${file.name.war.webstudio}" />
-   </target>   
 
    <target name="start-tomcat-webclient" 
            description="Starts the Alfresco Tomcat server on Windows" 

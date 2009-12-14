@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>In-Context Component Functions</shortname>
-  <description>In-Context Component Functions</description>
-  <url>/incontext/components</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

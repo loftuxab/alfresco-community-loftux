@@ -29,15 +29,22 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorContext;
-import org.alfresco.connector.HttpMethod;
-import org.alfresco.connector.Response;
-import org.alfresco.connector.exception.ConnectorServiceException;
+import org.springframework.extensions.surf.FrameworkUtil;
+import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.WebFrameworkManager;
+import org.springframework.extensions.surf.exception.ConnectorServiceException;
+import org.springframework.extensions.surf.exception.UserFactoryException;
+import org.springframework.extensions.surf.site.AlfrescoUser;
+import org.springframework.extensions.surf.site.AuthenticationUtil;
+import org.springframework.extensions.surf.support.AlfrescoUserFactory;
+import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.surf.util.StringBuilderWriter;
-import org.alfresco.web.scripts.Status;
-import org.alfresco.web.scripts.json.JSONWriter;
-import org.alfresco.web.site.exception.UserFactoryException;
+import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.connector.Connector;
+import org.springframework.extensions.webscripts.connector.ConnectorContext;
+import org.springframework.extensions.webscripts.connector.HttpMethod;
+import org.springframework.extensions.webscripts.connector.Response;
+import org.springframework.extensions.webscripts.json.JSONWriter;
 
 /**
  * Slingshot User Factory makes use of the slingshot REST API to persist
@@ -126,7 +133,7 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
             
             writer.endObject();
             
-            Connector conn = FrameworkHelper.getConnector(context, ALFRESCO_ENDPOINT_ID);
+            Connector conn = FrameworkUtil.getConnector(context, ALFRESCO_ENDPOINT_ID);
             ConnectorContext c = new ConnectorContext(HttpMethod.POST);
             c.setContentType("application/json");
             Response res = conn.call("/slingshot/profile/userprofile", c,

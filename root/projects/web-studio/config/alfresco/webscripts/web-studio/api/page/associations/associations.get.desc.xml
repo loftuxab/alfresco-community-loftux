@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Get Page Template Associations</shortname>
-  <description>Get Page Template Associations</description>
-  <url>/api/page/associations</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

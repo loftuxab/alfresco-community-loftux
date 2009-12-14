@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Spaces Tree</shortname>
-  <description>Spaces Tree</description>
-  <url>/tree/spaces</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

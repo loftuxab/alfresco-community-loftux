@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Add Child Navigation Node Wizard</shortname>
-  <description>Add Child Navigation Node Wizard</description>
-  <url>/wizard/navigation/add</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Navigation Properties Wizard</shortname>
-  <description>Navigation Properties Wizard</description>
-  <url>/wizard/navigation/edit</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

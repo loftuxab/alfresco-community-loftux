@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Delete a Row from a Table Layout Type Template</shortname>
-  <description>Delete a Row from a Table Layout Type Template</description>
-  <url>/api/template/tablelayout/row/delete/get</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

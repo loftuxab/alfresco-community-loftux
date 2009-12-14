@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Create Site</shortname>
-  <description>Create Site</description>
-  <url>/api/site/create</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

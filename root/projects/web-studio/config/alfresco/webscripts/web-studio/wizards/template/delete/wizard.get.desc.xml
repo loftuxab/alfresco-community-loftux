@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Remove Template Wizard</shortname>
-  <description>Remove Template Wizard</description>
-  <url>/wizard/template/remove</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

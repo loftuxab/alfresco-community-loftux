@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Login</shortname>
-  <description>Login</description>
-  <url>/api/login</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

@@ -24,8 +24,10 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.web.site.exception.UserFactoryException;
+import org.springframework.extensions.surf.FrameworkUtil;
+import org.springframework.extensions.surf.exception.PlatformRuntimeException;
+import org.springframework.extensions.surf.exception.UserFactoryException;
+import org.springframework.extensions.surf.site.AlfrescoUser;
 
 /**
  * User object extended to provide persistence back to an Alfresco repo.
@@ -67,11 +69,11 @@ public class SlingshotUser extends AlfrescoUser
     {
         try
         {
-            ((SlingshotUserFactory)FrameworkHelper.getUserFactory()).saveUser(this);
+            ((SlingshotUserFactory)FrameworkUtil.getServiceRegistry().getUserFactory()).saveUser(this);
         }
         catch (UserFactoryException err)
         {
-            throw new AlfrescoRuntimeException("Unable to save user details: " + err.getMessage(), err);
+            throw new PlatformRuntimeException("Unable to save user details: " + err.getMessage(), err);
         }
     }
 }

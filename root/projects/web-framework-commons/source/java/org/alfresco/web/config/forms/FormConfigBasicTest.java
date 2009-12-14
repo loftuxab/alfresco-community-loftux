@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.util.BaseTest;
 import org.springframework.extensions.config.Config;
 import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.ConfigException;
 import org.springframework.extensions.config.xml.XMLConfigService;
-import org.alfresco.util.BaseTest;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in the web client

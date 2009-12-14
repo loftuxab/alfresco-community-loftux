@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Alfresco Web Studio Importer</shortname>
-  <description>Alfresco Web Studio Importer</description>
-  <url>/api/importer</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Table Layout Region Manager</shortname>
-  <description>Table Layout Region Manager</description>
-  <url>/wizard/regionmanager/tablelayout</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

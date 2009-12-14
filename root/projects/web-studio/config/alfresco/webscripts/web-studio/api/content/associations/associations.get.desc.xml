@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Get Content Associations</shortname>
-  <description>Get Content Associations</description>
-  <url>/api/content/associations</url>
-  <format default="html">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

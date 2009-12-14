@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Copy Page Wizard</shortname>
-  <description>Copy Page Wizard</description>
-  <url>/wizard/navigation/copy</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

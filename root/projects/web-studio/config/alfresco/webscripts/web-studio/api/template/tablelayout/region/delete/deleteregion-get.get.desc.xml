@@ -1,8 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Delete a Table Layout Type Region</shortname>
-  <description>Delete a Table Layout Type Region</description>
-  <url>/api/template/tablelayout/region/delete/get</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>
