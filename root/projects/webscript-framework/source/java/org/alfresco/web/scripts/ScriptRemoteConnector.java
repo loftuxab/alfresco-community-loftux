@@ -34,7 +34,7 @@ import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.i18n.I18NUtil;
+import org.springframework.extensions.surf.util.I18NUtil;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -61,7 +61,7 @@ import org.alfresco.jlan.server.filesys.loader.MemorySegmentList;
 import org.alfresco.jlan.server.filesys.loader.MultipleFileRequest;
 import org.alfresco.jlan.server.filesys.loader.SingleFileRequest;
 import org.alfresco.jlan.util.MemorySize;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Database File Data Loader Class

@@ -38,8 +38,8 @@ import org.alfresco.jlan.server.auth.acl.AccessControlManager;
 import org.alfresco.jlan.server.auth.passthru.DomainMapping;
 import org.alfresco.jlan.server.core.ShareMapper;
 import org.alfresco.jlan.server.filesys.DefaultShareMapper;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.element.GenericConfigElement;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.element.GenericConfigElement;
 
 /**
  * Server Security Configuration Section Class

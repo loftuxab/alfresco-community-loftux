@@ -24,8 +24,8 @@
  */
 package org.alfresco.web.scripts.jsf;
 
-import org.alfresco.util.Content;
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.Content;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;

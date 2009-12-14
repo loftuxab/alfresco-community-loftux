@@ -1,4 +1,4 @@
-package org.alfresco.config.element;
+package org.springframework.extensions.config.element;
 
 /*
  * GenericConfigElement.java
@@ -6,7 +6,7 @@ package org.alfresco.config.element;
  * Copyright (c) 2007 Starlasoft. All rights reserved.
  */
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Generic Config Element Class

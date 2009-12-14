@@ -204,7 +204,7 @@ public class WrappedRequestContext implements RequestContext
         return this.context.getRequestMethod();
     }
     
-    public org.alfresco.util.Content getRequestContent()
+    public org.springframework.extensions.surf.util.Content getRequestContent()
     {
         return this.context.getRequestContent();
     }   

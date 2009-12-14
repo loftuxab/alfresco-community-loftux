@@ -70,7 +70,7 @@ import org.alfresco.jlan.smb.server.ntfs.NTFSStreamsInterface;
 import org.alfresco.jlan.smb.server.ntfs.StreamInfo;
 import org.alfresco.jlan.smb.server.ntfs.StreamInfoList;
 import org.alfresco.jlan.util.WildCard;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Database Disk Driver Class

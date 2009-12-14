@@ -30,7 +30,7 @@ import org.alfresco.jlan.server.config.ConfigSection;
 import org.alfresco.jlan.server.config.ConfigurationListener;
 import org.alfresco.jlan.server.config.InvalidConfigurationException;
 import org.alfresco.jlan.server.config.ServerConfiguration;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 /**
  * Debug Configuration Section Class

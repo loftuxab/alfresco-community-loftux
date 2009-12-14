@@ -28,6 +28,7 @@ import java.io.StringReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.config.ConfigService;
 import org.xml.sax.InputSource;
 
 import freemarker.ext.dom.NodeModel;

@@ -31,7 +31,7 @@ import java.io.Writer;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 
-import org.alfresco.util.URLEncoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptResponse;

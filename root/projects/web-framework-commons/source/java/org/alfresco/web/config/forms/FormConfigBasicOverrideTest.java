@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigElement;
 
 public class FormConfigBasicOverrideTest extends FormConfigBasicTest
 {

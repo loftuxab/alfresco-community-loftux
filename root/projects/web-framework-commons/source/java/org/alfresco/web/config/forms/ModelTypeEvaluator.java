@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.config.forms;
 
-import org.alfresco.config.evaluator.Evaluator;
+import org.springframework.extensions.config.evaluator.Evaluator;
 
 /**
  * Evaluator to determine whether the condition matches the content
@@ -38,7 +38,7 @@ public class ModelTypeEvaluator implements Evaluator
      * Determines whether the given condition matches the type provided
      * by the object.
      * 
-     * @see org.alfresco.config.evaluator.Evaluator#applies(java.lang.Object,
+     * @see org.springframework.extensions.config.evaluator.Evaluator#applies(java.lang.Object,
      *      java.lang.String)
      */
     public boolean applies(Object obj, String condition)

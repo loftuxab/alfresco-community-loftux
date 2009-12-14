@@ -2,7 +2,7 @@
 
    <plug-ins>
       <evaluators>
-         <evaluator id="object-type" class="org.alfresco.config.evaluator.ObjectTypeEvaluator" />
+         <evaluator id="object-type" class="org.springframework.extensions.config.evaluator.ObjectTypeEvaluator" />
       </evaluators>
    </plug-ins>
    

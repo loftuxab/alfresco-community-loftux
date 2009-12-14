@@ -33,9 +33,9 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.util.Content;
-import org.alfresco.util.InputStreamContent;
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.Content;
+import org.springframework.extensions.surf.util.InputStreamContent;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Runtime;

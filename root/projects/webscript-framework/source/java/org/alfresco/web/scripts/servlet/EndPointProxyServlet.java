@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.ConnectorService;
@@ -43,7 +43,7 @@ import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.CredentialsImpl;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.util.Base64;
+import org.springframework.extensions.surf.util.Base64;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.IdentityType;

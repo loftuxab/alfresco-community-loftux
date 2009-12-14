@@ -4,7 +4,7 @@
 <beans>
 
     <!-- I18N -->
-    <bean id="rmActionResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+    <bean id="rmActionResourceBundles" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
         <property name="resourceBundles">
             <list>
                 <value>alfresco.module.org_alfresco_module_dod5015.rm-actions</value>

@@ -27,8 +27,8 @@ package org.alfresco.jlan.ftp;
 
 import java.net.InetAddress;
 
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.element.GenericConfigElement;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.element.GenericConfigElement;
 import org.alfresco.jlan.server.config.ConfigId;
 import org.alfresco.jlan.server.config.ConfigSection;
 import org.alfresco.jlan.server.config.ConfigurationListener;

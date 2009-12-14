@@ -26,11 +26,11 @@ package org.alfresco.connector;
 
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.connector.exception.CredentialVaultProviderException;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.util.ReflectionHelper;
+import org.springframework.extensions.surf.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.AuthenticatorDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;

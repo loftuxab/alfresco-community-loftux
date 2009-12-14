@@ -31,9 +31,9 @@ import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.ISO8601DateFormat;
-import org.alfresco.util.Pair;
-import org.alfresco.util.ParameterCheck;
+import org.springframework.extensions.surf.util.ISO8601DateFormat;
+import org.springframework.extensions.surf.util.Pair;
+import org.springframework.extensions.surf.util.ParameterCheck;
 
 /**
  * Class to represent a Records Management audit entry.

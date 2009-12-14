@@ -26,9 +26,9 @@ package org.alfresco.web.config.forms;
 
 import java.util.Iterator;
 
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.ConfigException;
-import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.ConfigException;
+import org.springframework.extensions.config.xml.elementreader.ConfigElementReader;
 import org.dom4j.Element;
 
 /**
@@ -60,7 +60,7 @@ class ConstraintHandlersElementReader implements ConfigElementReader
    public static final String ATTR_EVENT = "event";
    
    /**
-    * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
+    * @see org.springframework.extensions.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
     */
    @SuppressWarnings("unchecked")
    public ConfigElement parse(Element element)

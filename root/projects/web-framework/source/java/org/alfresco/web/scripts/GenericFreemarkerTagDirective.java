@@ -31,8 +31,8 @@ import java.util.Map;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
 
-import org.alfresco.util.ReflectionHelper;
-import org.alfresco.util.StringBuilderWriter;
+import org.springframework.extensions.surf.util.ReflectionHelper;
+import org.springframework.extensions.surf.util.StringBuilderWriter;
 import org.alfresco.web.framework.render.RenderContext;
 
 import freemarker.core.Environment;

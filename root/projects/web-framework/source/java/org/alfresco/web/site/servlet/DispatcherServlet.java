@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.User;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.util.Base64;
+import org.springframework.extensions.surf.util.Base64;
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.model.ContentAssociation;

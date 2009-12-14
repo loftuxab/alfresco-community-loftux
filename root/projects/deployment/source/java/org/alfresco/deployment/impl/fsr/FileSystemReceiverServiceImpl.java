@@ -29,7 +29,7 @@ import java.io.File;
 
 
 import org.alfresco.deployment.impl.server.DeploymentCommandQueue;
-import org.alfresco.util.PropertyCheck;
+import org.springframework.extensions.surf.util.PropertyCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

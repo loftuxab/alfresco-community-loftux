@@ -28,8 +28,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.config.source.FileConfigSource;
-import org.alfresco.config.xml.XMLConfigService;
+import org.springframework.extensions.config.source.FileConfigSource;
+import org.springframework.extensions.config.xml.XMLConfigService;
 
 import junit.framework.TestCase;
 

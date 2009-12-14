@@ -24,8 +24,8 @@
  */
 package org.alfresco.web.studio;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.web.config.WebStudioConfigElement;
 import org.alfresco.web.framework.TaskManager;
 import org.alfresco.web.site.FrameworkHelper;

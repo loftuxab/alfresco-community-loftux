@@ -34,8 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
-import org.alfresco.util.Content;
-import org.alfresco.util.InputStreamContent;
+import org.springframework.extensions.surf.util.Content;
+import org.springframework.extensions.surf.util.InputStreamContent;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
@@ -575,7 +575,7 @@ public abstract class AbstractRequestContext implements RequestContext
     /* (non-Javadoc)
      * @see org.alfresco.web.site.RequestContext#getRequestContent()
      */
-    public synchronized org.alfresco.util.Content getRequestContent()
+    public synchronized org.springframework.extensions.surf.util.Content getRequestContent()
     {
         // ensure we only try to read the content once - as this method may be called several times
         // but the underlying inputstream itself can only be processed a single time

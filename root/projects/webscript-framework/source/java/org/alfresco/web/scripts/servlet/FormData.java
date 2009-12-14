@@ -35,8 +35,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.util.Content;
-import org.alfresco.util.InputStreamContent;
+import org.springframework.extensions.surf.util.Content;
+import org.springframework.extensions.surf.util.InputStreamContent;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;

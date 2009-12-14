@@ -34,7 +34,7 @@ import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.exception.ConnectorServiceException;
-import org.alfresco.util.StringBuilderWriter;
+import org.springframework.extensions.surf.util.StringBuilderWriter;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.json.JSONWriter;
 import org.alfresco.web.site.exception.UserFactoryException;

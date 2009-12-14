@@ -32,7 +32,6 @@ import java.util.Map;
 
 import org.alfresco.config.ScriptConfigModel;
 import org.alfresco.config.TemplateConfigModel;
-import org.alfresco.i18n.I18NUtil;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Page;
@@ -41,6 +40,7 @@ import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.framework.render.RenderUtil;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 /**
  * Helper to generate the model map for Script and Template execution.

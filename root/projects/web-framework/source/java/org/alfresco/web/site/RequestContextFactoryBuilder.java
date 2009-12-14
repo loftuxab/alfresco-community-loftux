@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.util.ReflectionHelper;
+import org.springframework.extensions.surf.util.ReflectionHelper;
 import org.alfresco.web.config.WebFrameworkConfigElement.RequestContextDescriptor;
 import org.alfresco.web.site.exception.RequestContextException;
 

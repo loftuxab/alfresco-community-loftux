@@ -25,7 +25,7 @@
 
 package org.alfresco.jlan.oncrpc.nfs;
 
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 import org.alfresco.jlan.oncrpc.RpcAuthenticator;
 import org.alfresco.jlan.server.config.ConfigId;
 import org.alfresco.jlan.server.config.ConfigSection;

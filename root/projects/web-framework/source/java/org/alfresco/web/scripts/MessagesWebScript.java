@@ -30,8 +30,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.i18n.I18NUtil;
-import org.alfresco.util.StringBuilderWriter;
+import org.springframework.extensions.surf.util.I18NUtil;
+import org.springframework.extensions.surf.util.StringBuilderWriter;
 import org.alfresco.web.scripts.json.JSONWriter;
 
 /**

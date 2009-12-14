@@ -32,7 +32,7 @@ import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.User;
-import org.alfresco.util.URLEncoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.apache.commons.logging.Log;

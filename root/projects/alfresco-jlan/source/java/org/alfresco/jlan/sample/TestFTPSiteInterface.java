@@ -31,7 +31,7 @@ import org.alfresco.jlan.ftp.FTPRequest;
 import org.alfresco.jlan.ftp.FTPSiteInterface;
 import org.alfresco.jlan.ftp.FTPSrvSession;
 import org.alfresco.jlan.server.config.ServerConfiguration;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 
 /**

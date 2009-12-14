@@ -29,12 +29,12 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigElement;
 import org.alfresco.connector.AlfrescoAuthenticator;
 import org.alfresco.connector.ConnectorSession;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.scripts.ProcessorModelHelper;

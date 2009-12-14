@@ -27,7 +27,7 @@ package org.alfresco.jlan.server.core;
 
 import org.alfresco.jlan.server.SrvSession;
 import org.alfresco.jlan.server.filesys.TreeConnection;
-import org.alfresco.config.ConfigElement;
+import org.springframework.extensions.config.ConfigElement;
 
 
 /**

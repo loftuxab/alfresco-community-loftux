@@ -24,8 +24,8 @@
  */
 package org.alfresco.web.config;
 
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.springframework.extensions.config.ConfigElement;
+import org.springframework.extensions.config.xml.elementreader.ConfigElementReader;
 import org.dom4j.Element;
 
 /**

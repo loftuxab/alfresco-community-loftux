@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
-import org.alfresco.config.ConfigService;
+import org.springframework.extensions.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorProvider;
 import org.alfresco.connector.ConnectorProviderImpl;

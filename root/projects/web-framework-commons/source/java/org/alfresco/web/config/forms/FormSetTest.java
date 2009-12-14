@@ -32,7 +32,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.alfresco.config.ConfigException;
+import org.springframework.extensions.config.ConfigException;
 
 public class FormSetTest extends TestCase
 {
