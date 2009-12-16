@@ -153,6 +153,26 @@ public class DBDeviceContext extends DiskDeviceContext {
 	}
 	
 	/**
+	 * Class constructor
+	 * 
+	 * @param name String
+	 * @param args ConfigElement
+	 * @exception DeviceContextException
+	 */
+	public DBDeviceContext(String name, ConfigElement args)
+		throws DeviceContextException {
+	  super();
+	  
+	  // Set the shared device name
+	  
+	  setShareName( name);
+	  
+	  // Initialize the database interface
+
+	  initialize(args);
+	}
+	
+	/**
 	 * Initialize the database device context
 	 * 
 	 * @param args ConfigElement
