@@ -76,10 +76,6 @@ public class JLANServerService implements WrapperListener, Runnable {
 	 */
 	public Integer start(String[] args) {
 
-		//	Indicate that startup will take a short while
-		
-		WrapperManager.signalStarting(20000);
-		
 		//  Command line parameter should specify the configuration file
 
 		PrintStream out = System.out;
