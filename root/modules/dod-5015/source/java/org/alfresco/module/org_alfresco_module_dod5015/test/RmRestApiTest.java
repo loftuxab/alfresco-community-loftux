@@ -1237,7 +1237,13 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(folder.has("nodeRef"));
         assertTrue(folder.getString("nodeRef").startsWith("workspace://SpacesStore/"));
         assertTrue(folder.has("id"));
-        assertTrue(folder.getString("id").startsWith("2009-0000"));
+        
+        // "id" should start with year-number pattern e.g. 2009-0000
+        // This regular expression represents a string that starts with 4 digits followed by a hyphen,
+        // then 4 more digits and then any other characters
+        final String idRegExp = "^\\d{4}-\\d{4}.*";
+        assertTrue(folder.getString("id").matches(idRegExp));
+        
         assertTrue(folder.has("children"));
         JSONArray records = folder.getJSONArray("children");
         assertEquals("Expecting 2 transferred records", 2, records.length());
@@ -1249,7 +1255,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(record1.has("nodeRef"));
         assertTrue(record1.getString("nodeRef").startsWith("workspace://SpacesStore/"));
         assertTrue(record1.has("id"));
-        assertTrue(record1.getString("id").startsWith("2009-0000"));
+        assertTrue(record1.getString("id").matches(idRegExp));
         assertTrue(record1.has("declaredBy"));
         assertEquals("System", record1.getString("declaredBy"));
         assertTrue(record1.has("declaredAt"));
