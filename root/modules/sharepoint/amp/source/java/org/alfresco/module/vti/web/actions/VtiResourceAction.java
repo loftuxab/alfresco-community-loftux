@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.vti.web.actions;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -83,7 +84,6 @@ public class VtiResourceAction extends HttpServlet implements VtiAction
 
     private void writeResponse(String resourceLocation, HttpServletResponse response, String alfrescoContext) throws IOException
     {
-
         byte[] resource = null;
 
         try
@@ -106,8 +106,8 @@ public class VtiResourceAction extends HttpServlet implements VtiAction
 
     private byte[] cacheResource(String resourceLocation, String alfrescoContext) throws IOException
     {
+        InputStream input = new FileInputStream(this.getClass().getClassLoader().getResource("").getPath() + resourceLocation);
 
-        InputStream input = this.getClass().getClassLoader().getResourceAsStream(resourceLocation);
         byte[] result = new byte[input.available()];
         input.read(result);
 
