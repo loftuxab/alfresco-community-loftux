@@ -515,7 +515,7 @@ public class OracleDBInterface extends JdbcDBInterface implements DBQueueInterfa
 
 				stmt.execute("CREATE TABLE " + getTransactionTableName() + " (FileId NUMBER NOT NULL, StreamId NUMBER NOT NULL," +
 				    "TranId NUMBER NOT NULL, ReqType NUMBER(2), TempFile VARCHAR2(512), VirtualPath VARCHAR2(512), QueuedAt TIMESTAMP," +
-				    "Attribs VARCHAR(512), PRIMARY KEY (FileId,TranId))");
+				    "Attribs VARCHAR(512), PRIMARY KEY (FileId,StreamId,TranId))");
 
 				stmt.close();
         
@@ -883,7 +883,7 @@ public class OracleDBInterface extends JdbcDBInterface implements DBQueueInterfa
    * @return int
    * @exception DBException
    */
-  public int createStreamRecord(String sname, int fid)
+	public int createStreamRecord(String sname, int fid)
   	throws DBException {
 
 		//	Create a new file stream attached to the specified file
@@ -904,8 +904,8 @@ public class OracleDBInterface extends JdbcDBInterface implements DBQueueInterfa
 
 			long timeNow = System.currentTimeMillis();
 		
-			stmt = conn.prepareStatement("INSERT INTO " + getFileSysTableName()
-																	 + "(FileId,StreamName,CreateDate,ModifyDate,AccessDate,StreamSize,StreamId) VALUES (?,?,?,?,?,?," + getTablePrefix() +"StreamId.NEXTVAL)");
+			stmt = conn.prepareStatement("INSERT INTO " + getStreamsTableName()
+							+ "(FileId,StreamName,CreateDate,ModifyDate,AccessDate,StreamSize,StreamId) VALUES (?,?,?,?,?,?," + getTablePrefix() +"StreamId.NEXTVAL)");
 			stmt.setInt(1, fid);
 			stmt.setString(2, sname);
 			stmt.setLong(3, timeNow);

@@ -135,6 +135,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 	public static final int MaxPathLength = 255;
 
+	// NTFS streams information buffer size
+	
+	public static final int NTFSStreamsInfoBufsize	= 4096;	// 4K buffer
+	
 	// Security descriptor to allow Everyone access, returned by the QuerySecurityDescrptor NT
 	// transaction when NTFS streams are enabled for a virtual filesystem.
 
@@ -4326,14 +4330,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			smbPkt.setPosition(prmPos);
 			smbPkt.packWord(0);
 
-			// Create a data buffer using the SMB packet. The response should always fit into a
-			// single reply packet.
-
-			DataBuffer replyBuf = new DataBuffer(buf, dataPos, buf.length - dataPos);
-
 			// Check if the virtual filesystem supports streams, and streams are enabled
 
 			boolean streams = false;
+			DataBuffer replyBuf = null;
 
 			if ( disk instanceof NTFSStreamsInterface) {
 
@@ -4364,6 +4364,24 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 					return;
 				}
 
+				// Allocate a larger response buffer if there is more than one stream to return information for
+				
+				if ( streamList.numberOfStreams() > 1 && buf.length < NTFSStreamsInfoBufsize) {
+					
+					// Allocate a larger packet for the response
+					
+					smbPkt = m_sess.getPacketPool().allocatePacket( NTFSStreamsInfoBufsize, smbPkt, dataPos);
+					
+					// Switch to the response buffer
+					
+					buf = smbPkt.getBuffer();
+				}
+				
+				// Create a data buffer using the SMB packet. The response should always fit into a
+				// single reply packet.
+
+				replyBuf = new DataBuffer(buf, dataPos, buf.length - dataPos);
+
 				// Pack the file streams information into the return data packet
 
 				dataLen = QueryInfoPacker.packStreamFileInfo(streamList, replyBuf, true);
@@ -4387,6 +4405,11 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 				if ( netFile.hasAccessDate())
 					fileInfo.setAccessDateTime( netFile.getAccessDate());
 				
+				// Create a data buffer using the SMB packet. The response should always fit into a
+				// single reply packet.
+
+				replyBuf = new DataBuffer(buf, dataPos, buf.length - dataPos);
+
 				// Pack the file information into the return data packet
 
 				dataLen = QueryInfoPacker.packInfo(fileInfo, replyBuf, infoLevl, true);
