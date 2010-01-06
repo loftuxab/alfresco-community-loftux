@@ -2956,6 +2956,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       
       FileState parent = getFileState(stream.getFullName(), dbCtx, false);
       StreamInfo sInfo = null;
+      int sattr = 0;
       
       if ( parent != null) {
         
@@ -2972,6 +2973,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
             //  Update the stream size
             
             sInfo.setSize(stream.getFileSize());
+            sattr += StreamInfo.SetStreamSize;
             
             //  DEBUG
             
@@ -2995,11 +2997,18 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
           
           sInfo.setSize(stream.getFileSize());
           sInfo.setStreamId(stream.getStreamId());
+          
+          sattr += StreamInfo.SetStreamSize;
         }
         
         //  Set the modify date/time for the stream
         
         sInfo.setModifyDateTime(System.currentTimeMillis());
+        sattr += StreamInfo.SetModifyDate;
+        
+        // Set the stream information values to be updated
+        
+        sInfo.setStreamInformationFlags( sattr);
 
         //  Update the stream details
         
