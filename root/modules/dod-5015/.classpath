@@ -9,7 +9,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Web-Client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Remote API"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MBean"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" sourcepath="/3rd Party/src/spring-webscripts-1.0.0.CI-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT-tests.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -37,6 +37,7 @@ import org.springframework.extensions.surf.types.Page;
 import org.springframework.extensions.surf.uri.UriTemplateListIndex;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
+
 /**
  * Slingshot specific implementation of PageViewResolver.
  * 
@@ -78,7 +79,7 @@ public class SlingshotPageViewResolver extends AbstractWebFrameworkViewResolver
                     pageId = uriTokens.get(SlingshotPageMapper.URI_PAGEID);
                 }
             }
-            page = FrameworkUtil.getCurrentRequestContext().getModel().getPage(pageId);
+            page = getObjectService().getPage(pageId);
         }
         
         return (page != null);
@@ -116,7 +117,7 @@ public class SlingshotPageViewResolver extends AbstractWebFrameworkViewResolver
                     pageId = uriTokens.get(SlingshotPageMapper.URI_PAGEID);
                 }
             }
-            page = FrameworkUtil.getCurrentRequestContext().getModel().getPage(pageId);
+            page = getObjectService().getPage(pageId);
         }
         
         if (page != null)

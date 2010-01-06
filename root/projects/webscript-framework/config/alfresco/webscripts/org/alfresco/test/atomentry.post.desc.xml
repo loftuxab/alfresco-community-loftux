@@ -1,5 +1,0 @@
-<webscript>
-  <shortname>Echo atom entry title</shortname>
-  <description>Echo title from atom entry request</description>
-  <url>/test/atomentry</url>
-</webscript>

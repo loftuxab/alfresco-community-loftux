@@ -11,12 +11,6 @@
       <param-value>true</param-value>
    </context-param>
    
-   <context-param>
-      <param-name>contextClass</param-name>
-      <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
-      <description>Spring context class</description>
-   </context-param>
-   
    <filter>
       <description>Set HTTP cache Expires header 30 days forward for a mapping.</description>
       <filter-name>CacheExpiresFilter</filter-name>
@@ -108,6 +102,13 @@
          <param-name>contextConfigLocation</param-name>
          <param-value>/WEB-INF/classes/web-application-config.xml</param-value>
       </init-param>
+      <!-- TODO: resolve this - needs JBoss specific JBossVFSHelper available
+      <init-param>
+         <param-name>contextClass</param-name>
+         <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
+         <description>Spring context class</description>
+      </init-param>
+      -->
       <load-on-startup>1</load-on-startup>
    </servlet>
    

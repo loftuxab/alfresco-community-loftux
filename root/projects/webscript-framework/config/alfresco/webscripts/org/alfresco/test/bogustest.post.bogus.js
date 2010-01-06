@@ -1,1 +1,0 @@
-model.rc = requestbody.content;

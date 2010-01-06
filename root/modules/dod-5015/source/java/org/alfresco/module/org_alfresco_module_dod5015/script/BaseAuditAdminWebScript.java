@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.springframework.extensions.surf.util.ISO8601DateFormat;
-import org.alfresco.web.scripts.DeclarativeWebScript;
+import org.springframework.extensions.webscripts.DeclarativeWebScript;
 
 /**
  * Base class for all audit administration webscripts.

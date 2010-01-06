@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Unit Test for exception handling</shortname>
-  <description>Ensure appropriate status template is used for response</description>
-  <format>argument</format>
-  <url>/test/exception</url>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

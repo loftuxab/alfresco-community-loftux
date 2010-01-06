@@ -64,7 +64,6 @@
          <pathelement location="${dir.project.repository.config}"/>
          <pathelement location="${dir.project.webclient.config}"/>
          <pathelement location="${dir.project.deployment.config}"/>
-         <pathelement location="${dir.project.webscriptframework.config}"/>
          <pathelement location="${dir.project.remoteapi.config}"/>
          <dirset dir="${dir.projects}">
             <include name="**/${dir.name.source}/${dir.name.test.resources}" />
@@ -84,9 +83,7 @@
          <pathelement location="${dir.project.remoteapi.classes}" />
          <pathelement location="${dir.project.repository.classes}" />
          <pathelement location="${dir.project.wdrdeployment.classes}" />
-         <pathelement location="${dir.project.webframework.classes}" />
          <pathelement location="${dir.project.webframeworkcommons.classes}" />
-         <pathelement location="${dir.project.webscriptframework.classes}" />
          <pathelement location="${dir.project.webclient.classes}" />
          <pathelement location="${dir.project.webserviceclient.classes}" />
          
@@ -97,7 +94,6 @@
          <pathelement location="${dir.project.webclient.config}" />
          <pathelement location="${dir.project.deployment.config}" />
          <pathelement location="${dir.project.linkvalidation.config}" />
-         <pathelement location="${dir.project.webscriptframework.config}" />
          <pathelement location="${dir.project.remoteapi.config}" />
          
          <pathelement location="${dir.project.core}/${dir.name.source}/${dir.name.test.resources}" />
@@ -131,6 +127,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-core-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-core-configservice-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT-tests.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/devenv/mysql-connector-java-5.1.7-bin.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/j2ee/servlet.jar" />
@@ -327,25 +324,22 @@
    <target name="incremental-webclient-depends" 
            description="Performs an incremental build of the dependencies of the Alfresco WAR"
            depends="incremental-core,
-                    package-webscriptframework-jar,
                     incremental-jlan,
                     incremental-mbeans,
                     incremental-deployment,
                     incremental-repository,
                     incremental-wdrdeployment,
                     incremental-remoteapi,
+                    incremental-webframeworkcommons,
                     incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation" />
-         
+   
    <target name="incremental" 
            description="Performs an incremental build of all projects"
            depends="incremental-webclient-depends,
-                    incremental-webscriptframework,
                     incremental-webclient,  
                     incremental-webserviceclient,
-                    incremental-webframework,
-                    incremental-webframeworkcommons,
                     incremental-slingshot,
                     incremental-mobile" />
 
@@ -407,29 +401,14 @@
                     package-webclient-jar,
                     deploy-webclient-tomcat-exploded" />
    
-   <target name="incremental-webscriptframework-tomcat" 
-           depends="incremental-core,
-                    incremental-webscriptframework,
-                    deploy-webscriptframework-tomcat" />
-   
-   <target name="incremental-webframework-tomcat" 
-           depends="incremental-core,
-                    package-webscriptframework-jar,
-                    incremental-webframework,
-                    deploy-webframework-tomcat" />
-   
    <target name="incremental-mobile-tomcat" 
            description="Performs an incremental build and deployment of the mobile WAR"
            depends="incremental-core, 
-                    package-webscriptframework-jar, 
-                    package-webframework-jar, 
                     incremental-mobile,
                     deploy-mobile-tomcat" />
    
   <target name="incremental-mobile-tomcat-exploded" 
           depends="incremental-core, 
-                   package-webscriptframework-jar, 
-                   package-webframework-jar, 
                    package-mobile-jar,
                    deploy-mobile-tomcat-exploded,
                    minimize-mobile-deployed-javascript" />
@@ -461,8 +440,6 @@
                     generate-taglibdocs-webclient, 
                     generate-javadocs-webserviceclient,
                     generate-javadocs-jlan,
-                    generate-javadocs-webscriptframework,
-                    generate-javadocs-webframework,
                     generate-javadocs-mobile,
                     generate-javadocs-slingshot" />
 
@@ -492,8 +469,8 @@
                     clean-remoteapi, 
                     clean-jndi, 
                     clean-catalinavirtual, 
-                    clean-linkvalidation, 
-                    clean-webscriptframework,
+                    clean-linkvalidation,
+                    clean-webframeworkcommons,
                     clean-webclient" />
                     
    <target name="clean-slingshot-projects" 
@@ -504,8 +481,6 @@
    <target name="clean-mobile-projects" 
            description="Cleans all projects related to the mobile project" 
            depends="clean-core,
-                    clean-webscriptframework,
-                    clean-webframework,
                     clean-mobile" />
    
    <target name="clean-modules"
@@ -539,9 +514,6 @@
    <target name="clean-application-tomcat-deploy" 
            description="Cleans all apps from the application Tomcat server" 
            depends="init">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframeworkcommons}" />
-      <delete dir="${dir.deploy.tomcat.application.webframeworkcommons}" 
-              includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
       <delete dir="${dir.deploy.tomcat.application.slingshot}" 
               includeEmptyDirs="true" quiet="yes" />
@@ -642,21 +614,21 @@
          <fileset dir="${dir.project.remoteapi.classes}" />
          <fileset dir="${dir.project.catalinavirtual.classes}" />
          <fileset dir="${dir.project.linkvalidation.classes}" />
-         <fileset dir="${dir.project.webscriptframework.classes}" />
+         <fileset dir="${dir.project.webframeworkcommons.classes}" />
          <fileset dir="${dir.project.webclient.classes}" 
                   excludes="**/extension/**" />
-        <fileset dir="${dir.project.jlan.classes}" excludes="org/alfresco/config/**" />
-        
+         <fileset dir="${dir.project.jlan.classes}" excludes="org/alfresco/config/**" />
+         
          <!-- copy config files -->
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
          <fileset dir="${dir.project.repository.config}" 
                   excludes="**/extension/**" />
+         <fileset dir="${dir.project.linkvalidation.config}" 
+                  excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.config}"
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.webclient.config}" 
-                  excludes="**/extension/**" />
-         <fileset dir="${dir.project.webscriptframework.config}" 
                   excludes="**/extension/**" />
          <!-- NOTE: include dev-context.xml to allow developer overrides -->
          <fileset dir="${dir.project.repository.config}" 
@@ -714,39 +686,6 @@
       <copy todir="${dir.deploy.tomcat.webclient}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
       </copy>
-   </target>
-   
-   <target name="deploy-webscriptframework-tomcat" depends="init" 
-           description="Deploys the Web Script Framework WAR to the application Tomcat server">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webscriptframework}" />
-      <delete dir="${dir.deploy.tomcat.application.webscriptframework}" 
-              includeEmptyDirs="true" quiet="yes" />
-      
-      <!-- copy the WebScript Framework WAR file to the application Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.application}" 
-            file="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" />
-   </target>
-
-   <target name="deploy-webframework-tomcat" depends="init" 
-           description="Deploys the WebFramework WAR to the application Tomcat server">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframework}" />
-      <delete dir="${dir.deploy.tomcat.application.webframework}" 
-              includeEmptyDirs="true" quiet="yes" />
-      
-      <!-- copy the WebFramework WAR file to the application Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.application}" 
-            file="${dir.project.webframework.dist}/${file.name.war.webframework}" />
-   </target>
-   
-   <target name="deploy-webframeworkcommons-tomcat" depends="init" 
-           description="Deploys the WebFrameworkCommons WAR to the application Tomcat server">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframeworkcommons}" />
-      <delete dir="${dir.deploy.tomcat.application.webframeworkcommons}" 
-              includeEmptyDirs="true" quiet="yes" />
-      
-      <!-- copy the WebFrameworkCommons WAR file to the application Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.application}" 
-            file="${dir.project.webframeworkcommons.dist}/${file.name.war.webframeworkcommons}" />
    </target>
    
    <target name="deploy-slingshot-tomcat" depends="init" 
@@ -854,24 +793,18 @@
       
       <!-- copy all source files -->
       <copy todir="${dir.deploy.tomcat.application.mobile}" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.mobile.src.web}" />
       </copy>
       
       <!-- copy config files -->
       <copy todir="${dir.deploy.tomcat.application.mobile}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
-         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
          <fileset dir="${dir.project.mobile.config}" excludes="**/extension/**" />
       </copy>
       
       <!-- add all class files to WEB-INF/classes -->
       <copy todir="${dir.deploy.tomcat.application.mobile}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.core.classes}" />
-         <fileset dir="${dir.project.webscriptframework.classes}" />
-         <fileset dir="${dir.project.webframework.classes}" />
          <fileset dir="${dir.project.mobile.classes}" />
       </copy>
       
@@ -1012,7 +945,6 @@
                     test-remoteapi,
                     test-wdrdeployment,
                     test-catalinavirtual,
-                    test-webscriptframework,
                     test-webframeworkcommons, 
                     test-webclient, 
                     test-webserviceclient,
@@ -1178,7 +1110,7 @@
       <!-- copy jar -->
       <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/lib"
             file="${dir.module.dod5015.dist}/${file.name.jar.dod5015}" />
-      <!-- copy webscripts, etc. -->
+      <!-- copy web scripts, etc. -->
       <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.module.dod5015.config}">
             <include name="**/*.*" />
@@ -1198,7 +1130,7 @@
       <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.modules}/dod-5015-share/source/web" />
       </copy>
-      <!-- copy webscripts, etc. -->
+      <!-- copy web scripts, etc. -->
       <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.modules}/dod-5015-share/config">
             <include name="**/*.*" />

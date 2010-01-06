@@ -161,7 +161,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
             
             // Consider the theme
             String themeId = (String) context.getThemeId();
-            Theme theme = context.getModel().getTheme(themeId);
+            Theme theme = context.getObjectService().getTheme(themeId);
             if (theme != null)
             {
                 pageId = theme.getPageId(pageTypeId);
@@ -184,7 +184,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
     	if (pageId != null)
     	{
     		// We have a page Id.  We must resolve it to a page.
-            Page page = context.getModel().getPage(pageId);
+            Page page = context.getObjectService().getPage(pageId);
             if (page != null)
             {
                 context.setPage(page);
