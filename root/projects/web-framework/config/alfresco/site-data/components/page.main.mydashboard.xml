@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>page</scope>
-   <region-id>main</region-id>
-   <source-id>mydashboard</source-id>
-   <url>/test/remotetest1</url>
-</component>

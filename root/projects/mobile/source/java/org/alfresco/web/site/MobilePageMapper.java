@@ -29,17 +29,19 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.connector.AlfrescoAuthenticator;
-import org.alfresco.connector.ConnectorSession;
+import org.springframework.extensions.config.WebFrameworkConfigElement;
+import org.springframework.extensions.surf.FrameworkUtil;
+import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.WebFrameworkConstants;
+import org.springframework.extensions.surf.WebFrameworkServiceRegistry;
+import org.springframework.extensions.surf.exception.PageMapperException;
+import org.springframework.extensions.surf.support.AbstractPageMapper;
+import org.springframework.extensions.surf.types.Page;
+import org.springframework.extensions.surf.types.Theme;
 import org.springframework.extensions.surf.util.URLDecoder;
-import org.alfresco.web.framework.exception.ContentLoaderException;
-import org.alfresco.web.framework.model.Page;
-import org.alfresco.web.framework.model.Theme;
-import org.alfresco.web.framework.resource.ResourceContent;
-import org.alfresco.web.scripts.ProcessorModelHelper;
-import org.alfresco.web.scripts.URLHelper;
-import org.alfresco.web.scripts.WebScriptProcessor;
-import org.alfresco.web.site.exception.PageMapperException;
+import org.springframework.extensions.webscripts.ProcessorModelHelper;
+import org.springframework.extensions.webscripts.URLHelper;
+import org.springframework.extensions.webscripts.WebScriptProcessor;
 
 /**
  * This is a Page Mapper class which serves to interpret URLs at dispatch
@@ -70,11 +72,13 @@ public class MobilePageMapper extends AbstractPageMapper
     
     
     /**
-     * Empty constructor - for instantiation via reflection 
+     * Constructor
+     * 
+     * @param serviceRegistry   The WebFrameworkServiceRegistry
      */
-    public MobilePageMapper()
+    public MobilePageMapper(WebFrameworkServiceRegistry serviceRegistry)
     {
-        super();
+        super(serviceRegistry);
     }
     
     /**
@@ -131,6 +135,7 @@ public class MobilePageMapper extends AbstractPageMapper
          * Finally, if nothing can be determined, a generic page is
          * bound into the request context.
          */
+        final WebFrameworkConfigElement config = FrameworkUtil.getConfig();
         String pageTypeId = (String) request.getParameter("pt");
         if (pageTypeId != null && pageTypeId.length() != 0)
         {
@@ -139,7 +144,7 @@ public class MobilePageMapper extends AbstractPageMapper
             
             // Consider the theme
             String themeId = (String) context.getThemeId();
-            Theme theme = context.getModel().getTheme(themeId);
+            Theme theme = context.getObjectService().getTheme(themeId);
             if (theme != null)
             {
                 pageId = theme.getPageId(pageTypeId);
@@ -148,13 +153,13 @@ public class MobilePageMapper extends AbstractPageMapper
             // Consider whether a system default has been set up
             if (pageId == null)
             {
-                pageId = getPageId(context, pageTypeId);
+                pageId = config.getDefaultPageTypeInstanceId(pageTypeId);
             }
             
             // Worst case, pick a generic page
             if (pageId == null)
             {
-                pageId = getPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
+                pageId = config.getDefaultPageTypeInstanceId(WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
             }
         }
         
@@ -162,7 +167,7 @@ public class MobilePageMapper extends AbstractPageMapper
     	if (pageId != null)
     	{
     		// We have a page Id.  We must resolve it to a page.
-            Page page = context.getModel().getPage(pageId);
+            Page page = context.getObjectService().getPage(pageId);
             if (page != null)
             {
                 context.setPage(page);
@@ -175,6 +180,6 @@ public class MobilePageMapper extends AbstractPageMapper
          * Note that if we didn't set it, it would still automatically
          * pick up the default format.
          */
-        context.setFormatId(FrameworkHelper.getConfig().getDefaultFormatId());
+        context.setFormatId(FrameworkUtil.getConfig().getDefaultFormatId());
     }
 }

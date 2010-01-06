@@ -99,9 +99,6 @@
                token="version.edition=Community"
                value="version.edition=${file.name.codeline}"
                summary="yes" />
-      <copy todir="${dir.project.webscriptframework.config}" 
-            file="${dir.project.repository.config}/alfresco/version.properties"
-            overwrite="true"/>
    </target>
 
    <target name="set-revision-number"
@@ -126,9 +123,6 @@
                token="version.edition=Community"
                value="version.edition=${file.name.codeline}"
                summary="yes" />
-      <copy todir="${dir.project.webscriptframework.config}" 
-            file="${dir.project.repository.config}/alfresco/version.properties"
-            overwrite="true"/>
    </target>
 
    <target name="set-build-number-cc"
@@ -141,9 +135,6 @@
                token="@code-line@"
                value="${file.name.codeline}"
                summary="yes" />
-      <copy todir="${dir.project.webscriptframework.config}" 
-            file="${dir.project.repository.config}/alfresco/version.properties"
-            overwrite="true"/>
    </target>
 
    <target name="revert-changes"
@@ -151,7 +142,6 @@
       <exec executable="svn">
          <arg line="revert ${dir.project.repository.config}/alfresco/version.properties"/>
       </exec>
-      <delete quiet="yes" file="${dir.project.webscriptframework.config}/version.properties" />
    </target>
 
    <target name="generate-checksums"
@@ -1049,12 +1039,6 @@
       <zip destfile="${dir.continuous.assemble.sdk}/doc/api/web-client-doc.zip">
          <zipfileset dir="${dir.project.webclient.docs.java}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/webscript-framework-doc.zip">
-         <zipfileset dir="${dir.project.webscriptframework.docs.java}" />
-      </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/web-framework-doc.zip">
-         <zipfileset dir="${dir.project.webframework.docs.java}" />
-      </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/doc/api/share-doc.zip">
          <zipfileset dir="${dir.project.slingshot.docs.java}" />
       </zip>
@@ -1100,11 +1084,6 @@
             file="${dir.project.deployment.dist}/${file.name.jar.deployment}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.webclient.dist}/${file.name.jar.webclient}" />
-      <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
-            file="${dir.project.webscriptframework.dist}/${file.name.jar.webscriptframework}" />
-<!--      <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
-            file="${dir.project.webframework.dist}/${file.name.jar.webframework}" />
--->
       <!-- Deployment Libraries -->
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/deployment"/>
       <copy todir="${dir.continuous.assemble.sdk}/lib/deployment"
@@ -1188,12 +1167,6 @@
       </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/src/web-client-src.zip">
          <zipfileset dir="${dir.project.webclient.src}" />
-      </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/src/webscript-framework-src.zip">
-         <zipfileset dir="${dir.project.webscriptframework.src}" />
-      </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/src/web-framework-src.zip">
-         <zipfileset dir="${dir.project.webframework.src}" />
       </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/src/share-src.zip">
          <zipfileset dir="${dir.project.slingshot.src}" />
@@ -1291,11 +1264,6 @@
       <copy todir="${dir.continuous.assemble.docs.java}/repository">
          <fileset dir="${dir.project.repository.docs.java}" />
       </copy>
-      <!--
-      <copy todir="${dir.continuous.assemble.docs.java}/webscript-framework">
-         <fileset dir="${dir.project.webscriptframework.docs.java}" />
-      </copy>
-      -->
       <copy todir="${dir.continuous.assemble.docs.java}/web-client">
          <fileset dir="${dir.project.webclient.docs.java}" />
       </copy>

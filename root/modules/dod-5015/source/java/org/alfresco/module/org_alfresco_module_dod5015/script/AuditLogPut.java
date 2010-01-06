@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.web.scripts.Cache;
-import org.alfresco.web.scripts.Status;
-import org.alfresco.web.scripts.WebScriptException;
-import org.alfresco.web.scripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.Cache;
+import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.WebScriptException;
+import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;

@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.extensions.surf.FrameworkUtil;
 import org.springframework.extensions.surf.RequestContext;
-import org.springframework.extensions.surf.WebFrameworkManager;
 import org.springframework.extensions.surf.exception.ConnectorServiceException;
 import org.springframework.extensions.surf.exception.UserFactoryException;
 import org.springframework.extensions.surf.site.AlfrescoUser;

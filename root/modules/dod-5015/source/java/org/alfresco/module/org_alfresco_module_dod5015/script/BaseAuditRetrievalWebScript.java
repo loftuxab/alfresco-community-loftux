@@ -38,7 +38,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.InvalidQNameException;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.web.scripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;

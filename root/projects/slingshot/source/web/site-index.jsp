@@ -9,12 +9,12 @@
    
    // test user dashboard page exists?
    RequestContext context = (RequestContext)request.getAttribute(RequestContext.ATTR_REQUEST_CONTEXT);
-   if (context.getModel().getPage("user/" + userid + "/dashboard") == null)
+   if (context.getObjectService().getPage("user/" + userid + "/dashboard") == null)
    {
       // no site found! create initial dashboard for this user...
       Map<String, String> tokens = new HashMap<String, String>();
       tokens.put("userid", userid);
-      FrameworkUtil.getServiceRegistry().getPresetsManager().constructPreset(context.getModel(), "user-dashboard", tokens);
+      FrameworkUtil.getServiceRegistry().getPresetsManager().constructPreset("user-dashboard", tokens);
    }
    
    // forward to user specific dashboard page

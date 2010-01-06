@@ -1397,192 +1397,7 @@
                          windowtitle="Alfresco Catalina Valve" 
                          projectdir="${dir.project.catalinavirtual}"/>
    </target>
-
-
-   <!-- ********************************** -->
-   <!-- ** WebScripts Framework Project ** -->
-   <!-- ********************************** -->
    
-   <target name="incremental-webscriptframework" 
-           depends="package-webscriptframework" />
-      
-   <target name="build-webscriptframework" 
-           depends="clean-webscriptframework, 
-                    incremental-webscriptframework" />
-   
-   <target name="clean-webscriptframework" 
-           depends="init">
-      <clean projectdir="${dir.project.webscriptframework}" />
-   </target>
-   
-   <target name="compile-webscriptframework" 
-           depends="init">
-      <compile-java projectdir="${dir.project.webscriptframework}" />
-   </target>
-   
-   <target name="package-webscriptframework"
-           depends="package-webscriptframework-war" />
-   
-   <target name="package-webscriptframework-jar"
-           depends="compile-webscriptframework">
-      <mkdir dir="${dir.project.webscriptframework.dist}" />
-      <jar jarfile="${dir.project.webscriptframework.dist}/${file.name.jar.webscriptframework}" 
-           basedir="${dir.project.webscriptframework.classes}" />
-   </target>
-
-   <target name="package-webscriptframework-war" 
-           depends="assemble-webscriptframework-war">
-      <war warfile="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" 
-           webxml="${dir.project.webscriptframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webscriptframework.assemble}" />
-      </war>
-   </target>
-
-   <target name="assemble-webscriptframework-war" 
-           depends="package-webscriptframework-jar">
-      <mkdir dir="${dir.project.webscriptframework.assemble}" />
-
-      <copy todir="${dir.project.webscriptframework.assemble}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" 
-                  excludes="WEB-INF/**" />
-      </copy>
-
-      <copy todir="${dir.project.webscriptframework.assemble}/WEB-INF">
-         <fileset dir="${dir.project.webscriptframework.src.webinf}" 
-                  excludes="web.xml" />
-      </copy>
-
-      <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.project.webscriptframework.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.project.core.src.java}" 
-                  includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" 
-                  excludes="**/web-extension/**" />
-      </copy>
-
-      <copy todir="${dir.project.webscriptframework.assemble}/WEB-INF/lib">
-         <fileset dir="${dir.project.core.dist}" 
-                  includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
-         <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webscriptframework.libs}" />
-         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
-                  includes="${includes.webscriptframework.libs.spring-surf}" />
-         <fileset dir="${dir.project.3rdparty.lib}/optional" 
-                  includes="${includes.webscriptframework.libs.optional}" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera" 
-                  includes="${includes.webscriptframework.libs.abdera}" />
-      </copy>
-   </target>  
-   
-   <target name="test-webscriptframework" 
-           depends="compile-webscriptframework">
-      <run-tests projectdir="${dir.project.webscriptframework}" />
-   </target>
-   
-   <target name="generate-javadocs-webscriptframework" 
-           depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Script Framework" 
-                         windowtitle="Alfresco Web Script Framework" 
-                         projectdir="${dir.project.webscriptframework}"/>
-   </target>
-
-
-   <!-- *************************** -->
-   <!-- ** Web Framework Project ** -->
-   <!-- *************************** -->
-   
-   <target name="incremental-webframework" 
-           depends="package-webframework" />
-   
-   <target name="build-webframework" 
-           depends="clean-webframework, 
-                    incremental-webframework" />
-   
-   <target name="clean-webframework" 
-           depends="init">
-      <clean projectdir="${dir.project.webframework}" />
-   </target>
-   
-   <target name="compile-webframework" 
-           depends="init">
-      <compile-java projectdir="${dir.project.webframework}" />
-   </target>
-   
-   <target name="package-webframework" 
-           depends="package-webframework-war" />
-   
-   <target name="package-webframework-jar"
-           depends="compile-webframework">
-      <mkdir dir="${dir.project.webframework.dist}" />
-      <jar jarfile="${dir.project.webframework.dist}/${file.name.jar.webframework}" 
-           basedir="${dir.project.webframework.classes}" />
-   </target>
-
-   <target name="package-webframework-war" 
-           depends="assemble-webframework-war">
-      <war warfile="${dir.project.webframework.dist}/${file.name.war.webframework}" 
-           webxml="${dir.project.webframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webframework.assemble}" />
-      </war>
-   </target>
-
-   <target name="assemble-webframework-war" 
-           depends="package-webframework-jar">
-      <mkdir dir="${dir.project.webframework.assemble}" />
-      
-      <copy todir="${dir.project.webframework.assemble}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
-      </copy>
-
-      <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.project.webframework.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.project.core.src.java}" 
-                  includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" 
-                  excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.webframework.config}" 
-                  excludes="**/web-extension/**" />
-      </copy>
-
-      <copy todir="${dir.project.webframework.assemble}/WEB-INF/lib">
-         <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webscriptframework.libs}" />
-         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
-                  includes="${includes.webscriptframework.libs.spring-surf}" />
-         <fileset dir="${dir.project.3rdparty.lib}/optional" 
-                  includes="${includes.webscriptframework.libs.optional}" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
-                  includes="${includes.webscriptframework.libs.abdera}" />
-         <fileset dir="${dir.project.core.dist}" 
-                  includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.jlan.dist}" 
-                  includes="${file.name.jar.jlan}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
-      </copy>
-   </target>  
-   
-   <target name="test-webframework" 
-           depends="compile-webframework">
-      <run-tests projectdir="${dir.project.webframework}" />
-   </target>
-   
-   <target name="generate-javadocs-webframework" 
-           depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Framework" 
-                         windowtitle="Alfresco Web Framework" 
-                         projectdir="${dir.project.webframework}"/>
-   </target>
-           
    
    <!-- *********************************** -->
    <!-- ** Web Framework Commons Project ** -->
@@ -1606,7 +1421,7 @@
    </target>
    
    <target name="package-webframeworkcommons"
-           depends="package-webframeworkcommons-war" />
+           depends="package-webframeworkcommons-jar" />
    
    <target name="package-webframeworkcommons-jar"
               depends="compile-webframeworkcommons">
@@ -1614,55 +1429,6 @@
       <jar jarfile="${dir.project.webframeworkcommons.dist}/${file.name.jar.webframeworkcommons}" 
            basedir="${dir.project.webframeworkcommons.classes}" />
    </target>
-
-   <target name="package-webframeworkcommons-war" 
-           depends="assemble-webframeworkcommons-war">
-      <war warfile="${dir.project.webframeworkcommons.dist}/${file.name.war.webframeworkcommons}" 
-           webxml="${dir.project.webframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webframeworkcommons.assemble}" />
-      </war>
-   </target>
-
-   <target name="assemble-webframeworkcommons-war" 
-           depends="package-webframeworkcommons-jar">
-      <mkdir dir="${dir.project.webframeworkcommons.assemble}" />
-      
-      <!-- copy all required files from webscript and web framework projects -->
-      <copy todir="${dir.project.webframeworkcommons.assemble}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
-      </copy>
-      
-      <copy todir="${dir.project.webframeworkcommons.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.webframework.config}" excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
-      </copy>
-
-      <!-- add all JAR to WEB-INF/lib -->
-      <copy todir="${dir.project.webframeworkcommons.assemble}/WEB-INF/lib">
-         <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webscriptframework.libs}" />
-         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
-                  includes="${includes.webscriptframework.libs.spring-surf}" />
-         <fileset dir="${dir.project.3rdparty.lib}/optional" 
-                  includes="${includes.webscriptframework.libs.optional}" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
-                  includes="${includes.webscriptframework.libs.abdera}" />
-         <fileset dir="${dir.project.core.dist}" 
-                  includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
-         <fileset dir="${dir.project.webframeworkcommons.dist}" 
-                  includes="${file.name.jar.webframeworkcommons}" />
-      </copy>
-   </target>  
    
    <target name="test-webframeworkcommons" 
            depends="compile-webframeworkcommons">
@@ -1676,9 +1442,10 @@
                          projectdir="${dir.project.webframeworkcommons}" />
    </target>
    
-   <!-- **************************************** -->
-   <!-- ** Web Client 3.0 (Slingshot) Project ** -->
-   <!-- **************************************** -->
+   
+   <!-- ******************************* -->
+   <!-- ** Share (Slingshot) Project ** -->
+   <!-- ******************************* -->
    
    <target name="incremental-slingshot" 
            depends="package-slingshot" />
@@ -1724,7 +1491,7 @@
       <copy todir="${dir.project.slingshot.assemble}">
          <fileset dir="${dir.project.slingshot.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
-      <!-- next copy all required files from webscript, web framework and web framework commons projects -->
+      <!-- next copy all required files from web framework commons projects -->
       <copy todir="${dir.project.slingshot.assemble}">
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
@@ -1902,8 +1669,6 @@
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.config}"
                   excludes="**/extension/**" />
-         <fileset dir="${dir.project.webscriptframework.config}"
-                  excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webclient.config}"
                   excludes="**/extension/**" />
          <!-- 
@@ -1957,18 +1722,18 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.repository.dist}" 
                   includes="${file.name.jar.repository}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.linkvalidation.dist}" 
                   includes="${file.name.jar.linkvalidation}" />
          <fileset dir="${dir.project.mbeans.dist}" 
                   includes="${file.name.jar.mbeans}" />
          <fileset dir="${dir.project.deployment.dist}"
                   includes="${file.name.jar.deployment}"/>
-        <fileset dir="${dir.project.wdrdeployment.dist}"
+         <fileset dir="${dir.project.wdrdeployment.dist}"
                  includes="${file.name.jar.wdrdeployment}"/>
          <fileset dir="${dir.project.remoteapi.dist}" 
                   includes="${file.name.jar.remoteapi}" />
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                  includes="${file.name.jar.webframeworkcommons}" />
          <fileset dir="${dir.project.jlan.dist}" 
                   includes="${file.name.jar.jlan}" />
       </copy>
@@ -3225,98 +2990,6 @@
                          windowtitle="Alfresco JLAN API" 
                          projectdir="${dir.project.jlan}"/>
    </target>
-
-   
-   <!-- ************************************* -->
-   <!-- ** Web Framework (Surf) Project ** -->
-   <!-- ************************************* -->
-
-   <!-- Builds an empty Surf application (delivery tier) -->
-   <target name="incremental-surf" 
-           depends="build-surf-empty">
-                    
-      <war warfile="${dir.project.webframework.dist}/surf.war" 
-           webxml="${dir.project.webframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webframework.assemble}" />
-      </war>
-                    
-   </target>
-           
-   <!-- Builds a starter Surf application (delivery tier) -->
-   <target name="incremental-surf-starter" 
-           depends="build-surf-empty">
-
-      <!-- copy all required files from project: web-framework-samples -->
-      <copy todir="${dir.project.webframework.assemble}">
-         <fileset dir="${dir.projects}/web-framework-samples/source/web" excludes="WEB-INF/web.xml" />
-      </copy>
-      <copy todir="${dir.project.webframework.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.projects}/web-framework-samples/config" excludes="**/web-extension/**" />
-      </copy>
-      
-      <war warfile="${dir.project.webframework.dist}/surf.war" 
-           webxml="${dir.project.webframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webframework.assemble}" />
-      </war>      
-      
-   </target>
-   
-   <!-- Builds an empty Surf application (authoring tier) -->
-   <target name="incremental-surfauthoring" 
-           depends="build-surf-empty">
-                    
-      <!-- Copy Surf Authoring configuration files into the assembly -->
-      <copy   file="${dir.project.webframework}/config/alfresco/web-extension/custom-web-framework-application-context.xml.preview"
-            tofile="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/web-extension/custom-web-framework-application-context.xml"/>
-      <copy   file="${dir.project.webframework}/config/alfresco/web-extension/web-framework-config-custom.xml.preview"
-            tofile="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/web-extension/web-framework-config-custom.xml"/>
-                    
-      <war warfile="${dir.project.webframework.dist}/surf-preview.war" 
-           webxml="${dir.project.webframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webframework.assemble}" />
-      </war>
-                    
-   </target>
-   
-   <!-- Inits the environment for a surf app build -->
-   <target name="clean-surf"
-           depends="clean-webscriptframework,
-                    clean-webframework" />   
-   
-   <target name="build-surf-empty"
-           depends="incremental-core,
-                    package-webscriptframework-jar, 
-                    package-webframework-jar, 
-                    package-webframeworkcommons-jar,
-                    assemble-surf-war" />
-
-   <target name="assemble-surf-war" 
-           depends="assemble-webframework-war">
-
-      <!-- Removing any and all test objects -->
-      <delete includeemptydirs="true" quiet="yes">
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts"
-      	          includes="**/*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates"
-      	          includes="**/*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/components"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/configurations"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/content-associations"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/page-associations"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/pages"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/template-instances"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco"
-      	          includes="**/*-test.xml" defaultexcludes="false" />
-      </delete>
-      
-      <mkdir dir="${dir.project.webframework.dist}" />
-   </target>
    
    
    <!-- ************************ -->
@@ -3363,17 +3036,13 @@
            depends="package-mobile-jar">
       <mkdir dir="${dir.project.mobile.assemble}" />
       
-      <!-- copy all required files from webscript and webframework projects -->
+      <!-- copy all required files -->
       <copy todir="${dir.project.mobile.assemble}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.mobile.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
       <copy todir="${dir.project.mobile.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
          <fileset dir="${dir.project.mobile.config}" excludes="**/web-extension/**" />
       </copy>
       
@@ -3391,10 +3060,6 @@
                   includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
          <fileset dir="${dir.project.mobile.dist}" 
                   includes="${file.name.jar.mobile}" />
       </copy>

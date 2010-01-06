@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<page>
-   <id>welcome</id>
-   <title>The test welcome page</title>
-   <template-instance>welcome-main</template-instance>
-   <authentication>none</authentication>
-</page>

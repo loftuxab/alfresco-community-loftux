@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" sourcepath="/3rd Party/src/spring-webscripts-1.0.0.CI-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/spring-surf/spring-surf-core-1.0.0.CI-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/spring-surf/spring-surf-core-configservice-1.0.0.CI-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/org.springframework.webmvc-3.0.0.104.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/org.springframework.webmvc-3.0.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

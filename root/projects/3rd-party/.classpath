@@ -67,7 +67,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/j2ee/jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/j2ee/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/devenv/org.springframework.test-3.0.0.CI-499.jar" sourcepath="src/org.springframework.test-sources-3.0.0.CI-499.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/devenv/org.springframework.test-3.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/devenv/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guessencoding-1.0.jar" sourcepath="src/guessencoding-1.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-lang-2.1.jar"/>
@@ -111,17 +111,17 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/XmlSchema-1.4.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.core-3.0.0.CI-499.jar" sourcepath="src/org.springframework.core-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.beans-3.0.0.CI-499.jar" sourcepath="src/org.springframework.beans-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.expression-3.0.0.CI-499.jar" sourcepath="src/org.springframework.expression-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context-3.0.0.CI-499.jar" sourcepath="src/org.springframework.context-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context.support-3.0.0.CI-499.jar" sourcepath="src/org.springframework.context.support-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.transaction-3.0.0.CI-499.jar" sourcepath="src/org.springframework.transaction-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.aop-3.0.0.CI-499.jar" sourcepath="src/org.springframework.aop-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.asm-3.0.0.CI-499.jar" sourcepath="src/org.springframework.asm-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.jdbc-3.0.0.CI-499.jar" sourcepath="src/org.springframework.jdbc-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.orm-3.0.0.CI-499.jar" sourcepath="src/org.springframework.orm-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.web-3.0.0.CI-499.jar" sourcepath="src/org.springframework.web-sources-3.0.0.CI-499.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.core-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.beans-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.expression-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context.support-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.transaction-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.aop-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.asm-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.jdbc-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.orm-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.web-3.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar" sourcepath="src/PDFRenderer-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>

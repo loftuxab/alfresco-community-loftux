@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>Web Script Family Index</shortname>
-  <description>Provide an index of Web Scripts for the specified family</description>
-  <url>/index/family/{family}</url>
-  <authentication>admin</authentication>
-  <lifecycle>internal</lifecycle>
-</webscript>

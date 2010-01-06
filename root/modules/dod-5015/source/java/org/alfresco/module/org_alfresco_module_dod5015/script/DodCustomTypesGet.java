@@ -34,10 +34,10 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.web.scripts.Cache;
-import org.alfresco.web.scripts.DeclarativeWebScript;
-import org.alfresco.web.scripts.Status;
-import org.alfresco.web.scripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.Cache;
+import org.springframework.extensions.webscripts.DeclarativeWebScript;
+import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.WebScriptRequest;
 
 /**
  * This class provides the implementation for the dodcustomtypes.get webscript.

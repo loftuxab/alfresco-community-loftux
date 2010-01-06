@@ -26,12 +26,13 @@ package org.alfresco.module.vti.web.scripts;
 
 import java.io.IOException;
 import java.io.Writer;
+
 import org.springframework.extensions.surf.util.StringBuilderWriter;
-import org.alfresco.web.scripts.json.JSONWriter;
-import org.alfresco.web.scripts.AbstractWebScript;
-import org.alfresco.web.scripts.WebScriptException;
-import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
+import org.springframework.extensions.webscripts.AbstractWebScript;
+import org.springframework.extensions.webscripts.WebScriptException;
+import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptResponse;
+import org.springframework.extensions.webscripts.json.JSONWriter;
 
 
 /**
