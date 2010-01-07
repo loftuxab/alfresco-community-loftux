@@ -128,6 +128,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-core-configservice-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT-tests.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-api-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-1.0.0.CI-SNAPSHOT.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/devenv/mysql-connector-java-5.1.7-bin.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/j2ee/servlet.jar" />
