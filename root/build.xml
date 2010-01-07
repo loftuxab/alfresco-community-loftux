@@ -244,6 +244,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/org.springframework.jdbc-${file.version.springframework}.jar"/>
          <pathelement location="${dir.project.3rdparty.lib}/org.springframework.orm-${file.version.springframework}.jar"/>
          <pathelement location="${dir.project.3rdparty.lib}/org.springframework.web-${file.version.springframework}.jar"/>
+         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.webmvc-${file.version.springframework}.jar"/>
          <pathelement location="${dir.project.3rdparty.lib}/standard.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/stax-utils-20060502.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/subetha-smtp.jar" />
