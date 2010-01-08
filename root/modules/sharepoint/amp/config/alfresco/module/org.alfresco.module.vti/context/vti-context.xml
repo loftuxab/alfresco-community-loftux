@@ -3,7 +3,7 @@
 
 <beans>
 
-    <bean id="vtiResourceBundles" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
+    <bean id="vtiResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
         <property name="resourceBundles">
             <list>
                 <value>alfresco.messages.vti-webview</value>
