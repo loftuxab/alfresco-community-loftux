@@ -12,13 +12,13 @@
    </context-param>
    
    <filter>
-      <description>Set HTTP cache Expires header 30 days forward for a mapping.</description>
       <filter-name>CacheExpiresFilter</filter-name>
+      <description>Set HTTP cache Expires header 30 days forward for a mapping.</description>
       <filter-class>org.alfresco.web.scripts.servlet.StaticAssetCacheFilter</filter-class>
       <init-param>
-         <description>Add an Expires Header 30 days forward</description>
          <param-name>expires</param-name>
          <param-value>30</param-value>
+         <description>Add an Expires Header 30 days forward</description>
       </init-param>
    </filter>
    
