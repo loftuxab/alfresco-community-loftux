@@ -11,6 +11,21 @@
       <param-value>true</param-value>
    </context-param>
    
+   <!-- Spring Application Context location and context class -->
+   <context-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>/WEB-INF/classes/web-application-config.xml</param-value>
+      <description>Spring config file location</description>
+   </context-param>
+   <!-- TODO: resolve this - needs JBoss specific JBossVFSHelper available
+        NOTE: may not be required with Spring3.0.0
+   <context-param>
+      <param-name>contextClass</param-name>
+      <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
+      <description>Spring context class</description>
+   </context-param>
+   -->
+   
    <filter>
       <filter-name>CacheExpiresFilter</filter-name>
       <description>Set HTTP cache Expires header 30 days forward for a mapping.</description>
@@ -22,16 +37,16 @@
       </init-param>
    </filter>
    
-   <!-- Enables clean URLs with JSP views e.g. /welcome instead of /page/welcome -->
    <filter>
       <filter-name>UrlRewriteFilter</filter-name>
+      <description>Redirects view and service URLs to the dispatcher servlet.</description>
       <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
    </filter>
    
-   <!-- For NTLM authentication support use the following filter and the mappings below -->
-   <!--
+   <!-- For NTLM authentication support use the following filter and the mappings below
    <filter>
       <filter-name>Authentication Filter</filter-name>
+      <description>Share NTLM authentication support filter.</description>
       <filter-class>org.alfresco.web.site.servlet.NTLMAuthenticationFilter</filter-class>
       <init-param>
          <param-name>endpoint</param-name>
@@ -77,8 +92,7 @@
    </filter-mapping>
    
    <!-- For NTLM authentication support enable the following mappings -->
-   <!-- after enabling the NTLMAuthenticationFilter filter class above -->
-   <!--
+   <!-- after enabling the NTLMAuthenticationFilter filter class above
    <filter-mapping>
       <filter-name>Authentication Filter</filter-name>
       <url-pattern>/page/*</url-pattern>
@@ -88,27 +102,21 @@
       <filter-name>Authentication Filter</filter-name>
       <url-pattern>/p/*</url-pattern>
    </filter-mapping>
-   
-   <filter-mapping>
-      <filter-name>Authentication Filter</filter-name>
-      <url-pattern>/s/*</url-pattern>
-   </filter-mapping>
    -->
+   
+   <!-- Spring Context Loader listener - the name of the default global context is passed to the DispatcherServlet
+        in the servlet definition below - this is to allow the NTLM filter etc. to find the single app context -->
+   <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
    
    <servlet>
       <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
       <init-param>
-         <param-name>contextConfigLocation</param-name>
-         <param-value>/WEB-INF/classes/web-application-config.xml</param-value>
+         <param-name>contextAttribute</param-name>
+         <param-value>org.springframework.web.context.WebApplicationContext.ROOT</param-value>
       </init-param>
-      <!-- TODO: resolve this - needs JBoss specific JBossVFSHelper available
-      <init-param>
-         <param-name>contextClass</param-name>
-         <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
-         <description>Spring context class</description>
-      </init-param>
-      -->
       <load-on-startup>1</load-on-startup>
    </servlet>
    
