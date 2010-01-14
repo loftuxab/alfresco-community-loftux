@@ -538,13 +538,13 @@ Alfresco.util.fromExplodedJSONDate = function(date)
          {
             ++p_value;
          }
-			p_value = String(p_value);
-			var length = parseInt(p_meta, 10) || 2;
-			while (p_value.length < length)
-			{
-				p_value = "0" + p_value;
-			}
-			return p_value;
+         p_value = String(p_value);
+         var length = parseInt(p_meta, 10) || 2;
+         while (p_value.length < length)
+         {
+            p_value = "0" + p_value;
+         }
+         return p_value;
       });
       return Alfresco.thirdparty.fromISO8601.apply(this, [isoDate, Array.prototype.slice.call(arguments).slice(1)]);
    }
@@ -601,13 +601,13 @@ Alfresco.util.toExplodedJSONDate = function(date)
  */
 Alfresco.util.pad = function(value, length)
 {
-	value = String(value);
-	length = parseInt(length, 10) || 2;
-	while (value.length < length)
-	{
-		value = "0" + value;
-	}
-	return value;
+   value = String(value);
+   length = parseInt(length, 10) || 2;
+   while (value.length < length)
+   {
+      value = "0" + value;
+   }
+   return value;
 };
 
 /**
@@ -1622,16 +1622,17 @@ Alfresco.util.setVar = function(p_name, p_value)
  */
 Alfresco.util.getTags = function(str)
 {
-   var tag = null,
+   var match = null,
       tags = [],
-      regexp = /([^\s\"\*\\\>\<\?\/\:\|]+)/gi;
+      regexp = new RegExp(/([^"^\s]+)\s*|"([^"]+)"\s*/g);
 
-   while ((tag = regexp.exec(str)))
+   while (match = regexp.exec(str))
    {
-      if (tags[tag[1]] === undefined)
+      tag = match[1] || match[2];
+      if (tags[tag] === undefined)
       {
-         tags[tag[1]] = true;
-         tags.push(tag[1]);
+         tags[tag] = true;
+         tags.push(tag);
       }
    }
    return tags;
@@ -1651,10 +1652,10 @@ Alfresco.util.cleanBubblingObject = function(callbackObj)
    // See Bubbling Library, fire() function. These fields are correct for v2.1.
    var augmented =
    {
-	   action: true,
-	   flagged: true,
-	   decrepitate: true,
-	   stop: true
+      action: true,
+      flagged: true,
+      decrepitate: true,
+      stop: true
    },
       cleanObj = {};
    
@@ -2742,7 +2743,7 @@ Alfresco.util.Ajax = function()
        *
        * @method request
        * @param obj
-       * @param encode	indicates whether the parameter values should be encoded or not
+       * @param encode   indicates whether the parameter values should be encoded or not
        * @private
        */
       jsonToParamString: function(obj, encode)
@@ -3428,91 +3429,96 @@ else
 Alfresco.thirdparty.dateFormat = function()
 {
    /*** dateFormat
-   	Accepts a date, a mask, or a date and a mask.
-   	Returns a formatted version of the given date.
-   	The date defaults to the current date/time.
-   	The mask defaults ``"ddd mmm d yyyy HH:MM:ss"``.
+      Accepts a date, a mask, or a date and a mask.
+      Returns a formatted version of the given date.
+      The date defaults to the current date/time.
+      The mask defaults ``"ddd mmm d yyyy HH:MM:ss"``.
    */
    var dateFormat = function()
    {
-   	var   token        = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloZ]|"[^"]*"|'[^']*'/g,
-      		timezone     = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
-      		timezoneClip = /[^-+\dA-Z]/g,
-      		pad = function (value, length)
-      		{
-      			value = String(value);
-      			length = parseInt(length, 10) || 2;
-      			while (value.length < length)
-      			{
-      				value = "0" + value;
-      			}
-      			return value;
-      		};
+      var   token        = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloZ]|"[^"]*"|'[^']*'/g,
+            timezone     = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
+            timezoneClip = /[^-+\dA-Z]/g,
+            pad = function (value, length)
+            {
+               value = String(value);
+               length = parseInt(length, 10) || 2;
+               while (value.length < length)
+               {
+                  value = "0" + value;
+               }
+               return value;
+            };
 
-   	// Regexes and supporting functions are cached through closure
-   	return function (date, mask)
-   	{
-   		// Treat the first argument as a mask if it doesn't contain any numbers
-   		if (arguments.length == 1 &&
-   			   (typeof date == "string" || date instanceof String) &&
-   			   !/\d/.test(date))
-   		{
-   			mask = date;
-   			date = undefined;
-   		}
+      // Regexes and supporting functions are cached through closure
+      return function (date, mask)
+      {
+         // Treat the first argument as a mask if it doesn't contain any numbers
+         if (arguments.length == 1 &&
+               (typeof date == "string" || date instanceof String) &&
+               !/\d/.test(date))
+         {
+            mask = date;
+            date = undefined;
+         }
+         
+         if (typeof date == "string")
+         { 
+            date = date.replace(".", ""); 
+         }
 
-   		date = date ? new Date(date) : new Date();
-   		if (isNaN(date))
-   		{
-   			throw "invalid date";
-   		}
+         date = date ? new Date(date) : new Date();
+         if (isNaN(date))
+         {
+            throw "invalid date";
+         }
 
-   		mask = String(this.masks[mask] || mask || this.masks["default"]);
+         mask = String(this.masks[mask] || mask || this.masks["default"]);
 
-   		var d = date.getDate(),
-   			 D = date.getDay(),
-   			 m = date.getMonth(),
-   			 y = date.getFullYear(),
-   			 H = date.getHours(),
-   			 M = date.getMinutes(),
-   			 s = date.getSeconds(),
-   			 L = date.getMilliseconds(),
-   			 o = date.getTimezoneOffset(),
-   			 flags =
-   			 {
-   				 d:    d,
-   				 dd:   pad(d),
-   				 ddd:  this.i18n.dayNames[D],
-   				 dddd: this.i18n.dayNames[D + 7],
-   				 m:    m + 1,
-   				 mm:   pad(m + 1),
-   				 mmm:  this.i18n.monthNames[m],
-   				 mmmm: this.i18n.monthNames[m + 12],
-   				 yy:   String(y).slice(2),
-   				 yyyy: y,
-   				 h:    H % 12 || 12,
-   				 hh:   pad(H % 12 || 12),
-   				 H:    H,
-   				 HH:   pad(H),
-   				 M:    M,
-   				 MM:   pad(M),
-   				 s:    s,
-   				 ss:   pad(s),
-   				 l:    pad(L, 3),
-   				 L:    pad(L > 99 ? Math.round(L / 10) : L),
-   				 t:    H < 12 ? this.TIME_AM.charAt(0) : this.TIME_PM.charAt(0),
-   				 tt:   H < 12 ? this.TIME_AM : this.TIME_PM,
-   				 T:    H < 12 ? this.TIME_AM.charAt(0).toUpperCase() : this.TIME_PM.charAt(0).toUpperCase(),
-   				 TT:   H < 12 ? this.TIME_AM.toUpperCase() : this.TIME_PM.toUpperCase(),
-   				 Z:    (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
-   				 o:    (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4)
-   			 };
+         var d = date.getDate(),
+             D = date.getDay(),
+             m = date.getMonth(),
+             y = date.getFullYear(),
+             H = date.getHours(),
+             M = date.getMinutes(),
+             s = date.getSeconds(),
+             L = date.getMilliseconds(),
+             o = date.getTimezoneOffset(),
+             flags =
+             {
+                d:    d,
+                dd:   pad(d),
+                ddd:  this.i18n.dayNames[D],
+                dddd: this.i18n.dayNames[D + 7],
+                m:    m + 1,
+                mm:   pad(m + 1),
+                mmm:  this.i18n.monthNames[m],
+                mmmm: this.i18n.monthNames[m + 12],
+                yy:   String(y).slice(2),
+                yyyy: y,
+                h:    H % 12 || 12,
+                hh:   pad(H % 12 || 12),
+                H:    H,
+                HH:   pad(H),
+                M:    M,
+                MM:   pad(M),
+                s:    s,
+                ss:   pad(s),
+                l:    pad(L, 3),
+                L:    pad(L > 99 ? Math.round(L / 10) : L),
+                t:    H < 12 ? this.TIME_AM.charAt(0) : this.TIME_PM.charAt(0),
+                tt:   H < 12 ? this.TIME_AM : this.TIME_PM,
+                T:    H < 12 ? this.TIME_AM.charAt(0).toUpperCase() : this.TIME_PM.charAt(0).toUpperCase(),
+                TT:   H < 12 ? this.TIME_AM.toUpperCase() : this.TIME_PM.toUpperCase(),
+                Z:    (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
+                o:    (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4)
+             };
 
-   		return mask.replace(token, function ($0)
-   		{
-   			return ($0 in flags) ? flags[$0] : $0.slice(1, $0.length - 1);
-   		});
-   	};
+         return mask.replace(token, function ($0)
+         {
+            return ($0 in flags) ? flags[$0] : $0.slice(1, $0.length - 1);
+         });
+      };
    }();
 
    /**
@@ -3526,24 +3532,24 @@ Alfresco.thirdparty.dateFormat.TIME_AM = Alfresco.util.message("date-format.am")
 Alfresco.thirdparty.dateFormat.TIME_PM = Alfresco.util.message("date-format.pm");
 Alfresco.thirdparty.dateFormat.masks =
 {
-	"default":       Alfresco.util.message("date-format.default"),
-	defaultDateOnly: Alfresco.util.message("date-format.defaultDateOnly"),
-	shortDate:       Alfresco.util.message("date-format.shortDate"),
-	mediumDate:      Alfresco.util.message("date-format.mediumDate"),
-	longDate:        Alfresco.util.message("date-format.longDate"),
-	fullDate:        Alfresco.util.message("date-format.fullDate"),
-	shortTime:       Alfresco.util.message("date-format.shortTime"),
-	mediumTime:      Alfresco.util.message("date-format.mediumTime"),
-	longTime:        Alfresco.util.message("date-format.longTime"),
-	isoDate:         "yyyy-mm-dd",
-	isoTime:         "HH:MM:ss",
-	isoDateTime:     "yyyy-mm-dd'T'HH:MM:ss",
-	isoFullDateTime: "yyyy-mm-dd'T'HH:MM:ss.lo"
+   "default":       Alfresco.util.message("date-format.default"),
+   defaultDateOnly: Alfresco.util.message("date-format.defaultDateOnly"),
+   shortDate:       Alfresco.util.message("date-format.shortDate"),
+   mediumDate:      Alfresco.util.message("date-format.mediumDate"),
+   longDate:        Alfresco.util.message("date-format.longDate"),
+   fullDate:        Alfresco.util.message("date-format.fullDate"),
+   shortTime:       Alfresco.util.message("date-format.shortTime"),
+   mediumTime:      Alfresco.util.message("date-format.mediumTime"),
+   longTime:        Alfresco.util.message("date-format.longTime"),
+   isoDate:         "yyyy-mm-dd",
+   isoTime:         "HH:MM:ss",
+   isoDateTime:     "yyyy-mm-dd'T'HH:MM:ss",
+   isoFullDateTime: "yyyy-mm-dd'T'HH:MM:ss.lo"
 };
 Alfresco.thirdparty.dateFormat.i18n =
 {
-	dayNames: Alfresco.thirdparty.dateFormat.DAY_NAMES,
-	monthNames: Alfresco.thirdparty.dateFormat.MONTH_NAMES
+   dayNames: Alfresco.thirdparty.dateFormat.DAY_NAMES,
+   monthNames: Alfresco.thirdparty.dateFormat.MONTH_NAMES
 };
 
 
@@ -3565,70 +3571,70 @@ Alfresco.thirdparty.fromISO8601 = function()
 {
    var fromISOString = function()
    {
-      //	summary:
-      //		Returns a Date object given a string formatted according to a subset of the ISO-8601 standard.
+      //   summary:
+      //      Returns a Date object given a string formatted according to a subset of the ISO-8601 standard.
       //
-      //	description:
-      //		Accepts a string formatted according to a profile of ISO8601 as defined by
-      //		[RFC3339](http://www.ietf.org/rfc/rfc3339.txt), except that partial input is allowed.
-      //		Can also process dates as specified [by the W3C](http://www.w3.org/TR/NOTE-datetime)
-      //		The following combinations are valid:
+      //   description:
+      //      Accepts a string formatted according to a profile of ISO8601 as defined by
+      //      [RFC3339](http://www.ietf.org/rfc/rfc3339.txt), except that partial input is allowed.
+      //      Can also process dates as specified [by the W3C](http://www.w3.org/TR/NOTE-datetime)
+      //      The following combinations are valid:
       //
-      //			* dates only
-      //			|	* yyyy
-      //			|	* yyyy-MM
-      //			|	* yyyy-MM-dd
-      // 			* times only, with an optional time zone appended
-      //			|	* THH:mm
-      //			|	* THH:mm:ss
-      //			|	* THH:mm:ss.SSS
-      // 			* and "datetimes" which could be any combination of the above
+      //         * dates only
+      //         |   * yyyy
+      //         |   * yyyy-MM
+      //         |   * yyyy-MM-dd
+      //          * times only, with an optional time zone appended
+      //         |   * THH:mm
+      //         |   * THH:mm:ss
+      //         |   * THH:mm:ss.SSS
+      //          * and "datetimes" which could be any combination of the above
       //
-      //		timezones may be specified as Z (for UTC) or +/- followed by a time expression HH:mm
-      //		Assumes the local time zone if not specified.  Does not validate.  Improperly formatted
-      //		input may return null.  Arguments which are out of bounds will be handled
-      //		by the Date constructor (e.g. January 32nd typically gets resolved to February 1st)
-      //		Only years between 100 and 9999 are supported.
+      //      timezones may be specified as Z (for UTC) or +/- followed by a time expression HH:mm
+      //      Assumes the local time zone if not specified.  Does not validate.  Improperly formatted
+      //      input may return null.  Arguments which are out of bounds will be handled
+      //      by the Date constructor (e.g. January 32nd typically gets resolved to February 1st)
+      //      Only years between 100 and 9999 are supported.
       //
-      //	formattedString:
-      //		A string such as 2005-06-30T08:05:00-07:00 or 2005-06-30 or T08:05:00
+      //   formattedString:
+      //      A string such as 2005-06-30T08:05:00-07:00 or 2005-06-30 or T08:05:00
 
       var isoRegExp = /^(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(.\d+)?)?((?:[+-](\d{2}):(\d{2}))|Z)?)?$/;
 
       return function(formattedString)
       {
-      	var match = isoRegExp.exec(formattedString);
-      	var result = null;
+         var match = isoRegExp.exec(formattedString);
+         var result = null;
 
-      	if (match)
-      	{
-      		match.shift();
-      		if (match[1]){match[1]--;} // Javascript Date months are 0-based
-      		if (match[6]){match[6] *= 1000;} // Javascript Date expects fractional seconds as milliseconds
+         if (match)
+         {
+            match.shift();
+            if (match[1]){match[1]--;} // Javascript Date months are 0-based
+            if (match[6]){match[6] *= 1000;} // Javascript Date expects fractional seconds as milliseconds
 
-      		result = new Date(match[0]||1970, match[1]||0, match[2]||1, match[3]||0, match[4]||0, match[5]||0, match[6]||0);
+            result = new Date(match[0]||1970, match[1]||0, match[2]||1, match[3]||0, match[4]||0, match[5]||0, match[6]||0);
 
-      		var offset = 0;
-      		var zoneSign = match[7] && match[7].charAt(0);
-      		if (zoneSign != 'Z')
-      		{
-      			offset = ((match[8] || 0) * 60) + (Number(match[9]) || 0);
-      			if (zoneSign != '-')
-      			{
-      			   offset *= -1;
-      			}
-      		}
-      		if (zoneSign)
-      		{
-      			offset -= result.getTimezoneOffset();
-      		}
-      		if (offset)
-      		{
-      			result.setTime(result.getTime() + offset * 60000);
-      		}
-      	}
+            var offset = 0;
+            var zoneSign = match[7] && match[7].charAt(0);
+            if (zoneSign != 'Z')
+            {
+               offset = ((match[8] || 0) * 60) + (Number(match[9]) || 0);
+               if (zoneSign != '-')
+               {
+                  offset *= -1;
+               }
+            }
+            if (zoneSign)
+            {
+               offset -= result.getTimezoneOffset();
+            }
+            if (offset)
+            {
+               result.setTime(result.getTime() + offset * 60000);
+            }
+         }
 
-      	return result; // Date or null
+         return result; // Date or null
       };
    }();
    
@@ -3657,52 +3663,52 @@ Alfresco.thirdparty.toISO8601 = function()
 {
    var toISOString = function()
    {
-      //	summary:
-      //		Format a Date object as a string according a subset of the ISO-8601 standard
+      //   summary:
+      //      Format a Date object as a string according a subset of the ISO-8601 standard
       //
-      //	description:
-      //		When options.selector is omitted, output follows [RFC3339](http://www.ietf.org/rfc/rfc3339.txt)
-      //		The local time zone is included as an offset from GMT, except when selector=='time' (time without a date)
-      //		Does not check bounds.  Only years between 100 and 9999 are supported.
+      //   description:
+      //      When options.selector is omitted, output follows [RFC3339](http://www.ietf.org/rfc/rfc3339.txt)
+      //      The local time zone is included as an offset from GMT, except when selector=='time' (time without a date)
+      //      Does not check bounds.  Only years between 100 and 9999 are supported.
       //
-      //	dateObject:
-      //		A Date object
-   	var _ = function(n){ return (n < 10) ? "0" + n : n; };
+      //   dateObject:
+      //      A Date object
+      var _ = function(n){ return (n < 10) ? "0" + n : n; };
 
       return function(dateObject, options)
       {
-      	options = options || {};
-      	var formattedDate = [];
-      	var getter = options.zulu ? "getUTC" : "get";
-      	var date = "";
-      	if (options.selector != "time")
-      	{
-      		var year = dateObject[getter+"FullYear"]();
-      		date = ["0000".substr((year+"").length)+year, _(dateObject[getter+"Month"]()+1), _(dateObject[getter+"Date"]())].join('-');
-      	}
-      	formattedDate.push(date);
-      	if (options.selector != "date")
-      	{
-      		var time = [_(dateObject[getter+"Hours"]()), _(dateObject[getter+"Minutes"]()), _(dateObject[getter+"Seconds"]())].join(':');
-      		var millis = dateObject[getter+"Milliseconds"]();
-      		if (options.milliseconds === undefined || options.milliseconds) 
-      		{
-      			time += "."+ (millis < 100 ? "0" : "") + _(millis);
-      		}
-      		if (options.zulu)
-      		{
-      			time += "Z";
-      		}
-      		else if (options.selector != "time")
-      		{
-      			var timezoneOffset = dateObject.getTimezoneOffset();
-      			var absOffset = Math.abs(timezoneOffset);
-      			time += (timezoneOffset > 0 ? "-" : "+") + 
-      				_(Math.floor(absOffset/60)) + ":" + _(absOffset%60);
-      		}
-      		formattedDate.push(time);
-      	}
-      	return formattedDate.join('T'); // String
+         options = options || {};
+         var formattedDate = [];
+         var getter = options.zulu ? "getUTC" : "get";
+         var date = "";
+         if (options.selector != "time")
+         {
+            var year = dateObject[getter+"FullYear"]();
+            date = ["0000".substr((year+"").length)+year, _(dateObject[getter+"Month"]()+1), _(dateObject[getter+"Date"]())].join('-');
+         }
+         formattedDate.push(date);
+         if (options.selector != "date")
+         {
+            var time = [_(dateObject[getter+"Hours"]()), _(dateObject[getter+"Minutes"]()), _(dateObject[getter+"Seconds"]())].join(':');
+            var millis = dateObject[getter+"Milliseconds"]();
+            if (options.milliseconds === undefined || options.milliseconds) 
+            {
+               time += "."+ (millis < 100 ? "0" : "") + _(millis);
+            }
+            if (options.zulu)
+            {
+               time += "Z";
+            }
+            else if (options.selector != "time")
+            {
+               var timezoneOffset = dateObject.getTimezoneOffset();
+               var absOffset = Math.abs(timezoneOffset);
+               time += (timezoneOffset > 0 ? "-" : "+") + 
+                  _(Math.floor(absOffset/60)) + ":" + _(absOffset%60);
+            }
+            formattedDate.push(time);
+         }
+         return formattedDate.join('T'); // String
       };
    }();
 
@@ -4347,10 +4353,13 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                }
                else if (candidates.length > 1)
                {
-                  if (obj.filterData.indexOf("]") !== -1)
+                  if (obj.filterData.indexOf("]") !== -1 || obj.filterData.indexOf(",") !== -1)
                   {
-                     // Special case handling, as YUI Selector doesn't work with "]" within an attribute
-                     // See http://yuilibrary.com/projects/yui2/ticket/1978321
+                     /**
+                      * Special case handling, as YUI Selector doesn't work with "]" or "," within an attribute
+                      * See http://yuilibrary.com/projects/yui2/ticket/1978321 ("]" issue)
+                      * and comment in selector-debug.js ("," issue)
+                      */
                      for (var i = 0, ii = candidates.length; i < ii; i++)
                      {
                         if (candidates[i].firstChild.rel == obj.filterData)

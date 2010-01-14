@@ -196,7 +196,11 @@
                obj: null,
                scope: this
             };
-            tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.nodeName);
+            tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.regexMatch,
+            {
+               pattern: /([\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)/,
+               match: false
+            });
             tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.mandatory);
             tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.length,
             {
@@ -377,7 +381,7 @@
       onPopularTagsLinkClicked: function TagLibrary_onPopularTagsLinkClicked(e, obj)
       {
          // load the popular tags through an ajax call
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/tags?d={d}&tn={tn}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/tags?d={d}&topN={tn}",
          {
             site: this.options.siteId,
             d: new Date().getTime(),

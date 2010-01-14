@@ -29,14 +29,16 @@
                <label for="${args.htmlid}-minorVersion-radioButton">${msg("label.version")}</label>
             </div>
             <div class="yui-u">
-               <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" /> ${msg("label.minorVersion")}
+               <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" tabindex="0"/>
+               <label for="${args.htmlid}-minorVersion-radioButton">${msg("label.minorVersion")}</label>
             </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first">&nbsp;
             </div>
             <div class="yui-u">
-               <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion" /> ${msg("label.majorVersion")}
+               <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion" tabindex="0"/>
+               <label for="${args.htmlid}-majorVersion-radioButton">${msg("label.majorVersion")}</label>
             </div>
          </div>
          <div class="yui-gd">
@@ -44,7 +46,7 @@
                <label for="${args.htmlid}-description-textarea">${msg("label.comments")}</label>
             </div>
             <div class="yui-u">
-               <textarea id="${args.htmlid}-description-textarea" name="description" cols="80" rows="4"></textarea>
+               <textarea id="${args.htmlid}-description-textarea" name="description" cols="80" rows="4" tabindex="0"></textarea>
             </div>
          </div>
       </div>
@@ -53,13 +55,17 @@
       <div style="display:none">
          <div id="${args.htmlid}-left-div" class="fileupload-left-div">
             <span class="fileupload-percentage-span hidden">&nbsp;</span>
-            <select class="fileupload-contentType-select <#if (contentTypes?size == 1)>hidden</#if>">
+            <#if (contentTypes?size == 1)>
+            <input class="fileupload-contentType-input" type="hidden" value="${contentTypes[0].id}"/>
+            <#elseif (contentTypes?size > 1)>
+            <select class="fileupload-contentType-select" tabindex="0">
                <#if (contentTypes?size > 0)>
                   <#list contentTypes as contentType>
                      <option value="${contentType.id}">${msg(contentType.value)}</option>
                   </#list>
                </#if>
             </select>
+            </#if>
          </div>
          <div id="${args.htmlid}-center-div" class="fileupload-center-div">
             <span class="fileupload-progressSuccess-span">&nbsp;</span>
@@ -68,13 +74,13 @@
          </div>
          <div id="${args.htmlid}-right-div" class="fileupload-right-div">
             <span class="fileupload-fileButton-span">
-               <button class="fileupload-file-button" value="Remove">${msg("button.remove")}</button>
+               <button class="fileupload-file-button" value="Remove" disabled="true" tabindex="0">${msg("button.remove")}</button>
             </span>
          </div>
       </div>
          <div class="bdft">
-            <input id="${args.htmlid}-upload-button" type="button" value="${msg("button.upload")}" />
-            <input id="${args.htmlid}-cancelOk-button" type="button" value="${msg("button.cancel")}" />
+            <input id="${args.htmlid}-upload-button" type="button" value="${msg("button.upload")}" tabindex="0"/>
+            <input id="${args.htmlid}-cancelOk-button" type="button" value="${msg("button.cancel")}" tabindex="0"/>
          </div>
    </div>
 </div>
