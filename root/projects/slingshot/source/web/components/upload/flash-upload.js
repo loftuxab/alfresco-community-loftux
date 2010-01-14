@@ -169,7 +169,7 @@
        *       literal as the value.
        *       The object literal is of the form:
        *       {
-       *          contentType: {HTMLElement},        // select that holds the chosen contentType for the file.
+       *          contentType: {HTMLElement},        // select, hidden input or null (holds the chosen contentType for the file).
        *          fileButton: {YAHOO.widget.Button}, // Will be disabled on success or STATE_FAILURE
        *          state: {int},                      // Keeps track if the individual file has been successfully uploaded or failed
        *                                             // (state flow: STATE_BROWSING > STATE_UPLOADING > STATE_SUCCESS or STATE_FAILURE)
@@ -534,6 +534,21 @@
          // Enable the Esc key listener
          this.widgets.escapeListener.enable();
 
+         // Remove the a elements to make tabbing work as expeceted
+         var swfObjectCreatedElements = Dom.getChildren(this.id + "-flashuploader-div"),
+            el,
+            tagName;
+         for (var i = 0, il = swfObjectCreatedElements.length; i < il; i++)
+         {
+            el = swfObjectCreatedElements[i];
+            tagName = el.tagName.toLowerCase();
+            if (tagName == "a")
+            {
+               el.parentNode.removeChild(el);
+            }
+         }
+         this.panel.setFirstLastFocusable();
+
          // Show the upload panel
          this.panel.show();
 
@@ -544,12 +559,6 @@
          {
             Dom.addClass(swfWrapper, "button-fix");
          }
-
-         var swf = Dom.getChildrenBy(Dom.get(this.id + "-flashuploader-div"), function(node)
-         {
-            return node.tagName.toLowerCase() == "embed" || node.tagName.toLowerCase() == "object";
-         })[0];
-         swf.focus();
       },
 
       /**
@@ -584,6 +593,8 @@
          if (this.dataTable.getRecordSet().getLength() > 0)
          {
             this.widgets.uploadButton.set("disabled", false);
+            this.panel.setFirstLastFocusable();
+            this.panel.focusFirst();
          }
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
@@ -600,7 +611,7 @@
 
 
       /**
-       * Fired by YUI:s DataTable when a row has been added to the data table list.
+       * Fired by YUI:s DataTable when a row has been deleted to the data table list.
        * Keeps track of added files.
        *
        * @method onRowDeleteEvent
@@ -608,6 +619,9 @@
        */
       onRowDeleteEvent: function FlashUpload_onRowDeleteEvent(event)
       {
+         // Update tabbing and focus
+         this.panel.setFirstLastFocusable();
+         this.panel.focusFirst();         
       },
 
       /**
@@ -673,7 +687,10 @@
          var fileInfo = this.fileStore[event.id];
 
          // Hide the contentType drop down if it wasn't hidden already
-         Dom.addClass(fileInfo.contentType, "hidden");
+         if (fileInfo.contentType)
+         {
+            Dom.addClass(fileInfo.contentType, "hidden");
+         }
 
          // Show the progress percentage if it wasn't visible already
          fileInfo.progressPercentage.innerHTML = "0%";
@@ -1019,11 +1036,17 @@
 
             // Display the version input form
             Dom.removeClass(this.versionSection, "hidden");
+            Dom.get(this.id + "-minorVersion-radioButton").disabled = false;
+            Dom.get(this.id + "-majorVersion-radioButton").disabled = false;
+            Dom.get(this.id + "-description-textarea").disabled = false;
          }
          else
          {
             // Hide the version input form
             Dom.addClass(this.versionSection, "hidden");
+            Dom.get(this.id + "-minorVersion-radioButton").disabled = true;
+            Dom.get(this.id + "-majorVersion-radioButton").disabled = true;
+            Dom.get(this.id + "-description-textarea").disabled = true;
          }
 
          if (this.showConfig.mode === this.MODE_MULTI_UPLOAD)
@@ -1264,6 +1287,14 @@
             {
                this.fileStore[flashId].contentType = contentType[0];
             }
+            else
+            {
+               contentType = Dom.getElementsByClassName("fileupload-contentType-input", "input", templateInstance);
+               if(contentType.length == 1)
+               {
+                  this.fileStore[flashId].contentType = contentType[0];
+               }
+            }
 
             // Save references to elements that will be updated during upload.
             var progressPercentage = Dom.getElementsByClassName("fileupload-percentage-span", "span", templateInstance);
@@ -1278,14 +1309,14 @@
             {
                var fileButton = new YAHOO.widget.Button(fButton[0],
                {
-                  type: "button"
+                  type: "button",
+                  disabled: false
                });
                fileButton.subscribe("click", function()
                {
                   this._onFileButtonClickHandler(flashId, oRecord.getId());
                }, this, true);
-               this.fileStore[flashId].fileButton = fileButton;
-               fileButton.focus();
+               this.fileStore[flashId].fileButton = fileButton;               
             }
 
             // Insert the templateInstance to the column.
@@ -1402,6 +1433,7 @@
          }
          this.state = this.STATE_FINISHED;
          this.widgets.cancelOkButton.set("label", this.msg("button.ok"));
+         this.widgets.cancelOkButton.focus();
          this.widgets.uploadButton.set("disabled", true);
          
          var callback = this.showConfig.onFileUploadComplete;
@@ -1467,7 +1499,17 @@
                else
                {
                   attributes.uploadDirectory = this.showConfig.uploadDirectory;
-                  attributes.contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
+                  if (fileInfo.contentType)
+                  {
+                     if (fileInfo.contentType.tagName.toLowerCase() == "select")
+                     {
+                        attributes.contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
+                     }
+                     else
+                     {
+                        attributes.contentType = fileInfo.contentType.value;
+                     }
+                  }
                   attributes.overwrite = this.showConfig.overwrite;
                   if (this.showConfig.thumbnails)
                   {

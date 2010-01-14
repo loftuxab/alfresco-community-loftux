@@ -305,6 +305,13 @@
                text: e.json.message
             });
          }
+
+         // Enable the tags input field again
+         var tagInputElem = Dom.get(this.id + "-tag-input-field");
+         if (tagInputElem)
+         {
+            tagInputElem.disabled = false;
+         }
       }
 
    });
