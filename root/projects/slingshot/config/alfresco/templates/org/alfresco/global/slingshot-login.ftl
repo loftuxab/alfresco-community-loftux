@@ -55,10 +55,6 @@
          {
             form.setAttribute("alflogin", true);
          }
-         else
-         {
-            form.attributes.action.nodeValue = "";
-         }
       }
       
       var enterListener = new YAHOO.util.KeyListener(form,

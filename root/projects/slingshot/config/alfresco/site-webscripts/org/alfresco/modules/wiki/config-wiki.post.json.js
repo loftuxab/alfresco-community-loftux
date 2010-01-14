@@ -19,7 +19,7 @@ function getPageText(wikipage)
    c.save();
 
    var siteId = String(json.get("siteId"));
-   var uri = "/slingshot/wiki/page/" + siteId + "/" + wikipage + "?format=mediawiki";
+   var uri = "/slingshot/wiki/page/" + siteId + "/" + encodeURIComponent(wikipage) + "?format=mediawiki";
 
    var connector = remote.connect("alfresco");
    var result = connector.get(uri);

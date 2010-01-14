@@ -3,7 +3,7 @@
 var wikipage = args.wikipage;
 if (wikipage)
 {
-   var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + wikipage + "?format=mediawiki",
+   var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + encodeURIComponent(wikipage) + "?format=mediawiki",
       connector = remote.connect("alfresco"),
       result = connector.get(uri),
       myConfig = new XML(config.script);
