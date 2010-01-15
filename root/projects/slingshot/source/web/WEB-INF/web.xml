@@ -17,14 +17,6 @@
       <param-value>/WEB-INF/classes/web-application-config.xml</param-value>
       <description>Spring config file location</description>
    </context-param>
-   <!-- TODO: resolve this - needs JBoss specific JBossVFSHelper available
-        NOTE: may not be required with Spring3.0.0
-   <context-param>
-      <param-name>contextClass</param-name>
-      <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
-      <description>Spring context class</description>
-   </context-param>
-   -->
    
    <filter>
       <filter-name>CacheExpiresFilter</filter-name>

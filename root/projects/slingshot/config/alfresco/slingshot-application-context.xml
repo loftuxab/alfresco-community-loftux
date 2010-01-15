@@ -97,9 +97,6 @@
             
             <!-- Classpath Persister -->
             <ref bean="webframework.sitedata.persister.classpath" />
-            
-            <!-- System Persister -->
-            <ref bean="webframework.sitedata.persister.system" />
          </list>
       </property>
       <property name="defaultPersister">
@@ -112,7 +109,7 @@
    <bean id="webframework.factory.user.slingshot" class="org.alfresco.web.site.SlingshotUserFactory" parent="webframework.factory.base" />
    
    <!-- "no-component" processor -->
-   <bean id="webframework.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
+   <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
    
    <!-- override the view resolver to handle Slingshot template URI driven page IDs -->
    <bean id="pageViewResolver" class="org.alfresco.web.site.SlingshotPageViewResolver" parent="abstractWebFrameworkViewResolver" />
