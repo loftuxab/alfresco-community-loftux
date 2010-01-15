@@ -32,7 +32,7 @@
    <div class="yui-g">
       <h2>${msg("label.time")}</h2>
    </div>
-<#if result.allday?exists>
+<#if result.allday=='true'>
    <div class="yui-gd">
       <div class="yui-u first">&nbsp;</div>
       <div class="yui-u">${msg("label.allday")}</div>
