@@ -50,6 +50,7 @@
                           <a class="dayLabel">${viewArgs.view.dates[id].day}</a>
                           <#if (viewArgs.view.dates[id].events??)>
                            <#assign numEvents = 0>
+                           <#assign numAllDayEvents = 0>
                            <#list viewArgs.view.dates[id].events as event>
                                 <#if (event.allday) >                              
                                     <div class="vevent allday theme-bg-color-1">
@@ -63,13 +64,14 @@
                                              <span class="category" >${event.tags}</span> 
                                         </div>
                                     </div>
+                                    <#assign numAllDayEvents = numAllDayEvents + 1>
                                  <#else>
                                     <#assign outputtedUl = false>
                                         <#if numEvents==0>
                                          <ul class="dayEvents">
                                          <#assign outputtedUl = true>
                                         </#if>
-                                         <#if (numEvents > 4) >
+                                         <#if (numEvents > (4 - numAllDayEvents)) >
                                             <#assign class="hidden">
                                          <#else>
                                             <#assign class="">
@@ -81,7 +83,7 @@
                                                <p class="dates"><span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                                - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
                                                <span class="location">${event.location}</span>
-                                               <span class="duration" title="${event.duration}">1h</span>
+                                               <span class="duration" title="${event.duration}">${event.duration}</span>
                                                <span class="category" >${event.tags}</span>
                                              </li>
                                          <#assign numEvents=numEvents + 1>    

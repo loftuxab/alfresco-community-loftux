@@ -31,7 +31,7 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-allday">${msg("label.allday")}:</label></div>
-            <#if event.allday?exists>
+            <#if (edit && event.allday=='true')>
             <div class="yui-u"><input id="${args.htmlid}-allday" type="checkbox" name="allday" tabindex="4" checked="checked"/></div>
             <#else>
             <div class="yui-u"><input id="${args.htmlid}-allday" type="checkbox" name="allday" tabindex="4"/></div>

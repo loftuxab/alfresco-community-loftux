@@ -732,7 +732,7 @@
            vEventEl.parentNode.removeChild(vEventEl);
            vEventEl=null;           
         }
-
+        
         if (data.allday!=='')
         {
           data.allday='allday';
@@ -756,8 +756,23 @@
            { 
              elUl = ul[0];
            }
+           var numAllDayEvents = YAHOO.util.Selector.query('div.allday',elUl.parentNode).length;                
+           var checkIfOverThreshold = function (listEl)
+              {
+                var dayEvents = listEl.getElementsByTagName('li');
+                var allDayEvents = YAHOO.util.Selector.query('div.allday',listEl.parentNode);                
+                // var threshold = (numAllDayEvents) ? 4 - numAllDayEvents : 4;
+                var targetHeight = YAHOO.util.Dom.getRegion(targetEl).height - (YAHOO.util.Dom.getRegion(dayEvents[0]).height*4);
+                var numEventsHeight = ((dayEvents.length>0) ? YAHOO.util.Dom.getRegion(dayEvents[0]).height*dayEvents.length:0);
+                //add alldayEvents height
+                if (allDayEvents.length>0)
+                {
+                   numEventsHeight+=YAHOO.util.Dom.getRegion(allDayEvents[0]).height*allDayEvents.length
+                }
+                return (numEventsHeight>=targetHeight)                 
+              }
            var dayEvents = elUl.getElementsByTagName('li');
-           if (dayEvents.length>=5)
+           if (checkIfOverThreshold(elUl))
            {
              data.hidden = 'hidden';
              someHidden = true;
@@ -781,7 +796,7 @@
            else {
              elUl.appendChild(vEventEl);
              if (someHidden) {
-               elUl.innerHTML +='<li class="moreEvents"><a href="">'+this._msg('label.show-more')+'</a></li>';
+               elUl.innerHTML +='<li class="moreEvents"><a href="#" class="theme-color-1">'+this._msg('label.show-more')+'</a></li>';
              }
            }
         }
@@ -1715,14 +1730,14 @@
             newDtStart = newDtStart.replace(timeReplace,'T'+hour);
         }
         var newEndDate = Alfresco.CalendarHelper.getEndDate(newDtStart,calEvent.getData('duration',true));
-        var duration = calEvent.getData('duration',false);
+        var duration = calEvent.getData('duration',true);
         calEvent.update({
             dtstart : newDtStart,
             dtend : newEndDate
         });
         if (args.dropped)
         {
-          this.updateEvent(calEvent);
+          YAHOO.lang.later(0, this,this.updateEvent,calEvent);
           if ((this.calendarView  === Alfresco.CalendarView.VIEWTYPE_DAY) | (this.calendarView  === Alfresco.CalendarView.VIEWTYPE_WEEK) ) {
             this.renderMultipleEvents();
            
@@ -1743,10 +1758,10 @@
        */
       updateEvent : function(calEvent)
       {
-        
+
         var eventUri = Dom.getElementsByClassName('summary','a',calEvent.getEl())[0].href;
         var dts  = Alfresco.util.fromISO8601(calEvent.getData('dtstart'));
-        var dte  = Alfresco.util.fromISO8601(calEvent.getData('dtend'));
+        var dte  = Alfresco.util.fromISO8601(calEvent.getData('dtend',false));
         // IE's slowness sometimes means that dtend is incorrectly parsed when an
         // event is quickly resized.
         // so we must add a recheck. Interim fix. 
@@ -1860,6 +1875,7 @@
         {
           //reshow original data
           Dom.removeClass(cell,'showing');
+          Dom.removeClass([cell,cell.parentNode.parentNode],'theme-bg-color-2');          
           Dom.removeClass(elTarget,'active');
           var hiddenItems = Dom.getElementsByClassName('tohide','li',cell);
           if ( hiddenItems )
@@ -1887,9 +1903,15 @@
         }
         else //show more
         {
-
           Dom.addClass(cell,'showing');
-
+          Dom.addClass([cell,cell.parentNode.parentNode],'theme-bg-color-2');
+          var allDayEvents = YAHOO.util.Selector.query('div.allday',cell.parentNode);
+          //if there are allday events then we must adjust for that too
+          if (allDayEvents.length)
+          {
+             var pixelFix = (YAHOO.env.ua.ie) ? ((YAHOO.env.ua.ie<8)) ? 0 : 6 : 6;
+             Dom.setStyle(cell, 'top', (allDayEvents.length*2)*(Dom.getRegion(allDayEvents[0]).height-pixelFix)+'px');
+          }
           Dom.addClass(elTarget,'active');
           var hiddenItems = Dom.getElementsByClassName('hidden','li',cell);
           for (var i=0,el;el=hiddenItems[i];i++) {
@@ -2148,7 +2170,7 @@ Alfresco.calendarEvent = function(id, sGroup, config) {
     this.initEventData(id, (YAHOO.lang.isUndefined(config.performRender)) ? true : config.performRender ) ;
     this.initEvents();
     YAHOO.util.DDM.mode = YAHOO.util.DDM.INTERSECT; 
-    
+
     if (config.resizable===true)
     {
       this.resize = new YAHOO.util.Resize(this.getEl(),{
@@ -2273,7 +2295,7 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
      */
     onDragDrop: function(e, id) 
     {
-       // get the drag and drop object that was targeted
+      // get the drag and drop object that was targeted
       var oDD;
       if ("string" == typeof id) 
       {
@@ -2286,9 +2308,8 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
       //elem that dragged el was dropped on
       var targetEl = oDD.getEl(); 
       var el = this.getEl();
+      var draggedOutCellUl = el.parentNode;
       var currTd;
-      //allda
-      
       if ( (YAHOO.util.Dom.hasClass(targetEl,'day')) )
       {
           currTd = targetEl;
@@ -2324,28 +2345,45 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
               {
                   YAHOO.util.Dom.removeClass(dayEventsHidden[0],'hidden');
               }
+              var checkIfOverThreshold = function (listEl)
+              {
+                var dayEvents = listEl.getElementsByTagName('li');
+                var allDayEvents = YAHOO.util.Selector.query('div.allday',listEl.parentNode);                
+                // var threshold = (numAllDayEvents) ? 4 - numAllDayEvents : 4;
+                var targetHeight = YAHOO.util.Dom.getRegion(targetEl).height - (YAHOO.util.Dom.getRegion(dayEvents[0]).height*4);
+                var numEventsHeight = ((dayEvents.length>0) ? YAHOO.util.Dom.getRegion(dayEvents[0]).height*dayEvents.length:0);
+                //add alldayEvents height
+                if (allDayEvents.length>0)
+                {
+                   numEventsHeight+=YAHOO.util.Dom.getRegion(allDayEvents[0]).height*allDayEvents.length
+                }
+                return (numEventsHeight>=targetHeight)                 
+              }
               //must sort and not insert after showmore
               if (dayHasExistingEvents)
               {
-                var dayEvents = elUl.getElementsByTagName('li');
-                
-                if (dayEvents.length>=5)
+                var moreEventsTrigger = YAHOO.util.Dom.getElementsByClassName('moreEvents','li',elUl);                
+                //add event as hidden
+                if (checkIfOverThreshold(elUl))
                 {
                     if (!YAHOO.util.Dom.hasClass(elUl,'showing'))
                     {
                         YAHOO.util.Dom.addClass(el,'hidden');
                     }
-                    var moreEventsTrigger = YAHOO.util.Dom.getElementsByClassName('moreEvents','li',elUl);
+                    //check if more events link is in this cell and add before
                     if (moreEventsTrigger.length>0)
                     {
                       elUl.insertBefore(el,moreEventsTrigger[0]);
                     }
+                    //otherwise add event and then create more events link
                     else
                     {
                       elUl.appendChild(el);
-                      elUl.innerHTML +='<li class="moreEvents"><a href="" class="theme-color-1">'+Alfresco.util.message('label.show-more','Alfresco.CalendarView')+'</a></li>';
+                      YAHOO.util.Dom.setStyle(el,'position','static');                      
+                      elUl.innerHTML +='<li class="moreEvents"><a href="#" class="theme-color-1">'+Alfresco.util.message('label.show-more','Alfresco.CalendarView')+'</a></li>';
                     }
                 }
+                //just add as normal
                 else {
                     elUl.appendChild(el);
                 }
@@ -2353,7 +2391,14 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
               else {
                   elUl.appendChild(el);
               }
-              
+              //remove show more trigger link from dragged *out* cell
+              var moreEventsTrigger = YAHOO.util.Dom.getElementsByClassName('moreEvents','li',draggedOutCellUl);                              
+              if (moreEventsTrigger.length>0 && checkIfOverThreshold(draggedOutCellUl))
+              {
+                 YAHOO.util.Dom.removeClass(moreEventsTrigger[0].previousSibling, 'hidden');
+                 draggedOutCellUl.removeChild(moreEventsTrigger[0]);
+              }
+
               //force a reparse as dom refs get out of sync
               this.eventData.parse(el.parentNode);
             }
@@ -2400,27 +2445,32 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
      */
     onDragOver: function(e, id) 
     {
-       if ("string" == typeof id) 
+
+       if (this.config.view!==Alfresco.CalendarView.VIEWTYPE_MONTH)
        {
-        oDD = YAHOO.util.DDM.getDDById(id);
-       }
-       else 
-       {
-        oDD = YAHOO.util.DDM.getBestMatch(id);
-       }
-       //elem that dragged el was dropped on
-       var targetEl = this.getBestMatch(id);
-       if (targetEl)
-       {
-         //week and day view
-         if ( (YAHOO.util.Dom.hasClass(targetEl,'hourSegment')) )
-         {
-             var el = this.getEl();
-             //resize according to target's width and x coord
-             YAHOO.util.Dom.setX(el,Math.max(0,parseInt(YAHOO.util.Dom.getX(targetEl),10)));
-         }
-         this.targetEl = targetEl;
-         this.fireEvent('eventMoved',{targetEl:this.targetEl,dropped:false});
+          if ("string" == typeof id) 
+          {
+           oDD = YAHOO.util.DDM.getDDById(id);
+          }
+          else 
+          {
+           oDD = YAHOO.util.DDM.getBestMatch(id);
+          }
+
+          //elem that dragged el was dropped on
+          var targetEl = this.getBestMatch(id);
+          if (targetEl)
+          {
+            //week and day view
+            if ( (YAHOO.util.Dom.hasClass(targetEl,'hourSegment')) )
+            {
+                var el = this.getEl();
+                //resize according to target's width and x coord
+                YAHOO.util.Dom.setX(el,Math.max(0,parseInt(YAHOO.util.Dom.getX(targetEl),10)));
+            }
+            this.targetEl = targetEl;
+            this.fireEvent('eventMoved',{targetEl:this.targetEl,dropped:false});
+          }          
        }
      },
     
@@ -2576,7 +2626,7 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
      */
     show : function()
     {
-      YAHOO.util.Dom.setStyle(this.getEl(),'display','');
+      YAHOO.util.Dom.setStyle(this.getElement(),'display','');
     },
     /**
      * Hides event
@@ -2584,7 +2634,7 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
      */
     hide : function()
     {
-      YAHOO.util.Dom.setStyle(this.getEl(),'display','none');
+      YAHOO.util.Dom.setStyle(this.getElement(),'display','none');
     }
 });
 
