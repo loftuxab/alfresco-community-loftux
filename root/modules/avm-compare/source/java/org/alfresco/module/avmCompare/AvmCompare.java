@@ -27,35 +27,23 @@
 
 package org.alfresco.module.avmCompare;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.SortedMap;
+
+import org.alfresco.repo.avm.AVMNodeType;
+import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
+import org.alfresco.service.cmr.avmsync.AVMDifference;
 import org.alfresco.service.cmr.avmsync.AVMSyncService;
 import org.alfresco.service.cmr.remote.AVMRemote;
-import org.alfresco.service.cmr.avmsync.AVMDifference;
-import org.alfresco.web.scripts.AbstractWebScript;
-import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
-import org.alfresco.web.scripts.WebScriptServletResponse;
-import org.alfresco.web.scripts.WebScriptStatus;
-
-import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.Map;
-import java.io.IOException;
-import java.util.List;
-
+import org.alfresco.util.NameMatcher;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
-import org.alfresco.service.cmr.avm.AVMNotFoundException;
-import org.alfresco.repo.avm.AVMNodeType;
-
-
-import org.alfresco.service.namespace.QName;
-import org.alfresco.util.NameMatcher;
-
-
-import java.io.PrintWriter;
+import org.springframework.extensions.webscripts.AbstractWebScript;
+import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptResponse;
+import org.springframework.extensions.webscripts.servlet.WebScriptServletResponse;
 
 
 
