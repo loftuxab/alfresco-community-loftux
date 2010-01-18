@@ -82,6 +82,7 @@ public class ScheduledDispositionJob implements Job
     	ResultSet results = search.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, SearchService.LANGUAGE_LUCENE, query);
     	
     	List<NodeRef> resultNodes = results.getNodeRefs();
+    	results.close();
     	
 		msg = new StringBuilder();
 		msg.append("Found ")

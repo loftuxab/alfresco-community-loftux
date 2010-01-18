@@ -137,10 +137,16 @@ public class TestUtilities implements DOD5015Model
         searchParameters.setQuery(query);
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
         ResultSet rs = searchService.query(searchParameters);
-        
-        //setComplete();
-        //endTransaction();
-        return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+        try
+        {        
+            //setComplete();
+            //endTransaction();
+            return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+        }
+        finally
+        {
+            rs.close();
+        }
     }
     
     public static NodeRef getRecordCategory(SearchService searchService, String seriesName, String categoryName)
@@ -153,10 +159,16 @@ public class TestUtilities implements DOD5015Model
         searchParameters.setQuery(query);
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
         ResultSet rs = searchService.query(searchParameters);
-        
-        //setComplete();
-        //endTransaction();
-        return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+        try
+        {            
+            //setComplete();
+            //endTransaction();
+            return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+        }
+        finally
+        {
+            rs.close();
+        }
     }
     
     public static NodeRef getRecordFolder(SearchService searchService, String seriesName, String categoryName, String folderName)
@@ -170,11 +182,16 @@ public class TestUtilities implements DOD5015Model
         searchParameters.setQuery(query);
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
         ResultSet rs = searchService.query(searchParameters);
-        
-        //setComplete();
-        //endTransaction();
-        
-        return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+        try
+        {
+            // setComplete();
+            // endTransaction();
+            return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+        }
+        finally
+        {
+            rs.close();
+        }
     }
 
     

@@ -60,6 +60,7 @@ public class MediaWikiBootstrap extends AbstractModuleComponent
             throw new AlfrescoRuntimeException("Unable to find company home node when running mediawiki integration bootstrap");
         }
         NodeRef companyHome = resultSet.getNodeRef(0);
+        resultSet.close();
         
         // Create a mediawiki space within the company home space
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);

@@ -307,6 +307,7 @@ public class Session implements ScriptObject
 		        // Do the search
 		        ResultSet resultSet = searchService.query(store.getStoreRef(), language, statement);
 		        List<NodeRef> nodeRefs = resultSet.getNodeRefs();
+		        resultSet.close();
 		        result = new Node[nodeRefs.size()];
 		        int iIndex = 0;
 		        for (NodeRef nodeRef : nodeRefs)
@@ -381,7 +382,7 @@ public class Session implements ScriptObject
         try
         {
         	// Validate for the currently held ticket
-            authenticationService.validate(ticket);
+            authenticationService.validate(ticket, null);
             
             // Do the work in a retrying transaction
             RetryingTransactionCallback<R> callback = new RetryingTransactionCallback<R>()

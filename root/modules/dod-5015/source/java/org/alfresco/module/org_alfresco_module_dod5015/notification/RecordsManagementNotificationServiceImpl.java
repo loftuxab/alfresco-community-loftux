@@ -196,6 +196,7 @@ public class RecordsManagementNotificationServiceImpl implements RecordsManageme
                     SearchService.LANGUAGE_XPATH, template);
         
             final List<NodeRef> templateNodes = templateResults.getNodeRefs();
+            templateResults.close();
             if (templateNodes.size() == 0)
             {
                 throw new AlfrescoRuntimeException("Can not find records due for review email template");

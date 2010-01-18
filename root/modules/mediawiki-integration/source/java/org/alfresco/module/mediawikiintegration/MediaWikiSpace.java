@@ -123,7 +123,7 @@ public class MediaWikiSpace extends Folder
             try
             {
                 // Try and validate the ticket
-                authenticationService.validate(ticket);
+                authenticationService.validate(ticket, null);
                 
                 // Check whether these credentials have the required permissions on the wikispace
                 NodeRef nodeRef = new NodeRef(nodeRefWikiSpace);

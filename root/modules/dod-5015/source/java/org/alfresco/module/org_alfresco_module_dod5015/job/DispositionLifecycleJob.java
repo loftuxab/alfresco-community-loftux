@@ -94,8 +94,8 @@ public class DispositionLifecycleJob implements Job
 
                 ResultSet results = search.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
                             SearchService.LANGUAGE_LUCENE, query);
-
                 List<NodeRef> resultNodes = results.getNodeRefs();
+                results.close();
 
                 RetryingTransactionHelper trn = trxService.getRetryingTransactionHelper();
 

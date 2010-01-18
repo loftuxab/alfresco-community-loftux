@@ -100,6 +100,7 @@ public class FirstFoundationClient
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
         ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, "PATH:\"/app:company_home\"");
         NodeRef companyHome = resultSet.getNodeRef(0);
+        resultSet.close();
 
         //
         // create new content node within company home
