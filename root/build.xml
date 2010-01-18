@@ -223,7 +223,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/pdfbox-0.8.0-incubating.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/PDFRenderer.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/poi-3.5-FINAL-20090928.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/portlet-api-lib.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/j2ee/portlet_20.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/quartz-1.6.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/resolver.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/rhino-js-1.6R7.jar" />
