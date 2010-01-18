@@ -26,6 +26,7 @@ package org.alfresco.web.site;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -68,14 +69,15 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
         }
         return authenticated;
     }
+
     
     /**
-     * @see org.alfresco.web.site.AlfrescoUserFactory#constructUser(java.lang.String, boolean, boolean)
+     * @see org.alfresco.web.site.AlfrescoUserFactory#constructUser(java.lang.String, Map<String, Boolean>)
      */
     @Override
-    protected AlfrescoUser constructUser(String userId, boolean isAdmin, boolean isGuest)
+    protected AlfrescoUser constructUser(String userId, Map<String, Boolean> capabilities)
     {
-        return new SlingshotUser(userId, isAdmin, isGuest);
+        return new SlingshotUser(userId, capabilities);
     }
 
     /**

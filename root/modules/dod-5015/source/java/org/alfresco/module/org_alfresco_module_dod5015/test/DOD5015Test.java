@@ -79,9 +79,9 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.security.PublicServiceAccessService;
@@ -122,7 +122,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	private RecordsManagementAdminService rmAdminService;
 	private RMCaveatConfigService caveatConfigService;
 	
-	private AuthenticationService authenticationService;
+	private MutableAuthenticationService authenticationService;
 	private PersonService personService;
 	private AuthorityService authorityService;
 	private PermissionService permissionService;
@@ -152,7 +152,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 		// Get the service required in the tests
 		this.unprotectedNodeService = (NodeService)applicationContext.getBean("nodeService");
 		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); // use upper 'N'odeService (to test access config interceptor)		                NodeService unprotectedNodeService = (NodeService)applicationContext.getBean("nodeService");
-		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
+		this.authenticationService = (MutableAuthenticationService)this.applicationContext.getBean("AuthenticationService");
 		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("AuthorityService");
 		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");		

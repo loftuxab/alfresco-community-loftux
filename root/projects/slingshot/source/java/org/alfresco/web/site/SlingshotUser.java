@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import java.util.Map;
+
 import org.springframework.extensions.surf.FrameworkUtil;
 import org.springframework.extensions.surf.exception.PlatformRuntimeException;
 import org.springframework.extensions.surf.exception.UserFactoryException;
@@ -39,26 +41,14 @@ public class SlingshotUser extends AlfrescoUser
     /**
      * Instantiates a new user.
      * 
-     * @param id the id
-     */
-    public SlingshotUser(String id)
-    {
-        super(id);
-    }
-
-    /**
-     * Instantiates a new user.
-     * 
      * @param id
      *            the id
-     * @param isAdmin
-     *            is this an admin user?
-     * @param isGuest
-     *            is this a guest user?
+     * @param capabilities
+     *            map of string keyed capabilities given to the user
      */
-    public SlingshotUser(String id, boolean isAdmin, boolean isGuest)
+    public SlingshotUser(String id, Map<String, Boolean> capabilities)
     {
-        super(id, isAdmin, isGuest);
+        super(id, capabilities);
     }
     
     /**

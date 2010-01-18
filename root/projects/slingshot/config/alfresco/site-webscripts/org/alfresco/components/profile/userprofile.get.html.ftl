@@ -3,6 +3,7 @@
    {
       userId: "${user.name}",
       profile: {
+         isMutable: ${((profile.capabilities.isMutable)!false)?string},
          name: "<#if profile.name??>${profile.name?html}</#if>",
          lastName: "<#if profile.lastName??>${profile.lastName?html}</#if>",
          firstName: "<#if profile.firstName??>${profile.firstName?html}</#if>",
@@ -29,12 +30,11 @@
 //]]></script>
 
 <#assign el=args.htmlid>
-<#assign editable = (user.name == profile.name)>
 <#assign displayname=profile.firstName>
 <#if profile.lastName??><#assign displayname=displayname + " " + profile.lastName></#if>
 <div id="${el}-body" class="profile">
    <div id="${el}-readview" class="hidden">
-      <#if editable>
+      <#if profile.capabilities.isMutable>
       <div class="editcolumn">
          <div class="btn-edit"><button id="${el}-button-edit" name="edit">${msg("button.editprofile")}</button></div>
       </div>
@@ -136,7 +136,7 @@
       </div>
    </div>
    
-   <#if editable>
+   <#if profile.capabilities.isMutable>
    <div id="${el}-editview" class="hidden">
       <form id="${htmlid}-form" action="${url.context}/service/components/profile/userprofile" method="post">
       
