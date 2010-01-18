@@ -28,30 +28,19 @@
 package org.alfresco.module.truncateMalformedXml;
 
 
-import org.alfresco.web.scripts.DeclarativeWebScript;
-import org.alfresco.web.scripts.WebScriptRequest;
-
-import org.alfresco.web.scripts.AbstractWebScript;
-import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
-import org.alfresco.web.scripts.WebScriptServletResponse;
-import org.alfresco.web.scripts.WebScriptStatus;
-import org.alfresco.service.cmr.remote.AVMRemote;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.io.IOException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.PrintWriter;
+import java.util.Map;
 
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
-import org.alfresco.service.cmr.avm.AVMNotFoundException;
 import org.alfresco.service.cmr.remote.AVMRemote;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.util.NameMatcher;
-
-import java.io.PrintWriter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.webscripts.AbstractWebScript;
+import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptResponse;
+import org.springframework.extensions.webscripts.servlet.WebScriptServletResponse;
 
 
 

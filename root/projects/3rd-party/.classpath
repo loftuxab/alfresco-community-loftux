@@ -147,5 +147,12 @@
 	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar" sourcepath="src/fontbox-0.8.0-incubating-src.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-1.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-surf-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-surf-1.0.0.CI-SNAPSHOT-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-surf-api-1.0.0.CI-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-surf-core-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-surf-core-1.0.0.CI-SNAPSHOT-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-surf-core-configservice-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-surf-core-configservice-1.0.0.CI-SNAPSHOT-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT-tests.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webscripts-1.0.0.CI-SNAPSHOT-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-api-1.0.0.CI-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
