@@ -100,7 +100,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
             redirectTo = pagesMap.get(action);
         }
 
-        resp.addCookie(new Cookie("alfUser", ""));
+        resp.addCookie(new Cookie("alfUser0", ""));
         resp.sendRedirect(redirectTo);
     }
 

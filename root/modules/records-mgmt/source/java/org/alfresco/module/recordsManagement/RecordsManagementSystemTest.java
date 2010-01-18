@@ -112,6 +112,7 @@ public class RecordsManagementSystemTest extends BaseSpringTest
 		// Get a reference to the company home node
 		ResultSet results1 = this.searchService.query(RecordsManagementSystemTest.SPACES_STORE, SearchService.LANGUAGE_XPATH, "app:company_home");
 		NodeRef companyHome = results1.getNodeRefs().get(0);
+		results1.close();
 		
 		Map<QName, Serializable> props = new HashMap<QName, Serializable>(10);
 		props.put(RecordsManagementModel.PROP_RECORD_CATEGORY_IDENTIFIER, CAT_ID);

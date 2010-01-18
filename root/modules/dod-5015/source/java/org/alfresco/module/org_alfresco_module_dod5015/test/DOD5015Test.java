@@ -404,6 +404,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         ResultSet types = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
         
         final List<NodeRef> resultNodeRefs = types.getNodeRefs();
+        types.close();
         return resultNodeRefs;
     }
     
@@ -4281,6 +4282,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         {
             assertEquals(0, rs.length());
         }
+        rs.close();
         
         // Sanity check node service - eg. getProperty, getChildAssocs
         
@@ -4397,7 +4399,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
     {
         String typeQuery = "TYPE:\"" + TYPE_RECORD_CATEGORY + "\"";
         ResultSet types = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
-        
-        return types.getNodeRefs();
+        List<NodeRef> nodeRefs = types.getNodeRefs();
+        types.close();
+        return nodeRefs;
     }
 }

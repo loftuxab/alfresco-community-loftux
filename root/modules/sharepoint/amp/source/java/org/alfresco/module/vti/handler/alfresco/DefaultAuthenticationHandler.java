@@ -68,7 +68,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler, Site
     {
         try
         {
-            authenticationService.validate(user.getTicket());
+            authenticationService.validate(user.getTicket(), httpRequest.getSession().getId());
 
             if (!isSiteMember(httpRequest, alfrescoContext, user.getUserName()))
             {

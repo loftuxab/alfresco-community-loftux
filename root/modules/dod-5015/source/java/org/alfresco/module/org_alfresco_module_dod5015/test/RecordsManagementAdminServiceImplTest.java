@@ -561,6 +561,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         ResultSet types = this.searchService.query(TestUtilities.SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
         
         final List<NodeRef> resultNodeRefs = types.getNodeRefs();
+        types.close();
         return resultNodeRefs;
     }
 

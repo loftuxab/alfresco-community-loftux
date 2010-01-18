@@ -144,6 +144,7 @@ public class RMJScriptTest extends BaseAlfrescoSpringTest implements RecordsMana
         {
             result = resultSet.getNodeRef(0);
         }
+        resultSet.close();
         return result;
     }
     

@@ -56,6 +56,7 @@ public class SpacesStore extends Store implements ScriptObject
 		        SearchService searchService = SpacesStore.this.session.getServiceRegistry().getSearchService();
 		        ResultSet resultSet = searchService.query(SpacesStore.this.storeRef, SearchService.LANGUAGE_LUCENE, "PATH:\"app:company_home\"");
 		        NodeRef companyHome = resultSet.getNodeRef(0);
+		        resultSet.close();
 		        return new Node(session, companyHome);
 			}
     	});

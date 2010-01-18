@@ -91,9 +91,10 @@ public class NotifyOfRecordsDueForReviewJob implements Job
                 queryBuffer.append(") ");                
                 String query = queryBuffer.toString();
 
-                ResultSet results = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, SearchService.LANGUAGE_LUCENE, query);
-             
-                final List<NodeRef> resultNodes = results.getNodeRefs();                
+                ResultSet results = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, SearchService.LANGUAGE_LUCENE, query);             
+                final List<NodeRef> resultNodes = results.getNodeRefs();
+                results.close();
+                
                 if (logger.isDebugEnabled() == true)
                 {
                     logger.debug("Found " + resultNodes.size() + " nodes due for review and without notification.");
