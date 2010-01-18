@@ -36,9 +36,9 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
@@ -59,7 +59,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
 	private TransactionService transactionService;
 	private RMCaveatConfigService caveatConfigService;
 	
-	private AuthenticationService authenticationService;
+	private MutableAuthenticationService authenticationService;
 	private PersonService personService;
 	private AuthorityService authorityService;
 
@@ -80,7 +80,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
 
 		// Get the service required in the tests
 		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); // use upper 'N'odeService (to test access config interceptor)	
-		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
+		this.authenticationService = (MutableAuthenticationService)this.applicationContext.getBean("AuthenticationService");
 		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("AuthorityService");
 		this.caveatConfigService = (RMCaveatConfigServiceImpl)this.applicationContext.getBean("caveatConfigService");

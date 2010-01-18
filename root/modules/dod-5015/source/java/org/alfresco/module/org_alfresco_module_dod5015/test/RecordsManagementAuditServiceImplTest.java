@@ -44,7 +44,7 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -312,7 +312,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         rmAuditService.clear();
         rmAuditService.start();
 
-        AuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
+        MutableAuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
         PersonService personService = serviceRegistry.getPersonService();
         
         try

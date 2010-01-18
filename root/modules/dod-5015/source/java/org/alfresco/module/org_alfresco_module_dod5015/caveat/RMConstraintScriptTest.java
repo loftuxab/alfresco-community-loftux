@@ -30,16 +30,13 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
-import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.PropertyMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.extensions.webscripts.Status;
-import org.springframework.extensions.webscripts.TestWebScriptServer.DeleteRequest;
 import org.springframework.extensions.webscripts.TestWebScriptServer.GetRequest;
-import org.springframework.extensions.webscripts.TestWebScriptServer.PostRequest;
-import org.springframework.extensions.webscripts.TestWebScriptServer.PutRequest;
 import org.springframework.extensions.webscripts.TestWebScriptServer.Response;
 
 /**
@@ -49,7 +46,7 @@ import org.springframework.extensions.webscripts.TestWebScriptServer.Response;
  */
 public class RMConstraintScriptTest extends BaseWebScriptTest
 {
-    private AuthenticationService authenticationService;
+    private MutableAuthenticationService authenticationService;
     private RMCaveatConfigService caveatConfigService;
     private PersonService personService;
     
@@ -61,7 +58,7 @@ public class RMConstraintScriptTest extends BaseWebScriptTest
     protected void setUp() throws Exception
     {
         this.caveatConfigService = (RMCaveatConfigService)getServer().getApplicationContext().getBean("CaveatConfigService");
-        this.authenticationService = (AuthenticationService)getServer().getApplicationContext().getBean("AuthenticationService");
+        this.authenticationService = (MutableAuthenticationService)getServer().getApplicationContext().getBean("AuthenticationService");
         this.personService = (PersonService)getServer().getApplicationContext().getBean("PersonService");
         super.setUp();
     }

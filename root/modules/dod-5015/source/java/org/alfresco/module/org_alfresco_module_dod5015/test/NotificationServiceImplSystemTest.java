@@ -43,9 +43,9 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.GUID;
@@ -79,7 +79,7 @@ public class NotificationServiceImplSystemTest extends TestCase
     private RecordsManagementNotificationService rmNotificationService;
     private RetryingTransactionHelper transactionHelper;
     private NodeService nodeService;
-    private AuthenticationService authenticationService;
+    private MutableAuthenticationService authenticationService;
     private PersonService personService;
     private AuthorityService authorityService;
     private RecordsManagementSecurityService rmSecurityService;
@@ -93,7 +93,7 @@ public class NotificationServiceImplSystemTest extends TestCase
         rmNotificationService = (RecordsManagementNotificationService)applicationContext.getBean("RecordsManagementNotificationService");
         transactionHelper = (RetryingTransactionHelper)applicationContext.getBean("retryingTransactionHelper");
         nodeService = (NodeService)applicationContext.getBean("NodeService");
-        authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
+        authenticationService = (MutableAuthenticationService)applicationContext.getBean("authenticationService");
         personService = (PersonService)applicationContext.getBean("PersonService");
         authorityService = (AuthorityService)applicationContext.getBean("AuthorityService");
         rmSecurityService = (RecordsManagementSecurityService)applicationContext.getBean("RecordsManagementSecurityService");

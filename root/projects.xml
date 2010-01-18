@@ -1707,7 +1707,7 @@
          <fileset dir="${dir.project.3rdparty.lib}/jmagick" 
                   includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
-                  includes="*.jar" />
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jgroups" 

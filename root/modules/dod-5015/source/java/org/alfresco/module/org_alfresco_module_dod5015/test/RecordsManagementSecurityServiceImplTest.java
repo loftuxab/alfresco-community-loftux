@@ -49,9 +49,9 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -71,7 +71,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
 	private NodeService nodeService;
-	private AuthenticationService authenticationService;
+	private MutableAuthenticationService authenticationService;
 	private AuthorityService authorityService;
 	private PermissionService permissionService;
 	private PersonService personService;
@@ -86,7 +86,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
 
 		// Get the service required in the tests
 		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
-		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
+		this.authenticationService = (MutableAuthenticationService)this.applicationContext.getBean("AuthenticationService");
 		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("authorityService");
 		this.rmSecurityService = (RecordsManagementSecurityService)this.applicationContext.getBean("RecordsManagementSecurityService");
