@@ -1,9 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
 
-<web-app>
-
-   <display-name>Alfresco Project Slingshot</display-name>    
+   <display-name>Alfresco Project Slingshot</display-name>
    <description>Alfresco Project Slingshot application</description>
    
    <context-param>
@@ -13,19 +12,19 @@
    
    <!-- Spring Application Context location and context class -->
    <context-param>
+      <description>Spring config file location</description>
       <param-name>contextConfigLocation</param-name>
       <param-value>/WEB-INF/classes/web-application-config.xml</param-value>
-      <description>Spring config file location</description>
    </context-param>
-   
+
    <filter>
-      <filter-name>CacheExpiresFilter</filter-name>
       <description>Set HTTP cache Expires header 30 days forward for a mapping.</description>
+      <filter-name>CacheExpiresFilter</filter-name>
       <filter-class>org.alfresco.web.scripts.servlet.StaticAssetCacheFilter</filter-class>
       <init-param>
+         <description>Add an Expires Header 30 days forward</description>
          <param-name>expires</param-name>
          <param-value>30</param-value>
-         <description>Add an Expires Header 30 days forward</description>
       </init-param>
    </filter>
    

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd">
+    <portlet>
+        <description>Spring Surf Portlet</description>
+        <portlet-name>SurfPortlet</portlet-name>
+        <portlet-class>org.alfresco.web.site.portlet.DispatcherPortlet</portlet-class>
+        
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>VIEW</portlet-mode>
+            <portlet-mode>HELP</portlet-mode>
+        </supports>
+
+        <portlet-info>
+            <title>Spring Surf Portlet</title>
+            <short-title>Spring Surf</short-title>
+        </portlet-info>
+    </portlet>
+    
+    <user-attribute>
+        <name>user.home-info.online.email</name>
+    </user-attribute>
+
+</portlet-app>
