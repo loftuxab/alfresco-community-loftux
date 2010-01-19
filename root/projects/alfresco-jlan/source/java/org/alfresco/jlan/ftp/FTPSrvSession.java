@@ -2042,131 +2042,129 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 			FileOpenParams params = new FileOpenParams(ftpPath.getSharePath(), openAction, AccessMode.ReadWrite, 0, 0);
 
-			// Create a new file to receive the data
+	        // transaction begins in the innards of 'disk'
+	        try 
+	        {
+	            // Are we opening an existing file or creating a new one?
+	            if ( sts == FileStatus.FileExists) 
+	            {
+	                // Open and truncate the existing file
+	                netFile = disk.openFile(this, tree, params);
+	                disk.truncateFile( this, tree, netFile, 0L);
+	            }
+	            else 
+	            {
+	                // Create a new file
+	                netFile = disk.createFile(this, tree, params);
+	            }
 
-			if ( sts == FileStatus.FileExists) {
+	            // Notify change listeners that a new file has been created
+	            DiskDeviceContext diskCtx = (DiskDeviceContext) tree.getContext();
 
-				// Open or truncate the existing file
+	            if ( diskCtx.hasChangeHandler())
+	                diskCtx.getChangeHandler().notifyFileChanged(NotifyChange.ActionAdded, ftpPath.getSharePath());
 
-				netFile = disk.openFile(this, tree, params);
-                
-                // Truncate the existing file
-                
-                disk.truncateFile( this, tree, netFile, 0L);
-			}
-			else {
+	            // Send the intermediate response
 
-				// Create a new file
+	            sendFTPResponse(150, "File status okay, about to open data connection");
 
-				netFile = disk.createFile(this, tree, params);
-				
-				// Commit any transaction before starting the data transfer
-				
-				endTransaction();
-			}
+	            // Check if there is an active data session
 
-			// Notify change listeners that a new file has been created
+	            if ( m_dataSess == null) {
+	                sendFTPResponse(425, "Can't open data connection");
+	                return;
+	            }
 
-			DiskDeviceContext diskCtx = (DiskDeviceContext) tree.getContext();
+	            // Get the data connection socket
 
-			if ( diskCtx.hasChangeHandler())
-				diskCtx.getChangeHandler().notifyFileChanged(NotifyChange.ActionAdded, ftpPath.getSharePath());
+	            Socket dataSock = null;
 
-			// Send the intermediate response
+	            try {
+	                dataSock = m_dataSess.getSocket();
+	            }
+	            catch (Exception ex) {
+	            }
 
-			sendFTPResponse(150, "File status okay, about to open data connection");
+	            if ( dataSock == null) {
+	                sendFTPResponse(426, "Connection closed; transfer aborted");
+	                return;
+	            }
 
-			// Check if there is an active data session
+	            // Open an input stream from the client
 
-			if ( m_dataSess == null) {
-				sendFTPResponse(425, "Can't open data connection");
-				return;
-			}
+	            is = dataSock.getInputStream();
 
-			// Get the data connection socket
+	            // DEBUG
 
-			Socket dataSock = null;
+	            if ( Debug.EnableInfo && hasDebug(DBG_FILE))
+	                debugPrintln("Storing ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
+	                        + ftpPath.getSharePath() + (append ? " (Append)" : ""));
 
-			try {
-				dataSock = m_dataSess.getSocket();
-			}
-			catch (Exception ex) {
-			}
+	            // Allocate the buffer for the file data
 
-			if ( dataSock == null) {
-				sendFTPResponse(426, "Connection closed; transfer aborted");
-				return;
-			}
+	            byte[] buf = new byte[DEFAULT_BUFFERSIZE];
+	            long filePos = 0;
+	            int len = is.read(buf, 0, buf.length);
+	            boolean abort = false;
 
-			// Open an input stream from the client
+	            // If the data is to be appended then set the starting file position to the end of the
+	            // file
 
-			is = dataSock.getInputStream();
+	            if ( append == true)
+	                filePos = netFile.getFileSize();
 
-			// DEBUG
+	            // Read/write loop
 
-			if ( Debug.EnableInfo && hasDebug(DBG_FILE))
-				debugPrintln("Storing ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
-						+ ftpPath.getSharePath() + (append ? " (Append)" : ""));
+	            while (len > 0 && abort == false) {
 
-			// Allocate the buffer for the file data
+	                // DEBUG
 
-			byte[] buf = new byte[DEFAULT_BUFFERSIZE];
-			long filePos = 0;
-			int len = is.read(buf, 0, buf.length);
-			boolean abort = false;
+	                if ( Debug.EnableInfo && hasDebug(DBG_FILEIO))
+	                    debugPrintln(" Receive len=" + len + " bytes");
 
-			// If the data is to be appended then set the starting file position to the end of the
-			// file
+	                // Write the current data block to the file, update the file position
 
-			if ( append == true)
-				filePos = netFile.getFileSize();
+	                disk.writeFile(this, tree, netFile, buf, 0, len, filePos);
+	                filePos += len;
 
-			// Read/write loop
+	                // Read another block of data from the client
 
-			while (len > 0 && abort == false) {
+	                len = is.read(buf, 0, buf.length);
 
-				// DEBUG
+	                // Check if the file transfer has been aborted
 
-				if ( Debug.EnableInfo && hasDebug(DBG_FILEIO))
-					debugPrintln(" Receive len=" + len + " bytes");
+	                abort = checkForAbort();
+	            }
 
-				// Write the current data block to the file, update the file position
+	            // Close the input stream from the client
 
-				disk.writeFile(this, tree, netFile, buf, 0, len, filePos);
-				filePos += len;
+	            is.close();
+	            is = null;
 
-				// Read another block of data from the client
+	            // Close the network file
 
-				len = is.read(buf, 0, buf.length);
+	            disk.closeFile(this, tree, netFile);
+	            netFile = null;
 
-				// Check if the file transfer has been aborted
+	            // Indicate that the file has been received, or the transfer was aborted
 
-				abort = checkForAbort();
-			}
+	            if ( abort == false)
+	                sendFTPResponse(226, "Closing data connection");
+	            else
+	                sendFTPResponse(426, "Transfer aborted by client");
 
-			// Close the input stream from the client
+	            // DEBUG
 
-			is.close();
-			is = null;
+	            if ( Debug.EnableInfo && hasDebug(DBG_FILEIO))
+	                debugPrintln(" Transfer complete, file closed");
 
-			// Close the network file
-
-			disk.closeFile(this, tree, netFile);
-			netFile = null;
-
-			// Indicate that the file has been received, or the transfer was aborted
-
-			if ( abort == false)
-				sendFTPResponse(226, "Closing data connection");
-			else
-				sendFTPResponse(426, "Transfer aborted by client");
-
-			// DEBUG
-
-			if ( Debug.EnableInfo && hasDebug(DBG_FILEIO))
-				debugPrintln(" Transfer complete, file closed");
-		}
-		catch (SocketException ex) {
+	        }
+	        finally
+	        {
+	            endTransaction();
+	        }
+	    }
+	    catch (SocketException ex) {
 
 			// DEBUG
 
@@ -2200,9 +2198,10 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 			// Indicate that there was an error during writing of the file
 
-			sendFTPResponse(451, "Disk full");
-		}
-		catch (Exception ex) {
+	        sendFTPResponse(451, "Disk full or Quota Exceeded");
+	    }
+	    catch (Exception ex) 
+	    {
 
 			// DEBUG
 
