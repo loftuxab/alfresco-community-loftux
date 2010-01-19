@@ -484,8 +484,8 @@
        */
       onSearchClick: function GroupFinder_onSearchClick(e, p_obj)
       {
-         var searchTerm = Dom.get(this.id + "-search-text").value;
-         if (searchTerm.length < this.options.minSearchTermLength)
+         var searchTerm = YAHOO.lang.trim(Dom.get(this.id + "-search-text").value);
+         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -495,7 +495,7 @@
          }
          
          this.itemSelectButtons = {};
-         this._performSearch(searchTerm);
+         this._performSearch("*" + searchTerm);
       },
 
 

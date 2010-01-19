@@ -376,13 +376,17 @@ YAHOO.namespace('extension');
 
          // Store for easy access
          columnBrowser._id = columnBrowser.get("id");
-         columnBrowser._el = columnBrowser.get("element")
+         columnBrowser._el = columnBrowser.get("element");
 
          // Create the carousel that houses the columns
          columnBrowser._setupCarousel();
 
-         // Do the initial request to get the root column
-         columnBrowser._doRequest(columnBrowser.get("url"), null);
+         // Do the initial request to get the root column if ul is present
+         var url = columnBrowser.get("url");
+         if(url)
+         {
+            columnBrowser._doRequest(url, null);
+         }
       },
 
       /**
