@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sh @@ALFRESCO_DIR@@/alfresco.sh start
+sh @@ALF_HOME@@/alfresco.sh start

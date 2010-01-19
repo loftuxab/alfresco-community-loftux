@@ -2,7 +2,7 @@
 # -------
 # Script for apply AMPs to installed WAR
 # -------
-ALF_HOME=@@ALFRESCO_DIR@@
+ALF_HOME=@@ALF_HOME@@
 export JAVA_HOME="@@JAVA_HOME@@"
 export PATH=$PATH:$JAVA_HOME/bin
 cd "$ALF_HOME"

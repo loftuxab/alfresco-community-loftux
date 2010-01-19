@@ -1,7 +1,7 @@
 #!/bin/sh
 # Start or stop Alfresco server
 # Set the following to where Tomcat is installed
-ALF_HOME=@@ALFRESCO_DIR@@
+ALF_HOME=@@ALF_HOME@@
 cd "$ALF_HOME"
 APPSERVER="${ALF_HOME}/tomcat"
 export JAVA_HOME="@@JAVA_HOME@@"

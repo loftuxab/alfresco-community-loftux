@@ -10,6 +10,9 @@ set CATALINA_HOME=%ALF_HOME%virtual-tomcat
 
 rem Set any default JVM options
 
+if not exist "SetPaths.bat" goto start
+call SetPaths.bat
+
 :start
 set PATH=%JAVA_HOME%/bin;%ALF_HOME%bin;%PATH%
 rem ---------------------------------------
