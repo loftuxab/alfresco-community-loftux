@@ -1,5 +1,10 @@
 <script type="text/javascript">//<![CDATA[
-   Alfresco.util.ComponentManager.get("${args.htmlid}").setMessages(${messages});
+   Alfresco.util.ComponentManager.get("${args.htmlid}").setOptions(
+   {
+      visible: [<#list aspects.visible as a>"${a}"<#if a_has_next>,</#if></#list>],
+      addable: [<#list aspects.addable as a>"${a}"<#if a_has_next>,</#if></#list>],
+      removeable: [<#list aspects.removeable as a>"${a}"<#if a_has_next>,</#if></#list>]
+   }).setMessages(${messages});
 //]]></script>
 <div id="${args.htmlid}-dialog" class="aspects">
    <div id="${args.htmlid}-title" class="hd"></div>

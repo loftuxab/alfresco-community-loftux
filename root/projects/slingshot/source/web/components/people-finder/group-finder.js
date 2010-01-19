@@ -360,10 +360,6 @@
             if (me.options.viewMode !== Alfresco.GroupFinder.VIEW_MODE_COMPACT)
             {
                desc += '<div class="detail"><span>' + me.msg("label.name") + ":</span> " + $html(oRecord.getData("fullName")) + '</div>';
-               desc += '<div class="detail">';
-               desc += '<span class="item"><span>' + me.msg("label.users") + ":</span> " + $html(oRecord.getData("userCount")) + '</span>';
-               desc += '<span class="item"><span>' + me.msg("label.subgroups") + ":</span> " + $html(oRecord.getData("groupCount")) + '</span>';
-               desc += '</div>';
             }
             elCell.innerHTML = desc;
          };

@@ -1,0 +1,74 @@
+<alfresco-config>
+
+   <!-- Global config section -->
+   <config replace="true">
+      <flags>
+         <!--
+            Developer debugging setting to turn on DEBUG mode for client scripts in the browser
+         -->
+         <client-debug>true</client-debug>
+
+         <!--
+            LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift).
+            This flag automatically activates logging on page load.
+         -->
+         <client-debug-autologging>false</client-debug-autologging>
+      </flags>
+   </config>
+
+   <!-- Document Library config section -->
+   <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+
+      <!--
+         Used by the "Manage Aspects" action
+
+         For custom aspects, remember to also add the relevant i18n string(s)
+            cm_myaspect=My Aspect
+      -->
+      <aspects>
+         <!-- Aspects that a user can see -->
+         <visible>
+            <aspect name="cm:generalclassifiable" />
+            <aspect name="cm:complianceable" />
+            <aspect name="cm:dublincore" />
+            <aspect name="cm:effectivity" />
+            <aspect name="cm:summarizable" />
+            <aspect name="cm:versionable" />
+            <aspect name="cm:templatable" />
+            <aspect name="cm:emailed" />
+            <aspect name="emailserver:aliasable" />
+            <aspect name="cm:taggable" />
+         </visible>
+
+         <!-- Aspects that a user can add. Same as "visible" if left empty -->
+         <addable>
+         </addable>
+
+         <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+         <removeable>
+         </removeable>
+      </aspects>
+
+      <!--
+         Used by the "Change Type" action
+
+         Define valid subtypes using the following example:
+            <type name="cm:content">
+               <subtype name="cm:mysubtype" />
+            </type>
+
+         Remember to also add the relevant i18n string(s):
+            cm_mysubtype=My SubType
+      -->
+      <types>
+         <type name="cm:content">
+            <subtype name="cm:mycontentsubtype" />
+         </type>
+
+         <type name="cm:folder">
+            <subtype name="cm:myfoldersubtype" />
+         </type>
+      </types>
+   </config>
+
+</alfresco-config>

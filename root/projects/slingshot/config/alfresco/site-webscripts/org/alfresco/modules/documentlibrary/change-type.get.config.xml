@@ -1,0 +1,9 @@
+<types>
+   <!--
+      Override in share-config-custom.xml
+
+      <type name="cm:content">
+         <subtype name="cm:mysubtype" />
+      </type>
+   -->
+</types>

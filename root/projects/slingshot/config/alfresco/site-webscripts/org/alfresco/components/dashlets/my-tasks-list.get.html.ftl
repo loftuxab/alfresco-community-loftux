@@ -46,11 +46,16 @@
       </#if>
       <#if task.invitation??>
          <#assign invite = task.invitation>
-         <#assign htmlInvitee>
+         <#if invite.type == "moderated">
+            <#assign initiator = invite.invitee>
+         <#elseif invite.type == "nominated">
+            <#assign initiator = invite.inviter>
+         </#if>
+         <#assign htmlInitiator>
             <div class="task-resource resource-spacer">
                <span class="task-resource-link">
-                  <@avatarImg invite.invitee />
-                  <span><@userProfile invite.invitee /></span>
+                  <@avatarImg initiator />
+                  <span><@userProfile initiator /></span>
                </span>
             </div>
          </#assign>
@@ -70,7 +75,7 @@
                </span>
             </div>
          </#assign>
-         ${msg("label.request-join", htmlInvitee, htmlSite, htmlRole)}
+         ${msg("label." + (invite.type) + "-invite-join", htmlInitiator, htmlSite, htmlRole)}
       </#if>
          </div>
          <div class="task-transitions">

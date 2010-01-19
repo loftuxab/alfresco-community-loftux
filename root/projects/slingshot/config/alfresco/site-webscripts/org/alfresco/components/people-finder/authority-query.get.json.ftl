@@ -8,14 +8,11 @@
       "displayName": "${authority.displayName}",
       "metadata":
       {
-      <#if authority.authorityType = "GROUP" >     
-         "groupCount": ${metadata.groupCount!0},
-         "userCount": ${metadata.userCount!0}
-      <#elseif authority.authorityType = "USER" >     
+      <#if authority.authorityType = "USER">
          "avatar": "${metadata.avatar!""}",
          "jobTitle": "${metadata.jobTitle!""}",
          "organization": "${metadata.organization!""}"
-      </#if> 
+      </#if>
       }
    }
    </#escape>

@@ -1,0 +1,22 @@
+<aspects>
+   <visible>
+      <aspect name="cm:generalclassifiable" />
+      <aspect name="cm:complianceable" />
+      <aspect name="cm:dublincore" />
+      <aspect name="cm:effectivity" />
+      <aspect name="cm:summarizable" />
+      <aspect name="cm:versionable" />
+      <aspect name="cm:templatable" />
+      <aspect name="cm:emailed" />
+      <aspect name="emailserver:aliasable" />
+      <aspect name="cm:taggable" />
+   </visible>
+
+   <!-- Aspects that a user can add. Same as "visible" if left empty -->
+   <addable>
+   </addable>
+
+   <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+   <removeable>
+   </removeable>
+</aspects>

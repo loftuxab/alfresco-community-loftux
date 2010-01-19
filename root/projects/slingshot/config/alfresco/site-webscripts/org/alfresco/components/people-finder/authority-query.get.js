@@ -27,8 +27,6 @@ var mapGroup = function(data)
       description: data.fullName,
       metadata:
       {
-         groupCount: data.groupCount,
-         userCount: data.userCount
       }
    });
 };

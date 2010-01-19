@@ -73,23 +73,6 @@
       selectedValues: null,
 
       /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       * @override
-       */
-      onComponentsLoaded: function DA_onComponentsLoaded()
-      {
-         // Shortcut for dummy instance
-         if (this.id === "null")
-         {
-            return;
-         }
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -550,10 +533,10 @@
          {
             var currentArr = response.json.current,
                currentObj = Alfresco.util.arrayToObject(currentArr),
-               visibleArr = response.json.visible,
+               visibleArr = this.options.visible,
                visibleObj = Alfresco.util.arrayToObject(visibleArr),
-               addableArr = response.json.addable,
-               removeableArr = response.json.removeable,
+               addableArr = this.options.addable,
+               removeableArr = this.options.removeable,
                i, ii;
 
             this.currentValues = currentArr;

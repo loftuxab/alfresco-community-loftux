@@ -64,6 +64,11 @@
       Alfresco.DocumentList.superclass.constructor.call(this, "Alfresco.DocumentList", htmlId, ["button", "menu", "container", "datasource", "datatable", "paginator", "json", "history"]);
 
       // Initialise prototype properties
+      this.currentPath = "";
+      this.currentPage = 1;
+      this.totalRecords = 0;
+      this.expectedHistoryEvent = false;
+      this.showingMoreActions = false;
       this.state =
       {
          actionEditOfflineActive: false
@@ -137,7 +142,7 @@
       var filterObj = Alfresco.util.cleanBubblingObject(filter),
          markup = YAHOO.lang.substitute("{filterOwner}|{filterId}|{filterData}|{filterDisplay}", filterObj, function(p_key, p_value, p_meta)
          {
-            return typeof p_value == "undefined" ? "" : $html(p_value);
+            return typeof p_value == "undefined" ? "" : escape(p_value);
          });
       
       return markup;
@@ -381,7 +386,7 @@
        * @property currentPath
        * @type string
        */
-      currentPath: "",
+      currentPath: null,
 
       /**
        * Current page being browsed.
@@ -390,7 +395,7 @@
        * @type int
        * @default 1
        */
-      currentPage: 1,
+      currentPage: null,
       
       /**
        * Total number of records (documents + folders) in the currentPath.
@@ -399,7 +404,7 @@
        * @type int
        * @default 0
        */
-      totalRecords: 0,
+      totalRecords: null,
 
       /**
        * Current filter to filter document list.
@@ -441,7 +446,7 @@
        * @type boolean
        * @default false
        */
-      expectedHistoryEvent: false,
+      expectedHistoryEvent: null,
 
       /**
        * Current actions menu being shown
@@ -459,7 +464,7 @@
        * @type boolean
        * @default false
        */
-      showingMoreActions: false,
+      showingMoreActions: null,
 
       /**
        * Deferred actions menu element when showing "More Actions" pop-up.
@@ -528,7 +533,7 @@
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "title", "description",
+               "index", "nodeRef", "nodeType", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "lockedBy", "lockedByUser",
                "version", "size", "contentUrl", "actionSet", "tags", "activeWorkflows", "isFavourite", "location", "permissions", "custom",
                "onlineEditUrl"
@@ -1008,10 +1013,10 @@
                   args[1].stop = true;
                   filterObj =
                   {
-                     filterOwner: decodeURI(filters[0]),
-                     filterId: decodeURI(filters[1]),
-                     filterData: decodeURI(filters[2]),
-                     filterDisplay: decodeURI(filters[3])
+                     filterOwner: unescape(filters[0]),
+                     filterId: unescape(filters[1]),
+                     filterData: unescape(filters[2]),
+                     filterDisplay: unescape(filters[3])
                   };
                   Alfresco.logger.debug("DL_fnFilterChangeHandler", "filterChanged =>", filterObj);
                   YAHOO.Bubbling.fire("filterChanged", filterObj);
@@ -1055,7 +1060,14 @@
           * YUI History - path
           */
          var bookmarkedPath = YAHOO.util.History.getBookmarkedState("path") || "";
-         while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath))){}
+         try
+         {
+            while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath))){}
+         }
+         catch (e)
+         {
+            // Catch "malformed URI sequence" exception
+         }
          
          this.currentPath = bookmarkedPath || this.options.initialPath || "";
          this.currentPath = $combine("/", this.currentPath);
@@ -2076,7 +2088,7 @@
        * Favourite document event handler
        *
        * @method onFavouriteDocument
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param row {HTMLElement} DOM reference to a TR element (or child thereof)
        */
       onFavouriteDocument: function DL_onFavouriteDocument(row)
       {

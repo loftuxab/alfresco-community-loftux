@@ -462,10 +462,6 @@
             {
                desc = '<h3 class="itemname">' + $html(oRecord.getData("displayName")) + '</h3>';
                desc += '<div class="detail"><span>' + me.msg("label.name") + ":</span> " + $html(oRecord.getData("fullName")) + '</div>';
-               desc += '<div class="detail">';
-               desc += '<span class="item"><span>' + me.msg("label.users") + ":</span> " + $html(metadata.userCount) + '</span>';
-               desc += '<span class="item"><span>' + me.msg("label.subgroups") + ":</span> " + $html(metadata.groupCount) + '</span>';
-               desc += '</div>';
             }
             elCell.innerHTML = desc;
          };

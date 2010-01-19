@@ -1612,8 +1612,10 @@ Alfresco.util.setVar = function(p_name, p_value)
 
 /**
  * Takes a string and splits it up to valid tags by using whitespace as separators.
- * Note! If invalid characters are found they are treated as separators.
- * I.e the string "hello*world alfresco" would result in  tags: "hello", "world" and "alfresco".
+ * Multi-word tags are supported by "quoting the phrase".
+ * e.g. the string
+ * <pre>hello*world "this is alfresco"</pre>
+ * would result in  tags: "hello*world" and "this is alfresco".
  *
  * @method getTags
  * @param str {string} a string containing tags
@@ -1624,14 +1626,15 @@ Alfresco.util.getTags = function(str)
 {
    var match = null,
       tags = [],
+      found = {},
       regexp = new RegExp(/([^"^\s]+)\s*|"([^"]+)"\s*/g);
 
    while (match = regexp.exec(str))
    {
       tag = match[1] || match[2];
-      if (tags[tag] === undefined)
+      if (found[tag] === undefined)
       {
-         tags[tag] = true;
+         found[tag] = true;
          tags.push(tag);
       }
    }
@@ -4149,7 +4152,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
        */
       onComponentsLoaded: function Base_onComponentsLoaded()
       {
-         if (this.onReady && this.onReady.call)
+         if (this.onReady && this.onReady.call && this.id !== "null")
          {
             YUIEvent.onContentReady(this.id, this.onReady, this, true);
          }
