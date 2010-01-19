@@ -34,9 +34,11 @@ import org.alfresco.jlan.locking.FileLock;
 import org.alfresco.jlan.locking.FileLockList;
 import org.alfresco.jlan.locking.LockConflictException;
 import org.alfresco.jlan.locking.NotLockedException;
+import org.alfresco.jlan.server.filesys.ExistingOpLockException;
 import org.alfresco.jlan.server.filesys.FileName;
 import org.alfresco.jlan.server.filesys.FileOpenParams;
 import org.alfresco.jlan.server.filesys.FileStatus;
+import org.alfresco.jlan.server.locking.OpLockDetails;
 import org.alfresco.jlan.smb.SharingMode;
 
 /**
@@ -102,13 +104,14 @@ public class FileState {
 	
 	private int m_openCount;
 	
-	//	Sharing mode
-	
-	private int m_sharedAccess = SharingMode.READWRITE;
+    // Sharing mode and PID of first process to open the file
+
+    private int m_sharedAccess = SharingMode.READWRITE + SharingMode.DELETE;
+    private int m_pid = -1;
 	
 	//	Cache of various file information
 	
-	private Hashtable m_cache;
+	private Hashtable<String, Object> m_cache;
 	
 	//	Count of streams associated with this file, -1 if not known
 	
@@ -118,6 +121,10 @@ public class FileState {
 	
 	private FileLockList m_lockList;
 	
+	// Oplock details
+
+	private OpLockDetails m_oplock;
+
 	//	Retention period expiry date/time
 	
 	private long m_retainUntil = -1L;
@@ -222,6 +229,15 @@ public class FileState {
 	  return m_sharedAccess;
 	}
 	
+    /**
+     * Return the PID of the first process to open the file, or -1 if the file is not open
+     * 
+     * @return int
+     */
+    public final int getProcessId() {
+    	return m_pid;
+    }
+    
 	/**
 	 * Return the file status
 	 * 
@@ -452,7 +468,7 @@ public class FileState {
 	 */
 	public final synchronized void addAttribute(String name, Object attr) {
 	  if ( m_cache == null)
-	  	m_cache = new Hashtable();
+	  	m_cache = new Hashtable<String, Object>();
 	  m_cache.put(name,attr);
 	}
 	
@@ -502,6 +518,16 @@ public class FileState {
 		m_path = normalizePath(path);		
 	}
 
+    /**
+     * Set the PID of the process opening the file
+     * 
+     * @param pid int
+     */
+    public final void setProcessId(int pid) {
+    	if ( getOpenCount() == 0)
+    		m_pid = pid;
+    }
+    
 	/**
 	 * Return the count of active locks on this file
 	 *
@@ -641,6 +667,46 @@ public class FileState {
 	}
 
 	/**
+	 * Check if the file has an active oplock
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasOpLock() {
+		return m_oplock != null ? true : false;
+	}
+
+	/**
+	 * Return the oplock details
+	 * 
+	 * @return OpLockDetails
+	 */
+	public final OpLockDetails getOpLock() {
+		return m_oplock;
+	}
+
+	/**
+	 * Set the oplock for this file
+	 * 
+	 * @param oplock OpLockDetails
+	 * @exception ExistingOpLockException If there is an active oplock on this file
+	 */
+	public final synchronized void setOpLock(OpLockDetails oplock)
+		throws ExistingOpLockException {
+
+		if ( m_oplock == null)
+			m_oplock = oplock;
+		else
+			throw new ExistingOpLockException();
+	}
+
+	/**
+	 * Clear the oplock
+	 */
+	public final synchronized void clearOpLock() {
+		m_oplock = null;
+	}
+
+	/**
 	 * Normalize the path to uppercase the directory names and keep the case of the file name.
 	 * 
 	 * @param path String
@@ -689,13 +755,13 @@ public class FileState {
 
 	    //	Enumerate the available attribute objects
 	    
-	    Enumeration names = m_cache.keys();
+	    Enumeration<String> names = m_cache.keys();
 	    
 	    while ( names.hasMoreElements()) {
 	      
 	      //	Get the current attribute name
 	      
-	      String name = (String) names.nextElement();
+	      String name = names.nextElement();
 	      
 	      //	Get the associated attribute object
 	      
@@ -731,14 +797,19 @@ public class FileState {
 	  str.append(",Fid=");
 	  str.append(getFileId());
 
-		str.append(",Expire=");
-		str.append(getSecondsToExpire(System.currentTimeMillis()));
+	  str.append(",Expire=");
+	  str.append(getSecondsToExpire(System.currentTimeMillis()));
 		
-		str.append(",Sts=");
+	  str.append(",Sts=");
 	  str.append(_fileStates[getStatus()]);
 
-		str.append(",Locks=");
-		str.append(numberOfLocks());
+	  str.append(",Locks=");
+	  str.append(numberOfLocks());
+		
+	  if ( hasOpLock()) {
+		  str.append(",OpLock=");
+		  str.append(getOpLock());
+	  }
 		
 	  str.append("]");
 	  

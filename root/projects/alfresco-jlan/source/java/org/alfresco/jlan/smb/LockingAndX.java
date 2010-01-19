@@ -39,8 +39,10 @@ public class LockingAndX {
 	public static final int SharedLock		= 0x0001;
 	public static final int OplockBreak		= 0x0002;
 	public static final int ChangeType		= 0x0004;
-	public static final int Cancel				= 0x0008;
+	public static final int Cancel			= 0x0008;
 	public static final int LargeFiles		= 0x0010;
+	
+	public static final int Level2OpLock	= 0x0100;
 
 	/**
 	 * Check if this is a normal lock/unlock, ie. no flags except the LargeFiles flag may

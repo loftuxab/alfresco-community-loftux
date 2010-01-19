@@ -50,6 +50,7 @@ public final class FileSystem {
   public static final int ObjectIds				= 0x00010000;
   public static final int Encryption			= 0x00020000;
   public static final int NTFSStreams			= 0x00040000;
+  public static final int ReadOnlyVolume		= 0x00080000;
   
   // Filesystem type strings
   

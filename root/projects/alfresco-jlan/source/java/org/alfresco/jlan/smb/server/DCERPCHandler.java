@@ -518,6 +518,8 @@ public class DCERPCHandler {
 
 		// Check if there is a valid reply buffered
 
+		SMBSrvPacket respPkt = smbPkt;
+		
 		if ( pipeFile.hasBufferedData()) {
 
 			// Get the buffered data
@@ -535,22 +537,40 @@ public class DCERPCHandler {
 			if ( rdLen > bufLen)
 				rdLen = bufLen;
 
+			// Check if the requested data will fit into the current packet
+			
+			byte[] buf = respPkt.getBuffer();
+			int pos = respPkt.getByteOffset();
+			
+			if ( cmd == PacketType.ReadFile)
+				pos += 2;
+			
+			if ( rdLen > ( buf.length - pos)) {
+
+				// Allocate a larger packet for the response
+				
+				respPkt = sess.getPacketPool().allocatePacket( rdLen + pos, smbPkt, pos);
+				
+				// Switch to the response buffer
+				
+				buf = respPkt.getBuffer();
+			}
+			
 			// Build the read response
 
 			if ( cmd == PacketType.ReadFile) {
 
 				// Build the read response
 
-				smbPkt.setParameterCount(5);
-				smbPkt.setParameter(0, rdLen);
+				respPkt.setParameterCount(5);
+				respPkt.setParameter(0, rdLen);
 				for (int i = 1; i < 5; i++)
-					smbPkt.setParameter(i, 0);
-				smbPkt.setByteCount(rdLen + 3);
+					respPkt.setParameter(i, 0);
+				respPkt.setByteCount(rdLen + 3);
 
 				// Copy the data to the response
 
-				byte[] buf = smbPkt.getBuffer();
-				int pos = smbPkt.getByteOffset();
+				pos = respPkt.getByteOffset();
 
 				buf[pos++] = (byte) DataType.DataBlock;
 				DataPacker.putIntelShort(rdLen, buf, pos);
@@ -567,19 +587,18 @@ public class DCERPCHandler {
 
 				// Build the read andX response
 
-				smbPkt.setParameterCount(12);
-				smbPkt.setAndXCommand(0xFF);
+				respPkt.setParameterCount(12);
+				respPkt.setAndXCommand(0xFF);
 				for (int i = 1; i < 12; i++)
-					smbPkt.setParameter(i, 0);
+					respPkt.setParameter(i, 0);
 
 				// Copy the data to the response
 
-				byte[] buf = smbPkt.getBuffer();
-				int pos = DCEDataPacker.longwordAlign(smbPkt.getByteOffset());
+				pos = DCEDataPacker.longwordAlign(respPkt.getByteOffset());
 
-				smbPkt.setParameter(5, rdLen);
-				smbPkt.setParameter(6, pos - RFCNetBIOSProtocol.HEADER_LEN);
-				smbPkt.setByteCount((pos + rdLen) - smbPkt.getByteOffset());
+				respPkt.setParameter(5, rdLen);
+				respPkt.setParameter(6, pos - RFCNetBIOSProtocol.HEADER_LEN);
+				respPkt.setByteCount((pos + rdLen) - respPkt.getByteOffset());
 
 				try {
 					bufData.copyData(buf, pos, rdLen);
@@ -602,32 +621,32 @@ public class DCERPCHandler {
 
 				// Initialize the read response
 
-				smbPkt.setParameterCount(5);
+				respPkt.setParameterCount(5);
 				for (int i = 0; i < 5; i++)
-					smbPkt.setParameter(i, 0);
-				smbPkt.setByteCount(0);
+					respPkt.setParameter(i, 0);
+				respPkt.setByteCount(0);
 			}
 			else {
 
 				// Return a zero length read andX response
 
-				smbPkt.setParameterCount(12);
+				respPkt.setParameterCount(12);
 
-				smbPkt.setAndXCommand(0xFF);
+				respPkt.setAndXCommand(0xFF);
 				for (int i = 1; i < 12; i++)
-					smbPkt.setParameter(i, 0);
-				smbPkt.setByteCount(0);
+					respPkt.setParameter(i, 0);
+				respPkt.setByteCount(0);
 			}
 		}
 
 		// Clear the status code
 
-		smbPkt.setLongErrorCode(SMBStatus.NTSuccess);
+		respPkt.setLongErrorCode(SMBStatus.NTSuccess);
 
 		// Send the read reply
 
-		smbPkt.setFlags2(SMBPacket.FLG2_LONGERRORCODE);
-		sess.sendResponseSMB(smbPkt);
+		respPkt.setFlags2(SMBPacket.FLG2_LONGERRORCODE);
+		sess.sendResponseSMB(respPkt);
 	}
 
 	/**

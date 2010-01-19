@@ -145,6 +145,10 @@ public class SMBSrvPacket {
 	
 	private boolean m_asyncQueued;
 	
+	// Count of how many times the processing of this packet has been deferred
+	
+	private int m_deferredCount;
+	
 	/**
 	 * Default constructor
 	 */
@@ -1810,6 +1814,30 @@ public class SMBSrvPacket {
 	}
 	
 	/**
+	 * Clear the packet header
+	 */
+	public final void clearHeader() {
+		for ( int i = SIGNATURE; i < (SIGNATURE + HeaderLength); m_smbbuf[ i++] = 0);
+		InitializeBuffer();
+	}
+	
+	/**
+	 * Return the deferred processing count for this packet
+	 * 
+	 * @return int
+	 */
+	public final int getDeferredCount() {
+		return m_deferredCount;
+	}
+	
+	/**
+	 * Increment the deferred processing count for this packet
+	 */
+	public final void incrementDeferredCount() {
+		m_deferredCount++;
+	}
+	
+	/**
 	 * Return the SMB packet details as a string
 	 * 
 	 * @return String
@@ -1842,6 +1870,10 @@ public class SMBSrvPacket {
 		str.append(",BytCnt=");
 		str.append( getByteCount());
 		
+		if ( m_deferredCount > 0) {
+			str.append(",Defer=");
+			str.append(m_deferredCount);
+		}
 
 		str.append("]");
 		

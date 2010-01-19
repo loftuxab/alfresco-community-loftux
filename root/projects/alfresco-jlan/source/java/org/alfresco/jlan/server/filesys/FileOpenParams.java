@@ -394,11 +394,9 @@ public class FileOpenParams {
 	 * @return boolean
 	 */
 	public final boolean isReadOnlyAccess() {
-		if (( m_accessMode & AccessMode.NTFileWriteCheck) == 0 &&
-			( m_accessMode & AccessMode.NTFileReadCheck)  != 0)
+		if (( m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTRead)
 			return true;
 		return false;
-//		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTRead ? true : false;
 	}
 	
 	/**
@@ -407,11 +405,9 @@ public class FileOpenParams {
 	 * @return boolean
 	 */
 	public final boolean isWriteOnlyAccess() {
-		if (( m_accessMode & AccessMode.NTFileWriteCheck) != 0 &&
-			( m_accessMode & AccessMode.NTFileReadCheck) == 0)
-				return true;
-			return false;
-//		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTWrite ? true : false;
+		if (( m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTWrite)
+			return true;
+		return false;
 	}
 	
 	/**
@@ -420,11 +416,21 @@ public class FileOpenParams {
 	 * @return boolean
 	 */
 	public final boolean isReadWriteAccess() {
-		if (( m_accessMode & AccessMode.NTFileWriteCheck) != 0 &&
-			( m_accessMode & AccessMode.NTFileReadCheck)  != 0)
-				return true;
-			return false;
-//		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTReadWrite ? true : false;
+		if (( m_accessMode & AccessMode.NTReadWrite)  != 0)
+			return true;
+		return false;
+	}
+	
+	/**
+	 * Determine if the file open is to access the file attributes/metadata only
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isAttributesOnlyAccess() {
+		if (( m_accessMode & (AccessMode.NTReadWrite + AccessMode.NTAppend)) == 0 &&
+			(m_accessMode & (AccessMode.NTReadAttrib + AccessMode.NTWriteAttrib)) != 0)
+			return true;
+		return false;
 	}
 	
   /**

@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import org.alfresco.jlan.locking.FileLock;
 import org.alfresco.jlan.locking.FileLockList;
+import org.alfresco.jlan.server.locking.OpLockDetails;
 
 /**
  * <p>
@@ -95,6 +96,10 @@ public abstract class NetworkFile {
 
 	protected int m_grantedAccess;
 
+	// Allowed file access (can be different to granted file access if read-only access was requested)
+	
+	protected int m_allowedAccess = NetworkFile.READWRITE;
+	
 	// Flag to indicate that the file has been closed
 
 	protected boolean m_closed = true;
@@ -116,6 +121,10 @@ public abstract class NetworkFile {
 
 	private int m_flags;
 
+	// Oplock details
+	
+	private OpLockDetails m_oplock;
+	
 	/**
 	 * Create a network file object with the specified file identifier.
 	 * 
@@ -206,7 +215,7 @@ public abstract class NetworkFile {
 	/**
 	 * Return the full name, relative to the share.
 	 * 
-	 * @return java.lang.String
+	 * @return String
 	 */
 	public final String getFullName() {
 		return m_fullName;
@@ -215,7 +224,7 @@ public abstract class NetworkFile {
 	/**
 	 * Return the full name including the stream name, relative to the share.
 	 * 
-	 * @return java.lang.String
+	 * @return String
 	 */
 	public final String getFullNameStream() {
 		if ( isStream())
@@ -226,15 +235,26 @@ public abstract class NetworkFile {
 
 	/**
 	 * Return the granted file access mode.
+	 * 
+	 * @return int
 	 */
 	public final int getGrantedAccess() {
 		return m_grantedAccess;
 	}
 
 	/**
+	 * Return the allowed file access mode
+	 * 
+	 * @return int
+	 */
+	public final int getAllowedAccess() {
+		return m_allowedAccess;
+	}
+	
+	/**
 	 * Return the file/directory name.
 	 * 
-	 * @return java.lang.String
+	 * @return String
 	 */
 	public String getName() {
 		return m_name;
@@ -518,7 +538,7 @@ public abstract class NetworkFile {
 	/**
 	 * Set the full file name, relative to the share.
 	 * 
-	 * @param name java.lang.String
+	 * @param name String
 	 */
 	public final void setFullName(String name) {
 		m_fullName = name;
@@ -533,6 +553,15 @@ public abstract class NetworkFile {
 		m_grantedAccess = mode;
 	}
 
+	/**
+	 * Set the allowed access mode
+	 * 
+	 * @param mode int
+	 */
+	public final void setAllowedAccess(int mode) {
+		m_allowedAccess = mode;
+	}
+	
 	/**
 	 * Set the file name.
 	 * 
@@ -714,6 +743,33 @@ public abstract class NetworkFile {
 		return m_lockList;
 	}
 
+	/**
+	 * Check if there is an oplock on this file/handle
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasOpLock() {
+		return m_oplock != null ? true : false;
+	}
+	
+	/**
+	 * Return the oplock details
+	 * 
+	 * @return OpLockDetails
+	 */
+	public final OpLockDetails getOpLock() {
+		return m_oplock;
+	}
+	
+	/**
+	 * Set/clear the oplock on this file
+	 * 
+	 * @param oplock OpLockDetails
+	 */
+	public final void setOpLock(OpLockDetails oplock) {
+		m_oplock = oplock;
+	}
+	
 	/**
 	 * Set the unique file identifier
 	 * 
