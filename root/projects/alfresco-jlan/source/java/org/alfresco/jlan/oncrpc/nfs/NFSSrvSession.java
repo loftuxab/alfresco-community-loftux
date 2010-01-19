@@ -468,13 +468,13 @@ public class NFSSrvSession extends SrvSession {
 		  
 		  //	Enumerate the active connections
 
-		  Enumeration conns = m_connections.enumerateConnections();
+		  Enumeration<TreeConnection> conns = m_connections.enumerateConnections();
 		
 			while ( conns.hasMoreElements()) {	
 	
 				//	Get the current tree connection
 				
-				TreeConnection tree = (TreeConnection) conns.nextElement();
+				TreeConnection tree = conns.nextElement();
 				
 				tree.closeConnection(this);	
 	
@@ -489,5 +489,14 @@ public class NFSSrvSession extends SrvSession {
 				m_connections = null;
 			}
 		}
+	}
+	
+	/**
+	 * Indicate that NFS filesystem searches are case sensitive
+	 * 
+	 * @return boolean
+	 */
+	public boolean useCaseSensitiveSearch() {
+		return true;
 	}
 }

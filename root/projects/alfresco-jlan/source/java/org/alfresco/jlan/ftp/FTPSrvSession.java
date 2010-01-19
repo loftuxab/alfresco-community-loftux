@@ -35,7 +35,6 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -85,19 +84,19 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	//
 	// Debug flag values
 
-	public static final int DBG_STATE = 0x00000001; // Session state changes
-	public static final int DBG_RXDATA = 0x00000002; // Received data
-	public static final int DBG_TXDATA = 0x00000004; // Transmit data
-	public static final int DBG_DUMPDATA = 0x00000008; // Dump data packets
-	public static final int DBG_SEARCH = 0x00000010; // File/directory search
-	public static final int DBG_INFO = 0x00000020; // Information requests
-	public static final int DBG_FILE = 0x00000040; // File open/close/info
-	public static final int DBG_FILEIO = 0x00000080; // File read/write
-	public static final int DBG_ERROR = 0x00000100; // Errors
-	public static final int DBG_PKTTYPE = 0x00000200; // Received packet type
-	public static final int DBG_TIMING = 0x00000400; // Time packet processing
-	public static final int DBG_DATAPORT = 0x00000800; // Data port
-	public static final int DBG_DIRECTORY = 0x00001000; // Directory commands
+	public static final int DBG_STATE 		= 0x00000001; // Session state changes
+	public static final int DBG_RXDATA 		= 0x00000002; // Received data
+	public static final int DBG_TXDATA 		= 0x00000004; // Transmit data
+	public static final int DBG_DUMPDATA 	= 0x00000008; // Dump data packets
+	public static final int DBG_SEARCH 		= 0x00000010; // File/directory search
+	public static final int DBG_INFO 		= 0x00000020; // Information requests
+	public static final int DBG_FILE 		= 0x00000040; // File open/close/info
+	public static final int DBG_FILEIO 		= 0x00000080; // File read/write
+	public static final int DBG_ERROR 		= 0x00000100; // Errors
+	public static final int DBG_PKTTYPE 	= 0x00000200; // Received packet type
+	public static final int DBG_TIMING 		= 0x00000400; // Time packet processing
+	public static final int DBG_DATAPORT 	= 0x00000800; // Data port
+	public static final int DBG_DIRECTORY 	= 0x00001000; // Directory commands
 
 	// Enabled features
 
@@ -106,20 +105,16 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	public static final boolean FeatureSIZE = true;
 	public static final boolean FeatureMLST = true;
 
-	// Anonymous user name
-
-	private static final String USER_ANONYMOUS = "anonymous";
-
 	// Root directory and FTP directory seperator
 
-	private static final String ROOT_DIRECTORY = "/";
-	private static final String FTP_SEPERATOR = "/";
-	private static final char FTP_SEPERATOR_CHAR = '/';
+	private static final String ROOT_DIRECTORY 		= "/";
+	private static final String FTP_SEPERATOR 		= "/";
+	private static final char FTP_SEPERATOR_CHAR 	= '/';
 
 	// Share relative path directory seperator
 
-	private static final String DIR_SEPERATOR = "\\";
-	private static final char DIR_SEPERATOR_CHAR = '\\';
+	private static final String DIR_SEPERATOR 		= "\\";
+	private static final char DIR_SEPERATOR_CHAR 	= '\\';
 
 	// File transfer buffer size
 
@@ -137,13 +132,13 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 	// Machine listing fact ids
 
-	protected static final int MLST_SIZE = 0x0001;
-	protected static final int MLST_MODIFY = 0x0002;
-	protected static final int MLST_CREATE = 0x0004;
-	protected static final int MLST_TYPE = 0x0008;
-	protected static final int MLST_UNIQUE = 0x0010;
-	protected static final int MLST_PERM = 0x0020;
-	protected static final int MLST_MEDIATYPE = 0x0040;
+	protected static final int MLST_SIZE 		= 0x0001;
+	protected static final int MLST_MODIFY 		= 0x0002;
+	protected static final int MLST_CREATE 		= 0x0004;
+	protected static final int MLST_TYPE 		= 0x0008;
+	protected static final int MLST_UNIQUE		= 0x0010;
+	protected static final int MLST_PERM 		= 0x0020;
+	protected static final int MLST_MEDIATYPE 	= 0x0040;
 
 	// Default fact list to use for machine listing commands
 
@@ -279,9 +274,22 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 			m_dataSess = null;
 		}
 
+		// Check if there is an active transaction
+		
+		if ( hasTransaction()) {
+		
+			// DEBUG
+			
+			if ( Debug.EnableError)
+				debugPrintln("** Active transaction after packet processing, cleaning up **");
+			
+			// Close the active transaction
+			
+			endTransaction();
+		}
+		
 		// Close the socket first, if the client is still connected this should allow the
-		// input/output streams
-		// to be closed
+		// input/output streams to be closed
 
 		if ( m_sock != null) {
 			try {
@@ -2898,7 +2906,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 			// Get a list of file information objects for the current directory
 
-			Vector files = null;
+			Vector<Object> files = null;
 
 			files = listFilesForPath(ftpPath, false, false);
 
@@ -4060,6 +4068,15 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	protected final void sendFTPNotLoggedOnResponse()
 		throws IOException {
 		sendFTPResponse(530, "Not logged on");
+	}
+	
+	/**
+	 * Indicate that FTP filesystem searches are case sensitive
+	 * 
+	 * @return boolean
+	 */
+	public boolean useCaseSensitiveSearch() {
+		return true;
 	}
 	
 	/**
