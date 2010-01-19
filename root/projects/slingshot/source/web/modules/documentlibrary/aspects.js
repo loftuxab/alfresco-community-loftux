@@ -144,8 +144,6 @@
        */
       renderItem: function DA_renderItem(item, template)
       {
-         var me = this;
-         
          var renderHelper = function(p_key, p_value, p_metadata)
          {
             var html = "";

@@ -583,10 +583,10 @@
          }
       }
    });
-})();
 
-/**
- * Dummy instance to load optional YUI components early.
- * Use fake "null" id, which is tested later in onComponentsLoaded()
-*/
-new Alfresco.module.SimpleDialog("null");
+   /**
+    * Dummy instance to load optional YUI components early.
+    * Use fake "null" id, which is tested later in onComponentsLoaded()
+   */
+   var dummyInstance = new Alfresco.module.SimpleDialog("null");
+})();

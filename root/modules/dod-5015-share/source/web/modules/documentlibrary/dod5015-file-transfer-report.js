@@ -46,7 +46,7 @@
 
    Alfresco.module.RecordsFileTransferReport = function(htmlId)
    {
-      Alfresco.module.DoclibMoveTo.superclass.constructor.call(this, htmlId);
+      Alfresco.module.DoclibSiteFolder.superclass.constructor.call(this, htmlId);
       
       // Re-register with our own name
       this.name = "Alfresco.module.RecordsFileTransferReport";
@@ -58,9 +58,8 @@
       return this;
    };
    
-   YAHOO.extend(Alfresco.module.RecordsFileTransferReport, Alfresco.module.DoclibMoveTo,
+   YAHOO.extend(Alfresco.module.RecordsFileTransferReport, Alfresco.module.DoclibSiteFolder,
    {
-
       /**
        * Object container for initialization options
        */
@@ -96,7 +95,7 @@
          return Alfresco.module.RecordsFileTransferReport.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
             templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/file-transfer-report",
-            files: obj.transfer // To make the DoclibMoveTo component happy
+            files: obj.transfer // To make the DoclibSiteFolder component happy
          }, obj));
       },
 
@@ -211,7 +210,7 @@
           return url;
        }
    });
-})();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.RecordsFileTransferReport("null");
+   /* Dummy instance to load optional YUI components early */
+   var dummyInstance = new Alfresco.module.RecordsFileTransferReport("null");
+})();

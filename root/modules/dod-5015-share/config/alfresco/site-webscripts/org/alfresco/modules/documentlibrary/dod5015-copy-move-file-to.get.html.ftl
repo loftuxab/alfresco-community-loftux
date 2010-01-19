@@ -1,4 +1,4 @@
-<div id="${args.htmlid}-dialog" class="move-to">
+<div id="${args.htmlid}-dialog" class="site-folder">
    <div id="${args.htmlid}-title" class="hd"></div>
    <div class="bd">
       <div class="yui-g">
@@ -12,5 +12,5 @@
    </div>
 </div>
 <script type="text/javascript">//<![CDATA[
-Alfresco.util.addMessages(${messages}, "Alfresco.module.RecordsCopyMoveFileTo");
+   Alfresco.util.addMessages(${messages}, "Alfresco.module.RecordsCopyMoveFileTo");
 //]]></script>

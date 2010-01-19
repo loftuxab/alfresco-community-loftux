@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -335,7 +335,7 @@
          }
       }
    };
-})();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibActions();
+   /* Dummy instance to load optional YUI components early */
+   var dummyInstance = new Alfresco.module.DoclibActions();
+})();

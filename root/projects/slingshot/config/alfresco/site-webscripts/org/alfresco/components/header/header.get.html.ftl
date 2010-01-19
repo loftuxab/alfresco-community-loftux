@@ -53,7 +53,7 @@
                <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" maxlength="256" />
                <span class="search-icon">&nbsp;</span>
                <span class="menu-item-separator">&nbsp;</span>
-               <input id="${args.htmlid}-search-tbutton" type="button" />
+               <input id="${args.htmlid}-search-tbutton" type="button"/>
             </span>
          </span>
          </#if>
@@ -64,22 +64,22 @@
       <div class="bd">
          <#assign favDisplay><#if favouriteSites?size &gt; 0>block<#else>none</#if></#assign>
          <div id="${args.htmlid}-favouritesContainer" class="favourite-sites" style="display: ${favDisplay}">
-            <li>
+            <div>
                ${msg("header.site.favouriteSites")}
-            </li>
+            </div>
          </div>
          <ul id="${args.htmlid}-favouriteSites" class="favourite-sites-list separator" style="display: ${favDisplay}">
-         <#if favouriteSites?size!=0>
-         <#list favouriteSites as site>
+         <#if favouriteSites?size &gt; 0>
+            <#list favouriteSites as site>
             <li>
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
             </li>
-         </#list>
-         <#else><li></li></#if>
+            </#list>
+         </#if>
          </ul>
          <#assign addFavDisplay><#if (page.url.templateArgs.site?? && !currentSiteIsFav)>block<#else>none</#if></#assign>
          <ul id="${args.htmlid}-addFavourite" class="add-favourite-menuitem separator" style="display: ${addFavDisplay}">
-            <li>
+            <li style="display: ${addFavDisplay}">
                <a href="#" onclick="thisHeader.addAsFavourite(); return false;">${msg("link.add-favourite", siteTitle?html)}</a>
             </li>
          </ul>

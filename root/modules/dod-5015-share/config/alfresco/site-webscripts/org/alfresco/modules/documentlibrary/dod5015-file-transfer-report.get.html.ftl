@@ -1,4 +1,4 @@
-<div id="${args.htmlid}-dialog" class="move-to">
+<div id="${args.htmlid}-dialog" class="site-folder">
    <div id="${args.htmlid}-title" class="hd"></div>
    <div class="bd">
       <div class="yui-g">

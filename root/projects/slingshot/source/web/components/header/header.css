@@ -47,7 +47,7 @@
 .header span.menu-item-icon
 {
    padding: 3px 5px 0;
-   vertical-align: top;
+   vertical-align: middle;
 }
 
 .header .link-menu-button span.menu-item-icon
@@ -59,7 +59,7 @@
 {
    background-position: 0px 50%;
    background-repeat: no-repeat;
-   padding: 0 0px 1px 20px;
+   padding: 1px 0px 1px 20px;
 }
 
 .header span.my-dashboard a
@@ -106,8 +106,7 @@
 .header div.util-menu
 {
    float: right;
-   line-height: 2.2em;
-   margin: 1px 10px 0 0;
+   margin:5px 10px 0 0;
 }
 
 .header .search-tinput
@@ -188,7 +187,7 @@
 	padding: 4px 15px;
 }
 
-.header .yuimenu .bd div li
+.header .yuimenu .bd div div
 {
    font-weight: bold;
    padding: 4px 15px;
@@ -239,7 +238,7 @@
 
 .header .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
 {
-   color: #fff;
+   color: #FFFFFF;
 }
 
 /* Menu: disabled */
@@ -247,7 +246,7 @@
 .header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel.disabled
 {
 	color: #ccc;
-   background-color: #fff;
+   background-color: #FFF;
    cursor: default;
 }
 

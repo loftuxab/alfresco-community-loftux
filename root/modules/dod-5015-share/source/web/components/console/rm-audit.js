@@ -516,13 +516,12 @@
          }
 
          this.modules.selectAuditRecordLocation.setOptions(
-            {
-               mode: 'file',
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: '',
-               files: {}
-            }).showDialog();
+         {
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: '',
+            files: {}
+         }).showDialog();
       }, 
       
       onAuditRecordLocationSelected : function RM_Audit_AuditRecordLocationSelected(e, args)

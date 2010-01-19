@@ -34,40 +34,24 @@
    /**
    * YUI Library aliases
    */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+   var Dom = YAHOO.util.Dom;
 
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML;
 
-
    Alfresco.module.DoclibPermissions = function(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.module.DoclibPermissions";
-      this.id = htmlId;
+      Alfresco.module.DoclibPermissions.superclass.constructor.call(this, "Alfresco.module.DoclibPermissions", htmlId, ["button", "container", "connection", "json"]);
 
       // Initialise prototype properties
-      this.widgets = {};
-      this.modules = {};
       this.rolePickers = {};
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json"], this.onComponentsLoaded, this);
-
-      if (htmlId !== null)
-      {
-         // Register this component
-         Alfresco.util.ComponentManager.register(this);
-      }
 
       return this;
    };
    
-   Alfresco.module.DoclibPermissions.prototype =
+   YAHOO.extend(Alfresco.module.DoclibPermissions, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -111,22 +95,6 @@
       },
       
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
-      /**
        * Object container for storing role picker UI elements.
        * 
        * @property rolePickers
@@ -141,41 +109,6 @@
        * @type DOMElement
        */
       containerDiv: null,
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.module.DoclibPermissions} returns 'this' for method chaining
-       */
-      setOptions: function DLP_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.DoclibPermissions} returns 'this' for method chaining
-       */
-      setMessages: function DLP_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLP_onComponentsLoaded()
-      {
-      },
 
       /**
        * Main entry point
@@ -247,8 +180,9 @@
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
          
          // Mark-up the group/role drop-downs
-         var roles = YAHOO.util.Selector.query('button.site-group', this.widgets.dialog.element);
-         var roleElement, roleValue;
+         var roles = YAHOO.util.Selector.query('button.site-group', this.widgets.dialog.element),
+            roleElementId, roleValue;
+         
          for (var i = 0, j = roles.length; i < j; i++)
          {
             roleElementId = roles[i].id;
@@ -345,7 +279,7 @@
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: this._msg("message.permissions.failure")
+                  text: this.msg("message.permissions.failure")
                });
                return;
             }
@@ -372,9 +306,9 @@
             
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.permissions.success", successCount)
+               text: this.msg("message.permissions.success", successCount)
             });
-         }
+         };
          
          // Failure callback function
          var fnFailure = function DLP__onOK_failure(p_data)
@@ -383,9 +317,9 @@
 
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.permissions.failure")
+               text: this.msg("message.permissions.failure")
             });
-         }
+         };
 
          // Construct the data object for the genericAction call
          this.modules.actions.genericAction(
@@ -464,21 +398,24 @@
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
          {
-            titleDiv.innerHTML = this._msg("title.multi", this.options.files.length);
+            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length);
          }
          else
          {
             var fileSpan = '<span class="light">' + $html(this.options.files.displayName) + '</span>';
-            titleDiv.innerHTML = this._msg("title.single", fileSpan);
+            titleDiv.innerHTML = this.msg("title.single", fileSpan);
             // Convert to array
             this.options.files = [this.options.files];
          }
          
          // Default values - "None" initially
-         for (rolePicker in this.rolePickers)
+         for (var rolePicker in this.rolePickers)
          {
-            this.rolePickers[rolePicker].set("name", "");
-            this.rolePickers[rolePicker].set("label", this._msg("role.None"));
+            if (this.rolePickers.hasOwnProperty(rolePicker))
+            {
+               this.rolePickers[rolePicker].set("name", "");
+               this.rolePickers[rolePicker].set("label", this.msg("role.None"));
+            }
          }
          
          var defaultRoles = this.options.files[0].permissions.roles;
@@ -489,7 +426,7 @@
             if (permissions[2] in this.options.roles)
             {
                this.rolePickers[permissions[1]].set("name", permissions[2]);
-               this.rolePickers[permissions[1]].set("label", this._msg("role." + permissions[2]));
+               this.rolePickers[permissions[1]].set("label", this.msg("role." + permissions[2]));
             }
          }
 
@@ -537,39 +474,29 @@
        */
       _parseUI: function DLP__parseUI()
       {
-         var params = [];
-         var role;
+         var params = [],
+            role;
          
-         for (picker in this.rolePickers)
+         for (var picker in this.rolePickers)
          {
-            role = this.rolePickers[picker].get("name");
-            if ((role != "") && (role != "None"))
+            if (this.rolePickers.hasOwnProperty(picker))
             {
-               params.push(
+               role = this.rolePickers[picker].get("name");
+               if ((role != "") && (role != "None"))
                {
-                  group: this.rolePickers[picker].get("value"),
-                  role: role
-               });
+                  params.push(
+                  {
+                     group: this.rolePickers[picker].get("value"),
+                     role: role
+                  });
+               }
             }
          }
          
          return params;
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-       _msg: function DLP__msg(messageId)
-       {
-          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
-       }
-   };
-})();
+      }
+   });
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibPermissions(null);
+   /* Dummy instance to load optional YUI components early */
+   var dummyInstance = new Alfresco.module.DoclibPermissions("null");
+})();

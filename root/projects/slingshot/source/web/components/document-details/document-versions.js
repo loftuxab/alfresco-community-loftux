@@ -100,15 +100,18 @@
       onReady: function DV_onReady()
       {
          // Listen on clicks for revert version icons
-         var versions = this.options.versions, version, i, j, revertSpan;
+         var versions = this.options.versions, version, i, j, reverter;
          
          for (i = 0, j = versions.length; i < j; i++)
          {
-            revertSpan = Dom.get(this.id + "-revert-span-" + i);
-            if (revertSpan)
+            reverter = Dom.get(this.id + "-revert-a-" + i);
+            if (reverter)
             {
-               Event.addListener(revertSpan, "click", function (event, obj)
+               Event.addListener(reverter, "click", function (event, obj)
                {
+                  // Stop browser from using href attribute
+                  Event.preventDefault(event)
+
                   // Find the index of the version link by looking at its id
                   version = versions[obj.versionIndex];
 
@@ -131,13 +134,16 @@
             }
 
             // Listen on clicks on the version - date row so we can expand and collapse it
-            var expandDiv = Dom.get(this.id + "-expand-div-" + i),
+            var expander = Dom.get(this.id + "-expand-a-" + i),
                moreVersionInfoDiv = Dom.get(this.id + "-moreVersionInfo-div-" + i);            
 
-            if (expandDiv)
-            {
-               Event.addListener(expandDiv, "click", function (event, obj)
+            if (expander)
+            {               
+               Event.addListener(expander, "click", function (event, obj)
                {
+                  // Stop browser from using href attribute
+                  Event.preventDefault(event)
+
                   if (obj.moreVersionInfoDiv && Dom.hasClass(obj.expandDiv, "collapsed"))
                   {
                      Alfresco.util.Anim.fadeIn(obj.moreVersionInfoDiv);
@@ -152,7 +158,7 @@
                   }
                },
                {
-                  expandDiv: expandDiv,
+                  expandDiv: expander,
                   moreVersionInfoDiv: moreVersionInfoDiv
                }, this);
             }

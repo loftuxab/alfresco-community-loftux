@@ -132,7 +132,7 @@
        */
       onTagRefresh: function TagFilter_onRefresh(layer, args)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}&tn={tn}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}&topN={tn}",
          {
             site: this.options.siteId,
             container: this.options.containerId,
