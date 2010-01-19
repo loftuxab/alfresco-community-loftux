@@ -3,6 +3,7 @@
 
 <display>
 	<category name="Alfresco">
-		<portlet id="SurfPortlet"></portlet>
+		<portlet id="SurfPortlet"/>
+		<portlet id="CMISFolder"/>
 	</category>
 </display>

@@ -29,8 +29,8 @@
    </filter>
    
    <filter>
-      <filter-name>UrlRewriteFilter</filter-name>
       <description>Redirects view and service URLs to the dispatcher servlet.</description>
+      <filter-name>UrlRewriteFilter</filter-name>
       <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
    </filter>
    
