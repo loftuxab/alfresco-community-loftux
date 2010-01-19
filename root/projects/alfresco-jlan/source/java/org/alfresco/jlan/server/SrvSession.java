@@ -340,6 +340,13 @@ public abstract class SrvSession {
 	}
 	
 	/**
+	 * Determine if the protocol uses case sensitive filesystem searches
+	 * 
+	 * @return boolean
+	 */
+	public abstract boolean useCaseSensitiveSearch();
+	
+	/**
 	 * Set the authentication context, used during the initial session setup phase
 	 * 
 	 * @param ctx AuthContext
