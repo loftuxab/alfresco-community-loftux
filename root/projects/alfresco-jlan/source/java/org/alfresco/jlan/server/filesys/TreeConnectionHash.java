@@ -40,13 +40,13 @@ public class TreeConnectionHash {
 
 	//	Share name hash to tree connection
 	
-	private Hashtable m_connections;
+	private Hashtable<Integer, TreeConnection> m_connections;
 	
 	/**
 	 * Class constructor
 	 */
 	public TreeConnectionHash() {
-		m_connections = new Hashtable();
+		m_connections = new Hashtable<Integer, TreeConnection>();
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class TreeConnectionHash {
 	 * @return TreeConnection 
 	 */
 	public final TreeConnection deleteConnection(String shareName) {
-		return (TreeConnection) m_connections.get(new Integer(shareName.hashCode()));
+		return m_connections.get(new Integer(shareName.hashCode()));
 	}
 	
 	/**
@@ -87,7 +87,7 @@ public class TreeConnectionHash {
 		
 		//	Get the tree connection for the associated share name
 		
-		TreeConnection tree = (TreeConnection) m_connections.get(new Integer(shareName.hashCode()));
+		TreeConnection tree = m_connections.get(new Integer(shareName.hashCode()));
 			
 		//	Return the tree connection
 		 
@@ -114,9 +114,9 @@ public class TreeConnectionHash {
 	/**
 	 * Enumerate the connections
 	 * 
-	 * @return Enumeration
+	 * @return Enumeration<TreeConnection>
 	 */
-	public final Enumeration enumerateConnections() {
+	public final Enumeration<TreeConnection> enumerateConnections() {
 		return m_connections.elements();
 	}
 }

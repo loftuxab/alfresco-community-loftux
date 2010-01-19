@@ -41,6 +41,7 @@ import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
 import org.alfresco.jlan.server.SrvSession;
 import org.alfresco.jlan.server.auth.AuthenticatorException;
 import org.alfresco.jlan.server.auth.ICifsAuthenticator;
+import org.alfresco.jlan.server.filesys.DeferredPacketException;
 import org.alfresco.jlan.server.filesys.DiskDeviceContext;
 import org.alfresco.jlan.server.filesys.NetworkFile;
 import org.alfresco.jlan.server.filesys.TooManyConnectionsException;
@@ -77,11 +78,6 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 
 	public static final int DefaultBufferSize = 0x010000 + RFCNetBIOSProtocol.HEADER_LEN;
 	public static final int LanManBufferSize = 8192;
-
-	// Default and maximum number of connection slots
-
-	public static final int DefaultConnections = 4;
-	public static final int MaxConnections = 16;
 
 	// Maximum multiplexed packets allowed (client can send up to this many SMBs before waiting for
 	// a response)
@@ -124,6 +120,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	public static final int DBG_PKTSTATS    = 0x01000000; // Packet pool statistics
 	public static final int DBG_THREADPOOL  = 0x02000000; // Thread pool
 	public static final int DBG_BENCHMARK	= 0x04000000; // Benchmarking
+	public static final int DBG_OPLOCK		= 0x08000000; // Opportunistic locks
 
 	// Server session object factory
 
@@ -185,7 +182,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 
 	// Setup objects used during two stage session setup before the virtual circuit is allocated
 
-	private Hashtable m_setupObjects;
+	private Hashtable<Integer, Object> m_setupObjects;
 
 	// Flag to indicate an asynchronous read has been queued/is being processed
 	
@@ -697,7 +694,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	 */
 	public final void setSetupObject(int pid, Object obj) {
 		if ( m_setupObjects == null)
-			m_setupObjects = new Hashtable();
+			m_setupObjects = new Hashtable<Integer, Object>();
 		m_setupObjects.put(new Integer(pid), obj);
 	}
 
@@ -1490,6 +1487,13 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 					Debug.println("[SMB] Packet pool stats: " + getPacketPool());
 	
 			}
+			catch ( DeferredPacketException ex) {
+				
+				// Packet processing has been deferred, waiting on completion of some other processing
+				// Make sure the request packet is not released yet
+				
+				smbPkt = null;
+			}
 			catch (SocketException ex) {
 	
 				// DEBUG
@@ -1779,6 +1783,72 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	}
 
 	/**
+	 * Send an asynchonous error response SMB.
+	 * 
+	 * @param smbPkt SMBSrvPacket
+	 * @param errCode int Error code.
+	 * @param errClass int Error class.
+	 * @return boolean
+	 */
+	public final boolean sendAsyncErrorResponseSMB( SMBSrvPacket smbPkt, int errCode, int errClass)
+		throws java.io.IOException {
+
+		// Make sure the response flag is set
+
+		if ( smbPkt.isResponse() == false)
+			smbPkt.setFlags( smbPkt.getFlags() + SMBSrvPacket.FLG_RESPONSE);
+
+		// Set the error code and error class in the response packet
+
+		smbPkt.setParameterCount(0);
+		smbPkt.setByteCount(0);
+
+		// Add default flags/flags2 values
+
+		smbPkt.setFlags( smbPkt.getFlags() | getDefaultFlags());
+		smbPkt.setFlags2( smbPkt.getFlags2() | getDefaultFlags2());
+
+		// Check if the error is a NT 32bit error status
+
+		if ( errClass == SMBStatus.NTErr) {
+
+			// Enable the long error status flag
+
+			if ( smbPkt.isLongErrorCode() == false)
+				smbPkt.setFlags2( smbPkt.getFlags2() + SMBSrvPacket.FLG2_LONGERRORCODE);
+
+			// Set the NT status code
+
+			smbPkt.setLongErrorCode(errCode);
+		}
+		else {
+
+			// Disable the long error status flag
+
+			if ( smbPkt.isLongErrorCode() == true)
+				smbPkt.setFlags2(smbPkt.getFlags2() - SMBSrvPacket.FLG2_LONGERRORCODE);
+
+			// Set the error status/class
+
+			smbPkt.setErrorCode(errCode);
+			smbPkt.setErrorClass(errClass);
+		}
+
+		// Return the error response to the client
+
+		boolean sentOK = sendAsynchResponseSMB( smbPkt, smbPkt.getLength());
+
+		// Debug
+
+		if ( Debug.EnableInfo && hasDebug(DBG_ERROR))
+			debugPrintln("Async Error : Cmd = " + smbPkt.getPacketTypeString() + " - " + SMBErrorText.ErrorString(errClass, errCode) + ", sent=" + sentOK);
+		
+		// Return the send status
+		
+		return sentOK;
+	}
+
+	/**
 	 * Send, or queue, an asynchronous response SMB
 	 * 
 	 * @param pkt SMBSrvPacket
@@ -1995,5 +2065,14 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	 */
 	public final void setReadInProgress(boolean inProgress) {
 		m_asyncRead = inProgress;
+	}
+	
+	/**
+	 * Indicate that CIFS filesystem searches are not case sensitive
+	 * 
+	 * @return boolean
+	 */
+	public boolean useCaseSensitiveSearch() {
+		return false;
 	}
 }

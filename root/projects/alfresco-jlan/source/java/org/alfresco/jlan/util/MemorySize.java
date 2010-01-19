@@ -209,4 +209,24 @@ public class MemorySize {
 			
 		return ret;
 	}
+	
+	/**
+	 * Round up the size value to a 512 byte boundary
+	 * 
+	 * @param lSize long
+	 * @return long
+	 */
+	public static long roundupLongSize(long lSize) {
+	    return ( lSize + 512L) & 0xFFFFFFFFFFFFFE00L;
+	}
+
+	/**
+	 * Round up the size value to a 512 byte boundary
+	 * 
+	 * @param iSize int
+	 * @return int
+	 */
+	public static int roundupIntSize(int iSize) {
+	    return ( iSize + 512) & 0xFFFFFE00;
+	}
 }
