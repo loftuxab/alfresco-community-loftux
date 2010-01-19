@@ -27,16 +27,21 @@ function main ()
    model.title = feed.title;
    model.items = feed.items;
 
-   // Call the repository to see if the user is site manager or not
-   var userIsSiteManager = false;
-   var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
-   if (json.status == 200)
+   var userIsSiteManager = true;
+   //Check whether we are within the context of a site
+   if (page.url.templateArgs.site)
    {
-      var obj = eval('(' + json + ')');
-      if (obj.role)
-      {
-         userIsSiteManager = (obj.role == "SiteManager");
-      }
+	   //If we are, call the repository to see if the user is site manager or not
+	   userIsSiteManager = false;
+	   var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
+	   if (json.status == 200)
+	   {
+	      var obj = eval('(' + json + ')');
+	      if (obj.role)
+	      {
+	         userIsSiteManager = (obj.role == "SiteManager");
+	      }
+	   }
    }
    model.userIsSiteManager = userIsSiteManager;
 }
