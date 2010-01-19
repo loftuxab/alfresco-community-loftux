@@ -343,7 +343,7 @@
          onSearchClick: function ConsoleGroups_SearchPanelHandler_onSearchClick()
          {
             var queryElem = Dom.get(parent.id + "-search-text");
-            var query = queryElem.value;
+            var query = YAHOO.lang.trim(queryElem.value);
 
             // inform the user if the search term entered is too small
             if (query.length < parent.options.minqueryLength)

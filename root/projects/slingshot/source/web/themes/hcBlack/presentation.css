@@ -458,7 +458,7 @@ textarea
 /* A combination of a link and splitbutton wrapped inside a span */
 
 
-.yui-skin-hcBlack .link-menu-button .yui-menu-button span button
+.yui-skin-hcBlack .link-menu-button .yui-button span button
 {
    color: #4C4C4C;
    font-size: 2px;
@@ -466,15 +466,15 @@ textarea
    background-position: center center;
 }
 
-.yui-skin-hcBlack .link-menu-button .yui-menu-button.yui-menu-button-hover
+#Share.yui-skin-hcBlack .link-menu-button .yui-button.yui-button-hover
 {
    background-color: #FFFFFF;
-   border: 1px solid #7BA9CE;
+   border: 1px solid #000;
 }
 
-.yui-skin-hcBlack .link-menu-button .yui-menu-button span.first-child,
-.yui-skin-hcBlack .link-menu-button .yui-menu-button.yui-menu-button-activeoption span.first-child,
-.yui-skin-hcBlack .link-menu-button .yui-menu-button.yui-menu-button-hover span.first-child
+.yui-skin-hcBlack .link-menu-button .yui-button span.first-child,
+.yui-skin-hcBlack .link-menu-button .yui-button.yui-button-activeoption span.first-child,
+.yui-skin-hcBlack .link-menu-button .yui-button.yui-button-hover span.first-child
 {
    border-width: 0;
 }
@@ -490,11 +490,14 @@ textarea
    border: 1px solid #000;
 }
 
-.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-menu-button.yui-menu-button-hover
+#Share.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
 {   
-   border: 1px solid #FFFFFF;
+   border-color: transparent;
+   background-color: transparent;
 }
-.topiclist .yui-dt-liner {
+
+.topiclist .yui-dt-liner 
+{
    padding:0;
 }
 /* blog/wiki action items links */
