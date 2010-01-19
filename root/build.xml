@@ -220,7 +220,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/neethi-2.0.4.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/odf_utils.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/odmg-3.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/pdfbox-0.8.0-incubating.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/pdfbox-0.8.0-incubating-12-Nov-09.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/PDFRenderer-2009-09-27.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/poi-3.5-FINAL-20090928.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/j2ee/portlet_20.jar" />
