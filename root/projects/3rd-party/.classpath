@@ -146,7 +146,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-jcl-1.5.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/stax-api-1.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.8.0-incubating.jar" sourcepath="src/pdfbox-0.8.0-incubating-src.jar"/>
 	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar" sourcepath="src/fontbox-0.8.0-incubating-src.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-1.0-SNAPSHOT.jar"/>
@@ -158,5 +157,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webscripts-1.0.0.CI-SNAPSHOT-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-api-1.0.0.CI-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer-2009-09-27.jar" sourcepath="src/PDFRenderer-2009-09-27-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.8.0-incubating-12-Nov-09.jar" sourcepath="src/pdfbox-0.8.0-incubating-12-Nov-09-src.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

@@ -102,8 +102,8 @@ public class PdfToImageContentTransformer extends AbstractContentTransformer2
         	   logger.info(msg.toString());
            }
            
-           PDFPage page = pdffile.getPage(0);
-            
+           PDFPage page = pdffile.getPage(0, true);
+              
            //get the width and height for the doc at the default zoom              
            int width=(int)page.getBBox().getWidth();
            int height=(int)page.getBBox().getHeight();
