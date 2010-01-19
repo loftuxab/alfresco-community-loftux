@@ -27,8 +27,8 @@
                   <#list actionSet as action>
                      <li><a type="${action.asset!""}" rel="${action.permission!""}" href="${action.href}"><span class="${action.id}">${msg(action.label)}</span></a></li>
                   </#list>
-                     <li><hr /></li>
-                     <li><a rel="" href="#"><span class="onActionDeselectAll">${msg("menu.selected-items.deselect-all")}</span></a></li>
+                     <li><a href="#"><hr /></a></li>
+                     <li><a href="#"><span class="onActionDeselectAll">${msg("menu.selected-items.deselect-all")}</span></a></li>
                   </ul>
                </div>
             </div>

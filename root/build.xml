@@ -761,6 +761,31 @@
    </target>
 
    <target name="minimize-slingshot-deployed-javascript" depends="init">
+      <echo>Merging selected Slingshot Javascript files...</echo>
+      <concat destfile="${dir.deploy.tomcat.application.slingshot}/js/yui-common.js" force="yes" binary="yes">
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/utilities/utilities.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/button/button-min.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/container/container-min.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/menu/menu-min.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/json/json-min.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/selector/selector-min.js" />
+         <fileset file="${dir.project.slingshot.src.web}/yui/yui-patch.js" />
+      </concat>
+
+      <concat destfile="${dir.deploy.tomcat.application.slingshot}/js/documentlibrary-actions.js" force="yes" binary="yes">
+         <fileset file="${dir.project.slingshot.src.web}/components/documentlibrary/actions.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/global-folder.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/copy-move-to.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/details.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/taglibrary/taglibrary.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/workflow.js" />
+         <fileset file="${dir.project.slingshot.src.web}/components/people-finder/people-finder.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/permissions.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/aspects.js" />
+      </concat>
+
+      <echo>Compressing Slingshot Javascript...</echo>
       <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.slingshot}">
          <fileset dir="${dir.deploy.tomcat.application.slingshot}">
             <include name="**/*.js" />
@@ -768,6 +793,7 @@
             <exclude name="**/WEB-INF/**" />
             <exclude name="**/tiny_mce/**" />
             <exclude name="**/yui/**" />
+            <exclude name="**/log4javascript*.js" />
          </fileset>
          <arg line="-jar"/>
          <arg path="${dir.project.slingshot}/lib/yuicompressor-2.4.2.jar"/>
