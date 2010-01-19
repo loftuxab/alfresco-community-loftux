@@ -477,7 +477,16 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
      */
     show : function calendarEvent_show()
     {
-      YAHOO.util.Dom.setStyle(this.getElement(),'display','');
+      var el = this.getElement();
+      if (Dom.hasClass(this.el, 'allday'))
+      {
+         var multiples = Dom.getElementsByClassName(el.id+'-multiple', 'div');
+         for (var i=0,len = multiples.length;i<len;i++)
+         {
+            Dom.setStyle(multiples[i],'display','');
+         }
+      }
+      YAHOO.util.Dom.setStyle(el,'display','');
     },
     /**
      * Hides event
@@ -485,7 +494,16 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
      */
     hide : function calendarEvent_hide()
     {
-      YAHOO.util.Dom.setStyle(this.getElement(),'display','none');
+      var el = this.getElement()
+      if (Dom.hasClass(this.el, 'allday'))
+      {
+         var multiples = Dom.getElementsByClassName(el.id+'-multiple', 'div');
+         for (var i=0,len = multiples.length;i<len;i++)
+         {
+            Dom.setStyle(multiples[i],'display','none');
+         }
+      }
+      YAHOO.util.Dom.setStyle(el,'display','none');
     }
 });
 

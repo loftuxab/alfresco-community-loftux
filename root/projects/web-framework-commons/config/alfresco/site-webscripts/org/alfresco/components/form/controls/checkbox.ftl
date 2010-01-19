@@ -13,6 +13,6 @@
              <#if isTrue> value="true" checked="checked"</#if> <#if field.disabled>disabled="true"</#if> 
              <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if> 
              onchange='javascript:YAHOO.util.Dom.get("${fieldHtmlId}").value=YAHOO.util.Dom.get("${fieldHtmlId}-entry").checked;' />
-      <label for="${fieldHtmlId}-entry" class="checkbox">${field.label?html}<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
+      <label for="${fieldHtmlId}-entry" class="checkbox">${field.label?html}</label>
    </#if>
 </div>

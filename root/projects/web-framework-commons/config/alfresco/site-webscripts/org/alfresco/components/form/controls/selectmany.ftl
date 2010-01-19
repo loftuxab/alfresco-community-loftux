@@ -21,10 +21,10 @@
                <#if field.disabled>disabled="true"</#if>>
                <#list field.control.params.options?split(",") as nameValue>
                   <#if nameValue?index_of("|") == -1>
-                     <option value="${nameValue}"<#if (field.value?string?index_of(nameValue) != -1)> selected="selected"</#if>>${nameValue}</option>
+                     <option value="${nameValue}"<#if (field.value?string?index_of(nameValue) != -1)> selected="selected"</#if>>${nameValue?html}</option>
                   <#else>
                      <#assign choice=nameValue?split("|")>
-                     <option value="${choice[0]}"<#if (field.value?string?index_of(choice[0]) != -1)> selected="selected"</#if>>${msgValue(choice[1])}</option>
+                     <option value="${choice[0]}"<#if (field.value?string?index_of(choice[0]) != -1)> selected="selected"</#if>>${msgValue(choice[1])?html}</option>
                   </#if>
                </#list>
          </select>

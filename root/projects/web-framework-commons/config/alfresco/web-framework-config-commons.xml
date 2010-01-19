@@ -150,7 +150,7 @@
                <show id="cm:description" force="true" />
 
                <!-- tags and categories -->
-               <show id="cm:taggable" for-mode="edit" />
+               <show id="cm:taggable" for-mode="edit" force="true" />
                <show id="cm:categories" />
             </field-visibility>
             <appearance>

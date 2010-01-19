@@ -75,15 +75,14 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
      
      var elUl = null;
      var someHidden = false;
-     if (data.allday!=='allday')
+     if(data.allday && data.allday!='false')
      {
-       data.el = 'li';  
-       data.contEl = 'div';
+       data.el = 'div';
+       data.contEl='div'; 
      }
      else {
-       data.el = 'div';
-       data.contEl='div';
-
+       data.el = 'li';  
+       data.contEl = 'div';
      }
 
      if (data.dtstart) { // have to convert
@@ -97,7 +96,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
         vEventEl=null;           
      }
      
-     if (data.allday!=='')
+     if(data.allday && data.allday!='false')
      {
        data.allday='allday';
        data.hidden = '';
@@ -250,7 +249,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
                 }
 
                 var multipleAllDayEl = document.createElement('div');
-                multipleAllDayEl.className='allday multipleAllDay theme-bg-color-1';
+                multipleAllDayEl.className='allday multipleAllDay theme-bg-color-1 ' + eventEl.id + '-multiple';                
                 multipleAllDayEl.id=eventEl.id+'-multiple'+(i+1);
                 if (targetCell)
                 {
