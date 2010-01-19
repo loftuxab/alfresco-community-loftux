@@ -59,16 +59,18 @@ import org.alfresco.jlan.server.filesys.TreeConnection;
 import org.alfresco.jlan.server.filesys.VolumeInfo;
 import org.alfresco.jlan.server.filesys.cache.FileState;
 import org.alfresco.jlan.server.filesys.cache.FileStateCache;
-import org.alfresco.jlan.server.filesys.cache.FileStateLockManager;
 import org.alfresco.jlan.server.filesys.loader.NamedFileLoader;
 import org.alfresco.jlan.server.filesys.quota.QuotaManager;
 import org.alfresco.jlan.server.locking.FileLockingInterface;
 import org.alfresco.jlan.server.locking.LockManager;
+import org.alfresco.jlan.server.locking.OpLockInterface;
+import org.alfresco.jlan.server.locking.OpLockManager;
 import org.alfresco.jlan.smb.SharingMode;
 import org.alfresco.jlan.smb.WinNT;
 import org.alfresco.jlan.smb.server.ntfs.NTFSStreamsInterface;
 import org.alfresco.jlan.smb.server.ntfs.StreamInfo;
 import org.alfresco.jlan.smb.server.ntfs.StreamInfoList;
+import org.alfresco.jlan.util.MemorySize;
 import org.alfresco.jlan.util.WildCard;
 import org.springframework.extensions.config.ConfigElement;
 
@@ -78,7 +80,7 @@ import org.springframework.extensions.config.ConfigElement;
  * @author gkspencer
  */
 public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolumeInterface, NTFSStreamsInterface,
-  FileLockingInterface, FileIdInterface, SymbolicLinkInterface {
+  FileLockingInterface, FileIdInterface, SymbolicLinkInterface, OpLockInterface {
 
   //  Attributes attached to the file state
   
@@ -93,9 +95,9 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
   
   public static final int MaxFileNameLen  = 255;
   
-  //  Lock manager
+  //  Maximum timestamp value to allow for file timestamps (01-Jan-2030 00:00:00)
   
-  private static LockManager _lockManager = new FileStateLockManager();
+  public static final long MaxTimestampValue	= 1896134400000L;
   
   //  Enable/disable debug output
   
@@ -164,9 +166,10 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       }
       else {
         
-        //  Decrement the open file count for this file
-        
-        fstate.decrementOpenCount();
+        // If the file open count is now zero then reset the stored sharing mode
+          
+        if ( fstate.decrementOpenCount() == 0)
+          fstate.setSharedAccess( SharingMode.READWRITE + SharingMode.DELETE);
       }
 
       //  Release any locks on the file owned by this session
@@ -542,6 +545,11 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       throw new IOException( "Failed to create file " + params.getPath());
     else {
       
+      // Save the file sharing mode, needs to be done before the open count is incremented
+        
+      fstate.setSharedAccess( params.getSharedAccess());
+      fstate.setProcessId( params.getProcessId());
+        
       //  Update the file state
     
       fstate.incrementOpenCount();
@@ -1080,22 +1088,84 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       }
     }
     
-    //  Check if the file shared access indicates exclusive file access
-    
-    if ( params.getSharedAccess() == SharingMode.NOSHARING && fstate.getOpenCount() > 0)
-      throw new FileSharingException("File already open, " + params.getPath());
+	// Check if the current file open allows the required shared access
+	
+	boolean nosharing = false;
 
-    //  Check if the file is read-only and write access has been requested
-    
-    if (( params.isReadWriteAccess() || params.isWriteOnlyAccess())) {
-      
-      //  Check if the file is read-only
-      
-      if ( finfo.isReadOnly())
-        throw new AccessDeniedException("Read-only file");
-      else if ( fstate.hasActiveRetentionPeriod())
-        throw new AccessDeniedException("File retention active");
+	// Check for execute access mode, only allow on .EXE files for now
+	
+//	if ( params.getAccessMode() == AccessMode.NTFileGenericExecute && params.getPath().toLowerCase().endsWith( ".exe") == false)
+//		throw new AccessDeniedException("Invalid access mode");
+	
+	if ( fstate.getOpenCount() > 0) {
+		
+		// Check for impersonation security level from the original process that opened the file
+		
+		if ( params.getSecurityLevel() == WinNT.SecurityImpersonation && params.getProcessId() == fstate.getProcessId())
+			nosharing = false;
+
+		// Check if the caller wants read access, check the sharing mode
+		// Check if the caller wants write access, check if the sharing mode allows write
+		
+    	else if ( params.isReadOnlyAccess() && (fstate.getSharedAccess() & SharingMode.READ) != 0)
+    		nosharing = false;
+		
+		// Check if the caller wants write access, check the sharing mode
+		
+    	else if (( params.isReadWriteAccess() || params.isWriteOnlyAccess()) && (fstate.getSharedAccess() & SharingMode.WRITE) == 0)
+    	{
+    		// DEBUG
+    		
+    		if ( Debug.EnableDbg && hasDebug())
+    			Debug.println("Sharing mode disallows write access path=" + params.getPath());
+    		
+    		// Access not allowed
+    		
+    		throw new AccessDeniedException( "Sharing mode (write)");
+    	}
+    	
+		// Check if the file has been opened for exclusive access
+		
+		else if ( fstate.getSharedAccess() == SharingMode.NOSHARING)
+			nosharing = true;
+		
+		// Check if the required sharing mode is allowed by the current file open
+		
+		else if ( ( fstate.getSharedAccess() & params.getSharedAccess()) != params.getSharedAccess())
+			nosharing = true;
+		
+		// Check if the caller wants exclusive access to the file
+		
+    	else if ( params.getSharedAccess() == SharingMode.NOSHARING)
+    		nosharing = true;
+	}
+	
+	// Check if the file allows shared access
+	
+	if ( nosharing == true)
+    {
+    	if ( params.getPath().equals( "\\") == false) {
+    		
+    		// DEBUG
+    		
+    		if ( Debug.EnableDbg && hasDebug())
+    			Debug.println("Sharing violation path=" + params.getPath() + ", sharing=0x" + Integer.toHexString(fstate.getSharedAccess()));
+    	
+    		// File is locked by another user
+    		
+    		throw new FileSharingException("File already open, " + params.getPath());
+    	}
     }
+	
+	// Update the file sharing mode and process id, if this is the first file open
+	
+	fstate.setSharedAccess( params.getSharedAccess());
+	fstate.setProcessId( params.getProcessId());
+	
+	// DEBUG
+	
+	if ( Debug.EnableDbg && fstate.getOpenCount() == 0 && hasDebug())
+		Debug.println("Path " + params.getPath() + ", sharing=0x" + Integer.toHexString(params.getSharedAccess()) + ", PID=" + params.getProcessId());
 
     //  Create a JDBC network file and open the top level file
 
@@ -1108,6 +1178,16 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     jdbcFile.setFileDetails(finfo);
     jdbcFile.setFileState(fstate);
         
+    // Set the granted file access
+    
+//    if ( finfo.isReadOnly() || params.isReadOnlyAccess())
+    if ( params.isReadOnlyAccess())
+    	jdbcFile.setGrantedAccess( NetworkFile.READONLY);
+    else if ( params.isWriteOnlyAccess())
+    	jdbcFile.setGrantedAccess( NetworkFile.WRITEONLY);
+    else
+    	jdbcFile.setGrantedAccess( NetworkFile.READWRITE);
+    
     //  Set the file owner
     
     if ( sess != null)
@@ -1374,25 +1454,19 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     if ( Debug.EnableInfo && hasDebug())
       Debug.println("DB setFileInformation() name=" + name + ", info=" + info.toString());
 
+    // If the only flag set is the delete on close flag then return, nothing to do
+    
+    if ( info.getSetFileInformationFlags() == FileInfo.SetDeleteOnClose)
+    	return;
+    
     //  Access the JDBC context
 
     DBDeviceContext dbCtx = (DBDeviceContext) tree.getContext();
 
     // Check if the database is online
     
-    if ( dbCtx.getDBInterface().isOnline() == false) {
-      
-      // Check if the delete on close flag is being set
-      
-      if ( info.getSetFileInformationFlags() == FileInfo.SetDeleteOnClose) {
-        
-        // Just return, file object will be marked for delete on close
-        
-        return;
-      }
-      else
+    if ( dbCtx.getDBInterface().isOnline() == false)
         throw new DiskOfflineException( "Database is offline");
-    }
     
     //  Get, or create, the file state
     
@@ -1424,6 +1498,23 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         namedLoader.setFileInformation(name, dbInfo.getFileId(), info);
       }
 
+      //  Validate any timestamp updates
+      //
+      //  Switch off invalid updates from being written to the database but allow them to be cached.
+      //  To allow test apps such as IFSTEST to complete successfully.
+      
+      int origFlags = info.getSetFileInformationFlags();
+      int dbFlags   = origFlags;
+      
+      if ( info.hasSetFlag(FileInfo.SetAccessDate) && info.getAccessDateTime() > MaxTimestampValue)
+    	  dbFlags -= FileInfo.SetAccessDate;
+      
+      if ( info.hasSetFlag(FileInfo.SetCreationDate) && info.getCreationDateTime() > MaxTimestampValue)
+    	  dbFlags -= FileInfo.SetCreationDate;
+      
+      if ( info.hasSetFlag(FileInfo.SetModifyDate) && info.getModifyDateTime() > MaxTimestampValue)
+    	  dbFlags -= FileInfo.SetModifyDate;
+
       //  Check if the inode change date/time has been set
 
       if ( info.hasChangeDateTime() == false) {
@@ -1431,10 +1522,21 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         if ( info.hasSetFlag(FileInfo.SetChangeDate) == false)
           info.setFileInformationFlags(info.getSetFileInformationFlags() + FileInfo.SetChangeDate);
       }
+      else if ( info.hasSetFlag(FileInfo.SetChangeDate) && info.getChangeDateTime() > MaxTimestampValue)
+    	  dbFlags -= FileInfo.SetChangeDate;
               
+      //  Update the information flags for the database update
+      
+      info.setFileInformationFlags( dbFlags);
+      
       //  Update the file information
       
-      dbCtx.getDBInterface().setFileInformation(dbInfo.getDirectoryId(), dbInfo.getFileId(), info);
+      if ( dbFlags != 0)
+    	  dbCtx.getDBInterface().setFileInformation(dbInfo.getDirectoryId(), dbInfo.getFileId(), info);
+
+      //  Use the original information flags when updating the cached file information details
+      
+      info.setFileInformationFlags(origFlags);
       
       //  Copy the updated values to the file state
       
@@ -1783,11 +1885,11 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         long extendSize = 0L;
         long endOfWrite = fileoff + siz;
         
-        if ( endOfWrite > finfo.getAllocationSize()) {
+        if ( endOfWrite > finfo.getSize()) {
           
           //  Calculate the amount the file must be extended
 
-          extendSize = endOfWrite - finfo.getAllocationSize();
+          extendSize = endOfWrite - finfo.getSize();
           
           //  Allocate space for the file extend
           
@@ -1814,7 +1916,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         //  Update the file information
       
         if ( extendSize > 0)
-          finfo.setAllocationSize(endOfWrite);
+            finfo.setAllocationSize(MemorySize.roundupLongSize(endOfWrite));
       }
       else {      
 
@@ -2649,6 +2751,8 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     
     streamList = new StreamInfoList();
     
+    // Add an entry for the main file data stream
+    
     StreamInfo sinfo = new StreamInfo("::$DATA", finfo.getFileId(), 0, finfo.getSize(), finfo.getAllocationSize());
     streamList.addStream(sinfo);
 
@@ -3201,11 +3305,42 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
    */
   public LockManager getLockManager(SrvSession sess, TreeConnection tree) {
     
-    //  Return the file state lock manager
-    
-    return _lockManager;
+    // Access the context
+	    
+    DBDeviceContext dbCtx = (DBDeviceContext) tree.getContext();
+    return dbCtx.getLockManager();
   }
   
+  /**
+   * Return the oplock manager implementation
+   * 
+   * @param sess SrvSession
+   * @param tree TreeConnection
+   * @return OpLockManager 
+   */
+  public OpLockManager getOpLockManager(SrvSession sess, TreeConnection tree) {
+    
+    // Access the context
+	    
+    DBDeviceContext dbCtx = (DBDeviceContext) tree.getContext();
+    return dbCtx.getLockManager();
+  }
+  
+	/**
+	 * Enable/disable oplock support
+	 * 
+	 * @param sess SrvSession
+	 * @param tree TreeConnection
+	 * @return boolean
+	 */
+	public boolean isOpLocksEnabled(SrvSession sess, TreeConnection tree) {
+	    
+	    // Access the context
+		    
+	    DBDeviceContext dbCtx = (DBDeviceContext) tree.getContext();
+	    return dbCtx.isOpLocksEnabled();
+	}
+	
   /**
    * Convert a file id to a share relative path
    *
