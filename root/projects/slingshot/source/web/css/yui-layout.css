@@ -135,29 +135,29 @@
 
 #Share .link-menu-button
 { 
-   padding-bottom:4px;
+   padding-bottom:2px;
    padding-top:2px;
    vertical-align:middle;
    border: 1px solid transparent;
 }
 
-#Share .link-menu-button .yui-menu-button,
-#Share .link-menu-button .yui-menu-button span,
-#Share .link-menu-button .yui-menu-button span button
+#Share .link-menu-button .yui-button,
+#Share .link-menu-button .yui-button span,
+#Share .link-menu-button .yui-button span button
 {
    margin: 0;
    padding: 0;
    vertical-align: middle;  
 }
 
-#Share .link-menu-button .yui-menu-button
+#Share .link-menu-button .yui-button
 {
    border: 1px solid transparent;
    background-image: none;
    /*margin-top:3px;*/
 }
 
-#Share .link-menu-button .yui-menu-button span button
+#Share .link-menu-button .yui-button span button
 {
    padding: 6px 7px;   
    /*
@@ -165,8 +165,8 @@
    */  
 }
 
-#Share .link-menu-button .yui-menu-button.yui-menu-button-activeoption button,
-#Share .link-menu-button .yui-menu-button.yui-menu-button-hover button
+#Share .link-menu-button .yui-button.yui-button-activeoption button,
+#Share .link-menu-button .yui-button.yui-button-hover button
 {
    text-decoration: none;
 }

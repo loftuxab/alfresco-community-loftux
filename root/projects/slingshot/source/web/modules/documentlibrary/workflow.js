@@ -36,34 +36,20 @@
    */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      DataSource = YAHOO.util.DataSource,
+      KeyListener = YAHOO.util.KeyListener;
 
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML;
 
-
    Alfresco.module.DoclibWorkflow = function(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.module.DoclibWorkflow";
-      this.id = htmlId;
-
-      // Initialise prototype properties
-      this.widgets = {};
-      this.modules = {};
-      
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "calendar"], this.onComponentsLoaded, this);
-
-      return this;
+      return Alfresco.module.DoclibWorkflow.superclass.constructor.call(this, "Alfresco.module.DoclibWorkflow", htmlId, ["button", "container", "connection", "json", "calendar"]);
    };
    
-   Alfresco.module.DoclibWorkflow.prototype =
+   YAHOO.extend(Alfresco.module.DoclibWorkflow, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -107,63 +93,12 @@
       },
       
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
-      /**
        * Container element for template in DOM.
        * 
        * @property containerDiv
        * @type DOMElement
        */
       containerDiv: null,
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.module.DoclibWorkflow} returns 'this' for method chaining
-       */
-      setOptions: function DLW_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.DoclibWorkflow} returns 'this' for method chaining
-       */
-      setMessages: function DLW_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLW_onComponentsLoaded()
-      {
-      },
 
       /**
        * Main entry point
@@ -324,7 +259,7 @@
             },
             obj: null,
             scope: this
-         }
+         };
 
          // JSON submit type, but we'll be intercepting the actual Ajax request
          this.modules.form.setAJAXSubmit(true,
@@ -345,11 +280,11 @@
          {
             fn: this.doBeforeAjaxRequest,
             scope: this
-         }
+         };
 
          // Setup a DataSource for the selected people list
-         this.widgets.dataSource = new YAHOO.util.DataSource([]); 
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
+         this.widgets.dataSource = new DataSource([]); 
+         this.widgets.dataSource.responseType = DataSource.TYPE_JSARRAY; 
          this.widgets.dataSource.responseSchema =
          { 
             fields: ["userName", "firstName", "lastName"]
@@ -392,7 +327,7 @@
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            var desc = '<a href="#" class="remove-person" title="' + me._msg("tooltip.remove-person") + '" tabindex="0"></a>';
+            var desc = '<a href="#" class="remove-person" title="' + me.msg("tooltip.remove-person") + '" tabindex="0"></a>';
             elCell.innerHTML = desc;
          };
 
@@ -408,7 +343,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-peopleselected", columnDefinitions, this.widgets.dataSource,
          {
-            MSG_EMPTY: this._msg("label.no-users-selected")
+            MSG_EMPTY: this.msg("label.no-users-selected")
          });
 
          // Hook remove person action click events
@@ -434,9 +369,8 @@
                }
                args[1].stop = true;
             }
-      		 
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("remove-person", fnRemoveHandler);
 
          // Hook date click events
@@ -444,7 +378,7 @@
          {
             me.widgets.calendarOverlay.show();
             args[1].stop = true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("due-date", fnDueDateClick);
 
          // Pre-render our pop-up calendar into an overlay
@@ -454,12 +388,12 @@
             hide_blank_weeks: true,
             mindate: new Date()
          });
-         this.widgets.calendar.cfg.setProperty("MONTHS_SHORT", this._msg("months.short").split(","));
-         this.widgets.calendar.cfg.setProperty("MONTHS_LONG", this._msg("months.long").split(","));
-         this.widgets.calendar.cfg.setProperty("WEEKDAYS_1CHAR", this._msg("days.initial").split(","));
-         this.widgets.calendar.cfg.setProperty("WEEKDAYS_SHORT", this._msg("days.short").split(","));
-         this.widgets.calendar.cfg.setProperty("WEEKDAYS_MEDIUM", this._msg("days.medium").split(","));
-         this.widgets.calendar.cfg.setProperty("WEEKDAYS_LONG", this._msg("days.long").split(","));
+         this.widgets.calendar.cfg.setProperty("MONTHS_SHORT", this.msg("months.short").split(","));
+         this.widgets.calendar.cfg.setProperty("MONTHS_LONG", this.msg("months.long").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_1CHAR", this.msg("days.initial").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_SHORT", this.msg("days.short").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_MEDIUM", this.msg("days.medium").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_LONG", this.msg("days.long").split(","));
          
          this.widgets.calendarOverlay = new YAHOO.widget.Dialog(this.id + "-calendarOverlay",
          {
@@ -547,7 +481,7 @@
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.workflow.failure")
+               text: this.msg("message.workflow.failure")
             });
             return;
          }
@@ -574,7 +508,7 @@
 
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.workflow.success", successCount)
+            text: this.msg("message.workflow.success", successCount)
          });
       },
 
@@ -592,7 +526,7 @@
          this.widgets.dialog.show();
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: this._msg("message.workflow.failure")
+            text: this.msg("message.workflow.failure")
          });
       },
 
@@ -621,7 +555,7 @@
                firstName: obj.firstName,
                lastName: obj.lastName,
                email: obj.email
-            }
+            };
 
             // Add the user to the selected list
             this.widgets.dataTable.addRow(person);
@@ -674,7 +608,7 @@
          else
          {
             this.widgets.calendarOverlay.hide();
-            Dom.get(this.id + "-dueDate").innerHTML = this._msg("label.due-date.none");
+            Dom.get(this.id + "-dueDate").innerHTML = this.msg("label.due-date.none");
             Dom.get(this.id + "-date").value = "";
          }
       },
@@ -691,7 +625,7 @@
       {
          var selected = p_args[0],
             selDate = this.widgets.calendar.toDate(selected[0]);
-         Dom.get(this.id + "-dueDate").innerHTML = '<a href="#" class="due-date">' + Alfresco.util.formatDate(selDate, this._msg("format.due-date")) + '</a>';
+         Dom.get(this.id + "-dueDate").innerHTML = '<a href="#" class="due-date">' + Alfresco.util.formatDate(selDate, this.msg("format.due-date")) + '</a>';
          Dom.get(this.id + "-date").value = selDate.toString();
          this.widgets.calendarOverlay.hide();
          this.modules.form.updateSubmitElements();
@@ -718,12 +652,11 @@
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
          {
-            titleDiv.innerHTML = this._msg("title.multi", this.options.files.length)
+            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length);
          }
          else
          {
-            var fileSpan = '<span class="light">' + $html(this.options.files.displayName) + '</span>';
-            titleDiv.innerHTML = this._msg("title.single", fileSpan)
+            titleDiv.innerHTML = this.msg("title.single", '<span class="light">' + $html(this.options.files.displayName) + '</span>');
          }
 
          // Clear results DataTable
@@ -735,7 +668,7 @@
 
          // Clear date
          Dom.get(this.id + "-dueDate-checkbox").checked = false;
-         Dom.get(this.id + "-dueDate").innerHTML = this._msg("label.due-date.none");
+         Dom.get(this.id + "-dueDate").innerHTML = this.msg("label.due-date.none");
          Dom.get(this.id + "-date").value = "";
 
          // Clear comment
@@ -758,9 +691,9 @@
          this.modules.form.applyTabFix();
          
          // Register the ESC key to close the dialog
-         var escapeListener = new YAHOO.util.KeyListener(document,
+         var escapeListener = new KeyListener(document,
          {
-            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+            keys: KeyListener.KEY.ESCAPE
          },
          {
             fn: function(id, keyEvent)
@@ -793,22 +726,9 @@
          // Undo Firefox caret issue
          Alfresco.util.undoCaretFix(formElement);
          this.widgets.dialog.hide();
-      },
+      }
+   });
 
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-       _msg: function DLW__msg(messageId)
-       {
-          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
-       }
-   };
+   /* Dummy instance to load optional YUI components early */
+   var dummyInstance = new Alfresco.module.DoclibWorkflow(null);
 })();
-
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibWorkflow(null);

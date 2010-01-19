@@ -303,18 +303,7 @@
        */
       onActionCopyTo: function dlA_onActionCopyTo(assets)
       {
-         if (!this.modules.copyTo)
-         {
-            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo");
-         }
-
-         this.modules.copyTo.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.currentPath,
-            files: assets
-         }).showDialog();
+         this._copyMoveTo("copy", assets);
       },
 
       /**
@@ -325,13 +314,37 @@
        */
       onActionMoveTo: function dlA_onActionMoveTo(assets)
       {
-         if (!this.modules.moveTo)
+         this._copyMoveTo("move", assets);
+      },
+
+      /**
+       * Copy/Move To implementation.
+       *
+       * @method _copyMoveTo
+       * @param mode {String} Operation mode: copy|move
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       * @private
+       */
+      _copyMoveTo: function dlA__copyMoveTo(mode, assets)
+      {
+         // Check mode is an allowed one
+         if (!mode in
+            {
+               copy: true,
+               move: true
+            })
          {
-            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo");
+            throw new Error("'" + mode + "' is not a valid Copy/Move to mode.");
+         }
+         
+         if (!this.modules.copyMoveTo)
+         {
+            this.modules.copyMoveTo = new Alfresco.module.DoclibCopyMoveTo(this.id + "-copyMoveTo");
          }
 
-         this.modules.moveTo.setOptions(
+         this.modules.copyMoveTo.setOptions(
          {
+            mode: mode,
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,

@@ -24,29 +24,28 @@
  */
  
 /**
- * Document Library "Copy-, Move- and File-To" module for Records Management.
+ * Document Library "Copy- and Move-To" module for Document Library.
  * 
  * @namespace Alfresco.module
- * @class Alfresco.module.RecordsCopyMoveFileTo
+ * @class Alfresco.module.DoclibCopyMoveTo
  */
 (function()
 {
-   Alfresco.module.RecordsCopyMoveFileTo = function(htmlId)
+   Alfresco.module.DoclibCopyMoveTo = function(htmlId)
    {
-      Alfresco.module.DoclibSiteFolder.superclass.constructor.call(this, htmlId);
-      
+      Alfresco.module.DoclibCopyMoveTo.superclass.constructor.call(this, htmlId);
+
       // Re-register with our own name
-      this.name = "Alfresco.module.RecordsCopyMoveFileTo";
+      this.name = "Alfresco.module.DoclibCopyMoveTo";
       Alfresco.util.ComponentManager.reregister(this);
 
       // Initialise prototype properties
       this.modules.actions = new Alfresco.module.DoclibActions();
-      this.pathsToExpand = [];
-
+      
       return this;
    };
-   
-   YAHOO.extend(Alfresco.module.RecordsCopyMoveFileTo, Alfresco.module.DoclibSiteFolder,
+
+   YAHOO.extend(Alfresco.module.DoclibCopyMoveTo, Alfresco.module.DoclibGlobalFolder,
    {
       /**
        * Set multiple initialization options at once.
@@ -54,40 +53,34 @@
        * @method setOptions
        * @override
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.module.RecordsCopyMoveFileTo} returns 'this' for method chaining
+       * @return {Alfresco.module.DoclibMoveTo} returns 'this' for method chaining
        */
-      setOptions: function RMCMFT_setOptions(obj)
+      setOptions: function DLCMT_setOptions(obj)
       {
          var dataWebScripts =
          {
             copy: "copy-to",
-            move: "move-to",
-            file: "add-child"
+            move: "move-to"
          };
          
          if (typeof dataWebScripts[obj.mode] == "undefined")
          {
-            throw new Error("Alfresco.module.RecordsCopyMoveFileTo: Invalid mode '" + obj.mode + "'");
+            throw new Error("Alfresco.module.CopyMoveTo: Invalid mode '" + obj.mode + "'");
          }
          
-         return Alfresco.module.RecordsCopyMoveFileTo.superclass.setOptions.call(this, YAHOO.lang.merge(
+         var allowedViewModes = [Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE];
+         if (obj.mode !== "move")
          {
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/copy-move-file-to",
+            allowedViewModes.push(Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY);
+         }
+
+         return Alfresco.module.DoclibCopyMoveTo.superclass.setOptions.call(this, YAHOO.lang.merge(
+         {
+            viewMode: Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE,
+            allowedViewModes: allowedViewModes,
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-move-to",
             dataWebScript: dataWebScripts[obj.mode]
          }, obj));
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @override
-       */
-      msg: function RMCMFT_msg(messageId)
-      {
-         return Alfresco.util.message.call(this, this.options.mode + "." + messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
       },
 
 
@@ -102,9 +95,8 @@
        * @method onOK
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
-       * @override
        */
-      onOK: function RMCMFT_onOK(e, p_obj)
+      onOK: function DLCMT_onOK(e, p_obj)
       {
          var files, multipleFiles = [], params, i, j;
 
@@ -123,12 +115,12 @@
          }
          
          // Success callback function
-         var fnSuccess = function RMCMFT__onOK_success(p_data)
+         var fnSuccess = function DLCMT__onOK_success(p_data)
          {
             var result,
                successCount = p_data.json.successCount,
                failureCount = p_data.json.failureCount;
-            
+
             this.widgets.dialog.hide();
 
             // Did the operation succeed?
@@ -140,8 +132,8 @@
                });
                return;
             }
-            
-            YAHOO.Bubbling.fire("filesMoved",
+
+            YAHOO.Bubbling.fire("filesCopied",
             {
                destination: this.currentPath,
                successCount: successCount,
@@ -154,7 +146,7 @@
                
                if (result.success)
                {
-                  YAHOO.Bubbling.fire(result.type == "folder" ? "folderMoved" : "fileMoved",
+                  YAHOO.Bubbling.fire(result.type == "folder" ? "folderCopied" : "fileCopied",
                   {
                      multiple: true,
                      nodeRef: result.nodeRef,
@@ -162,15 +154,15 @@
                   });
                }
             }
-            
+
             Alfresco.util.PopupManager.displayMessage(
             {
                text: this.msg("message.success", successCount)
             });
          };
-         
+
          // Failure callback function
-         var fnFailure = function RMCMFT__onOK_failure(p_data)
+         var fnFailure = function DLCMT__onOK_failure(p_data)
          {
             this.widgets.dialog.hide();
 
@@ -181,14 +173,29 @@
          };
 
          // Construct webscript URI based on current viewMode
-         var webscriptName = this.options.dataWebScript + "/site/{site}/{container}{path}";
-         params =
+         var webscriptName = this.options.dataWebScript;
+         if (this.options.viewMode == Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE)
          {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
-         };
-
+            webscriptName += "/site/{site}/{container}{path}";
+            // Parameters are site, container-based
+            params =
+            {
+               site: this.options.siteId,
+               container: this.options.containerId,
+               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
+            };
+         }
+         else
+         {
+            webscriptName += "/node/{nodeRef}{path}";
+            // Parameters are nodeRef-based
+            params =
+            {
+               nodeRef: this.options.nodeRef.replace(":/", ""),
+               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
+            };
+         }
+         
          // Construct the data object for the genericAction call
          this.modules.actions.genericAction(
          {
@@ -227,12 +234,25 @@
                }
             }
          });
-
+         
          this.widgets.okButton.set("disabled", true);
          this.widgets.cancelButton.set("disabled", true);
       },
 
+      /**
+       * Gets a custom message depending on current view mode
+       *
+       * @method msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @override
+       */
+      msg: function DLCMT_msg(messageId)
+      {
+         return Alfresco.util.message.call(this, this.options.mode + "." + messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
+      },
 
+      
       /**
        * PRIVATE FUNCTIONS
        */
@@ -242,33 +262,13 @@
        * @method _showDialog
        * @override
        */
-      _showDialog: function RMCMFT__showDialog()
+      _showDialog: function DLCMT__showDialog()
       {
          this.widgets.okButton.set("label", this.msg("button"));
-         return Alfresco.module.RecordsCopyMoveFileTo.superclass._showDialog.apply(this, arguments);
-      },
-
-      /**
-       * Build URI parameter string for treenode JSON data webscript
-       *
-       * @method _buildTreeNodeUrl
-       * @param path {string} Path to query
-       */
-       _buildTreeNodeUrl: function RMCMFT__buildTreeNodeUrl(path)
-       {
-          var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/{site}/{container}{path}";
-
-          var url = YAHOO.lang.substitute(uriTemplate,
-          {
-             site: encodeURIComponent(this.options.siteId),
-             container: encodeURIComponent(this.options.containerId),
-             path: Alfresco.util.encodeURIPath(path)
-          });
-
-          return url;
-       }
+         return Alfresco.module.DoclibCopyMoveTo.superclass._showDialog.apply(this, arguments);
+      }
    });
 
    /* Dummy instance to load optional YUI components early */
-   var dummyInstance = new Alfresco.module.RecordsCopyMoveFileTo("null");
+   var dummyInstance = new Alfresco.module.DoclibCopyMoveTo("null");
 })();

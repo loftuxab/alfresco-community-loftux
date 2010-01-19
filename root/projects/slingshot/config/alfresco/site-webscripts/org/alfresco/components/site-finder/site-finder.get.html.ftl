@@ -8,7 +8,7 @@
          id: "${invite.inviteId}",
          siteId: "${invite.resourceName}",
          type: "${invite.invitationType}"
-      }
+      }<#if invite_has_next>,</#if>
    </#list>
       ],
       setFocus: ${args.setFocus!'false'}

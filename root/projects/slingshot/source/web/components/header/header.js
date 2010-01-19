@@ -196,7 +196,7 @@
 
          var sitesButton = new YAHOO.widget.Button(this.id + "-sites",
          {
-            type: "menu"
+            type: "split"
          });
          sitesButton.subscribe("click", this.onSitesMenuShow, this, true);
          
@@ -309,7 +309,6 @@
        */
       onSitesMenuShow: function Header_onSitesMenuShow(e)
       {
-         // todo: Replace this positioning code when we use YUI 2.6.0 with position: "dynamic" and context
          // Position the menu under the link-menu-button wrapper span
          var coord = Dom.getXY(this.id + "-sites-linkMenuButton");
          coord[1] += Dom.get(this.id + "-sites-linkMenuButton").offsetHeight;
@@ -419,10 +418,10 @@
          }
          sites.sort();
 
-         sitesGroup = sitesMenu.getItemGroups()[1];
+         sitesGroup = sitesMenu.getItemGroups()[0];
          for (i = 0, ii = sitesGroup.length; i < ii; i++)
          {
-            sitesMenu.removeItem(0, 1, true);
+            sitesMenu.removeItem(0, 0, true);
          }
          
          Dom.setStyle(this.id + "-favouritesContainer", "display", sites.length > 0 ? "block" : "none");
@@ -437,7 +436,7 @@
                {
                   site: sites[i]
                })
-            }, 1);
+            }, 0);
          }
          
          // Show/hide "Add to favourites" menu item if we're in a site

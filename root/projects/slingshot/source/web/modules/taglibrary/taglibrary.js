@@ -198,7 +198,7 @@
             };
             tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.regexMatch,
             {
-               pattern: /([\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)/,
+               pattern: /([\*\\\><\?\/\:\|]+)|([\.]?[\.]+$)/,
                match: false
             });
             tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.mandatory);

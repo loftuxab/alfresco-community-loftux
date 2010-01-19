@@ -35,8 +35,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      KeyListener = YAHOO.util.KeyListener;
       
    /**
     * Alfresco Slingshot aliases
@@ -429,9 +428,9 @@
          this.modules.form.applyTabFix();
          
          // Register the ESC key to close the dialog
-         var escapeListener = new YAHOO.util.KeyListener(document,
+         var escapeListener = new KeyListener(document,
          {
-            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+            keys: KeyListener.KEY.ESCAPE
          },
          {
             fn: function(id, keyEvent)
@@ -463,7 +462,7 @@
          this.widgets.dialog.hide();
        }
    });
-})();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibDetails("null");
+   /* Dummy instance to load optional YUI components early */
+   var dummyInstance = new Alfresco.module.DoclibDetails("null");
+})();

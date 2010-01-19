@@ -24,10 +24,10 @@
  */
  
 /**
- * Document Library "Copy To" module for Document Library.
+ * Document Library "Global Folder" picker module for Document Library.
  * 
  * @namespace Alfresco.module
- * @class Alfresco.module.DoclibCopyTo
+ * @class Alfresco.module.DoclibGlobalFolder
  */
 (function()
 {
@@ -35,28 +35,33 @@
    * YUI Library aliases
    */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      KeyListener = YAHOO.util.KeyListener,
+      Selector = YAHOO.util.Selector;
 
    /**
     * Alfresco Slingshot aliases
     */
     var $html = Alfresco.util.encodeHTML,
-       $combine = Alfresco.util.combinePaths;
+       $combine = Alfresco.util.combinePaths,
+       $hasEventInterest = Alfresco.util.hasEventInterest;
 
-   Alfresco.module.DoclibCopyTo = function(htmlId)
+   Alfresco.module.DoclibGlobalFolder = function(htmlId)
    {
-      Alfresco.module.DoclibCopyTo.superclass.constructor.call(this, "Alfresco.module.DoclibCopyTo", htmlId, ["button", "container", "connection", "json", "treeview"]);
+      Alfresco.module.DoclibGlobalFolder.superclass.constructor.call(this, htmlId);
+
+      // Re-register with our own name
+      this.name = "Alfresco.module.DoclibGlobalFolder";
+      Alfresco.util.ComponentManager.reregister(this);
 
       // Initialise prototype properties
-      this.pathsToExpand = [];
       this.containers = {};
 
       // Decoupled event listeners
       if (htmlId != "null")
       {
-         YAHOO.Bubbling.on("copyTo-siteChanged", this.onSiteChanged, this);
-         YAHOO.Bubbling.on("copyTo-containerChanged", this.onContainerChanged, this);
+         this.eventGroup = htmlId;
+         YAHOO.Bubbling.on("siteChanged", this.onSiteChanged, this);
+         YAHOO.Bubbling.on("containerChanged", this.onContainerChanged, this);
       }
 
       return this;
@@ -65,32 +70,35 @@
    /**
    * Alias to self
    */
-   var DLCT = Alfresco.module.DoclibCopyTo;
+   var DLGF = Alfresco.module.DoclibGlobalFolder;
       
-   YAHOO.lang.augmentObject(DLCT,
+   /**
+   * View Mode Constants
+   */
+   YAHOO.lang.augmentObject(DLGF,
    {
       /**
-       * Copy To dialog "Site mode" constant.
+       * "Site" view mode constant.
        *
-       * @property MODE_SITE
+       * @property VIEW_MODE_SITE
        * @type integer
        * @final
        * @default 0
        */
-      MODE_SITE: 0,
+      VIEW_MODE_SITE: 0,
 
       /**
-       * Copy To dialog "Repository mode" constant.
+       * "Repository" view mode constant.
        *
-       * @property MODE_REPOSITORY
+       * @property VIEW_MODE_REPOSITORY
        * @type integer
        * @final
        * @default 1
        */
-      MODE_REPOSITORY: 1
+      VIEW_MODE_REPOSITORY: 1
    });
 
-   YAHOO.extend(Alfresco.module.DoclibCopyTo, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.module.DoclibGlobalFolder, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -98,7 +106,7 @@
       options:
       {
          /**
-          * Current siteId for site mode.
+          * Current siteId for site view mode.
           * 
           * @property siteId
           * @type string
@@ -106,7 +114,7 @@
          siteId: "",
 
          /**
-          * ContainerId representing root container in site mode
+          * ContainerId representing root container in site view mode
           *
           * @property containerId
           * @type string
@@ -115,7 +123,7 @@
          containerId: "documentLibrary",
 
          /**
-          * ContainerType representing root container in site mode
+          * ContainerType representing root container in site view mode
           *
           * @property containerType
           * @type string
@@ -124,7 +132,7 @@
          containerType: "cm:folder",
 
          /**
-          * NodeRef representing root container in repository mode
+          * NodeRef representing root container in repository view mode
           *
           * @property nodeRef
           * @type string
@@ -144,29 +152,52 @@
          /**
           * Width for the dialog
           *
-          * @property: width
-          * @type: integer
-          * @default: 40em
+          * @property width
+          * @type integer
+          * @default 40em
           */
          width: "60em",
          
          /**
-          * Files to copy
+          * Files to action
           *
-          * @property: files
-          * @type: object
-          * @default: null
+          * @property files
+          * @type object
+          * @default null
           */
          files: null,
 
          /**
-          * Dialog mode: site or repository
+          * Template URL
           *
-          * @property: mode
-          * @type: integer
-          * @default: Alfresco.modules.DoclibCopyTo.MODE_SITES
+          * @property templateUrl
+          * @type string
+          * @example "Alfresco.constants.URL_SERVICECONTEXT + modules/documentlibrary/copy-to"
+          * @default null,
           */
-         mode: DLCT.MODE_SITE
+         templateUrl: null,
+
+         /**
+          * Dialog view mode: site or repository
+          *
+          * @property viewMode
+          * @type integer
+          * @default Alfresco.modules.DoclibGlobalFolder.VIEW_MODE_SITE
+          */
+         viewMode: DLGF.VIEW_MODE_SITE,
+
+         /**
+          * Allowed dialog view modes
+          *
+          * @property allowedViewModes
+          * @type array
+          * @default [VIEW_MODE_SITE, VIEW_MODE_REPOSITORY]
+          */
+         allowedViewModes:
+         [
+            DLGF.VIEW_MODE_SITE,
+            DLGF.VIEW_MODE_REPOSITORY
+         ]
       },
       
       /**
@@ -205,20 +236,14 @@
        * Main entry point
        * @method showDialog
        */
-      showDialog: function DLCT_showDialog()
+      showDialog: function DLGF_showDialog()
       {
-         // DocLib Actions module
-         if (!this.modules.actions)
-         {
-            this.modules.actions = new Alfresco.module.DoclibActions();
-         }
-         
          if (!this.containerDiv)
          {
             // Load the UI template from the server
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-to",
+               url: this.options.templateUrl,
                dataObj:
                {
                   htmlid: this.id
@@ -228,7 +253,7 @@
                   fn: this.onTemplateLoaded,
                   scope: this
                },
-               failureMessage: "Could not load Document Library Copy-To template",
+               failureMessage: "Could not load Document Library template:" + this.options.templateUrl,
                execScripts: true
             });
          }
@@ -245,7 +270,7 @@
        * @method onTemplateLoaded
        * @param response {object} Server response from load template XHR request
        */
-      onTemplateLoaded: function DLCT_onTemplateLoaded(response)
+      onTemplateLoaded: function DLGF_onTemplateLoaded(response)
       {
          // Reference to self - used in inline functions
          var me = this;
@@ -272,31 +297,32 @@
 
          // Mode buttons
          var modeButtons = new YAHOO.widget.ButtonGroup(this.id + "-modeGroup");
-         modeButtons.on("checkedButtonChange", this.onModeChange, this.widgets.modeButtons, this);
+         modeButtons.on("checkedButtonChange", this.onViewModeChange, this.widgets.modeButtons, this);
          this.widgets.modeButtons = modeButtons;
 
          // Make user enter-key-strokes also trigger a change
-         var buttons = this.widgets.modeButtons.getButtons();
+         var buttons = this.widgets.modeButtons.getButtons(),
+            fnEnterListener = function(e)
+            {
+               if (KeyListener.KEY.ENTER == e.keyCode)
+               {
+                  this.set("checked", true);
+               }
+            };
+
          for (var i = 0; i < buttons.length; i++)
          {
-            var bi = i;
-            buttons[i].addListener("keydown", function(e)
-            {
-               if (YAHOO.util.KeyListener.KEY.ENTER == e.keyCode)
-               {
-                  modeButtons.check(bi);
-               }
-            });
+            buttons[i].addListener("keydown", fnEnterListener);
          }
          
          /**
           * Dynamically loads TreeView nodes.
-          * This MUST be inline in order to have access to the Alfresco.DocListCopyTo class.
+          * This MUST be inline in order to have access to the parent class.
           * @method fnLoadNodeData
           * @param node {object} Parent node
           * @param fnLoadComplete {function} Expanding node's callback function
           */
-         this.fnLoadNodeData = function DLCT_oR_fnLoadNodeData(node, fnLoadComplete)
+         this.fnLoadNodeData = function DLGF_oR_fnLoadNodeData(node, fnLoadComplete)
          {
             // Get the path this node refers to
             var nodePath = node.data.path;
@@ -307,16 +333,17 @@
             // Prepare the XHR callback object
             var callback =
             {
-               success: function DLCT_lND_success(oResponse)
+               success: function DLGF_lND_success(oResponse)
                {
-                  var results = eval("(" + oResponse.responseText + ")");
+                  var results = Alfresco.util.parseJSON(oResponse.responseText);
 
                   if (results.items)
                   {
+                     var item, tempNode;
                      for (var i = 0, j = results.items.length; i < j; i++)
                      {
-                        var item = results.items[i];
-                        var tempNode = new YAHOO.widget.TextNode(
+                        item = results.items[i];
+                        tempNode = new YAHOO.widget.TextNode(
                         {
                            label: $html(item.name),
                            path: $combine(nodePath, item.name),
@@ -341,7 +368,7 @@
                },
 
                // If the XHR call is not successful, fire the TreeView callback anyway
-               failure: function DLCT_lND_failure(oResponse)
+               failure: function DLGF_lND_failure(oResponse)
                {
                   try
                   {
@@ -387,10 +414,10 @@
        * Internal show dialog function
        * @method _showDialog
        */
-      _showDialog: function DLCT__showDialog()
+      _showDialog: function DLGF__showDialog()
       {
          // Must have list of files
-         if (this.options.files == null)
+         if (this.options.files === null)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -407,21 +434,44 @@
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
          {
-            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length)
+            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length);
          }
          else
          {
-            var fileSpan = '<span class="light">' + $html(this.options.files.displayName) + '</span>';
-            titleDiv.innerHTML = this.msg("title.single", fileSpan)
+            titleDiv.innerHTML = this.msg("title.single", '<span class="light">' + $html(this.options.files.displayName) + '</span>');
          }
 
-         // Dialog mode
-         this.setMode(this.options.mode, true);
+         // Dialog view mode
+         var allowedViewModes = Alfresco.util.arrayToObject(this.options.allowedViewModes),
+            modeButtons = this.widgets.modeButtons.getButtons(),
+            modeButton, viewMode;
+
+         if (!(this.options.viewMode in allowedViewModes))
+         {
+            this.options.viewMode = this.options.allowedViewModes[0];
+         }
+         for (var i = 0, ii = modeButtons.length; i < ii; i++)
+         {
+            modeButton = modeButtons[i];
+            viewMode = parseInt(modeButton.get("name"), 10);
+            modeButton.set("disabled", !(viewMode in allowedViewModes));
+            if (viewMode == this.options.viewMode)
+            {
+               if (modeButton.get("checked"))
+               {
+                  this.setViewMode(viewMode);
+               }
+               else
+               {
+                  modeButton.set("checked", true);
+               }
+            }
+         }
          
          // Register the ESC key to close the dialog
-         var escapeListener = new YAHOO.util.KeyListener(document,
+         var escapeListener = new KeyListener(document,
          {
-            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+            keys: KeyListener.KEY.ESCAPE
          },
          {
             fn: function(id, keyEvent)
@@ -438,16 +488,16 @@
       },
       
       /**
-       * Public function to set current dialog mode
+       * Public function to set current dialog view mode
        *  
-       * @method setMode
-       * @param mode {integer} New dialog mode constant
+       * @method setViewMode
+       * @param mode {integer} New dialog view mode constant
        */
-      setMode: function DLCT_setMode(mode)
+      setViewMode: function DLGF_setViewMode(viewMode)
       {
-         this.options.mode = mode;
+         this.options.viewMode = viewMode;
          
-         if (mode == DLCT.MODE_SITE)
+         if (viewMode == DLGF.VIEW_MODE_SITE)
          {
             Dom.removeClass(this.id + "-wrapper", "repository-mode");
             this._populateSitePicker();
@@ -457,6 +507,7 @@
             Dom.addClass(this.id + "-wrapper", "repository-mode");
             // Build the TreeView widget
             this._buildTree(this.options.nodeRef);
+            this.onPathChanged("/");
          }
       },
 
@@ -473,33 +524,37 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onSiteChanged: function DLCT_onSiteChanged(layer, args)
+      onSiteChanged: function DLGF_onSiteChanged(layer, args)
       {
-         var obj = args[1];
-         if (obj !== null)
+         // Check the event is directed towards this instance
+         if ($hasEventInterest(this, args))
          {
-            // Should be a site in the arguments
-            if (obj.site !== null)
+            var obj = args[1];
+            if (obj !== null)
             {
-               this.options.siteId = obj.site;
-               this._populateContainerPicker();
-               var sites = YAHOO.util.Selector.query("a", this.id + "-sitePicker"), site, i, j,
-                  picker = Dom.get(this.id + "-sitePicker");
-
-               for (i = 0, j = sites.length; i < j; i++)
+               // Should be a site in the arguments
+               if (obj.site !== null)
                {
-                  site = sites[i];
-                  if (site.getAttribute("rel") == obj.site)
+                  this.options.siteId = obj.site;
+                  this._populateContainerPicker();
+                  var sites = Selector.query("a", this.id + "-sitePicker"), site, i, j,
+                     picker = Dom.get(this.id + "-sitePicker");
+
+                  for (i = 0, j = sites.length; i < j; i++)
                   {
-                     Dom.addClass(site, "selected");
-                     if (obj.scrollTo)
+                     site = sites[i];
+                     if (site.getAttribute("rel") == obj.site)
                      {
-                        picker.scrollTop = Dom.getY(site) - Dom.getY(picker);
+                        Dom.addClass(site, "selected");
+                        if (obj.scrollTo)
+                        {
+                           picker.scrollTop = Dom.getY(site) - Dom.getY(picker);
+                        }
                      }
-                  }
-                  else
-                  {
-                     Dom.removeClass(site, "selected");
+                     else
+                     {
+                        Dom.removeClass(site, "selected");
+                     }
                   }
                }
             }
@@ -513,37 +568,40 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onContainerChanged: function DLCT_onContainerChanged(layer, args)
+      onContainerChanged: function DLGF_onContainerChanged(layer, args)
       {
-         var obj = args[1];
-         if (obj !== null)
+         // Check the event is directed towards this instance
+         if ($hasEventInterest(this, args))
          {
-            // Should be a container in the arguments
-            if (obj.container !== null)
+            var obj = args[1];
+            if (obj !== null)
             {
-               this.options.containerId = obj.container;
-               var container = this.containers[obj.container];
-               this.options.containerType = container.type;
-               this._buildTree("");
-               // Kick-off navigation to current path
-               this.onPathChanged(this.options.path);
-               var containers = YAHOO.util.Selector.query("a", this.id + "-containerPicker"), container, i, j,
-                  picker = Dom.get(this.id + "-containerPicker");
-               
-               for (i = 0, j = containers.length; i < j; i++)
+               // Should be a container in the arguments
+               if (obj.container !== null)
                {
-                  container = containers[i];
-                  if (container.getAttribute("rel") == obj.container)
+                  this.options.containerId = obj.container;
+                  this.options.containerType = this.containers[obj.container].type;
+                  this._buildTree("");
+                  // Kick-off navigation to current path
+                  this.onPathChanged(this.options.path);
+                  var containers = Selector.query("a", this.id + "-containerPicker"), container, i, j,
+                     picker = Dom.get(this.id + "-containerPicker");
+
+                  for (i = 0, j = containers.length; i < j; i++)
                   {
-                     Dom.addClass(container, "selected");
-                     if (obj.scrollTo)
+                     container = containers[i];
+                     if (container.getAttribute("rel") == obj.container)
                      {
-                        picker.scrollTop = Dom.getY(container) - Dom.getY(picker);
+                        Dom.addClass(container, "selected");
+                        if (obj.scrollTo)
+                        {
+                           picker.scrollTop = Dom.getY(container) - Dom.getY(picker);
+                        }
                      }
-                  }
-                  else
-                  {
-                     Dom.removeClass(container, "selected");
+                     else
+                     {
+                        Dom.removeClass(container, "selected");
+                     }
                   }
                }
             }
@@ -563,146 +621,9 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onOK: function DLCT_onOK(e, p_obj)
+      onOK: function DLGF_onOK(e, p_obj)
       {
-         var files, multipleFiles = [], params, i, j;
-
-         // Single/multi files into array of nodeRefs
-         if (YAHOO.lang.isArray(this.options.files))
-         {
-            files = this.options.files;
-         }
-         else
-         {
-            files = [this.options.files];
-         }
-         for (i = 0, j = files.length; i < j; i++)
-         {
-            multipleFiles.push(files[i].nodeRef);
-         }
-         
-         // Success callback function
-         var fnSuccess = function DLCT__onOK_success(p_data)
-         {
-            var result,
-               successCount = p_data.json.successCount,
-               failureCount = p_data.json.failureCount;
-
-            this.widgets.dialog.hide();
-
-            // Did the operation succeed?
-            if (!p_data.json.overallSuccess)
-            {
-               Alfresco.util.PopupManager.displayMessage(
-               {
-                  text: this.msg("message.failure")
-               });
-               return;
-            }
-
-            YAHOO.Bubbling.fire("filesCopied",
-            {
-               destination: this.currentPath,
-               successCount: successCount,
-               failureCount: failureCount
-            });
-            
-            for (var i = 0, j = p_data.json.totalResults; i < j; i++)
-            {
-               result = p_data.json.results[i];
-               
-               if (result.success)
-               {
-                  YAHOO.Bubbling.fire(result.type == "folder" ? "folderCopied" : "fileCopied",
-                  {
-                     multiple: true,
-                     nodeRef: result.nodeRef,
-                     destination: this.currentPath
-                  });
-               }
-            }
-
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this.msg("message.success", successCount)
-            });
-         }
-
-         // Failure callback function
-         var fnFailure = function DLCT__onOK_failure(p_data)
-         {
-            this.widgets.dialog.hide();
-
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this.msg("message.failure")
-            });
-         }
-
-         var webscriptName;
-         if (this.options.mode == DLCT.MODE_SITE)
-         {
-            webscriptName = "copy-to/site/{site}/{container}{path}"
-            // Parameters are site, container-based
-            params =
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
-            }
-         }
-         else
-         {
-            webscriptName = "copy-to/node/{nodeRef}/{path}"
-            // Parameters are nodeRef-based
-            params =
-            {
-               nodeRef: this.options.nodeRef.replace(":/", ""),
-               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
-            }
-         }
-         
-         // Construct the data object for the genericAction call
-         this.modules.actions.genericAction(
-         {
-            success:
-            {
-               callback:
-               {
-                  fn: fnSuccess,
-                  scope: this
-               }
-            },
-            failure:
-            {
-               callback:
-               {
-                  fn: fnFailure,
-                  scope: this
-               }
-            },
-            webscript:
-            {
-               method: Alfresco.util.Ajax.POST,
-               name: webscriptName,
-               params: params
-            },
-            wait:
-            {
-               message: this.msg("message.please-wait")
-            },
-            config:
-            {
-               requestContentType: Alfresco.util.Ajax.JSON,
-               dataObj:
-               {
-                  nodeRefs: multipleFiles
-               }
-            }
-         });
-         
-         this.widgets.okButton.set("disabled", true);
-         this.widgets.cancelButton.set("disabled", true);
+         this.widgets.dialog.hide();
       },
 
       /**
@@ -712,23 +633,30 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onCancel: function DLCT_onCancel(e, p_obj)
+      onCancel: function DLGF_onCancel(e, p_obj)
       {
-         // Lose the dialog
          this.widgets.dialog.hide();
       },
 
       /**
        * Mode change buttongroup event handler
        *
-       * @method onModeChange
+       * @method onViewModeChange
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onModeChange: function DLCT_onModeChange(e, p_obj)
+      onViewModeChange: function DLGF_onViewModeChange(e, p_obj)
       {
-         var mode = e.newValue.get("name");
-         this.setMode(mode == "site" ? DLCT.MODE_SITE : DLCT.MODE_REPOSITORY);
+         var viewMode = this.options.viewMode;
+         try
+         {
+            viewMode = parseInt(e.newValue.get("name"), 10);
+            this.setViewMode(viewMode);
+         }
+         catch(e)
+         {
+            // Remain in current view mode
+         }
       },
       
       /**
@@ -736,9 +664,9 @@
        * @method onExpandComplete
        * @param oNode {YAHOO.widget.Node} the node recently expanded
        */
-      onExpandComplete: function DLCT_onExpandComplete(oNode)
+      onExpandComplete: function DLGF_onExpandComplete(oNode)
       {
-         Alfresco.logger.debug("DLCT_onExpandComplete");
+         Alfresco.logger.debug("DLGF_onExpandComplete");
 
          // Make sure the tree's DOM has been updated
          this.widgets.treeview.render();
@@ -771,9 +699,9 @@
        * @param args.node {YAHOO.widget.Node} the node clicked
        * @return allowExpand {boolean} allow or disallow node expansion
        */
-      onNodeClicked: function DLCT_onNodeClicked(args)
+      onNodeClicked: function DLGF_onNodeClicked(args)
       {
-         Alfresco.logger.debug("DLCT_onNodeClicked");
+         Alfresco.logger.debug("DLGF_onNodeClicked");
 
          var node = args.node,
             userAccess = node.data.userAccess;
@@ -792,9 +720,9 @@
        * @method onPathChanged
        * @param path {string} new path
        */
-      onPathChanged: function DLCT_onPathChanged(path)
+      onPathChanged: function DLGF_onPathChanged(path)
       {
-         Alfresco.logger.debug("DLCT_onPathChanged");
+         Alfresco.logger.debug("DLGF_onPathChanged");
 
          // ensure path starts with leading slash if not the root node
          if (path.charAt(0) != "/")
@@ -861,12 +789,14 @@
        * @method _populateSitePicker
        * @private
        */
-      _populateSitePicker: function DLCT__populateSitePicker()
+      _populateSitePicker: function DLGF__populateSitePicker()
       {
-         var sitePicker = Dom.get(this.id + "-sitePicker");
+         var sitePicker = Dom.get(this.id + "-sitePicker"),
+            me = this;
+         
          sitePicker.innerHTML = "";
          
-         var fnSuccess = function DLCT__pSP_fnSuccess(response, sitePicker)
+         var fnSuccess = function DLGF__pSP_fnSuccess(response, sitePicker)
          {
             var sites = response.json, element, site, onclick, i, j;
             
@@ -878,18 +808,33 @@
                {
                   Dom.addClass(element, "last");
                }
-               onclick = "YAHOO.Bubbling.fire('copyTo-siteChanged', {site: '" + site.shortName.replace(/[']/g, "\\'") + "'}); return false;";
-               element.innerHTML = '<a rel="' + site.shortName + '" href="#" onclick="' + onclick + '"><h4>' + $html(site.title) + '</h4>' + '<span>' + $html(site.description) + '</span></a>';
+
+               onclick = function DLGF_pSP_onclick(shortName)
+               {
+                  return function()
+                  {
+                     YAHOO.Bubbling.fire("siteChanged",
+                     {
+                        site: shortName,
+                        eventGroup: me
+                     });
+                     return false;
+                  };
+               }(site.shortName);
+
+               element.innerHTML = '<a rel="' + site.shortName + '" href="#""><h4>' + $html(site.title) + '</h4>' + '<span>' + $html(site.description) + '</span></a>';
+               element.onclick = onclick;
                sitePicker.appendChild(element);
             }
             
             // Select current site
-            YAHOO.Bubbling.fire("copyTo-siteChanged",
+            YAHOO.Bubbling.fire("siteChanged",
             {
                site: this.options.siteId,
+               eventGroup: this,
                scrollTo: true
             });
-         }
+         };
          
          var config =
          {
@@ -902,7 +847,7 @@
                obj: sitePicker
             },
             failureCallback: null
-         }
+         };
          
          Alfresco.util.Ajax.request(config);
       },
@@ -912,12 +857,14 @@
        * @method _populateContainerPicker
        * @private
        */
-      _populateContainerPicker: function DLCT__populateContainerPicker()
+      _populateContainerPicker: function DLGF__populateContainerPicker()
       {
-         var containerPicker = Dom.get(this.id + "-containerPicker");
+         var containerPicker = Dom.get(this.id + "-containerPicker"),
+            me = this;
+         
          containerPicker.innerHTML = "";
          
-         var fnSuccess = function DLCT__pSP_fnSuccess(response, containerPicker)
+         var fnSuccess = function DLGF__pSP_fnSuccess(response, containerPicker)
          {
             var containers = response.json.containers, element, container, onclick, i, j;
             this.containers = {};
@@ -931,22 +878,33 @@
                {
                   Dom.addClass(element, "last");
                }
-               onclick = "YAHOO.Bubbling.fire('copyTo-containerChanged', {container: '" + container.name.replace(/[']/g, "\\'") + "'}); return false;";
-               if (container.description == "")
+
+               onclick = function DLGF_pCP_onclick(containerName)
                {
-                  container.description = this.msg("default.container.description");
-               }
+                  return function()
+                  {
+                     YAHOO.Bubbling.fire("containerChanged",
+                     {
+                        container: containerName,
+                        eventGroup: me
+                     });
+                     return false;
+                  };
+               }(container.name);
+
                element.innerHTML = '<a rel="' + container.name + '" href="#" onclick="' + onclick + '"><h4>' + container.name + '</h4>' + '<span>' + container.description + '</span></a>';
+               element.onclick = onclick;
                containerPicker.appendChild(element);
             }
 
             // Select current container
-            YAHOO.Bubbling.fire("copyTo-containerChanged",
+            YAHOO.Bubbling.fire("containerChanged",
             {
                container: this.options.containerId,
+               eventGroup: this,
                scrollTo: true
             });
-         }
+         };
          
          var config =
          {
@@ -959,7 +917,7 @@
                obj: containerPicker
             },
             failureCallback: null
-         }
+         };
          
          Alfresco.util.Ajax.request(config);
       },
@@ -970,9 +928,9 @@
        * @param p_rootNodeRef {string} NodeRef of root node for this tree
        * @private
        */
-      _buildTree: function DLCT__buildTree(p_rootNodeRef)
+      _buildTree: function DLGF__buildTree(p_rootNodeRef)
       {
-         Alfresco.logger.debug("DLCT__buildTree");
+         Alfresco.logger.debug("DLGF__buildTree");
 
          // Create a new tree
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
@@ -984,12 +942,12 @@
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
 
-         var rootLabel = (this.options.mode == DLCT.MODE_SITE ? (this.options.containerType == "dod:filePlan" ? "node.root-filePlan" : "node.root-sites") : "node.root-repository" )
+         var rootLabel = (this.options.viewMode == DLGF.VIEW_MODE_SITE ? (this.options.containerType == "dod:filePlan" ? "node.root-filePlan" : "node.root-sites") : "node.root-repository");
 
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
          {
-            label: this.msg(rootLabel),
+            label: this._msg(rootLabel), // Note: private _msg() function
             path: "/",
             nodeRef: p_rootNodeRef
          }, tree.getRoot(), false);
@@ -1008,9 +966,9 @@
        * @param isVisible {boolean} Whether the highlight is visible or not
        * @private
        */
-      _showHighlight: function DLCT__showHighlight(isVisible)
+      _showHighlight: function DLGF__showHighlight(isVisible)
       {
-         Alfresco.logger.debug("DLCT__showHighlight");
+         Alfresco.logger.debug("DLGF__showHighlight");
 
          if (this.selectedNode !== null)
          {
@@ -1031,9 +989,9 @@
        * @param node {object} New node to set as currently selected one
        * @private
        */
-      _updateSelectedNode: function DLCT__updateSelectedNode(node)
+      _updateSelectedNode: function DLGF__updateSelectedNode(node)
       {
-         Alfresco.logger.debug("DLCT__updateSelectedNode");
+         Alfresco.logger.debug("DLGF__updateSelectedNode");
 
          this._showHighlight(false);
          this.selectedNode = node;
@@ -1046,10 +1004,10 @@
        * @method _buildTreeNodeUrl
        * @param path {string} Path to query
        */
-       _buildTreeNodeUrl: function DLCT__buildTreeNodeUrl(path)
+       _buildTreeNodeUrl: function DLGF__buildTreeNodeUrl(path)
        {
           var uriTemplate = Alfresco.constants.PROXY_URI;
-          if (this.options.mode == DLCT.MODE_SITE)
+          if (this.options.viewMode == DLGF.VIEW_MODE_SITE)
           {
              if (this.options.containerType == "dod:filePlan")
              {
@@ -1074,9 +1032,22 @@
           });
 
           return url;
+       },
+
+       /**
+        * Gets a custom message regardless of current view mode
+        *
+        * @method _msg
+        * @param messageId {string} The messageId to retrieve
+        * @return {string} The custom message
+        * @private
+        */
+       _msg: function DLGF__msg(messageId)
+       {
+          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
        }
    });
-})();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibCopyTo("null");
+   /* Dummy instance to load optional YUI components early */
+   var dummyInstance = new Alfresco.module.DoclibGlobalFolder("null");
+})();

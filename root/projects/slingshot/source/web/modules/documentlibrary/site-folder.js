@@ -24,10 +24,10 @@
  */
  
 /**
- * Document Library "Move To" module for Document Library.
+ * Document Library "Site Folder" picker module for Document Library.
  * 
  * @namespace Alfresco.module
- * @class Alfresco.module.DoclibMoveTo
+ * @class Alfresco.module.DoclibSiteFolder
  */
 (function()
 {
@@ -35,8 +35,7 @@
    * YUI Library aliases
    */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      KeyListener = YAHOO.util.KeyListener;
 
    /**
     * Alfresco Slingshot aliases
@@ -44,9 +43,9 @@
     var $html = Alfresco.util.encodeHTML,
        $combine = Alfresco.util.combinePaths;
 
-   Alfresco.module.DoclibMoveTo = function(htmlId)
+   Alfresco.module.DoclibSiteFolder = function(htmlId)
    {
-      Alfresco.module.DoclibMoveTo.superclass.constructor.call(this, "Alfresco.module.DoclibMoveTo", htmlId, ["button", "container", "connection", "json", "treeview"]);
+      Alfresco.module.DoclibSiteFolder.superclass.constructor.call(this, "Alfresco.module.DoclibSiteFolder", htmlId, ["button", "container", "connection", "json", "treeview"]);
 
       // Initialise prototype properties
       this.pathsToExpand = [];
@@ -54,7 +53,7 @@
       return this;
    };
    
-   YAHOO.extend(Alfresco.module.DoclibMoveTo, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.module.DoclibSiteFolder, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -90,18 +89,18 @@
          /**
           * Width for the dialog
           *
-          * @property: width
-          * @type: integer
-          * @default: 30em
+          * @property width
+          * @type integer
+          * @default 30em
           */
          width: "40em",
          
          /**
-          * Files to move
+          * Files to action
           *
-          * @property: files
-          * @type: object
-          * @default: null
+          * @property files
+          * @type object
+          * @default null
           */
          files: null,
          
@@ -110,27 +109,10 @@
           *
           * @property templateUrl
           * @type string
-          * @default "Alfresco.constants.URL_SERVICECONTEXT + modules/documentlibrary/move-to"
+          * @example "Alfresco.constants.URL_SERVICECONTEXT + modules/documentlibrary/move-to"
+          * @default null,
           */
-         templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/move-to",
-
-         /**
-          * Override the default data webscript stem
-          *
-          * @property dataWebScriptStem
-          * @type string
-          * @default null
-          */
-         dataWebScriptStem: null,
-         
-         /**
-          * Override the default data webscript
-          *
-          * @property dataWebScript
-          * @type string
-          * @default "move-to/site"
-          */
-         dataWebScript: "move-to/site"
+         templateUrl: null
       },
       
       /**
@@ -161,14 +143,8 @@
        * Main entry point
        * @method showDialog
        */
-      showDialog: function DLMT_showDialog()
+      showDialog: function DLSF_showDialog()
       {
-         // DocLib Actions module
-         if (!this.modules.actions)
-         {
-            this.modules.actions = new Alfresco.module.DoclibActions();
-         }
-         
          if (!this.containerDiv)
          {
             // Load the UI template from the server
@@ -184,7 +160,7 @@
                   fn: this.onTemplateLoaded,
                   scope: this
                },
-               failureMessage: "Could not load Document Library Move-To template",
+               failureMessage: "Could not load template:" + this.options.templateUrl,
                execScripts: true
             });
          }
@@ -201,7 +177,7 @@
        * @method onTemplateLoaded
        * @param response {object} Server response from load template XHR request
        */
-      onTemplateLoaded: function DLMT_onTemplateLoaded(response)
+      onTemplateLoaded: function DLSF_onTemplateLoaded(response)
       {
          // Reference to self - used in inline functions
          var me = this;
@@ -226,12 +202,12 @@
 
          /**
           * Dynamically loads TreeView nodes.
-          * This MUST be inline in order to have access to the Alfresco.DocListMoveTo class.
+          * This MUST be inline in order to have access to the parent class.
           * @method fnLoadNodeData
           * @param node {object} Parent node
           * @param fnLoadComplete {function} Expanding node's callback function
           */
-         this.fnLoadNodeData = function DLMT_fnLoadNodeData(node, fnLoadComplete)
+         this.fnLoadNodeData = function DLSF_fnLoadNodeData(node, fnLoadComplete)
          {
             // Get the path this node refers to
             var nodePath = node.data.path;
@@ -242,16 +218,17 @@
             // Prepare the XHR callback object
             var callback =
             {
-               success: function DLMT_lND_success(oResponse)
+               success: function DLSF_lND_success(oResponse)
                {
-                  var results = eval("(" + oResponse.responseText + ")");
+                  var results = Alfresco.util.parseJSON(oResponse.responseText);
 
                   if (results.items)
                   {
+                     var item, tempNode;
                      for (var i = 0, j = results.items.length; i < j; i++)
                      {
-                        var item = results.items[i];
-                        var tempNode = new YAHOO.widget.TextNode(
+                        item = results.items[i];
+                        tempNode = new YAHOO.widget.TextNode(
                         {
                            label: $html(item.name),
                            path: $combine(nodePath, item.name),
@@ -276,7 +253,7 @@
                },
 
                // If the XHR call is not successful, fire the TreeView callback anyway
-               failure: function DLMT_lND_failure(oResponse)
+               failure: function DLSF_lND_failure(oResponse)
                {
                   try
                   {
@@ -322,10 +299,10 @@
        * Internal show dialog function
        * @method _showDialog
        */
-      _showDialog: function DLMT__showDialog()
+      _showDialog: function DLSF__showDialog()
       {
          // Must have list of files
-         if (this.options.files == null)
+         if (this.options.files === null)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -342,21 +319,20 @@
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
          {
-            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length)
+            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length);
          }
          else
          {
-            var fileSpan = '<span class="light">' + $html(this.options.files.displayName) + '</span>';
-            titleDiv.innerHTML = this.msg("title.single", fileSpan)
+            titleDiv.innerHTML = this.msg("title.single", '<span class="light">' + $html(this.options.files.displayName) + '</span>');
          }
 
          // Build the TreeView widget
          this._buildTree();
          
          // Register the ESC key to close the dialog
-         var escapeListener = new YAHOO.util.KeyListener(document,
+         var escapeListener = new KeyListener(document,
          {
-            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+            keys: KeyListener.KEY.ESCAPE
          },
          {
             fn: function(id, keyEvent)
@@ -391,123 +367,9 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onOK: function DLMT_onOK(e, p_obj)
+      onOK: function DLSF_onOK(e, p_obj)
       {
-         var files, multipleFiles = [], i, j;
-
-         // Single/multi files into array of nodeRefs
-         if (YAHOO.lang.isArray(this.options.files))
-         {
-            files = this.options.files;
-         }
-         else
-         {
-            files = [this.options.files];
-         }
-         for (i = 0, j = files.length; i < j; i++)
-         {
-            multipleFiles.push(files[i].nodeRef);
-         }
-         
-         // Success callback function
-         var fnSuccess = function DLMT__onOK_success(p_data)
-         {
-            var result,
-               successCount = p_data.json.successCount,
-               failureCount = p_data.json.failureCount;
-            
-            this.widgets.dialog.hide();
-
-            // Did the operation succeed?
-            if (!p_data.json.overallSuccess)
-            {
-               Alfresco.util.PopupManager.displayMessage(
-               {
-                  text: this.msg("message.failure")
-               });
-               return;
-            }
-            
-            YAHOO.Bubbling.fire("filesMoved",
-            {
-               destination: this.currentPath,
-               successCount: successCount,
-               failureCount: failureCount
-            });
-            
-            for (var i = 0, j = p_data.json.totalResults; i < j; i++)
-            {
-               result = p_data.json.results[i];
-               
-               if (result.success)
-               {
-                  YAHOO.Bubbling.fire(result.type == "folder" ? "folderMoved" : "fileMoved",
-                  {
-                     multiple: true,
-                     nodeRef: result.nodeRef,
-                     destination: this.currentPath
-                  });
-               }
-            }
-            
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this.msg("message.success", successCount)
-            });
-         }
-         
-         // Failure callback function
-         var fnFailure = function DLMT__onOK_failure(p_data)
-         {
-            this.widgets.dialog.hide();
-
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this.msg("message.failure")
-            });
-         }
-
-         // Construct the data object for the genericAction call
-         this.modules.actions.genericAction(
-         {
-            success:
-            {
-               callback:
-               {
-                  fn: fnSuccess,
-                  scope: this
-               }
-            },
-            failure:
-            {
-               callback:
-               {
-                  fn: fnFailure,
-                  scope: this
-               }
-            },
-            webscript:
-            {
-               method: Alfresco.util.Ajax.POST,
-               stem: this.options.dataWebScriptStem,
-               name: $combine(this.options.dataWebScript, this.options.siteId, this.options.containerId, Alfresco.util.encodeURIPath(this.selectedNode.data.path))
-            },
-            wait:
-            {
-               message: this.msg("message.please-wait")
-            },
-            config:
-            {
-               requestContentType: Alfresco.util.Ajax.JSON,
-               dataObj:
-               {
-                  nodeRefs: multipleFiles
-               }
-            }
-         });
-
-         this.widgets.okButton.set("disabled", true);
-         this.widgets.cancelButton.set("disabled", true);
+         this.widgets.dialog.hide();
       },
 
       /**
@@ -517,7 +379,7 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onCancel: function DLMT_onCancel(e, p_obj)
+      onCancel: function DLSF_onCancel(e, p_obj)
       {
          this.widgets.dialog.hide();
       },
@@ -527,9 +389,9 @@
        * @method onExpandComplete
        * @param oNode {YAHOO.widget.Node} the node recently expanded
        */
-      onExpandComplete: function DLMT_onExpandComplete(oNode)
+      onExpandComplete: function DLSF_onExpandComplete(oNode)
       {
-         Alfresco.logger.debug("DLMT_onExpandComplete");
+         Alfresco.logger.debug("DLSF_onExpandComplete");
 
          // Make sure the tree's DOM has been updated
          this.widgets.treeview.render();
@@ -562,9 +424,9 @@
        * @param args.node {YAHOO.widget.Node} the node clicked
        * @return allowExpand {boolean} allow or disallow node expansion
        */
-      onNodeClicked: function DLMT_onNodeClicked(args)
+      onNodeClicked: function DLSF_onNodeClicked(args)
       {
-         Alfresco.logger.debug("DLMT_onNodeClicked");
+         Alfresco.logger.debug("DLSF_onNodeClicked");
 
          var node = args.node,
             userAccess = node.data.userAccess;
@@ -582,9 +444,9 @@
        * @method onPathChanged
        * @param path {string} new path
        */
-      onPathChanged: function DLMT_onPathChanged(path)
+      onPathChanged: function DLSF_onPathChanged(path)
       {
-         Alfresco.logger.debug("DLMT_onPathChanged");
+         Alfresco.logger.debug("DLSF_onPathChanged");
 
          // ensure path starts with leading slash
          path = $combine("/", path);
@@ -648,9 +510,9 @@
        * @method _buildTree
        * @private
        */
-      _buildTree: function DLMT__buildTree()
+      _buildTree: function DLSF__buildTree()
       {
-         Alfresco.logger.debug("DLMT__buildTree");
+         Alfresco.logger.debug("DLSF__buildTree");
 
          // Create a new tree
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
@@ -684,9 +546,9 @@
        * @param isVisible {boolean} Whether the highlight is visible or not
        * @private
        */
-      _showHighlight: function DLMT__showHighlight(isVisible)
+      _showHighlight: function DLSF__showHighlight(isVisible)
       {
-         Alfresco.logger.debug("DLMT__showHighlight");
+         Alfresco.logger.debug("DLSF__showHighlight");
 
          if (this.selectedNode !== null)
          {
@@ -707,9 +569,9 @@
        * @param node {object} New node to set as currently selected one
        * @private
        */
-      _updateSelectedNode: function DLMT__updateSelectedNode(node)
+      _updateSelectedNode: function DLSF__updateSelectedNode(node)
       {
-         Alfresco.logger.debug("DLMT__updateSelectedNode");
+         Alfresco.logger.debug("DLSF__updateSelectedNode");
 
          this._showHighlight(false);
          this.selectedNode = node;
@@ -722,7 +584,7 @@
        * @method _buildTreeNodeUrl
        * @param path {string} Path to query
        */
-       _buildTreeNodeUrl: function DLMT__buildTreeNodeUrl(path)
+       _buildTreeNodeUrl: function DLSF__buildTreeNodeUrl(path)
        {
           var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode/site/{site}/{container}{path}";
 
@@ -736,7 +598,7 @@
           return url;
        }
    });
-})();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibMoveTo("null");
+   /* Dummy instance to load optional YUI components early */
+   var dummyInstance = new Alfresco.module.DoclibSiteFolder("null");
+})();
