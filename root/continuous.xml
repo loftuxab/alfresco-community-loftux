@@ -504,8 +504,6 @@
                      includes="${file.name.war.webclient}" />
          <zipfileset dir="${dir.project.slingshot.dist}"
                      includes="${file.name.war.slingshot}" />
-         <zipfileset dir="${dir.project.mobile.dist}"
-                     includes="${file.name.war.mobile}" />
          <zipfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <zipfileset dir="${dir.project.webclient.config}/alfresco/extension"
@@ -524,7 +522,8 @@
                                alf_start.bat,
                                restart_alf.bat,
                                alf_stop.bat,
-                               apply_amps.bat"
+                               apply_amps.bat,
+                               README.txt"
                      prefix="commands" />
          <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="commands/bin" />
@@ -556,8 +555,6 @@
                      includes="${file.name.war.webclient}" />
          <tarfileset dir="${dir.project.slingshot.dist}"
                      includes="${file.name.war.slingshot}" />
-         <tarfileset dir="${dir.project.mobile.dist}"
-                     includes="${file.name.war.mobile}" />
          <tarfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <tarfileset dir="${dir.project.webclient.config}/alfresco/extension"

@@ -57,7 +57,7 @@ CompressionMethod
 zlib
 
 Copyright
-{Alfresco 2005-2008}
+{Alfresco 2005-2009}
 
 CreateDesktopShortcut
 Yes
@@ -573,6 +573,9 @@ File ::2F3AAD19-F06C-4902-A8D6-B0EE75F6A0B1 -name avm-lookup-cache-context.xml.s
 File ::728A4900-31B5-43B9-A4CC-C48C3C1B99B6 -name chaining-example.zip -parent 3521827F-0B4B-4595-BA17-C94ACA01C633
 File ::B4A5E01D-DDEB-46E8-8E40-5CC5DB8F8784 -name file-servers-custom.xml.sample2 -parent 3521827F-0B4B-4595-BA17-C94ACA01C633
 File ::DCE4CC0F-FD88-4200-A5BE-C8DCE6045223 -name imap-bootsrap-context.xml.sample -parent 3521827F-0B4B-4595-BA17-C94ACA01C633
+File ::9117EDC7-D1DE-4830-88C4-A0F7240339DC -name lifecycle-messages.properties.sample -parent 3521827F-0B4B-4595-BA17-C94ACA01C633
+File ::D80D97BD-4C4A-4508-B81D-287C61D3C1DF -name lifecycle_processdefinition.xml.sample -parent 3521827F-0B4B-4595-BA17-C94ACA01C633
+File ::A88B5B59-0F29-4BB6-83D7-DDAB0418BB1D -name lifecycleModel.xml.sample -parent 3521827F-0B4B-4595-BA17-C94ACA01C633
 File ::1AF4D464-5129-4717-ABBE-8BCDCBEC7D90 -type dir -name messages -parent B4F5C6B1-CA90-43B0-BDF5-177048F4F5F3
 File ::5CD8B15B-133B-4691-A0A9-4CDCF058DC72 -name bpm-messages_fi_FI.properties -parent 1AF4D464-5129-4717-ABBE-8BCDCBEC7D90
 File ::7765CC7B-76CF-4F56-835C-5B923E6F3637 -name copy-service_fi_FI.properties -parent 1AF4D464-5129-4717-ABBE-8BCDCBEC7D90
@@ -2602,6 +2605,9 @@ File ::2A3420C0-CDF2-4B40-8982-59D2CEC108D5 -name alfresco-repository-3.2.jar -p
 File ::04F93025-7AFA-4861-8A3B-41A218AD17CF -name alfresco-core-3.2r.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
 File ::838C9FF1-6945-4ACF-8EE4-203B85ED2E07 -name alfresco-jndi-client-3.2r.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
 File ::82E6C4D0-4A25-4603-896F-3FED8481C198 -name alfresco-repository-3.2r.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
+File ::1A2DBB4D-75D7-4133-8FA7-1EFD4C7EAAEC -name alfresco-core-3.2.0beta2.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
+File ::011FC60F-FC36-46ED-B6DA-FD8EC95E1B94 -name alfresco-jndi-client-3.2.0beta2.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
+File ::C7700A3C-DDE5-40EB-A0F6-3C55C881BBA9 -name alfresco-repository-3.2.0beta2.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
 File ::82939A2E-1CF4-44BF-AB23-83E0B3C21195 -type dir -name conf -parent 3A9C34F9-0AE2-4F1C-9AB9-3BAE8BC4858C
 File ::692E4170-8A10-4860-A11D-56E8F7470EC0 -name alfresco-jmxrmi.access -parent 82939A2E-1CF4-44BF-AB23-83E0B3C21195
 File ::BD3CE02E-BD00-408A-91AE-93AE4BE4350B -name alfresco-jmxrmi.password -parent 82939A2E-1CF4-44BF-AB23-83E0B3C21195
@@ -3930,14 +3936,31 @@ Condition 8E1EFCAF-14C0-4649-999A-AEACDA8E4203 -active No -parent 3C654D54-8DFB-
 InstallComponent BFE9EF55-8DDE-4A48-A848-02EB9F58FE38 -setup Install -type action -conditions 408A2212-FC97-4BCD-9A91-9AFBDB442052 -title {Message Box} -component MessageBox -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition 408A2212-FC97-4BCD-9A91-9AFBDB442052 -active Yes -parent BFE9EF55-8DDE-4A48-A848-02EB9F58FE38 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 408A2212-FC97-4BCD-9A91-9AFBDB442052
 InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
+InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C05E8E9-4358-4BBB-B89A-57FA88483ABA
 InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -title {Execute OO Install} -component ExecuteExternalProgram -command reorder -active No -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent A7CCD851-05EF-4236-8321-7766DF06A256 -setup Install -type action -title {Unzip File} -component UnzipFile -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+InstallComponent 4D5D4BD3-A019-4018-9E97-3302896A80E3 -setup Install -type pane -conditions EB9E210F-8CAB-4AB8-A455-051FD0FFF296 -title {Select Database} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition EB9E210F-8CAB-4AB8-A455-051FD0FFF296 -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id EB9E210F-8CAB-4AB8-A455-051FD0FFF296
+InstallComponent 7B6DA885-8AAD-4546-B2DE-E27FB11227C6 -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
+InstallComponent 30AA76E4-6213-4743-82D1-6843F2451B76 -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
+InstallComponent 9AF7930A-D053-43A4-9EBE-6FBBCC21C251 -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
+InstallComponent CB7AA532-A1BF-4DF3-9394-576E72EFEC2F -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
+InstallComponent A68A86AB-089F-49D1-9053-94B684A45411 -setup Install -type pane -conditions 33DD3A8B-6D59-4088-A399-B920E97B1CE7 -title {Other DB Details} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition 33DD3A8B-6D59-4088-A399-B920E97B1CE7 -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 778A35E3-3F61-4D43-9CA8-D5B28F78F1B2
+InstallComponent DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271 -setup Install -type action -conditions 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5 -title {Set mssql port} -component SetVirtualText -command insert -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411
+Condition 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5 -active Yes -parent DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5
+InstallComponent 36381683-C425-4724-A78C-FFB02826072B -setup Install -type action -conditions 5926CF53-F2F1-4573-9565-9A1A05A41128 -title {Set oracleport} -component SetVirtualText -command insert -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411
+Condition 5926CF53-F2F1-4573-9565-9A1A05A41128 -active Yes -parent 36381683-C425-4724-A78C-FFB02826072B -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5
+InstallComponent F778570D-27D3-4011-82A0-92FB419454AF -setup Install -type action -conditions 61A20815-90B8-4168-B634-8E848E92998F -title {Set postgres port} -component SetVirtualText -command insert -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411
+Condition 61A20815-90B8-4168-B634-8E848E92998F -active Yes -parent F778570D-27D3-4011-82A0-92FB419454AF -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5
+InstallComponent 19B64FBB-66BA-42C2-A3DD-5C06A64FD37C -setup Install -type pane -conditions DFF0498C-3C23-4873-97B9-E4322F29C2C7 -title {Not MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition DFF0498C-3C23-4873-97B9-E4322F29C2C7 -active Yes -parent 19B64FBB-66BA-42C2-A3DD-5C06A64FD37C -title {String Equal Condition} -component StringEqualCondition -TreeObject::id DFF0498C-3C23-4873-97B9-E4322F29C2C7
+InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {778A35E3-3F61-4D43-9CA8-D5B28F78F1B2 238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition 778A35E3-3F61-4D43-9CA8-D5B28F78F1B2 -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 778A35E3-3F61-4D43-9CA8-D5B28F78F1B2
 Condition 238C7BD9-0EDF-4953-BC37-C32F5C2D089D -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 238C7BD9-0EDF-4953-BC37-C32F5C2D089D
 Condition E95B44DE-53E1-4944-AEE6-C2D89CCA323B -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id E95B44DE-53E1-4944-AEE6-C2D89CCA323B
 InstallComponent 702B15CC-0F7B-4BF0-9498-7C1BE3A26C18 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
@@ -3946,13 +3969,13 @@ InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane 
 Condition 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8
 Condition 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631
 Condition 3907E462-D52C-48BA-A959-7B629D58FF6F -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 3907E462-D52C-48BA-A959-7B629D58FF6F
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {8945FF90-FE58-47F6-A4C7-97F8E8DDC075 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {8945FF90-FE58-47F6-A4C7-97F8E8DDC075 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
 Condition 8945FF90-FE58-47F6-A4C7-97F8E8DDC075 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8945FF90-FE58-47F6-A4C7-97F8E8DDC075
 Condition 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3
 Condition 87245761-D5F3-470A-9E78-B56E97ADD1AF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 87245761-D5F3-470A-9E78-B56E97ADD1AF
-InstallComponent 3A529530-E4F4-4084-B35B-F1317BCF1141 -setup Install -type action -conditions 3C476F1B-1E83-4687-86DD-E44C7CC5D5A0 -title {Set Win Short Dir} -component SetVirtualText -command reorder -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1
+InstallComponent 3A529530-E4F4-4084-B35B-F1317BCF1141 -setup Install -type action -conditions 3C476F1B-1E83-4687-86DD-E44C7CC5D5A0 -title {Set Win Short Dir} -component SetVirtualText -command insert -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1
 Condition 3C476F1B-1E83-4687-86DD-E44C7CC5D5A0 -active Yes -parent 3A529530-E4F4-4084-B35B-F1317BCF1141 -title {Platform Condition} -component PlatformCondition -TreeObject::id A3203F7A-00C7-49E1-9718-68F3C09741BD
-InstallComponent FD2A20ED-A1D4-44AF-A138-A4AFE2D3743F -setup Install -type action -conditions 76D7689C-A025-4EF3-8240-20E805CF03AD -title {Execute Script} -component ExecuteScript -command reorder -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1
+InstallComponent FD2A20ED-A1D4-44AF-A138-A4AFE2D3743F -setup Install -type action -conditions 76D7689C-A025-4EF3-8240-20E805CF03AD -title {Execute Script} -component ExecuteScript -command insert -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1
 Condition 76D7689C-A025-4EF3-8240-20E805CF03AD -active Yes -parent FD2A20ED-A1D4-44AF-A138-A4AFE2D3743F -title {Platform Condition} -component PlatformCondition -TreeObject::id 76D7689C-A025-4EF3-8240-20E805CF03AD
 InstallComponent 93CA5D71-830F-44BE-A455-FA795E387DAE -setup Install -type pane -conditions {5614AE89-3CFB-4B2A-9E9E-3D3FCB84A61A 196A200B-E169-4A6E-9A50-0DF8BBDF23E9} -title {Check Tomcat Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 5614AE89-3CFB-4B2A-9E9E-3D3FCB84A61A -active Yes -parent 93CA5D71-830F-44BE-A455-FA795E387DAE -title {Port Test Condition} -component PortTestCondition -TreeObject::id 5614AE89-3CFB-4B2A-9E9E-3D3FCB84A61A
@@ -4051,7 +4074,7 @@ InstallComponent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -setup Install -type actio
 Condition 82B93F75-2DE4-43F5-A54C-CDC155048FA3 -active Yes -parent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -title {String Is Condition} -component StringIsCondition -TreeObject::id 82B93F75-2DE4-43F5-A54C-CDC155048FA3
 Condition 7132E75E-0CA4-41E8-9BA6-B3D52D57281E -active Yes -parent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -title {String Is Condition} -component StringIsCondition -TreeObject::id 7132E75E-0CA4-41E8-9BA6-B3D52D57281E
 Condition 28605D41-F3CF-4045-B4B9-1CE425EBDC03 -active Yes -parent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 28605D41-F3CF-4045-B4B9-1CE425EBDC03
-InstallComponent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -setup Install -type action -conditions {4C5B630E-A819-4C8D-A223-F10643DC1CDA 0E2B711C-DEBF-49E5-A966-C2D5177AE431} -title {Launch Web Browser} -component LaunchWebBrowser -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
+InstallComponent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -setup Install -type action -conditions {4C5B630E-A819-4C8D-A223-F10643DC1CDA 0E2B711C-DEBF-49E5-A966-C2D5177AE431} -title {Launch Web Browser} -component LaunchWebBrowser -command insert -active No -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
 Condition 4C5B630E-A819-4C8D-A223-F10643DC1CDA -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 4C5B630E-A819-4C8D-A223-F10643DC1CDA
 Condition 0E2B711C-DEBF-49E5-A966-C2D5177AE431 -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 0E2B711C-DEBF-49E5-A966-C2D5177AE431
 InstallComponent 3615204F-29E3-473F-A769-A74E859BE866 -setup Install -type action -conditions 77EE16CC-651A-4D2C-9B02-71FF43EF9FF9 -title {Delete File} -component DeleteFile -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
@@ -4061,16 +4084,16 @@ InstallComponent 80D7849E-9103-4EA2-B202-F23CC339309D -setup Install -type actio
 InstallComponent 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 34C97DF2-93F8-48A6-8BF2-56DF6F1DC5F1 -setup Install -type action -title {Replace MySQL Port} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
-InstallComponent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -setup Install -type action -conditions 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -title {Replace Text In Win} -component ReplaceTextInFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -setup Install -type action -conditions 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -title {Replace Text In Win} -component ReplaceTextInFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -active Yes -parent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -title {Platform Condition} -component PlatformCondition -TreeObject::id A4BB2D56-7848-464D-90C1-B75693CDD06E
-InstallComponent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -setup Install -type action -conditions A4BB2D56-7848-464D-90C1-B75693CDD06E -title {Replace Text In Nix} -component ReplaceTextInFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -setup Install -type action -conditions A4BB2D56-7848-464D-90C1-B75693CDD06E -title {Replace Text In Nix} -component ReplaceTextInFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition A4BB2D56-7848-464D-90C1-B75693CDD06E -active Yes -parent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -title {Platform Condition} -component PlatformCondition -TreeObject::id A4BB2D56-7848-464D-90C1-B75693CDD06E
 InstallComponent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC -setup Install -type actiongroup -title {Path Setup} -alias {Path Setup} -active Yes -parent ActionGroupsInstall
-InstallComponent 8F1A02C3-489B-45FE-B5F4-DBA1EA43B31B -setup Install -type action -conditions A3203F7A-00C7-49E1-9718-68F3C09741BD -title {Set Win Short Dir} -component SetVirtualText -command reorder -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
+InstallComponent 8F1A02C3-489B-45FE-B5F4-DBA1EA43B31B -setup Install -type action -conditions A3203F7A-00C7-49E1-9718-68F3C09741BD -title {Set Win Short Dir} -component SetVirtualText -command insert -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 Condition A3203F7A-00C7-49E1-9718-68F3C09741BD -active Yes -parent 8F1A02C3-489B-45FE-B5F4-DBA1EA43B31B -title {Platform Condition} -component PlatformCondition -TreeObject::id A3203F7A-00C7-49E1-9718-68F3C09741BD
-InstallComponent 5D5CAEC9-EB1E-4584-AA54-3EB7EBE23987 -setup Install -type action -conditions 2429DC0F-551B-46A7-932D-56012A311B52 -title {Make Win forward slash} -component ExecuteScript -command reorder -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
+InstallComponent 5D5CAEC9-EB1E-4584-AA54-3EB7EBE23987 -setup Install -type action -conditions 2429DC0F-551B-46A7-932D-56012A311B52 -title {Make Win forward slash} -component ExecuteScript -command insert -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 Condition 2429DC0F-551B-46A7-932D-56012A311B52 -active Yes -parent 5D5CAEC9-EB1E-4584-AA54-3EB7EBE23987 -title {Platform Condition} -component PlatformCondition -TreeObject::id 2429DC0F-551B-46A7-932D-56012A311B52
-InstallComponent 8F6D4A3E-5495-4416-B351-4A5B8AF22E77 -setup Install -type action -conditions 26C8F29E-D3C0-4F1C-8D53-32EABD61B4B0 -title {Set for Nix} -component SetVirtualText -command reorder -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
+InstallComponent 8F6D4A3E-5495-4416-B351-4A5B8AF22E77 -setup Install -type action -conditions 26C8F29E-D3C0-4F1C-8D53-32EABD61B4B0 -title {Set for Nix} -component SetVirtualText -command insert -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 Condition 26C8F29E-D3C0-4F1C-8D53-32EABD61B4B0 -active Yes -parent 8F6D4A3E-5495-4416-B351-4A5B8AF22E77 -title {Platform Condition} -component PlatformCondition -TreeObject::id 26C8F29E-D3C0-4F1C-8D53-32EABD61B4B0
 InstallComponent 8DF4772F-BB98-471E-99C9-CB3FEDD66C60 -setup Install -type action -title {Set Alf_data} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 InstallComponent AD2005D2-4400-4C05-834A-D0827D100FF7 -setup Install -type action -title {Set Context} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
@@ -4156,7 +4179,7 @@ No
 <%InstallDir%>
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,FileSize
-890714
+890980
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,Name
 SPP
@@ -4251,6 +4274,33 @@ ADMIN_HASH
 
 196A200B-E169-4A6E-9A50-0DF8BBDF23E9,Port
 <%ALF_TOMCATPORT%>
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Active
+Yes
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,BackButton,subst
+1
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,CancelButton,subst
+1
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Caption,subst
+1
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Conditions
+{1 condition}
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Message,subst
+1
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,NextButton,subst
+1
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Subtitle,subst
+1
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Title,subst
+1
 
 19F5E6E0-ED74-42E9-8A17-93EF7879CF50,CheckCondition
 {Before Action is Executed}
@@ -4475,6 +4525,27 @@ false
 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D,Filename
 <%ALF_OO%>/program/soffice.bin
 
+30AA76E4-6213-4743-82D1-6843F2451B76,Conditions
+{0 conditions}
+
+30AA76E4-6213-4743-82D1-6843F2451B76,Text,subst
+1
+
+30AA76E4-6213-4743-82D1-6843F2451B76,Type
+radiobutton
+
+30AA76E4-6213-4743-82D1-6843F2451B76,Value
+oracle
+
+30AA76E4-6213-4743-82D1-6843F2451B76,VirtualText
+ALF_DB
+
+30AA76E4-6213-4743-82D1-6843F2451B76,X
+150
+
+30AA76E4-6213-4743-82D1-6843F2451B76,Y
+130
+
 319487D5-991A-4544-9CB7-69BDA7BC5617,Conditions
 {0 conditions}
 
@@ -4482,7 +4553,7 @@ false
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-26224959
+26247840
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -4504,6 +4575,18 @@ false
 
 33613CE2-AD68-4419-9786-8D72A8B04979,String
 <%InstallStopped%>
+
+33DD3A8B-6D59-4088-A399-B920E97B1CE7,MatchCase
+No
+
+33DD3A8B-6D59-4088-A399-B920E97B1CE7,Operator
+{does not equal}
+
+33DD3A8B-6D59-4088-A399-B920E97B1CE7,String1
+<%ALF_DB%>
+
+33DD3A8B-6D59-4088-A399-B920E97B1CE7,String2
+mysql
 
 34C97DF2-93F8-48A6-8BF2-56DF6F1DC5F1,Conditions
 {0 conditions}
@@ -4564,6 +4647,18 @@ WCM
 
 3615204F-29E3-473F-A769-A74E859BE866,IgnoreErrors
 Yes
+
+36381683-C425-4724-A78C-FFB02826072B,Conditions
+{1 condition}
+
+36381683-C425-4724-A78C-FFB02826072B,ExecuteAction
+{Before Pane is Displayed}
+
+36381683-C425-4724-A78C-FFB02826072B,Value
+1521
+
+36381683-C425-4724-A78C-FFB02826072B,VirtualText
+DB_PORT
 
 36A8B144-D246-4AD7-8299-C14C811E3BF9,Conditions
 {1 condition}
@@ -4810,7 +4905,7 @@ Yes
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-119620070
+109258243
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -4853,6 +4948,33 @@ Yes
 
 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631,Port
 <%DB_PORT%>
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Active
+Yes
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,BackButton,subst
+1
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,CancelButton,subst
+1
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Caption,subst
+1
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Conditions
+{1 condition}
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Message,subst
+1
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,NextButton,subst
+1
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Subtitle,subst
+1
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Title,subst
+1
 
 4DE485D3-D090-4DF4-9C0B-C613140E5D93,ExitType
 Finish
@@ -4919,6 +5041,18 @@ Yes
 
 58079AC7-BB3A-4316-A978-A680E7F27B6E,Name
 {WCM Windows}
+
+5926CF53-F2F1-4573-9565-9A1A05A41128,CheckCondition
+{Before Action is Executed}
+
+5926CF53-F2F1-4573-9565-9A1A05A41128,MatchCase
+No
+
+5926CF53-F2F1-4573-9565-9A1A05A41128,String1
+<%ALF_DB%>
+
+5926CF53-F2F1-4573-9565-9A1A05A41128,String2
+oracle
 
 5927BB48-6C81-4470-B32A-AA33EF1D53A3,String
 <%ErrorsOccurred%>
@@ -5068,6 +5202,18 @@ Cancel
 
 6167A49E-551C-4CF3-944D-1FDBDD9C0106,WorkingDirectory
 <%InstallDir%>
+
+61A20815-90B8-4168-B634-8E848E92998F,CheckCondition
+{Before Action is Executed}
+
+61A20815-90B8-4168-B634-8E848E92998F,MatchCase
+No
+
+61A20815-90B8-4168-B634-8E848E92998F,String1
+<%ALF_DB%>
+
+61A20815-90B8-4168-B634-8E848E92998F,String2
+postgres
 
 638BA725-B209-4B92-B603-09E568B32EEF,CheckCondition
 {Before Action is Executed}
@@ -5383,6 +5529,15 @@ false
 76D7689C-A025-4EF3-8240-20E805CF03AD,Platform
 Windows
 
+778A35E3-3F61-4D43-9CA8-D5B28F78F1B2,MatchCase
+No
+
+778A35E3-3F61-4D43-9CA8-D5B28F78F1B2,String1
+<%ALF_DB%>
+
+778A35E3-3F61-4D43-9CA8-D5B28F78F1B2,String2
+mysql
+
 77D3BEF2-4EDE-4DF6-81BC-A7697E516AC5,CheckCondition
 {Before Action is Executed}
 
@@ -5444,6 +5599,30 @@ Yes
 
 7B5F3868-47A9-41CD-9AC3-1760F2B8F568,String
 <%CreateDesktopShortcut%>
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,Checked
+Yes
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,Conditions
+{0 conditions}
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,Text,subst
+1
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,Type
+radiobutton
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,Value
+mysql
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,VirtualText
+ALF_DB
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,X
+150
+
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,Y
+100
 
 7BB3FB0F-E84F-458C-9526-B41A8243BEBF,Active
 No
@@ -5558,6 +5737,18 @@ Windows
 
 847D20F0-88F0-4A85-ABAA-BF2FA978F0B4,WorkingDirectory
 <%InstallDir%>
+
+853D9C9C-94B2-46C4-93E6-58C9CE17A1F5,CheckCondition
+{Before Action is Executed}
+
+853D9C9C-94B2-46C4-93E6-58C9CE17A1F5,MatchCase
+No
+
+853D9C9C-94B2-46C4-93E6-58C9CE17A1F5,String1
+<%ALF_DB%>
+
+853D9C9C-94B2-46C4-93E6-58C9CE17A1F5,String2
+mssql
 
 86A3FCD3-420F-46F9-922E-7A1A0231C040,CheckCondition
 {Before Next Pane is Displayed}
@@ -5680,7 +5871,7 @@ JavaShortInstallDir
 <%InstallDir%>
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,FileSize
-2558
+2502
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,Name
 {Program Files Linux}
@@ -5814,6 +6005,27 @@ INDEXES
 991553B3-06E2-412E-89E5-1829C782E086,NextButton,subst
 1
 
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Conditions
+{0 conditions}
+
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Text,subst
+1
+
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Type
+radiobutton
+
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Value
+mssql
+
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,VirtualText
+ALF_DB
+
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,X
+150
+
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Y
+160
+
 9C516685-6F30-4420-A108-8F51B16D3AB8,CheckCondition
 {Before Action is Executed}
 
@@ -5907,6 +6119,33 @@ A679983A-9E44-4848-AE89-1571B8FD6229,Message,subst
 A679983A-9E44-4848-AE89-1571B8FD6229,NextButton,subst
 1
 
+A68A86AB-089F-49D1-9053-94B684A45411,Active
+Yes
+
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton,subst
+1
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton,subst
+1
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption,subst
+1
+
+A68A86AB-089F-49D1-9053-94B684A45411,Conditions
+{1 condition}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message,subst
+1
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton,subst
+1
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle,subst
+1
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title,subst
+1
+
 A6A7CCC8-86CA-4C86-8275-D8A2242ECC9D,String1
 <%InstallType%>
 
@@ -5971,7 +6210,7 @@ AAD9798A-56FA-4C12-882C-DD66829420CE,Caption,subst
 1
 
 AAD9798A-56FA-4C12-882C-DD66829420CE,Conditions
-{2 conditions}
+{3 conditions}
 
 AAD9798A-56FA-4C12-882C-DD66829420CE,Message,subst
 1
@@ -6261,6 +6500,27 @@ C8D4D791-2898-4FD5-A5EB-317C01AD0B62,Action
 CAC2425B-77D4-4237-B24D-95FCA5DD304D,Action
 {Uninstall Actions}
 
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,Conditions
+{0 conditions}
+
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,Text,subst
+1
+
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,Type
+radiobutton
+
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,Value
+postgres
+
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,VirtualText
+ALF_DB
+
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,X
+150
+
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,Y
+190
+
 CC04C0EA-21F5-464B-977F-6786765F611A,Conditions
 {0 conditions}
 
@@ -6320,6 +6580,9 @@ D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Subtitle,subst
 
 D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Title,subst
 1
+
+D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,Active
+No
 
 D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,Conditions
 {2 conditions}
@@ -6396,6 +6659,30 @@ D7EEA242-339D-49FC-A5B1-7787B21BA759,X
 D7EEA242-339D-49FC-A5B1-7787B21BA759,Y
 160
 
+DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271,Conditions
+{1 condition}
+
+DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271,ExecuteAction
+{Before Pane is Displayed}
+
+DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271,Value
+1433
+
+DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271,VirtualText
+DB_PORT
+
+DFF0498C-3C23-4873-97B9-E4322F29C2C7,MatchCase
+No
+
+DFF0498C-3C23-4873-97B9-E4322F29C2C7,Operator
+{does not equal}
+
+DFF0498C-3C23-4873-97B9-E4322F29C2C7,String1
+<%ALF_DB%>
+
+DFF0498C-3C23-4873-97B9-E4322F29C2C7,String2
+mysql
+
 E181E06B-BC95-4065-80E8-8614EE6074B7,Alias
 {OpenOffice File}
 
@@ -6427,7 +6714,7 @@ E230D053-6033-4990-B404-368AAA25BE36,X
 90
 
 E230D053-6033-4990-B404-368AAA25BE36,Y
-240
+245
 
 E35F2477-2025-4C48-BE4A-BC2DB58EFD16,Comment
 {Don't display this pane in an upgrade install}
@@ -6509,6 +6796,12 @@ EB50BCBF-8CE5-447F-80F9-C7A7CAA939E2,FileGroups
 
 EB50BCBF-8CE5-447F-80F9-C7A7CAA939E2,Name
 {SharePoint Protocol}
+
+EB9E210F-8CAB-4AB8-A455-051FD0FFF296,Filename
+<%ALF_MYSQL%>
+
+EB9E210F-8CAB-4AB8-A455-051FD0FFF296,Operator
+{does not exist}
 
 EBFFA989-8159-45F3-A243-3D59690CC465,CheckCondition
 {Before Action is Executed}
@@ -6641,6 +6934,18 @@ F70BEDD4-EA20-4A55-BBEB-FB0A605C8F89,X
 
 F70BEDD4-EA20-4A55-BBEB-FB0A605C8F89,Y
 140
+
+F778570D-27D3-4011-82A0-92FB419454AF,Conditions
+{1 condition}
+
+F778570D-27D3-4011-82A0-92FB419454AF,ExecuteAction
+{Before Pane is Displayed}
+
+F778570D-27D3-4011-82A0-92FB419454AF,Value
+5432
+
+F778570D-27D3-4011-82A0-92FB419454AF,VirtualText
+DB_PORT
 
 F7CA4AE5-D8B9-442E-BF9D-D17274CA2DD4,Conditions
 {0 conditions}
@@ -7419,6 +7724,29 @@ ZipArchive,VirtualTextMap
 
 }
 
+::msgcat::mcmset ca {
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Llegenda
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Missatge
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+SubtÃ­tol
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+RÃ²tul
+
+}
 ::msgcat::mcmset de {
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
@@ -7474,6 +7802,27 @@ Titel
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
 
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Überschrift
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Meldung
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Untertitel
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Titel
+
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
@@ -7502,6 +7851,18 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 
 11D931E9-F589-4F10-AEFF-734DE33E8488,Text
 <%CreateDesktopShortcutText%>
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Caption
+{You will need to prepare your database and add the appropriate JDBC driver into the Alfresco server once this installation has completed.  Please see the Alfresco Installation Guide for details on preparing your database.  You will not be able to start the Alfresco server until the database has been correctly prepared.}
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Message
+{Do not start the Alfresco server until the database has been correctly prepared.}
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Subtitle
+{Additional steps required after installation}
+
+19B64FBB-66BA-42C2-A3DD-5C06A64FD37C,Title
+{Database Preparation}
 
 19F5E6E0-ED74-42E9-8A17-93EF7879CF50,Message
 <%InstallStartupText%>
@@ -7536,6 +7897,9 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
 
+30AA76E4-6213-4743-82D1-6843F2451B76,Text
+Oracle
+
 3599937E-10E1-4029-8ACB-CCE5D85D306D,Description
 {Web Content Management features}
 
@@ -7567,6 +7931,18 @@ SET JAVA_HOME=<%Dir <%JavaInstallDir%> platform%>}
 
 4489F0C1-C985-41F0-B4A9-90868A73FE8E,Title
 <%ApplicationReadmeText%>
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Caption
+{Which type of database do you wish to use for Alfresco?}
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Message
+{If you choose any option other than MySQL, you will need to prepare the appropriate database before starting Alfresco.}
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Subtitle
+{Choose the type of database you wish to use for Alfresco}
+
+4D5D4BD3-A019-4018-9E97-3302896A80E3,Title
+{Choose Database Type}
 
 4EFE7BCF-E649-49F5-AFC9-487CE1DD4C88,Message
 {Continue as <%InstallDir%>/mysql/my.ini not found}
@@ -7645,6 +8021,9 @@ If you do not wish to use OpenOffice for Office document conversions, just selec
 7A903A54-A58E-414B-8E67-5EF0F1364ABC,Message
 <%UninstallCompleteText%>
 
+7B6DA885-8AAD-4546-B2DE-E27FB11227C6,Text
+MySQL
+
 7BB3FB0F-E84F-458C-9526-B41A8243BEBF,PromptMessage
 {Please tell us where your Java Runtime is located}
 
@@ -7694,6 +8073,9 @@ It is recommended that you close all other applications before  continuing.
 
 Click Next to continue or Cancel to exit Setup.}
 
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Text
+{Microsoft SQL Server}
+
 A2841CF3-EEB2-479E-9284-330E06D1E1A7,Caption
 {Samples Installation}
 
@@ -7716,6 +8098,27 @@ A679983A-9E44-4848-AE89-1571B8FD6229,Caption
 A679983A-9E44-4848-AE89-1571B8FD6229,Message
 {Installing Java (JDK).  
 This may take a few minutes...}
+
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+{Please give details of the database server to use.}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+{The installer will not try to communicate with the given database server to validate or configure it.  }
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+{Enter details of your database server}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+{Database Configuration}
 
 A88563D5-3EDB-4933-A42D-D51B94ED8D72,Description
 {Sample content and templates}
@@ -7740,6 +8143,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 
 C1DBCDEC-EC84-4D9C-A887-5045F2CE5C85,Text
 {View Alfresco Labs Wiki}
+
+CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,Text
+PostgreSQL
 
 CD047B45-9E60-4E0B-B9DD-2AD2CAB8772C,Message
 {Installer exists}
@@ -7847,6 +8253,27 @@ Título
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
 
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Leyenda
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Mensaje
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Subtítulo
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Título
+
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
@@ -7917,6 +8344,27 @@ Titre
 
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
+
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Légende
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Message
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Sous-titre
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Titre
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
@@ -7989,6 +8437,27 @@ Cím
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
 
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Leírás
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Üzenet
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Alcím
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Cím
+
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
@@ -8060,6 +8529,27 @@ Titolo
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
 
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Didascalia
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Messaggio
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Sottotitolo
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Titolo
+
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
@@ -8074,6 +8564,29 @@ E230D053-6033-4990-B404-368AAA25BE36,Text
 
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 <%InstallingApplicationText%>
+
+}
+::msgcat::mcmset lt {
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Pavadinimas
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Praneðimas
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Paantraðtë
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Antraðtë
 
 }
 ::msgcat::mcmset nl {
@@ -8130,6 +8643,27 @@ Titel
 
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
+
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Bijschrift
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Bericht
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Ondertitel
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Titel
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
@@ -8202,6 +8736,27 @@ TytuÅ‚
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
 
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+NagÅ‚Ã³wek
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+WiadomoÅ›Ä‡
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+PodtytuÅ‚
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+TytuÅ‚
+
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
@@ -8273,6 +8828,27 @@ Título
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
 
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Caption
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Mensagem
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Subtítulo
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Título
+
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
@@ -8343,6 +8919,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 
 9103325D-9719-4A25-87AE-B14FE9E12609,TextToWrite
 {}
+
+A68A86AB-089F-49D1-9053-94B684A45411,BackButton
+{< <%Back%>}
+
+A68A86AB-089F-49D1-9053-94B684A45411,CancelButton
+<%Cancel%>
+
+A68A86AB-089F-49D1-9053-94B684A45411,Caption
+Ïîäïèñü
+
+A68A86AB-089F-49D1-9053-94B684A45411,Message
+Ñîîáùåíèå
+
+A68A86AB-089F-49D1-9053-94B684A45411,NextButton
+{<%Next%> >}
+
+A68A86AB-089F-49D1-9053-94B684A45411,Subtitle
+Ïîäçàãîëîâîê
+
+A68A86AB-089F-49D1-9053-94B684A45411,Title
+Çàãîëîâîê
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}

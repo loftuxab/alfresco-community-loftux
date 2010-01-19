@@ -21,6 +21,10 @@ db.port=@@DB_PORT@@
 #-------------
 ooo.exe=@@ALF_OO@@/program/soffice
 ooo.user=@@OOUSER@@
+jodconverter.officeHome=@@ALF_OO@@
+jodconverter.portNumbers=8101
+#ooo.enabled=false
+#jodconverter.enabled=true
 img.root=@@ALF_IMG@@
 swf.exe=@@ALF_SWF@@/pdf2swf
 
@@ -34,26 +38,25 @@ alfresco_user_store.adminpassword=@@ADMIN_PWD@@
 #-------------
 #mysql#db.driver=org.gjt.mm.mysql.Driver
 #mysql#db.url=jdbc:mysql://${db.host}:${db.port}/${db.name}
-#mysql#hibernate.dialect=org.hibernate.dialect.MySQLInnoDBDialect
 
 #
 # Oracle connection
 #
 #oracle#db.driver=oracle.jdbc.OracleDriver
-#oracle#db.url=jdbc:oracle:thin:@localhost:1521:alfresco
+#oracle#db.url=jdbc:oracle:thin:@${db.host}:${db.port}:${db.name}
 
 #
 # SQLServer connection (note you must enable TCP protocol on fixed port 1433)
 #
 #mssql#db.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
-#mssql#db.url=jdbc:sqlserver://localhost:1433;databaseName=alfresco
+#mssql#db.url=jdbc:sqlserver://${db.host}:${db.port};databaseName=${db.name}
 #mssql#db.txn.isolation=4096
 
 #
 # PostgreSQL connection (requires postgresql-8.2-504.jdbc3.jar or equivalent)
 #
 #postgres#db.driver=org.postgresql.Driver
-#postgres#db.url=jdbc:postgresql://localhost:5432/alfresco
+#postgres#db.url=jdbc:postgresql://${db.host}:${db.port}/${db.name}
 
 #
 # Index Recovery Mode

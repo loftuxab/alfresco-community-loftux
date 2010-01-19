@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sh @@ALFRESCO_DIR@@/virtual_alf.sh stop
+sh @@ALF_HOME@@/virtual_alf.sh stop
