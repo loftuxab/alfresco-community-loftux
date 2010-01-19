@@ -106,5 +106,14 @@
          <display-web-preview>true</display-web-preview>
       </document-details>
    </config>
+   
+   <config evaluator="string-compare" condition="Search" replace="true">
+      <search>
+         <!-- default minimum length for search terms -->
+         <min-search-term-length>1</min-search-term-length>
+         <!-- default maximum number of results for a search -->
+         <max-search-results>100</max-search-results>
+      </search>
+   </config>
 
 </alfresco-config>
