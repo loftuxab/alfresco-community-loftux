@@ -36,6 +36,7 @@ import org.alfresco.jlan.server.filesys.FileAttribute;
 import org.alfresco.jlan.server.filesys.FileSystem;
 import org.alfresco.jlan.server.filesys.cache.FileState;
 import org.alfresco.jlan.server.filesys.cache.FileStateCache;
+import org.alfresco.jlan.server.filesys.cache.FileStateLockManager;
 import org.alfresco.jlan.server.filesys.loader.DeleteFileRequest;
 import org.alfresco.jlan.server.filesys.loader.FileLoader;
 import org.alfresco.jlan.server.filesys.loader.FileRequestQueue;
@@ -134,6 +135,14 @@ public class DBDeviceContext extends DiskDeviceContext {
 
 	private FileStateCache m_stateCache;
 
+	// File state based lock/oplock manager
+	
+	private FileStateLockManager m_lockManager;
+	
+	// Oplocks enable/disable
+	
+	private boolean m_oplocksEnabled = true;
+	
 	// Debug enable
 
 	private boolean m_debug;
@@ -333,6 +342,11 @@ public class DBDeviceContext extends DiskDeviceContext {
 			m_offlineFiles = true;
 		}
 
+		// Check if oplocks should be disabled
+		
+		if ( args.getChild("disableOplocks") != null)
+			m_oplocksEnabled = false;
+		
 		// Check if offline files are enabled above a specified size
 
 		nameVal = args.getChild("offlineFileSize");
@@ -470,6 +484,10 @@ public class DBDeviceContext extends DiskDeviceContext {
 
 		enableStateCache(true);
 
+		// Create the file state based lock manager
+		
+		m_lockManager = new FileStateLockManager( getStateCache());
+		
 		// Set the enabled database features
 
 		if ( hasNTFSStreamsEnabled() == true && m_loader.supportsStreams() == true)
@@ -640,6 +658,24 @@ public class DBDeviceContext extends DiskDeviceContext {
 		return m_offlineFileSize;
 	}
 
+	/**
+	 * Return the lock manager
+	 * 
+	 * @return FileStateLockManager
+	 */
+	public FileStateLockManager getLockManager() {
+		return m_lockManager;
+	}
+
+	/**
+	 * Check if oplocks should be enabled
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isOpLocksEnabled() {
+		return m_oplocksEnabled;
+	}
+	
 	/**
 	 * Determine if the retention period is enabled
 	 * 

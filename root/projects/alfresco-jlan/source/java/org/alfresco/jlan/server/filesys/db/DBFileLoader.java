@@ -1523,26 +1523,42 @@ public class DBFileLoader implements FileLoader, BackgroundFileLoader, FileState
 					else
 						entryName = getTempFilePrefix() + finfo.getFileId() + ".tmp";
 
-					JarEntry jarEntry = new JarEntry(entryName);
-					outJar.putNextEntry(jarEntry);
-
 					// Open the temporary file
 
-					FileInputStream tempFile = new FileInputStream(finfo.getTemporaryPath());
+					FileInputStream tempFile = null;
+					
+					try {
+						
+						tempFile = new FileInputStream(finfo.getTemporaryPath());
 
-					// Write the temporary file data to the Jar file
-
-					int rdlen = tempFile.read(inbuf);
-
-					while (rdlen > 0) {
-						outJar.write(inbuf, 0, rdlen);
-						rdlen = tempFile.read(inbuf);
+						// Create the Jar file entry
+						
+						JarEntry jarEntry = new JarEntry(entryName);
+						outJar.putNextEntry(jarEntry);
+	
+						// Write the temporary file data to the Jar file
+	
+						int rdlen = tempFile.read(inbuf);
+	
+						while (rdlen > 0) {
+							outJar.write(inbuf, 0, rdlen);
+							rdlen = tempFile.read(inbuf);
+						}
+	
+						// Close the temporary file, close the Jar file entry
+	
+						tempFile.close();
+						outJar.closeEntry();
 					}
-
-					// Close the temporary file, close the Jar file entry
-
-					tempFile.close();
-					outJar.closeEntry();
+					catch ( Exception ex) {
+						
+						// DEBUG
+						
+						if ( Debug.EnableError && hasDebug()) {
+							Debug.println("Failed to store " + finfo.getTemporaryPath());
+							Debug.println(ex);
+						}
+					}
 				}
 				else if ( Debug.EnableInfo && hasDebug()) {
 
@@ -2472,7 +2488,6 @@ public class DBFileLoader implements FileLoader, BackgroundFileLoader, FileState
 		// file segment.
 
 		FileSegment fileSeg = null;
-		MemorySegmentList memList = null;
 		CachedNetworkFile netFile = null;
 
 		synchronized (state) {

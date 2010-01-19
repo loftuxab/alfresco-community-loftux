@@ -42,19 +42,19 @@ public class FileSegmentInfo {
 
 	//	Segment load/save status
 	
-	public final static int Initial			= 0;
-	public final static int LoadWait		= 1;
-	public final static int Loading			= 2;
-	public final static int Available		= 3;
+	public final static int Initial		= 0;
+	public final static int LoadWait	= 1;
+	public final static int Loading		= 2;
+	public final static int Available	= 3;
 	public final static int SaveWait    = 4;
-	public final static int Saving			= 5;
-	public final static int Saved				= 6;
+	public final static int Saving		= 5;
+	public final static int Saved		= 6;
 	
-	public final static int Error				= 7;
+	public final static int Error		= 7;
 	
 	//	Flags
 	
-	private static final int Updated				=	0x0001;
+	private static final int Updated		= 0x0001;
 	private static final int RequestQueued	= 0x0002;
 	private static final int DeleteOnStore	= 0x0004;
 	
@@ -152,13 +152,6 @@ public class FileSegmentInfo {
 	public final void deleteTemporaryFile()
 		throws IOException {
 			
-    // DEBUG
-    
-    if ( isQueued()) {
-      Debug.println("@@ Delete queued file segment, " + this);
-      Thread.dumpStack();
-    }
-    
 		//	Delete the temporary file used by the file segment
 
 		File tempFile = new File(getTemporaryFile());
