@@ -2,8 +2,8 @@
    new Alfresco.GroupFinder("${args.htmlid}").setOptions(
    {
       siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>",
-      minSearchTermLength: "${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}",
-      maxSearchResults: "${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}",
+      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
+      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
       setFocus: ${args.setFocus!'false'},
       addButtonSuffix: "${args.addButtonSuffix!''}",
       dataWebScript: "${(args.dataWebScript!'api/groups')?replace("[", "{")?replace("]", "}")}"

@@ -319,6 +319,21 @@
    padding-bottom: 0.2em;
 }
 
+/* Document Info Banner */
+
+.doclist .info-banner
+{
+   background-color: #ffffe0;
+   background-image: url(images/warning-16.png);
+   background-position: 6px 4px;
+   background-repeat: no-repeat;
+   clear: left;
+   color: #888;
+   font-weight: bold;
+   margin-bottom: 4px;
+   padding: 5px 0px 3px 28px;
+}
+
 
 /* Tags */
 
@@ -327,22 +342,20 @@
    background-image: url(images/tag-16.png);
    background-position: 0px 0px;
    background-repeat: no-repeat;
+   padding-bottom: 2px;
    padding-left: 20px;
 }
 
 .doclist .documents .detail span.tag
 {
-   padding-right: 0.5em;
 }
 
 .doclist .documents .detail a.tag-link
 {
-   
 }
 
 .doclist .documents .detail a.tag-link span
 {
-   
 }
 
 
@@ -445,7 +458,7 @@
 
 
 /* Actions: Icons */
-.doclist .yui-dt-col-actions a
+.doclist .action-set a
 {
    background-image: url(images/generic-16.png);
 }
@@ -473,6 +486,11 @@
 .doclist .onActionDownload a
 {
    background-image: url(images/download-16.png);
+}
+
+.doclist .onActionView a
+{
+   background-image: url(images/view-in-browser.png);
 }
 
 .doclist .onActionEditOffline a
@@ -533,6 +551,16 @@
 .doclist .onActionChangeType a
 {
    background-image: url(images/change-type-16.png);
+}
+
+.doclist .onActionViewOriginal a
+{
+   
+}
+
+.doclist .onActionViewWorkingCopy a
+{
+   
 }
 
 

@@ -63,6 +63,31 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
    },
 
    /**
+    * Retrieves events from server
+    * 
+    * @method getEvents
+    *  
+    */
+   getEvents : function CalendarView_getEvents()
+   {
+      Alfresco.util.Ajax.request(
+      {
+         url: Alfresco.constants.PROXY_URI + "calendar/events/" + this.options.siteId + "/user",
+         dataObj:
+         {
+            from: toISO8601(this.options.startDate).split('T')[0]
+         },
+         //filter out non relevant events for current view            
+         successCallback: 
+         {
+            fn: this.onEventsLoaded,
+            scope: this
+         },
+            failureMessage: Alfresco.util.message("load.fail", "Alfresco.CalendarView")
+        });
+   },
+   
+   /**
     * Render events to DOM
     *  
     * @method addEvents
@@ -188,20 +213,22 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
            intersectEvents[elEv.id] = [];
 
            var reg = Dom.getRegion(elEv);
-           for (var j=0;j<numExistingEvents;j++)
+           if (reg!==false)
            {
-              var el = existingEvents[j];
-              if (el.id!==elEv.id)
-              {
-                var intersectRegion = reg.intersect(Dom.getRegion(el));
+               for (var j=0;j<numExistingEvents;j++)
+               {
+                  var el = existingEvents[j];
+                  if (el.id!==elEv.id)
+                  {
+                    var intersectRegion = reg.intersect(Dom.getRegion(el));
 
-                if (!YAHOO.lang.isNull(intersectRegion))
-                {
-                   intersectEvents[elEv.id].push(el);
-                }
-              }
-           }
-           
+                    if (!YAHOO.lang.isNull(intersectRegion))
+                    {
+                       intersectEvents[elEv.id].push(el);
+                    }
+                  }
+               }
+           }  
         }
      }
      var processedElems = [];
@@ -513,6 +540,10 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
          var segments  = Dom.getElementsByClassName('hourSegment','div',targetEl);
          targetEl = ( (~~ (1* min))>=30) ? segments[1] : segments[0];
          YAHOO.util.Dom.setStyle(targetEl,'position','relative');
+         if (min=='15' | min=='45')
+         {
+            Dom.setStyle(targetEl,'top',Dom.getRegion(targetEl).height/2+'px');
+         }         
          targetEl.appendChild(vEventEl);
          this.calEventConfig.resizable = true;
          this.calEventConfig.draggable = true;
@@ -521,7 +552,10 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
          this.events[id]=newCalEvent;
 
          newCalEvent.on('eventMoved', this.onEventMoved, newCalEvent, this);
-         this._adjustHeightByHour(vEventEl);
+         if (!Dom.hasClass(vEventEl,'allday'))
+         {
+            this._adjustHeightByHour(vEventEl);
+         }
          this.renderMultipleEvents();
          this._fixIEBorderBleedThrough(newCalEvent.getEl());
        }

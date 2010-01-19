@@ -147,31 +147,6 @@
       },
       
       /**
-       * Retrieves events from server
-       * 
-       * @method getEvents
-       *  
-       */
-      getEvents : function CalendarView_getEvents()
-      {
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.PROXY_URI + "calendar/events/" + this.options.siteId + "/user",
-            dataObj:
-            {
-               from: toISO8601(this.options.startDate).split('T')[0]
-            },
-            //filter out non relevant events for current view            
-            successCallback: 
-            {
-               fn: this.onEventsLoaded,
-               scope: this
-            },
-               failureMessage: Alfresco.util.message("load.fail", "Alfresco.CalendarView")
-           });
-      },
-      
-      /**
        * Renders view
        * 
        * @method render
@@ -213,10 +188,8 @@
          //initialise DOM Event registration
          this.initEvents();
          //pre configure config object for calendar object for current view
-         if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
-         {
-            this.initCalendarEvents();
-         }
+         this.initCalendarEvents();
+         this.getEvents(dateFormat(this.options.startDate,'yyyy-mm-dd'));                     
       },
 
       /**
@@ -579,15 +552,27 @@
             {
                fn: function(p_config, p_obj) 
                {
+                  var isAllDay = document.getElementsByName('allday').checked===true;
+                  var startEl = document.getElementsByName('start')[0];
+                  var endEl = document.getElementsByName('end')[0];
+
                   if (p_config.dataObj.tags)
                   {
                      p_config.dataObj.tags = p_config.dataObj.tags.join(' ');
                   }
+
                   if (YAHOO.lang.isUndefined(p_config.dataObj.start))
                   {
-                     p_config.dataObj.start = document.getElementsByName('start')[0].value;
-                     p_config.dataObj.end = document.getElementsByName('end')[0].value;
+                     p_config.dataObj.start = startEl.value;
+                     p_config.dataObj.end = endEl.value;
                   }
+
+                  // if times start and end at 00:00 and not allday then add 1 hour
+                  if (!isAllDay && (p_config.dataObj.start == '00:00' && p_config.dataObj.end =='00:00') )
+                  {
+                     p_config.dataObj.end = '01:00';
+                  } 
+
                   return true;
                },
                scope: this.eventDialog
@@ -850,11 +835,7 @@
                 };
             }();
          }
-         //do we need to move the getEvents further up before render()
-         if (this.calendarView !== Alfresco.CalendarView.VIEWTYPE_MONTH)
-         {
-            this.getEvents(dateFormat(this.options.startDate,'yyyy-mm-dd'));            
-         }
+
          this.render();         
       },
       
@@ -1315,7 +1296,11 @@ Alfresco.util.DialogManager = ( function () {
               document.getElementsByName('start')[0].disabled = document.getElementsByName('end')[0].disabled = document.getElementsByName('allday')[0].checked;     
               //hide mini-cal
               this.dialog.hideEvent.subscribe(function() {
-               Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').oCalendar.hide();
+                 var oCal = Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView');
+                 if (oCal && oCal.oCalendar)
+                 {
+                    oCal.oCalendar.hide();                    
+                 }
               },this,true);
           },
          scope: Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView')

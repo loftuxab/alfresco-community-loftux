@@ -28,7 +28,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
       
    },  
    /**
-    * Retrieves events from server
+    * Retrieves events from DOM
     * 
     * @method getEvents
     *  
@@ -48,7 +48,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
          [events]
       );
       // add view for events that span multiple days.
-      var allDayEvents = Dom.getElementsByClassName('allday',this.id);
+      var allDayEvents = Dom.getElementsByClassName('allday','div', Dom.get(this.id));
       for (var i=0,len=allDayEvents.length;i<len;i++)
       {
          this.renderMultipleDay(allDayEvents[i]);
@@ -90,7 +90,8 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
        data = this.convertDataToTemplateData(data);
        data.hidden = '';
      }
-     if (vEventEl)
+
+     if (vEventEl && Dom.inDocument(vEventEl))
      {
         vEventEl.parentNode.removeChild(vEventEl);
         vEventEl=null;           
@@ -183,10 +184,6 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
       // add view for events that span multiple days.
       this.renderMultipleDay(eventEl,data);
 
-      this.calEventConfig.resizable = false;
-      this.calEventConfig.draggable = false;
-      this.events[eventEl.id] = new Alfresco.calendarEvent(eventEl, this.dragGroup,this.calEventConfig); 
-      targetEl.appendChild(eventEl);
       Dom.addClass(eventEl,'allday');
       Dom.setStyle(eventEl,'width','100%');
       Dom.setStyle(eventEl,'height','auto');
@@ -199,7 +196,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
   /**
     * Render event that span multiple days
     * 
-    * @method renderAllDayEvents
+    * @method renderMultipleDay
     * @param eventEl {object} reference to event element
     * @param data {object} Value object of event data
     * 
@@ -400,6 +397,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
        if(data.allday)
        {
          data.allday = 'allday';
+         data.el = 'div'
          var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
          vEventEl = this.renderAllDayEvents(vEventEl,data);
          this.calEventConfig.draggable = YAHOO.util.Dom.hasClass(vEventEl,'allday') ? false : true;

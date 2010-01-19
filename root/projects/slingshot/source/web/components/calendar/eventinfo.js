@@ -268,14 +268,24 @@
             doBeforeAjaxRequest : {
                 fn : function(p_config, p_obj) 
                  {
+                     var isAllDay = document.getElementsByName('allday').checked===true;
+                     var startEl = document.getElementsByName('start')[0];
+                     var endEl = document.getElementsByName('end')[0];
+
                      p_config.method = Alfresco.util.Ajax.PUT;
                      p_config.dataObj.tags = this.tags.join(' ');
                      //all day
                      if (YAHOO.lang.isUndefined(p_config.dataObj.start))
                      {
-                        p_config.dataObj.start = document.getElementsByName('start')[0].value;
-                        p_config.dataObj.end = document.getElementsByName('end')[0].value;
+                        p_config.dataObj.start = startEl.value;
+                        p_config.dataObj.end = endEl.value;
                      }
+                     // if times start and end at 00:00 and not allday then add 1 hour
+                     if (!isAllDay && (p_config.dataObj.start == '00:00' && p_config.dataObj.end =='00:00') )
+                     {
+                        p_config.dataObj.end = '01:00';
+                     } 
+                     
                      this.form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
                    
                      return true;
@@ -315,7 +325,11 @@
                           document.getElementsByName('start')[0].disabled = document.getElementsByName('end')[0].disabled = document.getElementsByName('allday')[0].checked;                          
                           //hide mini-cal
                           this.dialog.hideEvent.subscribe(function() {
-                           Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').oCalendar.hide();
+                             var oCal = Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView');
+                             if (oCal && oCal.oCalendar)
+                             {
+                                oCal.oCalendar.hide();                    
+                             }
                           },this,true);                              
                        },
                scope : this.eventDialog

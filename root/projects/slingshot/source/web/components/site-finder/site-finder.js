@@ -161,6 +161,14 @@
        * @type object
        */
       pendingInvites: null,
+
+      /**
+       * Keeps track if this component is searching or not
+       *
+       * @property isSearching
+       * @type Boolean
+       */
+      isSearching: false,      
       
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -991,6 +999,7 @@
          
          var successHandler = function SiteFinder__pS_successHandler(sRequest, oResponse, oPayload)
          {
+            this.widgets.searchButton.set("disabled", false);
             if (timerShowLoadingMessage)
             {
                timerShowLoadingMessage.cancel();
@@ -1006,6 +1015,7 @@
          
          var failureHandler = function SiteFinder__pS_failureHandler(sRequest, oResponse)
          {
+            this.widgets.searchButton.set("disabled", false);
             if (timerShowLoadingMessage)
             {
                timerShowLoadingMessage.cancel();
@@ -1041,6 +1051,8 @@
                failure: failureHandler,
                scope: this
          });
+
+         this.widgets.searchButton.set("disabled", true);
       },
 
       /**

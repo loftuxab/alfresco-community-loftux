@@ -353,7 +353,18 @@ namespace AlfrescoExcel2003
             {
                // Need to unescape the the original path to get the filename
                fileName = Path.GetFileName(Uri.UnescapeDataString(relativePath));
-               string strTempFile = Path.GetTempFileName();
+               string strTempFile = Path.GetTempPath() + fileName;
+               if (File.Exists(strTempFile))
+               {
+                  try
+                  {
+                     File.Delete(strTempFile);
+                  }
+                  catch (Exception e)
+                  {
+                     strTempFile = Path.GetTempFileName();
+                  }
+               }
                WebClient fileReader = new WebClient();
                string url = m_ServerDetails.WebClientURL + "download/direct/" + nodeRef.Replace(":/", "") + "/" + Path.GetFileName(relativePath);
                fileReader.Headers.Add("Cookie: " + webBrowser.Document.Cookie);

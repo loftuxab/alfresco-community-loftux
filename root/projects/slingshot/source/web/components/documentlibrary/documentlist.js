@@ -788,7 +788,7 @@
                      for (i = 0, j = tags.length; i < j; i++)
                      {
                         tag = $html(tags[i]);
-                        desc += '<span class="tag"><a href="#" class="tag-link" rel="' + tag + '" title="' + tags[i] + '">' + tag + '</a></span>';
+                        desc += '<span class="tag"><a href="#" class="tag-link" rel="' + tag + '" title="' + tags[i] + '">' + tag + '</a></span>' + (i < j ? ", " : "");
                      }
                   }
                   else
@@ -831,14 +831,14 @@
                   /**
                    * Detailed View
                    */
-                  if (record.status.indexOf("workingCopy") != -1)
+                  if (record.custom.isWorkingCopy)
                   {
                      /**
                       * Working Copy
                       */
                      desc += '<div class="detail">';
-                     desc += '<span class="item"><em>' + me.msg("details.checked-out.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc += '<span class="item"><em>' + me.msg("details.checked-out.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + me.msg("details.editing-started.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.editing-started.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
                      desc += '<span class="item"><em>' + me.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';
                      desc += '<span class="item"><em>' + me.msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
@@ -866,7 +866,7 @@
                         for (i = 0, j = tags.length; i < j; i++)
                         {
                            tag = $html(tags[i]);
-                           desc += '<span class="tag"><a href="#" class="tag-link" rel="' + tag + '" title="' + tags[i] + '">' + tag + '</a></span>';
+                           desc += '<span class="tag"><a href="#" class="tag-link" rel="' + tag + '" title="' + tags[i] + '">' + tag + '</a></span>' + (j - i > 1 ? ", " : "");
                         }
                      }
                      else
@@ -1596,6 +1596,7 @@
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
+            viewUrl:  Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "\" target=\"_blank",
             documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
             folderDetailsUrl: urlContextSite + "/folder-details?nodeRef=" + nodeRef,
             editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
