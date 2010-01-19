@@ -1273,7 +1273,7 @@
       onSearchClick: function ConsoleUsers_onSearchClick(e, args)
       {
          var searchTermElem = Dom.get(this.id + "-search-text");
-         var searchTerm = searchTermElem.value;
+         var searchTerm = YAHOO.lang.trim(searchTermElem.value);
          
          // inform the user if the search term entered is too small
          if (searchTerm.length < this.options.minSearchTermLength)

@@ -653,7 +653,7 @@
             viewMode = parseInt(e.newValue.get("name"), 10);
             this.setViewMode(viewMode);
          }
-         catch(e)
+         catch(ex)
          {
             // Remain in current view mode
          }
@@ -892,7 +892,7 @@
                   };
                }(container.name);
 
-               element.innerHTML = '<a rel="' + container.name + '" href="#" onclick="' + onclick + '"><h4>' + container.name + '</h4>' + '<span>' + container.description + '</span></a>';
+               element.innerHTML = '<a rel="' + container.name + '" href="#"><h4>' + container.name + '</h4>' + '<span>' + container.description + '</span></a>';
                element.onclick = onclick;
                containerPicker.appendChild(element);
             }

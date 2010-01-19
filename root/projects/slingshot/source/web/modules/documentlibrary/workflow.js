@@ -36,7 +36,6 @@
    */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
-      DataSource = YAHOO.util.DataSource,
       KeyListener = YAHOO.util.KeyListener;
 
    /**
@@ -46,7 +45,7 @@
 
    Alfresco.module.DoclibWorkflow = function(htmlId)
    {
-      return Alfresco.module.DoclibWorkflow.superclass.constructor.call(this, "Alfresco.module.DoclibWorkflow", htmlId, ["button", "container", "connection", "json", "calendar"]);
+      return Alfresco.module.DoclibWorkflow.superclass.constructor.call(this, "Alfresco.module.DoclibWorkflow", htmlId, ["button", "container", "connection", "json", "calendar", "datatable"]);
    };
    
    YAHOO.extend(Alfresco.module.DoclibWorkflow, Alfresco.component.Base,
@@ -283,8 +282,8 @@
          };
 
          // Setup a DataSource for the selected people list
-         this.widgets.dataSource = new DataSource([]); 
-         this.widgets.dataSource.responseType = DataSource.TYPE_JSARRAY; 
+         this.widgets.dataSource = new YAHOO.util.DataSource([]); 
+         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
          this.widgets.dataSource.responseSchema =
          { 
             fields: ["userName", "firstName", "lastName"]
@@ -730,5 +729,5 @@
    });
 
    /* Dummy instance to load optional YUI components early */
-   var dummyInstance = new Alfresco.module.DoclibWorkflow(null);
+   var dummyInstance = new Alfresco.module.DoclibWorkflow("null");
 })();

@@ -430,6 +430,17 @@ div.filter
    margin: 0 -10px;
 }
 
+#divDocLibraryDocs .toolbar .nav-bar
+{
+   padding-bottom: 1.9em;
+}
+
+#divDocLibraryDocs .toolbar .breadcrumb .crumb,
+#divDocLibraryDocs .toolbar .breadcrumb a.icon
+{
+   border-color: #fff;
+}
+
 .doclist .documents .detail
 {
    width: 100%;
@@ -465,18 +476,18 @@ div.filter
    width: auto;
 }
 
-.copy-to .container-picker
+.global-folder .container-picker
 {
    margin: 0.5em 0.2em 0px;
 }
 
-.copy-to .path .treeview
+.global-folder .path .treeview
 {
    overflow-x: scroll;
-   width: 16em;
+   width: 32em;
 }
 
-.move-to .path .treeview
+.site-folder .path .treeview
 {
    overflow-x: scroll;
 }

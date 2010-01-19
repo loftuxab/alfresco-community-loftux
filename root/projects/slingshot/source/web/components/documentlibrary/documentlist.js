@@ -1207,6 +1207,13 @@
          {
             Alfresco.logger.debug("DataTable renderEvent");
             
+            // IE6 fix for long filename rendering issue
+            if (YAHOO.env.ua.ie < 7)
+            {
+               var ie6fix = this.widgets.dataTable.getTableEl().parentNode;
+               ie6fix.className = ie6fix.className;
+            }
+            
             if (this.widgets.dataTable.getRecordSet().getLength() === 0)
             {
                this.widgets.dataTable.set("renderLoopSize", 0);
@@ -1441,14 +1448,11 @@
        */
       onFileSelect: function DL_onFileSelect(sType, aArgs, p_obj)
       {
-         var domEvent = aArgs[0];
-         var eventTarget = aArgs[1];
+         var domEvent = aArgs[0],
+            eventTarget = aArgs[1];
 
-         // Get the className of the clicked item
-         var action = Alfresco.util.findEventClass(eventTarget);
-
-         this.selectFiles(action);
-
+         // Select based upon the className of the clicked item
+         this.selectFiles(Alfresco.util.findEventClass(eventTarget));
          Event.preventDefault(domEvent);
       },
 

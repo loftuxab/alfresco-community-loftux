@@ -468,20 +468,21 @@ span.mce_alfresco-imagelibrary
    background-position: center center;
 }
 
-.yui-skin-default .link-menu-button .yui-button.yui-button-hover
+#Share.yui-skin-default .link-menu-button .yui-button.yui-button-hover
 {
    background-color: #FFFFFF;
    border: 1px solid #7BA9CE;
 }
 
-.yui-skin-default .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+#Share.yui-skin-default .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
 {
    border-color: transparent;
+   background-color: transparent;
 }
 
 .yui-skin-default .link-menu-button .yui-button span.first-child,
-.yui-skin-default .link-menu-button .yui-button.yui-menu-button-activeoption span.first-child,
-.yui-skin-default .link-menu-button .yui-button.yui-menu-button-hover span.first-child
+.yui-skin-default .link-menu-button .yui-button.yui-button-activeoption span.first-child,
+.yui-skin-default .link-menu-button .yui-button.yui-button-hover span.first-child
 {
    border-width: 0;
 }

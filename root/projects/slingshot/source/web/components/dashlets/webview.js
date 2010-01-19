@@ -160,6 +160,7 @@
                {
                   fn: function WebView_doSetupForm_callback(form)
                   {
+                     form.addValidation(this.configDialog.id + "-webviewTitle", Alfresco.forms.validation.mandatory, null, "keyup");
                      form.addValidation(this.configDialog.id + "-url", Alfresco.forms.validation.mandatory, null, "blur");
                      form.addValidation(this.configDialog.id + "-url", Alfresco.forms.validation.url, null, "keyup");
                      form.setShowSubmitStateDynamically(true, false);

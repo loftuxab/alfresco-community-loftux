@@ -5,21 +5,7 @@
 .webview .title a.title-link
 {
    background: url("../images/new-window-16.png") no-repeat 100% 0;
-   float: left;
    padding-right: 20px;
-}
-
-.webview .title a.configure
-{
-   float: right;
-   height: 0;
-   left: -8px;
-   position: relative;
-}
-
-.webview .toolbar
-{
-   display: none;
 }
 
 .webview .scrollablePanel
