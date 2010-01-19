@@ -10,7 +10,7 @@
       <div id="${args.htmlid}-tags"></div>
    </div>
    
-   <div class="info-section">
+   <div id="${args.htmlid}-permissionSection" class="info-section hidden">
       <div class="heading">${msg("document-info.permissions")}</div>
       
       <div class="info">

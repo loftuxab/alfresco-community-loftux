@@ -12,8 +12,7 @@
    /**
    * YUI Library aliases
    */
-   var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event;
+   var Dom = YAHOO.util.Dom;
 
    /**
     * CommentList constructor.
@@ -24,34 +23,27 @@
     */
    Alfresco.CommentList = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.CommentList";
-      this.id = htmlId;
+      Alfresco.CommentList.superclass.constructor.call(this, "Alfresco.CommentList", htmlId, ["editor", "paginator"]);
       
       /* Initialise prototype properties */
       this.editData = 
       {
-         editDiv : null,
-         viewDiv : null,
-         row : -1,
-         data : null,
-         widgets : {}
+         editDiv: null,
+         viewDiv: null,
+         row: -1,
+         data: null,
+         widgets: {}
       };
-      this.widgets = {};
+      this.busy = false;
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["event", "editor", "element", "dom", "paginator"], this.onComponentsLoaded, this);
-
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
       YAHOO.Bubbling.on("refreshComments", this.onRefreshComments, this);
+
       return this;
    };
    
-   Alfresco.CommentList.prototype =
+   YAHOO.extend(Alfresco.CommentList, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -118,14 +110,6 @@
       },
       
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: {},
-      
-      /**
        * Object containing data about the currently edited
        * comment.
        */
@@ -143,44 +127,8 @@
        * @type boolean
        * @see _setBusy/_releaseBusy
        */
-      busy: false,
+      busy: null,
 
-      /**
-       * Set multiple initialization options at once.
-       * 
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function CommentList_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
-       */
-      setMessages: function CommentList_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function CommentList_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -196,17 +144,16 @@
             containers: [this.id + "-paginator"],
             rowsPerPage: this.options.pageSize,
             initialPage: 1,
-            template: this._msg("pagination.template"),
-            pageReportTemplate: this._msg("pagination.template.page-report"),
-            previousPageLinkLabel : this._msg("pagination.previousPageLinkLabel"),
-            nextPageLinkLabel     : this._msg("pagination.nextPageLinkLabel")
+            template: this.msg("pagination.template"),
+            pageReportTemplate: this.msg("pagination.template.page-report"),
+            previousPageLinkLabel : this.msg("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel     : this.msg("pagination.nextPageLinkLabel")
          });
          paginator.subscribe('changeRequest', this.onPaginatorChange, this, true);
          paginator.set('recordOffset', 0);
          paginator.set('totalRecords', 0);
          paginator.render();
          this.widgets.paginator = paginator;
-
 
          // Hook action events for the comments
          var fnActionHandlerDiv = function CommentList_fnActionHandlerDiv(layer, args)
@@ -218,13 +165,12 @@
                //var target = args[1].target;
                if (typeof me[action] == "function")
                {
-                  var commentElem = Dom.getAncestorByClassName(owner, 'comment');
-                  var index = parseInt(commentElem.id.substring((me.id + '-comment-view-').length), 10);
+                  var commentElem = Dom.getAncestorByClassName(owner, 'comment'),
+                     index = parseInt(commentElem.id.substring((me.id + '-comment-view-').length), 10);
                   me[action].call(me, index);
                   args[1].stop = true;
                }
             }
-      		 
             return true;
          };
          YAHOO.Bubbling.addDefaultAction("blogcomment-action", fnActionHandlerDiv);
@@ -321,7 +267,7 @@
                fn: this.loadCommentsSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.loadComments.failure")
+            failureMessage: this.msg("message.loadComments.failure")
          });
          
       },
@@ -374,11 +320,10 @@
          this.commentsData = comments;
          
          // inform the create comment component of whether the user can create a comment
-         var eventData =
+         YAHOO.Bubbling.fire("setCanCreateComment",
          {
             canCreateComment: response.json.nodePermissions.create
-         };
-         YAHOO.Bubbling.fire("setCanCreateComment", eventData);
+         });
 
          this._updatePaginator(response.json.startIndex, response.json.total);
       },
@@ -422,11 +367,11 @@
          var me = this;
          Alfresco.util.PopupManager.displayPrompt(
          {
-            title: this._msg("message.confirm.delete.title"),
-            text: this._msg("message.confirm.delete"),
+            title: this.msg("message.confirm.delete.title"),
+            text: this.msg("message.confirm.delete"),
             buttons: [
             {
-               text: this._msg("button.delete"),
+               text: this.msg("button.delete"),
                handler: function CommentList_onDeleteComment_delete()
                {
                   this.destroy();
@@ -434,7 +379,7 @@
                }
             },
             {
-               text: this._msg("button.cancel"),
+               text: this.msg("button.cancel"),
                handler: function CommentList_onDeleteComment_cancel()
                {
                   this.destroy();
@@ -461,7 +406,7 @@
       _deleteComment: function CommentList__deleteComment(row, data)
       {
          // show busy message
-         if (! this._setBusy(this._msg('message.wait')))
+         if (! this._setBusy(this.msg('message.wait')))
          {
             return;
          }
@@ -503,13 +448,13 @@
             url: url,
             method: "DELETE",
             responseContentType : "application/json",
-            successMessage: this._msg("message.delete.success"),
+            successMessage: this.msg("message.delete.success"),
             successCallback:
             {
                fn: success,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure"),
+            failureMessage: this.msg("message.delete.failure"),
             failureCallback:
             {
                fn: failure,
@@ -548,7 +493,7 @@
                   data: data
                }
             },
-            failureMessage: this._msg("message.loadeditform.failure"),
+            failureMessage: this.msg("message.loadeditform.failure"),
             execScripts: true
          });
       },
@@ -625,7 +570,7 @@
 
          // instantiate the simple editor we use for the form
          this.editData.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR, formId + '-content', this.options.editorConfig);
-         this.editData.widgets.editor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.comment"));
+         this.editData.widgets.editor.addPageUnloadBehaviour(this.msg("message.unsavedChanges.comment"));
          this.editData.widgets.editor.render();
 
          // Add validation to the editor
@@ -656,13 +601,13 @@
          commentForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
          commentForm.setAJAXSubmit(true,
          {
-            successMessage: this._msg("message.savecomment.success"),
+            successMessage: this.msg("message.savecomment.success"),
             successCallback:
             {
                fn: this.onEditFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.savecomment.failure"),
+            failureMessage: this.msg("message.savecomment.failure"),
             failureCallback:
             {
                fn: this.onEditFormSubmitFailure,
@@ -759,11 +704,11 @@
          html += '<div class="nodeEdit">';
          if (data.permissions.edit)
          {
-            html += '<div class="onEditComment"><a href="#" class="blogcomment-action">' + this._msg("action.edit") + '</a></div>';
+            html += '<div class="onEditComment"><a href="#" class="blogcomment-action">' + this.msg("action.edit") + '</a></div>';
          }
          if (data.permissions["delete"])
          {
-            html += '<div class="onDeleteComment"><a href="#" class="blogcomment-action">' + this._msg("action.delete") + '</a></div>';
+            html += '<div class="onDeleteComment"><a href="#" class="blogcomment-action">' + this.msg("action.delete") + '</a></div>';
          }
          html += '</div>';
   
@@ -772,10 +717,10 @@
   
          // comment info and content
          html += '<div class="nodeContent"><div class="userLink">' + Alfresco.util.people.generateUserLink(data.author);
-         html += ' ' + this._msg("comment.said") + ':';
+         html += ' ' + this.msg("comment.said") + ':';
          if (data.isUpdated)
          {
-            html += '<span class="theme-color-2 nodeStatus">(' + this._msg("comment.updated") + ')</span>';
+            html += '<span class="theme-color-2 nodeStatus">(' + this.msg("comment.updated") + ')</span>';
          }
          html += '</div>';
          html += '<div class="content yuieditor">' + data.content + '</div>';
@@ -784,7 +729,7 @@
          // footer
          html += '<div class="commentFooter">';
          html += '<span class="nodeFooterBlock">';
-         html += '<span class="nodeAttrLabel">' + this._msg("comment.postedOn") + ': ';
+         html += '<span class="nodeAttrLabel">' + this.msg("comment.postedOn") + ': ';
          html += Alfresco.util.formatDate(data.createdOn);
          html += '</span></span></div>';
          
@@ -879,19 +824,6 @@
          {
             return false;
          }
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function CommentList__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.CommentList", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();

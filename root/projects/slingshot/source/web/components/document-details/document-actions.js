@@ -141,7 +141,10 @@
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef
+            documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
+            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
+            workingCopyUrl: urlContextSite + "/document-details?nodeRef=" + (this.assetData.custom.workingCopyNode || nodeRef),
+            originalUrl: urlContextSite + "/document-details?nodeRef=" + (this.assetData.custom.workingCopyOriginal || nodeRef)
          });
       },
        
@@ -159,24 +162,21 @@
          this.doclistMetadata = args[1].metadata;
          this.currentPath = this.assetData.location.path;
          
-         /**
-          * Copy template into active area
-          */
+         // Copy template into active area
          var actionsContainer = Dom.get(this.id + "-actionSet"),
             actionSet = this.assetData.actionSet,
-            clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
+            clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true),
+            downloadUrl = Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
+            displayName = this.assetData.displayName;
 
+         // Token replacement
+         clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls());
+
+         // Replace existing actions and assign correct class for icon rendering
          actionsContainer.innerHTML = clone.innerHTML;
          Dom.addClass(actionsContainer, this.assetData.type);
          
-         /**
-          * Token replacement
-          */
-         actionsContainer.innerHTML = YAHOO.lang.substitute(window.unescape(actionsContainer.innerHTML), this.getActionUrls());
-         
-         /**
-          * Hide actions which have been disallowed through permissions
-          */
+         // Hide actions which have been disallowed through permissions
          if (this.assetData.permissions && this.assetData.permissions.userAccess)
          {
             var userAccess = this.assetData.permissions.userAccess,
@@ -224,6 +224,214 @@
          
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
+         
+         // Prompt auto-download (after Edit Offline action)?
+         if (window.location.hash == "#editOffline")
+         {
+            window.location.hash = "";
+
+            if (YAHOO.env.ua.ie > 6)
+            {
+               // MSIE7 blocks the download and gets the wrong URL in the "manual download bar"
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  title: this.msg("message.edit-offline.success", displayName),
+                  text: this.msg("message.edit-offline.success.ie7"),
+                  buttons: [
+                  {
+                     text: this.msg("button.download"),
+                     handler: function DocumentActions_oAEO_success_download()
+                     {
+                        window.location = downloadUrl;
+                        this.destroy();
+                     },
+                     isDefault: true
+                  },
+                  {
+                     text: this.msg("button.close"),
+                     handler: function DocumentActions_oAEO_success_close()
+                     {
+                        this.destroy();
+                     }
+                  }]
+               });
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this.msg("message.edit-offline.success", displayName)
+               });
+               // Kick off the download 3 seconds after the confirmation message
+               YAHOO.lang.later(3000, this, function()
+               {
+                  window.location = downloadUrl;
+               });
+            }
+         }
+         
+         if (window.location.hash == "#editCancelled")
+         {
+            window.location.hash = "";
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.edit-cancel.success", displayName)
+            });
+         }
+      },
+
+      /**
+       * Edit Offline.
+       *
+       * @override
+       * @method onActionEditOffline
+       * @param asset {object} Object literal representing file or folder to be actioned
+       */
+      onActionEditOffline: function DocumentActions_onActionEditOffline(asset)
+      {
+         var path = asset.location.path,
+            fileName = asset.fileName,
+            displayName = asset.displayName;
+
+         var me = this;
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: function DocumentActions_oAEO_success(data)
+                  {
+                     this.assetData.nodeRef = data.json.results[0].nodeRef;
+                     window.location = this.getActionUrls().documentDetailsUrl + "#editOffline";
+                  },
+                  scope: this
+               }
+            },
+            failure:
+            {
+               message: this.msg("message.edit-offline.failure", displayName)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "checkout/site/{site}/{container}{filepath}",
+               params:
+               {
+                  site: this.options.siteId,
+                  container: this.options.containerId,
+                  filepath: $combine(Alfresco.util.encodeURIPath(path), encodeURIComponent(fileName))
+               }
+            }
+         });
+      },
+
+      /**
+       * Cancel editing.
+       *
+       * @override
+       * @method onActionCancelEditing
+       * @param asset {object} Object literal representing file or folder to be actioned
+       */
+      onActionCancelEditing: function DocumentActions_onActionCancelEditing(asset)
+      {
+         var displayName = asset.displayName,
+            nodeRef = asset.nodeRef;
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: function DocumentActions_oACE_success(data)
+                  {
+                     this.assetData.nodeRef = data.json.results[0].nodeRef;
+                     window.location = this.getActionUrls().documentDetailsUrl + "#editCancelled";
+                  },
+                  scope: this
+               }
+            },
+            failure:
+            {
+               message: this.msg("message.edit-cancel.failure", displayName)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "cancel-checkout/node/{nodeRef}",
+               params:
+               {
+                  nodeRef: nodeRef.replace(":/", "")
+               }
+            }
+         });
+      },
+
+      /**
+       * Upload new version.
+       *
+       * @override
+       * @method onActionUploadNewVersion
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionUploadNewVersion: function DocumentActions_onActionUploadNewVersion(assets)
+      {
+         var displayName = assets.displayName,
+            nodeRef = assets.nodeRef,
+            version = assets.version;
+
+         if (!this.fileUpload)
+         {
+            this.fileUpload = Alfresco.getFileUploadInstance();
+         }
+
+         // Show uploader for multiple files
+         var description = this.msg("label.filter-description", displayName),
+            extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
+         
+         if (assets.custom && assets.custom.workingCopyVersion)
+         {
+            version = assets.custom.workingCopyVersion;
+         }
+         
+         var singleUpdateConfig =
+         {
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            updateNodeRef: nodeRef,
+            updateFilename: displayName,
+            updateVersion: version,
+            suppressRefreshEvent: true,
+            overwrite: true,
+            filter: [
+            {
+               description: description,
+               extensions: extensions
+            }],
+            mode: this.fileUpload.MODE_SINGLE_UPDATE,
+            onFileUploadComplete:
+            {
+               fn: this.onNewVersionUploadCompleteCustom,
+               scope: this
+            }
+         };
+         this.fileUpload.show(singleUpdateConfig);
+      },
+
+      /**
+       * Called from the uploader component after a the new version has been uploaded.
+       *
+       * @method onNewVersionUploadCompleteCustom
+       * @param complete {object} Object literal containing details of successful and failed uploads
+       */
+      onNewVersionUploadCompleteCustom: function DocumentActions_onNewVersionUploadCompleteCustom(complete)
+      {
+         // Call the normal callback to post the activity data
+         this.onNewVersionUploadComplete.call(this, complete);
+         this.assetData.nodeRef = complete.successful[0].nodeRef;
+         window.location = this.getActionUrls().documentDetailsUrl;
       },
       
       /**

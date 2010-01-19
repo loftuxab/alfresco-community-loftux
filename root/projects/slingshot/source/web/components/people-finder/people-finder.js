@@ -126,9 +126,9 @@
           * 
           * @property minSearchTermLength
           * @type int
-          * @default 3
+          * @default 1
           */
-         minSearchTermLength: 3,
+         minSearchTermLength: 1,
          
          /**
           * Maximum number of items to display in the results list
@@ -546,7 +546,7 @@
       onSearchClick: function PeopleFinder_onSearchClick(e, p_obj)
       {
          var searchTerm = Dom.get(this.id + "-search-text").value;
-         if (searchTerm.length < this.options.minSearchTermLength)
+         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
             {

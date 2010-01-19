@@ -30,7 +30,7 @@ function main()
       items = [],
       assets;
 
-   // Is our thumbnail tpe registered?
+   // Is our thumbnail type registered?
    var haveThumbnails = thumbnailService.isThumbnailNameRegistered(THUMBNAIL_NAME);
 
    // Use helper function to get the arguments
@@ -41,7 +41,7 @@ function main()
    }
 
    // "node" Type implies single nodeRef requested
-   if (parsedArgs.type === "node")
+   if (!filter && parsedArgs.type === "node")
    {
       filter = "node";
    }

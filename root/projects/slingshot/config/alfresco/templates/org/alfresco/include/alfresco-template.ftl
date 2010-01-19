@@ -84,6 +84,9 @@
    <script type="text/javascript" src="${url.context}/yui/selector/selector-debug.js"></script>
 <!-- YUI Patches -->
    <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
+   <script type="text/javascript">//<![CDATA[
+      YAHOO.util.Event.throwErrors = true;
+   //]]></script>
 <#else>
 <!-- Common YUI components: RELEASE concatenated -->
    <script type="text/javascript" src="${url.context}/js/yui-common.js"></script>

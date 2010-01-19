@@ -52,13 +52,13 @@
 
       /* Decoupled event listeners are added in setOptions */
       YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
+      YAHOO.Bubbling.on("recalculatePreviewLayout", this.onRecalculatePreviewLayout, this);
 
       return this;
    };
 
    YAHOO.extend(Alfresco.WebPreview, Alfresco.component.Base,
    {
-
       /**
        * Object container for initialization options
        *
@@ -131,19 +131,19 @@
           */
          YAHOO.deconcept.SWFObject.prototype.getVariablePairs = function()
          {
-       		var variablePairs = [],
-       		   key,
-       		   variables = this.getVariables();
-       		
-       		for (key in variables)
-       		{
-       			if (variables.hasOwnProperty(key))
-       			{
-       				variablePairs[variablePairs.length] = key + "=" + encodeURIComponent(variables[key]);
-       			}
-       		}
-       		return variablePairs;
-       	};
+             var variablePairs = [],
+                key,
+                variables = this.getVariables();
+             
+             for (key in variables)
+             {
+                if (variables.hasOwnProperty(key))
+                {
+                   variablePairs[variablePairs.length] = key + "=" + encodeURIComponent(variables[key]);
+                }
+             }
+             return variablePairs;
+          };
          
          Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -175,9 +175,9 @@
             refresh = false;
 
          // Name
-         if (this.options.name != documentDetails.displayName)
+         if (this.options.name != documentDetails.fileName)
          {
-            this.options.name = documentDetails.displayName;
+            this.options.name = documentDetails.fileName;
             refresh = true;
          }
 
@@ -199,6 +199,23 @@
          if (refresh)
          {
             this._setupWebPreview();
+         }
+      },
+
+      /**
+       * Because the WebPreview content is absolutely positioned, components which alter DOM layout can fire
+       * this event to prompt a recalculation of the absolute coordinates.
+       *
+       * @method onRecalculatePreviewLayout
+       * @param p_layer The type of the event
+       * @param p_args Event information
+       */
+      onRecalculatePreviewLayout: function WP_onRecalculatePreviewLayout(p_layer, p_args)
+      {
+         // Only if not in maximize view
+         if (this.widgets.realSwfDivEl.getStyle("height") !== "100%")
+         {
+            this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
          }
       },
 
@@ -299,7 +316,7 @@
                Event.addListener(swfId, "mouseover", function(e)
                {
                   var swf = Dom.get(swfId);
-                  if(swf && YAHOO.lang.isFunction(swf.setMode))
+                  if (swf && YAHOO.lang.isFunction(swf.setMode))
                   {
                      Dom.get(swfId).setMode("active");
                   }
@@ -307,10 +324,16 @@
                Event.addListener(swfId, "mouseout", function(e)
                {
                   var swf = Dom.get(swfId);
-                  if(swf && YAHOO.lang.isFunction(swf.setMode))
+                  if (swf && YAHOO.lang.isFunction(swf.setMode))
                   {
                      Dom.get(swfId).setMode("inactive");
                   }
+               });
+
+               // Page unload / unsaved changes behaviour
+               Event.addListener(window, "resize", function(e)
+               {
+                  YAHOO.Bubbling.fire("recalculatePreviewLayout");
                });
             }
             else
@@ -392,9 +415,9 @@
        */
       onWebPreviewerLogging: function WP_onWebPreviewerLogging(msg, level)
       {
-         if(YAHOO.lang.isFunction(Alfresco.logger[level]))
+         if (YAHOO.lang.isFunction(Alfresco.logger[level]))
          {
-            Alfresco.logger[level].call(Alfresco.logger, "WebPreviewer: " + msg)
+            Alfresco.logger[level].call(Alfresco.logger, "WebPreviewer: " + msg);
          }
       },
 

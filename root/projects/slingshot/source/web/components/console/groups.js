@@ -367,16 +367,16 @@
             var query = YAHOO.lang.trim(Dom.get(parent.id + "-search-text").value);
 
             // inform the user if the search term entered is too small
-            if (query.replace(/\*/g, "").length < parent.options.minqueryLength)
+            if (query.replace(/\*/g, "").length < parent.options.minSearchTermLength)
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: parent._msg("message.minimum-length", parent.options.minqueryLength)
+                  text: parent._msg("message.minimum-length", parent.options.minSearchTermLength)
                });
                return;
             }
 
-            parent.refreshUIState({"query": "*" + query});
+            parent.refreshUIState({"query": query});
          },
 
          /**
@@ -573,8 +573,7 @@
             this.modules.searchPeopleFinder.setOptions(
             {
                singleSelectMode: true,
-               showSelf: true,
-               minSearchTermLength: 3
+               showSelf: true
             });
 
             // Make sure we listen for events when the user selects a person
@@ -603,8 +602,7 @@
             // Set the correct options for our use
             this.modules.searchGroupFinder.setOptions(
             {
-               singleSelectMode: true,
-               minSearchTermLength: 3
+               singleSelectMode: true
             });
 
             // Make sure we listen for events when the user selects a group
@@ -756,7 +754,7 @@
          doSearch: function ConsoleGroups_SearchPanelHandler_doSearch()
          {
             // check search length again as we may have got here via history navigation
-            if (parent.query && parent.query.length >= parent.options.minqueryLength)
+            if (parent.query && parent.query.length >= parent.options.minSearchTermLength)
             {
                var me = this;
 
@@ -1229,7 +1227,7 @@
           */
          _buildSearchParams: function ConsoleGroups_SearchPanelHandler__buildSearchParams(query)
          {
-            return "shortNameFilter=" + encodeURIComponent(query);
+            return "shortNameFilter=*" + encodeURIComponent(query);
          },
 
          /**
@@ -1926,11 +1924,11 @@
          /**
           * Number of characters required for a search.
           *
-          * @property minqueryLength
+          * @property minSearchTermLength
           * @type int
-          * @default 3
+          * @default 1
           */
-         minqueryLength: 3,
+         minSearchTermLength: 1,
 
          /**
           * Maximum number of items to display in the results list

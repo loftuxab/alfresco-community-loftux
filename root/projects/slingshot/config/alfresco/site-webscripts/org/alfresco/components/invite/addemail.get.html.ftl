@@ -1,4 +1,4 @@
-
+<#if allowEmailInvite>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.AddEmailInvite("${args.htmlid}").setOptions(
    {
@@ -30,3 +30,4 @@
       </table>
    </div>
 </div>
+</#if>

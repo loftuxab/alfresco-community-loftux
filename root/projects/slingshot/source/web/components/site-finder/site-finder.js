@@ -77,14 +77,23 @@
       options:
       {
          /**
-          * Maximum number of results displayed.
-          * 
-          * @property maxResults
+          * Number of characters required for a search.
+          *
+          * @property minSearchTermLength
+          * @type int
+          * @default 0
+          */
+         minSearchTermLength: 0,
+
+         /**
+          * Maximum number of items to display in the results list
+          *
+          * @property maxSearchResults
           * @type int
           * @default 100
           */
-         maxResults: 100,
-         
+         maxSearchResults: 100,
+
          /**
           * The userid of the current user
           * 
@@ -612,7 +621,18 @@
        */
       doSearch: function SiteFinder_doSearch()
       {
-         this.searchTerm = Dom.get(this.id + "-term").value;
+         this.searchTerm = YAHOO.lang.trim(Dom.get(this.id + "-term").value);
+
+         // inform the user if the search term entered is too small
+         if (this.searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: parent._msg("message.minimum-length", this.options.minSearchTermLength)
+            });
+            return;
+         }
+
          this._performSearch(this.searchTerm);
       },
       
@@ -1033,7 +1053,7 @@
       {
          var params = YAHOO.lang.substitute("size={maxResults}&nf={term}",
          {
-            maxResults : this.options.maxResults,
+            maxResults : this.options.maxSearchResults,
             term : encodeURIComponent(searchTerm)
          });
 

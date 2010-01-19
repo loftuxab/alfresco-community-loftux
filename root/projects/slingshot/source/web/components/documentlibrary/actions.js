@@ -187,7 +187,8 @@
       onActionUploadNewVersion: function dlA_onActionUploadNewVersion(assets)
       {
          var displayName = assets.displayName,
-            nodeRef = assets.nodeRef;
+            nodeRef = assets.nodeRef,
+            version = assets.version;
 
          if (!this.fileUpload)
          {
@@ -198,12 +199,18 @@
          var description = this.msg("label.filter-description", displayName),
             extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
          
+         if (assets.custom && assets.custom.workingCopyVersion)
+         {
+            version = assets.custom.workingCopyVersion;
+         }
+         
          var singleUpdateConfig =
          {
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             updateNodeRef: nodeRef,
             updateFilename: displayName,
+            updateVersion: version,
             overwrite: true,
             filter: [
             {

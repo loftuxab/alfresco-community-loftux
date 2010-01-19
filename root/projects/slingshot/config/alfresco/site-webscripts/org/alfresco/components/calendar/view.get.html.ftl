@@ -221,7 +221,8 @@
 <!-- agenda -->
 <h2 id="calTitle"></h2>
 <div id="${args.htmlid}Container" class="alf-calendar agendaview">
-    <!-- hit repo to get this list of events -->
+    <div id="${args.htmlid}View">
+    </div>
 </div>
 </#if>
 

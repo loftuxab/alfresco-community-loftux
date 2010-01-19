@@ -2,8 +2,8 @@
    new Alfresco.PeopleFinder("${args.htmlid}").setOptions(
    {
       siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>",
-      minSearchTermLength: "${args.minSearchTermLength!'3'}",
-      maxSearchResults: "${args.maxSearchResults!'100'}",
+      minSearchTermLength: "${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}",
+      maxSearchResults: "${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}",
       setFocus: ${args.setFocus!'false'},
       addButtonSuffix: "${args.addButtonSuffix!''}",
       dataWebScript: "${(args.dataWebScript!'api/people')?replace("[", "{")?replace("]", "}")}"

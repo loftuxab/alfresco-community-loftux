@@ -126,19 +126,34 @@
       {
          if (response.json !== undefined)
          {
-            var documentDetails = response.json.items[0];
+            var documentDetails = response.json.items[0],
+               commentNode = documentDetails.nodeRef,
+               workingCopyMode = false;
             
+            /**
+             * If we're viewing a working copy, then:
+             *  (a) set "working copy" flag to allow some components to stay hidden/hide themselves
+             *  (b) show (read-only) comments from the source instead
+             */
+            if (documentDetails.custom.isWorkingCopy)
+            {
+               workingCopyMode = true;
+               // Show orignal's comments (read-only)
+               // commentNode = documentDetails.custom.workingCopyOriginal;
+            }
+
             // Fire event to inform any listening components that the data is ready
             YAHOO.Bubbling.fire("documentDetailsAvailable",
             {
                documentDetails: documentDetails,
-               metadata: response.json.metadata
+               metadata: response.json.metadata,
+               workingCopyMode: workingCopyMode
             });
             
             // Fire event to show comments for document
             YAHOO.Bubbling.fire("setCommentedNode",
             { 
-               nodeRef: documentDetails.nodeRef,
+               nodeRef: commentNode,
                title: documentDetails.displayName,
                page: "document-details",
                pageParams:

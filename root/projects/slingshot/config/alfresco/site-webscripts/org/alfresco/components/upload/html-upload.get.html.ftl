@@ -33,7 +33,7 @@
                   <label for="${args.htmlid}-contentType-select">${msg("label.contentType")}</label>
                </div>
                <div class="yui-u">
-                  <select id="${args.htmlid}-contentType-select" name="contentType">
+                  <select id="${args.htmlid}-contentType-select" name="contentType" tabindex="0">
                      <#if (contentTypes?size > 0)>
                         <#list contentTypes as contentType>
                            <option value="${contentType.id}">${msg(contentType.value)}</option>
@@ -47,7 +47,7 @@
                   <label for="${args.htmlid}-filedata-file">${msg("label.file")}</label>
                </div>
                <div class="yui-u">
-                  <input type="file" id="${args.htmlid}-filedata-file" name="filedata" />
+                  <input type="file" id="${args.htmlid}-filedata-file" name="filedata" tabindex="0" />
                </div>
             </div>
          </div>
@@ -58,17 +58,19 @@
             </div>
             <div class="yui-gd">
                <div class="yui-u first">
-                  <label for="${args.htmlid}-minorVersion-radioButton">${msg("label.version")}</label>
+                  <span>${msg("label.version")}</span>
                </div> 
                <div class="yui-u">
-                  <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" value="false" /> ${msg("label.minorVersion")}
+                  <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" value="false" tabindex="0" />
+                  <label for="${args.htmlid}-minorVersion-radioButton" id="${args.htmlid}-minorVersion">${msg("label.minorVersion")}</label>
                </div>
             </div>
             <div class="yui-gd">
                <div class="yui-u first">&nbsp;
                </div>
                <div class="yui-u">
-                  <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion" value="true" /> ${msg("label.majorVersion")}
+                  <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion" value="true" tabindex="0" />
+                  <label for="${args.htmlid}-majorVersion-radioButton" id="${args.htmlid}-majorVersion">${msg("label.majorVersion")}</label>
                </div>
             </div>
             <div class="yui-gd">
@@ -76,14 +78,14 @@
                   <label for="${args.htmlid}-description-textarea">${msg("label.comments")}</label>
                </div>
                <div class="yui-u">
-                  <textarea id="${args.htmlid}-description-textarea" name="description" cols="80" rows="4"></textarea>
+                  <textarea id="${args.htmlid}-description-textarea" name="description" cols="80" rows="4" tabindex="0"></textarea>
                </div>
             </div>
          </div>
 
          <div class="bdft">
-            <input id="${args.htmlid}-upload-button" type="button" value="${msg("button.upload")}" />
-            <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.cancel")}" />
+            <input id="${args.htmlid}-upload-button" type="button" value="${msg("button.upload")}" tabindex="0" />
+            <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.cancel")}" tabindex="0" />
          </div>
 
          </fieldset>

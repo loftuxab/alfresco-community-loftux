@@ -16,7 +16,7 @@ new Alfresco.DocumentVersions("${args.htmlid}").setOptions(
 );
 //]]></script>
 
-<div id="${args.htmlid}-body" class="document-versions">
+<div id="${args.htmlid}-body" class="document-versions hidden">
 
    <div class="info-section">
 

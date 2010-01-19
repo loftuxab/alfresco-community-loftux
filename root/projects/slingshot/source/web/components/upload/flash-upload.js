@@ -83,13 +83,15 @@
          uploadDirectory: null,
          updateNodeRef: null,
          updateFilename: null,
+         updateVersion: "1.0",
          mode: this.MODE_SINGLE_UPLOAD,
          filter: [],
          onFileUploadComplete: null,
          overwrite: false,
          thumbnails: null,
          uploadURL: null,
-         username: null
+         username: null,
+         suppressRefreshEvent: false
       };
       this.suppliedConfig = {};
       this.showConfig = {};
@@ -578,6 +580,7 @@
          this.minorVersion.checked = true;
          this.widgets.uploadButton.set("label", this.msg("button.upload"));
          this.widgets.uploadButton.set("disabled", true);
+         Dom.removeClass(this.id + "-upload-button", "hidden");
          this.widgets.cancelOkButton.set("label", this.msg("button.cancel"));
          this.widgets.cancelOkButton.set("disabled", false);
       },
@@ -922,11 +925,14 @@
                });
             }
 
-            // Tell the document list to refresh itself if present
-            YAHOO.Bubbling.fire("metadataRefresh",
+            if (!this.showConfig.suppressRefreshEvent)
             {
-               currentPath: this.showConfig.path
-            });
+               // Tell the document list to refresh itself if present
+               YAHOO.Bubbling.fire("metadataRefresh",
+               {
+                  currentPath: this.showConfig.path
+               });
+            }
          }
          else if (this.state === this.STATE_FINISHED)
          {
@@ -942,20 +948,23 @@
                   break;
                }
             }
-            if (fileName)
+            if (!this.showConfig.suppressRefreshEvent)
             {
-               YAHOO.Bubbling.fire("metadataRefresh",
+               if (fileName)
                {
-                  currentPath: this.showConfig.path,
-                  highlightFile: fileName
-               });
-            }
-            else
-            {
-               YAHOO.Bubbling.fire("metadataRefresh",
+                  YAHOO.Bubbling.fire("metadataRefresh",
+                  {
+                     currentPath: this.showConfig.path,
+                     highlightFile: fileName
+                  });
+               }
+               else
                {
-                  currentPath: this.showConfig.path
-               });
+                  YAHOO.Bubbling.fire("metadataRefresh",
+                  {
+                     currentPath: this.showConfig.path
+                  });
+               }
             }
          }
 
@@ -1036,17 +1045,16 @@
 
             // Display the version input form
             Dom.removeClass(this.versionSection, "hidden");
-            Dom.get(this.id + "-minorVersion-radioButton").disabled = false;
-            Dom.get(this.id + "-majorVersion-radioButton").disabled = false;
-            Dom.get(this.id + "-description-textarea").disabled = false;
+            var versions = (this.showConfig.updateVersion || "1.0").split("."),
+               majorVersion = parseInt(versions[0], 10),
+               minorVersion = parseInt(versions[1], 10);
+            Dom.get(this.id + "-minorVersion").innerHTML = this.msg("label.minorVersion.more", majorVersion + "." + (1 + minorVersion));
+            Dom.get(this.id + "-majorVersion").innerHTML = this.msg("label.majorVersion.more", (1 + majorVersion) + ".0");
          }
          else
          {
             // Hide the version input form
             Dom.addClass(this.versionSection, "hidden");
-            Dom.get(this.id + "-minorVersion-radioButton").disabled = true;
-            Dom.get(this.id + "-majorVersion-radioButton").disabled = true;
-            Dom.get(this.id + "-description-textarea").disabled = true;
          }
 
          if (this.showConfig.mode === this.MODE_MULTI_UPLOAD)
@@ -1435,6 +1443,7 @@
          this.widgets.cancelOkButton.set("label", this.msg("button.ok"));
          this.widgets.cancelOkButton.focus();
          this.widgets.uploadButton.set("disabled", true);
+         Dom.addClass(this.id + "-upload-button", "hidden");
          
          var callback = this.showConfig.onFileUploadComplete;
          if (callback && typeof callback.fn == "function")

@@ -67,7 +67,8 @@
        */
       onDocumentDetailsAvailable: function DocumentInfo_onDocumentDetailsAvailable(layer, args)
       {
-         var docData = args[1].documentDetails;
+         var docData = args[1].documentDetails,
+            workingCopyMode = args[1].workingCopyMode || false;
          
          // render tags values
          var tags = docData.tags,
@@ -96,11 +97,18 @@
             consumerPerms = noPerms,
             everyonePerms = noPerms;
          
-         var rawPerms = docData.permissions.roles;
+         if (!workingCopyMode)
+         {
+            Dom.removeClass(this.id + "-permissionSection", "hidden");
+         }
+         
+         var rawPerms = docData.permissions.roles,
+            permParts, group;
+         
          for (i = 0, ii = rawPerms.length; i < ii; i++)
          {
-            var permParts = rawPerms[i].split(";");
-            var group = permParts[1];
+            permParts = rawPerms[i].split(";");
+            group = permParts[1];
             if (group.indexOf("_SiteManager") != -1)
             {
                managerPerms = Alfresco.util.message("document-info.role." + permParts[2], this.name);

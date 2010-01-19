@@ -88,6 +88,24 @@
          siteId: "",
 
          /**
+          * Number of characters required for a search.
+          *
+          * @property minSearchTermLength
+          * @type int
+          * @default 0
+          */
+         minSearchTermLength: 0,
+
+         /**
+          * Maximum number of search results displayed.
+          *
+          * @property maxSearchResults
+          * @type int
+          * @default 100
+          */
+         maxSearchResults: 100,
+
+         /**
           * Whether to set UI focus to this component or not
           * 
           * @property setFocus
@@ -597,10 +615,15 @@
        */
       onSearchClick: function SentInvites_onSearchClick(e, p_obj)
       {
-         // fetch the firstname, lastname nad email
-         var searchTermElem = Dom.get(this.id + "-search-text");
-         var searchTerm = searchTermElem.value;
-         searchTerm = $html(searchTerm);
+         var searchTerm = YAHOO.lang.trim(Dom.get(this.id + "-search-text").value);
+         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+            });
+            return;
+         }
          
          this._performSearch(searchTerm);
       },

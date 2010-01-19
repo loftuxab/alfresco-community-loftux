@@ -8,7 +8,9 @@
       siteId: "${page.url.templateArgs.site!""}",
       siteTitle: "${siteTitle?js_string}",
       searchType: "${page.url.templateArgs.site!'all'}", // default search scope
-      favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>}
+      favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>},
+      minSearchTermLength: "${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}",
+      maxSearchResults: "${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}"      
    }).setMessages(
       ${messages}
    );
@@ -75,7 +77,7 @@
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
             </li>
             </#list>
-         </#if>
+         <#else><li></li></#if>
          </ul>
          <#assign addFavDisplay><#if (page.url.templateArgs.site?? && !currentSiteIsFav)>block<#else>none</#if></#assign>
          <ul id="${args.htmlid}-addFavourite" class="add-favourite-menuitem separator" style="display: ${addFavDisplay}">

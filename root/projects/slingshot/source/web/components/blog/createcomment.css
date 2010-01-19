@@ -1,9 +1,8 @@
 .addCommentForm
 {
-   margin: 20px;
-   padding: 20px;
-   border-top: 1px solid #b1b1b1;
    background-color: #fafafa;
+   border-top: 1px solid #b1b1b1;
+   padding: 20px;
 }
 
 .commentFormTitle

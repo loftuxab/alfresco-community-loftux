@@ -117,9 +117,9 @@
           * 
           * @property minSearchTermLength
           * @type number
-          * @default 3
+          * @default 1
           */
-         minSearchTermLength: 3,
+         minSearchTermLength: 1,
          
          /**
           * Maximum number of items to display in the results list

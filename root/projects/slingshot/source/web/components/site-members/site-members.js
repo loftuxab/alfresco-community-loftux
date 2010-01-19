@@ -97,9 +97,9 @@
           * 
           * @property minSearchTermLength
           * @type int
-          * @default 3
+          * @default 0
           */
-         minSearchTermLength: 3,
+         minSearchTermLength: 0,
          
          /**
           * Maximum number of search results displayed.
@@ -611,8 +611,8 @@
        */
       onSearch: function SiteMembers_onSearch()
       {
-         var searchTerm = $html(Dom.get(this.id + "-term").value);
-         if (searchTerm.length < this.options.minSearchTermLength)
+         var searchTerm = YAHOO.lang.trim(Dom.get(this.id + "-term").value);
+         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
