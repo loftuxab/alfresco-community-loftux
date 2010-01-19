@@ -1,8 +1,8 @@
 <#import "../import/alfresco-common.ftl" as common />
 
 <#-- Global flags retrieved from web-framework-config-application -->
-<#assign DEBUG=(config.global.flags.childrenMap["client-debug"][0].value = "true")>
-<#assign AUTOLOGGING=(config.global.flags.childrenMap["client-debug-autologging"][0].value = "true")>
+<#assign DEBUG=(common.globalConfig("client-debug", "false") = "true")>
+<#assign AUTOLOGGING=(common.globalConfig("client-debug-autologging", "false") = "true")>
 <#-- allow theme to be specified in url args - helps debugging themes -->
 <#assign theme = (page.url.args.theme)!theme />
 
@@ -65,7 +65,6 @@
    </#if>
 <#-- Selected components preloaded here for better UI experience. -->
 <#if DEBUG>
-<!-- log4javascript -->
    <script type="text/javascript" src="${url.context}/js/log4javascript.v1.4.1.js"></script>
 <!-- Common YUI components: DEBUG -->
    <script type="text/javascript" src="${url.context}/yui/yahoo/yahoo-debug.js"></script>
@@ -83,17 +82,12 @@
    <script type="text/javascript" src="${url.context}/yui/menu/menu-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/json/json-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/selector/selector-debug.js"></script>
-<#else>
-<!-- Common YUI components: RELEASE -->
-   <script type="text/javascript" src="${url.context}/yui/utilities/utilities.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/button/button-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/container/container-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/menu/menu-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/json/json-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/selector/selector-min.js"></script>
-</#if>
 <!-- YUI Patches -->
    <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
+<#else>
+<!-- Common YUI components: RELEASE concatenated -->
+   <script type="text/javascript" src="${url.context}/js/yui-common.js"></script>
+</#if>
 
 <!-- Site-wide Common Assets -->
    <@link rel="stylesheet" type="text/css" href="${url.context}/css/base.css" />

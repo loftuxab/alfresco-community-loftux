@@ -34,11 +34,11 @@
             <div id="${args.htmlid}-fileSelect-menu" class="yuimenu">
                <div class="bd">
                   <ul>
-                     <li><span><span class="selectDocuments">${msg("menu.select.documents")}</span></span></li>
-                     <li><span><span class="selectFolders">${msg("menu.select.folders")}</span></span></li>
-                     <li><span><span class="selectAll">${msg("menu.select.all")}</span></span></li>
-                     <li><span><span class="selectInvert">${msg("menu.select.invert")}</span></span></li>
-                     <li><span><span class="selectNone">${msg("menu.select.none")}</span></span></li>
+                     <li><a href="#"><span class="selectDocuments">${msg("menu.select.documents")}</span></a></li>
+                     <li><a href="#"><span class="selectFolders">${msg("menu.select.folders")}</span></a></li>
+                     <li><a href="#"><span class="selectAll">${msg("menu.select.all")}</span></a></li>
+                     <li><a href="#"><span class="selectInvert">${msg("menu.select.invert")}</span></a></li>
+                     <li><a href="#"><span class="selectNone">${msg("menu.select.none")}</span></a></li>
                   </ul>
                </div>
             </div>

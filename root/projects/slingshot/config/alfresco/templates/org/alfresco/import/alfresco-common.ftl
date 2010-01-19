@@ -15,3 +15,11 @@
       Alfresco.constants.HTML_EDITOR = '${htmlEditor}';
    //]]></script>
 </#macro>
+
+<#function globalConfig key default>
+   <#assign values = config.global.flags.childrenMap[key]>
+   <#if values?? && values?is_sequence>
+      <#return values[0].value>
+   </#if>
+   <#return default>
+</#function>
