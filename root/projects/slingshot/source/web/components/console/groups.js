@@ -102,6 +102,14 @@
          _visible: false,
 
          /**
+          * Keeps track if this panel is searching or not
+          *
+          * @property isSearching
+          * @type Boolean
+          */
+         isSearching: false,
+
+         /**
           * When the Add User dialog or the Add Group dialog is shown this variable keeps track
           * of which group the selected user or group should be added to.
           *
@@ -126,6 +134,7 @@
             // Search Button
             var searchButton = new YAHOO.widget.Button(parent.id + "-search-button", {});
             searchButton.on("click", this.onSearchClick, searchButton, this);
+            this.widgets.searchButton = searchButton;
 
             // ColumnBrowser
             this.widgets.columnbrowser = new YAHOO.extension.ColumnBrowser(parent.id + "-columnbrowser",
@@ -300,19 +309,19 @@
           */
          onUpdate: function ConsoleGroups_SearchPanelHandler_onUpdate()
          {
-            if (this.firstView || parent.query)
+            if (this.firstView || parent.query !== undefined)
             {
                /**
                 * The search panel shall only be displayed if a query exists OR
                 * when the page is initially loaded
-                */                
+                */
                this.firstView = false;
 
                // Lets display the search list since the state indicates a query has been used
                Dom.addClass(parent.id + "-browse-panel", "hidden");
                Dom.removeClass(parent.id + "-search-panel", "hidden");
                
-               if (parent.query)
+               if (parent.query !== undefined)
                {
                   // update the text field - as this event could come from bookmark, navigation or a search button click
                   var queryElem = Dom.get(parent.id + "-search-text");
@@ -754,7 +763,7 @@
          doSearch: function ConsoleGroups_SearchPanelHandler_doSearch()
          {
             // check search length again as we may have got here via history navigation
-            if (parent.query && parent.query.length >= parent.options.minSearchTermLength)
+            if (parent.query !== undefined && parent.query.length >= parent.options.minSearchTermLength)
             {
                var me = this;
 
@@ -769,12 +778,14 @@
 
                var successHandler = function ConsoleGroups__ps_successHandler(sRequest, oResponse, oPayload)
                {
+                  me._enableSearchUI();
                   me._setDefaultDataTableErrors(me.widgets.dataTable);
                   me.widgets.dataTable.onDataReturnInitializeTable.call(me.widgets.dataTable, sRequest, oResponse, oPayload);
                };
 
                var failureHandler = function ConsoleGroups__ps_failureHandler(sRequest, oResponse)
                {
+                  me._enableSearchUI();
                   if (oResponse.status == 401)
                   {
                      // Our session has likely timed-out, so refresh to offer the login page
@@ -796,13 +807,45 @@
                   }
                };
 
-               // Send the query to the server
+               // Send the query to the server and disable search button
                me.widgets.dataSource.sendRequest(me._buildSearchParams(parent.query),
                {
                   success: successHandler,
                   failure: failureHandler,
                   scope: parent
                });
+
+               // Disable search button and display a wait feedback message if the groups hasn't been found yet
+               me.widgets.searchButton.set("disabled", true);
+               me.isSearching = true;
+               YAHOO.lang.later(2000, me, function(){
+                  if (me.isSearching)
+                  {
+                     me.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: Alfresco.util.message("message.searching", parent.name),
+                        spanClass: "wait",
+                        displayTime: 0
+                     });
+                  }
+               }, []);
+            }
+         },
+
+         /**
+          * Enable search button, hide the pending wait message and set the panel as not searching.
+          *
+          * @method _enableSearchUI
+          * @private
+          */
+         _enableSearchUI: function ConsoleGroups_SearchPanelHandler_doSearch()
+         {
+            // Enable search button and close the wait feedback message if present
+            this.isSearching = false;
+            this.widgets.searchButton.set("disabled", false);
+            if (this.widgets.feedbackMessage)
+            {
+               this.widgets.feedbackMessage.destroy();
             }
          },
 
@@ -1984,7 +2027,7 @@
          this.groupDisplayName = undefined;
 
          var state = this.decodeHistoryState(args[1].state);
-         if (state.query)
+         if (state.query !== undefined)
          {
             this.query = state.query;
          }
@@ -2086,7 +2129,7 @@
             state += state.length > 0 ? "&" : "";
             state += "group=" + encodeURIComponent(obj.group);
          }
-         if (obj.query)
+         if (obj.query !== undefined)
          {
             state += state.length > 0 ? "&" : "";
             state += "query=" + encodeURIComponent(obj.query);

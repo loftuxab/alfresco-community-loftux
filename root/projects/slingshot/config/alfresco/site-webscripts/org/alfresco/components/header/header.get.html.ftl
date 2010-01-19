@@ -9,8 +9,7 @@
       siteTitle: "${siteTitle?js_string}",
       searchType: "${page.url.templateArgs.site!'all'}", // default search scope
       favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>},
-      minSearchTermLength: "${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}",
-      maxSearchResults: "${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}"      
+      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}
    }).setMessages(
       ${messages}
    );
@@ -64,14 +63,14 @@
 
    <div id="${args.htmlid}-sites-menu" class="yui-overlay menu-with-icons">
       <div class="bd">
-         <#assign favDisplay><#if favouriteSites?size &gt; 0>block<#else>none</#if></#assign>
+         <#assign favDisplay><#if favouriteSites?size != 0>block<#else>none</#if></#assign>
          <div id="${args.htmlid}-favouritesContainer" class="favourite-sites" style="display: ${favDisplay}">
             <div>
                ${msg("header.site.favouriteSites")}
             </div>
          </div>
          <ul id="${args.htmlid}-favouriteSites" class="favourite-sites-list separator" style="display: ${favDisplay}">
-         <#if favouriteSites?size &gt; 0>
+         <#if favouriteSites?size != 0>
             <#list favouriteSites as site>
             <li>
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>

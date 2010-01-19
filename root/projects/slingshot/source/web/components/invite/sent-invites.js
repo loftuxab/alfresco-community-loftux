@@ -140,6 +140,14 @@
       searchTerm: "",
 
       /**
+       * Keeps track if this component is searching or not
+       *
+       * @property isSearching
+       * @type Boolean
+       */
+      isSearching: false,
+
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -501,7 +509,10 @@
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);
          
          // trigger the search
-         this._performSearch("");
+         if (this.options.minSearchTermLength <= 0)
+         {
+            this._performSearch("");
+         }
       },
       
       /**
@@ -624,7 +635,7 @@
             });
             return;
          }
-         
+
          this._performSearch(searchTerm);
       },
 
@@ -670,6 +681,7 @@
          
          var successHandler = function SentInvites__pS_successHandler(sRequest, oResponse, oPayload)
          {
+            this._enableSearchUI();
             this._setDefaultDataTableErrors(this.widgets.dataTable);
             if (oResponse.results.length > 0)
             {
@@ -679,6 +691,7 @@
          
          var failureHandler = function SentInvites__pS_failureHandler(sRequest, oResponse)
          {
+            this._enableSearchUI();
             if (oResponse.status == 401)
             {
                // Our session has likely timed-out, so refresh to offer the login page
@@ -706,6 +719,38 @@
                failure: failureHandler,
                scope: this
          });
+
+         // Display a wait feedback message if the people hasn't been found yet
+         this.widgets.searchButton.set("disabled", true);
+         this.isSearching = true;
+         YAHOO.lang.later(2000, this, function(){
+            if (this.isSearching)
+            {
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message("message.searching", this.name),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
+            }
+         }, []);
+      },
+
+      /**
+       * Enable search button, hide the pending wait message and set the panel as not searching.
+       *
+       * @method _enableSearchUI
+       * @private
+       */
+      _enableSearchUI: function ConsoleGroups_SearchPanelHandler_doSearch()
+      {
+         // Enable search button and close the wait feedback message if present
+         this.isSearching = false;
+         this.widgets.searchButton.set("disabled", false);
+         if (this.widgets.feedbackMessage)
+         {
+            this.widgets.feedbackMessage.destroy();
+         }
       },
 
       /**

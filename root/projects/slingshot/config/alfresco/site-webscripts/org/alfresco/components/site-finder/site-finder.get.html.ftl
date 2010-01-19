@@ -2,14 +2,14 @@
    new Alfresco.SiteFinder("${args.htmlid}").setOptions(
    {
       currentUser: "${user.id}",
+      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
+      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
       inviteData: [
    <#list inviteData as invite>
       {
          id: "${invite.inviteId}",
          siteId: "${invite.resourceName}",
-         type: "${invite.invitationType}",
-         minSearchTermLength: "${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}",
-         maxSearchResults: "${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}"
+         type: "${invite.invitationType}"
       }<#if invite_has_next>,</#if>
    </#list>
       ],

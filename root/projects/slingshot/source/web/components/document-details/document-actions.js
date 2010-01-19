@@ -141,6 +141,7 @@
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
+            viewUrl:  Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "\" target=\"_blank",
             documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
             editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
             workingCopyUrl: urlContextSite + "/document-details?nodeRef=" + (this.assetData.custom.workingCopyNode || nodeRef),
@@ -167,6 +168,7 @@
             actionSet = this.assetData.actionSet,
             clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true),
             downloadUrl = Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
+            viewUrl = Alfresco.constants.PROXY_URI + this.assetData.contentUrl,
             displayName = this.assetData.displayName;
 
          // Token replacement

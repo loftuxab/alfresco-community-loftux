@@ -118,16 +118,7 @@
           * @type int
           * @default 1
           */
-         minSearchTermLength: 1,
-
-         /**
-          * Maximum number of items to display in the results list
-          *
-          * @property maxSearchResults
-          * @type int
-          * @default 100
-          */
-         maxSearchResults: 100
+         minSearchTermLength: 1
       },
       
       /**

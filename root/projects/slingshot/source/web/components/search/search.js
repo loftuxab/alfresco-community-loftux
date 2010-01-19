@@ -97,11 +97,11 @@
          /**
           * Maximum number of results displayed.
           * 
-          * @property maxResults
+          * @property maxSearchResults
           * @type int
           * @default 100
           */
-         maxResults: 100,
+         maxSearchResults: 100,
          
          /**
           * Search term to use for
@@ -118,7 +118,25 @@
           * @property searchTag
           * @type string
           */
-         initialSearchAll: true
+         initialSearchAll: true,
+
+         /**
+          * Number of characters required for a search.
+          *
+          * @property minSearchTermLength
+          * @type int
+          * @default 1
+          */
+         minSearchTermLength: 1,
+
+         /**
+          * Maximum number of items to display in the results list
+          *
+          * @property maxSearchResults
+          * @type int
+          * @default 100
+          */
+         maxSearchResults: 100         
       },
 
       /**
@@ -428,10 +446,10 @@
                me.widgets.dataTable.set("MSG_EMPTY", "");
                
                // update the results count, update hasMoreResults.
-               me.hasMoreResults = (oResponse.results.length > me.options.maxResults);
+               me.hasMoreResults = (oResponse.results.length > me.options.maxSearchResults);
                if (me.hasMoreResults)
                {
-                  oResponse.results = oResponse.results.slice(0, me.options.maxResults);
+                  oResponse.results = oResponse.results.slice(0, me.options.maxSearchResults);
                }
                me.resultsCount = oResponse.results.length;
                me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
@@ -570,6 +588,16 @@
        */
       _performSearch: function Search__performSearch(searchTerm, searchAll)
       {
+         var searchTerm = YAHOO.lang.trim(searchTerm);
+         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+            });
+            return;
+         }
+
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
           
@@ -678,7 +706,7 @@
          {
             site: encodeURIComponent(site),
             term : encodeURIComponent(searchTerm),
-            maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
+            maxResults : this.options.maxSearchResults + 1 // to be able to know whether we got more results
          });
          
          return params;

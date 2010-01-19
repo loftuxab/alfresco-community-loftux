@@ -77,6 +77,29 @@
       
       YAHOO.extend(SearchPanelHandler, Alfresco.ConsolePanelHandler,
       {
+
+         /**
+          * INSTANCE VARIABLES
+          */
+
+         /**
+          * Keeps track if this panel is searching or not
+          *
+          * @property isSearching
+          * @type Boolean
+          */
+         isSearching: false,
+
+
+         /**
+          * PANEL LIFECYCLE CALLBACKS
+          */
+
+         /**
+          * Called by the ConsolePanelHandler when this panel shall be loaded
+          *
+          * @method onLoad
+          */
          onLoad: function onLoad()
          {
             // Buttons
@@ -144,7 +167,7 @@
                }
                
                return updatedResponse;
-            }
+            };
             
             // Setup the main datatable
             this._setupDataTable();
@@ -178,7 +201,7 @@
             searchTermElem.value = parent.searchTerm;
             
             // check search length again as we may have got here via history navigation
-            if (parent.searchTerm.length >= parent.options.minSearchTermLength)
+            if (parent.searchTerm !== undefined && parent.searchTerm.length >= parent.options.minSearchTermLength)
             {
                var me = this;
                
@@ -193,12 +216,14 @@
                
                var successHandler = function ConsoleUsers__ps_successHandler(sRequest, oResponse, oPayload)
                {
+                  me._enableSearchUI();                  
                   me._setDefaultDataTableErrors(parent.widgets.dataTable);
                   parent.widgets.dataTable.onDataReturnInitializeTable.call(parent.widgets.dataTable, sRequest, oResponse, oPayload);
-               }
+               };
                
                var failureHandler = function ConsoleUsers__ps_failureHandler(sRequest, oResponse)
                {
+                  me._enableSearchUI();
                   if (oResponse.status == 401)
                   {
                      // Our session has likely timed-out, so refresh to offer the login page
@@ -218,17 +243,50 @@
                         me._setDefaultDataTableErrors(parent.widgets.dataTable);
                      }
                   }
-               }
-               
+               };
+
+               // Send the query to the server
                parent.widgets.dataSource.sendRequest(me._buildSearchParams(parent.searchTerm),
                {
                   success: successHandler,
                   failure: failureHandler,
                   scope: parent
                });
+
+               // Disable search button and display a wait feedback message if the users hasn't been found yet
+               parent.widgets.searchButton.set("disabled", true);
+               me.isSearching = true;
+               YAHOO.lang.later(2000, me, function(){
+                  if (me.isSearching)
+                  {
+                     me.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: Alfresco.util.message("message.searching", parent.name),
+                        spanClass: "wait",
+                        displayTime: 0
+                     });
+                  }
+               }, []);
             }
          },
-         
+
+         /**
+          * Enable search button, hide the pending wait message and set the panel as not searching.
+          *
+          * @method _enableSearchUI
+          * @private
+          */
+         _enableSearchUI: function ConsoleGroups_SearchPanelHandler_doSearch()
+         {
+            // Enable search button and close the wait feedback message if present
+            this.isSearching = false;
+            parent.widgets.searchButton.set("disabled", false);
+            if (this.widgets.feedbackMessage)
+            {
+               this.widgets.feedbackMessage.destroy();
+            }
+         },
+
          /**
           * Setup the YUI DataTable with custom renderers.
           *
@@ -1172,7 +1230,7 @@
        * @property searchTerm
        * @type string
        */
-      searchTerm: "",
+      searchTerm: undefined,
       
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -1249,7 +1307,7 @@
             this.showPanel(state.panel);
          }
          
-         if (state.search && this.currentPanelId === "search")
+         if (state.search !== undefined && this.currentPanelId === "search")
          {
             // keep track of the last search performed
             var searchTerm = state.search;
@@ -1529,7 +1587,7 @@
          {
             stateObj.userid = this.currentUserId;
          }
-         if (this.searchTerm !== "")
+         if (this.searchTerm !== undefined)
          {
             stateObj.search = this.searchTerm;
          }
@@ -1548,13 +1606,13 @@
             }
             state += "userid=" + encodeURIComponent(obj.userid ? obj.userid : stateObj.userid);
          }
-         if (obj.search || stateObj.search)
+         if (obj.search !== undefined || stateObj.search !== undefined)
          {
             if (state.length !== 0)
             {
                state += "&";
             }
-            state += "search=" + encodeURIComponent(obj.search ? obj.search : stateObj.search);
+            state += "search=" + encodeURIComponent(obj.search !== undefined ? obj.search : stateObj.search);
          }
          return state;
       },
