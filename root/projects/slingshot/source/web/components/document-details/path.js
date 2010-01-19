@@ -132,6 +132,37 @@
          
          Dom.setStyle(this.id + "-defaultPath", "display", "none");
          Dom.get(this.id + "-path").innerHTML = pathHtml;
+
+         Dom.addClass(this.id + "-status", "hidden");
+         
+         if (docData.custom.isWorkingCopy || docData.custom.hasWorkingCopy)
+         {
+            var bannerMsg, bannerStatus;
+            
+            // Locked / Working Copy handling
+            if (docData.lockedByUser === Alfresco.constants.USERNAME)
+            {
+               bannerStatus = docData.actionSet === "lockOwner" ? "lock-owner" : "editing";
+               bannerMsg = this.msg("banner." + bannerStatus);
+            }
+            else if (docData.lockedByUser && docData.lockedByUser !== "")
+            {
+               bannerStatus = "locked";
+               bannerMsg = this.msg("banner.locked", '<a href="' + Alfresco.util.uriTemplate("userpage",
+               {
+                  userid: docData.lockedByUser,
+                  pageid: "profile"
+               }) + '" class="theme-color-1">' + $html(docData.lockedBy) + '</a>') + '</div>';
+            }
+            
+            if (bannerMsg)
+            {
+               Dom.get(this.id + "-status").innerHTML = '<span class="' + $html(bannerStatus) + '">' + bannerMsg + '</span>';
+               Dom.removeClass(this.id + "-status", "hidden");
+            }
+            
+            YAHOO.Bubbling.fire("recalculatePreviewLayout");
+         }
       }
    });
 })();

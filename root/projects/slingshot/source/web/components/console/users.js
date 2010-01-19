@@ -633,7 +633,6 @@
             {
                viewMode: Alfresco.GroupFinder.VIEW_MODE_COMPACT,
                singleSelectMode: false,
-               minSearchTermLength: 1,
                wildcardPrefix: true
             });
          },
@@ -849,7 +848,6 @@
             {
                viewMode: Alfresco.GroupFinder.VIEW_MODE_COMPACT,
                singleSelectMode: false,
-               minSearchTermLength: 1,
                wildcardPrefix: true
             });
          },
@@ -1128,9 +1126,9 @@
           * 
           * @property minSearchTermLength
           * @type int
-          * @default 3
+          * @default 1
           */
-         minSearchTermLength: 3,
+         minSearchTermLength: 1,
          
          /**
           * Maximum number of items to display in the results list

@@ -6,6 +6,8 @@
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
          <action type="simple-link" id="onActionDetails" permission="edit" href="{editMetadataUrl}" label="actions.document.edit-metadata" />
          <action type="action-link" id="onActionUploadNewVersion" permission="edit" label="actions.document.upload-new-version" />
+         <action type="action-link" id="onActionEditOnline" permission="edit,online-edit" label="actions.document.edit-online" />
+         <action type="action-link" id="onActionEditOffline" permission="edit" label="actions.document.edit-offline" />
          <action type="action-link" id="onActionCopyTo" label="actions.document.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.document.move-to" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.document.delete" />
@@ -17,15 +19,21 @@
 
       <actionSet id="locked">
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
+         <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionCancelEditing" permission="cancel-checkout" label="actions.document.cancel-editing" />
       </actionSet>
 
       <actionSet id="lockOwner">
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
+         <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
       </actionSet>
 
       <actionSet id="workingCopyOwner">
+         <action type="simple-link" id="onActionDetails" permission="edit" href="{editMetadataUrl}" label="actions.document.edit-metadata" />
          <action type="action-link" id="onActionUploadNewVersion" label="actions.document.upload-new-version" />
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
          <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
       </actionSet>
 

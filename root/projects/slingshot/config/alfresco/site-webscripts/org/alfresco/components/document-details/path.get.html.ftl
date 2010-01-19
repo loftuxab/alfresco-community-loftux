@@ -13,3 +13,4 @@
    <span id="${args.htmlid}-defaultPath" class="path-link"><a href="${url.context}/page/site/${page.url.templateArgs.site}/documentlibrary">${msg("path.documents")}</a></span>
    <span id="${args.htmlid}-path"></span>
 </div>
+<div id="${args.htmlid}-status" class="status-banner hidden"></div>

@@ -7,7 +7,9 @@
       {
          id: "${invite.inviteId}",
          siteId: "${invite.resourceName}",
-         type: "${invite.invitationType}"
+         type: "${invite.invitationType}",
+         minSearchTermLength: "${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}",
+         maxSearchResults: "${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}"
       }<#if invite_has_next>,</#if>
    </#list>
       ],

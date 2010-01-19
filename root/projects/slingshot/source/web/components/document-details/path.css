@@ -34,3 +34,34 @@
 {
    padding: 0 0.5em;
 }
+
+.status-banner
+{
+   background-color: #ffffe0;
+   clear: left;
+   color: #888;
+   font-weight: bold;
+   margin: 0 -10px;
+   padding: 4px 0px;
+   text-align: center;
+}
+
+.status-banner span
+{
+   background-repeat: no-repeat;
+   line-height: 1.5em;
+   padding-left: 20px;
+}
+
+.status-banner .editing
+{
+   background-image: url(../documentlibrary/images/editing-indicator-16.png);
+}
+.status-banner .lock-owner
+{
+   background-image: url(../documentlibrary/images/lock-owner-indicator-16.png);
+}
+.status-banner .locked
+{
+   background-image: url(../documentlibrary/images/locked-indicator-16.png);
+}

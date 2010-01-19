@@ -31,7 +31,7 @@ var Filters =
       {field: "vitalRecordReviewPeriod", template: "%(rma:recordSearchVitalRecordReviewPeriod)"}
    ],
    
-   getFilterParams: function Filter_getFilterParams(filter, parsedArgs, favourites)
+   getFilterParams: function Filter_getFilterParams(filter, parsedArgs, optional)
    {
       var filterParams =
       {
@@ -48,14 +48,14 @@ var Filters =
       };
 
       // Max returned results specified?
-      var argMax = args["max"];
-      if ((argMax != null) && !isNaN(argMax))
+      var argMax = args.max;
+      if ((argMax !== null) && !isNaN(argMax))
       {
          filterParams.limitResults = argMax;
       }
 
       // Create query based on passed-in arguments
-      var filterData = args["filterData"],
+      var filterData = String(args.filterData),
          filterQuery = "";
 
       // Common types and aspects to filter from the UI
@@ -88,7 +88,7 @@ var Filters =
 
                if (ssNode != null)
                {
-                  var ssJson = eval('(' + ssNode.content + ')');
+                  var ssJson = eval('try{(' + ssNode.content + ')}catch(e){}');
                   filterQuery = ssJson.query;
                   // Wrap the query so that only valid items within the filePlan are returned
                   filterParams.variablePath = true;
@@ -98,13 +98,13 @@ var Filters =
                   filterParams.namespace = "http://www.alfresco.org/model/recordsmanagement/1.0";
                   // gather up the sort by fields
                   // they are encoded as "property/dir" i.e. "cm:name/asc"
-                  if (ssJson.sort && ssJson.sort.length != 0)
+                  if (ssJson.sort && ssJson.sort.length !== 0)
                   {
                      var sortPairs = ssJson.sort.split(",");
                      var sort = [];
                      for (var i=0, j; i<sortPairs.length; i++)
                      {
-                        if (sortPairs[i].length != 0)
+                        if (sortPairs[i].length !== 0)
                         {
                            j = sortPairs[i].indexOf("/");
                            sort.push(

@@ -87,7 +87,13 @@
       onDocumentDetailsAvailable: function DocumentLinks_onDocumentDetailsAvailable(layer, args)
       {
          var docData = args[1].documentDetails,
+            workingCopyMode = args[1].workingCopyMode || false,
             hasClipboard = window.clipboardData && clipboardData.setData;
+
+         if (!workingCopyMode)
+         {
+            Dom.removeClass(this.id + "-body", "hidden");
+         }
          
          // Construct the content-based URLs if the document actually has content (size > 0)
          if (parseInt(docData.size, 10) > 0)

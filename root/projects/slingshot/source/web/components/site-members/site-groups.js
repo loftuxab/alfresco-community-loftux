@@ -97,9 +97,9 @@
           * 
           * @property minSearchTermLength
           * @type int
-          * @default 3
+          * @default 0
           */
-         minSearchTermLength: 3,
+         minSearchTermLength: 0,
          
          /**
           * Maximum number of search results displayed.

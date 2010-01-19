@@ -270,7 +270,12 @@
                  {
                      p_config.method = Alfresco.util.Ajax.PUT;
                      p_config.dataObj.tags = this.tags.join(' ');
-
+                     //all day
+                     if (YAHOO.lang.isUndefined(p_config.dataObj.start))
+                     {
+                        p_config.dataObj.start = document.getElementsByName('start')[0].value;
+                        p_config.dataObj.end = document.getElementsByName('end')[0].value;
+                     }
                      this.form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
                    
                      return true;
@@ -339,7 +344,7 @@
                    var timeElements = [this.id + "-start", this.id + "-end"];
                    for (var i=0; i < timeElements.length; i++)
                    {
-                      form.addValidation(timeElements[i],Alfresco.forms.validation.regexMatch, validateTimeRegExp, "blur",cal._msg('message.invalid-time'));
+                      form.addValidation(timeElements[i],Alfresco.forms.validation.regexMatch, validateTimeRegExp, "blur",cal.msg('message.invalid-time'));
                    }
 
                    form.addValidation(this.id + "-tag-input-field", Alfresco.module.event.validation.tags, null, "keyup");

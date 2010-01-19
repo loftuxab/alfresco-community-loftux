@@ -5,7 +5,6 @@ textarea
    font-family: Arial, sans-serif; 
 } 
 
-
 /**
  * Global site header
  */
@@ -160,11 +159,6 @@ body.masked div.mask.full-preview-mask
 /* Dialogs */
 
 #Share #prompt
-{
-   width: 30em;
-}
-
-#Share #message
 {
    width: 30em;
 }

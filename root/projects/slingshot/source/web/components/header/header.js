@@ -109,7 +109,25 @@
           * @type object
           * @default {}
           */
-         favouriteSites: {}
+         favouriteSites: {},
+
+         /**
+          * Number of characters required for a search.
+          *
+          * @property minSearchTermLength
+          * @type int
+          * @default 1
+          */
+         minSearchTermLength: 1,
+
+         /**
+          * Maximum number of items to display in the results list
+          *
+          * @property maxSearchResults
+          * @type int
+          * @default 100
+          */
+         maxSearchResults: 100
       },
       
       /**
@@ -227,10 +245,15 @@
        */
       blurSearchText: function Header_blurSearchText()
       {
-         var searchVal = Dom.get(this.id + "-searchtext").value;
+         var searchVal = YAHOO.lang.trim(Dom.get(this.id + "-searchtext").value);
          if (searchVal.length == 0)
          {
-            this.defaultSearchText();
+            /**
+             * Since the blur event occurs before the KeyListener gets
+             * the enter we give the enter listener a chance of testing
+             * against "" instead of the help text.
+             */
+            YAHOO.lang.later(100, this, this.defaultSearchText, []);
          }
       }, 
       
@@ -264,8 +287,15 @@
        */
       doSearch: function Header_doSearch()
       {
-         var searchTerm = Dom.get(this.id + "-searchtext").value;
-         if (searchTerm.length != 0)
+         var searchTerm = YAHOO.lang.trim(Dom.get(this.id + "-searchtext").value);
+         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+            });
+         }
+         else
          {
             var searchAll =  (this.options.searchType == "all");
             

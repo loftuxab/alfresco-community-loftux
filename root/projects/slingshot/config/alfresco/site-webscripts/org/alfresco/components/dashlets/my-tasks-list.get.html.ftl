@@ -23,7 +23,7 @@
    <#list myTasks.tasks?sort_by("dueDate")?sort_by("priority") as task>
       <#assign overdue = ((task.dueDate != "") && (dateCompare(date?date, task.dueDate?date("yyyy-MM-dd")) == 1))>
       <#assign dueDate = "" />
-      <#if ((task.dueDate != "")) >
+      <#if (task.dueDate != "" && task.dueDate?substring(0, 4) != "9999") >
          <#assign dueDate = task.dueDate?date("yyyy-MM-dd")?string("dd MMM yyyy") />
       </#if>
    <div class="detail-list-item <#if task_index = 0>first-item<#elseif !task_has_next>last-item</#if>">
@@ -31,7 +31,7 @@
          <span class="priority<#if overdue> overdue</#if> theme-color-1 theme-border-2 theme-bg-color-3">${task.priority}</span>
       </div>
       <div class="task-details">
-         <h4>${task.description?html} <span class="light">${msg('label.due-on', dueDate)} <#if overdue> (${msg("status.overdue")})</span></#if></h4>
+         <h4>${task.description?html}<#if dueDate != ""> <span class="light">${msg('label.due-on', dueDate)} <#if overdue> (${msg("status.overdue")})</span></#if></#if></h4>
          <span class="task-status">${task.type}</span>
          <div class="task-resources">
       <#if task.resources??>

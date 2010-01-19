@@ -76,12 +76,14 @@
          uploadDirectory: null,
          updateNodeRef: null,
          updateFilename: null,
+         updateVersion: "1.0",
          mode: this.MODE_SINGLE_UPLOAD,
          onFileUploadComplete: null,
          overwrite: false,
          thumbnails: null,
          uploadURL: null,
-         username: null
+         username: null,
+         suppressRefreshEvent: false
       };
       this.showConfig = {};
 
@@ -282,16 +284,23 @@
 
          // Tell the document list to refresh itself if present
          var fileName = response.fileName ? response.fileName : this.widgets.filedata.value;
-         YAHOO.Bubbling.fire("metadataRefresh",
+         if (!this.showConfig.suppressRefreshEvent)
          {
-            currentPath: this.showConfig.path,
-            highlightFile: fileName
-         });
+            YAHOO.Bubbling.fire("metadataRefresh",
+            {
+               currentPath: this.showConfig.path,
+               highlightFile: fileName
+            });
+         }
               
          // Todo see if the nodeRef can be added to the list
          var objComplete =
          {
-            successful: [{nodeRef: response.nodeRef, fileName: fileName}]
+            successful: [
+            {
+               nodeRef: response.nodeRef,
+               fileName: fileName
+            }]
          };
 
          var callback = this.showConfig.onFileUploadComplete;
@@ -373,6 +382,11 @@
 
             // Display the version input form
             Dom.removeClass(this.widgets.versionSection, "hidden");
+            var versions = (this.showConfig.updateVersion || "1.0").split("."),
+               majorVersion = parseInt(versions[0], 10),
+               minorVersion = parseInt(versions[1], 10);
+            Dom.get(this.id + "-minorVersion").innerHTML = this.msg("label.minorVersion.more", majorVersion + "." + (1 + minorVersion));
+            Dom.get(this.id + "-majorVersion").innerHTML = this.msg("label.majorVersion.more", (1 + majorVersion) + ".0");
          }
          else
          {

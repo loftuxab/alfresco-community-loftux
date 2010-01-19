@@ -49,6 +49,7 @@
       Alfresco.DocumentVersions.superclass.constructor.call(this, "Alfresco.DocumentVersions", htmlId, ["button", "container"]);
 
       /* Decoupled event listeners */
+      YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
       YAHOO.Bubbling.on("metadataRefresh", this.onMetadataRefresh, this);
 
       return this;
@@ -182,9 +183,26 @@
 
          window.location.reload();
       },
+
+      /**
+       * Event handler called when the "documentDetailsAvailable" event is received
+       *
+       * @method: onDocumentDetailsAvailable
+       */
+      onDocumentDetailsAvailable: function DocumentInfo_onDocumentDetailsAvailable(layer, args)
+      {
+         var workingCopyMode = args[1].workingCopyMode || false;
+
+         if (!workingCopyMode)
+         {
+            Dom.removeClass(this.id + "-body", "hidden");
+         }
+      },
       
       /**
        * Event handler called when the "metadataRefresh" event is received
+       *
+       * @method: onMetadataRefresh
        */
       onMetadataRefresh: function DV_onMetadataRefresh(layer, args)
       {

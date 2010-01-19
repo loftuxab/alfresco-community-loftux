@@ -303,11 +303,11 @@
 
 .doclist .undeclared-record-info
 {
-   background-color: #ffffc0;
+   background-color: #ffffe0;
    background-image: url(images/warning-16.png);
    background-position: 6px 4px;
    background-repeat: no-repeat;
-   border: 1px dotted #888;
+   clear: left;
    color: #888;
    font-weight: bold;
    margin-bottom: 4px;

@@ -2,6 +2,8 @@
    new Alfresco.SentInvites("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
+      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
+      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
       setFocus: ${args.setFocus!'false'}
    }).setMessages(
       ${messages}

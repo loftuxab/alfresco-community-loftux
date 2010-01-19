@@ -4,8 +4,7 @@
    <region-id>people-finder</region-id>
    <source-id>invite</source-id>
    <url>/components/people-finder/people-finder</url>
-   <properties>
-      <minSearchTermLength>3</minSearchTermLength>
+   <properties>      
       <setFocus>true</setFocus>
       <addButtonSuffix>&gt;&gt;</addButtonSuffix>      
       <dataWebScript>api/sites/[siteId]/potentialmembers?authorityType=USER</dataWebScript>

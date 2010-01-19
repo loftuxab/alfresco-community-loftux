@@ -11,32 +11,24 @@
    </div>
    
    <div id="bd">
-
-	   <@region id="membersbar" scope="template" protected=true />
-   
-		<!-- start component code -->
-		<div class="yui-g grid">
-
-			<div class="yui-u first column1">
-					<div class="yui-b">
-					   <@region id="people-finder" scope="template" protected=true />
-					</div>
-					<div class="yui-b">
-					   <@region id="addemail" scope="template" protected=true />
-					</div>
-			</div>
-
-			<div class="yui-u column2">
-					<div class="yui-b">
-						<@region id="invitationlist" scope="template" protected=true />
-					</div>
-			</div>
-
-		</div>
-		<!-- end component code -->
-	</div>
-	
-    <br />
+      <@region id="membersbar" scope="template" protected=true />
+      <div class="yui-g grid">
+         <div class="yui-u first column1">
+            <div class="yui-b">
+               <@region id="people-finder" scope="template" protected=true />
+            </div>
+            <div class="yui-b">
+               <@region id="addemail" scope="template" protected=true />
+            </div>
+         </div>
+         <div class="yui-u column2">
+            <div class="yui-b">
+               <@region id="invitationlist" scope="template" protected=true />
+            </div>
+         </div>
+      </div>
+   </div>
+   <br/>
 </@>
 
 <@templateFooter>

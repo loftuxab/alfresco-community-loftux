@@ -9,8 +9,8 @@
       [
          <#list siteRoles as siteRole>"${siteRole}"<#if siteRole_has_next>,</#if></#list>
       ],
-      minSearchTermLength: ${args.minSearchTermLength!'3'},
-      maxSearchResults: ${args.maxSearchResults!'100'},
+      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
+      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
       setFocus: ${args.setFocus!'false'}
    }).setMessages(
       ${messages}

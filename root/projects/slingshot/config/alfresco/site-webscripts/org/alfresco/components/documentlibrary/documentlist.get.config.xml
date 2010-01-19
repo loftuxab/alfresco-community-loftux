@@ -18,6 +18,8 @@
 
       <actionSet id="locked">
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionCancelEditing" permission="cancel-checkout" label="actions.document.cancel-editing" />
       </actionSet>
 
       <actionSet id="lockOwner">
@@ -25,8 +27,10 @@
       </actionSet>
 
       <actionSet id="workingCopyOwner">
+         <action type="action-link" id="onActionDetails" permission="edit" label="actions.document.edit-metadata" />
          <action type="action-link" id="onActionUploadNewVersion" label="actions.document.upload-new-version" />
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download-again" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
          <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
       </actionSet>
 

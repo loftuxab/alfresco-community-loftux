@@ -4,4 +4,7 @@
    <region-id>sent-invites</region-id>
    <source-id>pending-invites</source-id>
    <url>/components/invite/sent-invites</url>
+   <properties>
+      <minSearchTermLength>0</minSearchTermLength>
+   </properties>
 </component>

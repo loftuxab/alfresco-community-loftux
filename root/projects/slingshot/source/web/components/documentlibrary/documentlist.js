@@ -528,9 +528,10 @@
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
-               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
-               "activeWorkflows", "isFavourite", "location", "permissions", "onlineEditUrl"
+               "index", "nodeRef", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "title", "description",
+               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "lockedBy", "lockedByUser",
+               "version", "size", "contentUrl", "actionSet", "tags", "activeWorkflows", "isFavourite", "location", "permissions", "custom",
+               "onlineEditUrl"
             ],
             metaFields:
             {
@@ -617,38 +618,44 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             var record = oRecord.getData(),
-               status = record.actionSet,
+               dataStatus = record.status,
                tip = "",
                desc = "";
             
-            // Locked by/Editing status
-            var lockType = "";
-            switch (status)
+            if (dataStatus.length > 0)
             {
-               case "locked":
-                  lockType = "locked";
-                  break;
-               
-               case "workingCopyOwner":
-                  lockType = "editing";
-                  break;
+               var statuses = dataStatus.split(",").sort(),
+                  status, s, SPACE = " ", meta,
+                  i18n, i18nMeta;
+
+               for (var i = 0, j = statuses.length; i < j; i++)
+               {
+                  status = statuses[i];
+                  meta = "";
+                  s = status.indexOf(SPACE);
+                  if (s > -1)
+                  {
+                     meta = status.substring(s + 1);
+                     status = status.substring(0, s);
+                  }
                   
-               case "lockOwner":
-                  lockType = "lock-owner";
-                  break;
+                  i18n = "tip." + status;
+                  i18nMeta = i18n + ".meta";
+                  if (meta && me.msg(i18nMeta) !== i18nMeta)
+                  {
+                     i18n = i18nMeta;
+                  }
+                  tip = Alfresco.util.message(i18n, me.name, meta.split("|")); // Note: deliberate bypass of me.msg() function
+                  desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + status + '-indicator-16.png" title="' + tip + '" alt="' + status + '" /></div>';
+               }
             }
-            if (lockType !== "")
-            {
-               tip = me.msg("tip." + lockType, record.lockedBy, record.lockedByUser);
-               desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + lockType + '-status-16.png" title="' + tip + '" alt="' + lockType + '" /></div>';
-            }
-            
+
             // In workflow status
             status = record.activeWorkflows;
             if (status !== "")
             {
                tip = me.msg("tip.active-workflow", status.split(",").length);
-               desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/workflow-16.png" title="' + tip + '" alt="' + tip + '" /></div>';
+               desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/workflow-indicator-16.png" title="' + tip + '" alt="' + tip + '" /></div>';
             }
             
             elCell.innerHTML = desc;
@@ -738,7 +745,7 @@
                description = record.description || me.msg("details.description.none");
             
             // Use title property if it's available
-            if (record.title && record.title !== record.fileName)
+            if (record.title && record.title !== record.displayName)
             {
                title = '<span class="title">(' + $html(record.title) + ')</span>';
             }
@@ -754,7 +761,7 @@
                /**
                 * Folders
                 */
-               desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
+               desc += '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
                desc += $html(record.displayName) + '</a>' + title + '</h3>';
 
                if (me.options.simpleView)
@@ -797,8 +804,18 @@
                 * Documents and Links
                 */
                docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
+
+               // Locked / Working Copy handling
+               if (record.lockedByUser === Alfresco.constants.USERNAME)
+               {
+                  desc += '<div class="info-banner">' + me.msg("details.banner." + (record.actionSet === "lockOwner" ? "lock-owner" : "editing")) + '</div>';
+               }
+               else if (record.lockedByUser && record.lockedByUser !== "")
+               {
+                  desc += '<div class="info-banner">' + me.msg("details.banner.locked", '<a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.lockedByUser) + '">' + $html(record.lockedBy) + '</a>') + '</div>';
+               }
                 
-               desc = '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(me, oRecord) + '<span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">';
+               desc += '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(me, oRecord) + '<span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">';
                desc += $html(record.displayName) + '</a></span>' + title + '</h3>';
                
                if (me.options.simpleView)
@@ -1573,14 +1590,17 @@
       getActionUrls: function DL_getActionUrls(record)
       {
          var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = record.getData("nodeRef");
+            nodeRef = record.getData("nodeRef"),
+            custom = record.getData("custom");
 
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
             documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
             folderDetailsUrl: urlContextSite + "/folder-details?nodeRef=" + nodeRef,
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef
+            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
+            workingCopyUrl: urlContextSite + "/document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
+            originalUrl: urlContextSite + "/document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)
          });
       },
 
@@ -2122,7 +2142,8 @@
          var successPath = (p_obj && (p_obj.path !== undefined)) ? p_obj.path : this.currentPath,
             successPage = (p_obj && (p_obj.page !== undefined)) ? p_obj.page : this.currentPage,
             loadingMessage = null,
-            timerShowLoadingMessage = null;
+            timerShowLoadingMessage = null,
+            me = this;
 
          // Clear the current document list if the data webscript is taking too long
          var fnShowLoadingMessage = function DL_fnShowLoadingMessage()
@@ -2135,9 +2156,13 @@
                {
                   displayTime: 0,
                   text: '<span class="wait">' + $html(this.msg("message.loading")) + '</span>',
-                  noEscape: true,
-                  effectDuration: 0.1
+                  noEscape: true
                });
+               
+               loadingMessage.showEvent.subscribe(function()
+               {
+                  this.loadingMessageShowing = true;
+               }, this, true);
             }
          };
          
@@ -2151,23 +2176,37 @@
          this.showingMoreActions = false;
          
          // Slow data webscript message
+         this.loadingMessageShowing = false;
          timerShowLoadingMessage = YAHOO.lang.later(this.options.loadingMessageDelay, this, fnShowLoadingMessage);
          
-         var successHandler = function DL__uDL_successHandler(sRequest, oResponse, oPayload)
+         var destroyLoaderMessage = function DL__uDL_destroyLoaderMessage()
          {
             if (timerShowLoadingMessage)
             {
                // Stop the "slow loading" timed function
-               Alfresco.logger.debug("DL__uDL_successHandler: Cancelling loading message timer.");
                timerShowLoadingMessage.cancel();
                timerShowLoadingMessage = null;
             }
-            if (loadingMessage !== null)
-            {
-               Alfresco.logger.debug("DL__uDL_successHandler: Destroying loading message pop-up.");
-               loadingMessage.destroy();
-            }
 
+            if (loadingMessage)
+            {
+               if (this.loadingMessageShowing)
+               {
+                  // Safe to destroy
+                  loadingMessage.destroy();
+                  loadingMessage = null;
+               }
+               else
+               {
+                  // Wait and try again later. Scope doesn't get set correctly with "this"
+                  YAHOO.lang.later(100, me, destroyLoaderMessage);
+               }
+            }
+         }
+         
+         var successHandler = function DL__uDL_successHandler(sRequest, oResponse, oPayload)
+         {
+            destroyLoaderMessage();
             // Updating the Doclist may change the file selection
             var fnAfterUpdate = function DL__uDL_sH_fnAfterUpdate()
             {
@@ -2184,16 +2223,7 @@
          
          var failureHandler = function DL__uDL_failureHandler(sRequest, oResponse)
          {
-            if (timerShowLoadingMessage)
-            {
-               // Stop the "slow loading" timed function
-               timerShowLoadingMessage.cancel();
-            }
-            if (loadingMessage !== null)
-            {
-               loadingMessage.destroy();
-            }
-            
+            destroyLoaderMessage();
             // Clear out deferred functions
             this.afterDocListUpdate = [];
 

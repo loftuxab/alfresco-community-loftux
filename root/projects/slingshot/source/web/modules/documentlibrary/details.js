@@ -442,8 +442,16 @@
          });
          escapeListener.enable();
 
-         // Set focus to fileName input
-         Dom.get(this.id + "-name").focus();
+         if (file.custom.isWorkingCopy)
+         {
+            // Disable name field if asset is a working copy
+            Dom.get(this.id + "-name").disabled = true;
+            Dom.get(this.id + "-fileTitle").focus();
+         }
+         else
+         {
+            Dom.get(this.id + "-name").focus();
+         }
       },
 
       /**
