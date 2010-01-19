@@ -518,6 +518,10 @@
                for (var i = 0, j = person.groups.length; i < j; person.groups[i++].toString = fnGroupToString) {}
                fnSetter("-view-groups", person.groups.join(", "));
                
+               // Button visibility based on account mutability
+               parent.widgets.edituserButton.set("disabled", !person.capabilities.isMutable);
+               parent.widgets.deleteuserButton.set("disabled", !person.capabilities.isMutable);
+               
                // Make main panel area visible
                Dom.setStyle(parent.id + "-view-main", "visibility", "visible");
             };
@@ -898,7 +902,7 @@
                found = false;
                for (i = 0, j = this._originalGroups.length; i < j; i++)
                {
-                  if (this._originalGroups[i] === group.itemName)
+                  if (this._originalGroups[i].itemName === group.itemName)
                   {
                      found = true;
                      break;
@@ -929,7 +933,7 @@
             // if this group was one of the original list, then add it to the removed list
             for (var i=0, j=this._originalGroups.length; i<j; i++)
             {
-               if (this._originalGroups[i] === group.itemName)
+               if (this._originalGroups[i].itemName === group.itemName)
                {
                   this._removedGroups.push(group.itemName);
                   break;
