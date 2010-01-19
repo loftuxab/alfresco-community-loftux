@@ -283,7 +283,7 @@
           data.duration = Alfresco.CalendarHelper.getDuration(Alfresco.util.fromISO8601(data.dtstart),Alfresco.util.fromISO8601(data.dtend));
           data.start = data.dtstart.split('T')[1].substring(0,5);
           data.end = data.dtend.split('T')[1].substring(0,5);
-          data.allday = (data.allday==='allday') ? data.allday : '';
+          data.allday = ((data.allday==='allday') | data.allday==='true') ? data.allday : '';
           data.tags = (YAHOO.lang.isArray(data.tags)) ? data.tags.join(' ') : data.tags;
           return data; 
       },
@@ -1020,21 +1020,26 @@
       onAfterEventSaved : function CalendarView_onAfterEventSaved(e, args)
       {
          // Refresh the tag component
-         YAHOO.Bubbling.fire("tagRefresh");
+         this.refreshTags();
          this.displayMessage('message.created.success',this.name);                  
       },
       
       onAfterEventDeleted : function CalendarView_onAfterEventDeleted(e, args)
       {
-         YAHOO.Bubbling.fire("tagRefresh");
+         this.refreshTags();
          this.displayMessage('message.deleted.success',this.name);                  
       },
    
       onAfterEventEdited : function CalendarView_onAfterEventDeleted(e, args)
       {
          // Refresh the tag component
-         YAHOO.Bubbling.fire("tagRefresh");
-      }          
+         this.refreshTags();
+      },
+      
+      refreshTags: function CalendarView_refreshTags()
+      {
+         YAHOO.lang.later(500, YAHOO.Bubbling,'fire','tagRefresh');
+      }
    });
    Alfresco.CalendarView.VIEWTYPE_WEEK = 'week';
    Alfresco.CalendarView.VIEWTYPE_MONTH = 'month';

@@ -428,7 +428,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
                    targetCell = dateCell;
                 }
                 var multipleAllDayEl = document.createElement('div');
-                multipleAllDayEl.className='allday multipleAllDay theme-bg-color-1';
+                multipleAllDayEl.className='allday multipleAllDay theme-bg-color-1 ' + eventEl.id + '-multiple';
                 multipleAllDayEl.id=eventEl.id+'-multiple'+(i+1);
                 if (targetCell)
                 {
