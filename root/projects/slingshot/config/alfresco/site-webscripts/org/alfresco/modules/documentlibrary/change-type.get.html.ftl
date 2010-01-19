@@ -7,7 +7,7 @@
             <div class="yui-u">
                <select id="${args.htmlid}-type" type="text" name="type" tabindex="1">
                   <option value="-">${msg("label.select")}</option>
-               <#list selectable as t>
+               <#list types.selectable as t>
                   <option value="${t}">${msg(t?replace(":", "_"))}</option>
                </#list>
                </select>&nbsp;*

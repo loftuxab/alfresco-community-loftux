@@ -2,15 +2,15 @@ model.addedContent = [];
 model.modifiedContent = [];
 
 // read config - use default values if not found
-var maxItems = 3;
-var conf = new XML(config.script);
+var maxItems = 3,
+   conf = new XML(config.script);
+
 if (conf["max-items"] != null)
 {
    maxItems = parseInt(conf["max-items"]);
 }
 
 var result = remote.call("/slingshot/profile/usercontents?user=" + stringUtils.urlEncode(page.url.templateArgs["userid"]) + "&maxResults=" + maxItems);
-
 if (result.status == 200)
 {
    // Create javascript objects from the server response
@@ -18,23 +18,26 @@ if (result.status == 200)
    
    ['created','modified'].forEach(function(type)
    {
-      var store = (type==='created') ? model.addedContent : model.modifiedContent;
-      var content = data[type].items;
+      var store = (type === 'created') ? model.addedContent : model.modifiedContent,
+         contents = data[type].items,
+         dateType = type + 'On',
+         content;
       
-      for (var i=0,len=content.length; i<len; i++)
+      for (var i = 0, len = contents.length; i < len; i++)
       {
-         var c = content[i];
+         content = contents[i];
          if (store.length < maxItems)
          {
             // convert createdOn and modifiedOn fields to date
-            if (c[type + 'On'])
+            if (content[dateType])
             {
-               c[type + 'On'] = new Date(c[type + 'On']);
+               content[dateType] = new Date(content[dateType]);
             }
-            store.push(c);
+            store.push(content);
          }
       }
-      (type==='created') ? model.addedContent = store: model.modifiedContent = store;
+      
+      model[type === 'created' ? "addedContent" : "modifiedContent"] = store;
    });
 }
 

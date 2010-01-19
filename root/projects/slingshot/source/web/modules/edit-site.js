@@ -34,7 +34,8 @@
 (function()
 {
    
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+      Element = YAHOO.util.Element;
    
    /**
     * EditSite constructor.
@@ -240,6 +241,21 @@
                var formEl = YAHOO.util.Dom.get(this.id + "-form");
                formEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + "api/sites/" + this.showConfig.shortName; 
 
+               // Site access
+               var siteVisibility = "PUBLIC";
+               if (this.widgets.isPublic.checked)
+               {
+                  if (this.widgets.isModerated.checked)
+                  {
+                     siteVisibility = "MODERATED";
+                  }
+               }
+               else
+               {
+                  siteVisibility = "PRIVATE";
+               }
+               this.widgets.siteVisibility.value = siteVisibility;
+
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
                this.widgets.panel.hide();
@@ -252,7 +268,7 @@
             },
             obj: null,
             scope: this
-         }
+         };
 
          // Submit as an ajax submit (not leave the page), in json format
          editSiteForm.setAJAXSubmit(true,
@@ -274,24 +290,30 @@
          editSiteForm.applyTabFix();
          editSiteForm.init();
 
-         this.widgets.isPublicCheckbox = Dom.get(this.id + "-isPublic-checkbox");
-         YAHOO.util.Event.addListener(this.widgets.isPublicCheckbox, "change", this.onIsPublicChange, this, true);
+         this.widgets.siteVisibility = Dom.get(this.id + "-visibility");
          this.widgets.isPublic = Dom.get(this.id + "-isPublic");
+         this.widgets.isModerated = Dom.get(this.id + "-isModerated");
+         this.widgets.isPrivate = Dom.get(this.id + "-isPrivate");
+
+         // Make sure we disable moderated if public isn't selected
+         YAHOO.util.Event.addListener(this.widgets.isPublic, "change", this.onVisibilityChange, this, true);
+         YAHOO.util.Event.addListener(this.widgets.isPrivate, "change", this.onVisibilityChange, this, true);
 
          // Show the panel
          this._showPanel();
       },
 
+
       /**
        * Called when user clicks on the isPublic checkbox.
        *
-       * @method onIsPublicChange
+       * @method onVisibilityChange
        * @param type
        * @param args
        */
-      onIsPublicChange: function CS_onIsPublicChange(type, args)
+      onVisibilityChange: function CS_onVisibilityChange(type, args)
       {
-         this.widgets.isPublic.value = this.widgets.isPublicCheckbox.checked ? "true" : "false";
+         new Element(this.widgets.isModerated).set("disabled", !new Element(this.widgets.isPublic).get("checked"));
       },
 
       /**

@@ -197,7 +197,12 @@
 
          // Show uploader for multiple files
          var description = this.msg("label.filter-description", displayName),
+            extensions = "*";
+         if (displayName && new RegExp(/[^\.]+\.[^\.]+/).exec(displayName))
+         {
+            // Only add an filtering extension if filename contains a name and a suffix
             extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
+         }
          
          if (assets.custom && assets.custom.workingCopyVersion)
          {
@@ -431,6 +436,7 @@
       onActionChangeType: function dlA_onActionChangeType(assets)
       {
          var nodeRef = assets.nodeRef,
+            currentType = assets.nodeType,
             displayName = assets.displayName,
             actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/type/node", nodeRef.replace(":/", ""));
 
@@ -448,7 +454,7 @@
          this.modules.changeType = new Alfresco.module.SimpleDialog(this.id + "-changeType").setOptions(
          {
             width: "30em",
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/change-type?nodeRef=" + nodeRef,
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/change-type?currentType=" + encodeURIComponent(currentType),
             actionUrl: actionUrl,
             doSetupFormsValidation:
             {

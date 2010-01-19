@@ -36,6 +36,7 @@
    
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element,
       KeyListener = YAHOO.util.KeyListener;
    
    /**
@@ -131,6 +132,10 @@
          this.widgets.isPublic = Dom.get(this.id + "-isPublic");
          this.widgets.isModerated = Dom.get(this.id + "-isModerated");
          this.widgets.isPrivate = Dom.get(this.id + "-isPrivate");
+
+         // Make sure we disable moderated if public isn't selected
+         YAHOO.util.Event.addListener(this.widgets.isPublic, "change", this.onVisibilityChange, this, true);
+         YAHOO.util.Event.addListener(this.widgets.isPrivate, "change", this.onVisibilityChange, this, true);
 
          // Configure the forms runtime
          var createSiteForm = new Alfresco.forms.Form(this.id + "-form");
@@ -230,6 +235,18 @@
          this._showPanel();
       },
 
+      /**
+       * Called when user clicks on the isPublic checkbox.
+       *
+       * @method onVisibilityChange
+       * @param type
+       * @param args
+       */
+      onVisibilityChange: function CS_onVisibilityChange(type, args)
+      {
+         new Element(this.widgets.isModerated).set("disabled", !new Element(this.widgets.isPublic).get("checked"));
+      },
+      
       /**
        * Called when user clicks on the cancel button.
        * Closes the CreateSite panel.

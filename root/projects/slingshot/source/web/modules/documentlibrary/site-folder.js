@@ -398,7 +398,7 @@
          // Redrawing the tree will clear the highlight
          this._showHighlight(true);
          
-         if (this.pathsToExpand.length > 0)
+         if (this.pathsToExpand && this.pathsToExpand.length > 0)
          {
             var node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
             if (node !== null)

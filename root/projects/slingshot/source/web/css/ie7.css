@@ -174,3 +174,15 @@ table .yui-dt-empty
    border: none !important;
 }
 
+/**
+ * Prevent icon overlay in taglibrary (ETHREEOH-3422)
+ * margin-right value must match padding-right value on ".tags_box li a" rule in taglibrary.css
+*/
+.taglibrary .top_taglist
+{
+   margin-right: 22px;
+}
+.taglibrary .bottom_taglist
+{
+   margin-right: 22px;
+}

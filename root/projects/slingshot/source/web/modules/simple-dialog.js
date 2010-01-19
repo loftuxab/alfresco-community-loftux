@@ -236,21 +236,6 @@
        },
 
       /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function AmSD_onComponentsLoaded()
-      {
-         // Shortcut for dummy instance
-         if (this.id === "null")
-         {
-            return;
-         }
-      },
-      
-      /**
        * Main entrypoint to show the dialog
        *
        * @method show

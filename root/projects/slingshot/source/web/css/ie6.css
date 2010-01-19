@@ -3,6 +3,13 @@
 textarea
 {
    font-family: Arial, sans-serif; 
+   padding: 2px;
+   width: 15em;
+}
+
+textarea.wide
+{
+   width: 30em;
 }
 
 
@@ -496,6 +503,13 @@ div.filter
 {
    margin-right: -20px;
 }
+
+.details input,
+.details textarea
+{
+   width: 26em;
+}
+
 
 /**
  * Calendar
