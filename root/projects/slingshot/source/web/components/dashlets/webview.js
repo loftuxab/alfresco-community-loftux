@@ -242,8 +242,9 @@
        */
       _browserDestroysPanel: function WW__browserDestroysPanel()
       {
-         // Bad browsers are IE and FF below 3
-         return (YAHOO.env.ua.ie > 0 || (YAHOO.env.ua.gecko > 0 && YAHOO.env.ua.gecko < 1.9));
+         // All browsers on Windows (tested w FP 10) and FF2 and below on Mac
+         return (navigator.userAgent.indexOf("Windows") != -1 ||
+                 (navigator.userAgent.indexOf("Macintosh") != -1 && YAHOO.env.ua.gecko > 0 && YAHOO.env.ua.gecko < 1.9));
       }
 
    });

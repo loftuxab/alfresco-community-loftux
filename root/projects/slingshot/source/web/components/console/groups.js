@@ -83,6 +83,16 @@
           * INSTANCE VARIABLES
           */
 
+          /**
+           * This variable helps the SearchPanel (which consists of 2 sub divs/panels)
+           * to make sure the browse div only loads the column browsers root groups
+           * once the browse div is visible. 
+           *
+           * @property firstView
+           * @type boolean
+          */
+         firstView: true,
+
          /**
           * Keeps track if this panel is visble or not
           *
@@ -120,7 +130,6 @@
             // ColumnBrowser
             this.widgets.columnbrowser = new YAHOO.extension.ColumnBrowser(parent.id + "-columnbrowser",
             {
-               url: Alfresco.constants.PROXY_URI + "api/rootgroups?zone=APP.DEFAULT",
                numVisible: 3,
                columnInfoBuilder:
                {
@@ -141,9 +150,9 @@
                root: parent._msg("label.breadcrumb.root")
             });
 
-            // Close search button
-            var closeSearchButton = new YAHOO.widget.Button(parent.id + "-closesearch-button", {});
-            closeSearchButton.on("click", this.onCloseSearchClick, closeSearchButton, this);
+            // browse button
+            var browse = new YAHOO.widget.Button(parent.id + "-browse-button", {});
+            browse.on("click", this.onBrowseClick, browse, this);
 
             // DataTable and DataSource setup
             this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?zone=APP.DEFAULT&");
@@ -291,19 +300,27 @@
           */
          onUpdate: function ConsoleGroups_SearchPanelHandler_onUpdate()
          {
-            if (parent.query)
+            if (this.firstView || parent.query)
             {
+               /**
+                * The search panel shall only be displayed if a query exists OR
+                * when the page is initially loaded
+                */                
+               this.firstView = false;
+
                // Lets display the search list since the state indicates a query has been used
                Dom.addClass(parent.id + "-browse-panel", "hidden");
                Dom.removeClass(parent.id + "-search-panel", "hidden");
+               
+               if (parent.query)
+               {
+                  // update the text field - as this event could come from bookmark, navigation or a search button click
+                  var queryElem = Dom.get(parent.id + "-search-text");
+                  queryElem.value = parent.query;
 
-               // update the text field - as this event could come from bookmark, navigation or a search button click
-               var queryElem = Dom.get(parent.id + "-search-text");
-               queryElem.value = parent.query;
-
-               // Redo the search
-               this.doSearch();
-
+                  // Redo the search
+                  this.doSearch();
+               }
             }
             else
             {
@@ -311,10 +328,15 @@
                Dom.addClass(parent.id + "-search-panel", "hidden");
                Dom.removeClass(parent.id + "-browse-panel", "hidden");
 
-               // Refresh the column browser
-               if (parent.refresh)
+               var paths = this.widgets.columnbrowser.get("urlPath");
+               if (!paths || paths.length == 0)
                {
-                  var paths = this.widgets.columnbrowser.get("urlPath");
+                  // Load the root groups
+                  this.widgets.columnbrowser.load([Alfresco.constants.PROXY_URI + "api/rootgroups?zone=APP.DEFAULT"], true);
+               }
+               else if (parent.refresh)
+               {
+                  // Refresh the column browser
                   this.widgets.columnbrowser.load(paths, true);
                }
             }
@@ -342,11 +364,10 @@
           */
          onSearchClick: function ConsoleGroups_SearchPanelHandler_onSearchClick()
          {
-            var queryElem = Dom.get(parent.id + "-search-text");
-            var query = YAHOO.lang.trim(queryElem.value);
+            var query = YAHOO.lang.trim(Dom.get(parent.id + "-search-text").value);
 
             // inform the user if the search term entered is too small
-            if (query.length < parent.options.minqueryLength)
+            if (query.replace(/\*/g, "").length < parent.options.minqueryLength)
             {
                Alfresco.util.PopupManager.displayMessage(
                {
@@ -355,15 +376,15 @@
                return;
             }
 
-            parent.refreshUIState({"query": query});
+            parent.refreshUIState({"query": "*" + query});
          },
 
          /**
-          * Called when the user clicks the close search button
+          * Called when the user clicks the browse button
           *
-          * @method onCloseSearchClick
+          * @method onBrowseClick
           */
-         onCloseSearchClick: function ConsoleGroups_SearchPanelHandler_onCloseSearchClick()
+         onBrowseClick: function ConsoleGroups_SearchPanelHandler_onBrowseClick()
          {
             parent.refreshUIState({"query": undefined, "refresh": "false"});
          },

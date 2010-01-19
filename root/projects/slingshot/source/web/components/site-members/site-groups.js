@@ -567,7 +567,7 @@
        */
       doSearch: function SiteGroups_doSearch()
       {
-         var searchTerm = $html(Dom.get(this.id + "-term").value);
+         var searchTerm = YAHOO.lang.trim(Dom.get(this.id + "-term").value);
          if (searchTerm.length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(

@@ -46,13 +46,13 @@
       </div>
       <div id="${el}-search-panel" class="search-main hidden">
          <div id="${el}-search-bar" class="search-bar theme-bg-color-3">
-            <div id="${el}-search-bar-text" class="search-bar-text">${msg("message.noresults")}</div>
+            <div id="${el}-search-bar-text" class="search-bar-text">${msg("message.usage")}</div>
             <!-- Search button -->
-            <div class="closesearch-button">
-               <span class="yui-button yui-push-button" id="${el}-closesearch-button">
-                  <span class="first-child"><button>${msg("button.close")}</button></span>
+            <div class="browse-button">
+               <span class="yui-button yui-push-button" id="${el}-browse-button">
+                  <span class="first-child"><button>${msg("button.browse")}</button></span>
                </span>
-            </div>
+            </div>                        
          </div>
          <div class="results" id="${el}-datatable"></div>
       </div>

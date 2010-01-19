@@ -744,8 +744,12 @@
             Dom.get(parent.id + "-create-quotatype").value = "gb";
             
             // clear selected groups
-            this._groups = [];
+            this._groups = [];            
             Dom.get(parent.id + "-create-groups").innerHTML = "";
+            if (parent.modules.createGroupFinder)
+            {
+               parent.modules.createGroupFinder.clearResults();
+            }
             if (this._form !== null)
             {
                this._form.init();
