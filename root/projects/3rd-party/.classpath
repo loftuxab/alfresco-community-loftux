@@ -158,5 +158,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-api-1.0.0.CI-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer-2009-09-27.jar" sourcepath="src/PDFRenderer-2009-09-27-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.8.0-incubating-12-Nov-09.jar" sourcepath="src/pdfbox-0.8.0-incubating-12-Nov-09-src.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.webmvc-3.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/abdera/axiom-impl-1.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/abdera/axiom-api-1.2.5.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
