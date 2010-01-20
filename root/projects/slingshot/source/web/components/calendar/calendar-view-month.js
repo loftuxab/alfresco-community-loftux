@@ -222,13 +222,13 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
           var durationObj = data.duration;
        }
 
-       if (durationObj && durationObj.D) 
+       if (!YAHOO.util.Lang.isUndefined(durationObj) && YAHOO.util.Lang.isObject(durationObj)) 
        {
 
           var numDays = ~~(1 * (durationObj.D));
           if (durationObj.W && durationObj.W>=1)
           {
-             numDays+=(~~(1 * (7*durationObj.W) ));
+             numDays+=(~~(1 * (7*durationObj.W) ))+1;
           }
           if (numDays>1)
           {

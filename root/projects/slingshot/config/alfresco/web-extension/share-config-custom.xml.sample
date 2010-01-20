@@ -20,6 +20,14 @@
    <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
 
       <!--
+         Whether the folder Tree component should enumerate child folders or not.
+         This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
+      -->
+      <tree>
+         <evaluate-child-folders>false</evaluate-child-folders>
+      </tree>
+
+      <!--
          Used by the "Manage Aspects" action
 
          For custom aspects, remember to also add the relevant i18n string(s)

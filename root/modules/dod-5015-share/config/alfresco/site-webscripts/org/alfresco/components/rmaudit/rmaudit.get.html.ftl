@@ -1,14 +1,11 @@
 <script type="text/javascript" charset="utf-8">    
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions(
-       {
-          'siteId': "${page.url.templateArgs.site!"rm"}",
-          'containerId': "${template.properties.container!"documentLibrary"}",
-          'viewMode':Alfresco.RM_Audit.VIEW_MODE_COMPACT
-          <#if (nodeRef?exists)>
-            ,'nodeRef' : '${nodeRef}'
-          </#if>          
-       }
-    ).setMessages(${messages});
+    {
+       <#if (nodeRef?exists)>nodeRef: '${nodeRef}',</#if>          
+       siteId: "${page.url.templateArgs.site}",
+       containerId: "${template.properties.container!"documentLibrary"}",
+       viewMode: Alfresco.RM_Audit.VIEW_MODE_COMPACT
+    }).setMessages(${messages});
 </script>
 <div id="${htmlid}-audit">
    <#-- for a specified noderef -->

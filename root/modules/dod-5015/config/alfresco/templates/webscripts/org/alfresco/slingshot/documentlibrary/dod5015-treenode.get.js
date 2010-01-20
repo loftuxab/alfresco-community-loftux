@@ -11,9 +11,11 @@ function getTreenode(siteId, path)
    try
    {
       var items = [],
+         hasSubfolders = true,
          parsedArgs = ParseArgs.getParsedArgs(),
          skipPermissionCheck = args["perms"] == "false",
-         item, node, rmNode, capabilities, cap;
+         evalChildFolders = args["children"] !== "false",
+         item, rmNode, capabilities, cap;
    
       // Use helper function to get the arguments
       if (parsedArgs === null)
@@ -24,33 +26,39 @@ function getTreenode(siteId, path)
       // Quick version if "skipPermissionCheck" flag set
       if (skipPermissionCheck)
       {
-         for each(node in parsedArgs.parentNode.children)
+         for each (item in parsedArgs.parentNode.children)
          {
-            if (itemIsAllowed(node))
+            if (itemIsAllowed(item))
             {
                items.push(
                {
-                  node: node
+                  node: item
                });
             }
          }
       }
       else
       {
-         for each(node in parsedArgs.parentNode.children)
+         for each (item in parsedArgs.parentNode.children)
          {
-            if (itemIsAllowed(node))
+            if (itemIsAllowed(item))
             {
                capabilities = {};
-               rmNode = rmService.getRecordsManagementNode(node);
+               rmNode = rmService.getRecordsManagementNode(item);
                for each (cap in rmNode.capabilities)
                {
                   capabilities[cap.name] = true;
                }
 
+               if (evalChildFolders)
+               {
+                  hasSubfolders = item.childFileFolders(false, true, "fm:forum").length > 0;
+               }
+
                items.push(
                {
-                  node: node,
+                  node: item,
+                  hasSubfolders: hasSubfolders,
                   permissions:
                   {
                      create: capabilities["Create"]

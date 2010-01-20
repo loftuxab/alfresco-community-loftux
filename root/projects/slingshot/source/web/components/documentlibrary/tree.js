@@ -95,7 +95,16 @@
           * @type string
           * @default "documentLibrary"
           */
-         containerId: "documentLibrary"
+         containerId: "documentLibrary",
+         
+         /**
+          * Evaluate child folders flag
+          *
+          * @property evaluateChildFolders
+          * @type boolean
+          * @default true
+          */
+         evaluateChildFolders: true
       },
       
       /**
@@ -873,6 +882,7 @@
        _buildTreeNodeUrl: function DLT__buildTreeNodeUrl(path)
        {
           var uriTemplate ="slingshot/doclib/treenode/site/" + $combine(encodeURIComponent(this.options.siteId), encodeURIComponent(this.options.containerId), Alfresco.util.encodeURIPath(path));
+          uriTemplate += "?children=" + this.options.evaluateChildFolders;
           return  Alfresco.constants.PROXY_URI + uriTemplate;
        }
    });

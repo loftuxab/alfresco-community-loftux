@@ -112,7 +112,16 @@
           * @example "Alfresco.constants.URL_SERVICECONTEXT + modules/documentlibrary/move-to"
           * @default null,
           */
-         templateUrl: null
+         templateUrl: null,
+
+         /**
+          * Evaluate child folders flag
+          *
+          * @property evaluateChildFolders
+          * @type boolean
+          * @default true
+          */
+         evaluateChildFolders: true
       },
       
       /**
@@ -587,6 +596,7 @@
        _buildTreeNodeUrl: function DLSF__buildTreeNodeUrl(path)
        {
           var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode/site/{site}/{container}{path}";
+          uriTemplate += "?children=" + this.options.evaluateChildFolders;
 
           var url = YAHOO.lang.substitute(uriTemplate,
           {
