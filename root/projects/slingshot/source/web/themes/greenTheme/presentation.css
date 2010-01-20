@@ -209,6 +209,11 @@ hr
    background-repeat: no-repeat;
 }
 
+.yui-skin-greenTheme .yui-overlay-hidden #message .bd span.wait
+{
+   display: none;
+}
+
 /* Style the default prompt */
 
 .yui-skin-greenTheme #prompt,

@@ -1243,15 +1243,6 @@
                ie6fix.className = ie6fix.className;
             }
             
-            if (this.widgets.dataTable.getRecordSet().getLength() === 0)
-            {
-               this.widgets.dataTable.set("renderLoopSize", 0);
-            }
-            else
-            {
-               this.widgets.dataTable.set("renderLoopSize", this.options.usePagination ? 16 : 32);
-            }
-            
             // Update the paginator if it's been created
             if (this.widgets.paginator)
             {

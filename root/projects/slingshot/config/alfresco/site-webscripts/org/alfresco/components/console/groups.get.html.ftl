@@ -61,7 +61,7 @@
       <div id="${el}-peoplepicker" class="groups people-picker" style="visibility: hidden;">
          <div class="hd"><span id="${el}-peoplepicker-title">${msg("panel.adduser.header")}</span></div>
          <div class="bd">
-            <div>
+            <div style="margin: auto 10px;">
                <div id="${el}-search-peoplefinder"></div>
             </div>
          </div>
@@ -71,7 +71,7 @@
       <div id="${el}-grouppicker" class="groups group-picker" style="visibility: hidden;">
          <div class="hd"><span id="${el}-grouppicker-title">${msg("panel.addgroup.header")}</span></div>
          <div class="bd">
-            <div>
+            <div style="margin: auto 10px;">
                <div id="${el}-search-groupfinder"></div>
             </div>
          </div>

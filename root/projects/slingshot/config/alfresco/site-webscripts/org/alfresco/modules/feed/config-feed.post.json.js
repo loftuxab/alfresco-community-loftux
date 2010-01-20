@@ -3,17 +3,23 @@
 var c = sitedata.getComponent(url.templateArgs.componentId);
 
 var uri = String(json.get("url"));
-if (uri !== "")
+var re = /^http:\/\//;
+if (!re.test(uri))
 {
-   var re = /^http:\/\//;
-   if (!re.test(uri))
-   {
-      uri = "http://" + uri;
-   }
-   
-   c.properties["feedurl"] = uri;
+   uri = "http://" + uri;
+}
 
-   var feed = getRSSFeed(uri);
+c.properties["feedurl"] = uri;
+model.feedurl = uri;
+
+var feed = getRSSFeed(uri);
+if (feed.error)
+{
+   model.title = msg.get("title.error." + feed.error);
+   model.items = [];
+}
+else
+{
    model.title = feed.title;
    model.items = feed.items;
 }

@@ -33,7 +33,7 @@
          </div>
       </div>
     </div>    
-    <div id="filters">
+    <div class="filters">
       <div class="yui-gb">
          <div class="yui-g first">
             <div class="yui-u first">

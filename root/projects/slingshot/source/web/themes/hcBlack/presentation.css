@@ -235,6 +235,11 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
    background-repeat: no-repeat;
 }
 
+.yui-skin-hcBlack .yui-overlay-hidden #message .bd span.wait
+{
+   display: none;
+}
+
 /* Style the default prompt */
 
 .yui-skin-hcBlack #prompt,

@@ -83,16 +83,6 @@
           * INSTANCE VARIABLES
           */
 
-          /**
-           * This variable helps the SearchPanel (which consists of 2 sub divs/panels)
-           * to make sure the browse div only loads the column browsers root groups
-           * once the browse div is visible. 
-           *
-           * @property firstView
-           * @type boolean
-          */
-         firstView: true,
-
          /**
           * Keeps track if this panel is visble or not
           *
@@ -309,13 +299,12 @@
           */
          onUpdate: function ConsoleGroups_SearchPanelHandler_onUpdate()
          {
-            if (this.firstView || parent.query !== undefined)
+            if (parent.refresh == undefined || parent.query !== undefined)
             {
                /**
-                * The search panel shall only be displayed if a query exists OR
-                * when the page is initially loaded
+                * The search panel shall only be displayed if a query exists OR when the page is initially loaded.
+                * The parent.refresh == undefined indicates that the page was reloaded when in browse view state.
                 */
-               this.firstView = false;
 
                // Lets display the search list since the state indicates a query has been used
                Dom.addClass(parent.id + "-browse-panel", "hidden");
@@ -763,8 +752,10 @@
          doSearch: function ConsoleGroups_SearchPanelHandler_doSearch()
          {
             // check search length again as we may have got here via history navigation
-            if (parent.query !== undefined && parent.query.length >= parent.options.minSearchTermLength)
+            if (!this.isSearching && parent.query !== undefined && parent.query.length >= parent.options.minSearchTermLength)
             {
+               this.isSearching = true;
+               
                var me = this;
 
                // Reset the custom error messages
@@ -814,19 +805,26 @@
                   failure: failureHandler,
                   scope: parent
                });
+               me._setResultsMessage("message.searchingFor", $html(parent.query));
 
                // Disable search button and display a wait feedback message if the groups hasn't been found yet
                me.widgets.searchButton.set("disabled", true);
-               me.isSearching = true;
                YAHOO.lang.later(2000, me, function(){
                   if (me.isSearching)
                   {
-                     me.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+                     if (!me.widgets.feedbackMessage)
                      {
-                        text: Alfresco.util.message("message.searching", parent.name),
-                        spanClass: "wait",
-                        displayTime: 0
-                     });
+                        me.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+                        {
+                           text: Alfresco.util.message("message.searching", parent.name),
+                           spanClass: "wait",
+                           displayTime: 0
+                        });
+                     }
+                     else if (!me.widgets.feedbackMessage.cfg.getProperty("visible"))
+                     {
+                        me.widgets.feedbackMessage.show();
+                     }
                   }
                }, []);
             }
@@ -838,15 +836,15 @@
           * @method _enableSearchUI
           * @private
           */
-         _enableSearchUI: function ConsoleGroups_SearchPanelHandler_doSearch()
+         _enableSearchUI: function ConsoleGroups_SearchPanelHandler__enableSearchUI()
          {
             // Enable search button and close the wait feedback message if present
-            this.isSearching = false;
-            this.widgets.searchButton.set("disabled", false);
-            if (this.widgets.feedbackMessage)
+            if (this.widgets.feedbackMessage && this.widgets.feedbackMessage.cfg.getProperty("visible"))
             {
-               this.widgets.feedbackMessage.destroy();
+               this.widgets.feedbackMessage.hide();
             }
+            this.widgets.searchButton.set("disabled", false);
+            this.isSearching = false;
          },
 
          /**
@@ -1930,7 +1928,7 @@
       query: null,
 
       /**
-       * Decides if panels data needs to be refreshed
+       * Decides if browse panels data needs to be refreshed
        *
        * @property refresh
        * @type boolean

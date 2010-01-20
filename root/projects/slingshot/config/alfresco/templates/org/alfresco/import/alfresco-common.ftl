@@ -17,9 +17,11 @@
 </#macro>
 
 <#function globalConfig key default>
-   <#assign values = config.global.flags.childrenMap[key]>
-   <#if values?? && values?is_sequence>
-      <#return values[0].value>
+   <#if config.global.flags??>
+      <#assign values = config.global.flags.childrenMap[key]>
+      <#if values?? && values?is_sequence>
+         <#return values[0].value>
+      </#if>
    </#if>
    <#return default>
 </#function>

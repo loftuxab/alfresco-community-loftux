@@ -35,26 +35,11 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Element = YAHOO.util.Element,
       Event = YAHOO.util.Event;
-
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML;
 
    Alfresco.Header = function(htmlId)
    {
-      this.name = "Alfresco.Header";
-      this.id = htmlId;
-
-      this.widgets = {};
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
+      Alfresco.Header.superclass.constructor.call(this, "Alfresco.Header", htmlId);
       
       // Notifications that the favourite sites have been updated
       YAHOO.Bubbling.on("favouriteSiteAdded", this.onFavouriteSiteAdded, this);
@@ -65,7 +50,7 @@
       return this;
    };
 
-   Alfresco.Header.prototype =
+   YAHOO.extend(Alfresco.Header, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -122,43 +107,6 @@
       },
       
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Header} returns 'this' for method chaining
-       */
-      setOptions: function Header_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Header} returns 'this' for method chaining
-       */
-      setMessages: function Header_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function Header_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);           
-      },
-      
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Initial History Manager event registration
        *
@@ -173,9 +121,10 @@
          this.defaultSearchText();
          
          // register the "enter" event on the search text field
-         var zinput = Dom.get(this.id + "-searchtext");
-         var me = this;
-         new YAHOO.util.KeyListener(zinput, 
+         var zinput = Dom.get(this.id + "-searchtext"),
+            me = this;
+
+         this.widgets.enterListener = new YAHOO.util.KeyListener(zinput, 
          {
             keys: 13
          }, 
@@ -185,30 +134,35 @@
             correctScope: true
          }, "keydown").enable();
                          
-         var searchMenu = new YAHOO.widget.Menu(this.id + "-searchtogglemenu",
-         {
-            context: [this.id + "-search-tbutton", "br", "tr"]
-         });
-         searchMenu.render();
-
-         var searchButton = new YAHOO.widget.Button(this.id + "-search-tbutton",
+         this.widgets.searchButton = new YAHOO.widget.Button(this.id + "-search-tbutton",
          {
             type: "menu",
-            menu: searchMenu
+            menu: new YAHOO.widget.Menu(this.id + "-searchtogglemenu"),
+            menualignment: ["tr", "br"]
          });
          Dom.removeClass(this.id + "-searchtogglemenu", "hidden");
 
-         var sitesMenu = new YAHOO.widget.Menu(this.id + "-sites-menu");
-         sitesMenu.render();
-         sitesMenu.subscribe("hide", this.onSitesMenuHide, this, true);
-         this.widgets.sitesMenu = sitesMenu;
-
-         var sitesButton = new YAHOO.widget.Button(this.id + "-sites",
+         this.widgets.sitesMenu = new YAHOO.widget.Menu(this.id + "-sites-menu");
+         this.widgets.sitesButton = new YAHOO.widget.Button(this.id + "-sites",
          {
-            type: "split"
+            type: "menu",
+            menu: this.widgets.sitesMenu
          });
-         sitesButton.subscribe("click", this.onSitesMenuShow, this, true);
-         
+         // Override align() function so menu can be aligned to "Sites" span, not button
+         this.widgets.sitesMenu.align = function align()
+         {
+            this.cfg.config.context.value = [Dom.get(me.id + "-sites-linkMenuButton"), "tl", "bl"];
+            return YAHOO.widget.Menu.superclass.align.apply(this, arguments);
+         };
+         // Listen for show and hide events on the menu so the Sites span can be styled
+         this.widgets.sitesMenu.subscribe("show", function sitesMenu_onShow()
+         {
+            Dom.addClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
+         }, this, true);
+         this.widgets.sitesMenu.subscribe("hide", function sitesMenu_onHide()
+         {
+            Dom.removeClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
+         }, this, true);
       },
       
       /**
@@ -283,7 +237,7 @@
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+               text: this.msg("message.minimum-length", this.options.minSearchTermLength)
             });
          }
          else
@@ -317,39 +271,9 @@
       {
          if (type == 'all')
          {
-            return this._msg("header.search.searchall");
+            return this.msg("header.search.searchall");
          }
-         return this._msg("header.search.searchsite", this.options.siteTitle);
-      },
-
-      /**
-       * Show the sites drop-down menu
-       *
-       * @method onSitesMenuShow
-       * @param e {object} User generated event
-       */
-      onSitesMenuShow: function Header_onSitesMenuShow(e)
-      {
-         // Position the menu under the link-menu-button wrapper span
-         var coord = Dom.getXY(this.id + "-sites-linkMenuButton");
-         coord[1] += Dom.get(this.id + "-sites-linkMenuButton").offsetHeight;
-         Dom.setXY(this.widgets.sitesMenu.id, coord);
-         this.widgets.sitesMenu.show();
-         this.widgets.sitesMenu.focus();
-
-         // Add a selector the link-menu-button wrapper so we can put a border around bothe the link and the button
-         Dom.addClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
-      },
-
-      /**
-       * Hide the sites drop-down menu
-       *
-       * @method onSitesMenuHide
-       * @param e {object} User generated event
-       */
-      onSitesMenuHide: function Header_onSitesMenuHide(e)
-      {
-         Dom.removeClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
+         return this.msg("header.search.searchsite", this.options.siteTitle);
       },
 
       /**
@@ -491,7 +415,7 @@
                {
                   Alfresco.util.PopupManager.displayPrompt(
                   {
-                     text: me._msg("message.siteFavourite.failure")
+                     text: me.msg("message.siteFavourite.failure")
                   });
                },
                scope: this
@@ -501,7 +425,6 @@
                fn: function(event, obj)
                {
                   YAHOO.Bubbling.fire("favouriteSiteAdded", obj.site);
-                  // sitesMenu.removeItem(this.widgets.sitesMenu.activeItem.index, this.widgets.sitesMenu.activeItem.groupIndex, true);
                },
                scope: this,
                obj:
@@ -511,23 +434,7 @@
             }
          };
 
-         this.preferencesService.set(
-            Alfresco.service.Preferences.FAVOURITE_SITES + "." + site.shortName,
-            true,
-            responseConfig);
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function Header__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
+         this.preferencesService.set(Alfresco.service.Preferences.FAVOURITE_SITES + "." + site.shortName, true, responseConfig);
       }      
-   };
+   });
 })();

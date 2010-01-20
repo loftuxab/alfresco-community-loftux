@@ -129,7 +129,14 @@
                {
                   fn: function RssFeed_onConfigFeed_callback(response)
                   {
-                     Dom.get(this.id + "-scrollableList").innerHTML = response.serverResponse.responseText;
+                     var rss = response.json;
+
+                     // Save url for new config dialog openings
+                     this.options.feedURL = (rss && rss.feedURL) ? rss.feedURL : this.options.feedURL;
+
+                     // Update title and items are with new rss 
+                     Dom.get(this.id + "-title").innerHTML = rss ? rss.title : "";
+                     Dom.get(this.id + "-scrollableList").innerHTML = rss ? rss.content : "";
                   },
                   scope: this
                },
