@@ -108,8 +108,7 @@
 {
    clear: both;
    background-color: #f6f9fc;
-   overflow-x: hidden;
-   overflow-y: auto;
+   overflow: auto;
    position: relative !important;
 }
 

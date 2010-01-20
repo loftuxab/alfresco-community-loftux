@@ -555,12 +555,12 @@
 
 .doclist .onActionViewOriginal a
 {
-   
+   background-image: url(images/original-doc-16.png);
 }
 
 .doclist .onActionViewWorkingCopy a
 {
-   
+   background-image: url(images/working-copy-16.png);
 }
 
 

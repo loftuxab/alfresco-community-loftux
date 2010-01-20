@@ -993,7 +993,7 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
       valid = YAHOO.lang.trim(field.value).length !== 0;
    }
    
-   if (!valid && !silent && form !== null)
+   if (!valid && !silent && form)
    {
       // if the keyCode from the event is the TAB or SHIFT keys don't show the error
       if (event && event.keyCode != 9 && event.keyCode != 16 || !event)
@@ -1077,7 +1077,7 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
       }
    }
    
-   if (!valid && !silent && form !== null)
+   if (!valid && !silent && form)
    {
       var msg = (message != null) ? message : "is not the correct length.";
       form.addError(form.getFieldLabel(field.id) + " " + msg, field);
@@ -1105,7 +1105,7 @@ Alfresco.forms.validation.number = function number(field, args, event, form, sil
    
    var valid = (isNaN(field.value) == false);
    
-   if (!valid && !silent && form !== null)
+   if (!valid && !silent && form)
    {
       var msg = (message != null) ? message : "is not a number.";
       form.addError(form.getFieldLabel(field.id) + " " + msg, field);
@@ -1146,7 +1146,7 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
       {
          valid = false;
          
-         if (!silent && form !== null)
+         if (!silent && form)
          {
             var msg = (message != null) ? message : "is not a number.";
             form.addError(form.getFieldLabel(field.id) + " " + msg, field);
@@ -1187,7 +1187,7 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
             valid = false;
          }
          
-         if (!valid && !silent && form !== null)
+         if (!valid && !silent && form)
          {
             var msg = (message != null) ? message : "is not within the allowable range.";
             form.addError(form.getFieldLabel(field.id) + " " + msg, field);
@@ -1316,7 +1316,7 @@ Alfresco.forms.validation.url = function url(field, args, event, form, silent, m
       valid = field.value.replace(pattern, "") === "";
 
       // Inform the user if invalid
-      if (!valid && !silent && form !== null)
+      if (!valid && !silent && form)
       {
          var msg = (message != null) ? message : "is invalid.";
          form.addError(form.getFieldLabel(field.id) + " " + msg, field);
@@ -1376,7 +1376,7 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, event, f
       }
 
       // Inform the user if invalid
-      if (!valid && !silent && form !== null)
+      if (!valid && !silent && form)
       {
          var msg = (message != null) ? message : "is invalid.";
          form.addError(form.getFieldLabel(field.id) + " " + msg, field);

@@ -163,14 +163,6 @@
       pendingInvites: null,
 
       /**
-       * Keeps track if this component is searching or not
-       *
-       * @property isSearching
-       * @type Boolean
-       */
-      isSearching: false,      
-      
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *

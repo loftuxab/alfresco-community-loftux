@@ -403,9 +403,9 @@
       {
          var recordSet = this.widgets.dataTable.getRecordSet(),
             record;
-         for (var i = 0, i = recordSet.getLength(); i < ii; i++)
+         for (var i = 0, ii = recordSet.getLength(); i < ii; i++)
          {
-            var record = recordSet.getRecord(i);
+            record = recordSet.getRecord(i);
             this._setRoleForRecord(record, roleName);
          }
          
@@ -543,11 +543,6 @@
          // success handler
          var success = function GroupsList__doAddResult_success(response)
          {
-            YAHOO.Bubbling.fire("itemSelected",
-            {
-               itemName: record.getData("itemName"),
-               displayName: record.getData("displayName")
-            });
             resultData.successes.push(resultData.index);
             resultData.index++;
             this._processResultData(resultData);

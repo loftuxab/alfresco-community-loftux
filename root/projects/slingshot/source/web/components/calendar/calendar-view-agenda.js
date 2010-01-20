@@ -127,12 +127,12 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
       var adjEl;
       while(day<=31)
       {
-         day++;
          adjEl=Dom.get('cal-'+partialId+'-'+Alfresco.CalendarHelper.padZeros(day));
          if (adjEl)
          {
             break;
          }
+         day++;         
       }
       return Dom.getPreviousSibling(adjEl); 
    },
@@ -165,7 +165,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
            }
            var evEl = Alfresco.CalendarHelper.renderTemplate('vevent',event);
            Dom.generateId(evEl);
-           if (event.start===event.end)
+           if (event.allday=='allday')
            {
               var pEl = Dom.getElementsByClassName('dates','p',evEl)[0];
               Dom.addClass(pEl,'theme-bg-color-1');
@@ -337,18 +337,11 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
          data.allday = (YAHOO.lang.isUndefined(data.allday)) ? '' : data.allday;
          data.from = data.from +'T'+data.start;
          data.to = data.to +'T'+data.end;
-         //get containing date TD cell for event
-         var targetEl = Dom.get('cal-'+data.from.split(':')[0]+':00');
+
          //render into allday section
          if(data.allday)
          {
             data.allday = 'allday';
-            var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
-            vEventEl = this.renderAllDayEvents(vEventEl,data);
-            this.calEventConfig.draggable = YAHOO.util.Dom.hasClass(vEventEl,'allday') ? false : true;
-            this.calEventConfig.resizable = (Dom.hasClass(vEventEl,'allday')) ? false : true;
-            var newCalEvent = new Alfresco.calendarEvent(vEventEl, this.dragGroup,YAHOO.lang.merge(this.calEventConfig,{performRender:false}));
-            this.events[vEventEl.id]=newCalEvent;
          }
          else 
          { //not allday
@@ -357,32 +350,37 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
             data.contEl = 'div';
             data.hidden = '';
             
-            var vEventEl;
-            targetEl = Dom.get('cal-'+data.from.split('T')[0]);
-            // date div doesn't exist in agenda view so let's create it.
-            if (!targetEl)
+         }
+         this.calEventConfig.resizable = false;
+         this.calEventConfig.draggable = false;
+         var vEventEl;
+         //get containing date TD cell for event
+         var targetEl = Dom.get('cal-'+data.from.split('T')[0]);
+         // date div doesn't exist in agenda view so let's create it.
+         if (!targetEl)
+         {
+            var event = [];
+            var identifier = data.from.split('T')[0];
+            event[identifier] = [];
+            event[identifier].push(data);
+            var adjEl = this._getAgendaInsertNode(identifier);
+            vEventEl = this.renderAgendaDayEvents(event,YAHOO.util.Selector.query('div.agendaview div', null, true),adjEl);
+         } // already exists 
+         else 
+         {
+            targetEl = targetEl.getElementsByTagName('ul')[0];
+            vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
+            targetEl.appendChild(vEventEl);
+            if (data.allday=='allday')
             {
-               var event = [];
-               var identifier = data.from.split('T')[0];
-               event[identifier] = [];
-               event[identifier].push(data);
-               var adjEl = this.getAgendaInsertNode(identifier);
-               vEventEl = this.renderAgendaDayEvents(event,Dom.getElementsByClassName('agendaview')[0],adjEl);
-            } // already exists 
-            else 
-            {
-               targetEl = targetEl.getElementsByTagName('ul')[0];
-               vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
-               targetEl.appendChild(vEventEl);
+               var pEl = Dom.getElementsByClassName('dates','p',vEventEl)[0];
+               Dom.addClass(pEl,'theme-bg-color-1');
+               Dom.addClass(pEl,'theme-color-1');                                
             }
-            this.calEventConfig.resizable = false;
-            this.calEventConfig.draggable = false;
          }
          var id = Event.generateId(vEventEl);
          var newCalEvent = new Alfresco.calendarEvent(vEventEl, this.dragGroup,YAHOO.lang.merge(this.calEventConfig,{performRender:false}));
          this.events[id]=newCalEvent;
-
-         newCalEvent.on('eventMoved', this.onEventMoved, newCalEvent, this);
       }
       YAHOO.Bubbling.fire("eventSavedAfter");
       this.displayMessage('message.created.success',this.name);             

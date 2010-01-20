@@ -201,8 +201,10 @@
             searchTermElem.value = parent.searchTerm;
             
             // check search length again as we may have got here via history navigation
-            if (parent.searchTerm !== undefined && parent.searchTerm.length >= parent.options.minSearchTermLength)
+            if (!this.isSearching && parent.searchTerm !== undefined && parent.searchTerm.length >= parent.options.minSearchTermLength)
             {
+               this.isSearching = true;
+
                var me = this;
                
                // Reset the custom error messages
@@ -252,19 +254,26 @@
                   failure: failureHandler,
                   scope: parent
                });
+               me._setResultsMessage("message.searchingFor", $html(parent.searchTerm));
 
                // Disable search button and display a wait feedback message if the users hasn't been found yet
                parent.widgets.searchButton.set("disabled", true);
-               me.isSearching = true;
                YAHOO.lang.later(2000, me, function(){
                   if (me.isSearching)
                   {
-                     me.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+                     if (!me.widgets.feedbackMessage)
                      {
-                        text: Alfresco.util.message("message.searching", parent.name),
-                        spanClass: "wait",
-                        displayTime: 0
-                     });
+                      me.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+                      {
+                         text: Alfresco.util.message("message.searching", parent.name),
+                         spanClass: "wait",
+                         displayTime: 0
+                      });
+                     }
+                     else if (!me.widgets.feedbackMessage.cfg.getProperty("visible"))
+                     {
+                      me.widgets.feedbackMessage.show();
+                     }
                   }
                }, []);
             }
@@ -276,15 +285,15 @@
           * @method _enableSearchUI
           * @private
           */
-         _enableSearchUI: function ConsoleGroups_SearchPanelHandler_doSearch()
+         _enableSearchUI: function _enableSearchUI()
          {
             // Enable search button and close the wait feedback message if present
-            this.isSearching = false;
-            parent.widgets.searchButton.set("disabled", false);
-            if (this.widgets.feedbackMessage)
+            if (this.widgets.feedbackMessage && this.widgets.feedbackMessage.cfg.getProperty("visible"))
             {
-               this.widgets.feedbackMessage.destroy();
+               this.widgets.feedbackMessage.hide();
             }
+            parent.widgets.searchButton.set("disabled", false);
+            this.isSearching = false;
          },
 
          /**

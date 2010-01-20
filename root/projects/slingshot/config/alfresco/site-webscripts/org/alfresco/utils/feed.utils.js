@@ -24,7 +24,7 @@ function getRSSFeed(uri, limit)
    var connector = remote.connect("http");
    var result = connector.call(uri);
 
-   if (result !== null)
+   if (result !== null && result.status == 200)
    {
       var rssXml = new String(result),
          rss;
@@ -33,15 +33,31 @@ function getRSSFeed(uri, limit)
       rssXml = prepareForE4X(rssXml);
 
       // Find out what type of feed
-      rss = new XML(rssXml);
-    	if (rss.name().localName.toLowerCase() == "rss")
-    	{
-          return parseRssFeed(rss, rssXml, limit);
-      }
-      else if(rss.name().localName.toLowerCase() == "feed")
+      try
       {
-          return parseAtomFeed(rss, rssXml, limit);
+         rss = new XML(rssXml);
+         if (rss.name().localName.toLowerCase() == "rss")
+         {
+             return parseRssFeed(rss, rssXml, limit);
+         }
+         else if(rss.name().localName.toLowerCase() == "feed")
+         {
+             return parseAtomFeed(rss, rssXml, limit);
+         }
       }
+      catch (e)
+      {
+         return {
+            error: "bad_data"
+         };
+      }
+
+   }
+   else
+   {
+      return {
+         error: "unavailable"
+      };
    }
 }
 

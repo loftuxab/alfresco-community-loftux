@@ -680,7 +680,7 @@
           */
          _enableNewValueButton: function ViewPanelHandler__enableNewValueButton(newValueInputEl)
          {
-            this.widgets.newValueButton.set("disabled", !Alfresco.forms.validation.mandatory(newValueInputEl));
+            this.widgets.newValueButton.set("disabled", (YAHOO.lang.trim(newValueInputEl.value).length === 0));
          },
 
          /**

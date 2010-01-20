@@ -111,13 +111,13 @@
 
 .header .search-tinput
 {
-	color: default;
-	width: 12em;
+   color: default;
+   width: 12em;
 }
 
 .header .search-tinput.gray
 {
-	color: #999;
+   color: #999;
 }
 
 .header .search-icon
@@ -153,16 +153,14 @@
 
 .header .yuimenu
 {
-	visibility: hidden;
-	position: relative;
 }
 
 .header .yuimenu .bd
 {
-	zoom: normal;
+   zoom: normal;
    border: 1px solid #84B4D5;
-	background-color: #FFFFFF;
-	padding: 0;
+   background-color: #FFFFFF;
+   padding: 0;
    margin-top: 2px;
 }
 
@@ -184,7 +182,7 @@
 {
    color: #68A2D2;
    cursor: pointer;
-	padding: 4px 15px;
+   padding: 4px 15px;
 }
 
 .header .yuimenu .bd div div
@@ -199,9 +197,8 @@
 .header .menu-with-icons .bd ul li.yuimenuitem a.yuimenuitemlabel
 {
    background-repeat: no-repeat;
-   background-position: left 5px;
-   margin-left: 15px;
-   padding-left: 22px;
+   background-position: 15px 5px;
+   padding-left: 37px;
 }
 
 .header .yuimenu .bd ul.favourite-sites-list li.yuimenuitem a.yuimenuitemlabel
@@ -245,7 +242,7 @@
 
 .header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel.disabled
 {
-	color: #ccc;
+   color: #ccc;
    background-color: #FFF;
    cursor: default;
 }

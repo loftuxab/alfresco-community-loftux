@@ -551,10 +551,6 @@
          // success handler
          var success = function InvitationList__doInviteUser_success(response)
          {
-            YAHOO.Bubbling.fire("onPersonSelected",
-            {
-               userName: record.getData("userName")
-            });
             inviteData.successes.push(inviteData.index);
             inviteData.index++;
             this._processInviteData(inviteData);

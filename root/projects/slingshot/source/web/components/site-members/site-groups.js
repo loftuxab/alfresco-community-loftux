@@ -775,66 +775,77 @@
        */
       _performSearch: function SiteGroups__performSearch(searchTerm)
       {
-         // Reset the custom error messages
-         this._setDefaultDataTableErrors(this.widgets.dataTable);
-         
-         // Display loading message
-         this.widgets.dataTable.set("MSG_EMPTY", this._msg("site-groups.searching"));
-         
-         // empty results table
-         this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
-         
-         function successHandler(sRequest, oResponse, oPayload)
+         if (!this.isSearching)
          {
-            this._enableSearchUI();
-            this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-            this._setDefaultDataTableErrors(this.widgets.dataTable);
-         }
-         
-         function failureHandler(sRequest, oResponse)
-         {
-            this._enableSearchUI();
-            if (oResponse.status == 401)
-            {
-               // Our session has likely timed-out, so refresh to offer the login page
-               window.location.reload();
-            }
-            else
-            {
-               try
-               {
-                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  this.widgets.dataTable.set("MSG_ERROR", response.message);
-                  this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
-               }
-               catch(e)
-               {
-                  this._setDefaultDataTableErrors(this.widgets.dataTable);
-               }
-            }
-         }
-         
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),
-         {
-            success: successHandler,
-            failure: failureHandler,
-            scope: this
-         });
+            this.isSearching = true;
 
-         // Display a wait feedback message if the people hasn't been found yet
-         this.widgets.searchButton.set("disabled", true);
-         this.isSearching = true;
-         YAHOO.lang.later(2000, this, function(){
-            if (this.isSearching)
+            // Reset the custom error messages
+            this._setDefaultDataTableErrors(this.widgets.dataTable);
+
+            // Display loading message
+            this.widgets.dataTable.set("MSG_EMPTY", this._msg("site-groups.searching"));
+
+            // empty results table
+            this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
+
+            function successHandler(sRequest, oResponse, oPayload)
             {
-               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
-               {
-                  text: Alfresco.util.message("message.searching", this.name),
-                  spanClass: "wait",
-                  displayTime: 0
-               });
+               this._enableSearchUI();
+               this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+               this._setDefaultDataTableErrors(this.widgets.dataTable);
             }
-         }, []);
+
+            function failureHandler(sRequest, oResponse)
+            {
+               this._enableSearchUI();
+               if (oResponse.status == 401)
+               {
+                  // Our session has likely timed-out, so refresh to offer the login page
+                  window.location.reload();
+               }
+               else
+               {
+                  try
+                  {
+                     var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                     this.widgets.dataTable.set("MSG_ERROR", response.message);
+                     this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
+                  }
+                  catch(e)
+                  {
+                     this._setDefaultDataTableErrors(this.widgets.dataTable);
+                  }
+               }
+            }
+
+            this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),
+            {
+               success: successHandler,
+               failure: failureHandler,
+               scope: this
+            });
+
+            // Display a wait feedback message if the people hasn't been found yet
+            this.widgets.searchButton.set("disabled", true);
+            YAHOO.lang.later(2000, this, function(){
+               if (this.isSearching)
+               {
+                  if (!this.widgets.feedbackMessage)
+                  {
+                     this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: Alfresco.util.message("message.searching", this.name),
+                        spanClass: "wait",
+                        displayTime: 0
+                     });
+                  }
+                  else if (!this.widgets.feedbackMessage.cfg.getProperty("visible"))
+                  {
+                     this.widgets.feedbackMessage.show();
+                  }
+               }
+            }, []);
+         }
       },
 
       /**
@@ -843,15 +854,15 @@
        * @method _enableSearchUI
        * @private
        */
-      _enableSearchUI: function ConsoleGroups_SearchPanelHandler_doSearch()
+      _enableSearchUI: function SiteGroups__enableSearchUI()
       {
          // Enable search button and close the wait feedback message if present
-         this.isSearching = false;
-         this.widgets.searchButton.set("disabled", false);
-         if (this.widgets.feedbackMessage)
+         if (this.widgets.feedbackMessage && this.widgets.feedbackMessage.cfg.getProperty("visible"))
          {
-            this.widgets.feedbackMessage.destroy();
+            this.widgets.feedbackMessage.hide();
          }
+         this.widgets.searchButton.set("disabled", false);
+         this.isSearching = false;
       },
       
       /**

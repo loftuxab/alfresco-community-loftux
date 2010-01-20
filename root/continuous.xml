@@ -1018,26 +1018,27 @@
       <!-- Documentation -->
       <!-- -->
       <mkdir dir="${dir.continuous.assemble.sdk}/doc" />
-
-      <!-- Javadoc -->
-      <mkdir dir="${dir.continuous.assemble.sdk}/doc/api" />
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/core-doc.zip">
+   	
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-core-doc.zip">
          <zipfileset dir="${dir.project.core.docs.java}" />
       </zip>
-<!--      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/remote-api-doc.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-remote-api-doc.zip">
          <zipfileset dir="${dir.project.remoteapi.docs.java}" />
-      </zip> -->
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/repository-doc.zip">
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-repository-doc.zip">
          <zipfileset dir="${dir.project.repository.docs.java}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/web-client-doc.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-web-client-doc.zip">
          <zipfileset dir="${dir.project.webclient.docs.java}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/web-client-doc.zip">
-         <zipfileset dir="${dir.project.webclient.docs.java}" />
-      </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/share-doc.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-share-doc.zip">
          <zipfileset dir="${dir.project.slingshot.docs.java}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-deployment-doc.zip">
+         <zipfileset dir="${dir.project.deployment.docs.java}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-web-service-client-doc.zip">
+       <zipfileset dir="${dir.project.webserviceclient.docs.java}" />
       </zip>
       
       <!-- Taglib -->
@@ -1081,6 +1082,7 @@
             file="${dir.project.deployment.dist}/${file.name.jar.deployment}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.webclient.dist}/${file.name.jar.webclient}" />
+
       <!-- Deployment Libraries -->
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/deployment"/>
       <copy todir="${dir.continuous.assemble.sdk}/lib/deployment"
@@ -1149,24 +1151,27 @@
       <!-- Source -->
       <!-- -->
       <mkdir dir="${dir.continuous.assemble.sdk}/src" />
-      <zip destfile="${dir.continuous.assemble.sdk}/src/core-src.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-core-src.zip">
          <zipfileset dir="${dir.project.core.src}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/src/remote-api-src.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-remote-api-src.zip">
          <zipfileset dir="${dir.project.remoteapi.src}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/src/repository-src.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-repository-src.zip">
          <zipfileset dir="${dir.project.repository.src}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/src/web-service-client-src.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-web-service-client-src.zip">
          <zipfileset dir="${dir.project.webserviceclient.src.java}" />
          <zipfileset dir="${dir.project.webserviceclient.src.generated}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/src/web-client-src.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-web-client-src.zip">
          <zipfileset dir="${dir.project.webclient.src}" />
       </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/src/share-src.zip">
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-share-src.zip">
          <zipfileset dir="${dir.project.slingshot.src}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-deployment-src.zip">
+         <zipfileset dir="${dir.project.deployment.src}" />
       </zip>
 
       <!-- -->

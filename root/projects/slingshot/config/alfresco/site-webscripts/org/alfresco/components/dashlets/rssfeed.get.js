@@ -24,8 +24,18 @@ function main ()
    model.target = args.target || "_self";
 
    var feed = getRSSFeed(uri);
-   model.title = feed.title;
-   model.items = feed.items;
+   if (feed.error)
+   {
+      model.title = msg.get("title.error." + feed.error);
+      model.error = true;
+      model.items = [];
+   }
+   else
+   {
+      model.title = feed.title;
+      model.items = feed.items;
+   }
+
 
    var userIsSiteManager = true;
    //Check whether we are within the context of a site

@@ -1,7 +1,7 @@
 .group-finder
 {
    color: #000;
-   margin: 24px 10px 10px;
+   margin: 1em 0 0;
 }
 
 .group-finder.list
@@ -81,17 +81,10 @@
 .group-finder .results
 {
    clear: both;
-   background-color: #f6f9fc;
-   overflow-x: hidden;
-   overflow-y: auto;
+   overflow: auto;
    position: relative !important;
 }
 
-/*.group-finder .itemname a
-{
-   color: #276FB6;
-}
-*/
 .group-finder .detail
 {
    line-height: 1.4em;

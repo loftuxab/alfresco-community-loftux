@@ -227,6 +227,11 @@ hr
    background-repeat: no-repeat;
 }
 
+.yui-skin-default .yui-overlay-hidden #message .bd span.wait
+{
+   display: none;
+}
+
 /* Style the default prompt and user input pop-ups */
 
 .yui-skin-default #prompt,
