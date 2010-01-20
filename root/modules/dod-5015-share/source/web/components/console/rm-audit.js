@@ -55,7 +55,6 @@
    Alfresco.RM_Audit = function RM_Audit_constructor(htmlId)
    {
       Alfresco.RM_Audit.superclass.constructor.call(this, "Alfresco.RM_Audit", htmlId,["button", "container", "datasource", "datatable", "paginator", "json", "calendar"]);
-      Alfresco.util.ComponentManager.register(this);
       
       YAHOO.Bubbling.on("PropertyMenuSelected", this.onPropertyMenuSelected, this);
       
@@ -866,7 +865,6 @@
                fixedcenter:true,
                zIndex: 1000
             });
-            this.widgets.auditDialog.render(document.body);            
          }
 
          var body = '<table id="auditEntryDetails">'+
@@ -920,7 +918,7 @@
             {
                var o = data.changedValues[i];
                o.className = (i%2===0) ? '' : ' class="odd"';
-               o.previous = $html(o.previous) || '&lt;none&gt;';
+               o.previous = o.previous || '<none>';
                changedValuesHTML += YAHOO.lang.substitute(changedValuesHTMLTemplate, o, function(p_key, p_value, p_meta)
                {
                   return $html(p_value);
@@ -944,7 +942,7 @@
          body +='</div>';
          this.widgets.auditDialog.setHeader(this.msg('label.dialog-title',data.event));
          this.widgets.auditDialog.setBody(body);
-         this.widgets.auditDialog.render();
+         this.widgets.auditDialog.render(document.body);
          this.widgets.auditDialog.center();
          if(YAHOO.env.ua.ie==6)
          {

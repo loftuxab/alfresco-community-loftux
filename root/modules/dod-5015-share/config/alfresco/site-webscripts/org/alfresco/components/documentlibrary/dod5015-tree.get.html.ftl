@@ -1,8 +1,11 @@
+<#assign treeConfig = config.scoped["DocumentLibrary"]["tree"]!>
+<#if treeConfig.getChildValue??><#assign evaluateChildFolders = treeConfig.getChildValue("evaluate-child-folders")!"true"></#if>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RecordsDocListTree("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${template.properties.container!"documentLibrary"}"
+      containerId: "${template.properties.container!"documentLibrary"}",
+      evaluateChildFolders: ${evaluateChildFolders!"true"}
    }).setMessages(
       ${messages}
    );

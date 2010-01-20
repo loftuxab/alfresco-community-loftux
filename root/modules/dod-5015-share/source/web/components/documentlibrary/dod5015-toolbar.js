@@ -554,7 +554,7 @@
          // Url to webscript to get the nodeRefs for the top level series
          var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/";
          url += encodeURIComponent(this.options.siteId) + "/" + encodeURIComponent(this.options.containerId);
-         url += "?perms=false";
+         url += "?perms=false&children=false";
 
          // Load all series so they (and all their child objects) can be exported
          Alfresco.util.Ajax.jsonGet(
@@ -564,10 +564,17 @@
             {
                fn: function(serverResponse)
                {
-                  if (serverResponse.json && serverResponse.json.items)
+                  if (serverResponse.json && serverResponse.json.items && serverResponse.json.items.length > 0)
                   {
                      // Display the export dialog and do the export
                      this.onActionExport(serverResponse.json.items);
+                  }
+                  else
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.nothing-to-export")
+                     });
                   }
                },
                scope: this

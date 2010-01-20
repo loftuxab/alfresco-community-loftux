@@ -257,6 +257,7 @@
        _buildTreeNodeUrl: function RMCMFT__buildTreeNodeUrl(path)
        {
           var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/{site}/{container}{path}";
+          uriTemplate += "?children=" + this.options.evaluateChildFolders;
 
           var url = YAHOO.lang.substitute(uriTemplate,
           {

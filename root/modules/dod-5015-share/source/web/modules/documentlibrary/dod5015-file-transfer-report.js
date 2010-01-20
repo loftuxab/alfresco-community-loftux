@@ -79,7 +79,16 @@
           * @property transfer The nodeRef to the transfer that shall be filed
           * @type object
           */
-         transfer: null
+         transfer: null,
+         
+         /**
+          * Evaluate child folders flag - for tree control
+          *
+          * @property evaluateChildFolders
+          * @type boolean
+          * @default true
+          */
+         evaluateChildFolders: true
       },
 
       /**
@@ -100,7 +109,7 @@
       },
 
       /**
-       *
+       * OK button clicked on destination select dialog
        *
        * @method onOK
        * @override
@@ -199,6 +208,7 @@
        _buildTreeNodeUrl: function RMCMFT__buildTreeNodeUrl(path)
        {
           var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/{site}/{container}{path}";
+          uriTemplate += "?children=" + this.options.evaluateChildFolders;
 
           var url = YAHOO.lang.substitute(uriTemplate,
           {

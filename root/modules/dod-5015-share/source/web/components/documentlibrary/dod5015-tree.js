@@ -117,6 +117,7 @@
        _buildTreeNodeUrl: function DLT__buildTreeNodeUrl(path)
        {
           var uriTemplate ="slingshot/doclib/dod5015/treenode/site/" + $combine(encodeURIComponent(this.options.siteId), encodeURIComponent(this.options.containerId), Alfresco.util.encodeURIPath(path));
+          uriTemplate += "?children=" + this.options.evaluateChildFolders;
           return  Alfresco.constants.PROXY_URI + uriTemplate + "?perms=false";
        }
    });

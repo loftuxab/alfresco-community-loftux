@@ -197,7 +197,16 @@
          [
             DLGF.VIEW_MODE_SITE,
             DLGF.VIEW_MODE_REPOSITORY
-         ]
+         ],
+
+         /**
+          * Evaluate child folders flag
+          *
+          * @property evaluateChildFolders
+          * @type boolean
+          * @default true
+          */
+         evaluateChildFolders: true
       },
       
       /**
@@ -1022,6 +1031,8 @@
           {
              uriTemplate += "slingshot/doclib/treenode/node/{nodeRef}{path}";
           }
+
+          uriTemplate += "?children=" + this.options.evaluateChildFolders;
 
           var url = YAHOO.lang.substitute(uriTemplate,
           {

@@ -11,6 +11,9 @@
       </div>
    </div>
 </div>
+<#assign treeConfig = config.scoped["DocumentLibrary"]["tree"]!>
+<#if treeConfig.getChildValue??><#assign evaluateChildFolders = treeConfig.getChildValue("evaluate-child-folders")!"true"></#if>
 <script type="text/javascript">//<![CDATA[
    Alfresco.util.addMessages(${messages}, "Alfresco.module.RecordsCopyMoveFileTo");
+   Alfresco.util.ComponentManager.get("${args.htmlid}").options.evaluateChildFolders = ${evaluateChildFolders!"true"};
 //]]></script>

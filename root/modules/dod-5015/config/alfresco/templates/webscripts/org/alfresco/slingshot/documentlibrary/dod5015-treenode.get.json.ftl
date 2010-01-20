@@ -5,10 +5,6 @@
    [
    <#list treenode.items as item>
       <#assign t = item.node>
-      <#assign hasChildren = false>
-      <#list t.children as c>
-         <#if c.isContainer><#assign hasChildren = true><#break></#if>
-      </#list>
       {
       <#if item.permissions??>
          "userAccess":
@@ -22,8 +18,8 @@
       </#if>
          "nodeRef": "${t.nodeRef}",
          "name": "${t.name}",
-         "description": "${(t.properties.description!"{}")}",
-         "hasChildren": ${hasChildren?string}
+         "description": "${(t.properties.description!"")}",
+         "hasChildren": ${item.hasSubfolders?string}
       }<#if item_has_next>,</#if>
    </#list>
    ]

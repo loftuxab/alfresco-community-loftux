@@ -10,10 +10,10 @@
    });
    new Alfresco.RM_Audit('${htmlid}-audit').setOptions(
    {
-      'siteId': "${page.url.templateArgs.site!"rm"}",
-      'containerId': "${template.properties.container!"documentLibrary"}",
-      'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
-      'auditEvents': ${eventsStr}
+      siteId: "${page.url.templateArgs.site!"rm"}",
+      containerId: "${template.properties.container!"documentLibrary"}",
+      viewMode: Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
+      auditEvents: ${eventsStr}
    }).setMessages(${messages});
 //]]</script>
   
