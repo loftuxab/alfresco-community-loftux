@@ -31,7 +31,11 @@
  */
 (function()
 {
-   
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom;
+
    /**
     * AddEmailInvite constructor.
     * 
@@ -41,79 +45,11 @@
     */
    Alfresco.AddEmailInvite = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.AddEmailInvite";
-      this.id = htmlId;
-      
-      /* Initialise prototype properties */
-      this.widgets = {};
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["event", "button"], this.onComponentsLoaded, this);
+      return Alfresco.AddEmailInvite.superclass.constructor.call(this, "Alfresco.AddEmailInvite", htmlId);
+   };
    
-      return this;
-   }
-   
-   Alfresco.AddEmailInvite.prototype =
+   YAHOO.extend(Alfresco.AddEmailInvite, Alfresco.component.Base,
    {
-      /**
-       * Object container for initialization options
-       *
-       * @property options
-       * @type object
-       */
-      options:
-      {
-      },
-
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.AddEmailInvite} returns 'this' for method chaining
-       */
-      setOptions: function AddEmailInvite_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.AddEmailInvite} returns 'this' for method chaining
-       */
-      setMessages: function AddEmailInvite_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function AddEmailInvite_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -128,23 +64,27 @@
 
       /**
        * Add email button click
+       *
+       * @method addEmailButtonClick
+       * @param e {object} DOM Event
+       * @param p_obj {object} Optional object literal from event listener definition
        */
-      addEmailButtonClick: function DLTB_onNewFolder(e, p_obj)
+      addEmailButtonClick: function AddEmailInvite_addEmailButtonClick(e, p_obj)
       {
          // fetch the firstname, lastname nad email
-         var firstNameElem = YAHOO.util.Dom.get(this.id + "-firstname");
-         var firstName = firstNameElem.value;
-         var lastNameElem = YAHOO.util.Dom.get(this.id + "-lastname");
-         var lastName = lastNameElem.value;
-         var emailElem = YAHOO.util.Dom.get(this.id + "-email");
-         var email = emailElem.value;
+         var firstNameElem = YAHOO.util.Dom.get(this.id + "-firstname"),
+            firstName = firstNameElem.value,
+            lastNameElem = YAHOO.util.Dom.get(this.id + "-lastname"),
+            lastName = lastNameElem.value,
+            emailElem = YAHOO.util.Dom.get(this.id + "-email"),
+            email = emailElem.value;
          
          // check whether we got enough information to proceed
          if (firstName.length < 1 || lastName.length < 1 || email.length < 1)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("addemail.mandatoryfieldsmissing")
+               text: this.msg("addemail.mandatoryfieldsmissing")
             });
             return;
          }
@@ -152,29 +92,15 @@
          // Fire the personSelected bubble event
          YAHOO.Bubbling.fire("personSelected",
          {
-            firstName : firstName,
-            lastName : lastName,
-            email : email
+            firstName: firstName,
+            lastName: lastName,
+            email: email
          });
             
          // clear the values
          firstNameElem.value = "";
          lastNameElem.value = "";
          emailElem.value = "";
-      },
-            
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function AddEmailInvite__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.AddEmailInvite", Array.prototype.slice.call(arguments).slice(1));
       }
-
-   };
+   });
 })();

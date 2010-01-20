@@ -148,24 +148,19 @@
          this.doclistMetadata = args[1].metadata;
          this.currentPath = this.assetData.location.path;
          
-         /**
-          * Copy template into active area
-          */
+         // Copy template into active area
          var actionsContainer = Dom.get(this.id + "-actionSet"),
             actionSet = this.assetData.actionSet,
             clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
 
+         // Token replacement
+         clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls());
+
+         // Replace existing actions and assign correct class for icon rendering
          actionsContainer.innerHTML = clone.innerHTML;
          Dom.addClass(actionsContainer, this.assetData.type);
 
-         /**
-          * Token replacement
-          */
-         actionsContainer.innerHTML = YAHOO.lang.substitute(window.unescape(actionsContainer.innerHTML), this.getActionUrls());
-
-         /**
-          * Hide actions which have been disallowed through permissions
-          */
+         // Hide actions which have been disallowed through permissions
          if (this.assetData.permissions && this.assetData.permissions.userAccess)
          {
             var userAccess = this.assetData.permissions.userAccess,
