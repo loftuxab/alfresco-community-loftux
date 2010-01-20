@@ -584,7 +584,7 @@
       {
          var obj = args[1];
          // Should be person details in the arguments
-         if (obj && (obj.userName !== null))
+         if (obj && (obj.userName !== undefined))
          {
             var userName = obj.userName;
             // Add the userName to the selectedUsers object
@@ -604,7 +604,10 @@
             }
             else
             {
-               this.userSelectButtons[userName].set("disabled", true);
+               if (this.userSelectButtons[userName])
+               {
+                  this.userSelectButtons[userName].set("disabled", true);
+               }
             }
          }
       },
@@ -620,7 +623,7 @@
       {
          var obj = args[1];
          // Should be person details in the arguments
-         if (obj && (obj.userName !== null))
+         if (obj && (obj.userName !== undefined))
          {
             delete this.selectedUsers[obj.userName];
             this.singleSelectedUser = "";
@@ -637,7 +640,10 @@
             }
             else
             {
-               this.userSelectButtons[obj.userName].set("disabled", false);
+               if (this.userSelectButtons[obj.userName])
+               {
+                  this.userSelectButtons[obj.userName].set("disabled", false);
+               }
             }
          }
       },

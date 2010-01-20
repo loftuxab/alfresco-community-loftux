@@ -884,7 +884,7 @@
                      // Group is root group or has only 1 parent
                      Dom.addClass(parent.id + "-multiparent", "hidden");
                      Dom.removeClass(parent.id + "-singleparent", "hidden");
-                     Dom.get(parent.id + "-singleparent-message").innerHTML = parent._msg("panel.deletegroup.singleparentmessage", displayName);
+                     Dom.get(parent.id + "-singleparent-message").innerHTML = parent._msg("panel.deletegroup.singleparentmessage", $html(displayName));
                      this.widgets.deleteGroupOkButton.on("click", this.onConfirmedDeleteGroupClick, callbackObj, this);
                   }
                   else
@@ -892,10 +892,10 @@
                      // Group has multiple parents
                      Dom.addClass(parent.id + "-singleparent", "hidden");
                      Dom.removeClass(parent.id + "-multiparent", "hidden");
-                     Dom.get(parent.id + "-multiparent-message").innerHTML = parent._msg("panel.deletegroup.multiparentmessage", displayName);
-                     Dom.get(parent.id + "-remove-message").innerHTML = parent._msg("panel.deletegroup.removemessage", displayName, parentDisplayName);
-                     Dom.get(parent.id + "-delete-message").innerHTML = parent._msg("panel.deletegroup.deletemessage", displayName);
-                     Dom.get(parent.id + "-searchdelete-message").innerHTML = parent._msg("panel.deletegroup.searchdeletemessage", displayName);
+                     Dom.get(parent.id + "-multiparent-message").innerHTML = parent._msg("panel.deletegroup.multiparentmessage", $html(displayName));
+                     Dom.get(parent.id + "-remove-message").innerHTML = parent._msg("panel.deletegroup.removemessage", $html(displayName), $html(parentDisplayName));
+                     Dom.get(parent.id + "-delete-message").innerHTML = parent._msg("panel.deletegroup.deletemessage", $html(displayName));
+                     Dom.get(parent.id + "-searchdelete-message").innerHTML = parent._msg("panel.deletegroup.searchdeletemessage", $html(displayName));
 
                      // Lets display the groups parents to the user, but only the first 10
                      var parentStr = "", displayLimit = 10;
@@ -907,7 +907,7 @@
                      {
                         parentStr += parent._msg("label.moregroups", groups.length - displayLimit);
                      }
-                     Dom.get(parent.id + "-parents").innerHTML = parentStr;
+                     Dom.get(parent.id + "-parents").innerHTML = $html(parentStr);
 
                      if (parentShortName)
                      {

@@ -189,13 +189,14 @@
          var renderCellDescription = function InvitationList_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // we currently render all results the same way
-            var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName"),
+            var record = oRecord.getData(),
+               name = YAHOO.lang.trim(record.firstName + " " + record.lastName),
                userName = "",
-               email = oRecord.getData("email");
+               email = record.email;
 
-            if (oRecord.getData("userName") !== undefined)
+            if (record.userName !== undefined && record.userName.length > 0)
             {
-                userName = "(" + oRecord.getData("userName") + ")";
+                userName = "(" + record.userName + ")";
             }
             elCell.innerHTML = '<h3 class="itemname">' + $html(name) + ' <span class="lighter theme-color-1">' + $html(userName) + '</span></h3><div class="detail">' + $html(email) + '</div>';
          };

@@ -539,7 +539,10 @@
             }
             else
             {
-               this.itemSelectButtons[itemName].set("disabled", true);
+               if (this.itemSelectButtons[itemName])
+               {
+                  this.itemSelectButtons[itemName].set("disabled", true);
+               }
             }
          }
       },

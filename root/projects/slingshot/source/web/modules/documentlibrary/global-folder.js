@@ -47,11 +47,7 @@
 
    Alfresco.module.DoclibGlobalFolder = function(htmlId)
    {
-      Alfresco.module.DoclibGlobalFolder.superclass.constructor.call(this, htmlId);
-
-      // Re-register with our own name
-      this.name = "Alfresco.module.DoclibGlobalFolder";
-      Alfresco.util.ComponentManager.reregister(this);
+      Alfresco.module.DoclibGlobalFolder.superclass.constructor.call(this, "Alfresco.module.DoclibGlobalFolder", htmlId, ["button", "container", "connection", "json", "treeview"]);
 
       // Initialise prototype properties
       this.containers = {};

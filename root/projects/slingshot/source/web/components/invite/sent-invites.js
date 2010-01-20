@@ -34,9 +34,7 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+   var Dom = YAHOO.util.Dom;
    
    /**
     * Alfresco Slingshot aliases
@@ -52,24 +50,17 @@
     */
    Alfresco.SentInvites = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.SentInvites";
-      this.id = htmlId;
+      Alfresco.SentInvites.superclass.constructor.call(this, "Alfresco.SentInvites", htmlId, ["button", "container", "datasource", "datatable", "json"]);
       
       /* Initialise prototype properties */
-      this.widgets = {};
       this.actionButtons = {};
+      this.searchTerm = "";
+      this.isSearching = false;
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
-
       return this;
    };
    
-   Alfresco.SentInvites.prototype =
+   YAHOO.extend(Alfresco.SentInvites, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -116,14 +107,6 @@
       },
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
-      /**
        * Object container for storing YUI button instances, indexed by username.
        * 
        * @property userSelectButtons
@@ -137,7 +120,7 @@
        * @property searchTerm
        * @type string
        */
-      searchTerm: "",
+      searchTerm: null,
 
       /**
        * Keeps track if this component is searching or not
@@ -145,45 +128,8 @@
        * @property isSearching
        * @type Boolean
        */
-      isSearching: false,
+      isSearching: null,
 
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.SentInvites} returns 'this' for method chaining
-       */
-      setOptions: function SentInvites_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.SentInvites} returns 'this' for method chaining
-       */
-      setMessages: function SentInvites_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function SentInvites_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -254,10 +200,10 @@
                      fullName = (firstName + " " + lastName).toLowerCase();
                      
                      // Determine if person matches search term
-                     if ((userName.indexOf(lowerCaseTerm) != -1)
-                        || (firstName.indexOf(lowerCaseTerm) != -1)
-                        || (lastName.indexOf(lowerCaseTerm) != -1)
-                        || (fullName.indexOf(lowerCaseTerm) != -1))
+                     if ((userName.indexOf(lowerCaseTerm) != -1) ||
+                         (firstName.indexOf(lowerCaseTerm) != -1) ||
+                         (lastName.indexOf(lowerCaseTerm) != -1) ||
+                         (fullName.indexOf(lowerCaseTerm) != -1))
                      {
                         // Add user to list
                         items.push(oFullResponse.invites[i]);
@@ -270,7 +216,8 @@
                }
 
                // Sort the invites list by the invitee's name
-               items.sort(function (invite1, invite2){
+               items.sort(function (invite1, invite2)
+               {
                   var name1 = invite1.invitee.firstName + invite1.invitee.lastName,
                      name2 = invite2.invitee.firstName + invite2.invitee.lastName;
                   return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
@@ -308,12 +255,12 @@
             return false;
          };
 
-         // Enter key listener
-         var enterListener = new YAHOO.util.KeyListener(this.id + "-search-button",
+         // Enter key listener for button
+         var buttonListener = new YAHOO.util.KeyListener(this.id + "-search-button",
          {
             keys: YAHOO.util.KeyListener.KEY.ENTER
          }, onKeyEnter, "keydown");
-         enterListener.enable();
+         buttonListener.enable();
       },
       
       /**
@@ -333,39 +280,6 @@
          var me = this;
 
          /**
-          * Invitation status cell formatter
-          *
-          * @method renderInvitationStatus
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         var renderCellInvitationStatus = function SentInvites_renderCellInvitationStatus(elCell, oRecord, oColumn, oData)
-         {
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
-            var invitationStatus = oRecord.getData('invitationStatus');
-            if (invitationStatus == 'pending')
-            {
-               Dom.addClass(elCell.parentNode, "pending");
-               invitationStatus = '<div class="status">' + me._msg('status.pending') + '</div>';
-            }
-            else if (invitationStatus == 'accepted')
-            {
-               Dom.addClass(elCell.parentNode, "accepted");
-               invitationStatus = '<div class="status">' + me._msg('status.accepted') + '</div>';
-            }
-            else if (invitationStatus == 'declined')
-            {
-               Dom.addClass(elCell.parentNode, "declined");
-               invitationStatus = '<div class="status">' + me._msg('status.declined') + '</div>';
-            }
-
-            elCell.innerHTML = invitationStatus;
-         };
-    
-         /**
           * User avatar custom datacell formatter
           *
           * @method renderCellAvatar
@@ -378,8 +292,8 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
-            var invitee = oRecord.getData("invitee");
+            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png",
+               invitee = oRecord.getData("invitee");
             if (invitee.avatar !== undefined)
             {
                avatarUrl = Alfresco.constants.PROXY_URI + invitee.avatar + "?c=queue&ph=true";
@@ -390,10 +304,10 @@
 
          var generateUserNameLink = function(person)
          {
-            var name = person.userName;
-            var firstName = person.firstName;
-            var lastName = person.lastName;
-            var linkExtra = "";
+            var name = person.userName,
+               firstName = person.firstName,
+               lastName = person.lastName,
+               linkExtra = "";
             if ((firstName !== undefined) || (lastName !== undefined))
             {
                name = firstName ? firstName + " " : "";
@@ -420,18 +334,18 @@
          var renderCellDescription = function SentInvites_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // Currently rendering all results the same way
-            var invitee = oRecord.getData("invitee");
-            
-            var sentDate = Alfresco.util.formatDate(oRecord.getData('sentInviteDate'));
-            var role = me._msg("role." + oRecord.getData("role"));
-            var desc = '<div class="to-invitee"><span class="attr-label">' + me._msg('info.to') + ': </span>';
+            var invitee = oRecord.getData("invitee"),
+               sentDate = Alfresco.util.formatDate(oRecord.getData('sentInviteDate')),
+               role = me.msg("role." + oRecord.getData("role"));
+
+            var desc = '<div class="to-invitee"><span class="attr-label">' + me.msg('info.to') + ': </span>';
             desc += '<span class="attr-value">' + generateUserNameLink(invitee) + '</span>';
             desc += '</div>';
             desc += '<div>';
-            desc += '<span class="attr-label">' + me._msg('info.sent') + ': </span>';
+            desc += '<span class="attr-label">' + me.msg('info.sent') + ': </span>';
             desc += '<span class="attr-value">' + $html(sentDate) + '</span>';
             desc += '<span class="separator"> | </span>';
-            desc += '<span class="attr-label">' + me._msg('info.role') + ': </span>';
+            desc += '<span class="attr-label">' + me.msg('info.role') + ': </span>';
             desc += '<span class="attr-value">' + $html(role) + '</span>';
             desc += '</div>';
             elCell.innerHTML = desc;
@@ -451,18 +365,17 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             
             var userName = oRecord.getData("invitee").userName;
-            var desc = '<span id="' + me.id + '-action-' + userName + '"></span>';
-            elCell.innerHTML = desc;
+            elCell.innerHTML = '<span id="' + me.id + '-action-' + userName + '"></span>';
 
             // create button
             var buttonLabel;
             if (oRecord.getData("invitationStatus") == 'pending')
             {
-               buttonLabel = me._msg("button.cancel");
+               buttonLabel = me.msg("button.cancel");
             }
             else
             {
-               buttonLabel = me._msg("button.clear");
+               buttonLabel = me.msg("button.clear");
             }
             
             var button = new YAHOO.widget.Button(
@@ -482,26 +395,19 @@
          };
 
          // DataTable column defintions
-         var columnDefinitions = [
-         /*{
-            key: "status", label: "Status", sortable: false, formatter: renderCellInvitationStatus, width: 70
-         },*/
-         {
-            key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: 70
-         },
-         {
-            key: "person", label: "Description", sortable: false, formatter: renderCellDescription
-         },
-         {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellActionButton, width: 100
-         }];
+         var columnDefinitions =
+         [
+            { key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: 70 },
+            { key: "person", label: "Description", sortable: false, formatter: renderCellDescription },
+            { key: "actions", label: "Actions", sortable: false, formatter: renderCellActionButton, width: 100 }
+         ];
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
             initialLoad: false,
-            MSG_EMPTY: this._msg("message.empty")
+            MSG_EMPTY: this.msg("message.empty")
          });
          
          // Enable row highlighting
@@ -543,7 +449,7 @@
          // show a wait message
          this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.removing"),
+            text: this.msg("message.removing"),
             spanClass: "wait",
             displayTime: 0
          });
@@ -584,13 +490,13 @@
                inviteId: record.getData('inviteId')
             },
             responseContentType : "application/json",
-            successMessage: this._msg("message.cancel.success"),
+            successMessage: this.msg("message.cancel.success"),
             successCallback:
             {
                fn: success,
                scope: this
             },
-            failureMessage: this._msg("message.cancel.failure"),
+            failureMessage: this.msg("message.cancel.failure"),
             failureCallback:
             {
                fn: failure,
@@ -631,7 +537,7 @@
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+               text: this.msg("message.minimum-length", this.options.minSearchTermLength)
             });
             return;
          }
@@ -719,14 +625,15 @@
             this.searchTerm = searchTerm;
             this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),
             {
-                  success: successHandler,
-                  failure: failureHandler,
-                  scope: this
+               success: successHandler,
+               failure: failureHandler,
+               scope: this
             });
 
             // Display a wait feedback message if the people hasn't been found yet
             this.widgets.searchButton.set("disabled", true);
-            YAHOO.lang.later(2000, this, function(){
+            YAHOO.lang.later(2000, this, function()
+            {
                if (this.isSearching)
                {
                   if (!this.widgets.feedbackMessage)
@@ -743,7 +650,7 @@
                      this.widgets.feedbackMessage.show();
                   }
                }
-            }, []);
+            });
          }
       },
 
@@ -775,20 +682,7 @@
          return YAHOO.lang.substitute("siteShortName={siteShortName}",
          {
             siteShortName: encodeURIComponent(this.options.siteId)
-         })
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function SentInvites__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.SentInvites", Array.prototype.slice.call(arguments).slice(1));
+         });
       }
-   };
+   });
 })();
