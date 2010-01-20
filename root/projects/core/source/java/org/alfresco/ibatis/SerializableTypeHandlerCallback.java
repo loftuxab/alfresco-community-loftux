@@ -26,10 +26,10 @@ package org.alfresco.ibatis;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.sql.Blob;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -50,26 +50,23 @@ public class SerializableTypeHandlerCallback implements TypeHandlerCallback
      */
     public Object getResult(ResultGetter getter) throws SQLException
     {
-        Blob blob = getter.getBlob();
         final Serializable ret;
-        if (getter.wasNull())
+        try
         {
-            ret = null;
+            InputStream is = getter.getResultSet().getBinaryStream(getter.getColumnName());
+            if (is == null || getter.wasNull())
+            {
+                return null;
+            }
+            // Get the stream and deserialize
+            ObjectInputStream ois = new ObjectInputStream(is);
+            Object obj = ois.readObject();
+            // Success
+            ret = (Serializable) obj;
         }
-        else
+        catch (Throwable e)
         {
-            try
-            {
-                // Get the stream and deserialize
-                ObjectInputStream ois = new ObjectInputStream(blob.getBinaryStream());
-                Object obj = ois.readObject();
-                // Success
-                ret = (Serializable) obj;
-            }
-            catch (Throwable e)
-            {
-                throw new DeserializationException(e);
-            }
+            throw new DeserializationException(e);
         }
         return ret;
     }
@@ -78,7 +75,7 @@ public class SerializableTypeHandlerCallback implements TypeHandlerCallback
     {
         if (parameter == null)
         {
-            setter.setNull(Types.BLOB);
+            setter.setNull(Types.LONGVARBINARY);
         }
         else
         {
