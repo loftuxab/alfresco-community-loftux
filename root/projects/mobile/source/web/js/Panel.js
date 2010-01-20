@@ -156,8 +156,6 @@
        */
       hide : function hide(direction) {
         this.slideOut(direction);
-        // var that = this;
-        //         setTimeout(350,that.destroy());
       }
     });
   }()
@@ -187,7 +185,7 @@ window.addEventListener('DOMContentLoaded',function(){
                       { 
                        el : el,
                        id:Mobile.util.Panel.NAME_PREFIX+el.id,
-                       title:el.id.split('-').join(' '),
+                       title: el.title,
                        buttons : {
                          backText: 'Back'
                        },

@@ -20,7 +20,7 @@ function(){
             var p = new Mobile.util.Panel({
               el:el,
               id:el.id,
-              title:el.id.split('-').join(' ')
+              title: el.title
             });
             p.init();
             App.addPanel(el.id,p);
@@ -49,7 +49,7 @@ function(){
               { 
                el : e.srcElement,
                id:Mobile.util.Panel.NAME_PREFIX+el.id,
-               title:el.id.split('-').join(' '),
+               title: el.title,
                buttons : {
                  backText: 'Back'
                },

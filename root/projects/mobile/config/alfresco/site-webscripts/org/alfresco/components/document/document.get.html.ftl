@@ -11,7 +11,7 @@
             </form>
             -->
           </div>
-          <a class="preview" href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/proxy/alfresco/${doc.thumbnailUrl}" /></a>
+          <a class="preview" href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/proxy/alfresco/${doc.thumbnailUrl}" width="77" height="100" /></a>
           <ul class="rr info">
               <li><span>${msg('label.name')}:</span> ${doc.displayName}</li>
               <li><span>${msg('label.description')}:</span> ${doc.description}</li>

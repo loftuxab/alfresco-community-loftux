@@ -25,6 +25,8 @@
 
 package org.alfresco.deployment.impl.server;
 
+import java.util.Arrays;
+
 /**
  * This is a very simple implementation of an authenticator for the deployment receiver.
  * 
@@ -33,7 +35,7 @@ package org.alfresco.deployment.impl.server;
 public class DeploymentReceiverAuthenticatorSimple implements DeploymentReceiverAuthenticator
 {
 	private String user;
-	private String password;
+	private char[] password;
 	
 	/**
 	 * Are the user and password valid for this deployment receiver?
@@ -41,9 +43,10 @@ public class DeploymentReceiverAuthenticatorSimple implements DeploymentReceiver
 	 * @param password
 	 * @return true, yes - go ahead.
 	 */
-	public boolean logon(String user, String password)
+	public boolean logon(String user, char[] password)
 	{
-		if(this.user.equals(user) && this.password.equals(password))
+	    
+		if(this.user.equals(user) && Arrays.equals(this.password, password))
 		{
 			return true;
 		}
@@ -61,11 +64,11 @@ public class DeploymentReceiverAuthenticatorSimple implements DeploymentReceiver
 		return user;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(char[] password) {
 		this.password = password;
 	}
 
-	public String getPassword() {
+	public char[] getPassword() {
 		return password;
 	}
 

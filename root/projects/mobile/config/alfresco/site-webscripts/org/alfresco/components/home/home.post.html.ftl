@@ -26,15 +26,15 @@
                 <li class="recentdocs"><a id="Recent-Documents"  class="disabled">${msg('label.myDocuments')}</a></li>
                 <li class="recentactivity"><a id="Recent-Activity" class="disabled">${msg('label.myActivity')}</a></li>
               -->
-                <li class="fav"><a id="Favourite-Sites" href="#sites#Fav" class="panelLink">${msg('label.myFavoriteSites')}</a></li>
-                <li class="sites"><a id="My-Sites" href="#sites#My" class="panelLink">${msg('label.mySites')}</a></li>
-                <li class="all"><a id="Tasks-All" href="#tasks#All" class="panelLink">${msg('label.allTasks')}</a></li>
+                <li class="fav"><a id="Favourite-Sites" href="#sites#Fav" title="${msg('label.myFavoriteSites')}" class="panelLink">${msg('label.myFavoriteSites')}</a></li>
+                <li class="sites"><a id="My-Sites" href="#sites#My" title="${msg('label.mySites')}" class="panelLink">${msg('label.mySites')}</a></li>
+                <li class="all"><a id="Tasks-All" href="#tasks#All" title="${msg('label.allTasks')}" class="panelLink">${msg('label.allTasks')}</a></li>
               </ul>
             </li>
             <li>
               <h2>${msg('label.today')}</h2>
               <ul class="rr hilite">
-                <li class="tasks"><a id="Tasks" href="#tasks#Today" class="panelLink">${msg('label.todayTasks')} <span>(${numTasks})</span></a>
+                <li class="tasks"><a id="Tasks" href="#tasks#Today" title="${msg('label.todayTasks')}" class="panelLink">${msg('label.todayTasks')} <span>(${numTodaysTasks})</span></a>
                    <#if (numOverdueTasks>0)>
                      <p><a href="#tasks#Overdue" class="panelLink disabled">${msg('label.overdueTasks')} <span>(${numOverdueTasks})</span></a></p>
                    </#if>
@@ -58,8 +58,8 @@
               <#-- Not Implemented
                  <li class="newwikipage"><a class="disabled" href="#sites">${msg('label.newWikiPage')}</a></li>
               -->
-                 <li class="publicsites"><a id="Public-Sites" href="#sites#All" class="panelLink">${msg('label.browsePublicSites')}</a></li>
-                 <li class="invitetosite"><a id="Select-Site" href="#invitesites" class="panelLink">${msg('label.inviteToSite')}</a></li>
+                 <li class="publicsites"><a id="Public-Sites" href="#sites#All" title="${msg('label.browsePublicSites')}" class="panelLink">${msg('label.browsePublicSites')}</a></li>
+                 <li class="invitetosite"><a id="Select-Site" href="#invitesites" title="${msg('label.inviteToSite')}" class="panelLink">${msg('label.inviteToSite')}</a></li>
               </ul>
             </li>
          </ul>

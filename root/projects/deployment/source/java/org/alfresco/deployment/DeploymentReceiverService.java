@@ -49,7 +49,7 @@ public interface DeploymentReceiverService
      * @param password The password for the user.
      * @return information on the new deployment.
      */
-    public DeploymentToken begin(String target, String storeName, int version, String user, String password);
+    public DeploymentToken begin(String target, String storeName, int version, String user, char[] password);
     
     /**
      * Signals that the deployment should prepare

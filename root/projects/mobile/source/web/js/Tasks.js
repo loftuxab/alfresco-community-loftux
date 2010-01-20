@@ -47,7 +47,7 @@
                   var o = data[i];
                   var taskId = o.id.replace('$','-');
                   this.data[filter][taskId] = o;
-                  elRef.html('bottom','<li class="tasks"><a id="'+taskId+'" href="#task" class="panelLink">' + o.description +'</a></li>');
+                  elRef.html('bottom','<li class="tasks"><a id="'+taskId+'" href="#task" title="'+o.description+'" class="panelLink">' + o.description +'</a></li>');
                }
             }
             else {
@@ -185,8 +185,8 @@
                                  task.oldId = task.id;
                                  task.id = d.id;
                                  // mikef test
-                                 // task.performAction(action,true);
-                                 task.performAction(action,false);
+                                 task.performAction(action,true);
+                                 // task.performAction(action,false);
                                  break;
                               }
                             }
@@ -227,7 +227,7 @@
                '    <li class="taskDoc"><a href="'+Mobile.constants.PROXY_URI+'api/node/content/'+ resource.nodeRef.replace(':/','')+'">'+ resource.displayName+'</a></li>'+
                '</ul>';
             };
-            contentHTML += '<form action="tasks.html" id="taskForm">'+
+            contentHTML += '<form id="taskForm">'+
             '<h3><label for="comment">Comment:</label></h3>'+
             '  <input type="text" id="comment" name="comment" value=""/>'+
             '  <div>';

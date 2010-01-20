@@ -37,6 +37,11 @@
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event;
 
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
    Alfresco.Header = function(htmlId)
    {
       Alfresco.Header.superclass.constructor.call(this, "Alfresco.Header", htmlId);
@@ -191,7 +196,7 @@
       blurSearchText: function Header_blurSearchText()
       {
          var searchVal = YAHOO.lang.trim(Dom.get(this.id + "-searchtext").value);
-         if (searchVal.length == 0)
+         if (searchVal.length === 0)
          {
             /**
              * Since the blur event occurs before the KeyListener gets
@@ -246,12 +251,12 @@
             
             // redirect to the search page
             var url = Alfresco.constants.URL_CONTEXT + "page/";
-            if (this.options.siteId.length != 0)
+            if (this.options.siteId.length !== 0)
             {
                url += "site/" + this.options.siteId + "/";
             }
             url += "search?t=" + encodeURIComponent(searchTerm);
-            if (this.options.siteId.length != 0)
+            if (this.options.siteId.length !== 0)
             {
                url += "&a=" + searchAll;
             }

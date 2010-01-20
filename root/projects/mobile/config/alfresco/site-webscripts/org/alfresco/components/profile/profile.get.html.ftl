@@ -19,7 +19,11 @@
 
               <div id="Info" class="active">
                 <div class="details">
-                  <img src="${url.context}/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" width="64" height="64" >
+                   <#if user.properties.avatar??>                   
+                  <img src="${url.context}/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" width="64" height="64" />
+                  <#else>
+                  <img src="${url.context}/themes/default/images/no-user-photo-64.png" alt="" />
+                  </#if>
                   <div>
                      ${profile.firstName!""} ${profile.lastName!""}
                     <p>${profile.jobTitle!""}</p>
@@ -52,7 +56,7 @@
               <#if ((numUserSites?number>0))>
               <ul id="Sites" class="e2e list hilite">
                 <#list userSites.sites as site>
-                <li><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
+                <li><a id="${site.shortName}" href="#site?site=${site.shortName}" title="${site.title}" class="panelLink">${site.title}</a></li>
                 </#list>
               </ul>
               <#else>

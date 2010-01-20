@@ -29,7 +29,7 @@
                        <p><span>${msg('label.modifiedBy')}:</span> ${content.modifiedBy}</p>
                        <p><span>${msg('label.modifiedOn')}:</span> ${content.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
                        <p><span>${msg('label.size')}:</span> ${content.size}</p>
-                       <a id="${content.domId}" href="#document?nodeRef=${content.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                       <a href="#document?nodeRef=${content.nodeRef}" title="${content.displayName}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                      </li>
                       </#list>
                      </ul>
@@ -49,7 +49,7 @@
                        <p class="toenail"><a href="${url.context}/p/site?site=${site.shortName}"><img src="${url.context}/themes/${theme}/images/64-siteicon.png"/></a></p>
                        <h3><a href="${url.context}/p/site?site=${site.shortName}">${site.title}</a></h3>
                        <p>${site.description}</p>
-                       <a href="${url.context}/p/site?site=${site.shortName}" class="panelLink more" ><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                       <a href="${url.context}/p/site?site=${site.shortName}" title="${site.title}" class="panelLink more" ><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                      </li>
                   </#list>
                   </ul>
@@ -67,9 +67,9 @@
                         <#else>
                           <p class="toenail"><a href="${url.context}/p/profile?person=${person.userName}"><img src="${url.context}/themes/${theme}/images/no-user-photo-64.png"/></a></p>
                         </#if>
-                       <p><a href="${url.context}/p/profile?person=${person.userName}" class="panelLink person">${person.firstName} ${person.lastName}</a></p>
+                       <p><a href="${url.context}/p/profile?person=${person.userName}" title="${person.userName!''} "class="panelLink person">${person.firstName} ${person.lastName}</a></p>
                        <p><span>${msg('Title')}:</span> ${person.jobtitle!''}</p>
-                       <a href="${url.context}/p/profile?person=${person.userName}" class="panelLink more" ><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                       <a href="${url.context}/p/profile?person=${person.userName}" title="${person.userName!''}" class="panelLink more" ><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                      </li>
                      </#list>
                   </ul>

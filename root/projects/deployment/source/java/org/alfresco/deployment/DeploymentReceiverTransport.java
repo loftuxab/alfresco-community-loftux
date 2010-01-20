@@ -70,7 +70,7 @@ public interface DeploymentReceiverTransport extends DeploymentReceiverService
      * @param user
      * @param password
      */
-    public void shutDown(String user, String password);
+    public void shutDown(String user, char[] password);
     
 //    /**
 //     * Get the target status for all targets

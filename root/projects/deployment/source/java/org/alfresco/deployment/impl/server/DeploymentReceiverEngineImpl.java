@@ -157,7 +157,7 @@ public class DeploymentReceiverEngineImpl implements
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#shutDown(java.lang.String, java.lang.String)
      */
-    public synchronized void shutDown(String user, String password)
+    public synchronized void shutDown(String user, char[] password)
     {
     	if(authenticator == null)
     	{
@@ -289,7 +289,7 @@ public class DeploymentReceiverEngineImpl implements
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#begin(java.lang.String, java.lang.String, java.lang.String)
      */
-    public DeploymentToken begin(String targetName, String storeName, int version, String user, String password)
+    public DeploymentToken begin(String targetName, String storeName, int version, String user, char[] password)
     {
     	try 
     	{
