@@ -28,7 +28,7 @@
                    }
                    var SpinningWheel = Mobile.thirdparty.SpinningWheel;
                    SpinningWheel.addSlot(years, 'right', date.getFullYear());
-                   SpinningWheel.addSlot(months, '', date.getMonth());
+                   SpinningWheel.addSlot(months, '', date.getMonth()+1);
                    SpinningWheel.addSlot(days, 'right', date.getDate());
  
                    SpinningWheel.setCancelAction(function(e) { });

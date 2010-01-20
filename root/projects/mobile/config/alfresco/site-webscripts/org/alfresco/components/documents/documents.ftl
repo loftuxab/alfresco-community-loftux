@@ -14,12 +14,12 @@
                <ul class="e2e">
                   <#list recentDocs as doc >
                   <li class="details ${doc.type}">
-                     <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
+                     <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png" width="45" height="62"/></a></p>
                      <h3><a href="${url.context}/proxy/alfresco/${doc.contentUrl}">${doc.displayName?html}</a></h3>
                      <p><span>${msg('label.modifiedBy')}:</span> ${doc.modifiedBy}</p>
                      <p><span>${msg('label.modifiedOn')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
                      <p><span>${msg('label.size')}:</span> ${doc.size} kb</p>
-                     <a id="${doc.domId}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                     <a id="rDocs-${doc.domId}" title="${doc.displayName?html}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                   </li>
                   </#list>
                </ul>
@@ -42,12 +42,12 @@
             <ul class="e2e">
               <#list myDocs as doc >
               <li class="details ${doc.type}">
-                <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
+                <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png" width="45" height="62"/></a></p>
                 <h3><a href="${url.context}/proxy/alfresco/${doc.contentUrl}">${doc.displayName?html}</a></h3>
                 <p><span>${msg('label.modifiedBy')}:</span> ${doc.modifiedBy}</p>
                 <p><span>${msg('label.modifiedOn')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
                 <p><span>${msg('label.size')}:</span> ${doc.size} kb</p>
-                <a id="${doc.domId}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                <a id="myDocs-${doc.domId}" title="${doc.displayName?html}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
               </li>
               </#list>
             </ul>
@@ -65,12 +65,12 @@
             <ul class="e2e">
               <#list allDocs as doc >
                 <li class="details ${doc.type}">
-                 <p class="toenail"><a href="${url.context}/proxy/alfresco/api/node/content/${doc.nodeRef?replace(':/','')}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
+                 <p class="toenail"><a href="${url.context}/proxy/alfresco/api/node/content/${doc.nodeRef?replace(':/','')}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png" width="45" height="62"/></a></p>
                  <h3><a href="${url.context}/proxy/alfresco/${doc.contentUrl}">${doc.displayName}</a></h3>
                  <p><span>${msg('label.modifiedBy')}:</span> ${doc.modifiedBy}</p>
                  <p><span>${msg('label.modifiedOn')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
                  <p><span>${msg('label.size')}:</span> ${doc.size} kb</p>
-                 <a id="${doc.domId}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                 <a id="allDocs-${doc.domId}" title="${doc.displayName?html}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                 </li>
               </#list>
             </ul>

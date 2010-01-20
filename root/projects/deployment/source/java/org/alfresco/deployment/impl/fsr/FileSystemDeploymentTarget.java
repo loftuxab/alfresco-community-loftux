@@ -234,7 +234,7 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
 		return fileSystemReceiverService;
 	}
 
-	public synchronized String begin(String targetName, String storeName, int version, String user, String password) 
+	public synchronized String begin(String targetName, String storeName, int version, String user, char[] password) 
 	{ 
 		// Authenticate with the user and password
 		if(!authenticator.logon(user, password))

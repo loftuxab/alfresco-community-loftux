@@ -7,6 +7,7 @@ var userObj = user.getUser(profileId);
 if (userObj != null)
 {
    model.profile = userObj;
+   model.profileSrc = userObj.toString();
 }
 else {
    model.profile = {};

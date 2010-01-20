@@ -17,9 +17,9 @@
            <li>
              <h2>${msg('label.documentLibrary')}</h2>
              <ul class="rr">
-               <li class="documents"><a id="Documents" href="#documents?site=${page.url.args.site}#RMod" class="panelLink">${msg('label.recentlyModified')}</a></li>
-               <li class="mydocuments"><a id="My-Documents" href="#documents?site=${page.url.args.site}#My" class="panelLink">${msg('label.myFavorites')}</a></li>
-               <li class="alldocuments"><a id="All-Documents" href="#documents?site=${page.url.args.site}#All" class="panelLink" >${msg('label.allDocuments')}</a></li>
+               <li class="documents"><a id="Documents" title="${msg('label.recentlyModified')}" href="#documents?site=${page.url.args.site}#RMod" class="panelLink">${msg('label.recentlyModified')}</a></li>
+               <li class="mydocuments"><a id="My-Documents" title="${msg('label.myFavorites')}" href="#documents?site=${page.url.args.site}#My" class="panelLink">${msg('label.myFavorites')}</a></li>
+               <li class="alldocuments"><a id="All-Documents" title="${msg('label.allDocuments')}" href="#documents?site=${page.url.args.site}#All" class="panelLink" >${msg('label.allDocuments')}</a></li>
                <#-- Not Implemented
                <li class="allfolders"><a id="All-Folders" class="disabled">${msg('label.allFolders')}</a></li>
                -->
@@ -39,7 +39,7 @@
            <li>
              <h2>${msg('label.siteActions')}</h2>
              <ul id="my" class="rr">
-               <li class="invitetosite"><a id="Invite-To-Site" href="#${url.context}/p/invite?site=${site.shortName}" class="panelLink">${msg('label.inviteToSite')}</a></li>
+               <li class="invitetosite"><a id="Invite-To-Site" title="${msg('label.inviteToSite')}" href="#${url.context}/p/invite?site=${site.shortName}" class="panelLink">${msg('label.inviteToSite')}</a></li>
                <#-- Not Implemented
                <li class="leavesite"><a id="Leave-Site" class="disabled">${msg('label.leaveSite')}</a></li>
                -->

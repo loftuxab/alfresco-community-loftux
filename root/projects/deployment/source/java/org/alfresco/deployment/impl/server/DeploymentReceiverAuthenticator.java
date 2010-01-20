@@ -33,6 +33,6 @@ public interface DeploymentReceiverAuthenticator
 	 * @param password
 	 * @return true, yes - go ahead.
 	 */
-	public boolean logon(String user, String password);
+	public boolean logon(String user, char[] password);
 
 }

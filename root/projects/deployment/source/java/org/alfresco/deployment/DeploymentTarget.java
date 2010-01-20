@@ -56,7 +56,7 @@ public interface DeploymentTarget
      * @return A deployment ticket which uniquely identifies the deployment.
      * @throws DeploymentException - unable to start a new deployment
      */
-    public String begin(String target, String storeName, int version, String user, String password);
+    public String begin(String target, String storeName, int version, String user, char[] password);
     
     /**
      * Signals that the deployment should be prepared.

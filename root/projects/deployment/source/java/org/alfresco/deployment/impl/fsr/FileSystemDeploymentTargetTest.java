@@ -47,7 +47,7 @@ public class FileSystemDeploymentTargetTest extends TestCase
     private File target = null;
     
     private String TEST_USER = "Giles";
-    private String TEST_PASSWORD = "Watcher";
+    private char[] TEST_PASSWORD = "Watcher".toCharArray();
     private String TEST_TARGET = "sampleTarget";
     
     private DeploymentTargetRegistry registry = null;

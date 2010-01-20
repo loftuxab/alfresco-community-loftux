@@ -15,7 +15,7 @@ public class ShutdownImpl {
     private String serviceName = "deployment";
     private String hostName = "localhost";
     private String user = "admin";
-    private String password = "password";
+    private char[] password = "password".toCharArray();
 	
     public void init() {
 	 		
@@ -88,11 +88,11 @@ public class ShutdownImpl {
 		return user;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(char[] password) {
 		this.password = password;
 	}
 
-	public String getPassword() {
+	public char[] getPassword() {
 		return password;
 	}
 }

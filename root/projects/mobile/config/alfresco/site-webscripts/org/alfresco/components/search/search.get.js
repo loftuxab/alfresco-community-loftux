@@ -1,40 +1,15 @@
-//http://localhost:8080/alfresco/service/slingshot/search?term=mobile&site=&container=&maxResults=101
-
-// {
-//  "items":
-//  [
-//    {
-//      "index": 0,
-//      "nodeRef": "workspace:\/\/SpacesStore\/4318a4bc-ab2c-47d3-a3e5-2709f3a604de",
-//      "type": "document",
-//      "name": "iPhone Wireframes - User Story XX - creating a wiki page outside a site.pdf",
-//      "displayName": "iPhone Wireframes - User Story XX - creating a wiki page outside a site.pdf",
-//      "description": "Wireframe of the iPhone Creating a wiki page from outside a story",
-//      "modifiedOn": "09 Apr 2009 17:30:21 GMT+0100 (BST)",
-//      "modifiedByUser": "admin",
-//      "modifiedBy": "Administrator ",
-//      "size": 215396,
-//      "tags": ["iphone","wireframe"],
-//      "browseUrl": "document-details?nodeRef=workspace:\/\/SpacesStore\/4318a4bc-ab2c-47d3-a3e5-2709f3a604de",
-//      "site":
-//      {
-//        "shortName": "mobile",
-//        "title": "Mobile"
-//      },
-//      "container": "documentLibrary"
-//    },
-//    ...
 var maxResults = 100;
 function getDocType(doc)
 {
   var displayType = '';
+  var docTypes = 'png,gif,jpg,jpeg,tiff,bmp,ppt,pdf,doc,xls';
   if (doc.type == 'document')
   {
     displayType = doc.name.match(/([^\/\\]+)\.(\w+)$/)[2] 
   }
-  else
+  if (docTypes.indexOf(displayType)==-1)
   {
-    displayType = doc.type; 
+     displayType = 'unknown';
   }
   return displayType;
 }
@@ -49,7 +24,6 @@ function getContentSearchResults(term)
     doc.modifiedOn = new Date(doc.modifiedOn);
     doc.displayType = getDocType(doc);
     doc.doclink =  "api/node/content/"+doc.nodeRef.replace(':/','')+'/'+stringUtils.urlEncode(doc.name);
-    doc.domId = doc.displayName.replace(/ /g,'').match(/^[a-zA-Z][a-zA-Z0-9\-\_]+/g)[0];    
     data.items[i]=doc;
   } 
   //work out if there we need pagination 
@@ -82,5 +56,3 @@ model.numSiteResults = model.siteResults.length;
 model.pplResults = getPeopleResults(query);
 model.numPplResults = model.pplResults.people.length;
 model.backButton = true;
-//debug stuff
-model.data = model.pplResults.toSource();

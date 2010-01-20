@@ -41,16 +41,15 @@ function inviteUser(site)
 }
 
 
-var userTasks = getUserTasks('all').tasks;
 var overdueTasks = getUserTasks('overdue').tasks;
-
+var todaysTasks = getUserTasks('today').tasks;
 var userEvents = getUserEvents().events;
 var inviteResult = inviteUser(page.url.args.site);
 
 model.inviteUserResult = (inviteResult.data && inviteResult.data.inviteId) ? 'true' : 'false';
 
-model.numTasks = userTasks.length;
 model.numOverdueTasks = overdueTasks.length;
+model.numTodaysTasks = todaysTasks.length;
 model.numEvents = userEvents.length;
 model.backButton = true;
 

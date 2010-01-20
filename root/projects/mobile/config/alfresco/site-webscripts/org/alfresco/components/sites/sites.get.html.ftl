@@ -13,7 +13,7 @@
               <#if (favSites?size!=0)>
               <ul id="Fav" class="e2e list active hilite">
                 <#list favSites as site>
-                <li class="fav"><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.title?html}</a></li>
+                <li class="fav"><a id="${site.title?replace(' ','-')}" title="${site.title?html}" href="#site?site=${site.shortName}" class="panelLink">${site.title?html}</a></li>
                 </#list>
               </ul>
               <#else>
@@ -22,7 +22,7 @@
               <#if (sites?size!=0)>              
               <ul id="My" class="e2e list hilite">
                 <#list sites as site>
-                <li class="sites"><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.title?html}</a></li>
+                <li class="sites"><a id="${site.title?replace(' ','-')}" title="${site.title?html}" href="#site?site=${site.shortName}" class="panelLink">${site.title?html}</a></li>
                 </#list>
               </ul>
               <#else>
@@ -31,7 +31,7 @@
               <#if (allSites?size!=0)>              
               <ul id="All" class="e2e list hilite">
                 <#list allSites as site>
-                <li class="sites"><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.title?html}</a></li>
+                <li class="sites"><a id="${site.title?replace(' ','-')}" title="${site.title?html}"  href="#site?site=${site.shortName}" class="panelLink">${site.title?html}</a></li>
                 </#list>
               </ul>
               <#else>
