@@ -18,7 +18,7 @@
             <value>/app:company_home/app:dictionary/cm:records_management</value>
         </property>
         <property name="queryLanguage">
-            <value>xpath</value>
+            <value>path</value>
         </property>
     </bean>
     <bean id="org_alfresco_module_dod5015_dictionaryRepositoryBootstrap" parent="dictionaryRepositoryBootstrap">
