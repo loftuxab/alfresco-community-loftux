@@ -50,7 +50,7 @@ public class EditDeclaredRecordMetadataCapability extends AbstractCapability
         {
             if (checkFilingUnfrozenUncutoffOpen(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isRecord(nodeRef))
+                if (isRecord(nodeRef) == true && isDeclared(nodeRef) == true)
                 {
                     if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.EDIT_DECLARED_RECORD_METADATA) == AccessStatus.ALLOWED)
                     {

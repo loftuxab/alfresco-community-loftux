@@ -214,6 +214,11 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         policyComponent.bindClassBehaviour(RecordsManagementPolicies.ON_REMOVE_REFERENCE, 
                                            ASPECT_RECORD, 
                                            new JavaBehaviour(this, "onRemoveReference", NotificationFrequency.TRANSACTION_COMMIT));
+        
+        // Identifier behaviours
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
+                                           ASPECT_RECORD_COMPONENT_ID,
+                                           new JavaBehaviour(this, "onIdentifierUpdate", NotificationFrequency.TRANSACTION_COMMIT));
     }
     
     /**
@@ -295,6 +300,31 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         {
             this.lookupAndExecuteScripts(node, oldProps, newProps);
         }
+    }
+    
+    /**
+     * Property update behaviour implementation
+     * 
+     * @param node
+     * @param oldProps
+     * @param newProps
+     */
+    public void onIdentifierUpdate(NodeRef node, Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
+    {
+       if (nodeService.exists(node) == true)
+       {
+           String newIdValue = (String)newProps.get(PROP_IDENTIFIER);
+           if (newIdValue != null)
+           {
+               String oldIdValue = (String)oldProps.get(PROP_IDENTIFIER);
+               if (oldIdValue != null && oldIdValue.equals(newIdValue) == false)
+               {
+                   throw new AlfrescoRuntimeException("The identifier property value of the object " + 
+                                                       node.toString() + 
+                                                       " can not be set, it is read only.");
+               }
+           }
+       }
     }
     
     /**
