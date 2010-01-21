@@ -40,12 +40,10 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementA
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
-import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -464,6 +462,40 @@ public abstract class AbstractCapability implements Capability
         }
         return AccessDecisionVoter.ACCESS_ABSTAIN;
     }
+    
+    public int checkUntransfered(NodeRef nodeRef)
+    {
+        int result = AccessDecisionVoter.ACCESS_ABSTAIN;
+        if (isRm(nodeRef) == true)
+        {
+            if (isTransfered(nodeRef) == true)
+            {
+                result = AccessDecisionVoter.ACCESS_DENIED;
+            }
+            else
+            {
+                result = AccessDecisionVoter.ACCESS_GRANTED;
+            }
+        }
+        return result;
+    }
+    
+    public int checkUndestroyed(NodeRef nodeRef)
+    {
+        int result = AccessDecisionVoter.ACCESS_ABSTAIN;
+        if (isRm(nodeRef) == true)
+        {
+            if (isDestroyed(nodeRef) == true)
+            {
+                result = AccessDecisionVoter.ACCESS_DENIED;
+            }
+            else
+            {
+                result = AccessDecisionVoter.ACCESS_GRANTED;
+            }
+        }
+        return result;
+    }
 
     public int checkOpen(NodeRef nodeRef)
     {
@@ -613,6 +645,16 @@ public abstract class AbstractCapability implements Capability
     public boolean isCutoff(NodeRef nodeRef)
     {
         return voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_CUT_OFF);
+    }
+    
+    public boolean isTransfered(NodeRef nodeRef)
+    {
+        return voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_TRANSFERRED);
+    }
+    
+    public boolean isDestroyed(NodeRef nodeRef)
+    {
+        return voter.getNodeService().hasAspect(nodeRef, DOD5015Model.ASPECT_GHOSTED);
     }
 
     public boolean isClosed(NodeRef nodeRef)
