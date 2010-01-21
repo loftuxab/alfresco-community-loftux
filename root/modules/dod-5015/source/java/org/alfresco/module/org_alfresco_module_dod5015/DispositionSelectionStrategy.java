@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.apache.commons.logging.Log;
@@ -108,7 +110,20 @@ public class DispositionSelectionStrategy implements RecordsManagementModel
      */
     class DispositionableNodeRefComparator implements Comparator<NodeRef>
     {
-        public int compare(NodeRef f1, NodeRef f2)
+        public int compare(final NodeRef f1, final NodeRef f2)
+        {
+            // Run as admin user
+            return AuthenticationUtil.runAs(new RunAsWork<Integer>()
+            {
+                public Integer doWork() throws Exception
+                {
+                    return new Integer(compareImpl(f1, f2));
+                }
+                
+            }, AuthenticationUtil.getAdminUserName()).intValue();           
+        }
+        
+        private int compareImpl(NodeRef f1, NodeRef f2)
         {
             //TODO Check the nodeRefs have the correct aspect
             

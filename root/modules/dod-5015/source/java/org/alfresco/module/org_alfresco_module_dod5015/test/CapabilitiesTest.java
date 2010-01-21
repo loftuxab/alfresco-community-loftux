@@ -5569,29 +5569,10 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
         recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-
-        try
-        {
-            recordsManagementActionService.executeRecordsManagementAction(record_1, "reviewed");
-            fail();
-        }
-        catch (AccessDeniedException ade)
-        {
-
-        }
-        try
-        {
-            recordsManagementActionService.executeRecordsManagementAction(record_2, "reviewed");
-            fail();
-        }
-        catch (AccessDeniedException ade)
-        {
-
-        }
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
     }
 
     public void testDeclareAuditAsRecordCapability()
