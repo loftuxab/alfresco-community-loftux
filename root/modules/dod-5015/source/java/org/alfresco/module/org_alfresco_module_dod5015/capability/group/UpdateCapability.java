@@ -71,10 +71,6 @@ public class UpdateCapability extends AbstractGroupCapability
         {
             return AccessDecisionVoter.ACCESS_DENIED;
         }
-        if (voter.getFileRecordsCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
-        {
-            return AccessDecisionVoter.ACCESS_GRANTED;
-        }
         if (voter.getCreateModifyDestroyFoldersCapability().evaluate(nodeRef, null) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;

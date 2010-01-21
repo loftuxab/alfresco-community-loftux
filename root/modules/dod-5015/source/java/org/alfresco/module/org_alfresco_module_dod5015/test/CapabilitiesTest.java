@@ -2504,7 +2504,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
         check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
@@ -2570,7 +2570,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
         check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
@@ -2636,7 +2636,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
         check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
@@ -2702,7 +2702,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
         check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
@@ -6672,9 +6672,9 @@ public class CapabilitiesTest extends TestCase
         checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
 
-        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
-        checkCapability(rm_administrator, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
-        checkCapability(rm_records_manager, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_security_officer, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_power_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
@@ -6688,9 +6688,9 @@ public class CapabilitiesTest extends TestCase
         checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
 
-        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
-        checkCapability(rm_administrator, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
-        checkCapability(rm_records_manager, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_security_officer, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_power_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(rm_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);

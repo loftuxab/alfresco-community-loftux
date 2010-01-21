@@ -817,8 +817,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 System.out.println("Disposition as of: " + asOfDate);
                 
                 // make sure the as of date is a month in the future
-                Date now = new Date();
-                assertEquals(asOfDate.getMonth(), now.getMonth()+1);
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MONTH, 1);
+                int monthThen = cal.get(Calendar.MONTH);
+                assertEquals(asOfDate.getMonth(), monthThen);;
                 
                 // make sure there aren't any events
                 List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
@@ -1151,8 +1153,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 System.out.println("Disposition as of: " + asOfDate);
                 
                 // make sure the as of date is a month in the future
-                Date now = new Date();
-                assertEquals(asOfDate.getMonth(), now.getMonth()+1);
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MONTH, 1);
+                int monthThen = cal.get(Calendar.MONTH);
+                assertEquals(asOfDate.getMonth(), monthThen);
                 
                 // make sure there aren't any events
                 List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
@@ -2007,8 +2011,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNotNull(asOfDate);
                 
                 // make sure the as of date is a month in the future
-                Date now = new Date();
-                assertEquals(asOfDate.getMonth(), now.getMonth()+1);
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MONTH, 1);
+                int monthThen = cal.get(Calendar.MONTH);
+                assertEquals(asOfDate.getMonth(), monthThen);
                 
                 // make sure there aren't any events
                 assertEquals(0, da.getEventCompletionDetails().size());
@@ -4351,56 +4357,45 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         //setComplete();
         //endTransaction();
     }
-	
-	/**
-	 * This test case reads several sample Record Folders from the filePlan to ensure
-	 * that they have been imported correctly.
-	 */
-	public void testReadRecordFolders()
-	{
-        NodeRef recordFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");     
-        assertNotNull(recordFolder);
-        
-        // Include this as it has brackets in its name.
-        recordFolder = TestUtilities.getRecordFolder(searchService, "Miscellaneous Files", "Civilian Employee Training Program Records", "Chuck Stevens Training Records (2008)");
-        assertNotNull(recordFolder);
-        
-        // Include this as it has a slash in its name.
-        recordFolder = TestUtilities.getRecordFolder(searchService, "Miscellaneous Files", "Monthly Cockpit Crew Training", "January Cockpit Crew Training");     
-        assertNotNull(recordFolder);
-	}
-
-	/**
-	 * This test case reads all the record categories under the spaces store and asserts
-	 * that each has a cm:description and that it is non-null.
-	 */
-    public void testRecordCategoryDescriptions()
+   
+    /**
+     * https://issues.alfresco.com/jira/browse/ETHREEOH-3587
+     */
+    public void testETHREEOH3587()
     {
-        // See Table 2-1.8 in DoD 5015.02-STD v3 Baseline RMA Compliance Test Procedures
-        List<NodeRef> recordCategories = this.getAllRecordCategories();
-        assertNotNull(recordCategories);
+        NodeRef recordFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");
         
-        for (NodeRef recordCategory : recordCategories)
+        // Create a record
+        final NodeRef record = createRecord(recordFolder, GUID.generate());
+        
+        // Commit in order to trigger the setUpRecordFolder behaviour
+        setComplete();
+        endTransaction();
+        
+        // Now try and update the id, this should fail
+        try 
+        {          
+            transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+            {
+                public Object execute() throws Throwable
+                {
+                    // Lets just check the record identifier has been set
+                    String id = (String)nodeService.getProperty(record, RecordsManagementModel.PROP_IDENTIFIER);
+                    assertNotNull(id);
+                    
+                    nodeService.setProperty(record, RecordsManagementModel.PROP_IDENTIFIER, "randomValue");
+    
+                    return null;
+                }          
+            }); 
+            
+            fail("You should not be allowed to update the identifier of a record once it has been created.");
+        }
+        catch(AlfrescoRuntimeException e)
         {
-            Map<QName, Serializable> props = nodeService.getProperties(recordCategory);
-            final Serializable recCatDescription = props.get(ContentModel.PROP_DESCRIPTION);
-            assertNotNull(recCatDescription);
+            // Expected
         }
         
-        // This test formerly tested a single RecordCategory like so:
-        // NodeRef recordCategory = this.getRecordCategory("Miscellaneous Files", "Civilian Employee Training Program Records");
-    }    
-    
-    /**
-     * Gets all Record Categories under the SPACES_STORE.
-     * @return
-     */
-    private List<NodeRef> getAllRecordCategories()
-    {
-        String typeQuery = "TYPE:\"" + TYPE_RECORD_CATEGORY + "\"";
-        ResultSet types = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
-        List<NodeRef> nodeRefs = types.getNodeRefs();
-        types.close();
-        return nodeRefs;
+        // TODO set the identifier of the second record to be the same as the first ....
     }
 }

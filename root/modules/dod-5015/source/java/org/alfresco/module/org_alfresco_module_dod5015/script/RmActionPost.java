@@ -66,10 +66,6 @@ public class RmActionPost extends DeclarativeWebScript
     private NodeService nodeService;
     private RecordsManagementActionService rmActionService;
     
-    private String actionName;
-    private List<NodeRef> targetNodeRefs = new ArrayList<NodeRef>();
-    private Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
-    
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
@@ -80,6 +76,7 @@ public class RmActionPost extends DeclarativeWebScript
         this.rmActionService = rmActionService;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
@@ -87,17 +84,80 @@ public class RmActionPost extends DeclarativeWebScript
         try
         {
             reqContentAsString = req.getContent().getContent();
-        } catch (IOException iox)
+        } 
+        catch (IOException iox)
         {
             throw new WebScriptException(Status.STATUS_BAD_REQUEST,
                     "Could not read content from req.", iox);
         }
 
-        initJsonParams(reqContentAsString);
+        String actionName = null;
+        List<NodeRef> targetNodeRefs = null;
+        Map<String, Serializable> actionParams = new HashMap<String, Serializable>(3);
+        
+        try
+        {        
+            JSONObject jsonObj = new JSONObject(new JSONTokener(reqContentAsString));
+                
+            // Get the action name
+            if (jsonObj.has(PARAM_NAME) == true)
+            {
+                actionName = jsonObj.getString(PARAM_NAME);
+            }
+                
+            // Get the target references
+            if (jsonObj.has(PARAM_NODE_REF) == true)
+            {
+                NodeRef nodeRef = new NodeRef(jsonObj.getString(PARAM_NODE_REF));
+                targetNodeRefs = new ArrayList<NodeRef>(1);
+                targetNodeRefs.add(nodeRef);
+            }
+            if (jsonObj.has(PARAM_NODE_REFS) == true)
+            {
+                JSONArray jsonArray = jsonObj.getJSONArray(PARAM_NODE_REFS);
+                if (jsonArray.length() != 0)
+                {
+                    targetNodeRefs = new ArrayList<NodeRef>(jsonArray.length());
+                    for (int i = 0; i < jsonArray.length(); i++)
+                    {
+                        NodeRef nodeRef = new NodeRef(jsonArray.getString(i));
+                        targetNodeRefs.add(nodeRef);
+                    }
+                }
+            }
+                
+            // params are optional.
+            if (jsonObj.has(PARAM_PARAMS))
+            {
+                JSONObject paramsObj = jsonObj.getJSONObject(PARAM_PARAMS);
+                for (Iterator iter = paramsObj.keys(); iter.hasNext(); )
+                {
+                    Object nextKey = iter.next();
+                    String nextKeyString = (String)nextKey;
+                    Object nextValue = paramsObj.get(nextKeyString);
+                    
+                    // Check for date values
+                    if (nextValue instanceof JSONObject)
+                    {
+                        if (((JSONObject)nextValue).has("iso8601") == true)
+                        {
+                            String dateStringValue = ((JSONObject)nextValue).getString("iso8601");
+                            nextValue = ISO8601DateFormat.parse(dateStringValue);
+                        }
+                    } 
+                    
+                    actionParams.put(nextKeyString, (Serializable)nextValue);
+                }
+            }
+        }
+        catch (JSONException exception)
+        {
+            throw new WebScriptException(Status.STATUS_BAD_REQUEST, "Unable to parse request JSON.");
+        }
         
         // validate input: check for mandatory params.
         // Some RM actions can be posted without a nodeRef.
-        if (this.actionName == null)
+        if (actionName == null)
         {
             throw new WebScriptException(Status.STATUS_BAD_REQUEST,
                 "A mandatory parameter has not been provided in URL");
@@ -106,7 +166,7 @@ public class RmActionPost extends DeclarativeWebScript
         // Check that all the nodes provided exist and build report string
         StringBuffer targetNodeRefsString = new StringBuffer(30);
         boolean firstTime = true;
-        for (NodeRef targetNodeRef : this.targetNodeRefs)
+        for (NodeRef targetNodeRef : targetNodeRefs)
         {
             if (nodeService.exists(targetNodeRef) == false)
             {
@@ -131,16 +191,16 @@ public class RmActionPost extends DeclarativeWebScript
         {
             StringBuilder msg = new StringBuilder();
             msg.append("Executing Record Action ")
-               .append(this.actionName)
+               .append(actionName)
                .append(", (")
                .append(targetNodeRefsString.toString())
                .append("), ")
-               .append(this.actionParams);
+               .append(actionParams);
             logger.debug(msg.toString());
         }
         
         Map<String, Object> model = new HashMap<String, Object>();        
-        if (this.targetNodeRefs.isEmpty())
+        if (targetNodeRefs.isEmpty())
         {
             RecordsManagementActionResult result = this.rmActionService.executeRecordsManagementAction(actionName, actionParams);
             if (result.getValue() != null)
@@ -166,66 +226,5 @@ public class RmActionPost extends DeclarativeWebScript
         model.put("message", "Successfully queued action [" + actionName + "] on " + targetNodeRefsString.toString());
 
         return model;
-    }
-
-    @SuppressWarnings("unchecked")
-    private void initJsonParams(final String reqContentAsString)
-    {
-        try
-        {
-            JSONObject jsonObj = new JSONObject(new JSONTokener(reqContentAsString));
-            
-            // Get the action name
-            this.actionName = jsonObj.getString(PARAM_NAME);
-            
-            // Get the target references
-            if (jsonObj.has(PARAM_NODE_REF) == true)
-            {
-                NodeRef nodeRef = new NodeRef(jsonObj.getString(PARAM_NODE_REF));
-                this.targetNodeRefs = new ArrayList<NodeRef>(1);
-                this.targetNodeRefs.add(nodeRef);
-            }
-            if (jsonObj.has(PARAM_NODE_REFS) == true)
-            {
-                JSONArray jsonArray = jsonObj.getJSONArray(PARAM_NODE_REFS);
-                if (jsonArray.length() != 0)
-                {
-                    this.targetNodeRefs = new ArrayList(jsonArray.length());
-                    for (int i = 0; i < jsonArray.length(); i++)
-                    {
-                        NodeRef nodeRef = new NodeRef(jsonArray.getString(i));
-                        this.targetNodeRefs.add(nodeRef);
-                    }
-                }
-            }
-            
-            // params are optional.
-            if (jsonObj.has(PARAM_PARAMS))
-            {
-                JSONObject paramsObj = jsonObj.getJSONObject(PARAM_PARAMS);
-                for (Iterator iter = paramsObj.keys(); iter.hasNext(); )
-                {
-                    Object nextKey = iter.next();
-                    String nextKeyString = (String)nextKey;
-                    Object nextValue = paramsObj.get(nextKeyString);
-                    
-                    // Check for date values
-                    if (nextValue instanceof JSONObject)
-                    {
-                        if (((JSONObject)nextValue).has("iso8601") == true)
-                        {
-                            String dateStringValue = ((JSONObject)nextValue).getString("iso8601");
-                            nextValue = ISO8601DateFormat.parse(dateStringValue);
-                        }
-                    } 
-                    
-                    this.actionParams.put(nextKeyString, (Serializable)nextValue);
-                }
-            }
-        }
-        catch(JSONException je)
-        {
-            // Intentionally empty. Missing mandatory parameters are detected in the calling method.
-        }
     }
 }
