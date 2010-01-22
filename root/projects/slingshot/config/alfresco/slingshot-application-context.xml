@@ -114,4 +114,12 @@
    <!-- override the view resolver to handle Slingshot template URI driven page IDs -->
    <bean id="pageViewResolver" class="org.alfresco.web.site.SlingshotPageViewResolver" parent="abstractWebFrameworkViewResolver" />
    
+   
+   <!--                             -->
+   <!--  Web Script Implementations -->
+   <!--                             -->
+ 
+   <!--  I18N resources and messages Web Script -->
+   <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" />
+   
 </beans>
