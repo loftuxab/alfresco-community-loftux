@@ -28,6 +28,7 @@ package org.alfresco.jlan.smb.server.win32;
 import java.io.IOException;
 
 import org.alfresco.jlan.debug.Debug;
+import org.alfresco.jlan.netbios.NetBIOSException;
 import org.alfresco.jlan.netbios.win32.NetBIOS;
 import org.alfresco.jlan.netbios.win32.Win32NetBIOS;
 import org.alfresco.jlan.server.core.NoPooledMemoryException;
@@ -220,7 +221,7 @@ public class Win32NetBIOSPacketHandler extends PacketHandler {
                 
 				// Indicate that the session has closed
 
-				return null;
+                throw new IOException( NetBIOS.getErrorString( sts));
 			}
 		}
 		

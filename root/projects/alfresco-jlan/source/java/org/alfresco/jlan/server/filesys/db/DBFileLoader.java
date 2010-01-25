@@ -699,7 +699,7 @@ public class DBFileLoader implements FileLoader, BackgroundFileLoader, FileState
 
 			// Check if the file data has been updated, if so then queue a file save
 
-			if ( fileSeg.isUpdated()) {
+			if ( fileSeg.isUpdated() && netFile.hasDeleteOnClose() == false) {
 
 				// Set the modified date/time and file size for the file
 
@@ -2622,5 +2622,14 @@ public class DBFileLoader implements FileLoader, BackgroundFileLoader, FileState
 				m_lastTranFile = 0L;
 			}
 		}
+	}
+	
+	/**
+	 * Set the database context
+	 * 
+	 * @param dbCtx DBDeviceContext
+	 */
+	public final void setContext(DBDeviceContext dbCtx) {
+		m_dbCtx = dbCtx;
 	}
 }

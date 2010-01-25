@@ -1226,57 +1226,79 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
     try {
 
-      //	Get the share id and path
+		// Check if the access check is on the share handle
 
-      shareId = getShareIdFromHandle(handle);
-      TreeConnection conn = getTreeConnection(sess, shareId);
-      path = getPathForHandle(sess, handle, conn);
+		if ( NFSHandle.isShareHandle(handle)) {
+			
+			// Pack the response
+			
+			rpc.buildResponseHeader();
+			rpc.packInt(NFS.StsSuccess);
 
-      //	Get the disk interface from the disk driver
+			packPostOpAttr(sess, null, shareId, rpc);
+			rpc.packInt(accessMode & NFS.AccessAll);
 
-      DiskInterface disk = (DiskInterface) conn.getSharedDevice().getInterface();
+			// DEBUG
 
-      //	Get the file information for the specified path
+			if (Debug.EnableInfo && hasDebugFlag(DBG_INFO))
+				Debug.println("Access share path=" + path);
+		
+		}
+		else {
+			
+			// Get the share id and path
 
-      FileInfo finfo = disk.getFileInformation(sess, conn, path);
-      if (finfo != null) {
+			shareId = getShareIdFromHandle(handle);
+			TreeConnection conn = getTreeConnection(sess, shareId);
+			path = getPathForHandle(sess, handle, conn);
 
-        //	Check the access that the session has to the filesystem
+			// Get the disk interface from the disk driver
 
-        int mask = 0;
+			DiskInterface disk = (DiskInterface) conn.getSharedDevice().getInterface();
 
-        if (conn.hasWriteAccess()) {
+			// Get the file information for the specified path
 
-          //	Set the mask to allow all operations
+			FileInfo finfo = disk.getFileInformation(sess, conn, path);
+			if (finfo != null) {
 
-          mask = NFS.AccessAll;
-        }
-        else if (conn.hasReadAccess()) {
+				// Check the access that the session has to the filesystem
 
-          //	Set the mask for read-only operations
+				int mask = 0;
+				
+				if (conn.hasWriteAccess()) {
 
-          mask = NFS.AccessRead + NFS.AccessLookup + NFS.AccessExecute;
-        }
+					// Set the mask to allow all operations
 
-        //	Pack the response
+					mask = NFS.AccessAll;
+				}
+				else if (conn.hasReadAccess()) {
 
-        rpc.buildResponseHeader();
-        rpc.packInt(NFS.StsSuccess);
-        
-        packPostOpAttr(sess, finfo, shareId, rpc);
-        rpc.packInt(accessMode & mask);
+					// Set the mask for read-only operations
 
-        //	DEBUG
+					mask = NFS.AccessRead + NFS.AccessLookup + NFS.AccessExecute;
+				}
+			
+				// Pack the response
 
-        if (Debug.EnableInfo && hasDebugFlag(DBG_INFO))
-          sess.debugPrintln("Access path=" + path + ", info=" + finfo);
-      }
-      else {
+				rpc.buildResponseHeader();
+				rpc.packInt(NFS.StsSuccess);
 
-        //	Return an error status
+				packPostOpAttr(sess, finfo, shareId, rpc);
+				rpc.packInt(accessMode & mask);
 
-        errorSts = NFS.StsNoEnt;
-      }
+				// DEBUG
+
+				if (Debug.EnableInfo && hasDebugFlag(DBG_INFO))
+					Debug.println("Access path=" + path + ", info=" + finfo);
+			
+			} else {
+
+				// Return an error status
+
+				errorSts = NFS.StsNoEnt;
+			}
+		}
+
     }
     catch (BadHandleException ex) {
       errorSts = NFS.StsBadHandle;

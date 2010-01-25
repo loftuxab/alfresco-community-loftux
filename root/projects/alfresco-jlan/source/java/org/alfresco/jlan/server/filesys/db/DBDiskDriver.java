@@ -3360,7 +3360,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
 
     //  Build an array of folder names working back from the files id
     
-    ArrayList names = new ArrayList(16);
+    ArrayList<String> names = new ArrayList<String>(16);
       
     try {
 
