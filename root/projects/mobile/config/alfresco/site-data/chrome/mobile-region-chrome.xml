@@ -4,11 +4,11 @@
 
    <!-- Define the rendering processors for this chrome -->	
    <processor mode="view">
-      <id>freemarker</id>
+      <id>webtemplate</id>
       <uri>mobile-region-chrome</uri>
    </processor>
    <processor mode="edit">
-      <id>freemarker</id>
+      <id>webtemplate</id>
       <uri>${mode.view.uri}</uri>
    </processor>   
    

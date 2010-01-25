@@ -30,7 +30,7 @@ import org.springframework.extensions.surf.support.AbstractPageMapperFactory;
 /**
  * @author Kevin Roast
  */
-public class SlingshotPageMapperFactory extends AbstractPageMapperFactory
+public class MobilePageMapperFactory extends AbstractPageMapperFactory
 {
     /**
      * @see org.springframework.extensions.surf.support.AbstractPageMapperFactory#newInstance()
@@ -38,6 +38,6 @@ public class SlingshotPageMapperFactory extends AbstractPageMapperFactory
     @Override
     public PageMapper newInstance()
     {
-        return new SlingshotPageMapper(getServiceRegistry());
+        return new MobilePageMapper(getServiceRegistry());
     }
 }
