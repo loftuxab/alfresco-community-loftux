@@ -41,7 +41,6 @@ import org.springframework.extensions.surf.types.Theme;
 import org.springframework.extensions.surf.util.URLDecoder;
 import org.springframework.extensions.webscripts.ProcessorModelHelper;
 import org.springframework.extensions.webscripts.URLHelper;
-import org.springframework.extensions.webscripts.WebScriptProcessor;
 
 /**
  * This is a Page Mapper class which serves to interpret URLs at dispatch
@@ -68,9 +67,6 @@ import org.springframework.extensions.webscripts.WebScriptProcessor;
  */
 public class MobilePageMapper extends AbstractPageMapper
 {
-    private static final String URI_PAGEID = "pageid";
-    
-    
     /**
      * Constructor
      * 
@@ -107,12 +103,7 @@ public class MobilePageMapper extends AbstractPageMapper
         int pathIndex = requestURI.indexOf('/', 1);
         
         // Test to see if any elements are provided beyond the servlet name.
-        // Optimization to ignore webscript /service requests when processing page URIs -
-        // this is because a RequestContext is created manually for service requests
-        // that pass through the web-framework webscript runtime - we know those requests
-        // are not related to pages or page types so we can skip some processing.
-        if (pathIndex != -1 && requestURI.length() > (pathIndex + 1) &&
-            !WebScriptProcessor.WEBSCRIPT_SERVICE_SERVLET.equals(requestURI.substring(0, pathIndex)))
+        if (pathIndex != -1 && requestURI.length() > (pathIndex + 1))
         {
             pageId = requestURI.substring(pathIndex + 1);
             context.setUri(pageId);

@@ -7,82 +7,48 @@
    <description>Alfresco Project Mobile application</description>
    
    <context-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>
-         classpath:alfresco/webscript-framework-application-context.xml
-         classpath:alfresco/web-framework-application-context.xml
-         classpath:alfresco/web-framework-model-context.xml
-         classpath*:alfresco/web-extension/custom-web-framework-application-context.xml
-         classpath:alfresco/mobile-application-context.xml
-         classpath*:alfresco/web-extension/custom-mobile-application-context.xml
-      </param-value>
-      <description>Spring config file locations</description>
-   </context-param>
-   
-   <context-param>
       <param-name>org.jboss.jbossfaces.WAR_BUNDLES_JSF_IMPL</param-name>
       <param-value>true</param-value>
    </context-param>
-
-   <context-param>
-      <param-name>contextClass</param-name>
-      <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
-      <description>Spring context class</description>
-   </context-param> 
    
-   <listener>
-      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-   </listener>
+   <filter>
+      <description>Redirects view and service URLs to the dispatcher servlet.</description>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+   </filter>
+   
+   <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/proxy/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/service/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/res/*</url-pattern>
+   </filter-mapping>
    
    <servlet>
-      <servlet-name>apiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
+      <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
       <init-param>
-         <param-name>container</param-name>
-         <param-value>webframework.webscripts.container</param-value>
+         <param-name>contextConfigLocation</param-name>
+         <param-value>/WEB-INF/classes/web-application-config.xml</param-value>
       </init-param>
-   </servlet>
-   
-   <servlet>
-      <servlet-name>proxyServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.EndPointProxyServlet</servlet-class>
-   </servlet>
-   
-   <!-- The Web Framework Dispatcher Servlet -->
-   <servlet>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
    </servlet>
    
-   <servlet>
-      <servlet-name>loginServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.LoginServlet</servlet-class>
-   </servlet>
-   
    <servlet-mapping>
-      <servlet-name>apiServlet</servlet-name>
-      <url-pattern>/service/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>proxyServlet</servlet-name>
-      <url-pattern>/proxy/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>pageRendererServlet</servlet-name>
+      <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
       <url-pattern>/page/*</url-pattern>
    </servlet-mapping>
-
    <servlet-mapping>
-      <servlet-name>pageRendererServlet</servlet-name>
+      <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
       <url-pattern>/p/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>loginServlet</servlet-name>
-      <url-pattern>/login/*</url-pattern>
    </servlet-mapping>
    
    <session-config>
