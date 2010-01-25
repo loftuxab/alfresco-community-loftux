@@ -140,7 +140,7 @@ public class DBDeviceContext extends DiskDeviceContext {
 	private FileStateLockManager m_lockManager;
 	
 	// Oplocks enable/disable
-	
+
 	private boolean m_oplocksEnabled = true;
 	
 	// Debug enable
@@ -447,7 +447,9 @@ public class DBDeviceContext extends DiskDeviceContext {
 				// Get the database features that the database interface must implement to support
 				// this file loader
 
-				dbFeatures = m_loader.getRequiredDBFeatures();
+				// Set the device context in the loader
+				
+				m_loader.setContext( this);
 			}
 			catch (Exception ex) {
 

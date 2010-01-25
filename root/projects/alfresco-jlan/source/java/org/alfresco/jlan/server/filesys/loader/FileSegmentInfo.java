@@ -74,9 +74,9 @@ public class FileSegmentInfo {
 	
 	private int m_status = Initial;
 
-  //  Amount of valid data in the file, used to allow reads during data loading
+	//  Amount of valid data in the file, used to allow reads during data loading
   
-  private long m_readable;
+	private long m_readable;
   
 	/**
 	 * Default constructor
@@ -158,13 +158,13 @@ public class FileSegmentInfo {
 				
 		if ( tempFile.exists() && tempFile.delete() == false) {
 
-		  //	DEBUG
+			//	DEBUG
 		  
-		  Debug.println("** Failed to delete " + toString() + " **");
+			Debug.println("** Failed to delete " + toString() + " **");
 		  
-		  //	Throw an exception, delete failed
+		  	//	Throw an exception, delete failed
 		  
-			throw new IOException("Failed to delete file " + getTemporaryFile());
+		  	throw new IOException("Failed to delete file " + getTemporaryFile());
 		}
 	}
 		

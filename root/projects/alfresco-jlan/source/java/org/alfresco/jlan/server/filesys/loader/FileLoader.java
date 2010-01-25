@@ -32,6 +32,7 @@ import org.alfresco.jlan.server.SrvSession;
 import org.alfresco.jlan.server.core.DeviceContext;
 import org.alfresco.jlan.server.filesys.FileOpenParams;
 import org.alfresco.jlan.server.filesys.NetworkFile;
+import org.alfresco.jlan.server.filesys.db.DBDeviceContext;
 import org.springframework.extensions.config.ConfigElement;
 
 
@@ -129,4 +130,12 @@ public interface FileLoader {
 	 */
 	public void addFileProcessor(FileProcessor fileProc)
 		throws FileLoaderException;
+	
+	/**
+	 * Set the database context, used before the loader is fully initialized so that it can
+	 * query the database interface if required.
+	 * 
+	 * @param dbCtx DBDeviceContext
+	 */
+	public void setContext(DBDeviceContext dbCtx);
 }

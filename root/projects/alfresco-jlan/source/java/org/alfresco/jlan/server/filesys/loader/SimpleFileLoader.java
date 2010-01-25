@@ -38,6 +38,7 @@ import org.alfresco.jlan.server.filesys.FileInfo;
 import org.alfresco.jlan.server.filesys.FileName;
 import org.alfresco.jlan.server.filesys.FileOpenParams;
 import org.alfresco.jlan.server.filesys.NetworkFile;
+import org.alfresco.jlan.server.filesys.db.DBDeviceContext;
 import org.alfresco.jlan.server.filesys.db.LocalDataNetworkFile;
 import org.springframework.extensions.config.ConfigElement;
 
@@ -398,5 +399,13 @@ public class SimpleFileLoader implements FileLoader, NamedFileLoader {
 		//	Not supported by this file loader implementation
 		
 		throw new FileLoaderException("File processors not supported");
+	}
+	
+	/**
+	 * Set the database context
+	 * 
+	 * @param dbCtx DBDeviceContext
+	 */
+	public final void setContext(DBDeviceContext dbCtx) {
 	}
 }
