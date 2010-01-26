@@ -13,7 +13,9 @@
       parentNodeRef: "alfresco://category/root",
       itemFamily: "category",
       maintainAddedRemovedItems: false,
-      params: "${field.control.params.params!""}"
+      params: "${field.control.params.params!""}",
+      createNewItemUri: "${field.control.params.createNewItemUri!}",
+      createNewItemIcon: "${field.control.params.createNewItemIcon!}"
    });
 })();
 //]]></script>
@@ -39,7 +41,7 @@
             <div class="show-picker">
                <button id="${controlId}-showPicker-button">${msg("button.select")}</button>
             </div>
-         
+            
             <@renderPickerHTML controlId />
          </#if>
       </div>

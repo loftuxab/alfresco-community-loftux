@@ -11,6 +11,7 @@ function main()
    var favouriteSites = [],
       collapsedTwisters = "",
       currentSiteIsFav = false,
+      repoLibraryVisible = false,
       siteTitle = "",
       prefs,
       favourites;
@@ -115,11 +116,19 @@ function main()
       collapsedTwisters = "";
    }
    
+   // Repository Library visibility
+   var repoConfig = config.scoped["RepositoryLibrary"]["visible"];
+   if (repoConfig !== null)
+   {
+      repoLibraryVisible = repoConfig.value == "true";
+   }
+   
    // Prepare the model for the template
    model.currentSiteIsFav = currentSiteIsFav;
    model.favouriteSites = favouriteSites;
    model.collapsedTwisters = collapsedTwisters;
    model.siteTitle = siteTitle;
+   model.repoLibraryVisible = repoLibraryVisible;
 }
 
 main();

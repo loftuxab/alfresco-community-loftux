@@ -27,7 +27,7 @@
    background-color: #f8f8f8;
    border-bottom: 1px dashed #c0c0c0;
    margin: 0 -10px;
-   padding: 4px 0.5em;
+   padding: 4px 0.5em 2px;
 }
 
 .doclist .doclist-bar-bottom
@@ -40,8 +40,10 @@
 .doclist span.separator
 {
    border-right: 1px dotted #457A9C;
-   margin: 0 4px 0 0;
-   padding: 2px 0 0;
+   margin: 0 4px;
+   padding: 2px 0;
+   position: relative;
+   top: -4px;
    vertical-align: bottom;
 }
 
@@ -57,7 +59,8 @@
 .doclist .doclist-bar .paginator
 {
    float: left;
-   margin: 4px 0;
+   margin: 0;
+   padding: 4px 0;
    text-align: center;
    width: 80%;
 }
@@ -106,7 +109,52 @@
    background-image: url(images/select-documents-16.png);
 }
 
+/* DocList bar Simple / Detailed view */
+.doclist .show-folders,
+.doclist .simple-detailed
+{
+   float: right;
+}
 
+.doclist .show-folders
+{
+   margin-right: 4px;
+}
+.doclist .show-folders .separator
+{
+   margin-left: 0;
+}
+
+.doclist .simple-detailed .yui-button
+{
+   margin-left: 0;
+   margin-right: 0;
+}
+
+.doclist .simple-detailed span.first-child
+{
+   background-position: 50% 50%;
+   background-repeat: no-repeat;
+   min-height: 16px;
+   padding: 0 2px;
+}
+
+.doclist .simple-detailed .simple-view span.first-child
+{
+   background-image: url(images/simple-view-off-16.png);
+}
+.doclist .simple-detailed .simple-view.yui-button-checked span.first-child
+{
+   background-image: url(images/simple-view-on-16.png);
+}
+.doclist .simple-detailed .detailed-view span.first-child
+{
+   background-image: url(images/detailed-view-off-16.png);
+}
+.doclist .simple-detailed .detailed-view.yui-button-checked span.first-child
+{
+   background-image: url(images/detailed-view-on-16.png);
+}
 
 /* Data Table */
 
@@ -255,8 +303,9 @@
    text-decoration: underline;
 }
 
-/* Favourite document indicator */
-.doclist .documents h3 a.favourite-document
+/* Favourite document / folder indicator */
+.doclist .documents h3 a.favourite-document,
+.doclist .documents h3 a.favourite-folder
 {
    background-image: url(../images/star-deselected_16x16.png);
    background-position: center;
@@ -265,12 +314,15 @@
    margin-right: 0.5em;
    padding: 0.5em;
 }
-.doclist .documents h3 a.favourite-document.enabled
+.doclist .documents h3 a.favourite-document.enabled,
+.doclist .documents h3 a.favourite-folder.enabled
 {
    background-image: url(../images/star-selected_16x16.png);
 }
 .doclist .documents h3 a.favourite-document:active,
-.doclist .documents h3 a.favourite-document:hover
+.doclist .documents h3 a.favourite-document:hover,
+.doclist .documents h3 a.favourite-folder:active,
+.doclist .documents h3 a.favourite-folder:hover
 {
    text-decoration: none;
 }
@@ -490,7 +542,7 @@
 
 .doclist .onActionView a
 {
-   background-image: url(images/view-in-browser.png);
+   background-image: url(images/view-in-browser-16.png);
 }
 
 .doclist .onActionEditOffline a
@@ -561,6 +613,11 @@
 .doclist .onActionViewWorkingCopy a
 {
    background-image: url(images/working-copy-16.png);
+}
+
+.doclist .onActionLocate a
+{
+   background-image: url(images/locate-item-16.png);
 }
 
 

@@ -47,10 +47,10 @@
             <div class="yui-ge">
                <input type="hidden" id="${args.htmlid}-page" name="page" value="wiki-page" />
                <div class="yui-u first">
-                  <input type="text" id="${args.htmlid}-renameTo" name="name" value="" size="30" tabindex="1" />
+                  <input type="text" id="${args.htmlid}-renameTo" name="name" value="" size="30" tabindex="0" />
                </div>
                <div class="yui-u">
-                  <input type="submit" id="${args.htmlid}-rename-save-button" value="${msg("button.save")}" tabindex="2" />
+                  <input type="submit" id="${args.htmlid}-rename-save-button" value="${msg("button.save")}" tabindex="0" />
                </div>
             </div>
          </form>

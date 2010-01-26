@@ -1,6 +1,6 @@
 #Share .yui-panel
 {
-   border-style:none;
+   border-style: none;
 }
 
 #Share .yui-panel .ft span.button-group
@@ -8,6 +8,7 @@
    text-align: center;
    vertical-align: middle;
 }
+
 #Share .yui-panel .bd
 {
    padding: 0;
@@ -30,6 +31,7 @@
 {
    width: 60%;
 }
+
 #Share .yui-panel .yui-gd .yui-u.first
 {
    width: 28%;
@@ -48,10 +50,9 @@
    text-align: right;
 }
 
-
 #Share .yui-panel .bd.yui-calcontainer
 {
-   padding:0.5em;
+   padding: 0.5em;
 }
 
 /* Style the default message  */
@@ -119,7 +120,6 @@
 {
 }
 
-
 #Share .flat-button a:hover
 {
    text-decoration: none;
@@ -130,15 +130,14 @@
    white-space: nowrap;
 }
 
-
 /* A combination of a link and splitbutton wrapped inside a span */
 
 #Share .link-menu-button
-{ 
-   padding-bottom:2px;
-   padding-top:2px;
-   vertical-align:middle;
+{
    border: 1px solid transparent;
+   padding-bottom: 2px;
+   padding-top: 0;
+   vertical-align: middle;
 }
 
 #Share .link-menu-button .yui-button,
@@ -147,22 +146,18 @@
 {
    margin: 0;
    padding: 0;
-   vertical-align: middle;  
+   vertical-align: middle;
 }
 
 #Share .link-menu-button .yui-button
 {
    border: 1px solid transparent;
    background-image: none;
-   /*margin-top:3px;*/
 }
 
 #Share .link-menu-button .yui-button span button
 {
-   padding: 6px 7px;   
-   /*
-   width: 20px;
-   */  
+   padding: 6px 7px;
 }
 
 #Share .link-menu-button .yui-button.yui-button-activeoption button,
@@ -172,6 +167,7 @@
 }
 
 /* DataTable overrides */
+
 #Share .yui-dt tr.yui-dt-first td
 {
    border-top: medium none;

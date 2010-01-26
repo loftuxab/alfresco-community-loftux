@@ -1,4 +1,5 @@
 /* Site-wide Styles */
+
 body
 {
    font-family: Arial, sans-serif;
@@ -21,11 +22,13 @@ a:hover
 
 h1
 {
+
+
 /*   font-family: Helvetica, Arial, sans-serif;
    font-size: 146.5%;
    font-weight: normal;
 */ 
-   font:normal 146.5% Helvetica, Arial, sans-serif;
+   font: normal 146.5% Helvetica, Arial, sans-serif;
 }
 
 h2
@@ -61,7 +64,6 @@ h4 .lighter
    color: #a2a2a2;
 }
 
-
 hr
 {
    color: #E4E4E4;
@@ -78,6 +80,7 @@ hr
    background: white !important;
    color: red !important;
 }
+
 .error-alt
 {
    background-color: red !important;
@@ -108,7 +111,7 @@ hr
    background-color: #92c15f;
    background-image: url(images/dashlet-title-bg.png);
    background-repeat: repeat-x;
-   border-bottom: 1px dashed #bababa; 
+   border-bottom: 1px dashed #bababa;
    color: #fff;
 }
 
@@ -131,7 +134,7 @@ hr
 
 .dashlet .body
 {
-	background-color: #F9FCFD;
+   background-color: #F9FCFD;
 }
 
 /*.dashlet .body a,
@@ -146,10 +149,9 @@ hr
    border-bottom: 1px dashed #e9e9e9;
 }
 
-
 .yui-skin-greenTheme .yui-panel
 {
-   border-bottom:medium none;
+   border-bottom: medium none;
 }
 
 .yui-skin-greenTheme .mask
@@ -159,7 +161,7 @@ hr
 
 .yui-skin-greenTheme .yui-panel .hd,
 .yui-skin-greenTheme .yui-panel .bdft,
-.yui-skin-greenTheme .yui-panel .ft 
+.yui-skin-greenTheme .yui-panel .ft
 {
    color: #515D6B;
    background: #E3EBEC;
@@ -183,7 +185,7 @@ hr
 
 .yui-skin-greenTheme .yui-panel .ft
 {
-   border-top:1px solid #C4C5C5;
+   border-top: 1px solid #C4C5C5;
    padding: 5px;
 }
 
@@ -199,8 +201,8 @@ hr
 
 .yui-skin-greenTheme #message .bd
 {
-   background-color:#808080;
-   color:white;
+   background-color: #808080;
+   color: white;
 }
 
 .yui-skin-greenTheme #message .bd span.wait
@@ -237,7 +239,6 @@ hr
    border-right: 1px solid #c4c5c5;
    background-color: #e3ebec;
 }
-
 
 /* Page title and navigation styles */
 
@@ -279,7 +280,6 @@ span.navigation-item-alt
    color: #9fc6e1;
 }
 
-
 span.navigation-item a,
 span.navigation-item a:visited
 {
@@ -317,20 +317,18 @@ span.navigation-separator-alt
 
 strong
 {
-	font-weight: bold;
+   font-weight: bold;
 }
-
 
 em
 {
-	font-style: italic;
+   font-style: italic;
 }
 
 .rich-content a.wiki-missing-page
 {
    color: #CC2200 !important;
 }
-
 
 select,
 input[type="text"],
@@ -341,14 +339,15 @@ textarea
 }
 
 /* same as theme-color-2 */
+
 .toolbar .link a:hover,
 .members-bar .member-link a:hover
 {
-   color:#009300;
+   color: #009300;
 }
 
-
 /* Richtext Editor Plug-ins */
+
 .yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon
 {
    background-position: 0 0 !important;
@@ -356,17 +355,20 @@ textarea
 }
 
 /* Point the YUI button to the themed sprite */
+
 .yui-skin-greenTheme .yui-button
 {
    background-image: url(images/sprite.png);
 }
 
 /* Override YUI Button styles for - flat button style */
+
 .yui-skin-greenTheme .flat-button .yui-button
 {
    background: none;
    border-color: transparent;
 }
+
 .yui-skin-greenTheme .flat-button .yui-button .first-child
 {
    border-color: transparent;
@@ -379,6 +381,7 @@ textarea
    border-style: solid;
    border-width: 1px 0;
 }
+
 .yui-skin-greenTheme .flat-button .yui-button-hover .first-child
 {
    border-color: #808080;
@@ -392,8 +395,8 @@ textarea
    background: #5FAC34 none;
 }
 
-
 /* Override YUI Button styles for - title button style */
+
 .yui-skin-greenTheme .title-button .yui-button
 {
    background: transparent url(images/title-button-bg.png) repeat-x 0 0;
@@ -414,7 +417,7 @@ textarea
 
 .yui-skin-greenTheme .yui-pg-container span
 {
-   color:#606060;
+   color: #606060;
 }
 
 .yui-skin-greenTheme .yui-pg-container span.yui-pg-page.yui-pg-current-page
@@ -444,7 +447,6 @@ textarea
 }
 
 /* A combination of a link and splitbutton wrapped inside a span */
-
 
 .yui-skin-greenTheme .link-menu-button .yui-button span button
 {
@@ -479,70 +481,84 @@ textarea
 }
 
 #Share.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
-{   
+{
    border-color: transparent;
    background-color: transparent;
 }
 
-.topiclist .yui-dt-liner {
-   padding:0;
+.topiclist .yui-dt-liner
+{
+   padding: 0;
 }
 
 .yui-skin-greenTheme .yui-dt-message
 {
-   background-color:inherit;
+   background-color: inherit;
 }
 
 /* blog/wiki action items links */
+
 body.yui-skin-greenTheme .wikipage .editPage a:hover,
 body.yui-skin-greenTheme .wikipage .deletePage a:hover,
 body.yui-skin-greenTheme .wikipage .detailsPage a:hover,
 body.yui-skin-greenTheme .nodeEdit .onEditBlogPost a:hover,
 body.yui-skin-greenTheme .nodeEdit .onDeleteBlogPost a:hover
 {
-
+   
 }
 
 .webview .title a,
 .wiki .title a
 {
-   color:#fff;
+   color: #fff;
 }
 
 /* YUI Menu */
-body.yui-skin-greenTheme .yuimenu .bd {
-   border:1px solid #008f22;
+
+body.yui-skin-greenTheme .yuimenu .bd
+{
+   border: 1px solid #008f22;
 }
+
 /* YUI Menu roll over state*/
+
 body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected
 {
    background-color: #008f22;
 }
+
 body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
 {
-   color:#00AE42;
+   color: #00AE42;
 }
+
 body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
 {
-    color:#FFF;
+   color: #FFF;
 }
+
 /*end YUI Menu */
 
 /* Doclist */
+
 body.yui-skin-greenTheme .doclist .more-actions a:active,
 body.yui-skin-greenTheme .doclist .more-actions a:hover
 {
    background-color: #5FAC34;
 }
-body.yui-skin-greenTheme .doclist div.more-actions {
-   border:1px solid #5FAC34;
+
+body.yui-skin-greenTheme .doclist div.more-actions
+{
+   border: 1px solid #5FAC34;
 }
+
 body.yui-skin-greenTheme .doclist .action-set a:active,
 body.yui-skin-greenTheme .doclist .action-set a:hover,
 body.yui-skin-greenTheme .doclist .action-set .highlighted
 {
    border: 1px solid #5FAC34;
 }
+
 body.yui-skin-greenTheme .doclist tr.yui-dt-odd.yui-dt-highlighted,
 body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-greenTheme .links-body tr.links-selected-row,
@@ -557,15 +573,32 @@ body.yui-skin-greenTheme .over,
 {
    background-color: #F5F5F5;
 }
+
 body.yui-skin-greenTheme .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
 body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 {
    border-left: 1px solid #C7ECBB;
 }
 
+body.yui-skin-greenTheme .categoryview .category .ygtvtn,
+body.yui-skin-greenTheme .categoryview .category .ygtvtm,
+body.yui-skin-greenTheme .categoryview .category .ygtvtmh, body.yui-skin-greenTheme .categoryview .category .ygtvtmhh,
+body.yui-skin-greenTheme .categoryview .category .ygtvtp,
+body.yui-skin-greenTheme .categoryview .category .ygtvtph, body.yui-skin-greenTheme .categoryview .category .ygtvtphh,
+body.yui-skin-greenTheme .categoryview .category .ygtvln,
+body.yui-skin-greenTheme .categoryview .category .ygtvlm,
+body.yui-skin-greenTheme .categoryview .category .ygtvlmh, body.yui-skin-greenTheme .categoryview .category .ygtvlmhh,
+body.yui-skin-greenTheme .categoryview .category .ygtvlp,
+body.yui-skin-greenTheme .categoryview .category .ygtvlph, body.yui-skin-greenTheme .categoryview .category .ygtvlphh,
+body.yui-skin-greenTheme .categoryview .category .ygtvdepthcell
+{
+   background-image: url(images/categoryview-sprite.gif);
+}
+
 /* end doclist */
 
 /* invite page */
+
 .inviteusersbyemail .byemailbody
 {
    background-color: #fbfbfb;
@@ -580,10 +613,11 @@ body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-la
 .yui-skin-greenTheme .calendar.weekview thead th,
 .yui-skin-greenTheme .calendar.monthview thead th
 {
-   color:#000;
+   color: #000;
 }
 
 /* filter list link */
+
 .yui-skin-greenTheme .treeview .selected > table,
 .yui-skin-greenTheme .filter li.selected, 
 .yui-skin-greenTheme .tags li.selected,
@@ -592,7 +626,7 @@ body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-la
 body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
 #Share.yui-skin-greenTheme .treeview .selected
 {
-   background-color:#D4F8C4;
+   background-color: #D4F8C4;
 }
 
 .yui-skin-greenTheme .filter a.disabled,
@@ -615,6 +649,7 @@ body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnb
 }
 
 /* Link color */
+
 body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected a,
 li.selected a.filter-link,
 li.selected a.tool-link,
@@ -626,15 +661,17 @@ body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:link,
 body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:visited, 
 body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:hover
 {
-
+   
 }
+
 body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel, 
 body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:link, 
 body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:visited, 
 body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:hover
 {
-
+   
 }
+
 .yui-skin-greenTheme .node .nodeTitle a,
 .yui-skin-greenTheme .node .nodeURL a,
 .yui-skin-greenTheme .nodeAttrValue a,
@@ -645,17 +682,19 @@ body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:h
 .yui-skin-greenTheme .site-members h3 a,
 .yui-skin-greenTheme .yui-calendar td.calcell a,
 .yui-skin-greenTheme .doclist .documents a,
-.yui-skin-greenTheme .attrValue a {
-  color: #00AE42;
+.yui-skin-greenTheme .attrValue a
+{
+   color: #00AE42;
 }
 
 .yui-skin-greenTheme .site-navigation
 {
-   background-image:url(./images/navigation-bg.png);
+   background-image: url(./images/navigation-bg.png);
 }
 
-.cmis .body a {
-   color:#00AE42;
+.cmis .body a
+{
+   color: #00AE42;
 }
 
 /* Twisters */
@@ -670,92 +709,101 @@ body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:h
    background: transparent url(images/collapsed.png) no-repeat scroll 0 50% !important;
 }
 
-
 /* Theme colors */
+
 .theme-color-1,
 a.theme-color-1,
 a.theme-color-1:visited,
-a.theme-color-1:hover {
-   color:#00AE42;
+a.theme-color-1:hover
+{
+   color: #00AE42;
 }
 
 .theme-color-2,
 a.theme-color-2,
 a.theme-color-2:visited,
-a.theme-color-2:hover {
+a.theme-color-2:hover
+{
+
+
 /*   color:#66BC29;*/
-   color:#038603;
+   color: #038603;
 }
 
 .theme-color-3,
 a.theme-color-3,
 a.theme-color-3:visited,
-a.theme-color-3:hover {
+a.theme-color-3:hover
+{
    color: #ebebeb;
 }
 
 .theme-color-4,
 a.theme-color-4,
 a.theme-color-4:visited,
-a.theme-color-4:hover {
-   color:#009300;
+a.theme-color-4:hover
+{
+   color: #009300;
 }
+
 .theme-color-5,
 a.theme-color-5,
 a.theme-color-5:visited,
 a.theme-color-5:hover
 {
-
+   
 }
 
 /* Theme background colors */
+
 .theme-bg-color-1,
-div.theme-bg-color-1 {
-   background-color:#5FAC34;
+div.theme-bg-color-1
+{
+   background-color: #5FAC34;
 }
 
-
 .theme-bg-color-2,
-div.theme-bg-color-2 {
-   background-color:#fffbdd;
+div.theme-bg-color-2
+{
+   background-color: #fffbdd;
 }
 
 .theme-bg-color-3,
 div.theme-bg-color-3
 {
-
+   
 }
 
 .theme-bg-color-4,
 div.theme-bg-color-4
 {
-
+   
 }
 
 .theme-bg-color-5,
 div.theme-bg-color-5
 {
-
+   
 }
 
 .theme-bg-1
 {
-
+   
 }
 
 .theme-bg-2
 {
-   background-color:#E3EAEC;
+   background-color: #E3EAEC;
 }
 
 /* Theme border type/colors */
 
 .theme-border-1
 {
-
+   
 }
 
 .theme-border-2
 {
-
+   
 }

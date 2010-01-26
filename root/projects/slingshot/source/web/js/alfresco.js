@@ -440,6 +440,7 @@ Alfresco.util.getFileIcon.types =
    "cm:folder": "folder",
    "{http://www.alfresco.org/model/content/1.0}category": "category",
    "cm:category": "category",
+   "tag": "tag",
    "{http://www.alfresco.org/model/site/1.0}sites": "site",
    "st:sites": "site",
    "{http://www.alfresco.org/model/site/1.0}site": "site",
@@ -851,28 +852,33 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj, p_oE
    
    // Create the button
    var oElement = p_oElement ? p_oElement : p_scope.id + "-" + p_name,
+      button = null;
+
+   if (YUIDom.get(oElement) !== null)
+   {
       button = new YAHOO.widget.Button(oElement, obj);
 
-   if (typeof button == "object")
-   {
-      // Register the click listener if one was supplied
-      if (typeof p_onclick == "function")
+      if (typeof button == "object")
       {
-         // Special case for a menu
-         if (obj.type == "menu")
+         // Register the click listener if one was supplied
+         if (typeof p_onclick == "function")
          {
-            button.getMenu().subscribe("click", p_onclick, p_scope, true);
+            // Special case for a menu
+            if (obj.type == "menu")
+            {
+               button.getMenu().subscribe("click", p_onclick, p_scope, true);
+            }
+            else
+            {
+               button.on("click", p_onclick, button, p_scope);
+            }
          }
-         else
+
+         // Special case if htmlName was passed-in as an option
+         if (typeof obj.htmlName != "undefined")
          {
-            button.on("click", p_onclick, button, p_scope);
+            button.get("element").getElementsByTagName("button")[0].name = obj.htmlName;
          }
-      }
-      
-      // Special case if htmlName was passed-in as an option
-      if (typeof obj.htmlName != "undefined")
-      {
-         button.get("element").getElementsByTagName("button")[0].name = obj.htmlName;
       }
    }
    return button;
@@ -1451,7 +1457,7 @@ Alfresco.util.getQueryStringParameters = function(url)
 {
    var i, len, idx, queryString, params, tokens, name, value, objParams;
 
-   url = url || top.location.href;
+   url = url || window.location.href;
 
    idx = url.indexOf("?");
    queryString = idx >= 0 ? url.substr(idx + 1) : url;
@@ -2112,7 +2118,7 @@ Alfresco.util.PopupManager = function()
        *    effectDuration: {int}, // the time in seconds that the effect should run, default is 0.5
        *    modal: {boolean},      // if a grey transparent overlay should be displayed in the background
        *    close: {boolean},      // if a close icon should be displayed in the right upper corner, default is false
-       *    buttons: []            // an array of button configs as described by YUI:s SimpleDialog, default is a single OK button
+       *    buttons: []            // an array of button configs as described by YUI's SimpleDialog, default is a single OK button
        *    noEscape: {boolean}    // indicates the the message has already been escaped (e.g. to display HTML-based messages)
        * }
        */
@@ -2229,7 +2235,7 @@ Alfresco.util.PopupManager = function()
        *    modal: {boolean},      // if a grey transparent overlay should be displayed in the background
        *    initialShow {boolean}  // whether to call show() automatically on the panel
        *    close: {boolean},      // if a close icon should be displayed in the right upper corner, default is true
-       *    buttons: []            // an array of button configs as described by YUI:s SimpleDialog, default is a single OK button
+       *    buttons: []            // an array of button configs as described by YUI's SimpleDialog, default is a single OK button
        *    okButtonText: {string} // Allows just the label of the OK button to be overridden
        *    noEscape: {boolean}    // indicates the the text property has already been escaped (e.g. to display HTML-based messages)
        *    html: {string},        // optional override for function-generated HTML <input> field. Note however that you must supply your own
@@ -2283,7 +2289,7 @@ Alfresco.util.PopupManager = function()
             {
                html += '<label for="' + id + '">' + (c.noEscape ? c.text : $html(c.text)) + '</label>';
             }
-            html += '<textarea id="' + id + '" tabindex="1">' + c.value + '</textarea>';
+            html += '<textarea id="' + id + '" tabindex="0">' + c.value + '</textarea>';
          }
          prompt.setBody(html);
 
@@ -3915,6 +3921,7 @@ Alfresco.service.BaseService.prototype =
     * Preference keys
     */
     Alfresco.service.Preferences.FAVOURITE_DOCUMENTS = "org.alfresco.share.documents.favourites";
+    Alfresco.service.Preferences.FAVOURITE_FOLDERS = "org.alfresco.share.folders.favourites";
     Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
     Alfresco.service.Preferences.IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imapFavourites";
     Alfresco.service.Preferences.COLLAPSED_TWISTERS = "org.alfresco.share.twisters.collapsed";
@@ -4299,7 +4306,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                var filterId = owner.className,
                   filterData = anchor.rel;
 
-               YAHOO.Bubbling.fire("filterChanged",
+               YAHOO.Bubbling.fire("changeFilter",
                {
                   filterOwner: me.name,
                   filterId: filterId,

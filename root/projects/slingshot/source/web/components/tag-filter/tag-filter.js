@@ -110,10 +110,7 @@
          Alfresco.TagFilter.superclass.onReady.call(this);
 
          // Kick-off tag population
-         if (this.options.siteId && this.options.containerId)
-         {
-            YAHOO.Bubbling.fire("tagRefresh");
-         }
+         YAHOO.Bubbling.fire("tagRefresh");
       },
       
 
@@ -132,29 +129,43 @@
        */
       onTagRefresh: function TagFilter_onRefresh(layer, args)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}&topN={tn}",
+         var url;
+         
+         if (this.options.siteId)
          {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            d: new Date().getTime(),
-            tn: this.options.numTags
-         });
+            url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}&topN={tn}",
+            {
+               site: this.options.siteId,
+               container: this.options.containerId,
+               d: new Date().getTime(),
+               tn: this.options.numTags
+            });
+         }
+         else
+         {
+            url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "collaboration/tagQuery?d={d}&m={m}&s={s}",
+            {
+               d: new Date().getTime(),
+               m: this.options.numTags,
+               s: "count"
+            });
+         }
          
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.GET,
-				url: url,
-				successCallback:
-				{
-					fn: this.onTagRefresh_success,
-					scope: this
-				},
-				failureCallback:
-				{
-					fn: this.onTagRefresh_failure,
-					scope: this
-				}
-			});
+            url: url,
+            successCallback:
+            {
+               fn: this.onTagRefresh_success,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this.onTagRefresh_failure,
+               scope: this
+            }
+         });
       },
       
       /**

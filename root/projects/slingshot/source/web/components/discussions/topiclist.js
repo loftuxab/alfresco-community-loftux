@@ -74,7 +74,7 @@
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
-      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("changeFilter", this.onChangeFilter, this);
       YAHOO.Bubbling.on("topiclistRefresh", this.onDiscussionsTopicListRefresh, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
@@ -580,7 +580,7 @@
             filterOwner: "Alfresco.DiscussionsTopicListFilter",
             filterData: null
          }, this.options.initialFilter);
-         YAHOO.Bubbling.fire("filterChanged", filterObj);
+         YAHOO.Bubbling.fire("changeFilter", filterObj);
       },
       
       /**
@@ -641,7 +641,7 @@
                filterOwner: "Alfresco.TagFilter",
                filterData: null
             };
-            YAHOO.Bubbling.fire("filterChanged", filterObj);
+            YAHOO.Bubbling.fire("changeFilter", filterObj);
          }
       },
       
@@ -766,13 +766,13 @@
       },
       
       /**
-       * DiscussionsTopicList View Filter changed event handler
+       * DiscussionsTopicList View change filter event handler
        *
-       * @method onFilterChanged
+       * @method onChangeFilter
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (new filterId)
        */
-      onFilterChanged: function DiscussionsTopicList_onFilterChanged(layer, args)
+      onChangeFilter: function DiscussionsTopicList_onChangeFilter(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
@@ -788,6 +788,7 @@
             {
                page: 1
             });
+            YAHOO.Bubbling.fire("filterChanged", this.currentFilter);
          }
       },
       

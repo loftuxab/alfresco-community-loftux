@@ -4,6 +4,8 @@
    <script type="text/javascript">//<![CDATA[
    (function()
    {
+      var $combine = Alfresco.util.combinePaths;
+      
       // If no location.hash exists, convert certain params in location.search to location.hash and replace the page
       var loc = window.location;
       if (loc.hash === "" && loc.search !== "")
@@ -12,13 +14,21 @@
          var hashParams =
          {
             "path": true,
-            "page": true
+            "page": true,
+            "filter": true
          };
          for (q in qs)
          {
             if (qs.hasOwnProperty(q) && q in hashParams)
             {
-               hash += "&" + q + "=" + encodeURIComponent(qs[q]);
+               if (q === "path")
+               {
+                  hash += "&" + "filter=path|" + encodeURIComponent($combine("/", qs[q]));
+               }
+               else
+               {
+                  hash += "&" + q + "=" + encodeURIComponent(qs[q]);
+               }
                delete qs[q];
             }
          }

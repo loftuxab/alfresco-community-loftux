@@ -34,7 +34,7 @@
                <label for="${args.htmlid}-title">${msg("form.title")}:</label>
             </div>
             <div class="yui-u">
-               <input class="wide" type="text" id="${args.htmlid}-title" name="title" value="" tabindex="1"/><span class="lbl dot">*</span>
+               <input class="wide" type="text" id="${args.htmlid}-title" name="title" value="" tabindex="0"/><span class="lbl dot">*</span>
             </div>
          </div>
          <div class="yui-gd">
@@ -42,7 +42,7 @@
                <label for="${args.htmlid}-description">${msg("form.description")}:</label>
             </div>
             <div class="yui-u">
-               <textarea class="wide" id="${args.htmlid}-description" type="textarea" rows="5" name="description" tabindex="2"></textarea>
+               <textarea class="wide" id="${args.htmlid}-description" type="textarea" rows="5" name="description" tabindex="0"></textarea>
             </div>
          </div>
          <div class="yui-gd">
@@ -50,7 +50,7 @@
                <label for="${args.htmlid}-url">${msg("form.url")}:</label>
             </div>
             <div class="yui-u">
-               <input class="wide" id="${args.htmlid}-url" type="text" name="url" tabindex="3"/><span class="lbl dot">*</span>
+               <input class="wide" id="${args.htmlid}-url" type="text" name="url" tabindex="0"/><span class="lbl dot">*</span>
             </div>
          </div>
          <div class="yui-gd">
@@ -58,7 +58,7 @@
                <label for="${args.htmlid}-internal">${msg("form.internal")}:</label>
             </div>
             <div class="yui-u">
-               <input id="${args.htmlid}-internal" type="checkbox" name="internal" tabindex="4"/>
+               <input id="${args.htmlid}-internal" type="checkbox" name="internal" tabindex="0"/>
                <span class="help">${msg("form.internalDescription")}</span>
             </div>
          </div>
@@ -74,8 +74,8 @@
          <div class="yui-gd">
             <div class="yui-u first">&nbsp;</div>
             <div class="yui-u">
-               <input type="submit" id="${args.htmlid}-ok" value="" tabindex="7"/>
-               <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="8"/>
+               <input type="submit" id="${args.htmlid}-ok" value="" tabindex="0"/>
+               <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="0"/>
             </div>
          </div>
       </fieldset>

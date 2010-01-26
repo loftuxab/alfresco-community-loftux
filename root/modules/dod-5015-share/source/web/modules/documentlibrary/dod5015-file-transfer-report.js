@@ -146,7 +146,7 @@
                   });
 
                   // Make sure other components display the new file if present
-                  YAHOO.Bubbling.fire("filterChanged",
+                  YAHOO.Bubbling.fire("changeFilter",
                   {
                      filterId: "path",
                      filterData: this.selectedNode.data.path,

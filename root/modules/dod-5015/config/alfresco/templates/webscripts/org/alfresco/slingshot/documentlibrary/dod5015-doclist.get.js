@@ -15,7 +15,26 @@ function getPerson(username)
 {
    if (typeof PeopleCache[username] == "undefined")
    {
-      PeopleCache[username] = people.getPerson(username);
+      var person = people.getPerson(username);
+      if (person == null && username == "System")
+      {
+         person =
+         {
+            properties:
+            {
+               userName: "System",
+               firstName: "System",
+               lastName: "User"
+            }
+         }
+      }
+      PeopleCache[username] =
+      {
+         userName: person.properties.userName,
+         firstName: person.properties.firstName,
+         lastName: person.properties.lastName,
+         displayName: (person.properties.firstName + " " + person.properties.lastName).replace(/^\s+|\s+$/g, "")
+      };
    }
    return PeopleCache[username];
 }

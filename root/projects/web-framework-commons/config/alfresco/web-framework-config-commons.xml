@@ -27,12 +27,10 @@
 	         </type>
              <type name="period" template="/org/alfresco/components/form/controls/period.ftl" />
 	         <type name="any" template="/org/alfresco/components/form/controls/textfield.ftl" />
-	         <type name="category" template="/org/alfresco/components/form/controls/category.ftl">
-               <control-param name="compactMode">true</control-param>
-            </type>
+	         <type name="category" template="/org/alfresco/components/form/controls/category.ftl" />
 	         <type name="association" template="/org/alfresco/components/form/controls/association.ftl" />
+            <type name="content" template="/org/alfresco/components/form/controls/content.ftl" />
 	         <!-- Data types that should always be rendered read-only -->
-	         <type name="content" template="/org/alfresco/components/form/controls/readonly.ftl" />
 	         <type name="qname" template="/org/alfresco/components/form/controls/readonly.ftl" />
 	         <type name="noderef" template="/org/alfresco/components/form/controls/readonly.ftl" />
 	         <type name="childassocref" template="/org/alfresco/components/form/controls/readonly.ftl" />
@@ -127,7 +125,15 @@
                </field>
                <field id="cm:taggable">
                   <control>
+                     <control-param name="compactMode">true</control-param>
                      <control-param name="params">aspect=cm:taggable</control-param>
+                     <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
+                     <control-param name="createNewItemIcon">tag</control-param>
+                  </control>
+               </field>
+               <field id="cm:categories">
+                  <control>
+                     <control-param name="compactMode">true</control-param>
                   </control>
                </field>
                <field id="cm:originator" read-only="true" />
@@ -164,7 +170,14 @@
                </field>
                <field id="cm:taggable">
                   <control>
+                     <control-param name="compactMode">true</control-param>
                      <control-param name="params">aspect=cm:taggable</control-param>
+                     <control-param name="createNew">true</control-param>
+                  </control>
+               </field>
+               <field id="cm:categories">
+                  <control>
+                     <control-param name="compactMode">true</control-param>
                   </control>
                </field>
             </appearance>

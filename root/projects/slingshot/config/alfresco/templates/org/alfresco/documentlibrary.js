@@ -22,41 +22,48 @@ function fromRepoType(repoType)
    return type;
 }
 
-function getContainerType()
+function getLocationType()
 {
    // Need to know what type of node the container is
    var siteId = page.url.templateArgs.site,
       containerId = template.properties.container,
       containerType = "cm:folder",
       appType = "";
-   
-   var p = sitedata.getPage("site/" + siteId + "/dashboard");
-   if (p != null)
+
+   if (siteId !== null)
    {
-      pageMetadata = eval('(' + p.properties.pageMetadata + ')');
-      pageMetadata = pageMetadata != null ? pageMetadata : {};
-      doclibMeta = pageMetadata[page.id] || {};
-      if (doclibMeta.titleId != null)
+      var p = sitedata.getPage("site/" + siteId + "/dashboard");
+      if (p != null)
       {
-         // Save the overridden page title into the request context
-         context.setValue("page-titleId", doclibMeta.titleId);
+         pageMetadata = eval('(' + p.properties.pageMetadata + ')');
+         pageMetadata = pageMetadata != null ? pageMetadata : {};
+         doclibMeta = pageMetadata[page.id] || {};
+         if (doclibMeta.titleId != null)
+         {
+            // Save the overridden page title into the request context
+            context.setValue("page-titleId", doclibMeta.titleId);
+         }
+         appType = doclibMeta.type;
       }
-      appType = doclibMeta.type;
-   }
 
-   var connector = remote.connect("alfresco");
-   result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId + "?type=" + toRepoType(appType));
-   if (result.status == 200)
+      var connector = remote.connect("alfresco");
+      result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId + "?type=" + toRepoType(appType));
+      if (result.status == 200)
+      {
+         var data = eval('(' + result + ')');
+         containerType = data.container.type;
+      }
+   }
+   
+   return (
    {
-      var data = eval('(' + result + ')');
-      containerType = data.container.type;
-   }
-
-   return containerType;
+      siteId: siteId,
+      containerType: containerType
+   });
 }
 
-var containerType = getContainerType(),
-   doclibType = fromRepoType(containerType);
+var objLocation = getLocationType(),
+   doclibType = fromRepoType(objLocation.containerType),
+   scopeType = objLocation.siteId !== null ? "" : "repo-";
 
-model.containerType = containerType;
-model.doclibType = doclibType == "" ? doclibType : doclibType + "-";
+model.doclibType = doclibType == "" ? scopeType : doclibType + "-";

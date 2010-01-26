@@ -1,0 +1,29 @@
+/* Categories */
+
+.doclist .documents .detail span.category-item
+{
+   background-image: url(images/category-16.png);
+   background-position: 0px 2px;
+   background-repeat: no-repeat;
+   padding-bottom: 2px;
+   padding-left: 20px;
+}
+
+.doclist .documents .detail span.category
+{
+}
+
+.doclist .documents .detail a.category-link
+{
+}
+
+.doclist .documents .detail a.category-link span
+{
+}
+
+/* Forms */
+.form-container .form-fields
+{
+   border-bottom: medium none;
+   padding: 1em;
+}

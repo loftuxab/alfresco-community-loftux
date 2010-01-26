@@ -1,12 +1,7 @@
-.details input[type="text"],
-.details textarea
+.details .form-container input,
+.details .form-container textarea
 {
-   width: 26em;
-}
-
-.details select
-{
-   width: 26.5em;
+   width: 37em;
 }
 
 .details .yui-gd .yui-u

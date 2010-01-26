@@ -26,8 +26,8 @@
             </div>
          </div>
          <div class="bdft">
-            <input type="button" id="${args.htmlid}-ok" value="${msg("button.apply")}" tabindex="6" />
-            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="7" />
+            <input type="button" id="${args.htmlid}-ok" value="${msg("button.apply")}" tabindex="0" />
+            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="0" />
          </div>
       </form>
    </div>

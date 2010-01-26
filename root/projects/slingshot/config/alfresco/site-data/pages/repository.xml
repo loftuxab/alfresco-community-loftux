@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Repository Document Library</title>
+   <title-id>page.repository.title</title-id>
+   <description>Repository Document Library</description>
+   <description-id>page.repository.description</description-id>
+   <template-instance>repository</template-instance>
+   <authentication>user</authentication>
+</page>

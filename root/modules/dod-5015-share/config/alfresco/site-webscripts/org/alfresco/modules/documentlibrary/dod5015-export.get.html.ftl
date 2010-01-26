@@ -19,8 +19,8 @@
             <div class="yui-u"><label for="${el}-zip">${msg("label.zip")}</label></div>
          </div>
          <div class="bdft">
-            <input type="button" id="${el}-ok" value="${msg("button.ok")}" tabindex="2" />
-            <input type="button" id="${el}-cancel" value="${msg("button.cancel")}" tabindex="5" />
+            <input type="button" id="${el}-ok" value="${msg("button.ok")}" tabindex="0" />
+            <input type="button" id="${el}-cancel" value="${msg("button.cancel")}" tabindex="0" />
          </div>
       </form>
    </div>

@@ -849,7 +849,7 @@
                      }
                   };
                   this.afterDocListUpdate.push(fnAfterUpdate);
-                  YAHOO.Bubbling.fire("filterChanged",
+                  YAHOO.Bubbling.fire("changeFilter",
                   {
                      filterOwner: "Alfresco.DocListFilePlan",
                      filterId: "transfers"

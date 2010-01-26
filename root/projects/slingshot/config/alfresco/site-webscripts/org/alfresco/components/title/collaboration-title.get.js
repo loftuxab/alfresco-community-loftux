@@ -27,7 +27,7 @@ if (json.status == 200)
    var obj = eval('(' + json + ')');
    userIsMember = true;
    userIsSiteManager = obj.role == "SiteManager";
-   
+
    // Store the memberships into the request context, it is used
    // downstream by other components - saves making same call many times
    context.setValue("memberships", obj);

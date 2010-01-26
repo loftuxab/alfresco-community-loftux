@@ -10,15 +10,15 @@
          <input id="${args.htmlid}-sort" type="hidden" name="sort" value="" />
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-name">${msg("label.name")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-name" type="text" name="name" tabindex="1" maxlength="255" />&nbsp;*</div>
+            <div class="yui-u"><input id="${args.htmlid}-name" type="text" name="name" tabindex="0" maxlength="255" />&nbsp;*</div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-description" type="text" name="description" tabindex="2" maxlength="255" /></div>
+            <div class="yui-u"><input id="${args.htmlid}-description" type="text" name="description" tabindex="0" maxlength="255" /></div>
          </div>
          <div class="bdft">
-            <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" tabindex="3"/>
-            <input type="button" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" tabindex="4"/>
+            <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" tabindex="0"/>
+            <input type="button" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" tabindex="0"/>
          </div>
       </form>
    </div>

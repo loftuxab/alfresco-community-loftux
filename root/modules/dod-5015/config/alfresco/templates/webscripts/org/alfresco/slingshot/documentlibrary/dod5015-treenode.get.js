@@ -30,9 +30,15 @@ function getTreenode(siteId, path)
          {
             if (itemIsAllowed(item))
             {
+               if (evalChildFolders)
+               {
+                  hasSubfolders = item.childFileFolders(false, true, "fm:forum").length > 0;
+               }
+
                items.push(
                {
-                  node: item
+                  node: item,
+                  hasSubfolders: hasSubfolders
                });
             }
          }

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>documentlist</region-id>
+   <source-id>repository</source-id>
+   <url>/components/documentlibrary/repo/documentlist</url>
+   <properties>
+      <pagination>true</pagination>
+   </properties>
+</component>

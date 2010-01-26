@@ -86,7 +86,7 @@
          var folderData = args[1].folderDetails,
             pathHtml = "",
             rootLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
-            baseLinkUrl = rootLinkUrl + "{file}#path=",
+            baseLinkUrl = rootLinkUrl + "?{file}path=",
             pathUrl = "/",
             folders = [];
          
@@ -104,7 +104,7 @@
          }
          else
          {
-            pathHtml += '<span class="path-link"><a href="' + rootLinkUrl + '">' + this.msg("path.documents") + '</a></span>';
+            pathHtml += '<span class="path-link"><a href="' + encodeURI(rootLinkUrl) + '">' + this.msg("path.documents") + '</a></span>';
          }
 
          path = $combine(path, folderData.fileName);
@@ -117,7 +117,7 @@
             
             pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               file: (y - x == 2) ? "?file=" + encodeURIComponent(folderData.fileName) : ""
+               file: (y - x == 2) ? "file=" + encodeURIComponent(folderData.fileName) + "&" : ""
             });
             pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
             

@@ -38,7 +38,7 @@ function main()
    // Found match?
    if (xmlActionSet.@id == "default")
    {
-      for each(var xmlAction in xmlActionSet..action)
+      for each(var xmlAction in xmlActionSet.action)
       {
          actionSet.push(
          {
@@ -53,6 +53,25 @@ function main()
    }
    
    model.actionSet = actionSet;
+
+   // New Content
+   var xmlCreateContent = myConfig.createContent,
+      createContent = [];
+   
+   if (xmlCreateContent != null)
+   {
+      for each (var xmlContent in xmlCreateContent.content)
+      {
+         createContent.push(
+         {
+            mimetype: xmlContent.@mimetype.toString(),
+            icon: xmlContent.@icon.toString(),
+            label: xmlContent.@label.toString()
+         });
+      }
+   }
+   
+   model.createContent = createContent;
 }
 
 main();

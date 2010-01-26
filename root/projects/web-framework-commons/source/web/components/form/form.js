@@ -282,11 +282,15 @@
        */
       onJsonPostFailure: function FormUI_onJsonPostFailure(response)
       {
-         // TODO: Try and extract the error message from the response
+         var errorMsg = this._msg("form.jsonsubmit.failed");
+         if (response.json.message)
+         {
+            errorMsg = errorMsg + ": " + response.json.message;
+         }
          
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: this._msg("form.jsonsubmit.failed")
+            text: errorMsg
          });
       },
       

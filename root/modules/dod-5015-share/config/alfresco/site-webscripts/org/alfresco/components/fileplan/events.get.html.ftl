@@ -92,13 +92,13 @@
                </div>
                <div class="yui-u overflow">
                   <span>                     
-                     <input id="${el}-completedAtTime" name="completedAtTime" class="completedAtTime" value="" type="text" size="10" tabindex="3"/>
+                     <input id="${el}-completedAtTime" name="completedAtTime" class="completedAtTime" value="" type="text" size="10" tabindex="0"/>
                   </span>
                </div>
             </div>
             <div class="bdft">
-               <input type="submit" id="${el}-completeEvent-ok-button" value="${msg("button.ok")}" tabindex="4"/>
-               <input type="submit" id="${el}-completeEvent-cancel-button" value="${msg("button.cancel")}" tabindex="5"/>
+               <input type="submit" id="${el}-completeEvent-ok-button" value="${msg("button.ok")}" tabindex="0"/>
+               <input type="submit" id="${el}-completeEvent-cancel-button" value="${msg("button.cancel")}" tabindex="0"/>
             </div>
          </form>
 

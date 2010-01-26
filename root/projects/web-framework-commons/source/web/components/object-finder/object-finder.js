@@ -35,15 +35,15 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+      Event = YAHOO.util.Event,
+      KeyListener = YAHOO.util.KeyListener;
 
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths,
       $hasEventInterest = Alfresco.util.hasEventInterest;
-
+   
    /**
     * ObjectFinder constructor.
     * 
@@ -54,17 +54,9 @@
     */
    Alfresco.ObjectFinder = function(htmlId, currentValueHtmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.ObjectFinder";
-      this.id = htmlId;
+      Alfresco.ObjectFinder.superclass.constructor.call(this, "Alfresco.ObjectFinder", htmlId, ["button", "menu", "container", "resize", "datasource", "datatable"]);
       this.currentValueHtmlId = currentValueHtmlId;
 
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "resize", "datasource", "datatable"], this.onComponentsLoaded, this);
-      
       /**
        * Decoupled event listeners
        */
@@ -77,7 +69,6 @@
 
       // Initialise prototype properties
       this.pickerId = htmlId + "-picker";
-      this.widgets = {};
       this.columns = [];
       this.currentValueMeta = [];
       this.selectedItems = [];
@@ -87,7 +78,7 @@
       return this;
    };
    
-   Alfresco.ObjectFinder.prototype =
+   YAHOO.extend(Alfresco.ObjectFinder, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -209,16 +200,26 @@
           * @type boolean
           * @default false
           */
-         mandatory: false
+         mandatory: false,
+         
+         /**
+          * Relative URI of "create new item" data webscript.
+          *
+          * @property createNewItemUri
+          * @type string
+          * @default ""
+          */
+         createNewItemUri: "",
+         
+         /**
+          * Icon type to augment "create new item" row.
+          *
+          * @property createNewItemIcon
+          * @type string
+          * @default ""
+          */
+         createNewItemIcon: ""
       },
-
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
 
       /**
        * Resizable columns
@@ -256,13 +257,14 @@
       /**
        * Set multiple initialization options at once.
        *
+       * @override
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
        * @return {Alfresco.ObjectFinder} returns 'this' for method chaining
        */
       setOptions: function ObjectFinder_setOptions(obj)
       {
-         this.options = YAHOO.lang.merge(this.options, obj);
+         Alfresco.ObjectFinder.superclass.setOptions.call(this, obj);
          // TODO: Do we need to filter this object literal before passing it on..?
          this.options.objectRenderer.setOptions(obj);
          
@@ -278,22 +280,11 @@
        */
       setMessages: function ObjectFinder_setMessages(obj)
       {
-         Alfresco.util.addMessages(obj, this.name);
+         Alfresco.ObjectFinder.superclass.setMessages.call(this, obj);
          this.options.objectRenderer.setMessages(obj);
          return this;
       },
       
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function ObjectFinder_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -304,7 +295,7 @@
       {
          this._getCurrentValueMeta();
          
-         if (this.options.disabled == false)
+         if (this.options.disabled === false)
          {
             if (this.options.compactMode)
             {
@@ -322,6 +313,13 @@
             Dom.get(this.id + "-showPicker-button-button").name = "-";
             Dom.get(this.id + "-ok-button").name = "-";
             Dom.get(this.id + "-cancel-button").name = "-";
+            
+            this.widgets.dialog = Alfresco.util.createYUIPanel(this.pickerId,
+            {
+               width: "60em"
+            });
+            this.widgets.dialog.hideEvent.subscribe(this.onCancel, null, this);
+            Dom.addClass(this.pickerId, "object-finder");
          }
       },
       
@@ -334,8 +332,22 @@
        */
       onShowPicker: function ObjectFinder_onShowPicker(e, p_obj)
       {
-         p_obj.set("disabled", true);
-         Dom.setStyle(this.pickerId, "display", "block");
+         // Register the ESC key to close the dialog
+         var escapeListener = new KeyListener(this.pickerId,
+         {
+            keys: KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(eventName, keyEvent)
+            {
+               this.onCancel();
+            },
+            scope: this,
+            correctScope: true
+         });
+         escapeListener.enable();
+
+         this.widgets.dialog.show();
          this._createResizer();
          this._populateSelectedItems();
          this.options.objectRenderer.onPickerShow();
@@ -343,6 +355,7 @@
          {
             eventGroup: this
          });
+         p_obj.set("disabled", true);
          Event.preventDefault(e);
       },
 
@@ -367,6 +380,30 @@
       },
 
       /**
+       * Create New OK button click handler
+       *
+       * @method onCreateNewOK
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onCreateNewOK: function DLTB_onCreateNewOK(e, p_obj)
+      {
+         Event.preventDefault(e);
+      },
+
+      /**
+       * Create New Cancel button click handler
+       *
+       * @method onCreateNewCancel
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onCreateNewCancel: function DLTB_onCreateNewCancel(e, p_obj)
+      {
+         Event.preventDefault(e);
+      },
+
+      /**
        * Picker OK button click handler
        *
        * @method onOK
@@ -386,7 +423,9 @@
          this._getCurrentValueMeta();
          
          if (Alfresco.logger.isDebugEnabled())
+         {
             Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + this.options.currentValue + "'");
+         }
          
          // inform the forms runtime that the control value has been updated (if field is mandatory)
          if (this.options.mandatory)
@@ -394,9 +433,13 @@
             YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
          }
          
-         Dom.setStyle(this.pickerId, "display", "none");
+         // Dom.setStyle(this.pickerId, "display", "none");
+         this.widgets.dialog.hide();
          this.widgets.showPicker.set("disabled", false);
-         Event.preventDefault(e);
+         if (e)
+         {
+            Event.preventDefault(e);
+         }
       },
 
       /**
@@ -408,9 +451,12 @@
        */
       onCancel: function ObjectFinder_onCancel(e, p_obj)
       {
-         Dom.setStyle(this.pickerId, "display", "none");
+         this.widgets.dialog.hide();
          this.widgets.showPicker.set("disabled", false);
-         Event.preventDefault(e);
+         if (e)
+         {
+            Event.preventDefault(e);
+         }
       },
 
 
@@ -525,20 +571,28 @@
 
             if (items === null)
             {
-               displayValue = "<span class=\"error\">" + this._msg("form.control.object-picker.current.failure") + "</span>";            
+               displayValue = "<span class=\"error\">" + this.msg("form.control.object-picker.current.failure") + "</span>";            
             }
             else
             {
+               var item;
                for (var i = 0, ii = items.length; i < ii; i++)
                {
-                  if (this.options.showLinkToTarget && this.options.targetLinkTemplate != null)
+                  item = items[i];
+                  // Special case for tags, which we want to render differently to categories
+                  if (item.type == "cm:category" && item.displayPath.indexOf("/categories/Tags") !== -1)
                   {
-                     displayValue += this.options.objectRenderer.renderItem(items[i], 16, 
+                     item.type = "tag";
+                  }
+
+                  if (this.options.showLinkToTarget && this.options.targetLinkTemplate !== null)
+                  {
+                     displayValue += this.options.objectRenderer.renderItem(item, 16, 
                         "<div>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
                   }
                   else
                   {
-                     displayValue += this.options.objectRenderer.renderItem(items[i], 16, "<div>{icon} {name}</div>");
+                     displayValue += this.options.objectRenderer.renderItem(item, 16, "<div>{icon} {name}</div>");
                   }
                }
             }
@@ -606,7 +660,7 @@
             var obj = args[1];
             if (obj && obj.label)
             {
-               this.widgets.navigationMenu.set("label", '<div><span class="item-icon"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/ajax_anim.gif" width="16" height="16" alt="' + this._msg("message.please-wait") + '"></span><span class="item-name">' + $html(obj.label) + '</span></div>');
+               this.widgets.navigationMenu.set("label", '<div><span class="item-icon"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/ajax_anim.gif" width="16" height="16" alt="' + this.msg("message.please-wait") + '"></span><span class="item-name">' + $html(obj.label) + '</span></div>');
             }
          }
       },
@@ -681,6 +735,94 @@
          }
       },
 
+      /**
+       * Returns Icon datacell formatter
+       *
+       * @method fnRenderCellIcon
+       */
+      fnRenderCellIcon: function ObjectFinder_fnRenderCellIcon()
+      {
+         var scope = this;
+
+         /**
+          * Icon datacell formatter
+          *
+          * @method renderCellIcon
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectFinder_renderCellIcon(elCell, oRecord, oColumn, oData)
+         {
+            var iconSize = scope.options.compactMode ? 16 : 32;
+         
+            oColumn.width = iconSize - 6;
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+            elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
+         };
+      },
+
+      /**
+       * Returns Name / description datacell formatter
+       *
+       * @method fnRenderCellName
+       */
+      fnRenderCellName: function ObjectFinder_fnRenderCellName()
+      {
+         var scope = this;
+
+         /**
+          * Name / description datacell formatter
+          *
+          * @method renderCellName
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectFinder_renderCellName(elCell, oRecord, oColumn, oData)
+         {
+            var template;
+            if (scope.options.compactMode)
+            {
+               template = '<h3 class="name">{name}</h3>';
+            }
+            else
+            {
+               template = '<h3 class="name">{name}</h3><div class="description">{description}</div>';
+            }
+
+            elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), 0, template);
+         };
+      },
+
+      /**
+       * Returns Remove item custom datacell formatter
+       *
+       * @method fnRenderCellRemove
+       */
+      fnRenderCellRemove: function ObjectFinder_fnRenderCellRemove()
+      {
+         var scope = this;
+
+         /**
+          * Remove item custom datacell formatter
+          *
+          * @method renderCellRemove
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectFinder_renderCellRemove(elCell, oRecord, oColumn, oData)
+         {  
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            elCell.innerHTML = '<a href="#" class="remove-item remove-' + scope.eventGroup + '" title="' + scope.msg("form.control.object-picker.remove-item") + '" tabindex="0"><span class="removeIcon">&nbsp;</span></a>';
+         };
+      },
+
 
       /**
        * PRIVATE FUNCTIONS
@@ -752,19 +894,14 @@
          this.widgets.navigationMenu = new YAHOO.widget.Button(this.pickerId + "-navigator",
          { 
             type: "menu", 
-            menu: this.pickerId + "-navigatorMenu"
+            menu: this.pickerId + "-navigatorMenu",
+            lazyloadmenu: false
          });
          
          // force the generated buttons to have a name of "-" so it gets ignored in
          // JSON submit. TODO: remove this when JSON submit behaviour is configurable
          Dom.get(this.pickerId + "-folderUp-button").name = "-";
          Dom.get(this.pickerId + "-navigator-button").name = "-";
-
-         // Clear the lazyLoad flag and fire initEvent to get menu rendered into the DOM
-         var navButton = this.widgets.navigationMenu;
-         navButton.getMenu().lazyLoad = false;
-         navButton.getMenu().initEvent.fire();
-         navButton.getMenu().render();
 
          this.widgets.navigationMenu.getMenu().subscribe("click", function (p_sType, p_aArgs)
          {
@@ -779,6 +916,24 @@
                });
             }
          });
+         
+         // Optional "Create New" UI controls
+         if (Dom.get(this.pickerId + "-createNew"))
+         {
+            // Create New - OK button
+            this.widgets.createNewOK = new YAHOO.widget.Button(this.pickerId + "-createNewOK",
+            {
+               disabled: true
+            });
+            this.widgets.createNewOK.on("click", this.onCreateNewOK, this.widgets.createNewOK, this);
+
+            // Create New - Cancel button
+            this.widgets.createNewCancel = new YAHOO.widget.Button(this.pickerId + "-createNewCancel",
+            {
+               disabled: true
+            });
+            this.widgets.createNewCancel.on("click", this.onCreateNewCancel, this.widgets.createNewCancel, this);
+         }
       },
 
       /**
@@ -796,81 +951,52 @@
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
          this.widgets.dataSource.responseSchema =
          { 
-            fields: ["type", "hasChildren", "name", "description", "displayPath", "hasChildren", "nodeRef"]
+            fields: ["type", "hasChildren", "name", "description", "displayPath", "nodeRef"]
          };
 
-         /**
-          * Icon datacell formatter
-          *
-          * @method renderCellIcon
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         var renderCellIcon = function OF__cSIC_renderCellIcon(elCell, oRecord, oColumn, oData)
+         this.widgets.dataSource.doBeforeParseData = function ObjectFinder_doBeforeParseData(oRequest, oFullResponse)
          {
-            var iconSize = me.options.compactMode ? 16 : 32;
+            var updatedResponse = oFullResponse;
             
-            oColumn.width = iconSize - 6;
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
-            elCell.innerHTML = me.options.objectRenderer.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
-         };
-
-         /**
-          * Name / description datacell formatter
-          *
-          * @method renderCellName
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         var renderCellName = function OF__cSIC_renderCellName(elCell, oRecord, oColumn, oData)
-         {
-            var template;
-            if (me.options.compactMode)
+            if (oFullResponse && oFullResponse.length > 0)
             {
-               template = '<h3 class="name">{name}</h3>';
-            }
-            else
-            {
-               template = '<h3 class="name">{name}</h3><div class="description">{description}</div>';
-            }
+               var items = oFullResponse.data.items;
 
-            elCell.innerHTML = me.options.objectRenderer.renderItem(oRecord.getData(), 0, template);
-         };
+               // Special case for tags, which we want to render differently to categories
+               var index, item;
+               for (index in items)
+               {
+                  if (items.hasOwnProperty(index))
+                  {
+                     item = items[index];
+                     if (item.type == "cm:category" && item.displayPath.indexOf("/categories/Tags") !== -1)
+                     {
+                        item.type = "tag";
+                     }
+                  }
+               }
 
-         /**
-          * Remove item custom datacell formatter
-          *
-          * @method renderCellRemove
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         var renderCellRemove = function OF__cSIC_renderCellRemove(elCell, oRecord, oColumn, oData)
-         {  
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            elCell.innerHTML = '<a href="#" class="remove-item remove-' + me.eventGroup + '" title="' + me._msg("form.control.object-picker.remove-item") + '"><span class="removeIcon">&nbsp;</span></a>';
+               // we need to wrap the array inside a JSON object so the DataTable is happy
+               updatedResponse =
+               {
+                  items: items
+               };
+            }
+            
+            return updatedResponse;
          };
 
          // DataTable defintion
-         var columnDefinitions = [
-         {
-            key: "nodeRef", label: "Icon", sortable: false, formatter: renderCellIcon, width: this.options.compactMode ? 10 : 26
-         },
-         {
-            key: "name", label: "Item", sortable: false, formatter: renderCellName
-         },
-         {
-            key: "remove", label: "Remove", sortable: false, formatter: renderCellRemove, width: 16
-         }];
+         var columnDefinitions =
+         [
+            { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellIcon(), width: this.options.compactMode ? 10 : 26 },
+            { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellName() },
+            { key: "remove", label: "Remove", sortable: false, formatter: this.fnRenderCellRemove(), width: 16 }
+         ];
+         
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.pickerId + "-selectedItems", columnDefinitions, this.widgets.dataSource,
          {
-            MSG_EMPTY: this._msg("form.control.object-picker.selected-items.empty")
+            MSG_EMPTY: this.msg("form.control.object-picker.selected-items.empty")
          });
 
          // Hook remove item action click events
@@ -879,7 +1005,7 @@
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {
-               var target, rowId, record, nodeRef;
+               var target, rowId, record;
 
                target = args[1].target;
                rowId = target.offsetParent;
@@ -908,7 +1034,7 @@
       _populateSelectedItems: function ObjectFinder__populateSelectedItems()
       {
          // Empty results table
-         this.widgets.dataTable.set("MSG_EMPTY", this._msg("form.control.object-picker.selected-items.empty"));
+         this.widgets.dataTable.set("MSG_EMPTY", this.msg("form.control.object-picker.selected-items.empty"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
 
          this.selectedItems = {};
@@ -960,21 +1086,8 @@
                width: this.widgets.resizer.get("width")
             });
          }
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function ObjectFinder__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.ObjectFinder", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
 
 
@@ -990,13 +1103,21 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+      Event = YAHOO.util.Event,
+      KeyListener = YAHOO.util.KeyListener;
 
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $hasEventInterest = Alfresco.util.hasEventInterest;
+      $hasEventInterest = Alfresco.util.hasEventInterest,
+      $combine = Alfresco.util.combinePaths;
+
+   /**
+    * Internal constants
+    */
+   var IDENT_CREATE_NEW = "~CREATE~NEW~";
+
 
    /**
     * ObjectRenderer constructor.
@@ -1009,16 +1130,7 @@
    {
       this.objectFinder = objectFinder;
       
-      // Mandatory properties
-      this.name = "Alfresco.ObjectRenderer";
-      this.id = objectFinder.pickerId;
-
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable"], this.onComponentsLoaded, this);
-      
+      Alfresco.ObjectRenderer.superclass.constructor.call(this, "Alfresco.ObjectRenderer", objectFinder.pickerId, ["button", "menu", "container", "datasource", "datatable"]);
       /**
        * Decoupled event listeners
        */
@@ -1029,13 +1141,12 @@
       YAHOO.Bubbling.on("selectedItemRemoved", this.onSelectedItemChanged, this);
 
       // Initialise prototype properties
-      this.widgets = {};
       this.addItemButtons = {};
 
       return this;
    };
    
-   Alfresco.ObjectRenderer.prototype =
+   YAHOO.extend(Alfresco.ObjectRenderer, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -1089,58 +1200,21 @@
       },
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
        * Object container for storing button instances, indexed by item id.
        * 
        * @property addItemButtons
        * @type object
        */
       addItemButtons: null,
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.ObjectRenderer} returns 'this' for method chaining
-       */
-      setOptions: function ObjectRenderer_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.ObjectRenderer} returns 'this' for method chaining
-       */
-      setMessages: function ObjectRenderer_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function ObjectRenderer_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
 
+      /**
+       * Create new item input control Dom Id
+       * 
+       * @property createNewItemId
+       * @type string
+       */
+      createNewItemId: null,
+      
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -1165,6 +1239,7 @@
       onPickerShow: function ObjectRenderer_onPickerShow()
       {
          this.addItemButtons = {};
+         Dom.get(this.objectFinder.pickerId).focus();
       },
 
       /**
@@ -1193,20 +1268,11 @@
          
          var renderHelper = function(p_key, p_value, p_metadata)
          {
-            var html = "";
-            
-            switch (p_key.toLowerCase())
+            if (p_key.toLowerCase() == "icon")
             {
-               case "icon":
-                  html = '<img src="' + me.getIconURL(item, iconSize) + '" width="' + iconSize + '" alt="" title="' + $html(item.name) + '" />'; 
-                  break;
-               
-               default:
-                  html = $html(p_value);
-                  break;
+               return '<img src="' + me.getIconURL(item, iconSize) + '" width="' + iconSize + '" alt="' + $html(item.description) + '" title="' + $html(item.name) + '" />'; 
             }
-            
-            return html;
+            return $html(p_value);
          };
          
          return YAHOO.lang.substitute(template, item, renderHelper);
@@ -1254,7 +1320,6 @@
          }
       },
 
-
       /**
        * Selected Item Changed event handler
        * Handles selectedItemAdded and selectedItemRemoved events
@@ -1291,6 +1356,267 @@
          }
       },
 
+      /**
+       * Returns Icon datacell formatter
+       *
+       * @method fnRenderItemIcon
+       */
+      fnRenderItemIcon: function ObjectRenderer_fnRenderItemIcon()
+      {
+         var scope = this;
+      
+         /**
+          * Icon datacell formatter
+          *
+          * @method renderItemIcon
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectRenderer_renderItemIcon(elCell, oRecord, oColumn, oData)
+         {
+            var iconSize = scope.options.compactMode ? 16 : 32;
+
+            oColumn.width = iconSize - 6;
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+            // Create New item cell type
+            if (oRecord.getData("type") == IDENT_CREATE_NEW)
+            {
+               Dom.addClass(this.getTrEl(elCell), "create-new-row");
+               var obj =
+               {
+                  type: scope.options.createNewItemIcon,
+                  description: scope.msg("form.control.object-picker.create-new")
+               };
+               elCell.innerHTML = scope.renderItem(obj, iconSize, '<div class="icon' + iconSize + '"><span class="new-item-overlay"></span>{icon}</div>');
+               return;
+            }
+
+            elCell.innerHTML = scope.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
+         };
+      },
+
+      /**
+       * Returns Name datacell formatter
+       *
+       * @method fnRenderItemName
+       */
+      fnRenderItemName: function ObjectRenderer_fnRenderItemName()
+      {
+         var scope = this;
+      
+         /**
+          * Name datacell formatter
+          *
+          * @method renderItemName
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectRenderer_renderItemName(elCell, oRecord, oColumn, oData)
+         {
+            var template = '';
+
+            // Create New item cell type
+            if (oRecord.getData("type") == IDENT_CREATE_NEW)
+            {
+               scope.createNewItemId = Alfresco.util.generateDomId();
+               elCell.innerHTML = '<input id="' + scope.createNewItemId + '" type="text" class="create-new-input" tabindex="0" />';
+               return;
+            }
+
+            if (oRecord.getData("hasChildren"))
+            {
+               template += '<h3 class="item-name"><a href="#" class="theme-color-1 parent-' + scope.eventGroup + '">{name}</a></h3>';
+            }
+            else
+            {
+               template += '<h3 class="item-name">{name}</h3>';
+            }
+      
+            if (!scope.options.compactMode)
+            {
+               template += '<div class="description">{description}</div>';
+            }
+
+            elCell.innerHTML = scope.renderItem(oRecord.getData(), 0, template);
+         };
+      },
+
+      /**
+       * Returns Add button datacell formatter
+       *
+       * @method fnRenderCellAdd
+       */
+      fnRenderCellAdd: function ObjectRenderer_fnRenderCellAdd()
+      {
+         var scope = this;
+      
+         /**
+          * Add button datacell formatter
+          *
+          * @method renderCellAvatar
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectRenderer_renderCellAdd(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            
+            var containerId = Alfresco.util.generateDomId(),
+               button;
+
+            // Create New item cell type
+            if (oRecord.getData("type") == IDENT_CREATE_NEW)
+            {
+               if (scope.options.compactMode)
+               {
+                  elCell.innerHTML = '<a href="#" class="create-new-item create-new-item-' + scope.eventGroup + '" title="' + scope.msg("form.control.object-picker.create-new") + '" tabindex="0"><span class="createNewIcon">&nbsp;</span></a>';
+               }
+               else
+               {
+                  Dom.setStyle(elCell.parentNode, "text-align", "right");
+                  elCell.innerHTML = '<span id="' + containerId + '"></span>';
+                  button = new YAHOO.widget.Button(
+                  {
+                     label: scope.msg("button.create"),
+                     container: containerId,
+                     onclick:
+                     {
+                        fn: scope.onCreateNewItem,
+                        scope: scope
+                     }
+                  });
+               }
+               return;
+            }
+
+            if (oRecord.getData("selectable"))
+            {
+               var nodeRef = oRecord.getData("nodeRef");
+
+               if (scope.options.compactMode)
+               {
+                  var style = "";
+                  if (!scope.objectFinder.canItemBeSelected(nodeRef))
+                  {
+                     style = 'style="display: none"';
+                  }
+                  elCell.innerHTML = '<a id="' + containerId + '" href="#" ' + style + ' class="add-item add-' + scope.eventGroup + '" title="' + scope.msg("form.control.object-picker.add-item") + '" tabindex="0"><span class="addIcon">&nbsp;</span></a>';
+                  scope.addItemButtons[nodeRef] = containerId;
+               }
+               else
+               {
+                  Dom.setStyle(elCell.parentNode, "text-align", "right");
+                  elCell.innerHTML = '<span id="' + containerId + '"></span>';
+
+                  var onItemAdded = function OR__cC_rCAB_onItemAdded(event, p_obj)
+                  {
+                     YAHOO.Bubbling.fire("selectedItemAdded",
+                     {
+                        eventGroup: scope,
+                        item: p_obj.getData()
+                     });
+                  };
+
+                  button = new YAHOO.widget.Button(
+                  {
+                     type: "button",
+                     label: scope.msg("button.add") + " >>",
+                     name: containerId + "-button",
+                     container: containerId,
+                     onclick:
+                     {
+                        fn: onItemAdded,
+                        obj: oRecord,
+                        scope: scope
+                     }
+                  });
+                  scope.addItemButtons[nodeRef] = button;
+
+                  if (!scope.objectFinder.canItemBeSelected(nodeRef))
+                  {
+                     button.set("disabled", true);
+                  }
+               }
+            }
+         };
+      },
+
+      /**
+       * Create New Item button click handler
+       *
+       * @method onCreateNewItem
+       */
+      onCreateNewItem: function ObjectFinder_onCreateNewItem()
+      {
+         var elInput = Dom.get(this.createNewItemId),
+            uri = $combine("/", this.options.createNewItemUri).substring(1),
+            itemName;
+         
+         if (elInput)
+         {
+            itemName = elInput.value;
+            if (itemName === null || itemName.length < 1)
+            {
+                return;
+            }
+            /**
+             * TODO: Validation?!
+             */
+            Alfresco.util.Ajax.jsonPost(
+            {
+               url: Alfresco.constants.PROXY_URI + uri,
+               dataObj:
+               {
+                  name: itemName
+               },
+               successCallback:
+               {
+                  fn: function(p_obj)
+                  {
+                     var response = p_obj.json;
+                     if (response && response.nodeRef)
+                     {
+                        var item =
+                        {
+                           type: this.options.itemType,
+                           name: response.name,
+                           nodeRef: response.nodeRef,
+                           selectable: true
+                        };
+
+                        if (!response.itemExists)
+                        {
+                           // Item didn't exist - display success message
+                           Alfresco.util.PopupManager.displayMessage(
+                           {
+                              text: this.msg("form.control.object-picker.create-new.success", response.name)
+                           });
+                           // Add the new item to the DataTable
+                           this.widgets.dataTable.addRow(item);
+                        }
+
+                        // Automatically select the new item
+                        YAHOO.Bubbling.fire("selectedItemAdded",
+                        {
+                           eventGroup: this,
+                           item: item
+                        });
+                     }
+                     elInput.value = "";
+                  },
+                  scope: this
+               },
+               failureMessage: this.msg("form.control.object-picker.create-new.failure")
+            });
+         }
+      },
 
       /**
        * PRIVATE FUNCTIONS
@@ -1313,7 +1639,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["type", "hasChildren", "name", "description", "displayPath", "hasChildren", "nodeRef", "selectable"]
+             fields: ["type", "hasChildren", "name", "description", "displayPath", "nodeRef", "selectable"]
          };
 
          this.widgets.dataSource.doBeforeParseData = function ObjectRenderer_doBeforeParseData(oRequest, oFullResponse)
@@ -1324,10 +1650,32 @@
             {
                var items = oFullResponse.data.items;
 
-               // crop item list to max length if required
+               // Crop item list to max length if required
                if (items.length > me.options.maxSearchResults)
                {
                   items = items.slice(0, me.options.maxSearchResults-1);
+               }
+               
+               // Add the special "Create new" record if required
+               if (me.options.createNewItemUri !== "")
+               {
+                  items = [{ type: IDENT_CREATE_NEW }].concat(items);
+               }
+               
+               // Special case for tags, which we want to render differently to categories
+               var index, item;
+               for (index in items)
+               {
+                  if (items.hasOwnProperty(index))
+                  {
+                     item = items[index];
+                     if (item.type == "cm:category" && item.displayPath.indexOf("/categories/Tags") !== -1)
+                     {
+                        item.type = "tag";
+                        // Also set the parent type to display the drop-down correctly. This may need revising for future type support.
+                        oFullResponse.data.parent.type = "tag";
+                     }
+                  }
                }
                
                // Notify interested parties of the parent details
@@ -1346,139 +1694,44 @@
             
             return updatedResponse;
          };
-         
-         /**
-          * Icon datacell formatter
-          *
-          * @method renderItemIcon
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         var renderItemIcon = function OR__cC_renderItemIcon(elCell, oRecord, oColumn, oData)
-         {
-            var iconSize = me.options.compactMode ? 16 : 32;
-
-            oColumn.width = iconSize - 6;
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
-            elCell.innerHTML = me.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
-         };
-
-         /**
-          * Name datacell formatter
-          *
-          * @method renderItemName
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         var renderItemName = function OR__cC_renderItemName(elCell, oRecord, oColumn, oData)
-         {
-            var template = '';
-
-            if (oRecord.getData("hasChildren"))
-            {
-               template += '<h3 class="item-name"><a href="#" class="theme-color-1 parent-' + me.eventGroup + '">{name}</a></h3>';
-            }
-            else
-            {
-               template += '<h3 class="item-name">{name}</h3>';
-            }
-            
-            if (!me.options.compactMode)
-            {
-               template += '<div class="description">{description}</div>';
-            }
-
-            elCell.innerHTML = me.renderItem(oRecord.getData(), 0, template);
-         };
-
-         /**
-          * Add button datacell formatter
-          *
-          * @method renderCellAvatar
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         var renderCellAdd = function OR__cC_renderCellAdd(elCell, oRecord, oColumn, oData)
-         {
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
-            if (oRecord.getData("selectable"))
-            {
-               var nodeRef = oRecord.getData("nodeRef"),
-                  containerId = Alfresco.util.generateDomId();
-
-               if (me.options.compactMode)
-               {
-                  var style = "";
-                  if (!me.objectFinder.canItemBeSelected(nodeRef))
-                  {
-                     style = 'style="display: none"';
-                  }
-                  elCell.innerHTML = '<a id="' + containerId + '" href="#" ' + style + ' class="add-item add-' + me.eventGroup + '" title="' + me._msg("form.control.object-picker.add-item") + '"><span class="addIcon">&nbsp;</span></a>';
-                  me.addItemButtons[nodeRef] = containerId;
-               }
-               else
-               {
-                  Dom.setStyle(elCell.parentNode, "text-align", "right");
-                  elCell.innerHTML = '<span id="' + containerId + '"></span>';
-
-                  var onItemAdded = function OR__cC_rCAB_onItemAdded(event, p_obj)
-                  {
-                     YAHOO.Bubbling.fire("selectedItemAdded",
-                     {
-                        eventGroup: me,
-                        item: p_obj.getData()
-                     });
-                  };
-
-                  var button = new YAHOO.widget.Button(
-                  {
-                     type: "button",
-                     label: me._msg("button.add") + " >>",
-                     name: containerId + "-button",
-                     container: containerId,
-                     onclick:
-                     {
-                        fn: onItemAdded,
-                        obj: oRecord,
-                        scope: me
-                     }
-                  });
-                  me.addItemButtons[nodeRef] = button;
-
-                  if (!me.objectFinder.canItemBeSelected(nodeRef))
-                  {
-                     button.set("disabled", true);
-                  }
-               }
-            }
-         };
 
          // DataTable column defintions
-         var columnDefinitions = [
-         {
-            key: "nodeRef", label: "Icon", sortable: false, formatter: renderItemIcon, width: this.options.compactMode ? 10 : 26
-         },
-         {
-            key: "name", label: "Item", sortable: false, formatter: renderItemName
-         },
-         {
-            key: "add", label: "Add", sortable: false, formatter: renderCellAdd, width: this.options.compactMode ? 16 : 80
-         }];
+         var columnDefinitions =
+         [
+            { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderItemIcon(), width: this.options.compactMode ? 10 : 26 },
+            { key: "name", label: "Item", sortable: false, formatter: this.fnRenderItemName() },
+            { key: "add", label: "Add", sortable: false, formatter: this.fnRenderCellAdd(), width: this.options.compactMode ? 16 : 80 }
+         ];
 
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
             initialLoad: false,
-            MSG_EMPTY: this._msg("form.control.object-picker.items-list.loading")
+            MSG_EMPTY: this.msg("form.control.object-picker.items-list.loading")
          });
+
+         // Rendering complete event handler
+         this.widgets.dataTable.subscribe("renderEvent", function()
+         {
+            if (this.options.createNewItemUri !== "")
+            {
+               this.widgets.enterListener = new KeyListener(this.createNewItemId,
+               {
+                  keys: KeyListener.KEY.ENTER
+               },
+               {
+                  fn: function(eventName, keyEvent, obj)
+                  {
+                     this.onCreateNewItem();
+                     Event.stopEvent(keyEvent[1]);
+                     return false;
+                  },
+                  scope: this,
+                  correctScope: true
+               }, YAHOO.env.ua.ie > 0 ? KeyListener.KEYDOWN : "keypress");
+               this.widgets.enterListener.enable();
+            }
+         }, this, true);
          
          // Hook add item action click events (for Compact mode)
          var fnAddItemHandler = function OR__cC_fnAddItemHandler(layer, args)
@@ -1486,7 +1739,7 @@
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {
-               var target, rowId, record, nodeRef;
+               var target, rowId, record;
 
                target = args[1].target;
                rowId = target.offsetParent;
@@ -1504,13 +1757,25 @@
          };
          YAHOO.Bubbling.addDefaultAction("add-" + this.eventGroup, fnAddItemHandler);
 
+         // Hook create new item action click events (for Compact mode)
+         var fnCreateNewItemHandler = function OR__cC_fnCreateNewItemHandler(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+            if (owner !== null)
+            {
+               me.onCreateNewItem();
+            }
+            return true;
+         };
+         YAHOO.Bubbling.addDefaultAction("create-new-item-" + this.eventGroup, fnCreateNewItemHandler);
+
          // Hook navigation action click events
          var fnNavigationHandler = function OR__cC_fnNavigationHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {
-               var target, rowId, record, nodeRef;
+               var target, rowId, record;
          
                target = args[1].target;
                rowId = target.offsetParent;
@@ -1540,13 +1805,13 @@
       _updateItems: function ObjectRenderer__updateItems(nodeRef)
       {
          // Empty results table
-         this.widgets.dataTable.set("MSG_EMPTY", this._msg("form.control.object-picker.items-list.loading"));
+         this.widgets.dataTable.set("MSG_EMPTY", this.msg("form.control.object-picker.items-list.loading"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
          
          var successHandler = function ObjectRenderer__uI_successHandler(sRequest, oResponse, oPayload)
          {
             this.options.parentNodeRef = nodeRef;
-            this.widgets.dataTable.set("MSG_EMPTY", this._msg("form.control.object-picker.items-list.empty"));
+            this.widgets.dataTable.set("MSG_EMPTY", this.msg("form.control.object-picker.items-list.empty"));
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };
          
@@ -1582,19 +1847,6 @@
             failure: failureHandler,
             scope: this
          });
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function ObjectRenderer__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.ObjectRenderer", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
