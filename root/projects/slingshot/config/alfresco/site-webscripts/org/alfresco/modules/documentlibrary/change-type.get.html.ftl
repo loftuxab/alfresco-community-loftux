@@ -5,7 +5,7 @@
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-type">${msg("label.type")}:</label></div>
             <div class="yui-u">
-               <select id="${args.htmlid}-type" type="text" name="type" tabindex="1">
+               <select id="${args.htmlid}-type" type="text" name="type" tabindex="0">
                   <option value="-">${msg("label.select")}</option>
                <#list types.selectable as t>
                   <option value="${t}">${msg(t?replace(":", "_"))}</option>
@@ -14,8 +14,8 @@
             </div>
          </div>
          <div class="bdft">
-            <input type="button" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="4" />
-            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="5" />
+            <input type="button" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="0" />
+            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="0" />
          </div>
       </form>
    </div>

@@ -44,42 +44,43 @@
    color: #333333;
 }
 
+.header .link-menu-button span.menu-item-icon
+{
+   padding: 1px 5px 0 20px;
+}
+
 .header span.menu-item-icon
 {
-   padding: 3px 5px 0;
+   background-position: 0 0;
+   background-repeat: no-repeat;
+   padding: 1px 10px 0 20px;
    vertical-align: middle;
 }
 
-.header .link-menu-button span.menu-item-icon
-{
-   padding: 1px 5px 0;
-}
-
-.header span.menu-item-icon a
-{
-   background-position: 0px 50%;
-   background-repeat: no-repeat;
-   padding: 1px 0px 1px 20px;
-}
-
-.header span.my-dashboard a
+.header span.my-dashboard
 {
    background-image: url(../images/my-dashboard-16.png);
 }
 
-.header span.my-profile a
+.header span.my-profile
 {
    background-image: url(../images/my-profile-16.png);
 }
 
-.header span.sites a
+.header span.sites
 {
    background-image: url(../images/site-16.png);
 }
 
-.header span.people a
+.header span.people
 {
    background-image: url(../images/users-16.png);
+   margin-left: 5px;
+}
+
+.header span.repository
+{
+   background-image: url(../images/repository-16.png);
 }
 
 .header div.logo
@@ -92,9 +93,9 @@
 .header div.personal-menu
 {
    float: left;
-   margin: 1px 0px 0px 0.5em;
-   vertical-align:middle;
-   line-height:2.2em;
+   line-height: 2.2em;
+   margin: 1px 0px 0px 10px;
+   vertical-align: middle;
 }
 
 .header div.personal-menu a,

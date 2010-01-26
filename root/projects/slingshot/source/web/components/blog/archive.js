@@ -115,7 +115,7 @@
             {
                var liElem = Dom.getAncestorByTagName(link, 'li');
                var date = me._getMonthFromId(liElem.id);  
-               YAHOO.Bubbling.fire("filterChanged",
+               YAHOO.Bubbling.fire("changeFilter",
                {
                   filterId: "bymonth",
                   filterOwner: me.name,

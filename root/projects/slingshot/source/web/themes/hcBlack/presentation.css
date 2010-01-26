@@ -1,14 +1,11 @@
 /* Site-wide Styles */
 
-
 body
 {
    font-family: Arial, sans-serif;
    font-size: 81%;
-   color: #000000; 
+   color: #000000;
 }
-
-
 
 a,
 a:visited,
@@ -25,11 +22,13 @@ a:hover
 
 h1
 {
+
+
 /*   font-family: Helvetica, Arial, sans-serif;
    font-size: 146.5%;
    font-weight: normal;
 */ 
-   font:normal 146.5% Helvetica, Arial, sans-serif;
+   font: normal 146.5% Helvetica, Arial, sans-serif;
 }
 
 h2
@@ -65,7 +64,6 @@ h4 .lighter
    color: #a2a2a2;
 }
 
-
 hr
 {
    color: #E4E4E4;
@@ -82,6 +80,7 @@ hr
    background: white !important;
    color: red !important;
 }
+
 .error-alt
 {
    background-color: red !important;
@@ -112,8 +111,8 @@ hr
    background-color: #d7e0e7;
    background-image: url(images/dashlet-title-bg.png);
    background-repeat: repeat-x;
-   border-bottom: 1px solid #bababa; 
-   color: #ffffff; 
+   border-bottom: 1px solid #bababa;
+   color: #ffffff;
 }
 
 .dashlet .feed
@@ -124,8 +123,8 @@ hr
 
 .dashlet .toolbar
 {
-   background-color: #f6f6f6; 
-   border-bottom: 1px solid #7e7e7e; 
+   background-color: #f6f6f6;
+   border-bottom: 1px solid #7e7e7e;
 }
 
 /*.dashlet .toolbar a
@@ -135,9 +134,9 @@ hr
 
 .dashlet .body
 {
-    background-image: url(images/dashlet-bg.png);
-    background-repeat: repeat-x;
-	background-color: white; 
+   background-image: url(images/dashlet-bg.png);
+   background-repeat: repeat-x;
+   background-color: white;
 }
 
 /*.dashlet .body a,
@@ -149,33 +148,41 @@ hr
 
 .dashlet .detail-list-item
 {
-   border-bottom: 1px dashed #575757; 
+   border-bottom: 1px dashed #575757;
 }
 
 /* Wiki dashlet text */
-body.yui-skin-hcBlack .wiki .title a {
-   color:#fff;
-}
-/* dashlets */
-body.yui-skin-hcBlack .dashlet .body a 
+
+body.yui-skin-hcBlack .wiki .title a
 {
-   text-decoration:underline;
+   color: #fff;
 }
-body.yui-skin-hcBlack .dashlet .body a:hover {
-   background-color:#F1FF00;
+
+/* dashlets */
+
+body.yui-skin-hcBlack .dashlet .body a
+{
+   text-decoration: underline;
 }
-.topiclist .yui-dt-liner {
-   padding:0;
+
+body.yui-skin-hcBlack .dashlet .body a:hover
+{
+   background-color: #F1FF00;
+}
+
+.topiclist .yui-dt-liner
+{
+   padding: 0;
 }
 
 .yui-skin-hcBlack .yui-dt-message
 {
-   background-color:inherit;
+   background-color: inherit;
 }
 
 .yui-skin-hcBlack .yui-panel
 {
-   border-bottom:medium none;
+   border-bottom: medium none;
 }
 
 .yui-skin-hcBlack .mask
@@ -185,7 +192,7 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
 
 .yui-skin-hcBlack .yui-panel .hd,
 .yui-skin-hcBlack .yui-panel .bdft,
-.yui-skin-hcBlack .yui-panel .ft 
+.yui-skin-hcBlack .yui-panel .ft
 {
    color: #515D6B;
    background: #E3EBEC;
@@ -209,7 +216,7 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
 
 .yui-skin-hcBlack .yui-panel .ft
 {
-   border-top:1px solid #C4C5C5;
+   border-top: 1px solid #C4C5C5;
    padding: 5px;
 }
 
@@ -225,8 +232,8 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
 
 .yui-skin-hcBlack #message .bd
 {
-   background-color:#808080;
-   color:white;
+   background-color: #808080;
+   color: white;
 }
 
 .yui-skin-hcBlack #message .bd span.wait
@@ -253,6 +260,7 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
 .yui-skin-hcBlack #prompt .bd,
 .yui-skin-hcBlack #userInput .bd
 {
+   
 }
 
 .yui-skin-hcBlack #prompt .ft,
@@ -262,7 +270,6 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
    border-right: 1px solid #c4c5c5;
    background-color: #e3ebec;
 }
-
 
 /* Page title and navigation styles */
 
@@ -276,7 +283,7 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
 .page-title a,
 .page-title a:visited
 {
-   color: #000000; 
+   color: #000000;
 }
 
 .page-title a:hover
@@ -293,8 +300,8 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
 {
    background-color: #000;
    background-image: url(../../components/images/navigation-bg.png);
-   border-bottom: 1px solid #000000; 
-   border-top: 1px solid #393939; 
+   border-bottom: 1px solid #000000;
+   border-top: 1px solid #393939;
    color: white;
 }
 
@@ -304,7 +311,6 @@ span.navigation-item-alt
 {
    color: #9fc6e1;
 }
-
 
 span.navigation-item a,
 span.navigation-item a:visited
@@ -321,12 +327,12 @@ span.navigation-item a:hover
 
 span.navigation-separator
 {
-   border-right: 1px dotted #4f4f4f; 
+   border-right: 1px dotted #4f4f4f;
 }
 
 span.navigation-separator-alt
 {
-   border-right: 1px solid #4f4f4f;  
+   border-right: 1px solid #4f4f4f;
 }
 
 /* Standard toolbar */
@@ -343,20 +349,18 @@ span.navigation-separator-alt
 
 strong
 {
-	font-weight: bold;
+   font-weight: bold;
 }
-
 
 em
 {
-	font-style: italic;
+   font-style: italic;
 }
 
 .rich-content a.wiki-missing-page
 {
    color: #CC2200 !important;
 }
-
 
 select,
 input[type="text"],
@@ -365,17 +369,22 @@ textarea
    border: 1px solid #838383;
    font-weight: normal;
 }
-#loginform input#username {
-   border:1px solid #C5D6E2;
+
+#loginform input#username
+{
+   border: 1px solid #C5D6E2;
 }
+
 /* same as theme-color-2 */
+
 .toolbar .link a:hover,
 .members-bar .member-link a:hover
 {
-   color:#009300;
+   color: #009300;
 }
 
 /* Richtext Editor Plug-ins */
+
 .yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon
 {
    background-position: 0 0 !important;
@@ -383,17 +392,20 @@ textarea
 }
 
 /* Point the YUI button to the themed sprite */
+
 .yui-skin-hcBlack .yui-button
 {
    background-image: url(images/sprite.png);
 }
 
 /* Override YUI Button styles for - flat button style */
+
 .yui-skin-hcBlack .flat-button .yui-button
 {
    background: none;
    border-color: transparent;
 }
+
 .yui-skin-hcBlack .flat-button .yui-button .first-child
 {
    border-color: transparent;
@@ -406,6 +418,7 @@ textarea
    border-style: solid;
    border-width: 1px 0;
 }
+
 .yui-skin-hcBlack .flat-button .yui-button-hover .first-child
 {
    border-color: #808080;
@@ -417,15 +430,15 @@ textarea
 .yui-skin-hcBlack .flat-button .yui-checkbox-button-checked
 {
    background: #000 none;
-   color:#fff;
+   color: #fff;
 }
 
-
 /* Override YUI Button styles for - title button style */
+
 .yui-skin-hcBlack .title-button .yui-button
 {
    background: #ccc url(images/title-button-bg.png) repeat-x 0 0;
-   border-color: #6e6e6e; 
+   border-color: #6e6e6e;
 }
 
 .yui-skin-hcBlack .title-button a:hover
@@ -435,14 +448,14 @@ textarea
 
 .yui-skin-hcBlack .title-button .yui-button .first-child
 {
-   border-color: #6e6e6e; 
+   border-color: #6e6e6e;
 }
 
 /* Paginator link styling */
 
 .yui-skin-hcBlack .yui-pg-container span
 {
-   color:#606060;
+   color: #606060;
 }
 
 .yui-skin-hcBlack .yui-pg-container span.yui-pg-page.yui-pg-current-page
@@ -461,7 +474,6 @@ textarea
 }
 
 /* A combination of a link and splitbutton wrapped inside a span */
-
 
 .yui-skin-hcBlack .link-menu-button .yui-button span button
 {
@@ -496,57 +508,72 @@ textarea
 }
 
 #Share.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
-{   
+{
    border-color: transparent;
    background-color: transparent;
 }
 
-.topiclist .yui-dt-liner 
+.topiclist .yui-dt-liner
 {
-   padding:0;
+   padding: 0;
 }
+
 /* blog/wiki action items links */
+
 body.yui-skin-hcBlack .wikipage .editPage a:hover,
 body.yui-skin-hcBlack .wikipage .deletePage a:hover,
 body.yui-skin-hcBlack .wikipage .detailsPage a:hover,
 body.yui-skin-hcBlack .nodeEdit .onEditBlogPost a:hover,
 body.yui-skin-hcBlack .nodeEdit .onDeleteBlogPost a:hover
 {
-   background-color:#f1ff00;
-   text-decoration:underline;
+   background-color: #f1ff00;
+   text-decoration: underline;
 }
 
-.webview .title a.configure {
-   text-decoration:underline;
+.webview .title a.configure
+{
+   text-decoration: underline;
 }
+
 /* YUI Menu */
-body.yui-skin-hcBlack .yuimenu .bd {
-   border:1px solid #000;
+
+body.yui-skin-hcBlack .yuimenu .bd
+{
+   border: 1px solid #000;
 }
+
 /* YUI Menu roll over state*/
+
 body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected
 {
    background-color: #000;
 }
+
 body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
 {
-   color:#000;
+   color: #000;
 }
+
 body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
 {
-    color:#FFF;
+   color: #FFF;
 }
+
 /*end YUI Menu */
 
 /* Doclist */
+
 body.yui-skin-hcBlack .doclist .more-actions a:active,
 body.yui-skin-hcBlack .doclist .more-actions a:hover
 {
    background-color: #000000;
 }
-body.yui-skin-hcBlack .doclist div.more-actions {
-   border:1px solid #000000;
+
+body.yui-skin-hcBlack .doclist div.more-actions
+{
+   border: 1px solid #000000;
 }
+
 body.yui-skin-hcBlack .doclist .action-set a:active,
 body.yui-skin-hcBlack .doclist .action-set a:hover,
 body.yui-skin-hcBlack .doclist .action-set .highlighted
@@ -563,28 +590,50 @@ body.yui-skin-hcBlack .over,
 {
    background-color: #FEFFF1;
 }
+
 .site-members .search-controls
 {
    background-color: #F5F5F5;
 }
+
 #Share.yui-skin-hcBlack .my-sites a.favourite-site.enabled,
-#Share.yui-skin-hcBlack .my-sites a.favourite-site {
-   text-decoration:none;
+#Share.yui-skin-hcBlack .my-sites a.favourite-site
+{
+   text-decoration: none;
 }
+
 body.yui-skin-hcBlack .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
 body.yui-skin-hcBlack .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 {
    border-left: 1px solid #FEFFF1;
 }
 
+body.yui-skin-hcBlack .categoryview .category .ygtvtn,
+body.yui-skin-hcBlack .categoryview .category .ygtvtm,
+body.yui-skin-hcBlack .categoryview .category .ygtvtmh, body.yui-skin-hcBlack .categoryview .category .ygtvtmhh,
+body.yui-skin-hcBlack .categoryview .category .ygtvtp,
+body.yui-skin-hcBlack .categoryview .category .ygtvtph, body.yui-skin-hcBlack .categoryview .category .ygtvtphh,
+body.yui-skin-hcBlack .categoryview .category .ygtvln,
+body.yui-skin-hcBlack .categoryview .category .ygtvlm,
+body.yui-skin-hcBlack .categoryview .category .ygtvlmh, body.yui-skin-hcBlack .categoryview .category .ygtvlmhh,
+body.yui-skin-hcBlack .categoryview .category .ygtvlp,
+body.yui-skin-hcBlack .categoryview .category .ygtvlph, body.yui-skin-hcBlack .categoryview .category .ygtvlphh,
+body.yui-skin-hcBlack .categoryview .category .ygtvdepthcell
+{
+   background-image: url(images/categoryview-sprite.gif);
+}
+
 /* end doclist */
+
 /* calendar */
+
 .yui-skin-hcBlack .dayview h2, .weekview h2,
 .yui-skin-hcBlack .calendar.weekview thead th,
 .yui-skin-hcBlack .calendar.monthview thead th
 {
-   color:#000;
+   color: #000;
 }
+
 body.yui-skin-hcBlack .vcalendar table,
 body.yui-skin-hcBlack .vcalendar table th,
 body.yui-skin-hcBlack .vcalendar table td,
@@ -594,21 +643,25 @@ body.yui-skin-hcBlack .dayview div.day,
 body.yui-skin-hcBlack .calendar.weekview tbody tr.alldayRow td,
 body.yui-skin-hcBlack tr#collapseTrigger td
 {
-   border-color:#000;
+   border-color: #000;
 }
+
 /* end calendar */
+
 /* invite page */
+
 .inviteusersbyemail .byemailbody
 {
    background-color: #fbfbfb;
 }
+
 .people-finder .results
 {
    background-color: #F6FEF5;
 }
 
-
 /* filter list link */
+
 .yui-skin-hcBlack .treeview .selected,
 .yui-skin-hcBlack .treeview .selected > table,
 .yui-skin-hcBlack .filter li.selected, 
@@ -640,6 +693,7 @@ body.yui-skin-hcBlack .yui-columnbrowser .yui-carousel-content li.yui-columnbrow
 }
 
 /* Link color */
+
 body.yui-skin-hcBlack .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected a,
 li.selected a.filter-link,
 li.selected a.tool-link,
@@ -651,15 +705,17 @@ body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:link,
 body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:visited, 
 body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:hover
 {
-   color:#fff;
+   color: #fff;
 }
+
 body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel, 
 body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:link, 
 body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:visited, 
 body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hover
 {
-   color:#000;
+   color: #000;
 }
+
 .yui-skin-hcBlack .node .nodeTitle a,
 .yui-skin-hcBlack .node .nodeURL a,
 .yui-skin-hcBlack .nodeAttrValue a,
@@ -669,28 +725,32 @@ body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hove
 .yui-skin-hcBlack .node .userLink a,
 .yui-skin-hcBlack .site-members h3 a,
 .yui-skin-hcBlack .doclist .documents a,
-.yui-skin-hcBlack .attrValue a {
-  color: #000000; 
-  text-decoration: underline;
+.yui-skin-hcBlack .attrValue a
+{
+   color: #000000;
+   text-decoration: underline;
 }
 
-.yui-skin-hcBlack .yui-calendar td.calcell a, {
-	color: #000000;
-	text-decoration: none;
-	}
+.yui-skin-hcBlack .yui-calendar td.calcell a,
+{
+   color: #000000;
+   text-decoration: none;
+}
 
 .yui-skin-hcBlack .site-navigation
 {
-   background-image:url(./images/navigation-bg.png);
+   background-image: url(./images/navigation-bg.png);
 }
-.cmis .body a {
-   color:#000;
-   text-decoration:underline;
+
+.cmis .body a
+{
+   color: #000;
+   text-decoration: underline;
 }
 
 .groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
 {
-   color:#fff;
+   color: #fff;
 }
 
 /* Twisters */
@@ -706,34 +766,42 @@ body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hove
 }
 
 /* Theme colors */
+
 .theme-color-1,
 a.theme-color-1,
 a.theme-color-1:visited,
-a.theme-color-1:hover {
-   color: #000000; 
+a.theme-color-1:hover
+{
+   color: #000000;
 }
 
 .theme-color-2,
 a.theme-color-2,
 a.theme-color-2:visited,
-a.theme-color-2:hover {
+a.theme-color-2:hover
+{
+
+
 /*   color:#66BC29;*/
-   color:#038603;
+   color: #038603;
 }
 
 .theme-color-3,
 a.theme-color-3,
 a.theme-color-3:visited,
-a.theme-color-3:hover {
-   color:#a9a9a9;
+a.theme-color-3:hover
+{
+   color: #a9a9a9;
 }
 
 .theme-color-4,
 a.theme-color-4,
 a.theme-color-4:visited,
-a.theme-color-4:hover {
-   color:#009300;
+a.theme-color-4:hover
+{
+   color: #009300;
 }
+
 .theme-color-5,
 a.theme-color-5,
 a.theme-color-5:visited,
@@ -741,54 +809,57 @@ a.theme-color-5:hover
 {
    color: #fff;
 }
+
 /* Theme background colors */
+
 .theme-bg-color-1,
-div.theme-bg-color-1 {
-   background-color:#000000; 
+div.theme-bg-color-1
+{
+   background-color: #000000;
 }
 
-
 .theme-bg-color-2,
-div.theme-bg-color-2 {
-   background-color:#fffbdd;
+div.theme-bg-color-2
+{
+   background-color: #fffbdd;
 }
 
 .theme-bg-color-3,
 div.theme-bg-color-3
 {
-
+   
 }
 
 .theme-bg-color-4,
 div.theme-bg-color-4
 {
-
+   
 }
 
 .theme-bg-color-5,
 div.theme-bg-color-5
 {
-
+   
 }
 
 .theme-bg-1
 {
-
+   
 }
 
 .theme-bg-2
 {
-   background-color:#E3EAEC;
+   background-color: #E3EAEC;
 }
 
 /* Theme border type/colors */
 
 .theme-border-1
 {
-
+   
 }
 
 .theme-border-2
 {
-
+   
 }

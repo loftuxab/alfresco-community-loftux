@@ -34,15 +34,12 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+   var Dom = YAHOO.util.Dom;
    
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML,
-      $links = Alfresco.util.activateLinks;
+   var $html = Alfresco.util.encodeHTML;
    
    /**
     * FolderInfo constructor.
@@ -53,64 +50,23 @@
     */
    Alfresco.FolderInfo = function(htmlId)
    {
-      this.name = "Alfresco.FolderInfo";
-      this.id = htmlId;
+      Alfresco.RepositoryFolderInfo.superclass.constructor.call(this, "Alfresco.FolderInfo", htmlId);
       
-      // initialise prototype properties
-      this.widgets = {};
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
-   
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
       
       return this;
-   }
+   };
    
-   Alfresco.FolderInfo.prototype =
+   YAHOO.extend(Alfresco.FolderInfo.prototype, Alfresco.component.Base,
    {
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setMessages: function FolderInfo_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function FolderInfo_onComponentsLoaded()
-      {
-         // don't need to do anything we will be informed via an event when data is ready
-      },
-      
       /**
        * Event handler called when the "folderDetailsAvailable" event is received
        */
       onFolderDetailsAvailable: function FolderInfo_onFolderDetailsAvailable(layer, args)
       {
-         var folderData = args[1].folderDetails;
+         var folderData = args[1].folderDetails,
+            i, ii;
          
          // render tags values
          var tags = folderData.tags,
@@ -122,10 +78,10 @@
          }
          else
          {
-            for (var x = 0; x < tags.length; x++)
+            for (i = 0, ii = tags.length; i < ii; i++)
             {
                tagsHtml += '<div class="tag"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/tag-16.png" />';
-               tagsHtml += $html(tags[x]) + '</div>';
+               tagsHtml += $html(tags[i]) + '</div>';
             }
          }
          
@@ -139,9 +95,9 @@
             everyonePerms = noPerms;
          
          var rawPerms = folderData.permissions.roles;
-         for (var x = 0; x < rawPerms.length; x++)
+         for (i = 0, ii = rawPerms.length; i < ii; i++)
          {
-            var permParts = rawPerms[x].split(";");
+            var permParts = rawPerms[i].split(";");
             var group = permParts[1];
             if (group.indexOf("_SiteManager") != -1)
             {
@@ -166,5 +122,5 @@
          Dom.get(this.id + "-perms-consumers").innerHTML = $html(consumerPerms);
          Dom.get(this.id + "-perms-everyone").innerHTML = $html(everyonePerms);
       }
-   };
+   });
 })();

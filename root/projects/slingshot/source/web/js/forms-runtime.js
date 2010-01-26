@@ -226,9 +226,9 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      // Allow linefeeds in textareas
                      return false;
                   }
-                  else if (target.tagName == "BUTTON")
+                  else if (target.tagName == "BUTTON" || Dom.hasClass(target, "yuimenuitemlabel"))
                   {
-                     // Eventlisteners for buttons must be notified that the enter key was entered
+                     // Eventlisteners for buttons and menus must be notified that the enter key was entered
                   }
                   else
                   {

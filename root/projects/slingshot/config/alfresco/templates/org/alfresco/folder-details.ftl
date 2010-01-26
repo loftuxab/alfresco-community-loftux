@@ -13,12 +13,12 @@
 <@templateBody>
    <div id="alf-hd">
       <@region id="header" scope="global" protected=true />
-      <@region id="title" scope="template" protected=true />
-      <@region id="navigation" scope="template" protected=true />
+      <@region id=doclibType + "title" scope="template" protected=true />
+      <@region id=doclibType + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
       <@region id=doclibType + "actions-common" scope="template" protected=true />
-      <@region id="path" scope="template" protected=true />
+      <@region id=doclibType + "path" scope="template" protected=true />
 
    <#if doclibType?starts_with("dod5015")>
       <div class="yui-g"> 
@@ -36,19 +36,19 @@
       <div class="yui-g">
          <div class="yui-g first">
             <div class="folder-details-comments">
-               <@region id="comments" scope="template" protected=true />
-               <@region id="createcomment" scope="template" protected=true />
+               <@region id=doclibType + "comments" scope="template" protected=true />
+               <@region id=doclibType + "createcomment" scope="template" protected=true />
             </div>
          </div>
          <div class="yui-g"> 
             <div class="yui-u first">
-               <@region id="folder-metadata-header" scope="template" protected=true />
-               <@region id="folder-metadata" scope="template" protected=true />
-               <@region id="folder-info" scope="template" protected=true />
+               <@region id=doclibType + "folder-metadata-header" scope="template" protected=true />
+               <@region id=doclibType + "folder-metadata" scope="template" protected=true />
+               <@region id=doclibType + "folder-info" scope="template" protected=true />
             </div>
             <div class="yui-u">
-               <@region id="folder-actions" scope="template" protected=true />
-               <@region id="folder-links" scope="template" protected=true />
+               <@region id=doclibType + "folder-actions" scope="template" protected=true />
+               <@region id=doclibType + "folder-links" scope="template" protected=true />
             </div>
          </div>
       </div>

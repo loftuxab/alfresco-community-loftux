@@ -69,7 +69,7 @@
        * @property currentFilter
        * @type string
        */
-      currentFilter: "favouriteDocuments",
+      currentFilter: "favourites",
 
       /**
        * Holds IDs to register preview tooltips with.
@@ -365,7 +365,7 @@
          
          file.isFavourite = !file.isFavourite;
          
-         if (this.currentFilter == "favouriteDocuments")
+         if (this.currentFilter == "favourites")
          {
             undoIndex = record.getData("index");
             this.widgets.dataTable.deleteRow(record);
@@ -386,7 +386,7 @@
                      file = record.getData();
                   
                   file.isFavourite = !file.isFavourite;
-                  if (this.currentFilter == "favouriteDocuments")
+                  if (this.currentFilter == "favourites")
                   {
                      this.widgets.dataTable.addRow(file, obj.undoIndex);
                   }

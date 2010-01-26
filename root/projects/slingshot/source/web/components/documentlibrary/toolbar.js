@@ -166,12 +166,12 @@
       selectedFiles: null,
 
       /**
-       * Dom ID of last crumb.
+       * Folder Details Url for last breadcrumb
        * 
-       * @property lastCrumbId
+       * @property folderDetailsUrl
        * @type string
        */
-      lastCrumbId: null,
+      folderDetailsUrl: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -181,6 +181,16 @@
        */
       onReady: function DLTB_onReady()
       {
+         // New Content menu button
+         this.widgets.createContent = Alfresco.util.createYUIButton(this, "createContent-button", this.onCreateContent,
+         {
+            type: "menu", 
+            menu: "createContent-menu",
+            lazyloadmenu: false,
+            disabled: true,
+            value: "create"
+         });
+
          // New Folder button: user needs "create" access
          this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewFolder,
          {
@@ -200,13 +210,9 @@
          {
             type: "menu", 
             menu: "selectedItems-menu",
+            lazyloadmenu: false,
             disabled: true
          });
-         // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
-         var menu = this.widgets.selectedItems.getMenu();
-         menu.lazyLoad = false;
-         menu.initEvent.fire();
-         menu.render();
 
          // Customize button
          this.widgets.customize = Alfresco.util.createYUIButton(this, "customize-button", this.onCustomize);
@@ -246,6 +252,38 @@
        * YUI WIDGET EVENT HANDLERS
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
+
+      /**
+       * Create Content menu click handler
+       *
+       * @method onCreateContent
+       * @param sType {string} Event type, e.g. "click"
+       * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
+       * @param p_obj {object} Object passed back from subscribe method
+       */
+      onCreateContent: function DLTB_onCreateContent(sType, aArgs, p_obj)
+      {
+         var domEvent = aArgs[0],
+            eventTarget = aArgs[1];
+
+         // Get the mimetype related to the clicked item
+         var mimetype = eventTarget.element.firstChild.rel,
+            destination = this.modules.docList.doclistMetadata.parent.nodeRef;
+         if (mimetype)
+         {
+            // TODO: Think about replacing this with code that rewrites the href attributes on a "filterChanged" (path) event.
+            // This might be necessary to allow the referrer HTTP header to be set by MSIE.
+            var url = Alfresco.util.uriTemplate("sitepage",
+            {
+               site: this.options.siteId,
+               pageid: "create-content"
+            });
+            url += "?mimeType=" + encodeURIComponent(mimetype) + "&destination=" + encodeURIComponent(destination);
+            window.location.href = url;
+         }
+
+         Event.preventDefault(domEvent);
+      },
 
       /**
        * New Folder button click handler
@@ -395,14 +433,14 @@
          }
       },
 
-       /**
-        * Selected Items button click handler
-        *
-        * @method onSelectedItems
-        * @param sType {string} Event type, e.g. "click"
-        * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
-        * @param p_obj {object} Object passed back from subscribe method
-        */
+      /**
+       * Selected Items button click handler
+       *
+       * @method onSelectedItems
+       * @param sType {string} Event type, e.g. "click"
+       * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
+       * @param p_obj {object} Object passed back from subscribe method
+       */
       onSelectedItems: function DLTB_onSelectedItems(sType, aArgs, p_obj)
       {
          var domEvent = aArgs[0],
@@ -642,32 +680,10 @@
          
          filter.filterData = newPath;
 
-         YAHOO.Bubbling.fire("filterChanged", filter);
+         YAHOO.Bubbling.fire("changeFilter", filter);
          Event.preventDefault(e);
       },
 
-      /**
-       * Path Changed handler
-       *
-       * @method pathChanged
-       * @param path {string} New path
-       */
-      pathChanged: function DLTB_pathChanged(path)
-      {
-         this.currentPath = path;
-         this._generateBreadcrumb();
-         this._generateRSSFeedUrl();
-         
-         // Enable/disable the Folder Up button
-         var paths = this.currentPath.split("/");
-         // Check for root path special case
-         if (this.currentPath === "/")
-         {
-            paths = ["/"];
-         }
-         this.widgets.folderUp.set("disabled", paths.length < 2);
-      },
-      
 
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
@@ -713,15 +729,25 @@
             this.currentFilter = Alfresco.util.cleanBubblingObject(obj);
             Alfresco.logger.debug("DLTB_onFilterChanged", "New Filter", this.currentFilter);
             
-            if (this.currentFilter.filterId == "path")
+            if (this.currentFilter.filterId == "path" || this.currentFilter.filterId == "category")
             {
-               this.pathChanged(this.currentFilter.filterData);
+               this.currentPath = this.currentFilter.filterData;
+               this._generateBreadcrumb();
+
+               // Enable/disable the Folder Up button
+               var paths = this.currentPath.split("/");
+               // Check for root path special case
+               if (this.currentPath === "/")
+               {
+                  paths = ["/"];
+               }
+               this.widgets.folderUp.set("disabled", paths.length < 2);
             }
             else
             {
                this._generateDescription();
-               this._generateRSSFeedUrl();
             }
+            this._generateRSSFeedUrl();
          }
       },
 
@@ -919,15 +945,10 @@
       onDoclistMetadata: function DLTB_onDoclistMetadata(layer, args)
       {
          var obj = args[1];
+         this.folderDetailsUrl = null;
          if (obj && obj.metadata)
          {
-            var crumb = Dom.get(this.lastCrumbId);
-            if (crumb)
-            {
-               var p = obj.metadata.parent,
-                  folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + p.nodeRef;
-               crumb.innerHTML = '<a href="' + folderDetailsUrl + '">' + crumb.innerHTML + '</a>';
-            }
+            this.folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + obj.metadata.parent.nodeRef;
          }
       },
       
@@ -961,7 +982,7 @@
          var me = this,
             displayPaths = paths.concat();
          
-         displayPaths[0] = Alfresco.util.message("node.root", "Alfresco.DocListTree");
+         displayPaths[0] = Alfresco.util.message("node.root", this.currentFilter.filterOwner);
 
          var fnCrumbIconClick = function DLTB__fnCrumbIconClick(e, path)
          {
@@ -974,7 +995,7 @@
             var filter = me.currentFilter;
             filter.filterData = path;
             
-            YAHOO.Bubbling.fire("filterChanged", filter);
+            YAHOO.Bubbling.fire("changeFilter", filter);
             Event.stopEvent(e);
          };
          
@@ -1000,25 +1021,18 @@
                });
                eIcon.on("click", fnBreadcrumbClick, newPath);
                eIcon.addClass("icon");
+               eIcon.addClass("filter-" + $html(this.currentFilter.filterId));
                eCrumb.appendChild(eIcon);
             }
 
-            // Last crumb shouldn't be rendered as a link until doclistMetadata is available
+            // Last crumb is rendered as a link if folderDetailsUrl is available (via doclistMetadata)
             if (j - i < 2)
             {
                eFolder = new Element(document.createElement("span"),
                {
-                  innerHTML: $html(displayPaths[i])
+                  innerHTML: (this.folderDetailsUrl && j > 1) ? '<a href="' + this.folderDetailsUrl + '">' + $html(displayPaths[i]) + '</a>' : $html(displayPaths[i])
                });
-               if (j > 1)
-               {
-                  this.lastCrumbId = Alfresco.util.generateDomId(eFolder.get("element"));
-               }
-               else
-               {
-                  this.lastCrumbId = null;
-               }
-               eFolder.addClass("folder");
+               eFolder.addClass("label");
                eCrumb.appendChild(eFolder);
                eBreadcrumb.appendChild(eCrumb);
             }

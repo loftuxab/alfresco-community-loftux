@@ -33,6 +33,7 @@
             <input id="${args.htmlid}-sites" type="button"/>
          </span>
          <span class="menu-item-icon people"><a href="${url.context}/page/people-finder">${msg("link.people")}</a></span>
+         <#if repoLibraryVisible><span class="menu-item-icon repository"><a href="${url.context}/page/repository">${msg("link.repository")}</a></span></#if>
       </div>
       </#if>
 

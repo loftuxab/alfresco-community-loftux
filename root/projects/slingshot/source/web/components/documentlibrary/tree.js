@@ -34,9 +34,7 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+   var Dom = YAHOO.util.Dom;
 
    /**
     * Alfresco Slingshot aliases
@@ -116,14 +114,6 @@
       isReady: false,
 
       /**
-       * Initial path on page load.
-       * 
-       * @property initialPath
-       * @type string
-       */
-      initialPath: null,
-
-      /**
        * Initial filter on page load.
        * 
        * @property initialFilter
@@ -181,7 +171,7 @@
          var me = this;
          
          // Create twister from our H2 tag
-         Alfresco.util.createTwister(this.id + "-h2", "DocListTree");
+         Alfresco.util.createTwister(this.id + "-h2", this.name.substring(this.name.lastIndexOf(".") + 1));
          
          /**
           * Dynamically loads TreeView nodes.
@@ -275,11 +265,6 @@
          this._buildTree();
          
          this.isReady = true;
-         if (this.initialPath !== null)
-         {
-            // We missed the filterChanged event, so fake it here
-            this.pathChanged(this.initialPath);
-         }
          if (this.initialFilter !== null)
          {
             // We weren't ready for the first filterChanged event, so fake it here
@@ -348,8 +333,8 @@
          
          this._updateSelectedNode(node);
          
-         // Fire the filter changed event
-         YAHOO.Bubbling.fire("filterChanged",
+         // Fire the change filter event
+         YAHOO.Bubbling.fire("changeFilter",
          {
             filterOwner: this.name,
             filterId: "path",
@@ -370,13 +355,6 @@
       {
          // ensure path starts with leading slash
          path = $combine("/", path);
-         // Defer if event received before we're ready
-         if (!this.isReady)
-         {
-            this.initialPath = path;
-            return;
-         }
-         
          this.currentPath = path;
 
          // Search the tree to see if this path's node is expanded
@@ -425,7 +403,7 @@
          do
          {
             node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
-         } while (this.pathsToExpand.length > 0 && node.expanded);
+         } while (this.pathsToExpand.length > 0 && node && node.expanded);
          
          if (node !== null)
          {
@@ -678,7 +656,7 @@
          var root = tree.getRoot();
 
          // Add default top-level node
-         var tempNode = this._buildTreeNode(
+         this._buildTreeNode(
          {
             name: Alfresco.util.message("node.root", this.name),
             path: "/",

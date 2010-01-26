@@ -45,7 +45,10 @@
          <div id="${args.htmlid}-paginator" class="paginator"></div>
       </div>
       <div class="yui-u align-right">
-         <button id="${args.htmlid}-simpleView-button" name="doclist-simpleView-button">${msg("button.view.simple")}</button>
+         <div id="${args.htmlid}-simpleDetailed" class="simple-detailed yui-buttongroup inline">
+            <#-- Don't insert linefeeds between these <input> tags -->
+            <input id="${args.htmlid}-simpleView" type="radio" name="simpleDetailed" title="${msg("button.view.simple")}" value="" /><input id="${args.htmlid}-detailedView" type="radio" name="simpleDetailed" title="${msg("button.view.detailed")}" value="" />
+         </div>
       </div>
    </div>
 

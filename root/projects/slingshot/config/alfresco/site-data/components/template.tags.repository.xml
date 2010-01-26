@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>tags</region-id>
+   <source-id>repository</source-id>
+   <url>/components/tag-filter</url>
+   <properties></properties>   
+</component>

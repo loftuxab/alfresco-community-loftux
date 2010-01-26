@@ -12,7 +12,7 @@ if (p !== null)
    usedPages = usedPages != null ? usedPages : [];
    pageMetadata = eval('(' + p.properties.pageMetadata + ')');
    pageMetadata = pageMetadata != null ? pageMetadata : {};
-   
+
    var availablePages = config.scoped["SitePages"]["pages"].childrenMap["page"], urlMap = {};
    for (i = 0; i < availablePages.size(); i++)
    {
@@ -24,7 +24,7 @@ if (p !== null)
          urlMap[pageId] = pageUrl;
       }
    }
-   
+
    // Find the label for each page
    for (var i = 0; i < usedPages.length; i++)
    {
@@ -33,7 +33,7 @@ if (p !== null)
          p = sitedata.getPage(pageId),
          pageUrl = urlMap[pageId],
          pageMeta = pageMetadata[pageId] || {};
-      
+   
       if (p != null)
       {
          usedPage.title = p.title;
@@ -50,7 +50,7 @@ if (p !== null)
          usedPage.title = "ERROR: page " + usedPage.pageId + " not found!";
       }
    }
-   
+
    model.siteExists = true;
 }
 

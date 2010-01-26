@@ -43,7 +43,7 @@
    Alfresco.doclib.Actions.prototype =
    {
       /**
-       * assets details.
+       * Assets details.
        *
        * @method onActionDetails
        * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
@@ -60,6 +60,24 @@
             siteId: this.options.siteId,
             file: assets
          }).showDialog();
+      },
+
+      /**
+       * Locate folder.
+       *
+       * @method onActionLocate
+       * @param asset {object} Object literal representing one file or folder to be actioned
+       */
+      onActionLocate: function dlA_onActionLocate(asset)
+      {
+         this.options.highlightFile = asset.displayName;
+
+         // Change active filter to path
+         YAHOO.Bubbling.fire("changeFilter",
+         {
+            filterId: "path",
+            filterData: asset.location.path
+         });
       },
 
       /**

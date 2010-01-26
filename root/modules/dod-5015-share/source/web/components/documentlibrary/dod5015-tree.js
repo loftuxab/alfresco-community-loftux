@@ -63,52 +63,6 @@
        */
 
       /**
-       * Build a tree node using passed-in data
-       *
-       * @method _buildTreeNode
-       * @param p_oData {object} Object literal containing required data for new node
-       * @param p_oParent {object} Optional parent node
-       * @param p_expanded {object} Optional expanded/collaped state flag
-       * @return {YAHOO.widget.TextNode} The new tree node
-       */
-      _buildTreeNode: function DLT__buildTreeNode(p_oData, p_oParent, p_expanded)
-      {
-         var treeNode = new YAHOO.widget.TextNode(
-         {
-            label: $html(p_oData.name),
-            path: p_oData.path,
-            nodeRef: p_oData.nodeRef,
-            description: p_oData.description
-         }, p_oParent, p_expanded);
-         
-         // Override YUI getStyle() function to allow our own folder nodes to be rendered.
-         // NOTE: Not currently in active use - this code is simply a copy of the YUI code
-         treeNode.getStyle = function()
-         {
-            if (this.isLoading)
-            {
-                return "ygtvloading";
-            }
-            else
-            {
-                // location top or bottom, middle nodes also get the top style
-                var loc = (this.nextSibling) ? "t" : "l";
-
-                // type p=plus(expand), m=minus(collapse), n=none(no children)
-                var type = "n";
-                if (this.hasChildren(true) || (this.isDynamic() && !this.getIconMode()))
-                {
-                    type = (this.expanded) ? "m" : "p";
-                }
-
-                return "ygtv" + loc + type;
-            }
-         };
-         
-         return treeNode;
-      },
-
-      /**
        * Build URI parameter string for treenode JSON data webscript
        *
        * @method _buildTreeNodeUrl
@@ -117,8 +71,7 @@
        _buildTreeNodeUrl: function DLT__buildTreeNodeUrl(path)
        {
           var uriTemplate ="slingshot/doclib/dod5015/treenode/site/" + $combine(encodeURIComponent(this.options.siteId), encodeURIComponent(this.options.containerId), Alfresco.util.encodeURIPath(path));
-          uriTemplate += "?children=" + this.options.evaluateChildFolders;
-          return  Alfresco.constants.PROXY_URI + uriTemplate + "?perms=false";
+          return  Alfresco.constants.PROXY_URI + uriTemplate + "?perms=false&children=" + this.options.evaluateChildFolders;
        }
    });
 })();

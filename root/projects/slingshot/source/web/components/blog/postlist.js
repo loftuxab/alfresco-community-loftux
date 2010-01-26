@@ -75,7 +75,7 @@
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
       YAHOO.Bubbling.on("blogConfigChanged", this.onBlogConfigChanged, this);
-      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("changeFilter", this.onChangeFilter, this);
       YAHOO.Bubbling.on("blogpostlistRefresh", this.onBlogPostListRefresh, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
@@ -573,7 +573,7 @@
             filterOwner: "Alfresco.BlogPostListFilter",
             filterData: null
          }, this.options.initialFilter);
-         YAHOO.Bubbling.fire("filterChanged", filterObj);
+         YAHOO.Bubbling.fire("changeFilter", filterObj);
       },
       
       // Actions
@@ -709,7 +709,7 @@
                filterOwner: "Alfresco.BlogPostListTags",
                filterData: null
             };
-            YAHOO.Bubbling.fire("filterChanged", filterObj);
+            YAHOO.Bubbling.fire("changeFilter", filterObj);
          }
       },
       
@@ -985,13 +985,13 @@
       
       
       /**
-       * BlogPostList Filter changed event handler
+       * BlogPostList Change filter event handler
        *
-       * @method onFilterChanged
+       * @method onChangeFilter
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (new filterId)
        */
-      onFilterChanged: function BlogPostList_onFilterChanged(layer, args)
+      onChangeFilter: function BlogPostList_onChangeFilter(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
@@ -1006,6 +1006,7 @@
             {
                page: 1
             });
+            YAHOO.Bubbling.fire("filterChanged", this.currentFilter);
          }
       },
       

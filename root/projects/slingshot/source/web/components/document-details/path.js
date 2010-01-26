@@ -39,7 +39,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $combine = Alfresco.util.combinePaths;
    
    /**
     * DocumentPath constructor.
@@ -86,8 +87,8 @@
       {
          var docData = args[1].documentDetails,
             pathHtml = "",
-            rootLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
-            baseLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary{file}#path=",
+            rootLinkUrl = $combine(Alfresco.constants.URL_PAGECONTEXT, "site", this.options.siteId, "documentlibrary"),
+            baseLinkUrl = rootLinkUrl + "?{file}path=",
             pathUrl = "/";
          
          var path = docData.location.path;
@@ -96,7 +97,7 @@
          {
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               file: "?file=" + encodeURIComponent(docData.fileName)
+               file: "file=" + encodeURIComponent(docData.fileName)
             });
             pathHtml += '">' + Alfresco.util.message("path.documents", this.name) + '</a></span>';
          }
@@ -118,9 +119,9 @@
                
                pathHtml += '<span class="path-link folder"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
                {
-                  file: (y - x > 1) ? "" : "?file=" + encodeURIComponent(docData.fileName)
+                  file: (y - x > 1) ? "" : "file=" + encodeURIComponent(docData.fileName) + "&"
                });
-               pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
+               pathHtml += encodeURIComponent(pathUrl) + '">' + $html(folders[x]) + '</a></span>';
                
                if (y - x > 1)
                {

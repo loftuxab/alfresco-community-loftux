@@ -37,14 +37,14 @@
       <#assign version = "1.0">
       <#if d.hasAspect("cm:versionable") && d.versionHistory?size != 0><#assign version = d.versionHistory[0].versionLabel></#if>
       <#if item.createdBy??>
-         <#assign createdBy = ((item.createdBy.properties.firstName!"") + " " + (item.createdBy.properties.lastName!""))?trim>
-         <#assign createdByUser = item.createdBy.properties.userName>
+         <#assign createdBy = item.createdBy.displayName>
+         <#assign createdByUser = item.createdBy.userName>
       <#else>
          <#assign createdBy="" createdByUser="">
       </#if>
       <#if item.modifiedBy??>
-         <#assign modifiedBy = ((item.modifiedBy.properties.firstName!"") + " " + (item.modifiedBy.properties.lastName!""))?trim>
-         <#assign modifiedByUser = item.modifiedBy.properties.userName>
+         <#assign modifiedBy = item.modifiedBy.displayName>
+         <#assign modifiedByUser = item.modifiedBy.userName>
       <#else>
          <#assign modifiedBy="" modifiedByUser="">
       </#if>

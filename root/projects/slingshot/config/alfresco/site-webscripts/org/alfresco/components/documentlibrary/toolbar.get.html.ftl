@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DocListToolbar("${args.htmlid}").setOptions(
+   new ${jsObject!"Alfresco.DocListToolbar"}("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
       hideNavBar: ${(preferences.hideNavBar!false)?string}
@@ -12,6 +12,21 @@
    <div id="${args.htmlid}-headerBar" class="header-bar flat-button theme-bg-2">
       <div class="left">
          <div class="hideable toolbar-hidden DocListTree">
+            <div class="create-content">
+               <button id="${args.htmlid}-createContent-button" name="createContent">${msg("button.create-content")}</button>
+               <div id="${args.htmlid}-createContent-menu" class="yuimenu">
+                  <div class="bd">
+                     <ul>
+                     <#list createContent as content>
+                        <li><a href="#" rel="${content.mimetype}"><span class="${content.icon}-file">${msg(content.label)}</span></a></li>
+                     </#list>
+                     </ul>
+                  </div>
+               </div>
+            </div>
+            <div class="separator">&nbsp;</div>
+         </div>
+         <div class="hideable toolbar-hidden DocListTree">
             <div class="new-folder"><button id="${args.htmlid}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
@@ -19,7 +34,7 @@
             <div class="file-upload"><button id="${args.htmlid}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
-         <div class="selected-items hideable toolbar-hidden DocListTree DocListFilter TagFilter">
+         <div class="selected-items hideable toolbar-hidden DocListTree DocListFilter TagFilter DocListCategories">
             <button class="no-access-check" id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
             <div id="${args.htmlid}-selectedItems-menu" class="yuimenu">
                <div class="bd">
@@ -42,11 +57,11 @@
    </div>
 
    <div id="${args.htmlid}-navBar" class="nav-bar flat-button theme-bg-4">
-      <div class="hideable toolbar-hidden DocListTree">
+      <div class="hideable toolbar-hidden DocListTree DocListCategories">
          <div class="folder-up"><button class="no-access-check" id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
          <div class="separator">&nbsp;</div>
       </div>
-      <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable toolbar-hidden DocListTree"></div>
+      <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable toolbar-hidden DocListTree DocListCategories"></div>
       <div id="${args.htmlid}-description" class="description hideable toolbar-hidden DocListFilter TagFilter"></div>
    </div>
 

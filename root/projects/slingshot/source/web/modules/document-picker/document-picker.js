@@ -875,18 +875,14 @@
          this.widgets.navigationMenu = new YAHOO.widget.Button(this.pickerId + "-navigator",
          { 
             type: "menu", 
-            menu: this.pickerId + "-navigatorMenu"
+            menu: this.pickerId + "-navigatorMenu",
+            lazyloadmenu: false
          });
 
          // force the generated buttons to have a name of "-" so it gets ignored in
          // JSON submit. TODO: remove this when JSON submit behaviour is configurable
          Dom.get(this.pickerId + "-folderUp-button").name = "-";
          Dom.get(this.pickerId + "-navigator-button").name = "-";
-         // Clear the lazyLoad flag and fire initEvent to get menu rendered into the DOM
-         var navButton = this.widgets.navigationMenu;
-         navButton.getMenu().lazyLoad = false;
-         navButton.getMenu().initEvent.fire();
-         navButton.getMenu().render();
          this.widgets.navigationMenu.getMenu().subscribe("click", function (p_sType, p_aArgs)
          {
             var menuItem = p_aArgs[1];

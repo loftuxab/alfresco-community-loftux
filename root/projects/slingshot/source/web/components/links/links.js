@@ -73,7 +73,7 @@
        */
       this.EDITEDCLASS = "edit-link";
 
-      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("changeFilter", this.onChangeFilter, this);
       YAHOO.Bubbling.on("linksListRefresh", this.onLinksListRefresh, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
    };
@@ -559,7 +559,7 @@
             filterData: null
          }, this.options.initialFilter);
          
-         YAHOO.Bubbling.fire("filterChanged", filterObj);
+         YAHOO.Bubbling.fire("changeFilter", filterObj);
       },
 
       /**
@@ -582,11 +582,11 @@
       /**
        * Links Filter changed event handler
        *
-       * @method onFilterChanged
+       * @method onChangeFilter
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (new filterId)
        */
-      onFilterChanged: function Links_onFilterChanged(layer, args)
+      onChangeFilter: function Links_onChangeFilter(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
@@ -601,6 +601,7 @@
             {
                page: 1
             });
+            YAHOO.Bubbling.fire("filterChanged", this.currentFilter);
          }
       },
 

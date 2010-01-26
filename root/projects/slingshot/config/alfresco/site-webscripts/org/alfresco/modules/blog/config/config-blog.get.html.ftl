@@ -11,7 +11,7 @@
          <div class="yui-gd">
             <div class="yui-u first caret-fix">${msg("label.type")}</div>
             <div class="yui-u caret-fix">
-               <select id="${args.htmlid}-blogType" name="blogType" tabindex="1">
+               <select id="${args.htmlid}-blogType" name="blogType" tabindex="0">
                   <option value=""></option>
                   <option value="wordpress">wordpress</option>
                   <option value="typepad">typepad</option>
@@ -25,43 +25,43 @@
          <div class="yui-gd">
             <div class="yui-u first caret-fix"><label for="${args.htmlid}-blogid">${msg("label.id")}:</label></div>
             <div class="yui-u caret-fix">
-               <input id="${args.htmlid}-blogid" type="text" name="blogId" tabindex="3" value="" />
+               <input id="${args.htmlid}-blogid" type="text" name="blogId" tabindex="0" value="" />
             </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first caret-fix"><label for="${args.htmlid}-title">${msg("label.name")}:</label></div>
             <div class="yui-u caret-fix">
-               <input id="${args.htmlid}-title" type="text" name="blogName" tabindex="5" value="" />
+               <input id="${args.htmlid}-title" type="text" name="blogName" tabindex="0" value="" />
             </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first caret-fix"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
             <div class="yui-u caret-fix">
-               <textarea id="${args.htmlid}-description" name="blogDescription" rows="3" tabindex="7" value=""></textarea>
+               <textarea id="${args.htmlid}-description" name="blogDescription" rows="3" tabindex="0" value=""></textarea>
             </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first caret-fix"><label for="${args.htmlid}-url">${msg("label.url")}:</label></div>
             <div class="yui-u caret-fix">
-               <input id="${args.htmlid}-url" type="text" name="blogUrl" tabindex="9" value="" />
+               <input id="${args.htmlid}-url" type="text" name="blogUrl" tabindex="0" value="" />
             </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first caret-fix"><label for="${args.htmlid}-username">${msg("label.username")}:</label></div>
             <div class="yui-u">
-               <input id="${args.htmlid}-username" type="text" name="username" tabindex="11" value="" />
+               <input id="${args.htmlid}-username" type="text" name="username" tabindex="0" value="" />
             </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first caret-fix"><label for="${args.htmlid}-password">${msg("label.password")}:</label></div>
             <div class="yui-u caret-fix">
-               <input id="${args.htmlid}-password" type="password" name="password" tabindex="13" value="" />
+               <input id="${args.htmlid}-password" type="password" name="password" tabindex="0" value="" />
             </div>
          </div>
             
          <div class="bdft">
-            <input type="submit" id="${args.htmlid}-ok" value="${msg('button.ok')}" tabindex="15"/>
-            <input type="submit" id="${args.htmlid}-cancel" value="${msg('button.cancel')}" tabindex="17"/>
+            <input type="submit" id="${args.htmlid}-ok" value="${msg('button.ok')}" tabindex="0"/>
+            <input type="submit" id="${args.htmlid}-cancel" value="${msg('button.cancel')}" tabindex="0"/>
          </div>
 
       </form>

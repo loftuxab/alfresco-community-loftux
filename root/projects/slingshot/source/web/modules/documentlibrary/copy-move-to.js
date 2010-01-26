@@ -68,15 +68,15 @@
             throw new Error("Alfresco.module.CopyMoveTo: Invalid mode '" + obj.mode + "'");
          }
          
-         var allowedViewModes = [Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE];
-         if (obj.mode !== "move")
-         {
-            allowedViewModes.push(Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY);
-         }
+         var allowedViewModes =
+         [
+            Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE,
+            Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY
+         ];
 
          return Alfresco.module.DoclibCopyMoveTo.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
-            viewMode: Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE,
+            viewMode: (obj.siteId && obj.siteId !== "") ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY,
             allowedViewModes: allowedViewModes,
             templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-move-to",
             dataWebScript: dataWebScripts[obj.mode]

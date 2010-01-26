@@ -45,8 +45,7 @@
     */
    Alfresco.EditMetadataMgr = function EditMetadataMgr_constructor(htmlId)
    {
-      this.name = "Alfresco.EditMetadataMgr";
-      this.id = htmlId;
+      Alfresco.EditMetadataMgr.superclass.constructor.call(this, "Alfresco.EditMetadataMgr", htmlId);
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("formContentReady", this.onFormContentReady, this);
@@ -99,7 +98,7 @@
       {
          // change the default 'Submit' label to be 'Save'
          var submitButton = args[1].buttons.submit;
-         submitButton.set("label", this.msg("edit-metadata-mgr.button.save"));
+         submitButton.set("label", this.msg("button.save"));
          
          // add a handler to the cancel button
          var cancelButton = args[1].buttons.cancel;
@@ -145,10 +144,16 @@
        */
       onMetadataUpdateFailure: function EditMetadataMgr_onMetadataUpdateFailure(response)
       {
+         var errorMsg = this.msg("edit-metadata-mgr.update.failed");
+         if (response.json.message)
+         {
+            errorMsg = errorMsg + ": " + response.json.message;
+         }  
+            
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: this.msg("message.failure"),
-            text: this.msg("edit-metadata-mgr.update.failed")
+            text: errorMsg
          });
       },
       
@@ -173,7 +178,7 @@
       _navigateForward: function EditMetadataMgr__navigateForward()
       {
          /* Did we come from the document library? If so, then direct the user back there */
-         if (document.referrer.match(/documentlibrary([?]|$)/))
+         if (document.referrer.match(/documentlibrary([?]|$)/) || document.referrer.match(/repository([?]|$)/))
          {
             // go back to the referrer page
             history.go(-1);
@@ -181,9 +186,12 @@
          else
          {
             // go back to the appropriate details page for the node
-            var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
-
+            var pageUrl = Alfresco.constants.URL_PAGECONTEXT;
+            if (this.options.siteId)
+            {
+               pageUrl += "site/" + this.options.siteId + "/";
+            }
+            pageUrl += this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
             window.location.href = pageUrl;
          }
       }

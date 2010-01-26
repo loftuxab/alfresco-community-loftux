@@ -1,11 +1,3 @@
-<#macro initialFilter>
-   <#assign filterId = page.url.args["filter"]!"path">
-      initialFilter:
-      {
-         filterId: "${filterId}",
-         filterData: "${page.url.args["filterData"]!""}"
-      },
-</#macro>
 <!--[if IE]>
    <iframe id="yui-history-iframe" src="${url.context}/yui/assets/blank.html"></iframe> 
 <![endif]-->
@@ -15,8 +7,6 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${template.properties.container!"documentLibrary"}",
-      initialPath: "${page.url.args["path"]!""}",
-      <@initialFilter />
       usePagination: ${(args.pagination!false)?string},
       showFolders: ${(preferences.showFolders!false)?string},
       simpleView: ${(preferences.simpleView!false)?string},
@@ -46,9 +36,14 @@
          <div id="${args.htmlid}-paginator" class="paginator"></div>
       </div>
       <div class="yui-u align-right">
-         <button id="${args.htmlid}-showFolders-button" name="doclist-showFolders-button">${msg("button.folders.show")}</button>
-         <span class="separator">&nbsp;</span>
-         <button id="${args.htmlid}-simpleView-button" name="doclist-simpleView-button">${msg("button.view.simple")}</button>
+         <div id="${args.htmlid}-simpleDetailed" class="simple-detailed yui-buttongroup inline">
+            <#-- Don't insert linefeeds between these <input> tags -->
+            <input id="${args.htmlid}-simpleView" type="radio" name="simpleDetailed" title="${msg("button.view.simple")}" value="" /><input id="${args.htmlid}-detailedView" type="radio" name="simpleDetailed" title="${msg("button.view.detailed")}" value="" />
+         </div>
+         <div class="show-folders">
+            <button id="${args.htmlid}-showFolders-button" name="doclist-showFolders-button">${msg("button.folders.show")}</button>
+            <span class="separator">&nbsp;</span>
+         </div>
       </div>
    </div>
 
@@ -88,8 +83,8 @@
                <h2>${msg("customize.header.actions")}</h2>
             </div>
             <div class="bdft">
-               <input type="button" id="${args.htmlid}-customize-ok" value="${msg("button.ok")}" tabindex="1" />
-               <input type="button" id="${args.htmlid}-customize-cancel" value="${msg("button.cancel")}" tabindex="2" />
+               <input type="button" id="${args.htmlid}-customize-ok" value="${msg("button.ok")}" tabindex="0" />
+               <input type="button" id="${args.htmlid}-customize-cancel" value="${msg("button.cancel")}" tabindex="0" />
             </div>
          </form>
       </div>

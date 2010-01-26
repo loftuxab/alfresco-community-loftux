@@ -79,4 +79,25 @@
       </types>
    </config>
 
+   <!-- Repository Library config section -->
+   <config evaluator="string-compare" condition="RepositoryLibrary" replace="true">
+      <!--
+         Whether the link to the Repository Library appears in the header component or not.
+      -->
+      <visible>false</visible>
+
+      <!--
+         Root nodeRef for top-level folder.
+      -->
+      <rootNode>alfresco://company/home</rootNode>
+
+      <!--
+         Whether the folder Tree component should enumerate child folders or not.
+         This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
+      -->
+      <tree>
+         <evaluate-child-folders>false</evaluate-child-folders>
+      </tree>
+   </config>
+
 </alfresco-config>

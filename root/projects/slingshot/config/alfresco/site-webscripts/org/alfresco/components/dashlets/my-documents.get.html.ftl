@@ -11,7 +11,7 @@
       <div id="${args.htmlid}-filters" class="yui-buttongroup">
          <span id="${args.htmlid}-favourites" class="yui-button yui-radio-button yui-button-checked">
             <span class="first-child">
-               <button type="button" name="${args.htmlid}" value="favouriteDocuments">${msg("filter.favourites")}</button>
+               <button type="button" name="${args.htmlid}" value="favourites">${msg("filter.favourites")}</button>
             </span>
          </span>
          <span id="${args.htmlid}-editing" class="yui-button yui-radio-button">

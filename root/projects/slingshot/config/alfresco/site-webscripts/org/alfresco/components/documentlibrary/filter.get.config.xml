@@ -5,6 +5,6 @@
    <filter id="editingOthers" label="link.editingOthers" />
    <filter id="recentlyModified" label="link.recentlyModified" />
    <filter id="recentlyAdded" label="link.recentlyAdded" />
-   <filter id="favouriteDocuments" label="link.favouriteDocuments" />
+   <filter id="favourites" label="link.favourites" />
 
 </filters>

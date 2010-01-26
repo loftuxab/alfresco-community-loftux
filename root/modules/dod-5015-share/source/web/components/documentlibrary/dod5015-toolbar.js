@@ -72,7 +72,6 @@
     */
    YAHOO.lang.augmentObject(Alfresco.RecordsDocListToolbar.prototype,
    {
-
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -124,13 +123,9 @@
          {
             type: "menu", 
             menu: "selectedItems-menu",
+            lazyloadmenu: false,
             disabled: true
          });
-         // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
-         var menu = this.widgets.selectedItems.getMenu();
-         menu.lazyLoad = false;
-         menu.initEvent.fire();
-         menu.render();
 
          // Customize button
          this.widgets.customize = Alfresco.util.createYUIButton(this, "customize-button", this.onCustomize);
@@ -239,15 +234,11 @@
       onDoclistMetadata: function DLTB_onDoclistMetadata(layer, args)
       {
          var obj = args[1];
+         this.folderDetailsUrl = null;
          if (obj && obj.metadata)
          {
-            var crumb = Dom.get(this.lastCrumbId);
-            if (crumb)
-            {
-               var p = obj.metadata.parent,
-                  folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/" + p.type + "-details?nodeRef=" + p.nodeRef;
-               crumb.innerHTML = '<a href="' + folderDetailsUrl + '">' + crumb.innerHTML + '</a>';
-            }
+            var p = obj.metadata.parent;
+            this.folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/" + p.type + "-details?nodeRef=" + p.nodeRef;
          }
       },
 
@@ -592,7 +583,7 @@
        */
       onFilterFolderUp: function DLTB_onFilterFolderUp(e, p_obj)
       {
-         YAHOO.Bubbling.fire("filterChanged",
+         YAHOO.Bubbling.fire("changeFilter",
          {
             filterId: this.currentFilter.filterId,
             filterData: ""
