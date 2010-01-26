@@ -23,6 +23,7 @@ function main()
    // for MT share
    if (inviteeUserName != undefined)
    {
+      inviteeUserName = encodeURIComponent(inviteeUserName);
       theUrl = theUrl + '?inviteeUserName=' + inviteeUserName;
    }
    
