@@ -39,9 +39,6 @@
       this.name = "Alfresco.module.DoclibCopyMoveTo";
       Alfresco.util.ComponentManager.reregister(this);
 
-      // Initialise prototype properties
-      this.modules.actions = new Alfresco.module.DoclibActions();
-      
       return this;
    };
 
@@ -73,6 +70,9 @@
             Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE,
             Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY
          ];
+         
+         // Actions module
+         this.modules.actions = new Alfresco.module.DoclibActions((obj.siteId && obj.siteId !== "") ? Alfresco.doclib.MODE_SITE : Alfresco.doclib.MODE_REPOSITORY);
 
          return Alfresco.module.DoclibCopyMoveTo.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
@@ -173,28 +173,8 @@
          };
 
          // Construct webscript URI based on current viewMode
-         var webscriptName = this.options.dataWebScript;
-         if (this.options.viewMode == Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE)
-         {
-            webscriptName += "/site/{site}/{container}{path}";
-            // Parameters are site, container-based
-            params =
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
-            };
-         }
-         else
-         {
-            webscriptName += "/node/{nodeRef}{path}";
-            // Parameters are nodeRef-based
-            params =
-            {
-               nodeRef: this.options.nodeRef.replace(":/", ""),
-               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
-            };
-         }
+         var webscriptName = this.options.dataWebScript + "/node/{nodeRef}",
+            nodeRef = new Alfresco.util.NodeRef(this.selectedNode.data.nodeRef);
          
          // Construct the data object for the genericAction call
          this.modules.actions.genericAction(
@@ -219,7 +199,10 @@
             {
                method: Alfresco.util.Ajax.POST,
                name: webscriptName,
-               params: params
+               params:
+               {
+                  nodeRef: nodeRef.uri
+               }
             },
             wait:
             {

@@ -70,13 +70,23 @@ function main()
    
    // Repository Library root node
    var rootNode = "alfresco://company/home",
-      repoConfig = config.scoped["RepositoryLibrary"]["rootNode"];
+      repoConfig = config.scoped["RepositoryLibrary"]["root-node"];
    if (repoConfig !== null)
    {
       rootNode = repoConfig.value;
    }
    
    model.rootNode = rootNode;
+
+   // Repository Url
+   var repositoryUrl = null,
+      repositoryConfig = config.scoped["DocumentLibrary"]["repository-url"];
+   if (repositoryConfig !== null)
+   {
+      repositoryUrl = repositoryConfig.value;
+   }
+
+   model.repositoryUrl = repositoryUrl;
 }
 
 main();

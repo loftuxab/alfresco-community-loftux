@@ -62,125 +62,31 @@
    YAHOO.extend(Alfresco.RepositoryDocListToolbar, Alfresco.DocListToolbar);
 
    /**
-    * Augment prototype with RecordsActions module, ensuring overwrite is enabled
-    */
-   YAHOO.lang.augmentProto(Alfresco.RepositoryDocListToolbar, Alfresco.doclib.RepositoryActions, true);
-   
-   /**
     * Augment prototype with main class implementation, ensuring overwrite is enabled
     */
    YAHOO.lang.augmentObject(Alfresco.RepositoryDocListToolbar.prototype,
    {
       /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @override
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.RepositoryDocListToolbar} returns 'this' for method chaining
+       */
+      setOptions: function RDLTB_setOptions(obj)
+      {
+         return Alfresco.RepositoryDocListToolbar.superclass.setOptions.call(this, YAHOO.lang.merge(
+         {
+            workingMode: Alfresco.doclib.MODE_REPOSITORY
+         }, obj));
+      },
+
+
+      /**
        * YUI WIDGET EVENT HANDLERS
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
-
-      /**
-       * Create Content menu click handler
-       *
-       * @method onCreateContent
-       * @param sType {string} Event type, e.g. "click"
-       * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
-       * @param p_obj {object} Object passed back from subscribe method
-       */
-      onCreateContent: function DLTB_onCreateContent(sType, aArgs, p_obj)
-      {
-         var domEvent = aArgs[0],
-            eventTarget = aArgs[1];
-
-         // Get the mimetype related to the clicked item
-         var mimetype = eventTarget.element.firstChild.rel,
-            destination = this.modules.docList.doclistMetadata.parent.nodeRef;
-         if (mimetype)
-         {
-            // TODO: Think about replacing this with code that rewrites the href attributes on a "filterChanged" (path) event.
-            // This might be necessary to allow the referrer HTTP header to be set by MSIE.
-            var url = Alfresco.constants.URL_PAGECONTEXT + "create-content";
-            url += "?mimeType=" + encodeURIComponent(mimetype) + "&destination=" + encodeURIComponent(destination);
-            window.location.href = url;
-         }
-
-         Event.preventDefault(domEvent);
-      },
-
-      /**
-       * New Folder button click handler
-       *
-       * @method onNewFolder
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
-       */
-      onNewFolder: function DLTB_onNewFolder(e, p_obj)
-      {
-         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/action/folder/site", this.options.siteId, this.options.containerId, Alfresco.util.encodeURIPath(this.currentPath));
-
-         var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
-         {
-            // Validation
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.mandatory, null, "blur");
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.nodeName, null, "keyup");
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.length,
-            {
-               max: 256,
-               crop: true
-            }, "keyup");
-            p_form.addValidation(this.id + "-createFolder-title", Alfresco.forms.validation.length,
-            {
-               max: 256,
-               crop: true
-            }, "keyup");
-            p_form.addValidation(this.id + "-createFolder-description", Alfresco.forms.validation.length,
-            {
-               max: 512,
-               crop: true
-            }, "keyup");
-            p_form.setShowSubmitStateDynamically(true, false);
-         };
-
-         if (!this.modules.createFolder)
-         {
-            this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder").setOptions(
-            {
-               width: "30em",
-               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/create-folder",
-               actionUrl: actionUrl,
-               doSetupFormsValidation:
-               {
-                  fn: doSetupFormsValidation,
-                  scope: this
-               },
-               firstFocus: this.id + "-createFolder-name",
-               onSuccess:
-               {
-                  fn: function DLTB_onNewFolder_callback(response)
-                  {
-                     var folder = response.json.results[0];
-                     YAHOO.Bubbling.fire("folderCreated",
-                     {
-                        name: folder.name,
-                        parentPath: folder.parentPath,
-                        nodeRef: folder.nodeRef
-                     });
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: this.msg("message.new-folder.success", folder.name)
-                     });
-                  },
-                  scope: this
-               }
-            });
-         }
-         else
-         {
-            this.modules.createFolder.setOptions(
-            {
-               actionUrl: actionUrl,
-               clearForm: true
-            });
-         }
-         this.modules.createFolder.show();
-      },
 
       /**
        * File Upload button click handler
@@ -189,7 +95,7 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onFileUpload: function DLTB_onFileUpload(e, p_obj)
+      onFileUpload: function RDLTB_onFileUpload(e, p_obj)
       {
          if (this.fileUpload === null)
          {
@@ -199,9 +105,7 @@
          // Show uploader for multiple files
          var multiUploadConfig =
          {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            uploadDirectory: this.currentPath,
+            destination: this.modules.docList.doclistMetadata.parent.nodeRef,
             filter: [],
             mode: this.fileUpload.MODE_MULTI_UPLOAD,
             thumbnails: "doclib",
@@ -220,128 +124,12 @@
        * @method onFileUploadComplete
        * @param complete {object} Object literal containing details of successful and failed uploads
        */
-      onFileUploadComplete: function DLTB_onFileUploadComplete(complete)
+      onFileUploadComplete: function RDLTB_onFileUploadComplete(complete)
       {
          // Overridden so activity doesn't get posted
       },
 
-      /**
-       * Delete Multiple Assets confirmed.
-       *
-       * @method _onActionDeleteConfirm
-       * @param assets {array} Array containing assets to be deleted
-       * @private
-       */
-      _onActionDeleteConfirm: function DLTB__onActionDeleteConfirm(assets)
-      {
-         var multipleAssets = [], i, ii;
-         for (i = 0, ii = assets.length; i < ii; i++)
-         {
-            multipleAssets.push(assets[i].nodeRef);
-         }
-         
-         // Success callback function
-         var fnSuccess = function DLTB__oADC_success(data, assets)
-         {
-            var result;
-            var successCount = 0;
 
-            // Did the operation succeed?
-            if (!data.json.overallSuccess)
-            {
-               Alfresco.util.PopupManager.displayMessage(
-               {
-                  text: this.msg("message.multiple-delete.failure")
-               });
-               return;
-            }
-
-            YAHOO.Bubbling.fire("filesDeleted");
-
-            for (i = 0, ii = data.json.totalResults; i < ii; i++)
-            {
-               result = data.json.results[i];
-               
-               if (result.success)
-               {
-                  successCount++;
-                  
-                  YAHOO.Bubbling.fire(result.type == "folder" ? "folderDeleted" : "fileDeleted",
-                  {
-                     multiple: true,
-                     nodeRef: result.nodeRef
-                  });
-               }
-            }
-
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this.msg("message.multiple-delete.success", successCount)
-            });
-         };
-         
-         // Construct the data object for the genericAction call
-         this.modules.actions.genericAction(
-         {
-            success:
-            {
-               callback:
-               {
-                  fn: fnSuccess,
-                  scope: this,
-                  obj: assets
-               }
-            },
-            failure:
-            {
-               message: this.msg("message.multiple-delete.failure")
-            },
-            webscript:
-            {
-               method: Alfresco.util.Ajax.DELETE,
-               name: "files"
-            },
-            wait:
-            {
-               message: this.msg("message.multiple-delete.please-wait")
-            },
-            config:
-            {
-               requestContentType: Alfresco.util.Ajax.JSON,
-               dataObj:
-               {
-                  nodeRefs: multipleAssets
-               }
-            }
-         });
-      },
-
-
-      /**
-       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
-       * Disconnected event handlers for inter-component event notification
-       */
-
-      /**
-       * Document List Metadata event handler
-       * NOTE: This is a temporary fix to enable access to the View Details action from the breadcrumb.
-       *       A more complete solution is to present the full list of parent folder actions.
-       *
-       * @method onDoclistMetadata
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onDoclistMetadata: function DLTB_onDoclistMetadata(layer, args)
-      {
-         var obj = args[1];
-         this.folderDetailsUrl = null;
-         if (obj && obj.metadata)
-         {
-            this.folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "folder-details?nodeRef=" + obj.metadata.parent.nodeRef;
-         }
-      },
-      
-   
       /**
        * PRIVATE FUNCTIONS
        */
@@ -352,7 +140,7 @@
        * @method _generateRSSFeedUrl
        * @private
        */
-      _generateRSSFeedUrl: function DLTB__generateRSSFeedUrl()
+      _generateRSSFeedUrl: function RDLTB__generateRSSFeedUrl()
       {
          if (this.widgets.rssFeed && this.modules.docList)
          {

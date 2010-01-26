@@ -8,6 +8,7 @@
          <action type="action-link" id="onActionManagePermissions" permission="permissions" label="actions.folder.manage-permissions" />
          <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.folder.manage-aspects" />
          <action type="action-link" id="onActionChangeType" permission="edit" label="actions.folder.change-type" />
+         <action type="simple-link" id="onActionExplorerView" permission="repository" href="{explorerViewUrl}" label="actions.folder.explorer-view" />
       </actionSet>
    </actionSets>
 </documentList>

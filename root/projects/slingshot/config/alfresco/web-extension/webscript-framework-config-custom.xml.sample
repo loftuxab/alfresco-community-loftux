@@ -63,7 +63,7 @@
                 <name>Alfresco - user access</name>
                 <description>Access to Alfresco Repository WebScripts that require user authentication</description>
                 <connector-id>alfrescoCookie</connector-id>
-                <endpoint-url>http://localhost/alfresco/wcs</endpoint-url>
+                <endpoint-url>http://localhost:8080/alfresco/wcs</endpoint-url>
                 <identity>user</identity>
                 <external-auth>true</external-auth>
             </endpoint>

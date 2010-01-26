@@ -803,7 +803,12 @@
          
          var fnSuccess = function DLGF__pSP_fnSuccess(response, sitePicker)
          {
-            var sites = response.json, element, site, onclick, i, j;
+            var sites = response.json, element, site, onclick, i, j, firstSite = null;
+            
+            if (sites.length > 0)
+            {
+               firstSite = sites[0].shortName;
+            }
             
             for (i = 0, j = sites.length; i < j; i++)
             {
@@ -832,10 +837,10 @@
                sitePicker.appendChild(element);
             }
             
-            // Select current site
+            // Select current site, or first site retrieved
             YAHOO.Bubbling.fire("siteChanged",
             {
-               site: this.options.siteId,
+               site: (this.options.siteId.length > 0) ? this.options.siteId : firstSite,
                eventGroup: this,
                scrollTo: true
             });

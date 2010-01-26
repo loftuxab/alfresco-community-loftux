@@ -235,7 +235,7 @@
          });
 
          // DocLib Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions();
+         this.modules.actions = new Alfresco.module.DoclibActions(this.options.workingMode);
          
          // Reference to Document List component
          this.modules.docList = Alfresco.util.ComponentManager.findFirst("Alfresco.DocumentList");
@@ -273,13 +273,7 @@
          {
             // TODO: Think about replacing this with code that rewrites the href attributes on a "filterChanged" (path) event.
             // This might be necessary to allow the referrer HTTP header to be set by MSIE.
-            var url = Alfresco.util.uriTemplate("sitepage",
-            {
-               site: this.options.siteId,
-               pageid: "create-content"
-            });
-            url += "?mimeType=" + encodeURIComponent(mimetype) + "&destination=" + encodeURIComponent(destination);
-            window.location.href = url;
+            window.location.href = "create-content?mimeType=" + encodeURIComponent(mimetype) + "&destination=" + encodeURIComponent(destination);
          }
 
          Event.preventDefault(domEvent);
@@ -294,73 +288,67 @@
        */
       onNewFolder: function DLTB_onNewFolder(e, p_obj)
       {
-         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/action/folder/site", this.options.siteId, this.options.containerId, Alfresco.util.encodeURIPath(this.currentPath));
+         var destination = this.modules.docList.doclistMetadata.parent.nodeRef;
 
-         var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
+         // Intercept before dialog show
+         var doBeforeDialogShow = function DLTB_onNewFolder_doBeforeDialogShow(p_form, p_dialog)
          {
-            // Validation
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.mandatory, null, "blur");
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.nodeName, null, "keyup");
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.length,
-            {
-               max: 256,
-               crop: true
-            }, "keyup");
-            p_form.addValidation(this.id + "-createFolder-title", Alfresco.forms.validation.length,
-            {
-               max: 256,
-               crop: true
-            }, "keyup");
-            p_form.addValidation(this.id + "-createFolder-description", Alfresco.forms.validation.length,
-            {
-               max: 512,
-               crop: true
-            }, "keyup");
-            p_form.setShowSubmitStateDynamically(true, false);
+            Dom.get(p_dialog.id + "-dialogTitle").innerHTML = this.msg("label.new-folder.title");
+            Dom.get(p_dialog.id + "-dialogHeader").innerHTML = this.msg("label.new-folder.header");
          };
+         
+         var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&destination={destination}&mode={mode}&submitType={submitType}&formId={formId}&showCancelButton=true",
+         {
+            itemKind: "type",
+            itemId: "cm:folder",
+            destination: destination,
+            mode: "create",
+            submitType: "json",
+            formId: "doclib-common"
+         });
 
-         if (!this.modules.createFolder)
+         // Using Forms Service, so always create new instance
+         var createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder");
+
+         createFolder.setOptions(
          {
-            this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder").setOptions(
+            width: "33em",
+            templateUrl: templateUrl,
+            actionUrl: null,
+            doBeforeDialogShow:
             {
-               width: "30em",
-               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/create-folder",
-               actionUrl: actionUrl,
-               doSetupFormsValidation:
+               fn: doBeforeDialogShow,
+               scope: this
+            },
+            onSuccess:
+            {
+               fn: function DLTB_onNewFolder_success(response)
                {
-                  fn: doSetupFormsValidation,
-                  scope: this
-               },
-               firstFocus: this.id + "-createFolder-name",
-               onSuccess:
-               {
-                  fn: function DLTB_onNewFolder_callback(response)
+                  var folderName = response.config.dataObj["prop_cm_name"];
+                  YAHOO.Bubbling.fire("folderCreated",
                   {
-                     var folder = response.json.results[0];
-                     YAHOO.Bubbling.fire("folderCreated",
-                     {
-                        name: folder.name,
-                        parentPath: folder.parentPath,
-                        nodeRef: folder.nodeRef
-                     });
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: this.msg("message.new-folder.success", folder.name)
-                     });
-                  },
-                  scope: this
-               }
-            });
-         }
-         else
-         {
-            this.modules.createFolder.setOptions(
+                     name: folderName,
+                     parentNodeRef: destination
+                  });
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.new-folder.success", folderName)
+                  });
+               },
+               scope: this
+            },
+            onFailure:
             {
-               actionUrl: actionUrl,
-               clearForm: true
-            });
-         }
-         this.modules.createFolder.show();
+               fn: function DLTB_onNewFolder_failure(response)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.new-folder.failure")
+                  });
+               },
+               scope: this
+            }
+         }).show();
       },
 
       /**
@@ -555,32 +543,35 @@
                }
             }
 
-            // Activities
-            var activityData;
-            if (successCount > 0)
+            // Activities, in Site mode only
+            if (this.options.workingMode == Alfresco.doclib.MODE_SITE)
             {
-               if (successCount < this.options.groupActivitiesAt)
+               var activityData;
+               if (successCount > 0)
                {
-                  // Below cutoff for grouping Activities into one
-                  for (i = 0; i < successCount; i++)
+                  if (successCount < this.options.groupActivitiesAt)
                   {
+                     // Below cutoff for grouping Activities into one
+                     for (i = 0; i < successCount; i++)
+                     {
+                        activityData =
+                        {
+                           fileName: data.json.results[i].id,
+                           path: this.currentPath
+                        };
+                        this.modules.actions.postActivity(this.options.siteId, "file-deleted", "documentlibrary", activityData);
+                     }
+                  }
+                  else
+                  {
+                     // grouped into one message
                      activityData =
                      {
-                        fileName: data.json.results[i].id,
+                        fileCount: successCount,
                         path: this.currentPath
                      };
-                     this.modules.actions.postActivity(this.options.siteId, "file-deleted", "documentlibrary", activityData);
+                     this.modules.actions.postActivity(this.options.siteId, "files-deleted", "documentlibrary", activityData);
                   }
-               }
-               else
-               {
-                  // grouped into one message
-                  activityData =
-                  {
-                     fileCount: successCount,
-                     path: this.currentPath
-                  };
-                  this.modules.actions.postActivity(this.options.siteId, "files-deleted", "documentlibrary", activityData);
                }
             }
 
@@ -948,7 +939,7 @@
          this.folderDetailsUrl = null;
          if (obj && obj.metadata)
          {
-            this.folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + obj.metadata.parent.nodeRef;
+            this.folderDetailsUrl = "folder-details?nodeRef=" + obj.metadata.parent.nodeRef;
          }
       },
       

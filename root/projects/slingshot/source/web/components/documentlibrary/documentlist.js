@@ -123,6 +123,15 @@
    YAHOO.extend(Alfresco.DocumentList, Alfresco.component.Base);
 
    /**
+    * Augment prototype with constants
+    */
+   YAHOO.lang.augmentObject(Alfresco.DocumentList,
+   {
+      MODE_SITE: 0,
+      MODE_REPOSITORY: 1
+   });
+
+   /**
     * Augment prototype with Actions module
     */
    YAHOO.lang.augmentProto(Alfresco.DocumentList, Alfresco.doclib.Actions);
@@ -174,7 +183,7 @@
     */
    Alfresco.DocumentList.generateThumbnailUrl = function DL_generateThumbnailUrl(record)
    {
-      return Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "") + "/content/thumbnails/doclib?c=queue&ph=true";
+      return Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "") + "/content/thumbnails/doclib?c=queue&ph=true&noCache=" + new Date().getTime();
    };
 
    /**
@@ -250,7 +259,17 @@
          usePagination: false,
 
          /**
-          * Current siteId.
+          * Working mode: Site or Repository.
+          * Affects how actions operate, e.g. actvities are not posted in Repository mode.
+          * 
+          * @property workingMode
+          * @type number
+          * @default Alfresco.doclib.MODE_SITE
+          */
+         workingMode: Alfresco.doclib.MODE_SITE,
+
+         /**
+          * Current siteId. Not used in Repository working mode.
           * 
           * @property siteId
           * @type string
@@ -258,13 +277,21 @@
          siteId: "",
 
          /**
-          * ContainerId representing root container
+          * ContainerId representing root container. Not used in Repository working mode.
           *
           * @property containerId
           * @type string
           * @default "documentLibrary"
           */
          containerId: "documentLibrary",
+
+         /**
+          * Current root nodeRef. Not used in Site working mode.
+          * 
+          * @property nodeRef
+          * @type Alfresco.util.NodeRef
+          */
+         nodeRef: null,
 
          /**
           * Initial page to show on load (otherwise taken from URL hash).
@@ -332,6 +359,20 @@
           * @default 5
           */
          groupActivitiesAt: 5,
+
+         /**
+          * Valid inline edit mimetypes
+          * Currently allowed are plain text, HTML and XML only
+          *
+          * @property inlineEditMimetypes
+          * @type object
+          */
+         inlineEditMimetypes:
+         {
+            "text/plain": true,
+            "text/html": true,
+            "text/xml": true
+         },
          
          /**
           * Valid online edit mimetypes
@@ -616,7 +657,7 @@
          YAHOO.Bubbling.addDefaultAction("filter-change", fnChangeFilterHandler);
 
          // DocLib Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions();
+         this.modules.actions = new Alfresco.module.DoclibActions(this.options.workingMode);
 
          // Continue only when History Manager fires its onReady event
          YAHOO.util.History.onReady(this.onHistoryManagerReady, this, true);
@@ -1040,7 +1081,7 @@
           * YUI History - filter
           */
          var bookmarkedFilter = YAHOO.util.History.getBookmarkedState("filter");
-         bookmarkedFilter = bookmarkedFilter === null ? "path|/" : (YAHOO.env.ua.gecko > 0) ? bookmarkedFilter : escape(bookmarkedFilter);
+         bookmarkedFilter = bookmarkedFilter === null ? "path|/" : (YAHOO.env.ua.gecko > 0) ? bookmarkedFilter : window.escape(bookmarkedFilter);
 
          try
          {
@@ -1179,7 +1220,7 @@
             });
             
             // Reset onlineEdit flag if correct conditions not met
-            if ((YAHOO.env.ua.ie === 0) || (typeof me.options.vtiServer.port != "number"))
+            if ((YAHOO.env.ua.ie === 0) || (me.options.vtiServer && typeof me.options.vtiServer.port != "number"))
             {
                me.doclistMetadata.onlineEditing = false;
             }
@@ -1592,10 +1633,18 @@
             // Trim the items in the clone depending on the user's access
             var userAccess = record.getData("permissions").userAccess;
             
-            // Inject a special-case permission if online editing is configured
+            // Inject special-case permissions
+            if (record.getData("mimetype") in this.options.inlineEditMimetypes)
+            {
+               userAccess["inline-edit"] = true;
+            }
             if (record.getData("onlineEditUrl"))
             {
                userAccess["online-edit"] = true;
+            }
+            if (this.options.repositoryUrl)
+            {
+               userAccess["repository"] = true;
             }
             
             // Inject the current filterId to allow filter-scoped actions
@@ -1669,9 +1718,9 @@
        */
       getActionUrls: function DL_getActionUrls(record)
       {
-         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/",
-            recordData = record.getData(),
+         var recordData = record.getData(),
             nodeRef = recordData.nodeRef,
+            nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
             contentUrl = recordData.contentUrl,
             custom = recordData.custom;
 
@@ -1679,11 +1728,14 @@
          {
             downloadUrl: Alfresco.constants.PROXY_URI + contentUrl + "?a=true",
             viewUrl:  Alfresco.constants.PROXY_URI + contentUrl + "\" target=\"_blank",
-            documentDetailsUrl: urlContextSite + "document-details?nodeRef=" + nodeRef,
-            folderDetailsUrl: urlContextSite + "folder-details?nodeRef=" + nodeRef,
-            editMetadataUrl: urlContextSite + "edit-metadata?nodeRef=" + nodeRef,
-            workingCopyUrl: urlContextSite + "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
-            originalUrl: urlContextSite + "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)
+            documentDetailsUrl: "document-details?nodeRef=" + nodeRef,
+            folderDetailsUrl: "folder-details?nodeRef=" + nodeRef,
+            editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
+            inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
+            workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
+            originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef),
+            managePermissionsUrl: "permissions?nodeRef=" + nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type,
+            explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
       },
 

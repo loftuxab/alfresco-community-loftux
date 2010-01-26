@@ -31,12 +31,15 @@
  */
 (function()
 {
-   Alfresco.module.DoclibActions = function()
+   Alfresco.module.DoclibActions = function(workingMode)
    {
       this.name = "Alfresco.module.DoclibActions";
       
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["json"], this.onComponentsLoaded, this);
+      
+      /* Working mode */
+      this.workingMode = workingMode !== undefined ? workingMode : Alfresco.doclib.MODE_SITE;
 
       return this;
    };
@@ -51,6 +54,15 @@
        * @type boolean
        */
       isReady: false,
+
+      /**
+       * Working mode: Site or Repository.
+       * 
+       * @property workingMode
+       * @type {number}
+       * @default Alfresco.doclib.MODE_SITE
+       */
+      workingMode: Alfresco.doclib.MODE_SITE,
 
       /**
        * Object literal for default AJAX request configuration
@@ -308,6 +320,12 @@
        */
       postActivity: function DLA_postActivity(siteId, activityType, page, data)
       {
+         // No activities in Repository mode
+         if (this.workingMode == Alfresco.doclib.MODE_REPOSITORY)
+         {
+            return;
+         }
+         
          var config =
          {
             method: "POST",

@@ -35,13 +35,12 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
-   
+      Event = YAHOO.util.Event;
+
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $combine = Alfresco.util.combinePaths;
    
    /**
     * DocumentLinks constructor.
@@ -57,8 +56,11 @@
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
       
+      // Initialise prototype properties
+      this.hasClipboard = window.clipboardData && window.clipboardData.setData;
+      
       return this;
-   }
+   };
    
    YAHOO.extend(Alfresco.DocumentLinks, Alfresco.component.Base,
    {
@@ -71,6 +73,14 @@
       options:
       {
          /**
+          * Repository Url if configured
+          * 
+          * @property repositoryUrl
+          * @type string
+          */
+         repositoryUrl: null,
+
+         /**
           * External authentication being used for login
           * 
           * @property externalAuth
@@ -78,7 +88,15 @@
           */
          externalAuth: false
       },
-      
+
+      /**
+       * Does the browser natively support clipboard data?
+       * 
+       * @property hasClipboard
+       * @type boolean
+       */
+      hasClipboard: null,
+
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
        *
@@ -87,90 +105,95 @@
       onDocumentDetailsAvailable: function DocumentLinks_onDocumentDetailsAvailable(layer, args)
       {
          var docData = args[1].documentDetails,
-            workingCopyMode = args[1].workingCopyMode || false,
-            hasClipboard = window.clipboardData && clipboardData.setData;
+            workingCopyMode = args[1].workingCopyMode || false;
 
-         if (!workingCopyMode)
+         if (workingCopyMode)
          {
-            Dom.removeClass(this.id + "-body", "hidden");
+            // No UI for Working Copy documents
+            return;
          }
+
+         Dom.removeClass(this.id + "-body", "hidden");
          
          // Construct the content-based URLs if the document actually has content (size > 0)
          if (parseInt(docData.size, 10) > 0)
          {
-            // Show UI controls
-            Dom.setStyle(this.id + "-download", "display", "block");
-            Dom.setStyle(this.id + "-view", "display", "block");
-            
+            // Download and View links
             var contentUrl = (this.options.externalAuth ? Alfresco.constants.PROXY_URI : Alfresco.constants.PROXY_FEED_URI) + docData.contentUrl;
-
-            // Populate the text fields with the appropriate URLs
-            Dom.get(this.id + "-download-url").value = contentUrl + "?a=true";
-            Dom.get(this.id + "-view-url").value = contentUrl;
-            
-            // Create YUI buttons for copy if clipboard functions available
-            if (hasClipboard)
+            this.populateLinkUI(
             {
-               this.widgets.downloadCopyButton = Alfresco.util.createYUIButton(this, "download-button", null,
-               {
-                  onclick:
-                  {
-                     fn: this._handleCopyClick,
-                     obj: "-download-url",
-                     scope: this
-                  }
-               });
+               name: "download",
+               url: contentUrl + "?a=true"
+            });
+            this.populateLinkUI(
+            {
+               name: "view",
+               url: contentUrl
+            });
+         }
 
-               this.widgets.viewCopyButton = Alfresco.util.createYUIButton(this, "view-button", null,
+         if (this.options.repositoryUrl)
+         {
+            // WebDAV URL
+            this.populateLinkUI(
+            {
+               name: "webdav",
+               url: $combine(this.options.repositoryUrl, docData.webdavUrl)
+            });
+         }
+
+         // This page
+         this.populateLinkUI(
+         {
+            name: "page",
+            url: window.location.href
+         });
+      },
+      
+      /**
+       * Populate a link UI element
+       *
+       * @method _populateLinkUI
+       * @param link {object} Object literal containing link details
+       */
+      populateLinkUI: function DocumentLinks_populateLinkUI(link)
+      {
+         var nameId = this.id + "-" + link.name,
+            urlId = nameId + "-url",
+            copyButtonName = link.name + "-button";
+         
+         if (Dom.get(nameId))
+         {
+            Dom.removeClass(nameId, "hidden");
+            Dom.get(urlId).value = link.url;
+            if (this.hasClipboard)
+            {
+               Alfresco.util.createYUIButton(this, copyButtonName, null,
                {
                   onclick:
                   {
                      fn: this._handleCopyClick,
-                     obj: "-view-url",
+                     obj: urlId,
                      scope: this
                   }
                });
             }
 
-            // Add focus event handlers to fields        
-            Event.addListener(Dom.get(this.id + "-download-url"), "focus", this._handleFocus, "-download-url", this);
-            Event.addListener(Dom.get(this.id + "-view-url"), "focus", this._handleFocus, "-view-url", this);
+            // Add focus event handler
+            Event.addListener(urlId, "focus", this._handleFocus, urlId, this);
          }
-         else
-         {
-            // Hide UI controls
-            Dom.setStyle(this.id + "-download", "display", "none");
-            Dom.setStyle(this.id + "-view", "display", "none");
-         }
-
-         // Page link URL and copy button if possible
-         Dom.get(this.id + "-page-url").value = window.location.href;
-         if (hasClipboard)
-         {
-            this.widgets.pageCopyButton = Alfresco.util.createYUIButton(this, "page-button", null,
-            {
-               onclick:
-               {
-                  fn: this._handleCopyClick,
-                  obj: "-page-url",
-                  scope: this
-               }
-            });
-         }
-         
-         Event.addListener(Dom.get(this.id + "-page-url"), "focus", this._handleFocus, "-page-url", this);
       },
       
       /**
        * Event handler to copy URLs to the system clipboard
        * 
        * @method _handleCopyClick
-       * @param event The event
-       * @param urlId The id of the element holding the URL to copy
+       * @param event {object} The event
+       * @param urlId {string} The Dom Id of the element holding the URL to copy
        */
       _handleCopyClick: function DocumentLinks__handleCopyClick(event, urlId)
       {
-         clipboardData.setData("Text", Dom.get(this.id + urlId).value);
+         clipboardData.setData("Text", Dom.get(urlId).value);
       },
       
       /**
@@ -178,14 +201,14 @@
        *
        * @method _handleFocus
        * @param event The event
-       * @field The suffix of the id of the field to select
+       * @field The Dom Id of the field to select
        */
-      _handleFocus: function DocumentLinks__handleFocus(event, field)
+      _handleFocus: function DocumentLinks__handleFocus(e, fieldId)
       {
-         YAHOO.util.Event.stopEvent(event);
+         YAHOO.util.Event.stopEvent(e);
          
-         var fieldObj = Dom.get(this.id + field);
-         if (fieldObj && fieldObj.select)
+         var fieldObj = Dom.get(fieldId);
+         if (fieldObj && typeof fieldObj.select == "function")
          {
             fieldObj.select();
          }

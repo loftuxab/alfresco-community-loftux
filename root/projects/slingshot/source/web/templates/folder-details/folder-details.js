@@ -73,7 +73,15 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+
+         /**
+          * Root node if Repository-based library
+          * 
+          * @property rootNode
+          * @type Alfresco.util.NodeRef
+          */
+         rootNode: null
       },
 
       /**
@@ -96,11 +104,16 @@
        */
       onReady: function FolderDetails_onReady()
       {
+         var url = Alfresco.constants.PROXY_URI + 'slingshot/doclib/doclist/node/' + this.options.nodeRef.uri;
+         if (this.options.siteId == "")
+         {
+            // Repository mode
+            url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
+         }
          var config =
          {
             method: "GET",
-            url: Alfresco.constants.PROXY_URI + 'slingshot/doclib/doclist/folders/node/' + 
-                 this.options.nodeRef.replace(":/", "") + '?filter=node',
+            url: url,
             successCallback: 
             { 
                fn: this._getDataSuccess, 

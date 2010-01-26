@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2009 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -61,11 +61,6 @@
     * Extend Alfresco.DocumentList
     */
    YAHOO.extend(Alfresco.RepositoryDocumentList, Alfresco.DocumentList);
-
-   /**
-    * Augment prototype with RepositoryActions module, ensuring overwrite is enabled
-    */
-   YAHOO.lang.augmentProto(Alfresco.RepositoryDocumentList, Alfresco.doclib.RepositoryActions, true);
 
    /**
     * Generate "changeFilter" event mark-up specifically for category changes
@@ -294,40 +289,20 @@
          };
       },
 
-
       /**
-       * Public functions
+       * Set multiple initialization options at once.
        *
-       * Functions designed to be called form external sources
-       */
-
-      /**
-       * The urls to be used when creating links in the action cell
-       *
+       * @method setOptions
        * @override
-       * @method getActionUrls
-       * @param record {object} A data source element describing the item in the list
-       * @return {object} Object literal containing URLs to be substituted in action placeholders
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.RepositoryDocumentList} returns 'this' for method chaining
        */
-      getActionUrls: function RDL_getActionUrls(record)
+      setOptions: function RDL_setOptions(obj)
       {
-         var urlContext = $combine(Alfresco.constants.URL_PAGECONTEXT, "/"),
-            recordData = record.getData(),
-            nodeRef = recordData.nodeRef,
-            contentUrl = recordData.contentUrl,
-            custom = recordData.custom;
-
-         return (
+         return Alfresco.RepositoryDocumentList.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
-            downloadUrl: Alfresco.constants.PROXY_URI + contentUrl + "?a=true",
-            viewUrl:  Alfresco.constants.PROXY_URI + contentUrl + "\" target=\"_blank",
-            documentDetailsUrl: urlContext + "document-details?nodeRef=" + nodeRef,
-            folderDetailsUrl: urlContext + "folder-details?nodeRef=" + nodeRef,
-            editMetadataUrl: urlContext + "edit-metadata?nodeRef=" + nodeRef,
-            workingCopyUrl: urlContext + "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
-            originalUrl: urlContext + "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef),
-            managePermissionsUrl: urlContext + "permissions?nodeRef=" + nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type
-         });
+            workingMode: Alfresco.doclib.MODE_REPOSITORY
+         }, obj));
       },
 
 
@@ -382,7 +357,7 @@
 
          // Filter parameters
          params += "?filter=" + encodeURIComponent(obj.filter.filterId);
-         if (obj.filter.filterData)
+         if (obj.filter.filterData && obj.filter.filterId !== "path")
          {
             params += "&filterData=" + encodeURIComponent(obj.filter.filterData);             
          }
@@ -395,6 +370,9 @@
          
          // No-cache
          params += "&noCache=" + new Date().getTime();
+         
+         // Repository mode (don't resolve Site-based folders)
+         params += "&libraryRoot=" + encodeURIComponent(this.options.nodeRef.toString());
 
          return params;
       }

@@ -185,14 +185,8 @@
          }
          else
          {
-            // go back to the appropriate details page for the node
-            var pageUrl = Alfresco.constants.URL_PAGECONTEXT;
-            if (this.options.siteId)
-            {
-               pageUrl += "site/" + this.options.siteId + "/";
-            }
-            pageUrl += this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
-            window.location.href = pageUrl;
+            // go forward to the appropriate details page for the node
+            window.location.href = this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
          }
       }
    });

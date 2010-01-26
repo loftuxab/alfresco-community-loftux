@@ -98,7 +98,7 @@
             // Root node link to contain current folder highlight parameter
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               file: "?file=" + encodeURIComponent(folderData.fileName)
+               file: "?file=" + encodeURIComponent(folderData.fileName) + "&"
             });
             pathHtml += '">' + this.msg("path.documents") + '</a></span>';
          }

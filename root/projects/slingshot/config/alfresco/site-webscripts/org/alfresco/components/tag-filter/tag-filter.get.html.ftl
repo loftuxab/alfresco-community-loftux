@@ -2,7 +2,8 @@
    new Alfresco.TagFilter("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${template.properties.container!""}"
+      containerId: "${template.properties.container!""}",
+      nodeRef: new Alfresco.util.NodeRef("${rootNode}")
    }).setMessages(
       ${messages}
    ).setFilterIds(["tag"]);

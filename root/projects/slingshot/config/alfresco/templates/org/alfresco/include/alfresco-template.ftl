@@ -18,9 +18,8 @@
 <#--
    JavaScript minimisation via YUI Compressor.
 -->
-<#assign minJS=DEBUG?string(".js", "-min.js")>
 <#macro script type src>
-   <script type="${type}" src="${src?replace(".js", minJS)}"></script>
+   <script type="${type}" src="${DEBUG?string(src, src?replace(".js", "-min.js"))}"></script>
 </#macro>
 <#--
    Stylesheets gathered and rendered using @import to workaround IEBug KB262161

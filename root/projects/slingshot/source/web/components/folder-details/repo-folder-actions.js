@@ -49,21 +49,19 @@
    YAHOO.extend(Alfresco.RepositoryFolderActions, Alfresco.FolderActions,
    {
       /**
-       * The urls to be used when creating links in the action cell
+       * Set multiple initialization options at once.
        *
+       * @method setOptions
        * @override
-       * @method getActionUrls
-       * @return {object} Object literal containing URLs to be substituted in action placeholders
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.RepositoryFolderActions} returns 'this' for method chaining
        */
-      getActionUrls: function DocumentActions_getActionUrls()
+      setOptions: function RepositoryFolderActions_setOptions(obj)
       {
-         var urlContext = Alfresco.constants.URL_PAGECONTEXT,
-            nodeRef = this.assetData.nodeRef;
-
-         return (
+         return Alfresco.RepositoryFolderActions.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
-            editMetadataUrl: urlContext + "edit-metadata?nodeRef=" + nodeRef
-         });
+            workingMode: Alfresco.doclib.MODE_REPOSITORY
+         }, obj));
       }
    });
 })();

@@ -187,7 +187,8 @@
          // DocLib Actions module
          if (!this.modules.actions)
          {
-            this.modules.actions = new Alfresco.module.DoclibActions();
+            // This module does not rely on Site scope, so can use the DoclibActions module in Repository mode all the time.
+            this.modules.actions = new Alfresco.module.DoclibActions(Alfresco.doclib.MODE_REPOSITORY);
          }
          
          this._createAspectsControls();

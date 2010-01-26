@@ -145,7 +145,15 @@
           * @property richMimeTypes
           * @type string
           */
-         richMimeTypes: "text/html,text/xhtml"
+         richMimeTypes: "text/html,text/xhtml",
+         
+         /**
+          * Whether the (plain text) editor should be forced visible, e.g. mimetype unrecognized
+          * 
+          * @property forceEditor
+          * @type boolean
+          */
+         forceEditor: false
       },
 
       /**
@@ -194,7 +202,7 @@
                      this._renderEditor();
                   }
                }
-               else if (this._isPlainMimeType(contentMimetype))
+               else if (this._isPlainMimeType(contentMimetype) || this.options.forceEditor)
                {
                   // populate the textarea with the content
                   this._populateContent();

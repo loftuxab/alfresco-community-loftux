@@ -89,6 +89,14 @@
          containerId: "",
 
          /**
+          * Root nodeRef for use in non-Site mode
+          * 
+          * @property nodeRef
+          * @type Alfresco.util.NodeRef
+          */
+         nodeRef: null,
+
+         /**
           * Number of tags to show
           *
           * @property numTags
@@ -104,6 +112,7 @@
        * the tags component, they need to fire this event.
        *
        * @method onReady
+       * @override
        */   
       onReady: function TagFilter_onReady()
       {
@@ -113,6 +122,29 @@
          YAHOO.Bubbling.fire("tagRefresh");
       },
       
+      /**
+       * Called if this filter is the owner, but the filterId could be found in the DOM
+       *
+       * @method handleFilterIdNotFound
+       * @override
+       * @param filter {object} New filter trying to be set
+       */
+      handleFilterIdNotFound: function TagFilter_handleFilterIdNotFound(filter)
+      {
+         var domId = Alfresco.util.generateDomId(),
+            newTag = this._generateTagMarkup(
+         {
+            name: filter.filterData,
+            domId: domId
+         });
+         
+         Dom.get(this.id + "-tags").innerHTML += newTag;
+
+         // This component now owns the active filter
+         this.selectedFilter = Dom.get(domId);
+         YUIDom.addClass(this.selectedFilter, "selected");
+      },
+
 
       /**
        * BUBBLING LIBRARY EVENT HANDLERS
@@ -133,6 +165,7 @@
          
          if (this.options.siteId)
          {
+            // Use the tag scope API
             url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}&topN={tn}",
             {
                site: this.options.siteId,
@@ -143,11 +176,13 @@
          }
          else
          {
-            url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "collaboration/tagQuery?d={d}&m={m}&s={s}",
+            // Use the collaboration REST API (from Office add-in)
+            url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "collaboration/tagQuery?d={d}&m={m}&s={s}&n={n}",
             {
                d: new Date().getTime(),
                m: this.options.numTags,
-               s: "count"
+               s: "count",
+               n: encodeURIComponent(this.options.nodeRef)
             });
          }
          
@@ -213,8 +248,14 @@
        */
       _generateTagMarkup: function TagFilter__generateTagMarkup(tag)
       {
-         var html = '<li><span class="tag">';
-         html += '<a href="#" class="' + this.uniqueEventKey + '" rel="' + $html(tag.name) + '">' + $html(tag.name) + '</a>&nbsp;(' + tag.count + ')';
+         var idAttr = tag.domId ? ' id="' + $html(tag.domId) + '"' : "",
+            html = '<li' + idAttr + '><span class="tag">';
+         
+         html += '<a href="#" class="' + this.uniqueEventKey + '" rel="' + $html(tag.name) + '">' + $html(tag.name) + '</a>';
+         if (tag.count)
+         {
+            html += '&nbsp;(' + tag.count + ')';
+         }
          html += '</span></li>';
          return html;
       }

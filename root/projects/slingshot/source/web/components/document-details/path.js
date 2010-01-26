@@ -97,7 +97,7 @@
          {
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               file: "file=" + encodeURIComponent(docData.fileName)
+               file: "file=" + encodeURIComponent(docData.fileName) + "&"
             });
             pathHtml += '">' + Alfresco.util.message("path.documents", this.name) + '</a></span>';
          }

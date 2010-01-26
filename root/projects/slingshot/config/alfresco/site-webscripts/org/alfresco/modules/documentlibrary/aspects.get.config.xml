@@ -10,6 +10,7 @@
       <aspect name="cm:emailed" />
       <aspect name="emailserver:aliasable" />
       <aspect name="cm:taggable" />
+      <aspect name="app:inlineeditable" />
    </visible>
 
    <!-- Aspects that a user can add. Same as "visible" if left empty -->
