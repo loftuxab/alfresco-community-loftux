@@ -442,7 +442,7 @@
          });
          escapeListener.enable();
 
-         if (file.custom.isWorkingCopy)
+         if (file.custom && file.custom.isWorkingCopy)
          {
             // Disable name field if asset is a working copy
             Dom.get(this.id + "-name").disabled = true;

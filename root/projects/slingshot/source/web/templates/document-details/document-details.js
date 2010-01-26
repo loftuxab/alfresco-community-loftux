@@ -135,7 +135,7 @@
              *  (a) set "working copy" flag to allow some components to stay hidden/hide themselves
              *  (b) show (read-only) comments from the source instead
              */
-            if (documentDetails.custom.isWorkingCopy)
+            if (documentDetails.custom && documentDetails.custom.isWorkingCopy)
             {
                workingCopyMode = true;
                // Show orignal's comments (read-only)

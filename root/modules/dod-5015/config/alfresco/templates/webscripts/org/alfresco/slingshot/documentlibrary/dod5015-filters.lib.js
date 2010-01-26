@@ -55,7 +55,7 @@ var Filters =
       }
 
       // Create query based on passed-in arguments
-      var filterData = String(args.filterData),
+      var filterData = args.filterData,
          filterQuery = "";
 
       // Common types and aspects to filter from the UI
@@ -84,7 +84,7 @@ var Filters =
             var searchNode = parsedArgs.location.siteNode.getContainer("Saved Searches");
             if (searchNode != null)
             {
-               var ssNode = searchNode.childByNamePath(filterData);
+               var ssNode = searchNode.childByNamePath(String(filterData));
 
                if (ssNode != null)
                {

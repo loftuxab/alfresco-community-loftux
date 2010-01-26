@@ -821,10 +821,10 @@
                   args[1].stop = true;
                   filterObj =
                   {
-                     filterOwner: decodeURI(filters[0]),
-                     filterId: decodeURI(filters[1]),
-                     filterData: decodeURI(filters[2]),
-                     filterDisplay: decodeURI(filters[3])
+                     filterOwner: unescape(filters[0]),
+                     filterId: unescape(filters[1]),
+                     filterData: unescape(filters[2]),
+                     filterDisplay: unescape(filters[3])
                   };
                   Alfresco.logger.debug("DL_fnFilterChangeHandler", "filterChanged =>", filterObj);
                   YAHOO.Bubbling.fire("filterChanged", filterObj);

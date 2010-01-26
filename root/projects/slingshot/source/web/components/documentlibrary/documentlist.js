@@ -836,7 +836,7 @@
                   /**
                    * Detailed View
                    */
-                  if (record.custom.isWorkingCopy)
+                  if (record.custom && record.custom.isWorkingCopy)
                   {
                      /**
                       * Working Copy
@@ -1594,7 +1594,7 @@
       {
          var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
             nodeRef = record.getData("nodeRef"),
-            custom = record.getData("custom");
+            custom = record.getData("custom") || {};
 
          return (
          {

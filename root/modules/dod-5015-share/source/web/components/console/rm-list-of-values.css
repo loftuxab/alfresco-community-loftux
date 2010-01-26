@@ -15,11 +15,6 @@
    margin:16px 10px 10px;
 }
 
-.listofvalues .hidden
-{
-   display: none;
-}
-
 .listofvalues .listofvalues-list
 {
    border: 1px solid #D7D7D7;
