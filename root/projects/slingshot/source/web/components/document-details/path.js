@@ -135,7 +135,7 @@
 
          Dom.addClass(this.id + "-status", "hidden");
          
-         if (docData.custom.isWorkingCopy || docData.custom.hasWorkingCopy)
+         if (docData.custom && (docData.custom.isWorkingCopy || docData.custom.hasWorkingCopy))
          {
             var bannerMsg, bannerStatus;
             

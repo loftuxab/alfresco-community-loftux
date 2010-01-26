@@ -34,15 +34,12 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+   var Dom = YAHOO.util.Dom;
    
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
+   var $combine = Alfresco.util.combinePaths;
    
    /**
     * DocumentActions constructor.
@@ -136,7 +133,8 @@
       getActionUrls: function DocumentActions_getActionUrls()
       {
          var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = this.assetData.nodeRef;
+            nodeRef = this.assetData.nodeRef,
+            custom = this.assetData.custom || {};
 
          return (
          {
@@ -144,8 +142,8 @@
             viewUrl:  Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "\" target=\"_blank",
             documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
             editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
-            workingCopyUrl: urlContextSite + "/document-details?nodeRef=" + (this.assetData.custom.workingCopyNode || nodeRef),
-            originalUrl: urlContextSite + "/document-details?nodeRef=" + (this.assetData.custom.workingCopyOriginal || nodeRef)
+            workingCopyUrl: urlContextSite + "/document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
+            originalUrl: urlContextSite + "/document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)
          });
       },
        
@@ -168,7 +166,6 @@
             actionSet = this.assetData.actionSet,
             clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true),
             downloadUrl = Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
-            viewUrl = Alfresco.constants.PROXY_URI + this.assetData.contentUrl,
             displayName = this.assetData.displayName;
 
          // Token replacement
@@ -294,8 +291,6 @@
          var path = asset.location.path,
             fileName = asset.fileName,
             displayName = asset.displayName;
-
-         var me = this;
 
          this.modules.actions.genericAction(
          {
@@ -448,7 +443,6 @@
       {
          var path = asset.location.path,
             fileName = asset.fileName,
-            filePath = $combine(path, fileName),
             displayName = asset.displayName,
             callbackUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
             encodedPath = path.length > 1 ? "?path=" + window.escape(path) : "";

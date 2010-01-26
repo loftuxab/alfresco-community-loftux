@@ -87,7 +87,7 @@
       </div>
 
       <!-- Auhtority/Access Dialog -->
-      <div id="${el}-authoritypicker" class="listofvalues authority-picker hidden">
+      <div id="${el}-authoritypicker" class="listofvalues authority-picker">
          <div class="hd"><span id="${el}-authoritypicker-title">${msg("panel.addaccess.header")}</span></div>
          <div class="bd">
             <div>
