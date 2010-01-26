@@ -48,6 +48,7 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
     private List<RuntimeExec> startupCommands;
     private boolean failOnError;
     private boolean killProcessesOnShutdown;
+    private boolean enabled;
     
     /** Keep track of the processes so that we can kill them on shutdown */
     private List<ExecutionResult> executionResults;
@@ -59,6 +60,7 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
      * <ul>
      *   <li>failOnError = true</li>
      *   <li>killProcessesOnShutdown = true</li>
+     *   <li>enabled = true</li>
      * </ul>
      */
     public RuntimeExecBootstrapBean()
@@ -67,6 +69,7 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
         this.executionResults = new ArrayList<ExecutionResult>(1);
         failOnError = true;
         killProcessesOnShutdown = true;
+        enabled = true;
     }
 
     /**
@@ -112,9 +115,55 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
         this.killProcessesOnShutdown = killProcessesOnShutdown;
     }
 
+    /**
+     * Set whether or not the process should be disabled at ApplicationContext bootstrap.
+     * If a RuntimeExecBootstrapBean is disabled, then the command will not be executed.
+     * This property is not required and is <code>false</code> by default.
+     * <P/>
+     * This method has been deprecated in favour of a clearer name introduced in 3.3.
+     * See {@link #setEnabled}.
+     * 
+     * @param disabledAtStartUp any String which <code>equalsIgnoreCase("true")</code>
+     *        to prevent the command from being executed.
+     * @since 3.2.1
+     * @deprecated Use {@link #setEnabled} instead, remembering that the boolean property should be inverted.
+     */
+    public void setDisabledAtStartUp(String disabledAtStartUp)
+    {
+    	boolean disabled = Boolean.parseBoolean(disabledAtStartUp);
+    	this.setEnabled(Boolean.toString(!disabled));
+    }
+
+    /**
+     * Set whether or not the process should be enabled at ApplicationContext bootstrap.
+     * If a RuntimeExecBootstrapBean is not enabled, then the command will not be executed.
+     * This property is not required and is <code>true</code> by default.
+     * 
+     * @param enabled any String which does not <code>equalsIgnoreCase("true")</code>
+     *        will prevent the command from being executed.
+     * 
+     * @since 3.3
+     */
+    public void setEnabled(String enabled)
+    {
+        // A String parameter rather than a boolean parameter is used here in order to allow
+        // the injection of properties ${foo.bar}. In this way undefined properties (which will
+        // be injected as "${foo.bar}") will mean the parameter is equivalent to false.
+        this.enabled = Boolean.parseBoolean(enabled);
+    }
+    
     @Override
     protected synchronized void onBootstrap(ApplicationEvent event)
     {
+        // If the command is disabled then do nothing.
+        if (this.enabled == false)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Bootstrap execution of " + startupCommands.size() + " was not enabled");
+            }
+            return;
+        }
         // execute
         for (RuntimeExec command : startupCommands)
         {
@@ -172,6 +221,11 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
     @Override
     protected synchronized void onShutdown(ApplicationEvent event)
     {
+        if (this.enabled == false)
+        {
+            return;
+        }
+        
         try
         {
             // We managed to stop the process ourselves (e.g. on subsystem shutdown). Remove the shutdown hook
