@@ -1,7 +1,7 @@
 <script type="text/javascript">//<![CDATA[
-
-   new Alfresco.Disposition("${args.htmlid}").setOptions({
-      nodeRef: "${page.url.args.nodeRef}",
+   new Alfresco.Disposition("${args.htmlid}").setOptions(
+   {
+      nodeRef: "${page.url.args.nodeRef!""}",
       siteId: "${page.url.templateArgs.site!""}",
       dipositionScheduleNodeRef: "${dipositionScheduleNodeRef!""}"
    }).setMessages(
@@ -30,21 +30,15 @@
       <div class="properties">
          <div class="field">
             <span class="label">${msg("label.dispositionAuthority")}:</span>
-            <span class="value">${authority!""}</span>
+            <span class="value">${(authority!"")?html}</span>
          </div>
          <div class="field">
             <span class="label">${msg("label.dispositionInstructions")}:</span>
-            <span class="value">${instructions!""}</span>
+            <span class="value">${(instructions!"")?html}</span>
          </div>
          <div class="field">
             <span class="label">${msg("label.appliedTo")}:</span>
-            <span class="value">
-               <#if (recordLevelDisposition)>
-               ${msg("label.appliedTo.record")}
-               <#else>
-               ${msg("label.appliedTo.folder")}
-               </#if>
-            </span>
+            <span class="value"><#if (recordLevelDisposition)>${msg("label.appliedTo.record")}<#else>${msg("label.appliedTo.folder")}</#if></span>
          </div>
       </div>
 
@@ -60,24 +54,18 @@
       </div>
 
       <div id="${el}-actions" class="actions">
-         <#if (actions?size > 0)>
+      <#if (actions?size > 0)>
          <#list actions as action>
          <div class="action">
             <div class="no">${action.index + 1}</div>
             <div class="more collapsed"><a href="#">${msg("link.description")}</a></div>
             <div class="name">${action.title}</div>
-            <div class="description" style="display: none;">
-               <#if (action.description?has_content)>
-               ${action.description}
-               <#else>
-               ${msg("label.nodescription")}
-               </#if>
-            </div>
+            <div class="description" style="display: none;"><#if (action.description?has_content)>${action.description?html}<#else>${msg("label.nodescription")}</#if></div>
          </div>
          </#list>
-         <#else>
+      <#else>
          ${msg("label.noactions")}
-         </#if>
+      </#if>
       </div>
    </div>
 

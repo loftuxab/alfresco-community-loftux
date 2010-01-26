@@ -481,7 +481,35 @@
           return fromISO8601(el.id.replace('cal-',''));
       },
 
-     /**
+      /**
+       * Adjusts height of specifed event depending on its duration
+       *  
+       * @method _adjustHeightByHour
+       * @param el {object} Event element to adjust
+       */
+      _adjustHeightByHour : function(el)
+      {
+        //TODO - get this from css class;
+        var hourHeight = 4.75; //em
+        //adjust height dependant on durations
+        if (this.calendarView != Alfresco.CalendarView.VIEWTYPE_MONTH)
+        {
+          var durationObj = hcalendar.parsers['duration'](this.events[el.id].getData('duration'));
+          if (durationObj)
+          {
+            var height = (hourHeight*(durationObj.H||0));
+            if (durationObj.M){
+                height += (hourHeight*(1/(60/durationObj.M)));
+            }
+            if (el && height)
+            {
+              Dom.setStyle(el,'height',height+'em');              
+            }
+          }
+        }  
+      },
+
+      /**
        * Displays add dialog
        * 
        * @method showAddDialog
