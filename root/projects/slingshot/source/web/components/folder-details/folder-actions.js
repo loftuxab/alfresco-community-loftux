@@ -35,6 +35,11 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $combine = Alfresco.util.combinePaths;
    
    /**
     * FolderActions constructor.
@@ -76,6 +81,16 @@
        */
       options:
       {
+         /**
+          * Working mode: Site or Repository.
+          * Affects how actions operate, e.g. actvities are not posted in Repository mode.
+          * 
+          * @property workingMode
+          * @type number
+          * @default Alfresco.doclib.MODE_SITE
+          */
+         workingMode: Alfresco.doclib.MODE_SITE,
+
          /**
           * Current siteId.
           * 
@@ -127,12 +142,13 @@
        */
       getActionUrls: function DocumentActions_getActionUrls()
       {
-         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = this.assetData.nodeRef;
+         var nodeRef = this.assetData.nodeRef,
+            nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri;
 
          return (
          {
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef
+            editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
+            explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
       },
        
@@ -166,6 +182,12 @@
             var userAccess = this.assetData.permissions.userAccess,
                actions = YAHOO.util.Selector.query("div", actionsContainer),
                action, actionPermissions, i, ii, j, jj, actionAllowed;
+
+            // Inject special-case permissions
+            if (this.options.repositoryUrl)
+            {
+               userAccess["repository"] = true;
+            }
             
             for (i = 0, ii = actions.length; i < ii; i++)
             {
@@ -207,7 +229,7 @@
          YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
          
          // DocLib Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions();
+         this.modules.actions = new Alfresco.module.DoclibActions(this.options.workingMode);
       },
 
       /**
@@ -223,7 +245,8 @@
          var path = asset.location.path,
             fileName = asset.fileName,
             displayName = asset.displayName,
-            callbackUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
+            callbackUrl = this.options.workingMode == Alfresco.doclib.MODE_SITE ? "documentlibrary" : "repository",
             encodedPath = path.length > 1 ? "?path=" + window.escape(path) : "";
          
          this.modules.actions.genericAction(
@@ -245,13 +268,10 @@
             webscript:
             {
                method: Alfresco.util.Ajax.DELETE,
-               name: "file/site/{site}/{container}{path}/{file}",
+               name: "file/node/{nodeRef}",
                params:
                {
-                  site: this.options.siteId,
-                  container: this.options.containerId,
-                  path: Alfresco.util.encodeURIPath(path),
-                  file: encodeURIComponent(fileName)
+                  nodeRef: nodeRef.uri
                }
             }
          });

@@ -777,8 +777,6 @@
          <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/global-folder.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/copy-move-to.js" />
-         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/details.js" />
-         <fileset file="${dir.project.slingshot.src.web}/modules/taglibrary/taglibrary.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/workflow.js" />
          <fileset file="${dir.project.slingshot.src.web}/components/people-finder/people-finder.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/permissions.js" />

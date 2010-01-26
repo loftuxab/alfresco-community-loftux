@@ -82,6 +82,16 @@
       options:
       {
          /**
+          * Working mode: Site or Repository.
+          * Affects how actions operate, e.g. actvities are not posted in Repository mode.
+          * 
+          * @property workingMode
+          * @type number
+          * @default Alfresco.doclib.MODE_SITE
+          */
+         workingMode: Alfresco.doclib.MODE_SITE,
+
+         /**
           * Current siteId.
           * 
           * @property siteId
@@ -96,7 +106,21 @@
           * @type string
           * @default "documentLibrary"
           */
-         containerId: "documentLibrary"
+         containerId: "documentLibrary",
+
+         /**
+          * Valid inline edit mimetypes
+          * Currently allowed are plain text, HTML and XML only
+          *
+          * @property inlineEditMimetypes
+          * @type object
+          */
+         inlineEditMimetypes:
+         {
+            "text/plain": true,
+            "text/html": true,
+            "text/xml": true
+         }
       },
       
       /**
@@ -132,18 +156,20 @@
        */
       getActionUrls: function DocumentActions_getActionUrls()
       {
-         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = this.assetData.nodeRef,
-            custom = this.assetData.custom || {};
+         var recordData = this.assetData,
+            nodeRef = recordData.nodeRef,
+            custom = recordData.custom || {};
 
          return (
          {
-            downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
-            viewUrl:  Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "\" target=\"_blank",
-            documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
-            workingCopyUrl: urlContextSite + "/document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
-            originalUrl: urlContextSite + "/document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)
+            downloadUrl: Alfresco.constants.PROXY_URI + recordData.contentUrl + "?a=true",
+            viewUrl:  Alfresco.constants.PROXY_URI + recordData.contentUrl + "\" target=\"_blank",
+            documentDetailsUrl: "document-details?nodeRef=" + nodeRef,
+            editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
+            inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
+            workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
+            originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef),
+            managePermissionsUrl: "permissions?nodeRef=" + nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type
          });
       },
        
@@ -162,25 +188,32 @@
          this.currentPath = this.assetData.location.path;
          
          // Copy template into active area
-         var actionsContainer = Dom.get(this.id + "-actionSet"),
-            actionSet = this.assetData.actionSet,
+         var assetData = this.assetData,
+            actionsContainer = Dom.get(this.id + "-actionSet"),
+            actionSet = assetData.actionSet,
             clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true),
-            downloadUrl = Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
-            displayName = this.assetData.displayName;
+            downloadUrl = Alfresco.constants.PROXY_URI + assetData.contentUrl + "?a=true",
+            displayName = assetData.displayName;
 
          // Token replacement
          clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls());
 
          // Replace existing actions and assign correct class for icon rendering
          actionsContainer.innerHTML = clone.innerHTML;
-         Dom.addClass(actionsContainer, this.assetData.type);
-         
+         Dom.addClass(actionsContainer, assetData.type);
+
          // Hide actions which have been disallowed through permissions
-         if (this.assetData.permissions && this.assetData.permissions.userAccess)
+         if (assetData.permissions && assetData.permissions.userAccess)
          {
-            var userAccess = this.assetData.permissions.userAccess,
+            var userAccess = assetData.permissions.userAccess,
                actions = YAHOO.util.Selector.query("div", actionsContainer),
                action, actionPermissions, i, ii, j, jj, actionAllowed;
+
+            // Inject special-case permissions for inline and online editing
+            if (assetData.mimetype in this.options.inlineEditMimetypes)
+            {
+               userAccess["inline-edit"] = true;
+            }
             
             for (i = 0, ii = actions.length; i < ii; i++)
             {
@@ -222,7 +255,7 @@
          YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
          
          // DocLib Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions();
+         this.modules.actions = new Alfresco.module.DoclibActions(this.options.workingMode);
          
          // Prompt auto-download (after Edit Offline action)?
          if (window.location.hash == "#editOffline")
@@ -289,8 +322,8 @@
       onActionEditOffline: function DocumentActions_onActionEditOffline(asset)
       {
          var path = asset.location.path,
-            fileName = asset.fileName,
-            displayName = asset.displayName;
+            displayName = asset.displayName,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
 
          this.modules.actions.genericAction(
          {
@@ -313,12 +346,10 @@
             webscript:
             {
                method: Alfresco.util.Ajax.POST,
-               name: "checkout/site/{site}/{container}{filepath}",
+               name: "checkout/node/{nodeRef}",
                params:
                {
-                  site: this.options.siteId,
-                  container: this.options.containerId,
-                  filepath: $combine(Alfresco.util.encodeURIPath(path), encodeURIComponent(fileName))
+                  nodeRef: nodeRef.uri
                }
             }
          });
@@ -334,7 +365,7 @@
       onActionCancelEditing: function DocumentActions_onActionCancelEditing(asset)
       {
          var displayName = asset.displayName,
-            nodeRef = asset.nodeRef;
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
 
          this.modules.actions.genericAction(
          {
@@ -360,7 +391,7 @@
                name: "cancel-checkout/node/{nodeRef}",
                params:
                {
-                  nodeRef: nodeRef.replace(":/", "")
+                  nodeRef: nodeRef.uri
                }
             }
          });
@@ -376,7 +407,7 @@
       onActionUploadNewVersion: function DocumentActions_onActionUploadNewVersion(assets)
       {
          var displayName = assets.displayName,
-            nodeRef = assets.nodeRef,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
             version = assets.version;
 
          if (!this.fileUpload)
@@ -395,8 +426,6 @@
          
          var singleUpdateConfig =
          {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
             updateNodeRef: nodeRef,
             updateFilename: displayName,
             updateVersion: version,
@@ -414,6 +443,11 @@
                scope: this
             }
          };
+         if (this.options.workingMode == Alfresco.doclib.MODE_SITE)
+         {
+            singleUpdateConfig.siteId = this.options.siteId;
+            singleUpdateConfig.containerId = this.options.containerId;
+         }
          this.fileUpload.show(singleUpdateConfig);
       },
 
@@ -444,7 +478,8 @@
          var path = asset.location.path,
             fileName = asset.fileName,
             displayName = asset.displayName,
-            callbackUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
+            callbackUrl = this.options.workingMode == Alfresco.doclib.MODE_SITE ? "documentlibrary" : "repository",
             encodedPath = path.length > 1 ? "?path=" + window.escape(path) : "";
          
          this.modules.actions.genericAction(
@@ -477,13 +512,10 @@
             webscript:
             {
                method: Alfresco.util.Ajax.DELETE,
-               name: "file/site/{site}/{container}{path}/{file}",
+               name: "file/node/{nodeRef}",
                params:
                {
-                  site: this.options.siteId,
-                  container: this.options.containerId,
-                  path: Alfresco.util.encodeURIPath(path),
-                  file: encodeURIComponent(fileName)
+                  nodeRef: nodeRef.uri
                }
             }
          });

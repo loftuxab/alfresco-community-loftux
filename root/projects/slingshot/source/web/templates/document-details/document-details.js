@@ -63,7 +63,7 @@
           * nodeRef of document being viewed
           * 
           * @property nodeRef
-          * @type string
+          * @type Alfresco.util.NodeRef
           */
          nodeRef: null,
          
@@ -73,7 +73,15 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+
+         /**
+          * Root node if Repository-based library
+          * 
+          * @property rootNode
+          * @type Alfresco.util.NodeRef
+          */
+         rootNode: null
       },
 
       /**
@@ -96,11 +104,16 @@
        */
       onReady: function DocumentDetails_onReady()
       {
+         var url = Alfresco.constants.PROXY_URI + 'slingshot/doclib/doclist/node/' + this.options.nodeRef.uri;
+         if (this.options.siteId == "")
+         {
+            // Repository mode
+            url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
+         }
          var config =
          {
             method: "GET",
-            url: Alfresco.constants.PROXY_URI + 'slingshot/doclib/doclist/documents/node/' + 
-                 this.options.nodeRef.replace(":/", "") + '?filter=node',
+            url: url,
             successCallback: 
             { 
                fn: this._getDataSuccess, 
@@ -126,7 +139,8 @@
       {
          if (response.json !== undefined)
          {
-            var documentDetails = response.json.items[0],
+            var documentMetadata = response.json.metadata,
+               documentDetails = response.json.items[0],
                commentNode = documentDetails.nodeRef,
                workingCopyMode = false;
             
@@ -141,6 +155,12 @@
                // Show orignal's comments (read-only)
                // commentNode = documentDetails.custom.workingCopyOriginal;
             }
+
+            // Fire event with parent metadata
+            YAHOO.Bubbling.fire("doclistMetadata",
+            {
+               metadata: documentMetadata
+            });
 
             // Fire event to inform any listening components that the data is ready
             YAHOO.Bubbling.fire("documentDetailsAvailable",

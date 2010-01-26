@@ -2,14 +2,14 @@
    <@formLib.renderFormsRuntime formId=formId />
 </#if>
 
-<div id="${args.htmlid}-dialog" class="details">
-   <div id="${args.htmlid}-title" class="hd"></div>
+<div id="${args.htmlid}-dialog">
+   <div id="${args.htmlid}-dialogTitle" class="hd">${msg("title")}</div>
    <div class="bd">
 
       <div id="${formId}-container" class="form-container">
 
-         <div class="yui-u first edit-metadata flat-button">
-            <button id="${args.htmlid}-editMetadata" tabindex="0"></button>
+         <div class="yui-g">
+            <h2 id="${args.htmlid}-dialogHeader">${msg("header")}</h2>
          </div>
    
          <#if form.showCaption?exists && form.showCaption>
@@ -17,6 +17,10 @@
          </#if>
       
          <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl}">
+   
+         <#if form.destination??>
+            <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination}" />
+         </#if>
    
             <div id="${formId}-fields" class="form-fields">
                <#list form.structure as item>

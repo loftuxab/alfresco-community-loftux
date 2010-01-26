@@ -13,175 +13,40 @@
    
    <config>
       <forms>
-	      <default-controls>
-	         <type name="text" template="/org/alfresco/components/form/controls/textfield.ftl" />
-	         <type name="mltext" template="/org/alfresco/components/form/controls/textarea.ftl" />
-	         <type name="int" template="/org/alfresco/components/form/controls/textfield.ftl" />
-	         <type name="float" template="/org/alfresco/components/form/controls/textfield.ftl" />
-	         <type name="double" template="/org/alfresco/components/form/controls/textfield.ftl" />
-	         <type name="long" template="/org/alfresco/components/form/controls/textfield.ftl" />
-	         <type name="boolean" template="/org/alfresco/components/form/controls/checkbox.ftl" />
-	         <type name="date" template="/org/alfresco/components/form/controls/date.ftl" />
-	         <type name="datetime" template="/org/alfresco/components/form/controls/date.ftl">
-	            <control-param name="showTime">true</control-param>
-	         </type>
+         <default-controls>
+            <type name="text" template="/org/alfresco/components/form/controls/textfield.ftl" />
+            <type name="mltext" template="/org/alfresco/components/form/controls/textarea.ftl" />
+            <type name="int" template="/org/alfresco/components/form/controls/textfield.ftl" />
+            <type name="float" template="/org/alfresco/components/form/controls/textfield.ftl" />
+            <type name="double" template="/org/alfresco/components/form/controls/textfield.ftl" />
+            <type name="long" template="/org/alfresco/components/form/controls/textfield.ftl" />
+            <type name="boolean" template="/org/alfresco/components/form/controls/checkbox.ftl" />
+            <type name="date" template="/org/alfresco/components/form/controls/date.ftl" />
+            <type name="datetime" template="/org/alfresco/components/form/controls/date.ftl">
+               <control-param name="showTime">true</control-param>
+            </type>
              <type name="period" template="/org/alfresco/components/form/controls/period.ftl" />
-	         <type name="any" template="/org/alfresco/components/form/controls/textfield.ftl" />
-	         <type name="category" template="/org/alfresco/components/form/controls/category.ftl" />
-	         <type name="association" template="/org/alfresco/components/form/controls/association.ftl" />
+            <type name="any" template="/org/alfresco/components/form/controls/textfield.ftl" />
+            <type name="category" template="/org/alfresco/components/form/controls/category.ftl" />
+            <type name="association" template="/org/alfresco/components/form/controls/association.ftl" />
             <type name="content" template="/org/alfresco/components/form/controls/content.ftl" />
-	         <!-- Data types that should always be rendered read-only -->
-	         <type name="qname" template="/org/alfresco/components/form/controls/readonly.ftl" />
-	         <type name="noderef" template="/org/alfresco/components/form/controls/readonly.ftl" />
-	         <type name="childassocref" template="/org/alfresco/components/form/controls/readonly.ftl" />
-	         <type name="assocref" template="/org/alfresco/components/form/controls/readonly.ftl" />
-	         <type name="path" template="/org/alfresco/components/form/controls/readonly.ftl" />
-	         <type name="locale" template="/org/alfresco/components/form/controls/readonly.ftl" />
-	      </default-controls>
-	      <constraint-handlers>
-	         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
-	         <constraint type="NUMBER" validation-handler="Alfresco.forms.validation.number" event="keyup" />
-	         <constraint type="MINMAX" validation-handler="Alfresco.forms.validation.numberRange" event="keyup" />
-	         <constraint type="LIST" validation-handler="Alfresco.forms.validation.inList" event="blur" />
-	         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.repoRegexMatch" event="keyup" />
-	         <constraint type="LENGTH" validation-handler="Alfresco.forms.validation.length" event="keyup" />
-	      </constraint-handlers>
+            <!-- Data types that should always be rendered read-only -->
+            <type name="qname" template="/org/alfresco/components/form/controls/readonly.ftl" />
+            <type name="noderef" template="/org/alfresco/components/form/controls/readonly.ftl" />
+            <type name="childassocref" template="/org/alfresco/components/form/controls/readonly.ftl" />
+            <type name="assocref" template="/org/alfresco/components/form/controls/readonly.ftl" />
+            <type name="path" template="/org/alfresco/components/form/controls/readonly.ftl" />
+            <type name="locale" template="/org/alfresco/components/form/controls/readonly.ftl" />
+         </default-controls>
+         <constraint-handlers>
+            <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
+            <constraint type="NUMBER" validation-handler="Alfresco.forms.validation.number" event="keyup" />
+            <constraint type="MINMAX" validation-handler="Alfresco.forms.validation.numberRange" event="keyup" />
+            <constraint type="LIST" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+            <constraint type="REGEX" validation-handler="Alfresco.forms.validation.repoRegexMatch" event="keyup" />
+            <constraint type="LENGTH" validation-handler="Alfresco.forms.validation.length" event="keyup" />
+         </constraint-handlers>
       </forms>
    </config>
-   
-   <!-- Default form configuration for the cm:content type -->
-   <config evaluator="node-type" condition="cm:content">
-      <forms>
-         <form>
-            <field-visibility>
-               <show id="cm:name" />
-               <show id="cm:title" force="true" />
-               <show id="cm:description" force="true" />
-               <show id="mimetype" />
-               <show id="cm:author" force="true" />
-               <show id="size" for-mode="view" />
-               <show id="cm:creator" for-mode="view" />
-               <show id="cm:created" for-mode="view" />
-               <show id="cm:modifier" for-mode="view" />
-               <show id="cm:modified" for-mode="view" />
-               
-               <!-- tags and categories -->
-               <show id="cm:taggable" for-mode="edit" force="true" />
-               <show id="cm:categories" />
-               
-               <!-- cm:dublincore aspect -->
-               <show id="cm:publisher"/>
-               <show id="cm:contributor"/>
-               <show id="cm:type"/>
-               <show id="cm:identifier"/>
-               <show id="cm:dcsource"/>
-               <show id="cm:coverage"/>
-               <show id="cm:rights"/>
-               <show id="cm:subject"/>
-               
-               <!-- cm:complianceable aspect -->
-               <show id="cm:removeAfter" />
-               
-               <!-- cm:effectivity aspect -->
-               <show id="cm:from"/>
-               <show id="cm:to"/>
-               
-               <!--  cm:summarizable aspect -->
-               <show id="cm:summary" />
-               
-               <!-- cm:translatable aspect -->
-               <show id="cm:translations" />
-               
-               <!-- cm:localizable aspect -->
-               <show id="cm:locale" />
-               
-               <!-- cm:ownable aspect -->
-               <show id="cm:owner" />
-               
-               <!-- cm:attachable aspect -->
-               <show id="cm:attachments" />
-               
-               <!-- cm:emailed aspect -->
-               <show id="cm:originator" />
-               <show id="cm:addressee" />
-               <show id="cm:addressees" />
-               <show id="cm:sentdate" />
-               <show id="cm:subjectline" />
-            </field-visibility>
-            <appearance>
-               <field id="cm:title">
-                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
-               </field>
-               <field id="cm:description">
-                  <control>
-                     <control-param name="activateLinks">true</control-param>
-                  </control>
-               </field>
-               <field id="mimetype">
-                  <control template="/org/alfresco/components/form/controls/mimetype.ftl" />
-               </field>
-               <field id="size">
-                  <control template="/org/alfresco/components/form/controls/size.ftl" />
-               </field>
-               <field id="cm:taggable">
-                  <control>
-                     <control-param name="compactMode">true</control-param>
-                     <control-param name="params">aspect=cm:taggable</control-param>
-                     <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
-                     <control-param name="createNewItemIcon">tag</control-param>
-                  </control>
-               </field>
-               <field id="cm:categories">
-                  <control>
-                     <control-param name="compactMode">true</control-param>
-                  </control>
-               </field>
-               <field id="cm:originator" read-only="true" />
-               <field id="cm:addressee" read-only="true" />
-               <field id="cm:addressees" read-only="true" />
-               <field id="cm:sentdate" read-only="true" />
-               <field id="cm:subjectline" read-only="true" />
-            </appearance>
-         </form>
-      </forms>
-   </config>
-   
-   <!-- Default form configuration for the cm:folder type -->
-   <config evaluator="node-type" condition="cm:folder">
-      <forms>
-         <form>
-            <field-visibility>
-               <show id="cm:name" />
-               <show id="cm:title" force="true" />
-               <show id="cm:description" force="true" />
 
-               <!-- tags and categories -->
-               <show id="cm:taggable" for-mode="edit" force="true" />
-               <show id="cm:categories" />
-            </field-visibility>
-            <appearance>
-               <field id="cm:title">
-                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
-               </field>
-               <field id="cm:description">
-                  <control>
-                     <control-param name="activateLinks">true</control-param>
-                  </control>
-               </field>
-               <field id="cm:taggable">
-                  <control>
-                     <control-param name="compactMode">true</control-param>
-                     <control-param name="params">aspect=cm:taggable</control-param>
-                     <control-param name="createNew">true</control-param>
-                  </control>
-               </field>
-               <field id="cm:categories">
-                  <control>
-                     <control-param name="compactMode">true</control-param>
-                  </control>
-               </field>
-            </appearance>
-          </form>
-      </forms>
-   </config>
 </alfresco-config>

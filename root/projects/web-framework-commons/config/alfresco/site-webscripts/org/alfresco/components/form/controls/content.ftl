@@ -21,8 +21,9 @@
          formMode: "${form.mode}",
          nodeRef: "${context.properties.nodeRef!""}",
          mimeType: "${context.properties.mimeType!""}",
-         <#if field.control.params.plainMimeTypes?exists>plainMimeTypes: "${field.control.params.plainMimeTypes}",</#if>
-         <#if field.control.params.richMimeTypes?exists>richMimeTypes: "${field.control.params.richMimeTypes}",</#if>
+         <#if field.control.params.plainMimeTypes??>plainMimeTypes: "${field.control.params.plainMimeTypes}",</#if>
+         <#if field.control.params.richMimeTypes??>richMimeTypes: "${field.control.params.richMimeTypes}",</#if>
+         <#if field.control.params.forceEditor??>forceEditor: ${field.control.params.forceEditor},</#if>
          editorParameters:
          {
             height: ${height},

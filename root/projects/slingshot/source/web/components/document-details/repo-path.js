@@ -67,7 +67,7 @@
          var docData = args[1].documentDetails,
             pathHtml = "",
             rootLinkUrl = $combine(Alfresco.constants.URL_PAGECONTEXT, "repository"),
-            baseLinkUrl = $combine(Alfresco.constants.URL_PAGECONTEXT, "repository?{file}path="),
+            baseLinkUrl = rootLinkUrl + "?{file}path=",
             pathUrl = "/";
          
          var path = docData.location.path;
@@ -77,7 +77,7 @@
          {
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               file: "file=" + encodeURIComponent(docData.fileName)
+               file: "file=" + encodeURIComponent(docData.fileName) + "&"
             });
             pathHtml += '">' + this.msg("path.repository") + '</a></span>';
          }

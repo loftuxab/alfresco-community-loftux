@@ -156,6 +156,22 @@
    background-image: url(images/detailed-view-on-16.png);
 }
 
+/* Forms */
+.form-container .form-fields
+{
+   border-bottom: medium none;
+   padding: 1em;
+}
+
+/* Details Form */
+
+.form-container .edit-metadata a
+{
+   background: transparent url(images/edit-metadata-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
+}
+
+
 /* Data Table */
 
 .doclist .documents table
@@ -618,6 +634,16 @@
 .doclist .onActionLocate a
 {
    background-image: url(images/locate-item-16.png);
+}
+
+.doclist .onActionInlineEdit a
+{
+   background-image: url(images/inline-edit-16.png);
+}
+
+.doclist .onActionExplorerView a
+{
+   background-image: url(images/view-alfresco-explorer-16.png);
 }
 
 

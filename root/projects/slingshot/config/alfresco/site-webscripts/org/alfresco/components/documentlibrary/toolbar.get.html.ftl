@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new ${jsObject!"Alfresco.DocListToolbar"}("${args.htmlid}").setOptions(
+   new Alfresco.DocListToolbar("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
       hideNavBar: ${(preferences.hideNavBar!false)?string}

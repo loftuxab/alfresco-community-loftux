@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2009 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -49,26 +49,19 @@
    YAHOO.extend(Alfresco.RepositoryDocumentActions, Alfresco.DocumentActions,
    {
       /**
-       * The urls to be used when creating links in the action cell
+       * Set multiple initialization options at once.
        *
+       * @method setOptions
        * @override
-       * @method getActionUrls
-       * @return {object} Object literal containing URLs to be substituted in action placeholders
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.RepositoryDocumentActions} returns 'this' for method chaining
        */
-      getActionUrls: function RepositoryDocumentActions_getActionUrls()
+      setOptions: function RepositoryDocumentActions_setOptions(obj)
       {
-         var urlContext = Alfresco.constants.URL_PAGECONTEXT + "/",
-            nodeRef = this.assetData.nodeRef;
-
-         return (
+         return Alfresco.RepositoryDocumentActions.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
-            downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
-            viewUrl:  Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "\" target=\"_blank",
-            documentDetailsUrl: urlContext + "document-details?nodeRef=" + nodeRef,
-            editMetadataUrl: urlContext + "edit-metadata?nodeRef=" + nodeRef,
-            workingCopyUrl: urlContext + "document-details?nodeRef=" + (this.assetData.custom.workingCopyNode || nodeRef),
-            originalUrl: urlContext + "document-details?nodeRef=" + (this.assetData.custom.workingCopyOriginal || nodeRef)
-         });
+            workingMode: Alfresco.doclib.MODE_REPOSITORY
+         }, obj));
       }
    });
 })();

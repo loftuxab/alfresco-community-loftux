@@ -38,7 +38,7 @@
    <script type="text/javascript">//<![CDATA[
    new Alfresco.RecordsFolderDetails().setOptions(
    {
-      nodeRef: "${url.args.nodeRef}",
+      nodeRef: new Alfresco.util.NodeRef("${url.args.nodeRef}"),
       siteId: "${page.url.templateArgs.site!""}"
    });
    //]]></script>

@@ -194,6 +194,12 @@
                success: function DLT_lND_success(oResponse)
                {
                   var results = YAHOO.lang.JSON.parse(oResponse.responseText), item, treeNode;
+                  
+                  // Update parent node's nodeRef if we didn't have it before
+                  if (results.parent && node.data.nodeRef.length == 0)
+                  {
+                     node.data.nodeRef = results.parent.nodeRef;
+                  }
 
                   if (results.items)
                   {
@@ -487,11 +493,13 @@
       onFolderCreated: function DLT_onFolderCreated(layer, args)
       {
          var obj = args[1];
-         if (obj && (obj.parentPath !== null))
+         if (obj && (obj.parentNodeRef !== null))
          {
-            // ensure path starts with leading slash
-            var parentNode = this.widgets.treeview.getNodeByProperty("path", $combine("/", obj.parentPath));
-            this._sortNodeChildren(parentNode);
+            var parentNode = this.widgets.treeview.getNodeByProperty("nodeRef", obj.parentNodeRef);
+            if (parentNode !== null)
+            {
+               this._sortNodeChildren(parentNode);
+            }
          }
       },
 

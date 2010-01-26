@@ -4,5 +4,7 @@
    <region-id>tags</region-id>
    <source-id>documentlibrary</source-id>
    <url>/components/tag-filter</url>
-   <properties></properties>   
+   <properties>
+      <scoped>true</scoped>
+   </properties>   
 </component>

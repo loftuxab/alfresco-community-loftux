@@ -67,7 +67,7 @@
          var folderData = args[1].folderDetails,
             pathHtml = "",
             rootLinkUrl = $combine(Alfresco.constants.URL_PAGECONTEXT, "repository"),
-            baseLinkUrl = $combine(Alfresco.constants.URL_PAGECONTEXT, "repository?{file}path="),
+            baseLinkUrl = rootLinkUrl + "?{file}path=",
             pathUrl = "/",
             folders = [];
          
@@ -79,7 +79,7 @@
             // Root node link to contain current folder highlight parameter
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               file: "file=" + encodeURIComponent(folderData.fileName)
+               file: "file=" + encodeURIComponent(folderData.fileName) + "&"
             });
             pathHtml += '">' + this.msg("path.repository") + '</a></span>';
          }

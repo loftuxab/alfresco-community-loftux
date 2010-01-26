@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RepositoryFolderActions("${args.htmlid}").setMessages(
+   new Alfresco.RepositoryFolderActions("${args.htmlid}").setOptions(
+   {
+      <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}"</#if>
+   }).setMessages(
       ${messages}
    );
 //]]></script>

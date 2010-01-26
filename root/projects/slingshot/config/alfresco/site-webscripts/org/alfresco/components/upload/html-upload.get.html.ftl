@@ -9,6 +9,7 @@
          <fieldset>
          <input type="hidden" id="${args.htmlid}-siteId-hidden" name="siteId" value=""/>
          <input type="hidden" id="${args.htmlid}-containerId-hidden" name="containerId" value=""/>
+         <input type="hidden" id="${args.htmlid}-destination-hidden" name="destination" value=""/>
          <input type="hidden" id="${args.htmlid}-username-hidden" name="username" value=""/>
          <input type="hidden" id="${args.htmlid}-updateNodeRef-hidden" name="updateNodeRef" value=""/>
          <input type="hidden" id="${args.htmlid}-uploadDirectory-hidden" name="uploadDirectory" value=""/>

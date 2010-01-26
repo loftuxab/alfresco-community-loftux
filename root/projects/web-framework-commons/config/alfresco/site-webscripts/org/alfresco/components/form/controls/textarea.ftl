@@ -20,6 +20,6 @@
       <textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" columns="${columns}"
                 <#if field.description?exists>title="${field.description}"</#if>
                 <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
-                <#if field.disabled>disabled="true"</#if>>${field.value}</textarea>
+                <#if field.disabled>disabled="true"</#if>>${field.value?html}</textarea>
    </#if>
 </div>

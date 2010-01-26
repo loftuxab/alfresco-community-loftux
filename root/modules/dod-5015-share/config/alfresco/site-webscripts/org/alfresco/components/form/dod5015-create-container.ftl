@@ -2,7 +2,7 @@
    <@formLib.renderFormsRuntime formId=formId />
 </#if>
 
-<div id="${args.htmlid}-dialog" class="create-folder">
+<div id="${args.htmlid}-dialog">
    <div id="${args.htmlid}-dialogTitle" class="hd">${msg("title")}</div>
    <div class="bd">
 
@@ -22,20 +22,20 @@
             <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination}" />
          </#if>
    
-         <div id="${formId}-fields" class="form-fields">
-            <#list form.structure as item>
-               <#if item.kind == "set">
-                  <@formLib.renderSet set=item />
-               <#else>
-                  <@formLib.renderField field=form.fields[item.id] />
-               </#if>
-            </#list>
-         </div>
+            <div id="${formId}-fields" class="form-fields">
+               <#list form.structure as item>
+                  <#if item.kind == "set">
+                     <@formLib.renderSet set=item />
+                  <#else>
+                     <@formLib.renderField field=form.fields[item.id] />
+                  </#if>
+               </#list>
+            </div>
 
-         <div class="bdft">
-            <input id="${formId}-submit" type="submit" value="${msg("form.button.submit.label")}" />
-            &nbsp;<input id="${formId}-cancel" type="button" value="${msg("form.button.cancel.label")}" />
-         </div>
+            <div class="bdft">
+               <input id="${formId}-submit" type="submit" value="${msg("form.button.submit.label")}" />
+               &nbsp;<input id="${formId}-cancel" type="button" value="${msg("form.button.cancel.label")}" />
+            </div>
       
          </form>
 

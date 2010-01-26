@@ -32,9 +32,8 @@
 (function()
 {
    /**
-    * Alfresco.doclib namespace
+    * Alfresco.doclib.RecordsActions namespace
     */
-   Alfresco.doclib = Alfresco.doclib || {};
    Alfresco.doclib.RecordsActions = {};
 
    /**

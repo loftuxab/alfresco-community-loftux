@@ -163,6 +163,7 @@ var Evaluator =
             if (previousAction == "cutoff")
             {
                permissions["undo-cutoff"] = true;
+               delete permissions["cutoff"];
             }
          }
       }

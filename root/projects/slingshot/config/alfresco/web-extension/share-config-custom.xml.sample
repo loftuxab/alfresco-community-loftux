@@ -46,6 +46,7 @@
             <aspect name="cm:emailed" />
             <aspect name="emailserver:aliasable" />
             <aspect name="cm:taggable" />
+            <aspect name="app:inlineeditable" />
          </visible>
 
          <!-- Aspects that a user can add. Same as "visible" if left empty -->
@@ -77,6 +78,12 @@
             <subtype name="cm:myfoldersubtype" />
          </type>
       </types>
+
+      <!--
+         If set, will present a WebDAV link for the current item on the Document and Folder details pages.
+         Also used to generate the "View in Alfresco Explorer" action for folders.
+      -->
+      <repository-url>http://localhost:8080/alfresco</repository-url>
    </config>
 
    <!-- Repository Library config section -->
@@ -89,7 +96,7 @@
       <!--
          Root nodeRef for top-level folder.
       -->
-      <rootNode>alfresco://company/home</rootNode>
+      <root-node>alfresco://company/home</root-node>
 
       <!--
          Whether the folder Tree component should enumerate child folders or not.

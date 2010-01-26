@@ -326,7 +326,7 @@
                   YAHOO.Bubbling.fire("folderCreated",
                   {
                      name: folderName,
-                     parentPath: this.currentPath
+                     parentNodeRef: destination
                   });
                   Alfresco.util.PopupManager.displayMessage(
                   {

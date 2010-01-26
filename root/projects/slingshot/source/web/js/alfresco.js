@@ -129,7 +129,11 @@ Alfresco.admin = Alfresco.admin || {};
  * @namespace Alfresco
  * @class Alfresco.doclib
  */
-Alfresco.doclib = Alfresco.doclib || {};
+Alfresco.doclib = Alfresco.doclib ||
+{
+   MODE_SITE: 0,
+   MODE_REPOSITORY: 1
+};
 
 /**
  * Alfresco top-level messages namespace.
@@ -318,7 +322,8 @@ Alfresco.util.assertNotEmpty = function(param, message)
 };
 
 /**
- * Append multiple parts of a path, ensuring duplicate path separators are removed
+ * Append multiple parts of a path, ensuring duplicate path separators are removed.
+ * Leaves "://" patterns intact so URIs and nodeRefs are safe to pass through.
  *
  * @method Alfresco.util.combinePaths
  * @param path1 {string} First path
@@ -333,9 +338,9 @@ Alfresco.util.combinePaths = function()
    var path = "", i, ii;
    for (i = 0, ii = arguments.length; i < ii; i++)
    {
-      path += arguments[i] + "/";
+      path += arguments[i] + (arguments[i] !== "/" ? "/" : "");
    }
-   return path.substring(0, path.length - 1).replace(/\/{2,}/g, "/");
+   return path.substring(0, path.length - 1).replace(/(^|[^:])\/{2,}/g, "$1/");
 };
 
 /**
@@ -3321,7 +3326,11 @@ Alfresco.util.Anim = function()
          storeType: this.storeType,
          storeId: this.storeId,
          id: this.id,
-         uri: this.uri
+         uri: this.uri,
+         toString: function()
+         {
+            return this.nodeRef;
+         }
       });
    };
 })();
@@ -4340,7 +4349,9 @@ Alfresco.util.RichEditor = function(editorName,id,config)
        */
       onFilterChanged: function BaseFilter_onFilterChanged(layer, args)
       {
-         var obj = args[1];
+         var obj = Alfresco.util.cleanBubblingObject(args[1]),
+            filterFound = false;
+         
          if ((obj !== null) && (obj.filterId !== null))
          {
             obj.filterOwner = obj.filterOwner || Alfresco.util.FilterManager.getOwner(obj.filterId);
@@ -4360,6 +4371,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                   // This component now owns the active filter
                   this.selectedFilter = candidates[0].parentNode;
                   YUIDom.addClass(this.selectedFilter, "selected");
+                  filterFound = true;
                }
                else if (candidates.length > 1)
                {
@@ -4377,6 +4389,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                            // This component now owns the active filter
                            this.selectedFilter = candidates[i].parentNode;
                            YUIDom.addClass(this.selectedFilter, "selected");
+                           filterFound = true;
                         }
                      }
                   }
@@ -4388,8 +4401,15 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                         // This component now owns the active filter
                         this.selectedFilter = candidates[0].parentNode.parentNode;
                         YUIDom.addClass(this.selectedFilter, "selected");
+                        filterFound = true;
                      }
                   }
+               }
+               
+               if (!filterFound)
+               {
+                  // Optional per-filter "filterId not found" handling
+                  this.handleFilterIdNotFound(obj);
                }
             }
             else
@@ -4401,6 +4421,17 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                }
             }
          }
+      },
+
+      /**
+       * Called if this filter is the owner, but the filterId could be found in the DOM
+       *
+       * @method handleFilterIdNotFound
+       * @param filter {object} New filter trying to be set
+       */
+      handleFilterIdNotFound: function BaseFilter_handleFilterIdNotFound(filter)
+      {
+         // Default handling: no implementation
       },
 
       /**

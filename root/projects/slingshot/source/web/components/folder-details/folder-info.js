@@ -50,7 +50,7 @@
     */
    Alfresco.FolderInfo = function(htmlId)
    {
-      Alfresco.RepositoryFolderInfo.superclass.constructor.call(this, "Alfresco.FolderInfo", htmlId);
+      Alfresco.FolderInfo.superclass.constructor.call(this, "Alfresco.FolderInfo", htmlId);
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
@@ -58,7 +58,7 @@
       return this;
    };
    
-   YAHOO.extend(Alfresco.FolderInfo.prototype, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.FolderInfo, Alfresco.component.Base,
    {
       /**
        * Event handler called when the "folderDetailsAvailable" event is received

@@ -80,6 +80,7 @@
       {
          siteId: null,
          containerId: null,
+         destination: null,
          uploadDirectory: null,
          updateNodeRef: null,
          updateFilename: null,
@@ -492,6 +493,7 @@
        * {
        *    siteId: {string},        // site to upload file(s) to
        *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
+       *    destination: {string},   // destination nodeRef to upload to if not using site & container
        *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
        *    updateNodeRef: {string}, // nodeRef to the document that should be updated
        *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
@@ -1495,10 +1497,20 @@
                
                attributes =
                {
-                  siteId: this.showConfig.siteId,
-                  containerId: this.showConfig.containerId,
                   username: this.showConfig.username
                };
+
+               // Site or Non-site (Repository) mode
+               if (this.showConfig.siteId !== null)
+               {
+                  attributes.siteId = this.showConfig.siteId;
+                  attributes.containerId = this.showConfig.containerId;
+               }
+               else
+               {
+                  attributes.destination = this.showConfig.destination
+               }
+               
                if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
                {         
                   attributes.updateNodeRef = this.showConfig.updateNodeRef;
@@ -1507,7 +1519,10 @@
                }
                else
                {
-                  attributes.uploadDirectory = this.showConfig.uploadDirectory;
+                  if (this.showConfig.uploadDirectory !== null)
+                  {
+                     attributes.uploadDirectory = this.showConfig.uploadDirectory;
+                  }
                   if (fileInfo.contentType)
                   {
                      if (fileInfo.contentType.tagName.toLowerCase() == "select")

@@ -35,7 +35,8 @@
  * var htmlUpload = Alfresco.getHtmlUploadInstance();
  * var multiUploadConfig =
  * {
- *    siteId: siteId, *    containerId: doclibContainerId,
+ *    siteId: siteId,
+ *    containerId: doclibContainerId,
  *    path: docLibUploadPath,
  *    filter: [],
  *    mode: htmlUpload.MODE_MULTI_UPLOAD,
@@ -73,6 +74,7 @@
       {
          siteId: null,
          containerId: null,
+         destination: null,
          uploadDirectory: null,
          updateNodeRef: null,
          updateFilename: null,
@@ -160,6 +162,7 @@
          this.widgets.filedata.contentEditable = false;
          this.widgets.siteId = Dom.get(this.id + "-siteId-hidden");
          this.widgets.containerId = Dom.get(this.id + "-containerId-hidden");
+         this.widgets.destination = Dom.get(this.id + "-destination-hidden");
          this.widgets.username = Dom.get(this.id + "-username-hidden");
          this.widgets.updateNodeRef = Dom.get(this.id + "-updateNodeRef-hidden");
          this.widgets.uploadDirectory = Dom.get(this.id + "-uploadDirectory-hidden");
@@ -239,6 +242,7 @@
        * {
        *    siteId: {string},        // site to upload file(s) to
        *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
+       *    destination: {string},   // destination nodeRef to upload to if not using site & container
        *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
        *    updateNodeRef: {string}, // nodeRef to the document that should be updated
        *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
@@ -323,11 +327,11 @@
          this.widgets.feedbackMessage.destroy();
 
          // Inform user that the upload failed
-         var key = "message.failure." + event.status.code,
+         var key = "message.failure." + e.status.code,
             text = Alfresco.util.message(key, this.name);
-         if(text == key)
+         if (text == key)
          {
-            text = event.status.code ? event.status.code : Alfresco.util.message("message.failure", this.name);
+            text = e.status.code ? e.status.code : Alfresco.util.message("message.failure", this.name);
          }
          Alfresco.util.PopupManager.displayPrompt(
          {
@@ -430,6 +434,7 @@
          // Set the hidden parameters
          this.widgets.siteId.value = this.showConfig.siteId;
          this.widgets.containerId.value = this.showConfig.containerId;
+         this.widgets.destination.value = this.showConfig.destination;
          this.widgets.username.value = this.showConfig.username;
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {

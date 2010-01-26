@@ -720,7 +720,7 @@
          html += ' ' + this.msg("comment.said") + ':';
          if (data.isUpdated)
          {
-            html += '<span class="theme-color-2 nodeStatus">(' + this.msg("comment.updated") + ')</span>';
+            html += '<span class="theme-color-2 nodeStatus"> (' + this.msg("comment.updated") + ')</span>';
          }
          html += '</div>';
          html += '<div class="content yuieditor">' + data.content + '</div>';

@@ -256,7 +256,7 @@
             // First get the parent nodeRef
             Alfresco.util.Ajax.jsonGet(
             {
-               url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/doclist/documents/node/" + this.options.nodeRef.replace(":/", "") + "?filter=node",
+               url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/doclist/node/" + this.options.nodeRef.replace(":/", ""),
                successCallback:
                {
                   fn: function (response)

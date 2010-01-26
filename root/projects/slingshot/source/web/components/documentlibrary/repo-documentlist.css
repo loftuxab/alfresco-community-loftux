@@ -20,10 +20,3 @@
 .doclist .documents .detail a.category-link span
 {
 }
-
-/* Forms */
-.form-container .form-fields
-{
-   border-bottom: medium none;
-   padding: 1em;
-}
