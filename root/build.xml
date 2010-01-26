@@ -119,7 +119,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-discovery-0.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-httpclient-3.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-io-1.1.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-io-1.4.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-jxpath-1.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-lang-2.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-logging-1.1.jar" />
@@ -149,11 +149,11 @@
          <pathelement location="${dir.project.3rdparty.lib}/jibx/jibx-run.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jmagick/JMagick.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/openoffice/jut.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-juh-2.0.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-jurt-2.0.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-ridl-2.0.3.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-juh-3.1.0.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-jurt-3.1.0.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-ridl-3.1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-sandbox-2.0.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-unoil-2.0.3.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-unoil-3.1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/openoffice/xstream-1.2.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xalan/serializer.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xalan/xalan.jar" />
