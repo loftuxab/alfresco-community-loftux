@@ -38,12 +38,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.alfresco.VtiUtils;
+import org.alfresco.repo.webdav.LockInfo;
 import org.alfresco.repo.webdav.PropFindMethod;
 import org.alfresco.repo.webdav.WebDAV;
 import org.alfresco.repo.webdav.WebDAVHelper;
 import org.alfresco.repo.webdav.WebDAVServerException;
-import org.alfresco.service.cmr.lock.LockService;
-import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -559,14 +558,14 @@ public class PropfindMethod extends PropFindMethod
     {
         // Get the lock status for the node
 
-        LockService lockService = getLockService();
-        LockStatus lockSts = lockService.getLockStatus(node);
+        LockInfo lockInfo = getNodeLockInfo(node);
 
-        // Output the lock status reponse
+        // Output the lock status response
 
-        if (lockSts != LockStatus.NO_LOCK)
+
+        if (lockInfo.isLocked())
         {
-            generateLockDiscoveryXML(xml, node);
+            generateLockDiscoveryXML(xml, node, lockInfo);
         }
         else
         {
