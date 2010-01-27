@@ -61,7 +61,7 @@ namespace AlfrescoExcel2003.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to http://www.alfresco.com/help/32/enterprise/msaddin/.
+        ///   Looks up a localized string similar to http://www.alfresco.com/help/32/labs/msaddin/.
         /// </summary>
         internal static string HelpURL {
             get {

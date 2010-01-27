@@ -352,7 +352,7 @@ namespace AlfrescoPowerPoint2003
                   {
                      File.Delete(strTempFile);
                   }
-                  catch (Exception e)
+                  catch (Exception)
                   {
                      strTempFile = Path.GetTempFileName();
                   }
