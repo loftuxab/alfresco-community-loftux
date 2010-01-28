@@ -11,7 +11,7 @@
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
       <#if field.control.params.options?exists && field.control.params.options != "">
-         <select id="${fieldHtmlId}" name="${field.name}" 
+         <select id="${fieldHtmlId}" name="${field.name}" tabindex="0"
                <#if field.description?exists>title="${field.description}"</#if>
                <#if field.control.params.size?exists>size="${field.control.params.size}"</#if> 
                <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>

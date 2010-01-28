@@ -133,6 +133,12 @@ textarea
    width: 100%;
 }
 
+.doclist div.simple div.more-actions
+{
+   margin-top: 1px;
+   z-index: 1;
+}
+
 .workflow .people-selected
 {
    height: 206px;
@@ -185,4 +191,14 @@ table .yui-dt-empty
 .taglibrary .bottom_taglist
 {
    margin-right: 22px;
+}
+
+/* Object Finder */
+.object-finder .picker-items
+{
+   padding-right: 20px !important;
+}
+.object-finder .picker-items table
+{
+   margin-right: -20px !important;
 }

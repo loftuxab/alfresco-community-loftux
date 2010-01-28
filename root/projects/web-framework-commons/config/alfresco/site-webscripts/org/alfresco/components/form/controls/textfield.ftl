@@ -14,7 +14,7 @@
       </div>
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-      <input id="${fieldHtmlId}" type="text" name="${field.name}" 
+      <input id="${fieldHtmlId}" type="text" name="${field.name}" tabindex="0"
              <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
              <#if field.value?is_number>value="${field.value?c}"<#else>value="${field.value?html}"</#if>
              <#if field.description?exists>title="${field.description}"</#if>

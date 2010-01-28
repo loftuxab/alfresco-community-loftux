@@ -17,7 +17,7 @@
       </div>
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-      <textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" columns="${columns}"
+      <textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" columns="${columns}" tabindex="0"
                 <#if field.description?exists>title="${field.description}"</#if>
                 <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
                 <#if field.disabled>disabled="true"</#if>>${field.value?html}</textarea>

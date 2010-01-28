@@ -97,6 +97,7 @@
    height: 20em;
    overflow-x: auto;
    overflow-y: scroll;
+   position: relative;
 }
 
 .object-finder .picker-items h3

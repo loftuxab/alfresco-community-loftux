@@ -150,7 +150,7 @@
                page: "folder-details",
                pageParams:
                {
-                  nodeRef: this.options.nodeRef
+                  nodeRef: this.options.nodeRef.toString()
                }
             });
          }

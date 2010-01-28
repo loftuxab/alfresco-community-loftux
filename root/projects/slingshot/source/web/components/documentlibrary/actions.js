@@ -93,6 +93,7 @@
             width: "40em",
             templateUrl: templateUrl,
             actionUrl: null,
+            destroyOnHide: true,
             doBeforeDialogShow:
             {
                fn: doBeforeDialogShow,

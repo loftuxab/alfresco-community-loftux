@@ -2018,8 +2018,7 @@ Alfresco.util.PopupManager = function()
          {
             throw new Error("Property text in userConfig must be set");
          }
-         // Construct the YUI Dialog that will display the message
-         var message = new YAHOO.widget.Dialog("message",
+         var dialogConfig =
          {
             modal: false,
             visible: c.visible,
@@ -2031,7 +2030,14 @@ Alfresco.util.PopupManager = function()
                duration: c.effectDuration
             },
             zIndex: this.zIndex++
-         });
+         };
+         // IE browsers don't deserve fading, as they can't handle it properly
+         if (YAHOO.env.ua.ie > 0)
+         {
+            delete dialogConfig.effect;
+         }
+         // Construct the YUI Dialog that will display the message
+         var message = new YAHOO.widget.Dialog("message", dialogConfig);
 
          // Set the message that should be displayed
          var bd =  "<span class='" + c.spanClass + "'>" + (c.noEscape ? c.text : $html(c.text)) + "</span>";

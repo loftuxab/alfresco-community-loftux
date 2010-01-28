@@ -14,7 +14,7 @@
       <label for="${fieldHtmlId}-entry">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
       <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="${field.value?string}" />
       <#if field.control.params.options?exists && field.control.params.options != "">
-         <select id="${fieldHtmlId}-entry" name="-" multiple="multiple" size="${size}"
+         <select id="${fieldHtmlId}-entry" name="-" multiple="multiple" size="${size}" tabindex="0"
                onchange="javascript:Alfresco.util.updateMultiSelectListValue('${fieldHtmlId}-entry', '${fieldHtmlId}', <#if field.mandatory>true<#else>false</#if>);"
                <#if field.description?exists>title="${field.description}"</#if> 
                <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>

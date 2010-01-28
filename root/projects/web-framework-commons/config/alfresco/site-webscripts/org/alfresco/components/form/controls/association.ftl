@@ -8,14 +8,14 @@
    <@renderPickerJS field "picker" />
    picker.setOptions(
    {
+   <#if field.control.params.showTargetLink??>
+      showLinkToTarget: ${field.control.params.showTargetLink},
+      targetLinkTemplate: "${url.context}/page/site/${page.url.templateArgs.site!""}/document-details?nodeRef={nodeRef}",
+   </#if>
       itemType: "${field.endpointType}",
       multipleSelectMode: ${field.endpointMany?string},
       parentNodeRef: "alfresco://company/home",
       itemFamily: "node"
-      <#if field.control.params.showTargetLink?exists>
-      , showLinkToTarget: ${field.control.params.showTargetLink},
-      targetLinkTemplate: "${url.context}/page/site/${page.url.templateArgs.site!""}/document-details?nodeRef={nodeRef}"
-      </#if>
    });
 })();
 //]]></script>
@@ -23,7 +23,7 @@
 <div class="form-field">
    <#if form.mode == "view">
       <div id="${controlId}" class="viewmode-field">
-         <#if field.endpointMandatory && field.value == "">
+         <#if (field.endpointMandatory || field.mandatory) && field.value == "">
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
