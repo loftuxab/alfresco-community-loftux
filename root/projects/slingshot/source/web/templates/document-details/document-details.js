@@ -178,7 +178,7 @@
                page: "document-details",
                pageParams:
                {
-                  nodeRef: this.options.nodeRef
+                  nodeRef: this.options.nodeRef.toString()
                }
             });
          }

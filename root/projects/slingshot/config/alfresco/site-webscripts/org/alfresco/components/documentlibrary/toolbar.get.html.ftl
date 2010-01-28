@@ -18,7 +18,7 @@
                   <div class="bd">
                      <ul>
                      <#list createContent as content>
-                        <li><a href="#" rel="${content.mimetype}"><span class="${content.icon}-file">${msg(content.label)}</span></a></li>
+                        <li><a href="create-content?mimeType=${content.mimetype?html}&amp;destination={nodeRef}"><span class="${content.icon}-file">${msg(content.label)}</span></a></li>
                      </#list>
                      </ul>
                   </div>

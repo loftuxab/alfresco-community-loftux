@@ -1063,7 +1063,8 @@
       {
          if (!this.widgets.resizer)
          {
-            var size = parseInt(Dom.getStyle(this.pickerId + "-body", "width"), 10);
+            var size = parseInt(Dom.get(this.pickerId + "-body").offsetWidth, 10) - 2,
+               heightFix = 0;
             this.columns[0] = Dom.get(this.pickerId + "-left");
             this.columns[1] = Dom.get(this.pickerId + "-right");
             this.widgets.resizer = new YAHOO.util.Resize(this.pickerId + "-left",
@@ -1072,6 +1073,9 @@
                 minWidth: 200,
                 maxWidth: (size - 200)
             });
+            // The resize handle doesn't quite get the element height correct, so it's saved here
+            heightFix = this.widgets.resizer.get("height");
+            
             this.widgets.resizer.on("resize", function(e)
             {
                 var w = e.width;
@@ -1079,11 +1083,17 @@
                 Dom.setStyle(this.columns[1], "width", (size - w - 8) + "px");
             }, this, true);
 
+            this.widgets.resizer.on("endResize", function(e)
+            {
+               // Reset the resize handle height to it's original value
+               this.set("height", heightFix);
+            });
+
             this.widgets.resizer.fireEvent("resize",
             {
                ev: 'resize',
                target: this.widgets.resizer,
-               width: this.widgets.resizer.get("width")
+               width: size / 2
             });
          }
       }
@@ -1590,6 +1600,12 @@
                            nodeRef: response.nodeRef,
                            selectable: true
                         };
+
+                        // Special case for tags, which we want to render differently to categories
+                        if (item.type == "cm:category" && response.displayPath.indexOf("/categories/Tags") !== -1)
+                        {
+                           item.type = "tag";
+                        }
 
                         if (!response.itemExists)
                         {

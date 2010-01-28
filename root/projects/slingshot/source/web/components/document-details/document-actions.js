@@ -37,11 +37,6 @@
    var Dom = YAHOO.util.Dom;
    
    /**
-    * Alfresco Slingshot aliases
-    */
-   var $combine = Alfresco.util.combinePaths;
-   
-   /**
     * DocumentActions constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -321,8 +316,7 @@
        */
       onActionEditOffline: function DocumentActions_onActionEditOffline(asset)
       {
-         var path = asset.location.path,
-            displayName = asset.displayName,
+         var displayName = asset.displayName,
             nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
 
          this.modules.actions.genericAction(
@@ -402,13 +396,13 @@
        *
        * @override
        * @method onActionUploadNewVersion
-       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       * @param asset {object} Object literal representing the file to be actioned upon
        */
-      onActionUploadNewVersion: function DocumentActions_onActionUploadNewVersion(assets)
+      onActionUploadNewVersion: function DocumentActions_onActionUploadNewVersion(asset)
       {
-         var displayName = assets.displayName,
+         var displayName = asset.displayName,
             nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
-            version = assets.version;
+            version = asset.version;
 
          if (!this.fileUpload)
          {
@@ -419,9 +413,9 @@
          var description = this.msg("label.filter-description", displayName),
             extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
          
-         if (assets.custom && assets.custom.workingCopyVersion)
+         if (asset.custom && asset.custom.workingCopyVersion)
          {
-            version = assets.custom.workingCopyVersion;
+            version = asset.custom.workingCopyVersion;
          }
          
          var singleUpdateConfig =

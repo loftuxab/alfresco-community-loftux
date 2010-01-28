@@ -219,9 +219,9 @@
           /**
            * Width for the dialog
            *
-           * @property: width
-           * @type: integer
-           * @default: 30em
+           * @property width
+           * @type integer
+           * @default 30em
            */
           width: "30em",
           
@@ -232,7 +232,16 @@
            * @type: boolean
            * @default: false
            */
-          clearForm: false
+          clearForm: false,
+          
+          /**
+           * Destroy the dialog instead of hiding it?
+           *
+           * @property destroyOnHide
+           * @type boolean
+           * @default false
+           */
+          destroyOnHide: false
        },
 
       /**
@@ -330,7 +339,7 @@
             for (var i = 0, j = inputs.length; i < j; i++)
             {
                input = inputs[i];
-               if(input.getAttribute("type") != "radio" && input.getAttribute("type") != "checkbox")
+               if(input.getAttribute("type") != "radio" && input.getAttribute("type") != "checkbox" && input.getAttribute("type") != "hidden")
                {
                   input.value = "";                  
                }
@@ -401,6 +410,10 @@
          // Undo Firefox caret issue
          Alfresco.util.undoCaretFix(form);
          this.dialog.hide();
+         if (this.options.destroyOnHide)
+         {
+            this.dialog.destroy();
+         }
       },
       
       /**

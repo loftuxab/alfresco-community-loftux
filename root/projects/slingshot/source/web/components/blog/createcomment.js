@@ -132,17 +132,6 @@
       initialized: false,
 
       /**
-       * Fired by YUI when parent element is available for scripting.
-       * Initial History Manager event registration
-       *
-       * @method onReady
-       */
-      onReady: function FlashUpload_onReady()
-      {
-         // Do nothing, UI will be created in onSetCommentedNode and/or onSetCanCreateComment instead
-      },
-
-      /**
        * Called by a bubble event to set the node for which comments should be displayed
        */
       onSetCommentedNode: function CreateComment_onSetCommentedNode(layer, args)
@@ -200,11 +189,14 @@
          // nodeRef
          Dom.get(this.id + '-nodeRef').setAttribute("value", this.options.itemNodeRef);
          
-         // site
-         Dom.get(this.id + '-site').setAttribute("value", this.options.siteId);
-         
-         // container
-         Dom.get(this.id + '-container').setAttribute("value", this.options.containerId);
+         if (this.options.siteId.length > 0)
+         {
+            // site
+            Dom.get(this.id + '-site').setAttribute("value", this.options.siteId);
+
+            // container
+            Dom.get(this.id + '-container').setAttribute("value", this.options.containerId);
+         }
          
          // itemTitle
          Dom.get(this.id + '-itemTitle').setAttribute("value", this.options.activityTitle);

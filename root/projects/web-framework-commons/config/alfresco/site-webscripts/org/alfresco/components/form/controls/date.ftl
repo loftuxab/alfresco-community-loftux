@@ -31,7 +31,7 @@
       <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="${field.value?html}" />
    
       <label for="${controlId}-date">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-      <input id="${controlId}-date" name="-" type="text" class="date-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
+      <input id="${controlId}-date" name="-" type="text" class="date-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"<#else>tabindex="0"</#if> />
    
       <#if field.disabled == false>
          <a id="${controlId}-icon"><img src="${url.context}/components/form/images/calendar.png" class="datepicker-icon"/></a>
@@ -40,7 +40,7 @@
       <div id="${controlId}" class="datepicker"></div>
    
       <#if showTime>
-         <input id="${controlId}-time" name="-" type="text" class="time-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
+         <input id="${controlId}-time" name="-" type="text" class="time-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"<#else>tabindex="0"</#if> />
       </#if>
    
       <div class="format-info">

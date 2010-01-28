@@ -9,7 +9,7 @@
       </div>
    <#else>
       <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="<#if isTrue>true<#else>false</#if>" />
-      <input id="${fieldHtmlId}-entry" type="checkbox" name="-" <#if field.description?exists>title="${field.description}"</#if>
+      <input id="${fieldHtmlId}-entry" type="checkbox" tabindex="0" name="-" <#if field.description?exists>title="${field.description}"</#if>
              <#if isTrue> value="true" checked="checked"</#if> <#if field.disabled>disabled="true"</#if> 
              <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if> 
              onchange='javascript:YAHOO.util.Dom.get("${fieldHtmlId}").value=YAHOO.util.Dom.get("${fieldHtmlId}-entry").checked;' />

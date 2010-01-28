@@ -593,3 +593,13 @@ table .yui-dt-empty
 {
    border: none !important;
 }
+
+/* Object Finder */
+.object-finder .picker-items
+{
+   padding-right: 20px !important;
+}
+.object-finder .picker-items table
+{
+   margin-right: -20px !important;
+}

@@ -186,7 +186,7 @@
             // Inject special-case permissions
             if (this.options.repositoryUrl)
             {
-               userAccess["repository"] = true;
+               userAccess.repository = true;
             }
             
             for (i = 0, ii = actions.length; i < ii; i++)

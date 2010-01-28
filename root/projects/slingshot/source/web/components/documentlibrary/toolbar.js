@@ -263,20 +263,16 @@
        */
       onCreateContent: function DLTB_onCreateContent(sType, aArgs, p_obj)
       {
-         var domEvent = aArgs[0],
-            eventTarget = aArgs[1];
-
-         // Get the mimetype related to the clicked item
-         var mimetype = eventTarget.element.firstChild.rel,
-            destination = this.modules.docList.doclistMetadata.parent.nodeRef;
-         if (mimetype)
+         var eventTarget = aArgs[1],
+            anchor = eventTarget.element.getElementsByTagName("a")[0];
+         
+         if (anchor && anchor.nodeName == "A")
          {
-            // TODO: Think about replacing this with code that rewrites the href attributes on a "filterChanged" (path) event.
-            // This might be necessary to allow the referrer HTTP header to be set by MSIE.
-            window.location.href = "create-content?mimeType=" + encodeURIComponent(mimetype) + "&destination=" + encodeURIComponent(destination);
+            anchor.href = YAHOO.lang.substitute(anchor.href,
+            {
+               nodeRef: this.modules.docList.doclistMetadata.parent.nodeRef
+            })
          }
-
-         Event.preventDefault(domEvent);
       },
 
       /**
@@ -315,6 +311,7 @@
             width: "33em",
             templateUrl: templateUrl,
             actionUrl: null,
+            destroyOnHide: true,
             doBeforeDialogShow:
             {
                fn: doBeforeDialogShow,
@@ -937,7 +934,7 @@
       {
          var obj = args[1];
          this.folderDetailsUrl = null;
-         if (obj && obj.metadata)
+         if (obj && obj.metadata && obj.metadata.parent && obj.metadata.parent.nodeRef)
          {
             this.folderDetailsUrl = "folder-details?nodeRef=" + obj.metadata.parent.nodeRef;
          }
