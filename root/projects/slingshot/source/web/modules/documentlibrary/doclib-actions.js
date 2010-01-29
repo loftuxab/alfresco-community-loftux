@@ -321,7 +321,7 @@
       postActivity: function DLA_postActivity(siteId, activityType, page, data)
       {
          // No activities in Repository mode
-         if (this.workingMode == Alfresco.doclib.MODE_REPOSITORY)
+         if (this.workingMode == Alfresco.doclib.MODE_REPOSITORY || siteId == null || siteId.length == 0)
          {
             return;
          }

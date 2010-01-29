@@ -469,6 +469,8 @@
             scope: this,
             correctScope: true
          });
+         
+         Dom.addClass(this.id + "-flashuploader-div", "hidden");
       },
 
       /**
@@ -529,6 +531,9 @@
             this.showConfig.uploadDirectory = "/";
          } 
 
+         var swfWrapper = this.id + "-flashuploader-div";
+         Dom.removeClass(swfWrapper, "hidden");
+
          // Apply the config before it is shown
          this._resetGUI();
 
@@ -557,7 +562,6 @@
          this.panel.show();
 
          // Need to resize FF in Ubuntu so the button appears
-         var swfWrapper = this.id + "-flashuploader-div";
          if (navigator.userAgent && navigator.userAgent.indexOf("Ubuntu") != -1 &&
             YAHOO.env.ua.gecko > 1 && !Dom.hasClass(swfWrapper, "button-fix"))
          {
@@ -972,6 +976,7 @@
 
          // Hide the panel
          this.panel.hide();
+         Dom.addClass(this.id + "-flashuploader-div", "hidden");
                   
          // Disable the Esc key listener
          this.widgets.escapeListener.disable();

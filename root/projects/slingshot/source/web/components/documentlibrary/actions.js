@@ -300,7 +300,7 @@
       onActionUploadNewVersion: function dlA_onActionUploadNewVersion(asset)
       {
          var displayName = asset.displayName,
-            nodeRef = asset.nodeRef,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
             version = asset.version;
 
          if (!this.fileUpload)
@@ -311,9 +311,10 @@
          // Show uploader for multiple files
          var description = this.msg("label.filter-description", displayName),
             extensions = "*";
+
          if (displayName && new RegExp(/[^\.]+\.[^\.]+/).exec(displayName))
          {
-            // Only add an filtering extension if filename contains a name and a suffix
+            // Only add a filtering extension if filename contains a name and a suffix
             extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
          }
          
@@ -324,9 +325,7 @@
          
          var singleUpdateConfig =
          {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            updateNodeRef: nodeRef,
+            updateNodeRef: nodeRef.toString(),
             updateFilename: displayName,
             updateVersion: version,
             overwrite: true,
@@ -342,6 +341,11 @@
                scope: this
             }
          };
+         if (this.options.workingMode == Alfresco.doclib.MODE_SITE)
+         {
+            singleUpdateConfig.siteId = this.options.siteId;
+            singleUpdateConfig.containerId = this.options.containerId;
+         }
          this.fileUpload.show(singleUpdateConfig);
       },
 

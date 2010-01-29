@@ -411,7 +411,13 @@
 
          // Show uploader for multiple files
          var description = this.msg("label.filter-description", displayName),
+            extensions = "*";
+
+         if (displayName && new RegExp(/[^\.]+\.[^\.]+/).exec(displayName))
+         {
+            // Only add a filtering extension if filename contains a name and a suffix
             extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
+         }
          
          if (asset.custom && asset.custom.workingCopyVersion)
          {
@@ -420,7 +426,7 @@
          
          var singleUpdateConfig =
          {
-            updateNodeRef: nodeRef,
+            updateNodeRef: nodeRef.toString(),
             updateFilename: displayName,
             updateVersion: version,
             suppressRefreshEvent: true,

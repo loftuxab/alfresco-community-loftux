@@ -2,8 +2,8 @@
 
 textarea
 {
-   font-family: Arial, sans-serif; 
-} 
+   font-family: Arial, sans-serif;
+}
 
 /**
  * Global site header
@@ -22,8 +22,8 @@ textarea
 
 .header .link-menu-button
 {
-   padding-bottom:3px;
-   padding-top:1px;
+   padding-bottom: 3px;
+   padding-top: 1px;
 }
 
 .header .search-site-icon
@@ -31,10 +31,10 @@ textarea
    top: -2px;
 }
 
-
 /**
  * Global site footer
  */
+
 .footer-ent
 {
    position: relative;
@@ -53,10 +53,10 @@ textarea
    padding-top: 10px;
 }
 
-
 /**
  * Page title and navigation
  */
+
 .site-navigation
 {
    margin-top: -1px;
@@ -68,10 +68,10 @@ textarea
    margin: 0 0.7em;
 }
 
-
 /**
  * Customise dashlets
  */
+
 .customise-dashlets ul.availableList,
 .customise-dashlets ul.usedList
 {
@@ -82,6 +82,7 @@ textarea
  * Dashlets / position:relative and overflow:auto bug
  * Plus: inability to do anything according to any standards, ever
  */
+
 .dashlet .scrollableList,
 .dashlet .scrollablePanel
 {
@@ -89,11 +90,11 @@ textarea
    position: relative;
 }
 
-
 /**
  * Dashlets that use a DataTable
  * Fixing MSIE's inability to do anything properly
  */
+
 .my-documents .scrollableList,
 .my-sites .scrollableList
 {
@@ -106,10 +107,10 @@ textarea
    margin-right: -20px !important;
 }
 
-
 /**
  * Document Library
  */
+
 .toolbar .selected-items hr
 {
    color: #e4e4e4;
@@ -144,15 +145,14 @@ textarea
    height: 206px;
 }
 
-
 /**
  * Calendar
  */
+
 .calendar-bar .align-right
 {
    width: 68% !important;
 }
-
 
 /* Full preview background mask */
 
@@ -175,6 +175,7 @@ body.masked div.mask.full-preview-mask
 }
 
 /* Prevent ghost border on first row for DataTables */
+
 table .yui-dt-empty
 {
    border: none !important;
@@ -184,20 +185,24 @@ table .yui-dt-empty
  * Prevent icon overlay in taglibrary (ETHREEOH-3422)
  * margin-right value must match padding-right value on ".tags_box li a" rule in taglibrary.css
 */
+
 .taglibrary .top_taglist
 {
    margin-right: 22px;
 }
+
 .taglibrary .bottom_taglist
 {
    margin-right: 22px;
 }
 
 /* Object Finder */
+
 .object-finder .picker-items
 {
    padding-right: 20px !important;
 }
+
 .object-finder .picker-items table
 {
    margin-right: -20px !important;
