@@ -1,6 +1,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.FolderActions("${args.htmlid}").setOptions(
    {
+      <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}",</#if>
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${template.properties.container!"documentLibrary"}"
    }).setMessages(

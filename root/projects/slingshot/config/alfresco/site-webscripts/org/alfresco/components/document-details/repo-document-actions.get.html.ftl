@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RepositoryDocumentActions("${args.htmlid}").setMessages(
+   new Alfresco.DocumentActions("${args.htmlid}").setOptions(
+   {
+      workingMode: Alfresco.doclib.MODE_REPOSITORY
+   }).setMessages(
       ${messages}
    );
 //]]></script>

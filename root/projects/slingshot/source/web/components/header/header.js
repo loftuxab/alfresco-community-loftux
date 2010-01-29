@@ -119,6 +119,12 @@
        */
       onReady: function Header_onReady()
       {
+         /* Temporary fix for 1024x768 resolutions */
+         if (window.screen.width < 1280)
+         {
+            Dom.setStyle(this.id + "-searchtext", "width", "10em");
+         }
+
          Event.addListener(this.id + "-searchtext", "focus", this.focusSearchText, null, this);
          Event.addListener(this.id + "-searchtext", "blur", this.blurSearchText, null, this);
          Event.addListener(this.id + "-search-sbutton", "click", this.doSearch, null, this);

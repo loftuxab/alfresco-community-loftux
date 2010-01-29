@@ -932,7 +932,7 @@
                   {
                      desc += scope.msg("details.tags.none");
                   }
-                  desc += '</span></div><div class="detail">&nbsp;</div>';
+                  desc += '</span></div>';
                }
             }
             else
