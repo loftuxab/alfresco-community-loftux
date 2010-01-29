@@ -7,7 +7,7 @@
    <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
          <list>
-            <value>alfresco.messages.webscripts</value>
+            <value>webscripts.messages.webscripts</value>
             <value>alfresco.messages.slingshot</value>
             <value>alfresco.messages.dod5015</value>
          </list>
