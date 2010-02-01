@@ -111,6 +111,19 @@
       <load-on-startup>1</load-on-startup>
    </servlet>
    
+   <servlet>
+      <servlet-name>feedApiServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.WebScriptFeedServlet</servlet-class>
+      <init-param>
+         <param-name>container</param-name>
+         <param-value>webscripts.container</param-value>
+      </init-param>
+      <init-param>
+         <param-name>authenticator</param-name>
+         <param-value>webscripts.authenticator.delegatingbasic</param-value>
+      </init-param>
+   </servlet>
+   
    <servlet-mapping>
       <servlet-name>Spring Surf Dispatcher Servlet</servlet-name>
       <url-pattern>/page/*</url-pattern>
@@ -120,33 +133,10 @@
       <url-pattern>/p/*</url-pattern>
    </servlet-mapping>
    
-   <!-- TODO: remove after spring-surf changes - NOTE: feedApiServlet?
-   <servlet>
-      <servlet-name>apiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
-      <init-param>
-         <param-name>container</param-name>
-         <param-value>webframework.webscripts.container</param-value>
-      </init-param>
-   </servlet>
-   
-   <servlet>
-      <servlet-name>feedApiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.WebScriptFeedServlet</servlet-class>
-      <init-param>
-         <param-name>container</param-name>
-         <param-value>webframework.webscripts.container</param-value>
-      </init-param>
-      <init-param>
-         <param-name>authenticator</param-name>
-         <param-value>webscripts.authenticator.delegatingbasic</param-value>
-      </init-param>
-   </servlet>
-
    <servlet-mapping>
       <servlet-name>feedApiServlet</servlet-name>
       <url-pattern>/feedservice/*</url-pattern>
-   </servlet-mapping>-->
+   </servlet-mapping>
    
    <session-config>
       <session-timeout>60</session-timeout>
