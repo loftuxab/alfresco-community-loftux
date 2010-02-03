@@ -26,7 +26,6 @@ package org.alfresco.web.portlet;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -76,14 +75,10 @@ public class ProxyPortlet implements Portlet
     public void processAction(ActionRequest req, ActionResponse res) throws PortletException, PortletSecurityException,
             IOException
     {
-        Map<String, String[]> params = req.getParameterMap();
-        for (Map.Entry<String, String[]> param : params.entrySet())
+        String scriptUrl = req.getParameter("scriptUrl");
+        if (scriptUrl != null)
         {
-            String name = param.getKey();
-            if (name.equals("scriptUrl") || name.startsWith("arg."))
-            {
-                res.setRenderParameter(name, param.getValue());
-            }
+            res.setRenderParameter("scriptUrl", scriptUrl);
         }
     }
 
@@ -135,41 +130,7 @@ public class ProxyPortlet implements Portlet
 
         String contextPath = req.getContextPath();
         String scriptUrl = req.getParameter("scriptUrl");
-        if (scriptUrl != null)
-        {
-            // build web script url from render request
-            StringBuilder scriptUrlArgs = null;
-            Map<String, String[]> params = req.getParameterMap();
-            for (Map.Entry<String, String[]> param : params.entrySet())
-            {
-                String name = param.getKey();
-                if (name.startsWith("arg."))
-                {
-                    String argName = name.substring("arg.".length());
-                    for (String argValue : param.getValue())
-                    {
-                        if (scriptUrlArgs == null)
-                        {
-                            scriptUrlArgs = new StringBuilder(128).append(scriptUrl).append('?');
-                        }
-                        else
-                        {
-                            scriptUrlArgs.append("&");
-                        }
-
-                        // Append encoded argument
-                        String encoding = res.getCharacterEncoding();
-                        scriptUrlArgs.append(URLEncoder.encode(argName, encoding)).append("=").append(
-                                URLEncoder.encode(argValue, encoding));
-                    }
-                }
-            }
-            if (scriptUrlArgs != null)
-            {
-                scriptUrl = scriptUrlArgs.toString();
-            }
-        }
-        else
+        if (scriptUrl == null)
         {
             // retrieve initial scriptUrl as configured by Portlet
             scriptUrl = initScriptUrl;
@@ -181,11 +142,10 @@ public class ProxyPortlet implements Portlet
                 {
                     scriptUrl = contextPath + "/page/user/" + URLEncoder.encode(userId, "UTF-8") + "/dashboard";
                 }
-            }
-
-            if (scriptUrl == null)
-            {
-                throw new PortletException("Initial Web script URL has not been specified.");
+                else
+                {
+                    throw new PortletException("Initial Web script URL has not been specified.");
+                }
             }
         }
 
