@@ -183,7 +183,7 @@
     */
    Alfresco.DocumentList.generateThumbnailUrl = function DL_generateThumbnailUrl(record)
    {
-      return Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "") + "/content/thumbnails/doclib?c=queue&ph=true&noCache=" + new Date().getTime();
+      return Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "") + "/content/thumbnails/doclib?c=queue&ph=true";
    };
 
    /**
