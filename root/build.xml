@@ -86,7 +86,7 @@
          <pathelement location="${dir.project.webframeworkcommons.classes}" />
          <pathelement location="${dir.project.webclient.classes}" />
          <pathelement location="${dir.project.webserviceclient.classes}" />
-         
+         <pathelement location="${dir.project.3rdparty.lib}/junit-4.6.jar" />
          <pathelement location="${user.home}" />
          <!-- <pathelement location="${alf.build.location.data}"/> -->
          
@@ -1018,7 +1018,7 @@
 
       <mkdir dir="${projectdir}/${dir.name.build}/${dir.name.test.results}" />
       <java fork="yes" 
-            classname="junit.textui.TestRunner" 
+            classname="org.junit.runner.JUnitCore" 
             dir="${projectdir}"
             output="${projectdir}/${dir.name.build}/${dir.name.test.results}/${testcase}.out">
          <jvmarg value="-Xmx${mem.size.max}"/>
