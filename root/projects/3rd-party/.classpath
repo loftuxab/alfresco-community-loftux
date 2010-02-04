@@ -30,7 +30,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/wss4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcr-1.0.jar" sourcepath="src/jcr_src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/freemarker-2.3.13.jar" sourcepath="src/freemarker-2.3.13.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.4.jar" sourcepath="src/jid3lib-0.5.4-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar" sourcepath="src/htmlparser-1.6-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-beanutils-1.7.0.jar"/>
@@ -123,7 +123,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.springframework.web-3.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-3.5-FINAL-20090928.jar" sourcepath="src/poi-3.5-FINAL-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-3.7-SNAPSHOT-20100204.jar" sourcepath="src/poi-3.7-20100204.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-scratchpad-3.7-SNAPSHOT-20100204.jar" sourcepath="src/poi-3.7-20100204.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-3.7-SNAPSHOT-20100204.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-schemas-3.7-SNAPSHOT-20100204.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.2.jar" sourcepath="src/commons-dbcp-1.2.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-2.4.1.jar"/>
