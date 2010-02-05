@@ -117,6 +117,15 @@
    <@script type="text/javascript" src="${url.context}/js/forms-runtime.js"></@script>
    <@common.uriTemplate />
    <@common.htmlEditor htmlEditor="tinyMCE"/>
+   
+   <!-- Share Preference keys -->
+   <script type="text/javascript">//<![CDATA[
+      Alfresco.service.Preferences.FAVOURITE_DOCUMENTS = "org.alfresco.share.documents.favourites";
+      Alfresco.service.Preferences.FAVOURITE_FOLDERS = "org.alfresco.share.folders.favourites";
+      Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
+      Alfresco.service.Preferences.IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imapFavourites";
+      Alfresco.service.Preferences.COLLAPSED_TWISTERS = "org.alfresco.share.twisters.collapsed";
+   //]]></script>
 
 <!-- Template Assets -->
 <#nested>

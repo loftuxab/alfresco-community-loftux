@@ -38,6 +38,7 @@
       <property name="resourceBundles">
          <list>
             <value>webscripts.messages.webscripts</value>
+            <value>alfresco.messages.common</value>
             <value>alfresco.messages.slingshot</value>
          </list>
       </property>

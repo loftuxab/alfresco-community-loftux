@@ -8,6 +8,7 @@
       <property name="resourceBundles">
          <list>
             <value>webscripts.messages.webscripts</value>
+            <value>alfresco.messages.common</value>
             <value>alfresco.messages.slingshot</value>
             <value>alfresco.messages.dod5015</value>
          </list>

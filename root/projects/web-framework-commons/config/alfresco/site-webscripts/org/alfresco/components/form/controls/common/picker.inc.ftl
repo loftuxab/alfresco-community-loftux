@@ -11,8 +11,8 @@
       mandatory: ${field.endpointMandatory?string},
    </#if>
       currentValue: "${field.value}",
-      minSearchTermLength: "${args.minSearchTermLength!'3'}",
-      maxSearchResults: "${args.maxSearchResults!'100'}"
+      minSearchTermLength: ${args.minSearchTermLength!'1'},
+      maxSearchResults: ${args.maxSearchResults!'100'}
    }).setMessages(
       ${messages}
    );
@@ -25,8 +25,8 @@
 
    <div id="${pickerId}-body" class="bd">
       <div class="picker-header">
-         <div class="folder-up"><button id="${pickerId}-folderUp"></button></div>
-         <div class="navigator">
+         <div id="${pickerId}-folderUpContainer" class="folder-up"><button id="${pickerId}-folderUp"></button></div>
+         <div id="${pickerId}-navigatorContainer" class="navigator">
             <button id="${pickerId}-navigator"></button>
             <div id="${pickerId}-navigatorMenu" class="yuimenu">
                <div class="bd">
@@ -35,6 +35,10 @@
                   </ul>
                </div>
             </div>
+         </div>
+         <div id="${pickerId}-searchContainer" class="search">
+            <input type="text" class="search-input" name="-" id="${pickerId}-searchText" value="" maxlength="256" />
+            <div class="search-button"><button id="${pickerId}-searchButton">${msg("form.control.object-picker.search")}</button></div>
          </div>
       </div>
       <div class="yui-g">

@@ -192,14 +192,34 @@
             {
                if (this._isRichMimeType(contentMimetype))
                {
-                  // populate the textarea with the content
-                  this._populateContent();
-                  
-                  // render the TinyMCE editor for rich mimetypes
-                  // but only when the field is not disabled
-                  if (!this.options.disabled)
+                  if (this.options.formMode === "create")
                   {
-                     this._renderEditor();
+                     // in create mode render the editor immediately
+                     if (!this.options.disabled)
+                     {
+                        this._renderEditor();
+                     }
+                  }
+                  else
+                  {
+                     // populate the textarea with the content and
+                     // once that is complete call the provided
+                     // callback function to render the TinyMCE
+                     // editor (when it's not disabled)
+                     this._populateContent(
+                     {
+                        successCallback: 
+                        {
+                           fn: function()
+                           {
+                              if (!this.options.disabled)
+                              {
+                                 this._renderEditor();
+                              }
+                           },
+                           scope: this
+                        }
+                     });
                   }
                }
                else if (this._isPlainMimeType(contentMimetype) || this.options.forceEditor)
@@ -234,9 +254,10 @@
        * Retrieves and populates the content for the current control
        * 
        * @method _populateContent
+       * @param callback Optional object containing a callback function
        * @private
        */
-      _populateContent: function RichTextControl__populateContent()
+      _populateContent: function RichTextControl__populateContent(callback)
       {
          if (this.options.nodeRef !== null && this.options.nodeRef.length > 0)
          {
@@ -246,6 +267,15 @@
             var onSuccess = function RichTextControl_populateContent_onSuccess(response)
             {
                Dom.get(this.id).value = response.serverResponse.responseText;
+               
+               // if a callback was provided, execute it
+               if (callback && callback.successCallback)
+               {
+                  if (Alfresco.logger.isDebugEnabled())
+                     Alfresco.logger.debug("calling callback");
+                  
+                  callback.successCallback.fn.call(callback.successCallback.scope, response);
+               }
             };
             
             // failure handler, display alert

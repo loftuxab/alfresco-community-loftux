@@ -1577,7 +1577,7 @@
             <exclude name="**/log4javascript*.js" />
          </fileset>
          <arg line="-jar"/>
-         <arg path="${dir.project.slingshot}/lib/yuicompressor-2.4.2.jar"/>
+         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
          <arg line="-o"/>
          <targetfile />
          <srcfile />
@@ -1597,6 +1597,148 @@
                          projectdir="${dir.project.slingshot}"/>
    </target>
 
+   <!-- ************************ -->
+   <!-- ** Web Editor Project ** -->
+   <!-- ************************ -->
+   
+   <target name="incremental-webeditor" 
+           depends="package-webeditor" />
+   
+   <target name="build-webeditor" 
+           depends="clean-webeditor, 
+                    incremental-webeditor" />
+   
+   <target name="clean-webeditor" 
+           depends="init">
+      <clean projectdir="${dir.project.webeditor}" />
+   </target>
+   
+   <target name="compile-webeditor" 
+           depends="init">
+      <compile-java projectdir="${dir.project.webeditor}" />
+   </target>
+   
+   <target name="package-webeditor"
+           depends="package-webeditor-war" />
+   
+   <target name="package-webeditor-jar"
+              depends="compile-webeditor">
+      <mkdir dir="${dir.project.webeditor.dist}" />
+      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor}" 
+           basedir="${dir.project.webeditor.classes}" />
+   </target>
+
+   <target name="package-webeditor-war" 
+           depends="assemble-webeditor-war,
+                    minimize-webeditor-javascript">
+      <war warfile="${dir.project.webeditor.dist}/${file.name.war.webeditor}" 
+           webxml="${dir.project.webeditor.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webeditor.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-webeditor-war" 
+           depends="package-webeditor-jar">
+      <mkdir dir="${dir.project.webeditor.assemble}" />
+      
+      <!-- first copy all required files from webeditor project -->
+      <copy todir="${dir.project.webeditor.assemble}">
+         <fileset dir="${dir.project.webeditor.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      <!-- next copy all required files from web framework commons projects -->
+      <copy todir="${dir.project.webeditor.assemble}">
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      
+      <copy todir="${dir.project.webeditor.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.webeditor.config}" excludes="**/web-extension/**" />
+      </copy>
+      <copy todir="${dir.project.webeditor.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
+      </copy>
+
+      <!-- add all JAR to WEB-INF/lib -->
+      <copy todir="${dir.project.webeditor.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                  includes="${file.name.jar.webframeworkcommons}" />
+         <fileset dir="${dir.project.webeditor.dist}" 
+                  includes="${file.name.jar.webeditor}" />
+      </copy>
+      
+      <!-- unzip and add 3rd party javascript library -->
+      <unzip src="${file.zip.webeditor.yui}" 
+             dest="${dir.project.webeditor.assemble}" />
+             
+      <!-- there seems to be a hidden __MACOSX folder in the YUI -->
+      <!-- distribution, remove it if present -->
+      <delete dir="${dir.project.webeditor.assemble}/__MACOSX" 
+              includeEmptyDirs="true" quiet="yes" />
+
+      <!-- Copy our yui directory to apply YUI fixes -->
+      <copy todir="${dir.project.webeditor.assemble}/yui">
+         <fileset dir="${dir.project.webeditor.src.web}/yui" />
+      </copy>
+   </target>  
+   
+   <target name="minimize-webeditor-javascript"
+           depends="init">
+      <echo>Compressing Web Editor Javascript...</echo>
+      <apply executable="java" parallel="false" dest="${dir.project.webeditor.assemble}">
+         <fileset dir="${dir.project.webeditor.assemble}">
+            <include name="**/*.js" />
+            <exclude name="**/*-min.js" />
+            <exclude name="**/WEB-INF/**" />
+            <exclude name="**/tiny_mce/**" />
+            <exclude name="**/yui/**" />
+         </fileset>
+         <arg line="-jar"/>
+         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
+         <arg line="-o"/>
+         <targetfile />
+         <srcfile />
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
+   </target>
+
+   <target name="test-webeditor" 
+           depends="compile-webeditor">
+      <run-tests projectdir="${dir.project.webeditor}" />
+   </target>
+   
+   <target name="generate-javadocs-webeditor" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Editor" 
+                         windowtitle="Alfresco Web Editor" 
+                         projectdir="${dir.project.webeditor}"/>
+   </target>
+   
+   <target name="package-webeditor-sample-war" depends="package-webeditor-jar">
+      <war warfile="${dir.project.webeditor.dist}/${file.name.war.webeditor.sample}" 
+           webxml="${dir.project.webeditor.src.sample}/WEB-INF/web.xml">
+         <fileset dir="${dir.project.webeditor.src.sample}" excludes="WEB-INF/web.xml" />
+         <zipfileset dir="${dir.project.webeditor.src.webinf}" includes="awe.tld" prefix="WEB-INF" />
+         <zipfileset dir="${dir.project.webeditor.dist}" includes="${file.name.jar.webeditor}" prefix="WEB-INF/lib" />
+         <zipfileset dir="${dir.project.3rdparty}/lib/commons" prefix="WEB-INF/lib"
+                     includes="commons-httpclient-3.1.jar, commons-logging-1.1.jar, commons-codec-1.3.jar" />
+         <zipfileset dir="${dir.project.3rdparty}/lib" prefix="WEB-INF/lib" includes="json.jar" />
+      </war>
+   </target>
+   
    <!-- ************************ -->
    <!-- ** Web Client Project ** -->
    <!-- ************************ -->
@@ -2094,7 +2236,7 @@
            <exclude name="**/yui/**" />
         </fileset>
         <arg line="-jar"/>
-        <arg path="${dir.project.slingshot}/lib/yuicompressor-2.4.2.jar"/>
+        <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
         <arg line="-o"/>
         <targetfile />
         <srcfile />
@@ -3104,7 +3246,7 @@
    	<apply executable="java" parallel="false" dest="${dir.project.mobile.assemble}/js">
    		<fileset dir="${dir.project.mobile.assemble}/js" includes="alf-mobile.js"/>
    		<arg line="-jar"/>
-   		<arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
+   		<arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
    		<arg line="-o"/>
    		<targetfile/>
    		<srcfile/>

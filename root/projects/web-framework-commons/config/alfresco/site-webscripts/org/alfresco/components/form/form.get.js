@@ -428,6 +428,13 @@ function createFormUIModel(mode, formModel, formConfig)
       formUIModel.destination = destination;
    }
    
+   // if a redirectUrl has been provided add to the model
+   var redirect = getArgument("redirect");
+   if (redirect !== null)
+   {
+      formUIModel.redirect = redirect;
+   }
+   
    // setup custom form templates to use if they are present
    if (formConfig !== null)
    {
@@ -850,9 +857,13 @@ function setupField(mode, formModel, fieldName, fieldConfig)
          logger.warn("\"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
       }
       
-      var control = {};
-      control.template = "/org/alfresco/components/form/controls/ambiguous.ftl";
-      fieldDef = createTransientField(fieldName, control);
+      fieldDef = createTransientField(fieldName, 
+      {
+         control:
+         {
+            template: "/org/alfresco/components/form/controls/ambiguous.ftl"
+         }
+      });
    }
    else
    {
@@ -993,8 +1004,14 @@ function setupFieldControl(fieldDef, fieldConfig)
    }
    else
    {
-      // get the default control for associations
-      defaultControlConfig = defaultControls.items["association"];
+      // look for a specific type based default control for associations
+      defaultControlConfig = defaultControls.items["association:" + fieldDef.endpointType];
+      
+      // get the generic default control for associations if a type specific one was not found
+      if (defaultControlConfig === null)
+      {
+         defaultControlConfig = defaultControls.items["association"];
+      }
    }
    
    // see if the fieldConfig already has a template defined, if not 
@@ -1146,19 +1163,6 @@ function setupFieldConstraints(fieldDef, fieldConfig)
       }
    }
    
-   // setup number constraint if field is a number
-   if (fieldDef.dataType === "int" || fieldDef.dataType === "long" || 
-       fieldDef.dataType === "double" || fieldDef.dataType === "float" )
-   {
-      var constraint = createFieldConstraint("NUMBER", {}, fieldDef, fieldConfig);
-      
-      if (constraint !== null)
-      {
-         // add the constraint to the global list
-         formUIConstraints.push(constraint);
-      }
-   }
-   
    // look for model defined constraints on the field definition
    if (typeof fieldDef.constraints !== "undefined")
    {
@@ -1172,6 +1176,19 @@ function setupFieldConstraints(fieldDef, fieldConfig)
             // add the constraint to the global list
             formUIConstraints.push(constraint);
          }
+      }
+   }
+   
+   // setup number constraint if field is a number
+   if (fieldDef.dataType === "int" || fieldDef.dataType === "long" || 
+       fieldDef.dataType === "double" || fieldDef.dataType === "float" )
+   {
+      var constraint = createFieldConstraint("NUMBER", {}, fieldDef, fieldConfig);
+      
+      if (constraint !== null)
+      {
+         // add the constraint to the global list
+         formUIConstraints.push(constraint);
       }
    }
 
@@ -1199,10 +1216,14 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
    var defaultConstraintConfig = defaultConstraintHandlers.items[constraintId];
    if (defaultConstraintConfig !== null)
    {
-      constraint = {};
-      constraint.fieldId = fieldDef.id;
-      constraint.validationHandler = defaultConstraintConfig.validationHandler;
-      constraint.params = jsonUtils.toJSONString(constraintParams);
+      constraint = 
+      {
+         constraintId: constraintId,
+         fieldId: fieldDef.id,
+         validationHandler: defaultConstraintConfig.validationHandler,
+         params: jsonUtils.toJSONString(constraintParams)
+      };
+      
       if (defaultConstraintConfig.event !== null && defaultConstraintConfig.event !== "")
       {
          constraint.event = defaultConstraintConfig.event;
@@ -1283,6 +1304,9 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
             fieldDef.control.params.maxLength = constraintParams.maxLength;
          }
       }
+      
+      // setup a default help message for the field if appropriate
+      setupConstraintHelpText(fieldDef, constraintId, constraintParams);
    }
    else if (logger.isWarnLoggingEnabled())
    {
@@ -1376,6 +1400,35 @@ function createTransientField(fieldName, fieldConfig)
    setupFieldText(fieldDef, fieldConfig);
    
    return fieldDef;
+}
+
+/**
+ * Adds help text to the field definition if appropriate.
+ * 
+ * @param fieldDef Object representing the field definition
+ * @param constraintId The id of the constraint
+ * @param constraintParams Object representing the constraint parameters
+ */
+function setupConstraintHelpText(fieldDef, constraintId, constraintParams)
+{
+   // only add help text if there isn't any already
+   if (typeof fieldDef.help === "undefined")
+   {
+      if (constraintId === "LENGTH")
+      {
+         var text = msg.get("form.field.constraint.length", [constraintParams.minLength, constraintParams.maxLength]);
+         fieldDef.help = text;
+      }
+      else if (constraintId === "MINMAX")
+      {
+         var text = msg.get("form.field.constraint.minmax", [constraintParams.minValue, constraintParams.maxValue]);
+         fieldDef.help = text;
+      }
+      else if (constraintId === "NUMBER")
+      {
+         fieldDef.help = msg.get("form.field.constraint.number");
+      }
+   }
 }
 
 /**

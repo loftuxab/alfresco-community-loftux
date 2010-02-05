@@ -21,5 +21,6 @@
              <#if field.control.params.maxLength?exists>maxlength="${field.control.params.maxLength}"</#if> 
              <#if field.control.params.size?exists>size="${field.control.params.size}"</#if> 
              <#if field.disabled>disabled="true"</#if> />
+      <@formLib.renderFieldHelp field=field />
    </#if>
 </div>
