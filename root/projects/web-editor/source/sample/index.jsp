@@ -30,11 +30,11 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!-- 
-logo = http://localhost:8080/alfresco/d/d/workspace/SpacesStore/5515b4c7-5656-4b0d-918c-09da9662cb1b/logo.png
-content = workspace://SpacesStore/54aef362-e1fa-4f08-a71a-e94af992d804 
-footer =  workspace://SpacesStore/1bc62a94-fec9-4c02-ac3f-398d73ae013f
--->
+<%
+String logoNodeRef = "workspace/SpacesStore/04e1c411-1896-45fb-9847-1c487af7f379";
+String mainTextNodeRef = "workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5";
+String subTextNodeRef = "workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3ce666";
+%>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -51,28 +51,28 @@ footer =  workspace://SpacesStore/1bc62a94-fec9-4c02-ac3f-398d73ae013f
    
    <body class="yui-skin-default">
       
-      <div class="logo"><img src="http://localhost:8080/alfresco/d/d/workspace/SpacesStore/04e1c411-1896-45fb-9847-1c487af7f379/logo.png?guest=true" /></div>
+      <div class="logo"><img src="http://localhost:8080/alfresco/d/d/<%=logoNodeRef%>/logo.png?guest=true" /></div>
       <h1>
-         <customer:property nodeRef="workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5" property="cm:title" />
-         <awe:markContent id="workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5" formId="default" />
+         <customer:property nodeRef="<%=mainTextNodeRef%>" property="cm:title" />
+         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
       </h1>
       
       <h3>
-         <customer:property nodeRef="workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5" property="cm:description" />
-         <awe:markContent id="workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5" formId="default" />
+         <customer:property nodeRef="<%=mainTextNodeRef%>" property="cm:description" />
+         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
       </h3>
       
       <div class="content">
-         <awe:markContent id="workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5" formId="default" />
-         <customer:content nodeRef="workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5" />
+         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
+         <customer:content nodeRef="<%=mainTextNodeRef%>" />
       </div>
       <div class="trailer-text">
-         <customer:property nodeRef="workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3ce666" property="cm:description" />
-         <awe:markContent id="workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3ce666" formId="description" />
+         <customer:property nodeRef="<%=subTextNodeRef%>" property="cm:description" />
+         <awe:markContent id="<%=subTextNodeRef%>" formId="description" />
       </div>
       <div class="links">
-         <awe:markContent id="workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3ce666" formId="default" />
-         <customer:content nodeRef="workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3ce666" />
+         <awe:markContent id="<%=subTextNodeRef%>" formId="default" />
+         <customer:content nodeRef="<%=subTextNodeRef%>" />
       </div>
       
       <div class="copyright">&copy; 2010 Customer, Inc. All Rights Reserved.</div>

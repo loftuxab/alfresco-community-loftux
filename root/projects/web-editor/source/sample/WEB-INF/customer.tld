@@ -20,6 +20,7 @@
       <attribute>
          <name>nodeRef</name>
          <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
    
@@ -31,11 +32,13 @@
       <attribute>
          <name>nodeRef</name>
          <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
       </attribute>
       
       <attribute>
          <name>property</name>
          <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
       </attribute>      
    </tag>
    
