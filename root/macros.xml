@@ -176,6 +176,7 @@
             <fileset dir="${dir.project.3rdparty.lib}" includes="org.springframework*.jar"/>
          </copy>
          <copy todir="@{location}/server/lib"  file="${dir.project.3rdparty.lib}/hibernate-3.2.6-patched.jar"/>
+         <copy todir="@{location}/server/lib"  file="${dir.project.3rdparty.lib}/aopalliance.jar"/>
          <copy todir="@{location}/server/lib"  file="${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}"/>
          <copy todir="@{location}/common/lib"  file="${dir.project.jndi.dist}/${file.name.jar.jndi}"/>
          <copy todir="@{location}/common/lib"  file="${dir.project.repository.dist}/${file.name.jar.repository}"/>
