@@ -25,6 +25,7 @@
       <attribute>
          <name>toolbarLocation</name>
          <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
          <description>
             Specifies the default location of the toolbar, can be set to "top", "left" or "right",
             defaults to "top"
@@ -45,6 +46,7 @@
       <attribute>
          <name>id</name>
          <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
          <description>
             The identifier (NodeRef) of the content.
          </description>
@@ -53,6 +55,7 @@
       <attribute>
          <name>formId</name>
          <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
          <description>
             The identifier of the form that should be used to edit the conent.
          </description>
@@ -61,6 +64,7 @@
       <attribute>
          <name>nestedMarker</name>
          <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
          <description>
             Indicates that the HTML tag that contains the content marker also contains the referenced content itself. Defaults to false.
          </description>

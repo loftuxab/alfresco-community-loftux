@@ -26,6 +26,11 @@
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
+               <field id="cm:content">
+                  <control>
+                     <control-param name="editorAppearance">full</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
          
