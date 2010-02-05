@@ -408,3 +408,29 @@ Alfresco.util.updateMultiSelectListValue = function(list, hiddenField, signalCha
       }
    }
 };
+
+/**
+ * Helper function to toggle the state of the help text element
+ * represented by the given id.
+ * 
+ * @method toggleHelpText
+ * @param helpTextId The id of the help text element to toggle
+ * @static
+ */
+Alfresco.util.toggleHelpText = function(helpTextId)
+{
+   var helpElem = YUIDom.get(helpTextId);
+   
+   if (helpElem)
+   {
+      if (helpElem.style.display != "block")
+      {
+         helpElem.style.display = "block";
+      }
+      else
+      {
+         helpElem.style.display = "none";
+      }
+   }
+};
+

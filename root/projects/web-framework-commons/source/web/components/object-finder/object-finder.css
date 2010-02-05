@@ -52,16 +52,16 @@
 
 .object-finder .picker-header .folder-up button
 {
-   background: transparent url(../images/up-arrow-16.png) no-repeat 50% 50%;
+   background: transparent url(../form/images/up-arrow-16.png) no-repeat 50% 50%;
 }
 .object-finder .picker-header .folder-up .yui-button-disabled button
 {
-   background-image: url(../images/up-arrow-disabled-16.png);
+   background-image: url(../form/images/up-arrow-disabled-16.png);
 }
 
 .object-finder .picker-header .navigator span.wait
 {
-   background-image: url(../images/ajax_anim.gif);
+   background-image: url(../form/images/ajax_anim.gif);
    background-repeat: no-repeat;
    padding: 1px 0 2px 16px;
 }
@@ -88,6 +88,22 @@
 }
 
 .object-finder .picker-header .navigator .navigator-items-list span.item-name
+{
+}
+
+.object-finder .picker-header .search
+{
+   display: none;
+}
+
+.object-finder .picker-header .search .search-input
+{
+   float: left;
+   width: 20em;
+   padding: 0.3em 1em 0.4em 0.5em;
+}
+
+.object-finder .picker-header .search .search-button
 {
 }
 
@@ -151,8 +167,8 @@
 
 .object-finder .picker-items .addIcon
 {
-   background: transparent url(../images/add-icon-16.png) no-repeat center center;
-   padding: 8px;
+	background: transparent url(../form/images/add-icon-16.png) no-repeat center center;
+	padding: 8px;
 }
 
 .object-finder .picker-items .removeIcon

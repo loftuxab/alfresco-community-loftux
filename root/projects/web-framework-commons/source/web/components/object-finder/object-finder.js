@@ -111,6 +111,20 @@
           * @type string
           */
          itemType: "cm:content",
+         
+         /**
+          * The 'family' of the item to find can be one of the following:
+          * 
+          * - node
+          * - category
+          * - authority
+          * 
+          * default is "node".
+          * 
+          * @property itemFamily
+          * @type string
+          */
+         itemFamily: "node",
 
          /**
           * Compact mode flag
@@ -151,14 +165,13 @@
          targetLinkTemplate: null,
          
          /**
-          *** NOT IMPLEMENTED ***
           * Number of characters required for a search
           * 
           * @property minSearchTermLength
           * @type int
-          * @default 3
+          * @default 1
           */
-         minSearchTermLength: 3,
+         minSearchTermLength: 1,
          
          /**
           * Maximum number of items to display in the results list
@@ -351,10 +364,16 @@
          this._createResizer();
          this._populateSelectedItems();
          this.options.objectRenderer.onPickerShow();
-         YAHOO.Bubbling.fire("refreshItemList",
+         
+         // only refresh the items if we're not in authority mode
+         if (this._inAuthorityMode() == false)
          {
-            eventGroup: this
-         });
+            YAHOO.Bubbling.fire("refreshItemList",
+            {
+               eventGroup: this
+            });
+         }
+         
          p_obj.set("disabled", true);
          Event.preventDefault(e);
       },
@@ -458,7 +477,33 @@
             Event.preventDefault(e);
          }
       },
-
+      
+      /**
+       * Triggers a search
+       *
+       * @method onSearch
+       */
+      onSearch: function ObjectFinder_onSearch()
+      {
+         var searchTerm = Dom.get(this.pickerId + "-searchText").value;
+         if (searchTerm.length < this.options.minSearchTermLength)
+         {
+            // show error message
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("form.control.object-picker.search.enter-more", this.options.minSearchTermLength)
+            });
+         }
+         else
+         {
+            // execute search
+            YAHOO.Bubbling.fire("refreshItemList",
+            {
+               eventGroup: this,
+               searchTerm: searchTerm
+            });
+         }
+      },
 
       /**
        * PUBLIC INTERFACE
@@ -660,7 +705,7 @@
             var obj = args[1];
             if (obj && obj.label)
             {
-               this.widgets.navigationMenu.set("label", '<div><span class="item-icon"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/ajax_anim.gif" width="16" height="16" alt="' + this.msg("message.please-wait") + '"></span><span class="item-name">' + $html(obj.label) + '</span></div>');
+               this.widgets.navigationMenu.set("label", '<div><span class="item-icon"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/form/images/ajax_anim.gif" width="16" height="16" alt="' + this.msg("message.please-wait") + '"></span><span class="item-name">' + $html(obj.label) + '</span></div>');
             }
          }
       },
@@ -883,56 +928,86 @@
       {
          var me = this;
          
-         // Up Navigation button
-         this.widgets.folderUp = new YAHOO.widget.Button(this.pickerId + "-folderUp",
+         if (this._inAuthorityMode())
          {
-            disabled: true
-         });
-         this.widgets.folderUp.on("click", this.onFolderUp, this.widgets.folderUp, this);
-
-         // Navigation drop-down menu
-         this.widgets.navigationMenu = new YAHOO.widget.Button(this.pickerId + "-navigator",
-         { 
-            type: "menu", 
-            menu: this.pickerId + "-navigatorMenu",
-            lazyloadmenu: false
-         });
-         
-         // force the generated buttons to have a name of "-" so it gets ignored in
-         // JSON submit. TODO: remove this when JSON submit behaviour is configurable
-         Dom.get(this.pickerId + "-folderUp-button").name = "-";
-         Dom.get(this.pickerId + "-navigator-button").name = "-";
-
-         this.widgets.navigationMenu.getMenu().subscribe("click", function (p_sType, p_aArgs)
-         {
-            var menuItem = p_aArgs[1];
-            if (menuItem)
+            // only show the search box for authority mode
+            Dom.setStyle(this.pickerId + "-folderUpContainer", "display", "none");
+            Dom.setStyle(this.pickerId + "-navigatorContainer", "display", "none");
+            Dom.setStyle(this.pickerId + "-searchContainer", "display", "block");
+            
+            // setup search widgets
+            this.widgets.searchButton = new YAHOO.widget.Button(this.pickerId + "-searchButton");
+            this.widgets.searchButton.on("click", this.onSearch, this.widgets.searchButton, this);
+            
+            // force the generated buttons to have a name of "-" so it gets ignored in
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+            Dom.get(this.pickerId + "-searchButton").name = "-";
+            
+            // register the "enter" event on the search text field
+            var zinput = Dom.get(this.pickerId + "-searchText");
+            new YAHOO.util.KeyListener(zinput, 
             {
-               YAHOO.Bubbling.fire("parentChanged",
+               keys: 13
+            }, 
+            {
+               fn: me.onSearch,
+               scope: this,
+               correctScope: true
+            }, "keydown").enable();
+         }
+         else
+         {
+            // Up Navigation button
+            this.widgets.folderUp = new YAHOO.widget.Button(this.pickerId + "-folderUp",
+            {
+               disabled: true
+            });
+            this.widgets.folderUp.on("click", this.onFolderUp, this.widgets.folderUp, this);
+   
+            // Navigation drop-down menu
+            this.widgets.navigationMenu = new YAHOO.widget.Button(this.pickerId + "-navigator",
+            { 
+               type: "menu", 
+               menu: this.pickerId + "-navigatorMenu",
+               lazyloadmenu: false
+            });
+            
+            // force the generated buttons to have a name of "-" so it gets ignored in
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+            Dom.get(this.pickerId + "-folderUp-button").name = "-";
+            Dom.get(this.pickerId + "-navigator-button").name = "-";
+   
+            this.widgets.navigationMenu.getMenu().subscribe("click", function (p_sType, p_aArgs)
+            {
+               var menuItem = p_aArgs[1];
+               if (menuItem)
                {
-                  eventGroup: me,
-                  label: menuItem.cfg.getProperty("label"),
-                  nodeRef: menuItem.value
+                  YAHOO.Bubbling.fire("parentChanged",
+                  {
+                     eventGroup: me,
+                     label: menuItem.cfg.getProperty("label"),
+                     nodeRef: menuItem.value
+                  });
+               }
+            });
+            
+            // Optional "Create New" UI controls
+            if (Dom.get(this.pickerId + "-createNew"))
+            {
+               // Create New - OK button
+               this.widgets.createNewOK = new YAHOO.widget.Button(this.pickerId + "-createNewOK",
+               {
+                  disabled: true
                });
+               this.widgets.createNewOK.on("click", this.onCreateNewOK, this.widgets.createNewOK, this);
+   
+               // Create New - Cancel button
+               this.widgets.createNewCancel = new YAHOO.widget.Button(this.pickerId + "-createNewCancel",
+               {
+                  disabled: true
+               });
+               this.widgets.createNewCancel.on("click", this.onCreateNewCancel, this.widgets.createNewCancel, this);
             }
-         });
-         
-         // Optional "Create New" UI controls
-         if (Dom.get(this.pickerId + "-createNew"))
-         {
-            // Create New - OK button
-            this.widgets.createNewOK = new YAHOO.widget.Button(this.pickerId + "-createNewOK",
-            {
-               disabled: true
-            });
-            this.widgets.createNewOK.on("click", this.onCreateNewOK, this.widgets.createNewOK, this);
-
-            // Create New - Cancel button
-            this.widgets.createNewCancel = new YAHOO.widget.Button(this.pickerId + "-createNewCancel",
-            {
-               disabled: true
-            });
-            this.widgets.createNewCancel.on("click", this.onCreateNewCancel, this.widgets.createNewCancel, this);
          }
       },
 
@@ -1096,6 +1171,17 @@
                width: size / 2
             });
          }
+      },
+      
+      /**
+       * Determines whether the picker is in 'authority' mode.
+       * 
+       * @method _inAuthorityMode
+       * @return true if the picker is being used to find authorities i.e. users and groups
+       */
+      _inAuthorityMode: function ObjectFinder__inAuthorityMode()
+      {
+         return (this.options.itemFamily == "authority");
       }
    });
 })();
@@ -1181,6 +1267,20 @@
           * @type string
           */
          itemType: "cm:content",
+         
+         /**
+          * The 'family' of the item to find can be one of the following:
+          * 
+          * - node
+          * - category
+          * - authority
+          * 
+          * default is "node".
+          * 
+          * @property itemFamily
+          * @type string
+          */
+         itemFamily: "node",
 
          /**
           * Parameters to be passed to the data webscript
@@ -1206,7 +1306,25 @@
           * @type int
           * @default 100
           */
-         maxSearchResults: 100
+         maxSearchResults: 100,
+         
+         /**
+          * Relative URI of "create new item" data webscript.
+          *
+          * @property createNewItemUri
+          * @type string
+          * @default ""
+          */
+         createNewItemUri: "",
+         
+         /**
+          * Icon type to augment "create new item" row.
+          *
+          * @property createNewItemIcon
+          * @type string
+          * @default ""
+          */
+         createNewItemIcon: ""
       },
 
       /**
@@ -1306,7 +1424,13 @@
          // Check the event is directed towards this instance
          if ($hasEventInterest(this, args))
          {
-            this._updateItems(this.options.parentNodeRef);
+            var searchTerm = "";
+            var obj = args[1];
+            if (obj && obj.searchTerm)
+            {
+               searchTerm = obj.searchTerm;
+            }
+            this._updateItems(this.options.parentNodeRef, searchTerm);
          }
       },
 
@@ -1325,7 +1449,7 @@
             var obj = args[1];
             if (obj && obj.nodeRef)
             {
-               this._updateItems(obj.nodeRef);
+               this._updateItems(obj.nodeRef, "");
             }
          }
       },
@@ -1718,12 +1842,18 @@
             { key: "name", label: "Item", sortable: false, formatter: this.fnRenderItemName() },
             { key: "add", label: "Add", sortable: false, formatter: this.fnRenderCellAdd(), width: this.options.compactMode ? 16 : 80 }
          ];
+         
+         var initialMessage = this.msg("form.control.object-picker.items-list.loading");
+         if (this._inAuthorityMode())
+         {
+            initialMessage = this.msg("form.control.object-picker.items-list.search");
+         }
 
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
             initialLoad: false,
-            MSG_EMPTY: this.msg("form.control.object-picker.items-list.loading")
+            MSG_EMPTY: initialMessage
          });
 
          // Rendering complete event handler
@@ -1817,8 +1947,9 @@
        *
        * @method _updateItems
        * @param nodeRef {string} Parent nodeRef
+       * @param searchTerm {string} Search term
        */
-      _updateItems: function ObjectRenderer__updateItems(nodeRef)
+      _updateItems: function ObjectRenderer__updateItems(nodeRef, searchTerm)
       {
          // Empty results table
          this.widgets.dataTable.set("MSG_EMPTY", this.msg("form.control.object-picker.items-list.loading"));
@@ -1852,7 +1983,8 @@
             }
          };
          
-         var url = nodeRef.replace("://", "/") + "/children?selectableType=" + this.options.itemType;
+         var url = nodeRef.replace("://", "/") + "/children?selectableType=" + this.options.itemType +
+               "&searchTerm=" + encodeURIComponent(searchTerm) + "&size=" + this.options.maxSearchResults;
          if (this.options.params)
          {
             url += "&" + this.options.params;
@@ -1863,6 +1995,17 @@
             failure: failureHandler,
             scope: this
          });
+      },
+      
+      /**
+       * Determines whether the picker is in 'authority' mode.
+       * 
+       * @method _inAuthorityMode
+       * @return true if the picker is being used to find authorities i.e. users and groups
+       */
+      _inAuthorityMode: function ObjectFinder__inAuthorityMode()
+      {
+         return (this.options.itemFamily == "authority");
       }
    });
 })();

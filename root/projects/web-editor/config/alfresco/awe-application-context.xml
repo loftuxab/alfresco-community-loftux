@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <!-- Override the config source to include Web Framework Commons and Web Editor config -->
+   <bean id="webframework.configsource" class="org.springframework.extensions.config.source.UrlConfigSource">
+      <constructor-arg>
+         <list>
+            <!-- Spring Web Scripts -->
+            <value>classpath:org/springframework/extensions/webscripts/spring-webscripts-config.xml</value>
+            <value>classpath:META-INF/spring-webscripts-config-custom.xml</value>
+            <value>jar:*!/META-INF/spring-webscripts-config-custom.xml</value>
+            
+            <!-- Spring Surf -->
+            <value>classpath:org/springframework/extensions/surf/spring-surf-config.xml</value>
+            <value>classpath:org/springframework/extensions/surf/spring-surf-config-remote.xml</value>
+            <value>classpath:META-INF/spring-surf-config-custom.xml</value>
+            <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
+            
+            <!-- Web Framework Commons -->
+            <value>classpath:alfresco/web-framework-config-commons.xml</value>
+            
+            <!-- Web Framework Commons -->
+            <value>classpath:alfresco/awe-form-config.xml</value>
+            
+            <!-- Wed Editor custom config -->
+            <value>classpath:alfresco/web-extension/awe-config-custom.xml</value>
+            
+            <!-- Surf Autowire Support -->
+            <value>webapp:WEB-INF/surf.xml</value>
+         </list>
+      </constructor-arg>
+   </bean>
+   
+   <!-- Override WebScript Messages - add web editor application messages -->
+   <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
+      <property name="resourceBundles">
+         <list>
+            <value>webscripts.messages.webscripts</value>
+            <value>alfresco.messages.common</value>
+            <value>alfresco.messages.awe</value>
+         </list>
+      </property>
+   </bean>
+   
+   <!-- Override Web Framework Abstract Handler Mappings -->
+   <bean id="webframeworkHandlerMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" abstract="true">
+      <property name="interceptors">
+         <list>
+            <ref bean="requestContextInterceptor"/>
+            <ref bean="themeInterceptor"/>
+         </list>
+      </property>
+      <property name="mappings">
+         <value>
+            /system/**=remoteController
+            /proxy/**=endpointController
+            /resource/**=resourceController
+            /dologin/**=loginController
+            /dologout/**=logoutController
+         </value>
+      </property>
+   </bean>
+   
+   <!-- Web Editor Factory beans -->
+   <bean id="webframework.factory.pagemapper.awe" class="org.alfresco.web.site.WebEditorPageMapperFactory" parent="webframework.factory.base" />
+   
+   <!-- "no-component" processor -->
+   <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
+   
+   <!--                             -->
+   <!--  Web Script Implementations -->
+   <!--                             -->
+   
+   <!--  I18N resources and messages Web Script -->
+   <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" />
+   
+</beans>

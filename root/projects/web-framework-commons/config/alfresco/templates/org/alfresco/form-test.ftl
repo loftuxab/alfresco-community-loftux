@@ -1,130 +1,173 @@
-<#include "include/alfresco-template.ftl" />
-<@templateHeader>
-</@>
+<#assign templateStylesheets = []>
 
-<@templateBody>
-   <div id="alf-hd">
-      <@region id="header" scope="global" protected=true/>
-      <@region id="title" scope="template" protected=true />
-   </div>
-   <div id="bd">
-      <div style="padding: 10px; margin-top: 10px; background-color: #eee; border: 1px dotted #c0c0c0;">
-         <h2>Form Test Page</h2>
-         <#if url.args.mode?exists>
-            <#assign mode="${url.args.mode}">
-         <#else>
-            <#assign mode="edit">
-         </#if>
-         <#if url.args.submitType?exists>
-            <#assign submitType="${url.args.submitType}">
-         <#else>
-            <#assign submitType="multipart">
-         </#if>
-         <form method="get">
-            <fieldset style="border: 1px solid #aaa; margin-top: 10px; padding: 8px;">
-               <legend style="color: #515d6b;">Item Details</legend>
-               <label for="itemKind">Kind:</label>
-               <input id="itemKind" type="text" name="itemKind" style="width: 50px; margin: 5px 5px 5px 0px;" 
-                      value="<#if url.args.itemKind?exists>${url.args.itemKind}<#else>node</#if>" />
-               <label for="itemId">Id:</label>
-               <input id="itemId" type="text" name="itemId" style="width: 450px; margin: 5px 5px 5px 0px;" 
-                      value="<#if url.args.itemId?exists>${url.args.itemId}</#if>" />
-               <br/>
-               <label for="destination">Destination:</label>
-               <input id="destination" type="text" name="destination" style="width: 494px; margin: 5px 5px 5px 0px;" 
-                      value="<#if url.args.destination?exists>${url.args.destination}</#if>" />
-            </fieldset>
-            <fieldset style="border: 1px solid #aaa; margin: 10px 0px; padding: 8px;">
-               <legend style="color: #515d6b;">Form Details</legend>
-               <label for="formId">Id:</label>
-               <input id="formId" name="formId" style="width: 200px; margin: 5px 10px 5px 0px;" 
-                      value="<#if url.args.formId?exists>${url.args.formId}</#if>" />
-               <label style="margin-right: 5px;">Mode:</label>
-               <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
-               <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
-               <input id="mode-create" type="radio" name="mode" value="create"<#if mode == "create"> checked</#if>>&nbsp;Create&nbsp;
-               <br/>
-               <label style="margin-right: 5px;">Submit Type:</label>
-               <input id="submitType-multi" type="radio" name="submitType" value="multipart"<#if submitType == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;
-               <input id="submitType-json" type="radio" name="submitType" value="json"<#if submitType == "json"> checked</#if>>&nbsp;JSON&nbsp;
-               <input id="submitType-url" type="radio" name="submitType" value="urlencoded"<#if submitType == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
-               <input id="fr-toggle" name="fr" type="checkbox"<#if url.args.fr?exists> checked</#if>>&nbsp;Test Forms Runtime
-            </fieldset>
-            <input type="submit" value="Show Form" />
-            <input type="button" value="Clear"
-                   onclick="javascript:document.getElementById('itemKind').value='';document.getElementById('itemId').value='';document.getElementById('formId').value='';" />
-         </form>
-      </div>
+<#macro link rel type href>
+   <#assign templateStylesheets = templateStylesheets + [href]>
+</#macro>
+
+<#macro renderStylesheets>
+   <style type="text/css" media="screen">
+   <#list templateStylesheets as href>
+      @import "${href}";
+   </#list>
+   </style>
+</#macro>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+      <title>Form Test Page</title>
+      <meta http-equiv="X-UA-Compatible" content="Edge" />
+
+      <@link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
+      <@link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/default/skin.css" />
+
+      <script type="text/javascript" src="${url.context}/js/log4javascript.v1.4.1.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/yahoo/yahoo-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/event/event-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/dom/dom-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/dragdrop/dragdrop-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/animation/animation-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/logger/logger-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/connection/connection-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/element/element-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/get/get-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/yuiloader/yuiloader-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/button/button-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/container/container-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/menu/menu-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/json/json-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/selector/selector-debug.js"></script>
+      <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
+      <script type="text/javascript" src="${url.context}/js/bubbling.v2.1.js"></script>
+      <script type="text/javascript" src="${url.context}/service/messages.js?locale=en_US"></script>
+      <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
+      <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
       
-      <div style="margin-left: 1.4em; margin-top: 1.4em;">
-         <@region id="form-ui" scope="template" />
-      </div>
+      <script type="text/javascript">//<![CDATA[
+         Alfresco.constants = Alfresco.constants || {};
+         Alfresco.constants.DEBUG = true;
+         Alfresco.constants.AUTOLOGGING = false;
+         Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
+         Alfresco.constants.PROXY_URI_RELATIVE = "${url.context}/proxy/alfresco/";
+         Alfresco.constants.THEME = "default";
+         Alfresco.constants.URL_CONTEXT = "${url.context}/";
+         Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
+         Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
+         Alfresco.constants.USERNAME = "admin";
+         Alfresco.constants.HTML_EDITOR = "tinyMCE";
+         Alfresco.constants.URI_TEMPLATES = {};
+      //]]></script>
       
-      <#if url.args.fr?exists>
-         <div style="padding: 10px; margin-bottom: 10px; margin-top: 10px; background-color: #eee; border: 1px dotted #c0c0c0;">
-            <h2>Forms Runtime Test</h2>
-            
-            <div id="form-errors" style="margin-top: 5px; color: red;">
-            </div>
-            
-            <div class="form-container">
-               <form id="forms-runtime-test" method="get">
-                  <input type="hidden" name="fr" value="true" />
-                  <label for="username">Username</label>
-                  <input id="username" name="username" type="text" size="40" />
-                  <label for="pwd">Password</label>
-                  <input id="pwd" name="pwd" type="password" size="40" />
-                  <label for="email">Email Address</label>
-                  <input id="email" name="email" type="text" size="40" />
-                  <label for="name">Name</label>
-                  <input id="name" name="name" type="text" size="40" />
-                  <label for="age">Age</label>
-                  <input id="age" type="text" name="age" size="5" />
-                  <label for="gender">Gender</label>
-                  <input id="gender" name="gender" type="radio" value="male" />&nbsp;Male
-                  <input id="gender" name="gender" type="radio" value="female" />&nbsp;Female
-                  <label for="country">Country</label>
-                  <select id="country" name="country">
-                     <option value="">Please select...</option>
-                     <option value="france">France</option>
-                     <option value="germany">Germany</option>
-                     <option value="">Separator...</option>
-                     <option value="spain">Spain</option>
-                     <option value="uk">United Kingdom</option>
-                     <option value="us">United States</option>
-                  </select>
-                  <label for="interests">Interests</label>
-                  <input id="interests" name="interests" type="text" size="40" />
-               
-                  <hr/>
+      <@renderStylesheets />
+      
+      ${head}
+      
+      <style type="text/css" media="screen">
+         body
+         {
+            text-align: left;
+         }
+         
+         .form-console
+         {
+            padding: 10px; 
+            margin: 10px; 
+            background-color: #f9fcfd;
+            border: 1px dotted #c0c0c0;
+         }
+         
+         .form-console h2
+         {
+            font-family: Helvetica,Arial,sans-serif;
+            font-size: 146.5%;
+         }
+         
+         .form-console fieldset
+         {
+            border: 1px solid #aaa; 
+            margin-top: 10px; 
+            padding: 8px;
+         }
+         
+         .form-console legend
+         {
+            color: #515d6b;
+         }
+         
+         .form-console input
+         {
+            margin: 5px 5px 5px 0px;
+         }
+         
+         .form-console .inline-label
+         {
+            margin-right: 5px;
+            margin-left: 5px;
+            font-weight: bold;
+         }
+         
+         .form-console .button
+         {
+            margin-top: 15px;
+         }
+         
+         .form-instance
+         {
+            margin-left: 1.4em; 
+            margin-top: 1.4em;
+         }
+      </style>
+      
+   </head>
+   <body class="yui-skin-default">
+      <div id="bd">
+         <div class="form-console">
+            <h2>Form Test Page</h2>
+            <#if url.args.mode?exists>
+               <#assign mode="${url.args.mode}">
+            <#else>
+               <#assign mode="edit">
+            </#if>
+            <#if url.args.submitType?exists>
+               <#assign submitType="${url.args.submitType}">
+            <#else>
+               <#assign submitType="multipart">
+            </#if>
+            <form method="get">
+               <fieldset>
+                  <legend>Item Details</legend>
+                  <label for="itemKind">Kind:</label>
+                  <input id="itemKind" type="text" name="itemKind" value="<#if url.args.itemKind?exists>${url.args.itemKind}<#else>node</#if>" size="5" />
+                  <label for="itemId">Id:</label>
+                  <input id="itemId" type="text" name="itemId" value="<#if url.args.itemId?exists>${url.args.itemId}</#if>" size="70" />
+                  <br/>
+                  <label for="destination">Destination:</label>
+                  <input id="destination" type="text" name="destination" value="<#if url.args.destination?exists>${url.args.destination}</#if>" size="77" />
+               </fieldset>
+               <fieldset>
+                  <legend>Form Details</legend>
+                  <label for="formId">Id:</label>
+                  <input id="formId" name="formId" value="<#if url.args.formId?exists>${url.args.formId}</#if>" />
+                  <label class="inline-label">Mode:</label>
+                  <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
+                  <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
+                  <input id="mode-create" type="radio" name="mode" value="create"<#if mode == "create"> checked</#if>>&nbsp;Create&nbsp;
                   
-                  <input id="regsubmit" type="submit" value="Submit" />
-                  <input value="Clear" type="reset" />
-               </form>
-            </div>
+                  <label class="inline-label">Submit Type:</label>
+                  <input id="submitType-multi" type="radio" name="submitType" value="multipart"<#if submitType == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;
+                  <input id="submitType-json" type="radio" name="submitType" value="json"<#if submitType == "json"> checked</#if>>&nbsp;JSON&nbsp;
+                  <input id="submitType-url" type="radio" name="submitType" value="urlencoded"<#if submitType == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
+               </fieldset>
+               <input type="submit" value="Show Form" class="button" />
+               <input type="button" value="Clear" class="button"
+                      onclick="javascript:document.getElementById('itemKind').value='';document.getElementById('itemId').value='';document.getElementById('formId').value='';" />
+            </form>
          </div>
          
-         <script type="text/javascript">
-            // setup forms-runtime-test form   
-            var frTest = new Alfresco.forms.Form("forms-runtime-test");
-            frTest.addValidation("username", Alfresco.forms.validation.length, {min: 3, max: 10}, "blur");
-            //frTest.addValidation("age", Alfresco.forms.validation.mandatory);
-            //frTest.addValidation("age", Alfresco.forms.validation.numberRange, {min: 18}, "blur");
-            //frTest.addValidation("country", Alfresco.forms.validation.mandatory);
-            //frTest.addValidation("gender", Alfresco.forms.validation.mandatory);
-            //frTest.addValidation("email", Alfresco.forms.validation.email, null, "blur");
-            //frTest.setValidateOnSubmit(false);
-            //frTest.setErrorContainer("form-errors");
-            //frTest.setValidateAllOnSubmit(true);
-            frTest.init();
-         </script>
-         
-      </#if>
-   </div>
-</@>
+         <div class="form-instance">
+            <@region id="form-ui" scope="template" />
+         </div>
 
-<@templateFooter>
-   <div id="alf-ft">
-      <@region id="footer" scope="global" protected=true />
-   </div>
-</@>
+      </div>
+
+   </body>
+</html>

@@ -426,6 +426,18 @@
                     package-slingshot-jar,
                     deploy-slingshot-tomcat-exploded,
                     minimize-slingshot-deployed-javascript" />
+   
+   <target name="incremental-webeditor-tomcat"
+           description="Performs an incremental build and deployment of the Web Editor WAR"
+           depends="package-webframeworkcommons-jar,
+                    incremental-webeditor,
+                    deploy-webeditor-tomcat" />
+
+   <target name="incremental-webeditor-tomcat-exploded"
+           depends="package-webframeworkcommons-jar,
+                    package-webeditor-jar,
+                    deploy-webeditor-tomcat-exploded,
+                    minimize-webeditor-deployed-javascript" />
 
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"
@@ -458,6 +470,7 @@
            depends="clean-webclient-projects,
                     clean-slingshot-projects,
                     clean-mobile-projects,
+                    clean-webeditor-projects,
                     clean-webserviceclient" />
                     
    <target name="clean-webclient-projects" 
@@ -479,6 +492,11 @@
            description="Cleans all projects related to the slingshot project" 
            depends="clean-webframeworkcommons,
                     clean-slingshot" />
+   
+   <target name="clean-webeditor-projects" 
+              description="Cleans all projects related to the web editor project" 
+              depends="clean-webframeworkcommons,
+                       clean-webeditor" />
                     
    <target name="clean-mobile-projects" 
            description="Cleans all projects related to the mobile project" 
@@ -518,6 +536,9 @@
            depends="init">
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
       <delete dir="${dir.deploy.tomcat.application.slingshot}" 
+              includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor}" />
+      <delete dir="${dir.deploy.tomcat.application.webeditor}" 
               includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.mobile}" />
       <delete dir="${dir.deploy.tomcat.application.mobile}" 
@@ -794,7 +815,119 @@
             <exclude name="**/log4javascript*.js" />
          </fileset>
          <arg line="-jar"/>
-         <arg path="${dir.project.slingshot}/lib/yuicompressor-2.4.2.jar"/>
+         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
+         <arg line="-o"/>
+         <targetfile />
+         <srcfile />
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
+   </target>
+      
+   <target name="deploy-webeditor-tomcat" depends="init" 
+           description="Deploys the web editor WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor}" />
+      <delete dir="${dir.deploy.tomcat.application.webeditor}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
+      <!-- copy the web editor WAR file to the application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
+            file="${dir.project.webeditor.dist}/${file.name.war.webeditor}" />
+   </target>
+   
+   <target name="deploy-webeditor-tomcat-exploded" depends="init">
+      <!-- remove the WAR, if necessary -->
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor}" />
+      
+      <!-- copy all source files, ensuring web editor project files are copied first -->
+      <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditor.src.web}" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      
+      <!-- copy config files, ensuring web editor project files are copied first -->
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditor.config}" excludes="**/extension/**" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
+      </copy>
+      
+      <!-- add all class files to WEB-INF/classes, ensuring web editor project files are copied first -->
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditor.classes}" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.jlan.classes}" />
+         <fileset dir="${dir.project.webframeworkcommons.classes}" />
+      </copy>
+      
+      <!-- add all JARs to WEB-INF/lib -->
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/lib" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                 includes="${includes.webscriptframework.libs.optional}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+      </copy>
+
+      <!-- unzip and add 3rd party javascript library -->
+      <unzip src="${file.zip.slingshot.yui}"
+             dest="${dir.deploy.tomcat.application.webeditor}" />
+             
+      <!-- there seems to be a hidden __MACOSX folder in the YUI -->
+      <!-- distribution, remove it if present -->
+      <delete dir="${dir.deploy.tomcat.application.webeditor}/__MACOSX" 
+              includeEmptyDirs="true" quiet="yes" />
+
+      <!-- Copy our yui directory to apply YUI fixes -->
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/yui" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditor.src.web}/yui" />
+      </copy>
+
+   </target>
+   
+   <target name="deploy-webeditor-sample" depends="package-webeditor-sample-war">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample}" />
+      <copy todir="${dir.deploy.tomcat.application}" 
+            file="${dir.project.webeditor.dist}/${file.name.war.webeditor.sample}" />
+   </target>
+   
+   <target name="deploy-webeditor-sample-exploded" depends="package-webeditor-jar">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample}" />
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditor.src.sample}" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}/WEB-INF" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditor.src.webinf}" includes="awe.tld" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}/WEB-INF/lib" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.3rdparty}/lib/commons" 
+                  includes="commons-httpclient-3.1.jar, commons-logging-1.1.jar, commons-codec-1.3.jar" />
+         <fileset dir="${dir.project.3rdparty}/lib" includes="json.jar" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditor.classes}" excludes="org/alfresco/web/site/**" />
+      </copy>
+   </target>
+
+   <target name="minimize-webeditor-deployed-javascript" depends="init">
+      <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.webeditor}">
+         <fileset dir="${dir.deploy.tomcat.application.webeditor}">
+            <include name="**/*.js" />
+            <exclude name="**/*-min.js" />
+            <exclude name="**/WEB-INF/**" />
+            <exclude name="**/tiny_mce/**" />
+            <exclude name="**/yui/**" />
+         </fileset>
+         <arg line="-jar"/>
+         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
          <arg line="-o"/>
          <targetfile />
          <srcfile />
@@ -862,7 +995,7 @@
       <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.mobile}/js">
          <fileset dir="${dir.deploy.tomcat.application.mobile}/js" includes="alf-mobile.js"/>
          <arg line="-jar"/>
-         <arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
+         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
          <arg line="-o"/>
          <targetfile/>
          <srcfile/>

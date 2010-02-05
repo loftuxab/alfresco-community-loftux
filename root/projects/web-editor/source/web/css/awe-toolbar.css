@@ -1,0 +1,109 @@
+#awe-ribbon-container{   
+   position:fixed;
+   top:0;
+   z-index:100;
+}
+
+#awe-ribbon-container #awe-ribbon
+{
+   visibility: hidden;
+   border-width:0;
+}
+
+#awe-ribbon-container #awe-ribbon_c
+{   
+   background-color:transparent;
+}
+#awe-ribbon-container #awe-ribbon
+{
+   background-color:#F2F2F2;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c,
+#awe-ribbon-container.awe-ribbon-orientation-left #awe-ribbon_c
+{
+   left:0;
+}
+#awe-ribbon-container.awe-ribbon-orientation-right #awe-ribbon_c
+{
+   right:0;
+}
+#awe-ribbon-container,
+#awe-ribbon-container.awe-ribbon-orientation-right,
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c
+{
+   width:100%;
+}
+#awe-ribbon-container.awe-ribbon-orientation-left,
+#awe-ribbon-container.awe-ribbon-orientation-left #awe-ribbon_c,
+#awe-ribbon-container.awe-ribbon-orientation-right #awe-ribbon_c
+{
+   width:10em;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon
+{
+   height:3em;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon .hd,
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon .bd,
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon .ft
+{
+   float:left;
+   height:inherit;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .hd.awe-ribbon-module
+{
+   width:5%;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .ft.awe-ribbon-module
+{
+   width:10%;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .bd.awe-ribbon-module
+{
+   width:85%;
+}
+#awe-ribbon-container .yui-toolbar-container
+{
+   margin-top:0.5em
+}
+
+#awe-ribbon-container .yui-toolbar-subcont
+{
+   border-bottom:0
+}
+
+#awe-ribbon .awe-ribbon-module,
+#awe-ribbon .awe-ribbon-module .yuimenu .bd
+{
+   border:none;
+   background:none;
+   /*background: rgba(87,163,217,0.5) none;*/
+   padding:0;
+}
+#awe-ribbon .awe-ribbon-module .yui-menu-shadow
+{
+   display:none;
+}
+
+#awe-ribbon .yui-toolbar-container .yui-menu-button span.first-child select
+{
+   /*font-size:10px;*/
+   /*border:1px solid black;*/
+}
+
+/*  toolbar focus */
+#awe-ribbon .yui-toolbar-container .yui-toolbar-groupitem .yui-button:focus
+{
+   border:1px dotted black;
+}
+#awe-ribbon-container #awe-ribbon_c #awe-ribbon .ft.awe-ribbon-module
+{
+   font-size:inherit;
+}
+
+/* plugin css (awe edit content */
+#awe-ribbon .yui-toolbar-show-hide-edit-markers .yui-toolbar-icon
+{
+   background:url(../themes/default/images/edit.png) no-repeat 6px 2px;
+   width:21px;
+}

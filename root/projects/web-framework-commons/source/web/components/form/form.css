@@ -87,6 +87,29 @@
    margin-right: 6px;
    vertical-align: -2px;
 }
+
+.form-container .help-icon
+{
+   margin-left: 0.4em;
+}
+
+.form-container .help-icon img
+{
+   vertical-align: -3px;
+}
+
+.form-container .help-text
+{
+   margin-top: 0.4em;
+   padding: 0.6em;
+   width: 37.5em;
+   background-color: #ffffcc;
+   border: 1px solid #cacaca;
+   display: none;
+   font-size: 77%;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;
+}
    
 .form-container .viewmode-field
 {

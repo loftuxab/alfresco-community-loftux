@@ -31,6 +31,10 @@
             <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination}" />
          </#if>
          
+         <#if form.mode != "view" && form.redirect??>
+            <input id="${formId}-redirect" name="alf_redirect" type="hidden" value="${form.redirect}" />
+         </#if>
+         
          <div id="${formId}-fields" class="form-fields">
             <#list form.structure as item>
                <#if item.kind == "set">
@@ -48,6 +52,8 @@
    
       </div>
    </#if>
+<#else>
+   <div class="form-container">${msg("form.not.present")}</div>
 </#if>
 
 

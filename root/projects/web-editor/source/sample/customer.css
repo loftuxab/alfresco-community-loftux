@@ -1,0 +1,49 @@
+body
+{
+   text-align: left;
+}
+
+h1
+{
+   font-size: 182%;
+   margin: 10px 10px 20px 10px;
+}
+
+h3
+{
+   font-size: 154%;
+   margin: 20px 10px;
+}
+
+li
+{
+   list-style-type: disc;
+   margin: 10px 0px 0px 40px;
+}
+
+.content
+{
+   margin: 10px;
+}
+
+.logo
+{
+   margin: 10px;
+}
+
+.trailer-text
+{
+   margin: 20px 10px 0px 10px;
+}
+
+.links
+{
+   margin: 20px 10px 0px 10px;
+}
+
+.copyright
+{
+   font-size: 77%;
+   color: #efefef;
+   margin: 30px 10px; 
+}

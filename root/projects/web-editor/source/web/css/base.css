@@ -1,0 +1,14 @@
+body
+{
+   text-align: left;
+}
+
+input, textarea, select
+{
+   padding: 2px;
+}
+
+.form-container
+{
+   padding: 20px;
+}
