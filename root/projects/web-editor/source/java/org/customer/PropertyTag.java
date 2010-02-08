@@ -22,6 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
+
 package org.customer;
 
 import java.io.IOException;
@@ -41,84 +42,81 @@ import org.json.JSONObject;
  */
 public class PropertyTag extends AbstractCustomerTag
 {
-    private static final long serialVersionUID = -7972734141482504413L;
-    
-    private String property;
-    
-    /**
-     * Returns the name of the property to display
-     * 
-     * @return Name of the property to display
-     */
-    public String getProperty()
-    {
-        return property;
-    }
-    
-    /**
-     * Sets the name of the property to display
-     * 
-     * @param name The name of the property to display
-     */
-    public void setProperty(String name)
-    {
-        this.property = name;
-    }
-    
-    /**
-     * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
-     */
-    public int doStartTag() throws JspException
-    {
-        try
-        {
-            Writer out = pageContext.getOut();
-         
-            //http://localhost:8080/alfresco/service/api/metadata?nodeRef=workspace://SpacesStore/08637a34-ec40-4295-845a-f1d4c549be68&shortQNames=true
-            
-            // setup http call to content webscript
-            String url = this.getRepoUrl() + "/service/api/metadata?nodeRef=" + getNodeRef() + "&shortQNames=true";
-            HttpClient client = getHttpClient();
-            GetMethod getContent = new GetMethod(url);
-            getContent.setDoAuthentication(true);
-            
-            try
+   private static final long serialVersionUID = -7972734141482504413L;
+
+   private String property;
+
+   /**
+    * Returns the name of the property to display
+    * 
+    * @return Name of the property to display
+    */
+   public String getProperty()
+   {
+      return property;
+   }
+
+   /**
+    * Sets the name of the property to display
+    * 
+    * @param name The name of the property to display
+    */
+   public void setProperty(String name)
+   {
+      this.property = name;
+   }
+
+   /**
+    * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
+    */
+   public int doStartTag() throws JspException
+   {
+      try
+      {
+         Writer out = pageContext.getOut();
+
+         // setup http call to content webscript
+         String url = this.getRepoUrl() + "/service/api/metadata?nodeRef=" + getNodeRef() + "&shortQNames=true";
+         HttpClient client = getHttpClient();
+         GetMethod getContent = new GetMethod(url);
+         getContent.setDoAuthentication(true);
+
+         try
+         {
+            // execute the method
+            client.executeMethod(getContent);
+
+            // get the JSON response
+            String jsonResponse = getContent.getResponseBodyAsString();
+            JSONObject json = new JSONObject(jsonResponse);
+            JSONObject props = json.getJSONObject("properties");
+            if (props.has(this.property))
             {
-                // execute the method
-                client.executeMethod(getContent);
-                
-                // get the JSON response
-                String jsonResponse = getContent.getResponseBodyAsString();
-                JSONObject json = new JSONObject(jsonResponse);
-                JSONObject props = json.getJSONObject("properties");
-                if (props.has(this.property))
-                {
-                    out.write(props.getString(this.property));
-                }
+               out.write(props.getString(this.property));
             }
-            finally
-            {
-                getContent.releaseConnection();
-            }
-        }
-        catch (IOException ioe)
-        {
-            throw new JspException(ioe.toString());
-        }
-        catch (JSONException je)
-        {
-            throw new JspException(je.toString());
-        }
-        
-      
-        return SKIP_BODY;
-    }
-    
-    @Override
-    public void release()
-    {
-        super.release();
-    
-        this.property = null;
-    }
+         }
+         finally
+         {
+            getContent.releaseConnection();
+         }
+      }
+      catch (IOException ioe)
+      {
+         throw new JspException(ioe.toString());
+      }
+      catch (JSONException je)
+      {
+         throw new JspException(je.toString());
+      }
+
+      return SKIP_BODY;
+   }
+
+   @Override
+   public void release()
+   {
+      super.release();
+
+      this.property = null;
+   }
 }

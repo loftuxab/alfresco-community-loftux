@@ -30,6 +30,9 @@ import java.util.List;
 
 import javax.servlet.jsp.JspException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Tag used at the end of the body section of a page to indicate the end
  * of a page that potentially contains editable Alfresco content.
@@ -38,25 +41,23 @@ import javax.servlet.jsp.JspException;
  */
 public class EndTemplateTag extends AbstractWebEditorTag
 {
-    private static final long serialVersionUID = -2917015141188997203L;
+   private static final long serialVersionUID = -2917015141188997203L;
+   private static final Log logger = LogFactory.getLog(EndTemplateTag.class);
 
-    /**
-     * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
-     */
-    public int doStartTag() throws JspException
-    {
-        // TODO: look for AWE enabled flag in request session, if not present don't render anything!
-        
-        try
-        {
+   /**
+    * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
+    */
+   public int doStartTag() throws JspException
+   {
+      if (isEditingEnabled())
+      {
+         try
+         {
             Writer out = pageContext.getOut();
-         
-            // determine if debug mode is enabled
-            //boolean debug = isDebugEnabled();
-            
+      
             // get the toolbar location from the request session
             String toolbarLocation = (String)this.pageContext.getRequest().getAttribute(KEY_TOOLBAR_LOCATION);
-            
+   
             // render div's used by popup panels
             out.write("<div id=\"awe\"><div id=\"awe-login-panel\"></div><div id=\"awe-panel\"></div></div>\n");
             out.write("<div id=\"awe-ribbon-container\" class=\"awe-ribbon-container\"><div id=\"awe-ribbon\" class=\"awe-ribbon\" role=\"toolbar\">\n");
@@ -72,27 +73,27 @@ public class EndTemplateTag extends AbstractWebEditorTag
             boolean first = true;
             for (MarkedContent content : markedContent)
             {
-                if (first == false)
-                {
-                    out.write(",");
-                }
-                else
-                {
-                    first = false;
-                }
-                
-                out.write("\n{\n   id: \"");
-                out.write(content.getMarkerId());
-                out.write("\",\n   nodeRef: \"");
-                out.write(content.getContentId());
-                out.write("\",\n   redirectUrl: window.location.href");
-                if (content.getFormId() != null)
-                {
-                    out.write(",\n   formId: \"");
-                    out.write(content.getFormId());
-                    out.write("\"");
-                }
-                out.write("\n}");
+               if (first == false)
+               {
+                  out.write(",");
+               }
+               else
+               {
+                  first = false;
+               }
+             
+               out.write("\n{\n   id: \"");
+               out.write(content.getMarkerId());
+               out.write("\",\n   nodeRef: \"");
+               out.write(content.getContentId());
+               out.write("\",\n   redirectUrl: window.location.href");
+               if (content.getFormId() != null)
+               {
+                  out.write(",\n   formId: \"");
+                  out.write(content.getFormId());
+                  out.write("\"");
+               }
+               out.write("\n}");
             }
             out.write("]);\n");
             out.write("AWE.module.Ribbon = new AWE.Ribbon(\"awe-ribbon\");");
@@ -100,20 +101,29 @@ public class EndTemplateTag extends AbstractWebEditorTag
             out.write(toolbarLocation);
             out.write("\"\n});\nAWE.module.Ribbon.render();\n");
             out.write("}\n</script>");
-        }
-        catch (IOException ioe)
-        {
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Completed endTemplate rendering for " + markedContent.size() + 
+                        " marked content items with toolbar location of: " + toolbarLocation);
+         }
+         catch (IOException ioe)
+         {
             throw new JspException(ioe.toString());
-        }
+         }
+      }
+      else if (logger.isDebugEnabled())
+      {
+         logger.debug("Skipping endTemplate rendering as editing is disabled");
+      }
       
-        return SKIP_BODY;
-    }
+      return SKIP_BODY;
+   }
     
-    /**
-     * @see javax.servlet.jsp.tagext.TagSupport#release()
-     */
-    public void release()
-    {
-        super.release();
-    }
+   /**
+    * @see javax.servlet.jsp.tagext.TagSupport#release()
+    */
+   public void release()
+   {
+      super.release();
+   }
 }
