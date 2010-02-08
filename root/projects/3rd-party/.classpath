@@ -165,5 +165,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/openoffice-jurt-3.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/openoffice-ridl-3.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/openoffice-unoil-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fop/avalon-framework-4.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fop/batik-all-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fop/fop-0.94.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fop/xmlgraphics-commons-1.2.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
