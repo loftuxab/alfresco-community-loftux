@@ -36,6 +36,12 @@
       
       <echo>user.home = ${user.home}</echo>
 
+      <!-- Where to get BSF/Rhino from if on Java 1.5 -->
+      <condition property="classpath.bsf_javascript" else=""
+           value="${dir.project.3rdparty.lib}/bsf-2.4.0.jar:${dir.project.3rdparty.lib}/rhino-js-1.6R7.jar:${dir.project.3rdparty.lib}/commons/commons-logging-1.1.jar">
+         <equals arg1="${ant.java.version}" arg2="1.5" />
+      </condition>
+
       <path id="classpath.compile">
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="**/*.jar" />
@@ -104,7 +110,7 @@
 
       <!-- Add on all the 3rd party libs based on the eclipse project -->
       <!-- Includes libs that are both exported and non-exported -->
-      <script language="javascript"> <![CDATA[
+      <script language="javascript" classpath="${classpath.bsf_javascript}"> <![CDATA[
          importClass(java.util.regex.Matcher);
          importClass(java.util.regex.Pattern);
          importClass(java.io.File);
