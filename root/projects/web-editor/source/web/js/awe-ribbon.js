@@ -19,14 +19,14 @@
    AWE.Ribbon = function AWE_Ribbon(htmlid, name, attr)
    {
       this.id = htmlid || 'awe-ribbon';
-      this.name = (name || 'AWE.Ribbon')
+      this.name = (name || 'AWE.Ribbon');
       this._domFriendlyName = this.name.replace(/\./g,'-');
       this.services = {};
       this.config = {};
       this.widgets = {
          toolbars : {}
       };
-   }
+   };
 
    YAHOO.extend(AWE.Ribbon, Element, {
 
@@ -78,7 +78,7 @@
          this.setAttributeConfig('loggedInStatus', {
             value:(Cookie.get('awe-loginStatus')=='true'),
             validator: YAHOO.lang.isBoolean
-         })
+         });
          this.on('positionChange', this.onPositionChangeEvent);
          this.on('modePositionChange', this.onModeChangeEvent);
          this.on('loggedInStatusChange', this.onLoginStatusChangeEvent);
@@ -152,7 +152,7 @@
                this.addToolbar({
                  buttonType: 'advanced',
                  buttons: [
-                     { group: 'editcontent',
+                     { group: AWE.Ribbon.PRIMARY_TOOLBAR,
                          buttons: [
                              { type: 'menu', label: 'Quick Edit', value: this._domFriendlyName + AWE.SEPARATOR + 'quickedit', id: this._domFriendlyName + AWE.SEPARATOR + 'quickedit',
                                  menu: function renderEditableContentMenu(markers)
@@ -169,7 +169,7 @@
                                     return menuConfig;
                                  }(AWE.getEditableContentMarkers())
                              },
-                             { type: 'push', label: 'Show/Hide edit markers', value: this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markers', id:  this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markers' },
+                             { type: 'push', label: 'Show/Hide edit markers', value: this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markers', id:  this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markers' }
                          ]
                      }
                  ]
@@ -178,13 +178,13 @@
                this.addToolbar({
                  buttonType: 'advanced',
                  buttons: [
-                     { group: 'textstyle',
+                     { group: AWE.Ribbon.SECONDARY_TOOLBAR,
                          buttons: [
-                             { type: 'menu', label: 'Ribbon placement', value: this._domFriendlyName + AWE.SEPARATOR +  'ribbon-placement', id: 'ribbon-placement',
+                             { type: 'menu', label: 'Ribbon placement', value: this._domFriendlyName + AWE.SEPARATOR +  'ribbon-placement', id:this._domFriendlyName + AWE.SEPARATOR +  'ribbon-placement',
                                  menu: [
                                   { text: 'top', value: AWE.Ribbon.POSITION_TOP},
                                   { text: 'left', value: AWE.Ribbon.POSITION_LEFT},
-                                  { text: 'right', value: AWE.Ribbon.POSITION_RIGHT},
+                                  { text: 'right', value: AWE.Ribbon.POSITION_RIGHT}
                                  ]
                              },
                              { type: 'push', label: 'Help', value: this._domFriendlyName  + AWE.SEPARATOR + 'help', id: this._domFriendlyName + AWE.SEPARATOR + 'help'},
@@ -200,38 +200,86 @@
                console.log('create tabview as container for tabbed toolbars');
             }
 
-            //handler for show/hide edit markers
-            this.widgets.toolbars[AWE.Ribbon.PRIMARY_TOOLBAR].on(this._domFriendlyName + AWE.SEPARATOR +  'quickeditClick', function quickEdit(e)
-            {
-               AWE.loadForm(e.button.value);
-            });
-            this.widgets.toolbars[AWE.Ribbon.PRIMARY_TOOLBAR].on(this._domFriendlyName + AWE.SEPARATOR +  'show-hide-edit-markersClick', function showhidemarkers(e)
-            {
-               var editMarkers = Selector.query('span.awe-edit');
-               if (Dom.hasClass(editMarkers[0], 'awe-edit-hidden'))
-               {
-                  Dom.setStyle(editMarkers, 'display', 'block');
-               }
-               else
-               {
-                  Dom.setStyle(editMarkers, 'display', 'none');
-               }
-
-            });
-
-            
             ribbon.render();
 
             this.refresh(['position','loggedInStatus']);
+
+            YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
+            YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);   
             YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
             YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
             YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
             YAHOO.Bubbling.on('awe-loggedIn', this.onLoggedIn, this, true);
             YAHOO.Bubbling.on('awe-loggedOut', this.onLoggedOut, this, true);
-//            YAHOO.Bubbling.on(this._domFriendlyName + '::ribbon-placementClick', this.onHelp, this, true);
+            //add mouseove behaviour
+            this.widgets.toolbars[AWE.Ribbon.PRIMARY_TOOLBAR].getButtonById(this._domFriendlyName+ AWE.SEPARATOR +'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
          }
       },
       
+      onQuickEditMouseOver: function AWE_Ribbon_onQuickEditMouseOver(e, args)
+      {
+         var targetContentEl = Dom.get(args[1].value.id).parentNode,
+             targetContentElRegion = Dom.getRegion(targetContentEl),
+             fadeIn = function fade(el){
+                var anim = new YAHOO.util.ColorAnim(el, {
+                   backgroundColor: {
+                       from:'#ffffff',
+                       to: '#FFFF99',
+                       duration:'0.5'
+                   } 
+               });
+               anim.onComplete.subscribe(function(el)
+               {
+                  return function()
+                  {
+                     fadeOut(el);
+                  };
+               }(el));
+               anim.animate();
+             },
+             fadeOut = function fade(el){
+                var anim = new YAHOO.util.ColorAnim(el, 
+                {
+                   backgroundColor: 
+                   {
+                       from: '#FFFF99',
+                       to: '#ffffff',
+                       duration:'0.5'                       
+                   } 
+               });
+               anim.animate();
+             };
+         //if not visible in viewport
+         if (!(targetContentElRegion.intersect(Dom.getClientRegion())))
+         {
+            if (this.scrollAnimation)
+            {
+               this.scrollAnimation.stop();
+            }
+            //set up animation
+            this.scrollAnimation = new YAHOO.util.Scroll((YAHOO.env.ua.gecko) ? document.documentElement : document.body,
+               {
+                  scroll:
+                  {
+                     to: [0, Math.max(0,targetContentElRegion.top-50)]
+                  }
+               },
+               1,
+               YAHOO.util.Easing.easeOut
+             );
+             
+             this.scrollAnimation.onComplete.subscribe(function(el){
+                return function()
+                {
+                   fadeIn(el);
+                };
+             }(targetContentEl));
+             this.scrollAnimation.animate();
+         }
+         else {
+            fadeIn(targetContentEl);
+         }
+      },
       /**
        * Adds toolbar to ribbon.
        *
@@ -261,46 +309,31 @@
             config
          );
          
-         for (var i=0, len = config.buttons.length;i<len;i++)
-         {
-            var group = config.buttons[i];
-            for (var j=0, groupButtonsLen = group.buttons.length;j<groupButtonsLen;j++)
-            {
-               var button = group.buttons[j];
-               var eventName  = this._domFriendlyName + AWE.SEPARATOR + button.value.split(AWE.SEPARATOR).pop() + 'Click';
-               this.widgets.toolbars[location].on(eventName, function buildEventHandler(evtName)
-               {
-                  return function(e)
-                  {
-                     //strip namespace from button value
-                     //if required to set state of button etc get button via id
-                     // so id must be specified in button toolbar config
-                     e.button.value = e.button.value.split(AWE.SEPARATOR).pop();
-                     Bubbling.fire(evtName, e);
-                  }
-               }(eventName));
-            }
-         }
-//       The following code is useful for those buttons that require the button
-//       to stay in a selected state. TODO Move this logic out to doAfterPluginActivate ?
-//         tbar.on('buttonClick', function AWE_Ribbon_generic_button_handler(o)
-//         {
-//            console.log(arguments.callee.name, arguments);
-//            //this should really fire valueClickEvent;
-//            var value = o.button.value;
-//
-//            if (this.lastButton && this.lastButton===o.button)
-//            {
-//               tbar.deselectButton(o.button.id);
-//               this.lastButton = null;
-//            }
-//            else
-//            {
-//               tbar.deselectAllButtons();
-//               tbar.selectButton(value);
-//               this.lastButton = o.button;
-//            }
-//         });
+
+        tbar.on('buttonClick', function AWE_Ribbon_generic_button_handler(args)
+        {
+           //strip out button id (namespace) from value
+           if (YAHOO.lang.isString(args.button.value))
+           {
+              args.button.value = args.button.value.split(AWE.SEPARATOR).pop();              
+           }
+           Bubbling.fire(args.button.id + args.type.replace('button',''), args);
+         // The following code is useful for those buttons that require the button
+         // to stay in a selected state. TODO Move this logic out to doAfterPluginActivate ?           
+         // var value = o.button.value;
+           // 
+           // if (this.lastButton && this.lastButton===o.button)
+           // {
+           //    tbar.deselectButton(o.button.id);
+           //    this.lastButton = null;
+           // }
+           // else
+           // {
+           //    tbar.deselectAllButtons();
+           //    tbar.selectButton(value);
+           //    this.lastButton = o.button;
+           // }
+        });
          return tbar;
       },
 
@@ -351,6 +384,27 @@
         {
            this.addButton(buttonConfigs[i], buttonGroup, location);
         }
+      },
+
+      onQuickEditClick : function AWE_Ribbon_onQuickEditClick(e, args)
+      {
+         AWE.loadForm(args[1].button.value);
+      },
+
+      onShowHideClick : function AWE_Ribbon_onShowHideClick(e, args)
+      {
+         var editMarkers = Selector.query('span.alfresco-content-marker');
+         this.onShowHideClick.isHidden = this.onShowHideClick.isHidden || false;
+         if (this.onShowHideClick.isHidden)
+         {
+            Dom.setStyle(editMarkers, 'display', '');
+            this.onShowHideClick.isHidden = false;
+         }
+         else
+         {
+            Dom.setStyle(editMarkers, 'display', 'none');
+            this.onShowHideClick.isHidden = true;
+         }         
       },
 
       onRibbonPlacementClick: function AWE_Ribbon_onRibbonPlacementClick(e, args)
@@ -457,14 +511,14 @@
          //if position has changed, change class
          if (e.prevValue!==e.newValue)
          {
-            container.removeClass(('awe-ribbon-orientation-'+e.prevValue))
-            container.addClass('awe-ribbon-orientation-'+e.newValue)
+            container.removeClass(('awe-ribbon-orientation-'+e.prevValue));
+            container.addClass('awe-ribbon-orientation-'+e.newValue);
          }
          
          if (e.newValue === AWE.Ribbon.POSITION_TOP && !this._originalBodyMarginTop)
          {
             //reset body height
-            this.widgets.ribbonBody.setStyle('height', 'inherit')
+            this.widgets.ribbonBody.setStyle('height', 'inherit');
 
             // save original margin as any position changes to ribbon *might*
             // change the margins value
@@ -474,13 +528,13 @@
             Dom.setStyle(
                bodyEl,
                'margin-top',
-               parseInt(Dom.getStyle(bodyEl,'margin-top')) +
-                  parseInt(Dom.getStyle(this.id,'height'))+'px'
+               parseInt(Dom.getStyle(bodyEl,'margin-top'),10) +
+                  (parseInt(Dom.getStyle(this.id,'height'),10))*1.5+'px'
             );
 
             // reset any padding (left or right) on body
             this._originalBodyMarginLeft = this._originalBodyMarginRight = null;
-            Dom.setStyle(bodyEl, 'margin-left', this._originalBodyMarginLeft)
+            Dom.setStyle(bodyEl, 'margin-left', this._originalBodyMarginLeft);
             Dom.setStyle(bodyEl, 'margin-right', this._originalBodyMarginRight);
             this.widgets.ribbonContainer.setStyle('margin-right', 0);
             this.widgets.ribbonContainer.setStyle('margin-left', 0);
@@ -508,11 +562,11 @@
                Dom.setStyle(
                   bodyEl,
                   'margin-right',
-                  parseInt(Dom.getStyle(bodyEl,'margin-right')) +
-                     parseInt(Dom.getStyle(this.id,'width'))+'px'
+                  parseInt(Dom.getStyle(bodyEl,'margin-right'),10) +
+                     parseInt(Dom.getStyle(this.id,'width'),10)+'px'
                );
                // set negative margin
-               this.widgets.ribbonContainer.setStyle('margin-right', 1- parseInt(Dom.getStyle(this.widgets.ribbonContainer.getElementsByTagName('div')[0], 'width')) + 'px');
+               this.widgets.ribbonContainer.setStyle('margin-right', 1- parseInt(Dom.getStyle(this.widgets.ribbonContainer.getElementsByTagName('div')[0], 'width'),10) + 'px');
                //reset
                this.widgets.ribbonContainer.setStyle('margin-left', 0);
                Dom.setStyle(
@@ -530,12 +584,12 @@
                Dom.setStyle(
                   bodyEl,
                   'margin-left',
-                  parseInt(Dom.getStyle(bodyEl,'margin-left')) +
-                     parseInt(Dom.getStyle(this.id,'width'))+'px'
+                  parseInt(Dom.getStyle(bodyEl,'margin-left'),10) +
+                     parseInt(Dom.getStyle(this.id,'width'),10)+'px'
                );
 
                // set negative margin
-               this.widgets.ribbonContainer.setStyle('margin-left', 1- parseInt(Dom.getStyle(this.widgets.ribbonContainer.getElementsByTagName('div')[0], 'width')) + 'px');
+               this.widgets.ribbonContainer.setStyle('margin-left', 1- parseInt(Dom.getStyle(this.widgets.ribbonContainer.getElementsByTagName('div')[0], 'width'),10) + 'px');
                //reset
                this.widgets.ribbonContainer.setStyle('margin-right', 0);
                Dom.setStyle(

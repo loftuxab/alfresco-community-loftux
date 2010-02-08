@@ -19,6 +19,24 @@
    background-color:#F2F2F2;
 }
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c,
+#awe-ribbon-container.awe-ribbon-orientation-left #awe-ribbon_c,
+#awe-ribbon-container.awe-ribbon-orientation-right #awe-ribbon_c
+{
+   border:1px solid #999;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c
+{
+   border-width:0 0 1px 0;
+}
+#awe-ribbon-container.awe-ribbon-orientation-left #awe-ribbon_c
+{
+   border-width:0 1px 0 0;
+}
+#awe-ribbon-container.awe-ribbon-orientation-right #awe-ribbon_c
+{
+   border-width:0 0 0 1px;
+}
+#awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c,
 #awe-ribbon-container.awe-ribbon-orientation-left #awe-ribbon_c
 {
    left:0;
@@ -50,17 +68,25 @@
    float:left;
    height:inherit;
 }
+#awe-ribbon-container.awe-ribbon-orientation-left #awe-ribbon .bd.awe-ribbon-module,
+#awe-ribbon-container.awe-ribbon-orientation-right #awe-ribbon .bd.awe-ribbon-module,
+#awe-ribbon-container.awe-ribbon-orientation-left #awe-ribbon .ft.awe-ribbon-module,
+#awe-ribbon-container.awe-ribbon-orientation-right #awe-ribbon .ft.awe-ribbon-module
+{
+   padding-left:1.5em;
+}
+
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .hd.awe-ribbon-module
 {
    width:5%;
 }
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .ft.awe-ribbon-module
 {
-   width:10%;
+   width:6%;
 }
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .bd.awe-ribbon-module
 {
-   width:85%;
+   width:89%;
 }
 #awe-ribbon-container .yui-toolbar-container
 {
@@ -69,9 +95,13 @@
 
 #awe-ribbon-container .yui-toolbar-subcont
 {
-   border-bottom:0
+   border-bottom:0;
+   padding:0;
 }
-
+#awe-ribbon h6 {
+   padding:0.5em;
+   text-align: center;
+}
 #awe-ribbon .awe-ribbon-module,
 #awe-ribbon .awe-ribbon-module .yuimenu .bd
 {
@@ -79,6 +109,10 @@
    background:none;
    /*background: rgba(87,163,217,0.5) none;*/
    padding:0;
+}
+#awe-ribbon .awe-ribbon-module .yuimenu .bd
+{
+   border:1px solid black;
 }
 #awe-ribbon .awe-ribbon-module .yui-menu-shadow
 {
@@ -102,8 +136,28 @@
 }
 
 /* plugin css (awe edit content */
-#awe-ribbon .yui-toolbar-show-hide-edit-markers .yui-toolbar-icon
+#awe-ribbon #AWE-Ribbon--show-hide-edit-markers span.yui-toolbar-icon
 {
-   background:url(../themes/default/images/edit.png) no-repeat 6px 2px;
-   width:21px;
+   background: transparent url(../themes/default/images/edit.png) no-repeat 6px 2px;
+   width:23px;
+}
+#awe-ribbon #AWE-Ribbon--logout span.yui-toolbar-icon
+{
+   background: transparent url(http://localhost:8080/alfresco/images/icons/logout.gif) no-repeat 7px 50%;
+   width:23px;
+}
+#awe-ribbon #AWE-Ribbon--help span.yui-toolbar-icon
+{
+   background: transparent url(http://localhost:8080/alfresco/images/icons/Help_icon.gif) no-repeat 7px 50%;
+   width:23px;
+}
+#awe-ribbon #AWE-Ribbon--ribbon-placement span.yui-toolbar-icon
+{
+   background:transparent url(http://localhost:8080/alfresco/images/icons/shelf.gif) no-repeat 6px 1px;
+   width:23px;
+}
+#awe-ribbon #AWE-Ribbon--quickedit span.yui-toolbar-icon
+{
+   background:transparent url(http://localhost:8080/alfresco/images/icons/search_controls.gif) no-repeat 5px 3px;
+   width:23px;
 }
