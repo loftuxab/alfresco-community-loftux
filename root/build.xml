@@ -100,167 +100,43 @@
          <pathelement location="${dir.project.remoteapi}/${dir.name.source}/${dir.name.test.resources}" />
          <pathelement location="${dir.project.repository}/${dir.name.source}/${dir.name.test.resources}" />
          <pathelement location="${dir.project.webclient}/${dir.name.source}/${dir.name.test.resources}" />
-         
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/abdera-core-0.4.0-incubating.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/abdera-extensions-json-0.4.0-incubating.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/abdera-i18n-0.4.0-incubating.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/abdera-parser-0.4.0-incubating.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/axiom-api-1.2.5.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/axiom-impl-1.2.5.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/geronimo-activation_1.0.2_spec-1.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/stax-api-1.0.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/abdera/wstx-asl-3.2.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/chemistry-tck-atompub-1.0-SNAPSHOT.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-beanutils-1.7.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-codec-1.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-collections-3.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-dbcp-1.2.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-digester-1.6.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-discovery-0.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-httpclient-3.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-io-1.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-jxpath-1.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-lang-2.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-logging-1.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons/commons-pool-1.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-core-1.0.0.CI-SNAPSHOT.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-core-configservice-1.0.0.CI-SNAPSHOT.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT-tests.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-webscripts-api-1.0.0.CI-SNAPSHOT.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/spring-surf/spring-surf-1.0.0.CI-SNAPSHOT.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/devenv/mysql-connector-java-5.1.7-bin.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/j2ee/servlet.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/mockito-all-1.8.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/devenv/org.springframework.test-${file.version.springframework}.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/devenv/yguard.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/fop/avalon-framework-4.2.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/fop/batik-all-1.6.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/fop/fop-0.94.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/fop/xmlgraphics-commons-1.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/ibatis-2.3.4.726-patched.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jbpm/bsh-1.3.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jbpm/jbpm-identity-3.3.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jbpm/jbpm-jpdl-3.3.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jbpm/springmodules-jbpm31.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jgroups/jgroups-2.8.0-b2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jibx/jibx-run.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jmagick/JMagick.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/jut.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-juh-3.1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-jurt-3.1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-ridl-3.1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-sandbox-2.0.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-unoil-3.1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/xstream-1.2.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/xalan/serializer.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/xalan/xalan.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/activation.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/acegi-security-0.8.2_patched.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/addressing-1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/antlr-2.7.5H3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/antlr-3.1.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/stringtemplate-3.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/aopalliance.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/axis-1.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/bcel.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/bcmail-jdk15-137.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/bcprov-jdk15-137.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/bliki-3.0.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/bsf-2.4.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/cglib-nodep-2.2_beta1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/chiba-1.3.0-patched.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/commons-modeler.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/cxf-2.2.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/dom4j-1.6.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/ehcache-1.4.1-patched.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/facebook_070716.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/FastInfoset-1.2.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/fontbox-0.8.0-incubating.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/freemarker-2.3.13.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/geronimo-activation_1.1_spec-1.0.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/geronimo-annotation_1.0_spec-1.1.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/geronimo-javamail_1.4_spec-1.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/geronimo-jaxws_2.1_spec-1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/geronimo-stax-api_1.0_spec-1.0.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/geronimo-ws-metadata_2.0_spec-1.1.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/greenmail-1.3-patched.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/guessencoding-1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/hibernate-3.2.6-patched.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/hrtlib.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/htmlparser-1.6.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/icu4j-2.3.0.677.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jakarta-oro-2.0.8.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jaxb-api-2.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jaxb-impl-2.1.7.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jaxb-xjc-2.1.7.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jaxen-1.1-beta-8.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jaxrpc.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jaxws-api-2.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jcr-1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jid3lib-0.5.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/joda-time-1.2.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jooconverter-2.1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/json.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jsr107cache-1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jta.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jug-lgpl-2.0.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/optional/log4j-1.2.15.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jutf7-1.0.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/lucene-analyzers-2.4.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/lucene-core-2.4.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/lucene-snowball-2.4.1.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/mail.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/myfaces-api-1.1.5.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/myfaces-impl-1.1.5.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/virtual-tomcat/naming-factory.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/virtual-tomcat/naming-resources.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/neethi-2.0.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/odf_utils.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/odmg-3.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/pdfbox-0.8.0-incubating-12-Nov-09.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/PDFRenderer-2009-09-27.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/poi-3.5-FINAL-20090928.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/j2ee/portlet_20.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/quartz-1.6.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/resolver.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/rhino-js-1.6R7.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/saaj-api-1.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/saaj-impl-1.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/saaj.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/saxpath.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/shale-test-1.0.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/slf4j-api-1.5.8.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/slf4j-jcl-1.5.8.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.core-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.beans-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.expression-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.context-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.context.support-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.transaction-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.aop-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.asm-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.jdbc-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.orm-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.web-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/org.springframework.webmvc-${file.version.springframework}.jar"/>
-         <pathelement location="${dir.project.3rdparty.lib}/standard.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/stax-utils-20060502.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/subetha-smtp.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/tm-extractors-1.0-patched.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/truezip.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/wsdl4j-1.6.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/wss4j.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/wstx-asl-3.2.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/xercesImpl-2.8.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/xml-apis.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/xml-resolver-1.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/xmlrpc.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/XmlSchema-1.4.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
       </path>
+
+      <!-- Add on all the 3rd party libs based on the eclipse project -->
+      <!-- Includes libs that are both exported and non-exported -->
+      <script language="javascript"> <![CDATA[
+         importClass(java.util.regex.Matcher);
+         importClass(java.util.regex.Pattern);
+         importClass(java.io.File);
+         importClass(java.io.FileInputStream);
+         importClass(java.io.InputStreamReader);
+         importClass(java.io.BufferedReader);
+
+         var path = project.getReference("classpath.unit.test");
+         var projPath = "projects/3rd-party/";
+
+         is_entry = Pattern.compile("[ \t]*\<classpathentry.*?");
+         //is_exported = Pattern.compile("[ \t]*\<classpathentry.*? exported=[\"\']true[\"\'][ \/].*");
+         is_lib = Pattern.compile(".*? kind=[\"\']lib[\"\'][ \/].*?");
+         get_path = Pattern.compile(".*? path=[\"\'](.*?)[\"\'][ \/].*?");
+
+         var f = new BufferedReader(new InputStreamReader(
+                 new FileInputStream(new File(projPath + ".classpath"))
+         ));
+         var line;
+         while( (line = f.readLine()) != null ) {
+            if( is_entry.matcher(line).matches() &&
+                     is_lib.matcher(line).matches()) {
+               var m = get_path.matcher(line);
+               if(m.matches()) {
+                  var this_path = m.group(1);
+                  var pe = path.createPathElement();
+                  pe.setLocation(new File(projPath+this_path));
+               }
+            }
+         }
+      ]]></script>
+
      <!-- Extension point for overriding -->
       <path id="classpath.unit.test.extension"/>
 
