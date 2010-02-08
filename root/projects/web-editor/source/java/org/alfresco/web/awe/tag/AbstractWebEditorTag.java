@@ -29,6 +29,8 @@ import java.util.List;
 
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.alfresco.web.awe.filter.WebEditorFilter;
+
 /**
  * Base class for all Web Editor tag implementations.
  * 
@@ -36,110 +38,114 @@ import javax.servlet.jsp.tagext.TagSupport;
  */
 public class AbstractWebEditorTag extends TagSupport
 {
-    private static final long serialVersionUID = 3251970922970982753L;
-    
-    private static final String PARAM_CONTEXT_PATH = "org.alfresco.web.awe.CONTEXT_PATH";
-    private static final String PARAM_DEBUG = "org.alfresco.web.awe.DEBUG";
-    
-    private static final String DEFAULT_CONTEXT_PATH = "/awe";
-    
-    private String aweContextPath = null;
-    private Boolean debugEnabled = null;
-    
-    protected static final String KEY_TOOLBAR_LOCATION = "awe_toolbar_location";
-    protected static final String KEY_MARKER_ID_PREFIX = "awe_marker_id_prefix";
-    protected static final String KEY_EDITABLE_CONTENT = "awe_editable_content";
+   private static final long serialVersionUID = 3251970922970982753L;
 
-    /**
-     * Returns the context path for the web editor application.
-     * <p>
-     * This is the value of the <code>org.alfresco.web.awe.CONTEXT_PATH</code> init
-     * parameter in web.xml. If the init parameter is not present the
-     * default context path of <code>/awe</code> will be returned.
-     * </p>
-     * 
-     * @return The AWE context path
-     */
-    protected String getWebEditorContextPath()
-    {
-        if (this.aweContextPath == null)
-        {
-            String contextPath = this.pageContext.getServletContext().getInitParameter(PARAM_CONTEXT_PATH);
-            if (contextPath != null)
-            {
-                // ensure there is a leading slash
-                if (contextPath.startsWith("/") == false)
-                {
-                    contextPath = "/" + contextPath;
-                }
-                
-                this.aweContextPath = contextPath;
-            }
-            else
-            {
-                this.aweContextPath = DEFAULT_CONTEXT_PATH;
-            }
-        }
-        
-        return this.aweContextPath;
-    }
+   private String urlPrefix = null;
+   private Boolean editingEnabled = null;
+   private Boolean debugEnabled = null;
     
-    /**
-     * Determines whether debug is enabled for the web editor application
-     * <p>
-     * This method returns true if the <code>org.alfresco.web.awe.DEBUG</code> init
-     * parameter in web.xml is set to <code>true</code>.
-     * </p>
-     * 
-     * @return true if debug is enabled
-     */
-    protected boolean isDebugEnabled()
-    {
-        if (this.debugEnabled == null)
-        {
-            String debug = this.pageContext.getServletContext().getInitParameter(PARAM_DEBUG);
-            if (debug != null && debug.equalsIgnoreCase("true"))
-            {
-                this.debugEnabled = Boolean.TRUE;
-            }
-            else
-            {
-                this.debugEnabled = Boolean.FALSE;
-            }
-        }
-        
-        return this.debugEnabled;
-    }
-    
-    /**
-     * Returns the list of marked content that has been discovered.
-     * <p>
-     * This list is built up as each markContent tag is encountered.
-     * </p>
-     * 
-     * @return List of MarkedContent objects
-     */
-    @SuppressWarnings("unchecked")
-    protected List<MarkedContent> getMarkedContent()
-    {
-        List<MarkedContent> markedContent = (List<MarkedContent>)this.pageContext.getRequest().getAttribute(
-                    KEY_EDITABLE_CONTENT);
-        
-        if (markedContent == null)
-        {
-            markedContent = new ArrayList<MarkedContent>();
-            this.pageContext.getRequest().setAttribute(KEY_EDITABLE_CONTENT, markedContent);
-        }
-        
-        return markedContent;
-    }
+   protected static final String KEY_TOOLBAR_LOCATION = "awe_toolbar_location";
+   protected static final String KEY_MARKER_ID_PREFIX = "awe_marker_id_prefix";
+   protected static final String KEY_EDITABLE_CONTENT = "awe_editable_content";
 
-    @Override
-    public void release()
-    {
-        super.release();
-        
-        this.aweContextPath = null;
-        this.debugEnabled = null;
-    }
+   protected boolean isEditingEnabled()
+   {
+      if (this.editingEnabled == null)
+      {
+         Object enabledKey = this.pageContext.getRequest().getAttribute(WebEditorFilter.KEY_ENABLED);
+         if (enabledKey != null && enabledKey instanceof Boolean)
+         {
+            this.editingEnabled = (Boolean)enabledKey;
+         }
+         else
+         {
+            this.editingEnabled = Boolean.FALSE;
+         }
+      }
+      
+      return this.editingEnabled;
+   }
+   
+   /**
+    * Returns the URL prefix for the web editor application.
+    * 
+    * @return The AWE prefix URL
+    */
+   protected String getWebEditorUrlPrefix()
+   {
+      if (this.urlPrefix == null)
+      {
+         String prefix = (String)this.pageContext.getRequest().getAttribute(WebEditorFilter.KEY_URL_PREFIX);
+         if (prefix != null && prefix.length() > 0)
+         {
+            this.urlPrefix = prefix;
+         }
+         else
+         {
+            this.urlPrefix = WebEditorFilter.DEFAULT_CONTEXT_PATH;
+         }
+      }
+       
+      return this.urlPrefix;
+   }
+
+   /**
+    * Determines whether debug is enabled for the web editor application
+    * <p>
+    * This is the value of the <code>debug</code> init
+    * parameter of the Web Editor filter definition in web.xml.
+    * If the init parameter is not present false will be returned.
+    * </p>
+    * 
+    * @return true if debug is enabled
+    */
+   protected boolean isDebugEnabled()
+   {
+      if (this.debugEnabled == null)
+      {
+         Object debug = this.pageContext.getRequest().getAttribute(WebEditorFilter.KEY_DEBUG);
+         if (debug != null && debug instanceof Boolean)
+         {
+            this.debugEnabled = (Boolean)debug;
+         }
+         else
+         {
+            this.debugEnabled = Boolean.FALSE;
+         }
+         
+      }
+      
+      return this.debugEnabled.booleanValue(); 
+   }
+
+   /**
+    * Returns the list of marked content that has been discovered.
+    * <p>
+    * This list is built up as each markContent tag is encountered.
+    * </p>
+    * 
+    * @return List of MarkedContent objects
+    */
+   @SuppressWarnings("unchecked")
+   protected List<MarkedContent> getMarkedContent()
+   {
+      List<MarkedContent> markedContent = (List<MarkedContent>)this.pageContext.getRequest().getAttribute(KEY_EDITABLE_CONTENT);
+    
+      if (markedContent == null)
+      {
+         markedContent = new ArrayList<MarkedContent>();
+         this.pageContext.getRequest().setAttribute(KEY_EDITABLE_CONTENT, markedContent);
+      }
+    
+      return markedContent;
+   }
+
+   @Override
+   public void release()
+   {
+      super.release();
+       
+      this.urlPrefix = null;
+      this.debugEnabled = null;
+   }
 }
