@@ -78,15 +78,16 @@
 
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .hd.awe-ribbon-module
 {
-   width:5%;
+   width:auto;
 }
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .ft.awe-ribbon-module
 {
-   width:6%;
+   width:auto;
+   float:right;
 }
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .bd.awe-ribbon-module
 {
-   width:89%;
+   width:auto;
 }
 #awe-ribbon-container .yui-toolbar-container
 {
