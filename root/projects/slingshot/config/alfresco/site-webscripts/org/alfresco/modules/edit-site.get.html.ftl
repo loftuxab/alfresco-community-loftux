@@ -13,7 +13,7 @@
             <div class="yui-u"><textarea id="${args.htmlid}-description" name="description" rows="3" tabindex="0">${profile.description?html}</textarea></div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first"><label for="${args.htmlid}-isPublic">${msg("label.acess")}:</label></div>
+            <div class="yui-u first"><label for="${args.htmlid}-isPublic">${msg("label.access")}:</label></div>
             <div class="yui-u">
                <input id="${args.htmlid}-isPublic" type="radio" <#if (profile.visibility == "PUBLIC" || profile.visibility == "MODERATED")>checked="checked"</#if> tabindex="0" name="-" /> ${msg("label.isPublic")}<br />
                <div class="moderated">
