@@ -93,6 +93,9 @@
          this.renderRibbon();
 //         renderPlugins();
          this.widgets.ribbon.show();
+         Event.addListener(window, "resize", function AWE_Ribbon_onResize() {
+            this.set('position', this.get('position'));
+         }, this, true);
       },
 
       /**
@@ -201,16 +204,17 @@
             }
 
             ribbon.render();
+            // Have to use later() as refreshing instantly means vertical toolbar 
+            // height are calculated slightly too high
+            YAHOO.lang.later(100, this, this.refresh,[['position','loggedInStatus']]);
 
-            this.refresh(['position','loggedInStatus']);
-
-            YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
-            YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);   
-            YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
-            YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
-            YAHOO.Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
-            YAHOO.Bubbling.on('awe-loggedIn', this.onLoggedIn, this, true);
-            YAHOO.Bubbling.on('awe-loggedOut', this.onLoggedOut, this, true);
+            Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
+            Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);   
+            Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
+            Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
+            Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
+            Bubbling.on('awe-loggedIn', this.onLoggedIn, this, true);
+            Bubbling.on('awe-loggedOut', this.onLoggedOut, this, true);
             //add mouseove behaviour
             this.widgets.toolbars[AWE.Ribbon.PRIMARY_TOOLBAR].getButtonById(this._domFriendlyName+ AWE.SEPARATOR +'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
          }

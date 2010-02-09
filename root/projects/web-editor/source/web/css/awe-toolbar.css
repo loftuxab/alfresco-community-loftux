@@ -74,6 +74,7 @@
 #awe-ribbon-container.awe-ribbon-orientation-right #awe-ribbon .ft.awe-ribbon-module
 {
    padding-left:1.5em;
+   min-height:3em;
 }
 
 #awe-ribbon-container.awe-ribbon-orientation-top #awe-ribbon_c #awe-ribbon .hd.awe-ribbon-module
