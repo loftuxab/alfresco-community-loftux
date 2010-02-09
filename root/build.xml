@@ -119,7 +119,7 @@
          importClass(java.io.BufferedReader);
 
          var path = project.getReference("classpath.unit.test");
-         var projPath = "projects/3rd-party/";
+         var projPath = project.getProperty("dir.project.3rdparty") + "/";
 
          is_entry = Pattern.compile("[ \t]*\<classpathentry.*?");
          //is_exported = Pattern.compile("[ \t]*\<classpathentry.*? exported=[\"\']true[\"\'][ \/].*");
