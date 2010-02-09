@@ -39,6 +39,11 @@
          Selector = YAHOO.util.Selector;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * Internal date formats
     */
    var DATE_LONG = "dddd, d mmmm yyyy",
@@ -211,7 +216,6 @@
          }
       },
 
-
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
        *
@@ -369,8 +373,7 @@
                   { "automatic" : ev.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "completed-at" : completedAt ? Alfresco.util.formatDate(completedAt) : "" },
                   { "completed-by" : ev.completedByFirstName + " " + ev.completedByLastName }
-               ],
-                  "undo-button", this.onUndoEventButtonClick, this.widgets.completedEventTemplate);
+               ], "undo-button", this.onUndoEventButtonClick, this.widgets.completedEventTemplate);
                
                eventEl = this.widgets.completedEventsEl.appendChild(eventEl);
                completed++;
@@ -383,8 +386,7 @@
                   { "name" : ev.label },
                   { "automatic" : ev.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "asof" : asOf ? Alfresco.util.formatDate(asOf) : this.msg("label.none") }
-               ],
-                  "complete-button", this.onCompleteEventButtonClick, this.widgets.incompleteEventTemplate);
+               ], "complete-button", this.onCompleteEventButtonClick, this.widgets.incompleteEventTemplate);
                
                eventEl = this.widgets.incompleteEventsEl.appendChild(eventEl);
                incomplete++;
@@ -431,7 +433,7 @@
             {
                if (attribute.hasOwnProperty(key))
                {
-                  Selector.query("." + key + " .value", eventEl, true).innerHTML = attribute[key];
+                  Selector.query("." + key + " .value", eventEl, true).innerHTML = $html(attribute[key]);
                   break;
                }
             }

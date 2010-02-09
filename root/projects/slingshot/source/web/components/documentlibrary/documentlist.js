@@ -2285,10 +2285,17 @@
                   noEscape: true
                });
                
-               loadingMessage.showEvent.subscribe(function()
+               if (YAHOO.env.ua.ie > 0)
                {
                   this.loadingMessageShowing = true;
-               }, this, true);
+               }
+               else
+               {
+                  loadingMessage.showEvent.subscribe(function()
+                  {
+                     this.loadingMessageShowing = true;
+                  }, this, true);
+               }
             }
          };
          

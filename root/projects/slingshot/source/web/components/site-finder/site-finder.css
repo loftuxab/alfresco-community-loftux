@@ -109,7 +109,8 @@
    margin-bottom: 6px;
 }
 
-.site-finder .moderated
+.site-finder .moderated,
+.site-finder .private
 {
    color: #fff;
    float: left;

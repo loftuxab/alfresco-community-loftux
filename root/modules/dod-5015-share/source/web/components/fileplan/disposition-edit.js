@@ -55,9 +55,7 @@
     */
    Alfresco.DispositionEdit = function DispositionEdit_constructor(htmlId)
    {
-      Alfresco.DispositionEdit.superclass.constructor.call(this, "Alfresco.DispositionEdit", htmlId, ["button", "container"]);
-
-      return this;
+      return Alfresco.DispositionEdit.superclass.constructor.call(this, "Alfresco.DispositionEdit", htmlId, ["button", "container"]);
    };
 
    YAHOO.extend(Alfresco.DispositionEdit, Alfresco.component.Base,
@@ -107,6 +105,7 @@
 
       /**
        * Fired by YUI when parent element is available for scripting
+       *
        * @method onReady
        */
       onReady: function DispositionEdit_onReady()
@@ -177,7 +176,7 @@
                         actions = schedule.actions ? schedule.actions : [],
                         action,
                         actionEl;
-                     if(actions.length == 0)
+                     if (actions.length == 0)
                      {
                         dummyEl.innerHTML = this.msg("message.noSteps");  
                      }
@@ -245,13 +244,13 @@
             actionLocationEl = Dom.getElementsByClassName("action-location", "select", actionEl)[0],
             actionLocationSpan = Dom.getElementsByClassName("action-location-section", "span", actionEl)[0],
             actionLocationRestrictedSpan = Dom.getElementsByClassName("action-location-restricted-section", "span", actionEl)[0];
-         if(actionName == "transfer")
+         if (actionName == "transfer")
          {
             // Display location since its a transfer action
             Dom.removeClass(actionLocationSpan, "hidden");
             Dom.addClass(actionLocationRestrictedSpan, "hidden");
             var locationSetInDropDown = Alfresco.util.setSelectedIndex(actionLocationEl, action.location) !== null;
-            if(action.location && action.location !== "" && !locationSetInDropDown)
+            if (action.location && action.location !== "" && !locationSetInDropDown)
             {
                /**
                 * The action/step had a location set but the current user hasn't been granted access
@@ -376,7 +375,7 @@
          }, this);
 
          var deleteEl = Dom.getElementsByClassName("delete", "span", actionEl)[0];
-         if(action.deleteable)
+         if (action.deleteable)
          {
             Event.addListener(deleteEl, "click", this.onDeleteActionClick, actionEl, this);
          }
@@ -1067,7 +1066,7 @@
          };
          var newActionEl = this._createAction(action),
                dummyEl = Dom.get(this.id + "-action-template-dummy");
-         if(dummyEl)
+         if (dummyEl)
          {
             dummyEl.parentNode.removeChild(dummyEl);
          }

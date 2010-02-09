@@ -376,10 +376,14 @@
             // description
             details += '<div class="sitedescription">' + $html(oRecord.getData("description")) + '</div>';
             
-            // Moderated flag
+            // Private / Moderated flag
             if (siteVisibility == "MODERATED")
             {
                details += '<div class="moderated theme-bg-color-1">' + me.msg("site-finder.moderated")  + '</div>';
+            }
+            else if (siteVisibility == "PRIVATE")
+            {
+               details += '<div class="private theme-bg-color-1">' + me.msg("site-finder.private")  + '</div>';
             }
             
             elCell.innerHTML = details;

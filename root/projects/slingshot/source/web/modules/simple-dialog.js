@@ -366,7 +366,7 @@
          this.form.applyTabFix();
          
          // Register the ESC key to close the dialog
-         var escapeListener = new KeyListener(document,
+         this.widgets.escapeListener = new KeyListener(document,
          {
             keys: KeyListener.KEY.ESCAPE
          },
@@ -378,7 +378,7 @@
             scope: this,
             correctScope: true
          });
-         escapeListener.enable();
+         this.widgets.escapeListener.enable();
 
          // Set focus if required
          if (this.options.firstFocus !== null)
@@ -394,6 +394,7 @@
        */
       hide: function AmSD_hide()
       {
+         this.widgets.escapeListener.disable();
          this._hideDialog();
       },
 
@@ -412,7 +413,11 @@
          this.dialog.hide();
          if (this.options.destroyOnHide)
          {
+            YAHOO.Bubbling.fire("formContainerDestroyed");
             this.dialog.destroy();
+            delete this.dialog;
+            delete this.widgets;
+            delete this.form;
          }
       },
       

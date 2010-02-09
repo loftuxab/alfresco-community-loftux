@@ -4,8 +4,8 @@
 function main()
 {
    var urlElements = url.extension.split("/");
-   var shortName = urlElements[0];
-   var valueName = urlElements[2]
+   var shortName = decodeURIComponent(urlElements[0]);
+   var valueName = decodeURIComponent(urlElements[2])
    
    // Get the constraint
    var constraint = caveatConfig.getConstraint(shortName);

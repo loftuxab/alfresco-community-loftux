@@ -98,7 +98,12 @@
        */
       onOK: function DLCMT_onOK(e, p_obj)
       {
-         var files, multipleFiles = [], params, i, j;
+         var files, multipleFiles = [], params, i, j,
+            eventSuffix =
+            {
+               copy: "Copied",
+               move: "Moved"
+            };
 
          // Single/multi files into array of nodeRefs
          if (YAHOO.lang.isArray(this.options.files))
@@ -133,7 +138,7 @@
                return;
             }
 
-            YAHOO.Bubbling.fire("filesCopied",
+            YAHOO.Bubbling.fire("files" + eventSuffix[this.options.mode],
             {
                destination: this.currentPath,
                successCount: successCount,
@@ -146,7 +151,7 @@
                
                if (result.success)
                {
-                  YAHOO.Bubbling.fire(result.type == "folder" ? "folderCopied" : "fileCopied",
+                  YAHOO.Bubbling.fire((result.type == "folder" ? "folder" : "file") + eventSuffix[this.options.mode],
                   {
                      multiple: true,
                      nodeRef: result.nodeRef,

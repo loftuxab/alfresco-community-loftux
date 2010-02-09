@@ -341,6 +341,16 @@
                success: function DLGF_lND_success(oResponse)
                {
                   var results = Alfresco.util.parseJSON(oResponse.responseText);
+                  
+                  if (results.parent && typeof node.data.userAccess == "undefined")
+                  {
+                     node.data.userAccess = results.parent.userAccess;
+                     node.setUpLabel(
+                     {
+                        label: node.label,
+                        style: results.parent.userAccess.create ? "" : "no-permission"
+                     });
+                  }
 
                   if (results.items)
                   {
@@ -586,7 +596,7 @@
                {
                   this.options.containerId = obj.container;
                   this.options.containerType = this.containers[obj.container].type;
-                  this._buildTree("");
+                  this._buildTree(this.containers[obj.container].nodeRef);
                   // Kick-off navigation to current path
                   this.onPathChanged(this.options.path);
                   var containers = Selector.query("a", this.id + "-containerPicker"), container, i, j,

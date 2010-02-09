@@ -296,6 +296,7 @@
    float: left;
    padding-bottom: 0.2em;
    padding-top: 0.2em;
+   width: 100%;
 }
 .doclist .documents h3.filename span.title
 {

@@ -66,6 +66,7 @@
       YAHOO.Bubbling.on("selectedItemRemoved", this.onSelectedItemRemoved, this);
       YAHOO.Bubbling.on("parentChanged", this.onParentChanged, this);
       YAHOO.Bubbling.on("parentDetails", this.onParentDetails, this);
+      YAHOO.Bubbling.on("formContainerDestroyed", this.onFormContainerDestroyed, this);
 
       // Initialise prototype properties
       this.pickerId = htmlId + "-picker";
@@ -777,6 +778,27 @@
                
                navMenu.render();
             }
+         }
+      },
+      
+      /**
+       * Notification that form is being destroyed.
+       *
+       * @method onFormContainerDestroyed
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters
+       */
+      onFormContainerDestroyed: function ObjectFinder_onFormContainerDestroyed(layer, args)
+      {
+         if (this.widgets.dialog)
+         {
+            this.widgets.dialog.destroy();
+            delete this.widgets.dialog;
+         }
+         if (this.widgets.resizer)
+         {
+            this.widgets.resizer.destroy();
+            delete this.widgets.resizer;
          }
       },
 
@@ -1859,7 +1881,7 @@
          // Rendering complete event handler
          this.widgets.dataTable.subscribe("renderEvent", function()
          {
-            if (this.options.createNewItemUri !== "")
+            if (this.options.createNewItemUri !== "" && !this.widgets.enterListener)
             {
                this.widgets.enterListener = new KeyListener(this.createNewItemId,
                {
@@ -1939,7 +1961,6 @@
             return true;
          };
          YAHOO.Bubbling.addDefaultAction("parent-" + this.eventGroup, fnNavigationHandler);
-
       },
       
       /**

@@ -40,6 +40,11 @@ Alfresco.RM = Alfresco.RM || {};
        Sel = YAHOO.util.Selector;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * RM EmailMappings componentconstructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -63,56 +68,64 @@ Alfresco.RM = Alfresco.RM || {};
    {
       /**
        * Initialises event listening and custom events
+       *
+       * @method: initEvents
        */
-      initEvents : function RM_EmailMappings_initEvents()
+      initEvents: function RM_EmailMappings_initEvents()
       {
          Event.on(this.id, 'click', this.onInteractionEvent, null, this);
-         this.registerEventHandler('click',[
+         this.registerEventHandler('click', [
+         {
+            rule: 'button#save-mappings-button',
+            o:
             {
-               rule : 'button#save-mappings-button',
-               o : {
-                     handler:this.onSaveMappings,
-                     scope : this
-               }
-            },
-            {
-               rule : 'button#discard-mappings-button',
-               o : {
-                     handler:this.onDiscardChanges,
-                     scope : this
-               }
-            },
-            {
-               rule : 'button.delete-mapping',
-               o : {
-                     handler:this.onDeleteMapping,
-                     scope : this
-               }
-            },
-            {
-               rule : 'button#add-mapping-button',
-               o : {
-                     handler:this.onAddMapping,
-                     scope : this
-               }
-            },
-            {
-               rule : 'button#emailProperty-but-button',
-               o : {
-                  handler : function showEmailProp(e)
-                  {
-                     this.widgets['emailProperty-menu'].show();
-                  },
-                  scope : this
-               }
+               handler :this.onSaveMappings,
+               scope: this
             }
-         ]);
+         },
+         {
+            rule: 'button#discard-mappings-button',
+            o:
+            {
+               handler :this.onDiscardChanges,
+               scope: this
+            }
+         },
+         {
+            rule: 'button.delete-mapping',
+            o:
+            {
+               handler :this.onDeleteMapping,
+               scope: this
+            }
+         },
+         {
+            rule: 'button#add-mapping-button',
+            o:
+            {
+               handler :this.onAddMapping,
+               scope: this
+            }
+         },
+         {
+            rule: 'button#emailProperty-but-button',
+            o:
+            {
+               handler: function showEmailProp(e)
+               {
+                  this.widgets['emailProperty-menu'].show();
+               },
+               scope: this
+            }
+         }]);
          
          return this;
       },
       
       /**
        * Handler for save button
+       *
+       * @method onSaveMappings
        */      
       onSaveMappings: function RM_EmailMappings_onSaveMappings()
       {
@@ -123,7 +136,7 @@ Alfresco.RM = Alfresco.RM || {};
             text: this.msg('label.save-changes-confirmation'),
             buttons: [
             {
-               text: this.msg('label.yes'), // To early to localize at this time, do it when called instead
+               text: this.msg('label.yes'),
                handler: function()
                {
                   me.dataMap.save();
@@ -132,19 +145,20 @@ Alfresco.RM = Alfresco.RM || {};
                isDefault: false
             },
             {
-               text: this.msg('label.no'), // To early to localize at this time, do it when called instead
+               text: this.msg('label.no'),
                handler: function()
                {
                   this.destroy();
                },
                isDefault: false
-            }
-            ]
+            }]
          });         
       },
       
       /**
        * Handler for discard changes button.
+       *
+       * @method onDiscardChanges
        */
       onDiscardChanges: function RM_EmailMappings_onDiscardChanges()
       {
@@ -155,7 +169,7 @@ Alfresco.RM = Alfresco.RM || {};
             text: this.msg('label.discard-changes-confirmation'),
             buttons: [
             {
-               text: this.msg('label.yes'), // To early to localize at this time, do it when called instead
+               text: this.msg('label.yes'),
                handler: function()
                {
                   me._discardChanges();
@@ -164,7 +178,7 @@ Alfresco.RM = Alfresco.RM || {};
                isDefault: false
             },
             {
-               text: this.msg('label.no'), // To early to localize at this time, do it when called instead
+               text: this.msg('label.no'),
                handler: function()
                {
                   this.destroy();
@@ -177,6 +191,8 @@ Alfresco.RM = Alfresco.RM || {};
 
       /**
        * Handler for delete mapping button. Removes from datamap and DOM
+       *
+       * @method onDeleteMapping
        */      
       onDeleteMapping: function RM_EmailMappings_onDeleteMapping(e)
       {
@@ -192,6 +208,8 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Handler for add mapping button
+       *
+       * @method onAddMapping
        */      
       onAddMapping: function RM_EmailMappings_onAddMapping()
       {
@@ -221,14 +239,18 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Discard changes by reloading page
+       *
+       * @method _discardChanges
+       * @private
        */      
-      _discardChanges: function RM_EmailMappings_discardChanges()
+      _discardChanges: function RM_EmailMappings__discardChanges()
       {
          window.location.reload();     
       },
       
       /**
        * Fired by YUI when parent element is available for scripting
+       *
        * @method onReady
        */
       onReady: function RM_EmailMappings_onReady()
@@ -302,6 +324,10 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Handler for when data mapping loads.
+       *
+       * @method onDataLoad
+       * @param e {object} Dom event
+       * @param args {object} Event parameters
        */
       onDataLoad : function RM_EmailMappings_onDataLoad(e, args)
       {
@@ -314,6 +340,10 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Handler for when data mapping saves. Disables save and discard buttons
+       *
+       * @method onDataSave
+       * @param e {object} Dom event
+       * @param args {object} Event parameters
        */
       onDataSave : function RM_EmailMappings_onDataSave(e, args)
       {
@@ -324,23 +354,26 @@ Alfresco.RM = Alfresco.RM || {};
       /**
        * Renders mapping to DOM.
        * 
+       * @method renderMapping
        * @param {Object} oMap - Value object of 'from' and 'to' string variables
        */
       renderMapping : function RM_EmailMappings_renderMapping(oMap)
       {
          var newLi = document.createElement('li');
          newLi.id = oMap.from + '::' + oMap.to;
-         newLi.innerHTML = YAHOO.lang.substitute("<p>{email} {to} {rm}</p>", {
-            email : oMap.from,
-            to : this.msg('label.to'),
-            rm : oMap.to
+         newLi.innerHTML = YAHOO.lang.substitute("<p>{email} {to} {rm}</p>",
+         {
+            email: $html(oMap.from),
+            to: this.msg('label.to'),
+            rm: $html(oMap.to)
          });
 
          this.widgets['list'].appendChild(newLi);
-         var button = new YAHOO.widget.Button({
-            id:oMap.from +'-'+ oMap.to + '-button',
-            label:this.msg('label.delete'),
-            container:newLi.id
+         var button = new YAHOO.widget.Button(
+         {
+            id: oMap.from +'-'+ oMap.to + '-button',
+            label: this.msg('label.delete'),
+            container: newLi.id
          });
          button.on('click', this.onDeleteMapping, this ,true);
          button.appendTo(newLi);
@@ -349,8 +382,12 @@ Alfresco.RM = Alfresco.RM || {};
       /**
        * Handler when mapping is added or deleted in UI (but not yet persisted).
        * Enables/Disables saves and discard buttons if UI is changed from initial state
+       * 
+       * @method onMappingChanged
+       * @param e {object} Dom event
+       * @param args {object} Event parameters
        */
-      onMappingChanged : function(e, args)
+      onMappingChanged: function RM_EmailMappings_onMappingChanged(e, args)
       {
          var data = args[1];
          if ((data.markedForAddition.length === 0) && (data.markedForDeletion.length === 0))
@@ -368,8 +405,12 @@ Alfresco.RM = Alfresco.RM || {};
       /**
        * Event handler called when a value from the property selection menu has been selected
        * Updates currently stored values.
+       * 
+       * @method onPropertyMenuSelected
+       * @param e {object} Dom event
+       * @param args {object} Event parameters
        */
-      onPropertyMenuSelected : function(e, args)
+      onPropertyMenuSelected: function RM_EmailMappings_onPropertyMenuSelected(e, args)
       {
          var item = args[1];
          
@@ -415,9 +456,8 @@ Alfresco.RM = Alfresco.RM || {};
        * Adds a mapping
        * 
        * @method add
-       * 
-       * @param {Object} Mapping object to add
-       * @return {Boolean} True or False depending on success of addition 
+       * @param obj {object} Mapping object to add
+       * @return {boolean} True or False depending on success of addition 
        */
       add: function RM_EmailMappings_Data_add(obj)
       {
@@ -428,12 +468,22 @@ Alfresco.RM = Alfresco.RM || {};
             this.data.mappings.push(obj);
             //reindex this.data
             this._index();
-            YAHOO.Bubbling.fire('EmailMappingsChanged', {markedForAddition:this.markedForAddition,markedForDeletion:this.markedForDeletion});
+            YAHOO.Bubbling.fire('EmailMappingsChanged',
+            {
+               markedForAddition: this.markedForAddition,
+               markedForDeletion: this.markedForDeletion
+            });
             return true;
          }
          return false;
       },
       
+      /**
+       * Removes a mapping
+       * 
+       * @method remove
+       * @param obj {object} Mapping object to remove
+       */
       remove: function RM_EmailMappings_Data_remove(obj)
       {
          //removing a new mapping but one that hasn't been saved
@@ -443,11 +493,11 @@ Alfresco.RM = Alfresco.RM || {};
          }
          else
          {
-            this.markedForDeletion+=obj.from + '::' + obj.to + ',';
+            this.markedForDeletion += obj.from + '::' + obj.to + ',';
          }
 
          var a = [];
-         for (var i=0,len=this.data.mappings.length;i<len;i++)
+         for (var i = 0, len = this.data.mappings.length; i < len; i++)
          {
             var o = this.data.mappings[i];
             if ((o.from != obj.from) || (o.to != obj.to))
@@ -459,16 +509,19 @@ Alfresco.RM = Alfresco.RM || {};
          
          //reindex this.data 
          this._index();
-         YAHOO.Bubbling.fire('EmailMappingsChanged', {markedForAddition:this.markedForAddition,markedForDeletion:this.markedForDeletion});            
+         YAHOO.Bubbling.fire('EmailMappingsChanged',
+         {
+            markedForAddition: this.markedForAddition,
+            markedForDeletion: this.markedForDeletion
+         });
       },
       
       /**
        * Checks if obj is valid for addition or not
        * 
        * @method isValidAddition 
-       * 
-       * @param {Object} Must have 'from' and 'to' properties, both of which should be strings. Invalid if already mapped
-       * return {Boolean} True or false 
+       * @param obj {object} Must have 'from' and 'to' properties, both of which should be strings. Invalid if already mapped
+       * @return {boolean} True if valid
        */
       isValidAddition: function RM_EmailMappings_Data_isValidAddition(obj)
       {
@@ -487,6 +540,8 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Loads mapping data via AJAX
+       *
+       * @method load 
        */
       load: function RM_EmailMappings_Data_load()
       {
@@ -501,7 +556,10 @@ Alfresco.RM = Alfresco.RM || {};
                {
                   me.data = args.json.data;
                   this._index();
-                  YAHOO.Bubbling.fire('EmailMappingsLoaded',{mappings:me.data});
+                  YAHOO.Bubbling.fire('EmailMappingsLoaded',
+                  {
+                     mappings: me.data
+                  });
                },
                scope: this
             },
@@ -511,6 +569,8 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Saves current data mapping via AJAX
+       *
+       * @method save 
        */
       save: function RM_EmailMappings_Data_save()
       {
@@ -523,7 +583,7 @@ Alfresco.RM = Alfresco.RM || {};
             {
                additions.pop();
             }
-            for (var i=0, len = additions.length; i<len; i++)
+            for (var i = 0, len = additions.length; i < len; i++)
             {
                var map = additions[i].split('::');
                dataObj.add.push(
@@ -537,11 +597,11 @@ Alfresco.RM = Alfresco.RM || {};
          {
             dataObj["delete"] = [];
             var deletions = this.markedForDeletion.split(',');
-            if (deletions[deletions.length-1].length === 0)
+            if (deletions[deletions.length - 1].length === 0)
             {
                deletions.pop();
             }
-            for (var i=0, len = deletions.length; i<len; i++)
+            for (var i = 0, len = deletions.length; i < len; i++)
             {
                var map = deletions[i].split('::');
                dataObj["delete"].push(
@@ -554,25 +614,29 @@ Alfresco.RM = Alfresco.RM || {};
          var me = this;
          Alfresco.util.Ajax.jsonRequest(
          {
-           method: Alfresco.util.Ajax.POST,
-           url: this.dataUri,
-           dataObj: dataObj,
-           successCallback:
-           {
-              fn: function datamap_save()
-              {
-                 me.markedForDeletion = "";
-                 me.markedForAddition = "";
-                 Alfresco.util.PopupManager.displayMessage({
-                        text: Alfresco.util.message('message.saveSuccess', "Alfresco.RM.EmailMappings"),
-                        spanClass: 'message',
-                        modal: true,
-                        noEscape: true,
-                        displayTime: 1
-                     });
-                 YAHOO.Bubbling.fire("EmailMappingsSaved", {mappings:me.data});
-              },
-              scope: this
+            method: Alfresco.util.Ajax.POST,
+            url: this.dataUri,
+            dataObj: dataObj,
+            successCallback:
+            {
+               fn: function datamap_save()
+               {
+                  me.markedForDeletion = "";
+                  me.markedForAddition = "";
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: Alfresco.util.message('message.saveSuccess', "Alfresco.RM.EmailMappings"),
+                     spanClass: 'message',
+                     modal: true,
+                     noEscape: true,
+                     displayTime: 1
+                  });
+                  YAHOO.Bubbling.fire("EmailMappingsSaved",
+                  {
+                     mappings: me.data
+                  });
+               },
+               scope: this
            },
            failureMessage: Alfresco.util.message("message.saveFailure", "Alfresco.RM.EmailMappings")
          });
@@ -582,21 +646,24 @@ Alfresco.RM = Alfresco.RM || {};
        * Indexes mapping so validation can be carried out more smoothly
        * 
        * @method index 
+       * @private
        * @return {} A object like
        * @example 
        *   {
-       *       from:{
+       *       from:
+       *       {
        *          'fromAttribute': 'CSV string of "to" attributes'
        *       },
-       *       to: { // required?
+       *       to:
+       *       {
        *          'toAttribute': 'CSV string of "from" attributes'
        *       }
        *   } 
        */
-      _index: function RM_EmailMappings_Data_index()
+      _index: function RM_EmailMappings_Data__index()
       {
          var indexedData = {};
-         for (var i=0, len = this.data.mappings.length;i<len;i++)
+         for (var i = 0, len = this.data.mappings.length; i < len; i++)
          {
             var o = this.data.mappings[i];
             if (indexedData[o.from] === undefined)
@@ -613,18 +680,18 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Retrieves values of index data based on specified key
-       *  
-       * @param {String} key - Value of the key used in the index - always the same as the 'from' value
-       * in a mapping
        * 
+       * @method getSelectionByKey
+       * @param key {string} Value of the key used in the index - always the same as the 'from' value in a mapping
+       * @return {string}
        */
-      getSelectionByKey: function RM_EmailMappings_Data_getSelectedValues(key)
+      getSelectionByKey: function RM_EmailMappings_Data_getSelectionByKey(key)
       {
-         if (this.index[key])
+         if (this.index.hasOwnProperty(key))
          {
             return this.index[key];
          }
-         else return '';
+         return '';
       }
    };
 }
