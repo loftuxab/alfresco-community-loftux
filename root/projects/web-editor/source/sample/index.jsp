@@ -52,12 +52,12 @@ String subTextNodeRef = "workspace://SpacesStore/27872b54-a3b5-47ed-9ac6-eaa5340
       
       <div class="logo"><img src="http://localhost:8080/alfresco/d/d/<%=logoNodeRef%>/app-logo.png?guest=true" /></div>
       <h1>
-         <awe:markContent id="<%=mainTextNodeRef%>" formId="title" />
+         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
          <customer:property nodeRef="<%=mainTextNodeRef%>" property="cm:title" />
       </h1>
       
       <h3>
-         <awe:markContent id="<%=mainTextNodeRef%>" formId="description" />
+         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
          <customer:property nodeRef="<%=mainTextNodeRef%>" property="cm:description" />
       </h3>
       
