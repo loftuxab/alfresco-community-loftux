@@ -15,6 +15,10 @@ Alfresco.RM = Alfresco.RM || {};
        Event = YAHOO.util.Event,
        Sel = YAHOO.util.Selector;
 
+    /**
+     * Alfresco Slingshot aliases
+     */
+   var $html = Alfresco.util.encodeHTML;
 
    /**
     * RM UserRights componentconstructor.
@@ -30,23 +34,25 @@ Alfresco.RM = Alfresco.RM || {};
       return this;
    };
     
-    YAHOO.extend(Alfresco.RM.UserRights, Alfresco.component.Base,
-    {
-      
+   YAHOO.extend(Alfresco.RM.UserRights, Alfresco.component.Base,
+   {
       /**
        * Initialises event listening and custom events
-       *  
+       *
+       * @method initEvents
        */
-      initEvents : function RM_UserRights_initEvents()
+      initEvents: function RM_UserRights_initEvents()
       {
-         Event.on(this.id,'click',this.onInteractionEvent,null,this);
+         Event.on(this.id,'click', this.onInteractionEvent, null, this);
          //register event
-         this.registerEventHandler('click',[
+         this.registerEventHandler('click',
+         [
             {
-               rule : 'button#save-mappings-button',
-               o : {
-                     handler:this.onSaveMappings,
-                     scope : this
+               rule: 'button#save-mappings-button',
+               o:
+               {
+                  handler:this.onSaveMappings,
+                  scope : this
                }
             }                                
          ]);
@@ -55,24 +61,24 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Fired by YUI when parent element is available for scripting
+       *
        * @method onReady
-       * 
        */
       onReady: function RM_UserRights_onReady()
       {
          this.initEvents();
 
-         this.widgets['roles']=Dom.get('userrightsRoles');
-         this.widgets['groups']=Dom.get('userrightsGroups');         
+         this.widgets['roles'] = Dom.get('userrightsRoles');
+         this.widgets['groups'] = Dom.get('userrightsGroups');         
          
-         var DS = this.widgets['datasource'] = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI+'api/rma/admin/userrightsreport');
-         
+         var DS = this.widgets['datasource'] = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + 'api/rma/admin/userrightsreport');
          DS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-         DS.responseSchema = {
-            fields: ["name","userName","roles","groups"]
+         DS.responseSchema =
+         {
+            fields: ["name", "userName", "roles", "groups"]
          };
          
-         DS.doBeforeCallback = function doBeforeCallback( oRequest , oFullResponse , oParsedResponse , oCallback )
+         DS.doBeforeCallback = function doBeforeCallback(oRequest, oFullResponse, oParsedResponse, oCallback)
          {
             var responseDataUsers = oFullResponse.data.users;
             var responseDataRoles = oFullResponse.data.roles;
@@ -80,96 +86,144 @@ Alfresco.RM = Alfresco.RM || {};
             var data = [];
 
             //massage data into a format that datatable likes
-               for (var key in responseDataUsers)
+            for (var key in responseDataUsers)
+            {
+               var userObject = responseDataUsers[key];
+               userObject.name = userObject.firstName + ' ' + userObject.lastName;
+               //create a label so we can use it in the roles and groups renderer
+               responseDataUsers[key].label = userObject.name;
+               //convert groups to use label and not name
+               var grps = [];
+               for (var i = 0, len = userObject.groups.length; i < len; i++)
                {
-                  var userObject = responseDataUsers[key];
-                  userObject.name = userObject.firstName + ' ' + userObject.lastName;
-                  //create a label so we can use it in the roles and groups renderer
-                  responseDataUsers[key].label = userObject.name;
-                  //convert groups to use label and not name
-                  var grps = [];
-                  for (var i=0,len=userObject.groups.length;i<len;i++)
-                  {
-                     grps.push(responseDataGroups[userObject.groups[i]].label);
-                  }
-                  userObject.groups=grps;
-                  data.push(userObject);
+                  grps.push(responseDataGroups[userObject.groups[i]].label);
                }
+               userObject.groups = grps;
+               data.push(userObject);
+            }
+
             //User Rights components needs access to roles and groups data
-            //so let's give it some data
-            YAHOO.Bubbling.fire('UserRights_DataLoad', {users:responseDataUsers,roles:responseDataRoles,groups:responseDataGroups});
-            return {results:data};
+            YAHOO.Bubbling.fire('UserRights_DataLoad',
+            {
+               users: responseDataUsers,
+               roles: responseDataRoles,
+               groups: responseDataGroups
+            });
+            return (
+            {
+               results:data
+            });
          };
 
-        /**
-         * Custom formatter to add a space between each role
-         *  
-         */   
-        YAHOO.widget.DataTable.Formatter.roles = function rolesFormatter(elLiner, oRecord, oColumn, oData) {
-           elLiner.innerHTML = oData.join(', ');
-        };
+         /**
+          * Custom formatter to add a space between each role
+          *
+          * @method rolesFormatter
+          */   
+         YAHOO.widget.DataTable.Formatter.roles = function rolesFormatter(elLiner, oRecord, oColumn, oData)
+         {
+            elLiner.innerHTML = oData.join(', ');
+         };
 
-        /**
-         * Custom formatter to add a space between each role
-         *  
-         */   
-        YAHOO.widget.DataTable.Formatter.groups = function rolesFormatter(elLiner, oRecord, oColumn, oData) {
-           elLiner.innerHTML = oData.join(', ');
-        };
+         /**
+          * Custom formatter to add a space between each role
+          * 
+          * @method groupsFormatter
+          */   
+         YAHOO.widget.DataTable.Formatter.groups = function groupsFormatter(elLiner, oRecord, oColumn, oData)
+         {
+            elLiner.innerHTML = oData.join(', ');
+         };
          
          var DT = this.widgets['datasource'] = new YAHOO.widget.DataTable("userrightsDT",
-             [
-               {key:"name", label:this.msg('label.name'), sortable:true, resizeable:true},
-               {key:"userName", label:this.msg('label.userid'),  sortable:true, resizeable:true},
-               {key:"roles", label:this.msg('label.roles'),  formatter:"roles", sortable:true, resizeable:true},
-               {key:"groups", label:this.msg('label.groups'),  formatter:"groups", sortable:true, resizeable:true}
-            ],DS);
+         [
+            { key: "name", label: this.msg('label.name'), sortable: true, resizeable: true },
+            { key: "userName", label: this.msg('label.userid'),  sortable: true, resizeable: true },
+            { key: "roles", label: this.msg('label.roles'),  formatter: "roles", sortable: true, resizeable: true },
+            { key: "groups", label: this.msg('label.groups'),  formatter: "groups", sortable: true, resizeable: true }
+         ], DS);
       },
       
       /**
        * Renders role and groups HTML based on data fired from datasource doBeforeCallback
-       *  
+       * 
+       * @method onDataLoad
+       * @param e {object} Dom event
+       * @param args {object} Event parameters
        */
-      onDataLoad : function RM_UserRights_onDataLoad(e, args)
+      onDataLoad: function RM_UserRights_onDataLoad(e, args)
       {
-         var rolesHTML = "", groupsHTML = "", templates = {
-            'list':'<dl>{data}</dl>',
-            'title':'<dt class={className}>{data}</dt>',
-            'item':'<dd class={className}>{data}</dd>',
-            'link': '<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'console/admin-console/users#state=panel%3Dview%26userid%3D{userId}%26search%3D{userId}">{name}</a>'
-         };
-         var users = args[1].users;
-         var dataKeys = {roles:args[1].roles, groups:args[1].groups};
+         var rolesHTML = "",
+            groupsHTML = "",
+            templates =
+            {
+               list: '<dl>{data}</dl>',
+               title: '<dt class={className}>{data}</dt>',
+               item: '<dd class={className}>{data}</dd>',
+               link: '<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'console/admin-console/users#state=panel%3Dview%26userid%3D{userId}%26search%3D{userId}">{name}</a>'
+            },
+            users = args[1].users,
+            dataKeys =
+            {
+               roles: args[1].roles,
+               groups: args[1].groups
+            };
+
          for (var q in dataKeys)
          {
-            var html = "";
-            var ii = 0;
-            for (var p in dataKeys[q])
+            if (dataKeys.hasOwnProperty(q))
             {
-               var data = dataKeys[q][p];
-               // render dt
-               html += YAHOO.lang.substitute(templates['title'], {data:data.label,className:(ii%2===0) ? 'odd':''});
-               var items = data.users;
-               if (items.length>0)
+               var html = "",
+                  ii = 0;
+               for (var p in dataKeys[q])
                {
-                  for (var i=0,len=items.length;i<len;i++)
+                  if (dataKeys[q].hasOwnProperty(p))
                   {
-                     //render link
-                     var link = YAHOO.lang.substitute(templates['link'], {name:users[items[i]].label, userId:items[i]});
-                     // render dd
-                     html+=YAHOO.lang.substitute(templates['item'], {data:link, className:(ii%2===0) ? 'odd':''});
+                     var data = dataKeys[q][p];
+                     // render dt
+                     html += YAHOO.lang.substitute(templates['title'],
+                     {
+                        data: $html(data.label),
+                        className: (ii % 2 === 0) ? 'odd' : ''
+                     });
+                     var items = data.users;
+                     if (items.length > 0)
+                     {
+                        for (var i = 0, len = items.length; i < len; i++)
+                        {
+                           //render link
+                           var link = YAHOO.lang.substitute(templates['link'],
+                           {
+                              name: $html(users[items[i]].label),
+                              userId: $html(items[i])
+                           });
+                           // render dd
+                           html += YAHOO.lang.substitute(templates['item'],
+                           {
+                              data: link,
+                              className: (ii % 2 === 0) ? 'odd' : ''
+                           });
+                        }
+                     }
+                     else
+                     {
+                        html += YAHOO.lang.substitute(templates['item'],
+                        {
+                           data: Alfresco.util.message('label.no-users', 'Alfresco.RM.UserRights'),
+                           className: (ii % 2 === 0) ? 'odd' : ''
+                        });                  
+                     }
+                     ii++;
                   }
                }
-               else
+               if (html !== "")
                {
-                     html+=YAHOO.lang.substitute(templates['item'], {data:Alfresco.util.message('label.no-users', 'Alfresco.RM.UserRights'),className:(ii%2===0) ? 'odd':''});                  
+                  //render to DOM
+                  this.widgets[q].innerHTML = YAHOO.lang.substitute(templates['list'],
+                  {
+                     data: html
+                  });
                }
-               ii++;
-            }
-            if (html!=="")
-            {
-               //render to DOM
-               this.widgets[q].innerHTML = YAHOO.lang.substitute(templates['list'],{data:html});               
             }
          }
       }

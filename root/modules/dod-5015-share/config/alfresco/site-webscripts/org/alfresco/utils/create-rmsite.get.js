@@ -3,13 +3,13 @@ function main()
    // Call the repo to create the site
    var siteJson =
    {
-      "shortName" : args["shortname"],
-      "sitePreset" : "rm-site-dashboard",
-      "title" : msg.get("title.rmsite"),
-      "description" : ""
+      shortName: args["shortname"],
+      sitePreset: "rm-site-dashboard",
+      title: msg.get("title.rmsite"),
+      description: msg.get("description.rmsite")
    };
-   var scriptRemoteConnector = remote.connect("alfresco");
-   var repoResponse = scriptRemoteConnector.post("/api/sites", jsonUtils.toJSONString(siteJson), "application/json");
+   var scriptRemoteConnector = remote.connect("alfresco"),
+      repoResponse = scriptRemoteConnector.post("/api/sites", jsonUtils.toJSONString(siteJson), "application/json");
    if (repoResponse.status == 401)
    {
       status.setCode(repoResponse.status, "error.loggedOut");

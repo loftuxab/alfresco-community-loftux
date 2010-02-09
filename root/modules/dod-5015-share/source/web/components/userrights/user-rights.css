@@ -1,40 +1,42 @@
 .userRights
 {
-   margin:1em;
-   width:100%;
+   margin: 1em 10px;
+   width: 100%;
 }
+
 .userRights h1,
 .userRights h2
 {
-   font-weight:bold;
+   font-weight: bold;
 }
+
 .userRights h2
 {
-   margin:1em 0;
+   margin: 1em 0;
 }
+
 .userRights dl
 {
-
-   border:1px solid #7F7F7F;
-} 
+   border: 1px solid #7F7F7F;
+}
 
 .userRights dt
 {
-   padding:3px;
+   padding: 3px;
 }
 
-.userRights dd 
+.userRights dd
 {
-   padding-left:50%;
+   padding-left: 50%;
 }
 
 .userRights dt.odd,
 .userRights dd.odd
 {
-   background-color:#EDF5FF;
+   background-color: #EDF5FF;
 }
 
 .userRights p
 {
-   padding-top:0;
+   padding-top: 0;
 }

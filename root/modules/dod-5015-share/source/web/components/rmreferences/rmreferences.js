@@ -55,9 +55,7 @@ Alfresco.RM = Alfresco.RM || {};
     */
    Alfresco.RM.References = function RM_References_constructor(htmlId)
    {
-      Alfresco.RM.References.superclass.constructor.call(this, "Alfresco.RM.References", htmlId);
-     
-      return this;
+      return Alfresco.RM.References.superclass.constructor.call(this, "Alfresco.RM.References", htmlId);
    };
    
    /**
@@ -113,7 +111,7 @@ Alfresco.RM = Alfresco.RM || {};
        */
       onDoneReference: function RM_References_onDoneReference(e, args)
       {
-         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/document-details?nodeRef={nodeRef}',
+         var uriTemplate = 'document-details?nodeRef={nodeRef}',
             pageUrl = YAHOO.lang.substitute(uriTemplate,
             {
                site: encodeURIComponent(this.options.siteId),
@@ -166,7 +164,7 @@ Alfresco.RM = Alfresco.RM || {};
        */
       onNewReference: function RM_References_onNewReference(e, args)
       {
-         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/new-rmreference?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}',
+         var uriTemplate = 'new-rmreference?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}',
             url = YAHOO.lang.substitute(uriTemplate,
             {
                site: encodeURIComponent(this.options.siteId),

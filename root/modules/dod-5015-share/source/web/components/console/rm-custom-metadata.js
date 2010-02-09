@@ -209,11 +209,11 @@
                   Dom.addClass(div, "property-item");
                   var html = '<div class="property-actions"><span id="' + editBtnContainerId + '"></span><span id="' + deleteBtnContainerId + '"></span>';
                   html += '</div><div><p class="property-title">' + $html(prop.label) + '</p><p>';
-                  html += parent._msg('label.type') + ': ' + parent._dataTypeLabel(prop.dataType);
+                  html += parent._msg('label.type') + ': ' + $html(parent._dataTypeLabel(prop.dataType));
                   // display any selection list constraint applied and if mandatory value
                   if (prop.constraintRefs.length !== 0)
                   {
-                     html += '&nbsp;&nbsp;&nbsp;' + parent._msg('label.selection-list') + ': ' + prop.constraintRefs[0].title;
+                     html += '&nbsp;&nbsp;&nbsp;' + parent._msg('label.selection-list') + ': ' + $html(prop.constraintRefs[0].title);
                   }
                   if (prop.mandatory)
                   {

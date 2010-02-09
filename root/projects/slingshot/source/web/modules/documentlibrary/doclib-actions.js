@@ -257,7 +257,8 @@
             {
                modal: true,
                displayTime: 0,
-               text: wait.message
+               text: wait.message,
+               effect: null
             });
             failure.popup = success.popup;
          }

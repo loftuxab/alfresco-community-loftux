@@ -605,7 +605,7 @@
             this.panel.setFirstLastFocusable();
             this.panel.focusFirst();
          }
-         if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+         if (this.showConfig.mode === this.MODE_SINGLE_UPDATE && this.panel.cfg.getProperty("visible"))
          {
             if (this.dataTable.getRecordSet().getLength() === 0)
             {
@@ -976,6 +976,8 @@
 
          // Hide the panel
          this.panel.hide();
+
+         // Hide the Flash movie
          Dom.addClass(this.id + "-flashuploader-div", "hidden");
                   
          // Disable the Esc key listener
@@ -1511,7 +1513,7 @@
                   attributes.siteId = this.showConfig.siteId;
                   attributes.containerId = this.showConfig.containerId;
                }
-               else
+               else if (this.showConfig.destination !== null)
                {
                   attributes.destination = this.showConfig.destination
                }

@@ -23,7 +23,7 @@
 <div class="form-field">
    <#if form.mode == "view">
       <div id="${controlId}" class="viewmode-field">
-         <#if (field.endpointMandatory?? || field.mandatory??) && field.value == "">
+         <#if (field.endpointMandatory!false || field.mandatory!false) && field.value == "">
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>

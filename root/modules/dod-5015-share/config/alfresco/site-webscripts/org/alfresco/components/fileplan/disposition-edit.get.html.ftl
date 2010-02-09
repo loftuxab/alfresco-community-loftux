@@ -1,18 +1,21 @@
 <script type="text/javascript">//<![CDATA[
-new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
-   ${messages}
-).setOptions({
-   nodeRef: "${page.url.args.nodeRef}",
-   siteId: "${page.url.templateArgs.site!""}",
-   events: {
+   new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
+      ${messages}
+   ).setOptions(
+   {
+      nodeRef: "${page.url.args.nodeRef}",
+      siteId: "${page.url.templateArgs.site!""}",
+      events:
+      {
       <#list events as event>
-      "${event.value}": { label: "${event.label}", automatic: ${event.automatic?string} }<#if (event_has_next)>, </#if>
+         "${event.value}": { label: "${event.label?html}", automatic: ${event.automatic?string} }<#if (event_has_next)>, </#if>
       </#list>
    },
-   actions: {
-      <#list dispositionActions as action>
-      "${action.value}": { label: "${action.label}" }<#if (action_has_next)>, </#if>
-      </#list>
+   actions:
+   {
+   <#list dispositionActions as action>
+      "${action.value}": { label: "${action.label?html}" }<#if (action_has_next)>, </#if>
+   </#list>
    }
 });
 //]]></script>
@@ -35,9 +38,10 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
       <hr />
       <input id="${el}-createaction-button" class="yui-button createaction createaction-button" name="createaction-button" value="${msg("button.createaction")}" type="button" >
       <select id="${el}-createaction-menu" class="createaction-menu" name="createaction-menu">
-         <#list dispositionActions as action>
-         <option value="${action.value}">${action.label}</option>
-         </#list>
+      <#-- double html encoding required here due to YUI bug -->
+      <#list dispositionActions as action>
+         <option value="${action.value?html}">${action.label?html?html}</option>
+      </#list>
       </select>
    </div>
 
@@ -88,9 +92,9 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                      <span class="action-location-section">
                         ${msg("label.transferTo")}:
                         <select name="location" class="action-location">
-                           <#list transferLocations as location>
-                           <option value="${location.value}">${location.label}</option>
-                           </#list>
+                        <#list transferLocations as location>
+                           <option value="${location.value?html}">${location.label?html}</option>
+                        </#list>
                         </select>
                         <span class="action-location-restricted-section">&nbsp;</span>
                      </span>
@@ -101,15 +105,15 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                      ${msg("label.after")}
                      <input type="text" class="period-amount" name="-"/>
                      <select class="period-unit">
-                        <#list periodTypes as periodType>
-                        <option value="${periodType.value}">${periodType.label}</option>
-                        </#list>
+                     <#list periodTypes as periodType>
+                        <option value="${periodType.value?html}">${periodType.label?html}</option>
+                     </#list>
                      </select>
                      ${msg("label.from")}
                      <select name="periodProperty" class="period-action">
-                        <#list periodProperties as periodProperty>
-                        <option value="${periodProperty.value}">${periodProperty.label}</option>
-                        </#list>
+                     <#list periodProperties as periodProperty>
+                        <option value="${periodProperty.value?html}">${periodProperty.label?html}</option>
+                     </#list>
                      </select>
                      <span class="or-relation">${msg("label.or")}</span>
                      <span class="and-relation">${msg("label.and")}</span>
@@ -130,9 +134,10 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                      <div class="events-header">
                         <button class="addevent-button">${msg("button.addevent")}</button>
                         <select class="addevent-menu">
-                           <#list events as event>
-                           <option value="${event.value}">${event.label}</option>
-                           </#list>                           
+                        <#-- double html encoding required here due to YUI bug -->
+                        <#list events as event>
+                           <option value="${event.value?html}">${event.label?html?html}</option>
+                        </#list>                           
                         </select>
                         <hr />
                      </div>

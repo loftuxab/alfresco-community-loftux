@@ -2036,7 +2036,7 @@ Alfresco.util.PopupManager = function()
             zIndex: this.zIndex++
          };
          // IE browsers don't deserve fading, as they can't handle it properly
-         if (YAHOO.env.ua.ie > 0)
+         if (c.effect === null || YAHOO.env.ua.ie > 0)
          {
             delete dialogConfig.effect;
          }

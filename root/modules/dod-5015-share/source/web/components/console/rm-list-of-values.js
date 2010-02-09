@@ -706,7 +706,7 @@
                if (oFullResponse && oFullResponse.data && oFullResponse.data.values)
                {
                   // Display the title of the list in the "edit title"
-                  Dom.get(parent.id + "-edittitle").innerHTML = parent.msg("label.edit-listofvalue-title", oFullResponse.data.constraintTitle);
+                  Dom.get(parent.id + "-edittitle").innerHTML = parent.msg("label.edit-listofvalue-title", $html(oFullResponse.data.constraintTitle));
 
                   // Get the values from the response
                   var values = oFullResponse.data.values;
@@ -718,12 +718,13 @@
                   });
 
                   // we need to wrap the array inside a JSON object so the DataTable is happy
-                  return {
+                  return (
+                  {
                      data:
                      {
                         values: values
                      }
-                  };
+                  });
                }
                return oFullResponse;
             };
@@ -1113,7 +1114,7 @@
          _setupAccessDataSource: function ViewPanelHandler__setupAccessDataSource()
          {
             // DataSource definition
-            var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints/";
+            var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints";
             this.widgets.accessDataSource = new YAHOO.util.DataSource(uriSearchResults);
             this.widgets.accessDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
             this.widgets.accessDataSource.connXhrMode = "queueRequests";
@@ -1135,7 +1136,8 @@
                   });
 
                   // we need to wrap the array inside a JSON object so the DataTable is happy
-                  return {
+                  return (
+                  {
                      data:
                      {
                         value:
@@ -1143,7 +1145,7 @@
                            authorities: authorities
                         }
                      }
-                  };
+                  });
                }
                return oFullResponse;
             };
@@ -1209,17 +1211,11 @@
 
             // AccessDataTable column defintions
             var columnDefinitions =
-                  [
-                     {
-                        key: "accessicon", label: "Icon", sortable: false, formatter: renderCellAccessIcon
-                     },                        
-                     {
-                        key: "access", label: "List", sortable: false, formatter: renderCellDescription
-                     },
-                     {
-                        key: "actions", label: "Actions", formatter: renderCellActions
-                     }
-                  ];
+            [
+               { key: "accessicon", label: "Icon", sortable: false, formatter: renderCellAccessIcon },                        
+               { key: "access", label: "List", sortable: false, formatter: renderCellDescription },
+               { key: "actions", label: "Actions", formatter: renderCellActions }
+            ];
 
             // AccessDataTable definition
             this.widgets.accessDataTable = new YAHOO.widget.DataTable(parent.id + "-access", columnDefinitions, this.widgets.accessDataSource,
@@ -1302,7 +1298,8 @@
             var selectedValueName = this._getSelectedValueName();
             if (selectedValueName)
             {
-               this.widgets.accessDataSource.sendRequest("/" + parent.constraintName + "/values/" + selectedValueName,
+               // Note: extra manual encoding of %2F ("/") to enable correct HTTP request generation
+               this.widgets.accessDataSource.sendRequest("/" + parent.constraintName + "/values/" + encodeURIComponent(selectedValueName).replace("%2F", "%252F"),
                {
                   success: successHandler,
                   failure: failureHandler,
@@ -1604,6 +1601,5 @@
          dataTable.set("MSG_EMPTY", emptyMessage);
          dataTable.set("MSG_ERROR", this.msg("message.error"));
       }
-
    });
 })();
