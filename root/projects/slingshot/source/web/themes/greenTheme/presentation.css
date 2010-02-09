@@ -4,7 +4,7 @@ body
 {
    font-family: Arial, sans-serif;
    font-size: 81%;
-   color: #515D6B;
+   color: #526A53;
 }
 
 a,
@@ -22,13 +22,9 @@ a:hover
 
 h1
 {
-
-
-/*   font-family: Helvetica, Arial, sans-serif;
+   font-family: Helvetica, Arial, sans-serif;
    font-size: 146.5%;
    font-weight: normal;
-*/ 
-   font: normal 146.5% Helvetica, Arial, sans-serif;
 }
 
 h2
@@ -79,12 +75,16 @@ hr
 {
    background: white !important;
    color: red !important;
+   font-weight: bold;
+   padding: 0.2em 1em;
 }
 
 .error-alt
 {
    background-color: red !important;
    color: white !important;
+   font-weight: bold;
+   padding: 0.2em 1em;
 }
 
 .light
@@ -163,38 +163,55 @@ hr
 .yui-skin-greenTheme .yui-panel .bdft,
 .yui-skin-greenTheme .yui-panel .ft
 {
-   color: #515D6B;
-   background: #E3EBEC;
-   border-bottom: 1px solid #C4C5C5;
-   border-left-color: #C4C5C5;
-   border-right-color: #C4C5C5;
+   color: #526A53;
+   background: #E3EDE6;
+   border-bottom: 1px solid #C5C7C6;
+   border-left-color: #C5C7C6;
+   border-right-color: #C5C7C6;
 }
 
 .yui-skin-greenTheme .yui-panel .hd
 {
    font-size: 123.1%;
    font-weight: bold;
-   border-bottom: 1px solid #C4C5C5;
+   border-bottom: 1px solid #C5C7C6;
 }
 
 .yui-skin-greenTheme .yui-panel .bdft
 {
    font-size: 100%;
-   border-top: 1px solid #C4C5C5;
+   border-top: 1px solid #C5C7C6;
 }
 
 .yui-skin-greenTheme .yui-panel .ft
 {
-   border-top: 1px solid #C4C5C5;
+   border-top: 1px solid #C5C7C6;
    padding: 5px;
 }
 
 .yui-skin-greenTheme .yui-panel .bd
 {
-   color: #515D6B;
-   background-color: #F9FBFD;
-   border-left-color: #C4C5C5;
-   border-right-color: #C4C5C5;
+   color: #526A53;
+   background-color: #F7FDF8;
+   border-left-color: #C5C7C6;
+   border-right-color: #C5C7C6;
+}
+
+.yui-skin-greenTheme .yui-panel .bd .yui-resize .yui-resize-handle
+{
+   background-color: #F7FDF8;
+}
+
+.yui-skin-greenTheme .yui-dt-data tr.yui-dt-odd.yui-dt-highlighted,
+.yui-skin-greenTheme .yui-dt-data tr.yui-dt-even.yui-dt-highlighted
+{
+   background-color: #F5FFF9;
+   cursor: auto;
+}
+
+.yui-skin-greenTheme .yui-dt-message
+{
+   background-color: inherit;
 }
 
 /* Style the default message  */
@@ -221,9 +238,9 @@ hr
 .yui-skin-greenTheme #prompt,
 .yui-skin-greenTheme #userInput
 {
-   border-top: 1px solid #C4C5C5;
-   border-bottom: 1px solid #C4C5C5;
-   background-color: #E3EBEC;
+   border-top: 1px solid #C5C7C6;
+   border-bottom: 1px solid #C5C7C6;
+   background-color: #E3EDE6;
 }
 
 .yui-skin-greenTheme #prompt .bd,
@@ -310,9 +327,14 @@ span.navigation-separator-alt
    border-bottom: 1px solid #C7CCCE;
 }
 
+.toolbar .action-bar
+{
+   border-right: 1px solid #9FB9AB;
+}
+
 .toolbar .separator
 {
-   border-right: 1px dotted #457A9C;
+   border-right: 1px dotted #3a6c38;
 }
 
 strong
@@ -332,6 +354,7 @@ em
 
 select,
 input[type="text"],
+input[type="password"],
 textarea
 {
    border: 1px solid #C5D6E2;
@@ -348,10 +371,16 @@ textarea
 
 /* Richtext Editor Plug-ins */
 
-.yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon
+.yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon,
+span.mce_alfresco-imagelibrary
 {
    background-position: 0 0 !important;
    background-image: url(images/alfresco-imagelib.png) !important;
+}
+
+.mce_alfresco-imagelibrary img
+{
+   background-position: 0px 2px !important;
 }
 
 /* Point the YUI button to the themed sprite */
@@ -408,7 +437,8 @@ textarea
    color: #000;
 }
 
-.yui-skin-greenTheme .title-button .yui-button .first-child
+.yui-skin-greenTheme .title-button .yui-button .first-child,
+.yui-skin-greenTheme .title-button .yui-button
 {
    border-color: #e3ffe3;
 }
@@ -462,6 +492,12 @@ textarea
    border: 1px solid #008F22;
 }
 
+#Share.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+{
+   border-color: transparent;
+   background-color: transparent;
+}
+
 .yui-skin-greenTheme .link-menu-button .yui-button span.first-child,
 .yui-skin-greenTheme .link-menu-button .yui-button.yui-button-activeoption span.first-child,
 .yui-skin-greenTheme .link-menu-button .yui-button.yui-button-hover span.first-child
@@ -480,20 +516,14 @@ textarea
    border: 1px solid #008F22;
 }
 
-#Share.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-menu-button-hover
 {
-   border-color: transparent;
-   background-color: transparent;
+   border: 1px solid #FFFFFF;
 }
 
 .topiclist .yui-dt-liner
 {
    padding: 0;
-}
-
-.yui-skin-greenTheme .yui-dt-message
-{
-   background-color: inherit;
 }
 
 /* blog/wiki action items links */
@@ -535,6 +565,12 @@ body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
 body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
 {
    color: #FFF;
+}
+
+body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel-disabled
+{
+   color: #A6A6A6;
+   cursor: default;
 }
 
 /*end YUI Menu */
@@ -682,7 +718,9 @@ body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:h
 .yui-skin-greenTheme .site-members h3 a,
 .yui-skin-greenTheme .yui-calendar td.calcell a,
 .yui-skin-greenTheme .doclist .documents a,
-.yui-skin-greenTheme .attrValue a
+.yui-skin-greenTheme .attrValue a,
+.yui-skin-greenTheme .detail .item a,
+.yui-skin-greenTheme .info .meta-value a
 {
    color: #00AE42;
 }
@@ -696,6 +734,22 @@ body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:h
 {
    color: #00AE42;
 }
+
+/* Calendar */
+
+.yui-skin-greenTheme #calendar .yui-calendar td.calcell.selected a
+{
+   background-color: #E9F1EA;
+}
+
+.yui-skin-greenTheme .dayview h2, .weekview h2,
+.yui-skin-greenTheme .calendar.weekview thead th,
+.yui-skin-greenTheme .calendar.monthview thead th
+{
+   color: #000;
+}
+
+/* End Calendar */
 
 /* Twisters */
 
@@ -724,9 +778,6 @@ a.theme-color-2,
 a.theme-color-2:visited,
 a.theme-color-2:hover
 {
-
-
-/*   color:#66BC29;*/
    color: #038603;
 }
 
@@ -771,19 +822,19 @@ div.theme-bg-color-2
 .theme-bg-color-3,
 div.theme-bg-color-3
 {
-   
+   background-color: #DDEDE6;
 }
 
 .theme-bg-color-4,
 div.theme-bg-color-4
 {
-   
+   background-color: #E9F1EA;
 }
 
 .theme-bg-color-5,
 div.theme-bg-color-5
 {
-   
+   background-color: #2FB42C;
 }
 
 .theme-bg-1
@@ -800,10 +851,10 @@ div.theme-bg-color-5
 
 .theme-border-1
 {
-   
+   border-color: #468058;
 }
 
 .theme-border-2
 {
-   
+   border-color: #2FB42C;
 }

@@ -322,7 +322,17 @@ span.navigation-separator-alt
    border-right: 1px solid #457A9C;
 }
 
-/* Standard toolbar separator */
+/* Standard toolbar */
+
+.toolbar
+{
+   border-bottom: 1px solid #C7CCCE;
+}
+
+.toolbar .action-bar
+{
+   border-right: 1px solid #9eb0b7;
+}
 
 .toolbar .separator
 {
@@ -674,6 +684,7 @@ li.selected a.filter-link,
 li.selected a.tool-link, 
 li.selected a.archive-link,
 li.selected a.tag-link,
+li.selected span.tag,
 body.yui-skin-default .treeview .selected table .ygtvlabel, 
 body.yui-skin-default .treeview .selected table .ygtvlabel:link, 
 body.yui-skin-default .treeview .selected table .ygtvlabel:visited, 
@@ -715,18 +726,6 @@ body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:hove
 .yui-skin-default .site-navigation
 {
    background-image: url(./images/navigation-bg.png);
-}
-
-/* Standard toolbar */
-
-.toolbar
-{
-   border-bottom: 1px solid #C7CCCE;
-}
-
-.toolbar .action-bar
-{
-   border-right: 1px solid #9eb0b7;
 }
 
 /* Calendar */
@@ -838,16 +837,12 @@ div.theme-bg-color-5
 
 .theme-bg-1
 {
-   
 
 }
 
 .theme-bg-2
 {
    background-color: #E3EAEC;
-/* bac
-
-kground-image: url(images/navbar-bg-2.png); */
 }
 
 /* Theme border type/colors */
