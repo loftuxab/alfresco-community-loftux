@@ -31,9 +31,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <%
-String logoNodeRef = "workspace/SpacesStore/d2a5186e-d5b0-4aa7-960d-c1cca3274423";
-String mainTextNodeRef = "workspace://SpacesStore/301c4bb4-1e23-4651-bda5-de8a48b36131";
-String subTextNodeRef = "workspace://SpacesStore/27872b54-a3b5-47ed-9ac6-eaa5340abec3";
+String logoNodeRef = "workspace://SpacesStore/04e1c411-1896-45fb-9847-1c487af7f379";
+String mainTextNodeRef = "workspace://SpacesStore/301a540e-7101-489c-a8a7-859102a99ea5";
+String subTextNodeRef = "workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3ce666";
 %>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -50,7 +50,7 @@ String subTextNodeRef = "workspace://SpacesStore/27872b54-a3b5-47ed-9ac6-eaa5340
    
    <body class="yui-skin-default">
       
-      <div class="logo"><img src="http://localhost:8080/alfresco/d/d/<%=logoNodeRef%>/app-logo.png?guest=true" /></div>
+      <div class="logo"><img src="http://localhost:8080/alfresco/d/d/<%=logoNodeRef.replace("://", "/")%>/app-logo.png?guest=true" /></div>
       <h1>
          <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
          <customer:property nodeRef="<%=mainTextNodeRef%>" property="cm:title" />
