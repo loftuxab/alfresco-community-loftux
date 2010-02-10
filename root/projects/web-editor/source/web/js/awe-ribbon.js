@@ -222,8 +222,8 @@
       
       onQuickEditMouseOver: function AWE_Ribbon_onQuickEditMouseOver(e, args)
       {
-         var targetContentEl = Dom.get(args[1].value.id).parentNode,
-             targetContentElRegion = Dom.getRegion(targetContentEl),
+         var targetContentEl = (args[1].value.nested) ? Dom.get(args[1].value.id).parentNode : Dom.get(args[1].value.id);
+         var targetContentElRegion = Dom.getRegion(targetContentEl),
              fadeIn = function fade(el){
                 var anim = new YAHOO.util.ColorAnim(el, {
                    backgroundColor: {
