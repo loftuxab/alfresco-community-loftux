@@ -86,7 +86,11 @@ public class EndTemplateTag extends AbstractWebEditorTag
                out.write(content.getMarkerId());
                out.write("\",\n   nodeRef: \"");
                out.write(content.getContentId());
-               out.write("\",\n   redirectUrl: window.location.href");
+               out.write("\",\n   title: \"");
+               out.write(content.getContentTitle());
+               out.write("\",\n   nested: ");
+               out.write(Boolean.toString(content.isNested()));
+               out.write(",\n   redirectUrl: window.location.href");
                if (content.getFormId() != null)
                {
                   out.write(",\n   formId: \"");

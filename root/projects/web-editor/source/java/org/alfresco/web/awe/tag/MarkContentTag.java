@@ -48,9 +48,8 @@ public class MarkContentTag extends AbstractWebEditorTag
    private static final Log logger = LogFactory.getLog(MarkContentTag.class);
 
    private String contentId;
-
+   private String contentTitle;
    private String formId;
-
    private boolean nestedMarker = false;
 
    /**
@@ -71,6 +70,26 @@ public class MarkContentTag extends AbstractWebEditorTag
    public void setId(String contentId)
    {
       this.contentId = contentId;
+   }
+   
+   /**
+    * Returns the title of the content to be edited
+    * 
+    * @return The title of the content to be edited
+    */
+   public String getTitle()
+   {
+      return this.contentTitle;
+   }
+   
+   /**
+    * Sets the title of the content to be edited
+    * 
+    * @param title The title of the content to be edited
+    */
+   public void setTitle(String title)
+   {
+      this.contentTitle = title;
    }
 
    /**
@@ -130,11 +149,13 @@ public class MarkContentTag extends AbstractWebEditorTag
             
             // generate a unique id for this marked content
             List<MarkedContent> markedContent = getMarkedContent();
-            String markerIdPrefix = (String) this.pageContext.getRequest().getAttribute(KEY_MARKER_ID_PREFIX);
+            String markerIdPrefix = (String) this.pageContext.getRequest().getAttribute(
+                     KEY_MARKER_ID_PREFIX);
             String markerId = markerIdPrefix + "-" + (markedContent.size() + 1);
    
             // create marked content object and store
-            MarkedContent content = new MarkedContent(markerId, this.contentId, this.formId);
+            MarkedContent content = new MarkedContent(markerId, this.contentId, this.contentTitle, 
+                     this.formId, this.nestedMarker);
             markedContent.add(content);
    
             // render edit link for content
@@ -161,11 +182,11 @@ public class MarkContentTag extends AbstractWebEditorTag
             
             out.write("\"><img src=\"");
             out.write(urlPrefix);
-            out.write("/themes/default/images/edit.png\" alt=\"Edit ");
-            // TODO: this needs to do a lookup for content title (done on client
-            // side?)
-            out.write(markerId);
-            out.write("\" border=\"0\" /></a></span>\n");
+            out.write("/themes/default/images/edit.png\" alt=\"");
+            out.write(this.contentTitle);
+            out.write("\" title=\"");
+            out.write(this.contentTitle);
+            out.write("\"border=\"0\" /></a></span>\n");
             
             if (logger.isDebugEnabled())
                logger.debug("Completed markContent rendering for: " + content);

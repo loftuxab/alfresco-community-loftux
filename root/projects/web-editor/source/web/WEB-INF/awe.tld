@@ -53,6 +53,16 @@
       </attribute>
       
       <attribute>
+         <name>title</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+         <description>
+            The title of the content, used as the alt tag for the edit link, in the drop down
+            list in the toolbar and the ttile of the popup panel.
+         </description>
+      </attribute>
+      
+      <attribute>
          <name>formId</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
@@ -66,7 +76,8 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
          <description>
-            Indicates that the HTML tag that contains the content marker also contains the referenced content itself. Defaults to false.
+            Indicates that the HTML tag that contains the content marker also contains 
+            the referenced content itself. Defaults to false.
          </description>
       </attribute>
 
