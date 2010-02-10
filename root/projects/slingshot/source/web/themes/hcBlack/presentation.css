@@ -22,13 +22,9 @@ a:hover
 
 h1
 {
-
-
-/*   font-family: Helvetica, Arial, sans-serif;
+   font-family: Helvetica, Arial, sans-serif;
    font-size: 146.5%;
    font-weight: normal;
-*/ 
-   font: normal 146.5% Helvetica, Arial, sans-serif;
 }
 
 h2
@@ -79,12 +75,16 @@ hr
 {
    background: white !important;
    color: red !important;
+   font-weight: bold;
+   padding: 0.2em 1em;
 }
 
 .error-alt
 {
    background-color: red !important;
    color: white !important;
+   font-weight: bold;
+   padding: 0.2em 1em;
 }
 
 .light
@@ -170,11 +170,6 @@ body.yui-skin-hcBlack .dashlet .body a:hover
    background-color: #F1FF00;
 }
 
-.topiclist .yui-dt-liner
-{
-   padding: 0;
-}
-
 .yui-skin-hcBlack .yui-dt-message
 {
    background-color: inherit;
@@ -226,6 +221,23 @@ body.yui-skin-hcBlack .dashlet .body a:hover
    background-color: #F9FBFD;
    border-left-color: #C4C5C5;
    border-right-color: #C4C5C5;
+}
+
+.yui-skin-hcBlack .yui-panel .bd .yui-resize .yui-resize-handle
+{
+   background-color: #F9FBFD;
+}
+
+.yui-skin-hcBlack .yui-dt-data tr.yui-dt-odd.yui-dt-highlighted,
+.yui-skin-hcBlack .yui-dt-data tr.yui-dt-even.yui-dt-highlighted
+{
+   background-color: #FEFFF1;
+   cursor: auto;
+}
+
+.yui-skin-hcBlack .yui-dt-message
+{
+   background-color: inherit;
 }
 
 /* Style the default message  */
@@ -342,6 +354,11 @@ span.navigation-separator-alt
    border-bottom: 1px solid #C7CCCE;
 }
 
+.toolbar .action-bar
+{
+   border-right: 1px solid #9FB9AB;
+}
+
 .toolbar .separator
 {
    border-right: 1px dotted #457A9C;
@@ -364,6 +381,7 @@ em
 
 select,
 input[type="text"],
+input[type="password"],
 textarea
 {
    border: 1px solid #838383;
@@ -385,10 +403,16 @@ textarea
 
 /* Richtext Editor Plug-ins */
 
-.yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon
+.yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon,
+span.mce_alfresco-imagelibrary
 {
    background-position: 0 0 !important;
    background-image: url(images/alfresco-imagelib.png) !important;
+}
+
+.mce_alfresco-imagelibrary img
+{
+   background-position: 0px 2px !important;
 }
 
 /* Point the YUI button to the themed sprite */
@@ -487,6 +511,12 @@ textarea
 {
    background-color: #FFFFFF;
    border: 1px solid #000;
+}
+
+#Share.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+{
+   border-color: transparent;
+   background-color: transparent;
 }
 
 .yui-skin-hcBlack .link-menu-button .yui-button span.first-child,
@@ -625,29 +655,6 @@ body.yui-skin-hcBlack .categoryview .category .ygtvdepthcell
 
 /* end doclist */
 
-/* calendar */
-
-.yui-skin-hcBlack .dayview h2, .weekview h2,
-.yui-skin-hcBlack .calendar.weekview thead th,
-.yui-skin-hcBlack .calendar.monthview thead th
-{
-   color: #000;
-}
-
-body.yui-skin-hcBlack .vcalendar table,
-body.yui-skin-hcBlack .vcalendar table th,
-body.yui-skin-hcBlack .vcalendar table td,
-body.yui-skin-hcBlack .vcalendar table .hourSegment,
-body.yui-skin-hcBlack .weekview div.day, 
-body.yui-skin-hcBlack .dayview div.day,
-body.yui-skin-hcBlack .calendar.weekview tbody tr.alldayRow td,
-body.yui-skin-hcBlack tr#collapseTrigger td
-{
-   border-color: #000;
-}
-
-/* end calendar */
-
 /* invite page */
 
 .inviteusersbyemail .byemailbody
@@ -748,6 +755,29 @@ body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hove
    text-decoration: underline;
 }
 
+/* calendar */
+
+.yui-skin-hcBlack .dayview h2, .weekview h2,
+.yui-skin-hcBlack .calendar.weekview thead th,
+.yui-skin-hcBlack .calendar.monthview thead th
+{
+   color: #000;
+}
+
+body.yui-skin-hcBlack .vcalendar table,
+body.yui-skin-hcBlack .vcalendar table th,
+body.yui-skin-hcBlack .vcalendar table td,
+body.yui-skin-hcBlack .vcalendar table .hourSegment,
+body.yui-skin-hcBlack .weekview div.day, 
+body.yui-skin-hcBlack .dayview div.day,
+body.yui-skin-hcBlack .calendar.weekview tbody tr.alldayRow td,
+body.yui-skin-hcBlack tr#collapseTrigger td
+{
+   border-color: #000;
+}
+
+/* end calendar */
+
 .groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
 {
    color: #fff;
@@ -780,9 +810,6 @@ a.theme-color-2,
 a.theme-color-2:visited,
 a.theme-color-2:hover
 {
-
-
-/*   color:#66BC29;*/
    color: #038603;
 }
 
