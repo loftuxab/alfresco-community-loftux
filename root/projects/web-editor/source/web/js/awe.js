@@ -107,6 +107,7 @@
             formUri: formUri,
             nodeRef: o.nodeRef,
             domContentId: o.id,
+            title: o.title,
             redirectUrl: o.redirectUrl
          }).show();
       };
@@ -134,6 +135,7 @@
                    config:
                    {
                      id: id,
+                     title: config.title,
                      formId: config.formId,
                      redirectUrl: config.redirectUrl,
                      nodeRef: config.nodeRef
@@ -542,6 +544,7 @@
                                     id:this.options.domContentId,
                                     formId:this.options.formId,
                                     nodeRef:this.options.nodeRef,
+                                    title:this.options.title,
                                     redirectUrl: this.options.redirectUrl
                                  });
                               },
@@ -595,7 +598,7 @@
             close: true,
             visible: false
          });
-         this.widgets.panel.setHeader('Edit ' + this.options.formId);
+         this.widgets.panel.setHeader(this.options.title);
          this.widgets.panel.render(Dom.get(this.id));
 
          //add hide handler
