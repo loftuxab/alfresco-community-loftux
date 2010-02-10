@@ -83,18 +83,18 @@ public class EndTemplateTag extends AbstractWebEditorTag
                }
              
                out.write("\n{\n   id: \"");
-               out.write(content.getMarkerId());
+               out.write(encode(content.getMarkerId()));
                out.write("\",\n   nodeRef: \"");
-               out.write(content.getContentId());
+               out.write(encode(content.getContentId()));
                out.write("\",\n   title: \"");
-               out.write(content.getContentTitle());
+               out.write(encode(content.getContentTitle()));
                out.write("\",\n   nested: ");
                out.write(Boolean.toString(content.isNested()));
                out.write(",\n   redirectUrl: window.location.href");
                if (content.getFormId() != null)
                {
                   out.write(",\n   formId: \"");
-                  out.write(content.getFormId());
+                  out.write(encode(content.getFormId()));
                   out.write("\"");
                }
                out.write("\n}");
@@ -102,7 +102,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             out.write("]);\n");
             out.write("AWE.module.Ribbon = new AWE.Ribbon(\"awe-ribbon\");");
             out.write("AWE.module.Ribbon.init({\n   position: \"");
-            out.write(toolbarLocation);
+            out.write(encode(toolbarLocation));
             out.write("\"\n});\nAWE.module.Ribbon.render();\n");
             out.write("}\n</script>");
             

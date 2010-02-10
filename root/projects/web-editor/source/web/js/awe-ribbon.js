@@ -165,7 +165,7 @@
                                     {
                                        menuConfig.push(
                                        {
-                                          text: Selector.query('img', markers[p].elem, true).alt,
+                                          text: (Selector.query('img', markers[p].elem, true).alt).replace(/</g, '&lt;').replace(/>/g, '&gt;'),
                                           value: markers[p].config
                                        });
                                     }
