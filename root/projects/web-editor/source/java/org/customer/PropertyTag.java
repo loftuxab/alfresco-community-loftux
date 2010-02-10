@@ -32,6 +32,8 @@ import javax.servlet.jsp.JspException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +45,7 @@ import org.json.JSONObject;
 public class PropertyTag extends AbstractCustomerTag
 {
    private static final long serialVersionUID = -7972734141482504413L;
+   private static final Log logger = LogFactory.getLog(PropertyTag.class);
 
    private String property;
 
@@ -77,6 +80,10 @@ public class PropertyTag extends AbstractCustomerTag
 
          // setup http call to content webscript
          String url = this.getRepoUrl() + "/service/api/metadata?nodeRef=" + getNodeRef() + "&shortQNames=true";
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Getting metadata from: " + url);
+         
          HttpClient client = getHttpClient();
          GetMethod getContent = new GetMethod(url);
          getContent.setDoAuthentication(true);
@@ -88,6 +95,10 @@ public class PropertyTag extends AbstractCustomerTag
 
             // get the JSON response
             String jsonResponse = getContent.getResponseBodyAsString();
+            
+            if (logger.isDebugEnabled())
+               logger.debug(jsonResponse);
+            
             JSONObject json = new JSONObject(jsonResponse);
             JSONObject props = json.getJSONObject("properties");
             if (props.has(this.property))

@@ -13,19 +13,6 @@
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
-            </appearance>
-         </form>
-         
-         <form id="default">
-            <field-visibility>
-               <show id="cm:title" force="true" />
-               <show id="cm:description" force="true" />
-               <show id="cm:content" />
-            </field-visibility>
-            <appearance>
-               <field id="cm:title">
-                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
-               </field>
                <field id="cm:content">
                   <control>
                      <control-param name="editorAppearance">full</control-param>

@@ -52,17 +52,15 @@ String subTextNodeRef = "workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3
       
       <div class="logo"><img src="http://localhost:8080/alfresco/d/d/<%=logoNodeRef.replace("://", "/")%>/app-logo.png?guest=true" /></div>
       <h1>
-         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
          <customer:property nodeRef="<%=mainTextNodeRef%>" property="cm:title" />
+         <awe:markContent id="<%=mainTextNodeRef%>" />
       </h1>
       
       <h3>
-         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
          <customer:property nodeRef="<%=mainTextNodeRef%>" property="cm:description" />
       </h3>
       
       <div class="content">
-         <awe:markContent id="<%=mainTextNodeRef%>" formId="default" />
          <customer:content nodeRef="<%=mainTextNodeRef%>" />
       </div>
       <div class="trailer-text">
@@ -70,7 +68,7 @@ String subTextNodeRef = "workspace://SpacesStore/e94797ce-c6e9-47eb-b28c-c6a4eb3
          <customer:property nodeRef="<%=subTextNodeRef%>" property="cm:description" />
       </div>
       <div class="links">
-         <awe:markContent id="<%=subTextNodeRef%>" formId="default" />         
+         <awe:markContent id="<%=subTextNodeRef%>" />         
          <customer:content nodeRef="<%=subTextNodeRef%>" />
       </div>
       
