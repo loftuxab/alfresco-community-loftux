@@ -89,14 +89,25 @@
        */
       var loadForm = function AWE_loadForm(o)
       {
+         // formId is optional so use appropriate substitute string
+         var formUri = null;
+         if (o.formId)
+         {
+            formUri = YAHOO.lang.substitute('/awe/service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+         }
+         else
+         {
+            formUri = YAHOO.lang.substitute('/awe/service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+         }
+         
          AWE.module.getFormPanelInstance('awe-panel').setOptions({
-            formName:'testPanel',
+            formName: 'testPanel',
             //currently points to html id of text container instead of form id
-            formId:o.formId,
-            formUri: YAHOO.lang.substitute('/awe/service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o),
+            formId: o.formId,
+            formUri: formUri,
             nodeRef: o.nodeRef,
             domContentId: o.id,
-            redirectUrl:o.redirectUrl
+            redirectUrl: o.redirectUrl
          }).show();
       };
 
