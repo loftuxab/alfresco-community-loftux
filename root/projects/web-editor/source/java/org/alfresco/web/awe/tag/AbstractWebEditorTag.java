@@ -139,6 +139,75 @@ public class AbstractWebEditorTag extends TagSupport
     
       return markedContent;
    }
+   
+   /**
+    * Encodes the given string, so that it can be used within an HTML page.
+    * 
+    * @param string     the String to convert
+    */
+   protected String encode(String string)
+   {
+       if (string == null)
+       {
+           return "";
+       }
+       
+       StringBuilder sb = null;      //create on demand
+       String enc;
+       char c;
+       for (int i = 0; i < string.length(); i++)
+       {
+           enc = null;
+           c = string.charAt(i);
+           switch (c)
+           {
+               case '"': enc = "&quot;"; break;    //"
+               case '&': enc = "&amp;"; break;     //&
+               case '<': enc = "&lt;"; break;      //<
+               case '>': enc = "&gt;"; break;      //>
+               
+               case '\u20AC': enc = "&euro;";  break;
+               case '\u00AB': enc = "&laquo;"; break;
+               case '\u00BB': enc = "&raquo;"; break;
+               case '\u00A0': enc = "&nbsp;"; break;
+               
+               default:
+                   if (((int)c) >= 0x80)
+                   {
+                       //encode all non basic latin characters
+                       enc = "&#" + ((int)c) + ";";
+                   }
+               break;
+           }
+           
+           if (enc != null)
+           {
+               if (sb == null)
+               {
+                   String soFar = string.substring(0, i);
+                   sb = new StringBuilder(i + 16);
+                   sb.append(soFar);
+               }
+               sb.append(enc);
+           }
+           else
+           {
+               if (sb != null)
+               {
+                   sb.append(c);
+               }
+           }
+       }
+       
+       if (sb == null)
+       {
+           return string;
+       }
+       else
+       {
+           return sb.toString();
+       }
+   }
 
    @Override
    public void release()
