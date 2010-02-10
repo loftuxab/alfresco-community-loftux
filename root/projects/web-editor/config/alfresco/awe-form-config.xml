@@ -15,7 +15,7 @@
                </field>
                <field id="cm:content">
                   <control>
-                     <control-param name="editorAppearance">full</control-param>
+                     <control-param name="editorAppearance">webeditor</control-param>
                   </control>
                </field>
             </appearance>
