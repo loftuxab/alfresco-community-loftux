@@ -108,6 +108,7 @@
             nodeRef: o.nodeRef,
             domContentId: o.id,
             title: o.title,
+            nested: o.nested,
             redirectUrl: o.redirectUrl
          }).show();
       };
@@ -138,7 +139,8 @@
                      title: config.title,
                      formId: config.formId,
                      redirectUrl: config.redirectUrl,
-                     nodeRef: config.nodeRef
+                     nodeRef: config.nodeRef,
+                     nested: config.nested
                   }
                 };
 
@@ -545,6 +547,7 @@
                                     formId:this.options.formId,
                                     nodeRef:this.options.nodeRef,
                                     title:this.options.title,
+                                    nested:this.options.nested,
                                     redirectUrl: this.options.redirectUrl
                                  });
                               },
