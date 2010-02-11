@@ -40,6 +40,9 @@
                <id>logout</id>
                <page-instance-id>slingshot-logout</page-instance-id>
             </page-type>
+            
+            <!-- theme - currently one of: default, greenTheme, hcBlack -->
+            <theme>default</theme>
          </defaults>
          
          <error-handler>

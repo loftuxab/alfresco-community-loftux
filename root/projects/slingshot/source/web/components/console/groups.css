@@ -1,5 +1,4 @@
 /* History Manager */
-
 #yui-history-iframe
 {
    position: absolute;
@@ -10,22 +9,19 @@
    visibility: hidden;
 }
 
-/* Users Tool */
-
+/* Groups Tool */
 .groups
 {
-   color: #000000;
    margin: 16px 10px 10px;
 }
 
-.groups.yui-panel
+.groups. yui-panel
 {
    margin: 0;
 }
 
 .groups .title
 {
-   color: #515D6B;
    font-size: 123.1%;
    font-weight: bold;
    margin-bottom: 0.8em;

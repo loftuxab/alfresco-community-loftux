@@ -61,6 +61,11 @@
       <url-pattern>/res/*</url-pattern>
    </filter-mapping>
    
+    <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/system/*</url-pattern>
+   </filter-mapping>
+   
    <filter-mapping>
       <filter-name>CacheExpiresFilter</filter-name>
       <url-pattern>*.jpg</url-pattern>

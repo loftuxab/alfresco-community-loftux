@@ -4,7 +4,7 @@
 
    <!-- Spring Surf -->
    <rule>
-      <from>/proxy**</from>
+      <from>/proxy/**</from>
       <to>/page/proxy/$1</to>
    </rule>
    <rule>
@@ -14,6 +14,10 @@
    <rule>
       <from>/service/**</from>
       <to>/page/$1</to>
+   </rule>
+   <rule>
+      <from>/system/**</from>
+      <to>/page/system/$1</to>
    </rule>
 
 </urlrewrite>
