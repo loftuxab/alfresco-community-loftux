@@ -1,4 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <theme>
-	<title>Slingshot Default Theme</title>
+	<title>Default Blue Theme</title>
+	<title-id>theme.default</title-id>
 </theme>
