@@ -1136,6 +1136,19 @@
       </java> 
    </target> 
 
+   <target name="context-dependency-list" description="List out what bits of the context depend on which other bits. Specify -Dcontext= for a different context file, and/or more details" depends="init">
+      <condition property="context" value="">
+         <not><isset property="context"/></not>
+      </condition>
+
+      <java fork="yes" 
+            classname="org.alfresco.util.ContextDependencyLister" 
+            dir="." >
+         <classpath refid="classpath.unit.test" />
+         <arg line="${context}" />
+      </java> 
+   </target> 
+
    <!-- ****************************************************** -->
    <!-- ************** DOD5015 Exploded targets ************** -->
    <!-- ****************************************************** -->
