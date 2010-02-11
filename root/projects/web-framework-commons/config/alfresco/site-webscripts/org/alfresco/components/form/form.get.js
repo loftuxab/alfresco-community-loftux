@@ -51,37 +51,45 @@ function main()
       if (logger.isLoggingEnabled())
          logger.log("json = " + json);
       
-      var formModel = eval('(' + json + ')');
-      
-      // if we got a successful response attempt to render the form
-      if (json.status == 200)
+      if (json.status == 401)
       {
-         // setup caches and variables
-         setupCaches(formModel);
-         
-         // setup the initial form ui model
-         formUIModel = createFormUIModel(mode, formModel, formConfig);
-         
-         // setup the form items i.e. fields, sets and their structure
-         setupFormUIItems(mode, formModel, formConfig, visibleFields);
-         
-         // create properties for all the objects built during form items 
-         // construction above
-         formUIModel.structure = formUIStructure;
-         formUIModel.fields = formUIFields;
-         formUIModel.constraints = formUIConstraints;
-         
-         // add the item kind, item id and form id arguments
-         formUIModel.arguments =
-         {
-            itemKind: itemKind,
-            itemId: itemId,
-            formId: formId
-         };
+         status.setCode(json.status, "Not authenticated");
+         return;
       }
       else
       {
-         model.error = formModel.message;
+         var formModel = eval('(' + json + ')');
+         
+         // if we got a successful response attempt to render the form
+         if (json.status == 200)
+         {
+            // setup caches and variables
+            setupCaches(formModel);
+            
+            // setup the initial form ui model
+            formUIModel = createFormUIModel(mode, formModel, formConfig);
+            
+            // setup the form items i.e. fields, sets and their structure
+            setupFormUIItems(mode, formModel, formConfig, visibleFields);
+            
+            // create properties for all the objects built during form items 
+            // construction above
+            formUIModel.structure = formUIStructure;
+            formUIModel.fields = formUIFields;
+            formUIModel.constraints = formUIConstraints;
+            
+            // add the item kind, item id and form id arguments
+            formUIModel.arguments =
+            {
+               itemKind: itemKind,
+               itemId: itemId,
+               formId: formId
+            };
+         }
+         else
+         {
+            model.error = formModel.message;
+         }
       }
    }
    

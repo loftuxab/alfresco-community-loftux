@@ -40,6 +40,7 @@ import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.webscripts.connector.Connector;
 import org.springframework.extensions.webscripts.connector.ConnectorService;
 import org.springframework.extensions.webscripts.connector.Response;
+import org.springframework.extensions.webscripts.connector.ResponseStatus;
 
 /**
  * This class provides common behaviour for the evaluators which use node-based
@@ -84,7 +85,13 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
                     String jsonResponseString = callMetadataService(objAsString);
 
                     result = checkJsonAgainstCondition(condition, jsonResponseString);
-                } catch (ConnectorServiceException e)
+                }
+                catch (NotAuthenticatedException ne)
+                {
+                   // ignore the fact that the lookup failed, the form UI component
+                   // will handle this and return the appropriate status code.
+                }
+                catch (ConnectorServiceException e)
                 {
                     if (getLogger().isWarnEnabled())
                     {
@@ -124,6 +131,12 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
 
         Response r = connector.call("/api/metadata?nodeRef=" + nodeString + "&shortQNames=true");
 
+        // check that the service call did not return unauthorized
+        if (r.getStatus().getCode() == ResponseStatus.STATUS_UNAUTHORIZED)
+        {
+           throw new NotAuthenticatedException();
+        }
+        
         String jsonResponseString = r.getResponse();
         
         // Cache the jsonResponseString in the RequestContext
@@ -134,5 +147,15 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
         ThreadLocalRequestContext.getRequestContext().setValue(keyForCachedJson, jsonResponseString);
         
         return jsonResponseString;
+    }
+    
+    /**
+     * Marker exception to indicate that authentication failed
+     *
+     * @author Gavin Cornwell
+     */
+    class NotAuthenticatedException extends RuntimeException 
+    {
+      private static final long serialVersionUID = 9136927085864150503L;
     }
 }
