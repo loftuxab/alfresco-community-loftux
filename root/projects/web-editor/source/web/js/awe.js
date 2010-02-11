@@ -523,6 +523,7 @@
                Alfresco.util.Ajax.request(
                {
                   url: this.options.formUri,
+                  noReloadOnAuthFailure: true,
                   dataObj:
                   {
                      htmlid: this.id+'-'+this.options.formName,
@@ -535,26 +536,27 @@
                   },
                   failureCallback:
                   {
-                     fn: function(args){
-                        if (args.serverResponse.responseText.indexOf('org.mozilla.javascript.EcmaError - SyntaxError: illegally formed XML syntax')!=-1)
+                     fn: function(args)
+                     {
+                        if (args.serverResponse.status == 401)
                         {
                            AWE.login(
                            {
                               fn: function AWE_FormPanel_ReloadAfterLogin()
                               {
-                                 AWE.loadForm({
-                                    id:this.options.domContentId,
-                                    formId:this.options.formId,
-                                    nodeRef:this.options.nodeRef,
-                                    title:this.options.title,
-                                    nested:this.options.nested,
+                                 AWE.loadForm(
+                                 {
+                                    id: this.options.domContentId,
+                                    formId: this.options.formId,
+                                    nodeRef: this.options.nodeRef,
+                                    title: this.options.title,
+                                    nested: this.options.nested,
                                     redirectUrl: this.options.redirectUrl
                                  });
                               },
                               scope: this
                            });
                         }
-
                      },
                      scope: this
                   },
