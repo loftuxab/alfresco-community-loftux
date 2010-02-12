@@ -1,0 +1,144 @@
+<rule-config type="condition">
+
+   <!--
+      The Javascript class that will handle the config.
+      Override this class if i.e. new customisations needs to be added
+   -->
+   <component>Alfresco.RuleConfigCondition</component>
+
+   <config-definitions webscript="/api/actionconditiondefinitions">
+      <!--
+         Action Condition Definitions that we don't want displayed in the menu
+      -->
+      <remove>
+         <condition name="composite-condition"/>
+         <condition name="compare-text-property"/>
+         <condition name="compare-integer-property"/>
+         <condition name="compare-date-property"/>
+      </remove>
+   </config-definitions>
+
+   <constraints webscript="/api/testdata/ruleconstraints.json"/>
+   
+   <menu>
+      <group>
+         <condition name="no-condition"/>
+      </group>
+      <group>
+         <property type="d:text" id="*"/>
+      </group>
+      <group>
+         <property type="d:int" id="*"/>
+         <property type="d:long" id="*"/>
+         <property type="d:double" id="*"/>
+         <property type="d:float" id="*"/>
+         <property type="d:long" id="size"/>
+      </group>
+      <group>
+         <condition name="compare-mime-type"/>
+      </group>
+      <group>
+         <property type="d:date" id="*"/>
+         <property type="d:datetime" id="*"/>
+      </group>
+      <group>
+         <property type="d:text" id="created-by"/>
+         <property type="d:text" id="modified-by"/>
+      </group>
+      <group>
+         <property type="d:text" id="author"/>
+      </group>
+      <group>
+         <property id="*"/>
+      </group>
+      <group>
+         <condition name="has-tag"/>
+         <condition name="in-category"/>
+      </group>
+      <group>
+         <condition name="is-subtype"/>
+      </group>
+      <group>
+         <condition name="has-aspect"/>
+      </group>
+      <group>
+         <condition name="*"/>
+      </group>
+      <group>
+         <item id="show-more"/>
+      </group>
+   </menu>
+
+   <defaults>
+      <property>name</property>
+      <property>title</property>
+      <property>description</property>
+      <property>created-date</property>
+      <property>created-by</property>
+      <property>modified-date</property>
+      <property>modified-by</property>
+      <property>author</property>
+   </defaults>
+
+   <property-evaluators>
+      <evaluator name="EQUALS">
+         <property type="d:text"/>
+         <property type="d:date"/>
+         <property type="d:datetime"/>
+         <property type="d:int"/>
+         <property type="d:long"/>
+         <property type="d:float"/>
+         <property type="d:double"/>
+      </evaluator>
+      <evaluator name="CONTAINS">
+         <property type="d:text"/>
+      </evaluator>
+      <evaluator name="BEGINS">
+         <property type="d:text"/>
+      </evaluator>
+      <evaluator name="ENDS">
+         <property type="d:text"/>
+      </evaluator>
+      <evaluator name="GREATER_THAN">
+         <property type="d:date"/>
+         <property type="d:datetime"/>
+         <property type="d:int"/>
+         <property type="d:long"/>
+         <property type="d:float"/>
+         <property type="d:double"/>
+      </evaluator>
+      <evaluator name="GREATER_THAN_EQUAL">
+         <property type="d:date"/>
+         <property type="d:datetime"/>
+         <property type="d:int"/>
+         <property type="d:long"/>
+         <property type="d:float"/>
+         <property type="d:double"/>
+      </evaluator>
+      <evaluator name="LESS_THAN">
+         <property type="d:date"/>
+         <property type="d:datetime"/>
+         <property type="d:int"/>
+         <property type="d:long"/>
+         <property type="d:float"/>
+         <property type="d:double"/>
+      </evaluator>
+      <evaluator name="LESS_THAN_EQUAL">
+         <property type="d:date"/>
+         <property type="d:datetime"/>
+         <property type="d:int"/>
+         <property type="d:long"/>
+         <property type="d:float"/>
+         <property type="d:double"/>
+      </evaluator>
+   </property-evaluators>
+
+   <customise>
+      <property type="d:text" id="author">PersonProperty</property>
+      <property type="d:int" id="size">SizeProperty</property>
+      <condition name="has-tag">HasTagCondition</condition>
+      <condition name="in-category">InCategoryCondition</condition>
+      <item id="show-more">ShowMore</item>
+   </customise>
+
+</rule-config>

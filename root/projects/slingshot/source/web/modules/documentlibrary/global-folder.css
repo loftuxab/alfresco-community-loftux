@@ -103,6 +103,7 @@
    background-image: url(images/site-16.png);
    background-repeat: no-repeat;
    padding-left: 20px;
+   padding-bottom: 0.3em;
 }
 
 .global-folder .container-picker h4
@@ -110,6 +111,7 @@
    background-image: url(images/open-folder-16.png);
    background-repeat: no-repeat;
    padding-left: 20px;
+   padding-bottom: 0.3em;
 }
 
 .global-folder .site-picker .last a,
@@ -123,7 +125,7 @@
 {
    border-bottom: 1px dashed #d7d7d7;
    display: block;
-   padding: 0.5em 1px;
+   padding: 0.5em;
 }
 .global-folder .site-picker a:active,
 .global-folder .site-picker a:hover,

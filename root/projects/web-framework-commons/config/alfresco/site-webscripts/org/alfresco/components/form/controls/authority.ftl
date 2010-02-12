@@ -41,7 +41,11 @@
             <input type="hidden" id="${controlId}-added" name="${field.name}_added" />
             <input type="hidden" id="${controlId}-removed" name="${field.name}_removed" />
             <div class="show-picker">
-               <button id="${controlId}-showPicker-button">${msg("button.select")}</button>
+               <span id="${controlId}-showPicker-button" class="yui-button yui-push-button">
+                  <span class="first-child">
+                     <button>${msg("button.select")}</button>
+                  </span>
+               </span>
             </div>
          
             <@renderPickerHTML controlId />

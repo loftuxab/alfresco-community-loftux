@@ -1,0 +1,13 @@
+<rule-config type="type">
+
+   <component>Alfresco.RuleConfigType</component>
+
+   <config-definitions webscript="/api/ruletypes"/>
+   
+   <menu>
+      <group>
+         <type name="*"/>
+      </group>
+   </menu>
+
+</rule-config>

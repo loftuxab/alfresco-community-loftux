@@ -1,0 +1,129 @@
+.rules-list
+{
+   padding: 1em;
+}
+
+.rules-list .rules-list-bar-icon,
+.rules-list li .no,
+.rules-list li .active-icon,
+.rules-list li .rule-icon
+{
+   padding: 0.5em;
+   margin-left: 0.25em;
+   margin-right: 0.25em;
+   background-repeat: no-repeat;
+   background-position: center center;
+}
+
+.rules-list .rules-list-bar
+{
+   border: 1px solid #C8C8C8;
+   border-bottom: none;
+   height: 2.2em;
+   line-height:2.2em;
+   background-color: #FFFFF6;
+   margin-top:0.5em;
+}
+
+.rules-list .rules-list-bar-icon
+{
+   margin-left: 0.75em;
+   background-image: url(../site/images/info-16.png);
+}
+
+.rules-list .rules-list-container
+{
+   background-color: #FBFBFB;
+   border: 1px solid #C8C8C8;
+   overflow: auto;
+}
+
+.rules-list li
+{
+   clear: both;
+   border-bottom: 1px dotted #ECECEC;
+   height: 3em;
+   padding-top: 0.4em;
+}
+
+.rules-list li:hover
+{
+   cursor: pointer;
+   background-color: #D2E5F2;
+}
+
+.rules-list li.selected
+{
+   background-color: #D2E5F2;
+}
+
+.rules-list li.message
+{
+   margin-left: 0.5em;   
+}
+
+.rules-list li .no,
+.rules-list li .active-icon,
+.rules-list li .rule-icon,
+.rules-list li .info
+{
+   float: left;
+}
+
+.rules-list li .active-icon
+{
+   background-image: url(../images/indicator-on-16.png)
+}
+
+.rules-list li .active-icon.inactive-icon
+{
+   background-image: url(../images/indicator-off-16.png);
+}
+
+.rules-list li .rule-icon
+{
+   background-image: url(../images/rule-16.png);
+   margin-right: 0.5em;
+}
+
+.rules-list li .info .inherited-folder
+{
+   margin-left: 0.5em;  
+}
+
+.rules-list li .info .title
+{
+   font-weight: bold;
+}
+
+/* filter = folder */
+
+.rules-list .rules-list-container.folder li .info .inherited,
+.rules-list .rules-list-container.folder li .info .inherited-from,
+.rules-list .rules-list-container.folder li .info .inherited-folder,
+.rules-list .rules-list-container.folder li .description
+{
+   display: none;
+}
+
+/* filter = inherited */
+
+.rules-list .rules-list-container.inherited li .info .inherited,
+.rules-list .rules-list-container.inherited li .description
+{
+   display: none;
+}
+
+
+/* filter = all */
+
+.rules-list .rules-list-container.all li .info .inherited-from,
+.rules-list .rules-list-container.all li .info .inherited-folder
+{
+   display: none;
+}
+
+.rules-list .rules-list-container.all li .description
+{
+   clear: both;
+}

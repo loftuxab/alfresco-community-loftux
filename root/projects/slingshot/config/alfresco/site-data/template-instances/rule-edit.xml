@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/rule-edit</template-type>
+   <properties>
+      <pageFamily>documentlibrary</pageFamily>
+   </properties>
+</template-instance>

@@ -925,7 +925,7 @@
                      for (i = 0, j = tags.length; i < j; i++)
                      {
                         tag = $html(tags[i]);
-                        desc += '<span class="tag"><a href="#" class="tag-link" rel="' + tag + '" title="' + tags[i] + '">' + tag + '</a></span>' + (i < j ? ", " : "");
+                        desc += '<span class="tag"><a href="#" class="tag-link" rel="' + tag + '" title="' + tags[i] + '">' + tag + '</a></span>' + (j - i > 1 ? ", " : "");
                      }
                   }
                   else
@@ -1199,7 +1199,7 @@
                "index", "nodeRef", "nodeType", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "lockedBy", "lockedByUser",
                "version", "size", "contentUrl", "actionSet", "tags", "categories", "activeWorkflows", "isFavourite", "location", "permissions", "custom",
-               "onlineEditUrl"
+               "actionLabels", "onlineEditUrl"
             ],
             metaFields:
             {
@@ -1626,12 +1626,9 @@
             // Simple or detailed view
             Dom.addClass(clone, this.options.simpleView ? "simple" : "detailed");
             
-            /**
-             * NOTE: If linefeeds exist between the <div> and <a> tags, the firstChild property
-             *       in the outer loop will return a text node "\n" instead of the <a> tag.
-             */
             // Trim the items in the clone depending on the user's access
-            var userAccess = record.getData("permissions").userAccess;
+            var userAccess = record.getData("permissions").userAccess,
+               actionLabels = record.getData("actionLabels") || {};
             
             // Inject special-case permissions
             if (record.getData("mimetype") in this.options.inlineEditMimetypes)
@@ -1644,7 +1641,7 @@
             }
             if (this.options.repositoryUrl)
             {
-               userAccess["repository"] = true;
+               userAccess.repository = true;
             }
             
             // Inject the current filterId to allow filter-scoped actions
@@ -1652,19 +1649,27 @@
             
             // Remove any actions the user doesn't have permission for
             var actions = YAHOO.util.Selector.query("div", clone),
-               actionPermissions, aP, i, ii, j, jj;
+               action, aTag, spanTag, actionPermissions, aP, i, ii, j, jj;
             for (i = 0, ii = actions.length; i < ii; i++)
             {
-               if (actions[i].firstChild.rel !== "")
+               action = actions[i];
+               aTag = action.firstChild;
+               spanTag = aTag.firstChild;
+               if (spanTag && actionLabels[action.className])
                {
-                  actionPermissions = actions[i].firstChild.rel.split(",");
+                  spanTag.innerHTML = $html(actionLabels[action.className]);
+               }
+               
+               if (aTag.rel !== "")
+               {
+                  actionPermissions = aTag.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
                   {
                      aP = actionPermissions[j];
                      // Support "negative" permissions
                      if ((aP.charAt(0) == "~") ? !!userAccess[aP.substring(1)] : !userAccess[aP])
                      {
-                        clone.removeChild(actions[i]);
+                        clone.removeChild(action);
                         break;
                      }
                   }
@@ -1730,6 +1735,7 @@
             viewUrl:  Alfresco.constants.PROXY_URI + contentUrl + "\" target=\"_blank",
             documentDetailsUrl: "document-details?nodeRef=" + nodeRef,
             folderDetailsUrl: "folder-details?nodeRef=" + nodeRef,
+            folderRulesUrl: "folder-rules?nodeRef=" + nodeRef,
             editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
             inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
             workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),

@@ -2,8 +2,11 @@
    <actionSets>
       <actionSet id="folder">
          <action type="simple-link" id="onActionDetails" permission="edit" href="{editMetadataUrl}" label="actions.folder.edit-metadata" />
+         <action type="action-link" id="onActionSimpleApprove" permission="simple-approve" label="actions.folder.simple-approve" />
+         <action type="action-link" id="onActionSimpleReject" permission="simple-reject" label="actions.folder.simple-reject" />
          <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.folder.move-to" />
+         <action type="simple-link" id="onActionRules" href="{folderRulesUrl}" label="actions.folder.rules" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />
          <action type="action-link" id="onActionManagePermissions" permission="permissions" label="actions.folder.manage-permissions" />
          <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.folder.manage-aspects" />

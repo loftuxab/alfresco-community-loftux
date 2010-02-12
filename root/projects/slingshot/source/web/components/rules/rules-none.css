@@ -1,0 +1,14 @@
+.rules-none
+{
+   padding-top: 1em;
+}
+
+.rules-none .yui-g .yui-u
+{
+   text-align: center;
+}
+
+.rules-none .yui-g .yui-u div
+{
+   padding: 1em;
+}

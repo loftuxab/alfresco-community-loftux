@@ -292,6 +292,26 @@
       },
 
       /**
+       * Rules.
+       *
+       * @method onActionRules
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionRules: function dlA_onActionRules(assets)
+      {
+         if (!this.modules.details)
+         {
+            this.modules.details = new Alfresco.module.DoclibDetails(this.id + "-details");
+         }
+
+         this.modules.details.setOptions(
+         {
+            siteId: this.options.siteId,
+            file: assets
+         }).showDialog();
+      },
+
+      /**
        * Upload new version.
        *
        * @method onActionUploadNewVersion

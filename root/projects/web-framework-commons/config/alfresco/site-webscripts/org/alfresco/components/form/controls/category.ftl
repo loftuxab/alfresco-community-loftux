@@ -9,7 +9,7 @@
    picker.setOptions(
    {
       itemType: "cm:category",
-      multipleSelectMode: true,
+      multipleSelectMode: ${(field.control.params.multipleSelectMode!true)?string},
       parentNodeRef: "alfresco://category/root",
       itemFamily: "category",
       maintainAddedRemovedItems: false,
@@ -20,26 +20,32 @@
 })();
 //]]></script>
 
-<div class="form-field">
+<div class="form-field inlineable">
    <#if form.mode == "view">
-      <div id="${controlId}" class="viewmode-field">
+      <div id="${controlId}" class="viewmode-field inlineable">
          <#if field.mandatory!false && field.value == "">
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
-         <span class="viewmode-label">${field.label?html}:</span>
+         <#if field.label != ""><span class="viewmode-label">${field.label?html}:</span></#if>
          <span id="${controlId}-currentValueDisplay" class="viewmode-value current-values"></span>
       </div>
    <#else>
+      <#if field.label != "">
       <label for="${controlId}">${field.label?html}:<#if field.mandatory!false><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
+      </#if>
       
-      <div id="${controlId}" class="object-finder">
+      <div id="${controlId}" class="object-finder inlineable">
          
-         <div id="${controlId}-currentValueDisplay" class="current-values"></div>
+         <div id="${controlId}-currentValueDisplay" class="current-values inlineable"></div>
          
          <#if form.mode != "view" && field.disabled == false>
             <input type="hidden" id="${fieldHtmlId}" name="${field.name}" value="${field.value?html}" />
-            <div class="show-picker">
-               <button id="${controlId}-showPicker-button">${msg("button.select")}</button>
+            <div class="show-picker inlineable">
+               <span id="${controlId}-showPicker-button" class="yui-button yui-push-button">
+                  <span class="first-child">
+                     <button>${msg("button.select")}</button>
+                  </span>
+               </span>
             </div>
             
             <@renderPickerHTML controlId />

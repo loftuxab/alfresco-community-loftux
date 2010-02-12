@@ -39,7 +39,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $combine = Alfresco.util.combinePaths;
+   var $html = Alfresco.util.encodeHTML,
+      $combine = Alfresco.util.combinePaths;
    
    /**
     * FolderActions constructor.
@@ -148,6 +149,7 @@
          return (
          {
             editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
+            folderRulesUrl: "folder-rules?nodeRef=" + nodeRef,
             explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
       },
@@ -165,8 +167,9 @@
          this.currentPath = this.assetData.location.path;
          
          // Copy template into active area
-         var actionsContainer = Dom.get(this.id + "-actionSet"),
-            actionSet = this.assetData.actionSet,
+         var assetData = this.assetData,
+            actionsContainer = Dom.get(this.id + "-actionSet"),
+            actionSet = assetData.actionSet,
             clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
 
          // Token replacement
@@ -174,28 +177,36 @@
 
          // Replace existing actions and assign correct class for icon rendering
          actionsContainer.innerHTML = clone.innerHTML;
-         Dom.addClass(actionsContainer, this.assetData.type);
+         Dom.addClass(actionsContainer, assetData.type);
 
          // Hide actions which have been disallowed through permissions
-         if (this.assetData.permissions && this.assetData.permissions.userAccess)
+         if (assetData.permissions && assetData.permissions.userAccess)
          {
-            var userAccess = this.assetData.permissions.userAccess,
+            var userAccess = assetData.permissions.userAccess,
+               actionLabels = assetData.actionLabels || {},
                actions = YAHOO.util.Selector.query("div", actionsContainer),
-               action, actionPermissions, i, ii, j, jj, actionAllowed;
+               action, actionPermissions, i, ii, j, jj, actionAllowed, aTag, spanTag;
 
             // Inject special-case permissions
             if (this.options.repositoryUrl)
             {
                userAccess.repository = true;
             }
-            
+
             for (i = 0, ii = actions.length; i < ii; i++)
             {
                action = actions[i];
                actionAllowed = true;
-               if (action.firstChild.rel !== "")
+               aTag = action.firstChild;
+               spanTag = aTag.firstChild;
+
+               if (spanTag && actionLabels[action.className])
                {
-                  actionPermissions = action.firstChild.rel.split(",");
+                  spanTag.innerHTML = $html(actionLabels[action.className]);
+               }
+               if (aTag.rel !== "")
+               {
+                  actionPermissions = aTag.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
                   {
                      if (!userAccess[actionPermissions[j]])
@@ -243,7 +254,6 @@
       _onActionDeleteConfirm: function FolderActions__onActionDeleteConfirm(asset)
       {
          var path = asset.location.path,
-            fileName = asset.fileName,
             displayName = asset.displayName,
             nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
             callbackUrl = this.options.workingMode == Alfresco.doclib.MODE_SITE ? "documentlibrary" : "repository",

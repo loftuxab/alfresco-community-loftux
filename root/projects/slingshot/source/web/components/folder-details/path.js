@@ -75,7 +75,15 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+
+         /**
+          * Current showIconType.
+          *
+          * @property showIconType
+          * @type boolean
+          */
+         showIconType: true
       },
       
       /**
@@ -131,14 +139,17 @@
          
          Dom.setStyle(this.id + "-defaultPath", "display", "none");
          Dom.get(this.id + "-path").innerHTML = pathHtml;
-         
-         var iconTypeHtml = YAHOO.lang.substitute('<img src="{iconContext}{icon}-48.png" width="48" height="48" /><span class="type">{type}</span>',
+
+         if (this.options.showIconType)
          {
-            iconContext: Alfresco.constants.URL_CONTEXT + "components/documentlibrary/images/",
-            icon: folderData.type,
-            type: this.msg("type." + folderData.type)
-         })
-         Dom.get(this.id + "-iconType").innerHTML = iconTypeHtml;
+            var iconTypeHtml = YAHOO.lang.substitute('<img src="{iconContext}{icon}-48.png" width="48" height="48" /><span class="type">{type}</span>',
+            {
+               iconContext: Alfresco.constants.URL_CONTEXT + "components/documentlibrary/images/",
+               icon: folderData.type,
+               type: this.msg("type." + folderData.type)
+            })
+            Dom.get(this.id + "-iconType").innerHTML = iconTypeHtml;            
+         }
       }
    });
 })();
