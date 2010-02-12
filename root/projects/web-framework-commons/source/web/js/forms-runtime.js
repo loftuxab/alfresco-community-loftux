@@ -1231,6 +1231,36 @@ Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form,
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
 };
 
+
+/**
+ * NodeRef validation handler, tests that the given field's value is a valid
+ * nodeRef identifier for a node in the repository.
+ *
+ * @method nodeRef
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
+ * @static
+ */
+Alfresco.forms.validation.nodeRef = function nodeRef(field, args, event, form, silent, message)
+{
+   if (Alfresco.logger.isDebugEnabled())
+      Alfresco.logger.debug("Validating field '" + field.id + "' is a valid noderef");
+
+   if (!args)
+   {
+      args = {};
+   }
+
+   args.pattern = /^[^\:^ ]+\:\/\/[^\:^ ]+\/[^ ]+$/;
+
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
+};
+
+
 /**
  * Email validation handler, tests that the given field's value is a valid
  * email address.

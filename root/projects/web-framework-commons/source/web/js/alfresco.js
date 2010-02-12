@@ -193,6 +193,111 @@ Alfresco.util.arrayToObject = function(arr)
    return obj;
 };
 
+
+/**
+ * Copies the values in an object into a new instance.
+ *
+ * Note 1. This method ONLY copy values of type object, array, date, boolean, string or number.
+ * Note 2. Functions are not copied.
+ * Note 3. Objects with a constructor other than of type Object are still in the result but aren't copied.
+ *         This means that objects of HTMLElements or window will be in the result but will not be copied and hence
+ *         shared between p_obj and the returned copy og p_obj.
+ *
+ * @method Alfresco.util.deepCopy
+ * @param p_obj {object|array|date|string|number|boolean} The object to copy
+ * @return {object|array|date|string|number|boolean} A new instance of the same type as o with the same values
+ * @static
+ */
+Alfresco.util.deepCopy = function(p_obj)
+{
+   if (!p_obj)
+   {
+      return p_obj;
+   }
+   else if (YAHOO.lang.isArray(p_obj))
+   {
+      var arr = [];
+      for (var i = 0, il = p_obj.length, arrVal; i < il; i++)
+      {
+         arrVal = p_obj[i];
+         if (!YAHOO.lang.isFunction(arrVal))
+         {
+            arr.push(Alfresco.util.deepCopy(arrVal));
+         }
+      }
+      return arr;
+   }
+   else if (Alfresco.util.isDate(p_obj))
+   {
+      return new Date(p_obj.getTime());
+   }
+   else if (YAHOO.lang.isString(p_obj) || YAHOO.lang.isNumber(p_obj) || YAHOO.lang.isBoolean(p_obj))
+   {
+      return p_obj;
+   }
+   else if (YAHOO.lang.isObject(p_obj))
+   {
+      if(p_obj.toString() == "[object Object]")
+      {
+         // This is a
+         var obj = {}, objVal;
+         for (var name in p_obj)
+         {
+            if (p_obj.hasOwnProperty(name))
+            {
+               objVal = p_obj[name];
+               if (!YAHOO.lang.isFunction(objVal))
+               {
+                  obj[name] = Alfresco.util.deepCopy(objVal);
+               }
+            }
+         }
+         return obj;
+      }
+      else
+      {
+         // The object was
+         return p_obj;
+      }
+   }
+   return null;
+};
+
+/**
+ * Tests if o is of type date
+ *
+ * @method Alfresco.util.isDate
+ * @param o {object} The object to test
+ * @return {boolean} True if o is of type date
+ * @static
+ */
+Alfresco.util.isDate = function(o)
+{
+   return o.constructor && o.constructor.toString().indexOf("Date") != -1;
+};
+
+/**
+ * Returns true if obj matches all attributes and their values in pattern.
+ * Attribute values in pattern may contain wildcards ("*").
+ *
+ * @method objectMatchesPattern
+ * @param obj {object} The object to match pattern against
+ * @param pattern {object} An object with attributes to match against obj
+ * @return {boolean} true if obj matches pattern, false otherwise
+ */
+Alfresco.util.objectMatchesPattern = function(obj, pattern)
+{
+   for (var attrName in pattern)
+   {
+      if (pattern.hasOwnProperty(attrName) &&
+          (!pattern.hasOwnProperty(attrName) || (obj[attrName] != pattern[attrName] && pattern[attrName] != "*")))
+      {
+         return false;
+      }
+   }
+   return true;
+};
+
 /**
  * Create empty JavaScript object literal from dotted notation string
  * <pre>e.g. Alfresco.util.dotNotationToObject("org.alfresco.site") returns {"org":{"alfresco":{"site":{}}}}</pre>
@@ -221,31 +326,33 @@ Alfresco.util.dotNotationToObject = function(str, value)
 };
 
 /**
- * Finds the index of an object in an array
+ * Returns an object literal's property value given a dotted notation string representing the property path
  *
- * @method Alfresco.util.findObjectPropertyByName
+ * @method Alfresco.util.findValueByDotNotation
  * @param obj {object} i.e. {org:{alfresco:{site:"share"}}}
- * @param str {striog} i.e. "org.alfresco.site"
+ * @param propertyPath {string} i.e. "org.alfresco.site"
+ * @param defaultValue {object} optional The value to return if there is no value for the propertyPath
  * @return {object} the value for the property specified by the string, in the example "share" would be returned
  * @static
  */
-Alfresco.util.findValueByDotNotation = function(obj, property)
+Alfresco.util.findValueByDotNotation = function(obj, propertyPath, defaultValue)
 {
-   if(property && obj)
+   var defaultValue = defaultValue ? defaultValue : null;
+   if(propertyPath && obj)
    {
       var currObj = obj;
-      var props = property.split(".");
+      var props = propertyPath.split(".");
       for (var i = 0; i < props.length; i++)
       {
          currObj = currObj[props[i]];
          if (typeof currObj == "undefined")
          {
-            return null;
+            return defaultValue;
          }
       }
       return currObj;
    }
-   return null;
+   return defaultValue;
 };
 
 /**
@@ -776,6 +883,35 @@ Alfresco.util.setSelectedIndex = function(selectEl, value)
 };
 
 /**
+ * Removes selectClass from all of selectEl's parent's child elements but adds it to selectEl.
+ *
+ * @method Alfresco.util.setSelectedClass
+ * @param parentEl {HTMLElement} The elements to deselct
+ * @param selectEl {HTMLElement} The element to select
+ * @param selectClass {string} The css class to remove from unselected and add to the selected element
+ * @static
+ */
+Alfresco.util.setSelectedClass = function(parentEl, selectEl, selectClass)
+{
+   var children = parentEl.childNodes,
+      child = null;
+
+   selectClass = selectClass ? selectClass : "selected";
+   for (var i = 0, l = children.length; i < l; i++)
+   {
+      child = children[i];
+      if (!selectEl || child.tagName == selectEl.tagName)
+      {
+         YUIDom.removeClass(child, selectClass);
+         if (child === selectEl)
+         {
+            YUIDom.addClass(child, selectClass);
+         }
+      }
+   }
+};
+
+/**
  * Returns a unique DOM ID for dynamically-created content. Optionally applies the new ID to an element.
  *
  * @method Alfresco.util.generateDomId
@@ -791,22 +927,34 @@ Alfresco.util.generateDomId = function(p_el, p_prefix)
       domId = prefix + Alfresco.util.generateDomId._nId++;
    } while (YUIDom.get(domId) !== null);
 
+   Alfresco.util.setDomId(p_el, domId)
+
+   return domId;
+};
+Alfresco.util.generateDomId._nId = 0;
+
+/**
+ * Sets the domId as the html dom id on el
+ *
+ * @method Alfresco.util.setDomId
+ * @param p_el {HTMLElement} Applies new ID to element
+ * @param p_domId {string} The dom id to apply
+ */
+Alfresco.util.setDomId = function(p_el, p_domId)
+{
    if (p_el)
    {
       if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8)
       {
          // MSIE 6 & 7-safe method
-         p_el.attributes["id"].value = domId;
+         p_el.attributes["id"].value = p_domId;
       }
       else
       {
-         p_el.setAttribute("id", domId);
+         p_el.setAttribute("id", p_domId);
       }
    }
-   
-   return domId;
 };
-Alfresco.util.generateDomId._nId = 0;
 
 /**
  * Converts "rel" attributes on <a> tags to "target" attributes.
@@ -1151,7 +1299,7 @@ Alfresco.util.hasEventInterest = function(p_eventGroup, p_args)
          obj.eventGroup = obj.anchor.rel;
       }
       
-      if (obj.eventGroup)
+      if (obj.eventGroup && p_eventGroup)
       {
          sourceGroup = (typeof obj.eventGroup == "string") ? obj.eventGroup : obj.eventGroup.eventGroup;
          targetGroup = (typeof p_eventGroup == "string") ? p_eventGroup : p_eventGroup.eventGroup;
@@ -4078,6 +4226,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
       this.id = (typeof id == "undefined" || id === null) ? Alfresco.util.generateDomId() : id;
 
       // Initialise default prototype properties
+      this.options = Alfresco.util.deepCopy(this.options);
       this.widgets = {};
       this.modules = {};
       this.services = {};

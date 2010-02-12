@@ -579,7 +579,8 @@
          {
             itemName: p_obj.getData("fullName"),
             shortName: p_obj.getData("shortName"),
-            displayName: p_obj.getData("displayName")
+            displayName: p_obj.getData("displayName"),
+            eventGroup: this
          });
       },
 

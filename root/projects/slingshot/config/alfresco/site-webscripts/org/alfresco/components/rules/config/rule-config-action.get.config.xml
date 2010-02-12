@@ -1,0 +1,70 @@
+<rule-config type="action">
+
+   <component>Alfresco.RuleConfigAction</component>
+
+   <config-definitions webscript="/api/actiondefinitions"/>
+
+   <constraints webscript="/api/testdata/ruleconstraints.json"/>
+
+   <menu>
+      <group>
+			<action name="script"/>
+		</group>
+		<group>
+			<action name="copy"/>
+			<action name="move"/>
+		</group>
+		<group>
+			<action name="check-in"/>
+			<action name="check-out"/>
+		</group>
+		<group>
+			<action name="tag"/>
+			<action name="link-category"/>
+		</group>
+		<group>
+			<action name="add-features"/>
+			<action name="remove-features"/>
+		</group>
+		<group>
+			<action name="simple-workflow"/>
+		</group>
+		<group>
+			<action name="mail"/>
+		</group>
+		<group>
+			<action name="transform"/>
+			<action name="transform-image"/>
+		</group>
+		<group>
+			<action name="extract-metadata"/>
+		</group>
+		<group>
+			<action name="create-thumbnail"/>
+		</group>
+		<group>
+			<action name="import"/>
+		</group>
+		<group>
+			<action name="specialise-type"/>
+		</group>
+		<group>
+			<action name="counter"/>
+		</group>
+      <group>
+         <action name="*"/>
+      </group>
+   </menu>
+
+   <customise>
+      <!-- Specific action filters -->
+      <action name="check-in">CheckIn</action>
+      <action name="check-out">Checkout</action>
+      <action name="copy">FileDestination</action>
+      <action name="move">FileDestination</action>
+      <action name="simple-workflow">SimpleWorkflow</action>
+      <action name="mail">SendAnEmail</action>
+      <action name="link-category">LinkCategory</action>
+   </customise>
+
+</rule-config>

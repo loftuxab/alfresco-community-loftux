@@ -1,0 +1,51 @@
+.property-picker
+{
+   width: 50em;   
+}
+
+.property-picker .yui-navset.yui-navset-top .yui-content
+{
+   padding: 0;
+   border-style: none;
+}
+
+.property-picker .property-picker-tree,
+.property-picker .property-picker-list
+{
+   height: 20em;   
+   padding: 0;
+   border-style: none;
+   background-color: #FFFFFF;
+   float: left;
+}
+
+.property-picker div.bdft
+{
+   clear: both;
+}
+
+.property-picker .property-picker-tree
+{
+   padding-left: 0.5em;
+   padding-right: 0.5em;
+   border-right: 1px solid #C4C5C5;
+   width: 18.9em;
+   overflow: auto;
+}
+
+.property-picker .property-picker-list
+{
+   overflow: auto;
+}
+
+.property-picker .property-picker-list table
+{
+   width: 30em;
+   border: none;
+}
+
+.property-picker .property-picker-list table td,
+.property-picker .property-picker-list table th
+{
+   border-right-style: none;
+}

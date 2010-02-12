@@ -1,0 +1,28 @@
+.rules-linked
+{
+   padding: 1em;
+}
+
+.rules-linked .yui-g
+{
+   margin-top: 1em;
+}
+
+.rules-linked .yui-g .yui-u
+{
+   text-align: right;
+}
+
+.rules-linked .yui-g .yui-u.first
+{
+   text-align: left;
+}
+
+.rules-linked .yui-g .yui-u.first .info
+{
+   background-image: url(../documentlibrary/images/folder-48.png);
+   background-position: left center;
+   background-repeat: no-repeat;
+   line-height: 2em;
+   padding-left: 6em;
+}

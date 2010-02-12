@@ -6,6 +6,8 @@
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
          <action type="simple-link" id="onActionView" href="{viewUrl}" label="actions.document.view" />
          <action type="action-link" id="onActionDetails" permission="edit" label="actions.document.edit-metadata" />
+         <action type="action-link" id="onActionSimpleApprove" permission="simple-approve" label="actions.document.simple-approve" />
+         <action type="action-link" id="onActionSimpleReject" permission="simple-reject" label="actions.document.simple-reject" />
          <action type="action-link" id="onActionLocate" permission="~filter-path" label="actions.document.locate" />
          <action type="action-link" id="onActionUploadNewVersion" permission="edit" label="actions.document.upload-new-version" />
          <action type="simple-link" id="onActionInlineEdit" permission="edit,inline-edit" href="{inlineEditUrl}" label="actions.document.inline-edit" />
@@ -44,9 +46,12 @@
       <actionSet id="folder">
          <action type="simple-link" id="onActionMetadata" href="{folderDetailsUrl}" label="actions.folder.view-metadata" />
          <action type="action-link" id="onActionDetails" permission="edit" label="actions.folder.edit-metadata" />
+         <action type="action-link" id="onActionSimpleApprove" permission="simple-approve" label="actions.folder.simple-approve" />
+         <action type="action-link" id="onActionSimpleReject" permission="simple-reject" label="actions.folder.simple-reject" />
          <action type="action-link" id="onActionLocate" permission="~filter-path" label="actions.folder.locate" />
          <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.folder.move-to" />
+         <action type="simple-link" id="onActionRules" href="{folderRulesUrl}" label="actions.folder.rules" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />
          <action type="action-link" id="onActionManagePermissions" permission="permissions" label="actions.folder.manage-permissions" />
          <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.folder.manage-aspects" />

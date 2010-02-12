@@ -347,19 +347,22 @@
       onShowPicker: function ObjectFinder_onShowPicker(e, p_obj)
       {
          // Register the ESC key to close the dialog
-         var escapeListener = new KeyListener(this.pickerId,
+         if (!this.widgets.escapeListener)
          {
-            keys: KeyListener.KEY.ESCAPE
-         },
-         {
-            fn: function(eventName, keyEvent)
+            this.widgets.escapeListener = new KeyListener(this.pickerId,
             {
-               this.onCancel();
+               keys: KeyListener.KEY.ESCAPE
             },
-            scope: this,
-            correctScope: true
-         });
-         escapeListener.enable();
+            {
+               fn: function(eventName, keyEvent)
+               {
+                  this.onCancel();
+               },
+               scope: this,
+               correctScope: true
+            });
+         }
+         this.widgets.escapeListener.enable();
 
          this.widgets.dialog.show();
          this._createResizer();
@@ -432,13 +435,17 @@
        */
       onOK: function ObjectFinder_onOK(e, p_obj)
       {
+         var addedItems = this.getAddedItems(),
+            removedItems = this.getRemovedItems(),
+            selectedItems = this.getSelectedItems();
+         
          if (this.options.maintainAddedRemovedItems)
          {
-            Dom.get(this.id + "-added").value = this.getAddedItems().toString();
-            Dom.get(this.id + "-removed").value = this.getRemovedItems().toString();
+            Dom.get(this.id + "-added").value = addedItems.toString();
+            Dom.get(this.id + "-removed").value = removedItems.toString();
          }
          
-         this.options.currentValue = this.getSelectedItems().toString();
+         this.options.currentValue = selectedItems.toString();
          Dom.get(this.currentValueHtmlId).value = this.options.currentValue;
          this._getCurrentValueMeta();
          
@@ -453,13 +460,21 @@
             YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
          }
          
-         // Dom.setStyle(this.pickerId, "display", "none");
+         this.widgets.escapeListener.disable();
          this.widgets.dialog.hide();
          this.widgets.showPicker.set("disabled", false);
          if (e)
          {
             Event.preventDefault(e);
          }
+         
+         YAHOO.Bubbling.fire("formValueChanged",
+         {
+            eventGroup: this,
+            addedItems: addedItems,
+            removedItems: removedItems,
+            selectedItems: selectedItems
+         });
       },
 
       /**
@@ -471,6 +486,7 @@
        */
       onCancel: function ObjectFinder_onCancel(e, p_obj)
       {
+         this.widgets.escapeListener.disable();
          this.widgets.dialog.hide();
          this.widgets.showPicker.set("disabled", false);
          if (e)
@@ -634,11 +650,11 @@
                   if (this.options.showLinkToTarget && this.options.targetLinkTemplate !== null)
                   {
                      displayValue += this.options.objectRenderer.renderItem(item, 16, 
-                        "<div>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
+                        "<div class='inlineable'>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
                   }
                   else
                   {
-                     displayValue += this.options.objectRenderer.renderItem(item, 16, "<div>{icon} {name}</div>");
+                     displayValue += this.options.objectRenderer.renderItem(item, 16, "<div class='inlineable'>{icon} {name}</div>");
                   }
                }
             }

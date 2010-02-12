@@ -78,11 +78,51 @@
          {
             viewMode: (obj.siteId && obj.siteId !== "") ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY,
             allowedViewModes: allowedViewModes,
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-move-to",
+            extendedTemplateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-move-to",
             dataWebScript: dataWebScripts[obj.mode]
          }, obj));
       },
 
+      /**
+       * Event callback when superclass' dialog template has been loaded
+       *
+       * @method onTemplateLoaded
+       * @override
+       * @param response {object} Server response from load template XHR request
+       */
+      onTemplateLoaded: function DLCMT_onTemplateLoaded(response)
+      {
+         // Load the UI template, which only will bring in new i18n-messages, from the server
+         Alfresco.util.Ajax.request(
+         {
+            url: this.options.extendedTemplateUrl,
+            dataObj:
+            {
+               htmlid: this.id
+            },
+            successCallback:
+            {
+               fn: this.onExtendedTemplateLoaded,
+               obj: response,
+               scope: this
+            },
+            failureMessage: "Could not load 'copy-move-to' template:" + this.options.extendedTemplateUrl,
+            execScripts: true
+         });
+      },
+
+      /**
+       * Event callback when this class' template has been loaded
+       *
+       * @method onExtendedTemplateLoaded
+       * @override
+       * @param response {object} Server response from load template XHR request
+       */
+      onExtendedTemplateLoaded: function DLCMT_onExtendedTemplateLoaded(response, superClassResponse)
+      {
+         // Now that we have loaded this components i18n messages let the original template get rendered.
+         Alfresco.module.DoclibCopyMoveTo.superclass.onTemplateLoaded.call(this, superClassResponse);
+      },
 
       /**
        * YUI WIDGET EVENT HANDLERS
@@ -229,6 +269,7 @@
 
       /**
        * Gets a custom message depending on current view mode
+       * and use superclasses
        *
        * @method msg
        * @param messageId {string} The messageId to retrieve
@@ -237,7 +278,16 @@
        */
       msg: function DLCMT_msg(messageId)
       {
-         return Alfresco.util.message.call(this, this.options.mode + "." + messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
+         var result = Alfresco.util.message.call(this, this.options.mode + "." + messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
+         if (result ==  (this.options.mode + "." + messageId))
+         {
+            result = Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1))
+         }
+         if (result == messageId)
+         {
+            result = Alfresco.util.message(messageId, "Alfresco.module.DoclibGlobalFolder", Array.prototype.slice.call(arguments).slice(1));
+         }
+         return result;
       },
 
       

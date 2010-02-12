@@ -1,0 +1,123 @@
+.rule-details .display
+{
+   background-color:#F5F9F4;
+   border:1px solid #C8C8C8;
+   padding:1em;
+}
+
+.rule-details h2
+{
+   padding-bottom: 0.5em;
+}
+
+.rule-details hr
+{
+   margin-bottom:1em;
+   margin-top:1em;
+}
+
+.rule-details em 
+{
+   color:#606060;
+   font-style:normal;
+   font-weight:normal;
+}
+
+.rule-details .actions
+{
+   text-align: right;
+}
+
+.rule-details .label
+{
+   font-weight: bold;
+}
+
+.rule-details .behaviour
+{
+   background-position:0.25em center;
+   background-repeat:no-repeat;
+   padding-bottom:0.25em;
+   padding-left:2em;
+   padding-top:0.25em;
+}
+
+.rule-details .behaviour.active
+{
+   background-image:url(../images/inherited-on-16.png);
+}
+
+.rule-details .behaviour.inactive
+{
+   background-image:url(../images/inherited-off-16.png);
+}
+
+.rule-details .configuration-section
+{
+   margin: 0;
+   border: 1px solid #C8C8C8;
+}
+
+.rule-details .configuration-section.unless
+{
+   border-top: none;
+}
+
+.rule-details .configuration-header
+{
+   border-bottom: 1px solid #C8C8C8;
+   background:#FFFFFF url(../../yui/assets/skins/default/sprite.png) repeat-x scroll 0 0;
+   height: 2.2em;
+   line-height: 2.2em;
+}
+
+.rule-details .configuration-header.unless
+{
+   border-top-color: #C8C8C8;
+}
+
+.rule-details .configuration-title
+{
+   padding-left: 1em;
+   color: #008000;   
+   float: left;
+}
+
+.rule-details .configuration-relation
+{
+   float: right;
+   padding-left: 1em;
+   padding-right: 1em;
+   background:#FFFFFF url(../../yui/assets/skins/default/sprite.png) repeat-x scroll 0 -100px;
+   border-left:1px solid #C8C8C8;
+}
+
+.rule-details .configuration-relation.and .or-label
+{
+   display: none;
+}
+
+.rule-details .configuration-relation.or .and-label
+{
+   display: none;
+}
+
+.rule-details .configuration-body
+{
+   background-color: #FFFFFF;
+   clear: both;
+}
+
+.rule-details .configuration
+{
+   padding:0.35em 0.35em 0.35em 1em;
+}
+
+.rule-details .configuration-separator
+{
+   padding: 1em;
+   background-repeat: no-repeat;
+   background-position: center center;
+   background-image: url(../images/expanded.png);
+}
+

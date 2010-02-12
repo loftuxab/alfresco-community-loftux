@@ -125,6 +125,7 @@
       Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
       Alfresco.service.Preferences.IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imapFavourites";
       Alfresco.service.Preferences.COLLAPSED_TWISTERS = "org.alfresco.share.twisters.collapsed";
+      Alfresco.service.Preferences.RULE_PROPERTY_SETTINGS = "org.alfresco.share.rule.properties";
    //]]></script>
 
 <!-- Template Assets -->

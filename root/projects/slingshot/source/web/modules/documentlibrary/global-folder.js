@@ -168,10 +168,9 @@
           *
           * @property templateUrl
           * @type string
-          * @example "Alfresco.constants.URL_SERVICECONTEXT + modules/documentlibrary/copy-to"
-          * @default null,
+          * @default Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/global-folder"
           */
-         templateUrl: null,
+         templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/global-folder",
 
          /**
           * Dialog view mode: site or repository
@@ -258,7 +257,7 @@
                   fn: this.onTemplateLoaded,
                   scope: this
                },
-               failureMessage: "Could not load Document Library template:" + this.options.templateUrl,
+               failureMessage: "Could not load 'global-folder' template:" + this.options.templateUrl,
                execScripts: true
             });
          }
@@ -319,7 +318,7 @@
          {
             buttons[i].addListener("keydown", fnEnterListener);
          }
-         
+
          /**
           * Dynamically loads TreeView nodes.
           * This MUST be inline in order to have access to the parent class.
@@ -431,29 +430,26 @@
        */
       _showDialog: function DLGF__showDialog()
       {
-         // Must have list of files
-         if (this.options.files === null)
-         {
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this.msg("message.no-files")
-            });
-            return;
-         }
-
          // Enable buttons
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);
 
          // Dialog title
          var titleDiv = Dom.get(this.id + "-title");
-         if (YAHOO.lang.isArray(this.options.files))
+         if (this.options.title)
          {
-            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length);
+             titleDiv.innerHTML = this.options.title;
          }
          else
          {
-            titleDiv.innerHTML = this.msg("title.single", '<span class="light">' + $html(this.options.files.displayName) + '</span>');
+            if (YAHOO.lang.isArray(this.options.files))
+            {
+               titleDiv.innerHTML = this.msg("title.multi", this.options.files.length);
+            }
+            else
+            {
+               titleDiv.innerHTML = this.msg("title.single", '<span class="light">' + $html(this.options.files.displayName) + '</span>');
+            }
          }
 
          // Dialog view mode
@@ -484,22 +480,30 @@
          }
          
          // Register the ESC key to close the dialog
-         var escapeListener = new KeyListener(document,
+         if (!this.widgets.escapeListener)
          {
-            keys: KeyListener.KEY.ESCAPE
-         },
-         {
-            fn: function(id, keyEvent)
+            this.widgets.escapeListener = new KeyListener(document,
             {
-               this.onCancel();
+               keys: KeyListener.KEY.ESCAPE
             },
-            scope: this,
-            correctScope: true
-         });
-         escapeListener.enable();
+            {
+               fn: function(id, keyEvent)
+               {
+                  this.onCancel();
+               },
+               scope: this,
+               correctScope: true
+            });
+         }
 
          // Show the dialog
+         this.widgets.escapeListener.enable();
          this.widgets.dialog.show();
+
+         if (this.options.path)
+         {
+            this.onPathChanged(this.options.path);
+         }         
       },
       
       /**
@@ -638,7 +642,22 @@
        */
       onOK: function DLGF_onOK(e, p_obj)
       {
+         // Close dialog and fire event so other components may use the selected folder
+         this.widgets.escapeListener.disable();
          this.widgets.dialog.hide();
+         
+         var selectedFolder = this.selectedNode ? this.selectedNode.data : null;
+         if (selectedFolder && this.options.viewMode == DLGF.VIEW_MODE_SITE)
+         {
+            selectedFolder.siteId = this.options.siteId;
+            selectedFolder.containerId = this.options.containerId;
+         }
+         
+         YAHOO.Bubbling.fire("folderSelected",
+         {
+            selectedFolder: selectedFolder,
+            eventGroup: this
+         });
       },
 
       /**
@@ -650,6 +669,7 @@
        */
       onCancel: function DLGF_onCancel(e, p_obj)
       {
+         this.widgets.escapeListener.disable();
          this.widgets.dialog.hide();
       },
 
@@ -967,7 +987,7 @@
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
          {
-            label: this._msg(rootLabel), // Note: private _msg() function
+            label: this.msg(rootLabel),
             path: "/",
             nodeRef: p_rootNodeRef
          }, tree.getRoot(), false);
@@ -1054,19 +1074,6 @@
           });
 
           return url;
-       },
-
-       /**
-        * Gets a custom message regardless of current view mode
-        *
-        * @method _msg
-        * @param messageId {string} The messageId to retrieve
-        * @return {string} The custom message
-        * @private
-        */
-       _msg: function DLGF__msg(messageId)
-       {
-          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
        }
    });
 

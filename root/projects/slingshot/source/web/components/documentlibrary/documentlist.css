@@ -19,7 +19,6 @@
    text-align: right;
 }
 
-
 /* DocList bar */
 
 .doclist .doclist-bar
@@ -47,7 +46,6 @@
    vertical-align: bottom;
 }
 
-
 /* DocList bar Buttons and Paginator */
 
 .doclist .doclist-bar .file-select
@@ -69,7 +67,6 @@
 {
    margin-right: 0;
 }
-
 
 /* DocList bar Select menu */
 
@@ -110,6 +107,7 @@
 }
 
 /* DocList bar Simple / Detailed view */
+
 .doclist .show-folders,
 .doclist .simple-detailed
 {
@@ -120,6 +118,7 @@
 {
    margin-right: 4px;
 }
+
 .doclist .show-folders .separator
 {
    margin-left: 0;
@@ -143,20 +142,24 @@
 {
    background-image: url(images/simple-view-off-16.png);
 }
+
 .doclist .simple-detailed .simple-view.yui-button-checked span.first-child
 {
    background-image: url(images/simple-view-on-16.png);
 }
+
 .doclist .simple-detailed .detailed-view span.first-child
 {
    background-image: url(images/detailed-view-off-16.png);
 }
+
 .doclist .simple-detailed .detailed-view.yui-button-checked span.first-child
 {
    background-image: url(images/detailed-view-on-16.png);
 }
 
 /* Forms */
+
 .form-container .form-fields
 {
    border-bottom: medium none;
@@ -170,7 +173,6 @@
    background: transparent url(images/edit-metadata-16.png) no-repeat 12px 4px;
    padding-left: 32px;
 }
-
 
 /* Data Table */
 
@@ -244,11 +246,11 @@
 }
 
 /* This rule is vital to workaround a Firefox mouseout bug */
+
 .doclist .yui-dt-col-4
 {
    overflow: visible;
 }
-
 
 /* Cell Renderers */
 
@@ -298,21 +300,25 @@
    padding-top: 0.2em;
    width: 100%;
 }
+
 .doclist .documents h3.filename span.title
 {
    color: #606060;
    font-size: 82%;
    padding-left: 0.7em;
 }
+
 .doclist .documents
 {
    color: #333333;
    margin: 0 -10px 0 -8px;
 }
+
 .doclist .documents a
 {
    color: #2B6EB5;
 }
+
 .doclist .documents a:active,
 .doclist .documents a:hover
 {
@@ -320,6 +326,7 @@
 }
 
 /* Favourite document / folder indicator */
+
 .doclist .documents h3 a.favourite-document,
 .doclist .documents h3 a.favourite-folder
 {
@@ -330,11 +337,13 @@
    margin-right: 0.5em;
    padding: 0.5em;
 }
+
 .doclist .documents h3 a.favourite-document.enabled,
 .doclist .documents h3 a.favourite-folder.enabled
 {
    background-image: url(../images/star-selected_16x16.png);
 }
+
 .doclist .documents h3 a.favourite-document:active,
 .doclist .documents h3 a.favourite-document:hover,
 .doclist .documents h3 a.favourite-folder:active,
@@ -379,9 +388,6 @@
    padding-right: 0.5em;
 }
 
-.doclist .documents .detail-first
-{
-}
 .doclist .documents .detail-last
 {
    padding-bottom: 0.2em;
@@ -402,7 +408,6 @@
    padding: 5px 0px 3px 28px;
 }
 
-
 /* Tags */
 
 .doclist .documents .detail span.tag-item
@@ -414,26 +419,12 @@
    padding-left: 20px;
 }
 
-.doclist .documents .detail span.tag
-{
-}
-
-.doclist .documents .detail a.tag-link
-{
-}
-
-.doclist .documents .detail a.tag-link span
-{
-}
-
-
 /* Actions Rollover */
 
 .doclist .documents .hidden
 {
    visibility: hidden;
 }
-
 
 /* Actions */
 
@@ -489,13 +480,14 @@
    color: #fff;
 }
 
-
 /* Actions: Simple view */
+
 .doclist div.simple div
 {
    float: left;
    line-height: 1em;
 }
+
 .doclist div.simple a.action-link,
 .doclist div.simple a.simple-link,
 .doclist div.simple a.show-more
@@ -504,28 +496,32 @@
    min-height: 16px;
    padding: 1px 0 0 24px;
 }
+
 .doclist div.simple a.action-link span,
 .doclist div.simple a.simple-link span
 {
    display: none;
 }
+
 .doclist div.simple div.more-actions
 {
    margin-left: -122px;
    margin-top: 3em;
 }
+
 .doclist div.simple div.more-actions div
 {
    float: none;
 }
+
 .doclist div.simple div.more-actions a.action-link span,
 .doclist div.simple div.more-actions a.simple-link span
 {
    display: block;
 }
 
-
 /* Actions: Icons */
+
 .doclist .action-set a
 {
    background-image: url(images/generic-16.png);
@@ -646,20 +642,38 @@
    background-image: url(images/view-alfresco-explorer-16.png);
 }
 
+.doclist .onActionRules a
+{
+   background-image: url(../images/rule-16.png);
+}
+
+.doclist .onActionSimpleApprove a
+{
+   background-image: url(images/simple-workflow-approve-16.png);
+}
+
+.doclist .onActionSimpleReject a
+{
+   background-image: url(images/simple-workflow-reject-16.png);
+}
 
 /* History Manager */
+
 #yui-history-iframe
 {
    position: absolute;
    top: 0;
    left: 0;
    width: 1px;
-   height: 1px; /* avoid scrollbars */
+   height: 1px;
+
+
+/* avoid scrollbars */
    visibility: hidden;
 }
 
-
 /* Preview Tooltip */
+
 .yui-tt .bd
 {
    background-color: #f4faff !important;
@@ -668,12 +682,14 @@
 }
 
 /* Show Folders inline link */
+
 .doclist .show-folders-link
 {
    cursor: pointer;
 }
 
 /* Customize Dialog */
+
 .doclist .customize
 {
    display: none;

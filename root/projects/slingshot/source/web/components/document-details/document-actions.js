@@ -35,6 +35,11 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
    
    /**
     * DocumentActions constructor.
@@ -201,8 +206,9 @@
          if (assetData.permissions && assetData.permissions.userAccess)
          {
             var userAccess = assetData.permissions.userAccess,
+               actionLabels = assetData.actionLabels || {},
                actions = YAHOO.util.Selector.query("div", actionsContainer),
-               action, actionPermissions, i, ii, j, jj, actionAllowed;
+               action, actionPermissions, i, ii, j, jj, actionAllowed, aTag, spanTag;
 
             // Inject special-case permissions for inline and online editing
             if (assetData.mimetype in this.options.inlineEditMimetypes)
@@ -214,9 +220,17 @@
             {
                action = actions[i];
                actionAllowed = true;
-               if (action.firstChild.rel !== "")
+               aTag = action.firstChild;
+               spanTag = aTag.firstChild;
+
+               if (spanTag && actionLabels[action.className])
                {
-                  actionPermissions = action.firstChild.rel.split(",");
+                  spanTag.innerHTML = $html(actionLabels[action.className]);
+               }
+
+               if (aTag.rel !== "")
+               {
+                  actionPermissions = aTag.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
                   {
                      if (!userAccess[actionPermissions[j]])
