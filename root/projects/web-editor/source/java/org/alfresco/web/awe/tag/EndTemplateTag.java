@@ -57,13 +57,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
       
             // get the toolbar location from the request session
             String toolbarLocation = (String)this.pageContext.getRequest().getAttribute(KEY_TOOLBAR_LOCATION);
-   
-            // render div's used by popup panels
-            out.write("<div id=\"awe\"><div id=\"awe-login-panel\"></div><div id=\"awe-panel\"></div></div>\n");
-            out.write("<div id=\"awe-ribbon-container\" class=\"awe-ribbon-container\"><div id=\"awe-ribbon\" class=\"awe-ribbon\" role=\"toolbar\">\n");
-            out.write("<div class=\"hd\"><h6>Web Editor</h6></div><div class=\"bd\"></div><div class=\"ft\"></div>\n");
-            out.write("</div></div>\n");
-            
+         
             // render JavaScript to configure toolbar and edit icons
             List<MarkedContent> markedContent = getMarkedContent();
             

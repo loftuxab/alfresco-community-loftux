@@ -22,6 +22,9 @@
  * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing
  */
+if (!this.AWE) {
+    this.AWE = {};
+}
 
 (function(){
    var Dom = YAHOO.util.Dom,
@@ -38,13 +41,29 @@
     * @constructor AWE
     */
    AWE = (function(){
-      var name = 'AWE'
+      var name = 'AWE';
       var loginModule = null;
       var editables = {};
       var loginDomElId = 'awe-login-panel';
 
       var init = function AWE_init()
       {
+         // init core awe divs
+         var body = document.getElementsByTagName('body')[0];
+         if (!Dom.get('awe'))
+         {
+            var el = document.createElement('div');
+            el.innerHTML =  '<div id="awe"><div id="awe-login-panel"></div><div id="awe-panel"></div><div id="awe-ribbon-container" class="awe-ribbon-container"><div id="awe-ribbon" class="awe-ribbon" role="toolbar"><div class="hd"><h6>Web Editor</h6></div><div class="bd"></div><div class="ft"></div></div></div></div>';
+            body.appendChild(el.firstChild);
+         }
+         if (!Dom.hasClass(body, 'awe-root-body'))
+         {
+            Dom.addClass(body, 'awe-root-body');
+         }
+         if (body.className.indexOf('yui-skin')==-1)
+         {
+            Dom.addClass(body, 'yui-skin-default');
+         }
          //handle events
          Bubbling.on(AWE.constants.AWE_EDIT_CONTENT_CLICK_EVENT, function onEditContent_click(e, args) {
             AWE.loadForm(args[1]);
@@ -593,7 +612,7 @@
          containerDiv.innerHTML = response.serverResponse.responseText;
 
          // The panel is created from the HTML returned in the XHR request, not the container
-         var panelDiv = Dom.getFirstChildBy(containerDiv, function(el) { return el.nodeName.toLowerCase() == 'div'});
+         var panelDiv = Dom.getFirstChildBy(containerDiv, function(el) { return el.nodeName.toLowerCase() == 'div';});
          this.widgets.panel = new YAHOO.widget.Panel(panelDiv, {
             width:'420px',
             modal: true,
