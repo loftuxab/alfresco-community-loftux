@@ -55,7 +55,7 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
         I18NUtil.setLocale(Locale.getDefault());
     }
     
-    public void testI18NBehaviour()
+    public void xtestI18NBehaviour()
     {
         // Register the bundle
         I18NUtil.registerResourceBundle(BASE_RESOURCE_NAME);
@@ -77,7 +77,7 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
         assertTrue(exception5.getMessage().contains(NON_I18NED_MSG));
     }
     
-    public void testMakeRuntimeException()
+    public void xtestMakeRuntimeException()
     {
         Throwable e = new RuntimeException("sfsfs");
         RuntimeException ee = AlfrescoRuntimeException.makeRuntimeException(e, "Test");
