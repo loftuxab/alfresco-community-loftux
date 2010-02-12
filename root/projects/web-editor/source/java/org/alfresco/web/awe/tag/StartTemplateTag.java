@@ -104,6 +104,10 @@ public class StartTemplateTag extends AbstractWebEditorTag
             // all the code below
    
             // render CSS required
+            //awe-reset
+            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
+            out.write(urlPrefix);
+            out.write("/css/awe-reset.css\" />\n");
             out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
             out.write(urlPrefix);
             out.write("/yui/reset-fonts-grids/reset-fonts-grids.css\" />\n");
@@ -213,7 +217,7 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("<script type=\"text/javascript\" src=\"");
             out.write(urlPrefix);
             out.write("/service/messages.js?locale=en_US\"></script>\n");
-   
+                        
             // render JavaScript constants
             out.write("<script type=\"text/javascript\">//<![CDATA[\n");
             out.write("Alfresco.constants = Alfresco.constants || {};\n");

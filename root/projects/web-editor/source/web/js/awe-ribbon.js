@@ -76,7 +76,7 @@
          });
 
          this.setAttributeConfig('loggedInStatus', {
-            value:(Cookie.get('awe-loginStatus')=='true'),
+            value:(this.getCookieValue('loggedInStatus')=='true'),
             validator: YAHOO.lang.isBoolean
          });
          this.on('positionChange', this.onPositionChangeEvent);
@@ -123,6 +123,7 @@
             {
                panelConfig.fixedCenter = true;
             }
+
 
             var ribbon = this.widgets.ribbon = new YAHOO.widget.Panel(this.id, panelConfig);
 
@@ -202,11 +203,12 @@
             {
                console.log('create tabview as container for tabbed toolbars');
             }
-
+            //get ribbon position from cookie if available otherwise reset to initial config value
+            this.set('position', this.getCookieValue('ribbon-position') || this.get('position'));
             ribbon.render();
-            // Have to use later() as refreshing instantly means vertical toolbar 
-            // height are calculated slightly too high
-            YAHOO.lang.later(100, this, this.refresh,[['position','loggedInStatus']]);
+
+            // Refresh any attributes here
+            this.refresh(['loggedInStatus']);
 
             Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
             Bubbling.on(this._domFriendlyName + AWE.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);   
@@ -300,7 +302,6 @@
          var location = location || AWE.Ribbon.PRIMARY_TOOLBAR,
              tbar = null,
              toolbarContainer = (location && location === AWE.Ribbon.SECONDARY_TOOLBAR) ? this.widgets.ribbonFooter : this.widgets.ribbonBody;
-
          //add primary toolbar
          if (this.widgets.toolbars[location]) // destroy existing toolbar first
          {
@@ -313,9 +314,8 @@
             config
          );
          
-
-        tbar.on('buttonClick', function AWE_Ribbon_generic_button_handler(args)
-        {
+         tbar.on('buttonClick', function AWE_Ribbon_generic_button_handler(args)
+         {
            //strip out button id (namespace) from value
            if (YAHOO.lang.isString(args.button.value))
            {
@@ -337,7 +337,7 @@
            //    tbar.selectButton(value);
            //    this.lastButton = o.button;
            // }
-        });
+         });
          return tbar;
       },
 
@@ -469,16 +469,56 @@
          });
         //show logout dialog
       },
+      
+      /**
+       * Sets value of specified sub cookie
+       * 
+       * @param name {String} Name of specified sub cookie to set
+       * @param value Value of specified sub-cookie
+       * 
+       * @return
+       */
+      setCookieValue: function AWE_Ribbon_setCookieValue(name, value)
+      {
+        var data = Cookie.getSubs('awe') || {};
+        data[name] = value;
+        return Cookie.setSubs('awe',data);
+      },
+      
+      /**
+       * Returns value of specified sub-cookie
+       * 
+       * @param name {String} (Optional) Name of specified sub cookie to retrieve. If no name specified then returns full cookie
+       * @return Value of specified sub-cookie or full cookie if no name specified.
+       */
+      getCookieValue: function AWE_Ribbon_saveCookieValue(name)
+      {
+        return (YAHOO.lang.isUndefined(name)) ? Cookie.getSubs('awe') : Cookie.getSub('awe', name);
+      },
 
+      /**
+       * Event handler that fires when user logs in
+       *  
+       * @param e {Object} Object literal describing previous and new value of
+       *                   attribute
+       * @param args {Object} Args passed into event
+       * 
+       */
       onLoggedIn: function AWE_Ribbon_onLoggedIn(e, args)
       {
-         Cookie.set('awe-loginStatus', args[1].loggedIn);
          this.set('loggedInStatus', args[1].loggedIn);
       },
 
+      /**
+       * Event handler that fires when user logs out
+       *  
+       * @param e {Object} Object literal describing previous and new value of
+       *                   attribute
+       * @param args {Object} Args passed into event
+       * 
+       */
       onLoggedOut: function AWE_Ribbon_onLoggedOut(e, args)
       {
-         Cookie.set('awe-loginStatus', args[1].loggedIn);
          this.set('loggedInStatus', args[1].loggedIn);
       },
 
@@ -498,6 +538,11 @@
          {
             this.widgets.toolbars[AWE.Ribbon.SECONDARY_TOOLBAR].disableButton(this._domFriendlyName + AWE.SEPARATOR + 'logout');
          }
+         if (e.prevValue!==e.newValue)
+         {
+            this.setCookieValue('loggedInStatus', e.newValue);            
+         }
+
       },
 
       /*
@@ -603,8 +648,8 @@
                );
                this._originalBodyMarginRight = null;
             }
-
          }
+         this.setCookieValue('ribbon-position', e.newValue);
       },
 
       /**
