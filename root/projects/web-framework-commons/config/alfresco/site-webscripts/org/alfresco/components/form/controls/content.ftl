@@ -10,12 +10,11 @@
    <script type="text/javascript">//<![CDATA[
    (function()
    {
-      new Alfresco.RichTextControl("${fieldHtmlId}").setOptions(
+      new Alfresco.ContentControl("${fieldHtmlId}").setOptions(
       {
          <#if field.disabled>disabled: true,</#if>
          currentValue: "${field.value}",
          mandatory: ${field.mandatory?string},
-         contentProperty: true,
          formMode: "${form.mode}",
          nodeRef: "${context.properties.nodeRef!""}",
          mimeType: "${context.properties.mimeType!""}",

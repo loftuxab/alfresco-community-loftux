@@ -300,7 +300,10 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("/modules/editors/tiny_mce-min.js\"></script>\n");
             out.write("<script type=\"text/javascript\" src=\"");
             out.write(urlPrefix);
-            out.write("/components/form/rich-text-control-min.js\"></script>\n");
+            out.write("/components/form/rich-text-min.js\"></script>\n");
+            out.write("<script type=\"text/javascript\" src=\"");
+            out.write(urlPrefix);
+            out.write("/components/form/content-min.js\"></script>\n");
    
             // render AWE JavaScript dependencies
             out.write("<script type=\"text/javascript\" src=\"");
