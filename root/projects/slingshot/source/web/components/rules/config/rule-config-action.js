@@ -401,7 +401,7 @@
                      hiddenFields.push(Selector.query("input[param=" + p_oObj.prefix + "-move]", p_oObj.configDef._id)[0]);
                      this._toggleDisableOnElements(hiddenFields, disabled);
                      p_oObj.button.set("disabled", disabled);
-                     this.updateSubmitElements(opts.configDef);
+                     this.updateSubmitElements(p_oObj.configDef);
                   },
                   {
                      enableCheckboxEl: enableCheckboxEl,
@@ -450,10 +450,7 @@
                         var opts = this.renderers["arca:category-picker"].currentOpts;
                         this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-aspect", "cm:classifiable");
                         this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-value", obj.selectedItems[0]);
-                        if (this.options.form)
-                        {
-                           this.options.form.updateSubmitElements();
-                        }
+                        this.updateSubmitElements(opts.configDef);
                      },
                      scope: this
                   }
