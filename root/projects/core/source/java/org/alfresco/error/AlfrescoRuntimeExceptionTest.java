@@ -24,7 +24,9 @@
  */
 package org.alfresco.error;
 
+import java.net.URL;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import junit.framework.TestCase;
 
@@ -57,6 +59,24 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
     
     public void testI18NBehaviour()
     {
+        // Ensure that the bundle is present on the classpath
+        String baseResourceAsProperty = BASE_RESOURCE_NAME.replace('.', '/') + ".properties";
+        URL baseResourceURL = AlfrescoRuntimeExceptionTest.class.getClassLoader().getResource(baseResourceAsProperty);
+        assertNotNull(baseResourceURL);
+        
+        baseResourceAsProperty = BASE_RESOURCE_NAME.replace('.', '/') + "_fr_FR" + ".properties";
+        baseResourceURL = AlfrescoRuntimeExceptionTest.class.getClassLoader().getResource(baseResourceAsProperty);
+        assertNotNull(baseResourceURL);
+        
+        // Ensure we can load it as a resource bundle
+        ResourceBundle properties = ResourceBundle.getBundle(BASE_RESOURCE_NAME);
+        assertNotNull(properties);
+        properties = ResourceBundle.getBundle(BASE_RESOURCE_NAME, new Locale("fr", "FR"));
+        assertNotNull(properties);
+       
+
+        // From here on in, we use Spring
+       
         // Register the bundle
         I18NUtil.registerResourceBundle(BASE_RESOURCE_NAME);
         
