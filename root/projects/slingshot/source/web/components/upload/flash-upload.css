@@ -78,7 +78,7 @@
    margin-left: 210px;
 }
 
-/* Add som padding to the file list so it looks centered */
+/* Add some padding to the file list so it looks centered */
 
 .yui-skin-default .yui-panel .bd .fileUpload-filelist-table
 {
@@ -87,18 +87,18 @@
 
 /* Remove the padding inherited from the panel for divs in the file list */
 
-.yui-skin-default .yui-panel .bd .fileUpload-filelist-table div.yui-dt-hd
+.fileUpload-filelist-table div.yui-dt-hd
 {
    height: 0;
    padding: 0;
 }
 
-.yui-skin-default .yui-panel .bd .fileUpload-filelist-table tbody.yui-dt-message td
+.fileUpload-filelist-table tbody.yui-dt-message td
 {
    border: none;
 }
 
-.yui-skin-default .yui-panel .bd .fileUpload-filelist-table tbody.yui-dt-message tr td div.yui-dt-empty
+.fileUpload-filelist-table tbody.yui-dt-message tr td div.yui-dt-empty
 {
    border: none;
    padding: 0.5em !important;
