@@ -12,8 +12,9 @@
 <@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config-condition.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/config/rule-config-action.css" />
 <@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config-action.js"></@script>
+<@script type="text/javascript" src="${page.url.context}/components/form/date.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/date-picker.js"></@script>
-<script type="text/javascript" src="${page.url.context}/yui/calendar/calendar-min.js"></script>
+<@script type="text/javascript" src="${page.url.context}/yui/calendar/calendar-min.js"></@script>
 <!-- Global Folder -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/global-folder.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/global-folder.js"></@script>

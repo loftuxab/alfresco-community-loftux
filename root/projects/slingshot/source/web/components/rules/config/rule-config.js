@@ -57,6 +57,9 @@
       Alfresco.RuleConfig.superclass.constructor.call(this, "Alfresco.RuleConfig", htmlId, ["button"]);
 
       this.configDefs = {};
+      this.datePickerConfigDefMap = {};
+
+      YAHOO.Bubbling.on("mandatoryControlValueUpdated", this.onDatePickerMandatoryControlValueUpdated, this);
 
       return this;
    };
@@ -137,7 +140,17 @@
        * @property configDefs
        * @type {object}
        */
-      configDefs: {},
+      configDefs: null,
+
+      /**
+       * Each date picker that is created will have its associated configDef mapped here so the bubbling event handler
+       * will know if the date picker belongs to this component and can provide the configDef to the
+       * updateSubmitElements method.
+       *
+       * @property datePickerConfigDefMap
+       * @type {object}
+       */
+      datePickerConfigDefMap: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -787,6 +800,20 @@
       },
 
       /**
+       * @method onDatePickerMandatoryControlValueUpdated
+       * @param layer
+       * @param args
+       */
+      onDatePickerMandatoryControlValueUpdated: function RuleConfig_onDatePickerMandatoryControlValueUpdated(layer, args)
+      {
+         var configDef = this.datePickerConfigDefMap[args[1].id];
+         if (configDef)
+         {
+            this.updateSubmitElements(configDef);
+         }
+      },
+
+      /**
        * @method _refreshRemoveButtonState
        */
       _refreshRemoveButtonState: function RuleConfig__refreshRemoveButtonState()
@@ -907,7 +934,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createDatePicker(containerEl, configDef, paramDef, [], value);
+               return this.createDatePicker(containerEl, configDef, paramDef, [], value, false);
             }
          },
 
@@ -915,7 +942,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createDatePicker(containerEl, configDef, paramDef, [], value);
+               return this.createDatePicker(containerEl, configDef, paramDef, [], value, true);
             }
          },
 
@@ -1068,7 +1095,7 @@
          }
       },
 
-      createDatePicker: function (containerEl, configDef, paramDef, constraintOptions, value)
+      createDatePicker: function (containerEl, configDef, paramDef, constraintOptions, value, showTime)
       {
          if (paramDef._type == "hidden")
          {
@@ -1077,9 +1104,8 @@
          }
          else
          {
-            // Todo Use the forms ui to create the html
             var valueEl = this.createInputOfType(containerEl, configDef, paramDef, [], value, "hidden"),
-                  valueId = Alfresco.util.generateDomId(valueEl);
+                  valueId = valueEl.getAttribute("id") ? valueEl.getAttribute("id") : Alfresco.util.generateDomId(valueEl);
             containerEl.appendChild(valueEl);
 
             var datePickerParentEl = document.createElement("span");
@@ -1095,26 +1121,36 @@
             Dom.addClass(datePickerImgEl, "datepicker-icon");
             datePickerIconEl.appendChild(datePickerImgEl);
 
-            var displayEl = this.createInputText(containerEl, configDef, paramDef, [], "");
-            Alfresco.util.setDomId(displayEl, datePickerId + "-date");
+            var displayDateEl = document.createElement("input");
+            displayDateEl.setAttribute("type", "text");            
+            Alfresco.util.setDomId(displayDateEl, datePickerId + "-date");
+            containerEl.appendChild(displayDateEl);
 
-            containerEl.appendChild(displayEl);
+            if (showTime)
+            {
+               var displayTimeEl = document.createElement("input");
+               displayTimeEl.setAttribute("type", "text");
+               Alfresco.util.setDomId(displayTimeEl, datePickerId + "-time");            
+               containerEl.appendChild(displayTimeEl);
+            }
+
             containerEl.appendChild(datePickerIconEl);
             containerEl.appendChild(datePickerParentEl);
             datePickerParentEl.appendChild(datePickerEl);
             var options = {
-               showTime: false,
-               mandatory: paramDef.isMandatory
+               showTime: showTime,
+               mandatory: paramDef.isMandatory,
+               currentValue: (value && value != "") ? value : null 
             };
-            if (value)
+            var datePicker = new Alfresco.DatePicker(datePickerId, valueId).setOptions(options).setMessages(
             {
-               options.currentValue = value;
-            }
-            new Alfresco.DatePicker(datePickerId, valueId).setOptions(options).setMessages(
-            {
-               "form.control.date-picker.choose": ""
+               "form.control.date-picker.choose": "",
+               "form.control.date-picker.entry.date.format": this.msg("form.control.date-picker.entry.date.format"),
+               "form.control.date-picker.display.date.format": this.msg("form.control.date-picker.display.date.format"),
+               "form.control.date-picker.entry.time.format": this.msg("form.control.date-picker.entry.time.format"),
+               "form.control.date-picker.display.time.format": this.msg("form.control.date-picker.display.time.format")
             });
-
+            this.datePickerConfigDefMap[datePicker.id] = configDef;
             return valueEl;
          }
       },
