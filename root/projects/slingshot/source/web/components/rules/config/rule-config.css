@@ -117,6 +117,18 @@
    padding: 0.25em;
 }
 
+.rule-config .rule-config-body .parameters .paramtype_d_date     input.datepicker-date,
+.rule-config .rule-config-body .parameters .paramtype_d_datetime input.datepicker-date
+{
+   width: 5em;
+}
+
+.rule-config .rule-config-body .parameters .paramtype_d_date     input.datepicker-time,
+.rule-config .rule-config-body .parameters .paramtype_d_datetime input.datepicker-time
+{
+   width: 2.8em;      
+}
+
 .rule-config .rule-config-body .parameters .datepicker
 {
    display: none;

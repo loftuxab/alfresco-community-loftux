@@ -8,6 +8,9 @@
 
    <menu>
       <group>
+			<item id="select"/>
+		</group>
+      <group>
 			<action name="script"/>
 		</group>
 		<group>
@@ -57,6 +60,7 @@
    </menu>
 
    <customise>
+      <item id="select">Select</item>
       <!-- Specific action filters -->
       <action name="check-in">CheckIn</action>
       <action name="check-out">Checkout</action>

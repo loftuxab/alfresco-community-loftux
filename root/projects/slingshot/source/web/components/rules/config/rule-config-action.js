@@ -69,13 +69,30 @@
 
       customisations:
       {
-         /**
-          */
+
+         Select:
+         {
+            fn: function(configDef, ruleConfig, configEl)
+            {
+               configDef.parameterDefinitions = [
+                  {
+                     name: "mandatory",
+                     type: "d:text",
+                     isMandatory: true,
+                     isMultiValued: false,
+                     displayLabel: this.msg("label.selectAnAction"),
+                     _type: "hidden"
+                  }
+               ];
+               return configDef;
+            }
+         },
+
          SendAnEmail:
          {
             fn: function(configDef, ruleConfig, configEl)
             {
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push({
                   type: "arca:email-dialog-button",
                   _buttonLabel: this.msg("button.message")
@@ -88,7 +105,7 @@
          {
             fn: function(configDef, ruleConfig, configEl)
             {
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push({
                   type: "arca:checkin-dialog-button",
                   _buttonLabel: this.msg("button.options")
@@ -101,7 +118,7 @@
          {
             fn: function(configDef, ruleConfig, configEl)
             {
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push({
                   type: "arca:destination-dialog-button",
                   displayLabel: this.msg("label.workingCopyLocation"),
@@ -117,7 +134,7 @@
             fn: function(configDef, ruleConfig, configEl)
             {
                // Hide all parameters since we are using a cusotm ui
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
 
                // Make parameter renderer create a "Destination" button that displays an destination folder browser
                configDef.parameterDefinitions.push({
@@ -134,7 +151,7 @@
             fn: function(configDef, ruleConfig, configEl)
             {
                // Hide all parameters since we are using a cusotm ui
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
 
                // Make approve parameters mandatory (not changed in repo for legacy reasons)
                this._getParamDef(configDef, "approve-step").isMandatory = true;
@@ -167,7 +184,7 @@
          {
             fn: function(configDef, ruleConfig, configEl)
             {
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push(
                {
                   type: "arca:category-picker"
@@ -190,7 +207,7 @@
             currentOpts: {},
             fn: function (containerEl, paramDef, configDef, value, ruleConfig)
             {
-               this.createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_emailFormButton_onClick(type, obj)
+               this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_emailFormButton_onClick(type, obj)
                {
                   this.renderers["arca:email-dialog-button"].currentOpts =
                   {
@@ -212,7 +229,7 @@
                               this._setHiddenParameter(opts.configDef, opts.ruleConfig, "subject", values.subject);
                               this._setHiddenParameter(opts.configDef, opts.ruleConfig, "text", values.message ? values.message : "");
                               this._setHiddenParameter(opts.configDef, opts.ruleConfig, "template", values.template ? values.template : "");
-                              this.updateSubmitElements(opts.configDef);
+                              this._updateSubmitElements(opts.configDef);
                            }
                         }
                      }, this);
@@ -235,7 +252,7 @@
             currentOpts: {},
             fn: function (containerEl, paramDef, configDef, value, ruleConfig)
             {
-               this.createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_checkinFormButton_onClick(type, obj)
+               this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_checkinFormButton_onClick(type, obj)
                {
                   this.renderers["arca:checkin-dialog-button"].currentOpts =
                   {
@@ -256,7 +273,7 @@
                               // todo: use this once parameter definition has changed on server!
                               // this._setHiddenParameter(opts.configDef, opts.ruleConfig, "version", values.version);
                               this._setHiddenParameter(opts.configDef, opts.ruleConfig, "description", values.comments);
-                              this.updateSubmitElements(opts.configDef);
+                              this._updateSubmitElements(opts.configDef);
                            }
                         }
                      }, this);
@@ -279,8 +296,8 @@
             {
                this._createLabel(paramDef.displayLabel, containerEl); 
                var nodeRef = ruleConfig.parameterValues ? ruleConfig.parameterValues.destination : null;
-               this.createPathSpan(containerEl, this.id + "-" + configDef._id + "-destinationLabel", nodeRef);
-               this.createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
+               this._createPathSpan(containerEl, this.id + "-" + configDef._id + "-destinationLabel", nodeRef);
+               this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
                {
                   this.renderers["arca:destination-dialog-button"].currentOpts =
                   {
@@ -310,7 +327,7 @@
                                  path = this.msg("label.site-path", selectedFolder.siteId, selectedFolder.path);
                               }
                               Dom.get(this.id + "-" + opts.configDef._id + "-destinationLabel").appendChild(document.createTextNode($html(path)));
-                              this.updateSubmitElements(opts.configDef);
+                              this._updateSubmitElements(opts.configDef);
                            }
                         }
                      }, this);
@@ -345,7 +362,7 @@
                }
 
                // Create button that displays the simple workflow dialog
-               var button = this.createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
+               var button = this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
                {
                   this.renderers["arca:simple-workflow-dialog-button"].currentOpts =
                   {
@@ -369,7 +386,7 @@
                               this._setHiddenParameter(opts.configDef, opts.ruleConfig, prefix + "-step", values.label);
                               this._setHiddenParameter(opts.configDef, opts.ruleConfig, prefix + "-move", values.action == "move");
                               this._setHiddenParameter(opts.configDef, opts.ruleConfig, prefix + "-folder", values.nodeRef);
-                              this.updateSubmitElements(opts.configDef);
+                              this._updateSubmitElements(opts.configDef);
                            }
                         }
                      }, this);
@@ -401,7 +418,7 @@
                      hiddenFields.push(Selector.query("input[param=" + p_oObj.prefix + "-move]", p_oObj.configDef._id)[0]);
                      this._toggleDisableOnElements(hiddenFields, disabled);
                      p_oObj.button.set("disabled", disabled);
-                     this.updateSubmitElements(p_oObj.configDef);
+                     this._updateSubmitElements(p_oObj.configDef);
                   },
                   {
                      enableCheckboxEl: enableCheckboxEl,
@@ -450,7 +467,7 @@
                         var opts = this.renderers["arca:category-picker"].currentOpts;
                         this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-aspect", "cm:classifiable");
                         this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-value", obj.selectedItems[0]);
-                        this.updateSubmitElements(opts.configDef);
+                        this._updateSubmitElements(opts.configDef);
                      },
                      scope: this
                   }

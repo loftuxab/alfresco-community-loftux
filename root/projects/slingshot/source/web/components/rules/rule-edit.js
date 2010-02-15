@@ -48,6 +48,7 @@
    {
       Alfresco.RuleEdit.superclass.constructor.call(this, "Alfresco.RuleEdit", htmlId, []);
 
+      // Decoupled event listeners
       YAHOO.Bubbling.on("ruleConfigReady", this.onRuleConfigReady, this);
 
       return this;
