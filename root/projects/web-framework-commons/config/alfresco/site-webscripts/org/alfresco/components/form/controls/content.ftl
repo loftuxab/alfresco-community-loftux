@@ -20,6 +20,7 @@
          mimeType: "${context.properties.mimeType!""}",
          <#if field.control.params.plainMimeTypes??>plainMimeTypes: "${field.control.params.plainMimeTypes}",</#if>
          <#if field.control.params.richMimeTypes??>richMimeTypes: "${field.control.params.richMimeTypes}",</#if>
+         <#if field.control.params.imageMimeTypes??>imageMimeTypes: "${field.control.params.imageMimeTypes}",</#if>
          <#if field.control.params.forceEditor??>forceEditor: ${field.control.params.forceEditor},</#if>
          <@editorParameters field />
       }).setMessages(
