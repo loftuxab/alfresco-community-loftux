@@ -117,7 +117,7 @@ function main()
          properties.push(
          {
             id: "date-created",
-            type: "d:date",
+            type: "d:datetime",
             displayLabel: "Date created"
          });
 
