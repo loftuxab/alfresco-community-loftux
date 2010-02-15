@@ -136,8 +136,10 @@
                var m = get_path.matcher(line);
                if(m.matches()) {
                   var this_path = m.group(1);
-                  var pe = path.createPathElement();
-                  pe.setLocation(new File(projPath+this_path));
+                  if(! this_path.startsWith("lib/ant-1.")) {
+                     var pe = path.createPathElement();
+                     pe.setLocation(new File(projPath+this_path));
+                  }
                }
             }
          }
