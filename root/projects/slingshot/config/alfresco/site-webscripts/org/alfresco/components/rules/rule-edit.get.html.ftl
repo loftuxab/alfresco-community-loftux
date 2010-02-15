@@ -38,7 +38,7 @@
             <label for="${el}-description">
                ${msg("label.description")}:
             </label>
-            <input id="${el}-description" type="text" title="${msg("label.description")}" value="" name="description"/>
+            <textarea id="${el}-description" type="text" title="${msg("label.description")}" value="" name="description"></textarea>
          </div>
 
          <h2>${msg("header.defineRule")}</h2>

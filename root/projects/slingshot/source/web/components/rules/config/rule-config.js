@@ -56,9 +56,11 @@
    {
       Alfresco.RuleConfig.superclass.constructor.call(this, "Alfresco.RuleConfig", htmlId, ["button"]);
 
-      this.configDefs = {};
-      this.datePickerConfigDefMap = {};
+      // Instance variables
+      this._configDefs = {};
+      this._datePickerConfigDefMap = {};
 
+      // Decoupled event listeners
       YAHOO.Bubbling.on("mandatoryControlValueUpdated", this.onDatePickerMandatoryControlValueUpdated, this);
 
       return this;
@@ -75,7 +77,7 @@
       options:
       {
          /**
-          * The type of config
+          * The type of configs that are manipulated
           *
           * @property ruleConfigType
           * @type string
@@ -83,7 +85,8 @@
          ruleConfigType: null,
 
          /**
-          * The type of config
+          * The id-name to use when accepting ruleConfig-objects in displayRuleConfigs and
+          * when returning ruleConfig-objects in getRuleConfigs.
           *
           * @property ruleConfigDefinitionKey
           * @type string
@@ -92,7 +95,10 @@
          ruleConfigDefinitionKey: "name",
          
          /**
-          * Describes how the menu items shall be ordered and grouped
+          * Describes how the menu items shall be ordered and grouped.
+          * Note that this is NOT the rule configs that will appear in the menu, it is a representation of how the
+          * select element shall group its options where each group contains of pattern objects that will match a
+          * rule config (or item) and therefore place the rule config in that specific group.
           *
           * @property menuMap
           * @type array
@@ -100,7 +106,8 @@
          menuMap: [],
 
          /**
-          * The rule configs that shall be selectable in the menu (types, conditions or actions)
+          * The rule configs that shall be selectable in the menu (types, conditions or actions).
+          * These will be placed inside the select menu and be organised/ordered as described in the menuMap.
           *
           * @property ruleConfigDefinitions
           * @type array
@@ -108,7 +115,7 @@
          ruleConfigDefinitions: [],
 
          /**
-          * customisations that may modify the default ui rendering of a rule config
+          * Customisations that may modify the default ui rendering of a rule config.
           *
           * @property customisationsMap
           * @type array
@@ -137,20 +144,21 @@
       /**
        * Used when a menu is built to save the config for each menu item so it can be passed into the renderer if selected.
        *
-       * @property configDefs
+       * @property _configDefs
        * @type {object}
+       * @private
        */
-      configDefs: null,
+      _configDefs: null,
 
       /**
        * Each date picker that is created will have its associated configDef mapped here so the bubbling event handler
        * will know if the date picker belongs to this component and can provide the configDef to the
-       * updateSubmitElements method.
+       * _updateSubmitElements method.
        *
-       * @property datePickerConfigDefMap
+       * @property _datePickerConfigDefMap
        * @type {object}
        */
-      datePickerConfigDefMap: null,
+      _datePickerConfigDefMap: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -179,7 +187,7 @@
                   this._toggleDisableOnElements(Selector.query("[param]", configsEl), true);
                   this._toggleDisableOnElements(Selector.query("select.config-name", configsEl), true);
                }
-               this.updateSubmitElements();
+               this._updateSubmitElements();
             }, enableCheckboxEl, this);
          }
 
@@ -199,7 +207,7 @@
          this.widgets.configTemplateEl = Dom.get(this.id + "-configTemplate");
 
          // Create select menu template that will be used for each config
-         this.widgets.selectTemplateEl = this.createSelectMenu();
+         this.widgets.selectTemplateEl = this._createSelectMenu();
 
          // Tell other components that this component is ready
          YAHOO.Bubbling.fire("ruleConfigReady",
@@ -209,16 +217,217 @@
       },
 
       /**
+       * Returns a list of all the current ruleConfigs as an array of ruleConfig objects.
+       *
+       * I.e
+       * [
+       *    {
+       *       "<the value of this.options.ruleConfigDefinitionKey>": "<the selected option value in the select menu>",
+       *       "parameterValues":
+       *       {
+       *          "paramName1": "paramValue1",
+       *          "paramName2": "paramValue2"
+       *       }
+       *    }
+       * ]
+       *
+       * @method getRuleConfigs
+       * @return {array} An array of ruleConfig objects
+       */
+      getRuleConfigs: function RuleConfig_getRuleConfigs()
+      {
+         // Empty result
+         var configs = [];
+
+         if (!Dom.hasClass(this.id + "-configs", "hidden"))
+         {
+            // Add configs
+            var configEls = Selector.query('li.config', this.id + "-body"),
+                  configEl,
+                  configDef,
+                  config;
+            for (var ci = 0, cil = configEls.length; ci < cil; ci++)
+            {
+               configEl = configEls[ci];
+
+               // Find config & name
+               configDef = this._getSelectedConfigDef(configEl);
+               if (configDef)
+               {
+                  config = {};
+                  config[this.options.ruleConfigDefinitionKey] = configDef.name;
+                  config.parameterValues = this._getParameters(configDef);
+                  configs.push(config);
+               }
+
+            }
+         }
+         return configs;
+      },
+
+      /**
+       * Displays ruleConfig rows as described in ruelConfigs.
+       *
+       * Expects the following format of the ruleConfig array:
+       * [
+       *    {
+       *       "<match the value of this.options.ruleConfigDefinitionKey>": "<the ruleConfig name to select in the select menu>",
+       *       "parameterValues":
+       *       {
+       *          "paramName1": "paramValue1",
+       *          "paramName2": "paramValue2"
+       *       }
+       *    }
+       * ]
+       *
+       * Note! Before this method is called the config body will be empty.
+       * This method shall be called after the "ruleConfigReady" event has been fired.
+       *
+       * @method displayRuleConfigs
+       * @param ruleConfigs {array} An array of rule configurations
+       */
+      displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
+      {
+         if (!ruleConfigs || ruleConfigs.length == 0)
+         {
+            ruleConfigs = [ {} ];
+         }
+         var ruleConfig,
+            configEl;
+         for (var i = 0, il = ruleConfigs.length; i < il; i++)
+         {
+            ruleConfig = ruleConfigs[i];
+            configEl = this._createConfigUI(ruleConfig, this.widgets.selectTemplateEl.cloneNode(true), null);
+            this._createConfigParameterUI(ruleConfig, configEl);
+         }
+         this._refreshRemoveButtonState();
+      },
+
+      
+      /**
+       * EVENT HANDLERS
+       */
+
+      /**
+       * Called from the "+" link to create another value for multi valued parameter
+       *
+       * @method onAddMoreParameterIconClick
+       * @param p_oEvent {object} The click event
+       * @param p_oParameterCtx {object} References to paramDef, configDef, ruleConfig
+       */
+      onAddExtraParameterIconClick: function RuleConfig_onAddMoreParameterIconClick(p_oEvent, p_oParameterCtx)
+      {
+         // Create a container for the extra parameter
+         var extraparamEl = document.createElement("span"),
+            paramDef = p_oParameterCtx.paramDef;
+         // Add new parameter container to the left of the add button
+         p_oParameterCtx.addButton.parentNode.insertBefore(extraparamEl, p_oParameterCtx.addButton);
+
+         // Add another parameter ui control
+         var ruleConfig = p_oParameterCtx.ruleConfig,
+            value = ruleConfig.parameterValues ? ruleConfig.parameterValues[paramDef.name] : null;
+         var el = p_oParameterCtx.paramRenderer.fn.call(this, extraparamEl, paramDef, p_oParameterCtx.configDef, value, ruleConfig);
+         Dom.addClass(el, "param");
+
+         // Add a delete button for the new parameter control
+         var deleteButton = document.createElement("span");
+         deleteButton.setAttribute("title", this.msg("button.deleteExtraParameter", paramDef.displayLabel ? paramDef.displayLabel: paramDef.name));
+         Dom.addClass(deleteButton, "delete-extra-parameter-button");
+         deleteButton.innerHTML = "-";
+         Dom.setStyle(deleteButton, "width", "10px");
+         Dom.setStyle(deleteButton, "height", "10px");
+         Event.addListener(deleteButton, "click", this.onDeleteExtraParameterIconClick, extraparamEl, this);
+         extraparamEl.appendChild(deleteButton);
+
+         this._updateSubmitElements(p_oParameterCtx.configDef);
+      },
+
+      /**
+       * Called from the "-" link to remove a value for multi valued parameter
+       *
+       * @method onDeleteExtraParameterIconClick
+       * @param p_oEvent {object} The click event
+       * @param p_oExtraparamEl {HTMLElement}
+       */
+      onDeleteExtraParameterIconClick: function RuleConfig_onDeleteExtraParameterIconClick(p_oEvent, p_oExtraparamEl)
+      {
+         p_oExtraparamEl.parentNode.removeChild(p_oExtraparamEl);
+      },
+
+      /**
+       * Called when the user selects an option int the ruleConfig select menu
+       *
+       * @method onConfigNameSelectChange
+       * @param p_oEvent {object} The change event
+       * @param configEl {HTMLElement} Contains the ruleConfig and configEl objects
+       */
+      onConfigNameSelectChange: function RuleConfig_onConfigNameSelectChange(p_oEvent, configEl)
+      {
+         this._createConfigParameterUI({}, configEl);
+      },
+
+      /**
+       * Called when the user clicks on an "+"/add rule config button
+       *
+       * @method onAddConfigButtonClick
+       * @param p_oEvent {object} The click event
+       * @param p_eConfig {HTMLDivElement} the config element the button belongs to
+       */
+      onAddConfigButtonClick: function RuleConfig_onAddConfigButtonClick(p_oEvent, p_eConfig)
+      {
+         var configEl = this._createConfigUI({}, this.widgets.selectTemplateEl.cloneNode(true), p_eConfig);
+         this._createConfigParameterUI({}, configEl);
+         this._refreshRemoveButtonState();
+      },
+
+      /**
+       * Called when the user clicks on an "-"/remove rule config button
+       *
+       * @method onRemoveConfigButtonClick
+       * @param p_oEvent {object} The click event
+       * @param p_eConfig {HTMLDivElement} the config element the button belongs to
+       */
+      onRemoveConfigButtonClick: function RuleConfig_onRemoveConfigButtonClick(p_oEvent, p_eConfig)
+      {
+         p_eConfig.parentNode.removeChild(p_eConfig);
+         this._refreshRemoveButtonState();
+      },
+
+      /**
+       * Called when a date has been selected from a date picker.
+       * Will cause the forms validation to run.
+       *
+       * @method onDatePickerMandatoryControlValueUpdated
+       * @param layer
+       * @param args
+       */
+      onDatePickerMandatoryControlValueUpdated: function RuleConfig_onDatePickerMandatoryControlValueUpdated(layer, args)
+      {
+         var configDef = this._datePickerConfigDefMap[args[1].id];
+         if (configDef)
+         {
+            this._updateSubmitElements(configDef);
+         }
+      },
+
+      
+      /**
+       * PRIVATE OR PROTECTED METHODS
+       */
+
+      /**
+       * Will set the disabled attribute to the value of "disabled" for the elements in p_aEls
        *
        * @method _toggleDisableOnElements
-       * @param p_aEls
-       * @param disable
+       * @param p_aEls {array} An array of HTMLElements
+       * @param p_bDisable {boolean} True if elements shall be disabled
+       * @private
        */
-      _toggleDisableOnElements: function RuleConfig__toggleDisableOnElements(p_aEls, disable)
+      _toggleDisableOnElements: function RuleConfig__toggleDisableOnElements(p_aEls, p_bDisable)
       {
          for (var i = 0, il = p_aEls.length; i < il; i ++)
          {
-            if (disable)
+            if (p_bDisable)
             {
                p_aEls[i].setAttribute("disabled", true);
             }
@@ -232,16 +441,19 @@
       /**
        * Called when all data that is needed for the menu has been loaded.
        *
-       * Will walk through the this.options.menuMap descriptor twice to create the menu, menu groups and items:
+       * Will walk through the this.options.menuMap descriptor twice to create the menu, menu groups and items by
+       * inserting the configDefs from this.options.ruleConfigDefinitions into a select-menu and its opt-groups.
+       *
        * 1. First pass will ask for objects using only pattern objects WITHOUT a wildcard attribute.
        * 2. Seconds pass will ask for objects using only pattern objects WITH at least one wild card attribute.
        *
-       * @method createSelectMenu
+       * @method _createSelectMenu
        * @return {HTMLSelectElement} The created menu
+       * @private
        */
-      createSelectMenu: function RuleConfig_createSelectMenu()
+      _createSelectMenu: function RuleConfig__createSelectMenu()
       {
-         // Use to see if a menuitem already has been added
+         // Used to see if a menu item already has been added
          var alreadyAdded = {};
 
          // Create menu items & groups from the menu options (make sure to make a copy so we can alter it)
@@ -284,7 +496,7 @@
                         {
                            // Add internal variable for storing the real menu items                           
                            itemOpt["_menuItems"] = [];
-                           menuItems = this.getConfigItems(itemTypeOpt, itemPatternOpt);
+                           menuItems = this._getConfigItems(itemTypeOpt, itemPatternOpt);
                            for (var mii = 0, mil = menuItems.length; mii < mil; mii++)
                            {
                               menuItem = menuItems[mii];
@@ -295,10 +507,10 @@
                                  itemOpt["_menuItems"].push(menuItem);
                                  alreadyAdded[menuItemKey] = true;
                               }
-                              if (!this.configDefs[menuItemKey])
+                              if (!this._configDefs[menuItemKey])
                               {
                                  // Save descriptor so we can look it up when menu changes
-                                 this.configDefs[menuItemKey] = menuItem.descriptor;
+                                 this._configDefs[menuItemKey] = menuItem.descriptor;
                               }
                            }
                         }
@@ -308,7 +520,7 @@
             }
          }
 
-         // Create a select element to clone and later use in the configs
+         // Create a select element that later will be cloned so it can be used individually use in the configs
          var selectEl = document.createElement("select"),
             optGroupEl,
             optionEl;
@@ -343,20 +555,21 @@
       },
 
       /**
-       * Called from createSelectMenu to get the configDef for a menu item.
+       * Called from _createSelectMenu to get the configDef for a menu item.
        *
-       * @method getConfigItems
+       * @method _getConfigItems
        * @param itemType
        * @param itemPatternObject
        * @return {array} Menu item objects (as described below) representing a configDef (or item)
        *                 matching all attributes in itemPatternObject.
+       * @protected
        * {
        *    id: string,
        *    label: string,
        *    descriptor: object
        * }
        */
-      getConfigItems: function RuleConfig_getConfigItems(itemType, itemPatternObject)
+      _getConfigItems: function RuleConfig__getConfigItems(itemType, itemPatternObject)
       {
          var results = [],
             ruleConfigDef;
@@ -393,88 +606,26 @@
       /**
        * Called to get the constraint options for a constraint.
        *
-       * @method getConstraintValues
+       * @method _getConstraintValues
        * @param p_sConstraintName
        * @param p_oRuleConfig
        * @return {array} rule constraint values
        */
-      getConstraintValues: function RuleConfig_getConstraintValues(p_sConstraintName, p_oRuleConfig)
+      _getConstraintValues: function RuleConfig__getConstraintValues(p_sConstraintName, p_oRuleConfig)
       {
          return this.options.constraints[p_sConstraintName];
       },
-
-      /**
-       * Returns all configuration rows as an array of objects.
-       *
-       * @method getRuleConfigs
-       * @return {array} An array of objects
-       */
-      getRuleConfigs: function RuleConfig_getRuleConfigs()
-      {
-         // Empty result
-         var configs = [];
-
-         if (!Dom.hasClass(this.id + "-configs", "hidden"))
-         {
-            // Add configs
-            var configEls = Selector.query('li.config', this.id + "-body"),
-                  configEl,
-                  configDef,
-                  config;
-            for (var ci = 0, cil = configEls.length; ci < cil; ci++)
-            {
-               configEl = configEls[ci];
-
-               // Find config & name
-               configDef = this._getSelectedConfigDef(configEl);
-               if (configDef)
-               {
-                  config = {};
-                  config[this.options.ruleConfigDefinitionKey] = configDef.name;
-                  config.parameterValues = this._getParameters(configDef);
-                  configs.push(config);
-               }
-
-            }
-         }
-         return configs;
-      },
-
-      /**
-       * Displays config rows for the configs.
-       *
-       * Note! Before this method is called the config body will be empty.
-       * This method shall be called after the "ruleConfigReady" event has been fired.
-       *
-       * @method displayRuleConfigs
-       * @param ruleConfigs {array} An array of rule configurations
-       */
-      displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
-      {
-         if (!ruleConfigs || ruleConfigs.length == 0)
-         {
-            ruleConfigs = [ {} ];
-         }
-         var ruleConfig,
-            configEl;
-         for (var i = 0, il = ruleConfigs.length; i < il; i++)
-         {
-            ruleConfig = ruleConfigs[i];
-            configEl = this.createConfigUI(ruleConfig, this.widgets.selectTemplateEl.cloneNode(true), null);
-            this.createConfigParameterUI(ruleConfig, configEl);
-         }
-         this._refreshRemoveButtonState();
-      },
-
+      
       /**
        * Creates a config row with the parameters and the parameter values
        *
-       * @method createConfigUI
+       * @method _createConfigUI
        * @param p_oRuleConfig {object} Rule config descriptor object
        * @param p_oSelectEl {HTMLSelectElement} The select menu to use
        * @param p_eRelativeConfigEl {object}
+       * @protected
        */
-      createConfigUI: function RuleConfig_createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
+      _createConfigUI: function RuleConfig__createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
       {
          if (p_oSelectEl.length > 0)
          {
@@ -531,11 +682,11 @@
       /**
        *
        *
-       * @method createConfigParameterUI
+       * @method _createConfigParameterUI
        * @param p_oRuleConfig {object} Rule config descriptor object
        * @param configEl {HTMLLIElement} Rule config descriptor object
        */
-      createConfigParameterUI: function RuleConfig_createConfigParameterUI(p_oRuleConfig, configEl)
+      _createConfigParameterUI: function RuleConfig__createConfigParameterUI(p_oRuleConfig, configEl)
       {
          // Remove old ui
          configEl.removeAttribute("id");
@@ -608,8 +759,8 @@
                          * Implement support for the "constraint" by using a select element
                          * that will be multi-valued depending on the paramDef.
                          */
-                        var constraintOptions = this.getConstraintValues(paramDef.constraint, p_oRuleConfig);
-                        controlEl = this.createSelect(paramEl, configDef, paramDef, constraintOptions, value);
+                        var constraintOptions = this._getConstraintValues(paramDef.constraint, p_oRuleConfig);
+                        controlEl = this._createSelect(paramEl, configDef, paramDef, constraintOptions, value);
                      }
                      else
                      {
@@ -646,7 +797,7 @@
          }
 
          // Make sure form is re-validated
-         this.updateSubmitElements(configDef);
+         this._updateSubmitElements(configDef);
       },
 
       /**
@@ -664,7 +815,7 @@
          if (selectEl.selectedIndex > -1)
          {
             var optionEl = selectEl.options[selectEl.selectedIndex];
-            var configDef = this.configDefs[optionEl.getAttribute("rel") + "_" + optionEl.value];
+            var configDef = this._configDefs[optionEl.getAttribute("rel") + "_" + optionEl.value];
             if (configDef)
             {
                configDef._id = configEl.getAttribute("id");
@@ -712,10 +863,11 @@
                }
             }
          }
+         return null;
       },
 
       /**
-       * @method getParamRenderer
+       * @method _getParamRenderer
        * @param paramDefType
        * @return {object} A RuleCOnfig parameter renderer
        */
@@ -723,96 +875,7 @@
       {
          return this.renderers[paramDefType];
       },
-
-      /**
-       * @method onAddMoreParameterIconClick
-       * @param p_oEvent {object} The click event
-       * @param p_oParameterCtx {object} References to paramDef, configDef, ruleConfig
-       */
-      onAddExtraParameterIconClick: function RuleConfig_onAddMoreParameterIconClick(p_oEvent, p_oParameterCtx)
-      {
-         // Create a container for the extra parameter
-         var extraparamEl = document.createElement("span"),
-            paramDef = p_oParameterCtx.paramDef;
-         // Add new parameter container to the left of the add button
-         p_oParameterCtx.addButton.parentNode.insertBefore(extraparamEl, p_oParameterCtx.addButton);
-
-         // Add another parameter ui control
-         var ruleConfig = p_oParameterCtx.ruleConfig,
-            value = ruleConfig.parameterValues ? ruleConfig.parameterValues[paramDef.name] : null;
-         var el = p_oParameterCtx.paramRenderer.fn.call(this, extraparamEl, paramDef, p_oParameterCtx.configDef, value, ruleConfig);
-         Dom.addClass(el, "param");
-
-         // Add a delete button for the new parameter control
-         var deleteButton = document.createElement("span");
-         deleteButton.setAttribute("title", this.msg("button.deleteExtraParameter", paramDef.displayLabel ? paramDef.displayLabel: paramDef.name));
-         Dom.addClass(deleteButton, "delete-extra-parameter-button");
-         deleteButton.innerHTML = "-";
-         Dom.setStyle(deleteButton, "width", "10px");
-         Dom.setStyle(deleteButton, "height", "10px");
-         Event.addListener(deleteButton, "click", this.onDeleteExtraParameterIconClick, extraparamEl, this);
-         extraparamEl.appendChild(deleteButton);
-
-         this.updateSubmitElements(p_oParameterCtx.configDef);
-      },
-
-      /**
-       * @method onDeleteExtraParameterIconClick
-       * @param p_oEvent {object} The click event
-       * @param p_oExtraparamEl {HTMLSpanElement}
-       */
-      onDeleteExtraParameterIconClick: function RuleConfig_onDeleteExtraParameterIconClick(p_oEvent, p_oExtraparamEl)
-      {
-         p_oExtraparamEl.parentNode.removeChild(p_oExtraparamEl);
-      },
-
-      /**
-       * @method onConfigNameSelectChange
-       * @param p_oEvent {object} The change event
-       * @param p_oObj {object} Contains the ruleConfig and configEl objects
-       */
-      onConfigNameSelectChange: function RuleConfig_onConfigNameSelectChange(p_oEvent, configEl)
-      {
-         this.createConfigParameterUI({}, configEl);
-      },
-
-      /**
-       * @method onAddConfigButtonClick
-       * @param p_oEvent {object} The click event
-       * @param p_eConfig {HTMLDivElement} the config element the button belongs to
-       */
-      onAddConfigButtonClick: function RuleConfig_onAddConfigButtonClick(p_oEvent, p_eConfig)
-      {
-         var configEl = this.createConfigUI({}, this.widgets.selectTemplateEl.cloneNode(true), p_eConfig);
-         this.createConfigParameterUI({}, configEl);
-         this._refreshRemoveButtonState();
-      },
-
-      /**
-       * @method onRemoveConfigButtonClick
-       * @param p_oEvent {object} The click event
-       * @param p_eConfig {HTMLDivElement} the config element the button belongs to
-       */
-      onRemoveConfigButtonClick: function RuleConfig_onRemoveConfigButtonClick(p_oEvent, p_eConfig)
-      {
-         p_eConfig.parentNode.removeChild(p_eConfig);
-         this._refreshRemoveButtonState();
-      },
-
-      /**
-       * @method onDatePickerMandatoryControlValueUpdated
-       * @param layer
-       * @param args
-       */
-      onDatePickerMandatoryControlValueUpdated: function RuleConfig_onDatePickerMandatoryControlValueUpdated(layer, args)
-      {
-         var configDef = this.datePickerConfigDefMap[args[1].id];
-         if (configDef)
-         {
-            this.updateSubmitElements(configDef);
-         }
-      },
-
+      
       /**
        * @method _refreshRemoveButtonState
        */
@@ -866,7 +929,7 @@
          {
             fn:function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -874,7 +937,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -882,7 +945,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -890,7 +953,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -899,7 +962,7 @@
             fn: function (containerEl, paramDef, configDef, value)
             {
                // todo limit validator to int's limit
-               return this.createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.number], value);
+               return this._createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.number], value);
             }
          },
 
@@ -908,7 +971,7 @@
             fn: function (containerEl, paramDef, configDef, value)
             {
                // todo limit validator to long's limit
-               return this.createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.number], value);
+               return this._createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.number], value);
             }
          },
 
@@ -917,7 +980,7 @@
             fn: function (containerEl, paramDef, configDef, value)
             {
                // todo add float validator
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -926,7 +989,7 @@
             fn: function (containerEl, paramDef, configDef, value)
             {
                // todo add double validator
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -934,7 +997,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createDatePicker(containerEl, configDef, paramDef, [], value, false);
+               return this._createDatePicker(containerEl, configDef, paramDef, [], value, false);
             }
          },
 
@@ -942,7 +1005,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createDatePicker(containerEl, configDef, paramDef, [], value, true);
+               return this._createDatePicker(containerEl, configDef, paramDef, [], value, true);
             }
          },
 
@@ -950,7 +1013,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               this.createSelect(containerEl, configDef, paramDef, [
+               this._createSelect(containerEl, configDef, paramDef, [
                   {
                      value: "true",
                      displayLabel: this.msg("label.yes")
@@ -967,7 +1030,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -975,7 +1038,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.nodeRef], value);
+               return this._createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.nodeRef], value);
             }
          },
 
@@ -983,7 +1046,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -1000,7 +1063,7 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          },
 
@@ -1008,58 +1071,72 @@
          {
             fn: function (containerEl, paramDef, configDef, value)
             {
-               return this.createInputText(containerEl, configDef, paramDef, [], value);
+               return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          }
       },
 
+      
       /**
        * RENDERER HELPERS
        */
 
-
-      createInputText: function (containerEl, configDef, paramDef, validators, value)
+      _createInputText: function (containerEl, configDef, paramDef, validators, value)
       {
          if (paramDef._type == "hidden")
          {
-            return this.createInputOfType(containerEl, configDef,paramDef, validators, value, "hidden");
+            return this._createInputOfType(containerEl, configDef,paramDef, validators, value, "hidden");
          }
          else
          {
-            return this.createInputOfType(containerEl, configDef,paramDef, validators, value, "text");
+            return this._createInputOfType(containerEl, configDef,paramDef, validators, value, "text");
          }
       },
 
-      createInputOfType: function (containerEl, configDef, paramDef, validators, value, type)
+      _createInputOfType: function (containerEl, configDef, paramDef, validators, value, type)
       {
          var el = document.createElement("input");
          el.setAttribute("type", type);
          el.setAttribute("name", "-");
+         el.setAttribute("title", paramDef.displayLabel ? paramDef.displayLabel : paramDef.name);
          el.setAttribute("param", paramDef.name);
          el.setAttribute("value", value ? value : "");
          containerEl.appendChild(el);
          if (paramDef.isMandatory)
          {
-            this.addValidation(el, Alfresco.forms.validation.mandatory, configDef);
+            this._addValidation(el, Alfresco.forms.validation.mandatory, configDef);
          }
          for (var i = 0, il = validators ? validators.length : 0; i < il; i++)
          {
-            this.addValidation(el, validators[i], configDef);
+            this._addValidation(el, validators[i], configDef);
          }
          return el;
       },
 
-      createSelect: function (containerEl, configDef, paramDef, constraintOptions, value)
+      _createLabel: function (text, forEl)
+      {
+         if (text && forEl)
+         {
+            var id = forEl.getAttribute("id") ? forEl.getAttribute("id") : Alfresco.util.generateDomId(forEl),
+                  labelEl = document.createElement("label");
+            labelEl.setAttribute("for", id);
+            labelEl.appendChild(document.createTextNode(text + ":"));
+            forEl.parentNode.insertBefore(labelEl, forEl);
+            return labelEl;
+         }
+      },
+      
+      _createSelect: function (containerEl, configDef, paramDef, constraintOptions, value)
       {
          if (paramDef._type == "hidden")
          {
-            // todo Add in custom validator that checks value against constraintOptions
-            return this.createInputOfType(containerEl, configDef, paramDef, [], value, "hidden");
+            return this._createInputOfType(containerEl, configDef, paramDef, [], value, "hidden");
          }
          else
          {
             var selectEl = document.createElement("select");
             selectEl.setAttribute("name", "-");
+            selectEl.setAttribute("title", paramDef.displayLabel ? paramDef.displayLabel : paramDef.name);
             selectEl.setAttribute("param", paramDef.name);
             if (paramDef.isMultiValued)
             {
@@ -1095,16 +1172,16 @@
          }
       },
 
-      createDatePicker: function (containerEl, configDef, paramDef, constraintOptions, value, showTime)
+      _createDatePicker: function (containerEl, configDef, paramDef, constraintOptions, value, showTime)
       {
          if (paramDef._type == "hidden")
          {
             // todo Add in custom validator that checks value against date pattern
-            return this.createInputOfType(containerEl, configDef, paramDef, [], "hidden");
+            return this._createInputOfType(containerEl, configDef, paramDef, [], "hidden");
          }
          else
          {
-            var valueEl = this.createInputOfType(containerEl, configDef, paramDef, [], value, "hidden"),
+            var valueEl = this._createInputOfType(containerEl, configDef, paramDef, [], value, "hidden"),
                   valueId = valueEl.getAttribute("id") ? valueEl.getAttribute("id") : Alfresco.util.generateDomId(valueEl);
             containerEl.appendChild(valueEl);
 
@@ -1122,14 +1199,19 @@
             datePickerIconEl.appendChild(datePickerImgEl);
 
             var displayDateEl = document.createElement("input");
-            displayDateEl.setAttribute("type", "text");            
+            displayDateEl.setAttribute("name", "-");
+            displayDateEl.setAttribute("title", paramDef.displayLabel ? paramDef.displayLabel : paramDef.name);
+            displayDateEl.setAttribute("type", "text");
+            Dom.addClass(displayDateEl, "datepicker-date");
             Alfresco.util.setDomId(displayDateEl, datePickerId + "-date");
             containerEl.appendChild(displayDateEl);
 
             if (showTime)
             {
                var displayTimeEl = document.createElement("input");
+               displayTimeEl.setAttribute("name", "-");
                displayTimeEl.setAttribute("type", "text");
+               Dom.addClass(displayTimeEl, "datepicker-time");
                Alfresco.util.setDomId(displayTimeEl, datePickerId + "-time");            
                containerEl.appendChild(displayTimeEl);
             }
@@ -1150,12 +1232,84 @@
                "form.control.date-picker.entry.time.format": this.msg("form.control.date-picker.entry.time.format"),
                "form.control.date-picker.display.time.format": this.msg("form.control.date-picker.display.time.format")
             });
-            this.datePickerConfigDefMap[datePicker.id] = configDef;
+            this._datePickerConfigDefMap[datePicker.id] = configDef;
             return valueEl;
          }
       },
+      
+      _createButton: function (containerEl, paramDef, configDef, ruleConfig, onClickHandler)
+      {
+         var buttonEl = document.createElement("button");
+         Alfresco.util.generateDomId(buttonEl);
+         containerEl.appendChild(buttonEl);
+         var button = new YAHOO.widget.Button(buttonEl,
+         {
+            type: "button",
+            label: paramDef._buttonLabel
+         });
+         button.on("click", onClickHandler, {
+            configDef: configDef,
+            ruleConfig: ruleConfig,
+            paramDef: paramDef,
+            containerEl: containerEl
+         }, this);
+         return button;
+      },
 
-      addValidation: function (el, validator, configDef)
+      /**
+       * Populate a folder path from a nodeRef.
+       *
+       * @method _createPathSpan
+       * @param containerEl {HTMLelement} Element within which the new span tag will be created
+       * @param id {string} Dom ID to be given to span tag
+       * @param nodeRef {string} NodeRef of folder
+       */
+      _createPathSpan: function (containerEl, id, nodeRef)
+      {
+         var pathEl = document.createElement("span");
+         Dom.setStyle(pathEl, "margin", "0 0.5em");
+         Alfresco.util.setDomId(pathEl, id);
+         if (nodeRef)
+         {
+            pathEl.innerHTML = this.msg("message.loading");
+            // Find the path for the nodeRef
+            Alfresco.util.Ajax.jsonPost(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/forms/picker/items",
+               dataObj:
+               {
+                  items: [nodeRef]
+               },
+               successCallback:
+               {
+                  fn: function (response, pathEl)
+                  {
+                     if (response.json !== undefined)
+                     {
+                        var folderDetails = response.json.data.items[0],
+                           path = $combine(folderDetails.displayPath, folderDetails.name);
+                        pathEl.innerHTML = $html(path);                        
+                     }
+                  },
+                  obj: pathEl,
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function (response, obj)
+                  {
+                     alert('failure');
+                  },
+                  obj: pathEl,
+                  scope: this
+               }
+            });
+         }
+         containerEl.appendChild(pathEl);
+         return pathEl;
+      },
+      
+      _addValidation: function (el, validator, configDef)
       {
          if (el && validator && this.options.form)
          {
@@ -1177,7 +1331,7 @@
                else if (valid && YAHOO.util.Dom.hasClass(args.configDef._id, "invalid"))
                {
                   // Make sure all other fields are valid as well before we display it as valid
-                  if (args.me.validateConfigDef(args.configDef))
+                  if (args.me._validateConfigDef(args.configDef))
                   {
                      YAHOO.util.Dom.removeClass(args.configDef._id, "invalid");
                   }
@@ -1205,16 +1359,17 @@
       /**
        * Will update the forms submit elements
        *
-       * @mehtod updateSubmitElements
+       * @mehtod _updateSubmitElements
        * @param configDef {object} (Optional) Will validate this configDef before updating submit elements
+       * @protected
        */
-      updateSubmitElements: function (configDef)
+      _updateSubmitElements: function (configDef)
       {
          if (this.options.form)
          {
             if (configDef)
             {
-               if (this.validateConfigDef(configDef))
+               if (this._validateConfigDef(configDef))
                {
                   Dom.removeClass(configDef._id, "invalid");
                }
@@ -1227,14 +1382,15 @@
          }
       },
 
-      validateConfigDef: function (configDef)
+      _validateConfigDef: function (configDef)
       {
          if (YAHOO.lang.isArray(configDef._validations))
          {
             for (var i = 0, il = configDef._validations.length, validation; i < il; i++)
             {
                validation = configDef._validations[i];
-               if (!validation.handler(Dom.get(validation.fieldId), validation.args, "keyup", this, true, null))
+               var el = Dom.get(validation.fieldId);
+               if (!el.disabled && !validation.handler(el, validation.args, "keyup", this, true, null))
                {
                   return false;
                }
@@ -1368,20 +1524,7 @@
          }
       },
 
-      _createLabel: function (text, forEl)
-      {
-         if (text && forEl)
-         {
-            var id = forEl.getAttribute("id") ? forEl.getAttribute("id") : Alfresco.util.generateDomId(forEl),
-                  labelEl = document.createElement("label");
-            labelEl.setAttribute("for", id);
-            labelEl.appendChild(document.createTextNode(text + ":"));
-            forEl.parentNode.insertBefore(labelEl, forEl);
-            return labelEl;
-         }
-      },
-
-      hideParameters: function (parameterDefinitions)
+      _hideParameters: function (parameterDefinitions)
       {
          if (parameterDefinitions)
          {
@@ -1391,78 +1534,7 @@
                paramDef._type = "hidden";
             }
          }
-      },
-
-      createButton: function (containerEl, paramDef, configDef, ruleConfig, onClickHandler)
-      {
-         var buttonEl = document.createElement("button");
-         Alfresco.util.generateDomId(buttonEl);
-         containerEl.appendChild(buttonEl);
-         var button = new YAHOO.widget.Button(buttonEl,
-         {
-            type: "button",
-            label: paramDef._buttonLabel
-         });
-         button.on("click", onClickHandler, {
-            configDef: configDef,
-            ruleConfig: ruleConfig,
-            paramDef: paramDef,
-            containerEl: containerEl
-         }, this);
-         return button;
-      },
-
-      /**
-       * Populate a folder path from a nodeRef.
-       *
-       * @method createPathSpan
-       * @param containerEl {HTMLelement} Element within which the new span tag will be created
-       * @param id {string} Dom ID to be given to span tag
-       * @param nodeRef {string} NodeRef of folder
-       */
-      createPathSpan: function (containerEl, id, nodeRef)
-      {
-         var pathEl = document.createElement("span");
-         Dom.setStyle(pathEl, "margin", "0 0.5em");
-         Alfresco.util.setDomId(pathEl, id);
-         if (nodeRef)
-         {
-            pathEl.innerHTML = this.msg("message.loading");
-            // Find the path for the nodeRef
-            Alfresco.util.Ajax.jsonPost(
-            {
-               url: Alfresco.constants.PROXY_URI + "api/forms/picker/items",
-               dataObj:
-               {
-                  items: [nodeRef]
-               },
-               successCallback:
-               {
-                  fn: function (response, pathEl)
-                  {
-                     if (response.json !== undefined)
-                     {
-                        var folderDetails = response.json.data.items[0],
-                           path = $combine(folderDetails.displayPath, folderDetails.name);
-                        pathEl.innerHTML = $html(path);                        
-                     }
-                  },
-                  obj: pathEl,
-                  scope: this
-               },
-               failureCallback:
-               {
-                  fn: function (response, obj)
-                  {
-                     alert('failure');
-                  },
-                  obj: pathEl,
-                  scope: this
-               }
-            });
-         }
-         containerEl.appendChild(pathEl);
-         return pathEl;
       }
+
    });
 })();

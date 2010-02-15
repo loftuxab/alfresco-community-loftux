@@ -47,6 +47,11 @@
    margin-right: 0.25em;
 }
 
+.rule-edit .form-field.description textarea
+{
+   width: 62em;
+}
+
 .rule-edit .form-field.title label,
 .rule-edit .form-field.description label
 {
@@ -57,10 +62,11 @@
 
 .rule-edit h2
 {
-   padding-top: 1em;   
+   padding-top: 1.2em;   
 }
 
 .rule-edit h2,
+.rule-edit .form-field.description,
 .rule-edit .form-field.executeAsynchronously,
 .rule-edit .form-field.scriptLocation,
 .rule-edit .main-buttons
@@ -73,6 +79,7 @@
    padding-bottom: 1em;
 }
 
+.rule-edit .form-field.title,
 .rule-edit .form-field.executeAsynchronously
 {
    padding-bottom: 0.5em;
@@ -100,4 +107,12 @@
 .rule-edit .if .rule-config
 {
    border-bottom: none;
+}
+
+.rule-edit .configuration-separator
+{
+   background-image:url(../images/expanded.png);
+   background-position:center center;
+   background-repeat:no-repeat;
+   padding:1em;
 }

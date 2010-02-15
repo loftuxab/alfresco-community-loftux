@@ -142,13 +142,13 @@
             {
                // Remove the property that was hidden
                this.options.properties.splice(i, 1);
-               this.widgets.selectTemplateEl = this.createSelectMenu();
+               this.widgets.selectTemplateEl = this._createSelectMenu();
             }
             else if (i == il && show)
             {
                // Add the property since it wasn't added before
                this.options.properties.push(newProperty);
-               this.widgets.selectTemplateEl = this.createSelectMenu();
+               this.widgets.selectTemplateEl = this._createSelectMenu();
             }
             else
             {
@@ -208,7 +208,7 @@
       /**
        * Called to get the config for a menu item.
        *
-       * @method getConfigItems
+       * @method _getConfigItems
        * @param itemType
        * @param itemPatternObject
        * @return {array} Menu item objects (as described below) representing a config (or item)
@@ -220,7 +220,7 @@
        * }
        * @override
        */
-      getConfigItems: function RuleConfigCondition_getConfigItems(itemType, itemPatternObject)
+      _getConfigItems: function RuleConfigCondition__getConfigItems(itemType, itemPatternObject)
       {
          if (itemType == "property")
          {
@@ -236,19 +236,19 @@
             }
             return results;
          }
-         return Alfresco.RuleConfigCondition.superclass.getConfigItems.call(this, itemType, itemPatternObject);
+         return Alfresco.RuleConfigCondition.superclass._getConfigItems.call(this, itemType, itemPatternObject);
       },
 
       /**
        * Called to get the constraint options for a constraint.
        *
-       * @method getConstraintValues
+       * @method _getConstraintValues
        * @param p_sConstraintName
        * @param p_oRuleConfig
        * @return {array} rule constraint values
        * @override
        */
-      getConstraintValues: function RuleConfigCondition_getConstraintValues(p_sConstraintName, p_oRuleConfig)
+      _getConstraintValues: function RuleConfigCondition__getConstraintValues(p_sConstraintName, p_oRuleConfig)
       {
          var values = this.options.constraints[p_sConstraintName];
          if (p_oRuleConfig[this.options.ruleConfigDefinitionKey] == this.options.comparePropertyValueDefinition.name)
@@ -383,7 +383,7 @@
 
          if (optionEl.value == this.options.comparePropertyValueDefinition.name)
          {
-            // Don't call super class since we want to invoke createConfigParameterUI our selves
+            // Don't call super class since we want to invoke _createConfigParameterUI our selves
             var ruleConfig = {
                parameterValues:
                {
@@ -391,7 +391,7 @@
                }
             };
             ruleConfig[this.options.ruleConfigDefinitionKey] = optionEl.value;
-            this.createConfigParameterUI(ruleConfig, p_eConfigEl);
+            this._createConfigParameterUI(ruleConfig, p_eConfigEl);
          }
          else
          {
@@ -407,16 +407,16 @@
        * normal menu item type (property) with the specific property name.
        *
        *
-       * @method createConfigUI
+       * @method _createConfigUI
        * @param p_oRuleConfig {object} Rule config descriptor object
        * @param p_oSelectEl {HTMLSelectElement} The select menu to clone and display
        * @param p_eRelativeConfigEl {object}
        * @override
        */
-      createConfigUI: function RuleConfigCondition_createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
+      _createConfigUI: function RuleConfigCondition__createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
       {
          // Super class will handle item & conditions....
-         var configEl = Alfresco.RuleConfigCondition.superclass.createConfigUI.call(this, p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl);
+         var configEl = Alfresco.RuleConfigCondition.superclass._createConfigUI.call(this, p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl);
 
          // ... but if it is a property we need to re-select the config type to select the specific property
          if (p_oRuleConfig[this.options.ruleConfigDefinitionKey] == this.options.comparePropertyValueDefinition.name)
@@ -484,7 +484,7 @@
             currentOpts: {},
             fn: function(configDef, ruleConfig, configEl)
             {
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push(
                {
                   type: "arcc:category-picker"
@@ -501,7 +501,7 @@
             currentOpts: {},
             fn: function(configDef, ruleConfig, configEl)
             {
-               this.hideParameters(configDef.parameterDefinitions);
+               this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push(
                {
                   type: "arcc:tag-picker"
@@ -570,7 +570,7 @@
                             * specific for this config row
                             */
                            var configEl = this.customisations.ShowMore.currentOpts.configEl,
-                              newSelectEl = this.createSelectMenu(),
+                              newSelectEl = this._createSelectMenu(),
                               selectEl = Selector.query('select', configEl)[0];
 
                            // Since we have created a new select menu, the history of previous selections must taken from the old menu
@@ -584,10 +584,10 @@
                            ruleConfig[this.options.ruleConfigDefinitionKey] = this.options.comparePropertyValueDefinition.name;
 
                            // Replace the current configEl and with a new one based on the new ruleConfig
-                           var newConfigEl = this.createConfigUI(ruleConfig, newSelectEl, configEl);
+                           var newConfigEl = this._createConfigUI(ruleConfig, newSelectEl, configEl);
                            this.customisations.ShowMore.currentOpts.configEl = newConfigEl;
                            configEl.parentNode.removeChild(configEl);
-                           this.createConfigParameterUI(ruleConfig, newConfigEl);
+                           this._createConfigParameterUI(ruleConfig, newConfigEl);
 
                            // Restore the properties as they were
                            this.options.properties = tmpProperties;
@@ -617,14 +617,6 @@
 
       renderers:
       {
-         "arcc:person":
-         {
-            fn: function (containerEl, paramDef, configDef, ruleConfig)
-            {
-               alert("person");
-            }
-         },
-
          /**
           * Category Picker
           */
@@ -655,7 +647,7 @@
                         var opts = this.renderers["arcc:category-picker"].currentOpts;
                         this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-aspect", "cm:classifiable");
                         this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-value", obj.selectedItems[0]);
-                        this.updateSubmitElements(opts.configDef);
+                        this._updateSubmitElements(opts.configDef);
                      },
                      scope: this
                   }
@@ -693,7 +685,7 @@
                      {
                         var opts = this.renderers["arcc:tag-picker"].currentOpts;
                         this._setHiddenParameter(opts.configDef, opts.ruleConfig, "tag", obj.selectedItems[0]);
-                        this.updateSubmitElements(opts.configDef);
+                        this._updateSubmitElements(opts.configDef);
                      },
                      scope: this
                   }
