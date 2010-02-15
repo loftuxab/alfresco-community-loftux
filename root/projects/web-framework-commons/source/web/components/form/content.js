@@ -108,6 +108,15 @@
          richMimeTypes: "text/html,text/xhtml",
          
          /**
+          * Comma separated list of mime types that will be shown
+          * using the img tag and allow upload of new versions
+          * 
+          * @property imageMimeTypes
+          * @type string
+          */
+         imageMimeTypes: "image/jpeg,image/jpg,image/png",
+         
+         /**
           * Whether the (plain text) editor should be forced visible, e.g. mimetype unrecognized
           * 
           * @property forceEditor
@@ -130,6 +139,7 @@
                   "', nodeRef = '" + this.options.nodeRef + "', mimetype = '" + this.options.mimeType + "'");
             Alfresco.logger.debug("Configured plain mimetypes for element '" + this.id + "': " + this.options.plainMimeTypes);
             Alfresco.logger.debug("Configured rich mimetypes for element '" + this.id + "': " + this.options.richMimeTypes);
+            Alfresco.logger.debug("Configured image mimetypes for element '" + this.id + "': " + this.options.imageMimeTypes);
             Alfresco.logger.debug("Editor parameters for element '" + this.id + "': " + 
                   YAHOO.lang.dump(this.options.editorParameters));
          }
@@ -176,16 +186,34 @@
                // populate the textarea with the content
                this._populateContent();
             }
+            else if (this._isImageMimeType(contentMimetype))
+            {
+               this._hideField();
+               
+               if (Alfresco.logger.isDebugEnabled())
+                  Alfresco.logger.debug("Hidden field '" + this.id + "' as support for images is not completed yet");
+               
+               // TODO: remove textarea from DOM
+               //       add <img> to field DOM programatically
+               //       add <input type="file" /> to DOM programatically
+               //       make the image height and width configurable
+               //       generate URL to the image using the nodeRef (cmis content webscript?)
+               //       investigate whether the picked image can be shown 
+            }
             else
             {
                this._hideField();
-               Alfresco.logger.debug("Hidden field '" + this.id + "' as the content for the mimetype can not be displayed");
+               
+               if (Alfresco.logger.isDebugEnabled())
+                  Alfresco.logger.debug("Hidden field '" + this.id + "' as the content for the mimetype can not be displayed");
             }
          }
          else
          {
             this._hideField();
-            Alfresco.logger.debug("Hidden field '" + this.id + "' as the mimetype is unknown");
+            
+            if (Alfresco.logger.isDebugEnabled())
+               Alfresco.logger.debug("Hidden field '" + this.id + "' as the mimetype is unknown");
          }
       },
       
@@ -200,7 +228,8 @@
       {
          if (this.options.nodeRef !== null && this.options.nodeRef.length > 0)
          {
-            Alfresco.logger.debug("Retrieving content for field '" + this.id + "' using nodeRef: " + this.options.nodeRef);
+            if (Alfresco.logger.isDebugEnabled())
+               Alfresco.logger.debug("Retrieving content for field '" + this.id + "' using nodeRef: " + this.options.nodeRef);
             
             // success handler, show the content
             var onSuccess = function ContentControl_populateContent_onSuccess(response)
@@ -222,7 +251,9 @@
             {
                // hide the whole field so incorrect content does not get re-submitted
                this._hideField();
-               Alfresco.logger.debug("Hidden field '" + this.id + "' as content retrieval failed");
+               
+               if (Alfresco.logger.isDebugEnabled())
+                  Alfresco.logger.debug("Hidden field '" + this.id + "' as content retrieval failed");
             };
             
             // attempt to retrieve content
@@ -246,7 +277,9 @@
          else if (this.options.formMode !== "create")
          {
             this._hideField();
-            Alfresco.logger.debug("Hidden field '" + this.id + "' as the nodeRef parameter is missing");
+            
+            if (Alfresco.logger.isDebugEnabled())
+               Alfresco.logger.debug("Hidden field '" + this.id + "' as the nodeRef parameter is missing");
          }
       },
       
@@ -281,7 +314,9 @@
             result = this.options.mimeType;
          }
          
-         Alfresco.logger.debug("Determined mimetype: " + result);
+         if (Alfresco.logger.isDebugEnabled())
+            Alfresco.logger.debug("Determined mimetype: " + result);
+         
          return result;
       },
       
@@ -302,7 +337,9 @@
             result = true;
          }
          
-         Alfresco.logger.debug("Testing whether '" + mimetype + "' is a configured rich mimetype: " + result);
+         if (Alfresco.logger.isDebugEnabled())
+            Alfresco.logger.debug("Testing whether '" + mimetype + "' is a configured rich mimetype: " + result);
+         
          return result;
       },
       
@@ -323,7 +360,32 @@
             result = true;
          }
          
-         Alfresco.logger.debug("Testing whether '" + mimetype + "' is a configured plain mimetype: " + result);
+         if (Alfresco.logger.isDebugEnabled())
+            Alfresco.logger.debug("Testing whether '" + mimetype + "' is a configured plain mimetype: " + result);
+         
+         return result;
+      },
+      
+      /**
+       * Determines whether the given mimetype is a configured 'image' mimetype.
+       * 
+       * @method _isImageMimeType
+       * @param mimetype {string} The mimetype to check
+       * @return true if the given mimetype is an 'image' mimetype
+       */
+      _isImageMimeType: function ContentControl__isImageMimeType(mimetype)
+      {
+         var result = false;
+         
+         if (this.options.imageMimeTypes !== null && this.options.imageMimeTypes.length > 0 &&
+             this.options.imageMimeTypes.indexOf(mimetype) != -1)
+         {
+            result = true;
+         }
+         
+         if (Alfresco.logger.isDebugEnabled())
+            Alfresco.logger.debug("Testing whether '" + mimetype + "' is a configured image mimetype: " + result);
+         
          return result;
       },
       
