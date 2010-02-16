@@ -1147,6 +1147,7 @@
             classname="org.alfresco.util.ContextDependencyLister" 
             dir="." >
          <classpath refid="classpath.unit.test" />
+         <classpath path="${ant.core.lib}" />
          <arg line="${context}" />
       </java> 
    </target> 
