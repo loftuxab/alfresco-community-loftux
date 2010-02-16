@@ -2106,7 +2106,7 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 			conn = getConnection();
 			stmt = conn.createStatement();
 
-			String sql = "SELECT SUM(FileSize) FROM " + getFileSysTableName();
+			String sql = "SELECT SUM(CAST(FileSize as BIGINT)) FROM " + getFileSysTableName();
 
 			// DEBUG
 

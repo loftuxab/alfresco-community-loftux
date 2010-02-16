@@ -2313,7 +2313,7 @@ public class OracleDBInterface extends JdbcDBInterface implements DBQueueInterfa
 			conn = getConnection();
 			stmt = conn.createStatement();
 
-			String sql = "SELECT SUM(FileSize) FROM " + getFileSysTableName();
+			String sql = "SELECT SUM(CAST(FileSize AS BIGINT)) FROM " + getFileSysTableName();
 			
       //	DEBUG
       
