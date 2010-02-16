@@ -93,31 +93,31 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
   //	Debug flags
 
-  public static final int DBG_RXDATA 		= 0x00000001; //	Received data
-  public static final int DBG_TXDATA 		= 0x00000002; //	Transmit data
+  public static final int DBG_RXDATA 	= 0x00000001; //	Received data
+  public static final int DBG_TXDATA 	= 0x00000002; //	Transmit data
   public static final int DBG_DUMPDATA 	= 0x00000004; //	Dump data packets
-  public static final int DBG_SEARCH 		= 0x00000008; //	File/directory search
-  public static final int DBG_INFO 			= 0x00000010; //	Information requests
-  public static final int DBG_FILE 			= 0x00000020; //	File open/close/info
-  public static final int DBG_FILEIO 		= 0x00000040; // 	File read/write
-  public static final int DBG_ERROR 		= 0x00000080; //	Errors
-  public static final int DBG_TIMING 		= 0x00000100; //	Time packet processing
+  public static final int DBG_SEARCH 	= 0x00000008; //	File/directory search
+  public static final int DBG_INFO 		= 0x00000010; //	Information requests
+  public static final int DBG_FILE 		= 0x00000020; //	File open/close/info
+  public static final int DBG_FILEIO 	= 0x00000040; // 	File read/write
+  public static final int DBG_ERROR 	= 0x00000080; //	Errors
+  public static final int DBG_TIMING 	= 0x00000100; //	Time packet processing
   public static final int DBG_DIRECTORY = 0x00000200; //	Directory commands
   public static final int DBG_SESSION 	= 0x00000400; //	Session creation/deletion
 
   //	Unix path seperator
 
-  public static final String UNIX_SEPERATOR = "/";
-  public static final char UNIX_SEPERATOR_CHAR = '/';
-  public static final String DOS_SEPERATOR = "\\";
-  public static final char DOS_SEPERATOR_CHAR = '\\';
+  public static final String UNIX_SEPERATOR 	= "/";
+  public static final char UNIX_SEPERATOR_CHAR 	= '/';
+  public static final String DOS_SEPERATOR 		= "\\";
+  public static final char DOS_SEPERATOR_CHAR 	= '\\';
 
   //	Constants
   //
   //	Unix file modes
 
   public static final int MODE_STFILE 			= 0100000;
-  public static final int MODE_STDIR 				= 0040000;
+  public static final int MODE_STDIR 			= 0040000;
   public static final int MODE_STREAD 			= 0000555;
   public static final int MODE_STWRITE 			= 0000333;
   public static final int MODE_DIR_DEFAULT 	= MODE_STDIR + (MODE_STREAD | MODE_STWRITE);
@@ -133,8 +133,8 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
   //	Cookie ids for . and .. directory entries
 
-  public static final long COOKIE_DOT_DIRECTORY = 0x00FFFFFFL;
-  public static final long COOKIE_DOTDOT_DIRECTORY = 0x00FFFFFEL;
+  public static final long COOKIE_DOT_DIRECTORY 	= 0x00FFFFFFL;
+  public static final long COOKIE_DOTDOT_DIRECTORY 	= 0x00FFFFFEL;
 
   //	ReadDir and ReadDirPlus reply header and per file fixed structure lengths.
   //
@@ -143,12 +143,12 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
   public final static int READDIRPLUS_HEADER_LENGTH 	= 108;
   public final static int READDIRPLUS_ENTRY_LENGTH 		= 200;
-  public final static int READDIR_HEADER_LENGTH 			= 108;
-  public final static int READDIR_ENTRY_LENGTH 				= 24;
+  public final static int READDIR_HEADER_LENGTH 		= 108;
+  public final static int READDIR_ENTRY_LENGTH 			= 24;
 
   //	File id offset
   
-  public static final long FILE_ID_OFFSET							= 2L;
+  public static final long FILE_ID_OFFSET				= 2L;
   
   //	Maximum request size to accept
 
@@ -162,7 +162,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
   public static final int MaxWriteSize 				= MaxRequestSize;
   public static final int PrefWriteSize 			= MaxRequestSize;
   public static final int MultWriteSize 			= 4096;
-  public static final int PrefReadDirSize 		= 8192;
+  public static final int PrefReadDirSize 			= 8192;
   public static final long MaxFileSize 				= 0x01FFFFFFF000L;
 
   //	Thread pool and packet pool defaults
@@ -255,6 +255,10 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
       //	Generate the write verifier
       
       m_writeVerifier = System.currentTimeMillis();
+		
+	  // Set the port mapper port
+		
+      setPortMapper( getNFSConfiguration().getPortMapperPort());
     }
     else
       setEnabled( false);
@@ -476,142 +480,143 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
     switch (rpc.getProcedureId()) {
 
-    //	Null request
-
-    case NFS.ProcNull:
-      response = procNull(nfsSess, rpc);
-      break;
-
-    // Get attributes request
-
-    case NFS.ProcGetAttr:
-      response = procGetAttr(nfsSess, rpc);
-      break;
-
-    //	Set attributes request
-
-    case NFS.ProcSetAttr:
-      response = procSetAttr(nfsSess, rpc);
-      break;
-
-    //	Lookup request
-
-    case NFS.ProcLookup:
-      response = procLookup(nfsSess, rpc);
-      break;
-
-    //	Access request
-
-    case NFS.ProcAccess:
-      response = procAccess(nfsSess, rpc);
-      break;
-
-    //	Read symbolic link request
-
-    case NFS.ProcReadLink:
-      response = procReadLink(nfsSess, rpc);
-      break;
-
-    //	Read file request
-
-    case NFS.ProcRead:
-      response = procRead(nfsSess, rpc);
-      break;
-
-    //	Write file request
-
-    case NFS.ProcWrite:
-      response = procWrite(nfsSess, rpc);
-      break;
-
-    //	Create file request
-
-    case NFS.ProcCreate:
-      response = procCreate(nfsSess, rpc);
-      break;
-
-    //	Create directory request
-
-    case NFS.ProcMkDir:
-      response = procMkDir(nfsSess, rpc);
-      break;
-
-    //	Create symbolic link request
-
-    case NFS.ProcSymLink:
-      response = procSymLink(nfsSess, rpc);
-      break;
-
-    //	Create special device request
-
-    case NFS.ProcMkNode:
-      response = procMkNode(nfsSess, rpc);
-      break;
-
-    //	Delete file request
-
-    case NFS.ProcRemove:
-      response = procRemove(nfsSess, rpc);
-      break;
-
-    //	Delete directory request
-
-    case NFS.ProcRmDir:
-      response = procRmDir(nfsSess, rpc);
-      break;
-
-    //	Rename request
-
-    case NFS.ProcRename:
-      response = procRename(nfsSess, rpc);
-      break;
-
-    //	Create hard link request
-
-    case NFS.ProcLink:
-      response = procLink(nfsSess, rpc);
-      break;
-
-    //	Read directory request
-
-    case NFS.ProcReadDir:
-      response = procReadDir(nfsSess, rpc);
-      break;
-
-    //	Read directory plus request
-
-    case NFS.ProcReadDirPlus:
-      response = procReadDirPlus(nfsSess, rpc);
-      break;
-
-    //	Filesystem status request
-
-    case NFS.ProcFsStat:
-      response = procFsStat(nfsSess, rpc);
-      break;
-
-    //	Filesystem information request
-
-    case NFS.ProcFsInfo:
-      response = procFsInfo(nfsSess, rpc);
-      break;
-
-    //	Retrieve POSIX information request
-
-    case NFS.ProcPathConf:
-      response = procPathConf(nfsSess, rpc);
-      break;
-
-    //	Commit request
-
-    case NFS.ProcCommit:
-      response = procCommit(nfsSess, rpc);
-      break;
+	    //	Null request
+	
+	    case NFS.ProcNull:
+	      response = procNull(nfsSess, rpc);
+	      break;
+	
+	    // Get attributes request
+	
+	    case NFS.ProcGetAttr:
+	      response = procGetAttr(nfsSess, rpc);
+	      break;
+	
+	    //	Set attributes request
+	
+	    case NFS.ProcSetAttr:
+	      response = procSetAttr(nfsSess, rpc);
+	      break;
+	
+	    //	Lookup request
+	
+	    case NFS.ProcLookup:
+	      response = procLookup(nfsSess, rpc);
+	      break;
+	
+	    //	Access request
+	
+	    case NFS.ProcAccess:
+	      response = procAccess(nfsSess, rpc);
+	      break;
+	
+	    //	Read symbolic link request
+	
+	    case NFS.ProcReadLink:
+	      response = procReadLink(nfsSess, rpc);
+	      break;
+	
+	    //	Read file request
+	
+	    case NFS.ProcRead:
+	      response = procRead(nfsSess, rpc);
+	      break;
+	
+	    //	Write file request
+	
+	    case NFS.ProcWrite:
+	      response = procWrite(nfsSess, rpc);
+	      break;
+	
+	    //	Create file request
+	
+	    case NFS.ProcCreate:
+	      response = procCreate(nfsSess, rpc);
+	      break;
+	
+	    //	Create directory request
+	
+	    case NFS.ProcMkDir:
+	      response = procMkDir(nfsSess, rpc);
+	      break;
+	
+	    //	Create symbolic link request
+	
+	    case NFS.ProcSymLink:
+	      response = procSymLink(nfsSess, rpc);
+	      break;
+	
+	    //	Create special device request
+	
+	    case NFS.ProcMkNode:
+	      response = procMkNode(nfsSess, rpc);
+	      break;
+	
+	    //	Delete file request
+	
+	    case NFS.ProcRemove:
+	      response = procRemove(nfsSess, rpc);
+	      break;
+	
+	    //	Delete directory request
+	
+	    case NFS.ProcRmDir:
+	      response = procRmDir(nfsSess, rpc);
+	      break;
+	
+	    //	Rename request
+	
+	    case NFS.ProcRename:
+	      response = procRename(nfsSess, rpc);
+	      break;
+	
+	    //	Create hard link request
+	
+	    case NFS.ProcLink:
+	      response = procLink(nfsSess, rpc);
+	      break;
+	
+	    //	Read directory request
+	
+	    case NFS.ProcReadDir:
+	      response = procReadDir(nfsSess, rpc);
+	      break;
+	
+	    //	Read directory plus request
+	
+	    case NFS.ProcReadDirPlus:
+	      response = procReadDirPlus(nfsSess, rpc);
+	      break;
+	
+	    //	Filesystem status request
+	
+	    case NFS.ProcFsStat:
+	      response = procFsStat(nfsSess, rpc);
+	      break;
+	
+	    //	Filesystem information request
+	
+	    case NFS.ProcFsInfo:
+	      response = procFsInfo(nfsSess, rpc);
+	      break;
+	
+	    //	Retrieve POSIX information request
+	
+	    case NFS.ProcPathConf:
+	      response = procPathConf(nfsSess, rpc);
+	      break;
+	
+	    //	Commit request
+	
+	    case NFS.ProcCommit:
+	      response = procCommit(nfsSess, rpc);
+	      break;
     }
 
     // Commit/rollback a transaction that the filesystem driver may have stored in the session
-    
-    nfsSess.endTransaction();
+
+    if ( nfsSess != null)
+    	nfsSess.endTransaction();
     
     //	Dump the response
 
@@ -1040,7 +1045,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     byte[] handle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(handle);
 
-    String fileName = rpc.unpackString();
+    String fileName = rpc.unpackUTF8String();
     
 		//	DEBUG
 
@@ -1757,7 +1762,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     byte[] handle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(handle);
 
-    String fileName = rpc.unpackString();
+    String fileName = rpc.unpackUTF8String();
     
     int createMode = rpc.unpackInt();
 
@@ -1766,12 +1771,12 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     if (Debug.EnableInfo && hasDebugFlag(DBG_FILE))
       sess.debugPrintln("Create request from " + rpc.getClientDetails() + ", name=" + fileName);
 
-		//	Check if the handle is valid
+	//	Check if the handle is valid
 		
-		if (NFSHandle.isValid(handle) == false) {
-		  rpc.buildErrorResponse(NFS.StsBadHandle);
-			return rpc;
-		}
+	if (NFSHandle.isValid(handle) == false) {
+		rpc.buildErrorResponse(NFS.StsBadHandle);
+		return rpc;
+	}
 		
     //	Call the disk share driver to create the new file
 
@@ -1829,14 +1834,14 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
         int uid = -1;
         int mode = -1;
 
-				if (rpc.unpackInt() == Rpc.True)
-					mode = rpc.unpackInt();
+		if (rpc.unpackInt() == Rpc.True)
+			mode = rpc.unpackInt();
 
-				if (rpc.unpackInt() == Rpc.True)
-					uid = rpc.unpackInt();
+		if (rpc.unpackInt() == Rpc.True)
+			uid = rpc.unpackInt();
 
-				if (rpc.unpackInt() == Rpc.True)
-					gid = rpc.unpackInt();
+		if (rpc.unpackInt() == Rpc.True)
+			gid = rpc.unpackInt();
 
         //	Create a new file
 
@@ -1952,7 +1957,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     byte[] handle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(handle);
 
-    String dirName = rpc.unpackString();
+    String dirName = rpc.unpackUTF8String();
    
 		//	DEBUG
 
@@ -2131,7 +2136,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     byte[] handle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(handle);
 
-    String fileName = rpc.unpackString();
+    String fileName = rpc.unpackUTF8String();
 
     //  Check if the handle is valid
     
@@ -2423,7 +2428,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     byte[] handle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(handle);
 
-    String fileName = rpc.unpackString();
+    String fileName = rpc.unpackUTF8String();
     
 		//	DEBUG
 
@@ -2568,7 +2573,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     byte[] handle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(handle);
 
-    String dirName = rpc.unpackString();
+    String dirName = rpc.unpackUTF8String();
    
 		//	DEBUG
 
@@ -2719,12 +2724,12 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     byte[] fromHandle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(fromHandle);
 
-    String fromName = rpc.unpackString();
+    String fromName = rpc.unpackUTF8String();
     
     byte[] toHandle = new byte[NFS.FileHandleSize];
     rpc.unpackByteArrayWithLength(toHandle);
 
-    String toName = rpc.unpackString();
+    String toName = rpc.unpackUTF8String();
     
 		//	DEBUG
 
@@ -3168,7 +3173,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
 			  rpc.packInt(Rpc.True);
 				rpc.packLong(finfo.getFileIdLong() + FILE_ID_OFFSET);
-				rpc.packString(finfo.getFileName());
+				rpc.packUTF8String(finfo.getFileName());
 				rpc.packLong(search.getResumeId() + searchMask);
 
 				//	Check if the relative path should be added to the file id cache
@@ -3513,7 +3518,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
 				rpc.packInt(Rpc.True);
 				rpc.packLong(finfo.getFileIdLong() + FILE_ID_OFFSET);
-				rpc.packString(finfo.getFileName());
+				rpc.packUTF8String(finfo.getFileName());
 				rpc.packLong(search.getResumeId() + searchMask);
 
 				//	Fill in the file attributes
@@ -4053,43 +4058,45 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     //  for an existing session
 
     int authType = rpc.getCredentialsType();
-    
-    //	Authenticate the request
-    
-    Object sessKey = getRpcAuthenticator().authenticateRpcClient(authType, rpc);
-    
+
+    boolean authFailed = true;
     NFSSrvSession sess = null;
-
-    switch (authType) {
-
-    //	Null authentication
-
-    case AuthType.Null:
-      sess = findAuthNullSession(rpc, sessKey);
-      break;
-
-    //	Unix authentication
-
-    case AuthType.Unix:
-      sess = findAuthUnixSession(rpc, sessKey);
-      break;
-    }
-
-    // DEBUG
     
-    if ( Debug.EnableDbg && hasDebugFlag( DBG_SESSION))
-    	Debug.println("[NFS] Found session " + sess);
-    
-    // Setup the authentication context for the request
-    
-    try
-    {
-      getRpcAuthenticator().setCurrentUser( sess, sess.getClientInformation());
+    try {
+    	
+	    //	Authenticate the request
+	    
+	    Object sessKey = getRpcAuthenticator().authenticateRpcClient(authType, rpc);
+	    
+	    switch (authType) {
+	
+		    //	Null authentication
+		
+		    case AuthType.Null:
+		      sess = findAuthNullSession(rpc, sessKey);
+		      break;
+		
+		    //	Unix authentication
+		
+		    case AuthType.Unix:
+		      sess = findAuthUnixSession(rpc, sessKey);
+		      break;
+	    }
+	
+	    // DEBUG
+	    
+	    if ( Debug.EnableDbg && hasDebugFlag( DBG_SESSION))
+	    	Debug.println("[NFS] Found session " + sess);
+
+	    // Setup the user context for this request
+	    
+	    if ( sess != null) {
+		    getRpcAuthenticator().setCurrentUser( sess, sess.getClientInformation());
+		    authFailed = false;
+	    }
     }
     catch ( Throwable ex)
     {
-      sess = null;
-
       // DEBUG
 
       if (Debug.EnableError && hasDebugFlag(DBG_ERROR))
@@ -4098,8 +4105,14 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
     // Check if the session is valid
 
-    if ( sess == null)
-      throw new RpcAuthenticationException(Rpc.AuthBadCred);
+    if ( authFailed) {
+    	
+    	// Check if the request is a Null request
+    	
+    	rpc.positionAtParameters();
+    	if ( rpc.getProcedureId() != NFS.ProcNull)
+    		throw new RpcAuthenticationException(Rpc.AuthBadCred);
+    }
     
     //	Return the server session
 

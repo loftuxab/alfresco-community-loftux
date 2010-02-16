@@ -615,15 +615,23 @@ public class XMLServerConfiguration extends CifsOnlyXMLServerConfiguration {
 
 		// Check for a port mapper server port
 
-		elem = findChildNode("PortMapperPort", nfs.getChildNodes());
-		if ( elem != null) {
-			try {
-				nfsConfig.setPortMapperPort(Integer.parseInt(getText(elem)));
-				if ( nfsConfig.getPortMapperPort() <= 0 || nfsConfig.getPortMapperPort() >= 65535)
-					throw new InvalidConfigurationException("Port mapper server port out of valid range");
-			}
-			catch (NumberFormatException ex) {
-				throw new InvalidConfigurationException("Invalid port mapper server port");
+		if ( findChildNode("disablePortMapperRegistration", nfs.getChildNodes()) != null) {
+			
+			// Disable port mapper registration for the mount/NFS servers
+			
+			nfsConfig.setPortMapperPort( -1);
+		}
+		else {
+			elem = findChildNode("PortMapperPort", nfs.getChildNodes());
+			if ( elem != null) {
+				try {
+					nfsConfig.setPortMapperPort(Integer.parseInt(getText(elem)));
+					if ( nfsConfig.getPortMapperPort() <= 0 || nfsConfig.getPortMapperPort() >= 65535)
+						throw new InvalidConfigurationException("Port mapper server port out of valid range");
+				}
+				catch (NumberFormatException ex) {
+					throw new InvalidConfigurationException("Invalid port mapper server port");
+				}
 			}
 		}
 

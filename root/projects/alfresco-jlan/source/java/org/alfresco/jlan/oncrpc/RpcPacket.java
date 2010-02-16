@@ -25,9 +25,11 @@
 
 package org.alfresco.jlan.oncrpc;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 
 import org.alfresco.jlan.util.DataPacker;
+import org.alfresco.jlan.util.UTF8Normalizer;
 
 /**
  * ONC/RPC Request/Response Packet Class
@@ -44,12 +46,16 @@ public class RpcPacket {
   
   //	Fragment header length
   
-  public static final int FragHeaderLen				= 4;
+  public static final int FragHeaderLen			= 4;
   
   //	Fixed packet lengths
   
   public static final int ResponseMismatchLen	= 24;
   public static final int ResponseAuthFailLen	= 20;
+  
+  // UTF-8 string normalizer
+  
+  private static UTF8Normalizer _utf8Normalizer = new UTF8Normalizer();
   
   //	RPC data buffer
   
@@ -98,11 +104,11 @@ public class RpcPacket {
 
     //	Allocate the RPC buffer
   
-	  m_buffer = new byte[len + FragHeaderLen];
+	m_buffer = new byte[len + FragHeaderLen];
     m_offset = FragHeaderLen;
 	  
-	  m_pos    = FragHeaderLen;
-	  m_endPos = m_buffer.length;
+	m_pos    = FragHeaderLen;
+	m_endPos = m_buffer.length;
   }
   
   /**
@@ -575,6 +581,30 @@ public class RpcPacket {
   }
   
   /**
+   * Pack a UTF-8 string
+   * 
+   * @param str String
+   */
+  public final void packUTF8String(String str) {
+	byte[] strByts = null;
+	
+	try {
+		if ( str != null)
+			strByts = str.getBytes( "UTF-8");
+	}
+	catch (Exception ex) {
+	}
+
+	DataPacker.putInt(strByts != null ? strByts.length : 0, m_buffer, m_pos);
+    m_pos += 4;
+    if ( str != null) {
+        System.arraycopy(strByts, 0, m_buffer, m_pos, strByts.length);
+        m_pos += strByts.length;
+        alignPosition();
+    }
+  }
+  
+  /**
    * Pack a port mapping structure
    * 
    * @param portMap PortMapping
@@ -621,6 +651,59 @@ public class RpcPacket {
     String str = "";
     if ( len > 0) {
       str = DataPacker.getString(m_buffer, m_pos, len);
+      m_pos += len;
+      alignPosition();
+    }
+    
+    return str;
+  }
+
+  /**
+   * Unpack a UTF-8 string
+   * 
+   * @return String
+   */
+  public final String unpackUTF8String() {
+    int len = unpackInt();
+
+    String str = "";
+    if ( len > 0) {
+    	
+      // Check for any bytes with the high bit set, run the string through
+      // the UTF-8 normalizer if any are found
+      
+      boolean utf8 = false;
+      int idx = 0;
+      
+      while ( utf8 == false && idx < len) {
+    	  if ((( int) m_buffer[m_pos + idx] & 0x80) != 0)
+    		  utf8 = true;
+    	  else
+    		  idx++;
+      }
+
+      // Normalize the UTF-8 bytes
+      
+      if ( utf8 == true) {
+    	  
+    	  // Create a UTF8 string and normalize
+
+    	  try {
+	    	  str = new String( m_buffer, m_pos, len, "UTF8");
+	    	  str = _utf8Normalizer.normalize( str);
+    	  }
+    	  catch ( UnsupportedEncodingException ex) {
+    	  }
+      }
+      else {
+      
+	      // Unpack the bytes into a string
+	  	
+	      str = DataPacker.getString(m_buffer, m_pos, len);
+      }
+      
+      // Update the buffer position
+    	  
       m_pos += len;
       alignPosition();
     }

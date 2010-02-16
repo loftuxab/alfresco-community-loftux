@@ -79,7 +79,7 @@ public class MountServer extends RpcNetworkServer implements RpcProcessor {
 	public static final String UNIX_SEPERATOR 		= "/";
 	public static final char UNIX_SEPERATOR_CHAR 	= '/';
 
-	public static final String DOS_SEPERATOR 			= "\\";
+	public static final String DOS_SEPERATOR 		= "\\";
 	public static final char DOS_SEPERATOR_CHAR 	= '\\';
 	
   //  Configuration sections
@@ -118,22 +118,26 @@ public class MountServer extends RpcNetworkServer implements RpcProcessor {
 		
 		setVersion(ServerVersion);
 
-    //  Get the NFS configuration
+		//  Get the NFS configuration
     
-    m_nfsConfig = (NFSConfigSection) config.getConfigSection( NFSConfigSection.SectionName);
+		m_nfsConfig = (NFSConfigSection) config.getConfigSection( NFSConfigSection.SectionName);
     
-    if ( m_nfsConfig != null) {
+		if ( m_nfsConfig != null) {
       
-  		//	Enable/disable debug output
-  
-  		setDebug( getNFSConfiguration().hasMountServerDebug());
-  		
-  		//	Set the port to bind the server to
-  		
-  		setPort( getNFSConfiguration().getMountServerPort());
-    }
-    else
-      setEnabled( false);
+	  		//	Enable/disable debug output
+	  
+	  		setDebug( getNFSConfiguration().hasMountServerDebug());
+	  		
+	  		//	Set the port to bind the server to
+	  		
+	  		setPort( getNFSConfiguration().getMountServerPort());
+	  		
+	  		// Set the port mapper port
+	  		
+	  		setPortMapper( getNFSConfiguration().getPortMapperPort());
+	    }
+	    else
+	    	setEnabled( false);
 	}
 
 	/**
@@ -302,22 +306,29 @@ public class MountServer extends RpcNetworkServer implements RpcProcessor {
       return rpc;
     }
     
-    //	Authenticate the request
+    //	Authenticate the request, unless it is a null request
+    
+    rpc.positionAtParameters();
+    int procId = rpc.getProcedureId();
     
     NFSSrvSession sess = null;
     
-    try {
-    
-      //	Create a temporary session for the request
-      
-      sess = createTemporarySession(rpc);
-    }
-    catch (RpcAuthenticationException ex) {
-      
-      //	Failed to authenticate the RPC client
-      
-      rpc.buildAuthFailResponse(ex.getAuthenticationErrorCode());
-      return rpc;
+    if (( version == Mount.VersionId1 && procId == Mount.ProcNull1) == false &&
+    		(version == Mount.VersionId3 && procId == Mount.ProcNull3) == false) {
+    	
+	    try {
+	    
+	      //	Create a temporary session for the request
+	      
+	      sess = createTemporarySession(rpc);
+	    }
+	    catch (RpcAuthenticationException ex) {
+	      
+	      //	Failed to authenticate the RPC client
+	      
+	      rpc.buildAuthFailResponse(ex.getAuthenticationErrorCode());
+	      return rpc;
+	    }
     }
     
     //	Position the RPC buffer pointer at the start of the call parameters

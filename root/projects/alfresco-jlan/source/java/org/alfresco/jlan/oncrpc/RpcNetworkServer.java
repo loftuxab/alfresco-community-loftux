@@ -43,6 +43,10 @@ import org.alfresco.jlan.server.config.ServerConfiguration;
  */
 public abstract class RpcNetworkServer extends NetworkServer implements RpcProcessor {
 
+	// Port mapper port
+	
+	private int m_portMapperPort = PortMapper.DefaultPort;
+	
 	/**
 	 * Class constructor
 	 *
@@ -79,11 +83,16 @@ public abstract class RpcNetworkServer extends NetworkServer implements RpcProce
 	protected final void registerRPCServer(PortMapping[] mappings)
 		throws IOException {
 
+	  // Check if portmapper registration has been disabled
+		
+	  if ( m_portMapperPort == -1)
+		  return;
+	  
 	  //	Connect to the local portmapper service to register the RPC service
 	  
 	  InetAddress localHost = InetAddress.getByName("127.0.0.1");
 	  
-	  TcpRpcClient rpcClient = new TcpRpcClient(localHost, PortMapper.DefaultPort, 512);
+	  TcpRpcClient rpcClient = new TcpRpcClient(localHost, m_portMapperPort, 512);
 	  
 	  //	Allocate RPC request and response packets
 	  
@@ -145,11 +154,16 @@ public abstract class RpcNetworkServer extends NetworkServer implements RpcProce
 	protected final void unregisterRPCServer(PortMapping[] mappings)
 		throws IOException {
 	  
+	  // Check if portmapper registration has been disabled
+	
+	  if ( m_portMapperPort == -1)
+		  return;
+		  
     //  Connect to the local portmapper service to unregister the RPC service
     
     InetAddress localHost = InetAddress.getByName("127.0.0.1");
     
-    TcpRpcClient rpcClient = new TcpRpcClient(localHost, PortMapper.DefaultPort, 512);
+    TcpRpcClient rpcClient = new TcpRpcClient(localHost, m_portMapperPort, 512);
     
     //  Allocate RPC request and response packets
     
@@ -183,6 +197,15 @@ public abstract class RpcNetworkServer extends NetworkServer implements RpcProce
       if ( Debug.EnableInfo && hasDebug())
         Debug.println("[" + getProtocolName() + "] UnRegister response " + rxRpc.toString());
     }
+	}
+	
+	/**
+	 * Set the port mapper port, or -1 to disable portmapper registration
+	 * 
+	 * @param port int
+	 */
+	public final void setPortMapper( int port) {
+		m_portMapperPort = port;
 	}
 	
   /**
