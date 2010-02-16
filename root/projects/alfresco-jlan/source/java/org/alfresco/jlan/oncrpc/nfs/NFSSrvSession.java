@@ -48,7 +48,7 @@ public class NFSSrvSession extends SrvSession {
 	//	Default and maximum number of search slots
 
 	private static final int DefaultSearches 	= 32;
-	private static final int MaxSearches 			= 256;
+	private static final int MaxSearches 		= 256;
 
 	//	Remote address and port
 	
@@ -148,12 +148,14 @@ public class NFSSrvSession extends SrvSession {
       
       NFSConfigSection config = getNFSServer().getNFSConfiguration();
       
-      m_fileCache.setDebug( config.hasNFSFileCacheDebug());
+      m_fileCache.setDebug( hasDebug( NFSServer.DBG_FILE));
       
       if ( config.getNFSFileCacheIOTimer() > 0)
         m_fileCache.setIOTimer( config.getNFSFileCacheIOTimer());
       if ( config.getNFSFileCacheCloseTimer() > 0)
         m_fileCache.setCloseTimer( config.getNFSFileCacheCloseTimer());
+      
+      m_fileCache.setRpcAuthenticator( config.getRpcAuthenticator());
     }
     
     // Return the file cache

@@ -34,71 +34,71 @@ public final class NFS {
 
   //	Default NFS server port
   
-  public static final int DefaultPort			= 2049;
+  public static final int DefaultPort		= 2049;
   
   //	Program and version id
   
-  public static final int ProgramId				= 100003;
-  public static final int VersionId				= 3; 
+  public static final int ProgramId			= 100003;
+  public static final int VersionId			= 3; 
     
   //	RPC procedure ids
   
-  public static final int ProcNull				= 0;
-  public static final int ProcGetAttr			= 1;
-  public static final int ProcSetAttr			= 2;
-  public static final int ProcLookup			= 3;
-  public static final int ProcAccess			= 4;
+  public static final int ProcNull			= 0;
+  public static final int ProcGetAttr		= 1;
+  public static final int ProcSetAttr		= 2;
+  public static final int ProcLookup		= 3;
+  public static final int ProcAccess		= 4;
   public static final int ProcReadLink		= 5;
-  public static final int ProcRead				= 6;
-  public static final int ProcWrite				= 7;
-  public static final int ProcCreate			= 8;
-  public static final int ProcMkDir				= 9;
-  public static final int ProcSymLink			= 10;
-  public static final int ProcMkNode			= 11;
-  public static final int ProcRemove			= 12;
-  public static final int ProcRmDir				= 13;
-  public static final int ProcRename			= 14;
-  public static final int ProcLink				= 15;
-  public static final int ProcReadDir			= 16;
+  public static final int ProcRead			= 6;
+  public static final int ProcWrite			= 7;
+  public static final int ProcCreate		= 8;
+  public static final int ProcMkDir			= 9;
+  public static final int ProcSymLink		= 10;
+  public static final int ProcMkNode		= 11;
+  public static final int ProcRemove		= 12;
+  public static final int ProcRmDir			= 13;
+  public static final int ProcRename		= 14;
+  public static final int ProcLink			= 15;
+  public static final int ProcReadDir		= 16;
   public static final int ProcReadDirPlus	= 17;
-  public static final int ProcFsStat			= 18;
-  public static final int ProcFsInfo			= 19;
+  public static final int ProcFsStat		= 18;
+  public static final int ProcFsInfo		= 19;
   public static final int ProcPathConf		= 20;
-  public static final int ProcCommit			= 21;
+  public static final int ProcCommit		= 21;
   
-  public static final int ProcMax					= 21;
+  public static final int ProcMax			= 21;
   
   //	NFS server status codes
   
-  public static final int StsSuccess			= 0;
-  public static final int StsPerm					= 1;
-  public static final int StsNoEnt				= 2;
-  public static final int StsIO						= 5;
-  public static final int StsNxIO					= 6;
-  public static final int StsAccess				= 13;
-  public static final int StsExist				= 17;
-  public static final int StsXDev					= 18;
-  public static final int StsNoDev				= 19;
-  public static final int StsNotDir				= 20;
-  public static final int StsIsDir				= 21;
-  public static final int StsInVal				= 22;
-  public static final int StsFBig					= 27;
-  public static final int StsNoSpc				= 28;
-  public static final int StsROFS					= 30;
-  public static final int StsMLink				= 31;
+  public static final int StsSuccess		= 0;
+  public static final int StsPerm			= 1;
+  public static final int StsNoEnt			= 2;
+  public static final int StsIO				= 5;
+  public static final int StsNxIO			= 6;
+  public static final int StsAccess			= 13;
+  public static final int StsExist			= 17;
+  public static final int StsXDev			= 18;
+  public static final int StsNoDev			= 19;
+  public static final int StsNotDir			= 20;
+  public static final int StsIsDir			= 21;
+  public static final int StsInVal			= 22;
+  public static final int StsFBig			= 27;
+  public static final int StsNoSpc			= 28;
+  public static final int StsROFS			= 30;
+  public static final int StsMLink			= 31;
   public static final int StsNameTooLong	= 63;
-  public static final int StsNotEmpty			= 66;
-  public static final int StsDQuot				= 69;
-  public static final int StsStale				= 70;
-  public static final int StsRemote				= 71;
+  public static final int StsNotEmpty		= 66;
+  public static final int StsDQuot			= 69;
+  public static final int StsStale			= 70;
+  public static final int StsRemote			= 71;
   public static final int StsBadHandle		= 10001;
-  public static final int StsNotSync			= 10002;
+  public static final int StsNotSync		= 10002;
   public static final int StsBadCookie		= 10003;
-  public static final int StsNotSupp			= 10004;
-  public static final int StsTooSmall			= 10005;
+  public static final int StsNotSupp		= 10004;
+  public static final int StsTooSmall		= 10005;
   public static final int StsServerFault	= 10006;
-  public static final int StsBadType			= 10007;
-  public static final int StsJukeBox			= 10008;
+  public static final int StsBadType		= 10007;
+  public static final int StsJukeBox		= 10008;
   
   //	Data structure limits
   
@@ -109,56 +109,56 @@ public final class NFS {
   
   //	File types
   
-  public static final int FileTypeReg			= 1;
-  public static final int FileTypeDir			= 2;
-  public static final int FileTypeBlk			= 3;
-  public static final int FileTypeChr			= 4;
-  public static final int FileTypeLnk			= 5;
+  public static final int FileTypeReg		= 1;
+  public static final int FileTypeDir		= 2;
+  public static final int FileTypeBlk		= 3;
+  public static final int FileTypeChr		= 4;
+  public static final int FileTypeLnk		= 5;
   public static final int FileTypeSock		= 6;
   public static final int FileTypeFifo		= 7;
   
   //	Filesystem properties
   
-  public static final int FileSysLink					= 0x0001;		//	supports hard links
-  public static final int FileSysSymLink			= 0x0002;		//	supports symbolic links
-  public static final int FileSysHomogeneuos	=	0x0004;		//	PATHCONF valid for all files
+  public static final int FileSysLink			= 0x0001;		//	supports hard links
+  public static final int FileSysSymLink		= 0x0002;		//	supports symbolic links
+  public static final int FileSysHomogeneuos	= 0x0004;		//	PATHCONF valid for all files
   public static final int FileSysCanSetTime		= 0x0008;		//	can set time on server side
   
   //	Access mask
   
-  public static final int AccessRead					= 0x0001;
-  public static final int AccessLookup				= 0x0002;
-  public static final int AccessModify				= 0x0004;
-  public static final int AccessExtend				= 0x0008;
-  public static final int AccessDelete				= 0x0010;
-  public static final int AccessExecute				= 0x0020;
+  public static final int AccessRead			= 0x0001;
+  public static final int AccessLookup			= 0x0002;
+  public static final int AccessModify			= 0x0004;
+  public static final int AccessExtend			= 0x0008;
+  public static final int AccessDelete			= 0x0010;
+  public static final int AccessExecute			= 0x0020;
   
-  public static final int AccessAll						= 0x003F;
+  public static final int AccessAll				= 0x003F;
   
   //	Create mode values
   
-  public static final int CreateUnchecked			= 1;
-  public static final int CreateGuarded				= 2;
-  public static final int CreateExclusive			= 3;
+  public static final int CreateUnchecked		= 1;
+  public static final int CreateGuarded			= 2;
+  public static final int CreateExclusive		= 3;
   
   //	Write request stable values
   
-  public static final int WriteUnstable				= 0;
-  public static final int WriteDataSync				= 1;
-  public static final int WriteFileSync				= 2;
+  public static final int WriteUnstable			= 0;
+  public static final int WriteDataSync			= 1;
+  public static final int WriteFileSync			= 2;
   
   //	Set attributes file timestamp settings
   
-  public static final int DoNotSetTime				= 0;
-  public static final int SetTimeServer				= 1;
-  public static final int SetTimeClient				= 2;
+  public static final int DoNotSetTime			= 0;
+  public static final int SetTimeServer			= 1;
+  public static final int SetTimeClient			= 2;
   
   //	RPC procedure names
   
   private static final String[] _procNames = { "Null", "GetAttr", "SetAttr", "Lookup", "Access", "ReadLink", "Read",
-      																				 "Write", "Create", "MkDir", "SymLink", "MkNode", "Remove", "RmDir",
-      																				 "Rename", "Link", "ReadDir", "ReadDirPlus", "FsStat", "FsInfo",
-      																				 "PathConf", "Commit" };
+      											 "Write", "Create", "MkDir", "SymLink", "MkNode", "Remove", "RmDir",
+      											 "Rename", "Link", "ReadDir", "ReadDirPlus", "FsStat", "FsInfo",
+      											 "PathConf", "Commit" };
   
   /**
    * Return a procedure id as a name
