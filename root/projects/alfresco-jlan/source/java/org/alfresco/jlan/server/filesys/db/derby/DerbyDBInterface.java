@@ -384,7 +384,7 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 				Statement stmt = conn.createStatement();
 
 				stmt.execute("CREATE TABLE " + getObjectIdTableName()
-						+ " (FileId INTEGER NOT NULL PRIMARY KEY, StreamId INTEGER NOT NULL, ObjectId VARCHAR(128))");
+						+ " (FileId INTEGER NOT NULL, StreamId INTEGER NOT NULL, ObjectId VARCHAR(128) PRIMARY KEY (FileId,StreamId))");
 
 				stmt.close();
 
