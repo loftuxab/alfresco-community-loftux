@@ -575,7 +575,7 @@ public class OracleDBInterface extends JdbcDBInterface implements DBQueueInterfa
 			  
 				Statement stmt = conn.createStatement();
 				
-				stmt.execute("CREATE TABLE " + getObjectIdTableName() + " (FileId NUMBER NOT NULL PRIMARY KEY, StreamId NUMBER NOT NULL, ObjectId VARCHAR2(128))");
+				stmt.execute("CREATE TABLE " + getObjectIdTableName() + " (FileId NUMBER NOT NULL, StreamId NUMBER NOT NULL, ObjectId VARCHAR2(128) PRIMARY KEY(FileId,StreamId))");
 
 				stmt.close();
         
