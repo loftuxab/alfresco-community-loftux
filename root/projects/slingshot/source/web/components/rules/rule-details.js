@@ -186,6 +186,18 @@
        */
       _displayRule: function RuleDetails__displayRule(rule)
       {
+         // Hide/show the edit & delete buttons
+         if (rule.url.indexOf(this.options.nodeRef.uri) == -1 )
+         {
+            // This rule doesn't belong to the current folder
+            Dom.addClass(this.id + "-actions", "hidden");
+         }
+         else
+         {
+            // This rule belongs to the current folder
+            Dom.removeClass(this.id + "-actions", "hidden");
+         }
+
          // Basic info
          Dom.get(this.id + "-title").innerHTML = $html(rule.title);
          Dom.get(this.id + "-description").innerHTML = $html(rule.description);
@@ -194,10 +206,10 @@
          Dom.addClass(this.id + "-disabled", rule.disabled == true ? "disabled" : "enabled");
          Dom.removeClass(this.id + "-executeAsynchronously", "enabled");
          Dom.removeClass(this.id + "-executeAsynchronously", "disabled");
-         Dom.addClass(this.id + "-executeAsynchronously", rule.executeAsynchronously == true ? "disabled" : "enabled");
+         Dom.addClass(this.id + "-executeAsynchronously", rule.executeAsynchronously == true ? "enabled" : "disabled");
          Dom.removeClass(this.id + "-applyToChildren", "enabled");
          Dom.removeClass(this.id + "-applyToChildren", "disabled");
-         Dom.addClass(this.id + "-applyToChildren", rule.applyToChildren == true ? "disabled" : "enabled");
+         Dom.addClass(this.id + "-applyToChildren", rule.applyToChildren == true ? "enabled" : "disabled");
 
          // When Configurations
          var whenConfigs = [];
@@ -309,10 +321,10 @@
          this.widgets.editButton.set("disabled", true);
 
          // Send the user to edit rule page
-         var url = YAHOO.lang.substitute("rule-edit?folderNodeRef={folderNodeRef}&ruleId={ruleId}",
+         var url = YAHOO.lang.substitute("rule-edit?nodeRef={nodeRef}&ruleId={ruleId}",
          {
-            folderNodeRef: this.options.nodeRef.toString(),
-            ruleId: this.ruleId.toString()
+            nodeRef: this.options.nodeRef.toString(),
+            ruleId: this.ruleDetails.id.toString()
          });
          window.location.href = url;
       },
@@ -325,7 +337,52 @@
        */
       onDeleteButtonClick: function RuleDetails_onDeleteButtonClick(event)
       {
-         alert('Not implemented');
+         this.widgets.deleteButton.set("disabled", true);
+         if (!this.widgets.deleteFeedbackMessage )
+         {
+            this.widgets.deleteFeedbackMessage = Alfresco.util.PopupManager.displayMessage(
+            {
+               text: Alfresco.util.message("message.deletingRule", this.name),
+               spanClass: "wait",
+               displayTime: 0
+            });
+         }
+         else
+         {
+            this.widgets.deleteFeedbackMessage .show();
+         }
+
+         // Delete rule
+         Alfresco.util.Ajax.jsonDelete(
+         {
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.uri + "/ruleset/rules/" + this.ruleDetails.id,
+            successCallback:
+            {
+               fn: function (response)
+               {
+                  this.widgets.deleteFeedbackMessage .hide();
+                  this.widgets.deleteButton.set("disabled", false);
+                  Dom.setStyle(this.widgets.displayEl, "display", "none");
+                  YAHOO.Bubbling.fire("folderRulesDetailsChanged",
+                  {
+                     nodeRef: this.options.nodeRef
+                  });
+               },
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: function (response)
+               {
+                  this.widgets.feedbackMessage.destroy();
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: Alfresco.util.message("message.deletingRule-failure", this.name)
+                  });
+               },
+               scope: this
+            }
+         });
       }
 
    });

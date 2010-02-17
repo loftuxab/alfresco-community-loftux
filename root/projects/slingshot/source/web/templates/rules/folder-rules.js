@@ -49,6 +49,7 @@
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("folderRulesDetailsAvailable", this.onFolderRulesDetailsAvailable, this);
+      YAHOO.Bubbling.on("folderRulesDetailsChanged", this.onFolderRulesDetailsChanged, this);
 
       return this;
    };
@@ -151,14 +152,7 @@
          });
 
          // Fire event to inform any listening components that the data is ready
-         YAHOO.Bubbling.fire("folderRulesDetailsAvailable",
-         {
-            folderRulesDetails:
-            {
-               rules: this.options.rules,
-               linkedFolder: this.options.linkedFolder
-            }
-         });
+         this._fireFolderRulesDetailsAvailable();
 
          // Display inherited rules
          this._displayInheritedRules();
@@ -220,6 +214,65 @@
 
          // Found no inherited rules make sure the component is hidden
          Dom.addClass(this.widgets.inheritedRulesList, "hidden");
+      },
+
+      /**
+       * Event called when another component has changed the details of a rule on a folder
+       * which requires ui to reload itself.
+       *
+       * @method onFolderRulesDetailsChanged
+       * @param layer
+       * @param args
+       * @private
+       */
+      onFolderRulesDetailsChanged: function RulesHeader_onFolderRulesDetailsChanged(layer, args)
+      {
+         // Load rule information form server
+         var nodeRefAsUrl = this.options.nodeRef.replace("://", "/"),
+            prevNoOfRules = this.options.rules ? this.options.rules.length : 0;
+         Alfresco.util.Ajax.jsonGet(
+         {
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRefAsUrl + "/ruleset/rules",
+            successCallback:
+            {
+               fn: function(response, p_prevNoOfRules)
+               {
+                  if (response.json)
+                  {
+                     this.options.rules = response.json.data;
+                     if ((prevNoOfRules == 0 && p_prevNoOfRules != 0) ||
+                         (prevNoOfRules != 0 && p_prevNoOfRules == 0))
+                     {
+                        // Reload page so appropriate components will be displayed in stead of the current ones
+                        window.location.reload();
+                     }
+                     else
+                     {
+                        this._fireFolderRulesDetailsAvailable();   
+                     }
+                  }
+               },
+               obj: prevNoOfRules,
+               scope: this
+            },
+            failureMessage:this.msg("message.getRuleFailure", this.name)
+         });
+      },
+
+      /**
+       * @method _fireFolderRulesDetailsAvailable
+       * @private
+       */
+      _fireFolderRulesDetailsAvailable: function RulesHeader__fireFolderRulesDetailsAvailable()
+      {
+         YAHOO.Bubbling.fire("folderRulesDetailsAvailable",
+         {
+            folderRulesDetails:
+            {
+               rules: this.options.rules,
+               linkedFolder: this.options.linkedFolder
+            }
+         });
       }
 
    });

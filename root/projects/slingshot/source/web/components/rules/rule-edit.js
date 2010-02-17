@@ -70,7 +70,7 @@
           * @property nodeRef
           * @type Alfresco.util.NodeRef
           */
-         folderNodeRef: null,
+         nodeRef: null,
 
          /**
           * Current siteId.
@@ -151,18 +151,27 @@
       {
 
          // Create & Edit menues & buttons
-         this.widgets.createButton = Alfresco.util.createYUIButton(this, "create-button", null,
+         this.widgets.createButton = Alfresco.util.createYUIButton(this, "create-button", function ()
+         {
+            this.createAnotherRule = false;
+         },
          {
             type: "submit"
-         });
-         this.widgets.createAnotherButton = Alfresco.util.createYUIButton(this, "createAnother-button", null,
+         }, this.id + "-create-button");
+         this.widgets.createAnotherButton = Alfresco.util.createYUIButton(this, "createAnother-button", function ()
+         {
+            this.createAnotherRule = true;
+         },
          {
             type: "submit"
-         });
-         this.widgets.saveButton = Alfresco.util.createYUIButton(this, "save-button", null,
+         }, this.id + "-createAnother-button");
+         this.widgets.saveButton = Alfresco.util.createYUIButton(this, "save-button", function ()
+         {
+            this.createAnotherRule = false;
+         },
          {
             type: "submit"
-         });
+         }, this.id + "-save-button");
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
          // Load rule config components
@@ -234,19 +243,22 @@
             fn: function()
             {
                var ruleId = Dom.get(this.id + "-id").value,
-                  url = Alfresco.constants.PROXY_URI + "api/node/" + this.options.folderNodeRef.uri + "/ruleset/rules",
-                  successCallback;
+                  url = Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.uri + "/ruleset/rules",
+                  successCallback,
+                  waitMessage;
                if (ruleId.length > 0)
                {
+                  waitMessage = this.msg("message.updating");
                   this.widgets.formEl.attributes.action.nodeValue = url + "/" + ruleId;
                   this.widgets.form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
                   successCallback = {
-                     fn: this.onRuleUpdate,
+                     fn: this.onRuleUpdated,
                      scope: this
                   };
                }
                else
                {
+                  waitMessage = this.msg("message.creating");
                   this.widgets.formEl.attributes.action.nodeValue = url;
                   this.widgets.form.setAjaxSubmitMethod(Alfresco.util.Ajax.POST);
                   successCallback = {
@@ -259,13 +271,13 @@
                   successCallback: successCallback,
                   failureCallback:
                   {
-                     fn: this.onSaveRuleFailed,
+                     fn: this.onPersistRuleFailed,
                      scope: this
                   }
                });
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
-                  text: Alfresco.util.message("message.creating", this.name),
+                  text: waitMessage,
                   spanClass: "wait",
                   displayTime: 0
                });
@@ -279,6 +291,10 @@
             {
                // Adjust the obj to fit the webscripts
                var rule = p_oConfig.dataObj;
+               rule.disabled = Dom.get(this.id + "-disabled").checked;
+               rule.applyToChildren = Dom.get(this.id + "-applyToChildren").checked;
+               rule.executeAsynchronously = Dom.get(this.id + "-executeAsynchronously").checked;
+
                rule.ruleType = [];
                var ruleConfigTypes = this.ruleConfigs[this.id + "-ruleConfigType"].getRuleConfigs();
                for (var i = 0, il = ruleConfigTypes.length; i < il; i++)
@@ -352,8 +368,19 @@
        */
       displayRule: function RuleEdit_displayRule(rule)
       {
+         // Set id and hide/show create/edit buttons
          var ruleConfig = null;
          Dom.get(this.id + "-id").value = rule.id ? rule.id : "";
+         if (rule.id)
+         {
+            Dom.removeClass(this.id + "-body", "create-mode");
+            Dom.addClass(this.id + "-body", "edit-mode");
+         }
+         else
+         {
+            Dom.addClass(this.id + "-body", "create-mode");
+            Dom.removeClass(this.id + "-body", "edit-mode");
+         }
 
          // Text fields
          Dom.get(this.id + "-title").value = rule.title;
@@ -361,7 +388,7 @@
 
          // Transform types into a config object for event section
          var typeConfigs = [];
-         for (var i = 0, il = rule.ruleType; i < il; i++)
+         for (var i = 0, il = rule.ruleType.length; i < il; i++)
          {
             typeConfigs.push(
             {
@@ -381,7 +408,7 @@
          var ifConditionConfigs = [],
             unlessConditionConfigs = [],
             config;
-         for (i = 0, il = rule.action.conditions; i < il; i++)
+         for (i = 0, il = rule.action.conditions.length; i < il; i++)
          {
             config = rule.action.conditions[i];
             if (config.invertCondition)
@@ -447,11 +474,7 @@
        */
       onCancelButtonClick: function RuleEdit_onCancelButtonClick(type, args)
       {
-         var url = YAHOO.lang.substitute("folder-rules?nodeRef={nodeRef}",
-         {
-            nodeRef: this.options.folderNodeRef.toString()
-         });
-         window.location.href = url;
+         this._navigateToFoldersPage();
       },
 
       /**
@@ -460,28 +483,47 @@
        */
       onRuleCreated: function RE_onRuleCreated(response)
       {
-         this.widgets.feedbackMessage.destroy();
-         alert('created');
+         this.widgets.feedbackMessage.hide();
+         if (this.createAnotherRule)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.createAnotherRule") 
+            });
+            this.displayRule(this.options.ruleTemplate);
+         }
+         else
+         {
+            this._navigateToFoldersPage();
+         }         
       },
 
       /**
        * @method onRuleUpdate
        * @param response
        */
-      onRuleUpdate: function RE_onRuleUpdate(response)
+      onRuleUpdated: function RE_onRuleUpdate(response)
       {
-         this.widgets.feedbackMessage.destroy();
-         alert('update');
+         this.widgets.feedbackMessage.hide();
+         this._navigateToFoldersPage();
       },
 
       /**
-       * @method onSaveRuleFailed
+       * @method onPersistRuleFailed
        * @param response
        */
-      onSaveRuleFailed: function RE_onSaveRuleFailed(response)
+      onPersistRuleFailed: function RE_onPersistRuleFailed(response)
       {
          this.widgets.feedbackMessage.destroy();
-         alert('failed');
+      },
+
+      _navigateToFoldersPage: function()
+      {
+         var url = YAHOO.lang.substitute("folder-rules?nodeRef={nodeRef}",
+         {
+            nodeRef: this.options.nodeRef.toString()
+         });
+         window.location.href = url;
       }
 
    });

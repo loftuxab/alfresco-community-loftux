@@ -3,14 +3,14 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RuleEdit("${el}").setOptions(
    {
-      folderNodeRef: new Alfresco.util.NodeRef("${page.url.args.folderNodeRef!""}"),
-      rule: ${rule},
+      nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}"),
+      <#if rule?exists>rule: ${rule},</#if>
       siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}
    );
 //]]></script>
-<div id="${el}-body" class="rule-edit <#if (page.url.args.ruleNodeRef?exists)>edit-mode<#else>create-mode</#if>">
+<div id="${el}-body" class="rule-edit">
    <form id="${el}-rule-form" method="" action="">
       <input id="${el}-id" type="hidden" name="id" value=""/> 
       <input type="hidden" name="action.actionDefinitionName" value="composite-action"/>

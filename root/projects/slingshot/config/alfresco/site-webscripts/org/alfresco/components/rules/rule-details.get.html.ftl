@@ -11,7 +11,7 @@
 <div id="${el}-body" class="rule-details">
 
    <div id="${el}-display" class="display" style="display: none;">
-      <div class="actions">
+      <div id="${el}-actions" class="actions">
          <input type="button" id="${el}-edit-button" value="${msg("button.edit")}" tabindex="0"/>
          <input type="button" id="${el}-delete-button" value="${msg("button.delete")}" tabindex="0"/>
       </div>

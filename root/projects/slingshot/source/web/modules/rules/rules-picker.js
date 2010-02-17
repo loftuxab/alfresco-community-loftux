@@ -267,27 +267,27 @@
 
             if (this.options.mode == RP.MODE_COPY_FROM)
             {
-               url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "/api/node/{folderNodeRef}/copy",
+               url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "/api/node/{nodeRef}/copy",
                {
-                  folderNodeRef: file.nodeRef.replace(":/", "")
+                  nodeRef: file.nodeRef.replace(":/", "")
                });
                dataObj.rules = rules;
                eventName = "rulesCopiedFrom";
                event = {
-                  folderNodeRef: file.nodeRef.replace(":/", ""),
+                  nodeRef: file.nodeRef.replace(":/", ""),
                   ruleNodeRefs: rules
                };
             }
             else if (this.options.mode == RP.MODE_LINK_TO)
             {
-               url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/sites?uri=/api/node/{folderNodeRef}/link/{ruleNodeRef}",
+               url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/sites?uri=/api/node/{nodeRef}/link/{ruleNodeRef}",
                {
-                  folderNodeRef: file.nodeRef.replace(":/", ""),
+                  nodeRef: file.nodeRef.replace(":/", ""),
                   ruleNodeRef: this.selectedNode.data.nodeRef.replace(":/", "")
                });
                eventName = "ruleLinkedTo";
                event = {
-                  folderNodeRef: file.nodeRef.replace(":/", ""),
+                  nodeRef: file.nodeRef.replace(":/", ""),
                   ruleNodeRefs: this.selectedNode.data.nodeRef
                };
             }
