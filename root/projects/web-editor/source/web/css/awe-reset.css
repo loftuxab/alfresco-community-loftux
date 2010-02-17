@@ -15,7 +15,7 @@ version: 2.7.0
    background: #FFF;
 } */
 
-body.awe-root-body,
+body.awe-root-body .awe,
 .awe div,
 .awe dl,
 .awe dt,
@@ -141,7 +141,7 @@ body.awe-root-body,
 
 
          
-         /*
+/*
 Copyright (c) 2009, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
@@ -158,7 +158,7 @@ version: 2.7.0
  * Percents could work for IE, but for backCompat purposes, we are using keywords.
  * x-small is for IE6/7 quirks mode.
  */
-body.awe-root-body {
+body.awe-root-body div.awe {
 	font:13px/1.231 arial,helvetica,clean,sans-serif;
 	/* for IE6/7 */ 
 	*font-size:small; 

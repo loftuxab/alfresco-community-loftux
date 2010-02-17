@@ -53,7 +53,7 @@ if (!this.AWE) {
          if (!Dom.get('awe'))
          {
             var el = document.createElement('div');
-            el.innerHTML =  '<div id="awe"><div id="awe-login-panel"></div><div id="awe-panel"></div><div id="awe-ribbon-container" class="awe-ribbon-container"><div id="awe-ribbon" class="awe-ribbon" role="toolbar"><div class="hd"><h6>Web Editor</h6></div><div class="bd"></div><div class="ft"></div></div></div></div>';
+            el.innerHTML =  '<div id="awe" class="awe"><div id="awe-login-panel"></div><div id="awe-panel"></div><div id="awe-ribbon-container" class="awe-ribbon-container"><div id="awe-ribbon" class="awe-ribbon" role="toolbar"><div class="hd"><h6>Web Editor</h6></div><div class="bd"></div><div class="ft"></div></div></div></div>';
             body.appendChild(el.firstChild);
          }
          if (!Dom.hasClass(body, 'awe-root-body'))
