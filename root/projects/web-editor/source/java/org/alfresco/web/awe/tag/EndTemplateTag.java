@@ -52,18 +52,43 @@ public class EndTemplateTag extends AbstractWebEditorTag
       if (isEditingEnabled())
       {
          try
-         {
+              {
             Writer out = pageContext.getOut();
       
             // get the toolbar location from the request session
             String toolbarLocation = (String)this.pageContext.getRequest().getAttribute(KEY_TOOLBAR_LOCATION);
-         
+            
             // render JavaScript to configure toolbar and edit icons
             List<MarkedContent> markedContent = getMarkedContent();
             
             out.write("<script type=\"text/javascript\">\n");
-            out.write("window.onload = function() {\n");
-            out.write("AWE.init().registerEditableContent([");
+                 out.write("window.onload = function() {\n");
+            out.write("AAF.boot(function handler()");
+            out.write("{\n");
+            out.write("AAF.loader.require({\n");
+            out.write("name:'com.alfresco.awe.init',\n");
+            out.write("repo:'lib',\n");
+            out.write("requires:['com.alfresco.awe','com.alfresco.awe.ribbon']\n");
+            out.write("});\n");
+      
+            out.write("AAF.loader.load(\n");
+            out.write("{\n");
+            out.write("fn:function AAF_Boot_SuccessHandler(o)\n");
+            out.write("{\n");
+            out.write("var y = (o.reference) ? o.reference : YAHOO;\n");
+            out.write("// o.reference is the SANDBOXED YAHOO object\n");
+            out.write("if (!o.reference)\n");
+            out.write("{\n");
+            out.write("console.log('Not running in sandbox mode');\n");
+            out.write("}\n");
+            out.write("else\n");
+            out.write("{\n");
+            out.write("console.log('must be running in sandbox mode');\n");
+            out.write("// Anything root level needs to be added to YAHOO namespace eg:\n");
+            out.write("// var AWE = o.reference.com.alfresco.awe;\n");
+            out.write("}\n");
+            out.write("\n\n");
+            out.write("y.com.alfresco.awe.init([");
             boolean first = true;
             for (MarkedContent content : markedContent)
             {
@@ -75,7 +100,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
                {
                   first = false;
                }
-             
+       
                out.write("\n{\n   id: \"");
                out.write(encode(content.getMarkerId()));
                out.write("\",\n   nodeRef: \"");
@@ -94,20 +119,30 @@ public class EndTemplateTag extends AbstractWebEditorTag
                out.write("\n}");
             }
             out.write("]);\n");
-            out.write("AWE.module.Ribbon = new AWE.Ribbon(\"awe-ribbon\");");
-            out.write("AWE.module.Ribbon.init({\n   position: \"");
-            out.write(encode(toolbarLocation));
-            out.write("\"\n});\nAWE.module.Ribbon.render();\n");
+            out.write("y.com.alfresco.awe.render();");
+            out.write("},\n");
+            out.write("scope:this\n");
+            out.write("},\n");
+            out.write("{\n");
+            out.write("fn:function AAF_Boot_FailureHandler()\n");
+            out.write("{\n");
+            out.write("},\n");
+            out.write("scope: this\n");
+            out.write("}\n");
+            out.write("\n);\n");
+            out.write("}\n");
+            out.write(");\n");
+
             out.write("}\n</script>");
             
             if (logger.isDebugEnabled())
                logger.debug("Completed endTemplate rendering for " + markedContent.size() + 
                         " marked content items with toolbar location of: " + toolbarLocation);
          }
-         catch (IOException ioe)
-         {
-            throw new JspException(ioe.toString());
-         }
+        catch (IOException ioe)
+        {
+           throw new JspException(ioe.toString());
+        }
       }
       else if (logger.isDebugEnabled())
       {

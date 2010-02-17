@@ -273,7 +273,6 @@
                1,
                YAHOO.util.Easing.easeOut
              );
-             
              this.scrollAnimation.onComplete.subscribe(function(el){
                 return function()
                 {

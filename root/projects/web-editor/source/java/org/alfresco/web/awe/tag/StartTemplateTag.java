@@ -98,229 +98,235 @@ public class StartTemplateTag extends AbstractWebEditorTag
             boolean debug = isDebugEnabled();
             
             out.write("\n<!-- **** Start of Alfresco Web Editor requirements **** -->\n");
+            
+            out.write("<script type=\"text/javascript\" src=\"");
+            out.write(urlPrefix);
+            out.write("/js/aaf-boot.js\"></script>\n");
+            
+            //register modules with loader
+            // TODO: these paths are absolute. Need to make these
+            // relative using 'core' repo. This needs to be called after
+            // AAF.init() for relative urls to work.
+            out.write("<script type=\"text/javascript\">");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.yahoo.bubbling\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/js/bubbling.v2.1.js\",\n");
+            out.write("varName: \"YAHOO.Bubbling\",\n");
+            out.write("requires:['utilities']\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.alfresco.messages\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/service/messages.js?locale=en_US\",\n");
+            out.write("varName: \"Alfresco\"\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.alfresco.alfresco\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/js/alfresco.js\",\n");
+            out.write("varName: \"Alfresco\",\n");
+            out.write("requires: ['utilities','animation','selector','cookie','menu','container','button','com.alfresco.messages','com.yahoo.bubbling']\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.alfresco.awe\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/js/awe.js\",\n");
+            out.write("varName: \"AWE\",\n");
+            out.write("requires:['com.alfresco.alfresco','com.alfresco.forms','com.alfresco.awe.reset.css','com.alfresco.awe.css','com.alfresco.awe.toolbar','force-yui-skin']\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.alfresco.awe.toolbar\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/js/yui-toolbar.js\",\n");
+            out.write("varName: \"YAHOO.widget.Toolbar\"\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.alfresco.awe.ribbon\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/js/awe-ribbon.js\",\n");
+            out.write("varName: \"AWE.Ribbon\",\n");
+            out.write("requires: ['com.alfresco.awe','com.alfresco.awe.ribbon.css']\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"force-yui-skin\",\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/yui/assets/skins/default/skin.css\"\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.alfresco.awe.reset.css\",\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/css/awe-reset.css\"\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: \"com.alfresco.awe.css\",\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/css/awe.css\"\n");
+            out.write("});\n");
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.awe.ribbon.css',\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/css/awe-toolbar.css\"\n");
+            out.write("});\n");            
+
+            // TOOD: work out how to add this.
+            // out.write("<!--[if gte IE 6]>\n");
+            // out.write("AAF.loader.addModule({\n");
+            // out.write("name: 'com.alfresco.awe.ribbon.ie6.css',\n");
+            // out.write("type: \"css\",\n");
+            // out.write("path: \"http://localhost:8081/awe/css/awe-toolbar-ie.css\"\n");
+            // out.write("});\n");            
+            // out.write("<![endif]-->\n");
+
+
+            
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/form/form-min.js\",\n");
+            out.write("requires: ['com.alfresco.forms.runtime','com.alfresco.forms.forms','com.alfresco.forms.datepicker','com.alfresco.forms.period','com.alfresco.forms.object-finder','calendar','com.alfresco.forms.rich-text-control','com.alfresco.alfresco.editors.tinymce','com.alfresco.forms.content']\n");
+            out.write("});\n");
+            
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.runtime',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/js/forms-runtime.js\"\n");
+            out.write("});\n");
+            
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.forms',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/form/form-min.js\",\n");
+            out.write("requires:['com.alfresco.forms.css']");
+            out.write("});\n");
+            
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.css',\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/form/form.css\"\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.datepicker',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/form/date-picker-min.js\"\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.period',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/form/period-min.js\"\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.object-finder',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/object-finder/object-finder-min.js\"\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.object-finder',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/object-finder/object-finder-min.js\",\n");
+            out.write("requires:['com.alfresco.forms.object-finder.css']");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.object-finder.css',\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/object-finder/object-finder.css\"\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.rich-text-control',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/form/rich-text-min.js\"\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.forms.content',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/components/form/content-min.js\"\n");
+            out.write("});\n");
+
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.alfresco.alfresco.editors.tinymce',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/modules/editors/tiny_mce-min.js\",\n");
+            out.write("requires:['com.alfresco.alfresco','com.tinymce']\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'com.tinymce',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/modules/editors/tiny_mce/tiny_mce.js\",\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'accessibility.aria.plugins.yui',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/js/accessibility/aria/plugins/yui/yui-aria.js\",\n");            out.write("requires:['accessibility.aria.plugins.yui.menu','accessibility.aria.plugins.yui.button','accessibility.aria.plugins.yui.container','accessibility.aria.plugins.yui.tabview']\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'accessibility.aria.plugins.yui.menu',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/lib/accessibility/aria/plugins/yui/menuviewariaplugin.js\",\n");
+            out.write("requires:['menu']\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'accessibility.aria.plugins.yui.container',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/lib/accessibility/aria/plugins/yui/containerviewariaplugin.js\",\n");
+            out.write("requires:['container']\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'accessibility.aria.plugins.yui.button',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/lib/accessibility/aria/plugins/yui/buttonviewariaplugin.js\",\n");
+            out.write("requires:['button']\n");
+            out.write("});\n");
+
+            out.write("AAF.loader.addModule({\n");
+            out.write("name: 'accessibility.aria.plugins.yui.tabview',\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/lib/accessibility/aria/plugins/yui/tabviewariaplugin.js\",\n");
+            out.write("requires:['button']\n");
+
+            out.write("});\n");
+         
+            out.write("</script>\n");            
+                           
+            // render JavaScript constants TODO
+            // out.write("<script type=\"text/javascript\">//<![CDATA[\n");
+            // out.write("Alfresco.constants = Alfresco.constants || {};\n");
+            // out.write("Alfresco.constants.DEBUG = ");
+            // out.write(debug ? "true" : "false");
+            // out.write(";\n");
+            // out.write("Alfresco.constants.AUTOLOGGING = false;\n");
+            // out.write("Alfresco.constants.PROXY_URI = window.location.protocol + \"//\" + window.location.host + \"");
+            // out.write(urlPrefix);
+            // out.write("/proxy/alfresco/\";\n");
+            // out.write("Alfresco.constants.PROXY_URI_RELATIVE = \"");
+            // out.write(urlPrefix);
+            // out.write("/proxy/alfresco/\";\n");
+            // out.write("Alfresco.constants.THEME = \"default\";\n");
+            // out.write("Alfresco.constants.URL_CONTEXT = \"");
+            // out.write(urlPrefix);
+            // out.write("/\";\n");
+            // out.write("Alfresco.constants.URL_PAGECONTEXT = \"");
+            // out.write(urlPrefix);
+            // out.write("/p/\";\n");
+            // out.write("Alfresco.constants.URL_SERVICECONTEXT = \"");
+            // out.write(urlPrefix);
+            // out.write("/service/\";\n");
+            // out.write("Alfresco.constants.USERNAME = \"admin\";\n");
+            // out.write("Alfresco.constants.HTML_EDITOR = \"tinyMCE\";\n");
+            // out.write("//]]></script>\n");
    
-            // NOTE: All the rendered CSS and JavaScript below should be replaced
-            // with a single call to a bootstrap.js script which will generate
-            // all the code below
-   
-            // render CSS required
-            //awe-reset
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/css/awe-reset.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/yui/reset-fonts-grids/reset-fonts-grids.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/yui/assets/skins/default/skin.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/yui/assets/skins/default/container.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/yui/assets/skins/default/menu.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/yui/assets/skins/default/button.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/css/base.css\" />\n");
-   
-            // render JavaScript required, depending on debug flag
-            if (debug)
-            {
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/yahoo/yahoo-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/event/event-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/dom/dom-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/dragdrop/dragdrop-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/animation/animation-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/logger/logger-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/connection/connection-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/element/element-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/get/get-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/yuiloader/yuiloader-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/button/button-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/container/container-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/menu/menu-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/json/json-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/selector/selector-debug.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/cookie/cookie-debug.js\"></script>\n");
-            }
-            else
-            {
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/utilities/utilities.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/button/button-min.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/container/container-min.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/menu/menu-min.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/json/json-min.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/selector/selector-min.js\"></script>\n");
-               out.write("<script type=\"text/javascript\" src=\"");
-               out.write(urlPrefix);
-               out.write("/yui/cookie/cookie-min.js\"></script>\n");
-            }
-   
-            // render JavaScript always required
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/yui/yui-patch.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/yui-toolbar.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/bubbling.v2.1.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/service/messages.js?locale=en_US\"></script>\n");
-                        
-            // render JavaScript constants
-            out.write("<script type=\"text/javascript\">//<![CDATA[\n");
-            out.write("Alfresco.constants = Alfresco.constants || {};\n");
-            out.write("Alfresco.constants.DEBUG = ");
-            out.write(debug ? "true" : "false");
-            out.write(";\n");
-            out.write("Alfresco.constants.AUTOLOGGING = false;\n");
-            out.write("Alfresco.constants.PROXY_URI = window.location.protocol + \"//\" + window.location.host + \"");
-            out.write(urlPrefix);
-            out.write("/proxy/alfresco/\";\n");
-            out.write("Alfresco.constants.PROXY_URI_RELATIVE = \"");
-            out.write(urlPrefix);
-            out.write("/proxy/alfresco/\";\n");
-            out.write("Alfresco.constants.THEME = \"default\";\n");
-            out.write("Alfresco.constants.URL_CONTEXT = \"");
-            out.write(urlPrefix);
-            out.write("/\";\n");
-            out.write("Alfresco.constants.URL_PAGECONTEXT = \"");
-            out.write(urlPrefix);
-            out.write("/p/\";\n");
-            out.write("Alfresco.constants.URL_SERVICECONTEXT = \"");
-            out.write(urlPrefix);
-            out.write("/service/\";\n");
-            out.write("Alfresco.constants.USERNAME = \"admin\";\n");
-            out.write("Alfresco.constants.HTML_EDITOR = \"tinyMCE\";\n");
-            out.write("//]]></script>\n");
-   
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/alfresco.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/forms-runtime.js\"></script>\n");
-   
-            // render forms CSS & JavaScript dependencies
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/yui/calendar/assets/calendar.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/components/object-finder/object-finder.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/components/form/form.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/css/awe.css\" />\n");
-            out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/css/awe-toolbar.css\" />\n");
-            out.write("<!--[if gte IE 6]>\n");
-            out.write("   <link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            out.write(urlPrefix);
-            out.write("/css/awe-toolbar-ie.css\" />\n");
-            out.write("<![endif]-->\n");
-   
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/components/form/form-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/components/form/date-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/components/form/date-picker-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/components/form/period-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/components/object-finder/object-finder-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/yui/calendar/calendar-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/modules/editors/tiny_mce/tiny_mce.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/modules/editors/tiny_mce-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/components/form/rich-text-min.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/components/form/content-min.js\"></script>\n");
-   
-            // render AWE JavaScript dependencies
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/awe.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/awe-ribbon.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/ariaplugins/containerariaplugin.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/ariaplugins/buttonariaplugin.js\"></script>\n");
-            out.write("<script type=\"text/javascript\" src=\"");
-            out.write(urlPrefix);
-            out.write("/js/ariaplugins/menuariaplugin.js\"></script>\n");
    
             out.write("<!-- **** End of Alfresco Web Editor requirements **** -->\n");
    
