@@ -71,7 +71,7 @@
          {
             padding: 10px; 
             margin: 10px; 
-            background-color: #f9fcfd;
+            background-color: #8dc3e9;
             border: 1px dotted #c0c0c0;
          }
          
@@ -83,14 +83,14 @@
          
          .form-console fieldset
          {
-            border: 1px solid #aaa; 
+            border: 1px solid black; 
             margin-top: 10px; 
             padding: 8px;
          }
          
          .form-console legend
          {
-            color: #515d6b;
+            color: black;
          }
          
          .form-console input
@@ -151,11 +151,13 @@
                   <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
                   <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
                   <input id="mode-create" type="radio" name="mode" value="create"<#if mode == "create"> checked</#if>>&nbsp;Create&nbsp;
-                  
                   <label class="inline-label">Submit Type:</label>
                   <input id="submitType-multi" type="radio" name="submitType" value="multipart"<#if submitType == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;
                   <input id="submitType-json" type="radio" name="submitType" value="json"<#if submitType == "json"> checked</#if>>&nbsp;JSON&nbsp;
                   <input id="submitType-url" type="radio" name="submitType" value="urlencoded"<#if submitType == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
+                  <br/>
+                  <label for="redirect">Redirect:</label>
+                  <input id="redirect" type="text" name="redirect" value="<#if url.args.redirect?exists>${url.args.redirect}</#if>" size="80" />
                </fieldset>
                <input type="submit" value="Show Form" class="button" />
                <input type="button" value="Clear" class="button"
