@@ -70,7 +70,7 @@
           * The nodeRef of the folder being viewed
           *
           * @property nodeRef
-          * @type string
+          * @type Alfresco.util.NodeRef
           */
          nodeRef: null,
 
@@ -178,54 +178,14 @@
                   if (response.json)
                   {
                      // Successfully started or stopped rules inheritance, now reaload info on the page
-                     Alfresco.util.Ajax.jsonGet(
+                     YAHOO.Bubbling.fire("folderRulesDetailsChanged",
                      {
-                        url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
-                        successCallback:
-                        {
-                           fn: function(response)
-                           {
-                              var data = response.json;
-                              if (data)
-                              {
-                                 // Change the icon/state of the inherit button
-                                 this.widgets.inheritRulesButton.set("disabled", false);
-                                 this._toggleInheritButton();
-
-                                 // TODO: Remove fake data later
-                                 var rules = [];
-                                 rules[rules.length] = {
-                                    nodeRef: "ornr1",
-                                    title: "First own rule",
-                                    description: "This is quite a rule one must say",
-                                    inheritedFolder:  null,
-                                    active:  false
-                                 };
-                                 rules[rules.length] = {
-                                    nodeRef: "ornr2",
-                                    title: "Second own rule",
-                                    description: "This is quite a rule one must say",
-                                    inheritedFolder:  null,
-                                    active:  true
-                                 };
-                                 data.rules = rules;
-
-                                 // Fire event to inform any listening components that the data is ready
-                                 YAHOO.Bubbling.fire("folderRulesDetailsAvailable",
-                                 {
-                                    folderRulesDetails:
-                                    {
-                                       rules: data.rules,
-                                       linkedFolder: data.linkedFolder
-                                    }
-                                 });
-                              }
-                           },
-                           scope: this
-                        },
-                        failureMessage: this.msg("message.getRules-failure")
+                        nodeRef: this.options.nodeRef
                      });
 
+                     // Change the icon/state of the inherit button
+                     this.widgets.inheritRulesButton.set("disabled", false);
+                     this._toggleInheritButton();
                   }
                },
                scope: this
@@ -277,10 +237,10 @@
        */
       onNewRuleButtonClick: function RulesHeader_onNewRuleButtonClick(type, args)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/rule-edit?folderNodeRef={folderNodeRef}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/rule-edit?nodeRef={nodeRef}",
          {
             siteId: this.options.siteId,
-            folderNodeRef: this.options.nodeRef.replace(":/", "")
+            nodeRef: this.options.nodeRef.toString()
          });
          window.location.href = url;
       },
@@ -306,7 +266,7 @@
             siteId: this.options.siteId,            
             files: {
                displayName: this.folderName,
-               nodeRef: this.options.nodeRef
+               nodeRef: this.options.nodeRef.toString()
             }
          }).showDialog();
 

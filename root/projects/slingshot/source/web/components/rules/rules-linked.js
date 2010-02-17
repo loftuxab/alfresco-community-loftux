@@ -67,7 +67,7 @@
           * nodeRef of folder being viewed
           *
           * @property nodeRef
-          * @type string
+          * @type Alfresco.util.NodeRef
           */
          nodeRef: null,
 

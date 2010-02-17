@@ -96,12 +96,20 @@
    text-align: center;
 }
 
-.rule-edit.edit-mode .create-header,
-.rule-edit.create-mode .edit-header,
-.rule-edit.edit-mode .main-buttons .create-buttons,
-.rule-edit.create-mode .main-buttons .edit-buttons
+.rule-edit .create-header,
+.rule-edit .edit-header,
+.rule-edit .main-buttons .create-buttons,
+.rule-edit .main-buttons .edit-buttons
 {
    display: none;
+}
+
+.rule-edit.edit-mode   .edit-header,
+.rule-edit.create-mode .create-header,
+.rule-edit.create-mode .main-buttons .create-buttons,
+.rule-edit.edit-mode   .main-buttons .edit-buttons
+{
+   display: inline;
 }
 
 .rule-edit .if .rule-config

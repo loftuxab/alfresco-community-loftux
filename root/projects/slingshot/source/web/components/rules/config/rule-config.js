@@ -288,6 +288,7 @@
        */
       displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
       {
+         Dom.get(this.id + "-configs").innerHTML = "";
          if (!ruleConfigs || ruleConfigs.length == 0)
          {
             ruleConfigs = [ {} ];

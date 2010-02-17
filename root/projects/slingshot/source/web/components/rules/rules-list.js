@@ -369,7 +369,7 @@
          // Stop event if method was called from a user click
          if (e)
          {
-            Event.preventDefault(e);
+            Event.stopEvent(e);
          }
       }
 

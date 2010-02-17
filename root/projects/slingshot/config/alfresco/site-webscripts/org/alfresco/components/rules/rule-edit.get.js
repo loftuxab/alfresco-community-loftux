@@ -1,41 +1,19 @@
 function main()
 {
-   var ruleNodeRef = page.url.args.ruleNodeRef,
+   var ruleNodeRef = page.url.args.nodeRef,
+      ruleId = page.url.args.ruleId,
       connector = remote.connect("alfresco"),
       rule = null;
 
    // Load rule to edit of given in url
-   if (ruleNodeRef)
+   if (ruleNodeRef && ruleId)
    {
-      result = connector.get("/api/sites/" + siteId);
+      result = connector.get("/api/node/" + ruleNodeRef.replace("://", "/") + "/ruleset/rules/" + ruleId);
       if (result.status == 200)
       {
          var data = eval('(' + result + ')');
+         rule = jsonUtils.toJSONString(data);
       }
-
-      rule = jsonUtils.toJSONString(
-      {
-         title: "",
-         description: "",
-         ruleType: [],
-         applyToChildren: false,
-         executeAsynchronously: true,
-         disabled: false,
-         action:
-         {
-            actionDefinitionName: "composite-action",
-            actions : [],
-            conditions : []
-         }
-      });
-   }
-   else
-   {
-      // Create a "new" empty default rule for the form
-      rule =
-      {
-         active: true
-      };
    }
    model.rule = rule;
 

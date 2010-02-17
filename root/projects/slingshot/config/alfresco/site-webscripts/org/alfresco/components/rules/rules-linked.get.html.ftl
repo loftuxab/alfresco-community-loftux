@@ -2,7 +2,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RulesLinked("${el}").setOptions(
    {
-      folderNodeRef: "${page.url.templateArgs.nodeRef!""}"
+      nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}"),
    }).setMessages(
       ${messages}
    );

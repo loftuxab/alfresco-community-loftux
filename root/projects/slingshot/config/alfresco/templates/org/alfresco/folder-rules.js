@@ -26,7 +26,7 @@ function main()
    {
       // Folder has linked rules
       model.linkedFolder = {
-         nodeRef: "linkedFolderNodeRef",
+         nodeRef: "linkednodeRef",
          name: "Requirements",
          path: "/Sailfish/Product management"
       };
