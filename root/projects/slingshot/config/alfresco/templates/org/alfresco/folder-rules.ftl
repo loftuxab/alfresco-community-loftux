@@ -48,14 +48,14 @@
       }<#else>null</#if>,
       rules: <#if rules?exists>[
          <#list rules as rule>{
-            nodeRef: "${rule.nodeRef}",
+            id: "${rule.id}",
             title: "${rule.title}",
             description: "${rule.description}",
             inheritedFolder: <#if rule.inheritedFolder?exists>{
                nodeRef: "${rule.inheritedFolder.nodeRef}",
                name: "${rule.inheritedFolder.name}"
             }<#else>null</#if>,
-            active: ${rule.active?string}
+            disabled: ${rule.disabled?string}
          }<#if rule_has_next>,</#if></#list>
       ]<#else>null</#if>
    });

@@ -332,7 +332,7 @@
                         type : op.type,
                         isMultiValued : false,
                         isMandatory : true,
-                        constraint: "property-evaluators"// todo use op.constraint when availlable
+                        constraint: op.constraint
                      },
                      {
                         name : vp.name,

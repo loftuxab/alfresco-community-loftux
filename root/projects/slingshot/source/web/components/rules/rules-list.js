@@ -49,6 +49,11 @@
    {
       Alfresco.RulesList.superclass.constructor.call(this, "Alfresco.RulesList", htmlId, []);
 
+      // Instance variables
+      this.isReady = false;
+      this.folderDetails = null;
+      this.rules = null;
+
       // Decoupled event listeners
       YAHOO.Bubbling.on("ruleSelected", this.onRuleSelected, this);
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);     
@@ -114,10 +119,10 @@
       /**
        * Folder from page load.
        *
-       * @property rules
+       * @property folderDetails
        * @type {object}
        */
-      folder: null,
+      folderDetails: null,
 
       /**
        * Rules on page load.
@@ -149,7 +154,7 @@
          {
             this._renderRules(this.rules);
          }
-         if (this.folder !== null)
+         if (this.folderDetails !== null)
          {
             this._renderText();
          }
@@ -181,7 +186,7 @@
       onFolderDetailsAvailable: function RulesHeader_onFolderDetailsAvailable(layer, args)
       {
          // Defer if event received before we're ready
-         this.folder = args[1].folderDetails;
+         this.folderDetails = args[1].folderDetails;
          if (this.isReady)
          {
             this._renderText();
@@ -225,12 +230,12 @@
          }
          else if (this.options.filter == "folder")
          {
-            this.widgets.rulesListText.innerHTML = this.msg("label.folderRules", this.folder.fileName);
+            this.widgets.rulesListText.innerHTML = this.msg("label.folderRules", this.folderDetails.fileName);
             this.widgets.rulesListBarText.innerHTML = this.msg("info.folderRulesRunOrder");
          }
          else if (this.options.filter == "all")
          {
-            this.widgets.rulesListText.innerHTML = this.msg("label.allRules", this.folder.fileName);
+            this.widgets.rulesListText.innerHTML = this.msg("label.allRules", this.folderDetails.fileName);
             // todo check if any folders are linking to this folders rule set
             if (false)
             {
@@ -314,9 +319,9 @@
          Dom.getElementsByClassName("title", "span", ruleEl)[0].innerHTML = rule.title;
          Dom.getElementsByClassName("description", "span", ruleEl)[0].innerHTML = rule.description;
 
-         if (rule.active != true)
+         if (rule.disabled)
          {
-            Dom.addClass(Dom.getElementsByClassName("active-icon", "div", ruleEl)[0], "inactive-icon");
+            Dom.addClass(Dom.getElementsByClassName("active-icon", "div", ruleEl)[0], "disabled");
          }
          if (rule.inheritedFolder)
          {
@@ -357,8 +362,15 @@
          // Fire event to inform any listening components that the data is ready
          YAHOO.Bubbling.fire("ruleSelected",
          {
+            folderDetails: this.folderDetails,
             ruleDetails: obj.rule
          });
+
+         // Stop event if method was called from a user click
+         if (e)
+         {
+            Event.preventDefault(e);
+         }
       }
 
    });

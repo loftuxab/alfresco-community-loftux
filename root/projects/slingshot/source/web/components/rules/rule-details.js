@@ -38,6 +38,11 @@
       Event = YAHOO.util.Event;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * RuleDetails constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
@@ -47,6 +52,10 @@
    Alfresco.RuleDetails = function RuleDetails_constructor(htmlId)
    {
       Alfresco.RuleDetails.superclass.constructor.call(this, "Alfresco.RuleDetails", htmlId, []);
+
+      // Instance variables
+      this.folderDetails = null;
+      this.ruleDetails = null;
 
       // Decoupled event listeners
       YAHOO.Bubbling.on("ruleSelected", this.onRuleSelected, this);
@@ -82,12 +91,20 @@
       },
 
       /**
-       * nodeRef of the rule that is being viewed
+       * Object describing the folder of the rule that is being viewed
        *
-       * @property ruleNodeRef
-       * @type Alfresco.util.NodeRef
+       * @property folderDetails
+       * @type {object}
        */
-      ruleNodeRef: null,
+      folderDetails: null,
+
+      /**
+       * Object describing the rule that is being viewed
+       *
+       * @property ruleDetails
+       * @type {object}
+       */
+      ruleDetails: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -114,7 +131,8 @@
        */
       onRuleSelected: function RulesHeader_onRuleSelected(layer, args)
       {
-         this.ruleNodeRef = new Alfresco.util.NodeRef(args[1].ruleDetails.nodeRef);
+         this.folderDetails = args[1].folderDetails;
+         this.ruleDetails = args[1].ruleDetails;
          this._loadRule();
       },
 
@@ -130,53 +148,17 @@
          Dom.setStyle(this.widgets.displayEl, "display", "none");
 
          // Load rule information form server
+         var nodeRefAsUrl = this.folderDetails.nodeRef.replace("://", "/");
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRefAsUrl + "/ruleset/rules/" + this.ruleDetails.id,
             successCallback:
             {
                fn: function(response)
                {
                   if (response.json)
                   {
-                     //var rule = response.json.data;
-                     var rule = {
-                        name: "A rule",
-                        description: "This is a fake test rule",
-                        modified: "2009-12-12",
-                        active: true,
-                        runInBackground: false,
-                        ruleAppliesToSubFolders: true,
-                        "when":
-                        {
-                           relation: "or",
-                           configurations: [
-                              { text: "Items are created" }
-                           ]
-                        },
-                        "if":
-                        {
-                           relation: "and",
-                           configurations: [
-                              { text: "Name contains *.doc" },
-                              { text: "Type is PNG" }
-                           ]
-                        },
-                        "unless":
-                        {
-                           relation: "and",
-                           configurations: [
-                           ]
-                        },
-                        "action":
-                        {
-                           relation: "or",
-                           configurations: [
-                              { text: "Move document to '/other/doclib'" }
-                           ]
-                        }
-                     };
-                     this._displayRule(rule);
+                     this._displayRule(response.json);
                   }
                },
                scope: this
@@ -205,24 +187,51 @@
       _displayRule: function RuleDetails__displayRule(rule)
       {
          // Basic info
-         Dom.get(this.id + "-name").innerHTML = rule.name;
-         Dom.get(this.id + "-description").innerHTML = rule.description;
-         Dom.get(this.id + "-name").innerHTML = rule.name;
-         Dom.removeClass(this.id + "-active", "active");
-         Dom.removeClass(this.id + "-active", "inactive");
-         Dom.addClass(this.id + "-active", rule.active == true ? "active" : "inactive");
-         Dom.removeClass(this.id + "-runInBackground", "active");
-         Dom.removeClass(this.id + "-runInBackground", "inactive");
-         Dom.addClass(this.id + "-runInBackground", rule.runInBackground == true ? "active" : "inactive");
-         Dom.removeClass(this.id + "-ruleAppliesToSubFolders", "active");
-         Dom.removeClass(this.id + "-ruleAppliesToSubFolders", "inactive");
-         Dom.addClass(this.id + "-ruleAppliesToSubFolders", rule.ruleAppliesToSubFolders == true ? "active" : "inactive");
+         Dom.get(this.id + "-title").innerHTML = $html(rule.title);
+         Dom.get(this.id + "-description").innerHTML = $html(rule.description);
+         Dom.removeClass(this.id + "-disabled", "enabled");
+         Dom.removeClass(this.id + "-disabled", "disabled");
+         Dom.addClass(this.id + "-disabled", rule.disabled == true ? "disabled" : "enabled");
+         Dom.removeClass(this.id + "-executeAsynchronously", "enabled");
+         Dom.removeClass(this.id + "-executeAsynchronously", "disabled");
+         Dom.addClass(this.id + "-executeAsynchronously", rule.executeAsynchronously == true ? "disabled" : "enabled");
+         Dom.removeClass(this.id + "-applyToChildren", "enabled");
+         Dom.removeClass(this.id + "-applyToChildren", "disabled");
+         Dom.addClass(this.id + "-applyToChildren", rule.applyToChildren == true ? "disabled" : "enabled");
 
-         // Configurations
-         this._displayConfigurations(rule["when"].configurations, rule["when"].relation, "when");
-         this._displayConfigurations(rule["if"].configurations, rule["if"].relation, "if");
-         this._displayConfigurations(rule["unless"].configurations, rule["unless"].relation, "unless");
-         this._displayConfigurations(rule["action"].configurations, rule["action"].relation, "action");
+         // When Configurations
+         var whenConfigs = [];
+         for (var i = 0, il = rule.ruleType.length; i < il; i++)
+         {
+            whenConfigs.push(
+            {
+               name: rule.ruleType[i]
+            });
+         }
+         this._displayConfigurations(whenConfigs, "name", null, "when");
+
+         // If & Unless configurations
+         var ifConfigs = [],
+            unlessConfigs = [];
+         i = 0;
+         il = rule.action.conditions.length;
+         for (var conditionConfig; i < il; i++)
+         {
+            conditionConfig = rule.action.conditions[i];
+            if (conditionConfig.invertCondition == true)
+            {
+               unlessConfigs.push(conditionConfig);
+            }
+            else
+            {
+               ifConfigs.push(conditionConfig);
+            }
+         }
+         this._displayConfigurations(ifConfigs, "conditionDefinitionName", null, "if");
+         this._displayConfigurations(unlessConfigs, "conditionDefinitionName", null, "unless");
+
+         // Action configurations
+         this._displayConfigurations(rule.action.actions, "actionDefinitionName", null, "action");
 
          // Display component again
          Alfresco.util.Anim.fadeIn(this.widgets.displayEl);
@@ -233,11 +242,12 @@
        *
        * @method _displayConfigurations
        * @param configurations {array} One of the configuration sets from the rule object
+       * @param configDefinitionNameKey {string} The object key for the config name value
        * @param relation {string} String to represent the relation type: "and" | "or"
        * @param classId {string} The class helping us to identify the html elements
        * @private
        */
-      _displayConfigurations: function RuleDetails__createConfigurations(configurations, relation, classId)
+      _displayConfigurations: function RuleDetails__displayConfigurations(configurations, configDefinitionNameKey, relation, classId)
       {
          var configurationSectionEl = Dom.getElementsByClassName(classId, "div", Dom.get(this.id + "-body"))[0];
          configurations = configurations ? configurations : [];
@@ -252,18 +262,21 @@
             Dom.removeClass(configurationSectionEl, "hidden");
          }
 
-         // Relation
-         var relationEl = Dom.getElementsByClassName("configuration-relation", "div", configurationSectionEl)[0];
-         if (configurations.length > 1)
+         // Relation support
+         if (relation != null)
          {
-            Dom.removeClass(relationEl, "hidden");
-            Dom.removeClass(relationEl, "and");
-            Dom.removeClass(relationEl, "or");
-            Dom.addClass(relationEl, relation);
-         }
-         else
-         {
-            Dom.addClass(relationEl, "hidden");
+            var relationEl = Dom.getElementsByClassName("configuration-relation", "div", configurationSectionEl)[0];
+            if (configurations.length > 1)
+            {
+               Dom.removeClass(relationEl, "hidden");
+               Dom.removeClass(relationEl, "and");
+               Dom.removeClass(relationEl, "or");
+               Dom.addClass(relationEl, relation);
+            }
+            else
+            {
+               Dom.addClass(relationEl, "hidden");
+            }
          }
 
          // Configurations
@@ -278,10 +291,9 @@
             configuration = configurations[i];
             var ruleEl = document.createElement("li");
             Dom.addClass(ruleEl, "configuration");
-            ruleEl.innerHTML = configuration.text; // Todo create real text here....
+            ruleEl.innerHTML = $html(configuration[configDefinitionNameKey]); 
             ruleEl = configurationBodyEl.appendChild(ruleEl);            
          }
-
       },
 
       /**
@@ -297,10 +309,10 @@
          this.widgets.editButton.set("disabled", true);
 
          // Send the user to edit rule page
-         var url = YAHOO.lang.substitute("rule-edit?folderNodeRef={folderNodeRef}&ruleNodeRef={ruleNodeRef}",
+         var url = YAHOO.lang.substitute("rule-edit?folderNodeRef={folderNodeRef}&ruleId={ruleId}",
          {
             folderNodeRef: this.options.nodeRef.toString(),
-            ruleNodeRef: this.ruleNodeRef.toString()
+            ruleId: this.ruleId.toString()
          });
          window.location.href = url;
       },

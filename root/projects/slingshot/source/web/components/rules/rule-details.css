@@ -42,12 +42,12 @@
    padding-top:0.25em;
 }
 
-.rule-details .behaviour.active
+.rule-details .behaviour.enabled
 {
    background-image:url(../images/inherited-on-16.png);
 }
 
-.rule-details .behaviour.inactive
+.rule-details .behaviour.disabled
 {
    background-image:url(../images/inherited-off-16.png);
 }

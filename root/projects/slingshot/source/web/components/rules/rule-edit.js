@@ -113,7 +113,7 @@
                ],
                conditions: [
                   {
-                     actionDefinitionName: "",
+                     conditionDefinitionName: "",
                      parameterValues: {}
                   }
                ],
@@ -399,7 +399,7 @@
          ruleConfig.setOptions(
          {
             form: this.widgets.form,
-            ruleConfigDefinitionKey: "actionDefinitionName"
+            ruleConfigDefinitionKey: "conditionDefinitionName"
          });
          ruleConfig.displayRuleConfigs(ifConditionConfigs);
 
@@ -408,7 +408,7 @@
          ruleConfig.setOptions(
          {
             form: this.widgets.form,
-            ruleConfigDefinitionKey: "actionDefinitionName"
+            ruleConfigDefinitionKey: "conditionDefinitionName"
          });
          ruleConfig.displayRuleConfigs(unlessConditionConfigs);
 
