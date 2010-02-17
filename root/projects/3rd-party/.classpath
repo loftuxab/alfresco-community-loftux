@@ -169,5 +169,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/fop/batik-all-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fop/fop-0.94.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fop/xmlgraphics-commons-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/chiba-1.3.0-patched.jar" sourcepath="src/chiba-1.3.0-patched-src.zip"/>
+	<classpathentry kind="lib" path="lib/commons/commons-jxpath-1.2.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
