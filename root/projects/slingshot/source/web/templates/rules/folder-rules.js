@@ -140,6 +140,7 @@
          {
             folderDetails:
             {
+               nodeRef: this.options.nodeRef,
                location:
                {
                   path: this.options.pathToFolder
@@ -203,7 +204,7 @@
       {
          // Check if there are inherited rules
          var rules = this.options.rules;
-         if (rules.length > 0)
+         if (rules && rules.length > 0)
          {
             // Give the inherit button the correct state/icon depending
             for (var i = 0, l = rules.length; i < l; i++)

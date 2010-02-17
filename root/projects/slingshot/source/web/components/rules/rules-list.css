@@ -59,7 +59,7 @@
 
 .rules-list li.message
 {
-   margin-left: 0.5em;   
+   padding-left: 0.5em;   
 }
 
 .rules-list li .no,
@@ -75,7 +75,7 @@
    background-image: url(../images/indicator-on-16.png)
 }
 
-.rules-list li .active-icon.inactive-icon
+.rules-list li .active-icon.disabled
 {
    background-image: url(../images/indicator-off-16.png);
 }

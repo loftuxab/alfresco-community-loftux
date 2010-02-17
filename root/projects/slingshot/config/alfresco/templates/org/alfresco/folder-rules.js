@@ -2,75 +2,38 @@
 
 function main()
 {
-   var nodeRef = page.url.args.nodeRef;
-   var connector = remote.connect("alfresco");
-   // todo use this when webscript exist: var result = connector.get("/api/node/" + page.url.args.nodeRef.replace (":/", "") + "/ruleset/rules");
-   var result = connector.get("/api/sites");
+   var nodeRef = page.url.args.nodeRef,
+      connector = remote.connect("alfresco");
+
+   // Load folder info
+   var result = connector.post("/api/forms/picker/items", '{"items": ["' + page.url.args.nodeRef + '"]}', "application/json");
    if (result.status == 200)
    {
-
-      //var data = eval('(' + result + ')'); 
-
-      // Load folder info
+      var folderDetails = eval('(' + result + ')').data.items[0];
       model.folder = {
-         name: "The Folder",
-         path: "/path/to/folder"
+         name: folderDetails.name,
+         path: folderDetails.displayPath
       };
+   }
 
-      // Load rules and see if there are any or if they are linked
-      if (false)
-      {
-         // Folder has linked rules
-         model.linkedFolder = {
-            nodeRef: "linkedFolderNodeRef",
-            name: "Requirements",
-            path: "/Sailfish/Product management"
-         };
-      }
-      else if (true)
-      {
-         // Folder has rules
-         var rules = [];
-         rules[rules.length] = {
-            nodeRef: "irnr1",
-            title: "First inherited rule",
-            description: "This is quite a rule one must say",
-            inheritedFolder:  {
-               nodeRef: "ifnr1",
-               name: "ifnr1"
-            },
-            active:  true
-         };
-         rules[rules.length] = {
-            nodeRef: "irnr2",
-            title: "Second inherited rule",
-            description: "This is quite a rule one must say",
-            inheritedFolder:  {
-               nodeRef: "ifnr1",
-               name: "ifnr1"
-            },
-            active:  true
-         };
-         rules[rules.length] = {
-            nodeRef: "ornr1",
-            title: "First own rule",
-            description: "This is quite a rule one must say",
-            inheritedFolder:  null,
-            active:  false
-         };
-         rules[rules.length] = {
-            nodeRef: "ornr2",
-            title: "Second own rule",
-            description: "This is quite a rule one must say",
-            inheritedFolder:  null,
-            active:  true
-         };
-         model.rules = rules;
-      }
-      else
-      {
-         // No (linked) rules at all
-      }
+   // Load rules
+   result = connector.get("/api/node/" + page.url.args.nodeRef.replace("://", "/") + "/ruleset/rules");
+   if (result.status == 200)
+   {
+      model.rules = eval('(' + result + ')').data;       
+   }
+   else if (false)
+   {
+      // Folder has linked rules
+      model.linkedFolder = {
+         nodeRef: "linkedFolderNodeRef",
+         name: "Requirements",
+         path: "/Sailfish/Product management"
+      };
+   }
+   else
+   {
+      // No (linked) rules at all
    }
 }
 

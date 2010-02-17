@@ -7,13 +7,11 @@ function main()
    // Load rule to edit of given in url
    if (ruleNodeRef)
    {
-      /*
       result = connector.get("/api/sites/" + siteId);
       if (result.status == 200)
       {
          var data = eval('(' + result + ')');
       }
-      */
 
       rule = jsonUtils.toJSONString(
       {

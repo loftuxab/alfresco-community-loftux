@@ -16,19 +16,16 @@
          <input type="button" id="${el}-delete-button" value="${msg("button.delete")}" tabindex="0"/>
       </div>
 
-      <h2 id="${el}-name">&nbsp;</h2>
+      <h2 id="${el}-title">&nbsp;</h2>
       <div>
          <em>${msg("label.description")}: </em><span id="${el}-description">&nbsp;</span>
-      </div>
-      <div>
-         <em>${msg("label.modified")}: </em><span id="${el}-modified">&nbsp;</span>
       </div>
 
       <hr/>
 
-      <div id="${el}-active" class="behaviour">${msg("label.active")}</div>
-      <div id="${el}-runInBackground" class="behaviour">${msg("label.runInBackground")}</div>
-      <div id="${el}-ruleAppliesToSubFolders" class="behaviour">${msg("label.ruleAppliesToSubFolders")}</div>
+      <div id="${el}-disabled" class="behaviour">${msg("label.disabled")}</div>
+      <div id="${el}-executeAsynchronously" class="behaviour">${msg("label.executeAsynchronously")}</div>
+      <div id="${el}-applyToChildren" class="behaviour">${msg("label.applyToChildren")}</div>
 
       <hr/>
 
@@ -45,7 +42,7 @@
       <div class="configuration-section if">
          <div class="configuration-header">
             <div class="configuration-title">${msg("header.if")}</div>
-            <div class="configuration-relation and">
+            <div class="configuration-relation and hidden">
                <span class="and-label">${msg("label.and")}</span>
                <span class="or-label">${msg("label.or")}</span>
             </div>
@@ -57,7 +54,7 @@
       <div class="configuration-section unless">
          <div class="configuration-header">
             <div class="configuration-title">${msg("header.unless")}</div>
-            <div class="configuration-relation and">
+            <div class="configuration-relation and hidden">
                <span class="and-label">${msg("label.and")}</span>
                <span class="or-label">${msg("label.or")}</span>
             </div>
