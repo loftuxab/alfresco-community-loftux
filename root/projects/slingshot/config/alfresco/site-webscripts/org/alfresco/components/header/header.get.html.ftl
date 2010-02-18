@@ -9,7 +9,8 @@
       siteTitle: "${siteTitle?js_string}",
       searchType: "${page.url.templateArgs.site!'all'}", // default search scope
       favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>},
-      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}
+      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
+      initialSearch: "${(page.url.args.t!"")?js_string}"
    }).setMessages(
       ${messages}
    );
@@ -52,7 +53,7 @@
          <span class="menu-item">
             <span class="search-container link-menu-button">
                <label for="${args.htmlid}-searchtext" style="display:none">${msg("header.search.inputlabel")}</label>
-               <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" maxlength="256" />
+               <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="${(page.url.args.t!"")?html}" maxlength="256" />
                <span class="search-icon">&nbsp;</span>
                <span class="menu-item-separator">&nbsp;</span>
                <input id="${args.htmlid}-search-tbutton" type="button"/>
