@@ -436,19 +436,26 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     
     params.setSession( sess);
     
-    //  Get, or create, a file state for the new file
+    // Check if this is a stream create
     
     FileState fstate = getFileState(params.getPath(), dbCtx, true);
-    if ( fstate.fileExists()) {
+
+    if ( params.isStream()) {
+
+    	// Make sure the parent file exists
+
+    	if ( fileExists( sess, tree, params.getPath()) == FileStatus.FileExists) {
+    		
+    		//  Create a new stream associated with the existing file
       
-      //  Check if the file creation is a new stream
-      
-      if ( params.isStream() == false)
+    		return createStream(params, fstate, dbCtx);
+    	}
+    }
+    else if ( fstate.fileExists()) {
+
+    	// File already exists
+    	
         throw new FileExistsException("File exists, " + params.getPath());
-        
-      //  Create a new stream associated with the existing file
-      
-      return createStream(params, fstate, dbCtx);
     }
       
     //  Split the path string and find the directory id to attach the file to
@@ -750,13 +757,39 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         
     if ( FileName.containsStreamName(name)) {
       
+    	// Get the file information for the stream
+    	
+    	FileInfo fInfo = null;
+    	
+    	try {
+    		fInfo = getFileInformation( sess, tree, name);
+    	}
+    	catch ( IOException ex) {
+    	}
+
+    	// Check if the file information was retrieved for the stream
+    	
+    	if ( fInfo != null)
+    		fileSts = FileStatus.FileExists;
+    	
+        //  Debug
+    	  
+        if ( Debug.EnableInfo && hasDebug())
+          Debug.println("DB fileExists() nameWithStream=" + name + ", fileSts=" + FileStatus.asString(fileSts));
+        
+/***
       //  Split the path into directory, file and stream name components
       
       String[] paths = FileName.splitPathStream(name);    
 
       //  Get, or create, the file state for main file path
       
-      String filePath = paths[0] + paths[1];
+      String filePath = null;
+      if ( paths[0] != null && paths[0].endsWith( FileName.DOS_SEPERATOR_STR) == false)
+    	  filePath = paths[0] + FileName.DOS_SEPERATOR_STR + paths[1];
+      else
+    	  filePath = paths[0] + paths[1];
+      
       FileState fstate = getFileState(filePath,dbCtx,true);
 
       //  Check if the top level file exists
@@ -801,6 +834,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
   
       if ( Debug.EnableInfo && hasDebug())
         Debug.println("DB fileExists() name=" + filePath + ", stream=" + paths[2] + ", fileSts=" + FileStatus.asString(fileSts));
+***/
     }
     else {
 
@@ -926,7 +960,20 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         //  Get, or create, the file state for main file path
         
         String filePath = paths[0] + paths[1];
-        FileState parent = getFileState(filePath,dbCtx,true);
+        FileState parent = getFileState(filePath,dbCtx,false);
+        
+        // Get the file information for the parent file to load the cache
+        
+        if ( parent == null) {
+        	
+        	// Get the file information for the parent file
+        	
+        	getFileInformation( sess, tree, filePath);
+        	
+        	// File state should exist for the parent now
+        	
+        	parent = getFileState(filePath,dbCtx,false);
+        }
   
         //  Check if the top level file exists
         
@@ -2915,6 +2962,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     
     DBFileInfo sfinfo = new DBFileInfo(sInfo.getName(), params.getFullPath(), finfo.getFileId(), finfo.getDirectoryId());
     sfinfo.setFileSize(sInfo.getSize());
+    sfinfo.setFileAttributes( FileAttribute.Normal);
     
     fstate.addAttribute(FileState.FileInformation, sfinfo);
     
