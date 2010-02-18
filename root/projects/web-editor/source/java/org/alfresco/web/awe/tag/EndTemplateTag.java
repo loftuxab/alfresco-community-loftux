@@ -63,17 +63,17 @@ public class EndTemplateTag extends AbstractWebEditorTag
             
             out.write("<script type=\"text/javascript\">\n");
                  out.write("window.onload = function() {\n");
-            out.write("AAF.boot(function handler()");
+            out.write("WEF.boot(function handler()");
             out.write("{\n");
-            out.write("AAF.loader.require({\n");
+            out.write("WEF.loader.require({\n");
             out.write("name:'com.alfresco.awe.init',\n");
             out.write("repo:'lib',\n");
             out.write("requires:['com.alfresco.awe','com.alfresco.awe.ribbon']\n");
             out.write("});\n");
       
-            out.write("AAF.loader.load(\n");
+            out.write("WEF.loader.load(\n");
             out.write("{\n");
-            out.write("fn:function AAF_Boot_SuccessHandler(o)\n");
+            out.write("fn:function WEF_Boot_SuccessHandler(o)\n");
             out.write("{\n");
             out.write("var y = (o.reference) ? o.reference : YAHOO;\n");
             out.write("// o.reference is the SANDBOXED YAHOO object\n");
@@ -124,7 +124,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             out.write("scope:this\n");
             out.write("},\n");
             out.write("{\n");
-            out.write("fn:function AAF_Boot_FailureHandler()\n");
+            out.write("fn:function WEF_Boot_FailureHandler()\n");
             out.write("{\n");
             out.write("},\n");
             out.write("scope: this\n");
