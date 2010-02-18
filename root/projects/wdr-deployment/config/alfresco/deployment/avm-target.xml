@@ -30,6 +30,16 @@
 						</property>
 					</bean>
 				</property>
+				
+				<!-- Where should the root of the web project be stored, by default /www/avm_webapps -->
+				<property name="rootPath">
+				    <value>/www/avm_webapps</value>
+				</property>
+				
+				<!-- storeName pattern mapping, by default "%storeName%-live" -->
+				<property name="storeNamePattern">
+                    <value>%storeName%-live</value>
+                </property>
 
 				<!--  Alfresco services -->
 				<property name="avmService">

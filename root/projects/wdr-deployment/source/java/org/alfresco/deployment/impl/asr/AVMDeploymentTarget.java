@@ -54,6 +54,7 @@ import org.alfresco.repo.avm.AVMNodeConverter;
 import org.alfresco.repo.avm.AVMNodeType;
 import org.alfresco.repo.avm.util.SimplePath;
 import org.alfresco.repo.domain.PropertyValue;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
@@ -73,6 +74,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 {   
+ 
 	/**
 	 * 
 	 */
@@ -102,6 +104,11 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
      * The pattern for the root of the destination
      */
     private String rootPath = "/www/avm_webapps";
+    
+    /**
+     * Who should this target run as ?
+     */
+    private String proxyUser = AuthenticationUtil.SYSTEM_USER_NAME;
     
     /**
      * The authenticator for this target
@@ -225,6 +232,21 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 	
 	public void prepare(String ticket) 
 	{
+	    final String fTicket = ticket;
+	    AuthenticationUtil.runAs(	            
+	            new AuthenticationUtil.RunAsWork<Void>()
+	            {
+                    public Void doWork() throws Exception
+                    {
+                        prepareImpl(fTicket);
+                        return null;
+                    }
+	            }
+	            , proxyUser);
+	}
+	    
+    private void prepareImpl(final String ticket)
+	{
 	  	logger.info("Prepare ticket: " + ticket);
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
@@ -292,11 +314,28 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
             throw new DeploymentException("Could not prepare.", e);
         }
 	}
+    
+    public void abort(String ticket) 
+    {
+        final String fTicket = ticket;
+        AuthenticationUtil.runAs(               
+                new AuthenticationUtil.RunAsWork<Void>()
+                {
+                    public Void doWork() throws Exception
+                    {
+                        abortImpl(fTicket);
+                        return null;
+                    }
+                }
+                , proxyUser);
+    }
 
 
-	public void abort(String ticket) 
+	private void abortImpl(String ticket) 
 	{
 	  	logger.info("Abort ticket: " + ticket);
+        AuthenticationUtil.setRunAsUser(proxyUser);
+        
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
@@ -359,9 +398,27 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
             fDeployments.remove(ticket);           
         }		
 	}
+	
 
-	public void commit(String ticket) 
+    public void commit(String ticket)
+    {
+        final String fTicket = ticket;
+        AuthenticationUtil.runAs(               
+                new AuthenticationUtil.RunAsWork<Void>()
+                {
+                    public Void doWork() throws Exception
+                    {
+                        commitImpl(fTicket);
+                        return null;
+                    }
+                }
+                , proxyUser);
+    }
+
+	private void commitImpl(String ticket) 
 	{	
+	       AuthenticationUtil.setRunAsUser(proxyUser);
+	       
 	       Deployment deployment = fDeployments.get(ticket);
 	        if (deployment == null)
 	        {
@@ -446,7 +503,24 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 	/**
 	 * Delete a file or directory
 	 */
-	public void delete(String ticket, String path) 
+	public void delete(String ticket, String path)
+	{
+	  final String fTicket = ticket;
+	  final String fPath = path;
+      AuthenticationUtil.runAs(               
+              new AuthenticationUtil.RunAsWork<Void>()
+              {
+                  public Void doWork() throws Exception
+                  {
+                      deleteImpl(fTicket, fPath);
+                      return null;
+                  }
+              }
+              , proxyUser);
+    }
+
+	
+	private void deleteImpl(String ticket, String path) 
 	{
 		Deployment deployment = fDeployments.get(ticket);
 		if (deployment == null)
@@ -495,7 +569,25 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 		}		
 	}
 
-	public List<FileDescriptor> getListing(String ticket, String path) 
+	/**
+	 * Get listing
+	 */
+	public List<FileDescriptor> getListing(String ticket, String path)
+	{
+	     final String fTicket = ticket;
+	     final String fPath = path;
+	     return AuthenticationUtil.runAs(               
+	              new AuthenticationUtil.RunAsWork<List<FileDescriptor>>()
+	              {
+	                  public List<FileDescriptor> doWork() throws Exception
+	                  {
+	                      return getListingImpl(fTicket, fPath);
+	                  }
+	              }
+	              , proxyUser);
+	}
+	
+	private List<FileDescriptor> getListingImpl(String ticket, String path) 
 	{
 		Deployment deployment = fDeployments.get(ticket);
 	    if (deployment == null)
@@ -535,7 +627,26 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 	/**
 	 * Create new directory
 	 */
-	public void createDirectory(String ticket, String path, String guid, Set<String>aspects, Map<String, Serializable> props) 
+    public void createDirectory(String ticket, String path, String guid, Set<String>aspects, Map<String, Serializable> props) 
+    {
+        final String fTicket = ticket;
+        final String fpath = path; 
+        final String fguid = guid;
+        final Set<String>faspects = aspects; 
+        final Map<String, Serializable> fprops = props;
+        AuthenticationUtil.runAs(               
+                new AuthenticationUtil.RunAsWork<Void>()
+                {
+                    public Void doWork() throws Exception
+                    {
+                        createDirectoryImpl(fTicket, fpath, fguid, faspects, fprops) ;
+                        return null;
+                    }
+                }
+                , proxyUser);
+    }
+
+	private void createDirectoryImpl(String ticket, String path, String guid, Set<String>aspects, Map<String, Serializable> props) 
 	{
 		Deployment deployment = fDeployments.get(ticket);
 		if (deployment == null)
@@ -610,6 +721,26 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 	 * Send 
 	 */
 	public OutputStream send(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
+	{
+        final String fTicket = ticket;
+        final String fpath = path; 
+        final String fguid = guid;
+        final String fencoding = encoding; 
+        final String fmimeType = mimeType;
+        final Set<String>faspects = aspects; 
+        final Map<String, Serializable> fprops = props;
+        return AuthenticationUtil.runAs(               
+                new AuthenticationUtil.RunAsWork<OutputStream>()
+                {
+                    public OutputStream  doWork() throws Exception
+                    {
+                        return sendImpl(fTicket, fpath, fguid, fencoding, fmimeType, faspects, fprops) ;
+                    }
+                }
+                , proxyUser);
+	}
+	
+	private OutputStream sendImpl(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
 	{
         final Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
@@ -730,9 +861,31 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
         		throw new DeploymentException("Could not send for path:" + path, e);
 	    }
 	}
+	
+	/**
+	 * 
+	 */
+    public void updateDirectory(String ticket, String path, String guid, Set<String>aspects, Map<String, Serializable> props) 
+    {
+        final String fTicket = ticket;
+        final String fpath = path; 
+        final String fguid = guid;
+        final Set<String>faspects = aspects; 
+        final Map<String, Serializable> fprops = props;
+        AuthenticationUtil.runAs(               
+                new AuthenticationUtil.RunAsWork<Void>()
+                {
+                    public Void doWork() throws Exception
+                    {
+                        updateDirectoryImpl(fTicket, fpath, fguid, faspects, fprops) ;
+                        return null;
+                    }
+                }
+                , proxyUser);
+    }
 
  
-	public void updateDirectory(String ticket, String path, String guid, Set<String>aspects, Map<String, Serializable> props) 
+	private void updateDirectoryImpl(String ticket, String path, String guid, Set<String>aspects, Map<String, Serializable> props) 
 	{
 		Deployment deployment = fDeployments.get(ticket);
 		if (deployment == null)
@@ -876,4 +1029,14 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 	public String getStoreNamePattern() {
 		return storeNamePattern;
 	}
+
+    public void setProxyUser(String proxyUser)
+    {
+        this.proxyUser = proxyUser;
+    }
+
+    public String getProxyUser()
+    {
+        return proxyUser;
+    }
 }
