@@ -10,6 +10,18 @@
    <import file="${alfresco.basedir}/macros.xml" />
    <import file="${alfresco.basedir}/projects.xml" />
 
+   <!-- For support of the script tag, we have to choose between -->
+   <!-- supporting Java 1.5 or Ant 1.6, and we've opted for -->
+   <!-- Java 1.5. (Ant 1.6 fails to be able to load the BSF or -->
+   <!-- JSR-223 jars from anywhere other than the ant lib directory) -->
+   <fail message="Ant 1.7 or higher is required to build. ${ant.version} detected">
+     <!-- antversion tag not available in 1.6 which is unhelpful -->
+     <condition><contains string="${ant.version}" substring="1.6." /></condition>
+   </fail>
+   <fail message="Ant 1.7 or higher is required to build. ${ant.version} detected">
+     <condition><not><antversion atleast="1.7" /></not></condition>
+   </fail>
+
    <target name="init">
       <property environment="env" />
 
