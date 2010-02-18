@@ -447,6 +447,8 @@ public class DBDeviceContext extends DiskDeviceContext {
 				// Get the database features that the database interface must implement to support
 				// this file loader
 
+				dbFeatures = m_loader.getRequiredDBFeatures();
+				
 				// Set the device context in the loader
 				
 				m_loader.setContext( this);

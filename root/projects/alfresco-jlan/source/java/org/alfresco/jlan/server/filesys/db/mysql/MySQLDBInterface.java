@@ -398,7 +398,7 @@ public class MySQLDBInterface extends JdbcDBInterface implements DBQueueInterfac
 				Statement stmt = conn.createStatement();
 
 				stmt.execute("CREATE TABLE " + getObjectIdTableName()
-						+ " (FileId INTEGER NOT NULL, StreamId INTEGER NOT NULL, ObjectId VARCHAR(128) PRIMARY KEY (FileId,StreamId))");
+						+ " (FileId INTEGER NOT NULL, StreamId INTEGER NOT NULL, ObjectId VARCHAR(128), PRIMARY KEY (FileId,StreamId))");
 
 				stmt.close();
 
