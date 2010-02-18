@@ -50,7 +50,7 @@ String subTextNodeRef = "workspace://SpacesStore/27872b54-a3b5-47ed-9ac6-eaa5340
       <awe:startTemplate />
       <script type="text/javascript" charset="utf-8">
          //Needs to move
-         AAF.init({
+         WEF.init({
             /**
              * Debug mode
              * 
