@@ -1288,6 +1288,7 @@
             {
                // Display the file size in human readable format after the filename.
                var fileInfoStr = record.name + " (" + Alfresco.util.formatFileSize(record.size) + ")";
+               templateInstance.setAttribute("title", fileInfoStr);
 
                // Display the file name and size.
                progressInfo = progressInfo[0];
@@ -1337,7 +1338,7 @@
             }
 
             // Insert the templateInstance to the column.
-            cell.appendChild (templateInstance);
+            cell.appendChild(templateInstance);
          };
 
          // Definition of the data table column
