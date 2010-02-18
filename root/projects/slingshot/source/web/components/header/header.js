@@ -93,6 +93,15 @@
          searchType: "",
          
          /**
+          * Initial search term, if any.
+          * 
+          * @property initialSearch
+          * @type string
+          * @default ""
+          */
+         initialSearch: "",
+         
+         /**
           * Favourite sites
           * 
           * @property favouriteSites
@@ -185,8 +194,11 @@
       {
          if (Dom.hasClass(this.id + "-searchtext", "gray"))
          {
-            Dom.get(this.id + "-searchtext").value = "";
-            Dom.removeClass(this.id + "-searchtext", "gray");
+            if (this.options.initialSearch.length === 0)
+            {
+               Dom.get(this.id + "-searchtext").value = "";
+               Dom.removeClass(this.id + "-searchtext", "gray");
+            }
          }
          else
          {
@@ -220,8 +232,11 @@
        */
       defaultSearchText: function Header_defaultSearchText()
       {
-         Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
-         Dom.addClass(this.id + "-searchtext", "gray");
+         if (this.options.initialSearch.length === 0)
+         {
+            Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
+            Dom.addClass(this.id + "-searchtext", "gray");
+         }
       },
 
       /**

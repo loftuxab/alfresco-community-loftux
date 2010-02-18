@@ -82,13 +82,13 @@
       options:
       {
          /**
-          * siteId to search in. "" if search should be cross-site
+          * siteId to search in, empty if search should be cross-site
           * 
           * @property siteId
           * @type string
           */
          siteId: "",
-
+         
          /**
           * Title/name of the site
           */
@@ -104,22 +104,30 @@
          maxSearchResults: 100,
          
          /**
-          * Search term to use for
-          * @property searchTerm
+          * Search term to use for the initial search
+          * @property initialSearchTerm
           * @type string
           * @default ""
           */
-         initialSearchTerm : "",
+         initialSearchTerm: "",
+         
+         /**
+          * Search tag to use for the initial search
+          * @property initialSearchTag
+          * @type string
+          * @default ""
+          */
+         initialSearchTag: "",
          
          /**
           * States whether all sites should be searched.
           * This field only has an effect if siteId != ""
           * 
-          * @property searchTag
+          * @property initialSearchAll
           * @type string
           */
          initialSearchAll: true,
-
+         
          /**
           * Number of characters required for a search.
           *
@@ -128,7 +136,7 @@
           * @default 1
           */
          minSearchTermLength: 1,
-
+         
          /**
           * Maximum number of items to display in the results list
           *
@@ -138,7 +146,7 @@
           */
          maxSearchResults: 100         
       },
-
+      
       /**
        * Object container for storing YUI widget instances.
        * 
@@ -146,7 +154,7 @@
        * @type object
        */
       widgets: null,
-
+      
       /**
        * Object container for storing module instances.
        * 
@@ -154,12 +162,17 @@
        * @type object
        */
       modules: null,
-
+      
       /**
-       * Search term used for the search.
+       * Search term used for the last search.
        */
       searchTerm: "",
-
+      
+      /**
+       * Search tag used for the last search.
+       */
+      searchTag: "",
+      
       /**
        * Whether the search was over all sites or just the current one
        */
@@ -244,13 +257,14 @@
          YAHOO.Bubbling.fire("onSearch",
          {
             searchTerm: this.options.initialSearchTerm,
+            searchTag: this.options.initialSearchTag,
             searchAll: (this.options.initialSearchAll == 'true')
          });
-
+         
          // Hook action events
          Alfresco.util.registerDefaultActionHandler(this.id, "search-tag", "span", this);
          Alfresco.util.registerDefaultActionHandler(this.id, "search-scope-toggle", "a", this);
-
+         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -420,7 +434,7 @@
 
          // show initial message
          this._setDefaultDataTableErrors(this.widgets.dataTable);
-         if (this.options.initialSearchTerm.length === 0)
+         if (this.options.initialSearchTerm.length === 0 && this.options.initialSearchTag.length === 0)
          {
             this.widgets.dataTable.set("MSG_EMPTY", "");
          }
@@ -490,7 +504,8 @@
       {
          this.refreshSearch(
          {
-            searchTerm: param
+            searchTag: param,
+            searchTerm: ""
          });
       },
       
@@ -519,6 +534,11 @@
          {
             searchTerm = args.searchTerm;
          }
+         var searchTag = this.searchTag;
+         if (args.searchTag !== undefined)
+         {
+            searchTag = args.searchTag;
+         }
          var searchAll= this.searchAll;
          if (args.searchAll !== undefined)
          {
@@ -532,6 +552,7 @@
             url += "site/" + this.options.siteId + "/";
          }
          url += "search?t=" + encodeURIComponent(searchTerm);
+         url += "&tag=" + encodeURIComponent(searchTag);
          url += "&a=" + searchAll;
          window.location = url;
       },
@@ -558,12 +579,17 @@
             {
                searchTerm = obj.searchTerm;
             }
+            var searchTag = this.searchTag;
+            if (obj.searchTag !== undefined)
+            {
+               searchTag = obj.searchTag;
+            }
             var searchAll= this.searchAll;
             if (obj.searchAll !== undefined)
             {
                searchAll = obj.searchAll;
             }
-            this._performSearch(searchTerm, searchAll);
+            this._performSearch(searchTerm, searchTag, searchAll);
          }
       },
 
@@ -586,10 +612,11 @@
        *
        * @method _performSearch
        */
-      _performSearch: function Search__performSearch(searchTerm, searchAll)
+      _performSearch: function Search__performSearch(searchTerm, searchTag, searchAll)
       {
          var searchTerm = YAHOO.lang.trim(searchTerm);
-         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
+         var searchTag = YAHOO.lang.trim(searchTag);
+         if (searchTag.length === 0 && searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -597,10 +624,10 @@
             });
             return;
          }
-
+         
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
-          
+         
          // update the ui to show that a search is on-going
          this.widgets.dataTable.set("MSG_EMPTY", "");
          this.widgets.dataTable.render();
@@ -608,6 +635,7 @@
          function successHandler(sRequest, oResponse, oPayload)
          {
             this.searchTerm = searchTerm;
+            this.searchTag = searchTag;
             this.searchAll = searchAll;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
             // update the result info
@@ -638,7 +666,7 @@
             }
          }
          
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm),
+         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm, searchTag),
          {
             success: successHandler,
             failure: failureHandler,
@@ -654,7 +682,15 @@
       _updateSearchInfo: function Search__updateSearchInfo()
       {
          // update the search results field
-         var searchFor = '<b>' + $html(this.searchTerm) + '</b>';
+         var searchFor;
+         if (this.searchTerm.length !== 0)
+         {
+            searchFor = '<b>' + $html(this.searchTerm) + '</b>';
+         }
+         else
+         {
+            searchFor = '<b>' + $html(this.searchTag) + '</b>';
+         }
          var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + $html(this.options.siteName) + '</b>'));
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)
@@ -699,14 +735,15 @@
        *
        * @method _buildSearchParams
        */
-      _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm)
+      _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm, searchTag)
       {
          var site = searchAll ? "" : this.options.siteId;
-         var params = YAHOO.lang.substitute("site={site}&term={term}&maxResults={maxResults}",
+         var params = YAHOO.lang.substitute("site={site}&term={term}&tag={tag}&maxResults={maxResults}",
          {
             site: encodeURIComponent(site),
-            term : encodeURIComponent(searchTerm),
-            maxResults : this.options.maxSearchResults + 1 // to be able to know whether we got more results
+            term: encodeURIComponent(searchTerm),
+            tag: encodeURIComponent(searchTag),
+            maxResults: this.options.maxSearchResults + 1 // to calculate whether more results were available
          });
          
          return params;
