@@ -97,11 +97,12 @@ public class StartTemplateTag extends AbstractWebEditorTag
             String urlPrefix = getWebEditorUrlPrefix();
             boolean debug = isDebugEnabled();
             
-            out.write("\n<!-- **** Start of Alfresco Web Editor requirements **** -->\n");
-            
             out.write("<script type=\"text/javascript\" src=\"");
             out.write(urlPrefix);
-            out.write("/js/wef-boot.js\"></script>\n");
+            out.write("/service/wef/bootstrap\"></script>\n");
+            
+            // TODO: Remove all the addResource() calls below, call
+            //       /service/wef/resources script instead from EndTemplateTag
             
             //register modules with loader
             // TODO: these paths are absolute. Need to make these
@@ -184,8 +185,6 @@ public class StartTemplateTag extends AbstractWebEditorTag
             // out.write("path: \"http://localhost:8081/awe/css/awe-toolbar-ie.css\"\n");
             // out.write("});\n");            
             // out.write("<![endif]-->\n");
-
-
             
             out.write("WEF.addResource({\n");
             out.write("name: 'com.alfresco.forms',\n");
@@ -273,7 +272,8 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("WEF.addResource({\n");
             out.write("name: 'accessibility.aria.plugins.yui',\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/js/accessibility/aria/plugins/yui/yui-aria.js\",\n");            out.write("requires:['accessibility.aria.plugins.yui.menu','accessibility.aria.plugins.yui.button','accessibility.aria.plugins.yui.container','accessibility.aria.plugins.yui.tabview']\n");
+            out.write("path: \"http://localhost:8081/js/accessibility/aria/plugins/yui/yui-aria.js\",\n");            
+            out.write("requires:['accessibility.aria.plugins.yui.menu','accessibility.aria.plugins.yui.button','accessibility.aria.plugins.yui.container','accessibility.aria.plugins.yui.tabview']\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
@@ -309,38 +309,7 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("repo:'lib',\n");
             out.write("requires:['com.alfresco.awe','com.alfresco.awe.ribbon']\n");
             out.write("});\n");
-         
-            out.write("</script>\n");            
-                           
-            // render JavaScript constants TODO
-            // out.write("<script type=\"text/javascript\">//<![CDATA[\n");
-            // out.write("Alfresco.constants = Alfresco.constants || {};\n");
-            // out.write("Alfresco.constants.DEBUG = ");
-            // out.write(debug ? "true" : "false");
-            // out.write(";\n");
-            // out.write("Alfresco.constants.AUTOLOGGING = false;\n");
-            // out.write("Alfresco.constants.PROXY_URI = window.location.protocol + \"//\" + window.location.host + \"");
-            // out.write(urlPrefix);
-            // out.write("/proxy/alfresco/\";\n");
-            // out.write("Alfresco.constants.PROXY_URI_RELATIVE = \"");
-            // out.write(urlPrefix);
-            // out.write("/proxy/alfresco/\";\n");
-            // out.write("Alfresco.constants.THEME = \"default\";\n");
-            // out.write("Alfresco.constants.URL_CONTEXT = \"");
-            // out.write(urlPrefix);
-            // out.write("/\";\n");
-            // out.write("Alfresco.constants.URL_PAGECONTEXT = \"");
-            // out.write(urlPrefix);
-            // out.write("/p/\";\n");
-            // out.write("Alfresco.constants.URL_SERVICECONTEXT = \"");
-            // out.write(urlPrefix);
-            // out.write("/service/\";\n");
-            // out.write("Alfresco.constants.USERNAME = \"admin\";\n");
-            // out.write("Alfresco.constants.HTML_EDITOR = \"tinyMCE\";\n");
-            // out.write("//]]></script>\n");
-   
-   
-            out.write("<!-- **** End of Alfresco Web Editor requirements **** -->\n");
+            out.write("</script>\n");
    
             // store the toolbar location into the request session
             this.pageContext.getRequest().setAttribute(KEY_TOOLBAR_LOCATION, getToolbarLocation());
