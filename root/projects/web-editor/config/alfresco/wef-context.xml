@@ -15,6 +15,10 @@
       <property name="path" value="/service/wef/application-resource" />
    </bean>
    
+   <bean id="webscript.org.alfresco.wef.wefresources.get" class="org.alfresco.wef.webscripts.WEFResourcesGet" parent="webscript">
+      <property name="pluginRegistry" ref="wefPluginRegistry" />
+   </bean>
+   
    <!-- ******* NOTE: All the config below will be in the AWE spring context file ******** -->
    
    <!-- Plugins  -->
