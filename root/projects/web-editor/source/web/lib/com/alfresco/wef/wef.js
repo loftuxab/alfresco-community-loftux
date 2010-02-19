@@ -156,7 +156,7 @@
        * @param {String} type Name of advice to unbind ('before', 'after' or
        * 'around')
        */
-      var unbind = function AAD_Do_unbind(oTarget, sMethod, type)
+      var unbind = function WEF_Do_unbind(oTarget, sMethod, type)
       {
          var resolvedName = 'fOrigMethod_'+type;
          if (oTarget[sMethod] && oTarget[sMethod][resolvedName])
