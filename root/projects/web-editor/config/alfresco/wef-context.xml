@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <bean id="wefPluginRegistry" class="org.alfresco.wef.WEFPluginRegistry" />
+   
+   <bean id="wefPluginBase" abstract="true" init-method="register">
+      <property name="pluginRegistry" ref="wefPluginRegistry" />
+   </bean>
+   
+   <bean id="wefApplication" parent="wefPluginBase" class="org.alfresco.wef.WEFApplicationImpl">
+      <property name="name" value="application.wef" />
+      <property name="description" value="The application" />
+      <property name="path" value="/service/wef/application-resource" />
+   </bean>
+   
+   <!-- ******* NOTE: All the config below will be in the AWE spring context file ******** -->
+   
+   <!-- Plugins  -->
+   <bean id="formsPlugin" parent="wefPluginBase" class="org.alfresco.wef.WEFPluginImpl">
+      <property name="name" value="com.alfresco.forms" />
+      <property name="description" value="Plugin providing forms capabilities" />
+      <property name="path" value="/components/form/form-min.js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="formsRuntime" />
+            <ref bean="formsCSS" />
+            <ref bean="formsDatePickerControl" />
+            <ref bean="formsPeriodControl" />
+            <ref bean="formsObjectFinderControl" />
+            <ref bean="formsObjectFinderControlCSS" />
+            <ref bean="formsRichTextControl" />
+            <ref bean="formsContentControl" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="awePlugin" parent="wefPluginBase" class="org.alfresco.wef.WEFPluginImpl">
+      <property name="name" value="com.alfresco.awe" />
+      <property name="description" value="Plugin providing in-context editing capabilities" />
+      <property name="path" value="/js/awe.js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="formsPlugin" />
+            <ref bean="aweResetCSS" />
+         </list>
+      </property>
+   </bean>
+   
+   <!-- Resources -->
+   <bean id="formsRuntime" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.runtime" />
+      <property name="description" value="Forms runtime" />
+      <property name="path" value="/js/forms-runtime.js" />
+      <property name="type" value="js" />
+   </bean>
+   
+   <bean id="formsCSS" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.css" />
+      <property name="description" value="Forms CSS" />
+      <property name="path" value="/components/form/form.css" />
+      <property name="type" value="css" />
+   </bean>
+   
+   <bean id="formsDatePickerControl" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.control.date-picker" />
+      <property name="description" value="Forms date picker control" />
+      <property name="path" value="/components/form/date-picker-min.js" />
+      <property name="type" value="js" />
+   </bean>
+   
+   <bean id="formsPeriodControl" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.control.period" />
+      <property name="description" value="Forms period control" />
+      <property name="path" value="/components/form/period-min.js" />
+      <property name="type" value="js" />
+   </bean>
+   
+   <bean id="formsObjectFinderControl" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.control.object-finder" />
+      <property name="description" value="Forms object finder control" />
+      <property name="path" value="/components/object-finder/object-finder-min.js" />
+      <property name="type" value="js" />
+   </bean>
+   
+   <bean id="formsObjectFinderControlCSS" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.control.object-finder-css" />
+      <property name="description" value="Forms object finder control CSS" />
+      <property name="path" value="/components/object-finder/object-finder.css" />
+      <property name="type" value="css" />
+   </bean>
+   
+   <bean id="formsRichTextControl" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.control.rich-text" />
+      <property name="description" value="Forms rich text control" />
+      <property name="path" value="/components/form/rich-text-min.js" />
+      <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="alfrescoTinyMCE" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="formsContentControl" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.forms.control.content" />
+      <property name="description" value="Forms content control" />
+      <property name="path" value="/components/form/content-min.js" />
+      <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="formsRichTextControl" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="alfrescoTinyMCE" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.editors.tinymce" />
+      <property name="description" value="Alfresco wrapped TinyMCE control" />
+      <property name="path" value="/modules/editors/tiny_mce-min.js" />
+      <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="tinyMCE" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="tinyMCE" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.moxiecode.tinymce" />
+      <property name="description" value="TinyMCE library" />
+      <property name="path" value="/modules/editors/tiny_mce/tiny_mce.js" />
+      <property name="type" value="js" />
+   </bean>
+   
+   <bean id="aweResetCSS" class="org.alfresco.wef.WEFResourceImpl">
+      <property name="name" value="com.alfresco.awe.reset-css" />
+      <property name="description" value="Reset CSS file for AWE" />
+      <property name="path" value="/res/awe/css/reset.css" />
+      <property name="type" value="css" />
+   </bean>
+   
+</beans>
