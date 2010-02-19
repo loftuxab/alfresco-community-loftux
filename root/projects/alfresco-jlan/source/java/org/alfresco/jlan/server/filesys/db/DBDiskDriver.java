@@ -776,65 +776,6 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     	  
         if ( Debug.EnableInfo && hasDebug())
           Debug.println("DB fileExists() nameWithStream=" + name + ", fileSts=" + FileStatus.asString(fileSts));
-        
-/***
-      //  Split the path into directory, file and stream name components
-      
-      String[] paths = FileName.splitPathStream(name);    
-
-      //  Get, or create, the file state for main file path
-      
-      String filePath = null;
-      if ( paths[0] != null && paths[0].endsWith( FileName.DOS_SEPERATOR_STR) == false)
-    	  filePath = paths[0] + FileName.DOS_SEPERATOR_STR + paths[1];
-      else
-    	  filePath = paths[0] + paths[1];
-      
-      FileState fstate = getFileState(filePath,dbCtx,true);
-
-      //  Check if the top level file exists
-      
-      if ( fstate != null && fstate.fileExists() == true) {
-        
-        //  Get the top level file details
-      
-        DBFileInfo dbInfo = getFileDetails(name, dbCtx, fstate);
-        
-        if ( dbInfo != null) {
-
-          //  Checkif the streams list is cached
-          
-          StreamInfoList streams = (StreamInfoList) fstate.findAttribute(DBStreamList);
-          
-          //  Get the list of available streams
-
-          if ( streams == null) {
-            
-            //  Load the streams list for the file
-            
-            streams = loadStreamList(fstate, dbInfo, dbCtx, true);
-            
-            //  Cache the streams list
-            
-            if ( streams != null)
-              fstate.addAttribute(DBStreamList, streams);
-          }
-          
-          if ( streams != null && streams.numberOfStreams() > 0) {
-            
-            //  Check if the required stream exists
-            
-            if ( streams.findStream(paths[2]) != null)
-              fileSts = FileStatus.FileExists;
-          }
-        }
-      }
-
-      //  Debug
-  
-      if ( Debug.EnableInfo && hasDebug())
-        Debug.println("DB fileExists() name=" + filePath + ", stream=" + paths[2] + ", fileSts=" + FileStatus.asString(fileSts));
-***/
     }
     else {
 

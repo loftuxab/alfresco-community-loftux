@@ -5664,7 +5664,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 			// Check if the requested file already exists
 
-			int fileSts = disk.fileExists(m_sess, conn, fileName);
+			int fileSts = disk.fileExists(m_sess, conn, params.getFullPath());
 
 			if ( fileSts == FileStatus.NotExist) {
 
