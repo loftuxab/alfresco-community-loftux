@@ -12,7 +12,8 @@
    <bean id="wefApplication" parent="wefPluginBase" class="org.alfresco.wef.WEFApplicationImpl">
       <property name="name" value="application.wef" />
       <property name="description" value="The application" />
-      <property name="path" value="/service/wef/application-resource" />
+      <property name="path" value="/service/wef/application" />
+      <property name="variableName" value="WEFApplication" />
       <property name="dependencies">
          <list>
             <ref bean="wefBase" />
@@ -60,6 +61,10 @@
       <property name="pluginRegistry" ref="wefPluginRegistry" />
    </bean>
    
+   <bean id="webscript.org.alfresco.wef.wefapplication.get" class="org.alfresco.wef.webscripts.WEFApplicationGet" parent="webscript">
+      <property name="pluginRegistry" ref="wefPluginRegistry" />
+   </bean>
+   
    <!-- ******* NOTE: All the config below will be in the AWE spring context file ******** -->
    
    <!-- Plugins  -->
@@ -67,6 +72,7 @@
       <property name="name" value="org.alfresco.forms" />
       <property name="description" value="Plugin providing forms capabilities" />
       <property name="path" value="/components/form/form-min.js" />
+      <property name="variableName" value="AWEForms" />
       <property name="dependencies">
          <list>
             <ref bean="formsRuntime" />
@@ -85,6 +91,7 @@
       <property name="name" value="org.alfresco.awe" />
       <property name="description" value="Plugin providing in-context editing capabilities" />
       <property name="path" value="/js/awe.js" />
+      <property name="variableName" value="AWE" />
       <property name="dependencies">
          <list>
             <ref bean="alfUtils" />

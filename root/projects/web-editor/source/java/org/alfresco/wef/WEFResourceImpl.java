@@ -15,6 +15,7 @@ public class WEFResourceImpl implements WEFResource
     protected String path;
     protected String type;
     protected String description;
+    protected String variableName;
     protected String container;
     protected List<WEFResource> dependencies;
 
@@ -88,8 +89,26 @@ public class WEFResourceImpl implements WEFResource
     public void setDescription(String description)
     {
         this.description = description;
-    }
+    } 
     
+    /*
+     * @see org.alfresco.wef.WEFResource#getVariableName()
+     */
+    public String getVariableName()
+    {
+        return this.variableName;
+    }
+
+    /**
+     * Sets the resource variable name.
+     * 
+     * @param variableName The variable name
+     */
+    public void setVariableName(String variableName)
+    {
+        this.variableName = variableName;
+    }
+
     /*
      * @see org.alfresco.wef.WEFResource#getDependencies()
      */
@@ -146,6 +165,8 @@ public class WEFResourceImpl implements WEFResource
         builder.append(this.type);
         builder.append(", description: ");
         builder.append(this.description);
+        builder.append(", variableName: ");
+        builder.append(this.variableName);
         builder.append(", container: ");
         builder.append(this.container);
         builder.append(", dependencies: ");

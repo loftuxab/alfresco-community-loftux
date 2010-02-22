@@ -62,6 +62,13 @@ public interface WEFResource
     public String getPath();
     
     /**
+     * Returns the resource varaible name
+     * 
+     * @return The variable name
+     */
+    public String getVariableName();
+    
+    /**
      * Returns the resource container.
      * 
      * @return The container

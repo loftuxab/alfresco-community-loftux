@@ -1,0 +1,11 @@
+<webscript>
+   <shortname>WEF Application</shortname>
+   <description><![CDATA[
+   Calls the init() method for all the registered plugins 
+   ]]>
+   </description>
+   <url>/wef/application</url>
+   <format default="text" />
+   <authentication>none</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>
