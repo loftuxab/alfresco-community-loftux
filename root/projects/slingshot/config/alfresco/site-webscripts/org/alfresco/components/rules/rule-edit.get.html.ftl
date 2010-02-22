@@ -4,7 +4,8 @@
    new Alfresco.RuleEdit("${el}").setOptions(
    {
       nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}"),
-      <#if rule?exists>rule: ${rule},</#if>
+      <#if rule??>rule: ${rule},</#if>
+      <#if constraints??>constraints: ${constraints},</#if>
       siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}
@@ -15,7 +16,7 @@
       <input id="${el}-id" type="hidden" name="id" value=""/> 
       <input type="hidden" name="action.actionDefinitionName" value="composite-action"/>
       
-      <h1 class="edit-header">${msg("header.editRule")}</h1>
+      <h1 class="edit-header">${msg("header.editRule")}<#if folder??>: ${folder.name}</#if></h1>
       <h1 class="create-header">${msg("header.newRule")}</h1>
 
       <div class="caption">
@@ -70,11 +71,14 @@
             <label for="${el}-executeAsynchronously">${msg("label.executeAsynchronously")}</label>
          </div>
          <div class="form-field scriptLocation">
+            <input id="${el}-compensatingActionId" type="hidden" name="action.compensatingAction.id" value="">
+            <input type="hidden" name="action.compensatingAction.actionDefinitionName" value="executeScript">            
             <label for="${el}-scriptLocation">${msg("label.scriptLocation")}</label>
             <select id="${el}-scriptLocation" name="action.compensatingAction.parameterValues.scriptLocation" title="${msg("label.scriptLocation")}">
+               <option value="">${msg("label.selectScript")}</option>
                <#list scripts as script>
                <option value="${script.value}">
-                  ${script.label}
+                  ${script.displayLabel}
                </option>
                </#list>
             </select>

@@ -2,10 +2,10 @@
 <script type="text/javascript">//<![CDATA[
    new ${component}("${el}").setOptions(
    {
-      <#if (menuMap?exists)>menuMap: ${menuMap},</#if>
-      <#if (ruleConfigDefinitions?exists)>ruleConfigDefinitions: ${ruleConfigDefinitions},</#if>
-      <#if (customisationsMap?exists)>customisationsMap: ${customisationsMap},</#if>
-      <#if (constraints?exists)>constraints: ${constraints},</#if>
+      <#if (menuMap??)>menuMap: ${menuMap},</#if>
+      <#if (ruleConfigDefinitions??)>ruleConfigDefinitions: ${ruleConfigDefinitions},</#if>
+      <#if (customisationsMap??)>customisationsMap: ${customisationsMap},</#if>
+      <#if (constraints??)>constraints: ${constraints},</#if>
       ruleConfigType: "${ruleConfigType}"
    }).setMessages(
       ${messages}

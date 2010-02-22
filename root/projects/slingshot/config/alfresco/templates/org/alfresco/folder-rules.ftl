@@ -15,7 +15,9 @@
       <@region id="rules-header" scope="template" protected=true />
       <div class="clear"></div>
 
-      <#if rules?exists>
+      <#if ruleset.linkedToRuleSet??>
+         <@region id="rules-linked" scope="template" protected=true />
+      <#elseif ruleset.rules??>
          <div class="yui-g">
             <div class="yui-g first">
                <div id="inherited-rules-container" class="hidden">
@@ -27,8 +29,6 @@
                <@region id="rule-details" scope="template" protected=true />
             </div>
          </div>
-      <#elseif linkedFolder?exists>
-         <@region id="rules-linked" scope="template" protected=true />
       <#else>
          <@region id="rules-none" scope="template" protected=true />
       </#if>
@@ -41,23 +41,30 @@
       siteId: "${page.url.templateArgs.site!""}",
       folderName: "${folder.name}",
       pathToFolder: "${folder.path}",
-      linkedFolder: <#if linkedFolder?exists>{
-         nodeRef: "${linkedFolder.nodeRef}",
-         name: "${linkedFolder.name}",
-         path: "${linkedFolder.path}"
-      }<#else>null</#if>,
-      rules: <#if rules?exists>[
-         <#list rules as rule>{
-            id: "${rule.id}",
-            title: "${rule.title}",
-            description: "${rule.description}",
-            inheritedFolder: <#if rule.inheritedFolder?exists>{
-               nodeRef: "${rule.inheritedFolder.nodeRef}",
-               name: "${rule.inheritedFolder.name}"
-            }<#else>null</#if>,
-            disabled: ${rule.disabled?string}
-         }<#if rule_has_next>,</#if></#list>
-      ]<#else>null</#if>
+      ruleset: {
+         rules: <#if ruleset.rules??>[<#list ruleset.rules as rule>
+            {
+               id: "${rule.id}",
+               title: "${rule.title}",
+               description: "${rule.description}",
+               url: "${rule.url}",
+               disabled: ${rule.disabled?string}
+            }<#if rule_has_next>,</#if></#list>
+         ]<#else>null</#if>,
+         inheritedRules: <#if ruleset.inheritedRules??>[<#list ruleset.inheritedRules as rule>
+            {
+               id: "${rule.id}",
+               title: "${rule.title}",
+               description: "${rule.description}",
+               url: "${rule.url}",
+               disabled: ${rule.disabled?string}
+            }<#if rule_has_next>,</#if></#list>
+         ]<#else>null</#if>,
+         linkedFromRuleSets: <#if ruleset.linkedFromRuleSets??>[<#list ruleset.linkedFromRuleSets as link>
+            "${link}"<#if link_has_next>,</#if></#list>
+         ]<#else>null</#if>,
+         linkedToRuleSet: <#if ruleset.linkedToRuleSet??>"ruleset.linkedToRuleSet"<#else>null</#if>
+      }
    });
    //]]></script>
 

@@ -148,7 +148,7 @@
          Dom.setStyle(this.widgets.displayEl, "display", "none");
 
          // Load rule information form server
-         var nodeRefAsUrl = this.folderDetails.nodeRef.replace("://", "/");
+         var nodeRefAsUrl = this.folderDetails.nodeRef.replace("://", "/"); // todo: USE rule.owningNode.nodeRef.replace("://", "/")
          Alfresco.util.Ajax.jsonGet(
          {
             url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRefAsUrl + "/ruleset/rules/" + this.ruleDetails.id,
@@ -338,7 +338,41 @@
       onDeleteButtonClick: function RuleDetails_onDeleteButtonClick(event)
       {
          this.widgets.deleteButton.set("disabled", true);
-         if (!this.widgets.deleteFeedbackMessage )
+         var me = this;
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg("message.confirm.delete.title"),
+            text: this.msg("message.confirm.delete"),
+            buttons: [
+            {
+               text: this.msg("button.delete"),
+               handler: function RuleDetails_onDeleteButtonClick_delete()
+               {
+                  this.destroy();
+                  me._onDeleteRuleConfirmed.call(me);
+               }
+            },
+            {
+               text: this.msg("button.cancel"),
+               handler: function RuleDetails_onDeleteButtonClick_cancel()
+               {
+                  this.destroy();
+                  me.widgets.deleteButton.set("disabled", false);
+               },
+               isDefault: true
+            }]
+         });
+      },
+
+
+      /**
+       * Fired when the user clicks the Delete button.
+       *
+       * @method _onDeleteRuleConfirmed
+       */
+      _onDeleteRuleConfirmed: function RuleDetails__onDeleteRuleConfirmed()
+      {
+         if (!this.widgets.deleteFeedbackMessage)
          {
             this.widgets.deleteFeedbackMessage = Alfresco.util.PopupManager.displayMessage(
             {
@@ -349,7 +383,7 @@
          }
          else
          {
-            this.widgets.deleteFeedbackMessage .show();
+            this.widgets.deleteFeedbackMessage.show();
          }
 
          // Delete rule
@@ -360,7 +394,7 @@
             {
                fn: function (response)
                {
-                  this.widgets.deleteFeedbackMessage .hide();
+                  this.widgets.deleteFeedbackMessage.hide();
                   this.widgets.deleteButton.set("disabled", false);
                   Dom.setStyle(this.widgets.displayEl, "display", "none");
                   YAHOO.Bubbling.fire("folderRulesDetailsChanged",

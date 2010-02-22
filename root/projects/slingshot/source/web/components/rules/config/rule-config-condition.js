@@ -83,8 +83,9 @@
           *
           * @property properties
           * @type {array}
+          * @default []
           */
-         properties: null,
+         properties: [],
 
          /**
           * The constraints for comparing properties contains all evaluator, regardless of what property type
@@ -96,6 +97,7 @@
           *
           * @property propertyEvaluratorMap
           * @type {object}
+          * @default {}
           */
          propertyEvaluatorMap: {},
 
@@ -250,7 +252,7 @@
        */
       _getConstraintValues: function RuleConfigCondition__getConstraintValues(p_sConstraintName, p_oRuleConfig)
       {
-         var values = this.options.constraints[p_sConstraintName];
+         var values = Alfresco.RuleConfigCondition.superclass._getConstraintValues.call(this, p_sConstraintName, p_oRuleConfig);
          if (p_oRuleConfig[this.options.ruleConfigDefinitionKey] == this.options.comparePropertyValueDefinition.name)
          {
             var propertyName = p_oRuleConfig.parameterValues.property,
