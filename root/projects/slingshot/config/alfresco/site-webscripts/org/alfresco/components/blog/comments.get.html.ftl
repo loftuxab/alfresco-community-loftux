@@ -9,8 +9,10 @@
       {
          height: ${args.editorHeight!180},
          width: ${args.editorWidth!700},
+         inline_styles: false,
+         convert_fonts_to_spans: false,
          theme: 'advanced',
-         theme_advanced_buttons1: "bold,italic,underline,|,bullist,numlist,|,forecolor,backcolor,|,undo,redo,removeformat",
+         theme_advanced_buttons1: "bold,italic,underline,|,bullist,numlist,|,forecolor,|,undo,redo,removeformat",
          theme_advanced_toolbar_location: "top",
          theme_advanced_toolbar_align: "left",
          theme_advanced_statusbar_location: "bottom",

@@ -7,6 +7,8 @@
    {
       height: ${height},
       width: ${width},
+      inline_styles: false,
+      convert_fonts_to_spans: false,
       theme: 'advanced',
       theme_advanced_toolbar_location: "top",
       theme_advanced_toolbar_align: "left",
@@ -22,7 +24,7 @@
       plugins: "table",
       theme_advanced_resizing: true,
       theme_advanced_buttons1_add: "fontselect,fontsizeselect",
-      theme_advanced_buttons2_add: "separator,forecolor,backcolor",
+      theme_advanced_buttons2_add: "separator,forecolor",
       theme_advanced_buttons3_add_before: "tablecontrols,separator",
       theme_advanced_disable: "styleselect",
       extended_valid_elements: "a[href|target|name],font[face|size|color|style],span[class|align|style]"
@@ -35,7 +37,7 @@
       ${field.control.params.editorParameters!""}
    <#else>
       theme_advanced_resizing: true,
-      theme_advanced_buttons1: "bold,italic,underline,separator,bullist,numlist,separator,forecolor,backcolor,separator,undo,redo,removeformat",
+      theme_advanced_buttons1: "bold,italic,underline,separator,bullist,numlist,separator,forecolor,separator,undo,redo,removeformat",
       theme_advanced_buttons2: null,
       theme_advanced_buttons3: null
    </#if>
