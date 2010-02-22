@@ -24,9 +24,12 @@
  */
 package org.alfresco.wef.webscripts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.wef.WEFApplication;
+import org.alfresco.wef.WEFPlugin;
 import org.alfresco.wef.WEFPluginRegistry;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.DeclarativeWebScript;
@@ -34,16 +37,14 @@ import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
 /**
- * WebScript implementation for the WEF resources script call.
+ * WebScript implementation for the WEF application script call.
  * <p>
- * Responsible for generating a WEF.addResource() JavaScript call for each resource 
- * required by the application and registered plugins.
- * Also responsible for generating the WEF.run("app name") JavaScript call to
- * execute the application.
+ * Responsible for generating an WEFApplication object that retrieves and 
+ * initialises all regsitered plugins.
  *
  * @author Gavin Cornwell
  */
-public class WEFResourcesGet extends DeclarativeWebScript
+public class WEFApplicationGet extends DeclarativeWebScript
 {
     protected WEFPluginRegistry pluginRegistry;
     
@@ -66,8 +67,18 @@ public class WEFResourcesGet extends DeclarativeWebScript
         // add the application name to the model
         model.put("appName", this.pluginRegistry.getApplications().get(0).getName());
         
-        // add all the application and plugin resources to the model
-    	model.put("resources", this.pluginRegistry.getPluginResources());
+        // build list of plugins excluding application plugins
+        ArrayList<WEFPlugin> plugins = new ArrayList<WEFPlugin>(8);
+        for (WEFPlugin plugin : this.pluginRegistry.getPlugins())
+        {
+            if ((plugin instanceof WEFApplication) == false)
+            {
+                plugins.add(plugin);
+            }
+        }
+        
+        // add the plugins to the model
+        model.put("plugins", plugins);
     	
         return model;
     }

@@ -61,6 +61,11 @@ public class EndTemplateTag extends AbstractWebEditorTag
             // render JavaScript to configure toolbar and edit icons
             List<MarkedContent> markedContent = getMarkedContent();
             
+            //String urlPrefix = getWebEditorUrlPrefix();
+            //out.write("<script type=\"text/javascript\" src=\"");
+            //out.write(urlPrefix);
+            //out.write("/service/wef/resources\"></script>\n");
+            
             out.write("<script type=\"text/javascript\">\n");
             out.write("window.onload = function() {\n");      
             out.write("WEF.run('com.alfresco.awe.init',");
@@ -123,6 +128,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             out.write("}\n");
             out.write("\n);\n");
             out.write("}\n</script>");
+            
             if (logger.isDebugEnabled())
                logger.debug("Completed endTemplate rendering for " + markedContent.size() + 
                         " marked content items with toolbar location of: " + toolbarLocation);
