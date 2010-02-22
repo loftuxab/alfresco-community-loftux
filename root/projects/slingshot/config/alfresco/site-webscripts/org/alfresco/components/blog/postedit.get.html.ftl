@@ -4,8 +4,10 @@
       siteId: "${page.url.templateArgs.site}",
       editorConfig : 
       {
+         inline_styles: false,
+         convert_fonts_to_spans: false,
          theme:'advanced',
-         theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,forecolor,backcolor",         
+         theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,forecolor",         
          theme_advanced_buttons2 :"bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,removeformat",
          theme_advanced_toolbar_location : "top",
          theme_advanced_toolbar_align : "left",
