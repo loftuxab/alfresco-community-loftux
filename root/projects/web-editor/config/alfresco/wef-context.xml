@@ -203,8 +203,7 @@
    <bean id="alfMessages" class="org.alfresco.wef.WEFResourceImpl">
       <property name="name" value="org.alfresco.messages" />
       <property name="description" value="Localised messages" />
-      <!-- TODO: How do we deal with the locale parameter here? -->
-      <property name="path" value="/service/messages.js?locale=en_US" />
+      <property name="path" value="/service/messages.js?locale=${locale}" />
       <property name="type" value="js" />
    </bean>
    
