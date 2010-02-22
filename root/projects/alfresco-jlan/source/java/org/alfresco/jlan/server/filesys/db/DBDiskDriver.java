@@ -450,6 +450,12 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       
     		return createStream(params, fstate, dbCtx);
     	}
+    	else {
+    		
+    		// Parent file does not exist
+    		
+    		throw new FileNotFoundException("Parent file does not exist to create stream, " + params.getPath());
+    	}
     }
     else if ( fstate.fileExists()) {
 
@@ -900,7 +906,12 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
   
         //  Get, or create, the file state for main file path
         
-        String filePath = paths[0] + paths[1];
+        String filePath = null;
+        if ( paths[0] != null && paths[0].endsWith( FileName.DOS_SEPERATOR_STR))
+        	filePath = paths[0] + paths[1];
+        else
+        	filePath = paths[0] + FileName.DOS_SEPERATOR_STR + paths[1];
+        
         FileState parent = getFileState(filePath,dbCtx,false);
         
         // Get the file information for the parent file to load the cache
