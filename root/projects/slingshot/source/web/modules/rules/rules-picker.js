@@ -267,27 +267,28 @@
 
             if (this.options.mode == RP.MODE_COPY_FROM)
             {
-               url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "/api/node/{nodeRef}/copy",
-               {
-                  nodeRef: file.nodeRef.replace(":/", "")
-               });
-               dataObj.rules = rules;
+               // todo: configure url and dataObj when repo supports copy action
                eventName = "rulesCopiedFrom";
                event = {
-                  nodeRef: file.nodeRef.replace(":/", ""),
+                  nodeRef: file.nodeRef,
                   ruleNodeRefs: rules
                };
             }
             else if (this.options.mode == RP.MODE_LINK_TO)
             {
-               url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/sites?uri=/api/node/{nodeRef}/link/{ruleNodeRef}",
-               {
-                  nodeRef: file.nodeRef.replace(":/", ""),
-                  ruleNodeRef: this.selectedNode.data.nodeRef.replace(":/", "")
-               });
-               eventName = "ruleLinkedTo";
+               url = Alfresco.constants.PROXY_URI + "api/actionQueue";
+               eventName = "rulesLinkedTo";
+               dataObj = {
+                  actionedUponNode : file.nodeRef,
+                  actionDefinitionName: "link-rules",
+                  parameterValues:
+                  {
+                     link_from_node: this.selectedNode.data.nodeRef
+                  }
+               };
+
                event = {
-                  nodeRef: file.nodeRef.replace(":/", ""),
+                  nodeRef: file.nodeRef,
                   ruleNodeRefs: this.selectedNode.data.nodeRef
                };
             }
@@ -365,7 +366,7 @@
 
          var fnSuccess = function RP__pRP_fnSuccess(response, rulePicker)
          {
-            var rules = response.json, element, rule, onclick, i, j;
+            var rules = response.json.data, element, rule, onclick, i, j;
 
             for (i = 0, j = rules.length; i < j; i++)
             {
@@ -388,7 +389,7 @@
                   };
                }(rule.shortName);
 
-               var checkbox = (this.options.mode == RP.MODE_COPY_FROM || this.options.mode == RP.MODE_PICKER) ? '<input type="checkbox" value="' + rule.shortName + '">' : "",
+               var checkbox = (this.options.mode == RP.MODE_COPY_FROM || this.options.mode == RP.MODE_PICKER) ? '<input type="checkbox" value="' + rule.id + '">' : "",
                   h4 = '<h4>' + checkbox +  '<span>' + $html(rule.title) + '</span></h4>',
                   description = '<span class="description">' + $html(rule.description) + '</span>',
                   span = '<span class="rule">' + h4 + description + '</span>';
@@ -399,9 +400,10 @@
             }
          };
 
+         var nodeRefAsPath = this.selectedNode.data.nodeRef.replace("://", "/");
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites",
+            url: Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsPath + "/ruleset/rules",
             successCallback:
             {
                fn: fnSuccess,

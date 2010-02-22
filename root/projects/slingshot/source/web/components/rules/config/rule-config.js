@@ -255,6 +255,10 @@
                if (configDef)
                {
                   config = {};
+                  if (configEl.getAttribute("paramid"))
+                  {
+                     config.id = configEl.getAttribute("paramid");
+                  }
                   config[this.options.ruleConfigDefinitionKey] = configDef.name;
                   config.parameterValues = this._getParameters(configDef);
                   configs.push(config);
@@ -614,7 +618,12 @@
        */
       _getConstraintValues: function RuleConfig__getConstraintValues(p_sConstraintName, p_oRuleConfig)
       {
-         return this.options.constraints[p_sConstraintName];
+         var values = this.options.constraints[p_sConstraintName];
+         if (!values)
+         {
+            values = [];
+         }
+         return values;
       },
       
       /**
@@ -651,7 +660,11 @@
             Selector.query('div.name', configEl)[0].appendChild(p_oSelectEl);
 
             // Set values
-            Selector.query('input[name=id]', configEl)[0].value = p_oRuleConfig.id ? p_oRuleConfig.id : "";
+            if (p_oRuleConfig.id)
+            {
+               configEl.setAttribute("paramid", p_oRuleConfig.id);
+            }
+
             Alfresco.util.setSelectedIndex(p_oSelectEl, p_oRuleConfig[this.options.ruleConfigDefinitionKey]);
 
             // Create add button
@@ -1445,7 +1458,7 @@
          var tagName = el.tagName.toLowerCase();
          if (tagName == "select")
          {
-            if (el.getAttribute("multiple"))
+            if (el.getAttribute("multiple") != "true")
             {
                return el.options[el.selectedIndex].value;
             }

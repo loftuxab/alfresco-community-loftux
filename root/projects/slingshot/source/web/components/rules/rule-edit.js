@@ -81,6 +81,15 @@
          siteId: "",
 
          /**
+          * The rule constraints that shall be selectable in drop downs for some parameters.
+          * Contains the constraint name as attribute keys and an array of constraint values as the attribute value.
+          *
+          * @property constraints
+          * @type object
+          */
+         constraints: {},
+
+         /**
           * Full info about the rule being edited
           *
           * @property rule
@@ -275,6 +284,7 @@
                      scope: this
                   }
                });
+               this._toggleButtons(true);
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
                   text: waitMessage,
@@ -322,6 +332,8 @@
       },
 
       /**
+       * Called when a rule config component has sent event telling its ready.
+       * This method will display the configs when all 4 of them are ready.
        *
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters
@@ -383,7 +395,9 @@
          }
 
          // Text fields
-         Dom.get(this.id + "-title").value = rule.title;
+         var titleEl = Dom.get(this.id + "-title");
+         titleEl.value = rule.title;
+         titleEl.focus();
          Dom.get(this.id + "-description").value = rule.description;
 
          // Transform types into a config object for event section
@@ -459,6 +473,8 @@
          {
             Alfresco.util.setSelectedIndex(Dom.get(this.id + "-scriptLocation"), scriptLocation);
          }
+         var compensatingActionId = Alfresco.util.findValueByDotNotation(rule, "action.compensatingAction.id", null);
+         Dom.get(this.id + "-compensatingActionId").value = compensatingActionId ? compensatingActionId : "";
 
          // Finally initialise the form
          this.widgets.form.init();
@@ -474,6 +490,7 @@
        */
       onCancelButtonClick: function RuleEdit_onCancelButtonClick(type, args)
       {
+         this._toggleButtons(true);
          this._navigateToFoldersPage();
       },
 
@@ -485,7 +502,7 @@
       {
          this.widgets.feedbackMessage.hide();
          if (this.createAnotherRule)
-         {
+         {            
             Alfresco.util.PopupManager.displayMessage(
             {
                text: this.msg("message.createAnotherRule") 
@@ -514,6 +531,7 @@
        */
       onPersistRuleFailed: function RE_onPersistRuleFailed(response)
       {
+         this._toggleButtons(false);
          this.widgets.feedbackMessage.destroy();
       },
 
@@ -524,7 +542,20 @@
             nodeRef: this.options.nodeRef.toString()
          });
          window.location.href = url;
-      }
+      },
 
+      /**
+       * Toggles buttons
+       *
+       * @method _toggleButtons
+       * @param disable
+       */
+      _toggleButtons: function(disable)
+      {
+         this.widgets.cancelButton.set("disabled", disable);
+         this.widgets.saveButton.set("disabled", disable);
+         this.widgets.createButton.set("disabled", disable);
+         this.widgets.createAnotherButton.set("disabled", disable);
+      }
    });
 })();

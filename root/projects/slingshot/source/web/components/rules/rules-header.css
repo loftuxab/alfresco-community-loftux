@@ -7,14 +7,3 @@
 {
    text-align: right;
 }
-
-.rules-header .rules-actions .inherit button
-{
-   background: transparent url(../images/inherited-off-16.png) no-repeat scroll 12px 4px;
-   padding-left: 32px;
-}
-
-.rules-header .rules-actions .inherit.active button 
-{
-   background-image: url(../images/inherited-on-16.png)
-}

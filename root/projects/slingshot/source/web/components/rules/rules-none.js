@@ -113,7 +113,7 @@
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/rule-edit?nodeRef={nodeRef}",
          {
             siteId: this.options.siteId,
-            nodeRef: this.options.nodeRef.replace(":/", "")
+            nodeRef: this.options.nodeRef
          });         
          window.location.href = url;
       },
@@ -129,7 +129,20 @@
        */
       onLinkToRuleSetButtonClick: function RulesNone_onLinkToRuleSetButtonClick(type, args)
       {
-         alert("popup rules selector with mode='folder'");
+         if (!this.modules.rulesPicker)
+         {
+            this.modules.rulesPicker = new Alfresco.module.RulesPicker(this.id + "-rulesPicker");
+         }
+
+         this.modules.rulesPicker.setOptions(
+         {
+            mode: Alfresco.module.RulesPicker.MODE_LINK_TO,
+            siteId: this.options.siteId,
+            files: {
+               displayName: this.folderDetails,
+               nodeRef: this.options.nodeRef.toString()
+            }
+         }).showDialog();
       }
 
    });

@@ -13,10 +13,7 @@
       <div class="yui-u first rules-title">
          <h1><span id="${el}-title"></span>: ${msg("header.rules")}</h1>
       </div>
-      <div id="${el}-actions" class="yui-u rules-actions">
-         <span id="${el}-inheritRules-container" class="inherit">
-            <button id="${el}-inheritRules-button" tabindex="0">${msg("button.inherit-rules")}</button>
-         </span>
+      <div id="${el}-actions" class="yui-u rules-actions hidden">
          <span class="separator">&nbsp;</span>
          <button class="new" id="${el}-newRule-button" tabindex="0">${msg("button.new-rule")}</button>
          <button class="copy" id="${el}-copyRuleFrom-button" tabindex="0">${msg("button.copy-rule-from")}</button>

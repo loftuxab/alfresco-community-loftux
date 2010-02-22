@@ -57,7 +57,7 @@
       // Decoupled event listeners
       YAHOO.Bubbling.on("ruleSelected", this.onRuleSelected, this);
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);     
-      YAHOO.Bubbling.on("folderRulesDetailsAvailable", this.onFolderRulesDetailsAvailable, this);
+      YAHOO.Bubbling.on("folderRulesetDetailsAvailable", this.onFolderRulesetDetailsAvailable, this);
 
       return this;
    };
@@ -150,14 +150,7 @@
          
          // Render rules if the info have been given (from an external event)
          this.isReady = true;
-         if (this.rules !== null)
-         {
-            this._renderRules(this.rules);
-         }
-         if (this.folderDetails !== null)
-         {
-            this._renderText();
-         }
+         this._displayDetails();
       },
 
       /**
@@ -187,32 +180,38 @@
       {
          // Defer if event received before we're ready
          this.folderDetails = args[1].folderDetails;
-         if (this.isReady)
-         {
-            this._renderText();
-         }
+         this._displayDetails();
       },
 
 
       /**
        * Event handler called when the "folderFulesDetailsAvailable" event is received
        *
-       * @method onFolderRulesDetailsAvailable
+       * @method onFolderRulesetDetailsAvailable
        * @param layer
        * @param args
        */
-      onFolderRulesDetailsAvailable: function RulesList_onFolderRulesDetailsAvailable(layer, args)
+      onFolderRulesetDetailsAvailable: function RulesList_onFolderRulesetDetailsAvailable(layer, args)
       {
-         var folderRulesData = args[1].folderRulesDetails;
-
-         // Defer if event received before we're ready
-         this.rules = folderRulesData.rules ? folderRulesData.rules : [];
-         if (this.isReady)
-         {
-            this._renderRules(this.rules);
-         }
+         this.ruleset = args[1].folderRulesetDetails;
+         this._displayDetails();
       },
 
+      /**
+       * Renders the deatils after they have been loaded
+       *
+       * @method _displayDetails
+       * @private
+       */
+      _displayDetails: function RulesList__displayDetails()
+      {
+         // Display loaded details
+         if (this.isReady && this.ruleset && this.folderDetails)
+         {
+            this._renderRules();
+            this._renderText();
+         }
+      },
 
       /**
        * Renders the text above the rules
@@ -236,10 +235,9 @@
          else if (this.options.filter == "all")
          {
             this.widgets.rulesListText.innerHTML = this.msg("label.allRules", this.folderDetails.fileName);
-            // todo check if any folders are linking to this folders rule set
-            if (false)
+            if (this.ruleset.linkedFromRuleSets && this.ruleset.linkedFromRuleSets.length > 0)
             {
-               this.widgets.rulesListBarText.innerHTML = this.msg("info.folderRulesRunOrder");
+               this.widgets.rulesListBarText.innerHTML = this.msg("info.folderLinkedFromRuleSets", this.ruleset.linkedFromRuleSets.length);
             }
          }
       },
@@ -248,14 +246,14 @@
        * Renders the rules
        *
        * @method _renderRules
-       * @param rules {Array} of rule objects
        * @private
        */
-      _renderRules: function RulesList__renderRules(rules)
+      _renderRules: function RulesList__renderRules()
       {
          var rule,
             ruleEl,
-            counter = 0;
+            counter = 0,
+            ruleset = this.ruleset;
 
          // Remove all rules
          while(this.widgets.rulesListContainerEl.hasChildNodes())
@@ -264,15 +262,19 @@
          }
 
          // Render rules
+         var inherited,
+            folderRulesStartIndex = ruleset.inheritedRules ? ruleset.inheritedRules.length : 0,
+            rules = (ruleset.inheritedRules ? ruleset.inheritedRules : []).concat(ruleset.rules ? ruleset.rules : []);
          for (var i = 0, ii = rules.length; i < ii; i++)
          {
+            inherited = (i < folderRulesStartIndex);
             rule = rules[i];
             rule.index = i;
-            if ((this.options.filter == "inherited" && rule.inheritedFolder) ||
-                (this.options.filter == "folder" && !rule.inheritedFolder) ||
+            if ((this.options.filter == "inherited" && inherited) ||
+                (this.options.filter == "folder" && !inherited) ||
                 this.options.filter == "all")
             {
-               ruleEl = this._createRule(rule);
+               ruleEl = this._createRule(rule, inherited);
                ruleEl = this.widgets.rulesListContainerEl.appendChild(ruleEl);
                counter++;
             }
@@ -303,10 +305,11 @@
        * Create a rule in the list
        *
        * @method _createRule
-       * @param rule The rule info object
+       * @param rule {object} The rule info object
+       * @param inherited {boolean}
        * @private
        */
-      _createRule: function RulesList__createRule(rule)
+      _createRule: function RulesList__createRule(rule, inherited)
       {
          // Clone template
          var ruleEl = this.widgets.ruleTemplateEl.cloneNode(true);
@@ -323,18 +326,21 @@
          {
             Dom.addClass(Dom.getElementsByClassName("active-icon", "div", ruleEl)[0], "disabled");
          }
-         if (rule.inheritedFolder)
+         if (inherited)
          {
             Dom.getElementsByClassName("inherited", "span", ruleEl)[0].innerHTML = this.msg("label.inheritedShort");
             Dom.getElementsByClassName("inherited-from", "span", ruleEl)[0].innerHTML = this.msg("label.inheritedFrom");
-            
-            var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0];
-            a.href = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",
+
+            if (rule.owningNode)
             {
-               siteId: this.options.siteId,
-               nodeRef: rule.inheritedFolder.nodeRef.replace(":/", "")
-            });
-            a.innerHTML = this.msg("label.inheritedFolder", rule.inheritedFolder.name);            
+               var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0];
+               a.href = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",
+               {
+                  siteId: this.options.siteId,
+                  nodeRef: rule.owningNode.nodeRef
+               });
+               a.innerHTML = this.msg("label.inheritedFolder", rule.owningNode.name);
+            }
          }
 
          // Add listener to clicks on the rule

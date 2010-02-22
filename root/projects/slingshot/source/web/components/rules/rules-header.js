@@ -39,6 +39,11 @@
       Event = YAHOO.util.Event;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+   
+   /**
     * RulesHeader constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
@@ -51,7 +56,7 @@
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
-      YAHOO.Bubbling.on("folderRulesDetailsAvailable", this.onFolderRulesDetailsAvailable, this);
+      YAHOO.Bubbling.on("folderRulesetDetailsAvailable", this.onFolderRulesetDetailsAvailable, this);
 
       return this;
    };
@@ -94,26 +99,18 @@
       /**
        * The folders name
        *
-       * @property folderName
+       * @property folderDetails
        * @type {string}
        */
-      folderName: null,
+      folderDetails: null,
 
       /**
-       * The rules do list
+       * The inherit and folder rules for the folder
        *
-       * @property rules
-       * @type {array}
-       */
-      rules: null,
-
-      /**
-       * Current linkedFolder.
-       *
-       * @property linkedFolder
+       * @property ruleset
        * @type {object}
        */
-      linkedFolder: null,
+      ruleset: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -124,12 +121,10 @@
       onReady: function RulesHeader_onReady()
       {
          // Save references to dom objects
-         this.widgets.inheritRulesContainer = Dom.get(this.id + "-inheritRules-container");
          this.widgets.actionsEl = Dom.get(this.id + "-actions");
          this.widgets.titleEl = Dom.get(this.id + "-title");
 
          // Create buttons
-         this.widgets.inheritRulesButton = Alfresco.util.createYUIButton(this, "inheritRules-button", this.onInheritRulesButtonClick);
          this.widgets.newRuleButton = Alfresco.util.createYUIButton(this, "newRule-button", this.onNewRuleButtonClick);
          this.widgets.copyRuleFromButton = Alfresco.util.createYUIButton(this, "copyRuleFrom-button", this.onCopyRuleFromButtonClick);
          this.widgets.runRulesMenu = Alfresco.util.createYUIButton(this, "runRules-menu", this.onRunRulesMenuSelect,
@@ -140,91 +135,33 @@
 
          // Display folder name & appropriate actions if info has been given
          this.isReady = true;
-         if (this.rules !== null)
-         {
-            this._displayActions();
-         }
-         if (this.folderName !== null)
-         {
-            this._displayFolderName();
-         }
-
+         this._displayDetails();
       },
 
       /**
-       * Called when user clicks on the inherite rule button.
-       * Will start or stop inheritance and afterwards load the folders rule data once again
-       * and dispatch it in an event.
+       * Event handler called when the "folderDetailsAvailable" event is received
        *
-       * @method onInheritRulesButtonClick
-       * @param type
+       * @method onFolderDetailsAvailable
+       * @param layer
        * @param args
        */
-      onInheritRulesButtonClick: function RulesHeader_onInheritRulesButtonClick(type, args)
+      onFolderDetailsAvailable: function RulesHeader_onFolderDetailsAvailable(layer, args)
       {
-         // Check the state of the button
-         var rulesAreInherited = Dom.hasClass(this.widgets.inheritRulesContainer, "active");
-         this.widgets.inheritRulesButton.set("disabled", true);
-
-         // Start/stop inherit rules from parent folder
-         Alfresco.util.Ajax.jsonRequest(
-         {
-            method: rulesAreInherited ? Alfresco.util.Ajax.GET : Alfresco.util.Ajax.GET,
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
-            successCallback:
-            {
-               fn: function(response)
-               {
-                  if (response.json)
-                  {
-                     // Successfully started or stopped rules inheritance, now reaload info on the page
-                     YAHOO.Bubbling.fire("folderRulesDetailsChanged",
-                     {
-                        nodeRef: this.options.nodeRef
-                     });
-
-                     // Change the icon/state of the inherit button
-                     this.widgets.inheritRulesButton.set("disabled", false);
-                     this._toggleInheritButton();
-                  }
-               },
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: function(response)
-               {
-                  this.widgets.inheritRulesButton.set("disabled", false);
-                  Alfresco.util.PopupManager.displayPrompt(
-                  {
-                     title: Alfresco.util.message("message.failure", this.name),
-                     text: this.msg("message." + (rulesAreInherited ? "start" : "stop") + "InheritRules-failure")
-                  });
-               },
-               scope: this
-            }
-         });
-
+         this.folderDetails = args[1].folderDetails;
+         this._displayDetails();
       },
 
       /**
-       * Called when user clicks on the create rule button.
-       * Takes the user to the new rule page.
+       * Event handler called when the "folderRulesDetailsAvailable" event is received
        *
-       * @method _toggleInheritButton
-       * @private
+       * @method onFolderRulesetDetailsAvailable
+       * @param layer
+       * @param args
        */
-      _toggleInheritButton: function RulesHeader__toggleInheritButton()
+      onFolderRulesetDetailsAvailable: function RulesHeader_onFolderRulesetDetailsAvailable(layer, args)
       {
-         var rulesAreInherited = Dom.hasClass(this.widgets.inheritRulesContainer, "active");
-         if (rulesAreInherited)
-         {
-            Dom.removeClass(this.widgets.inheritRulesContainer, "active");
-         }
-         else
-         {
-            Dom.addClass(this.widgets.inheritRulesContainer, "active");
-         }
+         this.ruleset = args[1].folderRulesetDetails;
+         this._displayDetails();
       },
 
       /**
@@ -265,7 +202,7 @@
             mode: Alfresco.module.RulesPicker.MODE_COPY_FROM,
             siteId: this.options.siteId,            
             files: {
-               displayName: this.folderName,
+               displayName: this.folderDetails,
                nodeRef: this.options.nodeRef.toString()
             }
          }).showDialog();
@@ -285,7 +222,7 @@
          // Display a wait feedback message if the people hasn't been found yet
          this.widgets.runRulesMenu.set("disabled", true);
          YAHOO.lang.later(2000, this, function(){
-            if (this.isSearching)
+            if (this.isRunning)
             {
                if (!this.widgets.feedbackMessage)
                {
@@ -307,45 +244,74 @@
 
          // TODO change to jsonPost and use runMode
          // Run rules for folder (and sub folders)
-         Alfresco.util.Ajax.jsonGet(
+         if (!this.isSearching)
          {
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
-            successCallback:
-            {
-               fn: function(response)
-               {
-                  this._enableSearchUI();
+            this.isSearching = true;
 
-                  var data = response.json;
-                  if (data)
+            Alfresco.util.Ajax.jsonGet(
+            {
+               url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
+               successCallback:
+               {
+                  fn: function(response)
                   {
-                     Alfresco.util.PopupManager.displayMessage(
+                     this._enableSearchUI();
+
+                     var data = response.json;
+                     if (data)
                      {
-                        text: this.msg("message.runRules-success")
-                     });
-                  }
+                        Alfresco.util.PopupManager.displayMessage(
+                        {
+                           text: this.msg("message.runRules-success")
+                        });
+                     }
+                  },
+                  scope: this
                },
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: function(response)
+               failureCallback:
                {
-                  this._enableSearchUI();
-                  Alfresco.util.PopupManager.displayPrompt(
+                  fn: function(response)
                   {
-                     title: this.msg("label.failure"), 
-                     text: this.msg("message.runRules-failure")
-                  });
+                     this._enableSearchUI();
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this.msg("label.failure"),
+                        text: this.msg("message.runRules-failure")
+                     });
 
-               },
-               scope: this
-            }
-         });
+                  },
+                  scope: this
+               }
+            });
+         }
 
          Event.preventDefault(aArgs[0]);
       },
 
+
+      /**
+       * Starts rendering  details has been loaded
+       *
+       * @method _displayDetails
+       */
+      _displayDetails: function RulesHeader__displayDetails()
+      {
+         if (this.isReady && this.ruleset && this.folderDetails)
+         {
+            // Display actions container
+            if (!this.ruleset.rules)
+            {
+               Dom.addClass(this.widgets.actionsEl, "hidden");
+            }
+            else
+            {
+               Dom.removeClass(this.widgets.actionsEl, "hidden");
+            }
+
+            // Display file name
+            this.widgets.titleEl.innerHTML = $html(this.folderDetails.fileName);
+         }
+      },
 
       /**
        * Enable search button, hide the pending wait message and set the panel as not searching.
@@ -361,89 +327,7 @@
             this.widgets.feedbackMessage.hide();
          }
          this.widgets.runRulesMenu.set("disabled", false);
-         this.isSearching = false;
-      },
-
-      
-      /**
-       * Event handler called when the "folderDetailsAvailable" event is received
-       *
-       * @method onFolderDetailsAvailable
-       * @param layer
-       * @param args
-       */
-      onFolderDetailsAvailable: function RulesHeader_onFolderDetailsAvailable(layer, args)
-      {
-         var folderData = args[1].folderDetails;
-         this.folderName = folderData.fileName;
-         if (this.isReady)
-         {
-            this._displayFolderName();
-         }
-      },
-
-      /**
-       * Displays the folder name as the title
-       *
-       * @method _displayFolderName
-       * @param layer
-       * @param args
-       * @private
-       */
-      _displayFolderName: function RulesHeader__displayFolderName(layer, args)
-      {
-         // Display the title
-         this.widgets.titleEl.innerHTML = this.folderName;
-      },
-
-      /**
-       * Event handler called when the "folderRulesDetailsAvailable" event is received
-       *
-       * @method onFolderRulesDetailsAvailable
-       * @param layer
-       * @param args
-       */
-      onFolderRulesDetailsAvailable: function RulesHeader_onFolderRulesDetailsAvailable(layer, args)
-      {
-         var folderRulesData = args[1].folderRulesDetails;
-         this.rules = folderRulesData.rules ? folderRulesData.rules : [],
-         this.linkedFolder = folderRulesData.linkedFolder;
-
-         if (this.isReady)
-         {
-            this._displayActions();
-         }
-      },
-
-      /**
-       * Decides how to display the actions depending on the folders rules info.
-       *
-       * @method _displayActions
-       * @param layer
-       * @param args
-       */
-      _displayActions: function RulesHeader__displayActions(layer, args)
-      {
-         if (this.rules.length > 0 && !this.linkedFolder)
-         {
-            // Give the inherit button the correct state/icon depending
-            Dom.removeClass(this.widgets.inheritRulesContainer, "active");
-            for (var i = 0, l = this.rules.length; i < l; i++)
-            {
-               if (this.rules[i].inheritedFolder)
-               {
-                  Dom.addClass(this.widgets.inheritRulesContainer, "active");
-                  break;
-               }
-            }
-
-            // Display actions container
-            Dom.removeClass(this.widgets.actionsEl, "hidden");
-         }
-         else
-         {
-            Dom.addClass(this.widgets.actionsEl, "hidden");
-         }
+         this.isRunning = false;
       }
 
    });

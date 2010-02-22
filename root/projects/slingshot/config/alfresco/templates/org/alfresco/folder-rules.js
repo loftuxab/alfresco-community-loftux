@@ -17,23 +17,15 @@ function main()
    }
 
    // Load rules
-   result = connector.get("/api/node/" + page.url.args.nodeRef.replace("://", "/") + "/ruleset/rules");
+   result = connector.get("/api/node/" + page.url.args.nodeRef.replace("://", "/") + "/ruleset");
    if (result.status == 200)
    {
-      model.rules = eval('(' + result + ')').data;       
-   }
-   else if (false)
-   {
-      // Folder has linked rules
-      model.linkedFolder = {
-         nodeRef: "linkednodeRef",
-         name: "Requirements",
-         path: "/Sailfish/Product management"
-      };
-   }
-   else
-   {
-      // No (linked) rules at all
+      var ruleset = eval('(' + result + ')').data;
+      if (!ruleset)
+      {
+         ruleset = {};
+      }
+      model.ruleset = ruleset;
    }
 }
 

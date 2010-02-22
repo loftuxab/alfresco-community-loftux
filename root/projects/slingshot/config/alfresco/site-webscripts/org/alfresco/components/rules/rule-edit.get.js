@@ -3,7 +3,23 @@ function main()
    var ruleNodeRef = page.url.args.nodeRef,
       ruleId = page.url.args.ruleId,
       connector = remote.connect("alfresco"),
-      rule = null;
+      rule = null,
+      result,
+      data;
+
+   // Load folder info
+   if (ruleNodeRef)
+   {
+      result = connector.post("/api/forms/picker/items", jsonUtils.toJSONString(
+      {
+         items: [ruleNodeRef]
+      }), "application/json");
+      if (result.status == 200)
+      {
+         data = eval('(' + result + ')').data;
+         model.folder = data.items[0];
+      }
+   }
 
    // Load rule to edit of given in url
    if (ruleNodeRef && ruleId)
@@ -11,28 +27,30 @@ function main()
       result = connector.get("/api/node/" + ruleNodeRef.replace("://", "/") + "/ruleset/rules/" + ruleId);
       if (result.status == 200)
       {
-         var data = eval('(' + result + ')');
+         data = eval('(' + result + ')');
          rule = jsonUtils.toJSONString(data);
       }
    }
    model.rule = rule;
 
-   // Load list of values needed
-   // todo: replace with real webscript
-   /*
-   result = connector.get("/api/sites/" + siteId);
+   // Load constraints
+   result = connector.get("/api/actionConstraints");
+
    if (result.status == 200)
    {
-      var data = eval('(' + result + ')');
+      var constraintsArr = eval('(' + result + ')').data;
+      var constraintsObj = {};
+      for (var i = 0, il = constraintsArr.length, constraint; i < il; i++)
+      {
+         constraint = constraintsArr[i];
+         constraintsObj[constraint.name] = constraint.values;
+         if (constraint.name == "ac-scripts")
+         {
+            model.scripts = constraint.values;
+         }
+      }
+      model.constraints = jsonUtils.toJSONString(constraintsObj);
    }
-   */
-   var scripts =
-   [
-      { value: "", label: msg.get("label.none") },
-      { value: "/some/script.js", label: "/some/script.js" },
-      { value: "/some/other/script.js", label: "/some/other/script.java" },
-   ];
-   model.scripts = scripts;
 
    // Repository Library root node
    var rootNode = "alfresco://company/home",
@@ -44,5 +62,7 @@ function main()
 
    model.rootNode = rootNode;
 }
+
+
 
 main();

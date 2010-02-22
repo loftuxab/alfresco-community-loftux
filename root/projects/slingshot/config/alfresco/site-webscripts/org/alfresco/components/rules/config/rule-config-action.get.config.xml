@@ -2,7 +2,14 @@
 
    <component>Alfresco.RuleConfigAction</component>
 
-   <config-definitions webscript="/api/actiondefinitions"/>
+   <config-definitions webscript="/api/actiondefinitions">
+      <!--
+         Action Definitions that we don't want displayed in the menu
+      -->
+      <remove>
+         <action name="copy-to-web-project"/>
+      </remove>
+   </config-definitions>
 
    <constraints webscript="/api/actionConstraints"/>
 

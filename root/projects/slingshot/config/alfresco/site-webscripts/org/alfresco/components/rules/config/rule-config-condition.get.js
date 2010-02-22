@@ -28,11 +28,11 @@ function main()
    model.ruleConfigDefinitions = jsonUtils.toJSONString(actionConditionDefinitions);
 
    // Load constraints for rule types
-   var actionConstraints = loadRuleConstraints(c);
-   model.constraints = jsonUtils.toJSONString(actionConstraints);
+   var conditionConstraints = loadRuleConstraints(c);
+   model.constraints = jsonUtils.toJSONString(conditionConstraints);
 
 
-   // Save proeprty-evaluator config as json
+   // Save property-evaluator config as json
    var propertyEvaluatorMap = {},
       propertyEvaluatorNodes = c.elements("property-evaluators"),
       propertyEvaluatorNode = propertyEvaluatorNodes && propertyEvaluatorNodes.length() > 0 ? propertyEvaluatorNodes[0] : null,

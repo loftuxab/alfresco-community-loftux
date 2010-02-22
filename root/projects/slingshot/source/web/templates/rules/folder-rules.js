@@ -48,7 +48,9 @@
       Alfresco.FolderRules.superclass.constructor.call(this, "Alfresco.FolderRules", null, ["button"]);
 
       /* Decoupled event listeners */
-      YAHOO.Bubbling.on("folderRulesDetailsAvailable", this.onFolderRulesDetailsAvailable, this);
+      YAHOO.Bubbling.on("rulesCopiedFrom", this.onRulesCopiedFrom, this);
+      YAHOO.Bubbling.on("rulesLinkedTo", this.onRulesLinkedTo, this);
+      YAHOO.Bubbling.on("folderRulesetDetailsAvailable", this.onFolderRulesetDetailsAvailable, this);
       YAHOO.Bubbling.on("folderRulesDetailsChanged", this.onFolderRulesDetailsChanged, this);
 
       return this;
@@ -97,20 +99,12 @@
          pathToFolder: "",
 
          /**
-          * Rules linked, inherited or directly related to the folder.
+          * Local and inherited rules  and info about rules that link to this folder or are linked form this folder.
           *
-          * @property rules
+          * @property ruleset
           * @type Array
           */
-         rules: null,
-
-         /**
-          * Folder who's rules are linked to the folder specified by nodeRef.
-          *
-          * @property linkedFolder
-          * @type {object}
-          */
-         linkedFolder: null
+         ruleset: null
       },
 
       /**
@@ -152,37 +146,55 @@
          });
 
          // Fire event to inform any listening components that the data is ready
-         this._fireFolderRulesDetailsAvailable();
+         this._fireFolderRulesetDetailsAvailable();
 
          // Display inherited rules
          this._displayInheritedRules();
       },
 
       /**
-       * Event handler called when the "folderRulesDetailsAvailable" event is received
+       * Event handler called when the "onRulesCopiedFrom" event is received
        *
-       * @method onFolderRulesDetailsAvailable
+       * @method onRulesCopiedFrom
        * @param layer
        * @param args
        */
-      onFolderRulesDetailsAvailable: function RulesHeader_onFolderRulesDetailsAvailable(layer, args)
+      onRulesCopiedFrom: function RulesHeader_onRulesCopiedFrom(layer, args)
       {
-         var folderRulesData = args[1].folderRulesDetails;
+         // Refresh page since new components needs to be rendered
+         document.location.reload();
+      },
 
-         if((!this.options.linkedFolder && folderRulesData.linkedFolder) ||
-            (this.options.linkedFolder && !folderRulesData.linkedFolder) ||
-            (this.options.linkedFolder && folderRulesData.linkedFolder && this.options.linkedFolder.nodeRef != folderRulesData.linkedFolder.nodeRef))
+      /**
+       * Event handler called when the "onRulesLinkedTo" event is received
+       *
+       * @method onRulesLinkedTo
+       * @param layer
+       * @param args
+       */
+      onRulesLinkedTo: function RulesHeader_onRulesLinkedTo(layer, args)
+      {
+         // Refresh page since new components needs to be rendered
+         document.location.reload();
+      },
+      
+      /**
+       * Event handler called when the "folderRulesetDetailsAvailable" event is received
+       *
+       * @method onfolderRulesetDetailsAvailable
+       * @param layer
+       * @param args
+       */
+      onFolderRulesetDetailsAvailable: function RulesHeader_onFolderRulesetDetailsAvailable(layer, args)
+      {
+         var folderRulesetData = args[1].folderRulesetDetails;
+
+         if(this.options.ruleset.linkedToRuleSet != folderRulesetData.linkedToRuleSet ||
+            !this.options.ruleset.rules && folderRulesetData.rules ||
+            this.options.ruleset.rules && !folderRulesetData.rules)
          {
             // Refresh page since new components needs to be rendered
-            document.location.refresh();
-         }
-
-         if(this.options.rules && folderRulesData.rules && this.options.rules.length != folderRulesData.rules.length)
-         {
-            // Remember rule information
-            this.options.linkedFolder = folderRulesData.linkedFolder;
-            this.options.rules = folderRulesData.rules;
-            this._displayInheritedRules();
+            document.location.reload();
          }
       },
 
@@ -197,23 +209,17 @@
       _displayInheritedRules: function RulesHeader__displayInheritedRules(layer, args)
       {
          // Check if there are inherited rules
-         var rules = this.options.rules;
-         if (rules && rules.length > 0)
+         var inheritedRules = this.options.ruleset ? this.options.ruleset.inheritedRules : null;
+         if (inheritedRules && inheritedRules.length > 0)
          {
-            // Give the inherit button the correct state/icon depending
-            for (var i = 0, l = rules.length; i < l; i++)
-            {
-               if (rules[i].inheritedFolder)
-               {
-                  // Found an inherited rule make sure the component is displayed
-                  Dom.removeClass(this.widgets.inheritedRulesList, "hidden");
-                  return;
-               }
-            }
+            // Found an inherited rule make sure the component is displayed
+            Dom.removeClass(this.widgets.inheritedRulesList, "hidden");
          }
-
-         // Found no inherited rules make sure the component is hidden
-         Dom.addClass(this.widgets.inheritedRulesList, "hidden");
+         else
+         {
+            // Found no inherited rules make sure the component is hidden
+            Dom.addClass(this.widgets.inheritedRulesList, "hidden");            
+         }
       },
 
       /**
@@ -229,26 +235,27 @@
       {
          // Load rule information form server
          var nodeRefAsUrl = this.options.nodeRef.replace("://", "/"),
-            prevNoOfRules = this.options.rules ? this.options.rules.length : 0;
+            prevNoOfRules = this.options.ruleset && this.options.ruleset.rules ? this.options.ruleset.rules.length : 0;
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRefAsUrl + "/ruleset/rules",
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRefAsUrl + "/ruleset",
             successCallback:
             {
                fn: function(response, p_prevNoOfRules)
                {
                   if (response.json)
                   {
-                     this.options.rules = response.json.data;
-                     if ((prevNoOfRules == 0 && p_prevNoOfRules != 0) ||
-                         (prevNoOfRules != 0 && p_prevNoOfRules == 0))
+                     this.options.ruleset = response.json.data;
+                     var newNoOfRules = this.options.ruleset && this.options.ruleset.rules ? this.options.ruleset.rules.length : 0;
+                     if ((newNoOfRules == 0 && p_prevNoOfRules != 0) ||
+                         (newNoOfRules != 0 && p_prevNoOfRules == 0))
                      {
                         // Reload page so appropriate components will be displayed in stead of the current ones
                         window.location.reload();
                      }
                      else
                      {
-                        this._fireFolderRulesDetailsAvailable();   
+                        this._fireFolderRulesetDetailsAvailable();
                      }
                   }
                },
@@ -260,18 +267,14 @@
       },
 
       /**
-       * @method _fireFolderRulesDetailsAvailable
+       * @method _fireFolderRulesetDetailsAvailable
        * @private
        */
-      _fireFolderRulesDetailsAvailable: function RulesHeader__fireFolderRulesDetailsAvailable()
+      _fireFolderRulesetDetailsAvailable: function RulesHeader__fireFolderRulesetDetailsAvailable()
       {
-         YAHOO.Bubbling.fire("folderRulesDetailsAvailable",
+         YAHOO.Bubbling.fire("folderRulesetDetailsAvailable",
          {
-            folderRulesDetails:
-            {
-               rules: this.options.rules,
-               linkedFolder: this.options.linkedFolder
-            }
+            folderRulesetDetails: this.options.ruleset
          });
       }
 
