@@ -1,13 +1,15 @@
 <#include "wef-boot.js" />
 
+<#if url.args?contains("debug=true")><#assign debug="true"><#else><#assign debug="false"></#if>
+
 // Constant definitions
 if (typeof Alfresco == "undefined" || !Alfresco)
 {
    var Alfresco = {};
 }
 Alfresco.constants = Alfresco.constants || {};
-Alfresco.constants.DEBUG = false;
-Alfresco.constants.AUTOLOGGING = false;
+Alfresco.constants.DEBUG = ${debug};
+Alfresco.constants.AUTOLOGGING = ${debug};
 Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
 Alfresco.constants.PROXY_URI_RELATIVE = "${url.context}/proxy/alfresco/";
 Alfresco.constants.THEME = "default";
@@ -24,7 +26,7 @@ WEF.init(
     * 
     * @type Boolean
     */
-   debugMode : true,
+   debugMode : ${debug},
 
    /**
     * constants
@@ -47,7 +49,6 @@ WEF.init(
    {
       /**
        * Server port of awe app
-       * TODO change to "serverPort"
        *
        * @type String
        */

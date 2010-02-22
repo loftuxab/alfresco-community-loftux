@@ -99,7 +99,12 @@ public class StartTemplateTag extends AbstractWebEditorTag
             
             out.write("<script type=\"text/javascript\" src=\"");
             out.write(urlPrefix);
-            out.write("/service/wef/bootstrap\"></script>\n");
+            out.write("/service/wef/bootstrap");
+            if (debug)
+            {
+                out.write("?debug=true");
+            }
+            out.write("\"></script>\n");
             
             // TODO: Remove all the addResource() calls below, call
             //       /service/wef/resources script instead from EndTemplateTag
