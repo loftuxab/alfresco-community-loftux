@@ -8,9 +8,9 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.ws.CmisPropertyDefinitionType  implements java.io.Serializable {
-    private EnumDateTimeResolution resolution;
-
     private org.alfresco.repo.cmis.ws.CmisPropertyDateTime defaultValue;
+
+    private org.alfresco.repo.cmis.ws.EnumDateTimeResolution resolution;
 
     private org.alfresco.repo.cmis.ws.CmisChoiceDateTime[] choice;
 
@@ -33,8 +33,8 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
            boolean orderable,
            java.lang.Boolean openChoice,
            org.apache.axis.message.MessageElement [] _any,
-           EnumDateTimeResolution resolution,
            org.alfresco.repo.cmis.ws.CmisPropertyDateTime defaultValue,
+           org.alfresco.repo.cmis.ws.EnumDateTimeResolution resolution,
            org.alfresco.repo.cmis.ws.CmisChoiceDateTime[] choice) {
         super(
             id,
@@ -52,20 +52,11 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
             orderable,
             openChoice,
             _any);
-        this.resolution = resolution;
         this.defaultValue = defaultValue;
+        this.resolution = resolution;
         this.choice = choice;
     }
 
-    public EnumDateTimeResolution getResolution()
-    {
-        return resolution;
-    }
-
-    public void setResolution(EnumDateTimeResolution resolution)
-    {
-        this.resolution = resolution;
-    }
 
     /**
      * Gets the defaultValue value for this CmisPropertyDateTimeDefinitionType.
@@ -84,6 +75,26 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
      */
     public void setDefaultValue(org.alfresco.repo.cmis.ws.CmisPropertyDateTime defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+
+    /**
+     * Gets the resolution value for this CmisPropertyDateTimeDefinitionType.
+     * 
+     * @return resolution
+     */
+    public org.alfresco.repo.cmis.ws.EnumDateTimeResolution getResolution() {
+        return resolution;
+    }
+
+
+    /**
+     * Sets the resolution value for this CmisPropertyDateTimeDefinitionType.
+     * 
+     * @param resolution
+     */
+    public void setResolution(org.alfresco.repo.cmis.ws.EnumDateTimeResolution resolution) {
+        this.resolution = resolution;
     }
 
 
@@ -129,6 +140,9 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
             ((this.defaultValue==null && other.getDefaultValue()==null) || 
              (this.defaultValue!=null &&
               this.defaultValue.equals(other.getDefaultValue()))) &&
+            ((this.resolution==null && other.getResolution()==null) || 
+             (this.resolution!=null &&
+              this.resolution.equals(other.getResolution()))) &&
             ((this.choice==null && other.getChoice()==null) || 
              (this.choice!=null &&
               java.util.Arrays.equals(this.choice, other.getChoice())));
@@ -145,6 +159,9 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
         int _hashCode = super.hashCode();
         if (getDefaultValue() != null) {
             _hashCode += getDefaultValue().hashCode();
+        }
+        if (getResolution() != null) {
+            _hashCode += getResolution().hashCode();
         }
         if (getChoice() != null) {
             for (int i=0;
@@ -180,7 +197,6 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
         elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumDateTimeResolution"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
-        elemField.setMaxOccurs(1);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("choice");

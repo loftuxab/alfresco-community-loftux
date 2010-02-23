@@ -36,7 +36,7 @@ public class CheckIn  implements java.io.Serializable {
 
     public CheckIn(
            java.lang.String repositoryId,
-           java.lang.String documentId,
+           java.lang.String objectId,
            java.lang.Boolean major,
            org.alfresco.repo.cmis.ws.CmisPropertiesType properties,
            org.alfresco.repo.cmis.ws.CmisContentStreamType contentStream,
@@ -46,7 +46,7 @@ public class CheckIn  implements java.io.Serializable {
            org.alfresco.repo.cmis.ws.CmisAccessControlListType removeACEs,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
-           this.objectId = documentId;
+           this.objectId = objectId;
            this.major = major;
            this.properties = properties;
            this.contentStream = contentStream;
@@ -93,8 +93,8 @@ public class CheckIn  implements java.io.Serializable {
      * 
      * @param objectId
      */
-    public void setObjectId(java.lang.String documentId) {
-        this.objectId = documentId;
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
     }
 
 

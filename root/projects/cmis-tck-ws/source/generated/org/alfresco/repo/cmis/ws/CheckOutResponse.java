@@ -21,10 +21,10 @@ public class CheckOutResponse  implements java.io.Serializable {
     }
 
     public CheckOutResponse(
-           java.lang.String documentId,
+           java.lang.String objectId,
            boolean contentCopied,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
-           this.objectId = documentId;
+           this.objectId = objectId;
            this.contentCopied = contentCopied;
            this.extension = extension;
     }
@@ -45,8 +45,8 @@ public class CheckOutResponse  implements java.io.Serializable {
      * 
      * @param objectId
      */
-    public void setObjectId(java.lang.String documentId) {
-        this.objectId = documentId;
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
     }
 
 

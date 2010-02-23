@@ -59,22 +59,26 @@
       <constructor-arg ref="cmisRelationshipService" />
    </bean>
    
+   <bean id="cmisACLServiceClient"
+      class="org.alfresco.cmis.test.ws.CmisAclServiceClient"
+      parent="abstractServiceClient">
+      <constructor-arg ref="cmisACLService" />
+   </bean>
    <!--
       =========================================================================================================
    -->
 
-   <bean id="abstractOriginalServiceClient" parent="abstractServiceClient" abstract="true"></bean>
-
    <bean id="abstractServiceClient" class="org.alfresco.cmis.test.ws.AbstractServiceClient"
       abstract="true">
-      <property name="proxyUrl" value="${cmis.proxy.host}:${cmis.proxy.port}" />
       <property name="serverUrl" value="${cmis.server.host}:${cmis.server.port}" />
       <property name="username" value="${cmis.username}" />
       <property name="password" value="${cmis.password}" />
-
+      <property name="aclPrincipalId" value="${cmis.acl.principalId}" />
+      <property name="aclUsername" value="${cmis.acl.username}" />
+      <property name="aclPassword" value="${cmis.acl.password}" />
       <property name="servicesFactory" ref="servicesFactory" />
    </bean>
-
+   
    <bean id="servicesFactory" class="org.alfresco.cmis.test.ws.CmisServicesFactory">
       <property name="repositoryServiceDescriptor" ref="cmisRepositoryServiceClient" />
       <property name="discoveryServiceDescriptor" ref="cmisDiscoveryServiceClient" />
@@ -83,12 +87,12 @@
       <property name="multiFilingServiceDescriptor" ref="cmisMultiFilingServiceClient" />
       <property name="navigationServiceDescriptor" ref="cmisNavigationServiceClient" />
       <property name="relationshipServiceDescriptor" ref="cmisRelationshipServiceClient" />
+      <property name="aclServiceDescriptor" ref="cmisACLServiceClient" />
    </bean>
 
    <!--
       =========================================================================================
    -->
-   
    <bean id="cmisRepositoryService" class="org.alfresco.cmis.test.ws.AbstractService">
       <constructor-arg value="RepositoryServicePort" />
       <constructor-arg value="RepositoryService" />
@@ -136,6 +140,13 @@
       <constructor-arg value="RelationshipService" />
       <constructor-arg value="http://docs.oasis-open.org/ns/cmis/ws/200901" />
       <constructor-arg value="${cmis.relationshipservice.path}" />
+   </bean>
+   
+   <bean id="cmisACLService" class="org.alfresco.cmis.test.ws.AbstractService">
+      <constructor-arg value="ACLServicePort" />
+      <constructor-arg value="ACLService" />
+      <constructor-arg value="http://docs.oasis-open.org/ns/cmis/ws/200901" />
+      <constructor-arg value="${cmis.aclservice.path}" />
    </bean>
 
 </beans>

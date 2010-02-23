@@ -26,22 +26,33 @@ package org.alfresco.cmis.test.ws;
 
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.alfresco.repo.cmis.ws.ApplyACL;
 import org.alfresco.repo.cmis.ws.CancelCheckOut;
 import org.alfresco.repo.cmis.ws.CheckInResponse;
 import org.alfresco.repo.cmis.ws.CheckOutResponse;
+import org.alfresco.repo.cmis.ws.CmisAccessControlEntryType;
+import org.alfresco.repo.cmis.ws.CmisAccessControlListType;
+import org.alfresco.repo.cmis.ws.CmisAccessControlPrincipalType;
 import org.alfresco.repo.cmis.ws.CmisObjectType;
 import org.alfresco.repo.cmis.ws.CmisPropertiesType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
+import org.alfresco.repo.cmis.ws.DeleteObject;
 import org.alfresco.repo.cmis.ws.DiscoveryServicePortBindingStub;
+import org.alfresco.repo.cmis.ws.EnumCapabilityACL;
 import org.alfresco.repo.cmis.ws.EnumCapabilityChanges;
 import org.alfresco.repo.cmis.ws.EnumCapabilityQuery;
+import org.alfresco.repo.cmis.ws.EnumCapabilityRendition;
 import org.alfresco.repo.cmis.ws.EnumIncludeRelationships;
+import org.alfresco.repo.cmis.ws.EnumTypeOfChanges;
+import org.alfresco.repo.cmis.ws.EnumVersioningState;
 import org.alfresco.repo.cmis.ws.GetContentChanges;
 import org.alfresco.repo.cmis.ws.GetContentChangesResponse;
 import org.alfresco.repo.cmis.ws.Query;
 import org.alfresco.repo.cmis.ws.QueryResponse;
+import org.alfresco.repo.cmis.ws.UpdateProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -274,9 +285,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
             }
         }
     }
-
-    // TODO: renditionFilter
-
+    
     public void testQueryWhere() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
@@ -292,6 +301,49 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
             QueryResponse queryResponse = queryAndAssert(statement, false, false, null, null, null, null);
             String resultId = getIdProperty(queryResponse.getObjects().getObjects()[0].getProperties(), PROP_OBJECT_ID);
             assertEquals("'WHERE' clause was resulted with invalid Object", documentsIds[0], resultId);
+        }
+    }
+    
+    public void testQueryIncludeRenditions() throws Exception
+    {
+        if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
+                || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
+        {
+            LOGGER.warn("testQueryIncludeRenditions() was skipped: Metadata query isn't supported");
+        }
+        else
+        {   
+            if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
+            {
+                String documentId = createAndAssertDocument();
+                List<RenditionData> testRenditions = getTestRenditions(documentId);
+                if (testRenditions != null)
+                {
+                    for (RenditionData testRendition : testRenditions)
+                    {
+                        CmisPropertiesType response = getAndAssertObjectProperties(documentsIds[0], PROP_NAME);
+                        String name = getStringProperty(response, PROP_NAME);
+                        String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE " + PROP_NAME + "='" + name + "'";
+                        QueryResponse queryResponse = queryAndAssert(statement, false, false, null, testRendition.getFilter(), null, null);
+                        String resultId = getIdProperty(queryResponse.getObjects().getObjects()[0].getProperties(), PROP_OBJECT_ID);
+                        assertEquals("'WHERE' clause was resulted with invalid Object", documentsIds[0], resultId);
+                        assertTrue("Response is empty", queryResponse != null && queryResponse.getObjects() != null && queryResponse.getObjects().getObjects() != null
+                                && queryResponse.getObjects().getObjects().length == 1);
+                        assertRenditions(queryResponse.getObjects().getObjects()[0], testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition.getExpectedMimetypes());
+                    }
+                }
+                else
+                {
+                    LOGGER.info("testQueryIncludeRenditions was skipped: No renditions found for document type");
+                }
+                LOGGER.info("[ObjectService->deleteObject]");
+                getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
+            }
+            else
+            {
+                LOGGER.info("testQueryIncludeRenditions was skipped: Renditions are not supported");
+            }
+                        
         }
     }
 
@@ -538,26 +590,113 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testGetContentChanges() throws Exception
+    public void testGetContentChangesForCreating() throws Exception
     {
         if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()))
         {
-            try
-            {
-                LOGGER.info("[DiscoveryService->getContentChanges]");
-                // TODO: changeLogToken
-                GetContentChangesResponse response = getServicesFactory().getDiscoveryService().getContentChanges(
-                        new GetContentChanges(getAndAssertRepositoryId(), null, false, "*", false, false, null, null));
-                assertNotNull("Get Content Changes response is undefined", response);
-            }
-            catch (Exception e)
-            {
-                fail(e.toString());
-            }
+            String changeLogToken = getAndAssertRepositoryInfo().getLatestChangeLogToken();
+            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
+                    EnumVersioningState.none);
+
+            receiveAndAssertContentChanges(changeLogToken, 30, documentId, EnumTypeOfChanges.created);
         }
         else
         {
-            LOGGER.warn("testGetContentChanges() was skipped: Changes capability is not supported");
+            LOGGER.warn("testGetContentChangesForCreating() was skipped: Changes capability is not supported");
         }
+    }
+
+    public void testGetContentChangesForUpdating() throws Exception
+    {
+        if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()))
+        {
+            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
+                    EnumVersioningState.none);
+
+            String changeLogToken = getAndAssertRepositoryInfo().getLatestChangeLogToken();
+            String documentNameNew = generateTestFileName("_new");
+            CmisPropertiesType properties = fillProperties(documentNameNew, null);
+            LOGGER.info("[ObjectService->updateProperties]");
+            documentId = getServicesFactory().getObjectService().updateProperties(new UpdateProperties(getAndAssertRepositoryId(), documentId, null, properties, null))
+                    .getObjectId();
+
+            receiveAndAssertContentChanges(changeLogToken, 30, documentId, EnumTypeOfChanges.updated);
+        }
+        else
+        {
+            LOGGER.warn("testGetContentChangesForCreating() was skipped: Changes capability is not supported");
+        }
+    }
+
+    public void testGetContentChangesForDeleting() throws Exception
+    {
+        if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()))
+        {
+            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
+                    EnumVersioningState.none);
+
+            String changeLogToken = getAndAssertRepositoryInfo().getLatestChangeLogToken();
+            deleteAndAssertObject(documentId);
+
+            receiveAndAssertContentChanges(changeLogToken, 30, documentId, EnumTypeOfChanges.deleted);
+        }
+        else
+        {
+            LOGGER.warn("testGetContentChangesForCreating() was skipped: Changes capability is not supported");
+        }
+    }
+
+    public void testGetContentChangesForSecurity() throws Exception
+    {
+        if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()) && EnumCapabilityACL.manage.equals(getAndAssertCapabilities().getCapabilityACL()))
+        {
+            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
+                    EnumVersioningState.none);
+
+            String changeLogToken = getAndAssertRepositoryInfo().getLatestChangeLogToken();
+
+            CmisAccessControlListType acList = new CmisAccessControlListType();
+            CmisAccessControlPrincipalType principal = new CmisAccessControlPrincipalType(aclPrincipalId, null);
+            CmisAccessControlEntryType ace = new CmisAccessControlEntryType(principal, new String[] { PERMISSION_READ }, true, null);
+            acList.setPermission(new CmisAccessControlEntryType[] { ace });
+            LOGGER.info("[ACLService->applyACL]");
+            getServicesFactory().getACLService().applyACL(new ApplyACL(getAndAssertRepositoryId(), documentId, acList, null, getAndAssertACLPrapagation(), null));
+
+            LOGGER.info("[DiscoveryService->getContentChanges]");
+            receiveAndAssertContentChanges(changeLogToken, 30, documentId, EnumTypeOfChanges.security);
+        }
+        else
+        {
+            LOGGER.warn("testGetContentChangesForCreating() was skipped: Changes capability is not supported");
+        }
+    }
+
+    private void receiveAndAssertContentChanges(String changeLogToken, Integer maxItems, String expectedObjectId, EnumTypeOfChanges changeType) throws Exception
+    {
+        LOGGER.info("[DiscoveryService->getContentChanges]");
+        GetContentChangesResponse response = getServicesFactory().getDiscoveryService().getContentChanges(
+                new GetContentChanges(getAndAssertRepositoryId(), changeLogToken, false, "*", false, false, maxItems != null ? BigInteger.valueOf(maxItems) : null, null));
+        assertTrue("Get Content Changes response is empty", response != null && response.getObjects() != null && response.getObjects().getObjects() != null);
+        assertTrue("Get Content Changes response is empty", response.getObjects().getObjects().length > 0);
+        boolean found = false;
+        for (CmisObjectType cmisObjectType : response.getObjects().getObjects())
+        {
+            assertTrue("Cmis object is null", cmisObjectType != null && cmisObjectType.getProperties() != null);
+            if (expectedObjectId.equals(getIdProperty(cmisObjectType.getProperties(), PROP_OBJECT_ID)))
+            {
+                assertNotNull("ChangeEventInfo is null", cmisObjectType.getChangeEventInfo());
+                assertNotNull("ChangeTime is null", cmisObjectType.getChangeEventInfo().getChangeTime());
+                assertNotNull("ChangeType is null", cmisObjectType.getChangeEventInfo().getChangeType());
+                if (changeType.equals(cmisObjectType.getChangeEventInfo().getChangeType()))
+                {
+                    found = true;
+                }
+            }
+        }
+        assertTrue("Ecpected ChangeEvent is not found", found);
     }
 }

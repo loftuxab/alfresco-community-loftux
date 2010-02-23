@@ -35,6 +35,9 @@ import org.alfresco.repo.cmis.ws.CheckIn;
 import org.alfresco.repo.cmis.ws.CheckInResponse;
 import org.alfresco.repo.cmis.ws.CheckOut;
 import org.alfresco.repo.cmis.ws.CheckOutResponse;
+import org.alfresco.repo.cmis.ws.CmisAccessControlEntryType;
+import org.alfresco.repo.cmis.ws.CmisAccessControlListType;
+import org.alfresco.repo.cmis.ws.CmisAccessControlPrincipalType;
 import org.alfresco.repo.cmis.ws.CmisContentStreamType;
 import org.alfresco.repo.cmis.ws.CmisFaultType;
 import org.alfresco.repo.cmis.ws.CmisObjectType;
@@ -53,6 +56,7 @@ import org.alfresco.repo.cmis.ws.DeleteContentStreamResponse;
 import org.alfresco.repo.cmis.ws.DeleteObject;
 import org.alfresco.repo.cmis.ws.DeleteTree;
 import org.alfresco.repo.cmis.ws.DeleteTreeResponse;
+import org.alfresco.repo.cmis.ws.EnumCapabilityACL;
 import org.alfresco.repo.cmis.ws.EnumCapabilityRendition;
 import org.alfresco.repo.cmis.ws.EnumIncludeRelationships;
 import org.alfresco.repo.cmis.ws.EnumServiceException;
@@ -400,6 +404,42 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         documentId = cancelCheckOutAndAssert(documentId);
         deleteAndAssertObject(documentId);
     }
+    
+    public void testDocumentCreatingWithACL() throws Exception
+    {
+        if (!EnumCapabilityACL.manage.equals(getAndAssertCapabilities().getCapabilityACL()))
+        {
+            logger.info("Repository doesn't support 'manage ACL' capability. Test will be skipped...");
+            return;
+        }
+        if (aclPrincipalId == null || aclUsername == null || aclPassword == null)
+        {
+            logger.info("ACL Credentials or ACL PrincipalId were not set. Test will be skipped...");
+            return;
+        }
+        
+        CmisAccessControlListType acList = new CmisAccessControlListType();
+        CmisAccessControlPrincipalType principal = new CmisAccessControlPrincipalType(aclPrincipalId, null);
+        CmisAccessControlEntryType ace = new CmisAccessControlEntryType(principal, new String[] { PERMISSION_READ }, true, null);
+        acList.setPermission(new CmisAccessControlEntryType[] { ace });
+
+        String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null, acList, null);
+        
+        getPropertiesUsingCredentials(documentId, aclUsername, aclPassword);
+        
+        deleteAndAssertObject(documentId);
+        
+        acList = new CmisAccessControlListType();
+        principal = new CmisAccessControlPrincipalType(aclPrincipalId, null);
+        ace = new CmisAccessControlEntryType(principal, new String[] { PERMISSION_WRITE }, true, null);
+        acList.setPermission(new CmisAccessControlEntryType[] { ace });
+
+        documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null, acList, null);        
+        documentId = updatePropertiesUsingCredentials(documentId, aclUsername, aclPassword);
+        
+        deleteAndAssertObject(documentId);
+
+    }
 
     private String createAndAssertVersionedDocument(EnumVersioningState versioningState) throws Exception
     {
@@ -480,6 +520,31 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     public void testFolderCreation() throws Exception
     {
         String folderId = createAndAssertFolder();
+        deleteAndAssertObject(folderId);
+    }
+    
+    public void testFolderCreatingWithACL() throws Exception
+    {
+        if (!EnumCapabilityACL.manage.equals(getAndAssertCapabilities().getCapabilityACL()))
+        {
+            logger.info("Repository doesn't support 'manage ACL' capability. Test will be skipped...");
+            return;
+        }
+        if (aclPrincipalId == null || aclUsername == null || aclPassword == null)
+        {
+            logger.info("ACL Credentials or ACL PrincipalId were not set. Test will be skipped...");
+            return;
+        }
+        
+        CmisAccessControlListType acList = new CmisAccessControlListType();
+        CmisAccessControlPrincipalType principal = new CmisAccessControlPrincipalType(aclPrincipalId, null);
+        CmisAccessControlEntryType ace = new CmisAccessControlEntryType(principal, new String[] { PERMISSION_READ }, true, null);
+        acList.setPermission(new CmisAccessControlEntryType[] { ace });
+
+        String folderId = createAndAssertFolder(generateTestFolderName(), getAndAssertFolderTypeId(), getAndAssertRootFolderId(), null, acList, null);
+        
+        getPropertiesUsingCredentials(folderId, aclUsername, aclPassword);
+                        
         deleteAndAssertObject(folderId);
     }
 
@@ -779,6 +844,37 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         assertTrue("No properties were returned", response != null && response.getObject() != null && response.getObject().getProperties() != null);
         assertNotNull("No 'Name' property was returned", getStringProperty(response.getObject().getProperties(), PROP_NAME));
     }
+    
+    public void testGetObjectIncludeRenditions() throws Exception
+    {
+        if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
+        {
+            String documentId = createAndAssertDocument();
+            List<RenditionData> testRenditions = getTestRenditions(documentId);
+            if (testRenditions != null)
+            {
+                for (RenditionData testRendition : testRenditions)
+                {
+                    LOGGER.info("[ObjectService->getObject]");
+                    GetObjectResponse response = getServicesFactory().getObjectService().getObject(
+                            new GetObject(getAndAssertRepositoryId(), documentId, PROP_OBJECT_ID, false, EnumIncludeRelationships.none, testRendition.getFilter(), null, null,
+                                    null));
+                    assertTrue("Response is empty", response != null && response.getObject() != null);
+                    assertRenditions(response.getObject(), testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition.getExpectedMimetypes());
+                }
+            }
+            else
+            {
+                LOGGER.info("testGetObjectIncludeRenditions was skipped: No renditions found for document type");
+            }
+            LOGGER.info("[ObjectService->deleteObject]");
+            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
+        }
+        else
+        {
+            LOGGER.info("testGetObjectIncludeRenditions was skipped: Renditions are not supported");
+        }
+    }
 
     public void testGetObjectIncludeAllowableActionsAndRelationships() throws Exception
     {
@@ -876,6 +972,53 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             assertTrue("Invalid content stream was returned", Arrays.equals(TEST_CONTENT.getBytes(), response.getContentStream().getStream()));
             LOGGER.info("[ObjectService->deleteObject]");
             getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
+        }
+        else
+        {
+            LOGGER.info("testGetContentStream was skipped: Content stream isn't allowed");
+        }
+    }
+    
+    public void testGetContentStreamForRenditions() throws Exception
+    {
+        if (isContentStreamAllowed())
+        {
+            if (getAndAssertCapabilities().getCapabilityRenditions().equals(EnumCapabilityRendition.read))
+            {
+                String documentId = createAndAssertDocument();
+                CmisRenditionType[] renditionTypes = null;
+                LOGGER.info("[ObjectService->getRenditions]");
+                renditionTypes = getServicesFactory().getObjectService().getRenditions(
+                        new GetRenditions(getAndAssertRepositoryId(), documentId, "*", BigInteger.valueOf(1), BigInteger.valueOf(0), null));
+                CmisObjectType cmisObject = new CmisObjectType();
+                cmisObject.setRendition(renditionTypes);
+                assertNotNull("No Renditions were returned", renditionTypes);
+                assertRenditions(cmisObject, "*", null, null);
+                for (CmisRenditionType cmisRendition : renditionTypes)
+                {
+                    GetContentStreamResponse response = null;
+                    try
+                    {
+                        LOGGER.info("[ObjectService->getContentStream]");
+                        response = getServicesFactory().getObjectService().getContentStream(
+                                new GetContentStream(getAndAssertRepositoryId(), documentId, cmisRendition.getStreamId(), null, null, null));
+                    }
+                    catch (Exception e)
+                    {
+                        LOGGER.info("[ObjectService->deleteObject]");
+                        getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
+                        fail(e.toString());
+                    }
+                    assertTrue("No content stream was returned", response != null && response.getContentStream() != null);
+                }
+                LOGGER.info("[ObjectService->deleteObject]");
+                getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
+            }
+            else
+            {
+                LOGGER.info("testGetRenditions was skipped: Renditions aren't supported");
+            }
+
         }
         else
         {
@@ -999,7 +1142,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), folderId, false, null));
     }
 
-    public void testMoveObjectUnfiled() throws Exception
+    // FIXME: Maybe cd06 specification have missed notion about un-filling in context of this operation (when sourceFolderId is required)
+    /*public void testMoveObjectUnfiled() throws Exception
     {
         if (getAndAssertCapabilities().isCapabilityUnfiling())
         {
@@ -1025,7 +1169,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             LOGGER.info("testMoveObjectUnfiled was skipped: Unfiling isn't supported");
         }
-    }
+    }*/
 
     public void testMoveObjectMultiFiled() throws Exception
     {
@@ -1358,24 +1502,6 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         assertTrue("Object exists", propResponse == null || propResponse.getProperties() == null);
     }
 
-    //Uncomment this when specification will describe rootFolder deletion
-    /*
-    public void testDeleteTreeRootFolder()
-    {
-        try
-        {            
-            LOGGER.info("[ObjectService->deleteTree]");
-            getServicesFactory().getObjectService().deleteTree(new DeleteTree(getAndAssertRepositoryId(), getAndAssertRootFolderId(), true, EnumUnfileObject.delete, true, null));
-            fail("No Exception was thrown during deleting root folder");
-        }
-        catch (Exception e)
-        {
-            assertTrue("Invalid exception was thrown during deleting root folder", e instanceof CmisFaultType
-                    && ((CmisFaultType) e).getType().equals(EnumServiceException.notSupported));
-        }
-    }
-     */
-
     public void testSetContentStream() throws Exception
     {
         if (isContentStreamAllowed())
@@ -1550,12 +1676,17 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 LOGGER.info("[ObjectService->getRenditions]");
                 renditionTypes = getServicesFactory().getObjectService().getRenditions(
                         new GetRenditions(getAndAssertRepositoryId(), documentId, "*", BigInteger.valueOf(1), BigInteger.valueOf(0), null));
+                assertNotNull("No Renditions were returned", renditionTypes);
+                CmisObjectType cmisObject = new CmisObjectType();
+                cmisObject.setRendition(renditionTypes);
+                assertRenditions(cmisObject, "*", null, null);
             }
             catch (Exception e)
             {
                 fail(e.toString());
-            }
-            assertNotNull("No Renditions were returned", renditionTypes);
+            }  
+            LOGGER.info("[ObjectService->deleteObject]");
+            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, true, null));
         }
         else
         {

@@ -24,11 +24,11 @@ public class DeleteContentStream  implements java.io.Serializable {
 
     public DeleteContentStream(
            java.lang.String repositoryId,
-           java.lang.String documentId,
+           java.lang.String objectId,
            java.lang.String changeToken,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
-           this.objectId = documentId;
+           this.objectId = objectId;
            this.changeToken = changeToken;
            this.extension = extension;
     }
@@ -69,8 +69,8 @@ public class DeleteContentStream  implements java.io.Serializable {
      * 
      * @param objectId
      */
-    public void setObjectId(java.lang.String documentId) {
-        this.objectId = documentId;
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
     }
 
 

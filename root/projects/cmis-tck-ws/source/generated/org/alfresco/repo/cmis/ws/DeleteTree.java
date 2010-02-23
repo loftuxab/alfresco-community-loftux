@@ -14,7 +14,7 @@ public class DeleteTree  implements java.io.Serializable {
 
     private java.lang.Boolean allVersions;
 
-    private org.alfresco.repo.cmis.ws.EnumUnfileObject unfileObject;
+    private org.alfresco.repo.cmis.ws.EnumUnfileObject unfileObjects;
 
     private java.lang.Boolean continueOnFailure;
 
@@ -30,13 +30,13 @@ public class DeleteTree  implements java.io.Serializable {
            java.lang.String repositoryId,
            java.lang.String folderId,
            java.lang.Boolean allVersions,
-           org.alfresco.repo.cmis.ws.EnumUnfileObject unfileObject,
+           org.alfresco.repo.cmis.ws.EnumUnfileObject unfileObjects,
            java.lang.Boolean continueOnFailure,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.folderId = folderId;
            this.allVersions = allVersions;
-           this.unfileObject = unfileObject;
+           this.unfileObjects = unfileObjects;
            this.continueOnFailure = continueOnFailure;
            this.extension = extension;
     }
@@ -103,22 +103,22 @@ public class DeleteTree  implements java.io.Serializable {
 
 
     /**
-     * Gets the unfileObject value for this DeleteTree.
+     * Gets the unfileObjects value for this DeleteTree.
      * 
-     * @return unfileObject
+     * @return unfileObjects
      */
-    public org.alfresco.repo.cmis.ws.EnumUnfileObject getUnfileObject() {
-        return unfileObject;
+    public org.alfresco.repo.cmis.ws.EnumUnfileObject getUnfileObjects() {
+        return unfileObjects;
     }
 
 
     /**
-     * Sets the unfileObject value for this DeleteTree.
+     * Sets the unfileObjects value for this DeleteTree.
      * 
-     * @param unfileObject
+     * @param unfileObjects
      */
-    public void setUnfileObject(org.alfresco.repo.cmis.ws.EnumUnfileObject unfileObject) {
-        this.unfileObject = unfileObject;
+    public void setUnfileObjects(org.alfresco.repo.cmis.ws.EnumUnfileObject unfileObjects) {
+        this.unfileObjects = unfileObjects;
     }
 
 
@@ -186,9 +186,9 @@ public class DeleteTree  implements java.io.Serializable {
             ((this.allVersions==null && other.getAllVersions()==null) || 
              (this.allVersions!=null &&
               this.allVersions.equals(other.getAllVersions()))) &&
-            ((this.unfileObject==null && other.getUnfileObject()==null) || 
-             (this.unfileObject!=null &&
-              this.unfileObject.equals(other.getUnfileObject()))) &&
+            ((this.unfileObjects==null && other.getUnfileObjects()==null) || 
+             (this.unfileObjects!=null &&
+              this.unfileObjects.equals(other.getUnfileObjects()))) &&
             ((this.continueOnFailure==null && other.getContinueOnFailure()==null) || 
              (this.continueOnFailure!=null &&
               this.continueOnFailure.equals(other.getContinueOnFailure()))) &&
@@ -215,8 +215,8 @@ public class DeleteTree  implements java.io.Serializable {
         if (getAllVersions() != null) {
             _hashCode += getAllVersions().hashCode();
         }
-        if (getUnfileObject() != null) {
-            _hashCode += getUnfileObject().hashCode();
+        if (getUnfileObjects() != null) {
+            _hashCode += getUnfileObjects().hashCode();
         }
         if (getContinueOnFailure() != null) {
             _hashCode += getContinueOnFailure().hashCode();
@@ -254,8 +254,8 @@ public class DeleteTree  implements java.io.Serializable {
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("unfileObject");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "unfileObject"));
+        elemField.setFieldName("unfileObjects");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "unfileObjects"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumUnfileObject"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);

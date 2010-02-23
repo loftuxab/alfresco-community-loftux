@@ -22,7 +22,7 @@ public class GetFolderTree  implements java.io.Serializable {
 
     private java.lang.String renditionFilter;
 
-    private java.lang.Boolean includePathSegments;
+    private java.lang.Boolean includePathSegment;
 
     /* This is an extension element to hold any
      * 							repository or
@@ -40,7 +40,7 @@ public class GetFolderTree  implements java.io.Serializable {
            java.lang.Boolean includeAllowableActions,
            org.alfresco.repo.cmis.ws.EnumIncludeRelationships includeRelationships,
            java.lang.String renditionFilter,
-           java.lang.Boolean includePathSegments,
+           java.lang.Boolean includePathSegment,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
            this.folderId = folderId;
@@ -49,7 +49,7 @@ public class GetFolderTree  implements java.io.Serializable {
            this.includeAllowableActions = includeAllowableActions;
            this.includeRelationships = includeRelationships;
            this.renditionFilter = renditionFilter;
-           this.includePathSegments = includePathSegments;
+           this.includePathSegment = includePathSegment;
            this.extension = extension;
     }
 
@@ -195,22 +195,22 @@ public class GetFolderTree  implements java.io.Serializable {
 
 
     /**
-     * Gets the includePathSegments value for this GetFolderTree.
+     * Gets the includePathSegment value for this GetFolderTree.
      * 
-     * @return includePathSegments
+     * @return includePathSegment
      */
-    public java.lang.Boolean getIncludePathSegments() {
-        return includePathSegments;
+    public java.lang.Boolean getIncludePathSegment() {
+        return includePathSegment;
     }
 
 
     /**
-     * Sets the includePathSegments value for this GetFolderTree.
+     * Sets the includePathSegment value for this GetFolderTree.
      * 
-     * @param includePathSegments
+     * @param includePathSegment
      */
-    public void setIncludePathSegments(java.lang.Boolean includePathSegments) {
-        this.includePathSegments = includePathSegments;
+    public void setIncludePathSegment(java.lang.Boolean includePathSegment) {
+        this.includePathSegment = includePathSegment;
     }
 
 
@@ -270,9 +270,9 @@ public class GetFolderTree  implements java.io.Serializable {
             ((this.renditionFilter==null && other.getRenditionFilter()==null) || 
              (this.renditionFilter!=null &&
               this.renditionFilter.equals(other.getRenditionFilter()))) &&
-            ((this.includePathSegments==null && other.getIncludePathSegments()==null) || 
-             (this.includePathSegments!=null &&
-              this.includePathSegments.equals(other.getIncludePathSegments()))) &&
+            ((this.includePathSegment==null && other.getIncludePathSegment()==null) || 
+             (this.includePathSegment!=null &&
+              this.includePathSegment.equals(other.getIncludePathSegment()))) &&
             ((this.extension==null && other.getExtension()==null) || 
              (this.extension!=null &&
               this.extension.equals(other.getExtension())));
@@ -308,8 +308,8 @@ public class GetFolderTree  implements java.io.Serializable {
         if (getRenditionFilter() != null) {
             _hashCode += getRenditionFilter().hashCode();
         }
-        if (getIncludePathSegments() != null) {
-            _hashCode += getIncludePathSegments().hashCode();
+        if (getIncludePathSegment() != null) {
+            _hashCode += getIncludePathSegment().hashCode();
         }
         if (getExtension() != null) {
             _hashCode += getExtension().hashCode();
@@ -372,8 +372,8 @@ public class GetFolderTree  implements java.io.Serializable {
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("includePathSegments");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includePathSegments"));
+        elemField.setFieldName("includePathSegment");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "includePathSegment"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);

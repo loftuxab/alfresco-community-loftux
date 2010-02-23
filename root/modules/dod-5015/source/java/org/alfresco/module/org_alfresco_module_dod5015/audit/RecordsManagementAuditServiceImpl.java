@@ -722,6 +722,12 @@ public class RecordsManagementAuditServiceImpl
         {
             private boolean firstEntry = true;
 
+            
+            public boolean valuesRequired()
+            {
+                return true;
+            }
+
             /**
              * Just log the error, but continue
              */

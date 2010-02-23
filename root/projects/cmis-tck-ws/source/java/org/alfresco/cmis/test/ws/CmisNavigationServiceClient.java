@@ -57,6 +57,7 @@ import org.alfresco.repo.cmis.ws.CmisPropertyString;
 import org.alfresco.repo.cmis.ws.CmisTypeDefinitionType;
 import org.alfresco.repo.cmis.ws.DeleteObject;
 import org.alfresco.repo.cmis.ws.DeleteTree;
+import org.alfresco.repo.cmis.ws.EnumCapabilityRendition;
 import org.alfresco.repo.cmis.ws.EnumIncludeRelationships;
 import org.alfresco.repo.cmis.ws.EnumServiceException;
 import org.alfresco.repo.cmis.ws.EnumUnfileObject;
@@ -309,6 +310,46 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         assertNotNull("GetDescendants response is NULL", descendantsResponse);
         assertObjectsTree(descendantsResponse, expectedTree);
     }
+    
+    public void testDescendantsReceivingIncludeRenditions() throws Exception
+    {
+        if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
+        {
+            String documentId = createAndAssertDocument();
+            List<RenditionData> testRenditions = getTestRenditions(documentId);
+            if (testRenditions != null)
+            {
+                TreeNode<String> expectedTree = createObjectsTree(folderId, versioningState, EnumTypesOfFileableObjects.BOTH, TEST_TREE_DEPTH, 1, 5, TEST_TREE_DEPTH);
+                for (RenditionData testRendition : testRenditions)
+                {
+                    NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
+                    LOGGER.info("[NavigationService->getDescendants]");
+                    CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger
+                            .valueOf(-1), "*", false, EnumIncludeRelationships.none, testRendition.getFilter(), null, null));
+
+                    assertNotNull("GetDescendants response is NULL", descendantsResponse);
+                    assertObjectsTree(descendantsResponse, expectedTree);
+                    List<CmisObjectInFolderContainerType> objectsList = convertTreeToObjectsList(descendantsResponse);
+                    for (CmisObjectInFolderContainerType objectInFolder : objectsList)
+                    {
+                        assertRenditions(objectInFolder.getObjectInFolder().getObject(), testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition
+                                .getExpectedMimetypes());
+                    }
+                }
+            }
+            else
+            {
+                LOGGER.info("testDescendantsReceivingIncludeRenditions was skipped: No renditions found for document type");
+            }
+            LOGGER.info("[ObjectService->deleteObject]");
+            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
+        }
+        else
+        {
+            LOGGER.info("testDescendantsReceivingIncludeRenditions was skipped: Renditions are not supported");
+        }
+        
+    }
 
     public void testDepthLimitedDescendantsReceiving() throws Exception
     {
@@ -472,6 +513,45 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         assertTrue("GetChildren response is NULL", childrenResponse.getObjects() != null && childrenResponse.getObjects().getObjects() != null);
         assertObjectsFromResponse(childrenResponse.getObjects().getObjects(), 0, expectedObjects.size());
         assertChildren(expectedObjects, childrenResponse.getObjects().getObjects(), true, "GetChildren service");
+    }
+    
+    public void testChildrenReceivingIncludeRenditions() throws Exception
+    {
+        if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
+        {
+            String documentId = createAndAssertDocument();
+            List<RenditionData> testRenditions = getTestRenditions(documentId);
+            if (testRenditions != null)
+            {
+                TreeNode<String> expectedTree = createObjectsTree(folderId, versioningState, EnumTypesOfFileableObjects.BOTH, 2, 1, CHILDREN_TEST_OBJECTS_AMOUNT, 2);
+                Set<String> expectedObjects = expectedTree.getChildren().keySet();
+                for (RenditionData testRendition : testRenditions)
+                {
+                    NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
+                    LOGGER.info("[NavigationService->getChildren]");
+                    GetChildrenResponse childrenResponse = navigationService.getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, false,
+                            EnumIncludeRelationships.none, testRendition.getFilter(), null, BigInteger.valueOf(0), BigInteger.valueOf(0), null));
+                    assertTrue("GetChildren response is NULL", childrenResponse.getObjects() != null && childrenResponse.getObjects().getObjects() != null);
+                    assertObjectsFromResponse(childrenResponse.getObjects().getObjects(), 0, expectedObjects.size());
+                    assertChildren(expectedObjects, childrenResponse.getObjects().getObjects(), true, "GetChildren service");
+                    for (CmisObjectInFolderType objectInFolder : childrenResponse.getObjects().getObjects())
+                    {
+                        assertRenditions(objectInFolder.getObject(), testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition.getExpectedMimetypes());
+                    }
+                }
+            }
+            else
+            {
+                LOGGER.info("testChildrenReceivingIncludeRenditions was skipped: No renditions found for document type");
+            }
+            LOGGER.info("[ObjectService->deleteObject]");
+            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
+        }
+        else
+        {
+            LOGGER.info("testChildrenReceivingIncludeRenditions was skipped: Renditions are not supported");
+        }
+
     }
 
     public void testGetChildrenPaigingFunctionality() throws Exception
@@ -951,6 +1031,65 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             {
                 getServicesFactory().getVersioningService().cancelCheckOut(new CancelCheckOut(getAndAssertRepositoryId(), documentId, null));
             }
+        }
+        else
+        {
+            LOGGER.warn("testGetCheckedoutDocsFolder was skipped: Versioning isn't supported");
+        }
+    }
+    
+    public void testGetCheckedoutDocsIncludeRenditions() throws Exception
+    {
+        if (isVersioningAllowed())
+        {
+            if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
+            {
+                String documentId = createAndAssertDocument();
+                List<RenditionData> testRenditions = getTestRenditions(documentId);
+                if (testRenditions != null)
+                {
+                    GetCheckedOutDocsResponse response = null;
+                    TreeNode<String> objectsTree = createObjectsTree(folderId, EnumVersioningState.checkedout, EnumTypesOfFileableObjects.DOCUMENTS, 1, 2, 3, 1);
+                    Set<String> createdDocuments = objectsTree.getChildren().keySet();                    
+                    for (RenditionData testRendition : testRenditions)
+                    {
+                        try
+                        {
+                            LOGGER.info("[NavigationService->getCheckedOutDocs]");
+                            response = getServicesFactory().getNavigationService().getCheckedOutDocs(
+                                    new GetCheckedOutDocs(getAndAssertRepositoryId(), folderId, "*", null, false, EnumIncludeRelationships.none, testRendition.getFilter(), null,
+                                            null, null));                            
+                        }
+                        catch (Exception e)
+                        {
+                            fail(e.toString());
+                        }
+                        assertTrue("No checked out documents were returned", response != null && response.getObjects() != null && response.getObjects().getObjects() != null
+                                && response.getObjects().getObjects().length > 0);
+                        for (CmisObjectType cmisObject : response.getObjects().getObjects())
+                        {
+                            assertRenditions(cmisObject, testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition.getExpectedMimetypes());
+                        }
+
+                    }
+                    LOGGER.info("[VersioningService->cancelCheckOut]");
+                    for (String checkedOutDocumentId : createdDocuments)
+                    {
+                        getServicesFactory().getVersioningService().cancelCheckOut(new CancelCheckOut(getAndAssertRepositoryId(), checkedOutDocumentId, null));
+                    }
+                }
+                else
+                {
+                    LOGGER.info("testGetObjectIncludeRenditions was skipped: No renditions found for document type");
+                }
+                LOGGER.info("[ObjectService->deleteObject]");
+                getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));                
+            }
+            else
+            {
+                LOGGER.info("testGetObjectIncludeRenditions was skipped: Renditions are not supported");
+            }          
+            
         }
         else
         {

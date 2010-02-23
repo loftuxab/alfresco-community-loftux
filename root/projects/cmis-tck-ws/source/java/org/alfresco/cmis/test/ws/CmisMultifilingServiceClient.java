@@ -85,7 +85,7 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         {
             LOGGER.info("Invoking client...");
         }
-        MultiFilingServicePort multiFilingServicePort = getServicesFactory().getMultiFilingServicePort(getProxyUrl() + getService().getPath());
+        MultiFilingServicePort multiFilingServicePort = getServicesFactory().getMultiFilingService(getProxyUrl() + getService().getPath());
         multiFilingServicePort.addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), documentId, folderId, true, null));
         multiFilingServicePort.removeObjectFromFolder(new RemoveObjectFromFolder(getAndAssertRepositoryId(), documentId, folderId, null));
     }
