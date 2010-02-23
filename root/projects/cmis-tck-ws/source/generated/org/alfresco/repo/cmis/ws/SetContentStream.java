@@ -28,13 +28,13 @@ public class SetContentStream  implements java.io.Serializable {
 
     public SetContentStream(
            java.lang.String repositoryId,
-           java.lang.String documentId,
+           java.lang.String objectId,
            java.lang.Boolean overwriteFlag,
            java.lang.String changeToken,
            org.alfresco.repo.cmis.ws.CmisContentStreamType contentStream,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
-           this.objectId = documentId;
+           this.objectId = objectId;
            this.overwriteFlag = overwriteFlag;
            this.changeToken = changeToken;
            this.contentStream = contentStream;
@@ -77,8 +77,8 @@ public class SetContentStream  implements java.io.Serializable {
      * 
      * @param objectId
      */
-    public void setObjectId(java.lang.String documentId) {
-        this.objectId = documentId;
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
     }
 
 

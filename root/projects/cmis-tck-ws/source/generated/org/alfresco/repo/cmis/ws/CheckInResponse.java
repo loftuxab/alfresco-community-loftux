@@ -19,9 +19,9 @@ public class CheckInResponse  implements java.io.Serializable {
     }
 
     public CheckInResponse(
-           java.lang.String documentId,
+           java.lang.String objectId,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
-           this.objectId = documentId;
+           this.objectId = objectId;
            this.extension = extension;
     }
 
@@ -41,8 +41,8 @@ public class CheckInResponse  implements java.io.Serializable {
      * 
      * @param objectId
      */
-    public void setObjectId(java.lang.String documentId) {
-        this.objectId = documentId;
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
     }
 
 

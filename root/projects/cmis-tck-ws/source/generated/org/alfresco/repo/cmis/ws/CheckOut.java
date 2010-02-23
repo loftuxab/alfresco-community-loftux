@@ -22,10 +22,10 @@ public class CheckOut  implements java.io.Serializable {
 
     public CheckOut(
            java.lang.String repositoryId,
-           java.lang.String documentId,
+           java.lang.String objectId,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
-           this.objectId = documentId;
+           this.objectId = objectId;
            this.extension = extension;
     }
 
@@ -65,8 +65,8 @@ public class CheckOut  implements java.io.Serializable {
      * 
      * @param objectId
      */
-    public void setObjectId(java.lang.String documentId) {
-        this.objectId = documentId;
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
     }
 
 

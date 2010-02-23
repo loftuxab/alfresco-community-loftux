@@ -24,25 +24,21 @@
  */
 package org.alfresco.cmis.test.ws;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.namespace.QName;
-
 import org.alfresco.repo.cmis.ws.CancelCheckOut;
 import org.alfresco.repo.cmis.ws.CheckIn;
 import org.alfresco.repo.cmis.ws.CheckInResponse;
 import org.alfresco.repo.cmis.ws.CheckOut;
 import org.alfresco.repo.cmis.ws.CheckOutResponse;
+import org.alfresco.repo.cmis.ws.CmisAccessControlListType;
 import org.alfresco.repo.cmis.ws.CmisContentStreamType;
 import org.alfresco.repo.cmis.ws.CmisFaultType;
 import org.alfresco.repo.cmis.ws.CmisObjectInFolderType;
@@ -52,6 +48,7 @@ import org.alfresco.repo.cmis.ws.CmisProperty;
 import org.alfresco.repo.cmis.ws.CmisPropertyBoolean;
 import org.alfresco.repo.cmis.ws.CmisPropertyId;
 import org.alfresco.repo.cmis.ws.CmisPropertyString;
+import org.alfresco.repo.cmis.ws.CmisRenditionType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryEntryType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryInfoType;
@@ -71,6 +68,7 @@ import org.alfresco.repo.cmis.ws.CreateRelationshipResponse;
 import org.alfresco.repo.cmis.ws.DeleteObject;
 import org.alfresco.repo.cmis.ws.DeleteTree;
 import org.alfresco.repo.cmis.ws.DeleteTreeResponse;
+import org.alfresco.repo.cmis.ws.EnumACLPropagation;
 import org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds;
 import org.alfresco.repo.cmis.ws.EnumContentStreamAllowed;
 import org.alfresco.repo.cmis.ws.EnumIncludeRelationships;
@@ -82,6 +80,7 @@ import org.alfresco.repo.cmis.ws.GetChildren;
 import org.alfresco.repo.cmis.ws.GetChildrenResponse;
 import org.alfresco.repo.cmis.ws.GetProperties;
 import org.alfresco.repo.cmis.ws.GetPropertiesResponse;
+import org.alfresco.repo.cmis.ws.GetRenditions;
 import org.alfresco.repo.cmis.ws.GetRepositories;
 import org.alfresco.repo.cmis.ws.GetRepositoryInfo;
 import org.alfresco.repo.cmis.ws.GetRepositoryInfoResponse;
@@ -91,17 +90,9 @@ import org.alfresco.repo.cmis.ws.GetTypeDefinition;
 import org.alfresco.repo.cmis.ws.GetTypeDefinitionResponse;
 import org.alfresco.repo.cmis.ws.GetTypeDescendants;
 import org.alfresco.repo.cmis.ws.ObjectServicePortBindingStub;
-import org.apache.axis.EngineConfiguration;
-import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.transport.http.HTTPSender;
+import org.alfresco.repo.cmis.ws.UpdateProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.axis.security.WSDoAllSender;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -109,7 +100,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  * 
  * @author Mike Shavnev
  */
-public abstract class AbstractServiceClient extends AbstractDependencyInjectionSpringContextTests implements CallbackHandler
+public abstract class AbstractServiceClient extends AbstractDependencyInjectionSpringContextTests 
 {
     private static Log LOGGER = LogFactory.getLog(AbstractServiceClient.class);
 
@@ -161,7 +152,17 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     private static final String TEST_FOLDER_NAME_PATTERN = "Test Folder(%d.%d)";
     private static final String TEST_DOCUMENT_NAME_PATTERN = "Test Document(%d.%d).txt";
     private static final String TEST_POLICY_NAME_PATTERN = "Test Policy(%s)%s";
+    
+    private static final String RENDITION_FILTER_NONE = "cmis:none";
+    private static final String IMAGE_BASE_MIMETYPE = "image/";
+    private static final String RENDITION_FILTER_DELIMITER = ",";
+    private static final String RENDITION_FILTER_WILDCARD = "*";
+    private static final String RENDITION_FILTER_SUBTYPES_POSTFIX = "/*";
 
+    protected static final String PERMISSION_READ = "cmis:read";
+    protected static final String PERMISSION_WRITE = "cmis:write";
+    protected static final String PERMISSION_ALL = "cmis:all";
+    
     private AbstractService abstractService;
 
     private String proxyUrl;
@@ -169,10 +170,11 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
     private String username;
     private String password;
-
-    private String ticket;
-    private SimpleProvider engineConfiguration;
-
+    
+    protected static String aclUsername;
+    protected static String aclPassword;
+    protected static String aclPrincipalId;
+    
     private CmisServicesFactory servicesFactory;
 
     private static String repositoryId;
@@ -186,8 +188,9 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     private static List<CmisTypeDefinitionType> relationshipSubTypes = new LinkedList<CmisTypeDefinitionType>();
     private static CmisRepositoryCapabilitiesType capabilities;
     private static EnumContentStreamAllowed contentStreamAllowed;
+    private static EnumACLPropagation aclPropagation;
     private static boolean versioningAllowed = false;
-
+   
     public AbstractServiceClient()
     {
         super();
@@ -257,80 +260,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     {
         this.servicesFactory = servicesFactory;
     }
-
-    /**
-     * Gets Axis engine configuration with WS Security configured
-     * 
-     * @return EngineConfiguration
-     */
-    public EngineConfiguration getEngineConfiguration()
-    {
-        if (engineConfiguration == null)
-        {
-            WSDoAllSender wsDoAllSender = new WSDoAllSender()
-            {
-                private static final long serialVersionUID = 3313512765705136489L;
-
-                @Override
-                public WSPasswordCallback getPassword(String username, int doAction, String clsProp, String refProp, RequestData reqData) throws WSSecurityException
-                {
-                    WSPasswordCallback passwordCallback = null;
-                    try
-                    {
-                        passwordCallback = super.getPassword(username, doAction, clsProp, refProp, reqData);
-                    }
-                    catch (WSSecurityException e)
-                    {
-                        passwordCallback = new WSPasswordCallback(username, WSPasswordCallback.USERNAME_TOKEN);
-                        try
-                        {
-                            CallbackHandler callbackHandler = (CallbackHandler) getOption(refProp);
-                            callbackHandler.handle(new Callback[] { passwordCallback });
-                        }
-                        catch (Exception e2)
-                        {
-                            throw new WSSecurityException("WSHandler: password callback failed", e);
-                        }
-                    }
-                    return passwordCallback;
-                }
-            };
-
-            wsDoAllSender.setOption(WSHandlerConstants.ACTION, WSConstants.USERNAME_TOKEN_LN + " " + WSConstants.TIMESTAMP_TOKEN_LN);
-            wsDoAllSender.setOption(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-            wsDoAllSender.setOption(WSHandlerConstants.PW_CALLBACK_REF, this);
-            wsDoAllSender.setOption(WSHandlerConstants.USER, username);
-
-            engineConfiguration = new SimpleProvider();
-            engineConfiguration.deployTransport(new QName("", "http"), new HTTPSender());
-            engineConfiguration.setGlobalRequest(wsDoAllSender);
-        }
-        return engineConfiguration;
-    }
-
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-    {
-        for (int i = 0; i < callbacks.length; i++)
-        {
-            if (callbacks[i] instanceof WSPasswordCallback)
-            {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (ticket != null)
-                {
-                    pc.setPassword(ticket);
-                }
-                else
-                {
-                    pc.setPassword(password);
-                }
-            }
-            else
-            {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
-            }
-        }
-    }
-
+  
     @Override
     protected String[] getConfigLocations()
     {
@@ -363,9 +293,15 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     {
         return createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null);
     }
-
+    
     protected String createAndAssertDocument(String documentName, String documentTypeId, String folderId, CmisPropertiesType properties, String content,
             EnumVersioningState initialVersion) throws Exception
+    {
+        return createAndAssertDocument(documentName, documentTypeId, folderId, properties, content, initialVersion, null, null);
+    }
+
+    protected String createAndAssertDocument(String documentName, String documentTypeId, String folderId, CmisPropertiesType properties, String content,
+            EnumVersioningState initialVersion, CmisAccessControlListType addACE, CmisAccessControlListType removeACE) throws Exception
     {
         ObjectServicePortBindingStub objectService = getServicesFactory().getObjectService();
 
@@ -408,7 +344,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
         LOGGER.info("[ObjectService->createDocument]");
         CreateDocumentResponse createDocument = objectService.createDocument(new CreateDocument(getAndAssertRepositoryId(), properties, folderId, contentStream, initialVersion,
-                null, null, null, null));
+                null, addACE, removeACE, null));
 
         assertNotNull("Create Document response is undefined", createDocument);
         assertNotNull("Create Document response is empty", createDocument.getObjectId());
@@ -423,6 +359,11 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     }
 
     protected String createAndAssertFolder(String folderName, String folderTypeId, String folderId, CmisPropertiesType properties) throws Exception
+    {
+        return createAndAssertFolder(folderName, folderTypeId, folderId, properties, null, null);
+    }
+    
+    protected String createAndAssertFolder(String folderName, String folderTypeId, String folderId, CmisPropertiesType properties, CmisAccessControlListType addACE, CmisAccessControlListType removeACE) throws Exception
     {
         ObjectServicePortBindingStub objectService = getServicesFactory().getObjectService();
 
@@ -457,7 +398,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         }
 
         LOGGER.info("[ObjectService->createFolder]");
-        CreateFolderResponse createFolder = objectService.createFolder(new CreateFolder(getAndAssertRepositoryId(), properties, folderId, null, null, null, null));
+        CreateFolderResponse createFolder = objectService.createFolder(new CreateFolder(getAndAssertRepositoryId(), properties, folderId, null, addACE, removeACE, null));
 
         assertNotNull("Create Folder response is undefined", createFolder);
         assertNotNull("Create Folder response is empty", createFolder.getObjectId());
@@ -584,13 +525,13 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
     protected String getPropertyName(CmisProperty property)
     {
-        String propertyName = (null != property) ? (property.getPropertyDefinitionId()) : (null);
+        String propertyName = (null != property) ? (String) (property.getPropertyDefinitionId()) : (null);
         if (null == propertyName)
         {
-            propertyName = property.getLocalName();
+            propertyName = (String) property.getLocalName();
             if (null == propertyName)
             {
-                propertyName = property.getDisplayName();
+                propertyName = (String) property.getDisplayName();
             }
         }
         return propertyName;
@@ -1298,6 +1239,185 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         }, true);
     }
 
+    protected void assertRenditions(CmisObjectType cmisObject, String filter, String[] expectedKinds, String[] expectedMimetypes)
+    {
+        assertNotNull("cmisObject is null", cmisObject);
+        
+        if (filter == null || filter.equals(RENDITION_FILTER_NONE))
+        {            
+            assertTrue("Rendition are not empty for empty filter", cmisObject.getRendition() == null || cmisObject.getRendition().length == 0);            
+        }
+        else
+        {
+            if (cmisObject.getRendition() != null)
+            {                                
+                for (CmisRenditionType rendition : cmisObject.getRendition())
+                {
+                    assertRendition(rendition); 
+                    if (!filter.equals(RENDITION_FILTER_WILDCARD))
+                    {
+                        assertContains(rendition, expectedKinds, expectedMimetypes);
+                    }
+                }
+            }
+        }
+    }
+    
+    protected void assertRendition(CmisRenditionType rendition)
+    {
+        assertNotNull("Rendition is null", rendition);
+        assertNotNull("Rendition streamId is null", rendition.getStreamId());
+        assertNotNull("Rendition kind is null", rendition.getKind());
+        assertNotNull("Rendition mimetype is null", rendition.getMimetype());
+        if (rendition.getMimetype().startsWith(IMAGE_BASE_MIMETYPE))
+        {
+            assertNotNull("Rendition width is null", rendition.getWidth());
+            assertNotNull("Rendition height is null", rendition.getHeight());
+        }
+    }
+    
+    protected void assertContains(CmisRenditionType rendition, String[] expectedKinds, String[] expectedMimetypes)
+    {
+        boolean contains = false;
+        if (expectedKinds != null)
+        {
+            for (String kind : expectedKinds)
+            {
+                if (rendition.getKind().equals(kind))
+                {
+                    contains = true;
+                    break;
+                }
+            }
+        }
+        if (expectedMimetypes != null)
+        {
+            for (String mimetype : expectedMimetypes)
+            {
+                if (mimetype.endsWith(RENDITION_FILTER_SUBTYPES_POSTFIX))
+                {
+                    String baseMimetype = getBaseType(mimetype);
+                    if (rendition.getMimetype().startsWith(baseMimetype))
+                    {
+                        contains = true;
+                        break;
+                    }
+                }
+                if (rendition.getMimetype().equals(mimetype))
+                {
+                    contains = true;
+                    break;
+                }
+            }
+        }
+        assertTrue("Received rendition doesn't satisfy the filter conditions", contains);
+    }
+    
+    protected String[] getMimeTypes(CmisRenditionType[] renditions)
+    {
+        Set<String> result = null;
+        if (renditions != null)
+        {
+            result = new HashSet<String>();
+            for (CmisRenditionType rendition : renditions)
+            {
+                result.add(rendition.getMimetype());
+            }
+        }
+        return result != null ? result.toArray(new String[0]) : null;
+    }
+    
+    protected String[] getBaseMimeTypes(CmisRenditionType[] renditions)
+    {
+        Set<String> result = null;
+        if (renditions != null)
+        {
+            result = new HashSet<String>();
+            for (CmisRenditionType rendition : renditions)
+            {
+                result.add(getBaseType(rendition.getMimetype()) + RENDITION_FILTER_SUBTYPES_POSTFIX);
+            }
+        }
+        return result != null ? result.toArray(new String[0]) : null;
+    }
+    
+    protected String getBaseType(String mimetype)
+    {
+        String baseMymetype = mimetype;
+        int subTypeIndex = mimetype.indexOf("/");
+        if (subTypeIndex > 0 || subTypeIndex < mimetype.length())
+        {
+            baseMymetype = mimetype.substring(0, subTypeIndex);
+        }
+        return baseMymetype;
+    }
+    
+    protected String[] getKinds(CmisRenditionType[] renditions)
+    {
+        Set<String> result = null;
+        if (renditions != null)
+        {
+            result = new HashSet<String>();
+            for (CmisRenditionType rendition : renditions)
+            {
+                result.add(rendition.getKind());
+            }
+        }
+        return result != null ? result.toArray(new String[0]) : null;
+    }
+   
+    protected String createFilter(String[] kinds, String[] mimetypes)
+    {
+        StringBuilder filter = new StringBuilder();
+        if (kinds != null)
+        {
+            for (String kind : kinds)
+            {
+                filter.append(kind);
+                filter.append(RENDITION_FILTER_DELIMITER);
+            }
+        }
+        if (mimetypes != null)
+        {
+            for (String mimetype : mimetypes)
+            {
+                filter.append(mimetype);
+                filter.append(RENDITION_FILTER_DELIMITER);
+            }
+        }
+        filter.delete(filter.length() - 1, filter.length());
+        return filter.toString();
+    }
+    
+    protected List<RenditionData> getTestRenditions(String objectId) throws Exception
+    {
+        GetRenditions getRenditionsRequest = new GetRenditions();
+        getRenditionsRequest.setRepositoryId(getAndAssertRepositoryId());
+        getRenditionsRequest.setObjectId(objectId);
+        getRenditionsRequest.setMaxItems(BigInteger.valueOf(200));
+        getRenditionsRequest.setSkipCount(BigInteger.ZERO);
+        getRenditionsRequest.setRenditionFilter(RENDITION_FILTER_WILDCARD);
+        LOGGER.info("[ObjectService->getRenditions]");
+        CmisRenditionType[] allRenditions = getServicesFactory().getObjectService().getRenditions(getRenditionsRequest);
+        
+        List<RenditionData> testRenditions = null;
+        if (allRenditions != null && allRenditions.length > 0)
+        {
+            String[] kinds = getKinds(allRenditions);
+            String[] mimetypes = getMimeTypes(allRenditions);
+            String[] baseMimeTypes = getBaseMimeTypes(allRenditions);
+            testRenditions = new ArrayList<RenditionData>();
+            testRenditions.add(new RenditionData(RENDITION_FILTER_WILDCARD, null, null));
+            testRenditions.add(new RenditionData(new String[]{kinds[0]}, null));
+            testRenditions.add(new RenditionData(kinds, null));
+            testRenditions.add(new RenditionData(null, new String[]{mimetypes[0]}));
+            testRenditions.add(new RenditionData(new String[]{kinds[0]}, new String[]{mimetypes[0]}));
+            testRenditions.add(new RenditionData(null, new String[]{baseMimeTypes[0]}));
+            testRenditions.add(new RenditionData(new String[]{kinds[0]}, new String[]{baseMimeTypes[0]}));
+        }                
+        return testRenditions;
+    }
+    
     protected String enumerateAndAssertTypesHierarchy(CmisTypeContainer[] rootContainers, BaseConditionCalculator calculator, boolean firstIsValid)
     {
         if ((null == rootContainers) || (null == calculator) || (rootContainers.length < 1))
@@ -1340,7 +1460,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
         return (null != bestType) ? (bestType.getId()) : (null);
     }
-
+    
     protected void addContainers(LinkedList<CmisTypeContainer> typesList, CmisTypeContainer[] currentContainers)
     {
         for (CmisTypeContainer container : currentContainers)
@@ -1461,6 +1581,19 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             assertNotNull("Capabilities are NULL", capabilities);
         }
         return capabilities;
+    }
+    
+    protected EnumACLPropagation getAndAssertACLPrapagation()
+    {
+        if (aclPropagation == null)
+        {
+            CmisRepositoryInfoType repoInfo = getAndAssertRepositoryInfo();
+            aclPropagation = repoInfo.getAclCapability() != null ? repoInfo.getAclCapability().getPropagation() : null;
+            aclPropagation = aclPropagation != null ? aclPropagation : EnumACLPropagation.repositorydetermined;
+            assertNotNull("Root Folder Id is NULL", rootFolderId);
+        }
+        
+        return aclPropagation;
     }
 
     protected String getAndAssertDocumentTypeId()
@@ -1686,6 +1819,25 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         assertTrue("Get All Versions response is empty", response.length > 0);
         return response;
     }
+    
+    protected void getPropertiesUsingCredentials(String objectId, String username, String password) throws Exception
+    {
+        GetPropertiesResponse response = null;
+        LOGGER.info("[ObjectService->getProperties]");
+        response = getServicesFactory().getObjectService(username, password).getProperties(new GetProperties(getAndAssertRepositoryId(), objectId, "*", null));
+        assertTrue("No properties were returned", response != null && response.getProperties() != null);
+        assertNotNull("No 'Name' property was returned", getStringProperty(response.getProperties(), PROP_NAME));
+    }
+    
+    protected String updatePropertiesUsingCredentials(String objectId, String username, String password) throws Exception
+    {
+        String documentNameNew = generateTestFileName("_new");
+        CmisPropertiesType properties = fillProperties(documentNameNew, null);
+        LOGGER.info("[ObjectService->updateProperties]");
+        objectId = getServicesFactory().getObjectService(username, password).updateProperties(new UpdateProperties(getAndAssertRepositoryId(), objectId, null, properties, null)).getObjectId();
+        assertNotNull(objectId);        
+        return objectId;
+    }
 
     protected String searchAndAssertDocumentTypeWithNoContentAlowed() throws Exception
     {
@@ -1728,5 +1880,79 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             }
         }, true);
     }
+    
+    protected class RenditionData
+    {
+        private String filter;
+        private String[] expectedKinds;
+        private String[] expectedMimetypes;
+        
+        public String getFilter()
+        {
+            return filter;
+        }
+        public String[] getExpectedKinds()
+        {
+            return expectedKinds;
+        }
+        public String[] getExpectedMimetypes()
+        {
+            return expectedMimetypes;
+        }
+        public RenditionData(String[] expectedKinds, String[] expectedMimetypes)
+        {
+            this.filter = createFilter(expectedKinds, expectedMimetypes);
+            this.expectedKinds = expectedKinds;
+            this.expectedMimetypes = expectedMimetypes;
+        }
+        public RenditionData(String filter, String[] expectedKinds, String[] expectedMimetypes)
+        {
+            this.filter = filter;
+            this.expectedKinds = expectedKinds;
+            this.expectedMimetypes = expectedMimetypes;
+        }
+    }
 
+    @SuppressWarnings("static-access")
+    public void setAclUsername(String aclUsername)
+    {
+        if (aclUsername != null && aclUsername.length() > 0)
+        {
+            this.aclUsername = aclUsername;
+        }
+    }
+
+    @SuppressWarnings("static-access")
+    public void setAclPassword(String aclPassword)
+    {
+        if (aclPassword != null && aclPassword.length() > 0)
+        {
+            this.aclPassword = aclPassword;
+        }
+    }
+
+    @SuppressWarnings("static-access")
+    public void setAclPrincipalId(String aclPrincipalId)
+    {
+        if (aclPrincipalId != null && aclPrincipalId.length() > 0)
+        {
+            this.aclPrincipalId = aclPrincipalId;
+        }
+    }
+    
+    public String getAclUsername()
+    {
+        return aclUsername;
+    }
+
+    public String getAclPassword()
+    {
+        return aclPassword;
+    }
+
+    public String getAclPrincipalId()
+    {
+        return aclPrincipalId;
+    }
+  
 }

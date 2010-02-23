@@ -8,8 +8,6 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisQueryType  implements java.io.Serializable, org.apache.axis.encoding.AnyContentType {
-    private java.lang.String repositoryId;
-
     private java.lang.String statement;
 
     private java.lang.Boolean searchAllVersions;
@@ -30,7 +28,6 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
     }
 
     public CmisQueryType(
-           java.lang.String repositoryId,
            java.lang.String statement,
            java.lang.Boolean searchAllVersions,
            java.lang.Boolean includeAllowableActions,
@@ -39,7 +36,6 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
            java.math.BigInteger maxItems,
            java.math.BigInteger skipCount,
            org.apache.axis.message.MessageElement [] _any) {
-           this.repositoryId = repositoryId;
            this.statement = statement;
            this.searchAllVersions = searchAllVersions;
            this.includeAllowableActions = includeAllowableActions;
@@ -48,26 +44,6 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
            this.maxItems = maxItems;
            this.skipCount = skipCount;
            this._any = _any;
-    }
-
-
-    /**
-     * Gets the repositoryId value for this CmisQueryType.
-     * 
-     * @return repositoryId
-     */
-    public java.lang.String getRepositoryId() {
-        return repositoryId;
-    }
-
-
-    /**
-     * Sets the repositoryId value for this CmisQueryType.
-     * 
-     * @param repositoryId
-     */
-    public void setRepositoryId(java.lang.String repositoryId) {
-        this.repositoryId = repositoryId;
     }
 
 
@@ -242,9 +218,6 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.repositoryId==null && other.getRepositoryId()==null) || 
-             (this.repositoryId!=null &&
-              this.repositoryId.equals(other.getRepositoryId()))) &&
             ((this.statement==null && other.getStatement()==null) || 
              (this.statement!=null &&
               this.statement.equals(other.getStatement()))) &&
@@ -280,9 +253,6 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getRepositoryId() != null) {
-            _hashCode += getRepositoryId().hashCode();
-        }
         if (getStatement() != null) {
             _hashCode += getStatement().hashCode();
         }
@@ -326,13 +296,6 @@ public class CmisQueryType  implements java.io.Serializable, org.apache.axis.enc
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisQueryType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("repositoryId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "repositoryId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("statement");
         elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "statement"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));

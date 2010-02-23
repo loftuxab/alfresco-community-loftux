@@ -8,6 +8,8 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisACLCapabilityType  implements java.io.Serializable {
+    private org.alfresco.repo.cmis.ws.EnumSupportedPermissions supportedPermissions;
+
     private org.alfresco.repo.cmis.ws.EnumACLPropagation propagation;
 
     private org.alfresco.repo.cmis.ws.CmisPermissionDefinition[] permissions;
@@ -18,12 +20,34 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
     }
 
     public CmisACLCapabilityType(
+           org.alfresco.repo.cmis.ws.EnumSupportedPermissions supportedPermissions,
            org.alfresco.repo.cmis.ws.EnumACLPropagation propagation,
            org.alfresco.repo.cmis.ws.CmisPermissionDefinition[] permissions,
            org.alfresco.repo.cmis.ws.CmisPermissionMapping[] mapping) {
+           this.supportedPermissions = supportedPermissions;
            this.propagation = propagation;
            this.permissions = permissions;
            this.mapping = mapping;
+    }
+
+
+    /**
+     * Gets the supportedPermissions value for this CmisACLCapabilityType.
+     * 
+     * @return supportedPermissions
+     */
+    public org.alfresco.repo.cmis.ws.EnumSupportedPermissions getSupportedPermissions() {
+        return supportedPermissions;
+    }
+
+
+    /**
+     * Sets the supportedPermissions value for this CmisACLCapabilityType.
+     * 
+     * @param supportedPermissions
+     */
+    public void setSupportedPermissions(org.alfresco.repo.cmis.ws.EnumSupportedPermissions supportedPermissions) {
+        this.supportedPermissions = supportedPermissions;
     }
 
 
@@ -114,6 +138,9 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
+            ((this.supportedPermissions==null && other.getSupportedPermissions()==null) || 
+             (this.supportedPermissions!=null &&
+              this.supportedPermissions.equals(other.getSupportedPermissions()))) &&
             ((this.propagation==null && other.getPropagation()==null) || 
              (this.propagation!=null &&
               this.propagation.equals(other.getPropagation()))) &&
@@ -134,6 +161,9 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
+        if (getSupportedPermissions() != null) {
+            _hashCode += getSupportedPermissions().hashCode();
+        }
         if (getPropagation() != null) {
             _hashCode += getPropagation().hashCode();
         }
@@ -170,6 +200,12 @@ public class CmisACLCapabilityType  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisACLCapabilityType"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("supportedPermissions");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "supportedPermissions"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumSupportedPermissions"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("propagation");
         elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "propagation"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumACLPropagation"));

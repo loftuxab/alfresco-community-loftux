@@ -178,16 +178,27 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
         this.canUpdateProperties = canUpdateProperties;
     }
 
-    public java.lang.Boolean getCanGetFolderTree()
-    {
+
+    /**
+     * Gets the canGetFolderTree value for this CmisAllowableActionsType.
+     * 
+     * @return canGetFolderTree
+     */
+    public java.lang.Boolean getCanGetFolderTree() {
         return canGetFolderTree;
     }
 
-    public void setCanGetFolderTree(java.lang.Boolean canGetFolderTree)
-    {
+
+    /**
+     * Sets the canGetFolderTree value for this CmisAllowableActionsType.
+     * 
+     * @param canGetFolderTree
+     */
+    public void setCanGetFolderTree(java.lang.Boolean canGetFolderTree) {
         this.canGetFolderTree = canGetFolderTree;
     }
-    
+
+
     /**
      * Gets the canGetProperties value for this CmisAllowableActionsType.
      * 
@@ -765,6 +776,9 @@ public class CmisAllowableActionsType  implements java.io.Serializable, org.apac
             ((this.canUpdateProperties==null && other.getCanUpdateProperties()==null) || 
              (this.canUpdateProperties!=null &&
               this.canUpdateProperties.equals(other.getCanUpdateProperties()))) &&
+            ((this.canGetFolderTree==null && other.getCanGetFolderTree()==null) || 
+             (this.canGetFolderTree!=null &&
+              this.canGetFolderTree.equals(other.getCanGetFolderTree()))) &&
             ((this.canGetProperties==null && other.getCanGetProperties()==null) || 
              (this.canGetProperties!=null &&
               this.canGetProperties.equals(other.getCanGetProperties()))) &&

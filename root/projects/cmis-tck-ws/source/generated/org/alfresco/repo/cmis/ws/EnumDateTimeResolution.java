@@ -1,36 +1,13 @@
-/*
- * Copyright (C) 2005-2009 Alfresco Software Limited.
+/**
+ * EnumDateTimeResolution.java
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
- * As a special exception to the terms and conditions of version 2.0 of
- * the GPL, you may redistribute this Program in connection with Free/Libre
- * and Open Source Software ("FLOSS") applications as described in Alfresco's
- * FLOSS exception.  You should have recieved a copy of the text describing
- * the FLOSS exception, and it is also available here:
- * http://www.alfresco.com/legal/licensing"
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
  */
+
 package org.alfresco.repo.cmis.ws;
 
-import java.io.Serializable;
-
-/**
- * @author Dmitry Velichkevich
- */
-public class EnumDateTimeResolution implements Serializable
-{
+public class EnumDateTimeResolution implements java.io.Serializable {
     private java.lang.String _value_;
     private static java.util.HashMap _table_ = new java.util.HashMap();
 
@@ -83,7 +60,7 @@ public class EnumDateTimeResolution implements Serializable
         new org.apache.axis.description.TypeDesc(EnumDateTimeResolution.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "EnumDateTimeResolution"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumDateTimeResolution"));
     }
     /**
      * Return type metadata object
@@ -91,4 +68,5 @@ public class EnumDateTimeResolution implements Serializable
     public static org.apache.axis.description.TypeDesc getTypeDesc() {
         return typeDesc;
     }
+
 }

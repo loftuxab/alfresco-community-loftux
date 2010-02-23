@@ -28,7 +28,7 @@ public class CmisRepositoryInfoType  implements java.io.Serializable, org.apache
 
     private org.alfresco.repo.cmis.ws.CmisACLCapabilityType aclCapability;
 
-    private java.math.BigDecimal cmisVersionSupported;
+    private java.lang.String cmisVersionSupported;
 
     private org.apache.axis.types.URI thinClientURI;
 
@@ -69,7 +69,7 @@ public class CmisRepositoryInfoType  implements java.io.Serializable, org.apache
            java.lang.String latestChangeLogToken,
            org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType capabilities,
            org.alfresco.repo.cmis.ws.CmisACLCapabilityType aclCapability,
-           java.math.BigDecimal cmisVersionSupported,
+           java.lang.String cmisVersionSupported,
            org.apache.axis.types.URI thinClientURI,
            java.lang.Boolean changesIncomplete,
            org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds[] changesOnType,
@@ -301,7 +301,7 @@ public class CmisRepositoryInfoType  implements java.io.Serializable, org.apache
      * 
      * @return cmisVersionSupported
      */
-    public java.math.BigDecimal getCmisVersionSupported() {
+    public java.lang.String getCmisVersionSupported() {
         return cmisVersionSupported;
     }
 
@@ -311,7 +311,7 @@ public class CmisRepositoryInfoType  implements java.io.Serializable, org.apache
      * 
      * @param cmisVersionSupported
      */
-    public void setCmisVersionSupported(java.math.BigDecimal cmisVersionSupported) {
+    public void setCmisVersionSupported(java.lang.String cmisVersionSupported) {
         this.cmisVersionSupported = cmisVersionSupported;
     }
 
@@ -681,7 +681,7 @@ public class CmisRepositoryInfoType  implements java.io.Serializable, org.apache
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("cmisVersionSupported");
         elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisVersionSupported"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "decimal"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();

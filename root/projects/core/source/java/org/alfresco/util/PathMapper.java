@@ -173,6 +173,19 @@ public class PathMapper
         }
     }
     
+    public boolean isEmpty()
+    {
+        readLock.lock();
+        try
+        {
+            return pathMaps.isEmpty();
+        }
+        finally
+        {
+            readLock.unlock();
+        }
+    }
+    
     private Set<String> updateMappedPaths(String sourcePath)
     {
         // Do a double-check

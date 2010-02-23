@@ -787,6 +787,13 @@ public class ObjectServicePortBindingStub extends org.apache.axis.client.Stub im
             cachedSerFactories.add(enumsf);
             cachedDeserFactories.add(enumdf);
 
+            qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumDateTimeResolution");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.repo.cmis.ws.EnumDateTimeResolution.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(enumsf);
+            cachedDeserFactories.add(enumdf);
+
             qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumDecimalPrecision");
             cachedSerQNames.add(qName);
             cls = org.alfresco.repo.cmis.ws.EnumDecimalPrecision.class;
@@ -853,6 +860,13 @@ public class ObjectServicePortBindingStub extends org.apache.axis.client.Stub im
             qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumRenditionKind");
             cachedSerQNames.add(qName);
             cls = org.alfresco.repo.cmis.ws.EnumRenditionKind.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(enumsf);
+            cachedDeserFactories.add(enumdf);
+
+            qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumSupportedPermissions");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.repo.cmis.ws.EnumSupportedPermissions.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(enumsf);
             cachedDeserFactories.add(enumdf);
@@ -1060,20 +1074,6 @@ public class ObjectServicePortBindingStub extends org.apache.axis.client.Stub im
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">deleteContentStreamResponse");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.repo.cmis.ws.DeleteContentStreamResponse.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">deleteObject");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.repo.cmis.ws.DeleteObject.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
     }
     private void addBindings1() {
             java.lang.Class cls;
@@ -1089,6 +1089,20 @@ public class ObjectServicePortBindingStub extends org.apache.axis.client.Stub im
             java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
             java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
             java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
+            qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">deleteContentStreamResponse");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.repo.cmis.ws.DeleteContentStreamResponse.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">deleteObject");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.repo.cmis.ws.DeleteObject.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", ">deleteObjectResponse");
             cachedSerQNames.add(qName);
             cls = org.alfresco.repo.cmis.ws.DeleteObjectResponse.class;
