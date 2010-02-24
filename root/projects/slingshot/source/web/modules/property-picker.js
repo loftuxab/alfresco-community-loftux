@@ -63,6 +63,15 @@
       options:
       {
          /**
+          * The transient properties to add to "special" properties.
+          *
+          * @property transientProperties
+          * @type array
+          * @default {}
+          */
+         transientProperties: {},
+
+         /**
           * Template URL
           *
           * @property templateUrl
@@ -113,6 +122,7 @@
                         listItems:
                         {
                            url: "{url.proxy}api/classes/{node.name}/properties",
+                           addTransientProperties: true,
                            id: "{item.name}",
                            type: "{item.dataType}",
                            label: "{item.title}"
@@ -129,6 +139,7 @@
                         listItems:
                         {
                            url: "{url.proxy}api/classes/{node.name}/properties",
+                           addTransientProperties: true,
                            id: "{item.name}",
                            type: "{item.dataType}",
                            label: "{item.title}"
@@ -145,6 +156,7 @@
                         listItems:
                         {
                            url: "{url.proxy}api/classes/{node.name}/properties",
+                           addTransientProperties: true,
                            id: "{item.name}",
                            type: "{item.dataType}",
                            label: "{item.title}"
@@ -680,6 +692,12 @@
             var descriptorObj = parentNodeObj ? parentNodeObj.listItems : {},
                items = [],
                itemObj;
+
+            if (descriptorObj.addTransientProperties)
+            {
+               listItemObjs = this._addTransientProperties(listItemObjs, descriptorObj);
+            }
+
             for (var j = 0, jl = listItemObjs.length; j < jl; j++)
             {
                itemObj = listItemObjs[j];
@@ -694,6 +712,46 @@
             // Add all files to table
             dataTable.addRows(items, 0);
          }
+      },
+
+      /**
+       * Adds transient properties to listItemObjs if a property of type "d:content" was present.
+       *
+       * @method addTransientProperties
+       * @param listItemObjs
+       * @param descriptorObj
+       * @return listItemObjs but with transient properties added if a property of type "d:content" was present
+       */
+      _addTransientProperties: function (listItemObjs, descriptorObj)
+      {
+         var foundTransientProperties = [],
+            tps = this.options.transientProperties;
+         for (var i = 0, il = listItemObjs.length; i < il; i++)
+         {
+            for (var name in tps)
+            {
+               if (tps.hasOwnProperty(name) && listItemObjs[i].dataType == name)
+               {
+                  foundTransientProperties.push({ type: name, index: i, properties: tps[name] });
+               }
+            }
+         }
+
+         for (i = 0, il = foundTransientProperties.length; i < il; i++)
+         {
+            var transientProperty = foundTransientProperties[i],
+               tpil = transientProperty.properties.length,
+               insertIndex = foundTransientProperties[i].index + (i * tpil),
+               property = listItemObjs[foundTransientProperties[i].index],
+               title = property.title ? property.title : property.name;
+            for (var tpi = 0; tpi < tpil; tpi++)
+            {
+               listItemObjs.splice(insertIndex + tpi, 0, Alfresco.util.deepCopy(property));
+               listItemObjs[insertIndex + tpi + 1].title = transientProperty.properties[tpi].displayLabel + " (" + title + ")";
+               listItemObjs[insertIndex + tpi + 1].transientProperty = transientProperty.properties[tpi].value;
+            }
+         }
+         return listItemObjs;
       },
 
       /**
