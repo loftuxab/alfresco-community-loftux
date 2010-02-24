@@ -332,6 +332,7 @@
    <target name="incremental-webeditor-tomcat-exploded"
            depends="package-webframeworkcommons-jar,
                     package-webeditor-jar,
+                    compile-webeditor-framework,
                     deploy-webeditor-tomcat-exploded,
                     minimize-webeditor-deployed-javascript" />
 
@@ -739,6 +740,9 @@
          <fileset dir="${dir.project.webeditor.src.web}" />
       </copy>
       <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
+         <fileset dir="${dir.projects}/web-editor-framework/source/web" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
@@ -747,12 +751,18 @@
          <fileset dir="${dir.project.webeditor.config}" excludes="**/extension/**" />
       </copy>
       <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.projects}/web-editor-framework/config" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
       </copy>
       
       <!-- add all class files to WEB-INF/classes, ensuring web editor project files are copied first -->
       <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webeditor.classes}" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.projects}/web-editor-framework/build/classes" includes="**/*.class" />
       </copy>
       <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.jlan.classes}" />
@@ -809,26 +819,13 @@
          <fileset dir="${dir.project.3rdparty}/lib" includes="json.jar" />
       </copy>
       <copy todir="${dir.deploy.tomcat.application.webeditor.sample}/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webeditor.classes}" excludes="org/alfresco/web/site/**" />
+         <fileset dir="${dir.project.webeditor.classes}" includes="org/alfresco/web/awe/**/*.class, org/customer/**/*.class" />
       </copy>
    </target>
 
    <target name="minimize-webeditor-deployed-javascript" depends="init">
-      <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.webeditor}">
-         <fileset dir="${dir.deploy.tomcat.application.webeditor}">
-            <include name="**/*.js" />
-            <exclude name="**/*-min.js" />
-            <exclude name="**/WEB-INF/**" />
-            <exclude name="**/tiny_mce/**" />
-            <exclude name="**/yui/**" />
-         </fileset>
-         <arg line="-jar"/>
-         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
-         <arg line="-o"/>
-         <targetfile />
-         <srcfile />
-         <mapper type="glob" from="*.js" to="*-min.js"/>
-      </apply>
+      <minimise-javascript sourcedir="${dir.deploy.tomcat.application.webeditor}" 
+                           destdir="${dir.deploy.tomcat.application.webeditor}" />
    </target>
    
    <target name="deploy-mobile-tomcat" depends="init" 

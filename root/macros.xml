@@ -202,6 +202,27 @@
       </sequential>
    </macrodef>
 
+   <macrodef name="minimise-javascript">
+      <attribute name="sourcedir" />
+      <attribute name="destdir" />
+      <sequential>
+         <apply executable="java" parallel="false" dest="@{destdir}">
+            <fileset dir="@{sourcedir}">
+               <include name="**/*.js" />
+               <exclude name="**/*-min.js" />
+               <exclude name="**/WEB-INF/**" />
+               <exclude name="**/tiny_mce/**" />
+               <exclude name="**/yui/**" />
+            </fileset>
+            <arg line="-jar"/>
+            <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
+            <arg line="-o"/>
+            <targetfile />
+            <srcfile />
+            <mapper type="glob" from="*.js" to="*-min.js"/>
+         </apply>
+      </sequential>
+   </macrodef>
 
    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

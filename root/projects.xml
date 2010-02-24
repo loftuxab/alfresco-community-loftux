@@ -1625,41 +1625,43 @@
               depends="compile-webeditor">
       <mkdir dir="${dir.project.webeditor.dist}" />
       <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor}" 
-           basedir="${dir.project.webeditor.classes}" />
+           basedir="${dir.project.webeditor.classes}" excludes="org/alfresco/web/awe/**, org/customer/**" />
    </target>
 
-   <target name="package-webeditor-war" 
-           depends="assemble-webeditor-war,
-                    minimize-webeditor-javascript">
+   <target name="package-webeditor-war" depends="assemble-webeditor-war, minimize-webeditor-war-javascript">
       <war warfile="${dir.project.webeditor.dist}/${file.name.war.webeditor}" 
            webxml="${dir.project.webeditor.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webeditor.assemble}" />
+         <fileset dir="${dir.project.webeditor.assemble.war}" />
       </war>
    </target>
 
-   <target name="assemble-webeditor-war" 
-           depends="package-webeditor-jar">
-      <mkdir dir="${dir.project.webeditor.assemble}" />
+   <target name="assemble-webeditor-war" depends="package-webeditor-jar, compile-webeditor-framework">
+      <mkdir dir="${dir.project.webeditor.assemble.war}" />
       
       <!-- first copy all required files from webeditor project -->
-      <copy todir="${dir.project.webeditor.assemble}">
+      <copy todir="${dir.project.webeditor.assemble.war}">
          <fileset dir="${dir.project.webeditor.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
+      
       <!-- next copy all required files from web framework commons projects -->
-      <copy todir="${dir.project.webeditor.assemble}">
+      <copy todir="${dir.project.webeditor.assemble.war}">
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
-      <copy todir="${dir.project.webeditor.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.project.webeditor.config}" excludes="**/web-extension/**" />
+      <copy todir="${dir.project.webeditor.assemble.war}">
+         <fileset dir="${dir.projects}/web-editor-framework/source/web" />
       </copy>
-      <copy todir="${dir.project.webeditor.assemble}/WEB-INF/classes">
+      
+      <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/classes">
+         <fileset dir="${dir.project.webeditor.config}" />
+         <fileset dir="${dir.projects}/web-editor-framework/config" />
+         <fileset dir="${dir.projects}/web-editor-framework/build/classes" includes="**/*.class" />
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
          <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
-      <copy todir="${dir.project.webeditor.assemble}/WEB-INF/lib">
+      <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
          <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
@@ -1676,67 +1678,178 @@
                   includes="${file.name.jar.jlan}" />
          <fileset dir="${dir.project.webframeworkcommons.dist}" 
                   includes="${file.name.jar.webframeworkcommons}" />
+         <!--
+         <fileset dir="${dir.projects}/web-editor-framework/build/dist" 
+                  includes="${file.name.jar.webeditorframework}" />
+         -->
          <fileset dir="${dir.project.webeditor.dist}" 
                   includes="${file.name.jar.webeditor}" />
       </copy>
       
       <!-- unzip and add 3rd party javascript library -->
       <unzip src="${file.zip.webeditor.yui}" 
-             dest="${dir.project.webeditor.assemble}" />
+             dest="${dir.project.webeditor.assemble.war}" />
              
       <!-- there seems to be a hidden __MACOSX folder in the YUI -->
       <!-- distribution, remove it if present -->
-      <delete dir="${dir.project.webeditor.assemble}/__MACOSX" 
+      <delete dir="${dir.project.webeditor.assemble.war}/__MACOSX" 
               includeEmptyDirs="true" quiet="yes" />
 
       <!-- Copy our yui directory to apply YUI fixes -->
-      <copy todir="${dir.project.webeditor.assemble}/yui">
+      <copy todir="${dir.project.webeditor.assemble.war}/yui">
          <fileset dir="${dir.project.webeditor.src.web}/yui" />
       </copy>
    </target>  
    
-   <target name="minimize-webeditor-javascript"
-           depends="init">
-      <echo>Compressing Web Editor Javascript...</echo>
-      <apply executable="java" parallel="false" dest="${dir.project.webeditor.assemble}">
-         <fileset dir="${dir.project.webeditor.assemble}">
-            <include name="**/*.js" />
-            <exclude name="**/*-min.js" />
-            <exclude name="**/WEB-INF/**" />
-            <exclude name="**/tiny_mce/**" />
-            <exclude name="**/yui/**" />
-         </fileset>
-         <arg line="-jar"/>
-         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
-         <arg line="-o"/>
-         <targetfile />
-         <srcfile />
-         <mapper type="glob" from="*.js" to="*-min.js"/>
-      </apply>
+   <target name="minimize-webeditor-war-javascript" depends="init">
+      <echo>Compressing Web Editor WAR Javascript...</echo>
+      <minimise-javascript sourcedir="${dir.project.webeditor.assemble.war}" 
+                           destdir="${dir.project.webeditor.assemble.war}" />
    </target>
-
-   <target name="test-webeditor" 
-           depends="compile-webeditor">
+   
+   <target name="package-webeditor-all"
+                 depends="package-webeditor-war, package-webeditor-taglib-jar, package-webeditor-plugin-jar,
+                          package-webeditor-forms-plugin-zip, package-webeditor-sample-war" />
+   
+   <target name="package-webeditor-taglib-jar" depends="compile-webeditor">
+      <mkdir dir="${dir.project.webeditor.dist}" />
+      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor.taglib}" 
+           basedir="${dir.project.webeditor.classes}" includes="org/alfresco/web/awe/**" />
+   </target>
+   
+   <target name="package-webeditor-plugin-jar" 
+           depends="assemble-webeditor-plugin-jar, minimize-webeditor-plugin-javascript">
+      <mkdir dir="${dir.project.webeditor.dist}" />
+      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor.plugin}" 
+           basedir="${dir.project.webeditor.assemble.plugin}" />
+   </target>
+   
+   <target name="assemble-webeditor-plugin-jar" depends="init">
+      <mkdir dir="${dir.project.webeditor.assemble.plugin}" />
+      <copy todir="${dir.project.webeditor.assemble.plugin}">
+         <!-- TODO: Exclude the files not required for a JAR -->
+         <fileset dir="${dir.project.webeditor.config}/" />
+      </copy>
+      <copy todir="${dir.project.webeditor.assemble.plugin}/META-INF">
+         <fileset dir="${dir.project.webeditor.src.web}" includes="lib/com/**" />
+      </copy>
+   </target>
+   
+   <target name="minimize-webeditor-plugin-javascript" depends="init">
+      <echo>Compressing Web Editor Plugin Javascript...</echo>
+      <minimise-javascript sourcedir="${dir.project.webeditor.assemble.plugin}/META-INF" 
+                           destdir="${dir.project.webeditor.assemble.plugin}/META-INF" />
+   </target>
+   
+   <target name="package-webeditor-forms-plugin-zip" 
+           depends="assemble-webeditor-forms-plugin-zip, minimize-webeditor-forms-javascript">
+      <mkdir dir="${dir.project.webeditor.dist}" />
+      <zip zipfile="${dir.project.webeditor.dist}/${file.name.zip.webeditor.forms}" 
+           basedir="${dir.project.webeditor.assemble.forms}" />
+   </target>
+   
+   <target name="assemble-webeditor-forms-plugin-zip" depends="package-webframeworkcommons-jar">
+      <mkdir dir="${dir.project.webeditor.assemble.forms}" />
+      
+      <copy todir="${dir.project.webeditor.assemble.forms}">
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" />
+      </copy>
+      
+      <copy todir="${dir.project.webeditor.assemble.forms}/WEB-INF/classes">
+         <fileset dir="${dir.project.webframeworkcommons.config}" />
+      </copy>
+      
+      <copy todir="${dir.project.webeditor.assemble.forms}/WEB-INF/lib">
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                  includes="${file.name.jar.webframeworkcommons}" />
+      </copy>
+   </target>
+   
+   <target name="minimize-webeditor-forms-javascript" depends="init">
+      <echo>Compressing Web Editor Forms Javascript...</echo>
+      <minimise-javascript sourcedir="${dir.project.webeditor.assemble.forms}" 
+                           destdir="${dir.project.webeditor.assemble.forms}" />
+   </target>
+   
+   <target name="package-webeditor-sample-jar" depends="compile-webeditor">
+      <mkdir dir="${dir.project.webeditor.dist}" />
+      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor.sample}" 
+           basedir="${dir.project.webeditor.classes}" includes="org/customer/**" />
+   </target>
+   
+   <target name="package-webeditor-sample-war" depends="package-webeditor-taglib-jar, package-webeditor-sample-jar">
+      <war warfile="${dir.project.webeditor.dist}/${file.name.war.webeditor.sample}" 
+           webxml="${dir.project.webeditor.src.sample}/WEB-INF/web.xml">
+         <fileset dir="${dir.project.webeditor.src.sample}" excludes="WEB-INF/web.xml" />
+         <zipfileset dir="${dir.project.webeditor.src.webinf}" includes="awe.tld" prefix="WEB-INF" />
+         <zipfileset dir="${dir.project.webeditor.dist}" prefix="WEB-INF/lib"
+                     includes="${file.name.jar.webeditor.taglib}, ${file.name.jar.webeditor.sample}" />
+         <zipfileset dir="${dir.project.3rdparty}/lib/commons" prefix="WEB-INF/lib"
+                     includes="commons-httpclient-3.1.jar, commons-logging-1.1.jar, commons-codec-1.3.jar" />
+         <zipfileset dir="${dir.project.3rdparty}/lib" prefix="WEB-INF/lib" includes="json.jar" />
+      </war>
+   </target>
+   
+   <target name="test-webeditor" depends="compile-webeditor">
       <run-tests projectdir="${dir.project.webeditor}" />
    </target>
    
-   <target name="generate-javadocs-webeditor" 
-           depends="init">
+   <target name="generate-javadocs-webeditor" depends="init">
       <generate-javadocs documenttitle="Alfresco Web Editor" 
                          windowtitle="Alfresco Web Editor" 
                          projectdir="${dir.project.webeditor}"/>
    </target>
    
-   <target name="package-webeditor-sample-war" depends="package-webeditor-jar">
-      <war warfile="${dir.project.webeditor.dist}/${file.name.war.webeditor.sample}" 
-           webxml="${dir.project.webeditor.src.sample}/WEB-INF/web.xml">
-         <fileset dir="${dir.project.webeditor.src.sample}" excludes="WEB-INF/web.xml" />
-         <zipfileset dir="${dir.project.webeditor.src.webinf}" includes="awe.tld" prefix="WEB-INF" />
-         <zipfileset dir="${dir.project.webeditor.dist}" includes="${file.name.jar.webeditor}" prefix="WEB-INF/lib" />
-         <zipfileset dir="${dir.project.3rdparty}/lib/commons" prefix="WEB-INF/lib"
-                     includes="commons-httpclient-3.1.jar, commons-logging-1.1.jar, commons-codec-1.3.jar" />
-         <zipfileset dir="${dir.project.3rdparty}/lib" prefix="WEB-INF/lib" includes="json.jar" />
-      </war>
+   <!-- ********************************** -->
+   <!-- ** Web Editor Framework Project ** -->
+   <!-- ********************************** -->
+   
+   <!-- NOTE: As this is a temporary project the directory paths are hard coded -->
+   
+   <target name="incremental-webeditor-framework" 
+           depends="package-webeditor-framework-jar" />
+   
+   <target name="build-webeditor-framework" 
+           depends="clean-webeditor-framework, 
+                    incremental-webeditor-framework" />
+   
+   <target name="clean-webeditor-framework" 
+           depends="init">
+      <clean projectdir="${dir.projects}/web-editor-framework" />
+   </target>
+   
+   <target name="compile-webeditor-framework" 
+           depends="init">
+      <compile-java projectdir="${dir.projects}/web-editor-framework" />
+   </target>
+   
+   <target name="package-webeditor-framework-jar" 
+           depends="assemble-webeditor-framework-jar, minimize-webeditor-framework-javascript">
+      <mkdir dir="${dir.projects}/web-editor-framework/build/dist" />
+      
+      <jar jarfile="${dir.projects}/web-editor-framework/build/dist/wef.jar" 
+           basedir="${dir.projects}/web-editor-framework/build/assemble" />
+   </target>
+   
+   <target name="assemble-webeditor-framework-jar" 
+           depends="compile-webeditor-framework">
+      <mkdir dir="${dir.projects}/web-editor-framework/build/assemble" />
+      <copy todir="${dir.projects}/web-editor-framework/build/assemble">
+         <fileset dir="${dir.projects}/web-editor-framework/build/classes" />
+         <fileset dir="${dir.projects}/web-editor-framework/config" />
+      </copy>
+      
+      <mkdir dir="${dir.projects}/web-editor-framework/build/assemble/META-INF" />
+      <copy todir="${dir.projects}/web-editor-framework/build/assemble/META-INF">
+         <fileset dir="${dir.projects}/web-editor-framework/source/web" />
+      </copy>
+   </target>
+   
+   <target name="minimize-webeditor-framework-javascript"
+           depends="init">
+      <echo>Compressing Web Editor Framework Javascript...</echo>
+      <minimise-javascript sourcedir="${dir.projects}/web-editor-framework/build/assemble" 
+                           destdir="${dir.projects}/web-editor-framework/build/assemble" />
    </target>
    
    <!-- ************************ -->
