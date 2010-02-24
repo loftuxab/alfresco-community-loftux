@@ -15,7 +15,7 @@
    <div class="rule-config-header">
       <#if enableButton?length &gt; 0>
       <div class="rule-config-title">
-         <input type="checkbox" id="${el}-${configType}-checkbox" name="-" <#if enableButton == "checked">checked</#if>>
+         <input type="checkbox" id="${el}-${configType}-checkbox" name="-" class="hidden" <#if enableButton == "checked">checked</#if>>
          <label for="${el}-${configType}-checkbox">${msg("header." + msgKey)}</label>
       </div>
       <#else>

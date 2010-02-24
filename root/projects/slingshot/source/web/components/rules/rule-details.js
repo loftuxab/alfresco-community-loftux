@@ -56,6 +56,8 @@
       // Instance variables
       this.folderDetails = null;
       this.ruleDetails = null;
+      this.rule = null;
+      this.ruleConfigsAreReady = false;
 
       // Decoupled event listeners
       YAHOO.Bubbling.on("ruleSelected", this.onRuleSelected, this);
@@ -63,7 +65,20 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.RuleDetails, Alfresco.component.Base,
+   /**
+    * Extend from Alfresco.component.Base
+    */
+   YAHOO.extend(Alfresco.RuleDetails, Alfresco.component.Base);
+
+   /**
+    * Augment prototype with Actions module
+    */
+   YAHOO.lang.augmentProto(Alfresco.RuleDetails, Alfresco.RuleConfigUtil);
+
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.RuleDetails.prototype,
    {
       /**
        * Object container for initialization options
@@ -99,12 +114,29 @@
       folderDetails: null,
 
       /**
-       * Object describing the rule that is being viewed
+       * Object describing basic information needed to load the rule
        *
        * @property ruleDetails
        * @type {object}
        */
       ruleDetails: null,
+
+      /**
+       * Object describing all information about a rule
+       *
+       * @property rule
+       * @type {object}
+       */
+      rule: null,
+
+      /**
+       * Flag set after rule config compoents are ready.
+       *
+       * @property ruleConfigsAreReady
+       * @type {boolean}
+       * @default false
+       */
+      ruleConfigsAreReady: false,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -114,12 +146,46 @@
        */
       onReady: function RuleDetails_onReady()
       {
+         /**
+          * Load rule config components.
+          * onRuleConfigsLoaded will be called when they have been inserted into the Dom and are visually ok.
+          * onRuleConfigsReady will be called when they have loaded their dependencies and are ready to display rules.
+          */
+         this.loadRuleConfigs();
+
          // Save a refererence to the details display div so we can hide it during load and when nothing is selected
          this.widgets.displayEl = Dom.get(this.id + "-display");
 
          // Create buttons
          this.widgets.editButton = Alfresco.util.createYUIButton(this, "edit-button", this.onEditButtonClick);
          this.widgets.deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteButtonClick);
+      },
+
+      /**
+       * Called then the rule config components have been loaded and inserted to the Dom and are looking visually ok.
+       * However they are not ready to use yet since they will need to load their own dependencies.
+       *
+       * @method onRuleConfigsLoaded
+       * @override
+       */
+      onRuleConfigsLoaded: function RuleEdit_onRuleConfigsLoaded()
+      {
+         // Remove config loading message and display configs
+         Dom.addClass(this.id + "-configsMessage", "hidden");
+         Dom.removeClass(this.id + "-configsContainer", "hidden");
+      },
+
+      /**
+       * Called then the rule config components have been loaded, inserted and are ready to dispaly rule configs
+       *
+       * @method onRuleConfigsReady
+       * @override
+       */
+      onRuleConfigsReady: function RuleEditUtil_onRuleConfigsReady()
+      {
+         // Display rule info if rule has been loaded
+         this.ruleConfigsAreReady = true;
+         this._displayRule();
       },
 
       /**
@@ -158,7 +224,9 @@
                {
                   if (response.json)
                   {
-                     this._displayRule(response.json);
+                     // Display rule info if config components has been loaded
+                     this.rule = response.json;
+                     this._displayRule();
                   }
                },
                scope: this
@@ -181,130 +249,42 @@
        * Display the rule and its configuration
        *
        * @method _displayRule
-       * @param rule {object} rule info
        * @private
        */
-      _displayRule: function RuleDetails__displayRule(rule)
+      _displayRule: function RuleDetails__displayRule()
       {
-         // Hide/show the edit & delete buttons
-         if (rule.url.indexOf(this.options.nodeRef.uri) == -1 )
+         if (this.ruleConfigsAreReady && this.rule)
          {
-            // This rule doesn't belong to the current folder
-            Dom.addClass(this.id + "-actions", "hidden");
-         }
-         else
-         {
-            // This rule belongs to the current folder
-            Dom.removeClass(this.id + "-actions", "hidden");
-         }
-
-         // Basic info
-         Dom.get(this.id + "-title").innerHTML = $html(rule.title);
-         Dom.get(this.id + "-description").innerHTML = $html(rule.description);
-         Dom.removeClass(this.id + "-disabled", "enabled");
-         Dom.removeClass(this.id + "-disabled", "disabled");
-         Dom.addClass(this.id + "-disabled", rule.disabled == true ? "disabled" : "enabled");
-         Dom.removeClass(this.id + "-executeAsynchronously", "enabled");
-         Dom.removeClass(this.id + "-executeAsynchronously", "disabled");
-         Dom.addClass(this.id + "-executeAsynchronously", rule.executeAsynchronously == true ? "enabled" : "disabled");
-         Dom.removeClass(this.id + "-applyToChildren", "enabled");
-         Dom.removeClass(this.id + "-applyToChildren", "disabled");
-         Dom.addClass(this.id + "-applyToChildren", rule.applyToChildren == true ? "enabled" : "disabled");
-
-         // When Configurations
-         var whenConfigs = [];
-         for (var i = 0, il = rule.ruleType.length; i < il; i++)
-         {
-            whenConfigs.push(
+            // Hide/show the edit & delete buttons
+            if (this.rule.url.indexOf(this.options.nodeRef.uri) == -1 )
             {
-               name: rule.ruleType[i]
-            });
-         }
-         this._displayConfigurations(whenConfigs, "name", null, "when");
-
-         // If & Unless configurations
-         var ifConfigs = [],
-            unlessConfigs = [];
-         i = 0;
-         il = rule.action.conditions.length;
-         for (var conditionConfig; i < il; i++)
-         {
-            conditionConfig = rule.action.conditions[i];
-            if (conditionConfig.invertCondition == true)
-            {
-               unlessConfigs.push(conditionConfig);
+               // This rule doesn't belong to the current folder
+               Dom.addClass(this.id + "-actions", "hidden");
             }
             else
             {
-               ifConfigs.push(conditionConfig);
+               // This rule belongs to the current folder
+               Dom.removeClass(this.id + "-actions", "hidden");
             }
-         }
-         this._displayConfigurations(ifConfigs, "conditionDefinitionName", null, "if");
-         this._displayConfigurations(unlessConfigs, "conditionDefinitionName", null, "unless");
 
-         // Action configurations
-         this._displayConfigurations(rule.action.actions, "actionDefinitionName", null, "action");
+            // Basic info
+            Dom.get(this.id + "-title").innerHTML = $html(this.rule.title);
+            Dom.get(this.id + "-description").innerHTML = $html(this.rule.description);
+            Dom.removeClass(this.id + "-disabled", "enabled");
+            Dom.removeClass(this.id + "-disabled", "disabled");
+            Dom.addClass(this.id + "-disabled", this.rule.disabled == true ? "disabled" : "enabled");
+            Dom.removeClass(this.id + "-executeAsynchronously", "enabled");
+            Dom.removeClass(this.id + "-executeAsynchronously", "disabled");
+            Dom.addClass(this.id + "-executeAsynchronously", this.rule.executeAsynchronously == true ? "enabled" : "disabled");
+            Dom.removeClass(this.id + "-applyToChildren", "enabled");
+            Dom.removeClass(this.id + "-applyToChildren", "disabled");
+            Dom.addClass(this.id + "-applyToChildren", this.rule.applyToChildren == true ? "enabled" : "disabled");
 
-         // Display component again
-         Alfresco.util.Anim.fadeIn(this.widgets.displayEl);
-      },
+            // Display all rule configs (when, if, unless & action)
+            this.displayRuleConfigs(this.rule, Alfresco.RuleConfig.MODE_TEXT, null);
 
-      /**
-       * Display a set of configurations in the container
-       *
-       * @method _displayConfigurations
-       * @param configurations {array} One of the configuration sets from the rule object
-       * @param configDefinitionNameKey {string} The object key for the config name value
-       * @param relation {string} String to represent the relation type: "and" | "or"
-       * @param classId {string} The class helping us to identify the html elements
-       * @private
-       */
-      _displayConfigurations: function RuleDetails__displayConfigurations(configurations, configDefinitionNameKey, relation, classId)
-      {
-         var configurationSectionEl = Dom.getElementsByClassName(classId, "div", Dom.get(this.id + "-body"))[0];
-         configurations = configurations ? configurations : [];
-
-         // Hide or display section depending on if at least one configuration exist
-         if (configurations.length == 0)
-         {
-            Dom.addClass(configurationSectionEl, "hidden");
-         }
-         else
-         {
-            Dom.removeClass(configurationSectionEl, "hidden");
-         }
-
-         // Relation support
-         if (relation != null)
-         {
-            var relationEl = Dom.getElementsByClassName("configuration-relation", "div", configurationSectionEl)[0];
-            if (configurations.length > 1)
-            {
-               Dom.removeClass(relationEl, "hidden");
-               Dom.removeClass(relationEl, "and");
-               Dom.removeClass(relationEl, "or");
-               Dom.addClass(relationEl, relation);
-            }
-            else
-            {
-               Dom.addClass(relationEl, "hidden");
-            }
-         }
-
-         // Configurations
-         var configurationBodyEl = Dom.getElementsByClassName("configuration-body", "ul", configurationSectionEl)[0],
-            configuration = null;
-         while(configurationBodyEl.hasChildNodes())
-         {
-            configurationBodyEl.removeChild(configurationBodyEl.firstChild);
-         }
-         for (var i = 0, l = configurations.length; i < l; i++)
-         {
-            configuration = configurations[i];
-            var ruleEl = document.createElement("li");
-            Dom.addClass(ruleEl, "configuration");
-            ruleEl.innerHTML = $html(configuration[configDefinitionNameKey]); 
-            ruleEl = configurationBodyEl.appendChild(ruleEl);            
+            // Display component again
+            Alfresco.util.Anim.fadeIn(this.widgets.displayEl);
          }
       },
 
@@ -419,5 +399,5 @@
          });
       }
 
-   });
+   }, true);
 })();

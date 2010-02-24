@@ -52,72 +52,15 @@
    background-image:url(../images/inherited-off-16.png);
 }
 
-.rule-details .configuration-section
-{
-   margin: 0;
-   border: 1px solid #C8C8C8;
-}
-
-.rule-details .configuration-section.unless
-{
-   border-top: none;
-}
-
-.rule-details .configuration-header
-{
-   border-bottom: 1px solid #C8C8C8;
-   background:#FFFFFF url(../../yui/assets/skins/default/sprite.png) repeat-x scroll 0 0;
-   height: 2.2em;
-   line-height: 2.2em;
-}
-
-.rule-details .configuration-header.unless
-{
-   border-top-color: #C8C8C8;
-}
-
-.rule-details .configuration-title
-{
-   padding-left: 1em;
-   color: #008000;   
-   float: left;
-}
-
-.rule-details .configuration-relation
-{
-   float: right;
-   padding-left: 1em;
-   padding-right: 1em;
-   background:#FFFFFF url(../../yui/assets/skins/default/sprite.png) repeat-x scroll 0 -100px;
-   border-left:1px solid #C8C8C8;
-}
-
-.rule-details .configuration-relation.and .or-label
-{
-   display: none;
-}
-
-.rule-details .configuration-relation.or .and-label
-{
-   display: none;
-}
-
-.rule-details .configuration-body
-{
-   background-color: #FFFFFF;
-   clear: both;
-}
-
-.rule-details .configuration
-{
-   padding:0.35em 0.35em 0.35em 1em;
-}
-
 .rule-details .configuration-separator
 {
-   padding: 1em;
-   background-repeat: no-repeat;
-   background-position: center center;
-   background-image: url(../images/expanded.png);
+   background-image:url(../images/expanded.png);
+   background-position:center center;
+   background-repeat:no-repeat;
+   padding:1em;
 }
 
+.rule-edit .if .rule-config
+{
+   border-bottom: none;
+}

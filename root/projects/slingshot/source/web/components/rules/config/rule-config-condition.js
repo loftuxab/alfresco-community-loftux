@@ -333,7 +333,7 @@
                         displayLabel : null, // Don't display evaluator label
                         type : op.type,
                         isMultiValued : false,
-                        isMandatory : true,
+                        isMandatory : true, // Make it mandatory even if the repo says it isn't
                         constraint: op.constraint
                      },
                      {
@@ -483,8 +483,7 @@
           */
          InCategoryCondition:
          {
-            currentOpts: {},
-            fn: function(configDef, ruleConfig, configEl)
+            edit: function(configDef, ruleConfig, configEl)
             {
                this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push(
@@ -500,8 +499,7 @@
           */
          HasTagCondition:
          {
-            currentOpts: {},
-            fn: function(configDef, ruleConfig, configEl)
+            edit: function(configDef, ruleConfig, configEl)
             {
                this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push(
@@ -523,11 +521,11 @@
           */
          ShowMore:
          {
-            manual: true,
-            currentOpts: {},
-            fn: function(configDefinition, p_oRuleConfig, configEl, paramsEl)
+            manual: { edit: true },
+            currentCtx: {},
+            edit: function(configDefinition, p_oRuleConfig, configEl, paramsEl)
             {
-               this.customisations.ShowMore.currentOpts =
+               this.customisations.ShowMore.currentCtx =
                {
                   configEl: configEl
                };
@@ -571,7 +569,7 @@
                             * Create a new select drop down, based on the current/temporary properties so it becomes
                             * specific for this config row
                             */
-                           var configEl = this.customisations.ShowMore.currentOpts.configEl,
+                           var configEl = this.customisations.ShowMore.currentCtx.configEl,
                               newSelectEl = this._createSelectMenu(),
                               selectEl = Selector.query('select', configEl)[0];
 
@@ -587,7 +585,7 @@
 
                            // Replace the current configEl and with a new one based on the new ruleConfig
                            var newConfigEl = this._createConfigUI(ruleConfig, newSelectEl, configEl);
-                           this.customisations.ShowMore.currentOpts.configEl = newConfigEl;
+                           this.customisations.ShowMore.currentCtx.configEl = newConfigEl;
                            configEl.parentNode.removeChild(configEl);
                            this._createConfigParameterUI(ruleConfig, newConfigEl);
 
@@ -601,7 +599,7 @@
                      if ($hasEventInterest(this.widgets.showMoreDialog, args))
                      {
                         // Reselect the previous choice in the menu
-                        var configEl = this.customisations.ShowMore.currentOpts.configEl;
+                        var configEl = this.customisations.ShowMore.currentCtx.configEl;
                         this._selectPreviousConfigName(Selector.query('select', configEl)[0]);
                      }
                   }, this);
@@ -624,10 +622,14 @@
           */
          "arcc:category-picker":
          {
-            currentOpts: {},
-            fn: function (containerEl, paramDef, configDef, value, ruleConfig)
+            currentCtx: {},
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               this.renderers["arcc:category-picker"].currentOpts =
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               this.renderers["arcc:category-picker"].currentCtx =
                {
                   configDef: configDef,
                   ruleConfig: ruleConfig,
@@ -646,10 +648,10 @@
                   {
                      fn: function(obj)
                      {
-                        var opts = this.renderers["arcc:category-picker"].currentOpts;
-                        this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-aspect", "cm:classifiable");
-                        this._setHiddenParameter(opts.configDef, opts.ruleConfig, "category-value", obj.selectedItems[0]);
-                        this._updateSubmitElements(opts.configDef);
+                        var ctx = this.renderers["arcc:category-picker"].currentCtx;
+                        this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "category-aspect", "cm:classifiable");
+                        this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "category-value", obj.selectedItems[0]);
+                        this._updateSubmitElements(ctx.configDef);
                      },
                      scope: this
                   }
@@ -663,10 +665,14 @@
           */
          "arcc:tag-picker":
          {
-            currentOpts: {},
-            fn: function (containerEl, paramDef, configDef, value, ruleConfig)
+            currentCtx: {},
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               this.renderers["arcc:tag-picker"].currentOpts =
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               this.renderers["arcc:tag-picker"].currentCtx =
                {
                   configDef: configDef,
                   ruleConfig: ruleConfig,
@@ -685,9 +691,9 @@
                   {
                      fn: function(obj)
                      {
-                        var opts = this.renderers["arcc:tag-picker"].currentOpts;
-                        this._setHiddenParameter(opts.configDef, opts.ruleConfig, "tag", obj.selectedItems[0]);
-                        this._updateSubmitElements(opts.configDef);
+                        var ctx = this.renderers["arcc:tag-picker"].currentCtx;
+                        this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "tag", obj.selectedItems[0]);
+                        this._updateSubmitElements(ctx.configDef);
                      },
                      scope: this
                   }

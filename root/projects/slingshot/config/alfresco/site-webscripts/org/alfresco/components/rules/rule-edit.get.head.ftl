@@ -1,9 +1,7 @@
 <#include "../component.head.inc">
-<!-- Rule Edit -->
-<@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/rule-edit.css" />
-<@script type="text/javascript" src="${page.url.context}/components/rules/rule-edit.js"></@script>
 <!-- Rule Configs -->
 <!-- Note! Needs to be imported here since they are brought in via XMLHttpRequest after page has rendered -->
+<@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config-util.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/config/rule-config.css" />
 <@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/config/rule-config-type.css" />
@@ -15,6 +13,9 @@
 <@script type="text/javascript" src="${page.url.context}/components/form/date.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/date-picker.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/yui/calendar/calendar-min.js"></@script>
+<!-- Rule Edit -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/rule-edit.css" />
+<@script type="text/javascript" src="${page.url.context}/components/rules/rule-edit.js"></@script>
 <!-- Global Folder -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/global-folder.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/global-folder.js"></@script>

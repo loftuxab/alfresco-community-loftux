@@ -66,8 +66,39 @@
       return this;
    };
 
+
+   /**
+   * Alias to self
+   */
+   var RC = Alfresco.RuleConfig;
+
+   /**
+   * View Mode Constants
+   */
+   YAHOO.lang.augmentObject(RC,
+   {
+      /**
+       * Set options.mode to this value to get a non editable text representation of the config
+       *
+       * @property MODE_TEXT
+       * @type {string}
+       * @public
+       */
+      MODE_TEXT: "text",
+
+      /**
+       * Set options.mode to this value to get an editable form input representation of the config
+       *
+       * @property MODE_EDIT
+       * @type {string}
+       * @public
+       */
+      MODE_EDIT: "edit"
+   });
+
    YAHOO.extend(Alfresco.RuleConfig, Alfresco.component.Base,
    {
+
       /**
        * Object container for initialization options
        *
@@ -76,6 +107,17 @@
        */
       options:
       {
+         /**
+          * Set to:
+          * - "text" for non editable text representation
+          * - "edit" for editable form inputs
+          *
+          * @property mode
+          * @type string
+          * @default RC.MODE_EDIT
+          */
+         mode: RC.MODE_EDIT,
+
          /**
           * The type of configs that are manipulated
           *
@@ -137,8 +179,9 @@
           *
           * @property form
           * @type object
+          * @default null
           */
-         form: {}
+         form: null
       },
 
       /**
@@ -263,7 +306,6 @@
                   config.parameterValues = this._getParameters(configDef);
                   configs.push(config);
                }
-
             }
          }
          return configs;
@@ -293,6 +335,12 @@
       displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
       {
          Dom.get(this.id + "-configs").innerHTML = "";
+         var checkboxEl = Dom.get(this.id + "-" + this.options.configType + "-checkbox");
+         if (checkboxEl && this.options.mode == RC.MODE_EDIT)
+         {
+            Dom.removeClass(checkboxEl, "hidden");
+         }
+
          if (!ruleConfigs || ruleConfigs.length == 0)
          {
             ruleConfigs = [ {} ];
@@ -322,29 +370,7 @@
        */
       onAddExtraParameterIconClick: function RuleConfig_onAddMoreParameterIconClick(p_oEvent, p_oParameterCtx)
       {
-         // Create a container for the extra parameter
-         var extraparamEl = document.createElement("span"),
-            paramDef = p_oParameterCtx.paramDef;
-         // Add new parameter container to the left of the add button
-         p_oParameterCtx.addButton.parentNode.insertBefore(extraparamEl, p_oParameterCtx.addButton);
-
-         // Add another parameter ui control
-         var ruleConfig = p_oParameterCtx.ruleConfig,
-            value = ruleConfig.parameterValues ? ruleConfig.parameterValues[paramDef.name] : null;
-         var el = p_oParameterCtx.paramRenderer.fn.call(this, extraparamEl, paramDef, p_oParameterCtx.configDef, value, ruleConfig);
-         Dom.addClass(el, "param");
-
-         // Add a delete button for the new parameter control
-         var deleteButton = document.createElement("span");
-         deleteButton.setAttribute("title", this.msg("button.deleteExtraParameter", paramDef.displayLabel ? paramDef.displayLabel: paramDef.name));
-         Dom.addClass(deleteButton, "delete-extra-parameter-button");
-         deleteButton.innerHTML = "-";
-         Dom.setStyle(deleteButton, "width", "10px");
-         Dom.setStyle(deleteButton, "height", "10px");
-         Event.addListener(deleteButton, "click", this.onDeleteExtraParameterIconClick, extraparamEl, this);
-         extraparamEl.appendChild(deleteButton);
-
-         this._updateSubmitElements(p_oParameterCtx.configDef);
+         this._addExtraParameter(p_oParameterCtx.paramDef, p_oParameterCtx.addButton, p_oParameterCtx.configDef, p_oParameterCtx.ruleConfig, p_oParameterCtx.paramRenderer, value);
       },
 
       /**
@@ -420,6 +446,40 @@
        * PRIVATE OR PROTECTED METHODS
        */
 
+
+      /**
+       * Called from the "+" link to create another value for multi valued parameter
+       *
+       * @method addExtraParameter
+       */
+      _addExtraParameter: function RuleConfig_addExtraParameter(paramDef, addButton, configDef, ruleConfig, paramRenderer, value)
+      {
+         // Create a container for the extra parameter
+         var extraparamEl = document.createElement("span");
+
+         // Add new parameter container to the left of the add button
+         addButton.parentNode.insertBefore(extraparamEl, addButton);
+
+         // Add another parameter ui control
+         var fn = paramRenderer[this.options.mode],
+            el = fn.call(this, extraparamEl, configDef, paramDef, ruleConfig, value);
+         Dom.addClass(el, "param");
+
+         if (this.options.mode == EC.MODE_EDIT)
+         {
+            // Add a delete button for the new parameter control
+            var deleteButton = document.createElement("span");
+            deleteButton.setAttribute("title", this.msg("button.deleteExtraParameter", paramDef.displayLabel ? paramDef.displayLabel: paramDef.name));
+            Dom.addClass(deleteButton, "delete-extra-parameter-button");
+            deleteButton.innerHTML = "-";
+            Dom.setStyle(deleteButton, "width", "10px");
+            Dom.setStyle(deleteButton, "height", "10px");
+            Event.addListener(deleteButton, "click", this.onDeleteExtraParameterIconClick, extraparamEl, this);
+            extraparamEl.appendChild(deleteButton);
+         }
+         this._updateSubmitElements(configDef);
+      },
+      
       /**
        * Will set the disabled attribute to the value of "disabled" for the elements in p_aEls
        *
@@ -657,36 +717,44 @@
                Alfresco.util.generateDomId(p_oSelectEl);
             }
             Event.addListener(p_oSelectEl, "change", this.onConfigNameSelectChange, configEl, this);
-            Selector.query('div.name', configEl)[0].appendChild(p_oSelectEl);
+            var configNameContainerEl = Selector.query('div.name', configEl)[0];
+            configNameContainerEl.appendChild(p_oSelectEl);
 
             // Set values
             if (p_oRuleConfig.id)
             {
                configEl.setAttribute("paramid", p_oRuleConfig.id);
             }
-
             Alfresco.util.setSelectedIndex(p_oSelectEl, p_oRuleConfig[this.options.ruleConfigDefinitionKey]);
 
-            // Create add button
-            var actionsEl = Selector.query('div.actions', configEl)[0];
-            var addButton = new YAHOO.widget.Button(
+            if (this.options.mode == RC.MODE_EDIT)
             {
-               label: "+",
-               container: actionsEl,
-               type: "push"
-            });
-            addButton.on("click", this.onAddConfigButtonClick, configEl, this);
-            addButton.addClass("add-config");
+               // Create add button
+               var actionsEl = Selector.query('div.actions', configEl)[0];
+               var addButton = new YAHOO.widget.Button(
+               {
+                  label: "+",
+                  container: actionsEl,
+                  type: "push"
+               });
+               addButton.on("click", this.onAddConfigButtonClick, configEl, this);
+               addButton.addClass("add-config");
 
-            // Create remove button
-            var removeButton = new YAHOO.widget.Button(
+               // Create remove button
+               var removeButton = new YAHOO.widget.Button(
+               {
+                  label: "-",
+                  container: actionsEl,
+                  type: "push"
+               });
+               removeButton.on("click", this.onRemoveConfigButtonClick, configEl, this);
+               removeButton.addClass("remove-config");
+            }
+            else if (this.options.mode == RC.MODE_TEXT)
             {
-               label: "-",
-               container: actionsEl,
-               type: "push"
-            });
-            removeButton.on("click", this.onRemoveConfigButtonClick, configEl, this);
-            removeButton.addClass("remove-config");
+               Dom.addClass(p_oSelectEl, "hidden");
+               configNameContainerEl.appendChild(document.createTextNode(p_oSelectEl.options[p_oSelectEl.selectedIndex].text));
+            }
 
             // Return element
             return configEl;
@@ -719,16 +787,16 @@
             // Find the correct customisation renderer
             var selectEl = Selector.query('select', configEl)[0],
                optionEl = selectEl.options[selectEl.selectedIndex],
-               configCustomisation = this._getConfigCustomisation(optionEl.getAttribute("rel"), configDef);
-
-            if (!configCustomisation || !configCustomisation.manual)
+               configCustomisation = this._getConfigCustomisation(optionEl.getAttribute("rel"), configDef),
+               customisationFn = configCustomisation ? configCustomisation[this.options.mode] : null;
+            if (!customisationFn || !(configCustomisation.manual && configCustomisation.manual[this.options.mode]))
             {
-               // If Customisations is manual it wants to handle cleanup by itself (or leave the old parameters)
+               // If Customisation for this mode is manual it wants to handle cleanup by itself (or leave the old parameters)
                paramsEl.innerHTML = "";
             }
-            if (configCustomisation)
+            if (customisationFn)
             {
-               configDef = configCustomisation.fn.call(this, configDef, p_oRuleConfig, configEl, paramsEl);
+               configDef = customisationFn.call(this, configDef, p_oRuleConfig, configEl, paramsEl);
             }
 
             // Render new parameter ui if any
@@ -741,10 +809,11 @@
                {
                   paramDef = configDef.parameterDefinitions[i];
                   paramRenderer = this._getParamRenderer(paramDef.type);
+                  var fn = paramRenderer[this.options.mode];
                   value = p_oRuleConfig.parameterValues ? p_oRuleConfig.parameterValues[paramDef.name] : null;
-                  if (!paramRenderer)
+                  if (!paramRenderer || !fn)
                   {
-                     // There is no renderer for the parameter type
+                     // There is no renderer for the parameter type in this mode
                      var errorSpan = document.createElement("span");
                      Dom.addClass(errorSpan, "error");
                      errorSpan.innerHTML = this.msg("label.noRendererForType", paramDef.type);
@@ -759,15 +828,15 @@
                   Dom.addClass(paramEl, "paramname_" + paramDef.name);
                   paramsEl.appendChild(paramEl);
 
-                  if (paramRenderer.manual)
+                  if (paramRenderer.manual && paramRenderer.manual[this.options.mode])
                   {
                      // Renderer wants to implement the "contraint":s- and "multiValued"-support for the parameter
-                     paramRenderer.fn.call(this, paramEl, paramDef, configDef, value, p_oRuleConfig);
+                     fn.call(this, paramEl, paramDef, configDef, p_oRuleConfig, value);
                   }
                   else
                   {
                      var controlEl;
-                     if (paramDef.constraint)
+                     if (paramDef.constraint && this.options.mode == RC.MODE_EDIT)
                      {
                         /**
                          * Implement support for the "constraint" by using a select element
@@ -778,17 +847,31 @@
                      }
                      else
                      {
-                        // Render the type specific ui control
-                        controlEl = paramRenderer.fn.call(this, paramEl, paramDef, configDef, value, p_oRuleConfig);
-                        if (paramDef.isMultiValued && paramDef._type != "hidden")
+                        // Save first values controlEl so we can add the label to the left of it below
+                        controlEl = fn.call(this, paramEl, configDef, paramDef, p_oRuleConfig, YAHOO.lang.isArray(value) && value.length > 0 ? values[0] : value);
+
+                        /**
+                         * Create an add button element (so we can add additional value elements to the left of it)
+                         * but activate it only if we are in edit mode
+                         */
+                        var addButton = document.createElement("span");
+                        paramEl.appendChild(addButton);
+
+                        // If it was a multi value we add the remaining values
+                        var vil = YAHOO.lang.isArray(value) ? value.length : -1;
+                        for (var vi = 1; vi < vil; vi++)
                         {
-                           var addButton = document.createElement("span");
+                           this._addExtraParameter(paramDef, addButton, configDef, p_oRuleConfig, paramRenderer, value[vi]);
+                        }
+
+                        // Style and activate add button if we are in edit mode
+                        if (paramDef.isMultiValued && this.options.mode == RC.MODE_EDIT && paramDef._type != "hidden")
+                        {
                            addButton.setAttribute("title", this.msg("button.addExtraParameter", paramDef.displayLabel ? paramDef.displayLabel: paramDef.name));
                            Dom.addClass(addButton, "add-extra-parameter-button");
                            addButton.innerHTML = "+";
                            Dom.setStyle(addButton, "width", "10px");
                            Dom.setStyle(addButton, "height", "10px");
-                           paramEl.appendChild(addButton);
                            Event.addListener(addButton, "click", this.onAddExtraParameterIconClick,
                            {
                               paramRenderer: paramRenderer,
@@ -800,7 +883,7 @@
                         }
                      }
                      Dom.addClass(controlEl, "param");
-                     if (paramDef._type != "hidden")
+                     if (this.options.mode == RC.MODE_TEXT || paramDef._type != "hidden")
                      {
                         // Display a label left to the parameter if displayLabel is present
                         this._createLabel(paramDef.displayLabel, controlEl);
@@ -934,14 +1017,18 @@
       },
 
       /**
-       * RENDERERS
+       * PARAMETER RENDERERS
        */
 
       renderers:
       {
          "d:any":
          {
-            fn:function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -949,7 +1036,11 @@
 
          "d:text":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -957,7 +1048,11 @@
 
          "d:mltext":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -965,7 +1060,11 @@
 
          "d:content":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -973,7 +1072,11 @@
 
          "d:int":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                // todo limit validator to int's limit
                return this._createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.number], value);
@@ -982,7 +1085,11 @@
 
          "d:long":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                // todo limit validator to long's limit
                return this._createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.number], value);
@@ -991,7 +1098,11 @@
 
          "d:float":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                // todo add float validator
                return this._createInputText(containerEl, configDef, paramDef, [], value);
@@ -1000,7 +1111,11 @@
 
          "d:double":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                // todo add double validator
                return this._createInputText(containerEl, configDef, paramDef, [], value);
@@ -1009,7 +1124,11 @@
 
          "d:date":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createDatePicker(containerEl, configDef, paramDef, [], value, false);
             }
@@ -1017,7 +1136,11 @@
 
          "d:datetime":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createDatePicker(containerEl, configDef, paramDef, [], value, true);
             }
@@ -1025,9 +1148,13 @@
 
          "d:boolean":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               this._createSelect(containerEl, configDef, paramDef, [
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createSelect(containerEl, configDef, paramDef, [
                   {
                      value: "true",
                      displayLabel: this.msg("label.yes")
@@ -1042,7 +1169,11 @@
 
          "d:qname":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -1050,7 +1181,11 @@
 
          "d:noderef":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.nodeRef], value);
             }
@@ -1058,7 +1193,11 @@
 
          "d:path":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -1066,8 +1205,12 @@
 
          "d:category":
          {
-            manual: true,
-            fn: function (containerEl, paramDef, configDef, value)
+            manual: { edit: true },
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                // todo display category picker
             }
@@ -1075,7 +1218,11 @@
 
          "d:locale":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -1083,7 +1230,11 @@
 
          "d:version":
          {
-            fn: function (containerEl, paramDef, configDef, value)
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
@@ -1268,6 +1419,46 @@
             containerEl: containerEl
          }, this);
          return button;
+      },
+
+
+      /**
+       * Displays the value as text
+       *
+       * @method _createValueSpan
+       * @param containerEl {HTMLElement} Element within which the new span tag will be created
+       * @param configDef {object} Object describing the configuration
+       * @param paramDef {object} Object describing the parameter
+       * @param ruleConfig {object} Object describing the rule config
+       * @param value {string} The value to display
+       * @param msgKey {string} (Optional) if a i18n message shall be used to enhance the display
+       */
+      _createValueSpan: function (containerEl, configDef, paramDef, ruleConfig, value, msgKey)
+      {
+         var valueEl = document.createElement("span");
+         if (value)
+         {
+            if (paramDef.constraint)
+            {
+               var constraintValues = this._getConstraintValues(paramDef.constraint, ruleConfig);
+               for (var i = 0, il = constraintValues.length; i < il; i++)
+               {
+                  if (constraintValues[i].value == value)
+                  {
+                     value = constraintValues[i].displayLabel;
+                     break;
+                  }
+               }
+            }
+            if (msgKey)
+            {
+               var tmp = this.msg(msgKey, value);
+               value = tmp != msgKey ? tmp : value;
+            }
+            valueEl.appendChild(document.createTextNode(value));
+         }
+         containerEl.appendChild(valueEl);
+         return valueEl;
       },
 
       /**
@@ -1523,7 +1714,7 @@
             {
                if (pvi >= peil)
                {
-                  paramEl = this._getParamRenderer(paramDef.type).fn.call(this, paramEls[0].parentNode, paramDef, configDef, paramValue[pvi], ruleConfig);
+                  paramEl = this._getParamRenderer(paramDef.type).fn.call(this, paramEls[0].parentNode, configDef, paramDef, ruleConfig, paramValue[pvi]);
                   Dom.addClass(paramEl, "param");
                }
                else
