@@ -67,25 +67,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             //out.write("/service/wef/resources\"></script>\n");
             
             out.write("<script type=\"text/javascript\">\n");
-            out.write("window.onload = function() {\n");      
-            out.write("WEF.run('com.alfresco.awe.init',");
-            out.write("{\n");
-            out.write("fn:function WEF_Run_SuccessHandler(o)\n");
-            out.write("{\n");
-            out.write("var y = (o.reference) ? o.reference : YAHOO;\n");
-            out.write("// o.reference is the SANDBOXED YAHOO object\n");
-            out.write("if (!o.reference)\n");
-            out.write("{\n");
-            out.write("console.log('Not running in sandbox mode');\n");
-            out.write("}\n");
-            out.write("else\n");
-            out.write("{\n");
-            out.write("console.log('must be running in sandbox mode');\n");
-            out.write("// Anything root level needs to be added to YAHOO namespace eg:\n");
-            out.write("// var AWE = o.reference.com.alfresco.awe;\n");
-            out.write("}\n");
-            out.write("\n\n");
-            out.write("y.com.alfresco.awe.init([");
+            out.write("WEF.ConfigRegistry.registerConfig('com.wefapps.awe',[\n");
             boolean first = true;
             for (MarkedContent content : markedContent)
             {
@@ -116,17 +98,8 @@ public class EndTemplateTag extends AbstractWebEditorTag
                out.write("\n}");
             }
             out.write("]);\n");
-            out.write("y.com.alfresco.awe.render();");
-            out.write("},\n");
-            out.write("scope:this\n");
-            out.write("},\n");
-            out.write("{\n");
-            out.write("fn:function WEF_Run_FailureHandler()\n");
-            out.write("{\n");
-            out.write("},\n");
-            out.write("scope: this\n");
-            out.write("}\n");
-            out.write("\n);\n");
+            out.write("window.onload = function() {\n");      
+            out.write("WEF.run('com.wefapps.awe');");
             out.write("}\n</script>");
             
             if (logger.isDebugEnabled())

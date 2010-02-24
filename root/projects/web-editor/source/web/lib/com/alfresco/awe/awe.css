@@ -1,7 +1,7 @@
-#awe {
+#wef {
    text-align: left;
 }
-#awe div.login-logo
+#wef div.login-logo
 {
    background:url(../templates/login/images/login-logo.png) no-repeat 0 0;
    margin:0.5em;
@@ -9,34 +9,34 @@
    height:61px;
 }
 
-/*#awe #awe-login-panel .yui-panel_container,*/
-#awe #awe-login-panel .yui-panel,
-/*#awe #awe-panel .yui-panel-container,*/
-#awe #awe-panel .yui-panel
+/*#wef #wef-login-panel .yui-panel_container,*/
+#wef #wef-login-panel .yui-panel,
+/*#wef #wef-panel .yui-panel-container,*/
+#wef #wef-panel .yui-panel
 {
    background-color:white;
 }
 /*
    reset the 3px padding introduced by base.css
 */
-#awe .yui-button,
-#awe .yui-panel {
+#wef .yui-button,
+#wef .yui-panel {
    padding:0
 }
 
-#awe .form-fields,
-#awe .form-buttons
+#wef .form-fields,
+#wef .form-buttons
 {
    padding:1em;
 }
 
-#awe div.ft,
-#awe div.form-buttons
+#wef div.ft,
+#wef div.form-buttons
 {
    text-align: right;
 }
 
-#awe div.ft
+#wef div.ft
 {
    border-width:1px 0 0 0;
 }

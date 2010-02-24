@@ -626,4 +626,4 @@
 	}
 	
 }());
-YAHOO.register("containerariaplugin", YAHOO.widget.Module, {version: "@VERSION@", build: "@BUILD@"});
+WEF.register("containerariaplugin", YAHOO.widget.Module, {version: "2.8", build: "1.0"});

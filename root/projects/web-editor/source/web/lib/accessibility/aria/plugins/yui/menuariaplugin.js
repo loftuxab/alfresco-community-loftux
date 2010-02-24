@@ -361,5 +361,4 @@
 	};
 
 }());
-YAHOO.register("menuariaplugin", YAHOO.widget.Menu, {version: "@VERSION@", build: "@BUILD@"});
-YAHOO.register("menuariaplugin", YAHOO.widget.Menu, {version: "@VERSION@", build: "@BUILD@"});
+WEF.register("menuariaplugin", YAHOO.widget.Menu, {version: "2.8", build: "1.0"});
