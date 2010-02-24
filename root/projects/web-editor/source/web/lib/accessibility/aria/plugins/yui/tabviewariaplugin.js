@@ -365,4 +365,4 @@
 	}, "initAttributes", "_setUseARIA", "_setLabelledBy", "_setDescribedBy", "addTab");
 
 }());
-YAHOO.register("tabviewariaplugin", YAHOO.widget.TabView, {version: "@VERSION@", build: "@BUILD@"});
+WEF.register("tabviewariaplugin", YAHOO.widget.TabView, {version: "2.8", build: "1.0"});

@@ -289,4 +289,4 @@
 	
 
 }());
-YAHOO.register("buttonariaplugin", YAHOO.widget.Button, {version: "@VERSION@", build: "@BUILD@"});
+WEF.register("buttonariaplugin", YAHOO.widget.Button, {version: "2.8", build: "1.0"});

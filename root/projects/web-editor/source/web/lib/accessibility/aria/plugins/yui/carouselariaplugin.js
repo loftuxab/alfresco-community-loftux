@@ -498,4 +498,4 @@
 	}, "initAttributes", "_setUseARIA", "_setLabelledBy", "_setDescribedBy");
 
 }());
-YAHOO.register("carouselariaplugin", YAHOO.widget.Carousel, {version: "@VERSION@", build: "@BUILD@"});
+WEF.register("carouselariaplugin", YAHOO.widget.Carousel, {version: "2.8", build: "1.0"});
