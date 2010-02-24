@@ -15,8 +15,6 @@
    <import resource="classpath*:org/springframework/extensions/surf/*-context.xml" />
    <import resource="classpath*:alfresco/web-extension/custom-web-framework-application-context.xml" />
    
-   <import resource="classpath*:alfresco/wef-context.xml" />
-   
    <!-- Import Web Editor -->
    <import resource="classpath*:alfresco/awe-application-context.xml" />
    <import resource="classpath*:alfresco/web-extension/custom-awe-application-context.xml" />
