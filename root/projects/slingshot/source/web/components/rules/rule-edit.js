@@ -48,13 +48,23 @@
    {
       Alfresco.RuleEdit.superclass.constructor.call(this, "Alfresco.RuleEdit", htmlId, []);
 
-      // Decoupled event listeners
-      YAHOO.Bubbling.on("ruleConfigReady", this.onRuleConfigReady, this);
-
       return this;
    };
 
-   YAHOO.extend(Alfresco.RuleEdit, Alfresco.component.Base,
+   /**
+    * Extend from Alfresco.component.Base
+    */
+   YAHOO.extend(Alfresco.RuleEdit, Alfresco.component.Base);
+
+   /**
+    * Augment prototype with Actions module
+    */
+   YAHOO.lang.augmentProto(Alfresco.RuleEdit, Alfresco.RuleConfigUtil);
+
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */   
+   YAHOO.lang.augmentObject(Alfresco.RuleEdit.prototype,
    {
       /**
        * Object container for initialization options
@@ -139,18 +149,6 @@
       },
 
       /**
-       * This is where the rule configs will be stored: type (event), condition (if & unless) & action (action).
-       * Will first contain the componentId as key and a false boolean value to indicate that a component is being
-       * loaded but hasn't fired its "ruleConfigReady" event. When the config component has fired the event
-       * onRuleConfigReady method will replace the boolean value with the component instance to
-       * indicate the config component is ready to be used.
-       *
-       * @property ruleConfigs
-       * @type object
-       */
-      ruleConfigs: {},
-
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Template initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -158,6 +156,12 @@
        */
       onReady: function RuleEdit_onReady()
       {
+         /**
+          * Load rule config components.
+          * onRuleConfigsLoaded will be called when they have been inserted into the Dom and are visually ok.
+          * onRuleConfigsReady will be called when they have loaded their dependencies and are ready to display rules.
+          */
+         this.loadRuleConfigs();
 
          // Create & Edit menues & buttons
          this.widgets.createButton = Alfresco.util.createYUIButton(this, "create-button", function ()
@@ -183,64 +187,7 @@
          }, this.id + "-save-button");
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
-         // Load rule config components
-         this._loadRuleConfigs([
-            { component: "components/rules/config/type", name: "ruleConfigType", dataObj: {}},
-            { component: "components/rules/config/condition", name: "ruleConfigIfCondition", dataObj: { mode: "if" }},
-            { component: "components/rules/config/condition", name: "ruleConfigUnlessCondition", dataObj: { mode: "unless" }},
-            { component: "components/rules/config/action", name: "ruleConfigAction", dataObj: {}}
-         ]);
-      },
-
-      /**
-       * Load rule config components and insert them inside this component
-       *
-       * @method _loadRuleConfigs
-       * @param {array} ruleConfigs array with objects describing from where to load the components and where to insert them
-       */
-      _loadRuleConfigs: function RuleEdit__loadRuleConfigs(ruleConfigs)
-      {
-         if (ruleConfigs && ruleConfigs.length > 0)
-         {
-            var ruleConfig = ruleConfigs[0],
-               ruleConfigComponentId = this.id + "-" + ruleConfig.name;
-            this.ruleConfigs[ruleConfigComponentId] = false;
-            ruleConfig.dataObj.htmlid = ruleConfigComponentId;
-            Alfresco.util.Ajax.request({
-               url: Alfresco.constants.URL_SERVICECONTEXT + ruleConfig.component,
-               dataObj: ruleConfig.dataObj,
-               successCallback:
-               {
-                  fn: function (response){
-                     // Insert config components html to this component
-                     Dom.get(this.id + "-" + ruleConfig.name).innerHTML = response.serverResponse.responseText;
-
-                     // Get the rest of the configs
-                     this._loadRuleConfigs(ruleConfigs.splice(1));
-                  },
-                  scope: this
-               },
-               execScripts: true
-            });
-         }
-         else
-         {
-            this.onRuleConfigsLoaded();
-         }
-      },
-
-      /**
-       * Called then the rule config components have been loaded and inserted 
-       *
-       * @method onRuleConfigsLoaded
-       */
-      onRuleConfigsLoaded: function RuleEdit_onRuleConfigsLoaded()
-      {
-         // Remove config loading message and display configs
-         Dom.addClass(this.id + "-configsMessage", "hidden");
-         Dom.removeClass(this.id + "-configsContainer", "hidden");
-
-         // Form definition
+         // Setup Form definition
          var form = new Alfresco.forms.Form(this.id + "-rule-form");
          this.widgets.form = form;
          this.widgets.formEl = Dom.get(this.id + "-rule-form");
@@ -332,35 +279,27 @@
       },
 
       /**
-       * Called when a rule config component has sent event telling its ready.
-       * This method will display the configs when all 4 of them are ready.
+       * Called then the rule config components have been loaded and inserted to the Dom and are looking visually ok.
+       * However they are not ready to use yet since they will need to load their own dependencies.
        *
-       * @param layer {object} Event fired (unused)
-       * @param args {array} Event parameters
+       * @method onRuleConfigsLoaded
+       * @override
        */
-      onRuleConfigReady: function RuleEdit_onRuleConfigReady(layer, args)
+      onRuleConfigsLoaded: function RuleEdit_onRuleConfigsLoaded()
       {
-         // Check the event is directed towards this instance
-         var configComponent = args[1].eventGroup,
-             configComponentId = configComponent.id;
-         if (YAHOO.lang.isBoolean(this.ruleConfigs[configComponentId]))
-         {
-            // The config component belongs to this component and is ready
-            // Save reference to config component instance
-            this.ruleConfigs[configComponentId] = configComponent;
-         }
+         // Remove config loading message and display configs
+         Dom.addClass(this.id + "-configsMessage", "hidden");
+         Dom.removeClass(this.id + "-configsContainer", "hidden");
+      },
 
-         // Check if all config components are ready, if so display the rules rule config sections
-         if (!this.ruleConfigs[this.id + "-ruleConfigType"] ||
-            !this.ruleConfigs[this.id + "-ruleConfigIfCondition"] ||
-            !this.ruleConfigs[this.id + "-ruleConfigUnlessCondition"] ||
-            !this.ruleConfigs[this.id + "-ruleConfigAction"])
-         {
-            // Not all config components are ready
-            return;
-         }
-
-
+      /**
+       * Called then the rule config components have been loaded, inserted and are ready to dispaly rule configs
+       *
+       * @method onRuleConfigsReady
+       * @override
+       */
+      onRuleConfigsReady: function RuleEditUtil_onRuleConfigsReady()
+      {
          // All config components are ready, display rule info
          if (this.options.rule)
          {
@@ -370,6 +309,9 @@
          {
             this.displayRule(this.options.ruleTemplate);
          }
+
+         // Finally initialise the form
+         this.widgets.form.init();
       },
 
       /**
@@ -381,7 +323,6 @@
       displayRule: function RuleEdit_displayRule(rule)
       {
          // Set id and hide/show create/edit buttons
-         var ruleConfig = null;
          Dom.get(this.id + "-id").value = rule.id ? rule.id : "";
          if (rule.id)
          {
@@ -400,67 +341,8 @@
          titleEl.focus();
          Dom.get(this.id + "-description").value = rule.description;
 
-         // Transform types into a config object for event section
-         var typeConfigs = [];
-         for (var i = 0, il = rule.ruleType.length; i < il; i++)
-         {
-            typeConfigs.push(
-            {
-               name: rule.ruleType[i]
-            });
-         }
-
-         // Initialise type config
-         ruleConfig = this.ruleConfigs[this.id + "-ruleConfigType"];
-         ruleConfig.setOptions(
-         {
-            form: this.widgets.form
-         });
-         ruleConfig.displayRuleConfigs(typeConfigs);
-
-         // Add all conditions to if OR unless config sections
-         var ifConditionConfigs = [],
-            unlessConditionConfigs = [],
-            config;
-         for (i = 0, il = rule.action.conditions.length; i < il; i++)
-         {
-            config = rule.action.conditions[i];
-            if (config.invertCondition)
-            {
-               unlessConditionConfigs.push(config);
-            }
-            else
-            {
-               ifConditionConfigs.push(config);
-            }
-         }
-
-         // Initialise if condition config
-         ruleConfig = this.ruleConfigs[this.id + "-ruleConfigIfCondition"];
-         ruleConfig.setOptions(
-         {
-            form: this.widgets.form,
-            ruleConfigDefinitionKey: "conditionDefinitionName"
-         });
-         ruleConfig.displayRuleConfigs(ifConditionConfigs);
-
-         // Initialise unless condition config
-         ruleConfig = this.ruleConfigs[this.id + "-ruleConfigUnlessCondition"];
-         ruleConfig.setOptions(
-         {
-            form: this.widgets.form,
-            ruleConfigDefinitionKey: "conditionDefinitionName"
-         });
-         ruleConfig.displayRuleConfigs(unlessConditionConfigs);
-
-         // Add actions to action section and initilise action config
-         ruleConfig = this.ruleConfigs[this.id + "-ruleConfigAction"];
-         ruleConfig.setOptions(
-         {
-            form: this.widgets.form,
-            ruleConfigDefinitionKey: "actionDefinitionName"
-         });
-         ruleConfig.displayRuleConfigs(rule.action.actions);
+         // Display all rule configs (when, if, unless & action)
+         this.displayRuleConfigs(rule, Alfresco.RuleConfig.MODE_EDIT, this.widgets.form);
 
          // Checkboxes
          Dom.get(this.id + "-disabled").checked = rule.disabled;
@@ -475,9 +357,6 @@
          }
          var compensatingActionId = Alfresco.util.findValueByDotNotation(rule, "action.compensatingAction.id", null);
          Dom.get(this.id + "-compensatingActionId").value = compensatingActionId ? compensatingActionId : "";
-
-         // Finally initialise the form
-         this.widgets.form.init();
       },
 
       /**
@@ -490,7 +369,7 @@
        */
       onCancelButtonClick: function RuleEdit_onCancelButtonClick(type, args)
       {
-         this._toggleButtons(true);
+         this._toggleButtons(false);
          this._navigateToFoldersPage();
       },
 
@@ -557,5 +436,5 @@
          this.widgets.createButton.set("disabled", disable);
          this.widgets.createAnotherButton.set("disabled", disable);
       }
-   });
+   }, true);
 })();

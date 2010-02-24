@@ -29,48 +29,15 @@
 
       <hr/>
 
-      <div class="configuration-section when">
-         <div class="configuration-header">
-            <div class="configuration-title">${msg("header.when")}</div>
-         </div>
-         <ul class="configuration-body">
-         </ul>
+      <div id="${el}-configsMessage">${msg("message.loading")}</div>
+      <div id="${el}-configsContainer" class="hidden">
+         <div id="${el}-ruleConfigType"></div>
+         <div class="configuration-separator">&nbsp;</div>
+         <div id="${el}-ruleConfigIfCondition" class="if"></div>
+         <div id="${el}-ruleConfigUnlessCondition" class="unless"></div>
+         <div class="configuration-separator">&nbsp;</div>
+         <div id="${el}-ruleConfigAction"></div>
       </div>
-
-      <div class="configuration-separator">&nbsp;</div>
-
-      <div class="configuration-section if">
-         <div class="configuration-header">
-            <div class="configuration-title">${msg("header.if")}</div>
-            <div class="configuration-relation and hidden">
-               <span class="and-label">${msg("label.and")}</span>
-               <span class="or-label">${msg("label.or")}</span>
-            </div>
-         </div>
-         <ul class="configuration-body">
-         </ul>
-      </div>
-
-      <div class="configuration-section unless">
-         <div class="configuration-header">
-            <div class="configuration-title">${msg("header.unless")}</div>
-            <div class="configuration-relation and hidden">
-               <span class="and-label">${msg("label.and")}</span>
-               <span class="or-label">${msg("label.or")}</span>
-            </div>
-         </div>
-         <ul class="configuration-body">
-         </ul>
-      </div>
-
-      <div class="configuration-separator">&nbsp;</div>
-
-      <div class="configuration-section action">
-         <div class="configuration-header">
-            <div class="configuration-title">${msg("header.action")}</div>
-         </div>
-         <ul class="configuration-body">
-         </ul>
-      </div>
+      
    </div>
 </div>
