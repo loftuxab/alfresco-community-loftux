@@ -1567,22 +1567,8 @@
       </concat>
 
       <echo>Compressing Slingshot Javascript...</echo>
-      <apply executable="java" parallel="false" dest="${dir.project.slingshot.assemble}">
-         <fileset dir="${dir.project.slingshot.assemble}">
-            <include name="**/*.js" />
-            <exclude name="**/*-min.js" />
-            <exclude name="**/WEB-INF/**" />
-            <exclude name="**/tiny_mce/**" />
-            <exclude name="**/yui/**" />
-            <exclude name="**/log4javascript*.js" />
-         </fileset>
-         <arg line="-jar"/>
-         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
-         <arg line="-o"/>
-         <targetfile />
-         <srcfile />
-         <mapper type="glob" from="*.js" to="*-min.js"/>
-      </apply>
+      <minimize-javascript sourcedir="${dir.project.slingshot.assemble}" 
+                           destdir="${dir.project.slingshot.assemble}" />
    </target>
 
    <target name="test-slingshot" 
@@ -1640,7 +1626,7 @@
       
       <!-- first copy all required files from webeditor project -->
       <copy todir="${dir.project.webeditor.assemble.war}">
-         <fileset dir="${dir.project.webeditor.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webeditor.src.web}" excludes="WEB-INF/web.xml, WEB-INF/awe.tld" />
       </copy>
       
       <!-- next copy all required files from web framework commons projects -->
@@ -1703,7 +1689,7 @@
    
    <target name="minimize-webeditor-war-javascript" depends="init">
       <echo>Compressing Web Editor WAR Javascript...</echo>
-      <minimise-javascript sourcedir="${dir.project.webeditor.assemble.war}" 
+      <minimize-javascript sourcedir="${dir.project.webeditor.assemble.war}" 
                            destdir="${dir.project.webeditor.assemble.war}" />
    </target>
    
@@ -1727,17 +1713,30 @@
    <target name="assemble-webeditor-plugin-jar" depends="init">
       <mkdir dir="${dir.project.webeditor.assemble.plugin}" />
       <copy todir="${dir.project.webeditor.assemble.plugin}">
-         <!-- TODO: Exclude the files not required for a JAR -->
-         <fileset dir="${dir.project.webeditor.config}/" />
+         <fileset dir="${dir.project.webeditor.config}">
+            <include name="alfresco/awe-form-config.xml" />
+            <include name="alfresco/messages/awe.properties" />
+            <include name="alfresco/site-data/components/template.metadata.metadata.xml" />
+            <include name="alfresco/site-data/pages/metadata.xml" />
+            <include name="alfresco/site-data/template-instances/metadata.xml" />
+            <include name="alfresco/templates/org/alfresco/include/awe.ftl" />
+            <include name="alfresco/templates/org/alfresco/metadata.ftl" />
+         </fileset>
       </copy>
       <copy todir="${dir.project.webeditor.assemble.plugin}/META-INF">
-         <fileset dir="${dir.project.webeditor.src.web}" includes="lib/com/**" />
+         <fileset dir="${dir.project.webeditor.src.web}">
+            <include name="css/**" />
+            <include name="js/**" />
+            <include name="lib/**" />
+            <include name="themes/**" />
+            <exclude name="themes/default/login.css" />
+         </fileset>
       </copy>
    </target>
    
    <target name="minimize-webeditor-plugin-javascript" depends="init">
       <echo>Compressing Web Editor Plugin Javascript...</echo>
-      <minimise-javascript sourcedir="${dir.project.webeditor.assemble.plugin}/META-INF" 
+      <minimize-javascript sourcedir="${dir.project.webeditor.assemble.plugin}/META-INF" 
                            destdir="${dir.project.webeditor.assemble.plugin}/META-INF" />
    </target>
    
@@ -1767,7 +1766,7 @@
    
    <target name="minimize-webeditor-forms-javascript" depends="init">
       <echo>Compressing Web Editor Forms Javascript...</echo>
-      <minimise-javascript sourcedir="${dir.project.webeditor.assemble.forms}" 
+      <minimize-javascript sourcedir="${dir.project.webeditor.assemble.forms}" 
                            destdir="${dir.project.webeditor.assemble.forms}" />
    </target>
    
@@ -1848,7 +1847,7 @@
    <target name="minimize-webeditor-framework-javascript"
            depends="init">
       <echo>Compressing Web Editor Framework Javascript...</echo>
-      <minimise-javascript sourcedir="${dir.projects}/web-editor-framework/build/assemble" 
+      <minimize-javascript sourcedir="${dir.projects}/web-editor-framework/build/assemble" 
                            destdir="${dir.projects}/web-editor-framework/build/assemble" />
    </target>
    
@@ -2340,21 +2339,8 @@
    <target name="minimize-dod5015-share-javascript"
            depends="init">
      <echo>Compressing DOD5015 Share Javascript...</echo>
-     <apply executable="java" parallel="false" dest="${dir.module.dod5015.share.assemble}">
-        <fileset dir="${dir.module.dod5015.share.assemble}">
-           <include name="**/*.js" />
-           <exclude name="**/*-min.js" />
-           <exclude name="**/WEB-INF/**" />
-           <exclude name="**/tiny_mce/**" />
-           <exclude name="**/yui/**" />
-        </fileset>
-        <arg line="-jar"/>
-        <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
-        <arg line="-o"/>
-        <targetfile />
-        <srcfile />
-        <mapper type="glob" from="*.js" to="*-min.js"/>
-     </apply>
+     <minimize-javascript sourcedir="${dir.module.dod5015.share.assemble}" 
+                          destdir="${dir.module.dod5015.share.assemble}" />
   </target>
    
    <target name="package-dod5015-share-extension" 
