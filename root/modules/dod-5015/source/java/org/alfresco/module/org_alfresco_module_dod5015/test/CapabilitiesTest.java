@@ -84,7 +84,7 @@ import org.springframework.context.ApplicationContext;
 public class CapabilitiesTest extends TestCase
 {
 
-    private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+    private ApplicationContext ctx;
 
     private NodeRef rootNodeRef;
 
@@ -179,7 +179,10 @@ public class CapabilitiesTest extends TestCase
      */
     protected void setUp() throws Exception
     {
+        ctx = ApplicationContextHelper.getApplicationContext(); 
+           
         super.setUp();
+        
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         publicNodeService = (NodeService) ctx.getBean("NodeService");
         transactionService = (TransactionService) ctx.getBean("transactionComponent");

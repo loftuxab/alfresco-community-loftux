@@ -60,7 +60,7 @@ import org.springframework.context.ApplicationContext;
 public class NotificationServiceImplSystemTest extends TestCase
 {
     /** Application context */
-    private static ApplicationContext applicationContext = ApplicationContextHelper.getApplicationContext();    
+    private ApplicationContext applicationContext;    
     private static boolean dataCreated = false;
     
     private static final String EMAIL_1 = "test@alfresco.com";  // Update test email here
@@ -87,6 +87,8 @@ public class NotificationServiceImplSystemTest extends TestCase
     @Override
     protected void setUp() throws Exception
     {
+        applicationContext = ApplicationContextHelper.getApplicationContext();
+        
         super.setUp();
         
         // Get services
