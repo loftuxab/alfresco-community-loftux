@@ -54,7 +54,6 @@ import org.alfresco.repo.cmis.ws.CmisPropertiesType;
 import org.alfresco.repo.cmis.ws.CmisPropertyDateTime;
 import org.alfresco.repo.cmis.ws.CmisPropertyId;
 import org.alfresco.repo.cmis.ws.CmisPropertyString;
-import org.alfresco.repo.cmis.ws.CmisTypeDefinitionType;
 import org.alfresco.repo.cmis.ws.DeleteObject;
 import org.alfresco.repo.cmis.ws.DeleteTree;
 import org.alfresco.repo.cmis.ws.EnumCapabilityRendition;
@@ -705,39 +704,6 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         {
             LOGGER.warn("testGetObjectParentMultifiled was skipped: Multifiling isn't supported");
         }
-    }
-
-    public void testGetObjectParentNotFileable() throws Exception
-    {
-        String notFileableTypeId = searchAndAssertNotFileableType();
-        if (notFileableTypeId != null)
-        {
-            String objectId = null;
-            CmisTypeDefinitionType definitionType = getAndAssertTypeDefinition(notFileableTypeId);
-            if (definitionType.getBaseId().equals(BASE_TYPE_RELATIONSHIP))
-            {
-                objectId = createAndAssertRelationship();
-            }
-            else if (definitionType.getBaseId().equals(BASE_TYPE_POLICY))
-            {
-                objectId = createAndAssertPolicy();
-            }
-            try
-            {
-                LOGGER.info("[NavigationService->getObjectParents]");
-                getServicesFactory().getNavigationService().getObjectParents(
-                        new GetObjectParents(getAndAssertRepositoryId(), objectId, "*", false, EnumIncludeRelationships.none, null, null, null));
-                fail("No Exception was thrown during getting object parents for not fileable object");
-            }
-            catch (Exception e)
-            {
-                assertTrue("Invalid exception was thrown during getting object parents for not fileable object", e instanceof CmisFaultType
-                        && ((CmisFaultType) e).getType().equals(EnumServiceException.invalidArgument));
-            }
-            LOGGER.info("[ObjectService->deleteObject]");
-            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), objectId, true, null));
-        }
-
     }
 
     public void testPathSegments() throws Exception

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -29,15 +29,14 @@ import java.io.Serializable;
 import org.alfresco.cmis.CMISDictionaryModel;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * Get the CMIS version series checked out by property
  * 
- * @author andyh
+ * @author dward
  */
-public class VersionSeriesCheckedOutByProperty extends AbstractProperty
+public class VersionSeriesCheckedOutByProperty extends AbstractVersioningProperty
 {
     /**
      * Construct
@@ -55,29 +54,15 @@ public class VersionSeriesCheckedOutByProperty extends AbstractProperty
      */
     public Serializable getValue(NodeRef nodeRef)
     {
-        if (getServiceRegistry().getNodeService().hasAspect(nodeRef, ContentModel.ASPECT_WORKING_COPY))
+        NodeRef versionSeries;
+        if (isWorkingCopy(nodeRef))
         {
             return getServiceRegistry().getNodeService().getProperty(nodeRef, ContentModel.PROP_WORKING_COPY_OWNER);
         }
-        else
+        else if (hasWorkingCopy((versionSeries = getVersionSeries(nodeRef))))
         {
-            LockType type = getServiceRegistry().getLockService().getLockType(nodeRef);
-            if (type == LockType.READ_ONLY_LOCK)
-            {
-                NodeRef wc = getServiceRegistry().getCheckOutCheckInService().getWorkingCopy(nodeRef);
-                if (wc != null)
-                {
-                    return getServiceRegistry().getNodeService().getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
+            return getServiceRegistry().getNodeService().getProperty(versionSeries, ContentModel.PROP_LOCK_OWNER);
         }
+        return null;
     }
 }

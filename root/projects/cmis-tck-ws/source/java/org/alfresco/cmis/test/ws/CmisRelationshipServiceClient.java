@@ -25,6 +25,8 @@
 package org.alfresco.cmis.test.ws;
 
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.repo.cmis.ws.CmisObjectType;
 import org.alfresco.repo.cmis.ws.CmisTypeDefinitionType;
@@ -192,7 +194,10 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
         }
         catch (Exception e)
         {
-            assertException("Object Relationships Receiving for Invlaid Object Id", e, EnumServiceException.objectNotFound);
+            Set<EnumServiceException> exceptions = new HashSet<EnumServiceException>();
+            exceptions.add(EnumServiceException.invalidArgument);
+            exceptions.add(EnumServiceException.objectNotFound);
+            assertException("Object Relationships Receiving for Invlaid Object Id", e, exceptions);
         }
     }
 

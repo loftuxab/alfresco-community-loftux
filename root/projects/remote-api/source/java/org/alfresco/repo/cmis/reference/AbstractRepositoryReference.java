@@ -22,65 +22,35 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.cmis.reference;
+package org.alfresco.repo.cmis.reference;
 
+import org.alfresco.cmis.CMISRepositoryReference;
 import org.alfresco.cmis.CMISServices;
-import org.alfresco.service.cmr.repository.StoreRef;
 
 
 /**
- * Store Ref Repository Reference
+ * Abstract Repository Reference
  * 
  * @author davidc
  */
-public class StoreRepositoryReference extends AbstractRepositoryReference
+public abstract class AbstractRepositoryReference implements CMISRepositoryReference
 {
-    private StoreRef storeRef;
+    protected CMISServices cmisServices;
 
     /**
      * Construct
      * 
      * @param cmisServices
-     * @param storeRef
      */
-    public StoreRepositoryReference(CMISServices cmisServices, StoreRef storeRef)
+    public AbstractRepositoryReference(CMISServices cmisServices)
     {
-        super(cmisServices);
-        this.storeRef = storeRef;
+        this.cmisServices = cmisServices;
     }
     
-    /**
-     * Construct
-     * 
-     * @param cmisServices
-     * @param store  accept storeType://storeId, storeType:storeId, storeId
-     */
-    public StoreRepositoryReference(CMISServices cmisServices, String store)
+    @Override
+    public String toString()
     {
-        super(cmisServices);
-        
-        if (store.indexOf(StoreRef.URI_FILLER) != -1)
-        {
-            storeRef = new StoreRef(store);
-        }
-        else if (store.indexOf(':') != -1)
-        {
-            String[] storeParts = store.split(":");
-            storeRef = new StoreRef(storeParts[0], storeParts[1]);
-        }
-        else
-        {
-            storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, store);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.cmis.CMISRepositoryReference#getStoreRef()
-     */
-    public StoreRef getStoreRef()
-    {
-        return storeRef;
+        return getStoreRef().toString();
     }
 
 }

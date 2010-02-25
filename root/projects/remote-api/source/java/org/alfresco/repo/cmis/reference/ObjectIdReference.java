@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,48 +18,40 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.cmis.reference;
+package org.alfresco.repo.cmis.reference;
 
+import org.alfresco.cmis.CMISObjectReference;
 import org.alfresco.cmis.CMISRepositoryReference;
+import org.alfresco.cmis.CMISServiceException;
 import org.alfresco.cmis.CMISServices;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-
+import org.springframework.extensions.webscripts.WebScriptException;
 
 /**
- * Path Object Reference
+ * CMIS Object ID reference. A CMIS object ID encapsulates both a store and a node and identifies a specific version.
  * 
- * @author davidc
+ * @author dward
  */
-public class ObjectPathReference extends AbstractObjectReference
+public class ObjectIdReference implements CMISObjectReference
 {
-    protected String path;
-    protected String[] reference;
+    private CMISServices cmisServices;
+    private String objectId;
 
     /**
      * Construct
      * 
      * @param cmisServices
-     * @param repo
-     * @param path
+     * @param storeRef
      */
-    public ObjectPathReference(CMISServices cmisServices, CMISRepositoryReference repo, String path)
+    public ObjectIdReference(CMISServices cmisServices, String objectId)
     {
-        super(cmisServices, repo);
-        this.path = path.startsWith("/") ? path : "/" + path;
-        this.path = (!cmisServices.getDefaultRootPath().equals("/")) ? cmisServices.getDefaultRootPath() + this.path : this.path;
-        String[] splitPath = this.path.split("/");
-        String[] pathSegments = new String[splitPath.length -1];
-        System.arraycopy(splitPath, 1, pathSegments, 0, splitPath.length -1);
-        this.reference = new String[2 + pathSegments.length];
-        StoreRef storeRef = repo.getStoreRef();
-        reference[0] = storeRef.getProtocol();
-        reference[1] = storeRef.getIdentifier();
-        System.arraycopy(pathSegments, 0, reference, 2, pathSegments.length);
+        this.cmisServices = cmisServices;
+        this.objectId = objectId;
     }
 
     /*
@@ -68,21 +60,35 @@ public class ObjectPathReference extends AbstractObjectReference
      */
     public NodeRef getNodeRef()
     {
-        return cmisServices.getNode("path", reference);
+        try
+        {
+            return cmisServices.getReadableObject(this.objectId, NodeRef.class);
+        }
+        catch (CMISServiceException e)
+        {
+            throw new WebScriptException(e.getStatusCode(), e.getMessage(), e);
+        }
     }
-    
-    /**
-     * @return  path
+
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.cmis.CMISObjectReference#getRepositoryReference()
      */
-    public String getPath()
+    public CMISRepositoryReference getRepositoryReference()
     {
-        return path;
+        return new AbstractRepositoryReference(cmisServices)
+        {
+            public StoreRef getStoreRef()
+            {
+                return getNodeRef().getStoreRef();
+            }
+        };
     }
-    
+
     @Override
     public String toString()
     {
-        return "ObjectPathReference[storeRef=" + repo.getStoreRef() + ",path=" + path + "]";
+        return "ObjectIdReference[objectId=" + this.objectId + "]";
     }
 
 }

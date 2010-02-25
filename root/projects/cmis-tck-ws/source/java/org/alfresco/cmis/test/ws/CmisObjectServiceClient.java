@@ -72,6 +72,8 @@ import org.alfresco.repo.cmis.ws.GetObjectByPath;
 import org.alfresco.repo.cmis.ws.GetObjectByPathResponse;
 import org.alfresco.repo.cmis.ws.GetObjectResponse;
 import org.alfresco.repo.cmis.ws.GetProperties;
+import org.alfresco.repo.cmis.ws.GetPropertiesOfLatestVersion;
+import org.alfresco.repo.cmis.ws.GetPropertiesOfLatestVersionResponse;
 import org.alfresco.repo.cmis.ws.GetPropertiesResponse;
 import org.alfresco.repo.cmis.ws.GetRenditions;
 import org.alfresco.repo.cmis.ws.MoveObject;
@@ -343,7 +345,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     private void assertDocumentConstraitException(String constraintCase, String documentName, String documentTypeId, String folderId, String content,
             EnumVersioningState initialVersion) throws Exception
     {
-        assertDocumentConstraitException(constraintCase, EnumServiceException.constraint, documentName, documentTypeId, folderId, content, initialVersion, false);
+        assertDocumentConstraitException(constraintCase, null, documentName, documentTypeId, folderId, content, initialVersion, false);
     }
 
     private void assertDocumentConstraitException(String constraintCase, EnumServiceException expectedException, String documentName, String documentTypeId, String folderId,
@@ -452,9 +454,23 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             fail(e.toString());
         }
-        CmisPropertiesType properties = getAndAssertObjectProperties(documentId, "*");
-        boolean majorVersion = getBooleanProperty(properties, PROP_IS_MAJOR_VERSION);
-        boolean checkedOut = getBooleanProperty(properties, PROP_IS_VERSION_SERIES_CHECKED_OUT);
+        GetPropertiesOfLatestVersionResponse response = null;
+        String versionSeriesId = getIdProperty(documentId, PROP_VERSION_SERIES_ID);
+        assertNotNull("'" + PROP_VERSION_SERIES_ID + "' property is NULL", versionSeriesId);
+        try
+        {
+            LOGGER.info("[VersioningService->getPropertiesOfLatestVersion]");
+            response = getServicesFactory().getVersioningService().getPropertiesOfLatestVersion(
+                    new GetPropertiesOfLatestVersion(getAndAssertRepositoryId(), versionSeriesId, EnumVersioningState._major.equals(versioningState.getValue()), null, null));
+        }
+        catch (Exception e)
+        {
+            fail(e.toString());
+        }
+        assertNotNull("GetPropertiesOfLatestVersion response is NULL", response);
+        assertNotNull("GetPropertiesOfLatestVersion response is empty", response.getProperties());
+        boolean majorVersion = getBooleanProperty(response.getProperties(), PROP_IS_MAJOR_VERSION);
+        boolean checkedOut = getBooleanProperty(response.getProperties(), PROP_IS_VERSION_SERIES_CHECKED_OUT);
         if (EnumVersioningState._major.equals(versioningState.getValue()))
         {
             assertTrue("Create Document service call was performed with 'MAJOR' Versioning State but it has no 'MAJOR' Versioning State", majorVersion);
@@ -558,10 +574,10 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     {
         String folderTypeId = getAndAssertFolderTypeId();
         String documentId = createAndAssertDocument();
-        assertFolderConstraitException("Folder Creation with none Folder 'parent folder id' input parameter", EnumServiceException.constraint, generateTestFolderName(),
+        assertFolderConstraitException("Folder Creation with none Folder 'parent folder id' input parameter", null, generateTestFolderName(),
                 folderTypeId, documentId, null);
         deleteAndAssertObject(documentId);
-        assertFolderConstraitException("Folder Creation with invalid 'parent folder id' input parameter", EnumServiceException.constraint, generateTestFolderName(), folderTypeId,
+        assertFolderConstraitException("Folder Creation with invalid 'parent folder id' input parameter", null, generateTestFolderName(), folderTypeId,
                 "Invalid Parent Folder Id", null);
     }
 
@@ -1230,8 +1246,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         }
         catch (Exception e)
         {
-            assertTrue("Invalid exception was thrown during deleting folder with child", e instanceof CmisFaultType
-                    && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
+            assertTrue("Invalid exception was thrown during deleting folder with child", e instanceof CmisFaultType);
         }
         getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), folder2Id, false, null));
         getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), folderId, false, null));
