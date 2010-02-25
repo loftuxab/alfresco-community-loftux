@@ -90,6 +90,7 @@
             <include name="**/*.jar" />
          </fileset>
          -->
+         <pathelement location="${user.home}" />
          <pathelement location="${dir.project.core.classes}" />
          <pathelement location="${dir.project.core.src.java}" />
          <pathelement location="${dir.project.catalinavirtual.classes}" />
@@ -105,7 +106,6 @@
          <pathelement location="${dir.project.webclient.classes}" />
          <pathelement location="${dir.project.webserviceclient.classes}" />
          <pathelement location="${dir.project.3rdparty.lib}/junit-4.6.jar" />
-         <pathelement location="${user.home}" />
          <!-- <pathelement location="${alf.build.location.data}"/> -->
          
          <pathelement location="${dir.project.repository.config}" />
