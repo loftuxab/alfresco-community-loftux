@@ -831,7 +831,7 @@
                   if (paramRenderer.manual && paramRenderer.manual[this.options.mode])
                   {
                      // Renderer wants to implement the "contraint":s- and "multiValued"-support for the parameter
-                     fn.call(this, paramEl, paramDef, configDef, p_oRuleConfig, value);
+                     fn.call(this, paramEl, configDef, paramDef, p_oRuleConfig, value);
                   }
                   else
                   {
@@ -883,7 +883,7 @@
                         }
                      }
                      Dom.addClass(controlEl, "param");
-                     if (this.options.mode == RC.MODE_TEXT || paramDef._type != "hidden")
+                     if (paramDef._type != "hidden")
                      {
                         // Display a label left to the parameter if displayLabel is present
                         this._createLabel(paramDef.displayLabel, controlEl);
@@ -1150,7 +1150,7 @@
          {
             text: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value ? this.msg("label.yes") : this.msg("label.no"));
             },
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
@@ -1163,7 +1163,7 @@
                      value: "false",
                      displayLabel: this.msg("label.no")
                   }
-               ], value)
+               ], value);
             }
          },
 
@@ -1239,6 +1239,7 @@
                return this._createInputText(containerEl, configDef, paramDef, [], value);
             }
          }
+
       },
 
       
@@ -1402,7 +1403,7 @@
          }
       },
       
-      _createButton: function (containerEl, paramDef, configDef, ruleConfig, onClickHandler)
+      _createButton: function (containerEl, configDef, paramDef, ruleConfig, onClickHandler)
       {
          var buttonEl = document.createElement("button");
          Alfresco.util.generateDomId(buttonEl);
@@ -1436,7 +1437,7 @@
       _createValueSpan: function (containerEl, configDef, paramDef, ruleConfig, value, msgKey)
       {
          var valueEl = document.createElement("span");
-         if (value)
+         if (value && paramDef._type != "hidden")
          {
             if (paramDef.constraint)
             {
@@ -1449,6 +1450,10 @@
                      break;
                   }
                }
+            }
+            if (paramDef.type = "d:noderef" && paramDef._type == "path")
+            {
+               return this._createPathSpan(containerEl, this.id + "-" + configDef._id + "-" + paramDef.name, value);
             }
             if (msgKey)
             {
@@ -1465,7 +1470,7 @@
        * Populate a folder path from a nodeRef.
        *
        * @method _createPathSpan
-       * @param containerEl {HTMLelement} Element within which the new span tag will be created
+       * @param containerEl {HTMLElement} Element within which the new span tag will be created
        * @param id {string} Dom ID to be given to span tag
        * @param nodeRef {string} NodeRef of folder
        */
@@ -1739,6 +1744,15 @@
                paramDef._type = "hidden";
             }
          }
+      },
+
+      _setParameter: function (ruleConfig, parameterName, value)
+      {
+         if (!ruleConfig.parameterValues)
+         {
+            ruleConfig.parameterValues = {};
+         }
+         ruleConfig.parameterValues[parameterName] = value;         
       }
 
    });
