@@ -51,6 +51,14 @@ if (typeof Alfresco == "undefined" || !Alfresco)
 Alfresco.constants = Alfresco.constants || {};
 
 /**
+ * Alfresco top-level template namespace.
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.template
+ */
+Alfresco.template = Alfresco.template || {};
+
+/**
  * Alfresco top-level component namespace.
  * 
  * @namespace Alfresco
@@ -149,21 +157,25 @@ Alfresco.messages = Alfresco.messages ||
 
 /**
  * Appends an array onto an object
+ *
  * @method Alfresco.util.appendArrayToObject
  * @param obj {object} Object to be appended to
  * @param arr {array} Array to append/merge onto object
+ * @param p_value {object} Optional: default value for property.
  * @return {object} The appended object
  * @static
  */
-Alfresco.util.appendArrayToObject = function(obj, arr)
+Alfresco.util.appendArrayToObject = function(obj, arr, p_value)
 {
-   if (arr)
+   var value = (p_value !== undefined ? p_value : true);
+   
+   if (YAHOO.lang.isObjecT(obj) && YAHOO.lang.isArray(arr))
    {
       for (var i = 0, ii = arr.length; i < ii; i++)
       {
          if (arr[i] !== undefined)
          {
-            obj[arr[i]] = true;
+            obj[arr[i]] = value;
          }
       }
    }
@@ -172,27 +184,57 @@ Alfresco.util.appendArrayToObject = function(obj, arr)
 
 /**
  * Convert an array into an object
+ *
  * @method Alfresco.util.arrayToObject
  * @param arr {array} Array to convert to object
+ * @param p_value {object} Optional: default value for property.
  * @return {object} Object conversion of array
  * @static
  */
-Alfresco.util.arrayToObject = function(arr)
+Alfresco.util.arrayToObject = function(arr, p_value)
 {
-   var obj = {};
-   if (arr)
+   var obj = {},
+      value = (p_value !== undefined ? p_value : true);
+
+   if (YAHOO.lang.isArray(arr))
    {
       for (var i = 0, ii = arr.length; i < ii; i++)
       {
          if (arr[i] !== undefined)
          {
-            obj[arr[i]] = true;
+            obj[arr[i]] = value;
          }
       }
    }
    return obj;
 };
 
+/**
+ * Makes a shallow copy of an object.
+ * Note: If any of the object's properties are themselves objects, they will be copied by reference.
+ * Use {Alfresco.util.deppCopy} instead if this is likely to be an issue for the client code.
+ *
+ * @method Alfresco.util.shallowCopy
+ * @param p_obj {object} The object to copy
+ * @return {object} A new instance of the object.
+ */
+Alfresco.util.shallowCopy = function(p_obj)
+{
+   if (p_obj === null || p_obj === undefined)
+   {
+      return p_obj;
+   }
+   
+   var obj = {};
+   for (var index in p_obj)
+   {
+      if (p_obj.hasOwnProperty(index))
+      {
+         obj[index] = p_obj[index];
+      }
+   }
+   return obj;
+}
 
 /**
  * Copies the values in an object into a new instance.
@@ -214,7 +256,8 @@ Alfresco.util.deepCopy = function(p_obj)
    {
       return p_obj;
    }
-   else if (YAHOO.lang.isArray(p_obj))
+
+   if (YAHOO.lang.isArray(p_obj))
    {
       var arr = [];
       for (var i = 0, il = p_obj.length, arrVal; i < il; i++)
@@ -227,19 +270,21 @@ Alfresco.util.deepCopy = function(p_obj)
       }
       return arr;
    }
-   else if (Alfresco.util.isDate(p_obj))
+
+   if (Alfresco.util.isDate(p_obj))
    {
       return new Date(p_obj.getTime());
    }
-   else if (YAHOO.lang.isString(p_obj) || YAHOO.lang.isNumber(p_obj) || YAHOO.lang.isBoolean(p_obj))
+
+   if (YAHOO.lang.isString(p_obj) || YAHOO.lang.isNumber(p_obj) || YAHOO.lang.isBoolean(p_obj))
    {
       return p_obj;
    }
-   else if (YAHOO.lang.isObject(p_obj))
+
+   if (YAHOO.lang.isObject(p_obj))
    {
-      if(p_obj.toString() == "[object Object]")
+      if (p_obj.toString() == "[object Object]")
       {
-         // This is a
          var obj = {}, objVal;
          for (var name in p_obj)
          {
@@ -260,6 +305,7 @@ Alfresco.util.deepCopy = function(p_obj)
          return p_obj;
       }
    }
+
    return null;
 };
 
@@ -3463,31 +3509,113 @@ Alfresco.util.Anim = function()
 {
    Alfresco.util.NodeRef = function(nodeRef)
    {
-      this.nodeRef = nodeRef;
-      
       try
       {
-         this.uri = nodeRef.replace(":/", "");
-         var a = this.uri.split("/");
-         this.storeType = a[0];
-         this.storeId = a[1];
-         this.id = a[2];
+         var uri = nodeRef.replace(":/", ""),
+            arr = uri.split("/");
+
+         return (
+         {
+            nodeRef: nodeRef,
+            storeType: arr[0],
+            storeId: arr[1],
+            id: arr[2],
+            uri: uri,
+            toString: function()
+            {
+               return nodeRef;
+            }
+         });
       }
       catch (e)
       {
-         return null;
+         throw "Invalid nodeRef: " + nodeRef;
       }
-   
+   };
+})();
+
+/**
+ * Utility class to only call a callback function once all flags have been set.
+ * A callback is only invoked once the last flag is set.
+ * <pre>
+ *    callback: {Object} Callback function of the form { fn: function, scope: callback scope, obj: optional pass-thru object }
+ *    flags: {Object|String[]} Object literal containing boolean properties (use to preset flags if required), or an array of strings representing flag names
+ * </pre>
+ *
+ * @class Alfresco.util.AndGate
+ */
+(function()
+{
+   Alfresco.util.AndGate = function(p_callback, p_flags)
+   {
+      /**
+       * Expired flag. Ensures callback is only invoked once.
+       */
+      var expired = false;
+      
+      /**
+       * Callback function
+       */
+      var callback = p_callback;
+
+      /**
+       * Flags
+       */
+      var flags = null;
+      
+      if (YAHOO.lang.isArray(p_flags))
+      {
+         flags = Alfresco.util.arrayToObject(p_flags, false);
+      }
+      else
+      {
+         flags = Alfresco.util.shallowCopy(p_flags);
+      }
+      
+      /**
+       * Checks all flags are set and invokes callback if they are.
+       *
+       * @method flagCheck
+       * @private
+       */
+      var flagCheck = function AndGate_flagCheck()
+      {
+         for (var index in flags)
+         {
+            if (flags.hasOwnProperty(index))
+            {
+               if (flags[index] !== true)
+               {
+                  return;
+               }
+            }
+         }
+
+         // All flags are set if we got here
+         if (YAHOO.lang.isFunction(callback.fn))
+         {
+            expired = true;
+            callback.fn.call(callback.scope || window, callback.obj);
+         }
+      };
+      
       return (
       {
-         nodeRef: this.nodeRef,
-         storeType: this.storeType,
-         storeId: this.storeId,
-         id: this.id,
-         uri: this.uri,
-         toString: function()
+         /**
+          * Set a flag and subsequently check for all flags being set.
+          *
+          * @method setFlag
+          * @param flag {String} The name of the flag to set.
+          */
+         setFlag: function AndGate_setFlag(flag)
          {
-            return this.nodeRef;
+            if (!expired && flags.hasOwnProperty(flag))
+            {
+               flags[flag] = true;
+               flagCheck();
+               return true;
+            }
+            return false;
          }
       });
    };
