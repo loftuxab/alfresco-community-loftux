@@ -131,10 +131,18 @@
 
          FileDestination:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               // Hide all parameters since we are using a cusotm ui but set default values
+               this._hideParameters(configDef.parameterDefinitions);
+               this._getParamDef(configDef, "destination-folder")._type = "path";
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
-               // Hide all parameters since we are using a cusotm ui
+               // Hide all parameters since we are using a cusotm ui but set default values
                this._hideParameters(configDef.parameterDefinitions);
+               this._setParameter(ruleConfig, "assoc-type", "cm:contains");
 
                // Make parameter renderer create a "Destination" button that displays an destination folder browser
                configDef.parameterDefinitions.push({
@@ -207,7 +215,7 @@
             currentCtx: {},
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_emailFormButton_onClick(type, obj)
+               this._createButton(containerEl, configDef, paramDef, ruleConfig, function RCA_emailFormButton_onClick(type, obj)
                {
                   this.renderers["arca:email-dialog-button"].currentCtx =
                   {
@@ -252,7 +260,7 @@
             currentCtx: {},
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_checkinFormButton_onClick(type, obj)
+               this._createButton(containerEl, configDef, paramDef, ruleConfig, function RCA_checkinFormButton_onClick(type, obj)
                {
                   this.renderers["arca:checkin-dialog-button"].currentCtx =
                   {
@@ -297,7 +305,7 @@
                this._createLabel(paramDef.displayLabel, containerEl); 
                var nodeRef = ruleConfig.parameterValues ? ruleConfig.parameterValues.destination : null;
                this._createPathSpan(containerEl, this.id + "-" + configDef._id + "-destinationLabel", nodeRef);
-               this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
+               this._createButton(containerEl, configDef, paramDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
                {
                   this.renderers["arca:destination-dialog-button"].currentCtx =
                   {
@@ -362,7 +370,7 @@
                }
 
                // Create button that displays the simple workflow dialog
-               var button = this._createButton(containerEl, paramDef, configDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
+               var button = this._createButton(containerEl, configDef, paramDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
                {
                   this.renderers["arca:simple-workflow-dialog-button"].currentCtx =
                   {

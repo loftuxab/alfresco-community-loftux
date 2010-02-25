@@ -48,7 +48,12 @@
                title: "${rule.title}",
                description: "${rule.description}",
                url: "${rule.url}",
-               disabled: ${rule.disabled?string}
+               disabled: ${rule.disabled?string},
+               owningNode:
+               {
+                  nodeRef : "${rule.owningNode.nodeRef}",
+                  name : "${rule.owningNode.name}"
+               }
             }<#if rule_has_next>,</#if></#list>
          ]<#else>null</#if>,
          inheritedRules: <#if ruleset.inheritedRules??>[<#list ruleset.inheritedRules as rule>
@@ -57,7 +62,12 @@
                title: "${rule.title}",
                description: "${rule.description}",
                url: "${rule.url}",
-               disabled: ${rule.disabled?string}
+               disabled: ${rule.disabled?string},
+               owningNode:
+               {
+                  nodeRef : "${rule.owningNode.nodeRef}",
+                  name : "${rule.owningNode.name}"
+               }
             }<#if rule_has_next>,</#if></#list>
          ]<#else>null</#if>,
          linkedFromRuleSets: <#if ruleset.linkedFromRuleSets??>[<#list ruleset.linkedFromRuleSets as link>

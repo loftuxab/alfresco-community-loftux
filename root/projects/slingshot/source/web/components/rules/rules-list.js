@@ -39,6 +39,11 @@
       Selector = YAHOO.util.Selector;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+    var $html = Alfresco.util.encodeHTML;
+
+   /**
     * RulesList constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
@@ -339,7 +344,7 @@
                   siteId: this.options.siteId,
                   nodeRef: rule.owningNode.nodeRef
                });
-               a.innerHTML = this.msg("label.inheritedFolder", rule.owningNode.name);
+               a.innerHTML = $html(rule.owningNode.name);
             }
          }
 
