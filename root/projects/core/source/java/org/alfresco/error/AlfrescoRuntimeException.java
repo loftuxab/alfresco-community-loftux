@@ -39,8 +39,11 @@ public class AlfrescoRuntimeException extends RuntimeException
     /**
      * Serial version UUID
      */
-    private static final long serialVersionUID = 3834594313622859827L;
+    private static final long serialVersionUID = 3787143176461219632L;
 
+    private String msgId;
+    private transient Object[] msgParams = null;
+    
     /**
      * Helper factory method making use of variable argument numbers
      */
@@ -81,6 +84,7 @@ public class AlfrescoRuntimeException extends RuntimeException
     public AlfrescoRuntimeException(String msgId)
     {
         super(resolveMessage(msgId, null));
+        this.msgId = msgId;
     }
     
     /**
@@ -92,6 +96,8 @@ public class AlfrescoRuntimeException extends RuntimeException
     public AlfrescoRuntimeException(String msgId, Object[] msgParams)
     {
         super(resolveMessage(msgId, msgParams));
+        this.msgId = msgId;
+        this.msgParams = msgParams;
     }
 
     /**
@@ -103,6 +109,7 @@ public class AlfrescoRuntimeException extends RuntimeException
     public AlfrescoRuntimeException(String msgId, Throwable cause)
     {
         super(resolveMessage(msgId, null), cause);
+        this.msgId = msgId;
     }
     
     /**
@@ -115,8 +122,26 @@ public class AlfrescoRuntimeException extends RuntimeException
     public AlfrescoRuntimeException(String msgId, Object[] msgParams, Throwable cause)
     {
         super(resolveMessage(msgId, msgParams), cause);
+        this.msgId = msgId;
+        this.msgParams = msgParams;
     }
     
+    /**
+     * @return the msgId
+     */
+    public String getMsgId()
+    {
+        return msgId;
+    }
+
+    /**
+     * @return the msgParams
+     */
+    public Object[] getMsgParams()
+    {
+        return msgParams;
+    }
+
     /**
      * Resolves the message id to the localised string.
      * <p>

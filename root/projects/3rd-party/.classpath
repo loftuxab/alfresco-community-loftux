@@ -52,7 +52,7 @@
 	<classpathentry kind="lib" path="lib/openoffice/xstream-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/jstl-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/standard.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons/commons-fileupload-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-fileupload-1.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl-2.8.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-pool-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jooconverter-2.1.0.jar" sourcepath="src/jooconverter-2.1.0-src.zip"/>
