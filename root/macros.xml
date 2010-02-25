@@ -202,7 +202,7 @@
       </sequential>
    </macrodef>
 
-   <macrodef name="minimise-javascript">
+   <macrodef name="minimize-javascript">
       <attribute name="sourcedir" />
       <attribute name="destdir" />
       <sequential>
@@ -213,6 +213,7 @@
                <exclude name="**/WEB-INF/**" />
                <exclude name="**/tiny_mce/**" />
                <exclude name="**/yui/**" />
+               <exclude name="**/log4javascript*.js" />
             </fileset>
             <arg line="-jar"/>
             <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
