@@ -55,13 +55,6 @@
         <property name="nodeService" ref="nodeService" />
     </bean>
     
-    <bean id="org_alfresco_module_dod5015_auditModel" class="org.alfresco.repo.audit.model.AuditModelReader">
-        <property name="auditModelUrl">
-           <value>classpath:alfresco/module/org_alfresco_module_dod5015/audit/rm-audit.xml</value>
-        </property>
-        <property name="auditModelRegistry" ref="auditModel.modelRegistry"/>
-    </bean>
-    
     <!-- Bootstrap the permission model -->
     
     <bean id="org_alfresco_module_dod5015_permissionBootstrap" parent="permissionModelBootstrap">
