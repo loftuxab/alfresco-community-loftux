@@ -786,20 +786,28 @@
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="**/truezip.jar" />
       </copy>
+      
+      <!-- unjar the spring surf core JAR -->
+      <unjar dest="${dir.continuous.assemble.mmt}/tmp-spring-surf" overwrite="true">
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" includes="spring-surf-core-*.jar" />
+      </unjar>
 
       <!-- get the files for the main mmt jar -->
       <copy todir="${dir.continuous.assemble.mmt}/tmp-mmt-jar" 
             flatten="false">
-         <fileset dir="${dir.project.core.classes}" 
-                  includes="org/alfresco/i18n/I18NUtil.class" />
+         
          <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/error/AlfrescoRuntimeException.class" />
          <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/util/VersionNumber.class" />
-         <fileset dir="${dir.project.core.classes}" 
-                  includes="org/alfresco/util/ISO8601DateFormat.class" />
-         <fileset dir="${dir.project.core.classes}" 
-                  includes="org/alfresco/util/Pair.class" />
+         <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
+                  includes="org/springframework/extensions/surf/util/I18NUtil.class" />
+         <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
+                  includes="org/springframework/extensions/surf/util/ISO8601DateFormat.class" />
+         <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
+                  includes="org/springframework/extensions/surf/util/Pair.class" />
+         <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
+                           includes="org/springframework/extensions/surf/exception/PlatformRuntimeException.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/repo/module/tool/default-file-mapping.properties" />
          <fileset dir="${dir.project.repository.classes}" 
@@ -823,7 +831,7 @@
       </jar>
       <!-- Remove temp files -->
       <delete dir="${dir.continuous.assemble.mmt}/tmp-mmt-jar" />
-
+      <delete dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" />
    </target>
    
    <target name="distribute-mmt" 
