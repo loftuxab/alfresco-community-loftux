@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 Alfresco Software Limited.
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,59 +22,36 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.cmis;
+package org.alfresco.repo.cmis.reference;
 
-import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.cmis.CMISServices;
+import org.alfresco.service.cmr.repository.StoreRef;
+
 
 /**
- * Thrown when an unsupported CMISAclPropagationModeEnum is specified.
- * @author andyh
- *
+ * Default Repository Reference
+ * 
+ * @author davidc
  */
-public class UnsupportedCMISAclPropagationMode extends AlfrescoRuntimeException
+public class DefaultRepositoryReference extends AbstractRepositoryReference
 {
-
     /**
+     * Construct
      * 
+     * @param cmisServices
      */
-    private static final long serialVersionUID = 3844368557738616296L;
-
-    /**
-     * @param msgId
-     * @param msgParams
-     * @param cause
-     */
-    public UnsupportedCMISAclPropagationMode(String msgId, Object[] msgParams, Throwable cause)
+    public DefaultRepositoryReference(CMISServices cmisServices)
     {
-        super(msgId, msgParams, cause);
+        super(cmisServices);
     }
 
-    /**
-     * @param msgId
-     * @param msgParams
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.cmis.CMISRepositoryReference#getStoreRef()
      */
-    public UnsupportedCMISAclPropagationMode(String msgId, Object[] msgParams)
+    public StoreRef getStoreRef()
     {
-        super(msgId, msgParams);
+        return cmisServices.getDefaultRootStoreRef();
     }
-
-    /**
-     * @param msgId
-     * @param cause
-     */
-    public UnsupportedCMISAclPropagationMode(String msgId, Throwable cause)
-    {
-        super(msgId, cause);
-    }
-
-    /**
-     * @param msgId
-     */
-    public UnsupportedCMISAclPropagationMode(String msgId)
-    {
-        super(msgId);
-    }
-    
-    
 
 }

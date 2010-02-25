@@ -376,14 +376,13 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             for (int i = 0; i < 2; i++)
             {
                 CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
-                checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), false, new CmisPropertiesType(), null, "");
+                checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), true, new CmisPropertiesType(), null, "");
             }
             checkInResponse = checkInAndAssert(checkOutAndAssert(checkInResponse.getObjectId()).getObjectId(), true, new CmisPropertiesType(), null, "");
-            for (int i = 0; i < 2; i++)
-            {
-                CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
-                checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), false, new CmisPropertiesType(), null, "");
-            }
+            CheckOutResponse checkOutResponse = checkOutAndAssert(checkInResponse.getObjectId());
+            String checkInComment = "CheckIn" + System.currentTimeMillis();
+            checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), true, new CmisPropertiesType(), null, checkInComment);
+            
             GetPropertiesOfLatestVersionResponse response = null;
             String versionSeriesId = getIdProperty(documentId, PROP_VERSION_SERIES_ID);
             assertNotNull("'" + PROP_VERSION_SERIES_ID + "' property is NULL", versionSeriesId);
@@ -399,7 +398,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             }
             assertNotNull("GetPropertiesOfLatestVersion response is NULL", response);
             assertNotNull("GetPropertiesOfLatestVersion response is empty", response.getProperties());
-            assertTrue("'" + PROP_IS_LATEST_VERSION + "' property value is FALSE", (Boolean) getBooleanProperty(response.getProperties(), PROP_IS_LATEST_VERSION));
+            assertTrue("Not latest version propertie were returned", checkInComment.equals(getStringProperty(response.getProperties(), PROP_CHECKIN_COMMENT)));
         }
         else
         {
@@ -458,8 +457,7 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             assertNotNull("Expected property was not returned", getIdProperty(response.getProperties(), PROP_OBJECT_ID));
             assertNotNull("Expected property was not returned", getStringProperty(response.getProperties(), PROP_NAME));
             assertNotNull("Expected property was not returned", getBooleanProperty(response.getProperties(), PROP_IS_LATEST_VERSION));
-
-            assertTrue("'" + PROP_IS_LATEST_VERSION + "' property value is FALSE", (Boolean) getBooleanProperty(response.getProperties(), PROP_IS_LATEST_VERSION));
+           
         }
         else
         {
@@ -576,8 +574,16 @@ public class CmisVersioningServiceClient extends AbstractServiceClient
             }
             assertNotNull("GetAllVersions response is NULL", response);
             assertTrue("GetAllVersions response is empty", response.length > 0);
-            assertNotNull("GetAllVersions response is empty", response[0]);
-            assertEquals("'" + PROP_CHECKIN_COMMENT + "' property value is invalid", checkinComment, getStringProperty(response[0].getProperties(), PROP_CHECKIN_COMMENT));
+            boolean found = false;
+            for (CmisObjectType obj : response)
+            {
+                assertNotNull("Object is null", obj);
+                if (checkinComment.equals(getStringProperty(obj.getProperties(), PROP_CHECKIN_COMMENT)))
+                {
+                    found = true;
+                }
+            }
+            assertTrue("Not all versions were returned", found);
         }
         else
         {

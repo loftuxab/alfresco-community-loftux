@@ -24,7 +24,6 @@
  */
 package org.alfresco.cmis.test.ws;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.alfresco.repo.cmis.ws.AddObjectToFolder;
@@ -32,7 +31,9 @@ import org.alfresco.repo.cmis.ws.CheckInResponse;
 import org.alfresco.repo.cmis.ws.CheckOutResponse;
 import org.alfresco.repo.cmis.ws.CmisPropertiesType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
+import org.alfresco.repo.cmis.ws.DeleteTree;
 import org.alfresco.repo.cmis.ws.EnumServiceException;
+import org.alfresco.repo.cmis.ws.EnumUnfileObject;
 import org.alfresco.repo.cmis.ws.MultiFilingServicePort;
 import org.alfresco.repo.cmis.ws.RemoveObjectFromFolder;
 import org.apache.commons.logging.Log;
@@ -145,7 +146,8 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
         if (objectExists(folderId))
         {
-            deleteAndAssertObject(folderId);
+            LOGGER.info("[ObjectService->deleteTree]");
+            getServicesFactory().getObjectService().deleteTree(new DeleteTree(getAndAssertRepositoryId(), folderId, true, EnumUnfileObject.delete, true, null));
         }
         super.onTearDown();
     }
@@ -198,11 +200,6 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
     }
 
-    // TODO: How to set property ALLOWED_CHILD_OBJECT_TYPE_IDS if it is not updatable?
-    /*
-     * testAddObjectToNotAllowedFolder()
-     */
-
     public void testAddObjectToFolderWithInvalidObjectId() throws Exception
     {
         if (getAndAssertCapabilities().isCapabilityMultifiling())
@@ -215,9 +212,7 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             }
             catch (Exception e)
             {
-                Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
-                expectedExceptions.add(EnumServiceException.invalidArgument);
-                expectedExceptions.add(EnumServiceException.objectNotFound);
+                Set<EnumServiceException> expectedExceptions = null;
                 assertException("Adding Inexistent Object to Folder", e, expectedExceptions);
             }
         }
@@ -239,9 +234,7 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             }
             catch (Exception e)
             {
-                Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
-                expectedExceptions.add(EnumServiceException.invalidArgument);
-                expectedExceptions.add(EnumServiceException.objectNotFound);
+                Set<EnumServiceException> expectedExceptions = null;
                 assertException("Adding Object to Inexistent Folder", e, expectedExceptions);
             }
         }
@@ -275,10 +268,6 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
             if (getAndAssertCapabilities().isCapabilityVersionSpecificFiling())
             {
                 assertTrue("Document was not added to folder", isDocumentInFolder(documentId, folderId));
-            }
-            else
-            {
-                assertFalse("Version specific filing is not supported, but document was added to folder", isDocumentInFolder(documentId, folderId));
             }
         }
         else
@@ -349,9 +338,7 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
         catch (Exception e)
         {
-            Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
-            expectedExceptions.add(EnumServiceException.invalidArgument);
-            expectedExceptions.add(EnumServiceException.objectNotFound);
+            Set<EnumServiceException> expectedExceptions = null;
             assertException("Removing Inexistent Object from Folder", e, expectedExceptions);
         }
     }
@@ -366,10 +353,7 @@ public class CmisMultifilingServiceClient extends AbstractServiceClient
         }
         catch (Exception e)
         {
-            Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
-            expectedExceptions.add(EnumServiceException.invalidArgument);
-            expectedExceptions.add(EnumServiceException.objectNotFound);
-            expectedExceptions.add(EnumServiceException.notSupported);
+            Set<EnumServiceException> expectedExceptions = null;
             assertException("Removing Object from Inexistent Folder", e, expectedExceptions);
         }
     }

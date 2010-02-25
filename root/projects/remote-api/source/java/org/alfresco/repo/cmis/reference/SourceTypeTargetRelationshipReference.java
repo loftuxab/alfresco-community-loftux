@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.cmis.reference;
+package org.alfresco.repo.cmis.reference;
 
 import org.alfresco.cmis.CMISRelationshipReference;
 import org.alfresco.cmis.CMISRepositoryReference;

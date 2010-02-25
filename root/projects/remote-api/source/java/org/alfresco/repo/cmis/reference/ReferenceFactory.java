@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,18 +22,15 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.cmis.reference;
+package org.alfresco.repo.cmis.reference;
 
 import java.util.Map;
 
-import org.alfresco.cmis.CMISDictionaryModel;
 import org.alfresco.cmis.CMISDictionaryService;
 import org.alfresco.cmis.CMISObjectReference;
 import org.alfresco.cmis.CMISRelationshipReference;
 import org.alfresco.cmis.CMISRepositoryReference;
 import org.alfresco.cmis.CMISServices;
-import org.alfresco.cmis.CMISTypeDefinition;
-import org.alfresco.error.AlfrescoRuntimeException;
 
 
 /**
@@ -44,7 +41,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
 public class ReferenceFactory
 {
     private CMISServices cmisService;
-    private CMISDictionaryService cmisDictionary;
 
     /**
      * @param cmisService
@@ -52,14 +48,6 @@ public class ReferenceFactory
     public void setCMISService(CMISServices cmisService)
     {
         this.cmisService = cmisService;
-    }
-
-    /**
-     * @param cmisDictionary
-     */
-    public void setCMISDictionaryService(CMISDictionaryService cmisDictionary)
-    {
-        this.cmisDictionary = cmisDictionary;
     }
     
     /**
@@ -102,17 +90,20 @@ public class ReferenceFactory
      */
     public CMISObjectReference createObjectReferenceFromUrl(Map<String, String> args, Map<String, String> templateArgs)
     {
-        String nodeRef = args.get("noderef");
-        if (nodeRef != null)
+        // Despite the name of this argument, it is included in the "Object by ID" URL template and actually accepts a
+        // value in object ID format (including version label suffix) so should be parsed as an object ID rather than a
+        // NodeRef
+        String objectId = args.get("noderef");
+        if (objectId != null)
         {
-            return new NodeRefReference(cmisService, nodeRef);
+            return new ObjectIdReference(cmisService, objectId);
         }
         
         CMISRepositoryReference repo = createRepoReferenceFromUrl(args, templateArgs);
         String id = templateArgs.get("id");
         if (id != null)
         {
-            return new ObjectIdReference(cmisService, repo, id);
+            return new NodeIdReference(cmisService, repo, id);
         }
         
         String path = templateArgs.get("path");
@@ -143,37 +134,11 @@ public class ReferenceFactory
      */
     public CMISRelationshipReference createRelationshipReferenceFromUrl(Map<String, String> args, Map<String, String> templateArgs)
     {
-        // retrieve relationship type definition
-        CMISTypeDefinition typeDefinition = null;
-        String relType = templateArgs.get("rel_type");
-        if (relType != null)
+        String assocId = templateArgs.get("assoc_id");
+        if (assocId != null)
         {
-            try
-            {
-                typeDefinition = cmisDictionary.findType(relType);
-            }
-            catch(AlfrescoRuntimeException e) {}
+            return new AssociationIdRelationshipReference(cmisService, assocId);
         }
-        if (typeDefinition == null)
-        {
-            return null;
-        }
-        if (!typeDefinition.getBaseType().getTypeId().equals(CMISDictionaryModel.RELATIONSHIP_TYPE_ID))
-        {
-            return null;
-        }
-        
-        // retrieve source / target nodes
-        String srcStore = templateArgs.get("store");
-        String srcId = templateArgs.get("id");
-        String tgtStore = templateArgs.get("target_store");
-        String tgtId = templateArgs.get("target_id");
-
-        if (srcStore != null && srcId != null && tgtStore != null && tgtId != null)
-        {
-            return new SourceTypeTargetRelationshipReference(cmisService, typeDefinition, srcStore, srcId, tgtStore, tgtId);
-        }
-
         return null;
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,52 +22,47 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.cmis.ws.utils;
+package org.alfresco.cmis.mapping;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
 
-import org.alfresco.cmis.mapping.CMISMapping;
+import org.alfresco.cmis.CMISDictionaryModel;
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
- * @author Dmitry Velichkevich
+ * @author dward
  */
-public enum AlfrescoObjectType
+public class VersionLabelProperty extends AbstractVersioningProperty
 {
-    DOCUMENT_OBJECT(ContentModel.TYPE_CONTENT.toString()),
-    FOLDER_OBJECT(ContentModel.TYPE_FOLDER.toString()),
-    DOCUMENT_OR_FOLDER_OBJECT("DOCUMENT_OR_FOLDER"),
-    RELATIONSHIP_OBJECT(CMISMapping.RELATIONSHIP_QNAME.toString()),
-    ANY_OBJECT("ANY");
-
-    String value;
-
-    final static Map<String, AlfrescoObjectType> VALUES;
-    static
+    /**
+     * Construct
+     * 
+     * @param serviceRegistry
+     */
+    public VersionLabelProperty(ServiceRegistry serviceRegistry)
     {
-        VALUES = new HashMap<String, AlfrescoObjectType>();
-        VALUES.put(DOCUMENT_OBJECT.getValue(), DOCUMENT_OBJECT);
-        VALUES.put(FOLDER_OBJECT.getValue(), FOLDER_OBJECT);
+        super(serviceRegistry, CMISDictionaryModel.PROP_VERSION_LABEL);
     }
 
-    AlfrescoObjectType(String value)
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.cmis.property.PropertyAccessor#getValue(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public Serializable getValue(NodeRef nodeRef)
     {
-        this.value = value;
-    }
-
-    public String getValue()
-    {
-        return this.value;
-    }
-
-    public static AlfrescoObjectType fromValue(String valueName)
-    {
-        AlfrescoObjectType result = VALUES.get(valueName);
-        if (result == null)
+        if (isWorkingCopy(nodeRef))
         {
-            result = ANY_OBJECT;
+            return "pwc";
         }
-        return result;
+        if (getVersionSeries(nodeRef).equals(nodeRef))
+        {
+            return "current";
+        }
+        else
+        {
+            return getServiceRegistry().getNodeService().getProperty(nodeRef, ContentModel.PROP_VERSION_LABEL);
+        }
     }
 }

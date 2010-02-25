@@ -549,8 +549,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         assertTrue("String Properties are empty", cmisProperties.getPropertyString().length > 0);
         for (int i = 0; i < cmisProperties.getPropertyString().length; i++)
         {
-            CmisPropertyString stringProperty = cmisProperties.getPropertyString(i);
-            assertNotNull("One of the String Properties is in 'not set' state", stringProperty);
+            CmisPropertyString stringProperty = cmisProperties.getPropertyString(i);            
             if ((null != property) && property.equals(getPropertyName(stringProperty)))
             {
                 return getAndAssertStringPropertyValue(stringProperty);
@@ -562,8 +561,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     private String getAndAssertStringPropertyValue(CmisPropertyString stringProp)
     {
         assertNotNull("String Property values collection is undefined", stringProp.getValue());
-        assertTrue("Values Collection of the String Porperty is empty", stringProp.getValue().length > 0);
-        assertNotNull("One of the String Property from properties' collection is in 'not set' state", stringProp.getValue(0));
+        assertTrue("Values Collection of the String Porperty is empty", stringProp.getValue().length > 0);        
         return stringProp.getValue(0);
     }
 
@@ -632,7 +630,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         boolean found = false;
         LOGGER.info("[NavigationService->getChildren]");
         GetChildrenResponse childrenResponse = getServicesFactory().getNavigationService().getChildren(
-                new GetChildren(getAndAssertRepositoryId(), folderId, PROP_OBJECT_ID, "", false, EnumIncludeRelationships.none, "", false, null, null, null));
+                new GetChildren(getAndAssertRepositoryId(), folderId, PROP_OBJECT_ID, null, false, EnumIncludeRelationships.none, "", false, null, null, null));
         if (childrenResponse == null || childrenResponse.getObjects() == null || childrenResponse.getObjects().getObjects() == null)
         {
             return false;
@@ -817,8 +815,12 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
     protected void assertException(String exceptionCase, Exception actual, EnumServiceException expected)
     {
-        Set<EnumServiceException> expectedSet = new HashSet<EnumServiceException>();
-        expectedSet.add(expected);
+        Set<EnumServiceException> expectedSet = null;
+        if (expected != null)
+        {
+            expectedSet = new HashSet<EnumServiceException>();
+            expectedSet.add(expected);
+        }        
         assertException(exceptionCase, actual, expectedSet);
     }
 
@@ -827,7 +829,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         String caseHint = ((null != exceptionCase) && !"".equals(exceptionCase)) ? (" during " + exceptionCase) : ("");
         if (actual instanceof CmisFaultType)
         {
-            if (null != expected)
+            if (null != expected && !expected.isEmpty())
             {
                 assertTrue(("Invalid exception was thrown" + caseHint + ". "), expected.contains(((CmisFaultType) actual).getType()));
             }
@@ -911,17 +913,18 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         {
             fail(e.toString());
         }
-        assertNotNull("GetTypeDescendants response is NULL", response);
-        assertTrue("GetTypeDescendants response is empty", response.length > 0);
-        for (CmisTypeContainer container : response)
+        if (response != null && response.length > 0)
         {
-            assertNotNull("Invalid Type Descendants response: one of the Type Container is undefined", container);
-            if (null != container.getChildren())
+            for (CmisTypeContainer container : response)
             {
-                for (CmisTypeContainer childContainer : container.getChildren())
+                assertNotNull("Invalid Type Descendants response: one of the Type Container is undefined", container);
+                if (null != container.getChildren())
                 {
-                    assertNotNull("Invalid Type Descendants response: one of the Descendants Type Container is undefined", childContainer);
-                    assertNotNull("Invalid Type Descendants response: one of the Descendants Type is undefined", childContainer.getType());
+                    for (CmisTypeContainer childContainer : container.getChildren())
+                    {
+                        assertNotNull("Invalid Type Descendants response: one of the Descendants Type Container is undefined", childContainer);
+                        assertNotNull("Invalid Type Descendants response: one of the Descendants Type is undefined", childContainer.getType());
+                    }
                 }
             }
         }
