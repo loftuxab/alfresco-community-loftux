@@ -448,7 +448,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     		
     		//  Create a new stream associated with the existing file
       
-    		return createStream(params, fstate, dbCtx);
+    		return createStream(sess, tree, params, fstate, dbCtx);
     	}
     	else {
     		
@@ -900,18 +900,9 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       
       if ( finfo == null) {     
 
-        //  Split the path into directory, file and stream name components
-        
-        String[] paths = FileName.splitPathStream(name);    
-  
         //  Get, or create, the file state for main file path
         
-        String filePath = null;
-        if ( paths[0] != null && paths[0].endsWith( FileName.DOS_SEPERATOR_STR))
-        	filePath = paths[0] + paths[1];
-        else
-        	filePath = paths[0] + FileName.DOS_SEPERATOR_STR + paths[1];
-        
+        String filePath = FileName.getParentPathForStream( name);
         FileState parent = getFileState(filePath,dbCtx,false);
         
         // Get the file information for the parent file to load the cache
@@ -939,10 +930,14 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
   
             //  Get the list of available streams
             
-            StreamInfoList streams = loadStreamList(parent, dbInfo, dbCtx, true);
+            StreamInfoList streams = getStreamList(sess, tree, filePath);
             
             if ( streams != null && streams.numberOfStreams() > 0) {
               
+              // Parse the path into directory, file and stream names
+            	
+              String[] paths = FileName.splitPathStream( name);
+            	
               //  Get the details for the stream, if the information is valid copy it to a file information
               //  object
               
@@ -953,14 +948,13 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
                 //  Create a file information object, copy the stream details to it
                 
                 finfo = new DBFileInfo(paths[1], name, dbInfo.getFileId(), dbInfo.getDirectoryId());
+                
                 finfo.setFileId(sInfo.getFileId());
                 finfo.setFileSize(sInfo.getSize());
                 
-                //  Use the parent files timestamps for now
-                
-                finfo.setCreationDateTime(dbInfo.getCreationDateTime());
-                finfo.setAccessDateTime(dbInfo.getAccessDateTime());
-                finfo.setModifyDateTime(dbInfo.getModifyDateTime());
+                finfo.setCreationDateTime( sInfo.getCreationDateTime());
+                finfo.setAccessDateTime( sInfo.getAccessDateTime());
+                finfo.setModifyDateTime( sInfo.getModifyDateTime());
                 
                 //  Attach to the file state
                 
@@ -1051,7 +1045,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       
       //  Open an NTFS stream
       
-      return openStream(params, fstate, dbCtx);
+      return openStream(sess, tree, params, fstate, dbCtx);
     }
     
     //  Get the file name
@@ -2734,13 +2728,14 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
 
     //  Get the file state for the top level file
     
-    FileState fstate = getFileState(fileName, dbCtx, true);
+    String parentPath = FileName.getParentPathForStream( fileName);
+    FileState fstate = getFileState(parentPath, dbCtx, true);
     
     //  Check if the file state already has the streams list cached
     
     StreamInfoList streamList = (StreamInfoList) fstate.findAttribute(DBStreamList);
-    if ( streamList != null)
-      return streamList;
+    if ( streamList != null && streamList.numberOfStreams() > 0)
+        return streamList;
     
     //  Get the main file information and convert to stream information
     
@@ -2782,18 +2777,20 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
   /**
    * Create a new stream with the specified parent file
    * 
+   * @param sess SrvSession
+   * @param tree TreeConnection
    * @param params FileOpenParams
    * @param parent FileState
    * @param dbCtx DBDeviceContext
    * @return NetworkFile
    * @exception IOException
    */
-  protected final NetworkFile createStream(FileOpenParams params, FileState parent, DBDeviceContext dbCtx)
+  protected final NetworkFile createStream(SrvSession sess, TreeConnection tree, FileOpenParams params, FileState parent, DBDeviceContext dbCtx)
     throws IOException {
 
     //  Get the file information for the parent file
     
-    DBFileInfo finfo = getFileDetails(params.getPath(),dbCtx,parent);
+    DBFileInfo finfo = getFileDetails(params.getPath(), dbCtx, parent);
     
     if (finfo == null)
       throw new AccessDeniedException();
@@ -2802,7 +2799,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     
     StreamInfoList streamList = (StreamInfoList) parent.findAttribute(DBStreamList);
     if ( streamList == null)
-      streamList = loadStreamList(parent, finfo, dbCtx, true);
+      streamList = getStreamList(sess, tree, params.getPath());
     
     if ( streamList == null)
       throw new AccessDeniedException();
@@ -2825,7 +2822,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       //  Create a network file to hold details of the new stream
 
       file = (DBNetworkFile) dbCtx.getFileLoader().openFile(params, finfo.getFileId(), stid, finfo.getDirectoryId(), true, false);
-      file.setFullName(params.getPath());
+      file.setFullName(params.getFullPath());
       file.setStreamId(stid);
       file.setStreamName(params.getStreamName());
       file.setDirectoryId(finfo.getDirectoryId());
@@ -2872,13 +2869,15 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
   /**
    * Open an existing stream with the specified parent file
    * 
+   * @param sess SrvSession
+   * @param tree TreeConnection
    * @param params FileOpenParams
    * @param parent FileState
    * @param dbCtx DBDeviceContext
    * @return NetworkFile
    * @exception IOException
    */
-  protected final NetworkFile openStream(FileOpenParams params, FileState parent, DBDeviceContext dbCtx)
+  protected final NetworkFile openStream(SrvSession sess, TreeConnection tree, FileOpenParams params, FileState parent, DBDeviceContext dbCtx)
     throws IOException {
 
     //  Get the file information for the parent file
@@ -2890,7 +2889,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
 
     //  Get the list of streams for the file
   
-    StreamInfoList streamList = loadStreamList(parent, finfo, dbCtx, true);
+    StreamInfoList streamList = getStreamList(sess, tree, params.getPath());
     if ( streamList == null)
       throw new AccessDeniedException();
     
@@ -2907,15 +2906,21 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
               
     //  Check if the file shared access indicates exclusive file access
   
-    if ( params.getSharedAccess() == SharingMode.NOSHARING && fstate.getOpenCount() > 0)
+    if ( params.getSharedAccess() == SharingMode.NOSHARING && fstate.getOpenCount() > 0 &&
+    		params.getProcessId() != fstate.getProcessId())
       throw new FileSharingException("File already open, " + params.getPath());
 
     //  Set the file information for the stream, using the stream information
     
     DBFileInfo sfinfo = new DBFileInfo(sInfo.getName(), params.getFullPath(), finfo.getFileId(), finfo.getDirectoryId());
+    
     sfinfo.setFileSize(sInfo.getSize());
     sfinfo.setFileAttributes( FileAttribute.Normal);
     
+    sfinfo.setCreationDateTime( sInfo.getCreationDateTime());
+    sfinfo.setModifyDateTime( sInfo.getModifyDateTime());
+    sfinfo.setAccessDateTime( sInfo.getAccessDateTime());
+
     fstate.addAttribute(FileState.FileInformation, sfinfo);
     
     //  Create a JDBC network file and open the stream
@@ -2927,8 +2932,8 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
                                                                                   finfo.getDirectoryId(), false, false);
 
     jdbcFile.setFileState(fstate);
-    jdbcFile.setFileSize(sInfo.getSize());
-
+    jdbcFile.setFileDetails( sfinfo);
+    
     //  Open the stream file, if not a directory
   
     jdbcFile.openFile(false);
@@ -3003,7 +3008,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         
         //  Update the cached file size
         
-        FileInfo finfo = (FileInfo) fstate.findAttribute(FileState.FileInformation);
+        FileInfo finfo = getFileInformation( sess, tree, fstate.getPath());
         if ( finfo != null && stream.getWriteCount() > 0) {
           
           //  Update the file size
@@ -3058,7 +3063,8 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       
       //  Update the in-memory stream information
       
-      FileState parent = getFileState(stream.getFullName(), dbCtx, false);
+      String parentPath = FileName.getParentPathForStream( stream.getFullName());
+      FileState parent = getFileState( parentPath, dbCtx, false);
       StreamInfo sInfo = null;
       int sattr = 0;
       
@@ -3066,7 +3072,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         
         //  Check if the stream list has been loaded
         
-        StreamInfoList streamList = loadStreamList(parent, null, dbCtx, false);
+        StreamInfoList streamList = getStreamList(sess, tree, parentPath);
         if ( streamList != null) {
           
           //  Find the stream information
@@ -3084,7 +3090,11 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
             if ( Debug.EnableInfo && hasDebug())
               Debug.println("Updated stream file size");
           }
+          else
+        	  Debug.println("** Failed to find details for stream " + stream.getStreamName());
         }
+        else
+        	Debug.println("** Failed to get streams list for " + parentPath);
       }
 
       //  Update the file details for the file stream in the database
@@ -3138,13 +3148,9 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
 
     DBDeviceContext dbCtx = (DBDeviceContext) tree.getContext();
 
-    //  Parse the path string to get the directory, file name and stream name
-    
-    String[] paths = FileName.splitPathStream(name);
-
     //  Get, or create, the file state for main file path and stream
       
-    String filePath = paths[0] + paths[1];
+    String filePath = FileName.getParentPathForStream( name);
     FileState fstate = getFileState(filePath, dbCtx, true);
     FileState sstate = getFileState(name, dbCtx, false);
 
@@ -3162,11 +3168,15 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
     
     StreamInfoList streamList = (StreamInfoList) fstate.findAttribute(DBStreamList);
     if ( streamList == null)
-      streamList = loadStreamList(fstate, finfo, dbCtx, true);
+      streamList = getStreamList(sess, tree, filePath);
     
     if ( streamList == null)
       throw new FileNotFoundException("Stream not found, " + name);
     
+    //  Parse the path string to get the directory, file name and stream name
+    
+    String[] paths = FileName.splitPathStream(name);
+
     //  Find the required stream details
     
     StreamInfo sInfo = streamList.findStream(paths[2]);
@@ -3226,6 +3236,11 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
         //  Load the streams list
         
         sList = dbCtx.getDBInterface().getStreamsList(finfo.getFileId(), DBInterface.StreamAll);
+        
+        // Cache the streams list via the parent file state
+        
+        if ( sList != null)
+        	fstate.addAttribute( DBStreamList, sList);
       }
       catch (DBException ex) {
       }

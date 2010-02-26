@@ -77,7 +77,7 @@ public class FileState {
 	//	Standard file information keys
 	
 	public static final String FileInformation	= "FileInfo";
-	public static final String StreamsList			= "StreamsList";
+	public static final String StreamsList		= "StreamsList";
 	
 	//	File name/path
 	
@@ -511,7 +511,7 @@ public class FileState {
 	 * @param path String
 	 */
 	public final void setPath(String path) {
-		
+
 		//	Split the path into directories and file name, only uppercase the directories to normalize
 		//	the path.
 

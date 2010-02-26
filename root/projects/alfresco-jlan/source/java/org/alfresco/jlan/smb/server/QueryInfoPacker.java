@@ -26,6 +26,7 @@
 package org.alfresco.jlan.smb.server;
 
 import org.alfresco.jlan.server.filesys.FileInfo;
+import org.alfresco.jlan.server.filesys.FileName;
 import org.alfresco.jlan.server.filesys.UnsupportedInfoLevelException;
 import org.alfresco.jlan.smb.FileInfoLevel;
 import org.alfresco.jlan.smb.NTTime;
@@ -558,9 +559,15 @@ public class QueryInfoPacker {
 
 			buf.putInt(0);
 
+			// Get the stream name
+			
+			String sName = sinfo.getName();
+			if ( sName.endsWith( FileName.DataStreamName) == false)
+				sName = sName + FileName.DataStreamName;
+			
 			// Set the stream name length
 
-			int nameLen = sinfo.getName().length();
+			int nameLen = sName.length();
 			if ( uni)
 				nameLen *= 2;
 			buf.putInt(nameLen);
@@ -576,7 +583,7 @@ public class QueryInfoPacker {
 			else
 				buf.putLong(sinfo.getAllocationSize());
 
-			buf.putString(sinfo.getName(), uni, false);
+			buf.putString(sName, uni, false);
 
 			// Word align the buffer
 

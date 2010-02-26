@@ -4173,6 +4173,11 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		String path = paramBuf.getString(tbuf.isUnicode());
 
+		// Normalize paths that end with the NTFS data stream name
+		
+		if ( path.endsWith( FileName.DataStreamName))
+			path = path.substring( 0, path.length() - FileName.DataStreamName.length());
+		
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_INFO))
@@ -4482,7 +4487,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 				// Get the file information
 
-				FileInfo fileInfo = disk.getFileInformation(m_sess, conn, netFile.getFullNameStream());
+				FileInfo fileInfo = disk.getFileInformation(m_sess, conn, netFile.getFullName());
 
 				if ( fileInfo == null) {
 					m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNotFound, SMBStatus.SRVNonSpecificError, SMBStatus.ErrSrv);

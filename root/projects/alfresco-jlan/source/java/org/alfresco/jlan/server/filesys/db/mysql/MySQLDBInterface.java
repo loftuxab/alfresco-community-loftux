@@ -4186,8 +4186,6 @@ public class MySQLDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 			if ( rs.next())
 				objectId = rs.getString("ObjectId");
-			else
-				throw new DBException("Failed to load object id for " + fileId);
 		}
 		catch (SQLException ex) {
 
