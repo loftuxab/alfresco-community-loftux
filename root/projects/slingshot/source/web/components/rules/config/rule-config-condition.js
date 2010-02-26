@@ -104,11 +104,20 @@
          /**
           * The config definition that will be used by/specialized by each property
           *
-          * @property properties
+          * @property comparePropertyValueDefinition
           * @type {object}
           * @mandatory
           */
-         comparePropertyValueDefinition: {}
+         comparePropertyValueDefinition: {},
+
+         /**
+          * The config definition that will be used by/specialized by the mime type property
+          *
+          * @property compareMimeTypeDefinition
+          * @type {object}
+          * @mandatory
+          */
+         compareMimeTypeDefinition: {}
       },
 
 
@@ -137,32 +146,21 @@
                if (property.id == newProperty.id)
                {
                   // The propery was found; add or remove it after loop
+                  property._hidden = !show;
                   break;
                }
             }
-            if (i < il && !show)
-            {
-               // Remove the property that was hidden
-               this.options.properties.splice(i, 1);
-               this.widgets.selectTemplateEl = this._createSelectMenu();
-            }
-            else if (i == il && show)
+            if (i == il && show)
             {
                // Add the property since it wasn't added before
                this.options.properties.push(newProperty);
-               this.widgets.selectTemplateEl = this._createSelectMenu();
             }
-            else
-            {
-               // The new property wasn't added or removed, in other words nothing has changed
-               return;
-            }
+            this.widgets.selectTemplateEl = this._createSelectMenu();
 
             // Look through all menus to and add or remove it if it isn't selected
             var configEls = Selector.query('li.config', this.id + "-body"),
                   configEl,
-                  selectEl,
-                  comparePropertyName = this.options.comparePropertyValueDefinition.name;
+                  selectEl;
             for (var ci = 0, cil = configEls.length; ci < cil; ci++)
             {
                configEl = configEls[ci];
@@ -170,7 +168,7 @@
                for (var oi = 0, oil = selectEl.options.length, option; oi < oil; oi++)
                {
                   option = selectEl.options[oi];
-                  if (option.value == comparePropertyName && option.getAttribute("rel") == "property_" + newProperty.id)
+                  if (this._isComparePropertyDefinition(option.value) && option.getAttribute("rel") == "property_" + newProperty.id)
                   {
                      if (!option.selected)
                      {
@@ -213,6 +211,7 @@
        * @method _getConfigItems
        * @param itemType
        * @param itemPatternObject
+       * @param displayHiddenPropertyId {object} Custom parameter
        * @return {array} Menu item objects (as described below) representing a config (or item)
        *                 matching all attributes in itemPatternObject.
        * {
@@ -222,7 +221,7 @@
        * }
        * @override
        */
-      _getConfigItems: function RuleConfigCondition__getConfigItems(itemType, itemPatternObject)
+      _getConfigItems: function RuleConfigCondition__getConfigItems(itemType, itemPatternObject, displayHiddenPropertyId)
       {
          if (itemType == "property")
          {
@@ -230,10 +229,13 @@
             for (var ci = 0, cil = this.options.properties.length, property; ci < cil; ci++)
             {
                property = this.options.properties[ci];
-               if (Alfresco.util.objectMatchesPattern(property, itemPatternObject))
+               if (!property._hidden || displayHiddenPropertyId)
                {
-                  // Create a menu item with a "faked" config definition for the property
-                  results.push(this._createPropertyConfigDef(property));
+                  if (Alfresco.util.objectMatchesPattern(property, itemPatternObject))
+                  {
+                     // Create a menu item with a "faked" config definition for the property
+                     results.push(this._createPropertyConfigDef(property));
+                  }
                }
             }
             return results;
@@ -253,10 +255,15 @@
       _getConstraintValues: function RuleConfigCondition__getConstraintValues(p_sConstraintName, p_oRuleConfig)
       {
          var values = Alfresco.RuleConfigCondition.superclass._getConstraintValues.call(this, p_sConstraintName, p_oRuleConfig);
-         if (p_oRuleConfig[this.options.ruleConfigDefinitionKey] == this.options.comparePropertyValueDefinition.name)
+         if (this._isComparePropertyDefinition(p_oRuleConfig[this.options.ruleConfigDefinitionKey]))
          {
             var propertyName = p_oRuleConfig.parameterValues.property,
-               propertyType,
+               contentProperty = p_oRuleConfig.parameterValues["content-property"];
+            if (contentProperty)
+            {
+               propertyName += "." + contentProperty;
+            }
+            var propertyType,
                evaluatorMap = this.options.propertyEvaluatorMap,
                propertyTypes,
                filteredValues = [];
@@ -301,53 +308,65 @@
        */
       _createPropertyConfigDef: function RuleConfigCondition__createPropertyConfigDef(property)
       {
-         var propertyConfigDef = {},
-            cpvd = this.options.comparePropertyValueDefinition;
-
-         if (cpvd && cpvd.parameterDefinitions && cpvd.parameterDefinitions.length > 1)
+         var descriptor;
+         if (property.id.indexOf(".") > property.id.indexOf(":"))
          {
-            var pp = this._getParamDef(cpvd, "property"),
-               cp = this._getParamDef(cpvd, "content-property"),
-               op = this._getParamDef(cpvd, "operation"),
-               vp = this._getParamDef(cpvd, "value");
-            propertyConfigDef = {
-               id: cpvd.name,
-               type: "property_" + property.id,
-               label: property.displayLabel,
-               descriptor:
-               {
-                  name: cpvd.name,
-                  displayLabel: cpvd.label,
-                  description: cpvd.description,
-                  parameterDefinitions: [
-                     {
-                        name : "property",
-                        displayLabel : null, // Property name will be visible in the menu instead
-                        type : pp.type,
-                        isMultiValued : false,
-                        isMandatory : true,
-                        _type: "hidden"
-                     },
-                     {
-                        name : op.name,
-                        displayLabel : null, // Don't display evaluator label
-                        type : op.type,
-                        isMultiValued : false,
-                        isMandatory : true, // Make it mandatory even if the repo says it isn't
-                        constraint: op.constraint
-                     },
-                     {
-                        name : vp.name,
-                        displayLabel : null, // Don't display value label 
-                        type : property.type,
-                        isMultiValued : false,
-                        isMandatory : true
-                     }
-                  ]
-               }
-            };
+            // This is a transient property, modify the type
+            if (property.id.split(".")[1] == "MIME_TYPE")
+            {
+               // use the specific mime type comparator
+               descriptor = Alfresco.util.deepCopy(this.options.compareMimeTypeDefinition);
+               this._getParamDef(descriptor, "property")._type = "hidden";
+            }
          }
+         if (!descriptor)
+         {
+            // Use the standard property comparator config definition
+            descriptor = Alfresco.util.deepCopy(this.options.comparePropertyValueDefinition);
+            this._getParamDef(descriptor, "property")._type = "hidden";
+            this._getParamDef(descriptor, "content-property")._type = "hidden";
+            this._getParamDef(descriptor, "operation").displayLabel = "";
+            this._getParamDef(descriptor, "operation").isMandatory = true;
+            this._getParamDef(descriptor, "value").displayLabel = "";
+            this._getParamDef(descriptor, "value").type = property.type;
+            descriptor.parameterDefinitions.reverse();
+         }
+
+         var propertyConfigDef = {
+            id: descriptor.name,
+            type: "property_" + property.id,
+            label: property.displayLabel,
+            descriptor: descriptor
+         };
          return  propertyConfigDef;
+      },
+
+      /**
+       * @method _createRuleConfig
+       * @param propertyId {string}
+       * @return {object} A ruleConfig based on info from property
+       */
+      _createRuleConfig: function RuleConfigCondition__createRuleConfig(propertyId)
+      {
+         var propertyTokens = propertyId.split("."),
+            property = propertyTokens[0],
+            contentProperty = propertyTokens.length > 1 ? propertyTokens[1] : null;
+         var ruleConfig = {
+            parameterValues:
+            {
+               "property": property
+            }
+         };
+         ruleConfig[this.options.ruleConfigDefinitionKey] = this.options.comparePropertyValueDefinition.name;
+         if (contentProperty)
+         {
+            ruleConfig.parameterValues["content-property"] = contentProperty;
+            if (contentProperty == "MIME_TYPE")
+            {
+               ruleConfig[this.options.ruleConfigDefinitionKey] = this.options.compareMimeTypeDefinition.name;
+            }
+         }
+         return ruleConfig;
       },
 
       /**
@@ -383,16 +402,11 @@
             };
          }
 
-         if (optionEl.value == this.options.comparePropertyValueDefinition.name)
+         if (this._isComparePropertyDefinition(optionEl.value))
          {
             // Don't call super class since we want to invoke _createConfigParameterUI our selves
-            var ruleConfig = {
-               parameterValues:
-               {
-                  property: optionEl.getAttribute("rel").substring("property".length + 1)
-               }
-            };
-            ruleConfig[this.options.ruleConfigDefinitionKey] = optionEl.value;
+            var propertyId = optionEl.getAttribute("rel").substring("property".length + 1),
+               ruleConfig = this._createRuleConfig(propertyId);
             this._createConfigParameterUI(ruleConfig, p_eConfigEl);
          }
          else
@@ -421,11 +435,16 @@
          var configEl = Alfresco.RuleConfigCondition.superclass._createConfigUI.call(this, p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl);
 
          // ... but if it is a property we need to re-select the config type to select the specific property
-         if (p_oRuleConfig[this.options.ruleConfigDefinitionKey] == this.options.comparePropertyValueDefinition.name)
+         var configDefinitionName = p_oRuleConfig[this.options.ruleConfigDefinitionKey];
+         if (this._isComparePropertyDefinition(configDefinitionName))
          {
             // Find select element and the property parameter
             var propertyName = p_oRuleConfig.parameterValues.property;
-            this._selectConfigName(p_oSelectEl, this.options.comparePropertyValueDefinition.name, "property_" + propertyName);
+            if (p_oRuleConfig.parameterValues["content-property"])
+            {
+               propertyName += "." + p_oRuleConfig.parameterValues["content-property"];
+            }
+            this._selectConfigName(p_oSelectEl, configDefinitionName, "property_" + propertyName);
          }
 
          // Return configEl like super class
@@ -470,6 +489,17 @@
          {
             this._selectConfigName(selectEl, previousSelectedConfigDef.value, previousSelectedConfigDef.rel);
          }
+      },
+
+      /**
+       * @method _isComparePropertyDefinition
+       * @param configDefinitionName {string} The config definition name to compare
+       * @private
+       */
+      _isComparePropertyDefinition: function RuleConfigCondition__isComparePropertyDefinition(configDefinitionName)
+      {
+         return (configDefinitionName == this.options.comparePropertyValueDefinition.name ||
+                  configDefinitionName == this.options.compareMimeTypeDefinition.name);
       },
 
       /**
@@ -544,18 +574,18 @@
                         property = {
                            id: property.id,
                            type: property.type,
-                           displayLabel: property.label
+                           displayLabel: property.label,
+                           _hidden: true
                         };
 
                         if (property)
                         {
                            // Add property to list of properties if its a new one
-                           var tmpProperties = Alfresco.util.deepCopy(this.options.properties),
-                              properties = this.options.properties;
+                           var properties = this.options.properties;
                            for (var i = 0, il = properties.length; i < il; i++)
                            {
                               if (properties[i].id == property.id)
-                              {
+                              {                                 
                                  break;
                               }
                            }
@@ -570,27 +600,18 @@
                             * specific for this config row
                             */
                            var configEl = this.customisations.ShowMore.currentCtx.configEl,
-                              newSelectEl = this._createSelectMenu(),
+                              newSelectEl = this._createSelectMenu(property.id),
                               selectEl = Selector.query('select', configEl)[0];
 
                            // Since we have created a new select menu, the history of previous selections must taken from the old menu
                            this.previousConfigNameSelections[Alfresco.util.generateDomId(newSelectEl)] = this.previousConfigNameSelections[selectEl.getAttribute("id")];
 
-                           var ruleConfig = {
-                              parameterValues: {
-                                 property: property.id
-                              }
-                           };
-                           ruleConfig[this.options.ruleConfigDefinitionKey] = this.options.comparePropertyValueDefinition.name;
-
-                           // Replace the current configEl and with a new one based on the new ruleConfig
+                           // Create a ruleConfig and replace the current configEl and with a new one based on ruleConfig
+                           var ruleConfig = this._createRuleConfig(property.id);
                            var newConfigEl = this._createConfigUI(ruleConfig, newSelectEl, configEl);
                            this.customisations.ShowMore.currentCtx.configEl = newConfigEl;
                            configEl.parentNode.removeChild(configEl);
                            this._createConfigParameterUI(ruleConfig, newConfigEl);
-
-                           // Restore the properties as they were
-                           this.options.properties = tmpProperties;
                         }
                      }
                   }, this);

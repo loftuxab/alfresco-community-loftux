@@ -13,18 +13,19 @@ function main()
     * and will be dynamically created on the page based on which property that is selected.
     */
    var i = 0;
-   for (var il = actionConditionDefinitions.length; i < il; i++)
+   for (; i < actionConditionDefinitions.length; i++)
    {
       if (actionConditionDefinitions[i].name == "compare-property-value")
       {
          model.comparePropertyValueDefinition = jsonUtils.toJSONString(actionConditionDefinitions[i]);
-         break;
+         actionConditionDefinitions.splice(i, 1);
       }
-   }
-   if (i < il)
-   {
-      actionConditionDefinitions.splice(i, 1);
-   }
+      else if (actionConditionDefinitions[i].name == "compare-mime-type")
+      {
+         model.compareMimeTypeDefinition = jsonUtils.toJSONString(actionConditionDefinitions[i]);
+         actionConditionDefinitions.splice(i, 1);
+      }
+   }   
    model.ruleConfigDefinitions = jsonUtils.toJSONString(actionConditionDefinitions);
 
    // Load constraints for rule types

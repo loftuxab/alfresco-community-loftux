@@ -513,10 +513,11 @@
        * 2. Seconds pass will ask for objects using only pattern objects WITH at least one wild card attribute.
        *
        * @method _createSelectMenu
+       * @param obj {object} (Optional) Custom parameter to send in for use for overriding classes
        * @return {HTMLSelectElement} The created menu
        * @private
        */
-      _createSelectMenu: function RuleConfig__createSelectMenu()
+      _createSelectMenu: function RuleConfig__createSelectMenu(obj)
       {
          // Used to see if a menu item already has been added
          var alreadyAdded = {};
@@ -561,7 +562,7 @@
                         {
                            // Add internal variable for storing the real menu items                           
                            itemOpt["_menuItems"] = [];
-                           menuItems = this._getConfigItems(itemTypeOpt, itemPatternOpt);
+                           menuItems = this._getConfigItems(itemTypeOpt, itemPatternOpt, obj);
                            for (var mii = 0, mil = menuItems.length; mii < mil; mii++)
                            {
                               menuItem = menuItems[mii];
@@ -625,6 +626,8 @@
        * @method _getConfigItems
        * @param itemType
        * @param itemPatternObject
+       * @param obj {object} THe custom parameter obj that was passed in to _createSelectMenu,
+       *                               suitable for overriding classes.
        * @return {array} Menu item objects (as described below) representing a configDef (or item)
        *                 matching all attributes in itemPatternObject.
        * @protected
@@ -634,7 +637,7 @@
        *    descriptor: object
        * }
        */
-      _getConfigItems: function RuleConfig__getConfigItems(itemType, itemPatternObject)
+      _getConfigItems: function RuleConfig__getConfigItems(itemType, itemPatternObject, obj)
       {
          var results = [],
             ruleConfigDef;
@@ -1313,9 +1316,17 @@
             {
                containerEl.appendChild(selectEl);
             }
-            if (!paramDef.isMandatory)
+            if (!paramDef.isMandatory || !constraintOptions || constraintOptions.length == 0)
             {
+               /**
+                * Create an empty options to select none-value OR
+                * since if there are no options in the select an error will be thrown
+                */
                selectEl.appendChild(document.createElement("option"));
+            }
+            if (paramDef.isMandatory)
+            {
+               this._addValidation(selectEl, Alfresco.forms.validation.mandatory, configDef, "change");
             }
             if (constraintOptions)
             {
@@ -1519,7 +1530,7 @@
          return pathEl;
       },
       
-      _addValidation: function (el, validator, configDef)
+      _addValidation: function (el, validator, configDef, event)
       {
          if (el && validator && this.options.form)
          {
@@ -1547,7 +1558,7 @@
                   }
                }
                return valid;
-            }, validationArgs, "keyup");
+            }, validationArgs, event ? event : "keyup");
 
             /**
              * ...but also group together validator with other validators for the same config

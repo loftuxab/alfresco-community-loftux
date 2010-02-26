@@ -82,6 +82,7 @@
 
    <property-evaluators>
       <evaluator name="EQUALS">
+         <property type="d:any"/>
          <property type="d:text"/>
          <property type="d:date"/>
          <property type="d:datetime"/>
@@ -134,8 +135,7 @@
    </property-evaluators>
 
    <customise>
-      <property type="d:text" id="author">PersonProperty</property>
-      <property type="d:int" id="size">SizeProperty</property>
+      <property type="d:content" id="cm:content.size">Size</property>
       <condition name="has-tag">HasTagCondition</condition>
       <condition name="in-category">InCategoryCondition</condition>
       <item id="show-more">ShowMore</item>
