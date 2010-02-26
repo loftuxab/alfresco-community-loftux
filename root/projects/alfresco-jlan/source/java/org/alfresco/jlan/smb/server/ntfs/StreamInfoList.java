@@ -36,13 +36,27 @@ public class StreamInfoList {
 
 	//	List of stream information objects
 	
-	private Vector m_list;
+	private Vector<StreamInfo> m_list;
 	
 	/**
 	 * Default constructor
 	 */
 	public StreamInfoList() {
-		m_list = new Vector();
+		m_list = new Vector<StreamInfo>();
+	}
+	
+	/**
+	 * Copy constructor
+	 * 
+	 * @param sList StreamInfoList
+	 */
+	public StreamInfoList( StreamInfoList sList) {
+		m_list = new Vector<StreamInfo>( sList.numberOfStreams());
+		
+		// Make a shallow copy of the stream information
+		
+		for ( int idx = 0; idx < sList.numberOfStreams(); idx++)
+			m_list.add( sList.getStreamAt( idx));
 	}
 	
 	/**
@@ -51,7 +65,7 @@ public class StreamInfoList {
 	 * @param info StreamInfo
 	 */
 	public final void addStream(StreamInfo info) {
-		m_list.addElement(info);
+		m_list.add(info);
 	}
 	
 	/**
@@ -69,7 +83,7 @@ public class StreamInfoList {
 			
 		//	Return the required stream information
 		
-		return (StreamInfo) m_list.elementAt(idx);
+		return m_list.get(idx);
 	}
 	
 	/**
@@ -86,7 +100,7 @@ public class StreamInfoList {
 			
 			//	Get the current stream information
 			
-			StreamInfo sinfo = (StreamInfo) m_list.elementAt(i);
+			StreamInfo sinfo = m_list.get(i);
 			
 			//	Check if the stream name matches
 			
@@ -123,8 +137,8 @@ public class StreamInfoList {
 				
 		//	Remove the required stream
 		
-		StreamInfo info = (StreamInfo) m_list.elementAt(idx);
-		m_list.removeElementAt(idx);
+		StreamInfo info = m_list.get(idx);
+		m_list.remove(idx);
 		return info;
 	}
 	
@@ -142,7 +156,7 @@ public class StreamInfoList {
 			
 			//	Get the current stream information
 			
-			StreamInfo sinfo = (StreamInfo) m_list.elementAt(i);
+			StreamInfo sinfo = m_list.get(i);
 			
 			//	Check if the stream name matches
 			
@@ -150,7 +164,7 @@ public class StreamInfoList {
 				
 				//	Remove the stream from the list
 
-				m_list.removeElementAt(i);
+				m_list.remove(i);
 				return sinfo;
 			}
 		}

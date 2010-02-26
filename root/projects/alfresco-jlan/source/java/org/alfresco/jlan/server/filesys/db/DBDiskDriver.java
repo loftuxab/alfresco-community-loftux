@@ -718,6 +718,47 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       if ( dbInfo.isFileType() == FileType.SymbolicLink)
         dbCtx.getDBInterface().deleteSymbolicLinkRecord( dbInfo.getDirectoryId(), dbInfo.getFileId());
       
+      // Check if the file has any NTFS streams
+      
+      StreamInfoList streamList = getStreamList( sess, tree, name);
+      
+      if ( streamList != null && streamList.numberOfStreams() > 0) {
+    	  
+    	  // Make a copy of the streams list as streams are removed from the original list as we delete them
+    	  
+    	  StreamInfoList sList = new StreamInfoList( streamList);
+    	  
+    	  // Delete the streams
+
+    	  StringBuilder sPath = new StringBuilder( 256);
+    	  sPath.append( name);
+    	  int delCnt = 0;
+    	  
+    	  for ( int idx = 0; idx < sList.numberOfStreams(); idx++) {
+    		  
+    		  // Get the current stream details
+    		  
+    		  StreamInfo sInfo = sList.getStreamAt( idx);
+    		  if ( sInfo.getName().equals( FileName.MainDataStreamName) == false) {
+    			  
+    			  // Build the full path to the stream
+    			  
+    			  sPath.setLength( name.length());
+    			  sPath.append( sInfo.getName());
+    			  
+    			  // Delete the stream
+    			  
+    			  deleteStream( sess, tree, sPath.toString());
+    			  delCnt++;
+    		  }
+    	  }
+    	  
+    	  // DEBUG
+    	  
+          if ( Debug.EnableInfo && hasDebug() && delCnt > 0)
+              Debug.println("DBDiskDriver deleted " + delCnt + " streams for name=" + name);
+      }
+      
       //  Delete the file record
 
       dbCtx.getDBInterface().deleteFileRecord(dbInfo.getDirectoryId(), dbInfo.getFileId(), dbCtx.isTrashCanEnabled());
