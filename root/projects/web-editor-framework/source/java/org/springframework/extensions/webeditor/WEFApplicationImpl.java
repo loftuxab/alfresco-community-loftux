@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.wef;
+package org.springframework.extensions.webeditor;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.wef;
+package org.springframework.extensions.webeditor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -66,7 +66,7 @@ public class WEFPluginRegistry
         this.plugins.put(plugin.getName(), plugin);
         
         if (logger.isDebugEnabled())
-            logger.debug("Added plugin to registry: " + plugin);
+            logger.debug("Added plugin to plugin registry: " + plugin);
         
         if (plugin instanceof WEFApplication)
         {
@@ -79,7 +79,7 @@ public class WEFPluginRegistry
             this.applications.put(plugin.getName(), (WEFApplication)plugin);
             
             if (logger.isDebugEnabled())
-                logger.debug("Added application plugin to registry: " + plugin);
+                logger.debug("Added application plugin to application registry: " + plugin);
         }
     }
     

@@ -1685,7 +1685,7 @@
       <copy todir="${dir.project.webeditor.assemble.war}/yui">
          <fileset dir="${dir.project.webeditor.src.web}/yui" />
       </copy>
-   </target>  
+   </target>
    
    <target name="minimize-webeditor-war-javascript" depends="init">
       <echo>Compressing Web Editor WAR Javascript...</echo>
@@ -1723,6 +1723,8 @@
             <include name="alfresco/templates/org/alfresco/metadata.ftl" />
          </fileset>
       </copy>
+      <copy todir="${dir.project.webeditor.assemble.plugin}/org/springframework/extensions/surf"
+            file="${dir.project.webeditor.config}/alfresco/awe-plugin-context.xml" />
       <copy todir="${dir.project.webeditor.assemble.plugin}/META-INF">
          <fileset dir="${dir.project.webeditor.src.web}">
             <include name="css/**" />
