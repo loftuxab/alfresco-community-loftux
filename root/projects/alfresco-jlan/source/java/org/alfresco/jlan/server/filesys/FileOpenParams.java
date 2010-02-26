@@ -56,10 +56,6 @@ public class FileOpenParams {
 	
 	private static String[] _openMode = { "Supersede", "Open", "Create", "OpenIf", "Overwrite", "OverwriteIf" };
 	
-	// Data stream name
-	
-	private static final String DataStreamName	= ":$DATA";
-	
 	//	File/directory to be opened
 	
 	private String m_path;
@@ -828,10 +824,10 @@ public class FileOpenParams {
 		
 		// Check for the data stream name
 		
-		if ( m_stream.equals( DataStreamName))
+		if ( m_stream.equals( FileName.MainDataStreamName))
 			m_stream = null;
-		else if ( m_stream.endsWith(DataStreamName))
-			m_stream = m_stream.substring( 0, m_stream.length() - DataStreamName.length());
+		else if ( m_stream.endsWith( FileName.DataStreamName))
+			m_stream = m_stream.substring( 0, m_stream.length() - FileName.DataStreamName.length());
 	}
 	
 	/**

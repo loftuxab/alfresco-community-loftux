@@ -4400,8 +4400,6 @@ public class OracleDBInterface extends JdbcDBInterface implements DBQueueInterfa
 			
 			if ( rs.next())
 			  objectId = rs.getString("ObjectId");
-			else
-			  throw new DBException("Failed to load object id for " + fileId);
     }
     catch (SQLException ex) {
 

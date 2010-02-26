@@ -53,7 +53,6 @@ import org.alfresco.jlan.server.filesys.loader.FileRequest;
 import org.alfresco.jlan.server.filesys.loader.FileRequestQueue;
 import org.alfresco.jlan.server.filesys.loader.FileSegment;
 import org.alfresco.jlan.server.filesys.loader.FileSegmentInfo;
-import org.alfresco.jlan.server.filesys.loader.MemorySegmentList;
 import org.alfresco.jlan.server.filesys.loader.SingleFileRequest;
 import org.alfresco.jlan.util.NameValue;
 import org.alfresco.jlan.util.NameValueList;
@@ -391,6 +390,9 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 		String fullName = params.getFullPath();
 		String[] paths = FileName.splitPath(params.getPath());
 		String name = paths[1];
+		
+		if ( params.isStream())
+			name = name + params.getStreamName();
 
 		// Find, or create, the file state for the file/directory
 
@@ -415,8 +417,7 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 			if ( create == true || params.isOverwrite() == true) {
 
 				// Indicate that the file data is available, this is a new file or the existing file is being
-				// overwritten
-				// so there is no data to load.
+				// overwritten so there is no data to load.
 
 				fileSeg.setStatus(FileSegmentInfo.Available);
 			}
@@ -433,13 +434,13 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 
 					if ( fileSeg.isDataLoading() == false)
 						queueFileRequest(new SingleFileRequest(FileRequest.LOAD, cacheFile.getFileId(), cacheFile.getStreamId(),
-								fileSeg.getInfo(), cacheFile.getFullNameStream(), fstate));
+								fileSeg.getInfo(), cacheFile.getFullName(), fstate));
 				}
 
 				// DEBUG
 
 				if ( Debug.EnableInfo && hasDebug())
-					Debug.println("ObjIdLoader Queued file load, SEQUENTIAL access");
+					Debug.println("ObjIdLoader Queued file load, SEQUENTIAL access, file=" + cacheFile.getFullName());
 			}
 		}
 		else {
@@ -499,8 +500,8 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 
 					// Create a file save request for the updated file segment
 
-					SingleFileRequest fileReq = new SingleFileRequest(FileRequest.SAVE, cacheFile.getFileId(), cacheFile
-							.getStreamId(), fileSeg.getInfo(), netFile.getFullNameStream(), cacheFile.getFileState());
+					SingleFileRequest fileReq = new SingleFileRequest(FileRequest.SAVE, cacheFile.getFileId(), cacheFile.getStreamId(), 
+							fileSeg.getInfo(), netFile.getFullName(), cacheFile.getFileState());
 
 					// Check if there are any attributes to be added to the file request
 
@@ -693,6 +694,11 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 			return StsError;
 		}
 
+		// DEBUG
+		
+		if ( Debug.EnableInfo && hasDebug())
+			Debug.println("## ObjIdLoader fileSeg=" + fileSeg.getTemporaryFile() + ", virtPath=" + loadReq.getVirtualPath());
+		
 		// Load the file data
 
 		int loadSts = StsRequeue;
@@ -711,20 +717,34 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 
 			objectId = getDBObjectIdInterface().loadObjectId(fileId, strmId);
 
-			// Load the file data
+			if ( objectId != null) {
 
-			loadFileData(fileId, strmId, objectId, fileSeg);
+				// Load the file data
 
-			// Set the load status
-
-			loadSts = StsSuccess;
-
-			// DEBUG
-
-			if ( Debug.EnableInfo && hasDebug()) {
-				long endTime = System.currentTimeMillis();
-				Debug.println("## ObjIdLoader loaded fid=" + loadReq.getFileId() + ", stream=" + loadReq.getStreamId()
-						+ ", time=" + (endTime - startTime) + "ms");
+				loadFileData(fileId, strmId, objectId, fileSeg);
+	
+				// Set the load status
+	
+				loadSts = StsSuccess;
+	
+				// DEBUG
+	
+				if ( Debug.EnableInfo && hasDebug()) {
+					long endTime = System.currentTimeMillis();
+					Debug.println("## ObjIdLoader loaded fid=" + loadReq.getFileId() + ", stream=" + loadReq.getStreamId()
+							+ ", time=" + (endTime - startTime) + "ms");
+				}
+			}
+			else {
+				
+				// DEBUG
+				
+				if ( Debug.EnableInfo && hasDebug())
+					Debug.println("## ObjIdLoader No object id mapping for fid=" + loadReq.getFileId() + ", stream=" + loadReq.getStreamId());
+				
+				// Indicate a load success
+				
+				loadSts = StsSuccess;
 			}
 		}
 		catch (DBException ex) {
@@ -759,6 +779,17 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 			// Indicate the file load failed
 
 			loadSts = StsRequeue;
+		}
+		catch (Exception ex) {
+
+			// DEBUG
+
+			if ( Debug.EnableError && hasDebug())
+				Debug.println(ex);
+
+			// Indicate the file load failed
+
+			loadSts = StsError;
 		}
 
 		// Clear the last modified date/time of the temporary file to indicate it has not been updated
@@ -1618,7 +1649,6 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 		// file segment.
 
 		FileSegment fileSeg = null;
-		MemorySegmentList memList = null;
 		CachedNetworkFile netFile = null;
 
 		synchronized (state) {
@@ -1645,7 +1675,7 @@ public abstract class ObjectIdFileLoader implements FileLoader, BackgroundFileLo
 
 					// DEBUG
 
-					if ( Debug.EnableInfo)
+					if ( Debug.EnableInfo && hasDebug())
 						Debug.println("## Temp file for stream ##");
 				}
 

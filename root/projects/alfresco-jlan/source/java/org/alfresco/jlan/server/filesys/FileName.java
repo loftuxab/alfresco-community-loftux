@@ -36,14 +36,19 @@ import java.util.StringTokenizer;
  */
 public final class FileName {
 
-  //	DOS file name seperator
+	//	DOS file name seperator
 
-  public static final char DOS_SEPERATOR 				= '\\';
-  public static final String DOS_SEPERATOR_STR 	= "\\";
+	public static final char DOS_SEPERATOR 				= '\\';
+	public static final String DOS_SEPERATOR_STR 	= "\\";
 
 	//	NTFS Stream seperator
 	
 	public static final String NTFSStreamSeperator	= ":";
+
+	// Data stream names
+	
+	public static final String MainDataStreamName	= "::$DATA";
+	public static final String DataStreamName		= ":$DATA";
 	
   /**
    * Build a path using the specified components.
@@ -619,5 +624,29 @@ public final class FileName {
 	  //	Return the relative path
 	  
 	  return relPath.toString();
+	}
+	
+	/**
+	 * Get the path to the parent file of an NTFS stream
+	 * 
+	 * @param streamPath String
+	 * @return String
+	 */
+	public final static String getParentPathForStream( String streamPath) {
+		
+		// Validate the path
+		
+		if ( streamPath == null)
+			return null;
+		
+		// Find the stream name within the path
+		
+		int idx = streamPath.indexOf( NTFSStreamSeperator);
+		if ( idx == -1)
+			return streamPath;
+		
+		// Remvoe the stream name from the end of the path
+		
+		return streamPath.substring( 0, idx);
 	}
 }
