@@ -22,63 +22,46 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.wef;
-
-import java.util.List;
+package org.springframework.extensions.webeditor;
 
 /**
- * Interface definition of a Web Editor Framework resource
+ * Implementation of a WEFPlugin that is capable of registering itself
+ * with a plugin registry.
  *
  * @author Gavin Cornwell
  */
-public interface WEFResource
+public class WEFPluginImpl extends WEFResourceImpl implements WEFPlugin
 {
-    /**
-     * Returns the resource name.
-     * 
-     * @return The name
-     */
-    public String getName();
+    public static final String TYPE_PLUGIN = "plugin"; 
+    
+    protected WEFPluginRegistry registry;
     
     /**
-     * Returns the resource description.
-     * 
-     * @return The description
+     * Default constructor
      */
-    public String getDescription();
+    public WEFPluginImpl()
+    {
+        this.type = TYPE_PLUGIN;
+    }
     
     /**
-     * Returns the resource type.
+     * Sets the WEFPluginRegistry instance to register all plugins with.
      * 
-     * @return The type
+     * @param registry The WEFPluginRegistry instance
      */
-    public String getType();
+    public void setPluginRegistry(WEFPluginRegistry registry)
+    {
+        this.registry = registry;
+    }
     
     /**
-     * Returns the resource path.
-     * 
-     * @return The path
+     * Registers this plugin with the plugin registry.
      */
-    public String getPath();
-    
-    /**
-     * Returns the resource varaible name
-     * 
-     * @return The variable name
-     */
-    public String getVariableName();
-    
-    /**
-     * Returns the resource container.
-     * 
-     * @return The container
-     */
-    public String getContainer();
-    
-    /**
-     * Returns a list of dependencies this resouce has.
-     * 
-     * @return The resource's dependencies
-     */
-    public List<WEFResource> getDependencies();
+    public void register()
+    {
+        if (this.registry != null)
+        {
+            this.registry.addPlugin(this);
+        }
+    }
 }

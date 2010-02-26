@@ -22,13 +22,63 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.wef;
+package org.springframework.extensions.webeditor;
+
+import java.util.List;
 
 /**
- * Marker interface to identify Web Editor Framework plugins.
+ * Interface definition of a Web Editor Framework resource
  *
  * @author Gavin Cornwell
  */
-public interface WEFPlugin extends WEFResource
+public interface WEFResource
 {
+    /**
+     * Returns the resource name.
+     * 
+     * @return The name
+     */
+    public String getName();
+    
+    /**
+     * Returns the resource description.
+     * 
+     * @return The description
+     */
+    public String getDescription();
+    
+    /**
+     * Returns the resource type.
+     * 
+     * @return The type
+     */
+    public String getType();
+    
+    /**
+     * Returns the resource path.
+     * 
+     * @return The path
+     */
+    public String getPath();
+    
+    /**
+     * Returns the resource varaible name
+     * 
+     * @return The variable name
+     */
+    public String getVariableName();
+    
+    /**
+     * Returns the resource container.
+     * 
+     * @return The container
+     */
+    public String getContainer();
+    
+    /**
+     * Returns a list of dependencies this resouce has.
+     * 
+     * @return The resource's dependencies
+     */
+    public List<WEFResource> getDependencies();
 }

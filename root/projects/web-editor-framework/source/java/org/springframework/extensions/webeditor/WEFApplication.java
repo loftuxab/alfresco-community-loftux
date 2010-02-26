@@ -22,46 +22,13 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.wef;
+package org.springframework.extensions.webeditor;
 
 /**
- * Implementation of a WEFPlugin that is capable of registering itself
- * with a plugin registry.
+ * Marker interface to identify a Web Editor Framework application.
  *
  * @author Gavin Cornwell
  */
-public class WEFPluginImpl extends WEFResourceImpl implements WEFPlugin
+public interface WEFApplication extends WEFPlugin
 {
-    public static final String TYPE_PLUGIN = "plugin"; 
-    
-    protected WEFPluginRegistry registry;
-    
-    /**
-     * Default constructor
-     */
-    public WEFPluginImpl()
-    {
-        this.type = TYPE_PLUGIN;
-    }
-    
-    /**
-     * Sets the WEFPluginRegistry instance to register all plugins with.
-     * 
-     * @param registry The WEFPluginRegistry instance
-     */
-    public void setPluginRegistry(WEFPluginRegistry registry)
-    {
-        this.registry = registry;
-    }
-    
-    /**
-     * Registers this plugin with the plugin registry.
-     */
-    public void register()
-    {
-        if (this.registry != null)
-        {
-            this.registry.addPlugin(this);
-        }
-    }
 }

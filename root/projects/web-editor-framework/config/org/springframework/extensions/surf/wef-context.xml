@@ -3,13 +3,13 @@
 
 <beans>
    
-   <bean id="wefPluginRegistry" class="org.alfresco.wef.WEFPluginRegistry" />
+   <bean id="wefPluginRegistry" class="org.springframework.extensions.webeditor.WEFPluginRegistry" />
    
    <bean id="wefPluginBase" abstract="true" init-method="register">
       <property name="pluginRegistry" ref="wefPluginRegistry" />
    </bean>
    
-   <bean id="wefApplication" parent="wefPluginBase" class="org.alfresco.wef.WEFApplicationImpl">
+   <bean id="wefApplication" parent="wefPluginBase" class="org.springframework.extensions.webeditor.WEFApplicationImpl">
       <property name="name" value="application.wef" />
       <property name="description" value="The application" />
       <property name="path" value="/service/wef/application" />
@@ -17,331 +17,76 @@
       <property name="dependencies">
          <list>
             <ref bean="wefBase" />
+            <ref bean="wefResetCSS" />
+            <ref bean="wefCSS" />
             <ref bean="wefRibbon" />
-            <ref bean="wefToolbar" />
          </list>
       </property>
    </bean>
    
    <!-- TODO: Determine if these should be loaded as part of the bootstrap process -->
-   <bean id="wefBase" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.wef" />
+   <bean id="wefBase" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.springframework.extensions.webeditor" />
       <property name="description" value="Base JavaScript for WEF" />
-      <property name="path" value="/lib/com/alfresco/wef/wef.js" />
+      <property name="path" value="/res/wef/wef.js" />
       <property name="type" value="js" />
    </bean>
    
-   <bean id="wefToolbar" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.wef.toolbar" />
-      <property name="description" value="Toolbar component used in ribbon component" />
-      <property name="path" value="/js/yui-toolbar.js" />
-      <property name="type" value="js" />
+   <bean id="wefResetCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.springframework.extensions.webeditor.reset-css" />
+      <property name="description" value="Reset CSS file used by WEF" />
+      <property name="path" value="/res/wef/wef-reset.css" />
+      <property name="type" value="css" />
    </bean>
    
-   <bean id="wefRibbon" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.wef.ribbon" />
+   <bean id="wefCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.springframework.extensions.webeditor.css" />
+      <property name="description" value="CSS file for WEF" />
+      <property name="path" value="/res/wef/wef.css" />
+      <property name="type" value="css" />
+   </bean>
+   
+   <bean id="wefRibbon" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.springframework.extensions.webeditor.ribbon" />
       <property name="description" value="Ribbon component used to host toolbars" />
-      <property name="path" value="/js/awe-ribbon.js" />
+      <property name="path" value="/res/wef/ui/ribbon/ribbon.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
             <ref bean="wefRibbonCSS" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="wefRibbonCSS" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.wef.ribbon-css" />
-      <property name="description" value="CSS file for the ribbon component" />
-      <property name="path" value="/css/awe-toolbar.css" />
-      <property name="type" value="css" />
-   </bean>
-
-   <bean id="webscript.org.alfresco.wef.wefresources.get" class="org.alfresco.wef.webscripts.WEFResourcesGet" parent="webscript">
-      <property name="pluginRegistry" ref="wefPluginRegistry" />
-   </bean>
-   
-   <bean id="webscript.org.alfresco.wef.wefapplication.get" class="org.alfresco.wef.webscripts.WEFApplicationGet" parent="webscript">
-      <property name="pluginRegistry" ref="wefPluginRegistry" />
-   </bean>
-   
-   <!-- ******* NOTE: All the config below will be in the AWE spring context file ******** -->
-   
-   <!-- Plugins  -->
-   <bean id="formsPlugin" parent="wefPluginBase" class="org.alfresco.wef.WEFPluginImpl">
-      <property name="name" value="org.alfresco.forms" />
-      <property name="description" value="Plugin providing forms capabilities" />
-      <property name="path" value="/components/form/form-min.js" />
-      <property name="variableName" value="AWEForms" />
-      <property name="dependencies">
-         <list>
-            <ref bean="formsRuntime" />
-            <ref bean="formsCSS" />
-            <ref bean="formsDatePickerControl" />
-            <ref bean="formsPeriodControl" />
-            <ref bean="formsObjectFinderControl" />
-            <ref bean="formsObjectFinderControlCSS" />
-            <ref bean="formsRichTextControl" />
-            <ref bean="formsContentControl" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="awePlugin" parent="wefPluginBase" class="org.alfresco.wef.WEFPluginImpl">
-      <property name="name" value="org.alfresco.awe" />
-      <property name="description" value="Plugin providing in-context editing capabilities" />
-      <property name="path" value="/js/awe.js" />
-      <property name="variableName" value="AWE" />
-      <property name="dependencies">
-         <list>
-            <ref bean="alfUtils" />
-            <ref bean="formsPlugin" />
-            <ref bean="aweResetCSS" />
-            <ref bean="aweCSS" />
+            <ref bean="wefRibbonIECSS" />
             <ref bean="wefToolbar" />
-            <ref bean="yuiSkin" />
          </list>
       </property>
    </bean>
    
-   <!-- Resources -->
-   
-   <!-- *** Forms *** -->
-   
-   <bean id="formsRuntime" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.runtime" />
-      <property name="description" value="Forms runtime" />
-      <property name="path" value="/js/forms-runtime.js" />
-      <property name="type" value="js" />
-      <property name="dependencies">
-         <list>
-            <ref bean="alfUtils" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="formsCSS" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.css" />
-      <property name="description" value="Forms CSS" />
-      <property name="path" value="/components/form/form.css" />
+   <bean id="wefRibbonCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.springframework.extensions.webeditor.ribbon-css" />
+      <property name="description" value="CSS file for the ribbon component" />
+      <property name="path" value="/res/wef/ui/ribbon/ribbon.css" />
       <property name="type" value="css" />
    </bean>
    
-   <bean id="formsDatePickerControl" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.control.date-picker" />
-      <property name="description" value="Forms date picker control" />
-      <property name="path" value="/components/form/date-picker-min.js" />
-      <property name="type" value="js" />
-   </bean>
-   
-   <bean id="formsPeriodControl" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.control.period" />
-      <property name="description" value="Forms period control" />
-      <property name="path" value="/components/form/period-min.js" />
-      <property name="type" value="js" />
-   </bean>
-   
-   <bean id="formsObjectFinderControl" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.control.object-finder" />
-      <property name="description" value="Forms object finder control" />
-      <property name="path" value="/components/object-finder/object-finder-min.js" />
-      <property name="type" value="js" />
-   </bean>
-   
-   <bean id="formsObjectFinderControlCSS" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.control.object-finder-css" />
-      <property name="description" value="Forms object finder control CSS" />
-      <property name="path" value="/components/object-finder/object-finder.css" />
+   <bean id="wefRibbonIECSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.springframework.extensions.webeditor.ribbon-ie-css" />
+      <property name="description" value="IE specific CSS file for the ribbon component" />
+      <property name="path" value="/res/wef/ui/ribbon/ribbon-ie.css" />
       <property name="type" value="css" />
    </bean>
    
-   <bean id="formsRichTextControl" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.control.rich-text" />
-      <property name="description" value="Forms rich text control" />
-      <property name="path" value="/components/form/rich-text-min.js" />
+   <bean id="wefToolbar" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.springframework.extensions.webeditor.toolbar" />
+      <property name="description" value="Toolbar component used in ribbon component" />
+      <property name="path" value="/js/yui-toolbar.js" />
       <property name="type" value="js" />
-      <property name="dependencies">
-         <list>
-            <ref bean="alfrescoTinyMCE" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="formsContentControl" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.forms.control.content" />
-      <property name="description" value="Forms content control" />
-      <property name="path" value="/components/form/content-min.js" />
-      <property name="type" value="js" />
-      <property name="dependencies">
-         <list>
-            <ref bean="formsRichTextControl" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="alfrescoTinyMCE" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.editors.tinymce" />
-      <property name="description" value="Alfresco wrapped TinyMCE control" />
-      <property name="path" value="/modules/editors/tiny_mce-min.js" />
-      <property name="type" value="js" />
-      <property name="dependencies">
-         <list>
-            <ref bean="tinyMCE" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="tinyMCE" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="com.moxiecode.tinymce" />
-      <property name="description" value="TinyMCE library" />
-      <property name="path" value="/modules/editors/tiny_mce/tiny_mce.js" />
-      <property name="type" value="js" />
-   </bean>
-   
-   <!-- *** Alfresco *** -->
-   
-   <bean id="alfMessages" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.messages" />
-      <property name="description" value="Localised messages" />
-      <property name="path" value="/service/messages.js?locale=${locale}" />
-      <property name="type" value="js" />
-   </bean>
-   
-   <bean id="alfUtils" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.utils" />
-      <property name="description" value="Common JavaScript utilities" />
-      <property name="path" value="/js/alfresco.js" />
-      <property name="type" value="js" />
-      <property name="dependencies">
-         <list>
-            <ref bean="yuiUtilities" />
-            <ref bean="yuiAnimation" />
-            <ref bean="yuiSelector" />
-            <ref bean="yuiCookie" />
-            <ref bean="yuiMenu" />
-            <ref bean="yuiContainer" />
-            <ref bean="yuiButton" />
-            <ref bean="yuiBubbling" />
-            <ref bean="alfMessages" />
-         </list>
-      </property>
-   </bean>
-   
-   <!-- *** AWE *** -->
-   
-   <bean id="aweResetCSS" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.awe.reset-css" />
-      <property name="description" value="Reset CSS file for AWE" />
-      <property name="path" value="/css/awe-reset.css" />
-      <property name="type" value="css" />
-   </bean>
-   
-   <bean id="aweCSS" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="org.alfresco.awe.css" />
-      <property name="description" value="Main CSS file for AWE" />
-      <property name="path" value="/css/awe.css" />
-      <property name="type" value="css" />
-   </bean>
-   
-   <!-- *** YUI *** -->
-   
-   <bean id="yuiBubbling" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="com.yahoo.bubbling" />
-      <property name="description" value="Bubbling event library" />
-      <property name="path" value="/js/bubbling.v2.1.js" />
-      <property name="type" value="js" />
-      <property name="dependencies">
-         <list>
-            <ref bean="yuiUtilities" />
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="yuiSkin" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="com.yahoo.skin" />
-      <property name="description" value="The default YUI skin" />
-      <property name="path" value="/yui/assets/skins/default/skin.css" />
-      <property name="type" value="css" />
-   </bean>
-   
-   <bean id="yuiUtilities" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="utilities" />
-      <property name="description" value="YUI utility library" />
-   </bean>
-   
-   <bean id="yuiAnimation" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="animation" />
-      <property name="description" value="YUI animation library" />
-   </bean>
-   
-   <bean id="yuiSelector" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="selector" />
-      <property name="description" value="YUI selector library" />
-   </bean>
-   
-   <bean id="yuiCookie" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="cookie" />
-      <property name="description" value="YUI cookie library" />
-   </bean>
-   
-   <bean id="yuiMenu" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="menu" />
-      <property name="description" value="YUI menu library" />
-   </bean>
-   
-   <bean id="yuiContainer" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="container" />
-      <property name="description" value="YUI container library" />
-   </bean>
-   
-   <bean id="yuiButton" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="button" />
-      <property name="description" value="YUI button library" />
-   </bean>
-   
-   <!-- *** Aria *** -->
-   
-   <bean id="yuiAria" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="accessibility.aria.plugins.yui" />
-      <property name="description" value="Accessibility plugins for YUI" />
-      <property name="path" value="/js/accessibility/aria/plugins/yui/yui-aria.js" />
-      <property name="type" value="js" />
-      <property name="dependencies">
-         <list>
-            <ref bean="yuiAriaMenu" />
-            <ref bean="yuiAriaContainer" />
-            <ref bean="yuiAriaButton" />
-            <ref bean="yuiAriaTabView" />
-         </list>
-      </property>
    </bean>
 
-   <bean id="yuiAriaMenu" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="accessibility.aria.plugins.yui.menu" />
-      <property name="description" value="Accessibility plugins for YUI menu" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/menuviewariaplugin.js" />
-      <property name="type" value="js" />
+   <bean id="webscript.org.springframework.extensions.webeditor.wefresources.get" class="org.springframework.extensions.webeditor.webscripts.WEFResourcesGet" parent="webscript">
+      <property name="pluginRegistry" ref="wefPluginRegistry" />
    </bean>
    
-   <bean id="yuiAriaContainer" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="accessibility.aria.plugins.yui.container" />
-      <property name="description" value="Accessibility plugins for YUI container" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/containerviewariaplugin.js" />
-      <property name="type" value="js" />
-   </bean>
-   
-   <bean id="yuiAriaButton" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="accessibility.aria.plugins.yui.button" />
-      <property name="description" value="Accessibility plugins for YUI button" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/buttonviewariaplugin.js" />
-      <property name="type" value="js" />
-   </bean>
-   
-   <bean id="yuiAriaTabView" class="org.alfresco.wef.WEFResourceImpl">
-      <property name="name" value="accessibility.aria.plugins.yui.tabview" />
-      <property name="description" value="Accessibility plugins for YUI tab view" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/tabviewariaplugin.js" />
-      <property name="type" value="js" />
+   <bean id="webscript.org.springframework.extensions.webeditor.wefapplication.get" class="org.springframework.extensions.webeditor.webscripts.WEFApplicationGet" parent="webscript">
+      <property name="pluginRegistry" ref="wefPluginRegistry" />
    </bean>
    
 </beans>
