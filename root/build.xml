@@ -180,7 +180,9 @@
          <!-- Content Tests -->
          <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
          <include name="**/org/alfresco/repo/content/ContentTestSuite.java" />
+         <include name="**/org/alfresco/repo/content/metadata/MetadataTestSuite.java" />
          <include name="**/org/alfresco/repo/content/metadata/xml/XmlMetadataExtracterTest.java" />
+         <include name="**/org/alfresco/repo/content/transform/TransformTestSuite.java" />
          <!-- Domain Tests -->
          <exclude name="**/org/alfresco/repo/domain/**/*Test.java" />
          <include name="**/org/alfresco/repo/domain/DomainTestSuite.java" />
