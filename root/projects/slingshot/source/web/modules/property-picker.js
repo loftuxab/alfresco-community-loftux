@@ -72,6 +72,19 @@
          transientProperties: {},
 
          /**
+          * The transient properties's types to add to "special" properties.
+          *
+          * @property transientPropertyTypes
+          * @type array
+          * @default {}
+          */
+         transientPropertyTypes: {
+            "SIZE" : "d:long",
+            "ENCODING" : "d:any",
+            "MIME_TYPE" : "d:any"
+         },
+
+         /**
           * Template URL
           *
           * @property templateUrl
@@ -742,13 +755,25 @@
             var transientProperty = foundTransientProperties[i],
                tpil = transientProperty.properties.length,
                insertIndex = foundTransientProperties[i].index + (i * tpil),
-               property = listItemObjs[foundTransientProperties[i].index],
-               title = property.title ? property.title : property.name;
-            for (var tpi = 0; tpi < tpil; tpi++)
+               property = Alfresco.util.deepCopy(listItemObjs[foundTransientProperties[i].index]),
+               title = property.title ? property.title : property.name,
+               newProperty,
+               tpi,
+               type;
+            for (tpi = 0; tpi < tpil; tpi++)
             {
                listItemObjs.splice(insertIndex + tpi, 0, Alfresco.util.deepCopy(property));
-               listItemObjs[insertIndex + tpi + 1].title = transientProperty.properties[tpi].displayLabel + " (" + title + ")";
-               listItemObjs[insertIndex + tpi + 1].transientProperty = transientProperty.properties[tpi].value;
+            }
+            for (tpi = 0; tpi < tpil; tpi++)
+            {
+               newProperty = listItemObjs[insertIndex + tpi + 1];
+               newProperty.title = transientProperty.properties[tpi].displayLabel + " (" + title + ")";
+               newProperty.name = newProperty.name + "." + transientProperty.properties[tpi].value;
+               type = this.options.transientPropertyTypes[transientProperty.properties[tpi].value];
+               if (type)
+               {
+                  newProperty.dataType = type;
+               }
             }
          }
          return listItemObjs;
