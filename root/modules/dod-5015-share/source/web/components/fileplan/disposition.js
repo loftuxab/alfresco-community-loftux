@@ -184,7 +184,7 @@
        *
        * @method: onFolderDetailsAvailable
        */
-      onFolderDetailsAvailable: function Events_onFolderDetailsAvailable(layer, args)
+      onFolderDetailsAvailable: function Disposition_onFolderDetailsAvailable(layer, args)
       {
          if (args[1].folderDetails.permissions.userAccess.CreateModifyDestroyFileplanMetadata)
          {

@@ -1,7 +1,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.Events("${args.htmlid}").setOptions(
    {
-      nodeRef: "${page.url.args.nodeRef}",
+      nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef}"),
       siteId: "${page.url.templateArgs.site!""}"      
    }).setMessages(
       ${messages}

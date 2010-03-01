@@ -29,7 +29,7 @@
  * or link the folder to another folders rule set.
  *
  * @namespace Alfresco
- * @class Alfresco.FolderPath
+ * @class Alfresco.RulesNone
  */
 (function()
 {
@@ -48,7 +48,7 @@
     * FolderPath constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.FolderPath} The new FolderPath instance
+    * @return {Alfresco.RulesNone} The new FolderPath instance
     * @constructor
     */
    Alfresco.RulesNone = function(htmlId)

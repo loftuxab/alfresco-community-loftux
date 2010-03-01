@@ -91,7 +91,7 @@
          {
             disabled: true
          });
-         YAHOO.Bubbling.on('documentDetailsAvailable', this.onDocumentDetailsAvailable, this);
+         YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
       },
 
       /**
@@ -103,10 +103,11 @@
        */
       onDocumentDetailsAvailable: function RecordsDocumentReferences_onDocumentDetailsAvailable(e, args)
       {
-         this.options.parentNodeRef = args[1].metadata.filePlan.replace(':/','');
-         this.options.docName = args[1].documentDetails.displayName;
-
          var docDetails = args[1].documentDetails;
+
+         this.options.parentNodeRef = args[1].metadata.filePlan.replace(':/','');
+         this.options.docName = docDetails.displayName;
+
          if (docDetails.permissions.userAccess.Create && docDetails.type !== "metadata-stub")
          {
             this.widgets.manageRefs.set("disabled", false);

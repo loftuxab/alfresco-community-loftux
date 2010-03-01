@@ -167,9 +167,9 @@
             documentDetailsUrl: "document-details?nodeRef=" + nodeRef,
             editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
             inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
+            managePermissionsUrl: "manage-permissions?nodeRef=" + nodeRef,
             workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
-            originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef),
-            managePermissionsUrl: "permissions?nodeRef=" + nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type
+            originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)
          });
       },
        

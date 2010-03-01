@@ -78,7 +78,7 @@
        * Makes sure a check for the parents file plan is done only once.
        *
        * @property _lookForParentsDispositionSchedule
-       * @type {boolean}
+       * @type boolean
        * @private
        */
       _lookForParentsDispositionSchedule: null,
@@ -87,7 +87,7 @@
        * True if the disposition schedule is applied to the parent
        *
        * @property dispositionScheduleAppliedToParent
-       * @type {boolean}
+       * @type boolean
        */
       _dispositionScheduleAppliedToParent: null,
 
@@ -95,7 +95,7 @@
        * Object container for event complete / undo buttons
        *
        * @property eventButtons
-       * @type {object}
+       * @type object
        */
       eventButtons: null,
 
@@ -111,7 +111,7 @@
           * The nodeRef to the object that owns the disposition schedule that is configured
           *
           * @property nodeRef
-          * @type {string}
+          * @type Alfresco.util.NodeRef
           */
          nodeRef: null,
 
@@ -161,7 +161,7 @@
          {
             Alfresco.util.Ajax.jsonGet(
             {
-               url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/nextdispositionaction",
+               url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.uri + "/nextdispositionaction",
                successCallback:
                {
                   fn: function(response)
@@ -260,7 +260,7 @@
             // First get the parent nodeRef
             Alfresco.util.Ajax.jsonGet(
             {
-               url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/doclist/node/" + this.options.nodeRef.replace(":/", ""),
+               url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/node/" + this.options.nodeRef.uri,
                successCallback:
                {
                   fn: function (response)
@@ -268,10 +268,10 @@
                      if (response.json.metadata && response.json.metadata.parent)
                      {
                         // Get the parent nodeRef from the reponse and try to find its fileplan
-                        var parentNodeRef = response.json.metadata.parent.nodeRef;
+                        var parentNodeRef = new Alfresco.util.NodeRef(response.json.metadata.parent.nodeRef);
                         Alfresco.util.Ajax.jsonGet(
                         {
-                           url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + parentNodeRef.replace(":/", "") + "/nextdispositionaction",
+                           url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + parentNodeRef.uri + "/nextdispositionaction",
                            successCallback:
                            {
                               fn: function(response)
@@ -287,7 +287,7 @@
 
                                     // Display a link to the fileplan's events
                                     var msgHTML = "<div>" + this.msg("label.dispositionScheduleAppliedToFolder", asOf) + "</div><br />";
-                                    msgHTML += "<a href='" + Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/record-folder-details?nodeRef=" + parentNodeRef + "'>" + this.msg("label.linkToFoldersDispositionSchedule") + "</a>";
+                                    msgHTML += "<a href='" + Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/record-folder-details?nodeRef=" + parentNodeRef.nodeRef + "'>" + this.msg("label.linkToFoldersDispositionSchedule") + "</a>";
                                     this._displayMessage(msgHTML);
                                  }
                               },
@@ -518,9 +518,9 @@
             url: Alfresco.constants.PROXY_URI_RELATIVE + "api/rma/actions/ExecutionQueue",
             dataObj:
             {
-               nodeRef : this.options.nodeRef,
-               name : action,
-               params : params
+               nodeRef: this.options.nodeRef.nodeRef,
+               name: action,
+               params: params
             },
             successCallback:
             {

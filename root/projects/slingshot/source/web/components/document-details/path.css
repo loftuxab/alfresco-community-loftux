@@ -30,6 +30,14 @@
    padding: 2px 0 2px 20px;
 }
 
+.path-nav span.self
+{
+   background-image: url(../documentlibrary/images/folder-closed-16.png);
+   background-position: left 50%;
+   background-repeat: no-repeat;
+   padding: 2px 0 2px 20px;
+}
+
 .path-nav .separator
 {
    padding: 0 0.5em;
@@ -64,4 +72,27 @@
 .status-banner .locked
 {
    background-image: url(../documentlibrary/images/locked-indicator-16.png);
+}
+
+.icon-type
+{
+   border-bottom: 1px solid #ccc;
+   line-height: 48px;
+   margin-right: -10px;
+   margin-left: -10px;
+   min-height: 48px;
+   padding: 0.5em 1em;
+}
+
+.icon-type img
+{
+   vertical-align: middle;
+}
+
+.icon-type .type
+{
+   font-size: 131%;
+   padding-left: 1em;
+   position: relative;
+   top: 3px;
 }

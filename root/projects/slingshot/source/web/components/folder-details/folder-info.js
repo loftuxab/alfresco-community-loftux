@@ -74,7 +74,7 @@
          
          if (tags.length === 0)
          {
-            tagsHtml = Alfresco.util.message("label.none", this.name);
+            tagsHtml = this.msg("label.none");
          }
          else
          {
@@ -88,7 +88,7 @@
          Dom.get(this.id + "-tags").innerHTML = tagsHtml;
          
          // render permissions values
-         var noPerms = Alfresco.util.message("folder-info.role.None", this.name),
+         var noPerms = this.msg("folder-info.role.None"),
             managerPerms = noPerms,
             collaboratorPerms = noPerms,
             consumerPerms = noPerms,
@@ -101,19 +101,19 @@
             var group = permParts[1];
             if (group.indexOf("_SiteManager") != -1)
             {
-               managerPerms = Alfresco.util.message("folder-info.role." + permParts[2], this.name);
+               managerPerms = this.msg("folder-info.role." + permParts[2]);
             }
             else if (group.indexOf("_SiteCollaborator") != -1)
             {
-               collaboratorPerms = Alfresco.util.message("folder-info.role." + permParts[2], this.name);
+               collaboratorPerms = this.msg("folder-info.role." + permParts[2]);
             }
             else if (group.indexOf("_SiteConsumer") != -1)
             {
-               consumerPerms = Alfresco.util.message("folder-info.role." + permParts[2], this.name);
+               consumerPerms = this.msg("folder-info.role." + permParts[2]);
             }
             else if (group === "GROUP_EVERYONE")
             {
-               everyonePerms = Alfresco.util.message("folder-info.role." + permParts[2], this.name);
+               everyonePerms = this.msg("folder-info.role." + permParts[2]);
             }
          }
          

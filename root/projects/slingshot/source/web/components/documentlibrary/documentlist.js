@@ -1196,7 +1196,7 @@
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "nodeType", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "title", "description",
+               "nodeRef", "nodeType", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "lockedBy", "lockedByUser",
                "version", "size", "contentUrl", "actionSet", "tags", "categories", "activeWorkflows", "isFavourite", "location", "permissions", "custom",
                "actionLabels", "onlineEditUrl"
@@ -1738,9 +1738,9 @@
             folderRulesUrl: "folder-rules?nodeRef=" + nodeRef,
             editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
             inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
+            managePermissionsUrl: "manage-permissions?nodeRef=" + nodeRef,
             workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
             originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef),
-            managePermissionsUrl: "permissions?nodeRef=" + nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type,
             explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
       },

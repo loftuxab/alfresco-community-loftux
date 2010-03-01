@@ -15,6 +15,7 @@
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.document.move-to" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.document.delete" />
          <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
+         <action type="simple-link" id="onActionManagePermissions" permission="permissions" href="{managePermissionsUrl}" label="actions.document.manage-permissions" />
          <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.document.manage-aspects" />
          <action type="action-link" id="onActionChangeType" permission="edit" label="actions.document.change-type" />
       </actionSet>

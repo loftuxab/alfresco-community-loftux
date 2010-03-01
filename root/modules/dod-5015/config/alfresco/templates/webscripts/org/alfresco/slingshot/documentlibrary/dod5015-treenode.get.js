@@ -1,4 +1,5 @@
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/parse-args.lib.js">
+<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/common.lib.js">
 
 /**
  * Document List Component: treenode
@@ -26,7 +27,7 @@ function getTreenode(siteId, path)
       // Quick version if "skipPermissionCheck" flag set
       if (skipPermissionCheck)
       {
-         for each (item in parsedArgs.parentNode.children)
+         for each (item in parsedArgs.pathNode.children)
          {
             if (itemIsAllowed(item))
             {
@@ -45,7 +46,7 @@ function getTreenode(siteId, path)
       }
       else
       {
-         for each (item in parsedArgs.parentNode.children)
+         for each (item in parsedArgs.pathNode.children)
          {
             if (itemIsAllowed(item))
             {

@@ -104,13 +104,14 @@
        */
       onReady: function DocumentDetails_onReady()
       {
-         var url = Alfresco.constants.PROXY_URI + 'slingshot/doclib/doclist/node/' + this.options.nodeRef.uri;
+         var url = Alfresco.constants.PROXY_URI + 'slingshot/doclib/node/' + this.options.nodeRef.uri;
          if (this.options.siteId == "")
          {
             // Repository mode
             url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
          }
-         var config =
+
+         Alfresco.util.Ajax.jsonGet(
          {
             method: "GET",
             url: url,
@@ -124,8 +125,7 @@
                fn: this._getDataFailure, 
                scope: this 
             }
-         };
-         Alfresco.util.Ajax.request(config);
+         });
       },
       
       /**
@@ -140,7 +140,7 @@
          if (response.json !== undefined)
          {
             var documentMetadata = response.json.metadata,
-               documentDetails = response.json.items[0],
+               documentDetails = response.json.item,
                commentNode = documentDetails.nodeRef,
                workingCopyMode = false;
             

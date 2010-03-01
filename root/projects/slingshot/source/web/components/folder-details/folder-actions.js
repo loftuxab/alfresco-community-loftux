@@ -150,6 +150,7 @@
          {
             editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
             folderRulesUrl: "folder-rules?nodeRef=" + nodeRef,
+            managePermissionsUrl: "manage-permissions?nodeRef=" + nodeRef,
             explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
       },
