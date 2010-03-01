@@ -67,7 +67,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             //out.write("/service/wef/resources\"></script>\n");
             
             out.write("<script type=\"text/javascript\">\n");
-            out.write("WEF.ConfigRegistry.registerConfig('com.wefapps.awe',[\n");
+            out.write("WEF.ConfigRegistry.registerConfig('org.wefapps.awe',[\n");
             boolean first = true;
             for (MarkedContent content : markedContent)
             {
@@ -99,7 +99,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             }
             out.write("]);\n");
             out.write("window.onload = function() {\n");      
-            out.write("WEF.run('com.wefapps.awe');");
+            out.write("WEF.run('org.wefapps.awe');");
             out.write("}\n</script>");
             
             if (logger.isDebugEnabled())

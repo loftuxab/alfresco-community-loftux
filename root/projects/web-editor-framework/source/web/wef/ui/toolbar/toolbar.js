@@ -1,0 +1,105 @@
+(function() {
+   
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      KeyListener = YAHOO.util.KeyListener,
+      Selector = YAHOO.util.Selector,
+      Element = YAHOO.util.Element,
+      Bubbling = YAHOO.Bubbling,
+      Cookie = YAHOO.util.Cookie;
+
+   YAHOO.namespace('org.wef.ui.Toolbar');
+      
+   YAHOO.org.wef.ui.Toolbar = function WEF_UI_Toolbar_constructor(config)
+   {
+     YAHOO.org.wef.ui.Toolbar.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
+   };
+       
+   YAHOO.extend(YAHOO.org.wef.ui.Toolbar, WEF.Widget,
+   {
+      init: function WEF_UI_Toolbar_init()
+      {
+         YAHOO.org.wef.ui.Toolbar.superclass.init.apply(this);
+         this.widgets.buttons = [];
+         
+         var el = this.element.get('element');
+         el.innerHTML= '<div class="wef-toolbar"><fieldset><legend>leg</legend><div class="wef-toolbar-subcont"><div class="wef-toolbar-group"><h3></h3><ul></ul></div></div></fieldset></div>';
+         this.widgets.buttonContainer = this.element.getElementsByTagName('ul')[0];
+         var buttons = this.config.buttons || {};
+         if (buttons.buttons) {
+            this.addButtons(buttons.buttons); 
+         };
+         //event handler
+         this.element.on('click', function(e){
+            var targetEl = Event.getTarget(e),
+                id = null,
+                btn = null,
+                value,
+                evtTypeStr = e.type.charAt(0).toUpperCase()+e.type.substring(1);
+            if (targetEl.id)
+            {
+               id = targetEl.id.replace(/-button$/,'');
+               btn = this.widgets.buttons[id];
+            }
+            if (btn) 
+            {
+               this.currentButton = btn;
+               if (btn.get('type') != 'menu') 
+               {
+                  value = btn.get('value');
+                  
+               }
+            }
+            // click is not on button el but a menu item
+            else
+            {
+               if (Dom.hasClass(targetEl, 'yuimenuitemlabel-selected'))
+               {
+                  value = this.currentButton.getMenu().activeItem.value;
+                  //rest id to button id so correct event is fired
+                  id = this.currentButton.get('id');
+               }
+            }
+            //
+            
+            if (!YAHOO.lang.isUndefined(id) && !YAHOO.lang.isUndefined(value))
+            {
+               Bubbling.fire(id+evtTypeStr, value);               
+            }
+            
+            
+            //
+         },this,true);
+         this.initAttributes(this.config);
+      },
+      
+      addButtons: function WEF_UI_Toolbar_addButtons(buttons)
+      {
+         for (var i = 0, len = buttons.length; i < len; i++) 
+         {
+            var btnConfig = buttons[i],
+               li;
+            btnConfig.icon = btnConfig.icon || false;
+            //create container
+            li = document.createElement('li');
+            li.className = 'wef-toolbar-groupitem';
+            this.widgets.buttonContainer.appendChild(li);
+            btnConfig.container = li;
+            var but = new YAHOO.widget.Button(btnConfig);
+            if(btnConfig.icon)
+            {
+               but.addClass('icon-button');
+            }
+            this.widgets.buttons.push(but);
+            this.widgets.buttons[btnConfig.id] = but; 
+         }
+      },
+      
+      getButtonById: function WEF_UI_Toolbar_getButtonById(buttonId)
+      {
+         return this.widgets.buttons[buttonId];
+      }
+      
+   });
+})();
+WEF.register("org.wef.ui.Toolbar", YAHOO.org.wef.ui.Toolbar, {version: "1.0", build: "1"});
