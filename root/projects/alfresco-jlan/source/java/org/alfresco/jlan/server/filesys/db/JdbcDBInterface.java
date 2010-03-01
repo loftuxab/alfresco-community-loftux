@@ -52,19 +52,19 @@ import org.springframework.extensions.config.ConfigElement;
  */
 public abstract class JdbcDBInterface implements DBInterface, DBConnectionPoolListener {
 
-  //	Constants
-  //
+	//	Constants
+	//
 	//	Default database table names
 	
-	public final static String FileSysTable				= "JLANFileSys";
+	public final static String FileSysTable			= "JLANFileSys";
 	public final static String StreamsTable	    	= "JLANStreams";
-	public final static String RetentionTable			= "JLANRetain";
-	public final static String QueueTable					= "JLANQueue";
+	public final static String RetentionTable		= "JLANRetain";
+	public final static String QueueTable			= "JLANQueue";
 	public final static String TransactQueueTable	= "JLANTransQueue";
-	public final static String DataTable					= "JLANData";
-	public final static String JarDataTable				= "JLANJarData";
-	public final static String ObjectIdTable			= "JLANObjectIds";
-  public final static String SymLinkTable       = "JLANSymLinks";
+	public final static String DataTable			= "JLANData";
+	public final static String JarDataTable			= "JLANJarData";
+	public final static String ObjectIdTable		= "JLANObjectIds";
+	public final static String SymLinkTable       	= "JLANSymLinks";
 	
 	//	Number of connections to allocate in the connection pool
 	
@@ -76,13 +76,13 @@ public abstract class JdbcDBInterface implements DBInterface, DBConnectionPoolLi
 
 	//	Default file data fragment size
 	
-	public final static long DefaultFragSize			= MemorySize.MEGABYTE / 2;		//	1/2Mb
-	public final static long MinFragSize 					= MemorySize.KILOBYTE * 64L;	// 	64Kb
-	public final static long MaxFragSize 					= MemorySize.GIGABYTE;				//	1Gb
+	public final static long DefaultFragSize		= MemorySize.MEGABYTE / 2;		//	1/2Mb
+	public final static long MinFragSize 			= MemorySize.KILOBYTE * 64L;	// 	64Kb
+	public final static long MaxFragSize 			= MemorySize.GIGABYTE;			//	1Gb
 	
-  //  Database device context
+	//  Database device context
   
-  protected DBDeviceContext m_dbCtx;
+	protected DBDeviceContext m_dbCtx;
   
 	//	Supported/requested database features
 	
@@ -114,7 +114,7 @@ public abstract class JdbcDBInterface implements DBInterface, DBConnectionPoolLi
 	protected String m_dataTable;
 	protected String m_jarDataTable;
 	protected String m_objectIdTable;
-  protected String m_symLinkTable;
+	protected String m_symLinkTable;
 
 	//	Retention period, milliseconds to add to current date/time value, or -1 if not enabled
 	
@@ -127,28 +127,28 @@ public abstract class JdbcDBInterface implements DBInterface, DBConnectionPoolLi
 	protected int m_dbInitConns = DBConnectionPool.DefaultMinSize;
 	protected int m_dbMaxConns  = DBConnectionPool.DefaultMaxSize;
   
-  protected int m_onlineCheckInterval;
+	protected int m_onlineCheckInterval;
   
 	//	Data fragment size to store per BLOB when the file data is stored in the database
 	
 	protected long m_dataFragSize = DefaultFragSize;
 	
-  //  Pending file ssave requests, used when the database goes offline
+	//  Pending file save requests, used when the database goes offline
   
-  protected FileRequestQueue m_pendingSaveRequests;
+	protected FileRequestQueue m_pendingSaveRequests;
   
 	//	Debug and SQL debug enable flags
 	
 	protected boolean m_debug;
 	protected boolean m_sqlDebug;
 	
-  // Lock file path
+	// Lock file path
   
-  private String m_lockFile;
+	private String m_lockFile;
   
-  // Use crash recovery folder
+	// Use crash recovery folder
   
-  private boolean m_crashRecovery;
+	private boolean m_crashRecovery;
   
   /**
    * Default constructor
