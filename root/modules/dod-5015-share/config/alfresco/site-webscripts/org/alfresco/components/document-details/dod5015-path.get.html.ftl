@@ -1,9 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DocumentPath("${args.htmlid}").setOptions(
-   {
-      siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${template.properties.container!"documentLibrary"}"
-   }).setMessages(
+   new Alfresco.component.Path("${args.htmlid}").setMessages(
       ${messages}
    );
 //]]></script>

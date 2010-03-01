@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>repo-path</region-id>
+   <source-id>manage-permissions</source-id>
+   <url>/components/document-details/repo/path</url>
+</component>

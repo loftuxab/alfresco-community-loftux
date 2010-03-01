@@ -301,7 +301,7 @@
          if (!workflowConfig.path && workflowConfig.nodeRef)
          {
             // Find the path for the nodeRef
-            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/node/" + workflowConfig.nodeRef.uri;
+            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + workflowConfig.nodeRef.uri;
             if (this.options.siteId == "")
             {
                // Repository mode
@@ -316,7 +316,7 @@
                   {
                      if (response.json !== undefined)
                      {
-                        var folderDetails = response.json.items[0];
+                        var folderDetails = response.json.item;
                         Dom.get(this.id + "-path").value = folderDetails.path ? folderDetails.path : "";
                         var paths = folderDetails.path.split("/");
                         Dom.get(this.id + "-destinationLabel").innerHTML = paths.length > 1 ? paths.pop() : "/";

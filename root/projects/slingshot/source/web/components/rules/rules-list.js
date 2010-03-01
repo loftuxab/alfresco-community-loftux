@@ -165,7 +165,7 @@
        * @param layer
        * @param args
        */
-      onRuleSelected: function RulesHeader_onRuleSelected(layer, args)
+      onRuleSelected: function RulesList_onRuleSelected(layer, args)
       {
          var nodeRef= args[1].ruleDetails.nodeRef;
          if (!Selector.query('input[name=nodeRef][value=' + nodeRef + ']', this.widgets.rulesListContainerEl, true))
@@ -181,7 +181,7 @@
        * @param layer
        * @param args
        */
-      onFolderDetailsAvailable: function RulesHeader_onFolderDetailsAvailable(layer, args)
+      onFolderDetailsAvailable: function RulesList_onFolderDetailsAvailable(layer, args)
       {
          // Defer if event received before we're ready
          this.folderDetails = args[1].folderDetails;
@@ -366,7 +366,7 @@
        * @param e click event object
        * @param obj callback object containg rule info & HTMLElements
        */
-      onRuleClick: function DispositionEdit_onRuleClick(e, obj)
+      onRuleClick: function RulesList_onRuleClick(e, obj)
       {
          Alfresco.util.setSelectedClass(obj.ruleEl.parentNode, obj.ruleEl);
 

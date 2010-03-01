@@ -7,7 +7,7 @@ function getDocNames(nodeRefs)
 {
    //must regexp this
    // nodeRef = nodeRef.replace(':','').replace("\\",'').replace('//','/');
-   // var result = remote.call("/slingshot/doclib/dod5015/doclist/node/"+nodeRef);
+   // var result = remote.call("/slingshot/doclib/dod5015/node/"+nodeRef);
    
    if (nodeRefs.length>0)
    {

@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.FolderPath("${args.htmlid}").setOptions(
+   new Alfresco.component.Path("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${template.properties.container!"documentLibrary"}"

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>permissions</region-id>
+   <source-id>manage-permissions</source-id>
+   <url>/components/manage-permissions/manage-permissions</url>
+   <properties>
+      <pagination>true</pagination>
+   </properties>
+</component>

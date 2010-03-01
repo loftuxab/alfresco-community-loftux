@@ -48,9 +48,15 @@ var getApiMappings = function()
 
    if (authorityType === "all" || authorityType == "group")
    {
+      var url = "/api/groups?shortNameFilter=" + encodeURIComponent(args.filter);
+      if (args.zone !== "all")
+      {
+         url += "zone=" + encodeURIComponent(args.zone === null ? "APP.DEFAULT" : args.zone);
+      }
+      
       apiMappings.push(
       {
-         url: "/api/groups?zone=APP.DEFAULT&shortNameFilter=" + encodeURIComponent(args.filter),
+         url: url,
          rootObject: "data",
          fn: mapGroup
       });

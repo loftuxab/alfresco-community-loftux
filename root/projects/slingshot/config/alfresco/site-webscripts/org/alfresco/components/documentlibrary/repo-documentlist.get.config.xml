@@ -17,6 +17,7 @@
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.document.move-to" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.document.delete" />
          <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
+         <action type="simple-link" id="onActionManagePermissions" permission="permissions" href="{managePermissionsUrl}" label="actions.document.manage-permissions" />
          <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.document.manage-aspects" />
       </actionSet>
 
@@ -51,6 +52,7 @@
          <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.folder.move-to" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />
+         <action type="simple-link" id="onActionManagePermissions" permission="permissions" href="{managePermissionsUrl}" label="actions.folder.manage-permissions" />
          <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.folder.manage-aspects" />
          <action type="simple-link" id="onActionExplorerView" permission="repository" href="{explorerViewUrl}" label="actions.folder.explorer-view" />
       </actionSet>

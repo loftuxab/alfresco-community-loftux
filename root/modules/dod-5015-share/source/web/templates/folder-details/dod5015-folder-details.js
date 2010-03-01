@@ -60,7 +60,7 @@
          var config =
          {
             method: "GET",
-            url: Alfresco.constants.PROXY_URI + 'slingshot/doclib/dod5015/doclist/node/' + this.options.nodeRef.uri,
+            url: Alfresco.constants.PROXY_URI + 'slingshot/doclib/dod5015/node/' + this.options.nodeRef.uri,
             successCallback: 
             { 
                fn: this._getDataSuccess, 

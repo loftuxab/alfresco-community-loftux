@@ -1,12 +1,18 @@
 var Filters =
 {
+   /**
+    * Type map to filter required types
+    */
    TYPE_MAP:
    {
-      "documents": '+(TYPE:"{http://www.alfresco.org/model/content/1.0}content" OR TYPE:"{http://www.alfresco.org/model/application/1.0}filelink" OR TYPE:"{http://www.alfresco.org/model/content/1.0}folder")',
-      "folders": '+TYPE:"{http://www.alfresco.org/model/content/1.0}folder"',
+      "documents": '+(TYPE:"{http://www.alfresco.org/model/content/1.0}content" OR TYPE:"{http://www.alfresco.org/model/application/1.0}filelink")',
+      "folders": '+(TYPE:"{http://www.alfresco.org/model/content/1.0}folder" OR TYPE:"{http://www.alfresco.org/model/application/1.0}folderlink")',
       "images": "-TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\" +@cm\\:content.mimetype:image/*"
    },
    
+   /**
+    * Query templates for custom search
+    */
    QUERY_TEMPLATES:
    [
       {field: "keywords", template: "%(cm:name cm:title cm:description TEXT)"},
@@ -31,11 +37,20 @@ var Filters =
       {field: "vitalRecordReviewPeriod", template: "%(rma:recordSearchVitalRecordReviewPeriod)"}
    ],
    
+   /**
+    * Create filter parameters based on input parameters
+    *
+    * @method getFilterParams
+    * @param filter {string} Required filter
+    * @param parsedArgs {object} Parsed arguments object literal
+    * @param optional {object} Optional arguments depending on filter type
+    * @return {object} Object literal containing parameters to be used in Lucene search
+    */
    getFilterParams: function Filter_getFilterParams(filter, parsedArgs, optional)
    {
       var filterParams =
       {
-         query: "+PATH:\"" + parsedArgs.parentNode.qnamePath + "/*\"",
+         query: "+PATH:\"" + parsedArgs.pathNode.qnamePath + "/*\"",
          limitResults: null,
          sort: [
          {
@@ -44,7 +59,7 @@ var Filters =
          }],
          language: "lucene",
          templates: null,
-         variablePath: false
+         variablePath: true
       };
 
       // Max returned results specified?
@@ -77,6 +92,8 @@ var Filters =
             break;
 
          case "node":
+            parsedArgs.pathNode = parsedArgs.rootNode.parent;
+            filterParams.variablePath = false;
             filterParams.query = "+ID:\"" + parsedArgs.rootNode.nodeRef + "\"";
             break;
 
@@ -91,7 +108,6 @@ var Filters =
                   var ssJson = eval('try{(' + ssNode.content + ')}catch(e){}');
                   filterQuery = ssJson.query;
                   // Wrap the query so that only valid items within the filePlan are returned
-                  filterParams.variablePath = true;
                   filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath + '//*" AND (' + filterQuery + ')';
                   filterParams.templates = Filters.QUERY_TEMPLATES;
                   filterParams.language = "fts-alfresco";
@@ -123,13 +139,13 @@ var Filters =
          case "transfers":
             if (filterData == null)
             {
+               filterParams.variablePath = false;
                filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\"";
                filterQuery += " +TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer\"";
                filterParams.query = filterQuery;
             }
             else
             {
-               filterParams.variablePath = true;
                filterParams.query = "+PARENT:\"" + filterData + "\"";
             }
             break;
@@ -137,19 +153,20 @@ var Filters =
          case "holds":
             if (filterData == null)
             {
+               filterParams.variablePath = false;
                filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\"";
                filterQuery += " +TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}hold\"";
                filterParams.query = filterQuery;
             }
             else
             {
-               filterParams.variablePath = true;
                filterParams.query = "+PARENT:\"" + filterData + "\"";
             }
             break;
 
          default:
-            filterQuery = "+PATH:\"" + parsedArgs.parentNode.qnamePath + "/*\"";
+            filterParams.variablePath = false;
+            filterQuery = "+PATH:\"" + parsedArgs.pathNode.qnamePath + "/*\"";
             filterParams.query = filterQuery + filterQueryDefaults;
             break;
       }

@@ -210,33 +210,6 @@ Alfresco.util.arrayToObject = function(arr, p_value)
 };
 
 /**
- * Makes a shallow copy of an object.
- * Note: If any of the object's properties are themselves objects, they will be copied by reference.
- * Use {Alfresco.util.deppCopy} instead if this is likely to be an issue for the client code.
- *
- * @method Alfresco.util.shallowCopy
- * @param p_obj {object} The object to copy
- * @return {object} A new instance of the object.
- */
-Alfresco.util.shallowCopy = function(p_obj)
-{
-   if (p_obj === null || p_obj === undefined)
-   {
-      return p_obj;
-   }
-   
-   var obj = {};
-   for (var index in p_obj)
-   {
-      if (p_obj.hasOwnProperty(index))
-      {
-         obj[index] = p_obj[index];
-      }
-   }
-   return obj;
-}
-
-/**
  * Copies the values in an object into a new instance.
  *
  * Note 1. This method ONLY copy values of type object, array, date, boolean, string or number.
@@ -383,8 +356,8 @@ Alfresco.util.dotNotationToObject = function(str, value)
  */
 Alfresco.util.findValueByDotNotation = function(obj, propertyPath, defaultValue)
 {
-   var defaultValue = defaultValue ? defaultValue : null;
-   if(propertyPath && obj)
+   var value = defaultValue ? defaultValue : null;
+   if (propertyPath && obj)
    {
       var currObj = obj;
       var props = propertyPath.split(".");
@@ -393,12 +366,12 @@ Alfresco.util.findValueByDotNotation = function(obj, propertyPath, defaultValue)
          currObj = currObj[props[i]];
          if (typeof currObj == "undefined")
          {
-            return defaultValue;
+            return value;
          }
       }
       return currObj;
    }
-   return defaultValue;
+   return value;
 };
 
 /**
@@ -863,7 +836,7 @@ Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
  */
 Alfresco.util.encodeURIPath = function(text)
 {
-   return encodeURI(text).replace(/#/g, "%23").replace(/&/g, "%26").replace(/=/g, "%3D");
+   return encodeURI(text).replace(/#/g, "%23").replace(/&/g, "%26").replace(/\=/g, "%3D");
 };
 
 /**
@@ -973,7 +946,7 @@ Alfresco.util.generateDomId = function(p_el, p_prefix)
       domId = prefix + Alfresco.util.generateDomId._nId++;
    } while (YUIDom.get(domId) !== null);
 
-   Alfresco.util.setDomId(p_el, domId)
+   Alfresco.util.setDomId(p_el, domId);
 
    return domId;
 };
@@ -1836,7 +1809,8 @@ Alfresco.util.getTags = function(str)
    var match = null,
       tags = [],
       found = {},
-      regexp = new RegExp(/([^"^\s]+)\s*|"([^"]+)"\s*/g);
+      regexp = new RegExp(/([^"\^\s]+)\s*|"([\^"]+)"\s*/g),
+      tag;
 
    while (match = regexp.exec(str))
    {
@@ -3535,18 +3509,18 @@ Alfresco.util.Anim = function()
 })();
 
 /**
- * Utility class to only call a callback function once all flags have been set.
- * A callback is only invoked once the last flag is set.
+ * Utility class to defer a function until all supplied conditions have been met via fulfil() call(s).
+ * A callback is only invoked once.
  * <pre>
+ *    conditions: {Object|String[]} Object literal containing boolean properties (use to preset conditions if required), or an array of strings representing condition names
  *    callback: {Object} Callback function of the form { fn: function, scope: callback scope, obj: optional pass-thru object }
- *    flags: {Object|String[]} Object literal containing boolean properties (use to preset flags if required), or an array of strings representing flag names
  * </pre>
  *
- * @class Alfresco.util.AndGate
+ * @class Alfresco.util.Deferred
  */
 (function()
 {
-   Alfresco.util.AndGate = function(p_callback, p_flags)
+   Alfresco.util.Deferred = function(p_conditions, p_callback)
    {
       /**
        * Expired flag. Ensures callback is only invoked once.
@@ -3554,44 +3528,44 @@ Alfresco.util.Anim = function()
       var expired = false;
       
       /**
-       * Callback function
+       * Deferred function callback
        */
       var callback = p_callback;
 
       /**
-       * Flags
+       * Condition flags
        */
-      var flags = null;
+      var conditions = {};
       
-      if (YAHOO.lang.isArray(p_flags))
+      if (YAHOO.lang.isArray(p_conditions))
       {
-         flags = Alfresco.util.arrayToObject(p_flags, false);
+         conditions = Alfresco.util.arrayToObject(p_conditions, false);
       }
       else
       {
-         flags = Alfresco.util.shallowCopy(p_flags);
+         YAHOO.lang.augmentObject(conditions, p_conditions, true);
       }
       
       /**
-       * Checks all flags are set and invokes callback if they are.
+       * Checks all conditions are fulfilled and invokes callback if they are.
        *
-       * @method flagCheck
+       * @method conditionCheck
        * @private
        */
-      var flagCheck = function AndGate_flagCheck()
+      var conditionCheck = function Deferred_conditionCheck()
       {
-         for (var index in flags)
+         for (var index in conditions)
          {
-            if (flags.hasOwnProperty(index))
+            if (conditions.hasOwnProperty(index))
             {
-               if (flags[index] !== true)
+               if (conditions[index] !== true)
                {
                   return;
                }
             }
          }
 
-         // All flags are set if we got here
+         // All conditions are fulfilled if we got here
          if (YAHOO.lang.isFunction(callback.fn))
          {
             expired = true;
@@ -3602,20 +3576,30 @@ Alfresco.util.Anim = function()
       return (
       {
          /**
-          * Set a flag and subsequently check for all flags being set.
+          * Fulfils a condition and subsequently check for all conditions being fulfilled.
           *
-          * @method setFlag
-          * @param flag {String} The name of the flag to set.
+          * @method fulfil
+          * @param name {String} The name of the condition to fulfil.
           */
-         setFlag: function AndGate_setFlag(flag)
+         fulfil: function Deferred_fulfil(p_name)
          {
-            if (!expired && flags.hasOwnProperty(flag))
+            if (!expired && conditions.hasOwnProperty(p_name))
             {
-               flags[flag] = true;
-               flagCheck();
+               conditions[p_name] = true;
+               conditionCheck();
                return true;
             }
             return false;
+         },
+
+         /**
+          * Immediately expires the deferral.
+          *
+          * @method expire
+          */
+         expire: function Deferred_expire()
+         {
+            expired = true;
          }
       });
    };

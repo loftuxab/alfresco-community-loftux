@@ -136,7 +136,6 @@
 
          Event.addListener(this.id + "-searchtext", "focus", this.focusSearchText, null, this);
          Event.addListener(this.id + "-searchtext", "blur", this.blurSearchText, null, this);
-         Event.addListener(this.id + "-search-sbutton", "click", this.doSearch, null, this);
          
          this.defaultSearchText();
          

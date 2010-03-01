@@ -1,57 +1,14 @@
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-evaluator.lib.js">
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-filters.lib.js">
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/parse-args.lib.js">
-
-const THUMBNAIL_NAME = "doclib";
-
-var PeopleCache = {};
-
-/**
- * Gets / caches a person object
- * @method getPerson
- * @param username {string} User name
- */
-function getPerson(username)
-{
-   if (typeof PeopleCache[username] == "undefined")
-   {
-      var person = people.getPerson(username);
-      if (person == null && username == "System")
-      {
-         person =
-         {
-            properties:
-            {
-               userName: "System",
-               firstName: "System",
-               lastName: "User"
-            }
-         }
-      }
-      PeopleCache[username] =
-      {
-         userName: person.properties.userName,
-         firstName: person.properties.firstName,
-         lastName: person.properties.lastName,
-         displayName: (person.properties.firstName + " " + person.properties.lastName).replace(/^\s+|\s+$/g, "")
-      };
-   }
-   return PeopleCache[username];
-}
+<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/common.lib.js">
 
 /**
  * Main entry point: Create collection of documents and folders in the given space
  * @method main
  */
-function main()
+function getDoclist()
 {
-   var filter = args.filter,
-      items = [],
-      assets;
-
-   // Is our thumbnail type registered?
-   var haveThumbnails = thumbnailService.isThumbnailNameRegistered(THUMBNAIL_NAME);
-
    // Use helper function to get the arguments
    var parsedArgs = ParseArgs.getParsedArgs("dod:filePlan");
    if (parsedArgs === null)
@@ -59,21 +16,22 @@ function main()
       return;
    }
 
-   // "node" Type implies single nodeRef requested
-   if (!filter && parsedArgs.type === "node")
-   {
-      filter = "node";
-   }
+   var filter = args.filter,
+      items = [];
 
    // Try to find a filter query based on the passed-in arguments
-   var allAssets = [],
-      filterParams = Filters.getFilterParams(filter, parsedArgs),
+   var allNodes = [],
+      favourites = Common.getFavourites(),
+      filterParams = Filters.getFilterParams(filter, parsedArgs,
+      {
+         favourites: favourites
+      }),
       query = filterParams.query;
 
-   // Query the assets - passing in sort and result limit parameters
+   // Query the nodes - passing in sort and result limit parameters
    if (query !== "")
    {
-      allAssets = search.query(
+      allNodes = search.query(
       {
          query: query,
          language: filterParams.language,
@@ -87,21 +45,21 @@ function main()
       });
    }
 
-   // Ensure folders appear at the top of the list
-   var folderAssets = [],
-      documentAssets = [];
+   // Ensure folders and folderlinks appear at the top of the list
+   var folderNodes = [],
+      documentNodes = [];
    
-   for each (asset in allAssets)
+   for each (node in allNodes)
    {
       try
       {
-         if (asset.isContainer)
+         if (node.isContainer || node.typeShort == "app:folderlink")
          {
-            folderAssets.push(asset);
+            folderNodes.push(node);
          }
          else
          {
-            documentAssets.push(asset);
+            documentNodes.push(node);
          }
       }
       catch (e)
@@ -110,162 +68,110 @@ function main()
       }
    }
    
-   var folderAssetsCount = folderAssets.length,
-      documentAssetsCount = documentAssets.length;
+   // Node type counts
+   var folderNodesCount = folderNodes.length,
+      documentNodesCount = documentNodes.length,
+      nodes = folderNodes.concat(documentNodes),
+      totalRecords = nodes.length;
    
-   if (parsedArgs.type === "documents")
-   {
-      assets = documentAssets;
-   }
-   else
-   {
-      assets = folderAssets.concat(documentAssets);
-   }
-   
-   // Make a note of totalRecords before trimming the assets array
-   var totalRecords = assets.length;
-
    // Pagination
-   var pageSize = args.size || assets.length,
+   var pageSize = args.size || nodes.length,
       pagePos = args.pos || "1",
       startIndex = (pagePos - 1) * pageSize;
 
-   assets = assets.slice(startIndex, pagePos * pageSize);
-   
-   var thumbnail, createdBy, modifiedBy, activeWorkflows, assetEvaluator,
-      defaultLocation, location, qnamePaths, displayPaths;
+   // Trim the nodes array down to the page size
+   nodes = nodes.slice(startIndex, pagePos * pageSize);
 
-   // Location if we're in a site
-   defaultLocation =
-   {
-      site: parsedArgs.location.site,
-      container: parsedArgs.location.container,
-      path: parsedArgs.location.path,
-      file: null
-   };
+   // Common or variable parent container?
+   var parent = null,
+      defaultLocation = {};
    
-   // Evaluate parent container
-   var parent = Evaluator.run(parsedArgs.parentNode);
-   
-   // User permissions and role
-   var user =
+   if (!filterParams.variablePath)
    {
-      permissions: parent.permissions
-   };
-   if (defaultLocation.site !== null)
-   {
-      user.role = parsedArgs.location.siteNode.getMembersRole(person.properties.userName);
+      var parentEval = Evaluator.run(parsedArgs.pathNode);
+      // Parent node permissions (and Site role if applicable)
+      parent =
+      {
+         node: parsedArgs.pathNode,
+         type: parentEval.assetType,
+         userAccess: parentEval.permissions
+      };
+      
+      // Store a default location to save repeated calculations
+      defaultLocation = Common.getLocation(parsedArgs.pathNode, parsedArgs.libraryRoot);
    }
 
-   // Populate location and other properties
-   for each (asset in assets)
+   var isThumbnailNameRegistered = thumbnailService.isThumbnailNameRegistered(THUMBNAIL_NAME),
+      thumbnail = null,
+      filePlanLocation = Common.getLocation(parsedArgs.rootNode);
+   
+   // Loop through and evaluate each node in this result set
+   for each (node in nodes)
    {
-      createdBy = null;
-      modifiedBy = null;
-      assetEvaluator = {};
-      activeWorkflows = [];
-
-      // Get users
-      createdBy = getPerson(asset.properties["cm:creator"]);
-      modifiedBy = getPerson(asset.properties["cm:modifier"]);
-      
-      // Does this collection of assets have potentially differering paths?
+      // Does this collection of nodes have potentially differering paths?
       if (filterParams.variablePath)
       {
-         qnamePaths = asset.qnamePath.split("/");
-         displayPaths = asset.displayPath.split("/");
-
-         if ((qnamePaths.length > 5) && (qnamePaths[2] == "st:sites"))
-         {
-            // This asset belongs to a site
-            location =
-            {
-               site: displayPaths[3],
-               container: displayPaths[4],
-               path: "/" + displayPaths.slice(5, displayPaths.length).join("/"),
-               file: asset.name
-            };
-         }
-         else
-         {
-            location =
-            {
-               site: null,
-               container: null,
-               path: null,
-               file: asset.name
-            };
-         }
+         location = Common.getLocation(node);
       }
       else
       {
          location =
          {
             site: defaultLocation.site,
+            siteTitle: defaultLocation.siteTitle,
             container: defaultLocation.container,
             path: defaultLocation.path,
-            file: asset.name
+            file: node.name
          };
       }
-
-      // Make sure we have a thumbnail
-      if (haveThumbnails)
+      
+      // Is our thumbnail type registered?
+      if (isThumbnailNameRegistered)
       {
-         thumbnail = asset.getThumbnail(THUMBNAIL_NAME);
+         // Make sure we have a thumbnail.
+         thumbnail = node.getThumbnail(THUMBNAIL_NAME);
          if (thumbnail === null)
          {
             // No thumbnail, so queue creation
-            asset.createThumbnail(THUMBNAIL_NAME, true);
+            node.createThumbnail(THUMBNAIL_NAME, true);
          }
       }
-      
+
       // Get evaluated properties
-      assetEvaluator = Evaluator.run(asset);
+      nodeEvaluator = Evaluator.run(node);
       
       items.push(
       {
-         asset: asset,
-         type: assetEvaluator.assetType,
-         createdBy: createdBy,
-         modifiedBy: modifiedBy,
-         status: assetEvaluator.status,
-         actionSet: assetEvaluator.actionSet,
-         actionPermissions: assetEvaluator.permissions,
-         suppressRoles: assetEvaluator.suppressRoles,
-         dod5015: jsonUtils.toJSONString(assetEvaluator.metadata),
-         tags: asset.tags,
+         node: node,
+         isLink: false,
+         type: nodeEvaluator.assetType,
+         createdBy: nodeEvaluator.createdBy,
+         modifiedBy: nodeEvaluator.modifiedBy,
+         status: nodeEvaluator.status,
+         actionSet: nodeEvaluator.actionSet,
+         actionPermissions: nodeEvaluator.permissions,
+         suppressRoles: nodeEvaluator.suppressRoles,
+         dod5015: jsonUtils.toJSONString(nodeEvaluator.metadata),
+         tags: node.tags,
          location: location
       });
    }
 
-   var parentMeta = filterParams.variablePath ? null :
-   {
-      nodeRef: String(parsedArgs.parentNode.nodeRef),
-      type: parent.assetType
-   };
-
    return (
    {
       luceneQuery: query,
-      onlineEditing: utils.moduleInstalled("org.alfresco.module.vti"),
-      itemCount:
-      {
-         folders: folderAssetsCount,
-         documents: documentAssetsCount
-      },
       paging:
       {
          startIndex: startIndex,
          totalRecords: totalRecords
       },
-      user: user,
-      items: items,
-      filePlan: parsedArgs.location.containerNode,
-      parent: parentMeta
+      filePlan: filePlanLocation.containerNode,
+      parent: parent,
+      items: items
    });
 }
 
 /**
  * Document List Component: doclist
  */
-model.doclist = main();
+model.doclist = getDoclist();

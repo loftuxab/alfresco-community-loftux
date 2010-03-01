@@ -106,12 +106,12 @@
                   // Reload the node's metadata
                   Alfresco.util.Ajax.request(
                   {
-                     url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/node/" + asset.nodeRef.replace(":/", ""),
+                     url: Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + new Alfresco.util.NodeRef(asset.nodeRef).uri,
                      successCallback:
                      {
                         fn: function dlA_onActionDetails_refreshSuccess(response)
                         {
-                           var file = response.json.items[0];
+                           var file = response.json.item;
 
                            // Fire "renamed" event
                            YAHOO.Bubbling.fire(asset.type == "folder" ? "folderRenamed" : "fileRenamed",

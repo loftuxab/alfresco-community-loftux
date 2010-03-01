@@ -39,7 +39,7 @@
     */
    Alfresco.FolderDetails = function FolderDetails_constructor()
    {
-      Alfresco.FolderDetails.superclass.constructor.call(this, null, "Alfresco.FolderDetails", ["editor"]);
+      Alfresco.FolderDetails.superclass.constructor.call(this, null, "Alfresco.FolderDetails");
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
@@ -104,15 +104,15 @@
        */
       onReady: function FolderDetails_onReady()
       {
-         var url = Alfresco.constants.PROXY_URI + 'slingshot/doclib/doclist/node/' + this.options.nodeRef.uri;
+         var url = Alfresco.constants.PROXY_URI + 'slingshot/doclib/node/' + this.options.nodeRef.uri;
          if (this.options.siteId == "")
          {
             // Repository mode
             url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
          }
-         var config =
+
+         Alfresco.util.Ajax.jsonGet(
          {
-            method: "GET",
             url: url,
             successCallback: 
             { 
@@ -120,8 +120,7 @@
                scope: this 
             },
             failureMessage: "Failed to load data for folder details"
-         };
-         Alfresco.util.Ajax.request(config);
+         });
       },
       
       /**
@@ -133,7 +132,7 @@
       {
          if (response.json !== undefined)
          {
-            var folderDetails = response.json.items[0];
+            var folderDetails = response.json.item;
             
             // Fire event to inform any listening components that the data is ready
             YAHOO.Bubbling.fire("folderDetailsAvailable",

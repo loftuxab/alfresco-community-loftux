@@ -526,6 +526,8 @@ var Evaluator =
          assetType: assetType,
          actionSet: actionSet,
          permissions: permissions,
+         createdBy: Common.getPerson(asset.properties["cm:creator"]),
+         modifiedBy: Common.getPerson(asset.properties["cm:modifier"]),
          status: status,
          metadata: Evaluator.getMetadata(asset, assetType),
          suppressRoles: suppressRoles

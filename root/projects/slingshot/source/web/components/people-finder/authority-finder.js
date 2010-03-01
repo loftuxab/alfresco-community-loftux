@@ -282,7 +282,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "authorities",
-             fields: ["authorityType", "shortName", "fullName", "displayName", "metadata"]
+             fields: ["authorityType", "shortName", "fullName", "displayName", "metadata", "calc_iconUrl"]
          };
 
          this.widgets.dataSource.doBeforeParseData = function AuthorityFinder_doBeforeParseData(oRequest, oFullResponse)
@@ -385,6 +385,9 @@
             {
                avatarUrl = Alfresco.constants.PROXY_URI + metadata.avatar + "?c=queue&ph=true";
             }
+            
+            // Store calculated URL to icon
+            oRecord.setData("calc_iconUrl", avatarUrl);
 
             elCell.innerHTML = '<img class="avatar" src="' + avatarUrl + '" alt="avatar" />';
          };
@@ -580,6 +583,7 @@
             itemName: p_obj.getData("fullName"),
             shortName: p_obj.getData("shortName"),
             displayName: p_obj.getData("displayName"),
+            iconUrl: p_obj.getData("calc_iconUrl"),
             eventGroup: this
          });
       },
