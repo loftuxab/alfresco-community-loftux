@@ -511,7 +511,7 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 
 		int fileId = -1;
 
@@ -523,9 +523,11 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 			// Check if the file already exists in the database
 
-			stmt = conn.createStatement();
-			String qsql = "SELECT FileName FROM " + getFileSysTableName() + " WHERE FileName = '"
-					+ checkNameForSpecialChars(fname) + "' AND DirId = " + dirId;
+			String qsql = "SELECT FileName FROM " + getFileSysTableName() + " WHERE FileName = ? AND DirId = ?";
+
+			stmt = conn.prepareStatement( qsql);
+			stmt.setString( 1, fname);
+			stmt.setInt( 2, dirId);
 
 			// DEBUG
 
@@ -534,9 +536,10 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 			// Check if the file/folder already exists
 
-			ResultSet rs = stmt.executeQuery(qsql);
+			ResultSet rs = stmt.executeQuery();
 			if ( rs.next())
 				throw new FileExistsException();
+			stmt.close();
 
 			// Check if a file or folder record should be created
 
@@ -577,8 +580,11 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 				// Get the last insert id
 
-				ResultSet rs2 = stmt.executeQuery("SELECT FileId FROM " + getFileSysTableName() + " WHERE FileName = '" + fname
-						+ "' AND DirId = " + dirId);
+				stmt = conn.prepareStatement( "SELECT FileId FROM " + getFileSysTableName() + " WHERE FileName = ? AND DirId = ?");
+				stmt.setString( 1, fname);
+				stmt.setInt( 2, dirId);
+				
+				ResultSet rs2 = stmt.executeQuery();
 
 				if ( rs2.next())
 					fileId = rs2.getInt(1);
@@ -675,7 +681,7 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 		Connection conn = null;
 		PreparedStatement stmt = null;
-		Statement stmt2 = null;
+		PreparedStatement stmt2 = null;
 
 		int streamId = -1;
 
@@ -709,9 +715,11 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 				// Get the stream id for the newly created stream
 
-				stmt2 = conn.createStatement();
-				ResultSet rs2 = stmt2.executeQuery("SELECT StreamId FROM " + getStreamsTableName() + " WHERE FileId = " + fid
-						+ " AND StreamName = '" + sname + "'");
+				stmt2 = conn.prepareStatement( "SELECT StreamId FROM " + getStreamsTableName() + " WHERE FileId = ? AND StreamName = ?");
+				stmt2.setInt( 1, fid);
+				stmt2.setString( 2, sname);
+
+				ResultSet rs2 = stmt2.executeQuery();
 
 				if ( rs2.next())
 					streamId = rs2.getInt(1);
@@ -1203,14 +1211,13 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 		int fileId = -1;
 
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 
 		try {
 
 			// Get a connection to the database, create a statement for the database lookup
 
 			conn = getConnection();
-			stmt = conn.createStatement();
 
 			// Build the SQL for the file lookup
 
@@ -1218,9 +1225,7 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 			sql.append("SELECT FileId FROM ");
 			sql.append(getFileSysTableName());
-			sql.append(" WHERE DirId = ");
-			sql.append(dirId);
-			sql.append(" AND ");
+			sql.append(" WHERE DirId = ? AND ");
 
 			// Check if the search is for a directory only
 
@@ -1237,17 +1242,14 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 				// Perform a caseless search
 
-				sql.append(" UPPER(FileName) = '");
-				sql.append(fname.toUpperCase());
-				sql.append("'");
+				sql.append(" UPPER(FileName) = ?");
+				fname = fname.toUpperCase();
 			}
 			else {
 
 				// Perform a case sensitive search
 
-				sql.append(" FileName = '");
-				sql.append(fname);
-				sql.append("'");
+				sql.append(" FileName = ?");
 			}
 
 			// DEBUG
@@ -1255,9 +1257,15 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 			if ( Debug.EnableInfo && hasSQLDebug())
 				Debug.println("[Derby] Get file id SQL: " + sql.toString());
 
+			// Use a prepared statement 
+			
+			stmt = conn.prepareStatement( sql.toString());
+			stmt.setInt(1, dirId);
+			stmt.setString(2, fname);
+			
 			// Run the database search
 
-			ResultSet rs = stmt.executeQuery(sql.toString());
+			ResultSet rs = stmt.executeQuery();
 
 			// Check if a file record exists
 
@@ -1807,29 +1815,32 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 		// Rename a file/folder
 
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 
 		try {
 
 			// Get a connection to the database
 
 			conn = getConnection();
-			stmt = conn.createStatement();
 
 			// Update the file record
 
-			stmt = conn.createStatement();
-			String sql = "UPDATE " + getFileSysTableName() + " SET FileName = '" + newName + "', DirId = " + newDir
-					+ ", ChangeDate = TIMESTAMP('" + new Timestamp(System.currentTimeMillis()) + "') WHERE FileId = " + fid;
+			String sql = "UPDATE " + getFileSysTableName() + " SET FileName = ?, DirId = ?, ChangeDate = ? WHERE FileId = ?";
+
+			stmt = conn.prepareStatement( sql);
+			stmt.setString( 1, newName);
+			stmt.setInt( 2, newDir);
+			stmt.setTimestamp( 3, new Timestamp(System.currentTimeMillis()));
+			stmt.setInt( 4, fid);
 
 			// DEBUG
 
 			if ( Debug.EnableInfo && hasSQLDebug())
-				Debug.println("[Derby] Rename SQL: " + sql.toString());
+				Debug.println("[Derby] Rename SQL: " + sql);
 
 			// Rename the file/folder
 
-			if ( stmt.executeUpdate(sql) == 0) {
+			if ( stmt.executeUpdate() == 0) {
 
 				// Original file not found
 
@@ -1969,10 +1980,7 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 		StringBuffer sql = new StringBuffer(128);
 		sql.append("SELECT * FROM ");
 		sql.append(getFileSysTableName());
-
-		sql.append(" WHERE DirId = ");
-		sql.append(dirId);
-		sql.append(" AND IsDeleted = 'N'");
+		sql.append(" WHERE DirId = ? AND IsDeleted = 'N'");
 
 		// Split the search path
 
@@ -1981,19 +1989,21 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 		// Check if the file name contains wildcard characters
 
 		WildCard wildCard = null;
-
+		String searchStr = null;
+		
 		if ( WildCard.containsWildcards(searchPath)) {
 
 			// For the '*.*' and '*' wildcards the SELECT will already return all files/directories
-			// that are attached to the
-			// parent directory. For 'name.*' and '*.ext' type wildcards we can use the LIKE clause
-			// to filter the required
-			// records, for more complex wildcards we will post-process the search using the
-			// WildCard class to match the
-			// file names.
+			// that are attached to the parent directory. For 'name.*' and '*.ext' type wildcards we can use the LIKE clause
+			// to filter the required records, for more complex wildcards we will post-process the search using the
+			// WildCard class to match the file names.
 
 			if ( searchPath.endsWith("\\*.*") == false && searchPath.endsWith("\\*") == false) {
 
+				// Use a wildcard match either before or after the search string
+				
+				sql.append(" AND FileName LIKE(?)");
+				
 				// Create a wildcard search pattern
 
 				wildCard = new WildCard(paths[1], true);
@@ -2002,23 +2012,19 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 				if ( wildCard.isType() == WildCard.WILDCARD_EXT) {
 
-					// Add the wildcard file extension selection clause to the SELECT
+					// Set the search string
 
-					sql.append(" AND FileName LIKE('");
-					sql.append(checkNameForSpecialChars(wildCard.getMatchPart()));
-					sql.append("%')");
-
+					searchStr = wildCard.getMatchPart() + "%";
+					
 					// Clear the wildcard object, we do not want it to filter the search results
 
 					wildCard = null;
 				}
 				else if ( wildCard.isType() == WildCard.WILDCARD_NAME) {
 
-					// Add the wildcard file name selection clause to the SELECT
+					// Set the search string
 
-					sql.append(" AND FileName LIKE('%");
-					sql.append(checkNameForSpecialChars(wildCard.getMatchPart()));
-					sql.append("')");
+					searchStr = "%" + wildCard.getMatchPart();
 
 					// Clear the wildcard object, we do not want it to filter the search results
 
@@ -2030,27 +2036,30 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 			// Search for a specific file/directory
 
-			sql.append(" AND FileName = '");
-			sql.append(checkNameForSpecialChars(paths[1]));
-			sql.append("'");
+			sql.append(" AND FileName = ?");
+			searchStr = paths[1];
 		}
 
 		// Return directories first
 
 		sql.append(" ORDER BY DirectoryFile DESC");
-
+		
 		// Start the search
 
 		ResultSet rs = null;
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 
 		try {
 
 			// Get a connection to the database
 
 			conn = getConnection();
-			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			stmt = conn.prepareStatement( sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			
+			stmt.setInt( 1, dirId);
+			if ( searchStr != null)
+				stmt.setString( 2, searchStr);
 
 			// DEBUG
 
@@ -2059,7 +2068,7 @@ public class DerbyDBInterface extends JdbcDBInterface implements DBQueueInterfac
 
 			// Start the folder search
 
-			rs = stmt.executeQuery(sql.toString());
+			rs = stmt.executeQuery();
 		}
 		catch (Exception ex) {
 
