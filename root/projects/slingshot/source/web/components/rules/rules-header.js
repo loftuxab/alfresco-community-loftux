@@ -299,7 +299,7 @@
          if (this.isReady && this.ruleset && this.folderDetails)
          {
             // Display actions container
-            if (!this.ruleset.rules)
+            if (!this.ruleset.rules || this.ruleset.linkedToRuleSet)
             {
                Dom.addClass(this.widgets.actionsEl, "hidden");
             }

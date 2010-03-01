@@ -37,10 +37,14 @@
    <script type="text/javascript">//<![CDATA[
    new Alfresco.FolderRules().setOptions(
    {
-      nodeRef: "${url.args.nodeRef}",
+      nodeRef: new Alfresco.util.NodeRef("${url.args.nodeRef}"),
       siteId: "${page.url.templateArgs.site!""}",
-      folderName: "${folder.name}",
-      pathToFolder: "${folder.path}",
+      folder: {
+         nodeRef: "${folder.nodeRef}",
+         site: "${folder.site}", 
+         name: "${folder.name}",
+         path: "${folder.path}"
+      },
       ruleset: {
          rules: <#if ruleset.rules??>[<#list ruleset.rules as rule>
             {
@@ -73,8 +77,14 @@
          linkedFromRuleSets: <#if ruleset.linkedFromRuleSets??>[<#list ruleset.linkedFromRuleSets as link>
             "${link}"<#if link_has_next>,</#if></#list>
          ]<#else>null</#if>,
-         linkedToRuleSet: <#if ruleset.linkedToRuleSet??>"ruleset.linkedToRuleSet"<#else>null</#if>
-      }
+         linkedToRuleSet: <#if ruleset.linkedToRuleSet??>"${ruleset.linkedToRuleSet}"<#else>null</#if>
+      },
+      linkedToFolder: <#if linkedToFolder??>{
+         nodeRef: "${linkedToFolder.nodeRef}",
+         site: "${linkedToFolder.site}",
+         name: "${linkedToFolder.name}",
+         path: "${linkedToFolder.path}"
+      }<#else>null</#if>         
    });
    //]]></script>
 

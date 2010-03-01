@@ -3,6 +3,7 @@
    new Alfresco.RulesLinked("${el}").setOptions(
    {
       nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}"),
+      siteId: "${page.url.templateArgs.site!""}" 
    }).setMessages(
       ${messages}
    );

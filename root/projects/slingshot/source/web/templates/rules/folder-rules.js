@@ -68,12 +68,12 @@
       {
          /**
           * nodeRef of folder being viewed
-          * 
+          *
           * @property nodeRef
-          * @type string
+          * @type Alfresco.util.NodeRef
           */
          nodeRef: null,
-         
+
          /**
           * Current siteId.
           * 
@@ -135,15 +135,24 @@
          {
             folderDetails:
             {
-               nodeRef: this.options.nodeRef,
+               nodeRef: this.options.nodeRef.toString(),
                location:
                {
-                  path: this.options.pathToFolder
+                  path: this.options.folder.path
                },
-               fileName: this.options.folderName,
+               fileName: this.options.folder.name,
                type: "folder"
             }
          });
+
+         if (this.options.linkedToFolder)
+         {
+            // Fire event to inform any listening components that the data is ready
+            YAHOO.Bubbling.fire("linkedToFolderDetailsAvailable",
+            {
+               linkedToFolder: this.options.linkedToFolder
+            });
+         }
 
          // Fire event to inform any listening components that the data is ready
          this._fireFolderRulesetDetailsAvailable();
@@ -234,11 +243,10 @@
       onFolderRulesDetailsChanged: function RulesHeader_onFolderRulesDetailsChanged(layer, args)
       {
          // Load rule information form server
-         var nodeRefAsUrl = this.options.nodeRef.replace("://", "/"),
-            prevNoOfRules = this.options.ruleset && this.options.ruleset.rules ? this.options.ruleset.rules.length : 0;
+         var prevNoOfRules = this.options.ruleset && this.options.ruleset.rules ? this.options.ruleset.rules.length : 0;
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRefAsUrl + "/ruleset",
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.uri + "/ruleset",
             successCallback:
             {
                fn: function(response, p_prevNoOfRules)

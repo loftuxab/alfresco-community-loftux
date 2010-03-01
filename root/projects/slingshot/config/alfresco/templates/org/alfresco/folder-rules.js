@@ -2,19 +2,9 @@
 
 function main()
 {
-   var nodeRef = page.url.args.nodeRef,
-      connector = remote.connect("alfresco");
-
    // Load folder info
-   var result = connector.post("/api/forms/picker/items", '{"items": ["' + page.url.args.nodeRef + '"]}', "application/json");
-   if (result.status == 200)
-   {
-      var folderDetails = eval('(' + result + ')').data.items[0];
-      model.folder = {
-         name: folderDetails.name,
-         path: folderDetails.displayPath
-      };
-   }
+   var connector = remote.connect("alfresco");
+   model.folder = loadDisplayInfo(connector, page.url.args.nodeRef);
 
    // Load rules
    result = connector.get("/api/node/" + page.url.args.nodeRef.replace("://", "/") + "/ruleset");
@@ -26,7 +16,33 @@ function main()
          ruleset = {};
       }
       model.ruleset = ruleset;
+
+      var linkedToNodeRef = ruleset.linkedToRuleSet;
+      if (linkedToNodeRef)
+      {
+         linkedToNodeRef = linkedToNodeRef.substring("/api/node/".length);
+         linkedToNodeRef = linkedToNodeRef.substring(0, linkedToNodeRef.indexOf("/ruleset"));
+         var tokens = linkedToNodeRef.split("/");
+         linkedToNodeRef = tokens[0] + "://" + tokens[1] + "/" + tokens[2];
+         model.linkedToFolder = loadDisplayInfo(connector, linkedToNodeRef);         
+      }
    }
+}
+
+function loadDisplayInfo(connector, nodeRef)
+{
+   var result = connector.get("/slingshot/doclib/node/" + nodeRef.replace("://", "/"));
+   if (result.status == 200)
+   {
+      var location = eval('(' + result + ')').item.location;
+      return {
+         nodeRef: nodeRef,
+         site: location.site, 
+         name: location.file,
+         path: location.path
+      };
+   }
+   return null;
 }
 
 main();
