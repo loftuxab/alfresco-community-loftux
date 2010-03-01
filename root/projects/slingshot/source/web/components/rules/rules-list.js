@@ -78,10 +78,10 @@
       options:
       {
          /**
-          * nodeRef of folder who's rules are being viewed
+          * nodeRef of folder being viewed
           *
           * @property nodeRef
-          * @type string
+          * @type Alfresco.util.NodeRef
           */
          nodeRef: null,
 

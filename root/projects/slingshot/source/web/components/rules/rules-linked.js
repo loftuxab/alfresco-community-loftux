@@ -48,7 +48,9 @@
       Alfresco.RulesLinked.superclass.constructor.call(this, "Alfresco.RulesLinked", htmlId, ["button"]);
 
       /* Decoupled event listeners */
-      YAHOO.Bubbling.on("folderRulesDetailsAvailable", this.onFolderRulesDetailsAvailable, this);
+      YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
+      YAHOO.Bubbling.on("folderRulesetDetailsAvailable", this.onFolderRulesetDetailsAvailable, this);
+      YAHOO.Bubbling.on("linkedToFolderDetailsAvailable", this.onLinkedToFolderDetailsAvailable, this);
 
       return this;
    };
@@ -89,12 +91,20 @@
       isReady: false,
 
       /**
-       * Current linkedFolder.
+       * The inherit and folder rules for the folder
        *
-       * @property linkedFolder
+       * @property ruleset
        * @type {object}
        */
-      linkedFolder: null,
+      ruleset: null,
+
+      /**
+       * Current linkedToFolder.
+       *
+       * @property linkedToFolder
+       * @type {object}
+       */
+      linkedToFolder: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -109,16 +119,19 @@
          this.widgets.titleEl = Dom.get(this.id + "-title");
 
          // Create buttons
-         this.widgets.viewLinkedFolderButton = Alfresco.util.createYUIButton(this, "view-button", this.onViewLinkedFolderButtonClick);
-         this.widgets.changeLinkButton = Alfresco.util.createYUIButton(this, "change-button", this.onChangeLinkButtonClick);
-         this.widgets.unlinkRulesButton = Alfresco.util.createYUIButton(this, "unlink-button", this.onUnlinkRulesButtonClick);
+         this.widgets.viewlinkedToFolderButton = Alfresco.util.createYUIButton(this, "view-button", this.onViewLinkedToFolderButtonClick);
+         this.widgets.changeLinkButton = Alfresco.util.createYUIButton(this, "change-button", this.onChangeLinkButtonClick,
+         {
+            disabled: true
+         });
+         this.widgets.unlinkRulesButton = Alfresco.util.createYUIButton(this, "unlink-button", this.onUnlinkRulesButtonClick,
+         {
+            disabled: true
+         });
 
          // Display folder name & appropriate actions if info has been given
          this.isReady = true;
-         if (this.linkedFolder !== null)
-         {
-            this._displayLinkedFolder();
-         }
+         this._enableAndDisplay();
       },
 
       /**
@@ -135,10 +148,14 @@
          this.widgets.unlinkRulesButton.set("disabled", true);
 
          // Start/stop inherit rules from parent folder
-         Alfresco.util.Ajax.jsonRequest(
+         Alfresco.util.Ajax.jsonPost(
          {
-            method: rulesAreInherited ? Alfresco.util.Ajax.GET : Alfresco.util.Ajax.GET,
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/actionQueue",
+            dataObj:
+            {
+               actionedUponNode : this.options.nodeRef.toString(),
+               actionDefinitionName: "unlink-rules"
+            },
             successCallback:
             {
                fn: function(response)
@@ -146,7 +163,7 @@
                   if (response.json)
                   {
                      // Successfully unlinked folder, now reload page so other components can be brougt in
-                     document.location.refresh();
+                     document.location.reload();
                   }
                },
                scope: this
@@ -172,16 +189,16 @@
        * Called when user clicks on the view rules button.
        * Takes the user to the linked folders rule page.
        *
-       * @method onViewLinkedFolderButtonClick
+       * @method onViewLinkedToFolderButtonClick
        * @param type
        * @param args
        */
-      onViewLinkedFolderButtonClick: function RulesLinked_onViewLinkedFolderButtonClick(type, args)
+      onViewLinkedToFolderButtonClick: function RulesLinked_onViewLinkedToFolderButtonClick(type, args)
       {
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",
          {
-            siteId: this.options.siteId,
-            nodeRef: this.linkedFolder.nodeRef.replace(":/", "")
+            siteId: this.linkedToFolder.site, 
+            nodeRef: this.linkedToFolder.nodeRef
          });
          window.location.href = url;
       },
@@ -196,40 +213,79 @@
        */
       onChangeLinkButtonClick: function RulesLinked_onChangeLinkButtonClick(type, args)
       {
-         alert("popup rules selector with mode='folder'");
+         if (!this.modules.rulesPicker)
+         {
+            this.modules.rulesPicker = new Alfresco.module.RulesPicker(this.id + "-rulesPicker");
+         }
+
+         this.modules.rulesPicker.setOptions(
+         {
+            mode: Alfresco.module.RulesPicker.MODE_LINK_TO,
+            siteId: this.options.siteId,
+            files: {
+               displayName: this.folderDetails,
+               nodeRef: this.options.nodeRef.toString()
+            }
+         }).showDialog();
       },
 
       /**
-       * Event handler called when the "folderRulesDetailsAvailable" event is received
+       * Event handler called when the "folderDetailsAvailable" event is received
        *
-       * @method onFolderRulesDetailsAvailable
+       * @method onFolderDetailsAvailable
        * @param layer
        * @param args
        */
-      onFolderRulesDetailsAvailable: function RulesLinked_onFolderRulesDetailsAvailable(layer, args)
+      onFolderDetailsAvailable: function RulesHeader_onFolderDetailsAvailable(layer, args)
       {
-         var folderRulesData = args[1].folderRulesDetails;
-         this.linkedFolder = folderRulesData.linkedFolder;
+         this.folderDetails = args[1].folderDetails;
+         this._enableAndDisplay();
+      },
 
-         if (this.isReady)
-         {
-            this._displayLinkedFolder();
-         }
+      /**
+       * Event handler called when the "folderRulesetDetailsAvailable" event is received
+       *
+       * @method onFolderRulesetDetailsAvailable
+       * @param layer
+       * @param args
+       */
+      onFolderRulesetDetailsAvailable: function RulesLinked_onFolderRulesetDetailsAvailable(layer, args)
+      {
+         this.ruleset = args[1].folderRulesetDetails;
+         this._enableAndDisplay();
+      },
+
+      /**
+       * Event handler called when the "linkedToFolderDetailsAvailable" event is received
+       *
+       * @method onLinkedToFolderDetailsAvailable
+       * @param layer
+       * @param args
+       */
+      onLinkedToFolderDetailsAvailable: function RulesLinked_onLinkedToFolderDetailsAvailable(layer, args)
+      {
+         this.linkedToFolder = args[1].linkedToFolder;
+         this._enableAndDisplay();
       },
 
       /**
        * Displays the folder name as the title
        *
-       * @method _displayLinkedFolder
+       * @method _enableAndDisplay
        * @param layer
        * @param args
        * @private
        */
-      _displayLinkedFolder: function RulesLinked__displayLinkedFolder(layer, args)
+      _enableAndDisplay: function RulesLinked__enableAndDisplay(layer, args)
       {
-         // Display the title & path
-         this.widgets.titleEl.innerHTML = this.linkedFolder.name;
-         this.widgets.pathEl.innerHTML = this.linkedFolder.path;
+         if (this.isReady && this.linkedToFolder && this.ruleset && this.folderDetails)
+         {
+            // Display the title & path
+            this.widgets.changeLinkButton.set("disabled", false);
+            this.widgets.unlinkRulesButton.set("disabled", false);
+            this.widgets.titleEl.innerHTML = this.linkedToFolder.name;
+            this.widgets.pathEl.innerHTML = this.linkedToFolder.path;
+         }
       }
 
    });
