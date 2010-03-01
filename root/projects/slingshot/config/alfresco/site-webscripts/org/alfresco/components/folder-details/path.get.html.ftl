@@ -12,6 +12,6 @@
    <span id="${args.htmlid}-defaultPath" class="path-link"><a href="${url.context}/page/site/${page.url.templateArgs.site}/documentlibrary">${msg("path.documents")}</a></span>
    <span id="${args.htmlid}-path"></span>
 </div>
-<#if args.showIconType!"true" == "true">
+<#if (args.showIconType!"true") == "true">
 <div id="${args.htmlid}-iconType" class="icon-type"></div>
 </#if>
