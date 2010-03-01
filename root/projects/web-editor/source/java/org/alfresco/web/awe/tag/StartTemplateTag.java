@@ -118,38 +118,31 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("requires:['utilities']\n");
             out.write("});\n");
             out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.messages\",\n");
+            out.write("name: \"org.alfresco.messages\",\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/service/messages.js?locale=en_US\",\n");
             out.write("varName: \"Alfresco\"\n");
             out.write("});\n");
             out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.alfresco\",\n");
+            out.write("name: \"org.alfresco.alfresco\",\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/js/alfresco.js\",\n");
             out.write("varName: \"Alfresco\",\n");
-            out.write("requires: ['utilities','animation','selector','cookie','menu','container','button','com.alfresco.messages','com.yahoo.bubbling']\n");
+            out.write("requires: ['utilities','animation','selector','cookie','accessibility.aria.plugins.yui.menu','accessibility.aria.plugins.yui.container','accessibility.aria.plugins.yui.button','org.alfresco.messages','com.yahoo.bubbling']\n");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.awe\",\n");
+            out.write("name: \"org.alfresco.awe\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/com/alfresco/awe/awe.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/awe.js\",\n");
             out.write("varName: \"AWE\",\n");
-            out.write("requires:['com.alfresco.alfresco','org.wef','com.alfresco.awe.ui.form-panel','com.alfresco.awe.ui.login-panel','com.alfresco.forms','com.alfresco.awe.css','com.alfresco.awe.toolbar','force-yui-skin']\n");
+            out.write("requires:['org.alfresco.alfresco','org.wef','org.alfresco.awe.ui.form-panel','org.alfresco.awe.ui.login-panel','org.alfresco.forms','org.alfresco.awe.css','force-yui-skin']\n");
             out.write("});\n");
-            
-            out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.awe.toolbar\",\n");
-            out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/js/yui-toolbar.js\",\n");
-            out.write("varName: \"YAHOO.widget.Toolbar\"\n");
-            out.write("});\n");
-            
+            	
             out.write("WEF.addResource({\n");
             out.write("name: \"org.wef\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/org/wef/wef.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/wef/wef.js\",\n");
             out.write("requires:['utilities','com.yahoo.bubbling','org.wef.reset.css','org.wef.css']\n");
             out.write("});\n");
             out.write("WEF.addResource({\n");
@@ -160,61 +153,92 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("WEF.addResource({\n");
             out.write("name: \"org.wef.reset.css\",\n");
             out.write("type: \"css\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/org/wef/wef-reset.css\"\n");
+            out.write("path: \"http://localhost:8081/awe/wef/wef-reset.css\"\n");
             out.write("});\n");
             out.write("WEF.addResource({\n");
             out.write("name: \"org.wef.css\",\n");
             out.write("type: \"css\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/org/wef/wef.css\"\n");
+            out.write("path: \"http://localhost:8081/awe/wef/wef.css\"\n");
             out.write("});\n");
             out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.awe.css\",\n");
+            out.write("name: \"org.alfresco.awe.css\",\n");
             out.write("type: \"css\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/com/alfresco/awe/awe.css\"\n");
+            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/awe.css\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.awe.ui.panel\",\n");
+            out.write("name: \"org.alfresco.awe.ui.panel\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/com/alfresco/awe/ui/panel/panel.js\",\n");
-            out.write("requires: ['com.alfresco.alfresco']\n");
+            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/ui/panel/panel.js\",\n");
+            out.write("requires: ['org.alfresco.alfresco']\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.awe.ui.form-panel\",\n");
+            out.write("name: \"org.alfresco.awe.ui.form-panel\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/com/alfresco/awe/ui/panel/form-panel.js\",\n");
-            out.write("requires: ['com.alfresco.awe.ui.panel']\n");
+            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/ui/panel/form-panel.js\",\n");
+            out.write("requires: ['org.alfresco.awe.ui.panel']\n");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
-            out.write("name: \"com.alfresco.awe.ui.login-panel\",\n");
+            out.write("name: \"org.alfresco.awe.ui.login-panel\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/com/alfresco/awe/ui/panel/login-panel.js\",\n");
-            out.write("requires: ['com.alfresco.awe.ui.panel']\n");
+            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/ui/panel/login-panel.js\",\n");
+            out.write("requires: ['org.alfresco.awe.ui.panel']\n");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
             out.write("name: \"org.wef.ui.ribbon\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/org/wef/ui/ribbon/ribbon.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/wef/ui/ribbon/ribbon.js\",\n");
             out.write("varName: \"WEF\",\n");
-            out.write("requires: ['com.alfresco.awe','org.wef.ui.ribbon.css']\n");
+            out.write("requires: ['org.wef.ui.ribbon.css','org.wef.ui.tabbed-toolbar']\n");
             out.write("});\n");            
             
             out.write("WEF.addResource({\n");
             out.write("name: \"org.wef.ui.ribbon.css\",\n");
             out.write("type: \"css\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/org/wef/ui/ribbon/ribbon.css\",\n");
+            out.write("path: \"http://localhost:8081/awe/wef/ui/ribbon/ribbon.css\",\n");
             out.write("varName: \"WEF\",\n");
-            out.write("requires: ['com.alfresco.awe']\n");
+            out.write("requires: ['org.wef']\n");
             out.write("});\n");            
 
+            out.write("WEF.addResource({\n");
+            out.write("name: \"org.wef.ui.tabbed-toolbar\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/wef/ui/tabbed-toolbar/tabbed-toolbar.js\",\n");
+            out.write("varName: \"WEF\",\n");
+            out.write("requires: ['org.wef','org.wef.ui.tabbed-toolbar.css','accessibility.aria.plugins.yui.tabview','org.wef.ui.toolbar']\n");
+            out.write("});\n");            
+            
+            out.write("WEF.addResource({\n");
+            out.write("name: \"org.wef.ui.tabbed-toolbar.css\",\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/wef/ui/tabbed-toolbar/tabbed-toolbar.css\",\n");
+            out.write("varName: \"WEF\",\n");
+            out.write("requires: ['org.wef']\n");
+            out.write("});\n");
+            
+            out.write("WEF.addResource({\n");
+            out.write("name: \"org.wef.ui.toolbar\",\n");
+            out.write("type: \"js\",\n");
+            out.write("path: \"http://localhost:8081/awe/wef/ui/toolbar/toolbar.js\",\n");
+            out.write("varName: \"WEF\",\n");
+            out.write("requires: ['org.wef','org.wef.ui.toolbar.css']\n");
+            out.write("});\n");            
+            
+            out.write("WEF.addResource({\n");
+            out.write("name: \"org.wef.ui.toolbar.css\",\n");
+            out.write("type: \"css\",\n");
+            out.write("path: \"http://localhost:8081/awe/wef/ui/toolbar/toolbar.css\",\n");
+            out.write("varName: \"WEF\",\n");
+            out.write("requires: ['org.wef']\n");
+            out.write("});\n");
             
             // TOOD: work out how to add this.
             // out.write("<!--[if gte IE 6]>\n");
             // out.write("WEF.addResource({\n");
-            // out.write("name: 'com.alfresco.awe.ribbon.ie6.css',\n");
+            // out.write("name: 'org.alfresco.awe.ribbon.ie6.css',\n");
             // out.write("type: \"css\",\n");
             // out.write("path: \"http://localhost:8081/awe/css/awe-toolbar-ie.css\"\n");
             // out.write("});\n");            
@@ -223,80 +247,80 @@ public class StartTemplateTag extends AbstractWebEditorTag
 
             
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms',\n");
+            out.write("name: 'org.alfresco.forms',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/form/form-min.js\",\n");
-            out.write("requires: ['com.alfresco.forms.runtime','com.alfresco.forms.forms','com.alfresco.forms.datepicker','com.alfresco.forms.period','com.alfresco.forms.object-finder','calendar','com.alfresco.forms.rich-text-control','com.alfresco.alfresco.editors.tinymce','com.alfresco.forms.content']\n");
+            out.write("requires: ['org.alfresco.forms.runtime','org.alfresco.forms.forms','org.alfresco.forms.datepicker','org.alfresco.forms.period','org.alfresco.forms.object-finder','calendar','org.alfresco.forms.rich-text-control','org.alfresco.alfresco.editors.tinymce','org.alfresco.forms.content']\n");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.runtime',\n");
+            out.write("name: 'org.alfresco.forms.runtime',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/js/forms-runtime.js\"\n");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.forms',\n");
+            out.write("name: 'org.alfresco.forms.forms',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/form/form-min.js\",\n");
-            out.write("requires:['com.alfresco.forms.css']");
+            out.write("requires:['org.alfresco.forms.css']");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.css',\n");
+            out.write("name: 'org.alfresco.forms.css',\n");
             out.write("type: \"css\",\n");
             out.write("path: \"http://localhost:8081/awe/components/form/form.css\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.datepicker',\n");
+            out.write("name: 'org.alfresco.forms.datepicker',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/form/date-picker-min.js\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.period',\n");
+            out.write("name: 'org.alfresco.forms.period',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/form/period-min.js\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.object-finder',\n");
+            out.write("name: 'org.alfresco.forms.object-finder',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/object-finder/object-finder-min.js\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.object-finder',\n");
+            out.write("name: 'org.alfresco.forms.object-finder',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/object-finder/object-finder-min.js\",\n");
-            out.write("requires:['com.alfresco.forms.object-finder.css']");
+            out.write("requires:['org.alfresco.forms.object-finder.css']");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.object-finder.css',\n");
+            out.write("name: 'org.alfresco.forms.object-finder.css',\n");
             out.write("type: \"css\",\n");
             out.write("path: \"http://localhost:8081/awe/components/object-finder/object-finder.css\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.rich-text-control',\n");
+            out.write("name: 'org.alfresco.forms.rich-text-control',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/form/rich-text-min.js\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.forms.content',\n");
+            out.write("name: 'org.alfresco.forms.content',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/components/form/content-min.js\"\n");
             out.write("});\n");
 
 
             out.write("WEF.addResource({\n");
-            out.write("name: 'com.alfresco.alfresco.editors.tinymce',\n");
+            out.write("name: 'org.alfresco.alfresco.editors.tinymce',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/modules/editors/tiny_mce-min.js\",\n");
-            out.write("requires:['com.alfresco.alfresco','com.tinymce']\n");
+            out.write("requires:['org.alfresco.alfresco','com.tinymce']\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
@@ -315,21 +339,21 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("WEF.addResource({\n");
             out.write("name: 'accessibility.aria.plugins.yui.menu',\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/accessibility/aria/plugins/yui/menuviewariaplugin.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/lib/accessibility/aria/plugins/yui/menuariaplugin.js\",\n");
             out.write("requires:['menu']\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
             out.write("name: 'accessibility.aria.plugins.yui.container',\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/accessibility/aria/plugins/yui/containerviewariaplugin.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/lib/accessibility/aria/plugins/yui/containerariaplugin.js\",\n");
             out.write("requires:['container']\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
             out.write("name: 'accessibility.aria.plugins.yui.button',\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/lib/accessibility/aria/plugins/yui/buttonviewariaplugin.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/lib/accessibility/aria/plugins/yui/buttonariaplugin.js\",\n");
             out.write("requires:['button']\n");
             out.write("});\n");
 
@@ -337,13 +361,13 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("name: 'accessibility.aria.plugins.yui.tabview',\n");
             out.write("type: \"js\",\n");
             out.write("path: \"http://localhost:8081/awe/lib/accessibility/aria/plugins/yui/tabviewariaplugin.js\",\n");
-            out.write("requires:['button']\n");
+            out.write("requires:['tabview']\n");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
-            out.write("name:'com.wefapps.awe',\n");
-            out.write("repo:'lib',\n");
-            out.write("requires:['com.alfresco.awe','org.wef','org.wef.ui.ribbon']\n");
+            out.write("name:'org.wefapps.awe',\n");
+            out.write("repo:'core',\n");
+            out.write("requires:['org.alfresco.awe','org.wef','org.wef.ui.ribbon']\n");
             out.write("});\n");
          
             out.write("</script>\n");            

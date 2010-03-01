@@ -110,7 +110,7 @@ if (typeof WEF == "undefined" || !WEF)
                    convertConfigToYUIModuleConfig._counter = (convertConfigToYUIModuleConfig._counter === undefined) ? 0 : ++convertConfigToYUIModuleConfig._counter;
                    yuiConfig.varName = "WEF_Loader_Variable_" + n + convertConfigToYUIModuleConfig._counter;
                }
-               var repoRootPath = (config.repo) ? repositories[config.repo] : repositories.lib;
+               var repoRootPath = (config.repo) ? repositories[config.repo] : repositories.core;
                if (config.path) 
                {
                    //absolute path
@@ -136,6 +136,7 @@ if (typeof WEF == "undefined" || !WEF)
                    //append filename - this is assumed using last part of path.
                    yuiConfig.fullpath = bootloaderConfig.serverPort + repoRootPath + modulePath + '/' + modulePath.substring(modulePath.lastIndexOf('/') + 1) + '.' + yuiConfig.type;
                }
+               console.log('s', yuiConfig.fullpath);
                return yuiConfig;
            };
            
@@ -412,8 +413,9 @@ if (typeof WEF == "undefined" || !WEF)
                if (!Dom.get('wef'))
                {
                   var el = document.createElement('div');
-                  el.innerHTML =  '<div id="wef" class="wef"></div>';
-                  body.appendChild(el.firstChild);
+                  el.id="wef";
+                  el.className='wef';
+                  body.insertBefore(el, body.firstChild);
                }
                if (!Dom.hasClass(body, 'wef-root-body'))
                {
@@ -475,7 +477,7 @@ if (typeof WEF == "undefined" || !WEF)
             report: function WEF_report()
             {
                console.log('FIXME: loader setup duplicate modules to reload so strip dups. this fix should be in loader (' + arguments.callee.name +')');
-               var loaded = WEF.report().loaded,
+               var loaded = loader.report().loaded,
                    index = '',
                    uniqs = [];
                for (var i = 0;i<loaded.length;i++)

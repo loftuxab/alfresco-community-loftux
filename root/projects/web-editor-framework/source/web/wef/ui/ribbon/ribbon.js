@@ -24,7 +24,7 @@
          
          //render ribbon after WEF is rendered
          Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
-         
+         this.widgets.toolbars = [];
          this.initServices();
          this.initAttributes(this.config);
       },
@@ -71,7 +71,7 @@
       renderRibbon: function WEF_UI_Ribbon_renderRibbon()
       {
          if (!Dom.get(this.config.id)) {
-            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div class="hd"><h6>Web Editor</h6></div><div class="bd"></div><div class="ft"></div></div></div>';
+            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div class="hd"><h6>Web Editor</h6></div><div class="bd"><div id="wef-toolbar-container"></div></div><div class="ft"><div id="wef-toolbar-secondary-container"></div></div></div></div>';
          }
          var panelConfig = {
             visible: false,
@@ -109,71 +109,90 @@
          //get ribbon position from cookie if available otherwise reset to initial config value
          this.set('position', WEF.getCookieValue(this.config.name,'ribbon-position') || this.get('position'));
          ribbon.render();
+         var name = 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'Toolbar';
+
+         this.addToolbar(
+            YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
+            {
+               id:  YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,//'wef-toolbar-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
+               name: name,
+               element: 'wef-toolbar-container',
+               toolbars: [ //really tabs
+               {
+                  id:  'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+                  name: 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+                  label: '<img src="/awe/lib/com/alfresco/awe/images/edit.gif" alt="AWE" />',
+                  content:'<a href="dsd">dsds</a>',
+                  active: true
+               }]
+            },
+            YAHOO.org.wef.ui.TabbedToolbar
+         );
+
+         name = 'WEF-Ribbon'+YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR+'Toolbar';
+         this.addToolbar(
+            YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR,
+            {
+               id:  YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR,
+               name: name,
+               element: 'wef-toolbar-secondary-container',
+               buttons:
+               {
+                  buttons: 
+                  [
+                     {
+                        type: 'menu',
+                        label: 'Orientation',
+                        value: name+ YAHOO.org.wef.SEPARATOR + 'ribbon-placement',
+                        id: this.config.name + YAHOO.org.wef.SEPARATOR + 'ribbon-placement',
+                        icon: true,
+                        menu: 
+                        [
+                           {
+                              text: 'top',
+                              value: YAHOO.org.wef.ui.Ribbon.POSITION_TOP
+                           }, 
+                           {
+                              text: 'left',
+                              value: YAHOO.org.wef.ui.Ribbon.POSITION_LEFT
+                           }, 
+                           {
+                              text: 'right',
+                              value: YAHOO.org.wef.ui.Ribbon.POSITION_RIGHT
+                           }
+                        ]
+                     },
+                     {
+                        type: 'push',
+                        label: 'Help',
+                        value: 'http://www.alfresco.com/help/32/labs/sharehelp/',
+                        id: this.config.name + YAHOO.org.wef.SEPARATOR + 'help',
+                        icon: true
+                     }, 
+                  ]
+               }
+            },
+            YAHOO.org.wef.ui.Toolbar
+         );
          // Refresh any attributes here
-         this.refresh(['loggedInStatus']);
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);
+         
          Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
          Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
-                  
       },
       
-      onQuickEditMouseOver: function WEF_UI_Ribbon_onQuickEditMouseOver(e, args)
+      getToolbar: function WEF_UI_Ribbon_getToolbar(toolbarId)
       {
-         var targetContentEl = (args[1].value.nested) ? Dom.get(args[1].value.id).parentNode : Dom.get(args[1].value.id);
-         var targetContentElRegion = Dom.getRegion(targetContentEl), fadeIn = function fade(el)
+         if (toolbarId === YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR | toolbarId === YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR)
          {
-            var anim = new YAHOO.util.ColorAnim(el, {
-               backgroundColor: {
-                  from: '#ffffff',
-                  to: '#FFFF99',
-                  duration: '0.5'
-               }
-            });
-            anim.onComplete.subscribe(function(el)
-            {
-               return function()
-               {
-                  fadeOut(el);
-               };
-            }(el));
-            anim.animate();
-         }, fadeOut = function fade(el)
+            return this.widgets.toolbars[toolbarId];            
+         }
+         else 
          {
-            var anim = new YAHOO.util.ColorAnim(el, {
-               backgroundColor: {
-                  from: '#FFFF99',
-                  to: '#ffffff',
-                  duration: '0.5'
-               }
-            });
-            anim.animate();
-         };
-         //if not visible in viewport
-         if (!(targetContentElRegion.intersect(Dom.getClientRegion()))) {
-            if (this.scrollAnimation) {
-               this.scrollAnimation.stop();
-            }
-            //set up animation
-            this.scrollAnimation = new YAHOO.util.Scroll((YAHOO.env.ua.gecko) ? document.documentElement : document.body, {
-               scroll: {
-                  to: [0, Math.max(0, targetContentElRegion.top - 50)]
-               }
-            }, 1, YAHOO.util.Easing.easeOut);
-            this.scrollAnimation.onComplete.subscribe(function(el)
-            {
-               return function()
-               {
-                  fadeIn(el);
-               };
-            }(targetContentEl));
-            this.scrollAnimation.animate();
-         }
-         else {
-            fadeIn(targetContentEl);
-         }
+            return this.widgets.toolbars[YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR].getToolbar(toolbarId);
+         } 
       },
+      
+      
       /**
        * Adds toolbar to ribbon.
        *
@@ -185,14 +204,39 @@
        * @return {YAHOO.widget.Toolbar} Toolbar reference
        *
        */
-      addToolbar: function WEF_UI_Ribbon_addToolbar(config, location)
+      addToolbar: function WEF_UI_Ribbon_addToolbar(id, config, toolbarType)
       {
-         var location = location || YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR, tbar = null, toolbarContainer = (location && location === YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR) ? this.widgets.ribbonFooter : this.widgets.ribbonBody;
-         //add primary toolbar
-         if (this.widgets.toolbars[location]) // destroy existing toolbar first
+         var location = location || YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
+             tbar = null; 
+          
+         if (!toolbarType)
          {
-            this.widgets.toolbars[location].destroy();
+            throw new Error('Unable to add toolbar of specified type')
          }
+         
+         // destroy existing toolbar first if not primary
+         /*if (id != YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR && this.widgets.toolbars[id])
+         {
+            this.widgets.toolbars[id].destroy();
+            delete this.widgets.toolbars[id];
+         }*/
+         //add primary/secondary toolbars
+         if (id === YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR | id === YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR)
+         {
+            if(!this.widgets.toolbars[id])
+            {
+               tbar = new toolbarType(config);      
+            }   
+         }
+         else //add toolbars as tabs of tabbed toolbars.
+         {
+            tbar = this.widgets.toolbars[YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR].addToolbar(id, config);            
+         }
+         this.widgets.toolbars.push(tbar)
+         this.widgets.toolbars[id] = tbar;
+         tbar.init();
+         tbar.render();
+         /*
          tbar = this.widgets.toolbars[location] = new YAHOO.widget.Toolbar(toolbarContainer.appendChild(document.createElement('div')), config);
          
          tbar.on('buttonClick', function WEF_UI_Ribbon_generic_button_handler(args)
@@ -202,6 +246,7 @@
                args.button.value = args.button.value.split(YAHOO.org.wef.SEPARATOR).pop();
             }
             Bubbling.fire(args.button.id + args.type.replace('button', ''), args);
+         */
          // The following code is useful for those buttons that require the button
          // to stay in a selected state. TODO Move this logic out to doAfterPluginActivate ?           
          // var value = o.button.value;
@@ -217,138 +262,45 @@
          //    tbar.selectButton(value);
          //    this.lastButton = o.button;
          // }
-         });
-         if (location===YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR)
-         {
-            //add mouseove behaviour
-            console.log('TODO: move mouseover handlre somewehre else')
-            this.widgets.toolbars[YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR].getButtonById(this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);            
-         }
+         //});
+
          return tbar;
       },
       
       /**
        * Add button to specified button group and specified toolbar
        *
+       * @param id {String} The name of the toolbar to add the button to.
        * @param buttonConfig {Object} An object literal for the button config
-       * @param buttonGroup {String} An name of the button group to add the button
-       *                             to.
-       * @param location {String} The name of the toolbar to add the button to.
        *
        * @return {Boolean} Success/failure of addition
        */
-      addButton: function WEF_UI_Ribbon_addButton(buttonConfig, buttonGroup, location)
+      addButtons: function WEF_UI_Ribbon_addButton(id, buttonConfig)
       {
-         var location = location || org.wef.ui.Ribbon.PRIMARY_TOOLBAR;
-         if (!this.widgets.toolbars[location]) {
-            return false;
-         }
-         // add 'orphaned' button
-         if (!buttonGroup) {
-            this.widgets.toolbars[location].addButton(buttonConfig);
-         }
-         // add button to group
-         else {
-            this.widgets.toolbars[location].addButtonToGroup(buttonConfig, buttonGroup);
-         }
-         return true;
-      },
-      
-      /**
-       * Add buttons to specified button group and specified toolbar
-       *
-       * @param buttonConfig {Array} An array  of object literal for the button
-       *                             config
-       * @param buttonGroup {String} An name of the button group to add the button
-       *                             to.
-       * @param location {String} The name of the toolbar to add the button to.
-       *
-       * @return {Boolean} Success/failure of addition
-       */
-      addButtons: function WEF_UI_Ribbon_addButtons(buttonConfigs, buttonGroup, location)
-      {
-         for (var i = 0, len = i; i < len; i++) {
-            this.addButton(buttonConfigs[i], buttonGroup, location);
-         }
-      },
-      
-      onQuickEditClick: function WEF_UI_Ribbon_onQuickEditClick(e, args)
-      {
-         org.wef.ui.loadForm(args[1].button.value);
-      },
-      
-      onShowHideClick: function WEF_UI_Ribbon_onShowHideClick(e, args)
-      {
-         var editMarkers = Selector.query('span.alfresco-content-marker');
-         this.onShowHideClick.isHidden = this.onShowHideClick.isHidden || false;
-         if (this.onShowHideClick.isHidden) {
-            Dom.setStyle(editMarkers, 'display', '');
-            this.onShowHideClick.isHidden = false;
-         }
-         else {
-            Dom.setStyle(editMarkers, 'display', 'none');
-            this.onShowHideClick.isHidden = true;
-         }
+
+        if (!this.widgets.toolbars[id])
+        {
+           throw new Error('Toolbar ' + id + ' not found');
+           return false;   
+        }
+        else
+        {
+           return this.widgets.toolbars[id].addButtons(buttonConfig);
+        }
       },
       
       onRibbonPlacementClick: function WEF_UI_Ribbon_onRibbonPlacementClick(e, args)
       {
-         this.set('position', args[1].button.value);
+         this.set('position', args[1]);
       },
       
       
       onHelpClick: function WEF_UI_Ribbon_onHelpClick(e, args)
       {
-         alert('help');
+        window.location=args[1]
       },
       
-      onLogoutClick: function WEF_UI_Ribbon_onLogoutClick(e, args)
-      {
-         var ribbonObj = this;
-         Alfresco.util.PopupManager.displayPrompt(
-         {
-            title: 'Logout?',
-            text: 'Are you sure you want to log out?',
-            buttons: [{
-               text: 'OK',
-               handler: function()
-               {
-                  var config = {
-                     url: '/awe/page/dologout',
-                     method: "GET",
-                     successCallback: {
-                        fn: function logoutSuccess(e)
-                        {
-                           ribbonObj.onLoggedOut.call(ribbonObj, e, [null, {
-                              loggedIn: false
-                           }]);
-                           this.hide();
-                           this.destroy();
-                        },
-                        scope: this
-                     },
-                     failureCallback: {
-                        fn: function logoutFailure(e)
-                        {
-                           this.hide();
-                           this.destroy();
-                        },
-                        scope: this
-                     }
-                  };
-                  Alfresco.util.Ajax.request(config);
-               }
-            }, {
-               text: 'Cancel',
-               handler: function()
-               {
-                  this.hide();
-                  this.destroy();
-               }
-            }]
-         });
-      //show logout dialog
-      },
+
     
       /*
     * Change handler for position attribute. Moves the ribbon around
@@ -367,7 +319,7 @@
             container.addClass('wef-ribbon-orientation-' + e.newValue);
          }
          
-         if (e.newValue === org.wef.ui.Ribbon.POSITION_TOP && !this._originalBodyMarginTop) {
+         if (e.newValue === YAHOO.org.wef.ui.Ribbon.POSITION_TOP && !this._originalBodyMarginTop) {
             //reset body height
             this.widgets.ribbonBody.setStyle('height', 'inherit');
             

@@ -16,7 +16,7 @@
 }
 #wef-ribbon-container #wef-ribbon
 {
-   background-color:#F2F2F2;
+   background-color:#b7d4e9;
 }
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c,
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c,
@@ -60,7 +60,7 @@
 }
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon
 {
-   height:3em;
+   height:6em;
 }
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon .hd,
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon .bd,
@@ -75,21 +75,24 @@
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon .ft.wef-ribbon-module
 {
    padding-left:1.5em;
-   min-height:3em;
+   min-height:6em;
 }
 
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .hd.wef-ribbon-module
 {
-   width:auto;
+   width:11em;
 }
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module
 {
    width:auto;
    float:right;
+   position:absolute;
+   top:0;
+   right:0;
 }
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .bd.wef-ribbon-module
 {
-   width:auto;
+   width:91.3%;
 }
 #wef-ribbon-container .yui-toolbar-container
 {
@@ -101,12 +104,14 @@
    border-bottom:0;
    padding:0;
 }
-#wef-ribbon h6 {
-   padding:0.5em;
+#wef-ribbon .hd.wef-ribbon-module h6 {
+   height:78px;
    text-align: center;
+   text-indent:-9999em;
+   overflow:hidden;
+   background:url(./images/awe-brand.gif) repeat scroll 0 0;
 }
-#wef-ribbon .wef-ribbon-module,
-#wef-ribbon .wef-ribbon-module .yuimenu .bd
+#wef-ribbon .wef-ribbon-module
 {
    border:none;
    background:none;
@@ -116,6 +121,7 @@
 #wef-ribbon .wef-ribbon-module .yuimenu .bd
 {
    border:1px solid black;
+   padding:0;
 }
 #wef-ribbon .wef-ribbon-module .yui-menu-shadow
 {
@@ -139,26 +145,52 @@
 }
 
 /* plugin css (awe edit content */
+#WEF-Ribbon--ribbon-placement,
+#WEF-Ribbon--ribbon-placement span.first-child,
+#WEF-Ribbon--help,
+#WEF-Ribbon--help span.first-child,
+#awe--loggedout,
+#awe--loggedout span.first-child 
+{
+   background:none;
+   border:0;
+}
+#wef-ribbon #awe--loggedout button,
+#wef-ribbon #WEF-Ribbon--help button,
+#wef-ribbon #WEF-Ribbon--ribbon-placement button
+{
+   font-weight:bold;
+   font-size:85%;
+   color:#333;
+}
+#wef-ribbon #WEF-Ribbon--help.yui-button-disabled button,
+#wef-ribbon #WEF-Ribbon--ribbon-placement.yui-button-disabled button,
+#wef-ribbon #awe--loggedout.yui-button-disabled button
+{
+   color:#999;
+}
+
+#wef-ribbon #awe--loggedout button
+{
+   background: transparent url(./images/logout.gif) no-repeat 7px 50%;
+}
+#wef-ribbon #WEF-Ribbon--help button
+{
+   background: transparent url(./images/help.gif) no-repeat 7px 50%;
+}
+#wef-ribbon #WEF-Ribbon--ribbon-placement span.first-child
+{
+   background:transparent url(./images/orientation.gif) no-repeat 6px 50%;
+}
+
+
+ 
 #wef-ribbon #WEF-Ribbon--show-hide-edit-markers span.yui-toolbar-icon
 {
    background: transparent url(http://localhost:8081/awe/themes/default/images/edit.png) no-repeat 6px 2px;
    width:23px;
 }
-#wef-ribbon #WEF-Ribbon--logout span.yui-toolbar-icon
-{
-   background: transparent url(http://localhost:8080/alfresco/images/icons/logout.gif) no-repeat 7px 50%;
-   width:23px;
-}
-#wef-ribbon #WEF-Ribbon--help span.yui-toolbar-icon
-{
-   background: transparent url(http://localhost:8080/alfresco/images/icons/Help_icon.gif) no-repeat 7px 50%;
-   width:23px;
-}
-#wef-ribbon #WEF-Ribbon--ribbon-placement span.yui-toolbar-icon
-{
-   background:transparent url(http://localhost:8080/alfresco/images/icons/shelf.gif) no-repeat 6px 1px;
-   width:23px;
-}
+
 #wef-ribbon #WEF-Ribbon--quickedit span.yui-toolbar-icon
 {
    background:transparent url(http://localhost:8080/alfresco/images/icons/search_controls.gif) no-repeat 5px 3px;

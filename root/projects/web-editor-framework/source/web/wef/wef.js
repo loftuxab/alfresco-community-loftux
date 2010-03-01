@@ -383,19 +383,25 @@
       WEF.Widget.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
       
       this.services = {};
-      this.widgets = {
-         toolbars : {}
-      };
-
-
+      this.widgets = {};
    };
    
    YAHOO.extend(WEF.Widget, WEF.Plugin, {
       
       init: function init()
       {
-         this.element = new Element(this.config.element);
+         //if no element on config then widget must assign one at some point.
+         if (this.config.element)
+         {
+            this.element = new Element(this.config.element);            
+         }
+      },
+      
+      initAttributes: function initAttributes()
+      {
+         
       }, 
+      
      /**
        * Renders object
        * 

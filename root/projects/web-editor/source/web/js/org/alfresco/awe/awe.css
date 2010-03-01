@@ -40,3 +40,18 @@
 {
    border-width:1px 0 0 0;
 }
+
+
+#awe--show-hide-edit-markers,
+#awe--show-hide-edit-markers span.first-child,
+#awe--quickedit,
+#awe--quickedit span.first-child
+{
+   background:none;
+   border:0;
+}
+#awe--quickedit button,
+#awe--show-hide-edit-markers button
+{
+   padding-left:0;
+}

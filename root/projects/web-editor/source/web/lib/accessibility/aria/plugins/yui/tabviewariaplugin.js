@@ -1,5 +1,4 @@
 (function () {
-
 	var Dom = YAHOO.util.Dom,
 		Event = YAHOO.util.Event,
 		UA = YAHOO.env.ua,
