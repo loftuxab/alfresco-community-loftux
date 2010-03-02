@@ -212,8 +212,20 @@
       {
          // Display form data from config
          checkinConfig = checkinConfig ? checkinConfig : {};
-         Dom.get(this.id + "-version-major").checked = (checkinConfig.version == "major");
-         Dom.get(this.id + "-version-minor").checked = (checkinConfig.version == "minor" || checkinConfig.version == null || checkinConfig.version == "");
+         var majorEl = Dom.get(this.id + "-version-major"),
+            minorEl = Dom.get(this.id + "-version-minor");
+         if (checkinConfig.version == "minor" || checkinConfig.version == null || checkinConfig.version == "")
+         {
+            minorEl.checked = true;
+            minorEl.focus();
+            majorEl.checked = false;
+         }
+         else if (checkinConfig.version == "major")
+         {
+            majorEl.checked = true;
+            majorEl.focus();
+            minorEl.checked = false;
+         }         
          Dom.get(this.id + "-comments").value = checkinConfig.comments ? $html(checkinConfig.comments) : "";
          this.widgets.form.updateSubmitElements();
 

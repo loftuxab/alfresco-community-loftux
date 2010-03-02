@@ -122,7 +122,8 @@
                configDef.parameterDefinitions.push({
                   type: "arca:destination-dialog-button",
                   displayLabel: this.msg("label.workingCopyLocation"),
-                  _buttonLabel: this.msg("button.select")
+                  _buttonLabel: this.msg("button.select"),
+                  _destinationParam: "destination-folder"
                });
                return configDef;
             }
@@ -148,7 +149,8 @@
                configDef.parameterDefinitions.push({
                   type: "arca:destination-dialog-button",
                   displayLabel: this.msg("label.to"),
-                  _buttonLabel: this.msg("button.select")
+                  _buttonLabel: this.msg("button.select"),
+                  _destinationParam: "destination-folder"
                });
                return configDef;
             }
@@ -199,7 +201,66 @@
                });
                return configDef;
             }
+         },
+
+         Transform:
+         {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               // Hide all parameters since we are using a cusotm ui but set default values
+               this._hideParameters(configDef.parameterDefinitions);
+
+               // But make mime type and destination folder visible and destination folder resolve the nodeRef to a path
+               this._getParamDef(configDef, "mime-type")._type = null;
+               this._getParamDef(configDef, "destination-folder")._type = "path";
+               return configDef;
+            },
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               // Hide all parameters but mime-type
+               this._hideParameters(configDef.parameterDefinitions);
+               this._getParamDef(configDef, "mime-type")._type = null;
+
+               // todo set appropriate values when known OR hide if they aren't mandatory
+               //this._setParameter(ruleConfig, "assoc-type", "");
+               //this._setParameter(ruleConfig, "assoc-name", "");
+
+               // Make parameter renderer create a "Destination" button that displays an destination folder browser
+               configDef.parameterDefinitions.push({
+                  type: "arca:destination-dialog-button",
+                  displayLabel: this.msg("label.to"),
+                  _buttonLabel: this.msg("button.select"),
+                  _destinationParam: "destination-folder"
+               });
+               return configDef;
+            }
+         },
+
+         Import:
+         {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               // Hide encoding and make destination folder resolve the nodeRef to a path
+               this._getParamDef(configDef, "encoding")._type = "hidden";
+               this._getParamDef(configDef, "destination-folder")._type = "path";
+               return configDef;
+            },
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               // Hide all parameters
+               this._hideParameters(configDef.parameterDefinitions);
+
+               // Make parameter renderer create a "Destination" button that displays an destination folder browser
+               configDef.parameterDefinitions.push({
+                  type: "arca:destination-dialog-button",
+                  displayLabel: this.msg("label.to"),
+                  _buttonLabel: this.msg("button.select"),
+                  _destinationParam: "destination"
+               });
+               return configDef;
+            }
          }
+
 
       },
 
@@ -278,8 +339,7 @@
                            if (values !== null)
                            {
                               var ctx = this.renderers["arca:checkin-dialog-button"].currentCtx;
-                              // todo: use this once parameter definition has changed on server!
-                              // this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "version", values.version);
+                              this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "minorChange", values.version == "minor" ? "true" : "false");
                               this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "description", values.comments);
                               this._updateSubmitElements(ctx.configDef);
                            }
@@ -289,7 +349,7 @@
                   var params = this._getParameters(obj.configDef);
                   this.widgets.checkInForm.showDialog(
                   {
-                     version: params.version,
+                     version: params.minorChange == "true" ? "minor" : "major",
                      comments: params.description
                   });
                });
@@ -310,7 +370,8 @@
                   this.renderers["arca:destination-dialog-button"].currentCtx =
                   {
                      configDef: obj.configDef,
-                     ruleConfig: obj.ruleConfig
+                     ruleConfig: obj.ruleConfig,
+                     paramDef: obj.paramDef
                   };
                   if (!this.widgets.destinationDialog)
                   {
@@ -329,7 +390,7 @@
                            {
                               var ctx = this.renderers["arca:destination-dialog-button"].currentCtx,
                                  path = selectedFolder.path;
-                              this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "destination-folder", selectedFolder.nodeRef);
+                              this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, ctx.paramDef._destinationParam, selectedFolder.nodeRef);
                               if (selectedFolder.siteId !== undefined)
                               {
                                  path = this.msg("label.site-path", selectedFolder.siteId, selectedFolder.path);
