@@ -2,10 +2,11 @@
 <#assign path = resource.path?interpret>
 <#escape x as jsonUtils.encodeJSONString(x)>
 {
-   name: "${resource.name}", 
-   type: "${resource.type}",
+   name: "${resource.name?html}", 
+   type: "${resource.type?html}",
    path: "${url.context}<@path />"<#if resource.dependencies?size &gt; 0>,
-   requires: [<#list resource.dependencies as dependency>"${dependency.name}"<#if dependency_has_next>,</#if></#list>]</#if>
+   requires: [<#list resource.dependencies as dependency>"${dependency.name?html}"<#if dependency_has_next>,</#if></#list>]</#if><#if resource.variableName??>,
+   varName: "${resource.variableName?html}"</#if>
 }
 </#escape>
 </#macro>
@@ -16,4 +17,11 @@ WEF.addResource(<@renderResource resource=resource />);
 </#if>
 </#list>
 
-WEF.run("${appName?html}");
+if (window.attachEvent)
+{
+   window.attachEvent("onload",function() {WEF.run("${appName?html}");});
+}
+else if (window.addEventListener)
+{
+   window.addEventListener("load",function() {WEF.run("${appName?html}");}, false);
+}

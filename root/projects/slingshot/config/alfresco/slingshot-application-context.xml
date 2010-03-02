@@ -18,10 +18,10 @@
             <value>classpath:META-INF/spring-surf-config-custom.xml</value>
             <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
             
-            <!-- Web Framework Commons -->
-            <value>classpath:alfresco/web-framework-config-commons.xml</value>
+            <!-- Common form config -->
+            <value>classpath:alfresco/form-config.xml</value>
             
-            <!-- Share Forms config -->
+            <!-- Share form config -->
             <value>classpath:alfresco/share-form-config.xml</value>
             
             <!-- Share custom config -->

@@ -1,22 +1,34 @@
 (function()
 {
-   /**
-    * WEFApplication top level object
-    * @namespace
-    * @constructor WEFApplication
-    */
-   WEFApplication = (function()
+   YAHOO.namespace("${appName}");
+
+   YAHOO.${appName} = function ${appName?replace(".", "_")}()
    {
-      var init = function WEFApplication_init()
-      {
-      <#list plugins as plugin>
-         var ${plugin.variableName?html} = WEF.getPlugin("${plugin.name?html}");
-         ${plugin.variableName?html}.init();
-      </#list>
-         
-         return this;
-      }
-   }
+      // initialise each plugin after WEF has rendered
+      YAHOO.Bubbling.on(
+         'WEF-Ribbon'+WEF.SEPARATOR+'afterRender',
+         function(e, args)
+         {
+            <#list plugins as plugin>
+            var plugin = WEF.getPlugin("${plugin.name?html}");
+            
+            // retrieve or create plugin config
+            var config = YAHOO.org.wef.ConfigRegistry.getConfig("${plugin.name?html}");
+            if (config == null)
+            {
+               config = 
+               {
+                  id: "${plugin.name?html}",
+                  name: "${plugin.name?html}"
+               }
+            }
+            
+            // initialise the plugin
+            plugin.init(config);
+            </#list>
+         }
+      );
+   };
 })();
 
-//WEF.register("${appName?html}", YAHOO.${appName?html}, {version: "1.0.0", build: "1"});
+WEF.register("${appName}", YAHOO.${appName}, {version: "1.0.0", build: "1"});

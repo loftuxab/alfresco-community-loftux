@@ -52,7 +52,14 @@ WEF.init(
        *
        * @type String
        */
-      serverPort: window.location.protocol + "//" + window.location.host + "${url.context}",
+      serverPort: window.location.protocol + "//" + window.location.host,
+      
+      /**
+       * Context path of awe app
+       *
+       * @type String
+       */
+      urlContext: window.location.protocol + "//" + window.location.host + "${url.context}",
       
       /**
        * Use sandbox to load files

@@ -395,6 +395,7 @@
    <target name="clean-webeditor-projects" 
               description="Cleans all projects related to the web editor project" 
               depends="clean-webframeworkcommons,
+                       clean-webeditor-framework,
                        clean-webeditor" />
                     
    <target name="clean-mobile-projects" 

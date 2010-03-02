@@ -8,7 +8,7 @@
       <property name="name" value="org.alfresco.forms" />
       <property name="description" value="Plugin providing forms capabilities" />
       <property name="path" value="/components/form/form-min.js" />
-      <property name="variableName" value="AWEForms" />
+      <property name="variableName" value="Alfresco.FormUI" />
       <property name="dependencies">
          <list>
             <ref bean="formsRuntime" />
@@ -26,15 +26,16 @@
    <bean id="awePlugin" parent="wefPluginBase" class="org.springframework.extensions.webeditor.WEFPluginImpl">
       <property name="name" value="org.alfresco.awe" />
       <property name="description" value="Plugin providing in-context editing capabilities" />
-      <property name="path" value="/js/awe.js" />
+      <property name="path" value="/res/awe/awe.js" />
       <property name="variableName" value="AWE" />
       <property name="dependencies">
          <list>
             <ref bean="alfUtils" />
             <ref bean="formsPlugin" />
-            <ref bean="aweResetCSS" />
             <ref bean="aweCSS" />
-            <ref bean="wefToolbar" />
+            <ref bean="aweLoginPanel" />
+            <ref bean="aweFormPanel" />
+            <ref bean="wefRibbon" />
             <ref bean="yuiSkin" />
          </list>
       </property>
@@ -165,74 +166,47 @@
    
    <!-- *** AWE *** -->
    
-   <bean id="aweResetCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="org.alfresco.awe.reset-css" />
-      <property name="description" value="Reset CSS file for AWE" />
-      <property name="path" value="/css/awe-reset.css" />
-      <property name="type" value="css" />
-   </bean>
-   
    <bean id="aweCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.awe.css" />
       <property name="description" value="Main CSS file for AWE" />
-      <property name="path" value="/css/awe.css" />
+      <property name="path" value="/res/awe/awe.css" />
       <property name="type" value="css" />
    </bean>
    
-   <!-- *** YUI *** -->
-   
-   <bean id="yuiBubbling" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="com.yahoo.bubbling" />
-      <property name="description" value="Bubbling event library" />
-      <property name="path" value="/js/bubbling.v2.1.js" />
+   <bean id="aweLoginPanel" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.alfresco.awe.panel.login" />
+      <property name="description" value="Login panel component" />
+      <property name="path" value="/res/awe/ui/panel/login-panel.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
-            <ref bean="yuiUtilities" />
+            <ref bean="awePanel" />
          </list>
       </property>
    </bean>
    
-   <bean id="yuiSkin" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="com.yahoo.skin" />
-      <property name="description" value="The default YUI skin" />
-      <property name="path" value="/yui/assets/skins/default/skin.css" />
-      <property name="type" value="css" />
+   <bean id="aweFormPanel" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.alfresco.awe.panel.form" />
+      <property name="description" value="Form panel component" />
+      <property name="path" value="/res/awe/ui/panel/form-panel.js" />
+      <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="awePanel" />
+         </list>
+      </property>
    </bean>
    
-   <bean id="yuiUtilities" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="utilities" />
-      <property name="description" value="YUI utility library" />
-   </bean>
-   
-   <bean id="yuiAnimation" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="animation" />
-      <property name="description" value="YUI animation library" />
-   </bean>
-   
-   <bean id="yuiSelector" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="selector" />
-      <property name="description" value="YUI selector library" />
-   </bean>
-   
-   <bean id="yuiCookie" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="cookie" />
-      <property name="description" value="YUI cookie library" />
-   </bean>
-   
-   <bean id="yuiMenu" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="menu" />
-      <property name="description" value="YUI menu library" />
-   </bean>
-   
-   <bean id="yuiContainer" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="container" />
-      <property name="description" value="YUI container library" />
-   </bean>
-   
-   <bean id="yuiButton" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="button" />
-      <property name="description" value="YUI button library" />
+   <bean id="awePanel" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.alfresco.awe.panel" />
+      <property name="description" value="Panel component" />
+      <property name="path" value="/res/awe/ui/panel/panel.js" />
+      <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="alfUtils" />
+         </list>
+      </property>
    </bean>
    
    <!-- *** Aria *** -->
@@ -240,7 +214,7 @@
    <bean id="yuiAria" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="accessibility.aria.plugins.yui" />
       <property name="description" value="Accessibility plugins for YUI" />
-      <property name="path" value="/js/accessibility/aria/plugins/yui/yui-aria.js" />
+      <property name="path" value="/res/lib/accessibility/aria/plugins/yui/yui-aria.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
@@ -255,29 +229,49 @@
    <bean id="yuiAriaMenu" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="accessibility.aria.plugins.yui.menu" />
       <property name="description" value="Accessibility plugins for YUI menu" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/menuviewariaplugin.js" />
+      <property name="path" value="/res/lib/accessibility/aria/plugins/yui/menuviewariaplugin.js" />
       <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="yuiMenu" />
+         </list>
+      </property>
    </bean>
    
    <bean id="yuiAriaContainer" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="accessibility.aria.plugins.yui.container" />
       <property name="description" value="Accessibility plugins for YUI container" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/containerviewariaplugin.js" />
+      <property name="path" value="/res/lib/accessibility/aria/plugins/yui/containerviewariaplugin.js" />
       <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="yuiContainer" />
+         </list>
+      </property>
    </bean>
    
    <bean id="yuiAriaButton" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="accessibility.aria.plugins.yui.button" />
       <property name="description" value="Accessibility plugins for YUI button" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/buttonviewariaplugin.js" />
+      <property name="path" value="/res/lib/accessibility/aria/plugins/yui/buttonviewariaplugin.js" />
       <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="yuiButton" />
+         </list>
+      </property>
    </bean>
    
    <bean id="yuiAriaTabView" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="accessibility.aria.plugins.yui.tabview" />
       <property name="description" value="Accessibility plugins for YUI tab view" />
-      <property name="path" value="/lib/accessibility/aria/plugins/yui/tabviewariaplugin.js" />
+      <property name="path" value="/res/lib/accessibility/aria/plugins/yui/tabviewariaplugin.js" />
       <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="yuiTabView" />
+         </list>
+      </property>
    </bean>
 
 </beans>

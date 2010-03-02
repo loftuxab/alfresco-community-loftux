@@ -18,10 +18,10 @@
             <value>classpath:META-INF/spring-surf-config-custom.xml</value>
             <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
             
-            <!-- Web Framework Commons -->
-            <value>classpath:alfresco/web-framework-config-commons.xml</value>
+            <!-- Common form config -->
+            <value>classpath:alfresco/form-config.xml</value>
             
-            <!-- Web Framework Commons -->
+            <!-- Web Editor form config -->
             <value>classpath:alfresco/awe-form-config.xml</value>
             
             <!-- Wed Editor custom config -->
