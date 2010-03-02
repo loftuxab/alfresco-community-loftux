@@ -3,11 +3,33 @@
 
 <beans>
 
-   <!-- Plugins  -->
-   <bean id="formsPlugin" parent="wefPluginBase" class="org.springframework.extensions.webeditor.WEFPluginImpl">
+   <!-- Plugin  -->
+   <bean id="awePlugin" parent="wefPluginBase" class="org.springframework.extensions.webeditor.WEFPluginImpl">
+      <property name="name" value="org.alfresco.awe" />
+      <property name="description" value="Plugin providing in-context editing capabilities" />
+      <property name="path" value="/res/awe/awe.js" />
+      <property name="variableName" value="AWE" />
+      <property name="dependencies">
+         <list>
+            <ref bean="wefRibbon" />
+            <ref bean="formsUI" />
+            <ref bean="aweCSS" />
+            <ref bean="aweLoginPanel" />
+            <ref bean="aweFormPanel" />
+            <ref bean="yuiSkin" />
+         </list>
+      </property>
+   </bean>
+   
+   <!-- Resources -->
+   
+   <!-- *** Forms *** -->
+   
+   <bean id="formsUI" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms" />
-      <property name="description" value="Plugin providing forms capabilities" />
+      <property name="description" value="Forms UI" />
       <property name="path" value="/components/form/form-min.js" />
+      <property name="type" value="js" />
       <property name="variableName" value="Alfresco.FormUI" />
       <property name="dependencies">
          <list>
@@ -22,28 +44,6 @@
          </list>
       </property>
    </bean>
-   
-   <bean id="awePlugin" parent="wefPluginBase" class="org.springframework.extensions.webeditor.WEFPluginImpl">
-      <property name="name" value="org.alfresco.awe" />
-      <property name="description" value="Plugin providing in-context editing capabilities" />
-      <property name="path" value="/res/awe/awe.js" />
-      <property name="variableName" value="AWE" />
-      <property name="dependencies">
-         <list>
-            <ref bean="alfUtils" />
-            <ref bean="formsPlugin" />
-            <ref bean="aweCSS" />
-            <ref bean="aweLoginPanel" />
-            <ref bean="aweFormPanel" />
-            <ref bean="wefRibbon" />
-            <ref bean="yuiSkin" />
-         </list>
-      </property>
-   </bean>
-   
-   <!-- Resources -->
-   
-   <!-- *** Forms *** -->
    
    <bean id="formsRuntime" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.runtime" />

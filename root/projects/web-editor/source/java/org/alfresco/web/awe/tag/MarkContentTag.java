@@ -182,7 +182,7 @@ public class MarkContentTag extends AbstractWebEditorTag
             
             out.write("\"><img src=\"");
             out.write(urlPrefix);
-            out.write("/themes/default/images/edit.png\" alt=\"");
+            out.write("/awe/images/edit.png\" alt=\"");
             out.write(encode(this.contentTitle));
             out.write("\" title=\"");
             out.write(encode(this.contentTitle));
