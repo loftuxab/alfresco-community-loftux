@@ -136,8 +136,8 @@
 
    <customise>
       <property type="d:content" id="cm:content.size">Size</property>
-      <condition name="has-tag">HasTagCondition</condition>
-      <condition name="in-category">InCategoryCondition</condition>
+      <condition name="has-tag">HasTag</condition>
+      <condition name="in-category">InCategory</condition>
       <item id="show-more">ShowMore</item>
    </customise>
 

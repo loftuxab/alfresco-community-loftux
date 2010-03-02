@@ -65,6 +65,11 @@
    display: inline;
 }
 
+.rule-config .rule-config-body .name span
+{
+   font-weight: bold;
+}
+
 .rule-config .rule-config-body .name select optgroup
 {
    padding-top: 0.25em;

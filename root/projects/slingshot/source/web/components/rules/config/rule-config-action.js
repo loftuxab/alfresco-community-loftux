@@ -90,6 +90,13 @@
 
          SendAnEmail:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               // Hide all parameters but subject
+               this._hideParameters(configDef.parameterDefinitions);
+               this._getParamDef(configDef, "subject")._type = null;
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                this._hideParameters(configDef.parameterDefinitions);
@@ -116,6 +123,13 @@
 
          Checkout:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               // Hide all parameters except destination-folder that shall be resolved to a path
+               this._hideParameters(configDef.parameterDefinitions);
+               this._getParamDef(configDef, "destination-folder")._type = "path";
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                this._hideParameters(configDef.parameterDefinitions);
@@ -158,6 +172,17 @@
 
          SimpleWorkflow:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               // Hide all parameters but the labels
+               this._hideParameters(configDef.parameterDefinitions);
+               this._getParamDef(configDef, "approve-step")._type = null;
+               if (ruleConfig.parameterValues && ruleConfig.parameterValues["reject-step"])
+               {
+                  this._getParamDef(configDef, "reject-step")._type = null;
+               }
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Hide all parameters since we are using a cusotm ui
@@ -192,6 +217,12 @@
 
          LinkCategory:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._getParamDef(configDef, "category-aspect")._type = "hidden";
+               this._getParamDef(configDef, "category-value")._type = "category";
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                this._hideParameters(configDef.parameterDefinitions);
@@ -242,7 +273,7 @@
             {
                // Hide encoding and make destination folder resolve the nodeRef to a path
                this._getParamDef(configDef, "encoding")._type = "hidden";
-               this._getParamDef(configDef, "destination-folder")._type = "path";
+               this._getParamDef(configDef, "destination")._type = "path";
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -363,7 +394,7 @@
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                this._createLabel(paramDef.displayLabel, containerEl); 
-               var nodeRef = ruleConfig.parameterValues ? ruleConfig.parameterValues.destination : null;
+               var nodeRef = ruleConfig.parameterValues ? ruleConfig.parameterValues[paramDef._destinationParam] : null;
                this._createPathSpan(containerEl, this.id + "-" + configDef._id + "-destinationLabel", nodeRef);
                this._createButton(containerEl, configDef, paramDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
                {
