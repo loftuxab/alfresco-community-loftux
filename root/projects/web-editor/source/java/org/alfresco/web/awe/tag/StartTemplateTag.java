@@ -134,7 +134,7 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("WEF.addResource({\n");
             out.write("name: \"org.alfresco.awe\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/awe.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/awe/awe.js\",\n");
             out.write("varName: \"AWE\",\n");
             out.write("requires:['org.alfresco.alfresco','org.wef','org.alfresco.awe.ui.form-panel','org.alfresco.awe.ui.login-panel','org.alfresco.forms','org.alfresco.awe.css','force-yui-skin']\n");
             out.write("});\n");
@@ -163,27 +163,27 @@ public class StartTemplateTag extends AbstractWebEditorTag
             out.write("WEF.addResource({\n");
             out.write("name: \"org.alfresco.awe.css\",\n");
             out.write("type: \"css\",\n");
-            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/awe.css\"\n");
+            out.write("path: \"http://localhost:8081/awe/awe/awe.css\"\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
             out.write("name: \"org.alfresco.awe.ui.panel\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/ui/panel/panel.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/awe/ui/panel/panel.js\",\n");
             out.write("requires: ['org.alfresco.alfresco']\n");
             out.write("});\n");
 
             out.write("WEF.addResource({\n");
             out.write("name: \"org.alfresco.awe.ui.form-panel\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/ui/panel/form-panel.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/awe/ui/panel/form-panel.js\",\n");
             out.write("requires: ['org.alfresco.awe.ui.panel']\n");
             out.write("});\n");
             
             out.write("WEF.addResource({\n");
             out.write("name: \"org.alfresco.awe.ui.login-panel\",\n");
             out.write("type: \"js\",\n");
-            out.write("path: \"http://localhost:8081/awe/js/org/alfresco/awe/ui/panel/login-panel.js\",\n");
+            out.write("path: \"http://localhost:8081/awe/awe/ui/panel/login-panel.js\",\n");
             out.write("requires: ['org.alfresco.awe.ui.panel']\n");
             out.write("});\n");
             

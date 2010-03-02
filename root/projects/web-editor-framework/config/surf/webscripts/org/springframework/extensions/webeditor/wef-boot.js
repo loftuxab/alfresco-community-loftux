@@ -1,6 +1,6 @@
 
-if (typeof WEF == "undefined" || !WEF) 
-{
+//if (typeof WEF == "undefined" || !WEF) 
+//{
     WEF = function WEF()
     {
         var config = {},
@@ -136,7 +136,7 @@ if (typeof WEF == "undefined" || !WEF)
                    //append filename - this is assumed using last part of path.
                    yuiConfig.fullpath = bootloaderConfig.serverPort + repoRootPath + modulePath + '/' + modulePath.substring(modulePath.lastIndexOf('/') + 1) + '.' + yuiConfig.type;
                }
-               console.log('s', yuiConfig.fullpath);
+               
                return yuiConfig;
            };
            
@@ -371,7 +371,8 @@ if (typeof WEF == "undefined" || !WEF)
                             fn:function WEF_load_success(obj)
                             {
                                var y = (obj.reference) ? obj.reference : YAHOO,
-                                   app = y.env.getVersion(appName).mainClass;
+                                   app = y.env.getVersion(appName).mainClass;                                   
+                                   
                                if (app)
                                {
                                   //initialise ribbon
@@ -537,7 +538,7 @@ if (typeof WEF == "undefined" || !WEF)
           getConfig : getConfig
        }; 
    })();
-}
+//}
 
 
 
