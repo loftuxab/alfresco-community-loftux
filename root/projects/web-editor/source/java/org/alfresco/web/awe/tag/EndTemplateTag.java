@@ -52,7 +52,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
       if (isEditingEnabled())
       {
          try
-              {
+         {
             Writer out = pageContext.getOut();
       
             // get the toolbar location from the request session
@@ -61,13 +61,13 @@ public class EndTemplateTag extends AbstractWebEditorTag
             // render JavaScript to configure toolbar and edit icons
             List<MarkedContent> markedContent = getMarkedContent();
             
-            //String urlPrefix = getWebEditorUrlPrefix();
-            //out.write("<script type=\"text/javascript\" src=\"");
-            //out.write(urlPrefix);
-            //out.write("/service/wef/resources\"></script>\n");
-            
+            // render config required for ribbon and marked content
             out.write("<script type=\"text/javascript\">\n");
-            out.write("WEF.ConfigRegistry.registerConfig('org.wefapps.awe',[\n");
+            out.write("WEF.ConfigRegistry.registerConfig('org.wef.ribbon',\n");
+            out.write("{ position: \"");
+            out.write(toolbarLocation);
+            out.write("\" });\n");
+            out.write("WEF.ConfigRegistry.registerConfig('org.alfresco.awe',[\n");
             boolean first = true;
             for (MarkedContent content : markedContent)
             {
@@ -98,15 +98,12 @@ public class EndTemplateTag extends AbstractWebEditorTag
                out.write("\n}");
             }
             out.write("]);\n");
-            out.write("if (window.attachEvent)\n");
-            out.write("{\n");
-            out.write("\twindow.attachEvent(\"onload\",function() {WEF.run('org.wefapps.awe');});\n");      
-            out.write("}\n");
-            out.write("else if (window.addEventListener)\n");
-            out.write("{\n");
-            out.write("\twindow.addEventListener(\"load\",function() {WEF.run('org.wefapps.awe');}, false);\n");
-            out.write("}\n");            
             out.write("\n</script>");
+            
+            // request all the resources
+            out.write("<script type=\"text/javascript\" src=\"");
+            out.write(getWebEditorUrlPrefix());
+            out.write("/service/wef/resources\"></script>\n");
             
             if (logger.isDebugEnabled())
                logger.debug("Completed endTemplate rendering for " + markedContent.size() + 

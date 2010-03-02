@@ -1430,6 +1430,59 @@
            basedir="${dir.project.webframeworkcommons.classes}" />
    </target>
    
+   <target name="package-forms-client-jar"
+           depends="assemble-forms-client-jar, minimize-forms-client-javascript">
+      <mkdir dir="${dir.project.webframeworkcommons.dist}" />
+      <zip zipfile="${dir.project.webframeworkcommons.dist}/${file.name.jar.formsclient}" 
+           basedir="${dir.project.webframeworkcommons.assemble}" />
+   </target>
+   
+   <target name="assemble-forms-client-jar" depends="compile-webframeworkcommons">
+      <mkdir dir="${dir.project.webframeworkcommons.assemble}" />
+      
+      <copy todir="${dir.project.webframeworkcommons.assemble.metainf}">
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" />
+      </copy>
+      
+      <copy todir="${dir.project.webframeworkcommons.assemble}">
+         <fileset dir="${dir.project.webframeworkcommons.config}" 
+                  excludes="alfresco/site-data/**, alfresco/templates/**, alfresco/form-config.xml" />
+      </copy>
+      
+      <copy todir="${dir.project.webframeworkcommons.assemble}">
+         <fileset dir="${dir.project.webframeworkcommons.classes}" includes="org/alfresco/web/config/**" />
+      </copy>
+      
+      <!-- NOTE: don't need to do this if we can 'add' config files to 'webframework.configsource' bean -->
+      <copy file="${dir.project.webframeworkcommons.config}/alfresco/form-config.xml"
+            tofile="${dir.project.webframeworkcommons.assemble.metainf}/spring-surf-config-custom.xml"/>
+      
+      <!-- copy YUI files (from web-editor project currently) -->
+      <unzip src="${file.zip.webeditor.yui}" 
+             dest="${dir.project.webframeworkcommons.assemble.metainf}" />
+      <delete dir="${dir.project.webframeworkcommons.assemble.metainf}/__MACOSX" 
+              includeEmptyDirs="true" quiet="yes" />
+      <copy todir="${dir.project.webframeworkcommons.assemble.metainf}/yui">
+         <fileset dir="${dir.project.webeditor.src.web}/yui" />
+      </copy>
+      
+      <!-- force overwrite copy of form.get.head.ftl so replace works correctly -->
+      <copy todir="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form" overwrite="yes"
+            file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" />
+      <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" 
+               token="${page.url.context}/" value="${page.url.context}/res/" />
+
+      <!-- TODO: Find a way to 'add' properties files to exisitng list of resource bundle -->
+      <!-- TODO: Create and add a -context.xml file to inject common.properties and? inject form-config.xml to 'webframework.configsource' bean -->
+      
+   </target>
+   
+   <target name="minimize-forms-client-javascript" depends="init">
+      <echo>Compressing Forms Client Javascript...</echo>
+      <minimize-javascript sourcedir="${dir.project.webframeworkcommons.assemble}" 
+                           destdir="${dir.project.webframeworkcommons.assemble}" />
+   </target>
+   
    <target name="test-webframeworkcommons" 
            depends="compile-webframeworkcommons">
       <run-tests projectdir="${dir.project.webframeworkcommons}" />
@@ -1621,7 +1674,7 @@
       </war>
    </target>
 
-   <target name="assemble-webeditor-war" depends="package-webeditor-jar, compile-webeditor-framework">
+   <target name="assemble-webeditor-war" depends="package-forms-client-jar, package-webeditor-jar, package-webeditor-framework-jar">
       <mkdir dir="${dir.project.webeditor.assemble.war}" />
       
       <!-- first copy all required files from webeditor project -->
@@ -1629,21 +1682,8 @@
          <fileset dir="${dir.project.webeditor.src.web}" excludes="WEB-INF/web.xml, WEB-INF/awe.tld" />
       </copy>
       
-      <!-- next copy all required files from web framework commons projects -->
-      <copy todir="${dir.project.webeditor.assemble.war}">
-         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
-      </copy>
-      
-      <copy todir="${dir.project.webeditor.assemble.war}">
-         <fileset dir="${dir.projects}/web-editor-framework/source/web" />
-      </copy>
-      
       <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/classes">
          <fileset dir="${dir.project.webeditor.config}" />
-         <fileset dir="${dir.projects}/web-editor-framework/config" />
-         <fileset dir="${dir.projects}/web-editor-framework/build/classes" includes="**/*.class" />
-         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
@@ -1662,28 +1702,12 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.jlan.dist}" 
                   includes="${file.name.jar.jlan}" />
-         <fileset dir="${dir.project.webframeworkcommons.dist}" 
-                  includes="${file.name.jar.webframeworkcommons}" />
-         <!--
-         <fileset dir="${dir.projects}/web-editor-framework/build/dist" 
-                  includes="${file.name.jar.webeditorframework}" />
-         -->
          <fileset dir="${dir.project.webeditor.dist}" 
                   includes="${file.name.jar.webeditor}" />
-      </copy>
-      
-      <!-- unzip and add 3rd party javascript library -->
-      <unzip src="${file.zip.webeditor.yui}" 
-             dest="${dir.project.webeditor.assemble.war}" />
-             
-      <!-- there seems to be a hidden __MACOSX folder in the YUI -->
-      <!-- distribution, remove it if present -->
-      <delete dir="${dir.project.webeditor.assemble.war}/__MACOSX" 
-              includeEmptyDirs="true" quiet="yes" />
-
-      <!-- Copy our yui directory to apply YUI fixes -->
-      <copy todir="${dir.project.webeditor.assemble.war}/yui">
-         <fileset dir="${dir.project.webeditor.src.web}/yui" />
+         
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                           includes="${file.name.jar.formsclient}" />
+         <fileset dir="${dir.projects}/web-editor-framework/build/dist" includes="wef.jar" />
       </copy>
    </target>
    
@@ -1694,8 +1718,8 @@
    </target>
    
    <target name="package-webeditor-all"
-                 depends="package-webeditor-war, package-webeditor-taglib-jar, package-webeditor-plugin-jar,
-                          package-webeditor-forms-plugin-zip, package-webeditor-sample-war" />
+                 depends="package-webeditor-war, package-webeditor-taglib-jar, 
+                          package-webeditor-plugin-jar, package-webeditor-sample-war" />
    
    <target name="package-webeditor-taglib-jar" depends="compile-webeditor">
       <mkdir dir="${dir.project.webeditor.dist}" />
@@ -1740,36 +1764,6 @@
       <echo>Compressing Web Editor Plugin Javascript...</echo>
       <minimize-javascript sourcedir="${dir.project.webeditor.assemble.plugin}/META-INF" 
                            destdir="${dir.project.webeditor.assemble.plugin}/META-INF" />
-   </target>
-   
-   <target name="package-webeditor-forms-plugin-zip" 
-           depends="assemble-webeditor-forms-plugin-zip, minimize-webeditor-forms-javascript">
-      <mkdir dir="${dir.project.webeditor.dist}" />
-      <zip zipfile="${dir.project.webeditor.dist}/${file.name.zip.webeditor.forms}" 
-           basedir="${dir.project.webeditor.assemble.forms}" />
-   </target>
-   
-   <target name="assemble-webeditor-forms-plugin-zip" depends="package-webframeworkcommons-jar">
-      <mkdir dir="${dir.project.webeditor.assemble.forms}" />
-      
-      <copy todir="${dir.project.webeditor.assemble.forms}">
-         <fileset dir="${dir.project.webframeworkcommons.src.web}" />
-      </copy>
-      
-      <copy todir="${dir.project.webeditor.assemble.forms}/WEB-INF/classes">
-         <fileset dir="${dir.project.webframeworkcommons.config}" />
-      </copy>
-      
-      <copy todir="${dir.project.webeditor.assemble.forms}/WEB-INF/lib">
-         <fileset dir="${dir.project.webframeworkcommons.dist}" 
-                  includes="${file.name.jar.webframeworkcommons}" />
-      </copy>
-   </target>
-   
-   <target name="minimize-webeditor-forms-javascript" depends="init">
-      <echo>Compressing Web Editor Forms Javascript...</echo>
-      <minimize-javascript sourcedir="${dir.project.webeditor.assemble.forms}" 
-                           destdir="${dir.project.webeditor.assemble.forms}" />
    </target>
    
    <target name="package-webeditor-sample-jar" depends="compile-webeditor">

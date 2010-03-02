@@ -1,15 +1,12 @@
 
-//if (typeof WEF == "undefined" || !WEF) 
-//{
     WEF = function WEF()
     {
-        var config = {},
-           loader = (function()
+        var config = {}, loader = (function()
            {
            var loadingModules = [], unloadedModules = [], loadedModules = [], registry = {}, repositories = {
                lib: '/lib',
                plugin: '/plugin',
-               core: '/js'
+               core: ''
            }, bootloaderConfig = {}, YUILoader = null;
            
            /**
@@ -35,7 +32,7 @@
                    loadYUILoader._counter = (loadYUILoader._counter === undefined) ? 0 : ++loadYUILoader._counter;
                    var node = document.createElement('script');
                    node.id = 'wef-yuiloader' + loadYUILoader._counter;
-                   node.src = bootloaderConfig.serverPort + yuiloaderPath;
+                   node.src = bootloaderConfig.urlContext + yuiloaderPath;
                    if (!+"\v1") // true only in IE
                    {
                        var id = node.id;
@@ -111,6 +108,12 @@
                    yuiConfig.varName = "WEF_Loader_Variable_" + n + convertConfigToYUIModuleConfig._counter;
                }
                var repoRootPath = (config.repo) ? repositories[config.repo] : repositories.core;
+               
+               if (config.fullpath)
+               {
+                  config.path = config.fullpath
+               }
+               
                if (config.path) 
                {
                    //absolute path
@@ -311,7 +314,8 @@
                        addResource(o[i]);
                    }
                }
-               else {
+               else 
+               {
                    if (!isYUILoaderCompatible) 
                    {
                        o = convertConfigToYUIModuleConfig(o);
@@ -382,9 +386,7 @@
                                      name : 'WEF-Ribbon',
                                      element: 'wef-ribbon'
                                   });
-                                  y.org.wef.module.Ribbon.init({
-                                     position:'top'
-                                  });
+                                  y.org.wef.module.Ribbon.init(y.org.wef.ConfigRegistry.getConfig("org.wef.ribbon"));
                                   //show ribbon after it is rendered.
                                   YAHOO.Bubbling.on('WEF-Ribbon--afterRender', function(e, args)
                                   {
@@ -457,6 +459,11 @@
              */
             addResource: function WEF_addResource(config)
             {
+               if (config.type == "plugin")
+               {
+                  this.PluginRegistry.registerPlugin(config.name);
+               }
+               
                loader.addResource(config);
             },
             
@@ -538,7 +545,58 @@
           getConfig : getConfig
        }; 
    })();
-//}
+   
+   /**
+    * Registry object to store plugins.
+    * 
+    * @class WEF.ConfigRegistry
+    * @constructor
+    * 
+    */
+   WEF.PluginRegistry = (function WEF_Plugin_Registry()
+   {
+      var plugins = {}, name = 'WEF_Plugin_Registry';
+
+      /**
+       * Registers plugin object against specified name
+       * 
+       * @param pluginName {String} name of object that the plugin is for
+       * @param plugin {Object} Object literal describing configuration
+       * 
+       */
+      var registerPlugin = function WEF_Plugin_Registry_registerPlugin(pluginName)
+      {
+         plugins[pluginName] = pluginName;
+      };
+ 
+      /**
+       * Retrieves plugin for specified plugin name
+       * 
+       * @param configName {String} Name of plugin 
+       * @return config {Object}
+       * 
+       */
+      var getPlugin = function WEF_Plugin_Registry_getPlugin(pluginName)
+      {
+         var plugin = null;
+         
+         if (plugins[pluginName] != null)
+         {
+            var versionObj = YAHOO.env.getVersion(pluginName); 
+            if (versionObj != null)
+            {
+               plugin = versionObj;
+            }
+         }
+         
+         return plugin;
+      };
+ 
+      return {
+         registerPlugin : registerPlugin,
+         getPlugin: getPlugin
+      }; 
+   })();
 
 
 
