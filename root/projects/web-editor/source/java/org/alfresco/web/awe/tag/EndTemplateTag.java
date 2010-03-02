@@ -98,9 +98,15 @@ public class EndTemplateTag extends AbstractWebEditorTag
                out.write("\n}");
             }
             out.write("]);\n");
-            out.write("window.onload = function() {\n");      
-            out.write("WEF.run('org.wefapps.awe');");
-            out.write("}\n</script>");
+            out.write("if (window.attachEvent)\n");
+            out.write("{\n");
+            out.write("\twindow.attachEvent(\"onload\",function() {WEF.run('org.wefapps.awe');});\n");      
+            out.write("}\n");
+            out.write("else if (window.addEventListener)\n");
+            out.write("{\n");
+            out.write("\twindow.addEventListener(\"load\",function() {WEF.run('org.wefapps.awe');}, false);\n");
+            out.write("}\n");            
+            out.write("\n</script>");
             
             if (logger.isDebugEnabled())
                logger.debug("Completed endTemplate rendering for " + markedContent.size() + 
