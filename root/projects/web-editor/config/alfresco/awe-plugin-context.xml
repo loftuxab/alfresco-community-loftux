@@ -28,7 +28,7 @@
    <bean id="formsUI" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms" />
       <property name="description" value="Forms UI" />
-      <property name="path" value="/components/form/form-min.js" />
+      <property name="path" value="/res/components/form/form-min.js" />
       <property name="type" value="js" />
       <property name="variableName" value="Alfresco.FormUI" />
       <property name="dependencies">
@@ -48,7 +48,7 @@
    <bean id="formsRuntime" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.runtime" />
       <property name="description" value="Forms runtime" />
-      <property name="path" value="/js/forms-runtime.js" />
+      <property name="path" value="/res/js/forms-runtime.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
@@ -60,42 +60,42 @@
    <bean id="formsCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.css" />
       <property name="description" value="Forms CSS" />
-      <property name="path" value="/components/form/form.css" />
+      <property name="path" value="/res/components/form/form.css" />
       <property name="type" value="css" />
    </bean>
    
    <bean id="formsDatePickerControl" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.control.date-picker" />
       <property name="description" value="Forms date picker control" />
-      <property name="path" value="/components/form/date-picker-min.js" />
+      <property name="path" value="/res/components/form/date-picker-min.js" />
       <property name="type" value="js" />
    </bean>
    
    <bean id="formsPeriodControl" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.control.period" />
       <property name="description" value="Forms period control" />
-      <property name="path" value="/components/form/period-min.js" />
+      <property name="path" value="/res/components/form/period-min.js" />
       <property name="type" value="js" />
    </bean>
    
    <bean id="formsObjectFinderControl" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.control.object-finder" />
       <property name="description" value="Forms object finder control" />
-      <property name="path" value="/components/object-finder/object-finder-min.js" />
+      <property name="path" value="/res/components/object-finder/object-finder-min.js" />
       <property name="type" value="js" />
    </bean>
    
    <bean id="formsObjectFinderControlCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.control.object-finder-css" />
       <property name="description" value="Forms object finder control CSS" />
-      <property name="path" value="/components/object-finder/object-finder.css" />
+      <property name="path" value="/res/components/object-finder/object-finder.css" />
       <property name="type" value="css" />
    </bean>
    
    <bean id="formsRichTextControl" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.control.rich-text" />
       <property name="description" value="Forms rich text control" />
-      <property name="path" value="/components/form/rich-text-min.js" />
+      <property name="path" value="/res/components/form/rich-text-min.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
@@ -107,7 +107,7 @@
    <bean id="formsContentControl" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.forms.control.content" />
       <property name="description" value="Forms content control" />
-      <property name="path" value="/components/form/content-min.js" />
+      <property name="path" value="/res/components/form/content-min.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
@@ -119,7 +119,7 @@
    <bean id="alfrescoTinyMCE" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.editors.tinymce" />
       <property name="description" value="Alfresco wrapped TinyMCE control" />
-      <property name="path" value="/modules/editors/tiny_mce-min.js" />
+      <property name="path" value="/res/modules/editors/tiny_mce-min.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
@@ -131,7 +131,7 @@
    <bean id="tinyMCE" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="com.moxiecode.tinymce" />
       <property name="description" value="TinyMCE library" />
-      <property name="path" value="/modules/editors/tiny_mce/tiny_mce.js" />
+      <property name="path" value="/res/modules/editors/tiny_mce/tiny_mce.js" />
       <property name="type" value="js" />
    </bean>
    
@@ -147,7 +147,7 @@
    <bean id="alfUtils" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.utils" />
       <property name="description" value="Common JavaScript utilities" />
-      <property name="path" value="/js/alfresco.js" />
+      <property name="path" value="/res/js/alfresco.js" />
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
