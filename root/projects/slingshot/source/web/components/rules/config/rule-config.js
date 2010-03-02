@@ -455,17 +455,23 @@
       _addExtraParameter: function RuleConfig_addExtraParameter(paramDef, addButton, configDef, ruleConfig, paramRenderer, value)
       {
          // Create a container for the extra parameter
-         var extraparamEl = document.createElement("span");
+         var extraParamEl = document.createElement("span");
 
          // Add new parameter container to the left of the add button
-         addButton.parentNode.insertBefore(extraparamEl, addButton);
+         addButton.parentNode.insertBefore(extraParamEl, addButton);
+
+         if (this.options.mode == RC.MODE_TEXT && paramDef._type != "hidden")
+         {
+            // Add comma before parameter
+            addButton.parentNode.insertBefore(document.createTextNode(", "), extraParamEl);
+         }
 
          // Add another parameter ui control
          var fn = paramRenderer[this.options.mode],
-            el = fn.call(this, extraparamEl, configDef, paramDef, ruleConfig, value);
+            el = fn.call(this, extraParamEl, configDef, paramDef, ruleConfig, value);
          Dom.addClass(el, "param");
 
-         if (this.options.mode == EC.MODE_EDIT)
+         if (this.options.mode == RC.MODE_EDIT && paramDef._type != "hidden")
          {
             // Add a delete button for the new parameter control
             var deleteButton = document.createElement("span");
@@ -474,8 +480,8 @@
             deleteButton.innerHTML = "-";
             Dom.setStyle(deleteButton, "width", "10px");
             Dom.setStyle(deleteButton, "height", "10px");
-            Event.addListener(deleteButton, "click", this.onDeleteExtraParameterIconClick, extraparamEl, this);
-            extraparamEl.appendChild(deleteButton);
+            Event.addListener(deleteButton, "click", this.onDeleteExtraParameterIconClick, extraParamEl, this);
+            extraParamEl.appendChild(deleteButton);
          }
          this._updateSubmitElements(configDef);
       },
@@ -756,7 +762,9 @@
             else if (this.options.mode == RC.MODE_TEXT)
             {
                Dom.addClass(p_oSelectEl, "hidden");
-               configNameContainerEl.appendChild(document.createTextNode(p_oSelectEl.options[p_oSelectEl.selectedIndex].text));
+               var nameEl = document.createElement("span");
+               nameEl.appendChild(document.createTextNode(p_oSelectEl.options[p_oSelectEl.selectedIndex].text));
+               configNameContainerEl.appendChild(nameEl);
             }
 
             // Return element
@@ -851,7 +859,7 @@
                      else
                      {
                         // Save first values controlEl so we can add the label to the left of it below
-                        controlEl = fn.call(this, paramEl, configDef, paramDef, p_oRuleConfig, YAHOO.lang.isArray(value) && value.length > 0 ? values[0] : value);
+                        controlEl = fn.call(this, paramEl, configDef, paramDef, p_oRuleConfig, YAHOO.lang.isArray(value) && value.length > 0 ? value[0] : value);
 
                         /**
                          * Create an add button element (so we can add additional value elements to the left of it)
@@ -1466,6 +1474,11 @@
             {
                return this._createPathSpan(containerEl, this.id + "-" + configDef._id + "-" + paramDef.name, value);
             }
+            else if (paramDef.type = "d:noderef" && paramDef._type == "category")
+            {
+               return this._createCategorySpan(containerEl, this.id + "-" + configDef._id + "-" + paramDef.name, value);
+            }
+
             if (msgKey)
             {
                var tmp = this.msg(msgKey, value);
@@ -1475,6 +1488,28 @@
          }
          containerEl.appendChild(valueEl);
          return valueEl;
+      },
+
+
+      /**
+       * Populate a category from a nodeRef.
+       *
+       * @method _createCategorySpan
+       * @param containerEl {HTMLElement} Element within which the new span tag will be created
+       * @param id {string} Dom ID to be given to span tag
+       * @param nodeRef {string} NodeRef of folder
+       */
+      _createCategorySpan: function (containerEl, id, nodeRef)
+      {
+         var url = nodeRef ? Alfresco.constants.PROXY_URI + "api/forms/picker/items" : null;
+         return this._createResolvableValueSpan(containerEl, id, Alfresco.util.Ajax.POST, url,
+         {
+            items: [nodeRef]
+         }, function (json)
+         {
+            var item = json.data.items[0];
+            return item.name;
+         });
       },
 
       /**
@@ -1487,44 +1522,71 @@
        */
       _createPathSpan: function (containerEl, id, nodeRef)
       {
+         var url = nodeRef ? Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + nodeRef.replace("://", "/") : null;
+         return this._createResolvableValueSpan(containerEl, id, Alfresco.util.Ajax.GET, url, null, function (json)
+         {
+            var location = json.item.location,
+               path = $combine(location.path, location.file);
+            path = location.siteTitle ? this.msg("label.site-path", location.siteTitle, path) : path;
+            return path;
+         });
+      },
+
+      /**
+       * Populate a folder path from a nodeRef.
+       *
+       * @method _createResolvableValueSpan
+       * @param containerEl {HTMLElement} Element within which the new span tag will be created
+       * @param id {string} Dom ID to be given to span tag
+       * @param url {string} The url to cal to get the display label
+       */
+      _createResolvableValueSpan: function (containerEl, id, method, url, dataObj, displayValueHandler)
+      {
          var pathEl = document.createElement("span");
          Dom.setStyle(pathEl, "margin", "0 0.5em");
          Alfresco.util.setDomId(pathEl, id);
-         if (nodeRef)
+         if (url)
          {
             pathEl.innerHTML = this.msg("message.loading");
-            // Find the path for the nodeRef
-            Alfresco.util.Ajax.jsonPost(
+
+            // Find the path for the value
+            var config =
             {
-               url: Alfresco.constants.PROXY_URI + "api/forms/picker/items",
-               dataObj:
-               {
-                  items: [nodeRef]
-               },
+               method: method,
+               url: url,
                successCallback:
                {
-                  fn: function (response, pathEl)
+                  fn: function (response, obj)
                   {
-                     if (response.json !== undefined)
-                     {
-                        var folderDetails = response.json.data.items[0],
-                           path = $combine(folderDetails.displayPath, folderDetails.name);
-                        pathEl.innerHTML = $html(path);                        
-                     }
+                     var displayLabel = obj.displayValueHandler.call(this, response.json);
+                     obj.pathEl.innerHTML = $html(displayLabel);
                   },
-                  obj: pathEl,
+                  obj:
+                  {
+                     pathEl: pathEl,
+                     displayValueHandler: displayValueHandler
+                  },
                   scope: this
                },
                failureCallback:
                {
                   fn: function (response, obj)
                   {
-                     alert('failure');
+                     obj.pathEl.innerHTML = this.msg("message.failure");
                   },
-                  obj: pathEl,
+                  obj:
+                  {
+                     pathEl: pathEl,
+                     displayValueHandler: displayValueHandler
+                  },
                   scope: this
                }
-            });
+            };
+            if (dataObj)
+            {
+               config.dataObj = dataObj;
+            }
+            Alfresco.util.Ajax.jsonRequest(config);
          }
          containerEl.appendChild(pathEl);
          return pathEl;
@@ -1730,7 +1792,7 @@
             {
                if (pvi >= peil)
                {
-                  paramEl = this._getParamRenderer(paramDef.type).fn.call(this, paramEls[0].parentNode, configDef, paramDef, ruleConfig, paramValue[pvi]);
+                  paramEl = this._getParamRenderer(paramDef.type)[this.options.mode].call(this, paramEls[0].parentNode, configDef, paramDef, ruleConfig, paramValue[pvi]);
                   Dom.addClass(paramEl, "param");
                }
                else

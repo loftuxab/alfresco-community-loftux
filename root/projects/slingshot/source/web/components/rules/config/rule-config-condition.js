@@ -511,11 +511,21 @@
          /**
           * Category picker
           */
-         InCategoryCondition:
+         InCategory:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._getParamDef(configDef, "category-aspect")._type = "hidden";
+               this._getParamDef(configDef, "category-value")._type = "category";
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
+               // Hide parameters and set mandatory value
                this._hideParameters(configDef.parameterDefinitions);
+               this._setParameter(ruleConfig, "category-aspect", "cm:classifiable");
+
+               // Make ui display a category picker
                configDef.parameterDefinitions.push(
                {
                   type: "arcc:category-picker"
@@ -527,11 +537,14 @@
          /**
           * Tag picker
           */
-         HasTagCondition:
+         HasTag:
          {
             edit: function(configDef, ruleConfig, configEl)
             {
+               // Hide parameters
                this._hideParameters(configDef.parameterDefinitions);
+
+               // Make ui display a tag picker
                configDef.parameterDefinitions.push(
                {
                   type: "arcc:tag-picker"
@@ -670,7 +683,6 @@
                      fn: function(obj)
                      {
                         var ctx = this.renderers["arcc:category-picker"].currentCtx;
-                        this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "category-aspect", "cm:classifiable");
                         this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "category-value", obj.selectedItems[0]);
                         this._updateSubmitElements(ctx.configDef);
                      },

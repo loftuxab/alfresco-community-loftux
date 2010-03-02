@@ -302,7 +302,7 @@
        * @method onRuleConfigsReady
        * @override
        */
-      onRuleConfigsReady: function RuleEditUtil_onRuleConfigsReady()
+      onRuleConfigsReady: function RuleEdit_onRuleConfigsReady()
       {
          // All config components are ready, display rule info
          if (this.options.rule)
@@ -415,7 +415,7 @@
       onPersistRuleFailed: function RE_onPersistRuleFailed(response)
       {
          this._toggleButtons(false);
-         this.widgets.feedbackMessage.destroy();
+         this.widgets.feedbackMessage.hide();
       },
 
       _navigateToFoldersPage: function()
