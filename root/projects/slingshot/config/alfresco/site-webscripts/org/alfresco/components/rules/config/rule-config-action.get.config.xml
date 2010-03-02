@@ -76,6 +76,9 @@
       <action name="simple-workflow">SimpleWorkflow</action>
       <action name="mail">SendAnEmail</action>
       <action name="link-category">LinkCategory</action>
+      <action name="transform">Transform</action>
+      <action name="transform-image">Transform</action>
+      <action name="import">Import</action>
    </customise>
 
 </rule-config>

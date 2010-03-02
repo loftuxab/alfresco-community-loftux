@@ -266,6 +266,10 @@
                   // Remove attribute so it doesn't get sent to the server
                   delete rule.action.compensatingAction;
                }
+               else if (!rule.action.compensatingAction.id)
+               {
+                  delete rule.action.compensatingAction.id;
+               }
                return true;
             },
             obj: null,

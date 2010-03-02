@@ -25,7 +25,7 @@
                <button class="use-template" id="${el}-useTemplate-menu" tabindex="0">${msg("button.useTemplate")}</button>
                <select class="use-template" id="${el}-useTemplate-options">
                   <#list templates as template>
-                  <option value="${template}">${template}</option>
+                  <option value="${template.value}">${template.displayLabel}</option>
                   </#list>
                </select>
                <br/>

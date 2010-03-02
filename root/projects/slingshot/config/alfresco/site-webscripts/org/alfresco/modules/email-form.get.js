@@ -1,13 +1,11 @@
 function main()
 {
    var connector = remote.connect("alfresco");
-   var result = connector.get("/api/sites");
+   var result = connector.get("/api/actionConstraints?name=ac-email-templates");
    var templates = [];
    if (result.status == 200)
    {
-      var data = eval('(' + result + ')');
-      templates.push("test-templates.ftl");
-      templates.push("test-templates-2.ftl");
+      templates = eval('(' + result + ')').data[0].values;
    }
    model.templates = templates;
 }

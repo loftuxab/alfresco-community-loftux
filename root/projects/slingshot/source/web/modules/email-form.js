@@ -121,7 +121,7 @@
        *        emailFormConfig.recipients {array} Array of the recipients usernames to send the email to
        *        emailFormConfig.subject {string) The emails subject
        *        emailFormConfig.message {string} The message of the email
-       *        emailFormConfig.template {string} The temaplte for the email
+       *        emailFormConfig.template {string} The template for the email
        */
       showDialog: function EF_showDialog(emailFormConfig)
       {
@@ -180,7 +180,8 @@
          this.widgets.useTemplateMenu = Alfresco.util.createYUIButton(this, "useTemplate-menu", this.onUseTemplateMenuSelect,
          {
             type: "menu",
-            menu: "useTemplate-options"
+            menu: "useTemplate-options",
+            lazyloadmenu: false
          });
          this.widgets.discardTemplateButton = Alfresco.util.createYUIButton(this, "discardTemplate-button", this.onDiscardTemplateButtonClick);
          this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
@@ -372,6 +373,14 @@
          messageEl.value = emailFormConfig.message && emailFormConfig.message.length > 0 ? $html(emailFormConfig.message) : "";
          if (emailFormConfig.template)
          {
+            var menuItems = this.widgets.useTemplateMenu.getMenu().getItems();
+            for (var i = 0, il = menuItems.length; i < il; i++)
+            {
+               if (menuItems[i].value == emailFormConfig.template)
+               {
+                  this.widgets.useTemplateMenu.set("label", menuItems[i].cfg.getProperty("text"));
+               }
+            }
             this._loadTemplate(emailFormConfig.template);
          }
          else
@@ -530,6 +539,7 @@
       onUseTemplateMenuSelect: function EF_onUseTemplateMenuSelect(sType, aArgs, p_obj)
       {
          // Get template so it can be displayed
+         this.widgets.useTemplateMenu.set("label", aArgs[1].cfg.getProperty("text"));
          this._loadTemplate(aArgs[1].value);
       },
 
@@ -544,9 +554,9 @@
          // Get template so it can be displayed
          var messageEl = Dom.get(this.id + "-message"),
             templateEl = Dom.get(this.id + "-template");
-         Alfresco.util.Ajax.jsonGet(
+         Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
+            url: Alfresco.constants.PROXY_URI + "api/node/" + template.replace("://", "/") + "/content",
             successCallback:
             {
                fn: function(response)
