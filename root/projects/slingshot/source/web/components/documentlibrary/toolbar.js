@@ -1012,7 +1012,7 @@
             {
                eFolder = new Element(document.createElement("span"),
                {
-                  innerHTML: (this.folderDetailsUrl && j > 1) ? '<a href="' + this.folderDetailsUrl + '">' + $html(displayPaths[i]) + '</a>' : $html(displayPaths[i])
+                  innerHTML: (this.folderDetailsUrl) ? '<a href="' + this.folderDetailsUrl + '">' + $html(displayPaths[i]) + '</a>' : $html(displayPaths[i])
                });
                eFolder.addClass("label");
                eCrumb.appendChild(eFolder);

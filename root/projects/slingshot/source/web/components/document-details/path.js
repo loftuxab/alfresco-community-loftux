@@ -198,7 +198,7 @@
          var path = folderData.location.path;
          
          // Document Library root node
-         if (path == "/")
+         if (path == "/" && folderData.location.file.length > 0)
          {
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
@@ -211,27 +211,29 @@
             pathHtml += '<span class="path-link"><a href="' + encodeURI(rootLinkUrl) + '">' + this.msg(this.options.rootLabelId) + '</a></span>';
          }
 
-         path = $combine(path, folderData.fileName);
-         folders = path.substring(1, path.length).split("/");
-         pathHtml += '<span class="separator"> &gt; </span>';
-         
-         for (var x = 0, y = folders.length; x < y; x++)
+         path = $combine(path, folderData.location.file);
+         if (path.length > 1)
          {
-            pathUrl += window.escape(folders[x]);
-            
-            pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
+            folders = path.substring(1, path.length).split("/");
+            pathHtml += '<span class="separator"> &gt; </span>';
+
+            for (var x = 0, y = folders.length; x < y; x++)
             {
-               file: (y - x == 2) ? "file=" + encodeURIComponent(folderData.fileName) + "&" : ""
-            });
-            pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
-            
-            if (y - x > 1)
-            {
-               pathHtml += '<span class="separator"> &gt; </span>';
-               pathUrl += "/";
+               pathUrl += window.escape(folders[x]);
+
+               pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
+               {
+                  file: (y - x == 2) ? "file=" + encodeURIComponent(folderData.fileName) + "&" : ""
+               });
+               pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
+
+               if (y - x > 1)
+               {
+                  pathHtml += '<span class="separator"> &gt; </span>';
+                  pathUrl += "/";
+               }
             }
          }
-
          
          Dom.setStyle(this.id + "-defaultPath", "display", "none");
          Dom.get(this.id + "-path").innerHTML = pathHtml;
