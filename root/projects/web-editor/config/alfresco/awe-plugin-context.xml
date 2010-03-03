@@ -3,7 +3,27 @@
 
 <beans>
 
-   <!-- Plugin  -->
+   <!-- Provide AWE specific resource bundle -->
+   <bean id="awePluginResourceBundle" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
+      <property name="resourceBundles">
+         <list>
+            <value>alfresco.messages.awe</value>
+         </list>
+      </property>
+   </bean>
+   
+   <!-- Provide AWE form config -->
+   <bean id="formsClientConfig" class="org.springframework.extensions.config.ConfigBootstrap" init-method="register">
+      <property name="configService" ref="web.config" />
+      <property name="configs">
+         <list>
+            <value>classpath:alfresco/form-config.xml</value>
+            <value>classpath:alfresco/awe-form-config.xml</value>
+         </list>
+      </property>
+   </bean>
+   
+   <!-- AWE Plugin  -->
    <bean id="awePlugin" parent="wefPluginBase" class="org.springframework.extensions.webeditor.WEFPluginImpl">
       <property name="name" value="org.alfresco.awe" />
       <property name="description" value="Plugin providing in-context editing capabilities" />
@@ -21,7 +41,7 @@
       </property>
    </bean>
    
-   <!-- Resources -->
+   <!-- AWE Plugin Resources -->
    
    <!-- *** Forms *** -->
    
