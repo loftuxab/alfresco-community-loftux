@@ -1446,16 +1446,16 @@
       
       <copy todir="${dir.project.webframeworkcommons.assemble}">
          <fileset dir="${dir.project.webframeworkcommons.config}" 
-                  excludes="alfresco/site-data/**, alfresco/templates/**, alfresco/form-config.xml" />
+                  excludes="alfresco/site-data/**, alfresco/templates/**" />
       </copy>
       
       <copy todir="${dir.project.webframeworkcommons.assemble}">
          <fileset dir="${dir.project.webframeworkcommons.classes}" includes="org/alfresco/web/config/**" />
       </copy>
       
-      <!-- NOTE: don't need to do this if we can 'add' config files to 'webframework.configsource' bean -->
-      <copy file="${dir.project.webframeworkcommons.config}/alfresco/form-config.xml"
-            tofile="${dir.project.webframeworkcommons.assemble.metainf}/spring-surf-config-custom.xml"/>
+      <!-- copy the forms client context file -->
+      <copy todir="${dir.project.webframeworkcommons.assemble}/org/springframework/extensions/surf" 
+            file="${dir.project.webframeworkcommons.src}/plugin/forms-client-context.xml" />
       
       <!-- copy YUI files (from web-editor project currently) -->
       <unzip src="${file.zip.webeditor.yui}" 
@@ -1471,10 +1471,6 @@
             file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" />
       <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" 
                token="${page.url.context}/" value="${page.url.context}/res/" />
-
-      <!-- TODO: Find a way to 'add' properties files to exisitng list of resource bundle -->
-      <!-- TODO: Create and add a -context.xml file to inject common.properties and? inject form-config.xml to 'webframework.configsource' bean -->
-      
    </target>
    
    <target name="minimize-forms-client-javascript" depends="init">

@@ -760,6 +760,10 @@
          <fileset dir="${dir.project.webframeworkcommons.classes}" />
       </copy>
       
+      <!-- copy forms-client-context.xml to inject form config and common properties -->
+      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes/org/springframework/extensions/surf" 
+            file="${dir.project.webframeworkcommons.src}/plugin/forms-client-context.xml" />
+      
       <!-- add all JARs to WEB-INF/lib -->
       <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/lib" verbose="${copy.verbose}">
          <fileset dir="${dir.project.3rdparty.lib}" 
