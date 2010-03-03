@@ -59,7 +59,7 @@ WEF.init(
        *
        * @type String
        */
-      urlContext: window.location.protocol + "//" + window.location.host + "${url.context}",
+      urlContext: window.location.protocol + "//" + window.location.host + "${url.context}" + "/res",
       
       /**
        * Use sandbox to load files
@@ -80,7 +80,7 @@ WEF.init(
        * 
        * @type string
        */
-      yuibase: "${url.context}/yui/",
+      yuibase: "${url.context}/res/yui/",
       
       /**
        * A filter to apply to loader.
