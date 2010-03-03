@@ -5,7 +5,7 @@
    ]]>
    </description>
    <url>/wef/application</url>
-   <format default="text" />
+   <format default="js" />
    <authentication>none</authentication>
    <lifecycle>internal</lifecycle>
 </webscript>
