@@ -403,7 +403,8 @@
                      this.widgets.destinationDialog = new Alfresco.module.DoclibGlobalFolder(this.id + "-destinationDialog");
                      this.widgets.destinationDialog.setOptions(
                      {
-                        title: this.msg("dialog.destination.title")
+                        title: this.msg("dialog.destination.title"),
+                        viewMode: (this.options.siteId && this.options.siteId !== "") ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY,
                      });
 
                      YAHOO.Bubbling.on("folderSelected", function (layer, args)
@@ -428,6 +429,7 @@
                   }
                   this.widgets.destinationDialog.setOptions(
                   {
+                     siteId: this.options.siteId,
                      path: Dom.get(this.id + "-" + obj.configDef._id + "-destinationLabel").innerHTML
                   });
                   this.widgets.destinationDialog.showDialog();
