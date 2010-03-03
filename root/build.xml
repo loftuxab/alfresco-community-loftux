@@ -196,8 +196,10 @@
          <exclude name="**/org/alfresco/repo/version/**/*Test.java" />
          <include name="**/org/alfresco/repo/version/VersionTestSuite.java" />
          <!-- AVM Tests -->
+         <!--
          <exclude name="**/org/alfresco/repo/avm/**/*Test.java" />
          <include name="**/org/alfresco/repo/avm/AVMTestSuite.java" />
+         -->
          <!-- WCM Tests -->
          <exclude name="**/org/alfresco/wcm/**/*Test.java" />
          <include name="**/org/alfresco/wcm/WCMTestSuite.java" />
