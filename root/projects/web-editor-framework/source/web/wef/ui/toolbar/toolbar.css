@@ -1,19 +1,19 @@
-.wef-toolbar legend,
-.wef-toolbar h3
+#wef .wef-toolbar legend,
+#wef .wef-toolbar h3
 {
    display:none;
 }
 
-.wef-toolbar .wef-toolbar-groupitem
+#wef .wef-toolbar .wef-toolbar-groupitem
 {
    float:left;
 }
 
-.wef-toolbar .icon-button button
+#wef .wef-toolbar .icon-button button
 {
    padding-left:2.5em;
 }
-.wef-toolbar yui-menu-button.icon-button span.first-child
+#wef .wef-toolbar yui-menu-button.icon-button span.first-child
 {
    background:transparent url(http://yui.yahooapis.com/2.8.0r4/build/button/assets/skins/sam/menu-button-arrow.png) no-repeat scroll 0 0
 }

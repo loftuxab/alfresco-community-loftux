@@ -73,11 +73,11 @@
                      {
                         if (args.serverResponse.status == 401)
                         {
-                           WEF.module.AWE.login(
+                           YAHOO.org.wef.PluginRegistry.getInstance('awe').login(
                            {
                               fn: function AWE_FormPanel_ReloadAfterLogin()
                               {
-                                 WEF.module.AWE.loadForm(
+                                 YAHOO.org.wef.PluginRegistry.getInstance('awe').loadForm(
                                  {
                                     id: this.options.domContentId,
                                     formId: this.options.formId,

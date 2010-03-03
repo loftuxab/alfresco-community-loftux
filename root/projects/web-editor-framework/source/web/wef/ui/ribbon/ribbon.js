@@ -21,7 +21,6 @@
       init: function WEF_UI_Ribbon_init()
       {
          YAHOO.org.wef.ui.Ribbon.superclass.init.apply(this);
-         
          //render ribbon after WEF is rendered
          Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.widgets.toolbars = [];
@@ -107,7 +106,7 @@
          Dom.addClass([ribbon.header, ribbon.body, ribbon.footer], 'wef-ribbon-module');
 
          //get ribbon position from cookie if available otherwise reset to initial config value
-         this.set('position', WEF.getCookieValue(this.config.name,'ribbon-position') || this.get('position'));
+         this.set('position', YAHOO.org.wef.getCookieValue(this.config.name,'ribbon-position') || this.get('position'));
          ribbon.render();
          var name = 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'Toolbar';
 
@@ -121,8 +120,8 @@
                {
                   id:  'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
                   name: 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-                  label: '<img src="/awe/lib/com/alfresco/awe/images/edit.gif" alt="AWE" />',
-                  content:'<a href="dsd">dsds</a>',
+                  label: '<img src="/awe/res/awe/images/edit.png" alt="AWE" />',
+                  content:'',
                   active: true
                }]
             },
@@ -340,7 +339,7 @@
             this.widgets.ribbonContainer.setStyle('margin-left', 0);
          }
          else 
-            if (e.newValue !== org.wef.ui.Ribbon.POSITION_TOP) {
+            if (e.newValue !== YAHOO.org.wef.ui.Ribbon.POSITION_TOP) {
                //reset body margin-top
                Dom.setStyle(bodyEl, 'margin-top', this._originalBodyMarginTop);
                this._originalBodyMarginTop = null;
