@@ -1656,11 +1656,20 @@
    <target name="package-webeditor"
            depends="package-webeditor-war" />
    
-   <target name="package-webeditor-jar"
-              depends="compile-webeditor">
+   <target name="package-webeditor-jar" depends="assemble-webeditor-jar">
       <mkdir dir="${dir.project.webeditor.dist}" />
       <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor}" 
-           basedir="${dir.project.webeditor.classes}" excludes="org/alfresco/web/awe/**, org/customer/**" />
+           basedir="${dir.project.webeditor.assemble.jar}" />
+   </target>
+   
+   <target name="assemble-webeditor-jar" depends="compile-webeditor">
+      <mkdir dir="${dir.project.webeditor.assemble.jar}" />
+      <copy todir="${dir.project.webeditor.assemble.jar}">
+         <fileset dir="${dir.project.webeditor.classes}" 
+                  excludes="org/alfresco/web/awe/**, org/customer/**" />
+         <fileset dir="${dir.project.webframeworkcommons.classes}" 
+                  includes="org/alfresco/web/scripts/servlet/**" />
+      </copy>
    </target>
 
    <target name="package-webeditor-war" depends="assemble-webeditor-war, minimize-webeditor-war-javascript">
@@ -1671,7 +1680,8 @@
    </target>
 
    <target name="assemble-webeditor-war" 
-           depends="package-forms-client-jar, package-webeditor-plugin-jar, package-webeditor-framework-jar">
+           depends="package-forms-client-jar, package-webeditor-jar, 
+                    package-webeditor-plugin-jar, package-webeditor-framework-jar">
       <mkdir dir="${dir.project.webeditor.assemble.war}" />
       
       <!-- first copy all required files from webeditor project -->
@@ -1683,6 +1693,9 @@
             <include name="WEB-INF/urlrewrite.xml" />
          </fileset>
       </copy>
+      
+      <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/classes" 
+            file="${dir.project.webeditor.src.java}/log4j.properties" />
       
       <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/classes">
          <fileset dir="${dir.project.webeditor.config}">
@@ -1711,6 +1724,8 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.jlan.dist}" 
                   includes="${file.name.jar.jlan}" />
+         <fileset dir="${dir.project.webeditor.dist}" 
+                  includes="${file.name.jar.webeditor}" />
          <fileset dir="${dir.project.webeditor.dist}" 
                   includes="${file.name.jar.webeditor.plugin}" />
          <fileset dir="${dir.project.webframeworkcommons.dist}" 
@@ -1763,6 +1778,7 @@
       <copy todir="${dir.project.webeditor.assemble.plugin}/META-INF">
          <fileset dir="${dir.project.webeditor.src.web}">
             <include name="awe/**" />
+            <include name="lib/**" />
          </fileset>
       </copy>
    </target>
