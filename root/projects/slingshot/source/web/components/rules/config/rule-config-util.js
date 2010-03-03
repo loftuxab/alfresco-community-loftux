@@ -84,11 +84,12 @@
             YAHOO.Bubbling.on("ruleConfigReady", this.onRuleConfigReady, this);
          }
 
-         this._loadRuleConfigs([
-            { component: "components/rules/config/type", name: "ruleConfigType", dataObj: {}},
-            { component: "components/rules/config/condition", name: "ruleConfigIfCondition", dataObj: { mode: "if" }},
-            { component: "components/rules/config/condition", name: "ruleConfigUnlessCondition", dataObj: { mode: "unless" }},
-            { component: "components/rules/config/action", name: "ruleConfigAction", dataObj: {}}
+         this._loadRuleConfigs(
+         [
+            { component: "components/rules/config/type", name: "ruleConfigType", dataObj: {} },
+            { component: "components/rules/config/condition", name: "ruleConfigIfCondition", dataObj: { mode: "if" } },
+            { component: "components/rules/config/condition", name: "ruleConfigUnlessCondition", dataObj: { mode: "unless" } },
+            { component: "components/rules/config/action", name: "ruleConfigAction", dataObj: {} }
          ]);
       },
 
@@ -104,15 +105,22 @@
          if (ruleConfigs && ruleConfigs.length > 0)
          {
             var ruleConfig = ruleConfigs[0],
-               ruleConfigComponentId = this.id + "-" + ruleConfig.name;
+               ruleConfigComponentId = this.id + "-" + ruleConfig.name,
+               dataObj = YAHOO.lang.merge(
+               {
+                  htmlid: ruleConfigComponentId,
+                  site: this.options.siteId
+               }, ruleConfig.dataObj);
+            
             this.ruleConfigs[ruleConfigComponentId] = false;
-            ruleConfig.dataObj.htmlid = ruleConfigComponentId;
-            Alfresco.util.Ajax.request({
+            Alfresco.util.Ajax.request(
+            {
                url: Alfresco.constants.URL_SERVICECONTEXT + ruleConfig.component,
-               dataObj: ruleConfig.dataObj,
+               dataObj: dataObj,
                successCallback:
                {
-                  fn: function (response){
+                  fn: function (response)
+                  {
                      // Insert config components html to this component
                      Dom.get(this.id + "-" + ruleConfig.name).innerHTML = response.serverResponse.responseText;
 

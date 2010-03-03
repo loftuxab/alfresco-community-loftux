@@ -6,7 +6,8 @@
       <#if (ruleConfigDefinitions??)>ruleConfigDefinitions: ${ruleConfigDefinitions},</#if>
       <#if (customisationsMap??)>customisationsMap: ${customisationsMap},</#if>
       <#if (constraints??)>constraints: ${constraints},</#if>
-      ruleConfigType: "${ruleConfigType}"
+      ruleConfigType: "${ruleConfigType}",
+      siteId: "${args.site!""}"
    }).setMessages(
       ${messages}
    );
