@@ -555,7 +555,9 @@
     */
    WEF.PluginRegistry = (function WEF_Plugin_Registry()
    {
-      var plugins = {}, name = 'WEF_Plugin_Registry';
+      var plugins = {}, 
+          name = 'WEF_Plugin_Registry'
+          pluginInstances = {};
 
       /**
        * Registers plugin object against specified name
@@ -572,7 +574,8 @@
       /**
        * Retrieves plugin for specified plugin name
        * 
-       * @param configName {String} Name of plugin 
+       * @param configName {String} Name of plugin
+       * 
        * @return config {Object}
        * 
        */
@@ -585,16 +588,29 @@
             var versionObj = YAHOO.env.getVersion(pluginName); 
             if (versionObj != null)
             {
-               plugin = versionObj;
+               plugin = versionObj.mainClass;
             }
          }
-         
+           
          return plugin;
       };
+      
+      var getInstance = function WEF_Plugin_Registry_getInstance(pluginId)
+      {
+         return pluginInstances[pluginId] || null;
+      };
+      
+      var registerInstance = function WEF_Plugin_Registry_registerInstance(pluginId, instance)
+      {
+         pluginInstances[pluginId] = instance;
+         return pluginInstances[pluginId];
+      }
  
       return {
          registerPlugin : registerPlugin,
-         getPlugin: getPlugin
+         getPlugin: getPlugin,
+         registerInstance : registerInstance,
+         getInstance: getInstance
       }; 
    })();
 

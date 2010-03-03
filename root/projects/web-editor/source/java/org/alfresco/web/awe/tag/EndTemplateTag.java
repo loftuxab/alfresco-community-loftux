@@ -61,7 +61,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             out.write("{ position: \"");
             out.write(toolbarLocation);
             out.write("\" });\n");
-            out.write("WEF.ConfigRegistry.registerConfig('org.alfresco.awe',[\n");
+            out.write("WEF.ConfigRegistry.registerConfig('org.alfresco.awe',{id:'awe',name:'awe',editables:[\n");
             boolean first = true;
             for (MarkedContent content : markedContent)
             {
@@ -91,7 +91,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
                }
                out.write("\n}");
             }
-            out.write("]);\n");
+            out.write("]});\n");
             out.write("\n</script>");
             
             // request all the resources

@@ -184,15 +184,7 @@
 }
 
 
- 
-#wef-ribbon #WEF-Ribbon--show-hide-edit-markers span.yui-toolbar-icon
+#wef-ribbon .wef-tab-toolbar .wef-toolbar .icon-button button
 {
-   background: transparent url(http://localhost:8081/awe/themes/default/images/edit.png) no-repeat 6px 2px;
-   width:23px;
-}
-
-#wef-ribbon #WEF-Ribbon--quickedit span.yui-toolbar-icon
-{
-   background:transparent url(http://localhost:8080/alfresco/images/icons/search_controls.gif) no-repeat 5px 3px;
-   width:23px;
+   padding-left:0;
 }

@@ -74,7 +74,7 @@
          [
             {
                type: 'menu',
-               label: '<img src="/awe/lib/com/alfresco/awe/images/quick-edit.gif" alt="Toggle edit markers" />',
+               label: '<img src="/awe/res/awe/images/quick-edit.gif" alt="Toggle edit markers" />',
                value: this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit',
                id: this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit',
                icon: true,
@@ -94,7 +94,7 @@
             }, 
             {
                type: 'push',
-               label: '<img src="/awe/lib/com/alfresco/awe/images/toggle-edit.gif" alt="Toggle edit markers" />',
+               label: '<img src="/awe/res/awe/images/toggle-edit.gif" alt="Toggle edit markers" />',
                value: this.config.namespace + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markers',
                icon: true               

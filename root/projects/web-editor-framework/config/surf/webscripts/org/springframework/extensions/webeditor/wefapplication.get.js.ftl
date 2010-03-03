@@ -10,7 +10,8 @@
          function(e, args)
          {
             <#list plugins as plugin>
-            var plugin = WEF.getPlugin("${plugin.name?html}");
+            var plugin = WEF.PluginRegistry.getPlugin("${plugin.name?html}"),
+                pluginInstance;
             
             // retrieve or create plugin config
             var config = YAHOO.org.wef.ConfigRegistry.getConfig("${plugin.name?html}");
@@ -22,9 +23,12 @@
                   name: "${plugin.name?html}"
                }
             }
-            
-            // initialise the plugin
-            plugin.init(config);
+            //create instance of plugin
+            pluginInstance = new plugin(config);
+            //store instance
+            WEF.PluginRegistry.registerInstance(config.id, pluginInstance);
+            // initialize the plugin
+            pluginInstance.init();
             </#list>
          }
       );
