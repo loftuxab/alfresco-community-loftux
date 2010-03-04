@@ -18,6 +18,7 @@
    <!-- Import Web Editor -->
    <import resource="classpath*:alfresco/awe-application-context.xml" />
    <import resource="classpath*:alfresco/awe-plugin-context.xml" />
+   <import resource="classpath*:alfresco/surf-bootstrap-context.xml" />
    <import resource="classpath*:alfresco/web-extension/custom-awe-application-context.xml" />
    
    <!-- Set up to auto-resolve to url based views -->   	
