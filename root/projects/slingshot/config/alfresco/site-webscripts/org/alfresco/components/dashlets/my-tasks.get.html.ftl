@@ -15,7 +15,7 @@
 <div class="dashlet my-tasks">
    <div class="title">${msg("header")}</div>
    <div class="toolbar flat-button">
-      <input id="${args.htmlid}-all" type="checkbox" name="all" value="${msg("filter.all")}" checked="checked" />
+      <input id="${args.htmlid}-all" type="checkbox" name="all" value="${msg("filter.all")}" />
       <input id="${args.htmlid}-dueOn" type="button" name="dueOn" value="${msg("filter.today")}" />
       <select id="${args.htmlid}-dueOn-menu">
          <option value="today">${msg("filter.today")}</option>

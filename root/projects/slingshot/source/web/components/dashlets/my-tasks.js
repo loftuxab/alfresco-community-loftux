@@ -38,6 +38,18 @@
    var $html = Alfresco.util.encodeHTML;
    
    /**
+    * Preferences
+    */
+   var PREFERENCES_MYTASKS = "org.alfresco.share.mytasks",
+       PREF_FILTER = PREFERENCES_MYTASKS + ".filter";
+   
+   /**
+    * Constants
+    */
+   var FILTER_ALL = "all";
+   var FILTER_INVITES = "invites";
+   
+   /**
     * Dashboard MyTasks constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -59,12 +71,14 @@
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
 
+      // Preferences service
+      this.preferencesService = new Alfresco.service.Preferences();
+
       return this;
    }
 
    Alfresco.MyTasks.prototype =
    {
-
       /**
        * Object container for initialization options
        *
@@ -80,7 +94,7 @@
           * @type string
           * @default "all"
           */
-         activeFilter: "all"
+         activeFilter: FILTER_ALL
       },
       
       /**
@@ -142,8 +156,8 @@
          this.widgets.all = new YAHOO.widget.Button(this.id + "-all",
          {
             type: "checkbox",
-            value: "all",
-            checked: true
+            value: FILTER_ALL,
+            checked: false
          });
          this.widgets.all.on("checkedChange", this.onAllCheckedChanged, this.widgets.all, this);
          
@@ -151,7 +165,7 @@
          this.widgets.invites = new YAHOO.widget.Button(this.id + "-invites",
          {
             type: "checkbox",
-            value: "invites",
+            value: FILTER_INVITES,
             checked: false
          });
          this.widgets.invites.on("checkedChange", this.onInvitesCheckedChanged, this.widgets.invites, this);
@@ -160,7 +174,8 @@
          this.widgets.dueOn = new YAHOO.widget.Button(this.id + "-dueOn",
          {
             type: "split",
-            menu: this.id + "-dueOn-menu"
+            menu: this.id + "-dueOn-menu",
+            lazyloadmenu: false
          });
          this.widgets.dueOn.on("click", this.onDateFilterClicked, this, true);
          this.widgets.dueOn.getMenu().subscribe("click", function (p_sType, p_aArgs)
@@ -191,8 +206,69 @@
          // The task list container
          this.taskList = Dom.get(this.id + "-taskList");
          
-         // Populate the task list
-         this.populateTaskList("all");
+         // Load preferences to override default filter
+         this.preferencesService.request(PREF_FILTER,
+         {
+            successCallback:
+            {
+               fn: function(p_oResponse)
+               {
+                  var filterPreference = Alfresco.util.findValueByDotNotation(p_oResponse.json, PREF_FILTER, null);
+                  if (filterPreference !== null)
+                  {
+                     // test for the two well known boolean filters - else a due date is specified
+                     // therefore manually update the selected menu button label and highlight
+                     switch (filterPreference)
+                     {
+                        case FILTER_ALL:
+                           this.widgets.all.set("checked", true, true);
+                           break;
+                        
+                        case FILTER_INVITES:
+                           this.widgets.invites.set("checked", true, true);
+                           break;
+                        
+                        default:
+                        {
+                           this.widgets.dueOn.value = filterPreference;
+                           
+                           // set the correct menu label
+                           var menuItems = this.widgets.dueOn.getMenu().getItems();
+                           for (index in menuItems)
+                           {
+                              if (menuItems.hasOwnProperty(index))
+                              {
+                                 if (menuItems[index].value === filterPreference)
+                                 {
+                                    this.widgets.dueOn.set("label", menuItems[index].cfg.getProperty("text"));
+                                    Dom.addClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
+                                    break;
+                                 }
+                              }
+                           }
+                           break;
+                        }
+                     }
+                     this.populateTaskList(filterPreference);
+                  }
+                  else
+                  {
+                     this.widgets.all.set("checked", true, true);
+                     this.populateTaskList(FILTER_ALL);
+                  }
+               },
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: function()
+               {
+                  this.widgets.all.set("checked", true, true);
+                  this.populateTaskList(FILTER_ALL);
+               },
+               scope: this
+            }
+         });
       },
       
       /**
@@ -257,12 +333,12 @@
       {
          switch (filter)
          {
-            case "all":
+            case FILTER_ALL:
                this.widgets.invites.set("checked", false, true);
                Dom.removeClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
                break;
 
-            case "invites":
+            case FILTER_INVITES:
                this.widgets.all.set("checked", false, true);
                Dom.removeClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
                break;
@@ -273,7 +349,6 @@
                Dom.addClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
                break;
          }
-         
       },
       
       /**
@@ -298,9 +373,10 @@
        */
       onAllCheckedChanged: function MyTasks_onAllCheckedChanged(p_oEvent, p_obj)
       {
-         this.setActiveFilter("all");
-         this.populateTaskList("all");
+         this.setActiveFilter(FILTER_ALL);
+         this.populateTaskList(FILTER_ALL);
          p_obj.set("checked", true, true);
+         this.preferencesService.set(PREF_FILTER, FILTER_ALL);
       },
 
       /**
@@ -311,9 +387,10 @@
        */
       onInvitesCheckedChanged: function MyTasks_onInvitesCheckedChanged(p_oEvent, p_obj)
       {
-         this.setActiveFilter("invites");
-         this.populateTaskList("invites");
+         this.setActiveFilter(FILTER_INVITES);
+         this.populateTaskList(FILTER_INVITES);
          p_obj.set("checked", true, true);
+         this.preferencesService.set(PREF_FILTER, FILTER_INVITES);
       },
 
       /**
@@ -339,6 +416,7 @@
          this.widgets.dueOn.value = filter;
          this.setActiveFilter(filter);
          this.populateTaskList(filter);
+         this.preferencesService.set(PREF_FILTER, filter);
       },
 
 
