@@ -38,6 +38,13 @@
    var $html = Alfresco.util.encodeHTML;
    
    /**
+    * Preferences
+    */
+   var PREFERENCES_ACTIVITIES = "org.alfresco.share.activities",
+       PREF_FILTER = PREFERENCES_ACTIVITIES + ".filter",
+       PREF_RANGE = PREFERENCES_ACTIVITIES + ".range";
+   
+   /**
     * Dashboard Activities constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -57,6 +64,9 @@
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
 
+      // Preferences service
+      this.preferencesService = new Alfresco.service.Preferences();
+      
       return this;
    };
 
@@ -156,13 +166,15 @@
       onReady: function Activities_onReady()
       {
          var me = this;
-
-         // Dropdown filter
+         
+         // Create dropdown filter widgets
          this.widgets.range = new YAHOO.widget.Button(this.id + "-range",
          {
             type: "split",
-            menu: this.id + "-range-menu"
+            menu: this.id + "-range-menu",
+            lazyloadmenu: false
          });
+         
          this.widgets.range.on("click", this.onDateFilterClicked, this, true);
          this.widgets.range.getMenu().subscribe("click", function (p_sType, p_aArgs)
          {
@@ -173,14 +185,14 @@
                me.onDateFilterChanged.call(me, p_aArgs[1]);
             }
          });
-         this.widgets.range.value = "today";
-         // Dropdown filter
+         
          this.widgets.user = new YAHOO.widget.Button(this.id + "-user",
          {
             type: "split",
-            menu: this.id + "-user-menu"
+            menu: this.id + "-user-menu",
+            lazyloadmenu: false
          });
-         //exclusion filter
+         
          this.widgets.user.on("click", this.onExclusionFilterClicked, this, true);
          this.widgets.user.getMenu().subscribe("click", function (p_sType, p_aArgs)
          {
@@ -189,23 +201,80 @@
             {
                me.widgets.user.set("label", menuItem.cfg.getProperty("text"));
                me.onExclusionFilterChanged.call(me, p_aArgs[1]);
-
             }
          });
-         this.widgets.user.value = "others";
-
+         
          // The activity list container
          this.activityList = Dom.get(this.id + "-activityList");
          
-         // Populate the activity list
-         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
+         // Load preferences to override default filter and range
+         this.widgets.range.value = "today";
+         this.widgets.user.value = "others";
+         this.preferencesService.request(PREFERENCES_ACTIVITIES,
+         {
+            successCallback:
+            {
+               fn: function(p_oResponse)
+               {
+                  var rangePreference = Alfresco.util.findValueByDotNotation(p_oResponse.json, PREF_RANGE, null);
+                  if (rangePreference !== null)
+                  {
+                     this.widgets.range.value = rangePreference;
+                     // set the correct menu label
+                     var menuItems = this.widgets.range.getMenu().getItems();
+                     for (index in menuItems)
+                     {
+                        if (menuItems.hasOwnProperty(index))
+                        {
+                           if (menuItems[index].value === rangePreference)
+                           {
+                              this.widgets.range.set("label", menuItems[index].cfg.getProperty("text"));
+                              break;
+                           }
+                        }
+                     }
+                  }
+                  
+                  var filterPreference = Alfresco.util.findValueByDotNotation(p_oResponse.json, PREF_FILTER, null);
+                  if (filterPreference !== null)
+                  {
+                     this.widgets.user.value = filterPreference;
+                     // set the correct menu label
+                     var menuItems = this.widgets.user.getMenu().getItems();
+                     for (index in menuItems)
+                     {
+                        if (menuItems.hasOwnProperty(index))
+                        {
+                           if (menuItems[index].value === filterPreference)
+                           {
+                              this.widgets.user.set("label", menuItems[index].cfg.getProperty("text"));
+                              break;
+                           }
+                        }
+                     }
+                  }
+                  // Populate the activity list
+                  this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
+               },
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: function()
+               {
+                  // Populate the activity list
+                  this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
+               },
+               scope: this
+            }
+         });
       },
       
       /**
        * Populate the activity list via Ajax request
        * @method populateActivityList
        */
-      populateActivityList: function Activities_populateActivityList(dateFilter,userFilter)
+      populateActivityList: function Activities_populateActivityList(dateFilter, userFilter)
       {
          // Load the activity list
          Alfresco.util.Ajax.request(
@@ -255,7 +324,6 @@
          this.activityList.innerHTML = '<div class="detail-list-item first-item last-item">' + this._msg("label.load-failed") + '</div>';
       },
       
-      
       /**
        * Updates the href attribute on the feed link
        * @method updateFeedLink
@@ -285,7 +353,6 @@
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
 
-
       /**
        * Date button clicked event handler
        * @method onDateFilterClicked
@@ -293,7 +360,7 @@
        */
       onDateFilterClicked: function Activities_onDateFilterClicked(p_oEvent)
       {
-         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
+         this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
       },
       
       /**
@@ -304,9 +371,10 @@
       onDateFilterChanged: function Activities_onDateFilterChanged(p_oMenuItem)
       {
          this.widgets.range.value = p_oMenuItem.value;
-         // this.setActiveFilter(dateFilter,Alfresco.Activities.FILTER_BYDATE);
-         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
+         this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
+         this.preferencesService.set(PREF_RANGE, this.widgets.range.value);
       },
+      
       /**
        * Exclusion drop-down changed event handler
        * @method onExclusionFilterChanged
@@ -316,7 +384,9 @@
       {
          this.widgets.user.value = p_oMenuItem.value;
          this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
-      },      
+         this.preferencesService.set(PREF_FILTER, this.widgets.user.value);
+      },
+      
       /**
        * Exclusion button clicked event handler
        * @method onExclusionFilterClicked
@@ -324,8 +394,7 @@
        */
       onExclusionFilterClicked: function Activities_onExclusionFilterClicked(p_oEvent)
       {
-         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
-
+         this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
       },
 
       /**
