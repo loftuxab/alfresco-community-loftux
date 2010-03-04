@@ -329,7 +329,7 @@
       displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
       {
          Dom.get(this.id + "-configs").innerHTML = "";
-         var checkboxEl = Dom.get(this.id + "-" + this.options.configType + "-checkbox");
+         var checkboxEl = Dom.get(this.id + "-" + this.options.ruleConfigType + "-checkbox");
          if (checkboxEl && this.options.mode == RC.MODE_EDIT)
          {
             Dom.removeClass(checkboxEl, "hidden");
@@ -344,8 +344,7 @@
          for (var i = 0, il = ruleConfigs.length; i < il; i++)
          {
             ruleConfig = ruleConfigs[i];
-            configEl = this._createConfigUI(ruleConfig, this.widgets.selectTemplateEl.cloneNode(true), null);
-            this._createConfigParameterUI(ruleConfig, configEl);
+            this._createConfigUI(ruleConfig, null, null);
          }
          this._refreshRemoveButtonState();
       },
@@ -400,8 +399,7 @@
        */
       onAddConfigButtonClick: function RuleConfig_onAddConfigButtonClick(p_oEvent, p_eConfig)
       {
-         var configEl = this._createConfigUI({}, this.widgets.selectTemplateEl.cloneNode(true), p_eConfig);
-         this._createConfigParameterUI({}, configEl);
+         this._createConfigUI({}, null, p_eConfig);
          this._refreshRemoveButtonState();
       },
 
@@ -513,7 +511,8 @@
        * 2. Seconds pass will ask for objects using only pattern objects WITH at least one wild card attribute.
        *
        * @method _createSelectMenu
-       * @param obj {object} (Optional) Custom parameter to send in for use for overriding classes
+       * @param obj {object} (Optional) Custom parameter to send in for use for overriding classes,
+       *                                will be a parameter to _getConfigItems.
        * @return {HTMLSelectElement} The created menu
        * @private
        */
@@ -626,8 +625,8 @@
        * @method _getConfigItems
        * @param itemType
        * @param itemPatternObject
-       * @param obj {object} THe custom parameter obj that was passed in to _createSelectMenu,
-       *                               suitable for overriding classes.
+       * @param obj {object} The custom parameter obj that was passed in to _createSelectMenu,
+       *                     suitable for overriding classes.
        * @return {array} Menu item objects (as described below) representing a configDef (or item)
        *                 matching all attributes in itemPatternObject.
        * @protected
@@ -688,17 +687,34 @@
          }
          return values;
       },
-      
+
       /**
        * Creates a config row with the parameters and the parameter values
        *
        * @method _createConfigUI
        * @param p_oRuleConfig {object} Rule config descriptor object
+       * @param p_oSelectEl {HTMLSelectElement} (Optional) Will clone the selectTemaplteEl if not provided
+       * @param p_eRelativeConfigEl {object} (Optional) will be placed in the end of omitted
+       * @return {HTMLElement} The config row
+       * @protected
+       */
+      _createConfigUI: function RuleConfig__createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
+      {
+         var configEl = this._createConfigNameUI(p_oRuleConfig, p_oSelectEl ? p_oSelectEl : this.widgets.selectTemplateEl.cloneNode(true), p_eRelativeConfigEl);
+         this._createConfigParameterUI(p_oRuleConfig, configEl);
+         return configEl;
+      },
+      
+      /**
+       * Creates a config name select
+       *
+       * @method _createConfigNameUI
+       * @param p_oRuleConfig {object} Rule config descriptor object
        * @param p_oSelectEl {HTMLSelectElement} The select menu to use
        * @param p_eRelativeConfigEl {object}
        * @protected
        */
-      _createConfigUI: function RuleConfig__createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
+      _createConfigNameUI: function RuleConfig__createConfigNameUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
       {
          if (p_oSelectEl.length > 0)
          {
@@ -887,10 +903,11 @@
                            }, this);
                         }
                      }
-                     Dom.addClass(controlEl, "param");
+                     
                      if (paramDef._type != "hidden")
                      {
                         // Display a label left to the parameter if displayLabel is present
+                        Dom.addClass(controlEl, "param");
                         this._createLabel(paramDef.displayLabel, controlEl);
                      }
                   }

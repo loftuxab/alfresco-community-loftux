@@ -25,31 +25,30 @@
          <condition name="no-condition"/>
       </group>
       <group>
-         <property type="d:text" id="*"/>
+         <property type="d:text" name="*"/>
       </group>
       <group>
-         <property type="d:int" id="*"/>
-         <property type="d:long" id="*"/>
-         <property type="d:double" id="*"/>
-         <property type="d:float" id="*"/>
-         <property type="d:long" id="size"/>
+         <property dataType="d:int" name="*"/>
+         <property dataType="d:long" name="*"/>
+         <property dataType="d:double" name="*"/>
+         <property dataType="d:float" name="*"/>         
       </group>
       <group>
          <condition name="compare-mime-type"/>
       </group>
       <group>
-         <property type="d:date" id="*"/>
-         <property type="d:datetime" id="*"/>
+         <property dataType="d:date" name="*"/>
+         <property dataType="d:datetime" name="*"/>
       </group>
       <group>
-         <property type="d:text" id="created-by"/>
-         <property type="d:text" id="modified-by"/>
+         <property dataType="d:text" name="cm:created"/>
+         <property dataType="d:text" name="cm:modified"/>
       </group>
       <group>
-         <property type="d:text" id="author"/>
+         <property dataType="d:text" name="cm:author"/>
       </group>
       <group>
-         <property id="*"/>
+         <property name="*"/>
       </group>
       <group>
          <condition name="has-tag"/>
@@ -70,20 +69,21 @@
    </menu>
 
    <defaults>
-      <property>name</property>
-      <property>title</property>
-      <property>description</property>
-      <property>created-date</property>
-      <property>created-by</property>
-      <property>modified-date</property>
-      <property>modified-by</property>
-      <property>author</property>
+      <property>cm:name</property>
+      <property>cm:title</property>
+      <property>cm:description</property>
+      <property>cm:created</property>
+      <property>cm:creator</property>
+      <property>cm:modified</property>
+      <property>cm:modifier</property>
+      <property>cm:author</property>
    </defaults>
 
    <property-evaluators>
       <evaluator name="EQUALS">
          <property type="d:any"/>
          <property type="d:text"/>
+         <property type="d:mltext"/>
          <property type="d:date"/>
          <property type="d:datetime"/>
          <property type="d:int"/>
@@ -93,12 +93,15 @@
       </evaluator>
       <evaluator name="CONTAINS">
          <property type="d:text"/>
+         <property type="d:mltext"/>
       </evaluator>
       <evaluator name="BEGINS">
          <property type="d:text"/>
+         <property type="d:mltext"/>
       </evaluator>
       <evaluator name="ENDS">
          <property type="d:text"/>
+         <property type="d:mltext"/>
       </evaluator>
       <evaluator name="GREATER_THAN">
          <property type="d:date"/>

@@ -214,53 +214,59 @@ Alfresco.util.arrayToObject = function(arr, p_value)
  *
  * @method Alfresco.util.deepCopy
  * @param p_obj {object|array|date|string|number|boolean} The object to copy
+ * @param p_oInstructions {object} (Optional) Contains special non default copy instructions
+ * @param p_oInstructions.copyFunctions {boolean} (Optional) false by default
  * @return {object|array|date|string|number|boolean} A new instance of the same type as o with the same values
  * @static
  */
-Alfresco.util.deepCopy = function(p_obj)
+Alfresco.util.deepCopy = function(p_oObj, p_oInstructions)
 {
-   if (!p_obj)
+   if (!p_oObj)
    {
-      return p_obj;
+      return p_oObj;
+   }
+   if (!p_oInstructions)
+   {
+      p_oInstructions = {};
    }
 
-   if (YAHOO.lang.isArray(p_obj))
+   if (YAHOO.lang.isArray(p_oObj))
    {
       var arr = [];
-      for (var i = 0, il = p_obj.length, arrVal; i < il; i++)
+      for (var i = 0, il = p_oObj.length, arrVal; i < il; i++)
       {
-         arrVal = p_obj[i];
-         if (!YAHOO.lang.isFunction(arrVal))
+         arrVal = p_oObj[i];
+         if (!YAHOO.lang.isFunction(arrVal) || p_oInstructions.copyFunctions == true)
          {
-            arr.push(Alfresco.util.deepCopy(arrVal));
+            arr.push(Alfresco.util.deepCopy(arrVal, p_oInstructions));
          }
       }
       return arr;
    }
 
-   if (Alfresco.util.isDate(p_obj))
+   if (Alfresco.util.isDate(p_oObj))
    {
-      return new Date(p_obj.getTime());
+      return new Date(p_oObj.getTime());
    }
 
-   if (YAHOO.lang.isString(p_obj) || YAHOO.lang.isNumber(p_obj) || YAHOO.lang.isBoolean(p_obj))
+   if (YAHOO.lang.isString(p_oObj) || YAHOO.lang.isNumber(p_oObj) || YAHOO.lang.isBoolean(p_oObj))
    {
-      return p_obj;
+      return p_oObj;
    }
 
-   if (YAHOO.lang.isObject(p_obj))
+   if (YAHOO.lang.isObject(p_oObj))
    {
-      if (p_obj.toString() == "[object Object]")
+      if (p_oObj.toString() == "[object Object]")
       {
          var obj = {}, objVal;
-         for (var name in p_obj)
+         for (var name in p_oObj)
          {
-            if (p_obj.hasOwnProperty(name))
+            if (p_oObj.hasOwnProperty(name))
             {
-               objVal = p_obj[name];
-               if (!YAHOO.lang.isFunction(objVal))
+               objVal = p_oObj[name];
+               if (!YAHOO.lang.isFunction(objVal) || p_oInstructions.copyFunctions == true)
                {
-                  obj[name] = Alfresco.util.deepCopy(objVal);
+                  obj[name] = Alfresco.util.deepCopy(objVal, p_oInstructions);
                }
             }
          }
@@ -269,7 +275,7 @@ Alfresco.util.deepCopy = function(p_obj)
       else
       {
          // The object was
-         return p_obj;
+         return p_oObj;
       }
    }
 

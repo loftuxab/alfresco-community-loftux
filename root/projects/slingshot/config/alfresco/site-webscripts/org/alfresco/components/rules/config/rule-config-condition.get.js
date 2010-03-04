@@ -74,7 +74,7 @@ function main()
       if (prefs && prefs.org && prefs.org.alfresco && prefs.org.alfresco.share && prefs.org.alfresco.share.rule && prefs.org.alfresco.share.rule.properties)
       {
          var userProperties = prefs.org.alfresco.share.rule.properties;
-         for each (propertyName in userProperties)
+         for (propertyName in userProperties)
          {
             // Will set value to "show" or "hide"
             ruleProperties[propertyName] = userProperties[propertyName];
@@ -82,49 +82,66 @@ function main()
       }
 
       // Get info such as type and display name about the properties to display
-      var propertiesParam = [];
-      for each (propertyName in ruleProperties)
+      var propertiesParam = [],
+         transientPropertyInstructions = {},
+         instructions,
+         propertyNameTokens;
+      for (propertyName in ruleProperties)
       {
-         if(ruleProperties[propertyName] == "show")
+         if (ruleProperties[propertyName] == "show")
          {
-            propertiesParam.push(propertyName);
+            propertyNameTokens = propertyName.split(".");
+            instructions = transientPropertyInstructions[propertyNameTokens[0]];
+            if (!instructions)
+            {
+               instructions = [];
+               transientPropertyInstructions[propertyNameTokens[0]] = instructions;
+            }
+            propertiesParam.push(propertyNameTokens[0]);
+            instructions.push(propertyNameTokens.length > 1 ? propertyName : propertyNameTokens[0]);
          }
       }
 
-      result = connector.get("/api/sites"); // todo replace with data dictionary webscript and use the propertiesParam
-      if (result.status == 200)
+      var allProperties = [],
+         instruction;
+      if (propertiesParam.length > 0)
       {
-         var properties = [];
-
-         // todo remove test data once webscript exists
-         properties.push(
+         result = connector.get("/api/properties?name=" + propertiesParam.join("&name="));
+         if (result.status == 200)
          {
-            id: "name",
-            type: "d:text",
-            displayLabel: "Name"
-         });
-         properties.push(
-         {
-            id: "title",
-            type: "d:text",
-            displayLabel: "Title"
-         });
-         properties.push(
-         {
-            id: "size",
-            type: "d:long",
-            displayLabel: "Size"
-         });
-         properties.push(
-         {
-            id: "date-created",
-            type: "d:datetime",
-            displayLabel: "Date created"
-         });
-
-         model.properties = jsonUtils.toJSONString(properties);
+            var properties = eval('(' + result + ')');
+            for (var i = 0, il = properties.length; i < il; i++)
+            {
+               property = properties[i];
+               instructions = transientPropertyInstructions[property.name];
+               for (var j = 0, jl = instructions ? instructions.length : 0; j < jl; j++)
+               {
+                  instruction = instructions[j];
+                  if (instruction == property.name)
+                  {
+                     // It was a normal property, just add it
+                     allProperties.push(
+                     {
+                        name: property.name,
+                        dataType: property.dataType,
+                        title: property.title
+                     });
+                  }
+                  else
+                  {
+                     // It was a transient property, modify the id to represent the transient proeprty
+                     allProperties.push(
+                     {
+                        name: property.name + "." + instruction.transientProperty,
+                        dataType: property.dataType,
+                        title: property.title
+                     });
+                  }
+               }
+            }
+         }
       }
-
+      model.properties = jsonUtils.toJSONString(allProperties);
    }
 }
 
