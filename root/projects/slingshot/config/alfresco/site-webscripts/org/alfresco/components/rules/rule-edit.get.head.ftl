@@ -31,6 +31,8 @@
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/email-form.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/email-form.js"></@script>
 <!-- Show more dialog -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/data-picker.css" />
+<@script type="text/javascript" src="${page.url.context}/modules/data-picker.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/property-picker.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/property-picker.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/rules/rules-property-picker.css" />

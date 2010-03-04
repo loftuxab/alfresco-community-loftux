@@ -103,7 +103,8 @@
    color: #ff6666;
 }
 
-.rule-config .rule-config-body .parameters label
+.rule-config .rule-config-body .parameters label,
+.rule-config .rule-config-body .parameters .param
 {
    margin-left: 0.5em;
 }

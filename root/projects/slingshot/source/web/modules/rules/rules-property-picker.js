@@ -43,10 +43,17 @@
       // Instance proeprties
       this.preferencesService = new Alfresco.service.Preferences();
 
+      // Instance variables
+      this.rulePropertySettings = {};
+
+      // Merge options
+      this.options = YAHOO.lang.merge(this.options, Alfresco.util.deepCopy(Alfresco.module.RulesPropertyPicker.superclass.options,
+      {
+         copyFunctions: true
+      }));
+
       // Override options to add an "Other" tab and an extra "Show in menu" column
       var me = this;
-      this.rulePropertySettings = {};
-      this.options.extendedTemplateUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/rules/property-picker";
       this.options.tabs.push(
       {
          id: "other",
@@ -113,6 +120,22 @@
 
    YAHOO.extend(Alfresco.module.RulesPropertyPicker, Alfresco.module.PropertyPicker,
    {
+
+      /**
+       * Object container for initialization options
+       */
+      options:
+      {
+         /**
+          * The extra template to get i18n messages
+          *
+          * @property rulesPropertyPickerTemplateUrl
+          * @type string
+          * @default Alfresco.constants.URL_SERVICECONTEXT + "modules/rules/property-picker"
+          */
+         rulesPropertyPickerTemplateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/rules/property-picker"
+      },
+
       /**
        * Preferences service used to tore which properties that shall be showed or hidden from the menu.
        *
@@ -142,18 +165,18 @@
          // Load the UI template, which will bring in additional i18n-messages from the server
          Alfresco.util.Ajax.request(
          {
-            url: this.options.extendedTemplateUrl,
+            url: this.options.rulesPropertyPickerTemplateUrl,
             dataObj:
             {
                htmlid: this.id
             },
             successCallback:
             {
-               fn: this.onExtendedTemplateLoaded,
+               fn: this.onRulesPropertyPickerTemplateLoaded,
                obj: response,
                scope: this
             },
-            failureMessage: this.msg("message.load.template.error", this.options.extendedTemplateUrl),
+            failureMessage: this.msg("message.load.template.error", this.options.rulesPropertyPickerTemplateUrl),
             execScripts: true
          });
       },
@@ -161,17 +184,16 @@
       /**
        * Event callback when this class' template has been loaded
        *
-       * @method onExtendedTemplateLoaded
+       * @method onRulesPropertyPickerTemplateLoaded
        * @override
        * @param response {object} Server response from load template XHR request
        */
-      onExtendedTemplateLoaded: function RPP_onExtendedTemplateLoaded(response, superClassResponse)
+      onRulesPropertyPickerTemplateLoaded: function RPP_onRulesPropertyPickerTemplateLoaded(response, superClassResponse)
       {
-         // Inject the template from the XHR request into a new DIV element and insert it when showDialog() is called
+         // Inject the template from the XHR request into a new DIV element and
          var tmpEl = document.createElement("div");
          tmpEl.setAttribute("style", "display:none");
          tmpEl.innerHTML = response.serverResponse.responseText;
-         this.widgets.rulesContainerEl = Dom.getFirstChild(tmpEl);
 
          // Load the users rules property settings before calling the super classes onTemplateLoaded method
          this.preferencesService.request(Alfresco.service.Preferences.RULE_PROPERTY_SETTINGS,

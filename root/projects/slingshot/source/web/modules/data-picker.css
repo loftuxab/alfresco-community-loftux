@@ -1,0 +1,51 @@
+.data-picker
+{
+   width: 50em;   
+}
+
+.data-picker .yui-navset.yui-navset-top .yui-content
+{
+   padding: 0;
+   border-style: none;
+}
+
+.data-picker .data-picker-tree,
+.data-picker .data-picker-list
+{
+   height: 20em;   
+   padding: 0;
+   border-style: none;
+   background-color: #FFFFFF;
+   float: left;
+}
+
+.data-picker div.bdft
+{
+   clear: both;
+}
+
+.data-picker .data-picker-tree
+{
+   padding-left: 0.5em;
+   padding-right: 0.5em;
+   border-right: 1px solid #C4C5C5;
+   width: 18.9em;
+   overflow: auto;
+}
+
+.data-picker .data-picker-list
+{
+   overflow: auto;
+}
+
+.data-picker .data-picker-list table
+{
+   width: 30em;
+   border: none;
+}
+
+.data-picker .data-picker-list table td,
+.data-picker .data-picker-list table th
+{
+   border-right-style: none;
+}

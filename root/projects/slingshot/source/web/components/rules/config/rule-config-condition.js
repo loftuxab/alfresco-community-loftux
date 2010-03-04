@@ -82,6 +82,19 @@
          properties: [],
 
          /**
+          * The transient properties's types to add to "special" properties.
+          *
+          * @property transientPropertyTypes
+          * @type array
+          * @default {}
+          */
+         transientPropertyTypes: {
+            "SIZE" : "d:long",
+            "ENCODING" : "d:any",
+            "MIME_TYPE" : "d:any"
+         },
+
+         /**
           * The constraints for comparing properties contains all evaluator, regardless of what property type
           * they are applicable to. This map specifies which types an evaluator is valid for.
           *
@@ -116,6 +129,158 @@
 
 
       /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.BlogPostEdit} returns 'this' for method chaining
+       * @override
+       */
+      setOptions: function BlogPostEdit_setOptions(obj)
+      {
+         if (YAHOO.lang.isArray(obj.properties))
+         {
+            for (var i = 0, il = obj.properties.length; i < il; i++)
+            {
+               obj.properties[i] = this._handleTransientProperty(obj.properties[i]);
+            }
+         }
+         return Alfresco.RuleConfigCondition.superclass.setOptions.call(this, obj);
+      },
+
+
+      /**
+       * Displays ruleConfig rows as described in ruleConfigs.
+       * See parent class for more information.
+       *
+       * We override since we need to load all property info before we display the rule configs
+       *
+       * @method displayRuleConfigs
+       * @param ruleConfigs {array} An array of rule configurations
+       * @override
+       */
+      displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
+      {
+         // Find out which properties to load
+         var ruleConfig,
+            propertyName,
+            contentPropertyName,
+            properties = this.options.properties,
+            propertiesToLoad = [],
+            propertyInstructions = {},
+            foundProperty,
+            foundContentProperty;
+         for (var i = 0, il = (ruleConfigs ? ruleConfigs.length : 0); i < il; i++)
+         {
+            ruleConfig = ruleConfigs[i];
+            if (this._isComparePropertyDefinition(ruleConfig[this.options.ruleConfigDefinitionKey]) &&
+               ruleConfig.parameterValues)
+            {
+               // Get the property name and content proeprty name
+               propertyName = ruleConfig.parameterValues["property"];
+               if (ruleConfig.parameterValues["content-property"])
+               {
+                  contentPropertyName = propertyName + "." + ruleConfig.parameterValues["content-property"];
+               }
+               else
+               {
+                  contentPropertyName = null;
+               }
+
+               // See if we already have the property in this.options.properties
+               foundProperty = false;
+               foundContentProperty = false;
+               for (var j = 0, jl = properties.length; j < jl; j++)
+               {
+                  if (properties[j].name == propertyName)
+                  {
+                     foundProperty = true;
+                  }
+                  if (properties[j].name == contentPropertyName)
+                  {
+                     foundContentProperty = true;
+                  }
+               }
+               if (foundContentProperty || (!contentPropertyName && foundProperty))
+               {
+                  // ...yes we had it, don't load it again
+               }
+               else
+               {
+                  // ... we did NOT have the property, make sure we load it
+                  propertiesToLoad.push(propertyName);
+                  var instructions = propertyInstructions[propertyName];
+                  if (!instructions)
+                  {
+                     instructions = [];
+                     propertyInstructions[propertyName] = instructions;
+                  }
+                  
+                  /**
+                   * We can only load "Normal" proeprties, therefore save instructions so we can create a
+                   * content proeprty based on the normal property after load
+                   */
+                  instructions.push(contentPropertyName ? contentPropertyName : propertyName);
+               }
+            }
+         }
+         if (propertiesToLoad.length == 0)
+         {
+            // No proeprties shall be loaded, call super class directly
+            Alfresco.RuleConfigCondition.superclass.displayRuleConfigs.call(this, ruleConfigs);
+         }
+         else
+         {
+            // Load properties and call super class afterwards
+            Alfresco.util.Ajax.jsonGet(
+            {
+               url: Alfresco.constants.PROXY_URI_RELATIVE + "api/properties?name=" + propertiesToLoad.join("&name="),
+               successCallback:
+               {
+                  fn: function(response, propertyInstructions)
+                  {
+                     var newProperties = response.json,
+                        newProperty,
+                        instructions,
+                        p;
+                     for (var pi = 0, pil = newProperties.length; pi < pil; pi++)
+                     {
+                        newProperty = newProperties[pi];
+                        instructions = propertyInstructions[newProperty.name];
+                        for (var ii = 0, iil = instructions.length; ii < iil; ii++)
+                        {
+                           /**
+                            * Add the new property and marked it as hidden so itjust turns up in menues where
+                            * its the actual value when the config row is added
+                            */
+                           p = Alfresco.util.deepCopy(newProperty);
+                           p._hidden = true;
+                           if (instructions[ii] != p.name)
+                           {
+                              // This is a content property make sure it is treated as one
+                              p.name = instructions[ii];
+                              p = this._handleTransientProperty(p);
+                           }
+                           this.options.properties.push(p);
+                        }
+                     }
+
+                     // Re create the menu template
+                     this.widgets.selectTemplateEl = this._createSelectMenu();
+
+                     // Finally call super class since we now have the proeprty info we need
+                     Alfresco.RuleConfigCondition.superclass.displayRuleConfigs.call(this, ruleConfigs);
+                  },
+                  obj: propertyInstructions,
+                  scope: this
+               },
+               failureMessage: this.msg("message.getPropertiesFailure")
+            });
+         }
+
+      },
+
+      /**
        * Called when the user changed what properties to display in the "Show more..." dialog (aka rules picker) 
        *
        * @method onReady
@@ -128,16 +293,12 @@
          var values = args[1];
          if (values)
          {
-            var newProperty = {
-               id: values.property.id,
-               type: values.property.type,
-               displayLabel: values.property.label
-            };
+            var newProperty = this._handleTransientProperty(values.property.item);
             var show = values.state == Alfresco.module.RulesPropertyPicker.PROPERTY_SHOW;
             for (var i = 0, il = this.options.properties.length, property; i < il; i++)
             {
                property = this.options.properties[i];
-               if (property.id == newProperty.id)
+               if (property.name == newProperty.name)
                {
                   // The propery was found; add or remove it after loop
                   property._hidden = !show;
@@ -162,7 +323,7 @@
                for (var oi = 0, oil = selectEl.options.length, option; oi < oil; oi++)
                {
                   option = selectEl.options[oi];
-                  if (this._isComparePropertyDefinition(option.value) && option.getAttribute("rel") == "property_" + newProperty.id)
+                  if (this._isComparePropertyDefinition(option.value) && option.getAttribute("rel") == "property_" + newProperty.name)
                   {
                      if (!option.selected)
                      {
@@ -205,7 +366,7 @@
        * @method _getConfigItems
        * @param itemType
        * @param itemPatternObject
-       * @param displayHiddenPropertyId {object} Custom parameter
+       * @param displayHiddenPropertyName {object} Custom parameter
        * @return {array} Menu item objects (as described below) representing a config (or item)
        *                 matching all attributes in itemPatternObject.
        * {
@@ -215,7 +376,7 @@
        * }
        * @override
        */
-      _getConfigItems: function RuleConfigCondition__getConfigItems(itemType, itemPatternObject, displayHiddenPropertyId)
+      _getConfigItems: function RuleConfigCondition__getConfigItems(itemType, itemPatternObject, displayHiddenPropertyName)
       {
          if (itemType == "property")
          {
@@ -223,7 +384,7 @@
             for (var ci = 0, cil = this.options.properties.length, property; ci < cil; ci++)
             {
                property = this.options.properties[ci];
-               if (!property._hidden || displayHiddenPropertyId)
+               if (!property._hidden || displayHiddenPropertyName)
                {
                   if (Alfresco.util.objectMatchesPattern(property, itemPatternObject))
                   {
@@ -263,9 +424,9 @@
                filteredValues = [];
             for (var i = 0, il = this.options.properties.length; i < il; i++)
             {
-               if (this.options.properties[i].id == propertyName)
+               if (this.options.properties[i].name == propertyName)
                {
-                  propertyType = this.options.properties[i].type;
+                  propertyType = this.options.properties[i].dataType;
                   break;
                }
             }
@@ -303,10 +464,10 @@
       _createPropertyConfigDef: function RuleConfigCondition__createPropertyConfigDef(property)
       {
          var descriptor;
-         if (property.id.indexOf(".") > property.id.indexOf(":"))
+         if (property.name.indexOf(".") > property.name.indexOf(":"))
          {
             // This is a transient property, modify the type
-            if (property.id.split(".")[1] == "MIME_TYPE")
+            if (property.name.split(".")[1] == "MIME_TYPE")
             {
                // use the specific mime type comparator
                descriptor = Alfresco.util.deepCopy(this.options.compareMimeTypeDefinition);
@@ -322,27 +483,72 @@
             this._getParamDef(descriptor, "operation").displayLabel = "";
             this._getParamDef(descriptor, "operation").isMandatory = true;
             this._getParamDef(descriptor, "value").displayLabel = "";
-            this._getParamDef(descriptor, "value").type = property.type;
+            this._getParamDef(descriptor, "value").type = property.dataType;
             descriptor.parameterDefinitions.reverse();
          }
 
          var propertyConfigDef = {
             id: descriptor.name,
-            type: "property_" + property.id,
-            label: property.displayLabel,
+            type: "property_" + property.name,
+            label: property.title ? property.title : property.name,
             descriptor: descriptor
          };
-         return  propertyConfigDef;
+         return propertyConfigDef;
       },
+
+
+      /**
+       * Creates a config row with the parameters and the parameter values.
+       * Will make sure to create a new selectEl if a proeprty is about to be displayed and
+       * that property is marked as hidden.
+       *
+       * @method _createConfigUI
+       * @param p_oRuleConfig {object} Rule config descriptor object
+       * @param p_oSelectEl {HTMLSelectElement} (Optional) Will clone the selectTemaplteEl if not provided
+       * @param p_eRelativeConfigEl {object} (Optional) will be placed in the end of omitted
+       * @return {HTMLElement} The config row
+       * @override
+       */
+      _createConfigUI: function RuleConfig__createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
+      {
+         var configDefinitionName = p_oRuleConfig[this.options.ruleConfigDefinitionKey];
+         if (this._isComparePropertyDefinition(configDefinitionName) && !p_oSelectEl)
+         {
+            var isHidden = false,
+               properties = this.options.properties,
+               property,
+               propertyName = p_oRuleConfig.parameterValues["property"],
+               contentPropertyName = p_oRuleConfig.parameterValues["content-property"];
+            propertyName += contentPropertyName ? "." + contentPropertyName : "";
+            for (var i = 0, il = properties.length; i < il; i++)
+            {
+               property = properties[i];
+               if (property.name == propertyName)
+               {
+                  isHidden = property._hidden;
+                  break;
+               }
+            }
+            if (isHidden)
+            {
+               p_oSelectEl = this._createSelectMenu(property);
+            }
+            else
+            {
+               // Do nothing super class will clone selectTemplateEl if attribute isn't defined
+            }
+         }
+         return Alfresco.RuleConfigCondition.superclass._createConfigUI.call(this, p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl);
+      },            
 
       /**
        * @method _createRuleConfig
-       * @param propertyId {string}
+       * @param propertyName {string}
        * @return {object} A ruleConfig based on info from property
        */
-      _createRuleConfig: function RuleConfigCondition__createRuleConfig(propertyId)
+      _createRuleConfig: function RuleConfigCondition__createRuleConfig(propertyName)
       {
-         var propertyTokens = propertyId.split("."),
+         var propertyTokens = propertyName.split("."),
             property = propertyTokens[0],
             contentProperty = propertyTokens.length > 1 ? propertyTokens[1] : null;
          var ruleConfig = {
@@ -399,8 +605,8 @@
          if (this._isComparePropertyDefinition(optionEl.value))
          {
             // Don't call super class since we want to invoke _createConfigParameterUI our selves
-            var propertyId = optionEl.getAttribute("rel").substring("property".length + 1),
-               ruleConfig = this._createRuleConfig(propertyId);
+            var propertyName = optionEl.getAttribute("rel").substring("property".length + 1),
+               ruleConfig = this._createRuleConfig(propertyName);
             this._createConfigParameterUI(ruleConfig, p_eConfigEl);
          }
          else
@@ -417,16 +623,16 @@
        * normal menu item type (property) with the specific property name.
        *
        *
-       * @method _createConfigUI
+       * @method _createConfigNameUI
        * @param p_oRuleConfig {object} Rule config descriptor object
        * @param p_oSelectEl {HTMLSelectElement} The select menu to clone and display
        * @param p_eRelativeConfigEl {object}
        * @override
        */
-      _createConfigUI: function RuleConfigCondition__createConfigUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
+      _createConfigNameUI: function RuleConfigCondition__createConfigNameUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
       {
          // Super class will handle item & conditions....
-         var configEl = Alfresco.RuleConfigCondition.superclass._createConfigUI.call(this, p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl);
+         var configEl = Alfresco.RuleConfigCondition.superclass._createConfigNameUI.call(this, p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl);
 
          // ... but if it is a property we need to re-select the config type to select the specific property
          var configDefinitionName = p_oRuleConfig[this.options.ruleConfigDefinitionKey];
@@ -447,26 +653,32 @@
 
       /**
        * @method _selectConfigName
-       * @param selectEl {HTMLSelectElement} The select element
-       * @param configDefName {string} The
-       * @param relPropertyName {string} The string "property_" concatenated with the property name/id taken from the data dictionary
+       * @param p_oSelectEl {HTMLSelectElement} The select element
+       * @param p_sConfigDefName {string} The
+       * @param p_sRelPropertyName {string} The string "property_" concatenated with the property name/id taken from the data dictionary
        * @private
        */
-      _selectConfigName: function RuleConfigCondition__selectConfigName(selectEl, configDefName, relPropertyName)
+      _selectConfigName: function RuleConfigCondition__selectConfigName(p_oSelectEl, p_sConfigDefName, p_sRelPropertyName)
       {
-         for (var adi = 0, adil = selectEl.options.length; adi < adil; adi++)
+         for (var adi = 0, adil = p_oSelectEl.options.length; adi < adil; adi++)
          {
-            if (selectEl.options[adi].value == configDefName &&
-               (!relPropertyName || selectEl.options[adi].getAttribute("rel") == relPropertyName))
+            if (p_oSelectEl.options[adi].value == p_sConfigDefName &&
+               (!p_sRelPropertyName || p_oSelectEl.options[adi].getAttribute("rel") == p_sRelPropertyName))
             {
-               selectEl.selectedIndex = adi;
+               p_oSelectEl.selectedIndex = adi;
+               if (this.options.mode == Alfresco.RuleConfig.MODE_TEXT)
+               {
+                  // Update the label since we are in text mode
+                  var nameEl = p_oSelectEl.parentNode.getElementsByTagName("span")[0];;
+                  nameEl.innerHTML = $html(p_oSelectEl.options[p_oSelectEl.selectedIndex].text);
+               }
                break;
             };
          }
          // Nothing was selected, select the first option instead
          if (adi == adil)
          {
-            selectEl.selectedIndex = 0;
+            p_oSelectEl.selectedIndex = 0;
          }
       },
 
@@ -494,6 +706,21 @@
       {
          return (configDefinitionName == this.options.comparePropertyValueDefinition.name ||
                   configDefinitionName == this.options.compareMimeTypeDefinition.name);
+      },
+
+      /**
+       * @method _handleTransientProperty
+       * @param property {string} The property to modify if its a transient property
+       * @private
+       */
+      _handleTransientProperty: function RuleConfigCondition__handleTransientProperty(property)
+      {
+         var propertyNameTokens = property.name.split(".");
+         if (propertyNameTokens.length > 1)
+         {
+            property.dataType = this.options.transientPropertyTypes[propertyNameTokens[1]];
+         }
+         return property;
       },
 
       /**
@@ -571,58 +798,48 @@
                {
                   this.widgets.showMoreDialog = new Alfresco.module.RulesPropertyPicker(this.id + "-showMoreDialog");
 
-                  YAHOO.Bubbling.on("propertiesSelected", function (layer, args)
+                  YAHOO.Bubbling.on("dataItemSelected", function (layer, args)
                   {
                      if ($hasEventInterest(this.widgets.showMoreDialog, args))
                      {
                         // Add property to this menu
-                        var property = args[1].selectedProperty;
+                        var properties = this.options.properties,
+                           property = this._handleTransientProperty(args[1].selectedItem.item);
+                        property._hidden = true;
 
-                        property = {
-                           id: property.id,
-                           type: property.type,
-                           displayLabel: property.label,
-                           _hidden: true
-                        };
-
-                        if (property)
+                        for (var i = 0, il = properties.length; i < il; i++)
                         {
-                           // Add property to list of properties if its a new one
-                           var properties = this.options.properties;
-                           for (var i = 0, il = properties.length; i < il; i++)
+                           if (properties[i].name == property.name)
                            {
-                              if (properties[i].id == property.id)
-                              {                                 
-                                 break;
-                              }
+                              break;
                            }
-                           if (i == il)
-                           {
-                              // Its a new property, add it
-                              properties.push(property);
-                           }
-
-                           /**
-                            * Create a new select drop down, based on the current/temporary properties so it becomes
-                            * specific for this config row
-                            */
-                           var configEl = this.customisations.ShowMore.currentCtx.configEl,
-                              newSelectEl = this._createSelectMenu(property.id),
-                              selectEl = Selector.query('select', configEl)[0];
-
-                           // Since we have created a new select menu, the history of previous selections must taken from the old menu
-                           this.previousConfigNameSelections[Alfresco.util.generateDomId(newSelectEl)] = this.previousConfigNameSelections[selectEl.getAttribute("id")];
-
-                           // Create a ruleConfig and replace the current configEl and with a new one based on ruleConfig
-                           var ruleConfig = this._createRuleConfig(property.id);
-                           var newConfigEl = this._createConfigUI(ruleConfig, newSelectEl, configEl);
-                           this.customisations.ShowMore.currentCtx.configEl = newConfigEl;
-                           configEl.parentNode.removeChild(configEl);
-                           this._createConfigParameterUI(ruleConfig, newConfigEl);
                         }
+                        if (i == il)
+                        {
+                           // Its a new property, add it
+                           properties.push(property);
+                        }
+
+                        /**
+                         * Create a new select drop down, based on the current/temporary properties so it becomes
+                         * specific for this config row
+                         */
+                        var configEl = this.customisations.ShowMore.currentCtx.configEl,
+                           newSelectEl = this._createSelectMenu(property.name),
+                           selectEl = Selector.query('select', configEl)[0];
+
+                        // Since we have created a new select menu, the history of previous selections must taken from the old menu
+                        this.previousConfigNameSelections[Alfresco.util.generateDomId(newSelectEl)] = this.previousConfigNameSelections[selectEl.getAttribute("id")];
+
+                        // Create a ruleConfig and replace the current configEl and with a new one based on ruleConfig
+                        var ruleConfig = this._createRuleConfig(property.name);
+                        var newConfigEl = this._createConfigNameUI(ruleConfig, newSelectEl, configEl);
+                        this.customisations.ShowMore.currentCtx.configEl = newConfigEl;
+                        configEl.parentNode.removeChild(configEl);
+                        this._createConfigParameterUI(ruleConfig, newConfigEl);
                      }
                   }, this);
-                  YAHOO.Bubbling.on("propertySelectionCancelled", function (layer, args)
+                  YAHOO.Bubbling.on("dataItemSelectionCancelled", function (layer, args)
                   {
                      if ($hasEventInterest(this.widgets.showMoreDialog, args))
                      {
