@@ -132,7 +132,8 @@
                nodeRef: this.options.nodeRef.toString(),
                location:
                {
-                  path: this.options.folder.path
+                  path: this.options.folder.path,
+                  file: this.options.folder.name
                },
                fileName: this.options.folder.name,
                type: "folder"

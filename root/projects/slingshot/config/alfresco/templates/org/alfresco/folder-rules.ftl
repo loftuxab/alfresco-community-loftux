@@ -39,13 +39,15 @@
    {
       nodeRef: new Alfresco.util.NodeRef("${url.args.nodeRef}"),
       siteId: "${page.url.templateArgs.site!""}",
-      folder: {
+      folder:
+      {
          nodeRef: "${folder.nodeRef}",
          site: "${folder.site}", 
          name: "${folder.name}",
          path: "${folder.path}"
       },
-      ruleset: {
+      ruleset:
+      {
          rules: <#if ruleset.rules??>[<#list ruleset.rules as rule>
             {
                id: "${rule.id}",
@@ -79,7 +81,8 @@
          ]<#else>null</#if>,
          linkedToRuleSet: <#if ruleset.linkedToRuleSet??>"${ruleset.linkedToRuleSet}"<#else>null</#if>
       },
-      linkedToFolder: <#if linkedToFolder??>{
+      linkedToFolder: <#if linkedToFolder??>
+      {
          nodeRef: "${linkedToFolder.nodeRef}",
          site: "${linkedToFolder.site}",
          name: "${linkedToFolder.name}",
