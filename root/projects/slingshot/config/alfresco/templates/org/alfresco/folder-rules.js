@@ -35,12 +35,13 @@ function loadDisplayInfo(connector, nodeRef)
    if (result.status == 200)
    {
       var location = eval('(' + result + ')').item.location;
-      return {
+      return (
+      {
          nodeRef: nodeRef,
          site: location.site, 
          name: location.file,
          path: location.path
-      };
+      });
    }
    return null;
 }
