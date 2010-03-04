@@ -1666,7 +1666,7 @@
       <mkdir dir="${dir.project.webeditor.assemble.jar}" />
       <copy todir="${dir.project.webeditor.assemble.jar}">
          <fileset dir="${dir.project.webeditor.classes}" 
-                  excludes="org/alfresco/web/awe/**, org/customer/**" />
+                  includes="org/alfresco/web/site/**" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" 
                   includes="org/alfresco/web/scripts/servlet/**" />
       </copy>
@@ -1759,11 +1759,15 @@
            basedir="${dir.project.webeditor.assemble.plugin}" />
    </target>
    
-   <target name="assemble-webeditor-plugin-jar" depends="init">
+   <target name="assemble-webeditor-plugin-jar" depends="compile-webeditor">
       <mkdir dir="${dir.project.webeditor.assemble.plugin}" />
+      <copy todir="${dir.project.webeditor.assemble.plugin}">
+         <fileset dir="${dir.project.webeditor.classes}" includes="org/alfresco/web/scripts/**" />
+      </copy>
       <copy todir="${dir.project.webeditor.assemble.plugin}">
          <fileset dir="${dir.project.webeditor.config}">
             <include name="alfresco/awe-form-config.xml" />
+            <include name="alfresco/surf-bootstrap-context.xml" />
             <include name="alfresco/messages/awe.properties" />
             <include name="alfresco/site-data/components/**" />
             <include name="alfresco/site-data/page-types/**" />

@@ -28,11 +28,4 @@
    <!-- "no-component" processor -->
    <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
    
-   <!--                             -->
-   <!--  Web Script Implementations -->
-   <!--                             -->
-   
-   <!--  I18N resources and messages Web Script -->
-   <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" />
-   
 </beans>
