@@ -80,7 +80,7 @@
 
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .hd.wef-ribbon-module
 {
-   width:11em;
+   width:133px;
 }
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module
 {
@@ -89,10 +89,11 @@
    position:absolute;
    top:0;
    right:0;
+   height:2em;
 }
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .bd.wef-ribbon-module
 {
-   width:91.3%;
+   width:auto;
 }
 #wef-ribbon-container .yui-toolbar-container
 {

@@ -1,3 +1,22 @@
+/**
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
+ *
+ * This file is part of Alfresco
+ *
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 (function() {
     
    var Dom = YAHOO.util.Dom,
@@ -60,6 +79,7 @@
          Event.addListener(window, "resize", function WEF_UI_Ribbon_onResize()
          {
             this.set('position', this.get('position'));
+            this.resizeRibbon();
          }, this, true);
       },
       
@@ -84,7 +104,6 @@
          if (YAHOO.env.ua.ie && YAHOO.env.ua.ie < 7) {
             panelConfig.fixedCenter = true;
          }
-         
          var ribbon = this.widgets.ribbon = new YAHOO.widget.Panel(this.config.id, panelConfig);
          // override panel.center() so that ribbon is redrawn on page scroll
          // at top of viewport.
@@ -104,16 +123,17 @@
          var container = this.widgets.ribbonContainer = new Element(ribbon.element.parentNode);
          container.addClass('wef-ribbon-orientation-' + this.get('position'));
          Dom.addClass([ribbon.header, ribbon.body, ribbon.footer], 'wef-ribbon-module');
-
+         //set correct width  
+         this.resizeRibbon()
+         
          //get ribbon position from cookie if available otherwise reset to initial config value
          this.set('position', YAHOO.org.wef.getCookieValue(this.config.name,'ribbon-position') || this.get('position'));
          ribbon.render();
          var name = 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'Toolbar';
-
          this.addToolbar(
             YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
             {
-               id:  YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,//'wef-toolbar-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
+               id:  YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
                name: name,
                element: 'wef-toolbar-container',
                toolbars: [ //really tabs
@@ -127,7 +147,6 @@
             },
             YAHOO.org.wef.ui.TabbedToolbar
          );
-
          name = 'WEF-Ribbon'+YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR+'Toolbar';
          this.addToolbar(
             YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR,
@@ -174,10 +193,21 @@
             YAHOO.org.wef.ui.Toolbar
          );
          // Refresh any attributes here
-         
          Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
          Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
       },
+      
+      resizeRibbon: function WEF_UI_Ribbon_resizeRibbon()
+      {
+        var newWidth = Dom.getRegion(this.widgets.ribbonContainer).width-parseInt(Dom.getStyle(this.widgets.ribbonHeader,'width'),10);
+        if (!YAHOO.env.ua.ie)
+        {
+           newWidth+=2;
+        }
+        
+        this.widgets.ribbonBody.setStyle('width', newWidth+'px'); 
+      },
+      
       
       getToolbar: function WEF_UI_Ribbon_getToolbar(toolbarId)
       {
@@ -212,13 +242,6 @@
          {
             throw new Error('Unable to add toolbar of specified type')
          }
-         
-         // destroy existing toolbar first if not primary
-         /*if (id != YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR && this.widgets.toolbars[id])
-         {
-            this.widgets.toolbars[id].destroy();
-            delete this.widgets.toolbars[id];
-         }*/
          //add primary/secondary toolbars
          if (id === YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR | id === YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR)
          {
@@ -233,7 +256,7 @@
          }
          this.widgets.toolbars.push(tbar)
          this.widgets.toolbars[id] = tbar;
-         tbar.init();
+         tbar.init();   
          tbar.render();
          /*
          tbar = this.widgets.toolbars[location] = new YAHOO.widget.Toolbar(toolbarContainer.appendChild(document.createElement('div')), config);

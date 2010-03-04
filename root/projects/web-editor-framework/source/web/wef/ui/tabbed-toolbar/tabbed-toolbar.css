@@ -3,11 +3,13 @@
    position:relative;
    top:-1px;
 }
+
 #wef-ribbon .wef-tab-toolbar .yui-navset .yui-nav
 {
    border-color: #93acbd;
    border-width: 0 0 1px;
 }
+
 #wef-ribbon .wef-tab-toolbar .yui-nav a,
 #wef-ribbon .wef-tab-toolbar .yui-nav a em
 {
@@ -21,8 +23,9 @@
 }
 #wef-ribbon .wef-tab-toolbar div.yui-content
 {
-   background:url(./images/tab-bg.gif) repeat scroll 0 0;
+   background:#fff url(./images/tab-bg.gif) repeat scroll 0 0;
    border-width:0 1px;
+   height:44px
 }
 #wef-ribbon .wef-tab-toolbar div.wef-toolbar
 {
