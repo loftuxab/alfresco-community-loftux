@@ -63,6 +63,13 @@ public interface WEFResource
     public String getVariableName();
     
     /**
+     * Returns the user agent
+     * 
+     * @return The user agent
+     */
+    public String getUserAgent();
+    
+    /**
      * Returns the resource container.
      * 
      * @return The container

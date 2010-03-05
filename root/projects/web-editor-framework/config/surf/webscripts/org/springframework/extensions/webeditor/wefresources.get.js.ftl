@@ -6,7 +6,8 @@
    type: "${resource.type?html}",
    path: "${url.context}<@path />"<#if resource.dependencies?size &gt; 0>,
    requires: [<#list resource.dependencies as dependency>"${dependency.name?html}"<#if dependency_has_next>,</#if></#list>]</#if><#if resource.variableName??>,
-   varName: "${resource.variableName?html}"</#if>
+   varName: "${resource.variableName?html}"</#if><#if resource.userAgent??>,
+   userAgent: "${resource.userAgent?html}"</#if>
 }
 </#escape>
 </#macro>
