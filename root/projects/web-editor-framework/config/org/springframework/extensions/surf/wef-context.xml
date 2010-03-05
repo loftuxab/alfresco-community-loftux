@@ -89,6 +89,7 @@
       <property name="description" value="IE specific CSS file for the ribbon component" />
       <property name="path" value="/res/wef/ui/ribbon/ribbon-ie.css" />
       <property name="type" value="css" />
+      <property name="userAgent" value="IE" />
    </bean>
    
    <bean id="wefTabbedToolbar" class="org.springframework.extensions.webeditor.WEFResourceImpl">

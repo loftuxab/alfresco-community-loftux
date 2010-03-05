@@ -34,6 +34,7 @@ public class WEFResourceImpl implements WEFResource
     protected String type;
     protected String description;
     protected String variableName;
+    protected String userAgent;
     protected String container;
     protected List<WEFResource> dependencies;
 
@@ -128,6 +129,24 @@ public class WEFResourceImpl implements WEFResource
     }
 
     /*
+     * @see org.springframework.extensions.webeditor.WEFResource#getUserAgent()
+     */
+    public String getUserAgent()
+    {
+        return this.userAgent;
+    }
+
+    /**
+     * Sets the user agent.
+     * 
+     * @param userAgent The user agent
+     */
+    public void setUserAgent(String userAgent)
+    {
+        this.userAgent = userAgent;
+    }
+
+    /*
      * @see org.alfresco.wef.WEFResource#getDependencies()
      */
     public List<WEFResource> getDependencies()
@@ -185,6 +204,8 @@ public class WEFResourceImpl implements WEFResource
         builder.append(this.description);
         builder.append(", variableName: ");
         builder.append(this.variableName);
+        builder.append(", userAgent: ");
+        builder.append(this.userAgent);
         builder.append(", container: ");
         builder.append(this.container);
         builder.append(", dependencies: ");
