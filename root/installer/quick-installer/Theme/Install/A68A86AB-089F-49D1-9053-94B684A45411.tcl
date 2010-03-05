@@ -1,6 +1,4 @@
-proc CreateWindow.AAD9798A-56FA-4C12-882C-DD66829420CE {wizard id} {
-   
-    
+proc CreateWindow.A68A86AB-089F-49D1-9053-94B684A45411 {wizard id} {
     set base  [$wizard widget get $id]
     set frame $base.titleframe
 
@@ -33,17 +31,8 @@ proc CreateWindow.AAD9798A-56FA-4C12-882C-DD66829420CE {wizard id} {
     $id widget set Caption -widget $base.caption
 
     frame $base.clientarea
-    grid  $base.clientarea -row 3 -sticky w -padx 8 -pady 20
+    grid  $base.clientarea -row 3 -sticky nsew -padx 8 -pady 4
     $id widget set ClientArea -widget $base.clientarea -type frame
-
-    grid rowconfigure    $base.clientarea 6 -weight 1
-    grid columnconfigure $base.clientarea 2 -weight 1
-
-    ttk::label $base.clientarea.label2 -text "Root Password:" -justify right
-    grid $base.clientarea.label2 -row 1 -column 0 -sticky e
-
-    ttk::entry $base.clientarea.entry2 -textvariable ::info(DB_ROOTPASS) -show "*"
-    grid $base.clientarea.entry2 -row 1 -column 1 -sticky e
 
     ttk::label $base.clientarea.label3 -text "Server:" -justify right
     grid $base.clientarea.label3 -row 2 -column 0 -sticky e
@@ -62,7 +51,7 @@ proc CreateWindow.AAD9798A-56FA-4C12-882C-DD66829420CE {wizard id} {
 
     ttk::entry $base.clientarea.entry5 -textvariable ::info(DB_NAME)
     grid $base.clientarea.entry5 -row 4 -column 1 -sticky e
-
+    
     ttk::label $base.clientarea.label7 -text "Database user:" -justify right
     grid $base.clientarea.label7 -row 5 -column 0 -sticky e
 

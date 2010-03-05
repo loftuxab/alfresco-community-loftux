@@ -62,7 +62,7 @@
 
    <target name="distribute" 
            description="Creates the distribution files for all platforms"
-           depends="set-build-number, 
+           depends="set-build-number,
                     incremental, 
                     distribute-mmt,
                     distribute-bm-remote,
@@ -365,9 +365,6 @@
       <mkdir dir="${dir.installer.quick}/output" />
       <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
-      </exec>
-      <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
       <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Linux-x86 -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
