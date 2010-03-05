@@ -50,3 +50,19 @@
    background:none;
    border:0;
 }
+
+.js-disabled-form .form-field input
+{
+   width: 50em;
+}
+
+.js-disabled-form .form-field textarea
+{
+   width: 50em;
+}
+
+.js-disabled-form .form-buttons input
+{
+   width: auto;
+}
+

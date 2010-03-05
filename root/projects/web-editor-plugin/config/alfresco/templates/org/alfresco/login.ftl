@@ -1,7 +1,6 @@
 <#include "include/awe.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/login/login.css" />
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/login.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/awe/ui/panel/login.css" />
 </@>
 <@templateBody>
    <div id="awe-login-wrapper">

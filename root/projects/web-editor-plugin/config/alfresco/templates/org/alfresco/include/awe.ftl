@@ -56,49 +56,41 @@
    <link rel="icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" />
 
 <!-- Site-wide YUI Assets -->
-   <@link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
-   <#if theme = 'default'>
-      <@link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/default/skin.css" />
-   <#else>
-      <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/yui/assets/skin.css" />   
-   </#if>
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/yui/reset-fonts-grids/reset-fonts-grids.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/yui/assets/skins/sam/skin.css" />
 <#-- Selected components preloaded here for better UI experience. -->
 <#if DEBUG>
 <!-- log4javascript -->
-   <script type="text/javascript" src="${url.context}/js/log4javascript.v1.4.1.js"></script>
+   <script type="text/javascript" src="${url.context}/res/js/log4javascript.v1.4.1.js"></script>
 <!-- Common YUI components: DEBUG -->
-   <script type="text/javascript" src="${url.context}/yui/yahoo/yahoo-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/event/event-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/dom/dom-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/dragdrop/dragdrop-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/animation/animation-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/logger/logger-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/connection/connection-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/element/element-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/get/get-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/yuiloader/yuiloader-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/button/button-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/container/container-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/menu/menu-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/json/json-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/selector/selector-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/yahoo/yahoo-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/event/event-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/dom/dom-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/dragdrop/dragdrop-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/animation/animation-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/logger/logger-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/connection/connection-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/element/element-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/get/get-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/yuiloader/yuiloader-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/button/button-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/container/container-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/menu/menu-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/json/json-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/selector/selector-debug.js"></script>
 <#else>
 <!-- Common YUI components: RELEASE -->
-   <script type="text/javascript" src="${url.context}/yui/utilities/utilities.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/button/button-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/container/container-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/menu/menu-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/json/json-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/selector/selector-min.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/utilities/utilities.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/button/button-min.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/container/container-min.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/menu/menu-min.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/json/json-min.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/selector/selector-min.js"></script>
 </#if>
-<!-- YUI Patches -->
-   <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
 
 <!-- Site-wide Common Assets -->
-   <@link rel="stylesheet" type="text/css" href="${url.context}/css/base.css" />  
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/awe.css" />
-   <@script type="text/javascript" src="${url.context}/js/bubbling.v2.1.js"></@script>
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/awe/awe.css" />  
+   <@script type="text/javascript" src="${url.context}/res/js/bubbling.v2.1.js"></@script>
    <#-- NOTE: Do not attempt to load -min.js version of messages.js -->
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
    <script type="text/javascript">//<![CDATA[
@@ -114,8 +106,8 @@
       Alfresco.constants.USERNAME = "${user.name!""}";
       Alfresco.constants.HTML_EDITOR = "tinyMCE";
    //]]></script>
-   <@script type="text/javascript" src="${url.context}/js/alfresco.js"></@script>
-   <@script type="text/javascript" src="${url.context}/js/forms-runtime.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/alfresco.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/forms-runtime.js"></@script>
 
 <!-- Template Assets -->
 <#nested>
@@ -124,9 +116,6 @@
 <!-- Component Assets -->
 ${head}
 
-<!-- MSIE CSS fix overrides -->
-   <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie6.css" /><![endif]-->
-   <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie7.css" /><![endif]-->
 </head>
 </#macro>
 
@@ -138,9 +127,9 @@ ${head}
 <#macro templateHtmlEditorAssets>
 <!-- HTML Editor Assets -->
    <#-- NOTE: Do not attempt to load -min.js version of tiny_mce/tiny_mce.js -->
-   <script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce/tiny_mce.js"></script>
-   <@script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce.js"></@script>
-   <@script type="text/javascript" src="${page.url.context}/modules/editors/yui_editor.js"></@script>
+   <script type="text/javascript" src="${page.url.context}/res/modules/editors/tiny_mce/tiny_mce.js"></script>
+   <@script type="text/javascript" src="${page.url.context}/res/modules/editors/tiny_mce.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/res/modules/editors/yui_editor.js"></@script>
 </#macro>
 
 
