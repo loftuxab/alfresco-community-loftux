@@ -12,7 +12,7 @@ Alfresco.constants.DEBUG = ${debug};
 Alfresco.constants.AUTOLOGGING = ${debug};
 Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
 Alfresco.constants.PROXY_URI_RELATIVE = "${url.context}/proxy/alfresco/";
-Alfresco.constants.THEME = "default";
+Alfresco.constants.THEME = "sam";
 Alfresco.constants.URL_CONTEXT = "${url.context}/";
 Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
 Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
@@ -106,7 +106,7 @@ WEF.init(
       skin: 
       {
          base: "/assets/skins/",
-         defaultSkin: "default" 
+         defaultSkin: "sam" 
       }               
    }
 });

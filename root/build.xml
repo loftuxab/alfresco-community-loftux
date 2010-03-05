@@ -334,13 +334,16 @@
    
    <target name="incremental-webeditor-tomcat"
            description="Performs an incremental build and deployment of the Web Editor WAR"
-           depends="package-webframeworkcommons-jar,
-                    incremental-webeditor,
+           depends="package-webframeworkcommons,
+                    package-webeditor,
+                    package-webeditor-plugin,
+                    package-webeditor-framework,
                     deploy-webeditor-tomcat" />
 
    <target name="incremental-webeditor-tomcat-exploded"
-           depends="package-webframeworkcommons-jar,
-                    package-webeditor-jar,
+           depends="compile-webframeworkcommons,
+                    compile-webeditor,
+                    compile-webeditor-plugin,
                     compile-webeditor-framework,
                     deploy-webeditor-tomcat-exploded,
                     minimize-webeditor-deployed-javascript" />
@@ -403,7 +406,9 @@
               description="Cleans all projects related to the web editor project" 
               depends="clean-webframeworkcommons,
                        clean-webeditor-framework,
-                       clean-webeditor" />
+                       clean-webeditor-plugin,
+                       clean-webeditor,
+                       clean-webeditor-customersite-sample" />
                     
    <target name="clean-mobile-projects" 
            description="Cleans all projects related to the mobile project" 
@@ -446,6 +451,9 @@
               includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor}" />
       <delete dir="${dir.deploy.tomcat.application.webeditor}" 
+              includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample.customersite}" />
+      <delete dir="${dir.deploy.tomcat.application.webeditor.sample.customersite}" 
               includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.mobile}" />
       <delete dir="${dir.deploy.tomcat.application.mobile}" 
@@ -731,36 +739,28 @@
       <!-- remove the WAR, if necessary -->
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor}" />
       
-      <!-- copy all source files, ensuring web editor project files are copied first -->
+      <!-- copy all source files -->
       <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webeditor.src.web}" excludes="WEB-INF/awe.tld" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditorplugin.src.web}" />
          <fileset dir="${dir.projects}/web-editor-framework/source/web" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
-      <!-- copy config files, ensuring web editor project files are copied first -->
+      <!-- copy config files -->
       <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset file="${dir.project.webeditor.src.java}/log4j.properties" />
          <fileset dir="${dir.project.webeditor.config}" excludes="**/extension/**" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.projects}/web-editor-framework/config" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditorplugin.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.projects}/web-editor-framework/config" excludes="**/extension/**" />
          <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
       </copy>
       
-      <!-- add all class files to WEB-INF/classes, ensuring web editor project files are copied first -->
+      <!-- add all class files to WEB-INF/classes -->
       <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webeditor.classes}" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditorplugin.classes}" />
          <fileset dir="${dir.projects}/web-editor-framework/build/classes" includes="**/*.class" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.jlan.classes}" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" />
       </copy>
@@ -783,43 +783,32 @@
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
 
-      <!-- unzip and add 3rd party javascript library -->
-      <unzip src="${file.zip.slingshot.yui}"
-             dest="${dir.deploy.tomcat.application.webeditor}" />
-             
-      <!-- there seems to be a hidden __MACOSX folder in the YUI -->
-      <!-- distribution, remove it if present -->
-      <delete dir="${dir.deploy.tomcat.application.webeditor}/__MACOSX" 
-              includeEmptyDirs="true" quiet="yes" />
-
-      <!-- Copy our yui directory to apply YUI fixes -->
-      <copy todir="${dir.deploy.tomcat.application.webeditor}/yui" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webeditor.src.web}/yui" />
-      </copy>
-
+      <!-- unzip and add YUI library -->
+      <unzip src="${file.zip.webeditor.yui}" dest="${dir.deploy.tomcat.application.webeditor}" />
    </target>
    
-   <target name="deploy-webeditor-sample" depends="package-webeditor-sample-war">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample}" />
+   <target name="deploy-webeditor-sample" depends="package-webeditor-customersite-sample-war">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample.customersite}" />
       <copy todir="${dir.deploy.tomcat.application}" 
-            file="${dir.project.webeditor.dist}/${file.name.war.webeditor.sample}" />
+            file="${dir.project.webeditorsamples.customersite.dist}/${file.name.war.webeditor.sample.customersite}" />
    </target>
    
-   <target name="deploy-webeditor-sample-exploded" depends="package-webeditor-jar">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample}" />
-      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webeditor.src.sample}" />
+   <target name="deploy-webeditor-sample-exploded" depends="compile-webeditor">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample.customersite}" />
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample.customersite}" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditorsamples.customersite.src.web}" />
       </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}/WEB-INF" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample.customersite}/WEB-INF" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webeditor.src.webinf}" includes="awe.tld" />
       </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}/WEB-INF/lib" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample.customersite}/WEB-INF/lib" verbose="${copy.verbose}">
          <fileset dir="${dir.project.3rdparty}/lib/commons" 
                   includes="commons-httpclient-3.1.jar, commons-logging-1.1.jar, commons-codec-1.3.jar" />
          <fileset dir="${dir.project.3rdparty}/lib" includes="json.jar" />
       </copy>
-      <copy todir="${dir.deploy.tomcat.application.webeditor.sample}/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webeditor.classes}" includes="org/alfresco/web/awe/**/*.class, org/customer/**/*.class" />
+      <copy todir="${dir.deploy.tomcat.application.webeditor.sample.customersite}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webeditorsamples.customersite.classes}" />
+         <fileset dir="${dir.project.webeditor.classes}" includes="org/alfresco/web/awe/**/*.class" />
       </copy>
    </target>
 

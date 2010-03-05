@@ -426,7 +426,7 @@
                }
                if (body.className.indexOf('yui-skin')==-1)
                {
-                  Dom.addClass(body, 'yui-skin-default');
+                  Dom.addClass(body, 'yui-skin-sam');
                }
                Bubbling.fire('WEF'+y.org.wef.SEPARATOR+'afterRender');
                
