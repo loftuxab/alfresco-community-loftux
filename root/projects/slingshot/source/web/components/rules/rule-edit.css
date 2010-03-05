@@ -112,9 +112,9 @@
    display: inline;
 }
 
-.rule-edit .if .rule-config
+.rule-edit .unless .rule-config
 {
-   border-bottom: none;
+   border-top: none;
 }
 
 .rule-edit .configuration-separator

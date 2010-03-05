@@ -77,9 +77,10 @@ function getControlFields(type)
 function main()
 {
    // Input arguments
-   var type = args.type || page.url.args.type,
-      name = args.name || ("wrapped-" + type),
-      label = args.label || "";
+   var type = decodeURIComponent(args.type || page.url.args.type),
+      name = decodeURIComponent(args.name) || ("wrapped-" + type),
+      label = decodeURIComponent(args.label) || "",
+      value = decodeURIComponent(args.value) || "";
 
    var control = getControlFields(type);
    if (control !== null)
@@ -93,7 +94,7 @@ function main()
          label: label,
          mandatory: false,
          name: name,
-         value: ""
+         value: value
       };
 
       model.form =

@@ -52,26 +52,8 @@
          copyFunctions: true
       }));
 
-      // Override options to add an "Other" tab and an extra "Show in menu" column
+      // Override options to add an extra "Show in menu" column
       var me = this;
-      this.options.tabs.push(
-      {
-         id: "other",
-         listItems: [
-            {
-               id: "applied-aspects",
-               type: "applied-aspects"
-            },
-            {
-               id: "script-returns-true",
-               type: "script-returns-true"
-            },
-            {
-               id: "type",
-               type: "type"
-            }
-         ]
-      });
       this.options.dataTableColumnDefinitions.push(
       {
          key: "id",
@@ -339,7 +321,8 @@
       /**
        * Internal show dialog function
        * @method _showDialog
-       * @private
+       * @protected
+       * @override
        */
       _showDialog: function RPP__showDialog()
       {

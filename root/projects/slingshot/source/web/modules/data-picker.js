@@ -640,9 +640,13 @@
       /**
        * Internal show dialog function
        * @method _showDialog
+       * @protected
        */
       _showDialog: function PP__showDialog()
       {
+         // Set dialog title
+         Dom.get(this.id + "-title").innerHTML = this.msg("header");
+
          // Enable buttons
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);

@@ -1,10 +1,5 @@
-.rules-property-picker.property-picker .other .property-picker-list table
-{
-   width: 50em;
-}
-
-.rules-property-picker.property-picker .property-picker-list table th.yui-dt-col-id,
-.rules-property-picker.property-picker .property-picker-list table td.yui-dt-col-id
+.rules-property-picker.property-picker.data-picker .data-picker-list table th.yui-dt-col-id,
+.rules-property-picker.property-picker.data-picker .data-picker-list table td.yui-dt-col-id
 {
    width: 30%;
    text-align: center;

@@ -32,7 +32,7 @@
       <div id="${el}-configsMessage">${msg("message.loading")}</div>
       <div id="${el}-configsContainer" class="hidden">
          <div id="${el}-ruleConfigType"></div>
-         <div class="configuration-separator">&nbsp;</div>
+         <div id="${el}-conditionSeparator" class="configuration-separator">&nbsp;</div>
          <div id="${el}-ruleConfigIfCondition" class="if"></div>
          <div id="${el}-ruleConfigUnlessCondition" class="unless"></div>
          <div class="configuration-separator">&nbsp;</div>

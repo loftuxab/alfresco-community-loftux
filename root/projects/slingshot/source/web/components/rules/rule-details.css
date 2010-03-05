@@ -60,7 +60,7 @@
    padding:1em;
 }
 
-.rule-details .if .rule-config
+.rule-details .unless .rule-config
 {
-   border-bottom: none;
+   border-top: none;
 }

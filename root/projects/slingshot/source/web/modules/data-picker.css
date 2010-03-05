@@ -29,7 +29,7 @@
    padding-left: 0.5em;
    padding-right: 0.5em;
    border-right: 1px solid #C4C5C5;
-   width: 18.9em;
+   width: 15.9em;
    overflow: auto;
 }
 
@@ -40,7 +40,7 @@
 
 .data-picker .data-picker-list table
 {
-   width: 30em;
+   width: 33em;
    border: none;
 }
 
