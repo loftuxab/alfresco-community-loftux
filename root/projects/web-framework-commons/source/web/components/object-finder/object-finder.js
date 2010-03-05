@@ -467,7 +467,8 @@
             eventGroup: this,
             addedItems: addedItems,
             removedItems: removedItems,
-            selectedItems: selectedItems
+            selectedItems: selectedItems,
+            selectedItemsMetaData: Alfresco.util.deepCopy(this.selectedItems)
          });
       },
 

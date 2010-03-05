@@ -261,6 +261,16 @@
                Dom.removeClass(this.id + "-actions", "hidden");
             }
 
+            // Make sure we don't display 2 separators without anything between                           
+            if (!this.rule.action.conditions || this.rule.action.conditions.length == 0)
+            {
+               Dom.addClass(this.id + "-conditionSeparator", "hidden");
+            }
+            else
+            {
+               Dom.removeClass(this.id + "-conditionSeparator", "hidden");
+            }
+
             // Basic info
             Dom.get(this.id + "-title").innerHTML = $html(this.rule.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.rule.description);

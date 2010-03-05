@@ -183,26 +183,27 @@
       {
          /**
           * Override this method to take appropriate actions when the config has been loaded,
-          * inserted to the Dom and has loaded all of it's own dependencies and is ready to get it's
-          * displayRuleConfig method invoked.
+          * inserted to the Dom and has loaded all of it's own dependencies and is ready to
+          * get it's displayRuleConfig method invoked.
           */
       },
 
       /**
-       * Called then the rule config components have been loaded and inserted
+       * Called then the rule config components have been loaded and inserted.
        *
        * @method onRuleConfigsLoaded
        */
       onRuleConfigsLoaded: function RuleEditUtil_onRuleConfigsLoaded()
       {
          /**
-          * Override this method to take appropriate actions when the config has been loaded, inserted to the Dom
-          * and is looking visually ok.
+          * Override this method to take appropriate actions when the config has been loaded,
+          * inserted to the Dom and is looking visually ok.
           */
       },
 
       /**
-       * Takes a rule and displays the info inside the rule confi components in editable mode if editMode is true
+       * Takes a rule and displays the info inside the rule config components in editable mode
+       * if editMode is true.
        *
        * @method displayRuleConfigs
        * @param rule {object} The object describing the rule with the info to display as rule configs
@@ -235,7 +236,7 @@
          var ifConditionConfigs = [],
                unlessConditionConfigs = [],
                config;
-         for (i = 0, il = rule.action.conditions.length; i < il; i++)
+         for (i = 0, il = rule.action.conditions ? rule.action.conditions.length : 0; i < il; i++)
          {
             config = rule.action.conditions[i];
             if (config.invertCondition)

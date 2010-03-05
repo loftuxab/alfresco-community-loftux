@@ -102,6 +102,10 @@ function loadRuleConfigDefinitions(xmlConfig)
    return [];
 }
 
+function sortConstraintsByTitle(constraint1, constraint2)
+{
+   return (constraint1.displayLabel > constraint2.displayLabel) ? 1 : (constraint1.displayLabel < constraint2.displayLabel) ? -1 : 0;
+}
 
 function loadRuleConstraints(xmlConfig)
 {
@@ -113,12 +117,15 @@ function loadRuleConstraints(xmlConfig)
       var result = connector.get(constraintsNode.@webscript.toString());
       if (result.status == 200)
       {
-         var constraintsArr = eval('(' + result + ')').data;
-         var constraintsObj = {};
+         var constraintsArr = eval('(' + result + ')').data,
+            constraintsObj = {},
+            values;
          for (var i = 0, il = constraintsArr.length, constraint; i < il; i++)
          {
             constraint = constraintsArr[i];
-            constraintsObj[constraint.name] = constraint.values;
+            values = constraint.values;
+            values.sort(sortConstraintsByTitle);
+            constraintsObj[constraint.name] = values;
          }
          return constraintsObj;
       }

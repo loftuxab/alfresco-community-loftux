@@ -338,7 +338,18 @@
          if (!ruleConfigs || ruleConfigs.length == 0)
          {
             ruleConfigs = [ {} ];
+            if (this.options.mode == RC.MODE_TEXT)
+            {
+               // Hide this component we are in text mode and ther's nothing to display
+               Dom.addClass(this.id + "-body", "hidden");
+            }
          }
+         else
+         {
+            // There are rule configs to display make sure we are not hiding this component
+            Dom.removeClass(this.id + "-body", "hidden");
+         }
+
          var ruleConfig,
             configEl;
          for (var i = 0, il = ruleConfigs.length; i < il; i++)
@@ -1148,7 +1159,7 @@
          {
             text: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+               return this._createDateSpan(containerEl, configDef, paramDef, ruleConfig, value);
             },
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
@@ -1160,7 +1171,7 @@
          {
             text: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
-               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+               return this._createDateSpan(containerEl, configDef, paramDef, ruleConfig, value);
             },
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
@@ -1452,7 +1463,6 @@
          return button;
       },
 
-
       /**
        * Displays the value as text
        *
@@ -1464,7 +1474,7 @@
        * @param value {string} The value to display
        * @param msgKey {string} (Optional) if a i18n message shall be used to enhance the display
        */
-      _createValueSpan: function (containerEl, configDef, paramDef, ruleConfig, value, msgKey)
+      _createValueSpan: function RC__createValueSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey)
       {
          var valueEl = document.createElement("span");
          if (value && paramDef._type != "hidden")
@@ -1501,6 +1511,22 @@
          return valueEl;
       },
 
+      /**
+       * Format the date and display it using _createValueSpan
+       *
+       * @method _createDateSpan
+       * @param containerEl {HTMLElement} Element within which the new span tag will be created
+       * @param configDef {object} Object describing the configuration
+       * @param paramDef {object} Object describing the parameter
+       * @param ruleConfig {object} Object describing the rule config
+       * @param value {string} The value to display
+       * @param msgKey {string} (Optional) if a i18n message shall be used to enhance the display
+       */
+      _createDateSpan: function RC__createDateSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey)
+      {
+         value = Alfresco.util.formatDate(value);
+         this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey);
+      },
 
       /**
        * Populate a category from a nodeRef.

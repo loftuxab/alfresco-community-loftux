@@ -885,6 +885,7 @@
                {
                   type: "category",
                   container: containerEl,
+                  value: ruleConfig.parameterValues["category-value"],
                   controlParams:
                   {
                      multipleSelectMode: false
@@ -922,27 +923,68 @@
                   ruleConfig: ruleConfig,
                   paramDef: paramDef
                };
-               var picker = new Alfresco.module.ControlWrapper(Alfresco.util.generateDomId());
-               picker.setOptions(
+
+               var onNodeRefTagLoaded = function (containerEl, nodeRefTag)
                {
-                  type: "tag",
-                  container: containerEl,
-                  controlParams:
-                  {
-                     multipleSelectMode: false
-                  },
-                  fnValueChanged:
-                  {
-                     fn: function(obj)
+                  var picker = new Alfresco.module.ControlWrapper(Alfresco.util.generateDomId());
+                  var options = {
+                     type: "tag",
+                     container: containerEl,
+                     controlParams:
                      {
-                        var ctx = this.renderers["arcc:tag-picker"].currentCtx;
-                        this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "tag", obj.selectedItems[0]);
-                        this._updateSubmitElements(ctx.configDef);
+                        multipleSelectMode: false
                      },
-                     scope: this
+                     fnValueChanged:
+                     {
+                        fn: function(obj)
+                        {
+                           var ctx = this.renderers["arcc:tag-picker"].currentCtx,
+                              tagNodeRef = obj.selectedItems[0],
+                              tag = obj.selectedItemsMetaData[tagNodeRef].name;
+                           this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "tag", tag);
+                           this._updateSubmitElements(ctx.configDef);
+                        },
+                        scope: this
+                     }
+                  };
+                  if (nodeRefTag)
+                  {
+                     options.value = nodeRefTag;
                   }
-               });
-               picker.show();
+                  picker.setOptions(options);
+                  picker.show();
+               };
+
+               var tag = ruleConfig.parameterValues ? ruleConfig.parameterValues["tag"] : null
+               if (!tag)
+               {
+                  onNodeRefTagLoaded.call(this, containerEl, null);
+               }
+               else
+               {
+                  Alfresco.util.Ajax.jsonPost(
+                  {
+                     url: Alfresco.constants.PROXY_URI_RELATIVE + "api/tag/workspace/SpacesStore",
+                     dataObj:
+                     {
+                        name: ruleConfig.parameterValues["tag"]
+                     },
+                     successCallback:
+                     {
+                        fn: function (p_oResponse, p_oObj)
+                        {
+                           p_oObj.onNodeRefTagLoaded.call(this, p_oObj.containerEl, p_oResponse.json.nodeRef)
+                        },
+                        scope: this,
+                        obj:
+                        {
+                           containerEl: containerEl,
+                           onNodeRefTagLoaded: onNodeRefTagLoaded
+                        }
+                     },
+                     failureMessage: this.msg("message.getTagFailure")
+                  });
+               }
             }
          }
       }

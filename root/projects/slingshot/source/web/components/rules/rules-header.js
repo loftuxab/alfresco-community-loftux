@@ -107,6 +107,14 @@
       ruleset: null,
 
       /**
+       * Keeps track if this component is running rules or not
+       *
+       * @property isRunning
+       * @type Boolean
+       */
+      isRunning: false,
+
+      /**
        * Fired by YUI when parent element is available for scripting.
        * Template initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -236,21 +244,27 @@
 
          var runMode = aArgs[1].value;
 
-         // TODO change to jsonPost and use runMode
          // Run rules for folder (and sub folders)
-         if (!this.isSearching)
+         if (!this.isRunning)
          {
-            this.isSearching = true;
+            this.isRunning = true;
 
-            Alfresco.util.Ajax.jsonGet(
+            // Start/stop inherit rules from parent folder
+            Alfresco.util.Ajax.jsonPost(
             {
-               url: Alfresco.constants.PROXY_URI_RELATIVE + "api/sites",
+               url: Alfresco.constants.PROXY_URI_RELATIVE + "api/actionQueue",
+               dataObj:
+               {
+                  "actionedUponNode": this.options.nodeRef.toString(),
+                  "actionDefinitionName": "execute-all-rules",
+                  "execute-inherited-rules": true, 
+                  "run-all-rules-on-children": (runMode == "run-recursive")
+               },
                successCallback:
                {
                   fn: function(response)
                   {
-                     this._enableSearchUI();
-
+                     this._enableRunRulesButton();
                      var data = response.json;
                      if (data)
                      {
@@ -266,17 +280,16 @@
                {
                   fn: function(response)
                   {
-                     this._enableSearchUI();
+                     this._enableRunRulesButton();
                      Alfresco.util.PopupManager.displayPrompt(
                      {
                         title: this.msg("label.failure"),
                         text: this.msg("message.runRules-failure")
-                     });
-
+                     });                     
                   },
                   scope: this
                }
-            });
+            });            
          }
 
          Event.preventDefault(aArgs[0]);
@@ -310,10 +323,10 @@
       /**
        * Enable search button, hide the pending wait message and set the panel as not searching.
        *
-       * @method _enableSearchUI
+       * @method _enableRunRulesButton
        * @private
        */
-      _enableSearchUI: function RulesHeader__enableSearchUI()
+      _enableRunRulesButton: function RulesHeader__enableRunRulesButton()
       {
          // Enable search button and close the wait feedback message if present
          if (this.widgets.feedbackMessage && this.widgets.feedbackMessage.cfg.getProperty("visible"))

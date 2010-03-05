@@ -1,7 +1,7 @@
 <#assign el=args.htmlid>
 <div id="${el}-dialog" class="data-picker">
    <div class="hd">
-      <span id="${el}-title">${msg("header")}</span></div>
+      <span id="${el}-title"></span></div>
    <div class="bd">
       <div id="${el}-tabs"></div>
    </div>

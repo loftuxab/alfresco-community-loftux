@@ -263,7 +263,7 @@
       /**
        * Internal show dialog function
        * @method _showDialog
-       * @private
+       * @protected
        */
       _showDialog: function PP__showDialog()
       {

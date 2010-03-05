@@ -16,7 +16,9 @@
       <div id="${el}-actions" class="yui-u rules-actions hidden">
          <span class="separator">&nbsp;</span>
          <button class="new" id="${el}-newRule-button" tabindex="0">${msg("button.new-rule")}</button>
-         <button class="copy" id="${el}-copyRuleFrom-button" tabindex="0">${msg("button.copy-rule-from")}</button>
+         <span class="hidden">
+            <button class="copy" id="${el}-copyRuleFrom-button" tabindex="0">${msg("button.copy-rule-from")}</button>
+         </span>
          <button class="run" id="${el}-runRules-menu" tabindex="0">${msg("menu.run")}</button>
          <select class="run-menu" id="${el}-runRules-options">
             <option value="run">${msg("menu.option.run")}</option>

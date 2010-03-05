@@ -129,7 +129,8 @@
                htmlid: encodeURIComponent(this.id),
                type: encodeURIComponent(this.options.type),
                name: encodeURIComponent(name),
-               label: encodeURIComponent(this.options.label)
+               label: encodeURIComponent(this.options.label),
+               value: encodeURIComponent(this.options.value)
             };
          
          this.eventGroup = this.id + "_" + name + "-cntrl";
