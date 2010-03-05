@@ -11,8 +11,3 @@
 ::BuilderAPI::ModifyObject -object "OpenOffice" -active No
 ::BuilderAPI::ModifyObject -object "Java File" -active No
 ::BuilderAPI::ModifyObject -object "Java" -active No
-
-if {[info exists ::info(Codeline)] && $::info(Codeline) eq
-"Community"} {
-     source community.ijs
-}

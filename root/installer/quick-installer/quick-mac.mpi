@@ -197,6 +197,24 @@ ProjectID
 ProjectVersion
 1.3.0.0
 
+QK_HOST
+localhost
+
+QK_PORT
+6060
+
+QK_VER
+8.0.1
+
+QuickrAmp
+<%InstallDir%>/amps/alfresco-quickr-unsupported.amp
+
+RMAmp
+<%InstallDir%>/amps/alfresco-dod5015.amp
+
+RMShareAmp
+{}
+
 SaveOnlyToplevelDirs
 No
 
@@ -235,6 +253,9 @@ Yes
 
 WEBSTUDIO
 false
+
+WebExtensionDir
+<%InstallDir%>/tomcat/shared/classes/alfresco/web-extension/
 
 WizardHeight
 365
@@ -3187,12 +3208,63 @@ FileGroup ::88FE9BA7-8A37-9E99-01FE-9F2E781B1FB0 -setup Install -alias {OpenOffi
 File ::34094D64-08EC-3A9D-2F31-2A26D4DB2C94 -name /Users/paulholmes-higgin/SVN/ALF-BINARIES/installer/osx/OpenOfficeInstallFiles.tar.gz -location ../../../../ALF-BINARIES/installer/osx -parent 88FE9BA7-8A37-9E99-01FE-9F2E781B1FB0
 FileGroup ::0DE76EF1-695C-4B07-9358-EA57EE8315EC -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows TarArchive ZipArchive MacOS-X} -name SPP -parent FileGroups
 File ::090A2806-27CF-44A4-8F50-4752ADC8A715 -directory <%InstallDir%>/amps -name W:/V3.1/root/modules/sharepoint/amp/build/dist/vti-module.amp -location ../../modules/sharepoint/amp/build/dist -parent 0DE76EF1-695C-4B07-9358-EA57EE8315EC
+FileGroup ::9B325852-3D6A-41CC-8169-1BAA3B219A86 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows TarArchive ZipArchive} -name RM -parent FileGroups
+File ::25892D0D-D03D-47E9-A1C9-51510D0FD198 -directory <%InstallDir%>/amps -name W:/V3.2/root/build/dist/alfresco-dod5015.amp -location ../../build/dist -parent 9B325852-3D6A-41CC-8169-1BAA3B219A86
+File ::73E03E56-FFEC-4153-ACA2-F7CA937EFFAA -directory <%InstallDir%>/amps-share -name W:/V3.2/root/build/dist/alfresco-dod5015-share.amp -location ../../build/dist -parent 9B325852-3D6A-41CC-8169-1BAA3B219A86
+FileGroup ::1554D2EE-E0F0-4758-9A46-121D14DACB28 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows TarArchive ZipArchive} -name Quickr -parent FileGroups
+File ::DCEC4BE7-EA4B-4834-B382-5AC2960CD4C7 -directory <%InstallDir%>/amps -name W:/V3.2/root/projects/installer/quickr/alfresco-quickr-unsupported.amp -location ../../projects/installer/quickr -parent 1554D2EE-E0F0-4758-9A46-121D14DACB28
+File ::E34ACD8B-103D-4E39-83F1-9C13C354EDF7 -type dir -directory <%InstallDir%>/tomcat/shared/classes/alfresco/web-extension/site-webscripts -name W:/V3.2/root/projects/installer/quickr/site-webscripts -location ../../projects/installer/quickr/site-webscripts -parent 1554D2EE-E0F0-4758-9A46-121D14DACB28
+File ::983E5345-5837-4992-A2A1-F034BA59C2D4 -type dir -name .svn -parent E34ACD8B-103D-4E39-83F1-9C13C354EDF7
+File ::621FC074-79FB-42CB-A266-14901950D30C -name entries -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
+File ::129417C2-5578-404F-8400-A47194AFA0C0 -type dir -name prop-base -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
+File ::EE873376-8D7F-4F94-BBC8-161577AB0CA0 -type dir -name props -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
+File ::6B6A57BC-DEEF-4894-8133-70CAC66B62FC -type dir -name text-base -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
+File ::51B9DA1D-B935-481A-8D9A-5A6919719574 -type dir -name tmp -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
+File ::A33E5E07-291A-4A87-AAC7-B8FCBF5185B2 -type dir -name prop-base -parent 51B9DA1D-B935-481A-8D9A-5A6919719574
+File ::5B6CA157-606C-4F6E-8C8F-298FA01E134C -type dir -name props -parent 51B9DA1D-B935-481A-8D9A-5A6919719574
+File ::81E8161D-B4D1-484C-8437-9BA7C83CCCA0 -type dir -name text-base -parent 51B9DA1D-B935-481A-8D9A-5A6919719574
+File ::452577EA-37ED-4A70-9F39-079418E38DD8 -type dir -name org -parent E34ACD8B-103D-4E39-83F1-9C13C354EDF7
+File ::7213416E-8442-4937-B0A7-A6AB84287EAB -type dir -name .svn -parent 452577EA-37ED-4A70-9F39-079418E38DD8
+File ::243E7B27-1E7A-455D-B473-C1D0CE60C03D -name entries -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
+File ::1B104F03-43E6-412F-9FD3-C83D341BBB94 -type dir -name prop-base -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
+File ::F6AD6BB1-8900-47DE-9D03-627E35E82321 -type dir -name props -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
+File ::59F7F97C-9B2E-47D1-97B9-12DF20F30530 -type dir -name text-base -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
+File ::307A51DC-7398-4186-8281-B6954A737F38 -type dir -name tmp -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
+File ::96393DA8-7E7F-4D19-A708-EE2E987F7EC7 -type dir -name prop-base -parent 307A51DC-7398-4186-8281-B6954A737F38
+File ::9FD01338-34A6-41EA-A14D-B3A8BDBCB917 -type dir -name props -parent 307A51DC-7398-4186-8281-B6954A737F38
+File ::E3B0C2DF-5A0C-4147-90DE-0F586E8E32F5 -type dir -name text-base -parent 307A51DC-7398-4186-8281-B6954A737F38
+File ::16577314-B7DD-4ACF-B139-E28177297217 -type dir -name alfresco -parent 452577EA-37ED-4A70-9F39-079418E38DD8
+File ::F60346BD-02A7-4149-9640-0C6E6B5459EE -type dir -name .svn -parent 16577314-B7DD-4ACF-B139-E28177297217
+File ::8A56C924-B2C1-47DA-82C6-61D9A69C723A -name entries -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
+File ::5280F892-84D7-4BE0-9A88-8A29D74A6D26 -type dir -name prop-base -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
+File ::8E464378-C15F-4AAC-8F0B-0EC8C9FC91D4 -type dir -name props -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
+File ::268684A0-D004-4A48-8EF6-350AB11A729B -type dir -name text-base -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
+File ::22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98 -type dir -name tmp -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
+File ::3BD9C452-836F-41C7-9D0B-04357936C515 -type dir -name prop-base -parent 22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98
+File ::73C05E4A-4188-418D-8F1F-5817B8517030 -type dir -name props -parent 22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98
+File ::467A74EC-07F8-4004-A279-1AF7A2D685DE -type dir -name text-base -parent 22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98
+File ::BECB94AC-CC17-4A45-B1D5-4AC36B00503F -type dir -name modules -parent 16577314-B7DD-4ACF-B139-E28177297217
+File ::8843D0A3-6209-4A2C-8B89-C582782F5A39 -name create-site.get.js -parent BECB94AC-CC17-4A45-B1D5-4AC36B00503F
+File ::03C610B9-DDCA-41E1-AD96-C11C884272B2 -name create-site.get.properties -parent BECB94AC-CC17-4A45-B1D5-4AC36B00503F
+File ::2FC28512-4D47-4834-9971-B9B516706523 -type dir -name .svn -parent BECB94AC-CC17-4A45-B1D5-4AC36B00503F
+File ::F93EB14E-6D67-4A83-8F57-7D55BA0AFEBB -name entries -parent 2FC28512-4D47-4834-9971-B9B516706523
+File ::253BEA1E-A32F-436D-A4D9-C42C35CFB339 -type dir -name prop-base -parent 2FC28512-4D47-4834-9971-B9B516706523
+File ::E57FD979-AD88-411B-A8DF-7AFF0E0CD5C3 -type dir -name props -parent 2FC28512-4D47-4834-9971-B9B516706523
+File ::980DB6B7-08DF-4F05-8C6D-787296E5A955 -type dir -name text-base -parent 2FC28512-4D47-4834-9971-B9B516706523
+File ::5BB82899-CD65-4A65-9F23-BCE2AA5A4871 -name create-site.get.js.svn-base -parent 980DB6B7-08DF-4F05-8C6D-787296E5A955
+File ::0B9AC8B4-70C8-4070-99DF-8D6808690460 -name create-site.get.properties.svn-base -parent 980DB6B7-08DF-4F05-8C6D-787296E5A955
+File ::A5C4A6FC-C187-4CD5-9A36-2009613370EA -type dir -name tmp -parent 2FC28512-4D47-4834-9971-B9B516706523
+File ::6E29BD81-E336-49D5-ABF8-B7C845342B14 -type dir -name prop-base -parent A5C4A6FC-C187-4CD5-9A36-2009613370EA
+File ::6C1300A1-06DB-4567-BD42-05EF1A7DEC76 -type dir -name props -parent A5C4A6FC-C187-4CD5-9A36-2009613370EA
+File ::3D215021-06B7-4823-BDAF-8513144D7D5D -type dir -name text-base -parent A5C4A6FC-C187-4CD5-9A36-2009613370EA
 Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name {Default Component} -parent Components
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name Samples -parent Components
 Component ::3599937E-10E1-4029-8ACB-CCE5D85D306D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name WCM -parent Components
 Component ::EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 -setup Install -alias Java -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name Java -parent Components
 Component ::751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 -setup Install -alias OpenOffice -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name OpenOffice -parent Components
 Component ::6DB1722A-53F8-4E0A-94C7-1DD43663EC60 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows MacOS-X} -name {SharePoint Protocol} -parent Components
+Component ::F68FFCD0-02FB-44B9-9B53-3502D7C3D651 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows} -name RM -parent Components
+Component ::041A4D57-8685-4BA7-A255-667A4019652E -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows} -name Quickr -parent Components
 SetupType ::8CD15942-AC97-4AD0-BEB3-9AC3290C20B2 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name Typical -parent SetupTypes
 SetupType ::CE9BD412-8B2C-422C-A23F-5572EB5F6410 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name Custom -parent SetupTypes
 
@@ -3270,24 +3342,34 @@ Condition 5F62014D-FF00-1133-0073-1B34152260C9 -active Yes -parent 73EBD608-2E51
 InstallComponent 7C464880-67E7-405E-A724-1171574C5F9B -setup Install -type pane -conditions {946720BA-D784-453F-8981-9F02F07F8A7E 742564FA-3964-4BC5-A471-2E5C47E0815C} -title {Check Tomcat Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 946720BA-D784-453F-8981-9F02F07F8A7E -active Yes -parent 7C464880-67E7-405E-A724-1171574C5F9B -title {Port Test Condition} -component PortTestCondition -TreeObject::id 946720BA-D784-453F-8981-9F02F07F8A7E
 Condition 742564FA-3964-4BC5-A471-2E5C47E0815C -active Yes -parent 7C464880-67E7-405E-A724-1171574C5F9B -title {Port Test Condition} -component PortTestCondition -TreeObject::id 742564FA-3964-4BC5-A471-2E5C47E0815C
-InstallComponent A6AD15A0-5754-4A70-A4C8-F7D64FE38031 -setup Install -type pane -title {Do Config} -component CustomBlankPane1 -active Yes -parent StandardInstall
-InstallComponent 5BF7D47A-D7A8-4FEF-8490-3FCC7397D7B2 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
-InstallComponent 4189489A-B002-4812-8ED2-5E7555A0F213 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
 InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding SPP} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 InstallComponent 6167A49E-551C-4CF3-944D-1FDBDD9C0106 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -command reorder -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
 InstallComponent CD057CD8-68CA-4230-8D9E-F84606DC3EFD -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
+InstallComponent 8FE58EB3-25C6-43F1-BBF6-5A92559D4011 -setup Install -type pane -conditions 49293C60-2BCA-439E-ABF1-BB40952DCC1E -title {Quickr options} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition 49293C60-2BCA-439E-ABF1-BB40952DCC1E -active Yes -parent 8FE58EB3-25C6-43F1-BBF6-5A92559D4011 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 49293C60-2BCA-439E-ABF1-BB40952DCC1E
+InstallComponent C1F8DB97-C128-4963-A683-AB683344F150 -setup Install -type pane -conditions F8231A25-5B9E-49DF-8214-EADC884E81AE -title {Check RM} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition F8231A25-5B9E-49DF-8214-EADC884E81AE -active Yes -parent C1F8DB97-C128-4963-A683-AB683344F150 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id F8231A25-5B9E-49DF-8214-EADC884E81AE
+InstallComponent 534ED318-370C-482E-80FB-7865AB40B875 -setup Install -type action -conditions 7D074874-3E43-48CC-BD5A-1CC64BE410EE -title {Add Checkbutton} -component AddWidget -command insert -active Yes -parent C1F8DB97-C128-4963-A683-AB683344F150
+Condition 7D074874-3E43-48CC-BD5A-1CC64BE410EE -active Yes -parent 534ED318-370C-482E-80FB-7865AB40B875 -title {String Is Condition} -component StringIsCondition -TreeObject::id 7D074874-3E43-48CC-BD5A-1CC64BE410EE
+InstallComponent AF619FEE-A3EF-4B4B-A941-6C541ADD2355 -setup Install -type action -conditions 3D2EED5B-F256-425E-9367-4EF27D3583E2 -title {Rename File} -component RenameFile -command insert -active Yes -parent C1F8DB97-C128-4963-A683-AB683344F150
+Condition 3D2EED5B-F256-425E-9367-4EF27D3583E2 -active Yes -parent AF619FEE-A3EF-4B4B-A941-6C541ADD2355 -title {String Is Condition} -component StringIsCondition -TreeObject::id 3D2EED5B-F256-425E-9367-4EF27D3583E2
+InstallComponent DD450572-863A-4427-905E-B61430E3F4A6 -setup Install -type action -conditions F72119B3-6FA9-4B81-A707-5C14E3452011 -title {Rename File} -component RenameFile -command insert -active Yes -parent C1F8DB97-C128-4963-A683-AB683344F150
+Condition F72119B3-6FA9-4B81-A707-5C14E3452011 -active Yes -parent DD450572-863A-4427-905E-B61430E3F4A6 -title {String Is Condition} -component StringIsCondition -TreeObject::id F72119B3-6FA9-4B81-A707-5C14E3452011
 InstallComponent 675F1AF3-A349-498E-8815-C08427B7BC0E -setup Install -type pane -conditions BE587B64-F450-46EC-8376-1E98292A3C18 -title {Disable Webstudio} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition BE587B64-F450-46EC-8376-1E98292A3C18 -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E -title {File Exists Condition} -component FileExistsCondition -TreeObject::id BE587B64-F450-46EC-8376-1E98292A3C18
 InstallComponent A16AE261-F193-431D-87A3-15475394A2F8 -setup Install -type action -conditions 791611F8-7C63-43E7-8B71-C174C7010D46 -title {Enable Checkbutton} -component AddWidget -command insert -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
 Condition 791611F8-7C63-43E7-8B71-C174C7010D46 -active Yes -parent A16AE261-F193-431D-87A3-15475394A2F8 -title {String Is Condition} -component StringIsCondition -TreeObject::id 791611F8-7C63-43E7-8B71-C174C7010D46
 InstallComponent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -setup Install -type action -conditions D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -title {Rename File} -component RenameFile -command insert -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
 Condition D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -active Yes -parent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -title {String Is Condition} -component StringIsCondition -TreeObject::id D2FB7E47-AAAA-485D-97D9-BE687D1A7AED
-InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding Samples} -component CustomBlankPane1 -command insert -active No -parent StandardInstall
+InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding AMPs} -component CustomBlankPane1 -operator OR -command insert -active Yes -parent StandardInstall
 Condition 6654B212-DC2E-4B87-87A4-A6651D834356 -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 Condition 5D3CD088-B812-4912-A7BA-38C26DBAEA7B -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 5D3CD088-B812-4912-A7BA-38C26DBAEA7B
 InstallComponent 6FD62EC4-634A-490E-A5B9-AFE1AEBCC406 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B
 InstallComponent 878D8811-5FAA-4580-A208-501610F2711E -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B
+InstallComponent A6AD15A0-5754-4A70-A4C8-F7D64FE38031 -setup Install -type pane -title {Do Config} -component CustomBlankPane1 -active Yes -parent StandardInstall
+InstallComponent 5BF7D47A-D7A8-4FEF-8490-3FCC7397D7B2 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
+InstallComponent 4189489A-B002-4812-8ED2-5E7555A0F213 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
 InstallComponent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent StandardInstall
 InstallComponent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -setup Install -type action -conditions {895E7578-265C-44C3-8943-CF6D99925B9F 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 895E7578-265C-44C3-8943-CF6D99925B9F -active Yes -parent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 895E7578-265C-44C3-8943-CF6D99925B9F
@@ -3381,6 +3463,10 @@ InstallComponent 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED -setup Install -type actio
 InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 710736DF-8343-4CA4-79DC-C3D09E164E83 -title {Write Text To File} -component WriteTextToFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition 710736DF-8343-4CA4-79DC-C3D09E164E83 -active Yes -parent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -title {Platform Condition} -component PlatformCondition -TreeObject::id 710736DF-8343-4CA4-79DC-C3D09E164E83
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E -setup Install -type action -conditions A846B443-D850-4F08-8E99-F19391B4CD75 -title {Write To GlobalProps} -component WriteTextToFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+Condition A846B443-D850-4F08-8E99-F19391B4CD75 -active Yes -parent E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E -title {File Exists Condition} -component FileExistsCondition -TreeObject::id A846B443-D850-4F08-8E99-F19391B4CD75
+InstallComponent F376C6A4-27D4-4D71-AF16-3093AD6DCEBA -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 413AC52B-E80B-4C17-9A57-305FAD28BDF2 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC -setup Install -type actiongroup -title {Path Setup} -alias {Path Setup} -active Yes -parent ActionGroupsInstall
 InstallComponent 8DF4772F-BB98-471E-99C9-CB3FEDD66C60 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 InstallComponent AD2005D2-4400-4C05-834A-D0827D100FF7 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
@@ -3439,6 +3525,18 @@ No
 
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message,subst
 1
+
+041A4D57-8685-4BA7-A255-667A4019652E,Description,subst
+1
+
+041A4D57-8685-4BA7-A255-667A4019652E,DisplayName,subst
+1
+
+041A4D57-8685-4BA7-A255-667A4019652E,FileGroups
+1554D2EE-E0F0-4758-9A46-121D14DACB28
+
+041A4D57-8685-4BA7-A255-667A4019652E,Name
+Quickr
 
 0421762A-7F7F-40AC-85C9-D39F4607C278,CheckCondition
 {Before Action is Executed}
@@ -3523,6 +3621,12 @@ CreateDesktopShortcut
 
 11D931E9-F589-4F10-AEFF-734DE33E8488,Y
 180
+
+1554D2EE-E0F0-4758-9A46-121D14DACB28,Destination
+<%InstallDir%>
+
+1554D2EE-E0F0-4758-9A46-121D14DACB28,Name
+Quickr
 
 196847CE-9E6C-4473-AD16-69782D16EB3B,Alias
 {Uninstall Actions}
@@ -3879,6 +3983,15 @@ disabled
 3C792AD2-7426-4EB0-B6EB-BBE13E8C56F1,Widget
 {Back Button;Next Button}
 
+3D2EED5B-F256-425E-9367-4EF27D3583E2,CheckCondition
+{Before Action is Executed}
+
+3D2EED5B-F256-425E-9367-4EF27D3583E2,Operator
+false
+
+3D2EED5B-F256-425E-9367-4EF27D3583E2,String
+<%RMEnabled%>
+
 3D88EE52-1868-4E40-8C75-4A27EF566021,Active
 Yes
 
@@ -3929,6 +4042,15 @@ Yes
 
 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF,Operator
 {does not exist}
+
+413AC52B-E80B-4C17-9A57-305FAD28BDF2,Conditions
+{0 conditions}
+
+413AC52B-E80B-4C17-9A57-305FAD28BDF2,Files
+<%WebExtensionDir%>/share-config-custom.xml
+
+413AC52B-E80B-4C17-9A57-305FAD28BDF2,StringMap
+{"<visible>false</visible>" "<visible>true</visible>"}
 
 42D178E7-8B68-430F-9E4E-ADEEF20EEFBB,Comment
 {Ask the user if they want to proceed with the uninstall.}
@@ -3987,6 +4109,9 @@ Yes
 48130794-42B9-4D0A-9248-BAF8F2A1E9AF,Filename
 <%JavaInstaller%>
 
+49293C60-2BCA-439E-ABF1-BB40952DCC1E,Filename
+<%QuickrAmp%>
+
 4A174902-1AF2-4A3E-920A-96A15AC23E75,Alias
 {Finish Actions}
 
@@ -4025,6 +4150,33 @@ false
 
 5230B397-A161-4CAC-990D-64E5618C7440,Filename
 <%ProgramExecutable%>
+
+534ED318-370C-482E-80FB-7865AB40B875,Checked
+Yes
+
+534ED318-370C-482E-80FB-7865AB40B875,Conditions
+{1 condition}
+
+534ED318-370C-482E-80FB-7865AB40B875,OffValue
+false
+
+534ED318-370C-482E-80FB-7865AB40B875,OnValue
+true
+
+534ED318-370C-482E-80FB-7865AB40B875,Text,subst
+1
+
+534ED318-370C-482E-80FB-7865AB40B875,Type
+checkbutton
+
+534ED318-370C-482E-80FB-7865AB40B875,VirtualText
+RMEnabled
+
+534ED318-370C-482E-80FB-7865AB40B875,X
+185
+
+534ED318-370C-482E-80FB-7865AB40B875,Y
+160
 
 57EE088D-54C3-4C9F-8596-064B5255EE8A,Active
 Yes
@@ -4138,10 +4290,7 @@ Yes
 1
 
 5D3CD088-B812-4912-A7BA-38C26DBAEA7B,Filename
-{<%Dir <%InstallDir%>/amps/vti-module.amp %>}
-
-5D3CD088-B812-4912-A7BA-38C26DBAEA7B,Operator
-{does not exist}
+<%RMAmp%>
 
 5EF13DF8-C897-46E2-AE83-BAE5C01F920D,Action
 {Uninstall Actions}
@@ -4265,7 +4414,7 @@ Yes
 <%UninstallStartupText%>
 
 6654B212-DC2E-4B87-87A4-A6651D834356,Filename
-{<%Dir <%InstallDir%>/amps/amp-samples.txt %>}
+<%QuickrAmp%>
 
 6657D0E3-3C45-4822-BA93-EE9F73FD839C,CheckCondition
 {Before Action is Executed}
@@ -4620,6 +4769,9 @@ false
 7A903A54-A58E-414B-8E67-5EF0F1364ABC,Message,subst
 1
 
+7A9C9E75-F41A-40E9-9332-F460A083AA2B,Active
+Yes
+
 7A9C9E75-F41A-40E9-9332-F460A083AA2B,BackButton,subst
 1
 
@@ -4682,6 +4834,15 @@ Yes
 
 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED,Source
 <%InstallDir%>/install_extension/alfresco-global.properties.install
+
+7D074874-3E43-48CC-BD5A-1CC64BE410EE,CheckCondition
+{Before Action is Executed}
+
+7D074874-3E43-48CC-BD5A-1CC64BE410EE,Operator
+false
+
+7D074874-3E43-48CC-BD5A-1CC64BE410EE,String
+<%RMEnabled%>
 
 7DDFE8E9-C854-4605-8319-0B0ACB10DA2D,CheckCondition
 {Before Action is Executed}
@@ -4866,6 +5027,33 @@ ALF_DATA
 8F9CD740-BE57-45DF-B176-5C11E746846B,Name
 {Program Files Linux}
 
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Active
+Yes
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,BackButton,subst
+1
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,CancelButton,subst
+1
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Caption,subst
+1
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Conditions
+{1 condition}
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Message,subst
+1
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,NextButton,subst
+1
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Subtitle,subst
+1
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Title,subst
+1
+
 905F2EE5-C4CD-4AA8-8FBC-C69674651036,CheckCondition
 {Before Action is Executed}
 
@@ -4967,6 +5155,12 @@ INDEXES
 
 991553B3-06E2-412E-89E5-1829C782E086,NextButton,subst
 1
+
+9B325852-3D6A-41CC-8169-1BAA3B219A86,Destination
+<%InstallDir%>
+
+9B325852-3D6A-41CC-8169-1BAA3B219A86,Name
+RM
 
 9C516685-6F30-4420-A108-8F51B16D3AB8,CheckCondition
 {Before Action is Executed}
@@ -5148,6 +5342,12 @@ A6FEE830-BC36-4766-BE03-8BCE4A792029,TclScript
 A7A67250-725D-453B-94A7-3384D68498D3,Conditions
 {0 conditions}
 
+A846B443-D850-4F08-8E99-F19391B4CD75,CheckCondition
+{Before Action is Executed}
+
+A846B443-D850-4F08-8E99-F19391B4CD75,Filename
+<%QuickrAmp%>
+
 A88563D5-3EDB-4933-A42D-D51B94ED8D72,Active
 No
 
@@ -5204,6 +5404,18 @@ AEA9FB5C-FBE9-4BA1-B265-60323724E764,Action
 
 AEA9FB5C-FBE9-4BA1-B265-60323724E764,Conditions
 {0 conditions}
+
+AF619FEE-A3EF-4B4B-A941-6C541ADD2355,Conditions
+{1 condition}
+
+AF619FEE-A3EF-4B4B-A941-6C541ADD2355,Destination
+<%InstallDir%>/amps/alfresco-dod5015.ampz
+
+AF619FEE-A3EF-4B4B-A941-6C541ADD2355,ExecuteAction
+{Before Next Pane is Displayed}
+
+AF619FEE-A3EF-4B4B-A941-6C541ADD2355,Source
+<%InstallDir%>/amps/alfresco-dod5015.amp
 
 AIX-ppc,Active
 No
@@ -5451,6 +5663,33 @@ C1DBCDEC-EC84-4D9C-A887-5045F2CE5C85,X
 C1DBCDEC-EC84-4D9C-A887-5045F2CE5C85,Y
 160
 
+C1F8DB97-C128-4963-A683-AB683344F150,Active
+Yes
+
+C1F8DB97-C128-4963-A683-AB683344F150,BackButton,subst
+1
+
+C1F8DB97-C128-4963-A683-AB683344F150,CancelButton,subst
+1
+
+C1F8DB97-C128-4963-A683-AB683344F150,Caption,subst
+1
+
+C1F8DB97-C128-4963-A683-AB683344F150,Conditions
+{1 condition}
+
+C1F8DB97-C128-4963-A683-AB683344F150,Message,subst
+1
+
+C1F8DB97-C128-4963-A683-AB683344F150,NextButton,subst
+1
+
+C1F8DB97-C128-4963-A683-AB683344F150,Subtitle,subst
+1
+
+C1F8DB97-C128-4963-A683-AB683344F150,Title,subst
+1
+
 C3DDCE2C-45B8-4E3C-A6E7-C9B66F5F6F80,CheckCondition
 {Before Action is Executed}
 
@@ -5488,7 +5727,7 @@ CD057CD8-68CA-4230-8D9E-F84606DC3EFD,Conditions
 {0 conditions}
 
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Components
-{A4F1E663-DD6F-4CFB-B8C8-496149F89359 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 6DB1722A-53F8-4E0A-94C7-1DD43663EC60}
+{A4F1E663-DD6F-4CFB-B8C8-496149F89359 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 6DB1722A-53F8-4E0A-94C7-1DD43663EC60 F68FFCD0-02FB-44B9-9B53-3502D7C3D651 041A4D57-8685-4BA7-A255-667A4019652E}
 
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Description,subst
 1
@@ -5631,6 +5870,18 @@ DB93DFD9-76DF-3084-9485-18510E5642DC,Value
 DB93DFD9-76DF-3084-9485-18510E5642DC,VirtualText
 ALF_OO
 
+DD450572-863A-4427-905E-B61430E3F4A6,Conditions
+{1 condition}
+
+DD450572-863A-4427-905E-B61430E3F4A6,Destination
+<%InstallDir%>/amps-share/alfresco-dod5015-share.ampz
+
+DD450572-863A-4427-905E-B61430E3F4A6,ExecuteAction
+{Before Next Pane is Displayed}
+
+DD450572-863A-4427-905E-B61430E3F4A6,Source
+<%InstallDir%>/amps-share/alfresco-dod5015-share.amp
+
 E35F2477-2025-4C48-BE4A-BC2DB58EFD16,Comment
 {Don't display this pane in an upgrade install}
 
@@ -5639,6 +5890,15 @@ false
 
 E35F2477-2025-4C48-BE4A-BC2DB58EFD16,String
 <%UpgradeInstall%>
+
+E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E,Conditions
+{1 condition}
+
+E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E,FileOpenAction
+{Append to file}
+
+E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E,TextToWrite,subst
+1
 
 E81B8A81-D03D-498A-9FEB-EDA61D16E117,Active
 Yes
@@ -5759,6 +6019,15 @@ Yes
 F2338184-37AF-4756-B940-BD88DEEF2C1E,Prompt
 <%InstallStartupText%>
 
+F376C6A4-27D4-4D71-AF16-3093AD6DCEBA,Conditions
+{0 conditions}
+
+F376C6A4-27D4-4D71-AF16-3093AD6DCEBA,Destination
+<%WebExtensionDir%>/share-config-custom.xml
+
+F376C6A4-27D4-4D71-AF16-3093AD6DCEBA,Source
+<%WebExtensionDir%>/share-config-custom.xml.sample
+
 F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,BackButton,subst
 1
 
@@ -5779,6 +6048,18 @@ F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,Message,subst
 
 F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,NextButton,subst
 1
+
+F68FFCD0-02FB-44B9-9B53-3502D7C3D651,Description,subst
+1
+
+F68FFCD0-02FB-44B9-9B53-3502D7C3D651,DisplayName,subst
+1
+
+F68FFCD0-02FB-44B9-9B53-3502D7C3D651,FileGroups
+9B325852-3D6A-41CC-8169-1BAA3B219A86
+
+F68FFCD0-02FB-44B9-9B53-3502D7C3D651,Name
+RM
 
 F70BEDD4-EA20-4A55-BBEB-FB0A605C8F89,Background
 white
@@ -5801,6 +6082,15 @@ F70BEDD4-EA20-4A55-BBEB-FB0A605C8F89,X
 F70BEDD4-EA20-4A55-BBEB-FB0A605C8F89,Y
 140
 
+F72119B3-6FA9-4B81-A707-5C14E3452011,CheckCondition
+{Before Action is Executed}
+
+F72119B3-6FA9-4B81-A707-5C14E3452011,Operator
+false
+
+F72119B3-6FA9-4B81-A707-5C14E3452011,String
+<%RMEnabled%>
+
 F7CA4AE5-D8B9-442E-BF9D-D17274CA2DD4,Conditions
 {0 conditions}
 
@@ -5809,6 +6099,9 @@ F7CA4AE5-D8B9-442E-BF9D-D17274CA2DD4,ShortcutName
 
 F7CA4AE5-D8B9-442E-BF9D-D17274CA2DD4,TargetFileName
 <%InstallDir%>/bin/AlfrescoShare.URL
+
+F8231A25-5B9E-49DF-8214-EADC884E81AE,Filename
+<%RMAmp%>
 
 F9A8D3B6-7571-439A-9C7C-FEC0EBA70DA4,CheckCondition
 {Before Action is Executed}
@@ -6364,6 +6657,12 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
 
+041A4D57-8685-4BA7-A255-667A4019652E,Description
+{Allows Quickr and Lotus Notes to communicate with Alfresco.  This extension is a Technology Preview and is unsupported.}
+
+041A4D57-8685-4BA7-A255-667A4019652E,DisplayName
+{Quickr Connector Support}
+
 0F270676-694A-4607-A2AE-9BEEC3C2B264,PromptMessage
 {Please tell us where Java (JDK) is located, or click Cancel if you do not have it installed.}
 
@@ -6413,6 +6712,9 @@ SET JAVA_HOME=<%Dir <%JavaHome%> platform%>}
 
 4489F0C1-C985-41F0-B4A9-90868A73FE8E,Title
 <%ApplicationReadmeText%>
+
+534ED318-370C-482E-80FB-7865AB40B875,Text
+{Include Records Management}
 
 5B9B98D5-D2EE-44DD-898C-99A7F0714878,Text
 <%CreateDesktopShortcutText%>
@@ -6508,6 +6810,18 @@ This may take a few minutes...}
 8CD15942-AC97-4AD0-BEB3-9AC3290C20B2,Description
 <%TypicalInstallDescription%>
 
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Caption
+{Please give details of the Quickr server to use.}
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Message
+{Please note that Quickr Content Services is a Technology Preview and not supported for production use.}
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Subtitle
+{Set options for your Quickr server}
+
+8FE58EB3-25C6-43F1-BBF6-5A92559D4011,Title
+{Quickr Content Services}
+
 991553B3-06E2-412E-89E5-1829C782E086,Message
 {This will install <%AppName%> on your computer. 
 
@@ -6556,6 +6870,18 @@ A88563D5-3EDB-4933-A42D-D51B94ED8D72,Description
 C1DBCDEC-EC84-4D9C-A887-5045F2CE5C85,Text
 {View Alfresco Labs Wiki}
 
+C1F8DB97-C128-4963-A683-AB683344F150,Caption
+{Records Management is a separately licensed component of Alfresco.  Please ensure you understand the terms of this license before installing this component.}
+
+C1F8DB97-C128-4963-A683-AB683344F150,Message
+{}
+
+C1F8DB97-C128-4963-A683-AB683344F150,Subtitle
+{Check license terms}
+
+C1F8DB97-C128-4963-A683-AB683344F150,Title
+{Records Management}
+
 CD047B45-9E60-4E0B-B9DD-2AD2CAB8772C,Message
 {Installer exists}
 
@@ -6574,6 +6900,18 @@ D4214F77-DED2-48E0-8CD0-0B88FE9B0E63,Subtitle
 D4214F77-DED2-48E0-8CD0-0B88FE9B0E63,Title
 {Alfresco Administrator Account}
 
+E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E,TextToWrite
+{
+# 
+# Lotus Quickr configuration options
+#-------------
+lotus.ws.version=<%QK_VER%>
+lotus.server.port=<%QK_PORT%>
+lotus.server.host=<%QK_HOST%>
+lotus.share.document.url=http\://localhost\:8080/share/page/site/{0}/document-details?nodeRef\={1}
+lotus.share.folder.url=http\://localhost\:8080/share/page/site/{0}/documentlibrary\#path\={1}
+lotus.share.site.url=http://localhost:8080/share/page/site/{0}/dashboard}
+
 EEE35F50-1F9E-44C8-9E0D-1F865FAAA301,Description
 {Java JDK}
 
@@ -6584,6 +6922,12 @@ F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,Message
 {We were unable to find a Java (JDK) on this computer.  You will need to download a JDK from http://java.sun.com/ using the link below.
 
 The download page has several options, you need to choose the basic JavaSE Developer Kit, without Java EE or Netbeans.  Usually, this is the first or second download option.}
+
+F68FFCD0-02FB-44B9-9B53-3502D7C3D651,Description
+{Include Records Management support.  This is a separately licensed component and should only be used if licensed.}
+
+F68FFCD0-02FB-44B9-9B53-3502D7C3D651,DisplayName
+{Records Management}
 
 F70BEDD4-EA20-4A55-BBEB-FB0A605C8F89,Text
 <%ViewReadmeText%>
