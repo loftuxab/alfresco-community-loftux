@@ -793,7 +793,7 @@
             file="${dir.project.webeditorsamples.customersite.dist}/${file.name.war.webeditor.sample.customersite}" />
    </target>
    
-   <target name="deploy-webeditor-sample-exploded" depends="compile-webeditor">
+   <target name="deploy-webeditor-sample-exploded" depends="compile-webeditor-customersite-sample">
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.webeditor.sample.customersite}" />
       <copy todir="${dir.deploy.tomcat.application.webeditor.sample.customersite}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webeditorsamples.customersite.src.web}" />

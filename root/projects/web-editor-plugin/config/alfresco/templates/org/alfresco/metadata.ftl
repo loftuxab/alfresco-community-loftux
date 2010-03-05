@@ -3,7 +3,7 @@
 </@>
 
 <@templateBody>      
-   <div>
+   <div class="js-disabled-form">
       <@region id="metadata" scope="template" />
    </div>
 </@>
