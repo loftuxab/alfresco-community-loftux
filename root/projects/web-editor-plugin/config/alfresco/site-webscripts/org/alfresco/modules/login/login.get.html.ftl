@@ -36,5 +36,5 @@
       </div>
    </div>
 <script>//<![CDATA[
-Alfresco.util.addMessages(${messages},"Alfresco.module.Login");
+Alfresco.util.addMessages(${messages}, "org.alfresco.awe.ui.LoginPanel");
 //]]></script>

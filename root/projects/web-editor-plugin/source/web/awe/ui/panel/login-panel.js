@@ -39,7 +39,7 @@
       var instance = Alfresco.util.ComponentManager.get(this.id);
       if (instance !== null)
       {
-         throw new Error("An instance of Alfresco.module.Login already exists.");
+         throw new Error("An instance of com.alfresco.awe.ui.LoginPanel already exists.");
       }
    
       YAHOO.org.alfresco.awe.ui.LoginPanel.superclass.constructor.call(this, 'com.alfresco.awe.ui.LoginPanel', containerId, ["button", "container", "connection", "selector", "json"]);
