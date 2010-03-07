@@ -1,9 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
    <title>Metadata</title>
-   <title-id>page.document.title</title-id>
-   <description>Document page</description>
-   <description-id>page.document.description</description-id>
+   <title-id>page.metadata.title</title-id>
    <template-instance>metadata</template-instance>
    <authentication>user</authentication>
 </page>
