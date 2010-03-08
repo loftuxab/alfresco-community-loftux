@@ -1,12 +1,15 @@
 <#include "common/editorparams.inc.ftl" />
 
-<#if field.control.params.rows?exists><#assign rows=field.control.params.rows><#else><#assign rows=8></#if>
-<#if field.control.params.columns?exists><#assign columns=field.control.params.columns><#else><#assign columns=60></#if>
+<#if field.control.params.rows??><#assign rows=field.control.params.rows><#else><#assign rows=8></#if>
+<#if field.control.params.columns??><#assign columns=field.control.params.columns><#else><#assign columns=60></#if>
+
+<#if form.capabilities?? && form.capabilities.javascript?? && form.capabilities.javascript == false><#assign jsDisabled=true><#else><#assign jsDisabled=false></#if>
 
 <#-- NOTE: content properties are not shown at all in view mode -->
 
 <#if form.mode != "view">
 <div class="form-field" id="${fieldHtmlId}-field">
+   <#if jsDisabled == false>
    <script type="text/javascript">//<![CDATA[
    (function()
    {
@@ -28,11 +31,12 @@
       );
    })();
    //]]></script>
+   </#if>
    
    <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
    <textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" columns="${columns}" tabindex="0"
-             <#if field.description?exists>title="${field.description}"</#if>
-             <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
-             <#if field.disabled>disabled="true"</#if>></textarea>
+             <#if field.description??>title="${field.description}"</#if>
+             <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
+             <#if field.disabled>disabled="true"</#if>><#if jsDisabled>${field.content?html}</#if></textarea>
 </div>
 </#if>

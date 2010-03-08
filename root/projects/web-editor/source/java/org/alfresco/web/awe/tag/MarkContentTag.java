@@ -159,7 +159,7 @@ public class MarkContentTag extends AbstractWebEditorTag
             out.write(urlPrefix);
             out.write("/page/metadata?nodeRef=");
             out.write(this.contentId);
-            out.write("&showCancelButton=true");
+            out.write("&js=off");
             
             String redirectUrl = calculateRedirectUrl();
             if (redirectUrl != null)

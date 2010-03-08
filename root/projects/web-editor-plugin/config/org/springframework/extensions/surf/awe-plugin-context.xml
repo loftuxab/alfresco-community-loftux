@@ -89,6 +89,19 @@
       <property name="description" value="Forms date picker control" />
       <property name="path" value="/res/components/form/date-picker-min.js" />
       <property name="type" value="js" />
+      <property name="dependencies">
+         <list>
+            <ref bean="yuiCalendar" />
+            <ref bean="dateJS" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="dateJS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.alfresco.forms.control.datejs" />
+      <property name="description" value="dateJS library" />
+      <property name="path" value="/res/components/form/date-min.js" />
+      <property name="type" value="js" />
    </bean>
    
    <bean id="formsPeriodControl" class="org.springframework.extensions.webeditor.WEFResourceImpl">

@@ -6,6 +6,7 @@ var defaultConstraintHandlers = null;
 var formUIConstraints = null;
 var formUIStructure = null;
 var formUIFields = null;
+var formCapabilities = null;
          
 /* constants */
 const PROP_PREFIX = "prop:"
@@ -441,6 +442,22 @@ function createFormUIModel(mode, formModel, formConfig)
    if (redirect !== null)
    {
       formUIModel.redirect = redirect;
+   }
+   
+   // determine if JavaScript has been flagged as being disabled
+   var jsEnabled = getArgument("js");
+   if (jsEnabled !== null && (jsEnabled === "off" || jsEnabled === "false" || jsEnabled === "disabled"))
+   {
+      formUIModel.capabilities =
+      {
+         javascript: false
+      };
+      
+      formCapabilities = formUIModel.capabilities
+      
+      if (logger.isLoggingEnabled())
+         logger.log("JavaScript disabled flag detected, added form capabilties: " + 
+               jsonUtils.toJSONString(formUIModel.capabilities));
    }
    
    // setup custom form templates to use if they are present
@@ -1349,6 +1366,27 @@ function setupFieldValue(mode, formModel, fieldDef, fieldConfig)
        (typeof fieldDef.defaultValue !== "undefined"))
    {
       fieldDef.value = fieldDef.defaultValue;
+   }
+   
+   // if the field is a content field and JavaScript is disabled
+   // we need to retrieve the content here and store in model
+   if (formCapabilities !== null && fieldDef.dataType === "content")
+   {
+      // NOTE: In the future when other capabilties are added the 'javascript'
+      //       flag will need to be checked, for now it's the only reason
+      //       the capabilities object will be present so a check is redundant
+      
+      if (logger.isLoggingEnabled())
+         logger.log("Retrieving content for \"" + fieldDef.configName + "\" as JavaScript is disabled");
+      
+      // get the nodeRef of the content and then the content itself
+      var nodeRef = getArgument("itemId");
+      var connector = remote.connect("alfresco");
+      var result = connector.get("/api/node/content/" + nodeRef.replace("://", "/"));
+      if (result.status == 200)
+      {
+         fieldDef.content = result;
+      }
    }
 }
 
