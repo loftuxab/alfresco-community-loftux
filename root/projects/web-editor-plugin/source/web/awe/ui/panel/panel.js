@@ -152,11 +152,7 @@
          escapeListener.enable();
          
          // Set the focus on the first field
-         var firstInputEl = Selector.query('input', this.id, true);
-         
-         if (firstInputEl) {
-            firstInputEl.focus();
-         }
+         this.widgets.panel.focusFirst();
       }
    });
 })();

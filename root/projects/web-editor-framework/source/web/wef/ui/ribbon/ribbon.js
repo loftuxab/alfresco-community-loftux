@@ -186,7 +186,7 @@
                         value: 'http://www.alfresco.com/help/32/labs/sharehelp/',
                         id: this.config.name + YAHOO.org.wef.SEPARATOR + 'help',
                         icon: true
-                     }, 
+                     } 
                   ]
                }
             },
@@ -236,8 +236,8 @@
       addToolbar: function WEF_UI_Ribbon_addToolbar(id, config, toolbarType)
       {
          var location = location || YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
-             tbar = null; 
-          
+             tbar = null;  
+         
          if (!toolbarType)
          {
             throw new Error('Unable to add toolbar of specified type')

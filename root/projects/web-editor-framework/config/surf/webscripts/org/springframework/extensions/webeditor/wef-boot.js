@@ -3,11 +3,16 @@
     {
         var config = {}, loader = (function()
            {
-           var loadingModules = [], unloadedModules = [], loadedModules = [], registry = {}, repositories = {
-               lib: '/lib',
-               plugin: '/plugin',
-               core: ''
-           }, bootloaderConfig = {}, YUILoader = null;
+           var loadingModules = [], 
+               unloadedModules = [], 
+               loadedModules = [],
+               ignoreModules = [], 
+               registry = {}, 
+               repositories = {
+                  lib: '/lib',
+                  plugin: '/plugin',
+                  core: ''
+               }, bootloaderConfig = {}, YUILoader = null;
            
            /**
             * Initialises WEF
@@ -90,9 +95,10 @@
                    name: config.name,
                    type: (config.type && config.type==='css') ? 'css' : 'js',
                    //type: config.type || 'js', 
-                   requires: config.requires || null
+                   requires: config.requires || null,
+                   userAgent: config.userAgent || null
                };
-   
+
                if (config.varName)
                {
                    yuiConfig.varName = config.varName;
@@ -144,6 +150,34 @@
            };
            
            /**
+            * Determines if specified module is valid for the current useragent.
+            * 
+            * @param {Object} module
+            * 
+            * @return {Boolean} True if valid, false if not.
+            */
+           var _filterByUA = function WEF__filterByUA(module)
+           {
+              if (!module)
+              {
+                 return false;
+              }
+              var moduleUA = module.userAgent,
+                  useragent = YAHOO.env.ua;
+              //console.log(module.name, moduleUA);
+              if (!YAHOO.lang.isNull(moduleUA)) 
+              {
+                 //console.log('a');
+                 if (!useragent[moduleUA.toLowerCase()]) 
+                 {
+                    //console.log('b');
+                    return false;
+                 }
+              }
+              return true;
+           };
+           
+           /**
             * Adds a module to be loaded. If module declares dependencies then also sets those modules to be loaded too
             *
             * @param config {Object} Module to setup for loading
@@ -162,17 +196,28 @@
                    for (var i = 0, len = config.requires.length; i < len; i++) 
                    {
                        var modName = config.requires[i];
+                       if (_filterByUA(registry[modName]))
+                       {
+                          unloadedModules.push(registry[modName]);                          
+                       }
+                       else if (modName.indexOf('.')>-1)
+                       {
+                          //console.log('ig', modName)
+                          ignoreModules.push(modName);
+                       }
                        //non yui files
                        if (modName.indexOf('.') !== -1 && registry[modName]) 
                        {
-                           unloadedModules.push(registry[modName]);
                            // add any dependencies
                            if (registry[modName].requires) 
                            {
                                for (var j = 0, jlen = registry[modName].requires.length; j < jlen; j++) 
                                {
                                    var depModName = registry[modName].requires[j];
-                                   this.require(registry[depModName], true);
+                                   //if (registry[depModName])
+                                   //{
+                                      this.require(registry[depModName], true);   
+                                   //}
                                }
                            }
                        }
@@ -180,7 +225,11 @@
                }
                
                var moduleConfig = (isYUILoaderCompatible) ? config : convertConfigToYUIModuleConfig(config);
-               unloadedModules.push(moduleConfig);
+               if (moduleConfig)
+               {
+                  unloadedModules.push(moduleConfig);
+               }
+               
                return this;
            };
            
@@ -192,7 +241,8 @@
             */
            var load = function WEF_load(successCallback, failureCallback)
            {
-               var loaderConfig = {};
+               var loaderConfig = {},
+                   useragent = YAHOO.env.ua;
                if (!YAHOO.util.YUILoader) 
                {
                    throw new Error('YUI Loader unavailable; Unable to load assets.');
@@ -201,11 +251,33 @@
                {
                    YUILoader = new YAHOO.util.YUILoader();
                }
+               
                for (var i = 0, len = unloadedModules.length; i < len; i++) 
                {
-                   YUILoader.addModule(unloadedModules[i]);
-                   loadingModules.push(unloadedModules[i]);
+                   
+                   var module  = unloadedModules[i];
+                   // (for ie css) if a useragent is specified and doesn't match
+                   // current ua,then move on 
+                   //     
+                   //console.log('test', module);
+                   /*if (!YAHOO.lang.isNull(moduleUA)) 
+                   {
+                      if (!useragent[moduleUA.toLowerCase()])
+                      {
+                         console.log('noadd', module.name + moduleUA);
+                         //continue;
+                         module = {
+                            name : module.name,
+                            ext : false,
+                            type: module.type
+                         }                         
+                      }
+                   }*/
+                   
+                   YUILoader.addModule(module);
+                   loadingModules.push(module);
                }
+
                unloadedModules = [];
                
                var requires = [];
@@ -279,6 +351,7 @@
                    loaderConfig.filter = bootloaderConfig.filter || 'min';
                    loaderConfig.loadOptional = bootloaderConfig.loadOptional || true;;
                    loaderConfig.skin = bootloaderConfig.skin || null;
+                   loaderConfig.ignore = ignoreModules;
                    YUILoader.sandbox(loaderConfig);
                }
                else {
@@ -293,6 +366,7 @@
                    YUILoader.filter = bootloaderConfig.filter || 'min';
                    YUILoader.loadOptional = bootloaderConfig.loadOptional || true;
                    YUILoader.skin = bootloaderConfig.skin || null;
+                   YUILoader.ignore = ignoreModules;
                    YUILoader.insert();
                }
            };
@@ -379,7 +453,7 @@
                                    
                                if (app)
                                {
-                                  //initialise ribbon
+                                  
                                   y.org.wef.module.Ribbon = new YAHOO.org.wef.ui.Ribbon(
                                   {
                                      id : 'wef-ribbon',
@@ -427,6 +501,12 @@
                if (body.className.indexOf('yui-skin')==-1)
                {
                   Dom.addClass(body, 'yui-skin-sam');
+               }
+               //add ua classnames to body
+               if (YAHOO.env.ua.ie)
+               {
+                  y.util.Dom.addClass('wef', 'wef-ie');
+                  y.util.Dom.addClass('wef', 'wef-ie-'+YAHOO.env.ua.ie);
                }
                Bubbling.fire('WEF'+y.org.wef.SEPARATOR+'afterRender');
                
@@ -484,10 +564,11 @@
             
             report: function WEF_report()
             {
-               console.log('FIXME: loader setup duplicate modules to reload so strip dups. this fix should be in loader (' + arguments.callee.name +')');
-               var loaded = loader.report().loaded,
+               var report = loader.report(),
+                   loaded = report.loaded,
                    index = '',
-                   uniqs = [];
+                   loadedModules = [];
+               //strip out any duplicates    
                for (var i = 0;i<loaded.length;i++)
                {
                    if (loaded[i])
@@ -496,11 +577,12 @@
                        if (index.indexOf(name + ',')==-1)
                        {
                            index+=name+',';
-                           uniqs.push(loaded[i]);
+                           loadedModules.push(loaded[i]);
                        }
                    }
                }
-               return uniqs;
+               report.loaded = loadedModules;
+               return report;
             }
         };
     }();

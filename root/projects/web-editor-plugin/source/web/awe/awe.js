@@ -93,7 +93,7 @@
          [
             {
                type: 'menu',
-               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/quick-edit.gif" alt="Toggle edit markers" />',
+               label: '<img src="/awe/res/awe/images/quick-edit.gif" alt="Toggle edit markers" />',
                value: this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit',
                id: this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit',
                icon: true,
@@ -113,7 +113,7 @@
             }, 
             {
                type: 'push',
-               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/toggle-edit.gif" alt="Toggle edit markers" />',
+               label: '<img src="/awe/res/awe/images/toggle-edit.gif" alt="Toggle edit markers" />',
                value: this.config.namespace + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markers',
                icon: true               
@@ -173,11 +173,11 @@
          var formUri = null;
          if (o.formId)
          {
-            formUri = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + 'service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+            formUri = YAHOO.lang.substitute('/awe/service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
          }
          else
          {
-            formUri = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + 'service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+            formUri = YAHOO.lang.substitute('/awe/service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
          }
          this.module.getFormPanelInstance('wef-panel').setOptions({
             formName: 'wefPanel',
@@ -293,6 +293,7 @@
       {
          var editMarkers = Selector.query('span.alfresco-content-marker');
          this.onShowHideClick.isHidden = this.onShowHideClick.isHidden || false;
+         
          if (this.onShowHideClick.isHidden) {
             Dom.setStyle(editMarkers, 'display', '');
             this.onShowHideClick.isHidden = false;
@@ -315,7 +316,7 @@
                handler: function()
                {
                   var config = {
-                     url: Alfresco.constants.URL_CONTEXT + 'page/dologout',
+                     url: '/awe/page/dologout',
                      method: "GET",
                      successCallback: {
                         fn: function logoutSuccess(e)
@@ -348,7 +349,6 @@
                }
             }]
          });
-      //show logout dialog
       },   
       onQuickEditMouseOver: function WEF_UI_Ribbon_onQuickEditMouseOver(e, args)
       {
@@ -389,9 +389,10 @@
                   this.scrollAnimation.stop();
                }
                //set up animation
-               this.scrollAnimation = new YAHOO.util.Scroll((YAHOO.env.ua.gecko) ? document.documentElement : document.body, {
+               this.scrollAnimation = new YAHOO.util.Scroll(document.documentElement, 
+               {
                   scroll: {
-                     to: [0, Math.max(0, targetContentElRegion.top - 50)]
+                     to: [0, Math.max(0, targetContentElRegion.top - 125)]
                   }
                }, 1, YAHOO.util.Easing.easeOut);
                this.scrollAnimation.onComplete.subscribe(function(el)

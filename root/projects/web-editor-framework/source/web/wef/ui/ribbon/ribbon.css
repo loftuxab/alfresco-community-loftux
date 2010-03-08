@@ -27,6 +27,8 @@
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c
 {
    border-width:0 0 1px 0;
+   -moz-box-shadow:0 0 20px #CCCCCC;
+   -webkit-box-shadow:0 0 20px #CCCCCC;
 }
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c
 {
@@ -87,7 +89,7 @@
    width:auto;
    float:right;
    position:absolute;
-   top:0;
+   top:2px;
    right:0;
    height:2em;
 }
