@@ -8,5 +8,6 @@
       <itemKind>node</itemKind>
       <itemId>{nodeRef}</itemId>
       <showCancelButton>true</showCancelButton>
+      <showCaption>true</showCaption>
    </properties>
 </component>
