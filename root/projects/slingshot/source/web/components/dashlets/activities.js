@@ -29,8 +29,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -53,24 +52,15 @@
     */
    Alfresco.Activities = function Activities_constructor(htmlId)
    {
-      this.name = "Alfresco.Activities";
-      this.id = htmlId;
+      Alfresco.Activities.superclass.constructor.call(this, "Alfresco.Activities", htmlId, ["button", "container"]);
       
-      this.widgets = {};
-
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
-
       // Preferences service
-      this.preferencesService = new Alfresco.service.Preferences();
+      this.services.preferences = new Alfresco.service.Preferences();
       
       return this;
    };
 
-   Alfresco.Activities.prototype =
+   YAHOO.extend(Alfresco.Activities, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -106,14 +96,6 @@
           */
          activeFilter: "today"
       },
-      
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
 
       /**
        * Activity list DOM container.
@@ -122,42 +104,6 @@
        * @type object
        */
       activityList: null,
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Activities} returns 'this' for method chaining
-       */
-      setOptions: function Activities_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Activities} returns 'this' for method chaining
-       */
-      setMessages: function Activities_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function Activities_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
 
       /**
        * Fired by YUI when parent element is available for scripting
@@ -210,7 +156,7 @@
          // Load preferences to override default filter and range
          this.widgets.range.value = "today";
          this.widgets.user.value = "others";
-         this.preferencesService.request(PREFERENCES_ACTIVITIES,
+         this.services.preferences.request(PREFERENCES_ACTIVITIES,
          {
             successCallback:
             {
@@ -321,7 +267,7 @@
        */
       onListLoadFailed: function Activities_onListLoadFailed()
       {
-         this.activityList.innerHTML = '<div class="detail-list-item first-item last-item">' + this._msg("label.load-failed") + '</div>';
+         this.activityList.innerHTML = '<div class="detail-list-item first-item last-item">' + this.msg("label.load-failed") + '</div>';
       },
       
       /**
@@ -372,7 +318,7 @@
       {
          this.widgets.range.value = p_oMenuItem.value;
          this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
-         this.preferencesService.set(PREF_RANGE, this.widgets.range.value);
+         this.services.preferences.set(PREF_RANGE, this.widgets.range.value);
       },
       
       /**
@@ -384,7 +330,7 @@
       {
          this.widgets.user.value = p_oMenuItem.value;
          this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
-         this.preferencesService.set(PREF_FILTER, this.widgets.user.value);
+         this.services.preferences.set(PREF_FILTER, this.widgets.user.value);
       },
       
       /**
@@ -395,21 +341,8 @@
       onExclusionFilterClicked: function Activities_onExclusionFilterClicked(p_oEvent)
       {
          this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function Activities__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.Activities", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
    Alfresco.Activities.FILTER_BYDATE = 'byDate';
    Alfresco.Activities.FILTER_BYUSER = 'byUser';
 })();

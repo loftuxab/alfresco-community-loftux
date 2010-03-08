@@ -29,8 +29,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+       Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -58,26 +57,18 @@
     */
    Alfresco.MyTasks = function MyTasks_constructor(htmlId)
    {
-      this.name = "Alfresco.MyTasks";
-      this.id = htmlId;
-
+      Alfresco.MyTasks.superclass.constructor.call(this, "Alfresco.MyTasks", htmlId, ["button", "container"]);
+      
       // Initialise prototype properties
-      this.widgets = {};
       this.activeTaskTransitions = {};
-
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
-
+      
       // Preferences service
-      this.preferencesService = new Alfresco.service.Preferences();
-
+      this.services.preferences = new Alfresco.service.Preferences();
+      
       return this;
    }
 
-   Alfresco.MyTasks.prototype =
+   YAHOO.extend(Alfresco.MyTasks, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -96,14 +87,6 @@
           */
          activeFilter: FILTER_ALL
       },
-      
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
 
       /**
        * Task list DOM container.
@@ -120,29 +103,6 @@
        * @type: object
        */
       activeTaskTransitions: null,
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
-       */
-      setMessages: function DL_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function MyTasks_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
 
       /**
        * Fired by YUI when parent element is available for scripting
@@ -207,7 +167,7 @@
          this.taskList = Dom.get(this.id + "-taskList");
          
          // Load preferences to override default filter
-         this.preferencesService.request(PREF_FILTER,
+         this.services.preferences.request(PREF_FILTER,
          {
             successCallback:
             {
@@ -321,7 +281,7 @@
       {
          // Reset transition so we don't stop any transitions from being sent
          this.activeTaskTransitions = {};
-         this.taskList.innerHTML = '<div class="detail-list-item first-item last-item"><span>' + this._msg("label.load-failed") + '</span></div>';
+         this.taskList.innerHTML = '<div class="detail-list-item first-item last-item"><span>' + this.msg("label.load-failed") + '</span></div>';
       },
       
       /**
@@ -376,7 +336,7 @@
          this.setActiveFilter(FILTER_ALL);
          this.populateTaskList(FILTER_ALL);
          p_obj.set("checked", true, true);
-         this.preferencesService.set(PREF_FILTER, FILTER_ALL);
+         this.services.preferences.set(PREF_FILTER, FILTER_ALL);
       },
 
       /**
@@ -390,7 +350,7 @@
          this.setActiveFilter(FILTER_INVITES);
          this.populateTaskList(FILTER_INVITES);
          p_obj.set("checked", true, true);
-         this.preferencesService.set(PREF_FILTER, FILTER_INVITES);
+         this.services.preferences.set(PREF_FILTER, FILTER_INVITES);
       },
 
       /**
@@ -403,6 +363,7 @@
          var filter =  this.widgets.dueOn.value;
          this.setActiveFilter(filter);
          this.populateTaskList(filter);
+         this.services.preferences.set(PREF_FILTER, filter);
       },
       
       /**
@@ -416,7 +377,7 @@
          this.widgets.dueOn.value = filter;
          this.setActiveFilter(filter);
          this.populateTaskList(filter);
-         this.preferencesService.set(PREF_FILTER, filter);
+         this.services.preferences.set(PREF_FILTER, filter);
       },
 
 
@@ -483,7 +444,7 @@
                   },
                   scope: this
                },
-               successMessage: this._msg("transition.success"),
+               successMessage: this.msg("transition.success"),
                failureCallback:
                {
                   fn: function()
@@ -492,23 +453,10 @@
                   },
                   scope: this
                },
-               failureMessage: this._msg("transition.failure"),
+               failureMessage: this.msg("transition.failure"),
                scope: this
             });
          }
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function MyTasks__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.MyTasks", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
