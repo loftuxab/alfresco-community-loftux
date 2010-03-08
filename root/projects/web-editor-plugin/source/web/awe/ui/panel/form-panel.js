@@ -42,7 +42,7 @@
          throw new Error("An instance of AWE.component.FormPanel already exists.");
       }
    
-      YAHOO.org.alfresco.awe.ui.FormPanel.superclass.constructor.call(this, "com.alfresco.awe.ui.FormPanel", containerId, ["button", "container", "connection", "selector", "json"]);
+      YAHOO.org.alfresco.awe.ui.FormPanel.superclass.constructor.call(this, "org.alfresco.awe.ui.FormPanel", containerId, ["button", "container", "connection", "selector", "json"]);
    
       return this;
    };
