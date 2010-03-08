@@ -175,6 +175,11 @@
       <property name="description" value="YUI cookie library" />
    </bean>
    
+   <bean id="yuiCalendar" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="calendar" />
+      <property name="description" value="YUI calendar library" />
+   </bean>
+   
    <bean id="yuiMenu" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="menu" />
       <property name="description" value="YUI menu library" />
