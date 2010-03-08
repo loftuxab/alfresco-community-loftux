@@ -87,8 +87,16 @@
          div = document.createElement('div');
          div.id = 'wef-panel';
          wefEl.appendChild(div);
-                  //add buttons to ribbon secondary
-         var tb = YAHOO.org.wef.module.Ribbon.getToolbar('WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root');
+         
+         var tb  = YAHOO.org.wef.module.Ribbon.addToolbar('WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+         {
+            id:'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+            name: 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+            label: '<img src="/awe/res/awe/images/edit.png" alt="AWE" />',
+            content:'',
+            active: true
+         },YAHOO.org.wef.ui.Toolbar);
+         
          tb.addButtons(
          [
             {

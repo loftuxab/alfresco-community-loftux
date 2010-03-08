@@ -135,15 +135,7 @@
             {
                id:  YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
                name: name,
-               element: 'wef-toolbar-container',
-               toolbars: [ //really tabs
-               {
-                  id:  'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-                  name: 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-                  label: '<img src="/awe/res/awe/images/edit.png" alt="AWE" />',
-                  content:'',
-                  active: true
-               }]
+               element: 'wef-toolbar-container'
             },
             YAHOO.org.wef.ui.TabbedToolbar
          );
@@ -190,8 +182,7 @@
                   ]
                }
             },
-            YAHOO.org.wef.ui.Toolbar
-         );
+            YAHOO.org.wef.ui.Toolbar);
          // Refresh any attributes here
          Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
          Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
@@ -235,8 +226,7 @@
        */
       addToolbar: function WEF_UI_Ribbon_addToolbar(id, config, toolbarType)
       {
-         var location = location || YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
-             tbar = null;  
+         var tbar = null;  
          
          if (!toolbarType)
          {
@@ -258,33 +248,6 @@
          this.widgets.toolbars[id] = tbar;
          tbar.init();   
          tbar.render();
-         /*
-         tbar = this.widgets.toolbars[location] = new YAHOO.widget.Toolbar(toolbarContainer.appendChild(document.createElement('div')), config);
-         
-         tbar.on('buttonClick', function WEF_UI_Ribbon_generic_button_handler(args)
-         {
-            //strip out button id (namespace) from value
-            if (YAHOO.lang.isString(args.button.value)) {
-               args.button.value = args.button.value.split(YAHOO.org.wef.SEPARATOR).pop();
-            }
-            Bubbling.fire(args.button.id + args.type.replace('button', ''), args);
-         */
-         // The following code is useful for those buttons that require the button
-         // to stay in a selected state. TODO Move this logic out to doAfterPluginActivate ?           
-         // var value = o.button.value;
-         // 
-         // if (this.lastButton && this.lastButton===o.button)
-         // {
-         //    tbar.deselectButton(o.button.id);
-         //    this.lastButton = null;
-         // }
-         // else
-         // {
-         //    tbar.deselectAllButtons();
-         //    tbar.selectButton(value);
-         //    this.lastButton = o.button;
-         // }
-         //});
 
          return tbar;
       },
