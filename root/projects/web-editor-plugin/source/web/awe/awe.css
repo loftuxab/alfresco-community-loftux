@@ -51,6 +51,37 @@
    border:0;
 }
 
+.js-disabled-form h2
+{
+   font-size: 146.5%;
+   margin-top: 1em;
+   color: #262d35;
+}
+
+.js-disabled-form .form-container label
+{
+   margin-bottom: 0.2em;
+   color: #262d35;
+}
+
+.js-disabled-form .form-container .caption
+{
+   margin: 5px 0px 5px 740px;
+}
+
+.js-disabled-form .form-container .form-fields
+{
+   background-color: #f5f9fd;
+   padding: 2em !important;
+   border: 1px solid #c2c2c2 !important;
+   width: 800px;
+}
+
+.js-disabled-form .form-container .form-buttons
+{
+   margin-top: 0.5em;
+}
+
 .js-disabled-form .form-field input
 {
    width: 50em;
