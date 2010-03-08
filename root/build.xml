@@ -179,14 +179,9 @@
          <include name="**/org/alfresco/repo/action/ActionTestSuite.java" />
          <!-- Content Tests -->
          <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
-         <include name="**/org/alfresco/repo/content/ContentTestSuite.java" />
-         <!-- TODO This suite commented out temporarily
-         <include name="**/org/alfresco/repo/content/metadata/MetadataTestSuite.java" />
-         -->
+         <include name="**/org/alfresco/repo/content/ContentFullContextTestSuite.java" />
+         <include name="**/org/alfresco/repo/content/ContentMinimalContextTestSuite.java" />
          <include name="**/org/alfresco/repo/content/metadata/xml/XmlMetadataExtracterTest.java" />
-         <!-- TODO This suite commented out temporarily
-         <include name="**/org/alfresco/repo/content/transform/TransformTestSuite.java" />
-         -->
          <!-- Domain Tests -->
          <exclude name="**/org/alfresco/repo/domain/**/*Test.java" />
          <include name="**/org/alfresco/repo/domain/DomainTestSuite.java" />
