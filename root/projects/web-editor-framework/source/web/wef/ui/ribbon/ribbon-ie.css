@@ -1,6 +1,21 @@
-#wef #wef-toolbar .hd,
-#wef #wef-toolbar .bd,
-#wef #wef-toolbar .ft
+#wef.wef-ie #wef-ribbon_c
 {
-   background:transparent url(/awe/themes/default/images/iebg.png);
+   position:relative;
+   top:-2px;
+   left:-2px;
+}
+
+#wef.wef-ie-7 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module 
+{
+   top:7px;
+} 
+
+#wef.wef-ie-7 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module .wef-toolbar .icon-button button
+{
+   padding-left:3.5em;
+}
+
+#wef.wef-ie-7 #wef-ribbon .hd.wef-ribbon-module h6
+{
+   height:82px;
 }

@@ -24,8 +24,11 @@
 #wef-ribbon .wef-tab-toolbar div.yui-content
 {
    background:#fff url(./images/tab-bg.gif) repeat scroll 0 0;
-   border-width:0 1px;
-   height:44px
+   border-width:0 0 0 1px;
+   border-color:#93ACBD;
+   /*height:44px;*/
+  height:47px;
+  padding-bottom:1px;
 }
 #wef-ribbon .wef-tab-toolbar div.wef-toolbar
 {
