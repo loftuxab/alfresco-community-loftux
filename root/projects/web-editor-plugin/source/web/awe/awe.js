@@ -24,7 +24,8 @@
       KeyListener = YAHOO.util.KeyListener,
       Selector = YAHOO.util.Selector,
       Bubbling = YAHOO.Bubbling,
-      Cookie = YAHOO.util.Cookie;
+      Cookie = YAHOO.util.Cookie,
+      WebEditor = YAHOO.org.springframework.extensions.webeditor;
     
     YAHOO.namespace('org.alfresco.awe.app');
 
@@ -48,10 +49,10 @@
          Bubbling.on('awe'+WEF.SEPARATOR+'loggedIn', this.onLoggedIn, this, true);
          Bubbling.on('awe'+WEF.SEPARATOR+'loggedout', this.onLoggedOut, this, true);
          
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);
          
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
          
          //Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.initAttributes(this.config);
@@ -88,22 +89,22 @@
          div.id = 'wef-panel';
          wefEl.appendChild(div);
          
-         var tb  = YAHOO.org.wef.module.Ribbon.addToolbar('WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+         var tb  = WebEditor.module.Ribbon.addToolbar('WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
          {
-            id:'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-            name: 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-            label: '<img src="/awe/res/awe/images/edit.png" alt="AWE" />',
+            id:'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+            name: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+            label: '<img src="/awe/res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
             content:'',
             active: true
-         },YAHOO.org.wef.ui.Toolbar);
+         },WebEditor.ui.Toolbar);
          
          tb.addButtons(
          [
             {
                type: 'menu',
-               label: '<img src="/awe/res/awe/images/quick-edit.gif" alt="Toggle edit markers" />',
-               value: this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit',
-               id: this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit',
+               label: '<img src="/awe/res/awe/images/quick-edit.gif" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
+               value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
+               id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                icon: true,
                menu: function renderEditableContentMenu(markers)
                {
@@ -121,21 +122,21 @@
             }, 
             {
                type: 'push',
-               label: '<img src="/awe/res/awe/images/toggle-edit.gif" alt="Toggle edit markers" />',
-               value: this.config.namespace + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markers',
-               id: this.config.name + YAHOO.org.wef.SEPARATOR + 'show-hide-edit-markers',
+               label: '<img src="/awe/res/awe/images/toggle-edit.gif" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
+               value: this.config.namespace + WebEditor.SEPARATOR + 'show-hide-edit-markers',
+               id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                icon: true               
             }
          ]);
-         tb.getButtonById(this.config.name + YAHOO.org.wef.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
-         tb = YAHOO.org.wef.module.Ribbon.getToolbar(YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR);
+         tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
+         tb = WebEditor.module.Ribbon.getToolbar(WebEditor.ui.Ribbon.SECONDARY_TOOLBAR);
          tb.addButtons(
             [ 
                {
                   type: 'push',
-                  label: 'Logout',
+                  label: this.getMessage('toolbar-logout-label'),
                   value: 'loggedout',
-                  id: this.config.name + YAHOO.org.wef.SEPARATOR + 'loggedout',
+                  id: this.config.name + WebEditor.SEPARATOR + 'loggedout',
                   icon: true,
                   disabled: true
                }
@@ -279,7 +280,7 @@
        */
       onLoginStatusChangeEvent: function WEF_UI_Ribbon_onLoginStatusChangeEvent(e)
       {
-         var btn = YAHOO.org.wef.module.Ribbon.getToolbar(YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR).getButtonById(this.config.name + YAHOO.org.wef.SEPARATOR + 'loggedout');
+         var btn = WebEditor.module.Ribbon.getToolbar(WebEditor.ui.Ribbon.SECONDARY_TOOLBAR).getButtonById(this.config.name + WebEditor.SEPARATOR + 'loggedout');
          if (e.newValue === true) 
          {
             btn.set('disabled', false);

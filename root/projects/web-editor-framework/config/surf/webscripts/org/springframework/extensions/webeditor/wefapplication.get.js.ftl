@@ -14,7 +14,7 @@
                 pluginInstance;
             
             // retrieve or create plugin config
-            var config = YAHOO.org.wef.ConfigRegistry.getConfig("${plugin.name?html}");
+            var config = YAHOO.org.springframework.extensions.webeditor.ConfigRegistry.getConfig("${plugin.name?html}");
             if (config == null)
             {
                config = 

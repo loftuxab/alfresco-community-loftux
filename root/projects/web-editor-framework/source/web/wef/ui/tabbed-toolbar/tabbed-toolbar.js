@@ -25,20 +25,21 @@
       Selector = YAHOO.util.Selector,
       Element = YAHOO.util.Element,
       Bubbling = YAHOO.Bubbling,
-      Cookie = YAHOO.util.Cookie;
+      Cookie = YAHOO.util.Cookie,
+      WebEditor = YAHOO.org.springframework.extensions.webeditor;
     
-   YAHOO.namespace('org.wef.ui.tabbed-toolbar');
+   YAHOO.namespace('org.springframework.extensions.webeditor.ui.tabbed-toolbar');
 
-   YAHOO.org.wef.ui.TabbedToolbar = function YAHOO_org_wef_ui_TabbedToolbar_constructor(config)
+   WebEditor.ui.TabbedToolbar = function YAHOO_org_springframework_extensions_webeditor_ui_TabbedToolbar_constructor(config)
    {
-     YAHOO.org.wef.ui.TabbedToolbar.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
+     WebEditor.ui.TabbedToolbar.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
    };
        
-   YAHOO.extend(YAHOO.org.wef.ui.TabbedToolbar, WEF.Widget,
+   YAHOO.extend(WebEditor.ui.TabbedToolbar, WEF.Widget,
    {
       init: function WEF_UI_TabbedToolbar_init()
       {
-         YAHOO.org.wef.ui.TabbedToolbar.superclass.init.apply(this);
+         WebEditor.ui.TabbedToolbar.superclass.init.apply(this);
          
          this.initAttributes(this.config);
          var d = document.createElement('div');
@@ -89,7 +90,7 @@
             buttons: { buttons: config.buttons || []}
          };
          config.owner = this.widgets.tabview;
-         return new YAHOO.org.wef.ui.Toolbar(toolbarConfig);           
+         return new WebEditor.ui.Toolbar(toolbarConfig);           
       },
       
       addButtons : function WEF_UI_TabbedToolbar_addButtons(toolbarId, buttonConfig)
@@ -107,4 +108,4 @@
       }
    });
 })();
-WEF.register("org.wef.ui.tabbed-toolbar", YAHOO.org.wef.ui.TabbedToolbar, {version: "1.0", build: "1"});
+WEF.register("org.springframework.extensions.webeditor.ui.tabbed-toolbar", YAHOO.org.springframework.extensions.webeditor.ui.TabbedToolbar, {version: "1.0", build: "1"});

@@ -57,7 +57,7 @@ public class EndTemplateTag extends AbstractWebEditorTag
             
             // render config required for ribbon and marked content
             out.write("<script type=\"text/javascript\">\n");
-            out.write("WEF.ConfigRegistry.registerConfig('org.wef.ribbon',\n");
+            out.write("WEF.ConfigRegistry.registerConfig('org.springframework.extensions.webeditor.ui.ribbon',\n");
             out.write("{ position: \"");
             out.write(toolbarLocation);
             out.write("\" });\n");
