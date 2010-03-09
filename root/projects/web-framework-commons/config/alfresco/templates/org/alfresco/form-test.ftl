@@ -71,7 +71,7 @@
          {
             padding: 10px; 
             margin: 10px; 
-            background-color: #8dc3e9;
+            background-color: #f5f9fd;
             border: 1px dotted #c0c0c0;
          }
          

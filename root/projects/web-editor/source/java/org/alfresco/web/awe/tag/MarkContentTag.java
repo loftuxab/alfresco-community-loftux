@@ -160,6 +160,8 @@ public class MarkContentTag extends AbstractWebEditorTag
             out.write("/page/metadata?nodeRef=");
             out.write(this.contentId);
             out.write("&js=off");
+            out.write("&title=");
+            out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
             
             String redirectUrl = calculateRedirectUrl();
             if (redirectUrl != null)
