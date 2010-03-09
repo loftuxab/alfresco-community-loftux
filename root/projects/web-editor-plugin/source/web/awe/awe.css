@@ -66,7 +66,7 @@
 
 .js-disabled-form .form-container .caption
 {
-   margin: 5px 0px 5px 740px;
+   margin: 5px 0px 5px 595px;
 }
 
 .js-disabled-form .form-container .form-fields
@@ -74,7 +74,7 @@
    background-color: #f5f9fd;
    padding: 2em !important;
    border: 1px solid #c2c2c2 !important;
-   width: 800px;
+   width: 655px;
 }
 
 .js-disabled-form .form-container .form-buttons
@@ -95,5 +95,28 @@
 .js-disabled-form .form-buttons input
 {
    width: auto;
+   border: 1px solid #146997;
+   color: #146997;
+   padding: 4px;
+   cursor: pointer;
+   font-weight: bold;
+}
+
+.js-disabled-form .cancel-link
+{
+   margin: -20px 0px 0px 665px;
+   color: #146997;
+}
+
+.js-disabled-form .cancel-link a
+{
+   color: #146997;
+   text-decoration: none;
+}
+
+.js-disabled-form .cancel-link a:visited
+{
+   color: #146997;
+   text-decoration: none;
 }
 
