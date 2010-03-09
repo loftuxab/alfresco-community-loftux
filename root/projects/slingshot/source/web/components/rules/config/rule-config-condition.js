@@ -85,13 +85,16 @@
           * The transient properties's types to add to "special" properties.
           *
           * @property transientPropertyTypes
-          * @type array
+          * @type object
           * @default {}
           */
          transientPropertyTypes: {
-            "SIZE" : "d:long",
-            "ENCODING" : "d:any",
-            "MIME_TYPE" : "d:any"
+            "d:content":
+            {
+               "SIZE" : "d:long",
+               "ENCODING" : "d:any",
+               "MIME_TYPE" : "d:any"
+            }
          },
 
          /**
@@ -129,6 +132,21 @@
 
 
       /**
+       * Overriden so we can apply the transient properties
+       *
+       * @method onReady
+       * @override
+       */
+      onReady: function RuleConfigCondition_onReady()
+      {
+         if (this.options.properties.length > 0)
+         {
+            this._handleTransientProperties(this.options.properties);
+         }
+         return Alfresco.RuleConfigCondition.superclass.onReady.call(this);
+      },
+
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -136,15 +154,9 @@
        * @return {Alfresco.BlogPostEdit} returns 'this' for method chaining
        * @override
        */
-      setOptions: function BlogPostEdit_setOptions(obj)
+      setOptions: function RuleConfigCondition_setOptions(obj)
       {
-         if (YAHOO.lang.isArray(obj.properties))
-         {
-            for (var i = 0, il = obj.properties.length; i < il; i++)
-            {
-               obj.properties[i] = this._handleTransientProperty(obj.properties[i]);
-            }
-         }
+         this._handleTransientProperties(this.options.properties);
          return Alfresco.RuleConfigCondition.superclass.setOptions.call(this, obj);
       },
 
@@ -159,7 +171,7 @@
        * @param ruleConfigs {array} An array of rule configurations
        * @override
        */
-      displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
+      displayRuleConfigs: function RuleConfigCondition_displayRulConfigs(ruleConfigs)
       {
          // Find out which properties to load
          var ruleConfig,
@@ -180,7 +192,7 @@
                propertyName = ruleConfig.parameterValues["property"];
                if (ruleConfig.parameterValues["content-property"])
                {
-                  contentPropertyName = propertyName + "." + ruleConfig.parameterValues["content-property"];
+                  contentPropertyName = propertyName + ":" + ruleConfig.parameterValues["content-property"];
                }
                else
                {
@@ -416,7 +428,7 @@
                contentProperty = p_oRuleConfig.parameterValues["content-property"];
             if (contentProperty)
             {
-               propertyName += "." + contentProperty;
+               propertyName += ":" + contentProperty;
             }
             var propertyType,
                evaluatorMap = this.options.propertyEvaluatorMap,
@@ -463,11 +475,12 @@
        */
       _createPropertyConfigDef: function RuleConfigCondition__createPropertyConfigDef(property)
       {
-         var descriptor;
-         if (property.name.indexOf(".") > property.name.indexOf(":"))
+         var descriptor,
+            propertyNameTokens = property.name.split(":");
+         if (propertyNameTokens.length == 3)
          {
             // This is a transient property, modify the type
-            if (property.name.split(".")[1] == "MIME_TYPE")
+            if (propertyNameTokens[2] == "MIME_TYPE")
             {
                // use the specific mime type comparator
                descriptor = Alfresco.util.deepCopy(this.options.compareMimeTypeDefinition);
@@ -519,7 +532,7 @@
                property,
                propertyName = p_oRuleConfig.parameterValues["property"],
                contentPropertyName = p_oRuleConfig.parameterValues["content-property"];
-            propertyName += contentPropertyName ? "." + contentPropertyName : "";
+            propertyName += contentPropertyName ? ":" + contentPropertyName : "";
             for (var i = 0, il = properties.length; i < il; i++)
             {
                property = properties[i];
@@ -548,13 +561,13 @@
        */
       _createRuleConfig: function RuleConfigCondition__createRuleConfig(propertyName)
       {
-         var propertyTokens = propertyName.split("."),
-            property = propertyTokens[0],
-            contentProperty = propertyTokens.length > 1 ? propertyTokens[1] : null;
+         var propertyNameTokens = propertyName.split(":"),
+            basePropertyName = propertyNameTokens[0] + ":" + propertyNameTokens[1],
+            contentProperty = propertyNameTokens.length == 3 ? propertyNameTokens[2] : null;
          var ruleConfig = {
             parameterValues:
             {
-               "property": property
+               "property": basePropertyName
             }
          };
          ruleConfig[this.options.ruleConfigDefinitionKey] = this.options.comparePropertyValueDefinition.name;
@@ -642,7 +655,7 @@
             var propertyName = p_oRuleConfig.parameterValues.property;
             if (p_oRuleConfig.parameterValues["content-property"])
             {
-               propertyName += "." + p_oRuleConfig.parameterValues["content-property"];
+               propertyName += ":" + p_oRuleConfig.parameterValues["content-property"];
             }
             this._selectConfigName(p_oSelectEl, configDefinitionName, "property_" + propertyName);
          }
@@ -709,16 +722,52 @@
       },
 
       /**
+       * @method _handleTransientProperties
+       * @param properties {array} The config definition name to compare
+       */
+      _handleTransientProperties: function RuleConfigCondition__handleTransientProperties(properties)
+      {         
+         if (YAHOO.lang.isArray(properties))
+         {
+            for (var i = 0, il = properties.length; i < il; i++)
+            {
+               properties[i] = this._handleTransientProperty(properties[i]);
+            }
+         }
+      },
+
+      /**
        * @method _handleTransientProperty
        * @param property {string} The property to modify if its a transient property
-       * @private
+       * @protected
        */
       _handleTransientProperty: function RuleConfigCondition__handleTransientProperty(property)
       {
-         var propertyNameTokens = property.name.split(".");
-         if (propertyNameTokens.length > 1)
+         var propertyNameTokens = property.name.split(":");
+         if (!property._transientHandled && propertyNameTokens.length == 3)
          {
-            property.dataType = this.options.transientPropertyTypes[propertyNameTokens[1]];
+            if (!property.title)
+            {
+               // No proper title find the label from constraints list
+               var constraints = [];
+               if (property.dataType == "d:content")
+               {
+                  constraints = this.options.constraints["ac-content-properties"];
+               }
+               for (var i = 0, il = constraints.length, constraint; i < il; i++)
+               {
+                  constraint = constraints[i];
+                  if (constraint.value == propertyNameTokens[2])
+                  {
+                     property.title = constraint.displayLabel + " (" + propertyNameTokens[0] + ":" + propertyNameTokens[1] + ")"; 
+                  }
+               }
+            }
+            if (this.options.transientPropertyTypes[property.dataType])
+            {
+               property.dataType = this.options.transientPropertyTypes[property.dataType][propertyNameTokens[2]];
+            }
+            property._transientHandled = true;
          }
          return property;
       },

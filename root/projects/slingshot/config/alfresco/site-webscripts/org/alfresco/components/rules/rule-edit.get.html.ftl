@@ -72,7 +72,7 @@
          </div>
          <div class="form-field scriptLocation">
             <input id="${el}-compensatingActionId" type="hidden" name="action.compensatingAction.id" value="">
-            <input type="hidden" name="action.compensatingAction.actionDefinitionName" value="executeScript">            
+            <input type="hidden" name="action.compensatingAction.actionDefinitionName" value="script">            
             <label for="${el}-scriptLocation">${msg("label.scriptLocation")}</label>
             <select id="${el}-scriptLocation" name="action.compensatingAction.parameterValues.scriptLocation" title="${msg("label.scriptLocation")}">
                <option value="">${msg("label.selectScript")}</option>

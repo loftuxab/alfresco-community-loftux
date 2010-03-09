@@ -132,7 +132,7 @@
                ],
                compensatingAction:
                {
-                  actionDefinitionName: "executeScript",
+                  actionDefinitionName: "script",
                   parameterValues:
                   {
                      scriptLocation: ""
