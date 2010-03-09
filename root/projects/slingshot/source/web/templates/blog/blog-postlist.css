@@ -1,7 +1,10 @@
-.yui-t1 {
+.yui-t1
+{
    width: auto;
 }
-.yui-t1 #yui-main {
+
+.yui-t1 #yui-main
+{
    margin-left: -50em;
 }
 
@@ -12,7 +15,6 @@
 
 .blog-filter h2
 {
-   background: url(images/expanded.png) no-repeat 0% 50%;
    margin-top: 1em;
    padding-left: 1em;
 }
