@@ -976,9 +976,7 @@ div.agendaview ul li {
 .yui-skin-default div.calendar-currentMonth .yui-button {
   background: url(images/toolbar-unchecked-gradient.gif) 0 0;
 }
-.yui-skin-default div.calendar-currentMonth .yui-link-button, .calendar-currentMonth .yui-link-button .first-child {
-  border-color:#b7b7b7;
-}
+
 .yui-skin-default div.calendar-currentMonth .yui-button-checked {
   background: url(images/toolbar-checked-gradient.gif) 0 0;
 }

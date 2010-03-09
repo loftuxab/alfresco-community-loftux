@@ -1,6 +1,5 @@
 .members-bar
 {
-   background-color: #e9edef;
    border-bottom: 1px solid #c7ccce;
    clear: left;
    margin: 0 -10px 1px;
@@ -14,5 +13,3 @@
    float: left;
    padding-left: 10px;
 }
-
-
