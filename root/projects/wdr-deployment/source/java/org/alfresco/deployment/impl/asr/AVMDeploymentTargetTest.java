@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import junit.framework.TestCase;
 
@@ -36,6 +37,7 @@ import org.alfresco.repo.avm.util.BulkLoader;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transfer.TransferServiceImpl;
 import org.alfresco.service.cmr.avm.AVMException;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMService;
@@ -46,12 +48,15 @@ import org.alfresco.service.cmr.avm.deploy.DeploymentReportCallback;
 import org.alfresco.service.cmr.avm.deploy.DeploymentService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.GUID;
 import org.alfresco.util.NameMatcher;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -65,6 +70,8 @@ public class AVMDeploymentTargetTest extends TestCase
     private String TEST_TARGET = "avm";
     
     private String TEST_DEST_PATH = "/www/avm_webapps";
+    
+    private static Log logger = LogFactory.getLog(AVMDeploymentTargetTest.class);
     
     /**
      * The application context.
@@ -707,6 +714,11 @@ public class AVMDeploymentTargetTest extends TestCase
     	assertTrue("big update too small", bigUpdate.size() > 100);
     
     	/**
+    	 * Now iterate through source and destination to make sure all assets are present and correct
+    	 */
+    	checkDir(storeName, "/");
+    	    	
+    	/**
     	 * Now do a smaller update and check that just a few files update
     	 */
     	avmService.removeNode(storeName + ":/avm/ibatis");
@@ -730,6 +742,38 @@ public class AVMDeploymentTargetTest extends TestCase
     	assertTrue("Delete Missing", smallUpdate.contains(new DeploymentEvent(DeploymentEvent.Type.END, null, TEST_TARGET)));	
     }
     
+    private void checkDir(String storeName, String path)
+    {
+        logger.debug("CheckDir" + storeName + ":" + path);
+        AVMNodeDescriptor source = avmService.lookup(-1, storeName + ":" + path);  
+        SortedMap<String, AVMNodeDescriptor> list = avmService.getDirectoryListing(source);
+        for(Map.Entry<String, AVMNodeDescriptor>  entry : list.entrySet())
+        {        
+            String childPath = entry.getValue().getPath();  
+            AVMNodeDescriptor sourceDesc = entry.getValue();     
+            int pos = childPath.indexOf(":");
+            if(pos > 0)
+            {
+                childPath = childPath.substring(pos + 1);
+            }
+            
+            AVMNodeDescriptor destDesc = avmService.lookup(-1, getDestPath(storeName, childPath));   
+            
+            // Check Lengths are equal
+            if(sourceDesc.isFile())
+            {
+                logger.debug("checking file" + childPath);
+                assertEquals("source and dest different lengths", sourceDesc.getLength(), destDesc.getLength());
+                assertTrue("dest is not file" + path, destDesc.isFile());
+                assertEquals("source and dest GUIDs are different", sourceDesc.getGuid(), destDesc.getGuid());
+            }
+            if(sourceDesc.isDirectory())
+            {
+                // Recurse through the children
+                checkDir(storeName, childPath);  
+            }
+        }
+    }
   
     
     private String getDestPath(String storeName, String path)
