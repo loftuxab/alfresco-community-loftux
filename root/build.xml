@@ -342,6 +342,14 @@
                     compile-webeditor-framework,
                     deploy-webeditor-tomcat-exploded,
                     minimize-webeditor-deployed-javascript" />
+   
+   <target name="package-all-webeditor"
+           depends="package-yui270-jar, 
+                    package-webeditor-framework, 
+                    package-forms-client-jar, 
+                    package-webeditor, 
+                    package-webeditor-plugin, 
+                    package-webeditor-customersite-sample" />
 
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"

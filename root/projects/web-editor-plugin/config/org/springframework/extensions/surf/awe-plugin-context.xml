@@ -33,6 +33,7 @@
       <property name="dependencies">
          <list>
             <ref bean="wefRibbon" />
+            <ref bean="aweBootstrap" />
             <ref bean="formsUI" />
             <ref bean="aweCSS" />
             <ref bean="aweLoginPanel" />
@@ -199,7 +200,14 @@
    </bean>
    
    <!-- *** AWE *** -->
-   
+
+   <bean id="aweBootstrap" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="org.alfresco.awe.bootstrap" />
+      <property name="description" value="AWE bootstrap script" />
+      <property name="path" value="/service/awe/bootstrap" />
+      <property name="type" value="js" />
+   </bean>
+    
    <bean id="aweCSS" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.awe.css" />
       <property name="description" value="Main CSS file for AWE" />

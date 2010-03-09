@@ -138,7 +138,7 @@
    <bean id="yuiBubbling" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="com.yahoo.bubbling" />
       <property name="description" value="Bubbling event library" />
-      <property name="path" value="/res/js/bubbling.v2.1.js" />
+      <property name="path" value="/res/wef/bubbling.v2.1.js" />
       <property name="type" value="js" />
       <property name="variableName" value="YAHOO.Bubbling" />
       <property name="dependencies">
