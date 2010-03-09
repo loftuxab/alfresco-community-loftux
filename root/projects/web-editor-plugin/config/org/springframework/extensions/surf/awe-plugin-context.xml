@@ -8,7 +8,6 @@
       <property name="resourceBundles">
          <list>
             <value>alfresco.messages.awe</value>
-            <value>org.springframework.extensions.webeditor.wef</value>
          </list>
       </property>
    </bean>
