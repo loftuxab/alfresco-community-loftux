@@ -4,8 +4,8 @@
 
 <@templateBody>
    <div class="js-disabled-form">
-      <h2>${url.args.title?html}</h2>
+      <#if url.args.title??><h2>${url.args.title?html}</h2></#if>
       <@region id="metadata" scope="template" />
-      <div class="cancel-link"><a href="${url.args.redirect?html}">${msg("button.cancel")}</a></div>
+      <#if url.args.redirect??><div class="cancel-link"><a href="${url.args.redirect?html}">${msg("button.cancel")}</a></div></#if>
    </div>
 </@>
