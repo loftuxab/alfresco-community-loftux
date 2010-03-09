@@ -3,6 +3,15 @@
 
 <beans>
    
+   <!-- Provide WEF specific resource bundle -->
+   <bean id="wefResourceBundle" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
+      <property name="resourceBundles">
+         <list>
+            <value>org.springframework.extensions.webeditor.wef</value>
+         </list>
+      </property>
+   </bean>
+   
    <!-- WEF Web Scripts -->
    <bean id="webscript.org.springframework.extensions.webeditor.wefresources.get" class="org.springframework.extensions.webeditor.webscripts.WEFResourcesGet" parent="webscript">
       <property name="pluginRegistry" ref="wefPluginRegistry" />

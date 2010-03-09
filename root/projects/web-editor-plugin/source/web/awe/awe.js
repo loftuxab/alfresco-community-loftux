@@ -93,7 +93,7 @@
          {
             id:'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             name: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-            label: '<img src="/awe/res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
+            label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
             content:'',
             active: true
          },WebEditor.ui.Toolbar);
@@ -102,7 +102,7 @@
          [
             {
                type: 'menu',
-               label: '<img src="/awe/res/awe/images/quick-edit.gif" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
+               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/quick-edit.gif" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
                value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                icon: true,
@@ -122,7 +122,7 @@
             }, 
             {
                type: 'push',
-               label: '<img src="/awe/res/awe/images/toggle-edit.gif" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
+               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/toggle-edit.gif" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
                value: this.config.namespace + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                icon: true               
@@ -182,11 +182,11 @@
          var formUri = null;
          if (o.formId)
          {
-            formUri = YAHOO.lang.substitute('/awe/service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+            formUri = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + 'service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
          }
          else
          {
-            formUri = YAHOO.lang.substitute('/awe/service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+            formUri = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + 'service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
          }
          this.module.getFormPanelInstance('wef-panel').setOptions({
             formName: 'wefPanel',
@@ -325,7 +325,7 @@
                handler: function()
                {
                   var config = {
-                     url: '/awe/page/dologout',
+                     url: Alfresco.constants.URL_CONTEXT + 'page/dologout',
                      method: "GET",
                      successCallback: {
                         fn: function logoutSuccess(e)
