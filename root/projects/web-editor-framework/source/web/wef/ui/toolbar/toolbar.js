@@ -25,20 +25,21 @@
       Selector = YAHOO.util.Selector,
       Element = YAHOO.util.Element,
       Bubbling = YAHOO.Bubbling,
-      Cookie = YAHOO.util.Cookie;
+      Cookie = YAHOO.util.Cookie,
+      WebEditor = YAHOO.org.springframework.extensions.webeditor;
 
-   YAHOO.namespace('org.wef.ui.Toolbar');
+   YAHOO.namespace('org.springframework.extensions.webeditor.ui.Toolbar');
       
-   YAHOO.org.wef.ui.Toolbar = function WEF_UI_Toolbar_constructor(config)
+   WebEditor.ui.Toolbar = function WEF_UI_Toolbar_constructor(config)
    {
-     YAHOO.org.wef.ui.Toolbar.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
+     WebEditor.ui.Toolbar.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
    };
        
-   YAHOO.extend(YAHOO.org.wef.ui.Toolbar, WEF.Widget,
+   YAHOO.extend(WebEditor.ui.Toolbar, WEF.Widget,
    {
       init: function WEF_UI_Toolbar_init()
       {
-         YAHOO.org.wef.ui.Toolbar.superclass.init.apply(this);
+         WebEditor.ui.Toolbar.superclass.init.apply(this);
          this.widgets.buttons = [];
          var el = this.element.get('element');
          el.innerHTML= '<div class="wef-toolbar"><fieldset><legend>leg</legend><div class="wef-toolbar-subcont"><div class="wef-toolbar-group"><h3></h3><ul></ul></div></div></fieldset></div>';
@@ -127,4 +128,4 @@
       
    });
 })();
-WEF.register("org.wef.ui.Toolbar", YAHOO.org.wef.ui.Toolbar, {version: "1.0", build: "1"});
+WEF.register("org.springframework.extensions.webeditor.ui.Toolbar", YAHOO.org.springframework.extensions.webeditor.ui.Toolbar, {version: "1.0", build: "1"});

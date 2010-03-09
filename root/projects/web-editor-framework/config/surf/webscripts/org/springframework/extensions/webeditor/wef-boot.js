@@ -164,13 +164,10 @@
               }
               var moduleUA = module.userAgent,
                   useragent = YAHOO.env.ua;
-              //console.log(module.name, moduleUA);
               if (!YAHOO.lang.isNull(moduleUA)) 
               {
-                 //console.log('a');
                  if (!useragent[moduleUA.toLowerCase()]) 
                  {
-                    //console.log('b');
                     return false;
                  }
               }
@@ -437,7 +434,7 @@
              * 
              * @param {Function} callback
              */
-            run: function WEF_Run(appName)//, appSuccessCallback, appFailureCallback)
+            run: function WEF_Run(appName)
             {
                 loader.boot(function (o)
                    {
@@ -454,27 +451,25 @@
                                if (app)
                                {
                                   
-                                  y.org.wef.module.Ribbon = new YAHOO.org.wef.ui.Ribbon(
+                                  y.org.springframework.extensions.webeditor.module.Ribbon = new YAHOO.org.springframework.extensions.webeditor.ui.Ribbon(
                                   {
                                      id : 'wef-ribbon',
                                      name : 'WEF-Ribbon',
                                      element: 'wef-ribbon'
                                   });
-                                  y.org.wef.module.Ribbon.init(y.org.wef.ConfigRegistry.getConfig("org.wef.ribbon"));
+                                  y.org.springframework.extensions.webeditor.module.Ribbon.init(y.org.springframework.extensions.webeditor.ConfigRegistry.getConfig("org.springframework.extensions.webeditor.ribbon"));
                                   //show ribbon after it is rendered.
                                   YAHOO.Bubbling.on('WEF-Ribbon--afterRender', function(e, args)
                                   {
-                                    y.org.wef.module.Ribbon.show();
+                                    y.org.springframework.extensions.webeditor.module.Ribbon.show();
                                   });
                                   //run app
                                   app();
-                                  y.Bubbling.fire('WEF'+y.org.wef.SEPARATOR+'afterInit');   
+                                  y.Bubbling.fire('WEF'+y.org.springframework.extensions.webeditor.SEPARATOR+'afterInit');   
                                }
                                o.render(y);
                             }
                          });
-                         //, 
-                         //appFailureCallback);
                       };
                    }(this)
                 );
@@ -508,7 +503,7 @@
                   y.util.Dom.addClass('wef', 'wef-ie');
                   y.util.Dom.addClass('wef', 'wef-ie-'+YAHOO.env.ua.ie);
                }
-               Bubbling.fire('WEF'+y.org.wef.SEPARATOR+'afterRender');
+               Bubbling.fire('WEF'+y.org.springframework.extensions.webeditor.SEPARATOR+'afterRender');
                
                //appSuccessCallback.fn.call(appSuccessCallback.scope||window, o);
             },

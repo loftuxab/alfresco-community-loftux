@@ -29,7 +29,7 @@
    }
    var Bubbling = YAHOO.Bubbling;
    
-   YAHOO.namespace('org.wef');
+   YAHOO.namespace('org.springframework.extensions.webeditor');
    /**
     * Provides AOP style functionality (before,after,around)
     * @class WEF.Do
@@ -334,6 +334,35 @@
       destroy : function destroy()
       {         
          return this;
+      },
+      
+      /**
+       * Add i18n messages to the global message store.
+       * 
+       * @param {String} name Name of key to use for message. Actual name is
+       *                      stored with the name of the component as a prefix
+       * @param {String} msg  Message value
+       */
+      setMessages: function(name, msg)
+      {
+         var name = this.config.name+'.'+ name,
+             container = YAHOO.lang.isUndefined(Alfresco) ? SpringSurf.messages.global : Alfresco.messages.global;
+         
+         container[name] = msg;
+      },
+      
+      /**
+       * Retrieves i18n message
+       * 
+       * @param {String} name Key of message. Fully qualified name is prefixed 
+       *                      with name of component
+       */
+      getMessage: function(name, namespace)
+      {
+         var name = (YAHOO.lang.isUndefined(namespace)) ? this.config.name+'.'+ name : namespace+'.'+name,
+             container = YAHOO.lang.isUndefined(Alfresco) ? SpringSurf.messages.global : Alfresco.messages.global;
+         
+         return container[name] || name;
       }
    };
    YAHOO.augment(WEF.Base, YAHOO.util.AttributeProvider);
@@ -476,6 +505,6 @@
    YAHOO.extend(WEF.App, WEF.Plugin);
    
 
-   YAHOO.org.wef = WEF;   
+   YAHOO.org.springframework.extensions.webeditor = WEF;   
 })();
-WEF.register("org.wef", YAHOO.org.wef, {version: "1.0", build: "1"});
+WEF.register("org.springframework.extensions.webeditor", YAHOO.org.springframework.extensions.webeditor, {version: "1.0", build: "1"});

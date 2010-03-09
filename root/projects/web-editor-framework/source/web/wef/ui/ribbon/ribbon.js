@@ -25,21 +25,21 @@
       Selector = YAHOO.util.Selector,
       Element = YAHOO.util.Element,
       Bubbling = YAHOO.Bubbling,
-      Cookie = YAHOO.util.Cookie;
+      Cookie = YAHOO.util.Cookie,
+      WebEditor = YAHOO.org.springframework.extensions.webeditor;
     
-   YAHOO.namespace('org.wef.ui.ribbon');
-
-   YAHOO.org.wef.ui.Ribbon = function(config)
+   YAHOO.namespace('org.springframework.extensions.webeditor.ui.ribbon');
+   
+   WebEditor.ui.Ribbon = function(config)
    {
-      //config.setUpCustomEvents = (['render','show','hide']).concat(config.setUpCustomEvents || []);
-     YAHOO.org.wef.ui.Ribbon.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
+     WebEditor.ui.Ribbon.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
    };
        
-   YAHOO.extend(YAHOO.org.wef.ui.Ribbon, WEF.Widget,
+   YAHOO.extend(WebEditor.ui.Ribbon, WEF.Widget,
    {
       init: function WEF_UI_Ribbon_init()
       {
-         YAHOO.org.wef.ui.Ribbon.superclass.init.apply(this);
+         WebEditor.ui.Ribbon.superclass.init.apply(this);
          //render ribbon after WEF is rendered
          Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.widgets.toolbars = [];
@@ -57,7 +57,7 @@
       {
          
          this.setAttributeConfig('position', {
-            value: YAHOO.org.wef.ui.Ribbon.POSITION_TOP,
+            value: WebEditor.ui.Ribbon.POSITION_TOP,
             validator: function WEF_UI_Ribbon_position_attribute_validator(value)
             {
                return ('top,left,right'.indexOf(value) != -1);
@@ -90,7 +90,7 @@
       renderRibbon: function WEF_UI_Ribbon_renderRibbon()
       {
          if (!Dom.get(this.config.id)) {
-            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div class="hd"><h6>Web Editor</h6></div><div class="bd"><div id="wef-toolbar-container"></div></div><div class="ft"><div id="wef-toolbar-secondary-container"></div></div></div></div>';
+            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div class="hd"><h6>'+this.getMessage('ribbon-title', 'wef')+'</h6></div><div class="bd"><div id="wef-toolbar-container"></div></div><div class="ft"><div id="wef-toolbar-secondary-container"></div></div></div></div>';
          }
          var panelConfig = {
             visible: false,
@@ -127,23 +127,23 @@
          this.resizeRibbon()
          
          //get ribbon position from cookie if available otherwise reset to initial config value
-         this.set('position', YAHOO.org.wef.getCookieValue(this.config.name,'ribbon-position') || this.get('position'));
+         this.set('position', WebEditor.getCookieValue(this.config.name,'ribbon-position') || this.get('position'));
          ribbon.render();
-         var name = 'WEF-'+YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR+'Toolbar';
+         var name = 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'Toolbar';
          this.addToolbar(
-            YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
+            WebEditor.ui.Ribbon.PRIMARY_TOOLBAR,
             {
-               id:  YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR,
+               id:  WebEditor.ui.Ribbon.PRIMARY_TOOLBAR,
                name: name,
                element: 'wef-toolbar-container'
             },
-            YAHOO.org.wef.ui.TabbedToolbar
+            WebEditor.ui.TabbedToolbar
          );
-         name = 'WEF-Ribbon'+YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR+'Toolbar';
+         name = 'WEF-Ribbon'+WebEditor.ui.Ribbon.SECONDARY_TOOLBAR+'Toolbar';
          this.addToolbar(
-            YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR,
+            WebEditor.ui.Ribbon.SECONDARY_TOOLBAR,
             {
-               id:  YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR,
+               id:  WebEditor.ui.Ribbon.SECONDARY_TOOLBAR,
                name: name,
                element: 'wef-toolbar-secondary-container',
                buttons:
@@ -152,40 +152,40 @@
                   [
                      {
                         type: 'menu',
-                        label: 'Orientation',
-                        value: name+ YAHOO.org.wef.SEPARATOR + 'ribbon-placement',
-                        id: this.config.name + YAHOO.org.wef.SEPARATOR + 'ribbon-placement',
+                        label: this.getMessage('ribbon-orientation-label','wef'),
+                        value: name+ WebEditor.SEPARATOR + 'ribbon-placement',
+                        id: this.config.name + WebEditor.SEPARATOR + 'ribbon-placement',
                         icon: true,
                         menu: 
                         [
                            {
-                              text: 'top',
-                              value: YAHOO.org.wef.ui.Ribbon.POSITION_TOP
+                              text: this.getMessage('ribbon-orientation-menu-top-label','wef'),
+                              value: WebEditor.ui.Ribbon.POSITION_TOP
                            }, 
                            {
-                              text: 'left',
-                              value: YAHOO.org.wef.ui.Ribbon.POSITION_LEFT
+                              text: this.getMessage('ribbon-orientation-menu-left-label','wef'),
+                              value: WebEditor.ui.Ribbon.POSITION_LEFT
                            }, 
                            {
-                              text: 'right',
-                              value: YAHOO.org.wef.ui.Ribbon.POSITION_RIGHT
+                              text: this.getMessage('ribbon-orientation-menu-right-label','wef'),
+                              value: WebEditor.ui.Ribbon.POSITION_RIGHT
                            }
                         ]
                      },
                      {
                         type: 'push',
-                        label: 'Help',
+                        label: this.getMessage('ribbon-help-label','wef'),
                         value: 'http://www.alfresco.com/help/32/labs/sharehelp/',
-                        id: this.config.name + YAHOO.org.wef.SEPARATOR + 'help',
+                        id: this.config.name + WebEditor.SEPARATOR + 'help',
                         icon: true
                      } 
                   ]
                }
             },
-            YAHOO.org.wef.ui.Toolbar);
+            WebEditor.ui.Toolbar);
          // Refresh any attributes here
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
-         Bubbling.on(this.config.name + YAHOO.org.wef.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
       },
       
       resizeRibbon: function WEF_UI_Ribbon_resizeRibbon()
@@ -202,13 +202,13 @@
       
       getToolbar: function WEF_UI_Ribbon_getToolbar(toolbarId)
       {
-         if (toolbarId === YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR | toolbarId === YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR)
+         if (toolbarId === WebEditor.ui.Ribbon.PRIMARY_TOOLBAR | toolbarId === WebEditor.ui.Ribbon.SECONDARY_TOOLBAR)
          {
             return this.widgets.toolbars[toolbarId];            
          }
          else 
          {
-            return this.widgets.toolbars[YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR].getToolbar(toolbarId);
+            return this.widgets.toolbars[WebEditor.ui.Ribbon.PRIMARY_TOOLBAR].getToolbar(toolbarId);
          } 
       },
       
@@ -233,7 +233,7 @@
             throw new Error('Unable to add toolbar of specified type')
          }
          //add primary/secondary toolbars
-         if (id === YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR | id === YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR)
+         if (id === WebEditor.ui.Ribbon.PRIMARY_TOOLBAR | id === WebEditor.ui.Ribbon.SECONDARY_TOOLBAR)
          {
             if(!this.widgets.toolbars[id])
             {
@@ -242,7 +242,7 @@
          }
          else //add toolbars as tabs of tabbed toolbars.
          {
-            tbar = this.widgets.toolbars[YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR].addToolbar(id, config);            
+            tbar = this.widgets.toolbars[WebEditor.ui.Ribbon.PRIMARY_TOOLBAR].addToolbar(id, config);            
          }
          this.widgets.toolbars.push(tbar)
          this.widgets.toolbars[id] = tbar;
@@ -304,7 +304,7 @@
             container.addClass('wef-ribbon-orientation-' + e.newValue);
          }
          
-         if (e.newValue === YAHOO.org.wef.ui.Ribbon.POSITION_TOP && !this._originalBodyMarginTop) {
+         if (e.newValue === WebEditor.ui.Ribbon.POSITION_TOP && !this._originalBodyMarginTop) {
             //reset body height
             this.widgets.ribbonBody.setStyle('height', 'inherit');
             
@@ -325,7 +325,7 @@
             this.widgets.ribbonContainer.setStyle('margin-left', 0);
          }
          else 
-            if (e.newValue !== YAHOO.org.wef.ui.Ribbon.POSITION_TOP) {
+            if (e.newValue !== WebEditor.ui.Ribbon.POSITION_TOP) {
                //reset body margin-top
                Dom.setStyle(bodyEl, 'margin-top', this._originalBodyMarginTop);
                this._originalBodyMarginTop = null;
@@ -338,7 +338,7 @@
                'px');
                
                // offset body element by width of ribbon if position is not at top.
-               if (e.newValue === org.wef.ui.Ribbon.POSITION_RIGHT && !this._originalBodyMarginRight) {
+               if (e.newValue === org.springframework.extensions.webeditor.ui.Ribbon.POSITION_RIGHT && !this._originalBodyMarginRight) {
                   //save original margin right
                   this._originalBodyMarginRight = Dom.getStyle(bodyEl, 'margin-right');
                   Dom.setStyle(bodyEl, 'margin-right', parseInt(Dom.getStyle(bodyEl, 'margin-right'), 10) +
@@ -351,7 +351,7 @@
                   Dom.setStyle(bodyEl, 'margin-left', this._originalBodyMarginLeft);
                   this._originalBodyMarginLeft = null;
                }
-               if (e.newValue === org.wef.ui.Ribbon.POSITION_LEFT && !this._originalBodyMarginLeft) {
+               if (e.newValue === org.springframework.extensions.webeditor.ui.Ribbon.POSITION_LEFT && !this._originalBodyMarginLeft) {
                   //save original margin left
                   this._originalBodyMarginLeft = Dom.getStyle(bodyEl, 'margin-left');
                   
@@ -371,11 +371,11 @@
       }
    });
    
-   YAHOO.org.wef.ui.Ribbon.POSITION_LEFT = 'left';
-   YAHOO.org.wef.ui.Ribbon.POSITION_RIGHT = 'right';
-   YAHOO.org.wef.ui.Ribbon.POSITION_TOP = 'top';
-   YAHOO.org.wef.ui.Ribbon.PRIMARY_TOOLBAR = 'primary';
-   YAHOO.org.wef.ui.Ribbon.SECONDARY_TOOLBAR = 'secondary';
+   WebEditor.ui.Ribbon.POSITION_LEFT = 'left';
+   WebEditor.ui.Ribbon.POSITION_RIGHT = 'right';
+   WebEditor.ui.Ribbon.POSITION_TOP = 'top';
+   WebEditor.ui.Ribbon.PRIMARY_TOOLBAR = 'primary';
+   WebEditor.ui.Ribbon.SECONDARY_TOOLBAR = 'secondary';
 })();
 
-WEF.register("org.wef.ui.ribbon", YAHOO.org.wef.ui.Ribbon, {version: "1.0", build: "1"});
+WEF.register("org.springframework.extensions.webeditor.ui.ribbon", YAHOO.org.springframework.extensions.webeditor.ui.Ribbon, {version: "1.0", build: "1"});
