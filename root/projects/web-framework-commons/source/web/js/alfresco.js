@@ -4010,6 +4010,7 @@ Alfresco.thirdparty.toISO8601 = function()
  * @namespace Alfresco.service
  * @class Alfresco.service.BaseService
  */
+
 /**
  * BaseService constructor.
  *
@@ -4313,6 +4314,11 @@ Alfresco.util.RichEditor = function(editorName,id,config)
    }
    return null;
 };
+
+/**
+ * Datalist rendering loop size constant
+ */
+Alfresco.util.RENDERLOOPSIZE = 25;
 
 
 /**

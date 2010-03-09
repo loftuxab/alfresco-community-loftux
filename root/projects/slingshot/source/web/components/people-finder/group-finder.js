@@ -424,7 +424,7 @@
          {
             if (oResponse.results)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
+               this.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
             }
             return true;
          };
