@@ -207,7 +207,7 @@
        */
       msg: function RPP_msg(messageId)
       {
-         var result = Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1))
+         var result = Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
          if (result == messageId)
          {
             result = Alfresco.util.message(messageId, "Alfresco.module.PropertyPicker", Array.prototype.slice.call(arguments).slice(1));

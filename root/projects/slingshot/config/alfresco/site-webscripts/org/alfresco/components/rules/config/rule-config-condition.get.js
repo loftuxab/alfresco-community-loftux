@@ -85,20 +85,22 @@ function main()
       var propertiesParam = [],
          transientPropertyInstructions = {},
          instructions,
-         propertyNameTokens;
+         propertyNameTokens,
+         basePropertyName;
       for (propertyName in ruleProperties)
       {
          if (ruleProperties[propertyName] == "show")
          {
-            propertyNameTokens = propertyName.split(".");
-            instructions = transientPropertyInstructions[propertyNameTokens[0]];
+            propertyNameTokens = propertyName.split(":");
+            basePropertyName = propertyNameTokens[0] + ":" + propertyNameTokens[1];
+            instructions = transientPropertyInstructions[basePropertyName];
             if (!instructions)
             {
                instructions = [];
-               transientPropertyInstructions[propertyNameTokens[0]] = instructions;
+               transientPropertyInstructions[basePropertyName] = instructions;
             }
-            propertiesParam.push(propertyNameTokens[0]);
-            instructions.push(propertyNameTokens.length > 1 ? propertyName : propertyNameTokens[0]);
+            propertiesParam.push(basePropertyName);
+            instructions.push(propertyNameTokens.length > 2 ? propertyName : basePropertyName);
          }
       }
 
@@ -129,12 +131,12 @@ function main()
                   }
                   else
                   {
-                     // It was a transient property, modify the id to represent the transient proeprty
+                     // It was a transient property, modify the id to represent the transient property
                      allProperties.push(
                      {
-                        name: property.name + "." + instruction.transientProperty,
+                        name: instruction,
                         dataType: property.dataType,
-                        title: property.title
+                        title: null // will be set inside client js file instead
                      });
                   }
                }

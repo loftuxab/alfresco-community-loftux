@@ -226,8 +226,7 @@
                property = Alfresco.util.deepCopy(listItemObjs[foundTransientProperties[i].index]),
                title = property.title ? property.title : property.name,
                newProperty,
-               tpi,
-               type;
+               tpi;
             for (tpi = 0; tpi < tpil; tpi++)
             {
                listItemObjs.splice(insertIndex + tpi, 0, Alfresco.util.deepCopy(property));
@@ -236,7 +235,7 @@
             {
                newProperty = listItemObjs[insertIndex + tpi + 1];
                newProperty.title = transientProperty.properties[tpi].displayLabel + " (" + title + ")";
-               newProperty.name = newProperty.name + "." + transientProperty.properties[tpi].value;
+               newProperty.name = newProperty.name + ":" + transientProperty.properties[tpi].value;
             }
          }
          return listItemObjs;
