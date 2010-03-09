@@ -482,7 +482,7 @@
             }
             else if (oResponse.results && !me.options.usePagination)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
+               this.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
             }
 
             // Must return true to have the "Loading..." message replaced by the error message

@@ -1304,7 +1304,7 @@
             }
             else if (oResponse.results && !me.options.usePagination)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
+               this.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
             }
             
             // We don't get an renderEvent for an empty recordSet, but we'd like one anyway

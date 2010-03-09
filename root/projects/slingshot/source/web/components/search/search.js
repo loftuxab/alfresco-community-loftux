@@ -460,7 +460,7 @@
                   oResponse.results = oResponse.results.slice(0, me.options.maxSearchResults);
                }
                me.resultsCount = oResponse.results.length;
-               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
+               me.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
             }
             // Must return true to have the "Loading..." message replaced by the error message
             return true;

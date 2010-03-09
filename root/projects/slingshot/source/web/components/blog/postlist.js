@@ -546,7 +546,7 @@
             }
             else if (oResponse.results && !me.options.usePagination)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
+               this.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
             }            
             
             // set whether publishing actions should be available

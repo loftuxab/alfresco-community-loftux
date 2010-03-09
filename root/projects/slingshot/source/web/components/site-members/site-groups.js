@@ -554,7 +554,7 @@
                {
                   me.widgets.dataTable.set("MSG_EMPTY", '<span style="white-space: nowrap;">' + me._msg("message.empty") + '</span>');
                }
-               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
+               me.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
             }
             
             // Must return true to have the "Searching..." message replaced by the error message
