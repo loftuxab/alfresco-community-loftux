@@ -272,7 +272,7 @@ body.yui-skin-hcBlack .dashlet .body a:hover
 .yui-skin-hcBlack #prompt .bd,
 .yui-skin-hcBlack #userInput .bd
 {
-   
+
 }
 
 .yui-skin-hcBlack #prompt .ft,
@@ -671,7 +671,9 @@ body.yui-skin-hcBlack .categoryview .category .ygtvdepthcell
 
 .yui-skin-hcBlack .treeview .selected,
 .yui-skin-hcBlack .treeview .selected > table,
-.yui-skin-hcBlack .filter li.selected, 
+.yui-skin-hcBlack .categoryview .selected,
+.yui-skin-hcBlack .categoryview .selected > table,
+.yui-skin-hcBlack .filter li.selected,
 .yui-skin-hcBlack .tags li.selected,
 .archive li.selected,
 .tool li.selected,
@@ -707,18 +709,26 @@ li.selected a.tool-link,
 li.selected a.archive-link,
 li.selected a.tag-link,
 li.selected span.tag,
-body.yui-skin-hcBlack .treeview .selected table .ygtvlabel, 
-body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:link, 
-body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:visited, 
-body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:hover
+body.yui-skin-hcBlack .treeview .selected table .ygtvlabel,
+body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:link,
+body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:visited,
+body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:hover,
+body.yui-skin-hcBlack .categoryview .selected table .ygtvlabel,
+body.yui-skin-hcBlack .categoryview .selected table .ygtvlabel:link,
+body.yui-skin-hcBlack .categoryview .selected table .ygtvlabel:visited,
+body.yui-skin-hcBlack .categoryview .selected table .ygtvlabel:hover
 {
    color: #fff;
 }
 
-body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel, 
-body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:link, 
-body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:visited, 
-body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hover
+body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel,
+body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:link,
+body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:visited,
+body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hover,
+body.yui-skin-hcBlack .categoryview .selected div.ygtvchildren table .ygtvlabel,
+body.yui-skin-hcBlack .categoryview .selected div.ygtvchildren table .ygtvlabel:link,
+body.yui-skin-hcBlack .categoryview .selected div.ygtvchildren table .ygtvlabel:visited,
+body.yui-skin-hcBlack .categoryview .selected div.ygtvchildren table .ygtvlabel:hover
 {
    color: #000;
 }
@@ -768,7 +778,7 @@ body.yui-skin-hcBlack .vcalendar table,
 body.yui-skin-hcBlack .vcalendar table th,
 body.yui-skin-hcBlack .vcalendar table td,
 body.yui-skin-hcBlack .vcalendar table .hourSegment,
-body.yui-skin-hcBlack .weekview div.day, 
+body.yui-skin-hcBlack .weekview div.day,
 body.yui-skin-hcBlack .dayview div.day,
 body.yui-skin-hcBlack .calendar.weekview tbody tr.alldayRow td,
 body.yui-skin-hcBlack tr#collapseTrigger td
@@ -854,24 +864,24 @@ div.theme-bg-color-2
 .theme-bg-color-3,
 div.theme-bg-color-3
 {
-   
+
 }
 
 .theme-bg-color-4,
 div.theme-bg-color-4
 {
-   
+
 }
 
 .theme-bg-color-5,
 div.theme-bg-color-5
 {
-   
+
 }
 
 .theme-bg-1
 {
-   
+
 }
 
 .theme-bg-2
@@ -883,10 +893,10 @@ div.theme-bg-color-5
 
 .theme-border-1
 {
-   
+
 }
 
 .theme-border-2
 {
-   
+
 }

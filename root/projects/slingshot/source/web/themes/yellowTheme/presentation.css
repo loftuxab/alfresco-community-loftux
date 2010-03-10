@@ -111,7 +111,6 @@ hr
    background-color: #eeeeee;
    background-image: url(images/dashlet-title-bg.png);
    background-repeat: repeat-x;
-   color: #277abb;
 }
 
 .dashlet .feed
@@ -453,7 +452,7 @@ span.mce_alfresco-imagelibrary
 .yui-skin-yellowTheme .yui-pg-container a.yui-pg-last
 {
    border-color: #CBCBCB;
-   color: #00AE42;
+   color: #F6931C;
    text-decoration: none;
 }
 
@@ -645,12 +644,14 @@ body.yui-skin-yellowTheme .categoryview .category .ygtvdepthcell
 /* filter list link */
 
 .yui-skin-yellowTheme .treeview .selected > table,
+.yui-skin-yellowTheme .categoryview .selected > table,
 .yui-skin-yellowTheme .filter li.selected, 
 .yui-skin-yellowTheme .tags li.selected,
 .archive li.selected,
 .tool li.selected,
 body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
-#Share.yui-skin-yellowTheme .treeview .selected
+#Share.yui-skin-yellowTheme .treeview .selected,
+#Share.yui-skin-yellowTheme .categoryview .selected
 {
    background-color: #ffee9e;
 }
@@ -676,28 +677,6 @@ body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-column
 
 /* Link color */
 
-body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected a,
-li.selected a.filter-link,
-li.selected a.tool-link,
-li.selected a.archive-link,
-li.selected a.tag-link,
-li.selected span.tag,
-body.yui-skin-yellowTheme .treeview .selected table .ygtvlabel, 
-body.yui-skin-yellowTheme .treeview .selected table .ygtvlabel:link, 
-body.yui-skin-yellowTheme .treeview .selected table .ygtvlabel:visited, 
-body.yui-skin-yellowTheme .treeview .selected table .ygtvlabel:hover
-{
-   
-}
-
-body.yui-skin-yellowTheme .treeview .selected div.ygtvchildren table .ygtvlabel, 
-body.yui-skin-yellowTheme .treeview .selected div.ygtvchildren table .ygtvlabel:link, 
-body.yui-skin-yellowTheme .treeview .selected div.ygtvchildren table .ygtvlabel:visited, 
-body.yui-skin-yellowTheme .treeview .selected div.ygtvchildren table .ygtvlabel:hover
-{
-   
-}
-
 .yui-skin-yellowTheme .node .nodeTitle a,
 .yui-skin-yellowTheme .node .nodeURL a,
 .yui-skin-yellowTheme .nodeAttrValue a,
@@ -719,7 +698,7 @@ body.yui-skin-yellowTheme .treeview .selected div.ygtvchildren table .ygtvlabel:
 
 .cmis .body a
 {
-   color: #00AE42;
+   color: #F6931C;
 }
 
 /* Calendar 
