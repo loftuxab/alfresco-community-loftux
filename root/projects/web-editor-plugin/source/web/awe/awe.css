@@ -1,12 +1,14 @@
-#wef {
+#wef 
+{
    text-align: left;
 }
+
 #wef div.login-logo
 {
-   background:url(./images/login-logo.png) no-repeat 0 0;
-   margin:0.5em;
-   width:210px;
-   height:61px;
+   background: url(./images/login-logo.png) no-repeat 0 0;
+   margin: 0.5em;
+   width: 210px;
+   height: 61px;
 }
 
 /*#wef #wef-login-panel .yui-panel_container,*/
@@ -14,20 +16,22 @@
 /*#wef #wef-panel .yui-panel-container,*/
 #wef #wef-panel .yui-panel
 {
-   background-color:white;
+   background-color: white;
 }
+
 /*
    reset the 3px padding introduced by base.css
 */
 #wef .yui-button,
-#wef .yui-panel {
-   padding:0
+#wef .yui-panel 
+{
+   padding: 0;
 }
 
 #wef .form-fields,
 #wef .form-buttons
 {
-   padding:1em;
+   padding: 1em;
 }
 
 #wef div.ft,
@@ -38,17 +42,16 @@
 
 #wef div.ft
 {
-   border-width:1px 0 0 0;
+   border-width: 1px 0 0 0;
 }
-
 
 #awe--show-hide-edit-markers,
 #awe--show-hide-edit-markers span.first-child,
 #awe--quickedit,
 #awe--quickedit span.first-child
 {
-   background:none;
-   border:0;
+   background: none;
+   border: 0;
 }
 
 .js-disabled-form h2

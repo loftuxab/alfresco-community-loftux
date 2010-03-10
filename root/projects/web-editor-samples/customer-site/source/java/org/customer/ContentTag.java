@@ -34,41 +34,41 @@ import org.apache.commons.httpclient.methods.GetMethod;
  */
 public class ContentTag extends AbstractCustomerTag
 {
-   private static final long serialVersionUID = -799036741074003523L;
+    private static final long serialVersionUID = -799036741074003523L;
 
-   /**
-    * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
-    */
-   public int doStartTag() throws JspException
-   {
-      try
-      {
-         Writer out = pageContext.getOut();
+    /**
+     * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
+     */
+    public int doStartTag() throws JspException
+    {
+        try
+        {
+            Writer out = pageContext.getOut();
 
-         // setup http call to content webscript
-         String url = this.getRepoUrl() + "/service/api/node/" + getNodeRef().replace("://", "/") + "/content";
-         HttpClient client = getHttpClient();
-         GetMethod getContent = new GetMethod(url);
-         getContent.setDoAuthentication(true);
+            // setup http call to content webscript
+            String url = this.getRepoUrl() + "/service/api/node/" + getNodeRef().replace("://", "/") + "/content";
+            HttpClient client = getHttpClient();
+            GetMethod getContent = new GetMethod(url);
+            getContent.setDoAuthentication(true);
 
-         try
-         {
-            // execute the method
-            client.executeMethod(getContent);
+            try
+            {
+                // execute the method
+                client.executeMethod(getContent);
 
-            // render the content returned
-            out.write(getContent.getResponseBodyAsString());
-         }
-         finally
-         {
-            getContent.releaseConnection();
-         }
-      }
-      catch (IOException ioe)
-      {
-         throw new JspException(ioe.toString());
-      }
+                // render the content returned
+                out.write(getContent.getResponseBodyAsString());
+            }
+            finally
+            {
+                getContent.releaseConnection();
+            }
+        }
+        catch (IOException ioe)
+        {
+            throw new JspException(ioe.toString());
+        }
 
-      return SKIP_BODY;
-   }
+        return SKIP_BODY;
+    }
 }

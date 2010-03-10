@@ -18,12 +18,12 @@
  */
 
 (function() 
-{   
+{
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      KeyListener = YAHOO.util.KeyListener,
-      Selector = YAHOO.util.Selector,
-      Bubbling = YAHOO.Bubbling;   
+       Event = YAHOO.util.Event,
+       KeyListener = YAHOO.util.KeyListener,
+       Selector = YAHOO.util.Selector,
+       Bubbling = YAHOO.Bubbling;   
 
    YAHOO.namespace('org.alfresco.awe.ui.LoginPanel');
 
@@ -41,11 +41,11 @@
       {
          throw new Error("An instance of org.alfresco.awe.ui.LoginPanel already exists.");
       }
-   
+
       YAHOO.org.alfresco.awe.ui.LoginPanel.superclass.constructor.call(this, 'org.alfresco.awe.ui.LoginPanel', containerId, ["button", "container", "connection", "selector", "json"]);
       return this;
    };
-   
+
    YAHOO.extend(YAHOO.org.alfresco.awe.ui.LoginPanel, YAHOO.org.alfresco.awe.ui.Panel,
    {
       /**
@@ -56,7 +56,7 @@
       {
          this.callback = null;
       },
-   
+
       /**
        * Called when the Login html template has been returned from the server.
        * Creates the YUI gui objects such as buttons and a panel and shows it.
@@ -72,14 +72,16 @@
             this.widgets.panel.destroy();
             this.widgets.panel = null;
          }
+
          // Inject the template from the XHR request into a new DIV element
          var containerDiv = document.createElement("div");
          containerDiv.innerHTML = response.serverResponse.responseText;
-   
+
          // The panel is created from the HTML returned in the XHR request, not the container
          var panelDiv = Dom.getFirstChild(containerDiv);
-   
-         this.widgets.panel = new YAHOO.widget.Panel(panelDiv, {
+
+         this.widgets.panel = new YAHOO.widget.Panel(panelDiv, 
+         {
             modal: true,
             constraintoviewport: true,
             draggable: false,
@@ -89,17 +91,20 @@
          });
          this.widgets.panel.render(Dom.get(this.id));
          this.widgets.btnLogin = new YAHOO.widget.Button(this.id+'-btn-login');
+
          // Commented out as a this.configChangedEvenet is null error occurs
          // this.widgets.panel.subscribe('hide', this.hide, this, true)
-         var formEl = Dom.get(this.id + "-form");
+
          //form submit handler
+         var formEl = Dom.get(this.id + "-form");
          Event.on(formEl, 'submit', function login_module_submit(e)
          {
             Event.preventDefault(e);
-            var config = {
+            var config = 
+            {
                url: formEl.action,
                method: "POST",
-               dataForm:'wef-login-panel-form',
+               dataForm: 'wef-login-panel-form',
                successCallback:
                {
                   fn: this.onLoginSuccess,
@@ -111,6 +116,7 @@
                   scope: this
                }
             };
+
             Alfresco.util.Ajax.request(config);
             this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
             {
@@ -121,13 +127,12 @@
             this.widgets.panel.hide();
             return false;
          },
-         this,
-         true);
-   
+         this, true);
+
          // Show the panel
          this._showPanel();
       },
-   
+
       /**
        * Called when a login attempt is successful
        * Saves the login ticket
@@ -144,7 +149,7 @@
          }
          Bubbling.fire('awe-loggedIn',{loggedIn:true});
       },
-   
+
       /**
        * Called when a login attempt fails
        * Displays login failure message and then login panel. Also resets ticket
@@ -175,7 +180,6 @@
                isDefault: true
             }]
          });
-   
       }
    });
 })();
