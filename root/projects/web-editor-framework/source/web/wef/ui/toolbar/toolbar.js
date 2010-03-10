@@ -17,24 +17,24 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
-   
+(function() 
+{
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      KeyListener = YAHOO.util.KeyListener,
-      Selector = YAHOO.util.Selector,
-      Element = YAHOO.util.Element,
-      Bubbling = YAHOO.Bubbling,
-      Cookie = YAHOO.util.Cookie,
-      WebEditor = YAHOO.org.springframework.extensions.webeditor;
+       Event = YAHOO.util.Event,
+       KeyListener = YAHOO.util.KeyListener,
+       Selector = YAHOO.util.Selector,
+       Element = YAHOO.util.Element,
+       Bubbling = YAHOO.Bubbling,
+       Cookie = YAHOO.util.Cookie,
+       WebEditor = YAHOO.org.springframework.extensions.webeditor;
 
    YAHOO.namespace('org.springframework.extensions.webeditor.ui.Toolbar');
-      
+
    WebEditor.ui.Toolbar = function WEF_UI_Toolbar_constructor(config)
    {
-     WebEditor.ui.Toolbar.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
+      WebEditor.ui.Toolbar.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
    };
-       
+
    YAHOO.extend(WebEditor.ui.Toolbar, WEF.Widget,
    {
       init: function WEF_UI_Toolbar_init()
@@ -49,7 +49,7 @@
          {
             this.addButtons(buttons.buttons); 
          }
-         
+
          //event handler
          this.element.on('click', function(e)
          {
@@ -93,12 +93,12 @@
             }
             if (!YAHOO.lang.isUndefined(id) && !YAHOO.lang.isUndefined(value))
             {
-               Bubbling.fire(id+evtTypeStr, value);               
+               Bubbling.fire(id+evtTypeStr, value);
             }
          },this,true);
          this.initAttributes(this.config);
       },
-      
+
       addButtons: function WEF_UI_Toolbar_addButtons(buttons)
       {
          for (var i = 0, len = buttons.length; i < len; i++) 
@@ -106,7 +106,7 @@
             var btnConfig = buttons[i],
                 li;
             btnConfig.icon = btnConfig.icon || false;
-            //create container
+            // create container
             li = document.createElement('li');
             li.className = 'wef-toolbar-groupitem';
             this.widgets.buttonContainer.appendChild(li);
@@ -125,7 +125,7 @@
       {
          return this.widgets.buttons[buttonId];
       }
-      
    });
 })();
+
 WEF.register("org.springframework.extensions.webeditor.ui.Toolbar", YAHOO.org.springframework.extensions.webeditor.ui.Toolbar, {version: "1.0", build: "1"});

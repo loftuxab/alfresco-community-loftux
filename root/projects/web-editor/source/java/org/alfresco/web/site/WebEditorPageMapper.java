@@ -74,25 +74,24 @@ public class WebEditorPageMapper extends AbstractPageMapper
     /**
      * Process a page request.
      */
-    public void executeMapper(RequestContext context,
-        ServletRequest request) throws PageMapperException
+    public void executeMapper(RequestContext context, ServletRequest request) throws PageMapperException
     {
-    	if (request instanceof HttpServletRequest == false)
-    	{
-    		throw new PageMapperException("The Web Editor page mapper must be given an HttpServletRequest to execute.");
-    	}
-    	
-    	// The request URI string.  This comes in as something like:
-    	//    /awe/p/user/profile
+        if (request instanceof HttpServletRequest == false)
+        {
+            throw new PageMapperException("The Web Editor page mapper must be given an HttpServletRequest to execute.");
+        }
+
+        // The request URI string.  This comes in as something like:
+        //    /awe/p/user/profile
         // Strip off the webapp name (if any - may be ROOT i.e. "/")
         HttpServletRequest req = ((HttpServletRequest)request);
-    	String requestURI = req.getRequestURI().substring(req.getContextPath().length());
+        String requestURI = req.getRequestURI().substring(req.getContextPath().length());
         requestURI = URLDecoder.decode(requestURI);
         
-    	// Extract page Id from the rest of the URI
-    	String pageId = null;
+        // Extract page Id from the rest of the URI
+        String pageId = null;
         
-	    // strip servlet name and set remaining path as currently executing URI
+        // strip servlet name and set remaining path as currently executing URI
         Map<String, String> uriTokens = null;
         int pathIndex = requestURI.indexOf('/', 1);
         
@@ -106,7 +105,7 @@ public class WebEditorPageMapper extends AbstractPageMapper
         // build a URLHelper object one time here - it is an immutable object
         URLHelper urlHelper = new URLHelper(req, uriTokens);
         context.setValue(ProcessorModelHelper.MODEL_URL, urlHelper);
-    	
+
         /**
          * Extract the page type id and determine which page to bind
          * into the request context.
@@ -148,10 +147,10 @@ public class WebEditorPageMapper extends AbstractPageMapper
             }
         }
         
-    	// Place everything into the request context
-    	if (pageId != null)
-    	{
-    		// We have a page Id.  We must resolve it to a page.
+        // Place everything into the request context
+        if (pageId != null)
+        {
+            // We have a page Id.  We must resolve it to a page.
             Page page = context.getObjectService().getPage(pageId);
             if (page != null)
             {

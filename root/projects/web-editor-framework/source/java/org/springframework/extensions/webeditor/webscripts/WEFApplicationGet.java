@@ -46,7 +46,7 @@ public class WEFApplicationGet extends DeclarativeWebScript
     {
         this.pluginRegistry = registry;
     }
-    
+
     @Override
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
@@ -57,7 +57,7 @@ public class WEFApplicationGet extends DeclarativeWebScript
         {
             throw new IllegalStateException("A WEF application plugin could not be found");
         }
-        
+
         // add the application name to the model
         model.put("appName", this.pluginRegistry.getApplications().get(0).getName());
         
@@ -70,10 +70,10 @@ public class WEFApplicationGet extends DeclarativeWebScript
                 plugins.add(plugin);
             }
         }
-        
+
         // add the plugins to the model
         model.put("plugins", plugins);
-    	
+
         return model;
     }
 }

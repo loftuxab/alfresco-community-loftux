@@ -1,20 +1,3 @@
-         /*
-Copyright (c) 2009, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.7.0
-*/
-/**
- * YUI Reset
- * @module reset
- * @namespace
- * @requires 
- */
-/* html {
-   color: #000;
-   background: #FFF;
-} */
-
 body.wef-root-body .wef,
 .wef div,
 .wef dl,
@@ -40,18 +23,21 @@ body.wef-root-body .wef,
 .wef p,
 .wef blockquote,
 .wef th,
-.wef td {
+.wef td 
+{
    margin: 0;
    padding: 0;
 }
 
-.wef table {
+.wef table 
+{
    border-collapse: collapse;
    border-spacing: 0;
 }
 
 .wef fieldset,
-.wef img {
+.wef img 
+{
    border: 0;
 }
 
@@ -64,22 +50,26 @@ body.wef-root-body .wef,
 .wef strong,
 .wef th,
 .wef var,
-.wef optgroup {
+.wef optgroup 
+{
    font-style: inherit;
    font-weight: inherit;
 }
 
 .wef del,
-.wef ins {
+.wef ins 
+{
    text-decoration: none;
 }
 
-.wef li {
+.wef li 
+{
    list-style: none;
 }
 
 .wef caption,
-.wef th {
+.wef th 
+{
    text-align: left;
 }
 
@@ -88,32 +78,38 @@ body.wef-root-body .wef,
 .wef h3,
 .wef h4,
 .wef h5,
-.wef h6 {
+.wef h6 
+{
    font-size: 100%;
    font-weight: normal;
 }
 
 .wef q:before,
-.wef q:after {
+.wef q:after 
+{
    content: '';
 }
 
 .wef abbr,
-.wef acronym {
+.wef acronym 
+{
    border: 0;
    font-variant: normal;
 }
 
-.wef sup {
+.wef sup 
+{
    vertical-align: baseline;
 }
 
-.wef sub {
+.wef sub 
+{
    vertical-align: baseline;
 }
 
 /*because legend doesn't inherit in IE */
-.wef legend {
+.wef legend 
+{
    color: #000;
 }
 
@@ -122,7 +118,8 @@ body.wef-root-body .wef,
 .wef textarea,
 .wef select,
 .wef optgroup,
-.wef option {
+.wef option 
+{
    font-family: inherit;
    font-size: inherit;
    font-style: inherit;
@@ -134,31 +131,17 @@ body.wef-root-body .wef,
 .wef input,
 .wef button,
 .wef textarea,
-.wef select {
+.wef select 
+{
    *font-size: 100%;
 }
-
-
-
-         
-/*
-Copyright (c) 2009, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.7.0
-*/
-/**
- * YUI Fonts
- * @module fonts
- * @namespace yui-
- * @requires 
- */
 
 /**
  * Percents could work for IE, but for backCompat purposes, we are using keywords.
  * x-small is for IE6/7 quirks mode.
  */
-body.wef-root-body div.wef {
+body.wef-root-body div.wef 
+{
    font:13px/1.231 arial,helvetica,clean,sans-serif;
    /* for IE6/7 */ 
    *font-size:small; 
@@ -173,14 +156,16 @@ body.wef-root-body div.wef {
 .wef input,
 .wef button,
 .wef textarea,
-.wef button {
+.wef button 
+{
    font:99% arial,helvetica,clean,sans-serif;
 }
 
 /**
  * To help tables remember to inherit
  */
-.wef table {
+.wef table 
+{
    font-size:inherit;
    font:100%;
 }
@@ -192,7 +177,8 @@ body.wef-root-body div.wef {
 .wef code,
 .wef kbd,
 .wef samp,
-.wef tt {
+.wef tt 
+{
    font-family:monospace;
    *font-size:108%;
    line-height:100%;

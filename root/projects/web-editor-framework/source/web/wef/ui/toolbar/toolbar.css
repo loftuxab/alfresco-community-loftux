@@ -1,16 +1,16 @@
 #wef .wef-toolbar legend,
 #wef .wef-toolbar h3
 {
-   display:none;
+   display: none;
 }
 
 #wef .wef-toolbar .wef-toolbar-groupitem
 {
-   float:left;
+   float: left;
 }
 
 #wef .wef-toolbar .icon-button button
 {
-   padding-left:2.5em;
+   padding-left: 2.5em;
 }
 

@@ -56,13 +56,13 @@ public class WEFResourcesGet extends DeclarativeWebScript
         {
             throw new IllegalStateException("A WEF application plugin could not be found");
         }
-        
+
         // add the application name to the model
         model.put("appName", this.pluginRegistry.getApplications().get(0).getName());
         
         // add all the application and plugin resources to the model
-    	model.put("resources", this.pluginRegistry.getPluginResources());
-    	
+        model.put("resources", this.pluginRegistry.getPluginResources());
+
         return model;
     }
 }
