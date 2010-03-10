@@ -655,12 +655,14 @@ body.yui-skin-greenTheme .categoryview .category .ygtvdepthcell
 /* filter list link */
 
 .yui-skin-greenTheme .treeview .selected > table,
+.yui-skin-greenTheme .categoryview .selected > table,
 .yui-skin-greenTheme .filter li.selected, 
 .yui-skin-greenTheme .tags li.selected,
 .archive li.selected,
 .tool li.selected,
 body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
-#Share.yui-skin-greenTheme .treeview .selected
+#Share.yui-skin-greenTheme .treeview .selected,
+#Share.yui-skin-greenTheme .categoryview .selected
 {
    background-color: #D4F8C4;
 }
@@ -685,28 +687,6 @@ body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnb
 }
 
 /* Link color */
-
-body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected a,
-li.selected a.filter-link,
-li.selected a.tool-link,
-li.selected a.archive-link,
-li.selected a.tag-link,
-li.selected span.tag,
-body.yui-skin-greenTheme .treeview .selected table .ygtvlabel, 
-body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:link, 
-body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:visited, 
-body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:hover
-{
-   
-}
-
-body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel, 
-body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:link, 
-body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:visited, 
-body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:hover
-{
-   
-}
 
 .yui-skin-greenTheme .node .nodeTitle a,
 .yui-skin-greenTheme .node .nodeURL a,

@@ -644,6 +644,7 @@ body.yui-skin-default .categoryview .category .ygtvdepthcell
 .yui-skin-default .filter li.selected,
 .yui-skin-default .tags li.selected,
 .yui-skin-default .treeview .selected,
+.yui-skin-default .categoryview .selected,
 .archive li.selected,
 .tool li.selected,
 body.yui-skin-default .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
@@ -688,7 +689,11 @@ li.selected span.tag,
 body.yui-skin-default .treeview .selected table .ygtvlabel, 
 body.yui-skin-default .treeview .selected table .ygtvlabel:link, 
 body.yui-skin-default .treeview .selected table .ygtvlabel:visited, 
-body.yui-skin-default .treeview .selected table .ygtvlabel:hover
+body.yui-skin-default .treeview .selected table .ygtvlabel:hover,
+body.yui-skin-default .categoryview .selected table .ygtvlabel,
+body.yui-skin-default .categoryview .selected table .ygtvlabel:link,
+body.yui-skin-default .categoryview .selected table .ygtvlabel:visited,
+body.yui-skin-default .categoryview .selected table .ygtvlabel:hover
 {
    
 }
@@ -696,7 +701,11 @@ body.yui-skin-default .treeview .selected table .ygtvlabel:hover
 body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel, 
 body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:link, 
 body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:visited, 
-body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:hover
+body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:hover,
+body.yui-skin-default .categoryview .selected div.ygtvchildren table .ygtvlabel,
+body.yui-skin-default .categoryview .selected div.ygtvchildren table .ygtvlabel:link,
+body.yui-skin-default .categoryview .selected div.ygtvchildren table .ygtvlabel:visited,
+body.yui-skin-default .categoryview .selected div.ygtvchildren table .ygtvlabel:hover
 {
    
 }

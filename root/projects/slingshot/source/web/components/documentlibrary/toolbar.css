@@ -23,14 +23,6 @@
    display: none;
 }
 
-
-/* Header Bar */
-
-.toolbar .header-bar
-{
-   background-color: #e3eaec;
-}
-
 .toolbar .left
 {
    float: left;
