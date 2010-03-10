@@ -22,14 +22,16 @@
    var Dom = YAHOO.util.Dom,
        Element = YAHOO.util.Element,
        Cookie = YAHOO.util.Cookie;
-      
+
    if (typeof WEF == "undefined" || !WEF)
    {
       throw new Error('WEF not found');   
    }
+
    var Bubbling = YAHOO.Bubbling;
-   
+
    YAHOO.namespace('org.springframework.extensions.webeditor');
+
    /**
     * Provides AOP style functionality (before,after,around)
     * @class WEF.Do
@@ -37,20 +39,19 @@
     */
    WEF.Do = function() 
    {
-      var aAspects = {
-         
+      var aAspects = 
+      {
          /**
           * Decorates method wth supplied function. Stores a reference to the
           * original function on the new function object 
           *  
           * @param {Object} oTarget Object that contains method to override
           * @param {String} sMethod Name of function to override
-          * @param {Function} fAdvice Function to run before specified object method          
+          * @param {Function} fAdvice Function to run before specified object method
           */
          before: function WEF_before(oTarget,sMethodName,fn) 
          {
             var fOrigMethod = oTarget[sMethodName];
-
             oTarget[sMethodName] = function()
             {
                fn.apply(oTarget, arguments);
@@ -58,14 +59,14 @@
             };
             oTarget[sMethodName]['fOrigMethod_before'] = fOrigMethod;
          },
-         
+
          /**
           * Decorates method wth supplied function. Stores a reference to the
           * original function on the new function object 
           *  
           * @param {Object} oTarget Object that contains method to override
           * @param {String} sMethod Name of function to override
-          * @param {Function} fAdvice Function to run before specified object method          
+          * @param {Function} fAdvice Function to run before specified object method
           */         
          after: function WEF_after(oTarget,sMethodName,fn)
          {
@@ -75,9 +76,9 @@
                var rv = fOrigMethod.apply(oTarget, arguments);
                return fn.apply(oTarget, [rv]);
             };
-            oTarget[sMethodName]['fOrigMethod_after'] = fOrigMethod;      
+            oTarget[sMethodName]['fOrigMethod_after'] = fOrigMethod;
          },
-         
+
          /**
           * Decorates method wth supplied function. Stores a reference to the
           * original function on the new function object 
@@ -85,8 +86,8 @@
           * @param {Object} oTarget Object that contains method to override
           * @param {String} sMethod Name of function to override
           * @param {Array} aFn Array of functions to run before and after 
-          * specified object method          
-          */         
+          * specified object method
+          */
          around: function WEF_around(oTarget,sMethodName,aFn)
          {
             var fOrigMethod = oTarget[sMethodName];
@@ -94,14 +95,15 @@
             {
                if (aFn && aFn.length==2) 
                {
-                  //before
+                  // before
                   aFn[0].apply(oTarget, arguments);
-                  //original
+                  // original
                   var rv = fOrigMethod.apply(oTarget, arguments);
-                  //after
+                  // after
                   return aFn[1].apply(oTarget, [rv]);
                }
-               else {
+               else 
+               {
                   return fOrigMethod.apply(oTarget, arguments);
                }
             };
@@ -123,13 +125,13 @@
       {
          if (oTarget && sAspect && sMethod && fAdvice && aAspects[sAspect]) 
          {
-             //decorate specified method
-             aAspects[sAspect](oTarget,sMethod,fAdvice);
+            // decorate specified method
+            aAspects[sAspect](oTarget,sMethod,fAdvice);
          }
-         
+
          return oTarget;
       };
-      
+
       /**
        * Decorates supplied object method with supplied function so that the 
        * function is run before the object method.
@@ -142,9 +144,9 @@
        */
       var before = function WEF_Do_before(oTarget, sMethod, fAdvice)
       {
-        return advise(oTarget,WEF.Do.BEFORE,sMethod,fAdvice);
+         return advise(oTarget,WEF.Do.BEFORE,sMethod,fAdvice);
       };
-      
+
       /**
        * Decorates supplied object method with supplied function so that the 
        * function is run after the object method.
@@ -157,9 +159,9 @@
        */
       var after = function WEF_Do_after(oTarget,sMethod,fAdvice)
       {
-        return advise(oTarget,WEF.Do.AFTER,sMethod,fAdvice);
+         return advise(oTarget,WEF.Do.AFTER,sMethod,fAdvice);
       };
-      
+
       /**
        * Decorates supplied object method with supplied function so that the 
        * function is run after the object method.
@@ -173,7 +175,7 @@
        */
       var around = function WEF_Do_around(oTarget,sMethod,aAdvices)
       {
-        return advise(oTarget,WEF.Do.AROUND,sMethod,aAdvices);
+         return advise(oTarget,WEF.Do.AROUND,sMethod,aAdvices);
       };
 
       /**
@@ -192,6 +194,7 @@
             oTarget[sMethod] = oTarget[sMethod][resolvedName];
          }
       };
+
       return {
          before: before,
          after : after,
@@ -199,11 +202,11 @@
          unbind: unbind
       };
    }();
-   
+
    WEF.Do.BEFORE = 'before';
    WEF.Do.AFTER  = 'after';
    WEF.Do.AROUND = 'around';
-   
+
    WEF.SEPARATOR = '--';
    WEF.DEBUG = 'DEBUG';
    WEF.BEFORE_EVENT = WEF.SEPARATOR + WEF.Do.BEFORE;
@@ -223,7 +226,7 @@
       data[name] = value;
       return Cookie.setSubs(rootName, data);
    };
-   
+
    /**
     * Returns value of specified sub-cookie
     *
@@ -234,7 +237,7 @@
    {
       return (YAHOO.lang.isUndefined(name)) ? Cookie.getSubs(rootName) : Cookie.getSub(rootName, name);
    };
-   
+
    /**
     * Base object of all AAF UI components. Automatically fires before and after
     * Bubbling events for init() and destroy().
@@ -258,84 +261,89 @@
             {
                return;
             }
-            
+
             var capitalizedMthName = mth.slice(0,1).toUpperCase() + mth.slice(1),
                 beforeMthdName = WEF.BEFORE_EVENT + capitalizedMthName,
                 afterMthdName = WEF.AFTER_EVENT + capitalizedMthName;
-                
+
             WEF.Do.around(this,mth,
             [
-               //before
+               // before
                function()
                {
                   if (WEF.get('debugMode'))
                   {
-                     Bubbling.fire(WEF.DEBUG + beforeMthdName,{
-                        name:this.config.name,
+                     Bubbling.fire(WEF.DEBUG + beforeMthdName,
+                     {
+                        name: this.config.name,
                         obj: this
-                     });                     
+                     });
                   }
-                  Bubbling.fire(this.config.name + beforeMthdName,{
-                     name:this.config.name,
+                  Bubbling.fire(this.config.name + beforeMthdName,
+                  {
+                     name: this.config.name,
                      obj: this
                   });
+                  
                   return this;
                },
-               //after
+
+               // after
                function()
                {
                   if (WEF.get('debugMode'))
                   {
-                     Bubbling.fire(WEF.DEBUG + afterMthdName,{
-                        name:this.config.name,
+                     Bubbling.fire(WEF.DEBUG + afterMthdName,
+                     {
+                        name: this.config.name,
                         obj: this
-                     });                     
+                     });
                   }
                   Bubbling.fire(this.config.name + afterMthdName,
                   {
-                     name:this.config.name,
+                     name: this.config.name,
                      obj: this
                   });
                   return this;
                }
             ]);
          }
-         
+
          var evts = (['init','destroy']).concat(this.config.setUpCustomEvents);
-         
-         for (var i=0,len=evts.length;i<len;i++)
+
+         for (var i = 0, len = evts.length; i < len; i++)
          {
-          _setupEvent.apply(this,[evts[i]]);
+            _setupEvent.apply(this,[evts[i]]);
          }
       }
+
       return this;
    };
 
    WEF.Base.prototype = 
    {
-      
       /**
        * Initialises object
        * 
        * Fires a beforeInit and afterInit event
        * @return this
        */
-      init : function init()
+      init: function init()
       {
          return this;
       },
-      
+
       /**
        * Destroys object
        * 
        * Fires a beforeDestroy and afterDestory event
        * @return this
        */      
-      destroy : function destroy()
+      destroy: function destroy()
       {         
          return this;
       },
-      
+
       /**
        * Add i18n messages to the global message store.
        * 
@@ -347,10 +355,10 @@
       {
          var name = this.config.name+'.'+ name,
              container = YAHOO.lang.isUndefined(Alfresco) ? SpringSurf.messages.global : Alfresco.messages.global;
-         
+
          container[name] = msg;
       },
-      
+
       /**
        * Retrieves i18n message
        * 
@@ -361,11 +369,13 @@
       {
          var name = (YAHOO.lang.isUndefined(namespace)) ? this.config.name+'.'+ name : namespace+'.'+name,
              container = YAHOO.lang.isUndefined(Alfresco) ? SpringSurf.messages.global : Alfresco.messages.global;
-         
+
          return container[name] || name;
       }
    };
+
    YAHOO.augment(WEF.Base, YAHOO.util.AttributeProvider);
+
    /**
     * The Plugin object constructor. Automatically fires before and after
     * Bubbling events for activate() and deactivate() in additional to those
@@ -380,16 +390,17 @@
       config.setUpCustomEvents = (['activate','deactivate']).concat(config.setUpCustomEvents || []);
       WEF.Plugin.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
    };
-   
-   YAHOO.extend(WEF.Plugin, WEF.Base, {
+
+   YAHOO.extend(WEF.Plugin, WEF.Base, 
+   {
       /**
        * Activates plugin
        * 
        * Fires a beforeActivate and afterActivate event
        * @return this
        */
-      activate : function activate()
-      {         
+      activate: function activate()
+      {
          return this;
       },
 
@@ -398,23 +409,23 @@
        * 
        * Fires a beforeDeactivate and afterDeActivate event
        * @return this
-       */      
-      deactivate : function deactivate()
+       */
+      deactivate: function deactivate()
       {
          return this;
       },
-      
+
       /**
        * Container for any service instances
        */
       services: {},
-      
+
       /**
        * Container for widget instances
        */
       widgets: {}
    });
-   
+
    /**
     * The App widget constructor. Automatically fires before and after
     * Bubbling events for render(), show() and hide(), in additional to those
@@ -429,52 +440,50 @@
    {
       config.setUpCustomEvents = (['render','show','hide']).concat(config.setUpCustomEvents || []);
       WEF.Widget.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
-      
+
       this.services = {};
       this.widgets = {};
    };
-   
-   YAHOO.extend(WEF.Widget, WEF.Plugin, {
-      
+
+   YAHOO.extend(WEF.Widget, WEF.Plugin, 
+   {
       init: function init()
       {
          //if no element on config then widget must assign one at some point.
          if (this.config.element)
          {
-            this.element = new Element(this.config.element);            
+            this.element = new Element(this.config.element);
          }
       },
-      
+
       initAttributes: function initAttributes()
       {
-         
-      }, 
-      
-     /**
+      },
+
+      /**
        * Renders object
        * 
        * Fires a beforeRender and afterRender event
        * @return this
        */
-      render : function WEF_Widget_render() 
+      render: function WEF_Widget_render() 
       {
          return this;
       },
-     
-     
-     /**
+
+      /**
        * Shows widget
        * 
        * Fires a beforeShow and afterShow event
        * @return this
-       */      
+       */
       show : function WEF_Widget_show()
       {
          Dom.addClass(this.config.id, 'wef-show');
          Dom.removeClass(this.config.id, 'wef-hide');
          return this;
       },
-      
+
       /**
        * Hides Widget
        * 
@@ -485,11 +494,11 @@
       hide: function WEF_Widget_hide()
       {
          Dom.addClass(this.config.id, 'wef-hide');
-         Dom.removeClass(this.config.id, 'wef-show');         
+         Dom.removeClass(this.config.id, 'wef-show');
          return this;
-      }      
+      }
    });
-   
+
    /**
     * The App object constructor
     * 
@@ -499,12 +508,12 @@
     */
    WEF.App = function WEF_App(config)
    {
-      WEF.App.superclass.constructor.apply(this, arguments);  
+      WEF.App.superclass.constructor.apply(this, arguments);
    };
-   
-   YAHOO.extend(WEF.App, WEF.Plugin);
-   
 
-   YAHOO.org.springframework.extensions.webeditor = WEF;   
+   YAHOO.extend(WEF.App, WEF.Plugin);
+
+   YAHOO.org.springframework.extensions.webeditor = WEF;
 })();
+
 WEF.register("org.springframework.extensions.webeditor", YAHOO.org.springframework.extensions.webeditor, {version: "1.0", build: "1"});

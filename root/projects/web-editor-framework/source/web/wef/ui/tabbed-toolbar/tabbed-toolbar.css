@@ -1,7 +1,7 @@
 #wef-ribbon .wef-tab-toolbar
 {
-   position:relative;
-   top:-1px;
+   position: relative;
+   top: -1px;
 }
 
 #wef-ribbon .wef-tab-toolbar .yui-navset .yui-nav
@@ -13,24 +13,27 @@
 #wef-ribbon .wef-tab-toolbar .yui-nav a,
 #wef-ribbon .wef-tab-toolbar .yui-nav a em
 {
-   border-color:#93acbd;
+   border-color: #93acbd;
 }
+
 #wef-ribbon .wef-tab-toolbar .yui-nav a
 {
    background: #ebf4fa none;
-   border:1px solid #93acbd;
-   border-bottom:0;   
+   border: 1px solid #93acbd;
+   border-bottom: 0;   
 }
+
 #wef-ribbon .wef-tab-toolbar div.yui-content
 {
-   background:#fff url(./images/tab-bg.gif) repeat scroll 0 0;
-   border-width:0 0 0 1px;
-   border-color:#93ACBD;
-   /*height:44px;*/
-  height:47px;
-  padding-bottom:1px;
+   background: #fff url(./images/tab-bg.gif) repeat scroll 0 0;
+   border-width: 0 0 0 1px;
+   border-color: #93ACBD;
+   /*height: 44px;*/
+   height: 47px;
+   padding-bottom: 1px;
 }
+
 #wef-ribbon .wef-tab-toolbar div.wef-toolbar
 {
-   margin:8px 0 5px 0;
+   margin: 8px 0 5px 0;
 }

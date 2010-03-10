@@ -1,150 +1,172 @@
-#wef-ribbon-container{   
-   position:fixed;
-   top:0;
-   z-index:100;
+#wef-ribbon-container
+{
+   position: fixed;
+   top: 0;
+   z-index: 100;
 }
 
 #wef-ribbon-container #wef-ribbon
 {
    visibility: hidden;
-   border-width:0;
+   border-width: 0;
 }
 
 #wef-ribbon-container #wef-ribbon_c
 {   
-   background-color:transparent;
+   background-color: transparent;
 }
+
 #wef-ribbon-container #wef-ribbon
 {
-   background-color:#b7d4e9;
+   background-color: #b7d4e9;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c,
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c,
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon_c
 {
-   border:1px solid #999;
+   border: 1px solid #999;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c
 {
-   border-width:0 0 1px 0;
-   -moz-box-shadow:0 0 20px #CCCCCC;
-   -webkit-box-shadow:0 0 20px #CCCCCC;
+   border-width: 0 0 1px 0;
+   -moz-box-shadow: 0 0 20px #CCCCCC;
+   -webkit-box-shadow: 0 0 20px #CCCCCC;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c
 {
-   border-width:0 1px 0 0;
+   border-width: 0 1px 0 0;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon_c
 {
-   border-width:0 0 0 1px;
+   border-width: 0 0 0 1px;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-top,
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c,
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c
 {
-   left:0;
+   left: 0;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon_c
 {
-   right:0;
+   right: 0;
 }
+
 #wef-ribbon-container,
 #wef-ribbon-container.wef-ribbon-orientation-right,
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c
 {
-   width:100%;
+   width: 100%;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-left,
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c,
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon_c
 {
-   width:10em;
+   width: 10em;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon
 {
-   height:6em;
+   height: 6em;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon .hd,
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon .bd,
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon .ft
 {
-   float:left;
-   height:inherit;
+   float: left;
+   height: inherit;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon .bd.wef-ribbon-module,
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon .bd.wef-ribbon-module,
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon .ft.wef-ribbon-module,
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon .ft.wef-ribbon-module
 {
-   padding-left:1.5em;
-   min-height:6em;
+   padding-left: 1.5em;
+   min-height: 6em;
 }
 
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .hd.wef-ribbon-module
 {
-   width:133px;
+   width: 133px;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module
 {
-   width:auto;
-   float:right;
-   position:absolute;
-   top:2px;
-   right:0;
-   height:2em;
+   width: auto;
+   float: right;
+   position: absolute;
+   top: 2px;
+   right: 0;
+   height: 2em;
 }
+
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .bd.wef-ribbon-module
 {
-   width:auto;
+   width: auto;
 }
+
 #wef-ribbon-container .yui-toolbar-container
 {
-   margin-top:0.5em
+   margin-top: 0.5em
 }
 
 #wef-ribbon-container .yui-toolbar-subcont
 {
-   border-bottom:0;
-   padding:0;
+   border-bottom: 0;
+   padding: 0;
 }
-#wef-ribbon .hd.wef-ribbon-module h6 {
-   height:78px;
+
+#wef-ribbon .hd.wef-ribbon-module h6 
+{
+   height: 78px;
    text-align: center;
-   text-indent:-9999em;
-   overflow:hidden;
-   background:url(./images/awe-brand.gif) repeat scroll 0 0;
+   text-indent: -9999em;
+   overflow: hidden;
+   background: url(./images/logo.gif) repeat scroll 0 0;
 }
+
 #wef-ribbon .wef-ribbon-module
 {
-   border:none;
-   background:none;
+   border: none;
+   background: none;
    /*background: rgba(87,163,217,0.5) none;*/
-   padding:0;
+   padding: 0;
 }
+
 #wef-ribbon .wef-ribbon-module .yuimenu .bd
 {
-   border:1px solid black;
-   padding:0;
+   border: 1px solid black;
+   padding: 0;
 }
+
 #wef-ribbon .wef-ribbon-module .yui-menu-shadow
 {
-   display:none;
+   display: none;
 }
 
 #wef-ribbon .yui-toolbar-container .yui-menu-button span.first-child select
 {
-   /*font-size:10px;*/
-   /*border:1px solid black;*/
+   /*font-size: 10px;*/
+   /*border: 1px solid black;*/
 }
 
 /*  toolbar focus */
 #wef-ribbon .yui-toolbar-container .yui-toolbar-groupitem .yui-button:focus
 {
-   border:1px dotted black;
+   border: 1px dotted black;
 }
+
 #wef-ribbon-container #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module
 {
-   font-size:inherit;
+   font-size: inherit;
 }
 
 /* plugin css (awe edit content */
@@ -155,39 +177,42 @@
 #awe--loggedout,
 #awe--loggedout span.first-child 
 {
-   background:none;
-   border:0;
+   background: none;
+   border: 0;
 }
+
 #wef-ribbon #awe--loggedout button,
 #wef-ribbon #WEF-Ribbon--help button,
 #wef-ribbon #WEF-Ribbon--ribbon-placement button
 {
-   font-weight:bold;
-   font-size:85%;
-   color:#333;
+   font-weight: bold;
+   font-size: 85%;
+   color: #333;
 }
+
 #wef-ribbon #WEF-Ribbon--help.yui-button-disabled button,
 #wef-ribbon #WEF-Ribbon--ribbon-placement.yui-button-disabled button,
 #wef-ribbon #awe--loggedout.yui-button-disabled button
 {
-   color:#999;
+   color: #999;
 }
 
 #wef-ribbon #awe--loggedout button
 {
    background: transparent url(./images/logout.gif) no-repeat 7px 50%;
 }
+
 #wef-ribbon #WEF-Ribbon--help button
 {
    background: transparent url(./images/help.gif) no-repeat 7px 50%;
 }
+
 #wef-ribbon #WEF-Ribbon--ribbon-placement span.first-child
 {
-   background:transparent url(./images/orientation.gif) no-repeat 6px 50%;
+   background: transparent url(./images/orientation.gif) no-repeat 6px 50%;
 }
-
 
 #wef-ribbon .wef-tab-toolbar .wef-toolbar .icon-button button
 {
-   padding-left:0;
+   padding-left: 0;
 }
