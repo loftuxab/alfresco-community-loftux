@@ -59,16 +59,15 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
-import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.springframework.extensions.surf.util.URLDecoder;
-import org.springframework.extensions.surf.util.URLEncoder;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.surf.util.URLDecoder;
+import org.springframework.extensions.surf.util.URLEncoder;
 
 /**
  * Alfresco implementation of DwsServiceHandler and AbstractAlfrescoDwsServiceHandler
@@ -216,8 +215,8 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
      */
     public void doRemoveDwsUser(FileInfo dwsFileInfo, String authority)
     {
-        String username = PermissionService.GROUP_PREFIX + authority;
-        if (authorityService.findAuthorities(AuthorityType.GROUP, username).size() == 0)
+        String username = authorityService.getName(AuthorityType.GROUP, authority);
+        if (!authorityService.authorityExists(username))
         {
             NodeRef personNodeRef = new NodeRef(authority);
             username = (String) nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME);
@@ -297,9 +296,10 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         while (userIterator.hasNext())
         {
             String username = userIterator.next();
-            if (authorityService.findAuthorities(AuthorityType.GROUP, username).size() > 0)
+            if (AuthorityType.getAuthorityType(username) == AuthorityType.GROUP)
             {
-                members.add(new MemberBean(username.replaceFirst(PermissionService.GROUP_PREFIX, ""), username.replaceFirst(PermissionService.GROUP_PREFIX, ""), "", "", true));
+                String shortName = authorityService.getShortName(username);
+                members.add(new MemberBean(shortName, shortName, "", "", true));
             }
             else
             {
