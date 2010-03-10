@@ -17,8 +17,8 @@
       <property name="configService" ref="web.config" />
       <property name="configs">
          <list>
-            <value>classpath:alfresco/form-config.xml</value>
             <value>classpath:alfresco/awe-form-config.xml</value>
+            <value>classpath:alfresco/web-extension/awe-config-custom.xml</value>
          </list>
       </property>
    </bean>
