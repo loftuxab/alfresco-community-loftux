@@ -32,7 +32,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
@@ -667,8 +666,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 String fullRoleName = getFullRoleName(role, rmRootNode);
                 
                 // Check that the role does not already exist for the rm root node
-                Set<String> exists = authorityService.findAuthoritiesByShortName(AuthorityType.GROUP, fullRoleName);
-                if (exists.size() != 0)
+                if (authorityService.authorityExists(authorityService.getName(AuthorityType.GROUP, fullRoleName)))
                 {
                     throw new AlfrescoRuntimeException("The role " + role + " already exists for root rm node " + rmRootNode.getId());
                 }
