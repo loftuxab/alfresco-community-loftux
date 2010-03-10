@@ -185,12 +185,9 @@
          <!-- Domain Tests -->
          <exclude name="**/org/alfresco/repo/domain/**/*Test.java" />
          <include name="**/org/alfresco/repo/domain/DomainTestSuite.java" />
-         <!-- Multilingual Tests -->
-         <exclude name="**/org/alfresco/repo/model/ml/**/*Test.java" />
-         <include name="**/org/alfresco/repo/model/ml/MultilingualTestSuite.java" />
-         <!-- FileFolder Tests -->
-         <exclude name="**/org/alfresco/repo/model/filefolder/**/*Test.java" />
-         <include name="**/org/alfresco/repo/model/filefolder/FileFolderTestSuite.java" />
+         <!-- Model (Multilingual and File Folder) Tests -->
+         <exclude name="**/org/alfresco/repo/model/**/*Test.java" />
+         <include name="**/org/alfresco/repo/model/ModelTestSuite.java" />
          <!-- Version Tests -->
          <exclude name="**/org/alfresco/repo/version/**/*Test.java" />
          <include name="**/org/alfresco/repo/version/VersionTestSuite.java" />
