@@ -225,24 +225,29 @@ span.navigation-separator-alt
    padding: 0.2em;
 }
 
-.draggable
+.dnd-draggable
 {
    cursor: move;
 }
 
-.drag
+.dnd-drag
 {
    cursor: move;
 }
 
-.dropInvalid
+.dnd-dropInvalid
 {
    cursor: no-drop;
 }
 
-.dropValid
+.dnd-dropValid
 {
    cursor: pointer;
+}
+
+.dnd-shadow
+{
+   visibility: hidden;
 }
 
 select,

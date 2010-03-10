@@ -16,25 +16,25 @@
       <span class="rules-list-bar-icon">&nbsp;</span>
       <span id="${el}-rulesListBarText" class="rules-list-bar-text"></span>
    </div>
-   <ol id="${el}-rulesListContainer" class="rules-list-container">
+   <ul id="${el}-rulesListContainer" class="rules-list-container">
       <li class="message">${msg("message.loadingRules")}</li>
-   </ol>
+   </ul>
 
    <!-- Rule Templates -->
    <div style="display:none">
-      <ol>
-         <li id="${el}-ruleTemplate"class="rules-list-item">
+      <ul>
+         <li id="${el}-ruleTemplate" class="rules-list-item">
             <input type="hidden" class="nodeRef" name="nodeRef" value=""/>
             <div class="no">&nbsp;</div>
             <div class="active-icon">&nbsp;</div>
             <div class="rule-icon">&nbsp;</div>
             <div class="info">
-               <span class="title">Name</span><span class="inherited">&nbsp;</span><br/>
+               <a class="title" href="#">Name</a><span class="inherited">&nbsp;</span><br/>
                <span class="inherited-from">&nbsp;</span><a class="inherited-folder">&nbsp;</a><br/>
                <span class="description">Description of the rules will go here</span>
             </div>
          </li>
-      </ol>
+      </ul>
    </div>
 
 </div>
