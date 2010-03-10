@@ -17,87 +17,91 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
-    
+(function() 
+{
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      KeyListener = YAHOO.util.KeyListener,
-      Selector = YAHOO.util.Selector,
-      Bubbling = YAHOO.Bubbling,
-      Cookie = YAHOO.util.Cookie,
-      WebEditor = YAHOO.org.springframework.extensions.webeditor;
-    
-    YAHOO.namespace('org.alfresco.awe.app');
+       Event = YAHOO.util.Event,
+       KeyListener = YAHOO.util.KeyListener,
+       Selector = YAHOO.util.Selector,
+       Bubbling = YAHOO.Bubbling,
+       Cookie = YAHOO.util.Cookie,
+       WebEditor = YAHOO.org.springframework.extensions.webeditor;
 
-    YAHOO.org.alfresco.awe.app = function()
-    {
+   YAHOO.namespace('org.alfresco.awe.app');
+
+   YAHOO.org.alfresco.awe.app = function()
+   {
       YAHOO.org.alfresco.awe.app.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
-    };
-    
-    YAHOO.extend(YAHOO.org.alfresco.awe.app, WEF.App,
-    {
-       init: function AWE_App_init()
-       {
+   };
+
+   YAHOO.extend(YAHOO.org.alfresco.awe.app, WEF.App,
+   {
+      init: function AWE_App_init()
+      {
          YAHOO.org.alfresco.awe.app.superclass.init.apply(this);
 
-         //handle events
-         //edit content icon event
-         Bubbling.on(YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT, function onEditContent_click(e, args) {
+         // handle events
+         // edit content icon event
+         Bubbling.on(YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT, function onEditContent_click(e, args) 
+         {
             this.loadForm(args[1]);
          }, this);
-         //login/logoff
+
+         // login/logoff
          Bubbling.on('awe'+WEF.SEPARATOR+'loggedIn', this.onLoggedIn, this, true);
          Bubbling.on('awe'+WEF.SEPARATOR+'loggedout', this.onLoggedOut, this, true);
-         
+
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);
-         
+
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
-         
+
          //Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.initAttributes(this.config);
          this.registerEditableContent(this.config.editables);
          this.render();
          return this;
-       },
-      
-       initAttributes : function AWE_App_initAttributes(attr)
-       {
-          this.setAttributeConfig('editables', {
+      },
+
+      initAttributes : function AWE_App_initAttributes(attr)
+      {
+         this.setAttributeConfig('editables',
+         {
             value: attr.editables,
             validator: YAHOO.lang.isArray 
          });
 
-         this.setAttributeConfig('loggedInStatus', {
+         this.setAttributeConfig('loggedInStatus',
+         {
             value: (WEF.getCookieValue(this.config.name, 'loggedInStatus') == 'true'),
             validator: YAHOO.lang.isBoolean
          });
+
          this.on('loggedInStatusChange', this.onLoginStatusChangeEvent);
-         
-       },
-       
-       render: function AWE_render()
-       {
+      },
+
+      render: function AWE_render()
+      {
          //innerHTML causes issues with rendering so use DOM
          var wefEl = Dom.get('wef'),
              div = document.createElement('div');
-         
+
          div.id = 'wef-login-panel';
          wefEl.appendChild(div);
-         
+
          div = document.createElement('div');
          div.id = 'wef-panel';
          wefEl.appendChild(div);
-         
+
          var tb  = WebEditor.module.Ribbon.addToolbar('WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
          {
-            id:'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
+            id: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             name: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
-            content:'',
+            content: '',
             active: true
-         },WebEditor.ui.Toolbar);
-         
+         }, WebEditor.ui.Toolbar);
+
          tb.addButtons(
          [
             {
@@ -119,32 +123,32 @@
                   }
                   return menuConfig;
                }(this.config.editables)
-            }, 
+            },
             {
                type: 'push',
                label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/toggle-edit.gif" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
                value: this.config.namespace + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
-               icon: true               
+               icon: true
             }
          ]);
          tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
          tb = WebEditor.module.Ribbon.getToolbar(WebEditor.ui.Ribbon.SECONDARY_TOOLBAR);
          tb.addButtons(
-            [ 
-               {
-                  type: 'push',
-                  label: this.getMessage('toolbar-logout-label'),
-                  value: 'loggedout',
-                  id: this.config.name + WebEditor.SEPARATOR + 'loggedout',
-                  icon: true,
-                  disabled: true
-               }
-             ]
-         );
+         [ 
+            {
+               type: 'push',
+               label: this.getMessage('toolbar-logout-label'),
+               value: 'loggedout',
+               id: this.config.name + WebEditor.SEPARATOR + 'loggedout',
+               icon: true,
+               disabled: true
+            }
+         ]);
 
-         this.refresh(['loggedInStatus']);   
-       },
+         this.refresh(['loggedInStatus']);
+      },
+
       /**
        * Initaliases login module
        *
@@ -154,26 +158,28 @@
        * @return {Object} Login module object
        *
        */
-      login : function AWE_login(o)
+      login: function AWE_login(o)
       {
          if (YAHOO.lang.isUndefined(this.widgets.loginModule))
          {
-            this.widgets.loginModule = new YAHOO.org.alfresco.awe.ui.LoginPanel('wef-login-panel').setOptions({
+            this.widgets.loginModule = new YAHOO.org.alfresco.awe.ui.LoginPanel('wef-login-panel').setOptions(
+            {
                templateUrl : Alfresco.constants.URL_SERVICECONTEXT + "modules/login/login",
                destroyPanelOnHide: false
             });
          }
          this.widgets.loginModule.show(o);
       },
-      
+
       /**
        * Loads a form
        *
        * @method loadForm
        * @param o {object} Config object; must have an dom element id and a nodeRef properties
-       *                   e.g {
-       *                          id: 'elementId' // Id of content element,
-       *                          nodeRef: '..'   // NodeRef of content
+       *                   e.g 
+       *                   {
+       *                      id: 'elementId' // Id of content element,
+       *                      nodeRef: '..'   // NodeRef of content
        *                   }
        */
       loadForm : function AWE_loadForm(o)
@@ -188,7 +194,9 @@
          {
             formUri = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + 'service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
          }
-         this.module.getFormPanelInstance('wef-panel').setOptions({
+
+         this.module.getFormPanelInstance('wef-panel').setOptions(
+         {
             formName: 'wefPanel',
             formId: o.formId,
             formUri: formUri,
@@ -199,7 +207,7 @@
             redirectUrl: o.redirectUrl
          }).show();
       },
-      
+
       /**
        * Registers editable content on page. Adds click events to load form.
        *
@@ -216,11 +224,11 @@
             var elem = Selector.query('a', Dom.get(id), true);
             if (elem)
             {
-                editables[config.id] = 
-                {
-                   elem:elem,
-                   config:
-                   {
+               editables[config.id] = 
+               {
+                  elem: elem,
+                  config:
+                  {
                      id: id,
                      title: config.title,
                      formId: config.formId,
@@ -228,24 +236,24 @@
                      nodeRef: config.nodeRef,
                      nested: config.nested
                   }
-                };
-                Event.on(elem, 'click', function AWE_EDIT_CONTENT_CLICK_EVENT(e, o)
-                  {
-                     Event.preventDefault(e);
-                     Bubbling.fire(YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT, o);
-                  },
-                  editables[config.id].config
-               );
+               };
+
+               Event.on(elem, 'click', function AWE_EDIT_CONTENT_CLICK_EVENT(e, o)
+               {
+                  Event.preventDefault(e);
+                  Bubbling.fire(YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT, o);
+               },
+               editables[config.id].config);
             }
          }
          this.set('editables', editables);
       },
-      
+
       getEditableContentMarkers :  function AWE_getEditableContentMarkers()
       {
          return this.get('editables');
       },
-      
+
       /**
        * Event handler that fires when user logs in
        *
@@ -258,7 +266,7 @@
       {
          this.set('loggedInStatus', args[1].loggedIn);
       },
-      
+
       /**
        * Event handler that fires when user logs out
        *
@@ -271,7 +279,7 @@
       {
          this.set('loggedInStatus', args[1].loggedIn);
       },
-      
+
       /*
        * Handler for when login status changes. Enables/disables the logout btn.
        *
@@ -289,30 +297,35 @@
          {
             btn.set('disabled', true);
          }
-         if (e.prevValue !== e.newValue) {
+
+         if (e.prevValue !== e.newValue)
+         {
             WEF.setCookieValue(this.config.name,'loggedInStatus', e.newValue);
-         }         
+         }
       },
+
       onQuickEditClick: function WEF_UI_Ribbon_onQuickEditClick(e, args)
       {
          this.loadForm(args[1]);
       },
-      
+
       onShowHideClick: function WEF_UI_Ribbon_onShowHideClick(e, args)
       {
          var editMarkers = Selector.query('span.alfresco-content-marker');
          this.onShowHideClick.isHidden = this.onShowHideClick.isHidden || false;
-         
-         if (this.onShowHideClick.isHidden) {
+
+         if (this.onShowHideClick.isHidden) 
+         {
             Dom.setStyle(editMarkers, 'display', '');
             this.onShowHideClick.isHidden = false;
          }
-         else {
+         else
+         {
             Dom.setStyle(editMarkers, 'display', 'none');
             this.onShowHideClick.isHidden = true;
          }
       },
-      
+
       onLogoutClick: function WEF_UI_Ribbon_onLogoutClick(e, args)
       {
          var ribbonObj = this;
@@ -320,90 +333,108 @@
          {
             title: 'Logout?',
             text: 'Are you sure you want to log out?',
-            buttons: [{
-               text: 'OK',
-               handler: function()
+            buttons: 
+            [
                {
-                  var config = {
-                     url: Alfresco.constants.URL_CONTEXT + 'page/dologout',
-                     method: "GET",
-                     successCallback: {
-                        fn: function logoutSuccess(e)
+                  text: 'OK',
+                  handler: function()
+                  {
+                     var config = 
+                     {
+                        url: Alfresco.constants.URL_CONTEXT + 'page/dologout',
+                        method: "GET",
+                        successCallback: 
                         {
-                           ribbonObj.onLoggedOut.call(ribbonObj, e, [null, {
-                              loggedIn: false
-                           }]);
-                           this.hide();
-                           this.destroy();
+                           fn: function logoutSuccess(e)
+                           {
+                              ribbonObj.onLoggedOut.call(ribbonObj, e, [null, {loggedIn: false}]);
+                              this.hide();
+                              this.destroy();
+                           },
+                           scope: this
                         },
-                        scope: this
-                     },
-                     failureCallback: {
-                        fn: function logoutFailure(e)
+                        failureCallback: 
                         {
-                           this.hide();
-                           this.destroy();
-                        },
-                        scope: this
-                     }
-                  };
-                  Alfresco.util.Ajax.request(config);
-               }
-            }, {
-               text: 'Cancel',
-               handler: function()
+                           fn: function logoutFailure(e)
+                           {
+                              this.hide();
+                              this.destroy();
+                           },
+                           scope: this
+                        }
+                     };
+                     Alfresco.util.Ajax.request(config);
+                  }
+               },
                {
-                  this.hide();
-                  this.destroy();
+                  text: 'Cancel',
+                  handler: function()
+                  {
+                     this.hide();
+                     this.destroy();
+                  }
                }
-            }]
+            ]
          });
-      },   
+      },
+
       onQuickEditMouseOver: function WEF_UI_Ribbon_onQuickEditMouseOver(e, args)
       {
          if (args.length>0)
          {
             var targetContentEl = (args[1].value.nested) ? Dom.get(args[1].value.id).parentNode : Dom.get(args[1].value.id),
-                targetContentElRegion = Dom.getRegion(targetContentEl), fadeIn = function fade(el)
+                targetContentElRegion = Dom.getRegion(targetContentEl), 
+                fadeIn = function fade(el)
+                {
+                   var anim = new YAHOO.util.ColorAnim(el,
+                   {
+                      backgroundColor: 
+                      {
+                         from: '#ffffff',
+                         to: '#FFFF99',
+                         duration: '0.5'
+                      }
+                   });
+                   anim.onComplete.subscribe(function(el)
+                   {
+                      return function()
+                      {
+                         fadeOut(el);
+                      };
+                   }(el));
+                   anim.animate();
+                },
+                fadeOut = function fade(el)
+                {
+                   var anim = new YAHOO.util.ColorAnim(el, 
+                   {
+                      backgroundColor: 
+                      {
+                         from: '#FFFF99',
+                         to: '#ffffff',
+                         duration: '0.5'
+                      }
+                   });
+                   anim.animate();
+                };
+
+            // if not visible in viewport
+            if (!(targetContentElRegion.intersect(Dom.getClientRegion())))
             {
-               var anim = new YAHOO.util.ColorAnim(el, {
-                  backgroundColor: {
-                     from: '#ffffff',
-                     to: '#FFFF99',
-                     duration: '0.5'
-                  }
-               });
-               anim.onComplete.subscribe(function(el)
+               if (this.scrollAnimation)
                {
-                  return function()
-                  {
-                     fadeOut(el);
-                  };
-               }(el));
-               anim.animate();
-            }, fadeOut = function fade(el)
-            {
-               var anim = new YAHOO.util.ColorAnim(el, {
-                  backgroundColor: {
-                     from: '#FFFF99',
-                     to: '#ffffff',
-                     duration: '0.5'
-                  }
-               });
-               anim.animate();
-            };
-            //if not visible in viewport
-            if (!(targetContentElRegion.intersect(Dom.getClientRegion()))) {
-               if (this.scrollAnimation) {
                   this.scrollAnimation.stop();
                }
+
                //set up animation
                this.scrollAnimation = new YAHOO.util.Scroll(document.documentElement, 
                {
-                  scroll: {
+                  scroll: 
+                  {
                      to: [0, Math.max(0, targetContentElRegion.top - 125)]
                   }
                }, 1, YAHOO.util.Easing.easeOut);
+
                this.scrollAnimation.onComplete.subscribe(function(el)
                {
                   return function()
@@ -411,23 +442,26 @@
                      fadeIn(el);
                   };
                }(targetContentEl));
+
                this.scrollAnimation.animate();
             }
-            else {
+            else
+            {
                fadeIn(targetContentEl);
             }
          }
       }, 
-      module: {
+      module: 
+      {
          getFormPanelInstance : function(id)
          {
             return Alfresco.util.ComponentManager.get(id) || new YAHOO.org.alfresco.awe.ui.FormPanel(id);
          }
       },
       component: {}
-               
-    });
-    YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT = 'AWE_EditContent_click';
+   });
+
+   YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT = 'AWE_EditContent_click';
 })();
 
 WEF.register("org.alfresco.awe", YAHOO.org.alfresco.awe.app, {version: "1.0.1", build: "1"});

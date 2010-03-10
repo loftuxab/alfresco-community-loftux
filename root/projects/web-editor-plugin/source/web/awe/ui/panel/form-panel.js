@@ -19,14 +19,14 @@
 
 (function()
 {
-      
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      KeyListener = YAHOO.util.KeyListener,
-      Selector = YAHOO.util.Selector,
-      Bubbling = YAHOO.Bubbling;
+       Event = YAHOO.util.Event,
+       KeyListener = YAHOO.util.KeyListener,
+       Selector = YAHOO.util.Selector,
+       Bubbling = YAHOO.Bubbling;
 
    YAHOO.namespace('org.alfresco.awe.ui.FormPanel');
+
    /**
     * FormPanel constructor.
     *
@@ -41,12 +41,12 @@
       {
          throw new Error("An instance of AWE.component.FormPanel already exists.");
       }
-   
+
       YAHOO.org.alfresco.awe.ui.FormPanel.superclass.constructor.call(this, "org.alfresco.awe.ui.FormPanel", containerId, ["button", "container", "connection", "selector", "json"]);
-   
+
       return this;
    };
-   
+
    YAHOO.extend(YAHOO.org.alfresco.awe.ui.FormPanel, YAHOO.org.alfresco.awe.ui.Panel,
    {
       /**
@@ -81,11 +81,13 @@
                      htmlid: this.id+'-'+this.options.formName,
                      showCancelButton:'true'
                   },
+
                   successCallback:
                   {
                      fn: this.onTemplateLoaded,
                      scope: this
                   },
+
                   failureCallback:
                   {
                      fn: function(args)
@@ -115,10 +117,9 @@
                   execScripts: true
                });
             }
-   
          }
       },
-   
+
       /**
        * Called when the FormPanel html template has been returned from the server.
        * Creates the YUI gui objects such as buttons and a panel and shows it.
@@ -133,13 +134,15 @@
             this.widgets.panel.destroy();
             this.widgets.panel = null;
          }
+
          // Inject the template from the XHR request into a new DIV element
          var containerDiv = document.createElement("div");
          containerDiv.innerHTML = response.serverResponse.responseText;
-   
+
          // The panel is created from the HTML returned in the XHR request, not the container
          var panelDiv = Dom.getFirstChildBy(containerDiv, function(el) { return el.nodeName.toLowerCase() == 'div';});
-         this.widgets.panel = new YAHOO.widget.Panel(panelDiv, {
+         this.widgets.panel = new YAHOO.widget.Panel(panelDiv, 
+         {
             width:'420px',
             modal: true,
             constraintoviewport: true,
@@ -150,13 +153,13 @@
          });
          this.widgets.panel.setHeader(this.options.title);
          this.widgets.panel.render(Dom.get(this.id));
-   
-  
-         YAHOO.Bubbling.on('beforeFormRuntimeInit', function(e, args) {
+
+         YAHOO.Bubbling.on('beforeFormRuntimeInit', function(e, args) 
+         {
             var form = args[1].runtime;
             var formComponent = args[1].component;
             formComponent.buttons.cancel.subscribe('click', this.onCancelButtonClick, this, true);
-            //set up UI update
+            // set up UI update
             form.doBeforeFormSubmit =
             {
                fn: function()
@@ -174,10 +177,11 @@
             };
          },
          this);
+
          // Show the panel
          this._showPanel();
       },
-   
+
       /**
        * Called when user clicks on the cancel button.
        * Closes the FormPanel panel.
@@ -190,15 +194,16 @@
       {
          this.hide();
       },
-   
+
       onUpdateContentUI: function AweFormPanel_onUpdateContentUI(args)
       {
          var contentElem = Dom.get(this.options.domContentId);
          var container  = document.createElement('div');
          container.innerHTML = args.serverResponse.responseText;
-         //remove childnodes of src content sparing edit link
+
+         // remove childnodes of src content sparing edit link
          var contentChildren = contentElem.childNodes;
-         for (var i=contentChildren.length-1;i>=0;i--)
+         for (var i = contentChildren.length - 1; i >= 0; i--)
          {
             var el = contentChildren[i];
             if (!Selector.test(el, 'span.wef-edit'))
@@ -206,13 +211,15 @@
                contentElem.removeChild(el);
             }
          }
-         //add to dom
+
+         // add to dom
          contentChildren = container.childNodes;
-         for (var i=contentChildren.length-1;i>=0;i--)
+         for (var i = contentChildren.length - 1; i >= 0; i--)
          {
             contentElem.insertBefore(contentChildren[i], Dom.getFirstChild(contentElem));
          }
       }
    });
 })();
-WEF.register("org.alfresco.awe.ui.form-panel", YAHOO.org.alfresco.awe.ui.FormPanel, {version: "1.0", build: "1"});   
+
+WEF.register("org.alfresco.awe.ui.form-panel", YAHOO.org.alfresco.awe.ui.FormPanel, {version: "1.0", build: "1"});
