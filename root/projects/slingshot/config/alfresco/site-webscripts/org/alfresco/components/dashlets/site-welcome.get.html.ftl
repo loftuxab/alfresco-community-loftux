@@ -5,7 +5,7 @@
    <div class="title">${msg("header.userWelcome")}</div>
    <div class="body">
       <div class="detail-list-item-alt theme-bg-color-2">
-         <h4>${msg("header.siteDashboard")}</h4>
+         <h4 class="theme-color-2">${msg("header.siteDashboard")}</h4>
          <div>${msg("text.siteDashboard")}</div>
       </div>
 <#if userIsSiteManager>

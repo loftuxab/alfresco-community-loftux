@@ -1,6 +1,5 @@
 div.dashlet.site-welcome div.detail-list-item-alt
 {
-   /*background-color: #fffbdd;*/
    border-bottom: 1px solid #ddd6a0;
    padding: 7px 9px 5px;
 }
@@ -8,7 +7,6 @@ div.dashlet.site-welcome div.detail-list-item-alt
 div.dashlet.site-welcome div.detail-list-item h4,
 div.dashlet.site-welcome div.detail-list-item-alt h4
 {
-   color: #038603;
    padding-bottom: 0.5em;
    padding-top: 0.3em;
 }
@@ -18,8 +16,3 @@ div.dashlet.site-welcome div.detail-list-item-alt div
 {
    padding-bottom: 0.5em;
 }
-
-/*div.dashlet.site-welcome a
-{
-   color: #4F94C9
-}*/
