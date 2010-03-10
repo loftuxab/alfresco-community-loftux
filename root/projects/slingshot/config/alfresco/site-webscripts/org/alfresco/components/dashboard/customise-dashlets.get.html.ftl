@@ -62,10 +62,10 @@
          </div>
          <ul id="${args.htmlid}-column-ul-0" class="availableList">
          <#list availableDashlets as dashlet>
-            <li class="customisableDashlet available" dashletUrl="${dashlet.url}">
-               <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
+            <li class="availableDashlet" dashletUrl="${dashlet.url}">
+               <a href="#"><img class="dnd-draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
                <span >${dashlet.shortName}</span>
-               <div class="draggable" title="${dashlet.description}"></div>
+               <div class="dnd-draggable" title="${dashlet.description}"></div>
             </li>
          </#list>
          </ul>
@@ -83,13 +83,13 @@
             <h3 class="padded">${msg("header.column", column_index + 1)}</h3>
             <ul id="${args.htmlid}-column-ul-${column_index + 1}" class="usedList">
             <#list column as dashlet>
-               <li class="customisableDashlet used" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
-                  <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
+               <li class="usedDashlet" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
+                  <a href="#"><img class="dnd-draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
                   <span>${dashlet.shortName}</span>
-                  <div class="draggable" title="${dashlet.description}"></div>
+                  <div class="dnd-draggable" title="${dashlet.description}"></div>
                </li>
             </#list>
-            </ul>
+            </ul>                                            
             </div>
          </#list>
          <div class="usedActions">
@@ -114,7 +114,7 @@
    <div style="display: none;">
       <ul>
          <!-- The shadow dashlet that is used during drag n drop to "make space" for the dragged dashlet -->
-         <li class="shadow" id="${args.htmlid}-dashlet-li-shadow"></li>
+         <li class="usedDashlet dnd-shadow" id="${args.htmlid}-dashlet-li-shadow"></li>
       </ul>
    </div>
 </div>

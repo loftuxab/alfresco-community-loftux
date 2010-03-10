@@ -297,6 +297,26 @@
             noRulesDiv.innerHTML = this.msg("message.noRules");
             this.widgets.rulesListContainerEl.appendChild(noRulesDiv);
          }
+         else if (this.options.filter == "folder")
+         {
+            // Add drag n drop support
+            this.dnd = new Alfresco.util.DnD(
+            {
+               draggables: [
+                  {
+                     container: this.widgets.rulesListContainerEl,
+                     groups: [Alfresco.util.DnD.GROUP_MOVE],
+                     cssClass: "rules-list-item"
+                  }
+               ],
+               targets: [
+                  {
+                     container: this.widgets.rulesListContainerEl,
+                     group: Alfresco.util.DnD.GROUP_MOVE
+                  }
+               ]
+            });
+         }
       },
       
 
@@ -312,13 +332,14 @@
       {
          // Clone template
          var ruleEl = this.widgets.ruleTemplateEl.cloneNode(true);
+         Alfresco.util.generateDomId(ruleEl);
 
          // Rule Id for later submit of reordering
          Dom.getElementsByClassName("nodeRef", "input", ruleEl)[0].value = rule.nodeRef;
 
          // Display rest of values
          Dom.getElementsByClassName("no", "div", ruleEl)[0].innerHTML = rule.index + 1;
-         Dom.getElementsByClassName("title", "span", ruleEl)[0].innerHTML = rule.title;
+         Dom.getElementsByClassName("title", "a", ruleEl)[0].innerHTML = rule.title;
          Dom.getElementsByClassName("description", "span", ruleEl)[0].innerHTML = rule.description;
 
          if (rule.disabled)
@@ -330,7 +351,7 @@
             Dom.getElementsByClassName("inherited", "span", ruleEl)[0].innerHTML = this.msg("label.inheritedShort");
             Dom.getElementsByClassName("inherited-from", "span", ruleEl)[0].innerHTML = this.msg("label.inheritedFrom");
 
-            if (rule.owningNode)
+            if (false && rule.owningNode)
             {
                var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0];
                a.href = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",

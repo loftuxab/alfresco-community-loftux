@@ -359,7 +359,8 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    position: relative;
 }
 
-.customisableDashlet
+.usedDashlet,
+.availableDashlet
 {
    overflow: hidden;
 }

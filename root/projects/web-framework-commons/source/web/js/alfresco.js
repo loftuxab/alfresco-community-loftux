@@ -3182,7 +3182,7 @@ Alfresco.util.Cursor = function()
        * @property DRAGGABLE
        * @type string
        */
-      DRAGGABLE: "draggable",
+      DRAGGABLE: "dnd-draggable",
 
       /**
        * Show cursor in state to indicate that the current element is dragged.
@@ -3191,7 +3191,7 @@ Alfresco.util.Cursor = function()
        * @property DRAG
        * @type string
        */
-      DRAG: "drag",
+      DRAG: "dnd-drag",
 
       /**
        * Show cursor in state to indicate that the element dragged over IS a valid drop point.
@@ -3200,7 +3200,7 @@ Alfresco.util.Cursor = function()
        * @property DROP_VALID
        * @type string
        */
-      DROP_VALID: "dropValid",
+      DROP_VALID: "dnd-dropValid",
 
       /**
        * Show cursor in state to indicate that the element dragged over is NOT a valid drop point.
@@ -3209,7 +3209,7 @@ Alfresco.util.Cursor = function()
        * @property DROP_INVALID
        * @type string
        */
-      DROP_INVALID: "dropInvalid",
+      DROP_INVALID: "dnd-dropInvalid",
 
       /**
        * @method setCursorState
