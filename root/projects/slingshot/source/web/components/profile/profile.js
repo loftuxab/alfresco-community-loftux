@@ -105,6 +105,7 @@
             
             // Form definition
             var form = new Alfresco.forms.Form(this.id + "-form");
+            this.widgets.form = form;
             form.setSubmitElements(this.widgets.save);
             form.setShowSubmitStateDynamically(true);
             form.setSubmitAsJSON(true);
@@ -162,7 +163,9 @@
          Dom.get(prefix + "companytelephone").value = p.companytelephone;
          Dom.get(prefix + "companyfax").value = p.companyfax;
          Dom.get(prefix + "companyemail").value = p.companyemail;
-
+         
+         this.widgets.form.updateSubmitElements();
+         
          // Show edit panel
          Dom.removeClass(this.id + "-editview", "hidden");
       },
