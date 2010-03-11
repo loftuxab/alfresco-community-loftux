@@ -99,7 +99,8 @@
             name: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
             content: '',
-            active: true
+            active: true,
+            pluginOwner:this
          }, WebEditor.ui.Toolbar);
 
          tb.addButtons(
@@ -377,6 +378,11 @@
             ]
          },
          Dom.get('wef'));
+      },
+      
+      onHelp: function AWE_onHelp()
+      {
+         window.location='http://www.alfresco.com/help/32/labs/sharehelp/';
       },
 
       onQuickEditMouseOver: function WEF_UI_Ribbon_onQuickEditMouseOver(e, args)
