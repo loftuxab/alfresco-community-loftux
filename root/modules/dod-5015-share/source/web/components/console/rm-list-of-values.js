@@ -193,12 +193,13 @@
                renameBtn.on("click", me.onRenameListOfValueClick, oRecord, me);
 
                // Delete list of value
-               var deleteBtn = new YAHOO.widget.Button(
+               // NOTE: removed for temp fix to ETHREEOH-3917 - repository side needs to implement Delete!
+               /*var deleteBtn = new YAHOO.widget.Button(
                {
                   container: elCell,
                   label: parent.msg("button.delete")
                });
-               deleteBtn.on("click", me.onDeleteListOfValueClick, oRecord, me);
+               deleteBtn.on("click", me.onDeleteListOfValueClick, oRecord, me);*/
             };
 
             // ListDataTable column defintions
@@ -430,7 +431,7 @@
           */
          _deleteList: function ViewPanelHandler__deleteList(oRecord)
          {
-            Alfresco.util.Ajax.jsonPost(
+            Alfresco.util.Ajax.jsonDelete(
             {
                url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints/" + oRecord.getData("constraintName"),
                successCallback:
