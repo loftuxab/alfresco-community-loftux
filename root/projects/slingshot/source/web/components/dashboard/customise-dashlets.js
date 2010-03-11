@@ -27,7 +27,8 @@
 {
 
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+      Event = YAHOO.util.Event,
+      Selector = YAHOO.util.Selector;
 
    /**
     * Alfresco.CustomiseDashlets constructor.
@@ -98,20 +99,20 @@
             draggables: [
                {
                   container: this.widgets.dashletListEl,
-                  groups: [Alfresco.util.DnD.GROUP_MOVE],
+                  groups: [Alfresco.util.DragAndDrop.GROUP_MOVE],
                   cssClass: "availableDashlet",
-                  protected: true,
-                  autoAdd: true
+                  protect: true,
+                  duplicatesOnEnterKey: true
                }
             ],
             targets: [
                {
                   container: this.widgets.dashletListEl,
-                  group: Alfresco.util.DnD.GROUP_DELETE
+                  group: Alfresco.util.DragAndDrop.GROUP_DELETE
                },
                {
                   container: this.widgets.trashcanListEl,
-                  group: Alfresco.util.DnD.GROUP_DELETE
+                  group: Alfresco.util.DragAndDrop.GROUP_DELETE
                }
             ]
          };
@@ -126,13 +127,13 @@
                dndConfig.draggables.push(
                {
                   container: ul,
-                  groups: [Alfresco.util.DnD.GROUP_MOVE, Alfresco.util.DnD.GROUP_DELETE],
+                  groups: [Alfresco.util.DragAndDrop.GROUP_MOVE, Alfresco.util.DragAndDrop.GROUP_DELETE],
                   cssClass: "usedDashlet"
                });
                dndConfig.targets.push(
                {
                   container: ul,
-                  group: Alfresco.util.DnD.GROUP_MOVE,
+                  group: Alfresco.util.DragAndDrop.GROUP_MOVE,
                   maximum: 5
                });
             }
@@ -142,7 +143,7 @@
             }
          }
 
-         var dnd = new Alfresco.util.DnD(dndConfig);
+         var dnd = new Alfresco.util.DragAndDrop(dndConfig);
          
          YAHOO.Bubbling.on("onDashboardLayoutChanged", this.onDashboardLayoutChanged, this);
          YAHOO.Bubbling.on("onDashboardLayoutsDisplayed", this.onDashboardLayoutsDisplayed, this);
@@ -267,17 +268,20 @@
             for (var j = 0; j < lis.length; j++)
             {
                var li = lis[j];
-               var dashlet =
+               if(!Dom.hasClass(li, "dnd-shadow"))
                {
-                  url: li.getAttribute("dashletUrl"),
-                  regionId: "component-" + i + "-" + (j + 1)
-               };
-               var originalRegionId = li.getAttribute("originalRegionId");
-               if (originalRegionId && originalRegionId.length > 0)
-               {
-                  dashlet.originalRegionId = originalRegionId;
+                  var dashlet =
+                  {
+                     url: Selector.query("input[type=hidden][name=dashleturl]", li, true).value,
+                     regionId: "component-" + i + "-" + (j + 1)
+                  };
+                  var originalRegionId = Selector.query("input[type=hidden][name=originalregionid]", li, true);
+                  if (originalRegionId)
+                  {
+                     dashlet.originalRegionId = originalRegionId.value;
+                  }
+                  dashlets[dashlets.length] = dashlet;
                }
-               dashlets[dashlets.length] = dashlet;
             }
          }
 

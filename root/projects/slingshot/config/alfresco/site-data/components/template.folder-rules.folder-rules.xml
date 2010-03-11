@@ -7,5 +7,6 @@
    <properties>
       <filter>folder</filter>
       <selectDefault>true</selectDefault>
+      <editable>true</editable>
    </properties>
 </component>

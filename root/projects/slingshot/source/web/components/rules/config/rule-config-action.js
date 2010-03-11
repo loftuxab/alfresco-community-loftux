@@ -126,6 +126,7 @@
             },
             edit: function(configDef, ruleConfig, configEl)
             {
+               // Note: Destination folder isn't mandatory, the same folder as the "current file" will be used  
                this._hideParameters(configDef.parameterDefinitions);
                configDef.parameterDefinitions.push({
                   type: "arca:destination-dialog-button",

@@ -385,6 +385,7 @@
                text: this.msg("message.createAnotherRule") 
             });
             this.displayRule(this.options.ruleTemplate);
+            this.widgets.cancelButton.set("disabled", false);
          }
          else
          {

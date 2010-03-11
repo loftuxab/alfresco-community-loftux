@@ -5,7 +5,8 @@
       nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}"),
       siteId: "${page.url.templateArgs.site!""}",      
       filter: "${args.filter!""}",
-      selectDefault: ${args.selectDefault!"false"}
+      selectDefault: ${args.selectDefault!"false"},
+      editable: ${args.editable!"false"}
    }).setMessages(
       ${messages}
    );
@@ -19,12 +20,15 @@
    <ul id="${el}-rulesListContainer" class="rules-list-container">
       <li class="message">${msg("message.loadingRules")}</li>
    </ul>
+   <div id="${el}-buttonsContainer" class="rules-button-container hidden">
+      <button id="${el}-save-button" tabindex="0">${msg("button.save")}</button>
+   </div>
 
    <!-- Rule Templates -->
    <div style="display:none">
       <ul>
          <li id="${el}-ruleTemplate" class="rules-list-item">
-            <input type="hidden" class="nodeRef" name="nodeRef" value=""/>
+            <input type="hidden" class="id" name="id" value=""/>
             <div class="no">&nbsp;</div>
             <div class="active-icon">&nbsp;</div>
             <div class="rule-icon">&nbsp;</div>

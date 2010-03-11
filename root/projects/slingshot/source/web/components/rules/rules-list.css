@@ -91,6 +91,12 @@
    font-weight: bold;
 }
 
+/* Make the pointer indicate the item is first of all clickable even though its draggable as well */ 
+.rules-list-item.dnd-draggable
+{
+   cursor: pointer;
+}
+
 /* Display all borders when dragged */
 .rules-list-item.dnd-focused
 {
@@ -141,4 +147,10 @@
 .rules-list .rules-list-container.all li .description
 {
    clear: both;
+}
+
+.rules-list .rules-button-container
+{
+   text-align: center;
+   padding-top: 0.5em;   
 }

@@ -21,7 +21,7 @@
  * Drag n Drop manager.
  *
  * @namespace Alfresco
- * @cssClass Alfresco.util.DnD
+ * @cssClass Alfresco.util.DragAndDrop
  */
 (function()
 {
@@ -33,13 +33,24 @@
       DDM = YAHOO.util.DragDropMgr;
 
    /**
-    * Alfresco.util.DnD constructor.
+    * Alfresco.util.DragAndDrop constructor.
     *
     * @param config {object} The object describing how the drag n drop shall be setup
-    * @return {Alfresco.util.DnD} The new CustomiseDashlets instance
+    *        config.shadow  {HTMLElement}
+    *        config.draggables {array}
+    *        config.draggables[].container {HTMLElement}
+    *        config.draggables[].groups {string} Alfresco.util.DragAndDrop.GROUP_XXX
+    *        config.draggables[].cssClass {string}
+    *        config.draggables[].protect {boolean}
+    *        config.draggables[].duplicatesOnEnterKey {boolean}
+    *        config.targets {array}
+    *        config.targets[].container {HTMLElement}
+    *        config.targets[].group {string} Alfresco.util.DragAndDrop.GROUP_MOVE
+    *        config.targets[].maximum {int}
+    * @return {Alfresco.util.DragAndDrop} The new DragAndDrop instance
     * @constructor
     */
-   Alfresco.util.DnD = function(config)
+   Alfresco.util.DragAndDrop = function(config)
    {
       // Instance variables
       this.config = config;
@@ -94,7 +105,7 @@
    /**
    * Alias to self
    */
-   var DD = Alfresco.util.DnD;
+   var DD = Alfresco.util.DragAndDrop;
 
    /**
    * View Mode Constants
@@ -132,7 +143,7 @@
       GROUP_DELETE: "dnd-delete"
    });
 
-   Alfresco.util.DnD.prototype =
+   Alfresco.util.DragAndDrop.prototype =
    {
 
       /**
@@ -144,9 +155,9 @@
       keyListeners: null,
 
       /**
-       * To let various methods know what dashlet that is currently selected, if any.
+       * To let various methods know what draggable that is currently selected, if any.
        *
-       * @property currentDashletEl
+       * @property currentEl
        * @type HTMLElement of type li
        */
       currentEl: null,
@@ -186,7 +197,7 @@
        * @method onDraggableBlur
        * @param event {object} a "blur" event
        */
-      onDraggableBlur: function CD_onDraggableBlur(event, li)
+      onDraggableBlur: function DD_onDraggableBlur(event, li)
       {
          // Remove the "dnd-focused" class from the draggable so it doesn't appera to be selected
          if (this.currentEl)
@@ -215,9 +226,9 @@
        * @method onDraggableFocus
        * @param event {object} a "focus" event
        */
-      onDraggableFocus: function CD_onDraggableFocus(event, li)
+      onDraggableFocus: function DD_onDraggableFocus(event, li)
       {
-         // Remove the focused class from no longer selected dashlets and add it to the current
+         // Remove the focused class from no longer selected draggables and add it to the current
          if (this.currentEl)
          {
             Dom.removeClass(this.currentEl, "dnd-focused");
@@ -247,8 +258,7 @@
                   KeyListener.KEY.RIGHT,
                   KeyListener.KEY.ESCAPE,
                   KeyListener.KEY.DELETE,
-                  KeyListener.KEY.ENTER,
-                  KeyListener.KEY.SPACE
+                  KeyListener.KEY.ENTER
                ]
             },
             {
@@ -277,33 +287,33 @@
        * @method onKeyPressed
        * @param event {object} a "key" event
        */
-      onKeyPressed: function CD_onKeyPressed(event, id)
+      onKeyPressed: function DD_onKeyPressed(event, id)
       {
-         var currentDraggable = this.currentEl,
+         var currentDraggable = this.currentEl,            
             relativeNode,
             target;
 
          if (id[1].keyCode === KeyListener.KEY.ESCAPE)
          {
-            // Deselect the current dashlet when escape is clicked
+            // Deselect the current draggable when escape is clicked
             this.focusDraggableAfterDomChange(currentDraggable, false);
          }
          else if (id[1].keyCode === KeyListener.KEY.ENTER)
          {
-            // Was enter hit for a dashlet available to columns?
+            // Was enter hit for a draggable available to columns?
             var metadata = this.draggables[this.getContainer(currentDraggable).getAttribute("id")];
-            if (metadata.autoAdd)
+            if (metadata.duplicatesOnEnterKey)
             {
                var ds = this.config.draggables;
                // Yes it was, find the first column with space for a new column.
                for (var i = 0, il = (ds ? ds.length : 0); i < il; i++)
                {
                   target = ds[i].container;
-                  if (!ds[i].protected && !this.isTargetFull(target))
+                  if (!ds[i].protect && !this.isTargetFull(target))
                   {
                      /**
                       * We have found a visible column with free space, make a copy
-                      * of the dashlet and insert it in the first position.
+                      * of the draggable and insert it in the first position.
                       */
                      var children = Dom.getChildrenBy(target, this.isRealDraggable);
                      this.copyAndInsertDraggable(currentDraggable, target, children.length > 0 ? children[0] : null);
@@ -320,21 +330,21 @@
          }
          else if (id[1].keyCode === KeyListener.KEY.DELETE)
          {
-            // Make sure we don't delete any dashlet from the available list
-            if (!this.isDraggableProtected(currentDraggable))
+            // Make sure we don't delete any draggable from the available list
+            if (this.isDraggableInGroup(currentDraggable, DD.GROUP_DELETE))
             {
                this.deleteDraggable(currentDraggable);
             }
          }
          else if (!this.isDraggableProtected(currentDraggable))
          {
-            // UP, DOWN, LEFT & RIGHT key events apply only to column dashlets.
+            // UP, DOWN, LEFT & RIGHT key events apply only to non protected draggables.
             if (id[1].keyCode === KeyListener.KEY.UP)
             {
                relativeNode = Dom.getPreviousSiblingBy(currentDraggable, this.isRealDraggable);
                if (relativeNode)
                {
-                  // Found a dashlet above, move the current one above it
+                  // Found a draggable above, move the current one above it
                   Dom.insertBefore(currentDraggable, relativeNode);
                   this.focusDraggableAfterDomChange(currentDraggable, true);
                }
@@ -344,14 +354,14 @@
                relativeNode = Dom.getNextSiblingBy(currentDraggable, this.isRealDraggable);
                if (relativeNode)
                {
-                  // Found a dashlet below, move the current one beneath it
+                  // Found a draggable below, move the current one beneath it
                   Dom.insertAfter(currentDraggable, relativeNode);
                   this.focusDraggableAfterDomChange(currentDraggable, true);
                }
             }
             else
             {
-               // Find a column index for the column to the left or right of the current dashlet
+               // Find a column index for the column to the left or right of the current draggable
                var containerIndex = this.getTargetIndex(currentDraggable);
                if (id[1].keyCode === KeyListener.KEY.LEFT)
                {
@@ -369,7 +379,7 @@
                target = this.getTargetByIndex(containerIndex);
                if (target && !this.isTargetFull(target) && !this.isDraggableProtected(target))
                {
-                  // Insert the dashlet in the same position as it had in the previous column
+                  // Insert the draggable in the same position as it had in the previous column
                   var draggableIndex = this._getDraggableIndex(currentDraggable);
                   relativeNode = this._getDraggable(target, draggableIndex);
                   if (relativeNode)
@@ -391,14 +401,14 @@
       },
 
       /**
-       * Creates a draggable Alfresco.CustomiseDashlets.Dashlet
+       * Creates a draggable Alfresco.util.DraggableProxy
        * that listens to blur, focus and click elements.
        *
        * @method _createDraggable
        * @param li {HTMLElement} of type li
        * @private
        */
-      _createDraggable: function CD__createDraggable(li, groups)
+      _createDraggable: function DD__createDraggable(li, groups)
       {
          // Setup drag n drop support
          var d = new Alfresco.util.DraggableProxy(li, this.shadow, this);
@@ -423,13 +433,13 @@
             var liEl = new Element(li);
             liEl.addListener("click", function(e, obj)
             {
-               obj.focus(); // will call selectDashlet
+               obj.focus(); // will call selectDraggable
             }, links[0], this);
          }
       },
 
       /**
-        * Creates a copy of the dragged dashlet 'srcEl' and inserts in column
+        * Creates a copy of the dragged draggable 'srcEl' and inserts in column
         * 'destUl' before 'insertBeforeNode'.
         *
         * @method copyAndInsertDraggable
@@ -437,28 +447,26 @@
         * @param destUl {HTMLElement} of type ul
         * @param insertBeforeNode {HTMLElement} of type li
         */
-      copyAndInsertDraggable: function CD_copyAndInsertDraggable(srcEl, destUl, insertBeforeNode)
+      copyAndInsertDraggable: function DD_copyAndInsertDraggable(srcEl, destUl, insertBeforeNode)
       {
          /**
           * Don't do a cloneNode copy since it will make IE point the
-          * new Dashlets a.focus handler to elSrc.
+          * new draggables a.focus handler to elSrc.
           * Create a new one and use innerHTML instead.
           */
          var draggableConfig = this.draggables[destUl.getAttribute("id")],
-            copy = document.createElement("li");
+            copy = document.createElement("li");         
          Alfresco.util.generateDomId(copy);
-         copy.setAttribute("dashletUrl", srcEl.getAttribute("dashletUrl"));
          if (draggableConfig.cssClass)
          {
             Dom.addClass(copy, draggableConfig.cssClass);
          }
-         Dom.addClass(copy, draggableConfig.protected == true ? "protected" : "not-protected");
          copy.innerHTML = srcEl.innerHTML + "";
 
-         // Make the dashlet draggable and selectable/focusable.
+         // Make the draggable draggable and selectable/focusable.
          this._createDraggable(copy, draggableConfig ? draggableConfig.groups : []);
 
-         // Make sure the new dashlet is visible to the user.
+         // Make sure the new draggable is visible to the user.
          Dom.setStyle(copy, "visibility", "");
          Dom.setStyle(copy, "display", "");
          if (insertBeforeNode)
@@ -471,7 +479,7 @@
             // Or last if no node was specified.
             destUl.appendChild(copy);
          }
-         // Make sure the new dashlet gets the focus.
+         // Make sure the new draggable gets the focus.
          this.focusDraggableAfterDomChange(copy, true);
       },
 
@@ -483,7 +491,7 @@
        * @param li {HTMLElement} of type li
        * @param focus {boolean} true if li should get focus, false if it should loose focus
        */
-      focusDraggableAfterDomChange: function CD_focusDraggableAfterDomChange(li, focus)
+      focusDraggableAfterDomChange: function DD_focusDraggableAfterDomChange(li, focus)
       {
          var doFocus = focus;
          var a = new Element(li).getElementsByTagName("a")[0];
@@ -503,14 +511,14 @@
       },
 
       /**
-       * Deletes the dashlet from the Dom.
+       * Deletes the draggable from the Dom.
        *
        * @method deleteDraggable
-       * @param li {HTMLElement} of type li (the dashlet to be deleted)
+       * @param li {HTMLElement} of type li (the draggable to be deleted)
        */
-      deleteDraggable: function CD_deleteDraggable(li)
+      deleteDraggable: function DD_deleteDraggable(li)
       {
-         // Remove the dashlet from the Dom.
+         // Remove the draggable from the Dom.
          li.parentNode.removeChild(li);
 
          // Hide the shadow object
@@ -518,27 +526,27 @@
       },
 
       /**
-       * Helper function to get a dashlet from a specific index in a column.
+       * Helper function to get a draggable from a specific index in a column.
        *
        * @method _getDraggable
-       * @param ul {HTMLElement} of type ul (the dashlet's column)
-       * @param index {int} index position of the dashlet
-       * @return {HTMLElement} of type li (the dashlet)
+       * @param ul {HTMLElement} of type ul (the draggable's column)
+       * @param index {int} index position of the draggable
+       * @return {HTMLElement} of type li (the draggable)
        */
-      _getDraggable: function CD__getDraggable(ul, index)
+      _getDraggable: function DD__getDraggable(ul, index)
       {
          var className = this.draggables[ul.getAttribute("id")].cssClass;
          return Dom.getElementsByClassName(className, "li", ul)[index];
       },
 
       /**
-       * Helper function to get a dashlet's index in it's column.
+       * Helper function to get a draggable's index in it's column.
        *
        * @method _getDraggableIndex
-       * @param li {HTMLElement} of type li (the dashlet)
-       * @return {int} index position of the dashlet
+       * @param li {HTMLElement} of type li (the draggable)
+       * @return {int} index position of the draggable
        */
-      _getDraggableIndex: function CD__getDraggableIndex(li)
+      _getDraggableIndex: function DD__getDraggableIndex(li)
       {
          var ul = li.parentNode,
             className = this.draggables[ul.getAttribute("id")].cssClass;
@@ -554,26 +562,26 @@
       },
 
       /**
-       * Helper function to get the index of the dashlet's column.
+       * Helper function to get the index of the draggable's column.
        *
        * @method getDraggableColumnIndex
-       * @param el {HTMLElement} of type li or ul (the dashlet)
+       * @param el {HTMLElement} of type li or ul (the draggable)
        * @return {int} the column index
        */
-      getDraggableColumnIndex: function CD_getDraggableColumnIndex(el)
+      getDraggableColumnIndex: function DD_getDraggableColumnIndex(el)
       {
          var metadata = this.draggables[this.getContainer(el).getAttribute("id")];
          return (metadata && metadata._index) ? metadata._index : -1;
       },
 
       /**
-       * Helper function to get the index of the dashlet's column.
+       * Helper function to get the index of the draggable's column.
        *
        * @method getTargetIndex
-       * @param el {HTMLElement} of type li or ul (the dashlet)
+       * @param el {HTMLElement} of type li or ul (the draggable)
        * @return {int} the column index
        */
-      getTargetIndex: function CD_getTargetIndex(el)
+      getTargetIndex: function DD_getTargetIndex(el)
       {
          var metadata = this.targets[this.getContainer(el).getAttribute("id")];
          return (metadata && metadata._index) ? metadata._index : null;
@@ -581,13 +589,13 @@
 
 
       /**
-       * Helper function to get the index of the dashlet's column.
+       * Helper function to get the index of the draggable's column.
        *
        * @method getTargetByIndex
-       * @param index {int} of type li or ul (the dashlet)
+       * @param index {int} of type li or ul (the draggable)
        * @return {HTMLElement} the target element at position defined by index
        */
-      getTargetByIndex: function CD_getTargetByIndex(index)
+      getTargetByIndex: function DD_getTargetByIndex(index)
       {
          for (var id in this.targets)
          {
@@ -607,7 +615,7 @@
        * @param el {HTMLElement} of type li (the draggable) or ul (the container)
        * @return {int} the column index
        */
-      getContainer: function CD_getContainer(el)
+      getContainer: function DD_getContainer(el)
       {
          if (el.nodeName.toLowerCase() == "li")
          {
@@ -617,13 +625,13 @@
       },
 
       /**
-       * Helper function to determine if a column can't fit anymore dashlets.
+       * Helper function to determine if a column can't fit anymore draggables.
        *
        * @method isTargetFull
-       * @param ul {HTMLElement} of type ul (the dashlet column)
+       * @param ul {HTMLElement} of type ul (the draggable column)
        * @return {boolean} true if column is full
        */
-      isTargetFull: function CD_isTargetFull(ul)
+      isTargetFull: function DD_isTargetFull(ul)
       {
          var max = this.targets[ul.getAttribute("id")].maximum;
          if (max)
@@ -641,24 +649,24 @@
        * shall be left and that a "copy" of the dragged around instead.
        *
        * @method isDraggableProtected
-       * @param li {HTMLElement} of type li (the dashlet)
+       * @param li {HTMLElement} of type li (the draggable)
        * @return {int} the column index
        */
-      isDraggableProtected: function CD_isDraggableProtected(li)
+      isDraggableProtected: function DD_isDraggableProtected(li)
       {
          var metadata = this.draggables[this.getContainer(li).getAttribute("id")];
-         return (metadata && metadata.protected == true);
+         return (metadata && metadata.protect == true);
       },
 
       /**
-       * Helper function to determine if el is a dashlet.
+       * Helper function to determine if el is a draggable.
        * Checked performed by looking of it hasn't got class "dnd-shadow".
        *
        * @method isRealDraggable
        * @param el {HTMLElement} element to test
        * @return {boolean} true if el hasn't got class "dnd-shadow"
        */
-      isRealDraggable: function CD_isRealDraggable(el)
+      isRealDraggable: function DD_isRealDraggable(el)
       {
          return el.nodeName.toLowerCase() == "li" && !Dom.hasClass(el, "dnd-shadow");
       },
@@ -671,7 +679,7 @@
        * @param tagType {string} tag type
        * @return {boolean} true if el's tag type is same as tagType
        */
-      isOfTagType: function CD_isOfTagType(el, tagType)
+      isOfTagType: function DD_isOfTagType(el, tagType)
       {
          var tagTypes = YAHOO.lang.isArray(tagType) ? tagType : [tagType];
          for (var i = 0, il = tagTypes.length; i < il; i++)
@@ -687,32 +695,45 @@
       /**
        * Helper function to determine if an element is an add drop target.
        *
-       * @method isInGroup
+       * @method isTargetInGroup
        * @param el {HTMLElement} of type li or ul to test
        * @param group {string} The group to match against
-       * @return {boolean} true if el should be considered as a add drop target
+       * @return {boolean} true if el should be considered as a memeber of group
        */
-      isInGroup: function CD_isInGroup(el, group)
+      isTargetInGroup: function DD_isTargetInGroup(el, group)
       {
          el = this.getContainer(el);
          return this.targets[el.getAttribute("id")].group == group;
+      },
+
+      /**
+       * Helper function to determine if an element is an add drop target.
+       *
+       * @method isDraggableInGroup
+       * @param el {HTMLElement} of type li or ul to test
+       * @param group {string} The group to match against
+       * @return {boolean} true if el should be considered as a memeber of group
+       */
+      isDraggableInGroup: function DD_isDraggableInGroup(el, group)
+      {
+         el = this.getContainer(el);
+         return Alfresco.util.arrayContains(this.draggables[el.getAttribute("id")].groups, group);
       }
 
    };
 
 
    /**
-    * Alfresco.CustomiseDashlets.DraggableProxy constructor.
+    * Alfresco.util.DraggableProxy constructor.
     *
-    * Alfresco.CustomiseDashlets.DraggableProxy is a class that represents a dragged dashlet.
+    * Alfresco.util.DraggableProxy is a class that represents the actual dragged element.
     * It extends the yui class YAHOO.util.DDProxy that gives access to most of
     * the needed properties during a drag n drop operation.
     *
-    * @param {HTMLElement} of type li
-    * @param {HTMLElement} of type li, a shared "invisible" dashlet that creates "space" in the list during drag n drop.
-    * @param {Alfresco.CustomiseDashlets} the component (for helper functions and the current context such as selected Dashlet etc)
-    * @param {string} the component (for helper functions and the current context such as selected Dashlet etc)
-    * @return {Alfresco.CustomiseDashlets} The new CustomiseDashlets instance
+    * @param li {HTMLElement} of type li, a shared "invisible" draggable that creates "space" in the list during drag n drop.
+    * @param shadow {Alfresco.util.DragAndDrop} the component (for helper functions and the current context such as selected draggable etc)
+    * @param dndComponent {string} the component (for helper functions and the current context such as selected draggable etc)
+    * @return {Alfresco.util.DraggableProxy} The new DraggableProxy instance
     * @constructor
     */
    Alfresco.util.DraggableProxy = function(li, shadow, dndComponent)
@@ -743,19 +764,19 @@
    YAHOO.extend(Alfresco.util.DraggableProxy, YAHOO.util.DDProxy,
    {
       /**
-       * Callback for when the user drags the dashlet.
-       * Will style the proxy to match the dashlet.
+       * Callback for when the user drags the draggable.
+       * Will style the proxy to match the draggable.
        *
        * @method startDrag
        * @param x {int} the x position of where the drag started
        * @param y {int} the y position of where the drag started
        */
-      startDrag: function CD_DP_startDrag(x, y)
+      startDrag: function DD_DP_startDrag(x, y)
       {
          // A new drag operation has started, make sure the droppedOnEl is reset.
          this.droppedOnEl = null;
 
-         // Remove the selection of the previously focused dashlet.
+         // Remove the selection of the previously focused draggable.
          if (this.dndComponent.currentEl)
          {
             this.dndComponent.currentEl.blur();
@@ -780,7 +801,7 @@
 
          if (!this.dndComponent.isDraggableProtected(srcEl))
          {
-            // Since the proxy looks like the dashlet we can hide the actual dashlet
+            // Since the proxy looks like the draggable we can hide the actual draggable
             Dom.setStyle(srcEl, "visibility", "hidden");
          }
 
@@ -790,11 +811,11 @@
 
       /**
        * Reset the shadow so its ready to be used when the proxy is
-       * dragged over other dashlets.
+       * dragged over other draggables.
        *
        * @method _resetSrcShadow
        */
-      _resetSrcShadow: function CD_DP__resetSrcShadow()
+      _resetSrcShadow: function DD_DP__resetSrcShadow()
       {
          var srcEl = this.getEl();
          var p = srcEl.parentNode;
@@ -811,29 +832,35 @@
        * Callback for when the drag n drop session is over, is called even if
        * the proxy wasn't dropped on a target.
        *
-       * Will either delete, add or leave the dashlet depending on where the
-       * dashlet was dropped.
+       * Will either delete, add or leave the draggable depending on where the
+       * draggable was dropped.
        *
        * @method endDrag
        * @param e {int}
        * @param id {string}
        */
-      endDrag: function CD_DP_endDrag(e, id)
+      endDrag: function DD_DP_endDrag(e, id)
       {
-         // Get the actual dashlet and the proxy
+         // Get the actual draggable and the proxy
          var srcEl = this.getEl();
          var proxy = this.getDragEl();
 
-         // Check if the dashlet was dropped on at delete target and should be deleted
-         if (this.droppedOnEl && this.dndComponent.isInGroup(this.droppedOnEl, DD.GROUP_DELETE))
+         // Check if the draggable was dropped on a delete target and should be deleted
+         if (this.droppedOnEl && this.dndComponent.isTargetInGroup(this.droppedOnEl, DD.GROUP_DELETE))
          {
-            // Only delete the dashlet if its a "column dashlet"
+            // Only delete the draggable if its a "non protected draggable"
             if (!this.dndComponent.isDraggableProtected(srcEl))
             {
                // It was, delete it
                this.dndComponent.deleteDraggable(srcEl);
+
+               // Fire event to inform any listening components that draggable has been deleted
+               YAHOO.Bubbling.fire("draggableDeleted",
+               {
+                  eventGroup: this.dndComponent
+               });
             }
-            // Make sure to remove delete indication from available dashlets column
+            // Make sure to remove delete indication from target
             var dropColumn = this.droppedOnEl;
             if (this.dndComponent.isOfTagType(dropColumn, "li"))
             {
@@ -841,7 +868,7 @@
             }
             Dom.removeClass(dropColumn, "deleteDrag");
 
-            // Return so we don't add the dashlet.
+            // Return so we don't add the draggable.
             return;
          }
 
@@ -849,7 +876,7 @@
           * If we get here, the draggable was either dropped on a add target,
           * the original column or just "dropped" outside a any target.
           * Either way animate the proxy to "fly" towards the shadow.
-          * Since we have used the shadow to make space for the dashlet during
+          * Since we have used the shadow to make space for the draggable during
           * the drag we can rely on that the shadow is in the position we're
           * the draggable should be placed.
           *
@@ -866,7 +893,7 @@
             }
          }, 0.3, YAHOO.util.Easing.easeOut);
 
-         // Save the scope of this for the callback after the anumation.
+         // Save the scope of this for the callback after the animation.
          var myThis = this;
 
          a.onComplete.subscribe(function()
@@ -876,7 +903,7 @@
             // Hide proxy
             Dom.setStyle(proxy, "visibility", "hidden");
 
-            // Insert and show the real dashlet
+            // Insert and show the real draggable
             myThis.insertSrcEl(srcEl);
 
             // Hide shadow
@@ -886,14 +913,14 @@
       },
 
       /**
-       * Checks what was dragged and to where, so it knows if to add or move the dashlet.
+       * Checks what was dragged and to where, so it knows if to add or move the draggable.
        *
        * @method insertSrcEl
        * @param srcEl {HTMLElement}
        */
-      insertSrcEl: function CD_DP_insertSrcEl(srcEl)
+      insertSrcEl: function DD_DP_insertSrcEl(srcEl)
       {
-         // Find out to where and from the dashlet was dragged.
+         // Find out to where and from the draggable was dragged.
          var destUl = this.srcShadow.parentNode;
          if (this.dndComponent.isDraggableProtected(srcEl))
          {
@@ -910,7 +937,7 @@
             destUl.insertBefore(srcEl, this.srcShadow);
             this.dndComponent.focusDraggableAfterDomChange(srcEl, true);
          }
-         // Show the new dashlet.
+         // Show the new draggable.
          Dom.setStyle(srcEl, "visibility", "");
          Dom.setStyle(srcEl, "display", "");
       },
@@ -922,7 +949,7 @@
        * @param event {HTMLElement}
        * @param id {string} The id of the target element the proxy was dropped over.
        */
-      onDragDrop: function CD_DP_onDragDrop(event, id)
+      onDragDrop: function DD_DP_onDragDrop(event, id)
       {
          // Find the drop target and save it for later.
          var destEl = Dom.get(id);
@@ -933,7 +960,7 @@
             Dom.removeClass(destEl, "target");
          }
 
-         if (!this.dndComponent.isInGroup(destEl, DD.GROUP_MOVE))
+         if (!this.dndComponent.isTargetInGroup(destEl, DD.GROUP_MOVE))
          {
             // If it wasn't a drop target do nothing...
             return;
@@ -943,16 +970,16 @@
           * Ok, it was dropped on an add target.
           *
           * Normally we would know this if the proxy was dragged above other
-          * dashlets ("li" elements) since we in that case would have placed
-          * the shadow inside that column to "give space" for the new dashlet.
+          * draggables ("li" elements) since we in that case would have placed
+          * the shadow inside that column to "give space" for the new draggable.
           *
           * However, if the column was empty OR the proxy only was dragged over
           * the columns "free space" (not over a "li" element) the shadow
           * would not have been placed inside the column. The proxy can also
-          * have been dropped over the original dashlet.
+          * have been dropped over the original draggable.
           *
           * Below is the code where we check that and if that is the case, add
-          * the shadow to the column so we later can decide where the dashlet
+          * the shadow to the column so we later can decide where the draggable
           * should be placed.
           *
           */
@@ -994,7 +1021,7 @@
        * @param cursorState {string} A state constant from Alfresco.util.Cursor
        * @private
        */
-      _changeCursor: function CD_DP__changeCursor(cursorState)
+      _changeCursor: function DD_DP__changeCursor(cursorState)
       {
          var proxy = this.getDragEl();
          var proxyEl = new Element(proxy, {});
@@ -1009,7 +1036,7 @@
        * @param event {HTMLelement}
        * @param id {string} The id of the target element the proxy was dragged out of
        */
-      onDragOut: function CD_onDragOut(event, id)
+      onDragOut: function DD_onDragOut(event, id)
       {
          this.isOver = false;
 
@@ -1019,11 +1046,11 @@
          var prevDestEl = Dom.get(id);
          if (this.dndComponent.isOfTagType(prevDestEl, ["ul", "ol"]))
          {
-            // Place the shadow in the dashlets original position
+            // Place the shadow in the draggables original position
             this._resetSrcShadow();
             this._changeCursor(Alfresco.util.Cursor.DRAG);
 
-            if (this.dndComponent.isInGroup(prevDestEl, DD.GROUP_DELETE))
+            if (this.dndComponent.isTargetInGroup(prevDestEl, DD.GROUP_DELETE))
             {
                Dom.removeClass(prevDestEl, "deleteDrag");
             }
@@ -1043,12 +1070,12 @@
        * Callback that gets called repeatedly when the proxy is dragged.
        * Keeps track of the direction the user is drawing the mouse so we on
        * the dragOver can decide if the shadow element should be placed above
-       * or over other dashlets.
+       * or over other draggables.
        *
        * @method onDrag
        * @param event {HTMLElement}
        */
-      onDrag: function CD_DP_onDrag(event)
+      onDrag: function DD_DP_onDrag(event)
       {
          // Keep track of the direction of the drag for use during onDragOver
          var y = Event.getPageY(event);
@@ -1066,13 +1093,13 @@
       /**
        * Callback that gets called when the proxy is over a drop target.
        * Places out the "invisible" shadow element to make space for the new
-       * dashlet in the column.
+       * draggable in the column.
        *
        * @method onDragOver
        * @param event {HTMLelement}
        * @param id {string} The id of the target element the proxy was dragged over.
        */
-      onDragOver: function CD_DP_onDragOver(event, id)
+      onDragOver: function DD_DP_onDragOver(event, id)
       {
          this.isOver = true;
 
@@ -1091,16 +1118,16 @@
             if (!this.dndComponent.isTargetFull(this.dndComponent.getContainer(destEl)) ||
                 this.dndComponent.getContainer(srcEl) == this.dndComponent.getContainer(destEl))
             {
-               // Make sure we only add the shadow to a column and not the available dashlets
+               // Make sure we only add the shadow to a column and not the available draggables
                if (!this.dndComponent.isDraggableProtected(destEl))
                {
-                  // Hide the original dashlet since we are about to show it as a shadow somewhere else
+                  // Hide the original draggable since we are about to show it as a shadow somewhere else
                   if (!this.dndComponent.isDraggableProtected(srcEl))
                   {
                      Dom.setStyle(srcEl, "display", "none");
                   }
 
-                  // Show shadow instead of original dashlet next to its target
+                  // Show shadow instead of original draggable next to its target
                   if (Dom.getStyle(this.srcShadow, "display") == "none")
                   {
                      Dom.setStyle(this.srcShadow, "display", "");
@@ -1126,10 +1153,10 @@
             if ((!srcElColumnIsProtected && destElColumnIsProtected) || // delete: from column over available.
                   (!destElColumnIsProtected && (!destElColumnIsFull || this.dndComponent.getContainer(srcEl) == this.dndComponent.getContainer(destEl))))
             {
-               // Set the cursor to indicate that the user may drop the dashlet here.
+               // Set the cursor to indicate that the user may drop the draggable here.
                this._changeCursor(Alfresco.util.Cursor.DROP_VALID);
                Dom.addClass(destEl, "target");
-               if (this.dndComponent.isInGroup(destEl, DD.GROUP_DELETE))
+               if (this.dndComponent.isTargetInGroup(destEl, DD.GROUP_DELETE))
                {
                   // Indicate that a drop means a delete
                   Dom.addClass(destEl, "deleteDrag");
@@ -1137,7 +1164,7 @@
             }
             else if (!destElColumnIsProtected && destElColumnIsFull)
             {
-               // Set the cursor to indicate that the user may NOT drop the dashlet here.
+               // Set the cursor to indicate that the user may NOT drop the draggable here.
                this._changeCursor(Alfresco.util.Cursor.DROP_INVALID);
             }
             else
