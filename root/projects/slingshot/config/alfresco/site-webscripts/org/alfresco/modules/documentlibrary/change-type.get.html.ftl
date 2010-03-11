@@ -8,7 +8,7 @@
                <select id="${args.htmlid}-type" type="text" name="type" tabindex="0">
                   <option value="-">${msg("label.select")}</option>
                <#list types.selectable as t>
-                  <option value="${t}">${msg(t?replace(":", "_"))}</option>
+                  <option value="${t}">${msg("type." + t?replace(":", "_"))}</option>
                </#list>
                </select>&nbsp;*
             </div>

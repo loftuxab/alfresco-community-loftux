@@ -1,20 +1,18 @@
 function main()
 {
-   var scriptRoot = new XML(config.script),
-      scopedRoot = config.scoped["DocumentLibrary"]["types"];
+   var scopedRoot = config.scoped["DocumentLibrary"]["types"];
 
    return (
    {
-      selectable: getConfigTypes(scriptRoot, scopedRoot, args.currentType || "")
+      selectable: getConfigTypes(scopedRoot, args.currentType || "")
    });
 }
 
-function getConfigTypes(scriptRoot, scopedRoot, currentType)
+function getConfigTypes(scopedRoot, currentType)
 {
    var types = [],
       configs, typeConfig, typeName;
 
-   // Try scoped config (override defaults)
    try
    {
       configs = scopedRoot.getChildren("type");
@@ -39,21 +37,10 @@ function getConfigTypes(scriptRoot, scopedRoot, currentType)
                return types;
             }
          }
-         return types;
       }
    }
    catch (e)
    {
-   }
-
-   // Fallback to local script config
-   var xmlType = scriptRoot..type.(@name == currentType);
-   if (xmlType.@name == currentType)
-   {
-      for each(var xmlSubtype in xmlType.subtype)
-      {
-         types.push(xmlSubtype.@name.toString());
-      }
    }
 
    return types;

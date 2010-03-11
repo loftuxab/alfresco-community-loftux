@@ -1,23 +1,21 @@
 function main()
 {
-   var scriptRoot = new XML(config.script),
-      scopedRoot = config.scoped["DocumentLibrary"]["aspects"];
+   var scopedRoot = config.scoped["DocumentLibrary"]["aspects"];
 
    return (
    {
-      visible: getConfigAspects(scriptRoot, scopedRoot, "visible"),
-      addable: getConfigAspects(scriptRoot, scopedRoot, "addable"),
-      removeable: getConfigAspects(scriptRoot, scopedRoot, "removeable")
+      visible: getConfigAspects(scopedRoot, "visible"),
+      addable: getConfigAspects(scopedRoot, "addable"),
+      removeable: getConfigAspects(scopedRoot, "removeable")
    });
 }
 
-function getConfigAspects(scriptRoot, scopedRoot, childName)
+function getConfigAspects(scopedRoot, childName)
 {
    var aspects = [],
       aspectName,
       configs;
 
-   // Try scoped config (override defaults)
    try
    {
       configs = scopedRoot.getChild(childName).childrenMap["aspect"];
@@ -32,19 +30,12 @@ function getConfigAspects(scriptRoot, scopedRoot, childName)
                aspects.push(aspectName.toString());
             }
          }
-
-         return aspects;
       }
    }
    catch (e)
    {
    }
 
-   // Fallback to local script config
-   for each (aspectName in scriptRoot[childName].aspect.@name)
-   {
-      aspects.push(aspectName.toString());
-   }
    return aspects;
 }
 

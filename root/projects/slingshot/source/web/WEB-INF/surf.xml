@@ -1,20 +1,5 @@
 <alfresco-config>
 
-   <!-- Global config section -->
-   <config>
-      <flags>
-         <!--
-            Developer debugging setting to turn on DEBUG mode for client scripts in the browser
-         -->
-         <client-debug>false</client-debug>
-         <!--
-            LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift).
-            This flag automatically activates logging on page load.
-         -->
-         <client-debug-autologging>false</client-debug-autologging>
-      </flags>
-   </config>
-
    <config evaluator="string-compare" condition="WebFramework">
    
       <web-framework>
@@ -61,62 +46,6 @@
       
       </web-framework>
 
-   </config>
-
-   <config evaluator="string-compare" condition="UriTemplate" replace="true">
-      <!-- list of URI based page Id templates used by Slingshot -->
-      <!-- when pages are requested from the framework, matches are attempted
-           against each uri-template, and the token values returned if matched -->
-      <uri-templates>
-         <uri-template id="sitedashboardpage">/site/{site}/dashboard</uri-template>
-         <uri-template id="sitepage">/site/{site}/{pageid}</uri-template>
-         <uri-template id="userdashboardpage">/user/{userid}/dashboard</uri-template>
-         <uri-template id="userpage">/user/{userid}/{pageid}</uri-template>
-         <uri-template id="userprofilepage">/user/{userid}/profile</uri-template>
-         <uri-template id="consolepage">/console/{pageid}/{toolid}</uri-template>
-      </uri-templates>
-   </config>
-
-   <config evaluator="string-compare" condition="SitePages" replace="true">
-      <pages>
-         <page id="calendar">calendar</page>
-         <page id="wiki-page">wiki-page?title=Main_Page</page>
-         <page id="documentlibrary">documentlibrary</page>
-         <page id="discussions-topiclist">discussions-topiclist</page>
-         <page id="blog-postlist">blog-postlist</page>
-         <page id="links">links</page>
-      </pages>
-   </config>
-
-   <config evaluator="string-compare" condition="HelpPages" replace="true">
-      <help-pages>
-         <share-help>http://www.alfresco.com/help/32/labs/sharehelp/</share-help>
-         <share-tutorial>http://www.alfresco.com/help/32/labs/sharetutorial/</share-tutorial>
-      </help-pages>
-   </config>
-   
-   <config evaluator="string-compare" condition="Users" replace="true">
-      <users>
-         <!-- minimum length for username and password -->
-         <username-min-length>2</username-min-length>
-         <password-min-length>3</password-min-length>
-      </users>
-   </config>
-
-   <config evaluator="string-compare" condition="DocumentDetails" replace="true">
-      <document-details>
-         <!-- display web previewer on document details page -->
-         <display-web-preview>true</display-web-preview>
-      </document-details>
-   </config>
-   
-   <config evaluator="string-compare" condition="Search" replace="true">
-      <search>
-         <!-- default minimum length for search terms -->
-         <min-search-term-length>1</min-search-term-length>
-         <!-- default maximum number of results for a search -->
-         <max-search-results>100</max-search-results>
-      </search>
    </config>
 
 </alfresco-config>
