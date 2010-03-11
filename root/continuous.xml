@@ -1164,6 +1164,7 @@
       </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-remote-api-src.zip">
          <zipfileset dir="${dir.project.remoteapi.src}" />
+         <zipfileset dir="${dir.project.remoteapi.src.generated}" />
       </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-repository-src.zip">
          <zipfileset dir="${dir.project.repository.src}" />
