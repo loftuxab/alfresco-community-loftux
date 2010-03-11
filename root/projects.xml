@@ -39,7 +39,7 @@
    
    <target name="generate-javadocs-core" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Core API Specification" 
+      <generate-javadocs documenttitle="Alfresco Core API ${version.number}" 
                          windowtitle="Alfresco Core API" 
                          projectdir="${dir.project.core}"/>
    </target>
