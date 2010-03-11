@@ -427,7 +427,7 @@
                }
 
                //set up animation
-               this.scrollAnimation = new YAHOO.util.Scroll(document.documentElement, 
+               this.scrollAnimation = new YAHOO.util.Scroll( (YAHOO.env.ua.webkit) ? document.body : document.documentElement, 
                {
                   scroll: 
                   {

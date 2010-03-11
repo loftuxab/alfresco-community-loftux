@@ -43,21 +43,12 @@
          // render ribbon after WEF is rendered
          Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.widgets.toolbars = [];
-         this.initServices();
          this.initAttributes(this.config);
-      },
-
-      initServices: function WEF_UI_Ribbon_initServices()
-      {
-         if (!this.services.prefs) 
-         {
-            // initialise services
-            this.services.prefs = new Alfresco.service.Preferences();
-         }
       },
 
       initAttributes: function WEF_UI_Ribbon_init_attributes(attr)
       {
+
          this.setAttributeConfig('position', 
          {
             value: WebEditor.ui.Ribbon.POSITION_TOP,
@@ -93,14 +84,14 @@
       {
          if (!Dom.get(this.config.id))
          {
-            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div class="hd"><h6>'+this.getMessage('ribbon-title', 'wef')+'</h6></div><div class="bd"><div id="wef-toolbar-container"></div></div><div class="ft"><div id="wef-toolbar-secondary-container"></div></div></div></div>';
+            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div id="wef-ribbonHeader" class="hd"><h6>'+this.getMessage('ribbon-title', 'wef')+'</h6></div><div id="wef-ribbonBody" class="bd"><div id="wef-toolbar-container"></div></div><div id="wef-ribbonFooter" class="ft"><div id="wef-toolbar-secondary-container"></div></div></div></div>';
          }
 
          var panelConfig = 
          {
             visible: false,
             draggable: false,
-            underlay: 'none',
+            underlay: (YAHOO.env.ua.ie>6) ? 'shadow':'none',
             close: false
          };
 
@@ -126,7 +117,7 @@
                this.cfg.setProperty("y", parseInt(y, 10));
                this.cfg.refireEvent("iframe");
             };
-         }
+         }         
 
          var header = this.widgets.ribbonHeader = new Element(ribbon.header);
          var body = this.widgets.ribbonBody = new Element(ribbon.body);
@@ -135,9 +126,9 @@
          container.addClass('wef-ribbon-orientation-' + this.get('position'));
          Dom.addClass([ribbon.header, ribbon.body, ribbon.footer], 'wef-ribbon-module');
          // set correct width  
-         this.resizeRibbon()
+         YAHOO.lang.later(0, this, this.resizeRibbon);
 
-         // get ribbon position from cookie if available otherwise reset to initial config value
+         //get ribbon position from cookie if available otherwise reset to initial config value
          this.set('position', WebEditor.getCookieValue(this.config.name,'ribbon-position') || this.get('position'));
          ribbon.render();
 
@@ -163,7 +154,7 @@
                {
                   buttons: 
                   [
-                     {
+                     /*{
                         type: 'menu',
                         label: this.getMessage('ribbon-orientation-label','wef'),
                         value: name+ WebEditor.SEPARATOR + 'ribbon-placement',
@@ -184,7 +175,7 @@
                               value: WebEditor.ui.Ribbon.POSITION_RIGHT
                            }
                         ]
-                     },
+                     },*/
                      {
                         type: 'push',
                         label: this.getMessage('ribbon-help-label','wef'),
@@ -204,13 +195,20 @@
 
       resizeRibbon: function WEF_UI_Ribbon_resizeRibbon()
       {
-         var newWidth = Dom.getRegion(this.widgets.ribbonContainer).width-parseInt(Dom.getStyle(this.widgets.ribbonHeader,'width'),10);
-         if (!YAHOO.env.ua.ie)
-         {
-            newWidth+=2;
-         }
-
-         this.widgets.ribbonBody.setStyle('width', newWidth+'px'); 
+        var newWidth = Dom.getRegion(this.widgets.ribbonContainer).width- parseInt(Dom.getStyle(this.widgets.ribbonHeader,'width',10));
+        if (!YAHOO.env.ua.ie)
+        {
+           newWidth+=2;
+        }
+        else if (YAHOO.env.ua.ie>7)
+        {
+           newWidth+=3;
+        }
+        else if (YAHOO.env.ua.ie<7)
+        {
+           newWidth-=7;
+        }
+        this.widgets.ribbonBody.setStyle('width', newWidth+'px');
       },
 
       getToolbar: function WEF_UI_Ribbon_getToolbar(toolbarId)

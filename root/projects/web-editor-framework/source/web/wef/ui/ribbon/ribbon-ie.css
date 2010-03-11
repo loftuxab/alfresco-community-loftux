@@ -5,17 +5,40 @@
    left: -2px;
 }
 
-#wef.wef-ie-7 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module 
+#wef.wef-ie-7 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonFooter,
+#wef.wef-ie-6 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonFooter 
 {
    top: 7px;
 } 
 
-#wef.wef-ie-7 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module .wef-toolbar .icon-button button
+#wef.wef-ie-7 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonFooter .wef-toolbar .icon-button button,
+#wef.wef-ie-6 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonFooter .wef-toolbar .icon-button button
 {
    padding-left: 3.5em;
 }
 
-#wef.wef-ie-7 #wef-ribbon .hd.wef-ribbon-module h6
+#wef.wef-ie-7 #wef-ribbon #wef-ribbonHeader h6,
+#wef.wef-ie-6 #wef-ribbon #wef-ribbonHeader h6
 {
    height: 82px;
+}
+
+
+#wef.wef-ie-6 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonFooter
+{
+   width:16em;
+}
+
+#wef.wef-ie-6 #wef-ribbon .wef-tab-toolbar DIV.wef-toolbar
+{
+   margin-bottom:0;
+}
+#wef.wef-ie-6 #wef-ribbon_c 
+{
+   padding-bottom:0
+}
+
+#wef.wef-ie-6 #awe-login_c
+{
+   width:260px;
 }
