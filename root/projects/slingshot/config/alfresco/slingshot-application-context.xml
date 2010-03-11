@@ -18,17 +18,20 @@
             <value>classpath:META-INF/spring-surf-config-custom.xml</value>
             <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
             
+            <!-- Surf Autowire Support -->
+            <value>webapp:WEB-INF/surf.xml</value>
+
             <!-- Common form config -->
             <value>classpath:alfresco/form-config.xml</value>
             
+            <!-- Share default config -->
+            <value>classpath:alfresco/share-config.xml</value>
+            
             <!-- Share form config -->
             <value>classpath:alfresco/share-form-config.xml</value>
-            
+
             <!-- Share custom config -->
             <value>classpath:alfresco/web-extension/share-config-custom.xml</value>
-            
-            <!-- Surf Autowire Support -->
-            <value>webapp:WEB-INF/surf.xml</value>
          </list>
       </constructor-arg>
    </bean>

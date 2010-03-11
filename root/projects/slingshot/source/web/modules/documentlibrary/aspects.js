@@ -161,7 +161,7 @@
        */
       i18n: function DA_i18n(aspect, scope)
       {
-         return this.msg(aspect.replace(":", "_"));
+         return this.msg("aspect." + aspect.replace(":", "_"));
       },
       
       /**

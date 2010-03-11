@@ -1,0 +1,166 @@
+<alfresco-config>
+
+   <!-- Global config section -->
+   <config>
+      <flags>
+         <!--
+            Developer debugging setting to turn on DEBUG mode for client scripts in the browser
+         -->
+         <client-debug>false</client-debug>
+         <!--
+            LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift).
+            This flag automatically activates logging on page load.
+         -->
+         <client-debug-autologging>false</client-debug-autologging>
+      </flags>
+   </config>
+
+   <config evaluator="string-compare" condition="UriTemplate">
+      <!-- list of URI based page Id templates used by Share -->
+      <!-- when pages are requested from the framework, matches are attempted
+           against each uri-template, and the token values returned if matched -->
+      <uri-templates>
+         <uri-template id="sitedashboardpage">/site/{site}/dashboard</uri-template>
+         <uri-template id="sitepage">/site/{site}/{pageid}</uri-template>
+         <uri-template id="userdashboardpage">/user/{userid}/dashboard</uri-template>
+         <uri-template id="userpage">/user/{userid}/{pageid}</uri-template>
+         <uri-template id="userprofilepage">/user/{userid}/profile</uri-template>
+         <uri-template id="consolepage">/console/{pageid}/{toolid}</uri-template>
+      </uri-templates>
+   </config>
+
+   <config evaluator="string-compare" condition="SitePages">
+      <pages>
+         <page id="calendar">calendar</page>
+         <page id="wiki-page">wiki-page?title=Main_Page</page>
+         <page id="documentlibrary">documentlibrary</page>
+         <page id="discussions-topiclist">discussions-topiclist</page>
+         <page id="blog-postlist">blog-postlist</page>
+         <page id="links">links</page>
+         <page id="data-lists">data-lists</page>
+      </pages>
+   </config>
+
+   <config evaluator="string-compare" condition="HelpPages">
+      <help-pages>
+         <share-help>http://www.alfresco.com/help/32/labs/sharehelp/</share-help>
+         <share-tutorial>http://www.alfresco.com/help/32/labs/sharetutorial/</share-tutorial>
+      </help-pages>
+   </config>
+   
+   <config evaluator="string-compare" condition="Users">
+      <users>
+         <!-- minimum length for username and password -->
+         <username-min-length>2</username-min-length>
+         <password-min-length>3</password-min-length>
+      </users>
+   </config>
+
+   <config evaluator="string-compare" condition="DocumentDetails">
+      <document-details>
+         <!-- display web previewer on document details page -->
+         <display-web-preview>true</display-web-preview>
+      </document-details>
+   </config>
+   
+   <config evaluator="string-compare" condition="Search">
+      <search>
+         <!-- default minimum length for search terms -->
+         <min-search-term-length>1</min-search-term-length>
+         <!-- default maximum number of results for a search -->
+         <max-search-results>100</max-search-results>
+      </search>
+   </config>
+
+   <!-- Document Library config section -->
+   <config evaluator="string-compare" condition="DocumentLibrary">
+
+      <!--
+         Whether the folder Tree component should enumerate child folders or not.
+         This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
+      -->
+      <tree>
+         <evaluate-child-folders>true</evaluate-child-folders>
+      </tree>
+
+      <!--
+         Used by the "Manage Aspects" action and Rules pages
+
+         For custom aspects, remember to also add the relevant i18n string(s)
+            aspect.cm_myaspect=My Aspect
+      -->
+      <aspects>
+         <!-- Aspects that a user can see -->
+         <visible>
+            <aspect name="cm:generalclassifiable" />
+            <aspect name="cm:complianceable" />
+            <aspect name="cm:dublincore" />
+            <aspect name="cm:effectivity" />
+            <aspect name="cm:summarizable" />
+            <aspect name="cm:versionable" />
+            <aspect name="cm:templatable" />
+            <aspect name="cm:emailed" />
+            <aspect name="emailserver:aliasable" />
+            <aspect name="cm:taggable" />
+            <aspect name="app:inlineeditable" />
+         </visible>
+
+         <!-- Aspects that a user can add. Same as "visible" if left empty -->
+         <addable>
+         </addable>
+
+         <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+         <removeable>
+         </removeable>
+      </aspects>
+
+      <!--
+         Used by the "Change Type" action
+
+         Define valid subtypes using the following example:
+            <type name="cm:content">
+               <subtype name="cm:mysubtype" />
+            </type>
+
+         Remember to also add the relevant i18n string(s):
+            type.cm_mysubtype=My SubType
+      -->
+      <types>
+         <type name="cm:content">
+         </type>
+
+         <type name="cm:folder">
+         </type>
+      </types>
+
+      <!--
+         If set, will present a WebDAV link for the current item on the Document and Folder details pages.
+         Also used to generate the "View in Alfresco Explorer" action for folders.
+      -->
+      <!--
+      <repository-url>http://localhost:8080/alfresco</repository-url>
+      -->
+   </config>
+
+   <!-- Repository Library config section -->
+   <config evaluator="string-compare" condition="RepositoryLibrary">
+      <!--
+         Whether the link to the Repository Library appears in the header component or not.
+      -->
+      <visible>false</visible>
+
+      <!--
+         Root nodeRef for top-level folder.
+      -->
+      <root-node>alfresco://company/home</root-node>
+
+      <!--
+         Whether the folder Tree component should enumerate child folders or not.
+         This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
+      -->
+      <tree>
+         <evaluate-child-folders>false</evaluate-child-folders>
+      </tree>
+   </config>
+
+</alfresco-config>
