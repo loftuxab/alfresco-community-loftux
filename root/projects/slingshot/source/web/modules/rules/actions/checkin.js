@@ -135,8 +135,6 @@
          var form = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.form = form;
 
-         // Comment is mandatory
-         form.addValidation(this.id + "-comments", Alfresco.forms.validation.mandatory, null, "keyup");
          // ...and has a maximum length
          form.addValidation(this.id + "-comments", Alfresco.forms.validation.length,
          {

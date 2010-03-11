@@ -96,6 +96,16 @@
           */
          filter: "all",
 
+         /**
+          * Editable, set to true if the rules order shall be editable by using
+          * drag n drop and tab focus and navigation keys.
+          *
+          * Note! Will only work when folter is set to folder.
+          *
+          * @property editable
+          * @type string
+          */
+         editable: false,
 
          /**
           * The filter of the rule list.
@@ -144,6 +154,11 @@
          this.widgets.rulesListBarText = Dom.get(this.id + "-rulesListBarText");
          this.widgets.rulesListContainerEl = Dom.get(this.id + "-rulesListContainer");
          this.widgets.ruleTemplateEl = Dom.get(this.id + "-ruleTemplate");
+         this.widgets.buttonsContainerEl = Dom.get(this.id + "-buttonsContainer");
+         this.widgets.saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveButtonClick,
+         {
+            disabled: true
+         });
 
          Dom.addClass(this.widgets.rulesListContainerEl, this.options.filter);
          
@@ -161,8 +176,8 @@
        */
       onRuleSelected: function RulesList_onRuleSelected(layer, args)
       {
-         var nodeRef= args[1].ruleDetails.nodeRef;
-         if (!Selector.query('input[name=nodeRef][value=' + nodeRef + ']', this.widgets.rulesListContainerEl, true))
+         var id = args[1].ruleDetails.id;
+         if (!Selector.query('input[name=id][value=' + id + ']', this.widgets.rulesListContainerEl, true))
          {
             Alfresco.util.setSelectedClass(this.widgets.rulesListContainerEl);
          }
@@ -194,6 +209,65 @@
       {
          this.ruleset = args[1].folderRulesetDetails;
          this._displayDetails();
+      },
+
+      /**
+       * Called when user clicks the save button to persist the reoredering.
+       *
+       * @method onSaveButtonClick
+       * @param type
+       * @param args
+       */
+      onSaveButtonClick: function RulesList_onSaveButtonClick(type, args)
+      {
+         // Disable save button
+         this.widgets.saveButton.set("disabled", true);
+
+         // COlelct rule ids from hidden input fields
+         var rules = [],
+            ruleInputs = Dom.getElementsByClassName("id", "input", this.widgets.rulesContainerEl);
+         for (var i = 0, il = ruleInputs.length; i < il; i++)
+         {
+            rules.push(ruleInputs[i].value);
+         }
+
+         // Start/stop inherit rules from parent folder
+         Alfresco.util.Ajax.jsonPost(
+         {
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/actionQueue",
+            dataObj:
+            {
+               actionedUponNode : this.options.nodeRef.toString(),
+               actionDefinitionName: "reorder-rules",
+               rules: rules
+            },
+            successCallback:
+            {
+               fn: function(response)
+               {
+                  if (response.json)
+                  {
+                     // Successfully persisted reorder of folders
+                     this.widgets.saveButton.set("disabled", true);
+                  }
+               },
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: function(response)
+               {
+                  // Display error message and reload
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     title: Alfresco.util.message("message.failure", this.name),
+                     text: this.msg("message.persistRuleorder-failure")
+                  });
+                  document.location.reload();
+               },
+               scope: this
+            }
+         });
       },
 
       /**
@@ -297,25 +371,26 @@
             noRulesDiv.innerHTML = this.msg("message.noRules");
             this.widgets.rulesListContainerEl.appendChild(noRulesDiv);
          }
-         else if (this.options.filter == "folder")
+         else if (this.options.filter == "folder" && this.options.editable)
          {
             // Add drag n drop support
-            this.dnd = new Alfresco.util.DnD(
+            this.dnd = new Alfresco.util.DragAndDrop(
             {
                draggables: [
                   {
                      container: this.widgets.rulesListContainerEl,
-                     groups: [Alfresco.util.DnD.GROUP_MOVE],
+                     groups: [Alfresco.util.DragAndDrop.GROUP_MOVE],
                      cssClass: "rules-list-item"
                   }
                ],
                targets: [
                   {
                      container: this.widgets.rulesListContainerEl,
-                     group: Alfresco.util.DnD.GROUP_MOVE
+                     group: Alfresco.util.DragAndDrop.GROUP_MOVE
                   }
                ]
             });
+            //Dom.removeClass(this.widgets.buttonsContainerEl, "hidden");
          }
       },
       
@@ -335,7 +410,7 @@
          Alfresco.util.generateDomId(ruleEl);
 
          // Rule Id for later submit of reordering
-         Dom.getElementsByClassName("nodeRef", "input", ruleEl)[0].value = rule.nodeRef;
+         Dom.getElementsByClassName("id", "input", ruleEl)[0].value = rule.id;
 
          // Display rest of values
          Dom.getElementsByClassName("no", "div", ruleEl)[0].innerHTML = rule.index + 1;

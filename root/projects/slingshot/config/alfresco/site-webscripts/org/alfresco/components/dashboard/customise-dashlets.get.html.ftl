@@ -62,7 +62,8 @@
          </div>
          <ul id="${args.htmlid}-column-ul-0" class="availableList">
          <#list availableDashlets as dashlet>
-            <li class="availableDashlet" dashletUrl="${dashlet.url}">
+            <li class="availableDashlet">
+               <input type="hidden" name="dashleturl" value="${dashlet.url}"/>
                <a href="#"><img class="dnd-draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
                <span >${dashlet.shortName}</span>
                <div class="dnd-draggable" title="${dashlet.description}"></div>
@@ -83,7 +84,9 @@
             <h3 class="padded">${msg("header.column", column_index + 1)}</h3>
             <ul id="${args.htmlid}-column-ul-${column_index + 1}" class="usedList">
             <#list column as dashlet>
-               <li class="usedDashlet" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
+               <li class="usedDashlet">
+                  <input type="hidden" name="dashleturl" value="${dashlet.url}"/>
+                  <input type="hidden" name="originalregionid" value="${dashlet.originalRegionId}"/>
                   <a href="#"><img class="dnd-draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
                   <span>${dashlet.shortName}</span>
                   <div class="dnd-draggable" title="${dashlet.description}"></div>
