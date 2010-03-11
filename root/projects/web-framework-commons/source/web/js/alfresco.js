@@ -2181,9 +2181,11 @@ Alfresco.util.PopupManager = function()
        *    displayTime: {int},     // time in seconds that the message will be displayed, default 2.5
        *    modal: {true}           // if the message should modal (the background overlayed with a gray transparent layer), default is false
        * }
+       * @param parent {HTMLElement} (optional) Parent element in which to render prompt. Defaults to document.body if not provided
        */
-      displayMessage: function(config)
+      displayMessage: function(config, parent)
       {
+         var parent = parent || document.body;
          // Merge the users config with the default config and check mandatory properties
          var c = YAHOO.lang.merge(this.defaultDisplayMessageConfig, config);
          if (c.text === undefined)
@@ -2219,7 +2221,7 @@ Alfresco.util.PopupManager = function()
           * Add it to the dom, center it, schedule the fade out of the message
           * and show it.
           */
-         message.render(document.body);
+         message.render(parent);
          message.center();
          // Need to schedule a fade-out?
          if (c.displayTime > 0)
@@ -2304,9 +2306,11 @@ Alfresco.util.PopupManager = function()
        *    buttons: []            // an array of button configs as described by YUI's SimpleDialog, default is a single OK button
        *    noEscape: {boolean}    // indicates the the message has already been escaped (e.g. to display HTML-based messages)
        * }
+       * @param parent {HTMLElement} (optional) Parent element in which to render prompt. Defaults to document.body if not provided
        */
-      displayPrompt: function(config)
+      displayPrompt: function(config, parent)
       {
+         var parent = parent || document.body;
          if (this.defaultDisplayPromptConfig.buttons[0].text === null)
          {
             /**
@@ -2356,7 +2360,7 @@ Alfresco.util.PopupManager = function()
          }
 
          // Add the dialog to the dom, center it and show it.
-         prompt.render(document.body);
+         prompt.render(parent);
          prompt.center();
          prompt.show();
       },

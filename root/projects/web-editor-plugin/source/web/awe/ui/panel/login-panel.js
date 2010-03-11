@@ -118,13 +118,16 @@
             };
 
             Alfresco.util.Ajax.request(config);
+            this.widgets.panel.hide();
             this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
             {
                text: Alfresco.util.message("message.logging-on", this.name),
                spanClass: "wait",
-               displayTime: 0
-            });
-            this.widgets.panel.hide();
+               displayTime: 0,
+               effect: null
+            },
+            Dom.get('wef'));
+            
             return false;
          },
          this, true);
@@ -179,7 +182,8 @@
                },
                isDefault: true
             }]
-         });
+         },
+         Dom.get('wef'));
       }
    });
 })();

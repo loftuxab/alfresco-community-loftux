@@ -45,6 +45,11 @@
    border-width: 1px 0 0 0;
 }
 
+#wef div#prompt div.ft
+{
+   border-width: 0 1px;
+}
+
 #awe--show-hide-edit-markers,
 #awe--show-hide-edit-markers span.first-child,
 #awe--quickedit,

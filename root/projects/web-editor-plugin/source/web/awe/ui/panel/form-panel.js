@@ -170,8 +170,10 @@
                   {
                      text: Alfresco.util.message("message.saving"),
                      spanClass: "wait",
-                     displayTime: 0
-                  });
+                     displayTime: 0,
+                     effect: null
+                  },
+                  Dom.get('wef'));
                },
                obj:null,
                scope:this
