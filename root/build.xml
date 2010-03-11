@@ -201,6 +201,10 @@
          <!-- WCM Tests -->
          <exclude name="**/org/alfresco/wcm/**/*Test.java" />
          <include name="**/org/alfresco/wcm/WCMTestSuite.java" />
+         <!-- Web Script Tests -->
+         <exclude name="**/org/alfresco/repo/web/scripts/**/*Test.java" />
+         <include name="**/org/alfresco/repo/web/scripts/WebScritTestSuite.java" />
+         <include name="**/org/alfresco/repo/web/scripts/wcm/sandbox/AssetTest.java" />
          <!-- All other tests -->
          <include name="**/*Test.java" />
          <!-- include the updated indexer tests -->
