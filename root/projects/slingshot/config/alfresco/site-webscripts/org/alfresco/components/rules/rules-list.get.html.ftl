@@ -22,6 +22,7 @@
    </ul>
    <div id="${el}-buttonsContainer" class="rules-button-container hidden">
       <button id="${el}-save-button" tabindex="0">${msg("button.save")}</button>
+      <button id="${el}-reset-button" tabindex="0">${msg("button.reset")}</button>
    </div>
 
    <!-- Rule Templates -->

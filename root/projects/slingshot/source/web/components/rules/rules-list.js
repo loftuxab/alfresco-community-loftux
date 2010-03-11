@@ -35,7 +35,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-    var $html = Alfresco.util.encodeHTML;
+    var $html = Alfresco.util.encodeHTML,
+       $hasEventInterest = Alfresco.util.hasEventInterest;
 
    /**
     * RulesList constructor.
@@ -57,6 +58,7 @@
       YAHOO.Bubbling.on("ruleSelected", this.onRuleSelected, this);
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);     
       YAHOO.Bubbling.on("folderRulesetDetailsAvailable", this.onFolderRulesetDetailsAvailable, this);
+      YAHOO.Bubbling.on("draggableMoved", this.onRuleMoved, this);
 
       return this;
    };
@@ -159,6 +161,10 @@
          {
             disabled: true
          });
+         this.widgets.resetButton = Alfresco.util.createYUIButton(this, "reset-button", this.onResetButtonClick,
+         {
+            disabled: true
+         });
 
          Dom.addClass(this.widgets.rulesListContainerEl, this.options.filter);
          
@@ -197,7 +203,6 @@
          this._displayDetails();
       },
 
-
       /**
        * Event handler called when the "folderFulesDetailsAvailable" event is received
        *
@@ -212,6 +217,44 @@
       },
 
       /**
+       * Event handler called when the "onRuleMoved" event is received
+       *
+       * @method onRuleMoved
+       * @param layer
+       * @param args
+       */
+      onRuleMoved: function RulesList_onRuleMoved(layer, args)
+      {
+         if ($hasEventInterest(this.widgets.dnd, args))
+         {
+            // Enable button so new order can be stored or restored
+            this.widgets.saveButton.set("disabled", false);
+            this.widgets.resetButton.set("disabled", false);
+
+            // Change the no label
+            var noEls = Selector.query("li .no", this.widgets.rulesListContainerEl);
+            for (var i = 0, il = noEls.length; i < il; i++)
+            {
+               noEls[i].innerHTML = (i + 1) + "";
+            }
+         }
+      },
+
+      /**
+       * Called when user clicks the reset button to restore the reoredering.
+       *
+       * @method onResetButtonClick
+       * @param type
+       * @param args
+       */
+      onResetButtonClick: function RulesList_onResetButtonClick(type, args)
+      {
+         document.location.reload();
+         this.widgets.resetButton.set("disabled", true);
+         this.widgets.saveButton.set("disabled", true);
+      },
+
+      /**
        * Called when user clicks the save button to persist the reoredering.
        *
        * @method onSaveButtonClick
@@ -222,10 +265,11 @@
       {
          // Disable save button
          this.widgets.saveButton.set("disabled", true);
+         this.widgets.resetButton.set("disabled", true);
 
-         // COlelct rule ids from hidden input fields
+         // Collect rule ids from hidden input fields
          var rules = [],
-            ruleInputs = Dom.getElementsByClassName("id", "input", this.widgets.rulesContainerEl);
+            ruleInputs = Selector.query("li input[type=hidden][name=id]", this.widgets.rulesListContainerEl);
          for (var i = 0, il = ruleInputs.length; i < il; i++)
          {
             rules.push(ruleInputs[i].value);
@@ -247,7 +291,12 @@
                {
                   if (response.json)
                   {
-                     // Successfully persisted reorder of folders
+                     // Successfully persisted reorder of folders 
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.persistRuleorder-success")
+                     });
+
                      this.widgets.saveButton.set("disabled", true);
                   }
                },
@@ -263,7 +312,7 @@
                      title: Alfresco.util.message("message.failure", this.name),
                      text: this.msg("message.persistRuleorder-failure")
                   });
-                  document.location.reload();
+                  this.widgets.resetButton.set("disabled", false);
                },
                scope: this
             }
@@ -347,9 +396,9 @@
                 (this.options.filter == "folder" && !inherited) ||
                 this.options.filter == "all")
             {
-               ruleEl = this._createRule(rule, inherited);
-               ruleEl = this.widgets.rulesListContainerEl.appendChild(ruleEl);
                counter++;
+               ruleEl = this._createRule(rule, inherited, counter);
+               ruleEl = this.widgets.rulesListContainerEl.appendChild(ruleEl);
             }
 
             // Select the first rule as default
@@ -374,7 +423,7 @@
          else if (this.options.filter == "folder" && this.options.editable)
          {
             // Add drag n drop support
-            this.dnd = new Alfresco.util.DragAndDrop(
+            this.widgets.dnd = new Alfresco.util.DragAndDrop(
             {
                draggables: [
                   {
@@ -390,7 +439,7 @@
                   }
                ]
             });
-            //Dom.removeClass(this.widgets.buttonsContainerEl, "hidden");
+            Dom.removeClass(this.widgets.buttonsContainerEl, "hidden");
          }
       },
       
@@ -401,9 +450,10 @@
        * @method _createRule
        * @param rule {object} The rule info object
        * @param inherited {boolean}
+       * @param counter {int}
        * @private
        */
-      _createRule: function RulesList__createRule(rule, inherited)
+      _createRule: function RulesList__createRule(rule, inherited, counter)
       {
          // Clone template
          var ruleEl = this.widgets.ruleTemplateEl.cloneNode(true);
@@ -413,7 +463,7 @@
          Dom.getElementsByClassName("id", "input", ruleEl)[0].value = rule.id;
 
          // Display rest of values
-         Dom.getElementsByClassName("no", "div", ruleEl)[0].innerHTML = rule.index + 1;
+         Dom.getElementsByClassName("no", "div", ruleEl)[0].innerHTML = counter;
          Dom.getElementsByClassName("title", "a", ruleEl)[0].innerHTML = rule.title;
          Dom.getElementsByClassName("description", "span", ruleEl)[0].innerHTML = rule.description;
 
@@ -426,7 +476,7 @@
             Dom.getElementsByClassName("inherited", "span", ruleEl)[0].innerHTML = this.msg("label.inheritedShort");
             Dom.getElementsByClassName("inherited-from", "span", ruleEl)[0].innerHTML = this.msg("label.inheritedFrom");
 
-            if (false && rule.owningNode)
+            if (rule.owningNode)
             {
                var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0];
                a.href = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",

@@ -929,6 +929,13 @@
             {
                // Yes, add it since it was dropped over a none protected target.
                this.dndComponent.copyAndInsertDraggable(srcEl, destUl, this.srcShadow);
+
+               // Fire event to inform any listening components that draggable has been duplicated
+               YAHOO.Bubbling.fire("draggableDuplicated",
+               {
+                  eventGroup: this.dndComponent,
+                  draggable: srcEl
+               });
             }
          }
          else
@@ -936,6 +943,14 @@
             // It was a "none protected draggale" that was dragged, move it.
             destUl.insertBefore(srcEl, this.srcShadow);
             this.dndComponent.focusDraggableAfterDomChange(srcEl, true);
+
+            // Fire event to inform any listening components that draggable has been moved
+            YAHOO.Bubbling.fire("draggableMoved",
+            {
+               eventGroup: this.dndComponent,
+               draggable: srcEl
+            }); 
+
          }
          // Show the new draggable.
          Dom.setStyle(srcEl, "visibility", "");

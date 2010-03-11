@@ -128,6 +128,8 @@
             {
                // Note: Destination folder isn't mandatory, the same folder as the "current file" will be used  
                this._hideParameters(configDef.parameterDefinitions);
+               this._setParameter(ruleConfig, "assoc-type", "cm:contains");
+               this._setParameter(ruleConfig, "assoc-name", "cm:checkout");
                configDef.parameterDefinitions.push({
                   type: "arca:destination-dialog-button",
                   displayLabel: this.msg("label.workingCopyLocation"),
@@ -138,8 +140,7 @@
             }
          },
 
-
-         FileDestination:
+         Copy:
          {
             text: function(configDef, ruleConfig, configEl)
             {
@@ -153,6 +154,7 @@
                // Hide all parameters since we are using a cusotm ui but set default values
                this._hideParameters(configDef.parameterDefinitions);
                this._setParameter(ruleConfig, "assoc-type", "cm:contains");
+               this._setParameter(ruleConfig, "assoc-name", "cm:copy");
 
                // Make parameter renderer create a "Destination" button that displays an destination folder browser
                configDef.parameterDefinitions.push({
@@ -161,6 +163,20 @@
                   _buttonLabel: this.msg("button.select"),
                   _destinationParam: "destination-folder"
                });
+               return configDef;
+            }
+         },
+
+         Move:
+         {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               return this.customisations.Copy.text.call(this, configDef, ruleConfig, configEl);
+            },
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               configDef = this.customisations.Copy.edit.call(this, configDef, ruleConfig, configEl);
+               this._setParameter(ruleConfig, "assoc-name", "cm:move");
                return configDef;
             }
          },
@@ -248,8 +264,8 @@
                this._getParamDef(configDef, "mime-type")._type = null;
 
                // todo set appropriate values when known OR hide if they aren't mandatory
-               //this._setParameter(ruleConfig, "assoc-type", "");
-               //this._setParameter(ruleConfig, "assoc-name", "");
+               this._setParameter(ruleConfig, "assoc-type", "cm:contains");
+               this._setParameter(ruleConfig, "assoc-name", "cm:copy");
 
                // Make parameter renderer create a "Destination" button that displays an destination folder browser
                configDef.parameterDefinitions.push({
@@ -405,7 +421,7 @@
                      this.widgets.destinationDialog.setOptions(
                      {
                         title: this.msg("dialog.destination.title"),
-                        viewMode: (this.options.siteId && this.options.siteId !== "") ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY,
+                        viewMode: (this.options.siteId && this.options.siteId !== "") ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY
                      });
 
                      YAHOO.Bubbling.on("folderSelected", function (layer, args)
