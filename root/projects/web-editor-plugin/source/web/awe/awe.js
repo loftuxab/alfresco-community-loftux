@@ -54,7 +54,7 @@
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);
 
-         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'logoutClick', this.onLogoutClick, this, true);
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'loggedoutClick', this.onLogoutClick, this, true);
 
          //Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.initAttributes(this.config);
@@ -277,7 +277,7 @@
        */
       onLoggedOut: function WEF_UI_Ribbon_onLoggedOut(e, args)
       {
-         this.set('loggedInStatus', args[1].loggedIn);
+         this.set('loggedInStatus', false);
       },
 
       /*
@@ -331,8 +331,8 @@
          var ribbonObj = this;
          Alfresco.util.PopupManager.displayPrompt(
          {
-            title: 'Logout?',
-            text: 'Are you sure you want to log out?',
+            title: Alfresco.util.message('message.logout-confirmation-title','org.alfresco.awe.ui.LoginPanel'),
+            text: Alfresco.util.message('message.logout-confirmation','org.alfresco.awe.ui.LoginPanel'),
             buttons: 
             [
                {
@@ -375,7 +375,8 @@
                   }
                }
             ]
-         });
+         },
+         Dom.get('wef'));
       },
 
       onQuickEditMouseOver: function WEF_UI_Ribbon_onQuickEditMouseOver(e, args)
