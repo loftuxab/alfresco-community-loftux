@@ -76,8 +76,8 @@
       <!-- Specific action filters -->
       <action name="check-in">CheckIn</action>
       <action name="check-out">Checkout</action>
-      <action name="copy">FileDestination</action>
-      <action name="move">FileDestination</action>
+      <action name="copy">Copy</action>
+      <action name="move">Move</action>
       <action name="simple-workflow">SimpleWorkflow</action>
       <action name="mail">SendAnEmail</action>
       <action name="link-category">LinkCategory</action>
