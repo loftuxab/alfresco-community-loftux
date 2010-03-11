@@ -122,4 +122,25 @@
    color: #146997;
    text-decoration: none;
 }
+#awe--loggedout,
+#awe--loggedout span.first-child 
+{
+   background:none;
+   border:0;
+}
+#wef-ribbon #awe--loggedout button
+{
+   font-weight:bold;
+   font-size:85%;
+   color:#333;
+}
 
+#wef-ribbon #awe--loggedout.yui-button-disabled button
+{
+   color:#999;
+}
+
+#wef-ribbon #awe--loggedout button
+{
+   background: transparent url(./images/logout.gif) no-repeat 7px 50%;
+}

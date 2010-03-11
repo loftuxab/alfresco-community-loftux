@@ -149,7 +149,8 @@
             draggable: true,
             fixedcenter: "contained",
             close: true,
-            visible: false
+            visible: false,
+            underlay:'none'
          });
          this.widgets.panel.setHeader(this.options.title);
          this.widgets.panel.render(Dom.get(this.id));

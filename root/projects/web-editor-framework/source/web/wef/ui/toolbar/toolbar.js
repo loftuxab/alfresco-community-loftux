@@ -118,7 +118,9 @@
             }
             this.widgets.buttons.push(but);
             this.widgets.buttons[btnConfig.id] = but;
-         }
+         };
+
+         Dom.addClass(this.widgets.buttonContainer.childNodes[0],'first');
       },
       
       getButtonById: function WEF_UI_Toolbar_getButtonById(buttonId)

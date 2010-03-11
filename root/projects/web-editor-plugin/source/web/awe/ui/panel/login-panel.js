@@ -147,7 +147,7 @@
          {
             this.callback.fn.call(this.callback.scope || window);
          }
-         Bubbling.fire('awe-loggedIn',{loggedIn:true});
+         Bubbling.fire('awe' + WEF.SEPARATOR + 'loggedIn',{loggedIn:true});
       },
 
       /**

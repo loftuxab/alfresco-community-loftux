@@ -25,14 +25,14 @@
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c,
 #wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon_c
 {
-   border: 1px solid #999;
+   border:1px solid #57585A;
 }
 
 #wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c
 {
-   border-width: 0 0 1px 0;
-   -moz-box-shadow: 0 0 20px #CCCCCC;
-   -webkit-box-shadow: 0 0 20px #CCCCCC;
+   border-width:0 0 2px 0;
+   -moz-box-shadow:0 0 20px #999;
+   -webkit-box-shadow:0 0 20px #999;
 }
 
 #wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon_c
@@ -83,22 +83,21 @@
    float: left;
    height: inherit;
 }
-
-#wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon .bd.wef-ribbon-module,
-#wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon .bd.wef-ribbon-module,
-#wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon .ft.wef-ribbon-module,
-#wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon .ft.wef-ribbon-module
+#wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon #wef-ribbonBody,
+#wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon #wef-ribbonBody,
+#wef-ribbon-container.wef-ribbon-orientation-left #wef-ribbon #wef-ribbonFooter,
+#wef-ribbon-container.wef-ribbon-orientation-right #wef-ribbon #wef-ribbonFooter
 {
    padding-left: 1.5em;
    min-height: 6em;
 }
 
-#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .hd.wef-ribbon-module
+#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonHeader
 {
    width: 133px;
 }
 
-#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module
+#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonFooter
 {
    width: auto;
    float: right;
@@ -107,8 +106,7 @@
    right: 0;
    height: 2em;
 }
-
-#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon .bd.wef-ribbon-module
+#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c #wef-ribbon #wef-ribbonBody
 {
    width: auto;
 }
@@ -123,10 +121,8 @@
    border-bottom: 0;
    padding: 0;
 }
-
-#wef-ribbon .hd.wef-ribbon-module h6 
-{
-   height: 78px;
+#wef-ribbon #wef-ribbonHeader h6 {
+   height:78px;
    text-align: center;
    text-indent: -9999em;
    overflow: hidden;
@@ -137,7 +133,6 @@
 {
    border: none;
    background: none;
-   /*background: rgba(87,163,217,0.5) none;*/
    padding: 0;
 }
 
@@ -152,36 +147,26 @@
    display: none;
 }
 
-#wef-ribbon .yui-toolbar-container .yui-menu-button span.first-child select
-{
-   /*font-size: 10px;*/
-   /*border: 1px solid black;*/
-}
-
 /*  toolbar focus */
 #wef-ribbon .yui-toolbar-container .yui-toolbar-groupitem .yui-button:focus
 {
    border: 1px dotted black;
 }
-
-#wef-ribbon-container #wef-ribbon_c #wef-ribbon .ft.wef-ribbon-module
+#wef-ribbon-container #wef-ribbon_c #wef-ribbon #wef-ribbonFooter
 {
    font-size: inherit;
 }
 
-/* plugin css (awe edit content */
+
 #WEF-Ribbon--ribbon-placement,
 #WEF-Ribbon--ribbon-placement span.first-child,
 #WEF-Ribbon--help,
-#WEF-Ribbon--help span.first-child,
-#awe--loggedout,
-#awe--loggedout span.first-child 
+#WEF-Ribbon--help span.first-child
 {
    background: none;
    border: 0;
 }
 
-#wef-ribbon #awe--loggedout button,
 #wef-ribbon #WEF-Ribbon--help button,
 #wef-ribbon #WEF-Ribbon--ribbon-placement button
 {
@@ -191,16 +176,12 @@
 }
 
 #wef-ribbon #WEF-Ribbon--help.yui-button-disabled button,
-#wef-ribbon #WEF-Ribbon--ribbon-placement.yui-button-disabled button,
-#wef-ribbon #awe--loggedout.yui-button-disabled button
+#wef-ribbon #WEF-Ribbon--ribbon-placement.yui-button-disabled button
 {
    color: #999;
 }
 
-#wef-ribbon #awe--loggedout button
-{
-   background: transparent url(./images/logout.gif) no-repeat 7px 50%;
-}
+
 
 #wef-ribbon #WEF-Ribbon--help button
 {
@@ -215,4 +196,15 @@
 #wef-ribbon .wef-tab-toolbar .wef-toolbar .icon-button button
 {
    padding-left: 0;
+}
+
+#wef #wef-toolbar-secondary-container .wef-toolbar .icon-button
+{
+   background:transparent url(./images/separator.gif) no-repeat scroll 0 5px;
+   padding-left:1em;
+}
+#wef #wef-toolbar-secondary-container .wef-toolbar li.first .icon-button
+{
+   background:none;
+   padding-left:0;
 }
