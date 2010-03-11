@@ -1,28 +1,10 @@
 <alfresco-config>
 
-   <!-- Global config section -->
-   <config>
-      <flags>
-         <!--
-            Developer debugging setting to turn on DEBUG mode for client scripts in the browser
-         -->
-         <client-debug>false</client-debug>
-         <!--
-            LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift).
-            This flag automatically activates logging on page load.
-         -->
-         <client-debug-autologging>false</client-debug-autologging>
-      </flags>
-   </config>
-
    <config evaluator="string-compare" condition="WebFramework">
-   
       <web-framework>
-      
          <!-- Configure Surf Defaults -->
          <defaults>
             <page-mapper-factory>webframework.factory.pagemapper.awe</page-mapper-factory>
-            <user-factory>webframework.factory.user.alfresco</user-factory>
             
             <theme>sam</theme>
             <site-configuration>awe.site.configuration</site-configuration>
@@ -30,12 +12,6 @@
 
             <!-- no chrome required for components -->
             <component-chrome></component-chrome>
-            
-            <!-- Web Editor specific page types -->
-            <page-type>
-               <id>login</id>
-               <page-instance-id>login</page-instance-id>
-            </page-type>
          </defaults>
          
          <error-handler>
@@ -51,9 +27,7 @@
             <!-- Pick the mode: development, production -->             
             <mode>production</mode>
          </autowire>
-      
       </web-framework>
-
    </config>
 
 </alfresco-config>
