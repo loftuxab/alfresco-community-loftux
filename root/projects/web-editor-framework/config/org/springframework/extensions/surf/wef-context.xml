@@ -130,7 +130,7 @@
       <property name="dependencies">
          <list>
             <ref bean="wefToolbarCSS" />
-            <ref bean="yuiButton" />
+            <ref bean="yuiAriaButton" />
          </list>
       </property>
    </bean>
