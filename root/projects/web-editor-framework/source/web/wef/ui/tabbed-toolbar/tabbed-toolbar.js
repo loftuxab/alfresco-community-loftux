@@ -48,7 +48,10 @@
          this.element = new Element(d);
          //create tabview
          this.widgets.tabview = new YAHOO.widget.TabView();
+         
          this.widgets.tabview.appendTo(this.element);
+         this.widgets.tabview.on('activeTabChange', this.onTabChange ,this, true);
+         
          this.widgets.toolbars = [];
 
          if (this.config.toolbars)
@@ -56,9 +59,7 @@
             for (var i = 0, len = this.config.toolbars.length; i < len; i++)
             {
                var tbConfig = this.config.toolbars[i];
-               var toolbar = this.addToolbar(tbConfig.id, tbConfig);
-               this.widgets.toolbars.push(toolbar);
-               this.widgets.toolbars[tbConfig.id] = toolbar; 
+               this.addToolbar(tbConfig.id, tbConfig);
             }
          }
       },
@@ -74,14 +75,17 @@
 
       addToolbar: function WEF_UI_TabbedToolbar_addToolbar(id, config)
       {
-         var tab  = new YAHOO.widget.Tab(
-         {
-            label: config.label,
-            content: config.content || "",
-            active: config.active  || false
-         });
-
+         var toolbar, 
+            tab  = new YAHOO.widget.Tab(
+            {
+               label: config.label,
+               content: config.content || "",
+               active: config.active  || false
+            });
+            
+         tab.pluginOwner = config.pluginOwner || null;
          this.widgets.tabview.addTab(tab);
+         
          var toolbarConfig = 
          {
             id:config.id+'-toolbar',
@@ -90,8 +94,15 @@
             buttons: { buttons: config.buttons || []}
          };
 
-         config.owner = this.widgets.tabview;
-         return new WebEditor.ui.Toolbar(toolbarConfig);
+         
+         toolbar = new WebEditor.ui.Toolbar(toolbarConfig);
+         this.widgets.toolbars.push(toolbar);
+         this.widgets.toolbars[id] = toolbar;
+         if (this.widgets.toolbars.length>0)
+         {
+            this.widgets.tabview.set('activeTab',this.widgets.tabview.getTab(0))
+         }
+         return toolbar;
       },
 
       addButtons : function WEF_UI_TabbedToolbar_addButtons(toolbarId, buttonConfig)
@@ -106,6 +117,12 @@
       getToolbar: function WEF_UI_TabbedToolbar_getToolbar(toolbarId)
       {
          return this.widgets.toolbars[toolbarId];
+      },
+      
+      onTabChange: function WEF_UI_TabbedToolbar_onTabChange(e)
+      {
+         Bubbling.fire(this.config.name + WEF.SEPARATOR + 'tabChange', e);
+
       }
    });
 })();

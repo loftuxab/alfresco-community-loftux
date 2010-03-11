@@ -43,6 +43,7 @@
          // render ribbon after WEF is rendered
          Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.widgets.toolbars = [];
+         this.widgets.activePlugin = null;
          this.initAttributes(this.config);
       },
 
@@ -142,7 +143,9 @@
             },
             WebEditor.ui.TabbedToolbar
          );
-
+         //subscribe to tabchange event 
+         Bubbling.on(name + WebEditor.SEPARATOR + 'tabChange', this.onTabChange, this, true);
+         
          name = 'WEF-Ribbon'+WebEditor.ui.Ribbon.SECONDARY_TOOLBAR+'Toolbar';
          this.addToolbar(
             WebEditor.ui.Ribbon.SECONDARY_TOOLBAR,
@@ -179,7 +182,7 @@
                      {
                         type: 'push',
                         label: this.getMessage('ribbon-help-label','wef'),
-                        value: 'http://www.alfresco.com/help/32/labs/sharehelp/',
+                        value: '',
                         id: this.config.name + WebEditor.SEPARATOR + 'help',
                         icon: true
                      } 
@@ -191,6 +194,7 @@
          // Refresh any attributes here
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'ribbon-placementClick', this.onRibbonPlacementClick, this, true);
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'helpClick', this.onHelpClick, this, true);
+         
       },
 
       resizeRibbon: function WEF_UI_Ribbon_resizeRibbon()
@@ -292,7 +296,10 @@
 
       onHelpClick: function WEF_UI_Ribbon_onHelpClick(e, args)
       {
-         window.location=args[1]
+         if (this.widgets.activePlugin && this.widgets.activePlugin.onHelp)
+         {
+            this.widgets.activePlugin.onHelp();
+         }
       },
 
       /**
@@ -376,6 +383,26 @@
          }
 
          WEF.setCookieValue(this.config.name,'ribbon-position', e.newValue);
+      },
+      
+      onTabChange: function WEF_UI_Ribbon_onTabChange(e,args)
+      {
+         var prevValue = args[1].prevValue,
+             newValue =args[1].newValue;
+         
+         if (this.widgets.activePlugin !== newValue.pluginOwner);
+         {
+            
+            if (prevValue.pluginOwner && prevValue.pluginOwner.deactivate)
+            {
+               prevValue.pluginOwner.deactivate();
+            }
+            if (newValue.pluginOwner && newValue.pluginOwner.activate)
+            {
+               this.widgets.activePlugin = newValue.pluginOwner;
+               this.widgets.activePlugin.activate();
+            }            
+         }
       }
    });
 
