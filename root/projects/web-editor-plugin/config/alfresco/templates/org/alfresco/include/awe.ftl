@@ -1,6 +1,16 @@
+<#function globalConfig key default>
+   <#if config.global.flags??>
+      <#assign values = config.global.flags.childrenMap[key]>
+      <#if values?? && values?is_sequence>
+         <#return values[0].value>
+      </#if>
+   </#if>
+   <#return default>
+</#function>
+
 <#-- Global flags retrieved from web-framework-config-application -->
-<#assign DEBUG=(config.global.flags.childrenMap["client-debug"][0].value = "true")>
-<#assign AUTOLOGGING=(config.global.flags.childrenMap["client-debug-autologging"][0].value = "true")>
+<#assign DEBUG=(globalConfig("client-debug", "false") = "true")>
+<#assign AUTOLOGGING=(globalConfig("client-debug-autologging", "false") = "true")>
 <#-- allow theme to be specified in url args - helps debugging themes -->
 <#assign theme = (page.url.args.theme)!theme />
 
