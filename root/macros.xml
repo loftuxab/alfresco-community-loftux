@@ -345,6 +345,9 @@
       <attribute name="libdir"/>
       <attribute name="classfile"/>
       <attribute name="classprop"/>
+      <!-- as part of fix for ETHREEOH-3996 - allow extra directories to be added to the classpath -->
+      <attribute name="optionalDirs" default=""/>
+
       <sequential>
       <echo file="@{classfile}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
@@ -354,9 +357,13 @@
      <pathconvert pathsep="@@@" dirsep="/" property="@{classprop}">
        <path>
             <fileset dir="@{libdir}" includes="**/*.jar"/>
+            <dirset dir="@{libdir}">
+               <include name="@{optionalDirs}"/>
+            </dirset>
        </path>
          <map from="@{libdir}" to=""/>
       </pathconvert>
+
      <echo file="@{classfile}" append="true">${@{classprop}}</echo>
 
       <replace file="@{classfile}" token="@@@">

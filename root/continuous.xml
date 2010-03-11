@@ -1118,9 +1118,12 @@
                  from="*.properties" 
                  to="*_en_US.properties"/>
       </copy>
-      <zip destfile="${dir.continuous.assemble.sdk}/lib/server/config.jar">
-         <zipfileset dir="${dir.continuous.assemble.sdk}/config" />
-      </zip>
+
+      <!-- fix for ETHREEOH-3996 add exploded config directory to SDK -->
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server/config">
+         <fileset dir="${dir.continuous.assemble.sdk}/config"/>
+      </copy>
+
       <delete dir="${dir.continuous.assemble.sdk}/config" />
 
       <!-- Dependencies -->
@@ -1212,8 +1215,9 @@
       <!-- Resolve the server lib path prefix using appropriate file separators -->
       <property name="dir.continuous.assemble.sdk.lib.server" location="${dir.continuous.assemble.sdk}/lib/server" />
       <generate-classpath classprop="serverlibs" libdir="${dir.continuous.assemble.sdk.lib.server}${file.separator}" 
-            classfile="${dir.continuous.assemble.sdk}/lib/server/.classpath">
+            classfile="${dir.continuous.assemble.sdk}/lib/server/.classpath" optionalDirs="config">
       </generate-classpath>
+
       <property name="dir.continuous.assemble.sdk.lib.remote" location="${dir.continuous.assemble.sdk}/lib/remote" />
       <generate-classpath classprop="remotelibs" libdir="${dir.continuous.assemble.sdk.lib.remote}${file.separator}" 
             classfile="${dir.continuous.assemble.sdk}/lib/remote/.classpath">
