@@ -16,14 +16,12 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
 */
-package org.alfresco.repo.cmis.ws;
+package org.alfresco.repo.transaction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.transaction.TransactionService;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -34,7 +32,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 /**
  * @author Dmitry Velichkevich
  */
-public class DMTransactionWrappingInterceptor extends TransactionAspectSupport implements MethodInterceptor
+public class RetryingTransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor
 {
     private TransactionService transactionService;
 
@@ -51,33 +49,27 @@ public class DMTransactionWrappingInterceptor extends TransactionAspectSupport i
             final TransactionAttribute transactionAttribute = getTransactionAttributeSource().getTransactionAttribute(method, target.getThis().getClass());
             if (null != transactionAttribute)
             {
-                return AuthenticationUtil.runAs(new RunAsWork<Object>()
+                return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Object>()
                 {
-                    public Object doWork() throws Exception
+                    public Object execute() throws Throwable
                     {
-                        return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Object>()
+                        try
                         {
-                            public Object execute() throws Throwable
+                            return method.invoke(target.getThis(), target.getArguments());
+                        }
+                        catch (InvocationTargetException e)
+                        {
+                            if (null != e.getTargetException())
                             {
-                                try
-                                {
-                                    return method.invoke(target.getThis(), target.getArguments());
-                                }
-                                catch (InvocationTargetException e)
-                                {
-                                    if (null != e.getTargetException())
-                                    {
-                                        throw e.getTargetException();
-                                    }
-                                    else
-                                    {
-                                        throw new AlfrescoRuntimeException(e.getMessage(), e);
-                                    }
-                                }
+                                throw e.getTargetException();
                             }
-                        }, transactionAttribute.isReadOnly(), (TransactionAttribute.PROPAGATION_REQUIRES_NEW == transactionAttribute.getPropagationBehavior()));
+                            else
+                            {
+                                throw new AlfrescoRuntimeException(e.getMessage(), e);
+                            }
+                        }
                     }
-                }, AuthenticationUtil.getFullyAuthenticatedUser());
+                }, transactionAttribute.isReadOnly(), (TransactionAttribute.PROPAGATION_REQUIRES_NEW == transactionAttribute.getPropagationBehavior()));
             }
             else
             {
