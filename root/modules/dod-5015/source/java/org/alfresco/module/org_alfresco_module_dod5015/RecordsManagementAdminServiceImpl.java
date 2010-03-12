@@ -423,10 +423,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 
     public void removeCustomPropertyDefinition(QName propQName)
     {
-        // data dictionary does not currently support incremental deletes
-        throw new UnsupportedOperationException("removeCustomConstraintDefinition: "+propQName);
-        
-        /*
         ParameterCheck.mandatory("propQName", propQName);
         
         M2Model deserializedModel = readCustomContentModel();
@@ -477,7 +473,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         {
             logger.info("deleteCustomPropertyDefinition: "+propQNameAsString+" from aspect: "+aspectName);
         }
-        */
     }
 
     /**
@@ -850,20 +845,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         }
     }
     
-    public List<ConstraintDefinition> getCustomConstraintDefinitions() 
+    public List<ConstraintDefinition> getCustomConstraintDefinitions(QName modelQName) 
     {
-        // all resolved defs (ie. constraint defs + property constraint defs (references + in-line defs)
-        Collection<ConstraintDefinition> conDefs = dictionaryService.getConstraints(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
-        
-        Collection<QName> customProps = dictionaryService.getProperties(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
-        for (QName customProp : customProps)
-        {
-            PropertyDefinition propDef = dictionaryService.getProperty(customProp);
-            for (ConstraintDefinition conDef : propDef.getConstraints())
-            {
-                conDefs.remove(conDef);
-            }
-        }
+        Collection<ConstraintDefinition> conDefs = dictionaryService.getConstraints(modelQName, true);
         
         for (ConstraintDefinition conDef : conDefs)
         {
@@ -879,8 +863,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     
     public void removeCustomConstraintDefinition(QName constraintQName) 
     {
-        // throw new UnsupportedOperationException("removeCustomConstraintDefinition: "+ constraintQName);
-        
         ParameterCheck.mandatory("constraintQName", constraintQName);
         
         M2Model deserializedModel = readCustomContentModel();
@@ -1012,7 +994,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         }
         return sourceTargetId.split(SOURCE_TARGET_ID_SEPARATOR);
     }
-
+    
     public String getCompoundIdFor(String sourceId, String targetId)
     {
         ParameterCheck.mandatoryString("sourceId", sourceId);
@@ -1028,23 +1010,5 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
             .append(SOURCE_TARGET_ID_SEPARATOR)
             .append(targetId);
         return result.toString();
-    }
-
-    /**
-     * Get custom constraint definition or null if it does not exist.
-     */
-    public ConstraintDefinition getCustomConstraintDefinition(QName constraintName)
-    {
-        Collection<ConstraintDefinition> conDefs = dictionaryService.getConstraints(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
-               
-        for (ConstraintDefinition conDef : conDefs)
-        {
-            if(conDef.getName().equals(constraintName))
-            {
-                return conDef;
-            }    
-        }
-        
-        return null;
     }
 }

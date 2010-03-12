@@ -14,7 +14,8 @@
    new Alfresco.RejectInvite("${args.htmlid}").setOptions(
    {
       inviteId: "${page.url.args.inviteId!''}",
-      inviteTicket: "${page.url.args.inviteTicket!''}"
+      inviteTicket: "${page.url.args.inviteTicket!''}",
+      inviteeUserName: "${page.url.args.inviteeUserName!''}",
    }).setMessages(
       ${messages}
    );

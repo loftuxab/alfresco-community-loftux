@@ -141,33 +141,53 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         }
     }
     
-    public void testCreateSimpleCustomProperties() throws Exception
+    public void testCreateAndDeleteCustomProperties() throws Exception
     {
         setComplete();
         endTransaction();
         
-        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+        int propCount = rmAdminService.getCustomPropertyDefinitions().size();
+        
+        final List<QName> propIds = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<List<QName>>()
+        {
+            public List<QName> execute() throws Throwable
+            {
+                List<QName> propIds = new ArrayList<QName>(4);
+                
+                // Create simple custom property definition (no constraint) for each type of customisable RM element
+                for (CustomisableRmElement ce : CustomisableRmElement.values())
                 {
-                    public Void execute() throws Throwable
-                    {
-                        // Create simple custom property definition (no constraint) for each type of customisable RM element
-                        for (CustomisableRmElement ce : CustomisableRmElement.values())
-                        {
-                            String aspectName = ce.getCorrespondingAspect();
-                            
-                            String propLocalName = "myProp-for-"+aspectName+"-"+testRunID;
-                            
-                            QName dataType = DataTypeDefinition.TEXT;
-                            String propTitle = "My property title";
-                            String description = "My property description";
-                            
-                            rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description);
-                        }
-                        return null;
-                    }          
-                });        
-
-        // TODO test usages
+                    String aspectName = ce.getCorrespondingAspect();
+                    
+                    String propLocalName = "myProp-for-"+aspectName+"-"+testRunID;
+                    
+                    QName dataType = DataTypeDefinition.TEXT;
+                    String propTitle = "My property title";
+                    String description = "My property description";
+                    
+                    QName propId = rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description);
+                    propIds.add(propId);
+                }
+                return propIds;
+            } 
+        });
+        
+        assertEquals(propCount+4, rmAdminService.getCustomPropertyDefinitions().size());
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                // delete simple custom property definition created earlier (for each type of customisable RM element)
+                for (QName propId : propIds)
+                {
+                    rmAdminService.removeCustomPropertyDefinition(propId);
+                }
+                return null;
+            } 
+        });
+        
+        assertEquals(propCount, rmAdminService.getCustomPropertyDefinitions().size());
     }
     
     public void testCreateAndUseCustomProperty() throws Exception
@@ -251,6 +271,32 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
                         return null;
                     }
                 });
+        
+        /* TODO
+        try
+        {
+            transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // attempt to delete custom property that is being used
+                        rmAdminService.removeCustomPropertyDefinition(generatedQName);
+                        return null;
+                    } 
+                });
+            
+            fail("Unexpected - should not be able to delete a custom property that is being used");
+        }
+        catch (AlfrescoRuntimeException are)
+        {
+            // expected
+        }
+        
+        // remove usage
+        
+        // delete custom property
+        
+        */
     }
     
     public void testCreateAndUseCustomChildReference() throws Exception
@@ -461,7 +507,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
                     {
                         // Just dump them out for visual inspection
                         System.out.println("Available custom constraints:");
-                        List<ConstraintDefinition> constraints = rmAdminService.getCustomConstraintDefinitions();
+                        List<ConstraintDefinition> constraints = rmAdminService.getCustomConstraintDefinitions(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
                         for (ConstraintDefinition constraint : constraints)
                         {
                             System.out.println("   - " + constraint.getName());
@@ -601,7 +647,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
                 {
                     public Integer execute() throws Throwable
                     {
-                        List<ConstraintDefinition> result = rmAdminService.getCustomConstraintDefinitions();
+                        List<ConstraintDefinition> result = rmAdminService.getCustomConstraintDefinitions(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
                         assertNotNull(result);
                         return result.size();
                     }          
@@ -634,7 +680,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
                 {
                     public Void execute() throws Throwable
                     {
-                        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
+                        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
                         assertEquals(beforeCnt+1, customConstraintDefs.size());
                         
                         boolean found = false;
@@ -683,7 +729,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
                 {
                     public Void execute() throws Throwable
                     {
-                        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
+                        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
                         assertEquals(beforeCnt+1, customConstraintDefs.size());
                         
                         boolean found = false;

@@ -135,11 +135,11 @@ public interface RecordsManagementAdminService
      * @return the propId.
      */
     public QName removeCustomPropertyDefinitionConstraints(QName propQName);
-
+    
     /**
+     * Remove custom property definition
      * 
      * @param propQName
-     * @deprecated currently throws UnsupportedOperationException
      */
     public void removeCustomPropertyDefinition(QName propQName);
     
@@ -250,22 +250,17 @@ public interface RecordsManagementAdminService
      * @param newLabel the new value for the label field.
      */
     public QName updateCustomAssocDefinition(QName refQName, String newLabel);
-
+    
     /**
-     * This method returns ConstraintDefinition objects defined in the rmc model
+     * This method returns ConstraintDefinition objects defined in the given model
      * (note: not property references or in-line defs)
      * The custom constraint definitions are retrieved from the dictionaryService
      * which is notified of any newly created definitions on transaction commit.
      * Therefore custom constraints created in the current transaction will not appear
      * in the results.
      */
-    public List<ConstraintDefinition> getCustomConstraintDefinitions();
+    public List<ConstraintDefinition> getCustomConstraintDefinitions(QName modelQName);
     
-    /**
-     * Get a Constraint Definition object
-     */
-    public ConstraintDefinition getCustomConstraintDefinition(QName constraintName);
-
     /**
      * This method adds a Constraint definition to the custom model.
      * The implementation of this method would have to go into the M2Model and insert
@@ -281,21 +276,17 @@ public interface RecordsManagementAdminService
     public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues);
     
     /**
-     * This method would remove a constraint definition from the custom model.
-     * The implementation of this method would have to go into the M2Model and
-     * remove the specified M2Constraint object from the model.
-     * It would be subject to the same limitations as other non-incremental changes.
+     * Remove custom constraint definition - if not referenced (by any properties)
      * 
-     * @param constraintName the name e.g. rmc:foo.
      * 
-     * @deprecated currently throws UnsupportedOperationException
+     * @param constraintName the name e.g. rmc:foo
      */
     public void removeCustomConstraintDefinition(QName constraintName);
     
     /**
-     * This method would change the list of values supported in a custom constraint
+     * Update custom constraint definition with new list of values (replaces existing list, if any)
      * 
-     * @param name the name e.g. rmc:foo of the custom constraint.
+     * @param constraintName the name e.g. rmc:foo
      * @param newValues
      */
     public void changeCustomConstraintValues(QName constraintName, List<String> newValues);
@@ -315,7 +306,7 @@ public interface RecordsManagementAdminService
      * @return the QName of the property, association definition which matches, or null.
      */
     public QName getQNameForClientId(String localName);
-
+    
     /**
      * Given a compound id for source and target strings (as used with parent/child
      * custom references), this method splits the String and returns an array containing
@@ -325,7 +316,7 @@ public interface RecordsManagementAdminService
      * @return a String array, where result[0] == sourceId and result[1] == targetId.
      */
     public String[] splitSourceTargetId(String sourceTargetId);
-
+    
     /**
      * This method retrieves a compound ID (client-side) for the specified
      * sourceId and targetId.

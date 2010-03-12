@@ -58,7 +58,7 @@
           * @property inviteId
           * @type string
           */
-         inviteId: "",   
+         inviteId: "",
          
          /**
           * Current ticket.
@@ -66,7 +66,15 @@
           * @property ticket
           * @type string
           */
-         inviteTicket: ""
+         inviteTicket: "",
+         
+         /**
+          * Current inviteeUserName.
+          * 
+          * @property inviteeUserName
+          * @type string
+          */
+         inviteeUserName: ""
       },
 
       /**
@@ -101,10 +109,11 @@
          
          // construct the url to call
          var url = YAHOO.lang.substitute(window.location.protocol + "//" + window.location.host +
-            Alfresco.constants.URL_CONTEXT + "proxy/alfresco-noauth/api/invite/{inviteId}/{inviteTicket}/reject",
+            Alfresco.constants.URL_CONTEXT + "proxy/alfresco-noauth/api/invite/{inviteId}/{inviteTicket}/reject?inviteeUserName={inviteeUserName}",
             {
                inviteId : this.options.inviteId,
-               inviteTicket : this.options.inviteTicket
+               inviteTicket : this.options.inviteTicket,
+               inviteeUserName : this.options.inviteeUserName
             });
 
          // make a backend call to decline the request
@@ -133,10 +142,11 @@
       {
          // redirect to the accept invite page
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "accept-invite" +
-            "?inviteId={inviteId}&inviteTicket={inviteTicket}",
+            "?inviteId={inviteId}&inviteTicket={inviteTicket}&inviteeUserName={inviteeUserName}",
             {
                inviteId : this.options.inviteId,
-               inviteTicket : this.options.inviteTicket
+               inviteTicket : this.options.inviteTicket,
+               inviteeUserName : this.options.inviteeUserName
             });
          window.location = url;
       }
