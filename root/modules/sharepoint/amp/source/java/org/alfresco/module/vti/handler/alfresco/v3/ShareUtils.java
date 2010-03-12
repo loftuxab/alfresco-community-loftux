@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.alfresco.repo.SessionUser;
+import org.alfresco.repo.admin.SysAdminParams;
 import org.springframework.extensions.surf.util.URLEncoder;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -39,7 +40,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ShareUtils
 {
-
     private static Log logger = LogFactory.getLog(ShareUtils.class);
 
     // constants
@@ -51,32 +51,15 @@ public class ShareUtils
     public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
     public static final String UTF_8 = "UTF-8";
 
-    // next parameters are configured in vti-handler-context.xml
-
-    // host and port of Share application
-    private String shareHostWithPort;
-
-    // context of Share application
-    private String shareContext;
-
-    // context of alfresco application
-    private String alfrescoContext;
-
-    // host and port of alfresco application
-    private String alfrescoHostWithPort;
+    private SysAdminParams sysAdminParams;
 
     public ShareUtils()
     {
     }
 
-    /**
-     * Set share host with port
-     * 
-     * @param shareHostWithPort the share host with port to set
-     */
-    public void setShareHostWithPort(String shareHostWithPort)
+    public void setSysAdminParams(SysAdminParams sysAdminParams)
     {
-        this.shareHostWithPort = shareHostWithPort;
+        this.sysAdminParams = sysAdminParams;
     }
 
     /**
@@ -86,37 +69,17 @@ public class ShareUtils
      */
     public String getShareHostWithPort()
     {
-        return shareHostWithPort;
+        return sysAdminParams.getShareProtocol() + "://" + sysAdminParams.getShareHost() + ":" + sysAdminParams.getSharePort();
     }
 
-    /**
-     * Set share context
-     * 
-     * @param shareContext shareContext to set
-     */
-    public void setShareContext(String shareContext)
+    private String getAlfrescoContext()
     {
-        this.shareContext = shareContext;
+        return "/" + sysAdminParams.getAlfrescoContext();
     }
 
-    /**
-     * Set alfresco context
-     * 
-     * @param alfrescoContext shareContext to set
-     */
-    public void setAlfrescoContext(String alfrescoContext)
+    private String getAlfrescoHostWithPort()
     {
-        this.alfrescoContext = alfrescoContext;
-    }
-
-    /**
-     * Set alfresco host with port
-     * 
-     * @param alfrescoHostWithPort the share host with port to set
-     */
-    public void setAlfrescoHostWithPort(String alfrescoHostWithPort)
-    {
-        this.alfrescoHostWithPort = alfrescoHostWithPort;
+        return sysAdminParams.getAlfrescoProtocol() + "://" + sysAdminParams.getAlfrescoHost() + ":" + sysAdminParams.getAlfrescoPort();
     }
 
     /**
@@ -137,7 +100,7 @@ public class ShareUtils
 
         String createSiteBody = "{\"isPublic\":\"" + isPublic + "\",\"title\":\"" + title + "\",\"shortName\":\"" + shortName + "\"," + "\"description\":\"" + description
                 + "\",\"sitePreset\":\"" + sitePreset + "\"" + (isPublic ? ",\"alfresco-createSite-instance-isPublic-checkbox\":\"on\"}" : "}");
-        PostMethod createSiteMethod = createPostMethod(alfrescoHostWithPort + alfrescoContext + "/s/api/sites?alf_ticket=" + user.getTicket(), createSiteBody, CONTENT_TYPE_JSON);
+        PostMethod createSiteMethod = createPostMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/api/sites?alf_ticket=" + user.getTicket(), createSiteBody, CONTENT_TYPE_JSON);
         try
         {
             if (logger.isDebugEnabled())
@@ -200,7 +163,7 @@ public class ShareUtils
      */
     private void createComponent(HttpClient httpClient, String siteName, SessionUser user, String componentName, String componentURL) throws UnsupportedEncodingException
     {
-        String url = alfrescoHostWithPort + alfrescoContext + "/s/remotestore/create/alfresco/site-data/components/page." + componentName + ".site~" + siteName
+        String url = getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/remotestore/create/alfresco/site-data/components/page." + componentName + ".site~" + siteName
                 + "~dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket();
         
         String body = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -259,7 +222,7 @@ public class ShareUtils
             "</properties>\n" +
          "</page>";
 
-        PostMethod createSiteDashboardMethod = createPostMethod(alfrescoHostWithPort + alfrescoContext + "/s/remotestore/create/alfresco/site-data/pages/site/" + siteName
+        PostMethod createSiteDashboardMethod = createPostMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/remotestore/create/alfresco/site-data/pages/site/" + siteName
                 + "/dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket(), createSiteDashboardBody, "application/octet-stream");
         try
         {
@@ -293,7 +256,7 @@ public class ShareUtils
      */
     private void createDocumentLibrary(HttpClient httpClient, String siteName, SessionUser user)
     {
-        GetMethod createDocumentLibraryFolderMethod = createGetMethod(alfrescoHostWithPort + alfrescoContext + "/s/slingshot/doclib/doclist/documents/site/" + siteName
+        GetMethod createDocumentLibraryFolderMethod = createGetMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/slingshot/doclib/doclist/documents/site/" + siteName
                 + "/documentLibrary?filter=recentlyModified&max=10&alf_ticket=" + user.getTicket());
         try
         {
@@ -328,7 +291,7 @@ public class ShareUtils
     private void createLinks(HttpClient httpClient, String siteName, SessionUser user)
     {
 
-        GetMethod createLinksFolderMethod = createGetMethod(alfrescoHostWithPort + alfrescoContext + "/s/api/links/site/" + siteName + "/links?page=1&pageSize=512&alf_ticket="
+        GetMethod createLinksFolderMethod = createGetMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/api/links/site/" + siteName + "/links?page=1&pageSize=512&alf_ticket="
                 + user.getTicket());
         try
         {
@@ -394,7 +357,7 @@ public class ShareUtils
     public void deleteSite(SessionUser user, String shortName) throws HttpException, IOException
     {
         HttpClient httpClient = new HttpClient();
-        DeleteMethod deleteSiteMethod = new DeleteMethod(alfrescoHostWithPort + alfrescoContext + "/s/api/sites/" + shortName + "?alf_ticket=" + user.getTicket());
+        DeleteMethod deleteSiteMethod = new DeleteMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/api/sites/" + shortName + "?alf_ticket=" + user.getTicket());
         try
         {
             if (logger.isDebugEnabled())
@@ -449,7 +412,7 @@ public class ShareUtils
      */
     private void deleteSiteComponent(HttpClient httpClient, String siteName, SessionUser user, String componentName)
             {
-        DeleteMethod deleteTitleMethod = new DeleteMethod(alfrescoHostWithPort + alfrescoContext + "/s/remotestore/delete/alfresco/site-data/components/page." + componentName
+        DeleteMethod deleteTitleMethod = new DeleteMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/remotestore/delete/alfresco/site-data/components/page." + componentName
                 + ".site~" + siteName + "~dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket());
         try
         {
@@ -483,7 +446,7 @@ public class ShareUtils
      */
     private void deleteSiteDashboard(HttpClient httpClient, String siteName, SessionUser user)
     {
-        DeleteMethod deleteDashboardMethod = new DeleteMethod(alfrescoHostWithPort + alfrescoContext + "/s/remotestore/delete/alfresco/site-data/pages/site/" + siteName
+        DeleteMethod deleteDashboardMethod = new DeleteMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/remotestore/delete/alfresco/site-data/pages/site/" + siteName
                 + "/dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket());
         try
         {
@@ -515,7 +478,7 @@ public class ShareUtils
      */
     public String getShareContext()
     {
-        return shareContext;
+        return "/" + sysAdminParams.getShareContext();
     }
 
     /**

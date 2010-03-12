@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.VtiHandlerException;
+import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -62,6 +63,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     private SearchService searchService;
     private NamespaceService namespaceService;
     private PersonService personService;
+    private SysAdminParams sysAdminParams;
 
     private AuthenticationComponent authenticationComponent;
 
@@ -69,7 +71,6 @@ public class VtiPathHelper extends AbstractLifecycleBean
 
     private String rootPath;
     private String storePath;
-    private String alfrescoContext;
     
     /**
      * Set authentication component
@@ -142,23 +143,13 @@ public class VtiPathHelper extends AbstractLifecycleBean
     }
     
     /**
-     * Set alfresco context
-     * 
-     * @param alfrescoContext the alfresco context to set
-     */
-    public void setAlfrescoContext(String alfrescoContext)
-    {
-        this.alfrescoContext = alfrescoContext;
-    }
-
-    /**
      * Get alfresco context
      * 
      * @return alfresco context
      */
     public String getAlfrescoContext()
     {
-        return alfrescoContext;
+        return "/" + sysAdminParams.getAlfrescoContext();
     }
     
     /**
@@ -434,9 +425,9 @@ public class VtiPathHelper extends AbstractLifecycleBean
         {
             URL url = new URL(document);
             
-            if (url.getPath().startsWith(alfrescoContext))
+            if (url.getPath().startsWith(getAlfrescoContext()))
             {
-                return alfrescoContext;
+                return getAlfrescoContext();
             }
             else
             {
@@ -548,6 +539,11 @@ public class VtiPathHelper extends AbstractLifecycleBean
     public void setPersonService(PersonService personService)
     {
         this.personService = personService;
+    }
+
+    public void setSysAdminParams(SysAdminParams sysAdminParams)
+    {
+        this.sysAdminParams = sysAdminParams;
     }
 
     public FileFolderService getFileFolderService()

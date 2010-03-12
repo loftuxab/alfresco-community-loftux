@@ -89,8 +89,8 @@
         <property name="fileFolderService" ref="FileFolderService" />
         <property name="permissionService" ref="PermissionService" />
         <property name="personService" ref="PersonService" />
-        <property name="alfrescoContext">
-        	<value>${vti.alfresco.deployment.context}</value>
+        <property name="sysAdminParams">
+            <ref bean="sysAdminParams" />
         </property>
     </bean>
 
@@ -118,18 +118,9 @@
     </bean>
   
     <bean id="shareUtils" class="org.alfresco.module.vti.handler.alfresco.v3.ShareUtils">    	
-    	<property name="shareContext">
-    		<value>${vti.share.shareContext}</value>
-    	</property>
-    	<property name="shareHostWithPort">
-    		<value>${vti.share.shareHostWithPort}</value>
-    	</property>
-    	<property name="alfrescoContext">
-    		<value>${vti.alfresco.deployment.context}</value>
-    	</property>
-    	<property name="alfrescoHostWithPort">
-    		<value>${vti.alfresco.alfresoHostWithPort}</value>
-    	</property>
+        <property name="sysAdminParams">
+            <ref bean="sysAdminParams" />
+        </property>
     </bean>
     
     <bean id="vtiAuthenticationHandler" class="org.alfresco.module.vti.handler.alfresco.DefaultAuthenticationHandler">

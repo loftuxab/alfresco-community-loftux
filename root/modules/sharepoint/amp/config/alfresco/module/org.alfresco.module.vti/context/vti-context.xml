@@ -45,9 +45,9 @@
     <bean id="vtiFilter" class="org.alfresco.module.vti.web.VtiFilter">
     	<property name="authenticationHandler" ref="vtiAuthenticationHandler"/>
     	<property name="vtiHandler" ref="vtiHandler"/>
-    	<property name="alfrescoContext">
-			<value>${vti.alfresco.deployment.context}</value>
-		</property>    	
+    	<property name="sysAdminParams">
+            <ref bean="sysAdminParams" />
+        </property>
     </bean>
         
     <bean id="vtiRequestDispatcher" class="org.alfresco.module.vti.web.VtiRequestDispatcher">
@@ -115,9 +115,9 @@
 				</bean>									
 			</list>
 		</constructor-arg>
-		<property name="context">
-			<value>${vti.alfresco.deployment.context}</value>
-		</property>
+		<property name="sysAdminParams">
+                    <ref bean="sysAdminParams" />
+                </property>
     </bean>   
   
     <bean id="vtiInfAction" class="org.alfresco.module.vti.web.actions.VtiInfAction">
