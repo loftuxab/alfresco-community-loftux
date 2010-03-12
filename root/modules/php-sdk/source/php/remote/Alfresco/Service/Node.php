@@ -456,7 +456,7 @@ class Node extends BaseObject
 			}
 			else
 			{
-				$value = $propertyDetails->values;				
+				$value = $propertyDetails->value;				
 			}
 			$this->_properties[$name] = $value;
 						
