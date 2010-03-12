@@ -536,6 +536,12 @@
             // Create the tree nodes in the tree view
             var descriptorObj = parentNodeObj ? parentNodeObj.treeNodes : {},
                n;
+
+            if (descriptorObj.dataModifier)
+            {
+               treeNodeObjs = descriptorObj.dataModifier.call(this, treeNodeObjs, descriptorObj);
+            }
+
             for (var j = 0, jl = treeNodeObjs.length; j < jl; j++)
             {
                n = treeNodeObjs[j];

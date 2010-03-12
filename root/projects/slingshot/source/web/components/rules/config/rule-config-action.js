@@ -63,6 +63,35 @@
 
       customisations:
       {
+         SpecialiseType:
+         {
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               // Limit the available types to the ones specified in share-config.xml
+               this._getParamDef(configDef, "type-name")._constraintFilter = "changeable";
+               return configDef;
+            }
+         },
+
+         AddFeatures:
+         {
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               // Limit the available types to the ones specified in share-config.xml
+               this._getParamDef(configDef, "aspect-name")._constraintFilter = "addable";
+               return configDef;
+            }
+         },
+
+         RemoveFeatures:
+         {
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               // Limit the available types to the ones specified in share-config.xml
+               this._getParamDef(configDef, "aspect-name")._constraintFilter = "removeable";
+               return configDef;
+            }
+         },
 
          Select:
          {

@@ -90,7 +90,11 @@
             aspect.cm_myaspect=My Aspect
       -->
       <aspects>
-         <!-- Aspects that a user can see -->
+
+         <!--
+            Aspects that a user can see in UI.
+            Used by Rules, aspects are the listed aspects for rule's "has-aspect" action condition.
+         -->
          <visible>
             <aspect name="cm:generalclassifiable" />
             <aspect name="cm:complianceable" />
@@ -105,17 +109,28 @@
             <aspect name="app:inlineeditable" />
          </visible>
 
-         <!-- Aspects that a user can add. Same as "visible" if left empty -->
+         <!--
+            Aspects that a user can add in UI.
+            Used by Rules, aspects are the listed aspects for rule's "add-features" action.
+            Same as "visible" if left empty.
+         -->
          <addable>
          </addable>
 
-         <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+         <!--
+            Aspects that a user can remove in UI.
+            Used by Rules, aspects are the listed aspects for rule's "remove-features" action.
+            Same as "visible" if left empty
+         -->
          <removeable>
          </removeable>
       </aspects>
 
       <!--
-         Used by the "Change Type" action
+         Used by the "Change Type" action.
+         Used by Rules:
+          - parent types are the listed types for rule's "is-subtype" action condition
+          - sub types are the listed types for rule's "specialise-type" action
 
          Define valid subtypes using the following example:
             <type name="cm:content">

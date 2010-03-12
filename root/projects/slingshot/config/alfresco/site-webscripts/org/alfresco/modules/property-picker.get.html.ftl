@@ -6,8 +6,8 @@ Alfresco.util.ComponentManager.get("${el}").setOptions(
 {
    transientProperties: {
       "d:content" : ${transientContentProperties}
-   }
+   },
+   <#if (classFilter??)>classFilter: ${classFilter}</#if>         
 });
 </#if>
 //]]></script>
-

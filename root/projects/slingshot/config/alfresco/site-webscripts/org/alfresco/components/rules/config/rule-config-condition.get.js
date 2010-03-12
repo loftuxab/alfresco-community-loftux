@@ -1,4 +1,5 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/components/rules/config/rule-config.lib.js">
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/config.lib.js">
 
 function main()
 {
@@ -32,6 +33,10 @@ function main()
    var conditionConstraints = loadRuleConstraints(c);
    model.constraints = jsonUtils.toJSONString(conditionConstraints);
 
+   // Load filter for aspects, types and property evalurators that shall be visible
+   var constraintsFilter = {};
+   constraintsFilter["ac-aspects"] = getDocumentLibraryAspects();
+   constraintsFilter["ac-types"] = getDocumentLibraryTypes();
 
    // Save property-evaluator config as json
    var propertyEvaluatorMap = {},
@@ -42,17 +47,19 @@ function main()
       propertyTypes;
    if (propertyEvaluatorNode)
    {
-      for each (evaluatorNode in propertyEvaluatorNode.elements("evaluator"))
+      for each (propertyNode in propertyEvaluatorNode.elements("property"))
       {
-         propertyTypes = [];
-         for each (propertyNode in evaluatorNode.elements("property"))
+         evaluatorNames = [];
+         for each (evaluatorNode in propertyNode.elements("evaluator"))
          {
-            propertyTypes.push(propertyNode.@type.toString());
+            evaluatorNames.push(evaluatorNode.@name.toString());
          }
-         propertyEvaluatorMap[evaluatorNode.@name.toString()] = propertyTypes;
+         propertyEvaluatorMap[propertyNode.@type.toString()] = evaluatorNames;
       }
+      constraintsFilter["ac-compare-operations"] = propertyEvaluatorMap;
    }
-   model.propertyEvaluatorMap = jsonUtils.toJSONString(propertyEvaluatorMap);
+   model.constraintsFilter = jsonUtils.toJSONString(constraintsFilter);
+
 
    // Load user preferences for which proeprties to show in menu as default
    var connector = remote.connect("alfresco");

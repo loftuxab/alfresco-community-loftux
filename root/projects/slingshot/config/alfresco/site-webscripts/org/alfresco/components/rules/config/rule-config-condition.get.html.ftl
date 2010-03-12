@@ -13,7 +13,6 @@
    {
       <#if (comparePropertyValueDefinition?exists)>comparePropertyValueDefinition: ${comparePropertyValueDefinition},</#if>
       <#if (compareMimeTypeDefinition?exists)>compareMimeTypeDefinition: ${compareMimeTypeDefinition},</#if>
-      <#if (propertyEvaluatorMap?exists)>propertyEvaluatorMap: ${propertyEvaluatorMap},</#if>
       properties: <#if (properties?exists)>${properties}<#else>[]</#if>
    });
 //]]></script>

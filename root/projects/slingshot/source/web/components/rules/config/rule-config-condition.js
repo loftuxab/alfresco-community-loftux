@@ -98,20 +98,6 @@
          },
 
          /**
-          * The constraints for comparing properties contains all evaluator, regardless of what property type
-          * they are applicable to. This map specifies which types an evaluator is valid for.
-          *
-          * Note!
-          * If an evaluator isn't specified that evaluator will be displayed for the property regardless
-          * of the property type.
-          *
-          * @property propertyEvaluratorMap
-          * @type {object}
-          * @default {}
-          */
-         propertyEvaluatorMap: {},
-
-         /**
           * The config definition that will be used by/specialized by each property
           *
           * @property comparePropertyValueDefinition
@@ -414,14 +400,13 @@
        * Called to get the constraint options for a constraint.
        *
        * @method _getConstraintValues
-       * @param p_sConstraintName
+       * @param p_oParamDef
        * @param p_oRuleConfig
        * @return {array} rule constraint values
        * @override
        */
-      _getConstraintValues: function RuleConfigCondition__getConstraintValues(p_sConstraintName, p_oRuleConfig)
+      _getConstraintValues: function RuleConfigCondition__getConstraintValues(p_oParamDef, p_oRuleConfig)
       {
-         var values = Alfresco.RuleConfigCondition.superclass._getConstraintValues.call(this, p_sConstraintName, p_oRuleConfig);
          if (this._isComparePropertyDefinition(p_oRuleConfig[this.options.ruleConfigDefinitionKey]))
          {
             var propertyName = p_oRuleConfig.parameterValues.property,
@@ -430,10 +415,7 @@
             {
                propertyName += ":" + contentProperty;
             }
-            var propertyType,
-               evaluatorMap = this.options.propertyEvaluatorMap,
-               propertyTypes,
-               filteredValues = [];
+            var propertyType;
             for (var i = 0, il = this.options.properties.length; i < il; i++)
             {
                if (this.options.properties[i].name == propertyName)
@@ -442,30 +424,9 @@
                   break;
                }
             }
-            for (var ei = 0, eil = values.length; propertyType && ei < eil; ei++)
-            {
-               propertyTypes = evaluatorMap[values[ei].value];
-               if (propertyTypes)
-               {
-                  // The evaluator was specified
-                  for (var pi = 0, pil = propertyTypes.length; pi < pil; pi++)
-                  {
-                     if (propertyTypes[pi] == propertyType)
-                     {
-                        // The evaluator allows the type
-                        filteredValues.push(values[ei]);
-                        break;
-                     }
-                  }
-               }
-               else
-               {
-                  filteredValues.push(values[ei]);
-               }
-            }
-            return filteredValues;
+            p_oParamDef._constraintFilter = propertyType;
          }
-         return values;
+         return Alfresco.RuleConfigCondition.superclass._getConstraintValues.call(this, p_oParamDef, p_oRuleConfig);
       },
 
       /**
@@ -778,6 +739,33 @@
 
       customisations:
       {
+
+         /**
+          * Has aspect
+          */
+         HasAspect:
+         {
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               // Limit the available types to the ones specified in share-config.xml
+               this._getParamDef(configDef, "aspect")._constraintFilter = "visible";
+               return configDef;
+            }
+         },
+
+         /**
+          * Is sub type
+          */
+         IsSubType:
+         {
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               // Limit the available types to the ones specified in share-config.xml
+               this._getParamDef(configDef, "type")._constraintFilter = "visible";
+               return configDef;
+            }
+         },
+
          /**
           * Category picker
           */
