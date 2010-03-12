@@ -152,7 +152,7 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
 
     public void testGetRelationshipsFilter() throws Exception
     {
-        GetObjectRelationshipsResponse relationshipsResponse = getAndAssertObjectRelationships(sourceId, false, EnumRelationshipDirection.either, null, PROP_OBJECT_ID + ", "
+        GetObjectRelationshipsResponse relationshipsResponse = getAndAssertObjectRelationships(sourceId, false, EnumRelationshipDirection.either, null, PROP_OBJECT_ID + ","
                 + PROP_SOURCE_ID, false, null, null);
         assertTrue("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length <= (getRelationshipSubTypes().size() + 1));
         for (CmisObjectType objectType : relationshipsResponse.getObjects().getObjects())
