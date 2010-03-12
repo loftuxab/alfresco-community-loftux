@@ -69,4 +69,15 @@ public class VmShutdownListener
     {
         return vmShuttingDown;
     }
+
+    /**
+     * Message carrier to break out of loops using the callback.
+     * 
+     * @author Derek Hulley
+     * @since 3.2.1
+     */
+    public static class VmShutdownException extends RuntimeException
+    {
+        private static final long serialVersionUID = -5876107469054587072L;
+    }
 }
