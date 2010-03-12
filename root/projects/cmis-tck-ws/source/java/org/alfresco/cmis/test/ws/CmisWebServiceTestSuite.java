@@ -113,7 +113,7 @@ public class CmisWebServiceTestSuite extends TestSuite
         LOGGER.info("******************************************************************");
         LOGGER.info("*                                                                *");
         LOGGER.info("*                          CMIS TEST                             *");
-        LOGGER.info("*       Copyright (C) 2005-2009 Alfresco Software Limited.       *");
+        LOGGER.info("*       Copyright (C) 2005-2010 Alfresco Software Limited.       *");
         LOGGER.info("*                                                                *");
         LOGGER.info("******************************************************************");
         LOGGER.info("");

@@ -19,7 +19,9 @@
 package org.alfresco.cmis.test.ws;
 
 import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +32,7 @@ import org.alfresco.repo.cmis.ws.CheckOutResponse;
 import org.alfresco.repo.cmis.ws.CmisAccessControlEntryType;
 import org.alfresco.repo.cmis.ws.CmisAccessControlListType;
 import org.alfresco.repo.cmis.ws.CmisAccessControlPrincipalType;
+import org.alfresco.repo.cmis.ws.CmisObjectListType;
 import org.alfresco.repo.cmis.ws.CmisObjectType;
 import org.alfresco.repo.cmis.ws.CmisPropertiesType;
 import org.alfresco.repo.cmis.ws.CmisRepositoryCapabilitiesType;
@@ -61,7 +64,12 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
 {
     private static Log LOGGER = LogFactory.getLog(CmisDiscoveryServiceClient.class);
 
-    private String[] documentsIds = new String[6];
+    private static int RELATIONSHIPS_AMOUNT = 6;
+
+    private String parentFolderId;
+    private List<String> documentIds = new LinkedList<String>();
+    private Set<String> sourceIds = new HashSet<String>();
+    private Set<String> targetIds = new HashSet<String>();
 
     public CmisDiscoveryServiceClient(AbstractService abstractService)
     {
@@ -135,9 +143,23 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
     protected void onSetUp() throws Exception
     {
         super.onSetUp();
-        for (int i = 0; i < documentsIds.length; i++)
+        parentFolderId = createAndAssertFolder();
+        for (int i = 0; i < RELATIONSHIPS_AMOUNT; i++)
         {
-            documentsIds[i] = createAndAssertDocument();
+            if (areRelationshipsSupported())
+            {
+                String sourceId = createRelationshipSourceObject(parentFolderId);
+                String targetId = createRelationshipTargetObject(parentFolderId);
+                createAndAssertRelationship(sourceId, targetId);
+                documentIds.add(sourceId);
+                documentIds.add(targetId);
+                sourceIds.add(sourceId);
+                targetIds.add(targetId);
+            }
+            else
+            {
+                documentIds.add(createAndAssertDocument(parentFolderId));
+            }
         }
     }
 
@@ -145,10 +167,11 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
     protected void onTearDown() throws Exception
     {
         super.onTearDown();
-        for (int i = 0; i < documentsIds.length; i++)
+        for (String documentId : documentIds)
         {
-            deleteAndAssertObject(documentsIds[i]);
+            deleteAndAssertObject(documentId, true);
         }
+        deleteAndAssertObject(parentFolderId);
     }
 
     public void testQueryAll() throws Exception
@@ -173,7 +196,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
     }
 
-    public void testQueryOrder() throws Exception
+    public void testQueryWithAscendingOrdering() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
                 || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
@@ -185,16 +208,74 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
             String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " ORDER BY " + PROP_NAME + " ASC";
             try
             {
-                QueryResponse queryResponse = queryAndAssert(statement, false, false, EnumIncludeRelationships.none, null, 10L, null);
-                assertTrue("Query response contains more objects than was expected", queryResponse.getObjects().getObjects().length <= 10);
-                String name1 = getStringProperty(queryResponse.getObjects().getObjects()[0].getProperties(), PROP_NAME);
-                String name2 = getStringProperty(queryResponse.getObjects().getObjects()[queryResponse.getObjects().getObjects().length - 1].getProperties(), PROP_NAME);
-                assertTrue("Query response objects are not ordered", name1.compareTo(name2) <= 0);
+                QueryResponse queryResponse = queryAndAssert(statement, false, false, EnumIncludeRelationships.none, null, null, null);
+                assertOrdering(queryResponse, new AbstractBaseOrderingComparator()
+                {
+                    @Override
+                    protected int compareImpl(String left, String right)
+                    {
+                        return left.compareToIgnoreCase(right);
+                    }
+                });
             }
             catch (Exception e)
             {
                 fail(e.toString());
             }
+        }
+    }
+
+    public void testQueryWithDescendingOrdering() throws Exception
+    {
+        if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
+                || EnumCapabilityQuery.fulltextonly.equals(getAndAssertCapabilities().getCapabilityQuery()))
+        {
+            LOGGER.warn("testQueryOrder() was skipped: Metadata query isn't supported");
+        }
+        else
+        {
+            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " ORDER BY " + PROP_NAME + " DESC";
+            try
+            {
+                QueryResponse queryResponse = queryAndAssert(statement, false, false, EnumIncludeRelationships.none, null, null, null);
+                assertOrdering(queryResponse, new AbstractBaseOrderingComparator()
+                {
+                    @Override
+                    protected int compareImpl(String left, String right)
+                    {
+                        return -left.compareToIgnoreCase(right);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                fail(e.toString());
+            }
+        }
+    }
+
+    private abstract class AbstractBaseOrderingComparator implements Comparator<String>
+    {
+        public int compare(String left, String right)
+        {
+            assertFalse("Name property(s) of Left or/and Right object(s) is/are undefined", ((null == left) || (null == right)));
+            assertFalse("Name property(s) of Left or/and Right object(s) is/are empty", ("".equals(left) || "".equals(right)));
+            return compareImpl(left, right);
+        }
+
+        protected abstract int compareImpl(String left, String right);
+    }
+
+    private void assertOrdering(QueryResponse queryResponse, Comparator<String> orderingChecker) throws Exception
+    {
+        CmisObjectListType objects = queryResponse.getObjects();
+        assertTrue("Query Response contains too little Objects amount than expected", (objects.getObjects().length > 1));
+        for (int i = 1; i < objects.getObjects().length; i++)
+        {
+            String leftName = getStringProperty(objects.getObjects(i - 1).getProperties(), PROP_NAME);
+            String currentName = getStringProperty(objects.getObjects(i).getProperties(), PROP_NAME);
+            assertTrue(("Query Response Objects are not ordered properly! Object with " + PROP_NAME + "='" + currentName + "' must be located before Object with " + PROP_NAME
+                    + "='" + leftName + "'"), (orderingChecker.compare(leftName, currentName) <= 0));
         }
     }
 
@@ -215,9 +296,9 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         {
             fail(e.toString());
         }
-        assertNotNull("Query response is NULL", queryResponse);
-        assertNotNull("Query response is NULL", queryResponse.getObjects());
-        assertNotNull("Query response is NULL", queryResponse.getObjects().getObjects());
+        assertNotNull("Query response is undefined", queryResponse);
+        assertNotNull("Query response is undefined", queryResponse.getObjects());
+        assertNotNull("Query response is undefined", queryResponse.getObjects().getObjects());
         return queryResponse;
     }
 
@@ -279,7 +360,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
             }
         }
     }
-    
+
     public void testQueryWhere() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
@@ -289,15 +370,15 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
         else
         {
-            CmisPropertiesType response = getAndAssertObjectProperties(documentsIds[0], PROP_NAME);
+            CmisPropertiesType response = getAndAssertObjectProperties(documentIds.iterator().next(), PROP_NAME);
             String name = getStringProperty(response, PROP_NAME);
             String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE " + PROP_NAME + "='" + name + "'";
             QueryResponse queryResponse = queryAndAssert(statement, false, false, null, null, null, null);
             String resultId = getIdProperty(queryResponse.getObjects().getObjects()[0].getProperties(), PROP_OBJECT_ID);
-            assertEquals("'WHERE' clause was resulted with invalid Object", documentsIds[0], resultId);
+            assertEquals("'WHERE' clause was resulted with invalid Object", documentIds.iterator().next(), resultId);
         }
     }
-    
+
     public void testQueryIncludeRenditions() throws Exception
     {
         if (EnumCapabilityQuery.none.equals(getAndAssertCapabilities().getCapabilityQuery())
@@ -306,7 +387,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
             LOGGER.warn("testQueryIncludeRenditions() was skipped: Metadata query isn't supported");
         }
         else
-        {   
+        {
             if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
             {
                 String documentId = createAndAssertDocument();
@@ -315,15 +396,16 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
                 {
                     for (RenditionData testRendition : testRenditions)
                     {
-                        CmisPropertiesType response = getAndAssertObjectProperties(documentsIds[0], PROP_NAME);
+                        CmisPropertiesType response = getAndAssertObjectProperties(documentIds.iterator().next(), PROP_NAME);
                         String name = getStringProperty(response, PROP_NAME);
                         String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE " + PROP_NAME + "='" + name + "'";
                         QueryResponse queryResponse = queryAndAssert(statement, false, false, null, testRendition.getFilter(), null, null);
                         String resultId = getIdProperty(queryResponse.getObjects().getObjects()[0].getProperties(), PROP_OBJECT_ID);
-                        assertEquals("'WHERE' clause was resulted with invalid Object", documentsIds[0], resultId);
+                        assertEquals("'WHERE' clause was resulted with invalid Object", documentIds.iterator().next(), resultId);
                         assertTrue("Response is empty", queryResponse != null && queryResponse.getObjects() != null && queryResponse.getObjects().getObjects() != null
                                 && queryResponse.getObjects().getObjects().length == 1);
-                        assertRenditions(queryResponse.getObjects().getObjects()[0], testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition.getExpectedMimetypes());
+                        assertRenditions(queryResponse.getObjects().getObjects()[0], testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition
+                                .getExpectedMimetypes());
                     }
                 }
                 else
@@ -337,7 +419,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
             {
                 LOGGER.info("testQueryIncludeRenditions was skipped: Renditions are not supported");
             }
-                        
+
         }
     }
 
@@ -421,7 +503,8 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         {
             if (isVersioningAllowed())
             {
-                String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null);
+                String parentFolderId = createAndAssertFolder();
+                String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), parentFolderId, null, TEST_CONTENT, null);
                 CheckInResponse checkInResponse = new CheckInResponse(documentId, null);
                 for (int i = 0; i < 2; i++)
                 {
@@ -429,7 +512,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
                     checkInResponse = checkInAndAssert(checkOutResponse.getObjectId(), true, new CmisPropertiesType(), createUniqueContentStream(), "");
                 }
                 CmisObjectType[] allVersions = getAndAssertAllVersions(checkInResponse.getObjectId(), "*", false);
-                String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE " + PROP_PARENT_ID + "='" + getAndAssertRootFolderId() + "'";
+                String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE IN_FOLDER('" + parentFolderId + "')";
                 QueryResponse queryResponse = null;
                 try
                 {
@@ -448,15 +531,17 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
                 for (CmisObjectType object : allVersions)
                 {
                     assertNotNull("Invalid Version Objects collection: one of the Version Objects is in 'not set' state solely", object);
+                    String currentId = getIdProperty(object.getProperties(), PROP_OBJECT_ID);
                     if (capabilities.isCapabilityAllVersionsSearchable())
                     {
-                        assertTrue("All Versions Searchable capability is supported but Version Objects was not returned", responseIds.contains(getIdProperty(object
-                                .getProperties(), PROP_OBJECT_ID)));
+                        assertTrue("All Versions Searchable capability is supported but Version Objects was not returned", responseIds.contains(currentId));
                     }
                     else
                     {
-                        assertFalse("All Versions Searchable capability is not supported but Version Objects was returned", responseIds.contains(getIdProperty(object
-                                .getProperties(), PROP_OBJECT_ID)));
+                        if (!documentId.equals(currentId))
+                        {
+                            assertFalse("All Versions Searchable capability is not supported but Version Objects was returned", responseIds.contains(currentId));
+                        }
                     }
                 }
             }
@@ -534,13 +619,20 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
         else
         {
-            String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue();
-            EnumIncludeRelationships[] relationshipInclusionRules = new EnumIncludeRelationships[] { EnumIncludeRelationships.none, EnumIncludeRelationships.both,
-                    EnumIncludeRelationships.source, EnumIncludeRelationships.target };
-            for (EnumIncludeRelationships rule : relationshipInclusionRules)
+            if (areRelationshipsSupported())
             {
-                QueryResponse queryResponse = queryAndAssert(statement, false, false, rule, null, null, null);
-                assertRelationships(queryResponse, rule);
+                String statement = "SELECT * FROM " + BASE_TYPE_DOCUMENT.getValue() + " WHERE IN_FOLDER('" + parentFolderId + "')";
+                EnumIncludeRelationships[] relationshipInclusionRules = new EnumIncludeRelationships[] { EnumIncludeRelationships.none, EnumIncludeRelationships.both,
+                        EnumIncludeRelationships.source, EnumIncludeRelationships.target };
+                for (EnumIncludeRelationships rule : relationshipInclusionRules)
+                {
+                    QueryResponse queryResponse = queryAndAssert(statement, false, false, rule, null, null, null);
+                    assertRelationships(queryResponse, rule);
+                }
+            }
+            else
+            {
+                LOGGER.warn("testQueryRelationships() was skipped: Relationships are not suppoerted by Repository");
             }
         }
     }
@@ -556,27 +648,39 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
             }
             else
             {
-                assertNotNull("Relationships were not returned for one of the Objects", object.getRelationship());
                 String objectId = getIdProperty(object.getProperties(), PROP_OBJECT_ID);
-                for (CmisObjectType relationship : object.getRelationship())
+                if (((EnumIncludeRelationships.source == includeRelationships) && !sourceIds.contains(objectId))
+                        || ((EnumIncludeRelationships.target == includeRelationships) && !targetIds.contains(objectId)))
                 {
-                    assertNotNull("Invalid Relationships collection in Query response: one of the Relationship Objects in 'not set' state solely", relationship);
-                    String sourceId = getIdProperty(relationship.getProperties(), PROP_SOURCE_ID);
-                    String targetId = getIdProperty(relationship.getProperties(), PROP_TARGET_ID);
-                    if (EnumIncludeRelationships.source.equals(includeRelationships))
+                    continue;
+                }
+                if (EnumIncludeRelationships.none == includeRelationships)
+                {
+                    assertNull("Relationships were returned for one of the Objects without request", object.getRelationship());
+                }
+                else
+                {
+                    assertNotNull(("'" + includeRelationships.getValue() + "' Relationships were not returned for one of the Objects"), object.getRelationship());
+                    for (CmisObjectType relationship : object.getRelationship())
                     {
-                        assertEquals(objectId, sourceId);
-                    }
-                    else
-                    {
-                        if (EnumIncludeRelationships.target.equals(includeRelationships))
+                        assertNotNull("Invalid Relationships collection in Query response: one of the Relationship Objects in 'not set' state solely", relationship);
+                        String sourceId = getIdProperty(relationship.getProperties(), PROP_SOURCE_ID);
+                        String targetId = getIdProperty(relationship.getProperties(), PROP_TARGET_ID);
+                        if (EnumIncludeRelationships.source.equals(includeRelationships))
                         {
-                            assertEquals(objectId, targetId);
+                            assertEquals(objectId, sourceId);
                         }
                         else
                         {
-                            assertTrue(("Object with Id='" + objectId + "' MUST be either Source or Target Object of each Relationship Object"), objectId.equals(sourceId)
-                                    || objectId.equals(targetId));
+                            if (EnumIncludeRelationships.target.equals(includeRelationships))
+                            {
+                                assertEquals(objectId, targetId);
+                            }
+                            else
+                            {
+                                assertTrue(("Object with Id='" + objectId + "' MUST be either Source or Target Object of each Relationship Object"), objectId.equals(sourceId)
+                                        || objectId.equals(targetId));
+                            }
                         }
                     }
                 }
@@ -589,7 +693,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()))
         {
             String changeLogToken = getAndAssertRepositoryInfo().getLatestChangeLogToken();
-            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            // TODO: Change document creation to default versioning state after versioning problem will be fixed
             String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
                     EnumVersioningState.none);
 
@@ -605,7 +709,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
     {
         if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()))
         {
-            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            // TODO: Change document creation to default versioning state after versioning problem will be fixed
             String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
                     EnumVersioningState.none);
 
@@ -628,7 +732,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
     {
         if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()))
         {
-            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            // TODO: Change document creation to default versioning state after versioning problem will be fixed
             String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
                     EnumVersioningState.none);
 
@@ -647,7 +751,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
     {
         if (!EnumCapabilityChanges.none.equals(getAndAssertCapabilities().getCapabilityChanges()) && EnumCapabilityACL.manage.equals(getAndAssertCapabilities().getCapabilityACL()))
         {
-            //TODO: Change document creation to default versioning state after versioning problem will be fixed
+            // TODO: Change document creation to default versioning state after versioning problem will be fixed
             String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT,
                     EnumVersioningState.none);
 
@@ -693,4 +797,5 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
         }
         assertTrue("Ecpected ChangeEvent is not found", found);
     }
+
 }

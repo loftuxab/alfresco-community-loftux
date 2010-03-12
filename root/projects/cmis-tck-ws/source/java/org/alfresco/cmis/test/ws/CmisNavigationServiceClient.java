@@ -257,7 +257,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
     public void testFilteredFoldersTreeReceiving() throws Exception
     {
         TreeNode<String> expectedTree = createObjectsTree(folderId, versioningState, EnumTypesOfFileableObjects.FOLDERS, 3, 1, 3, 3);
-        String filter = PROP_NAME + ", " + PROP_OBJECT_ID + ", " + PROP_CREATION_DATE;
+        String filter = PROP_NAME + "," + PROP_OBJECT_ID + "," + PROP_CREATION_DATE;
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
         LOGGER.info("[NavigationService->getFolderTree]");
         CmisObjectInFolderContainerType[] foldersTreeResponse = navigationService.getFolderTree(new GetFolderTree(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(3),
@@ -362,7 +362,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         TreeNode<String> expectedTree = createObjectsTree(folderId, versioningState, EnumTypesOfFileableObjects.BOTH, TEST_TREE_DEPTH, 1, 3, TEST_TREE_DEPTH);
 
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
-        String filter = PROP_NAME + ", " + PROP_OBJECT_ID + ", " + PROP_CREATION_DATE;
+        String filter = PROP_NAME + "," + PROP_OBJECT_ID + "," + PROP_CREATION_DATE;
         LOGGER.info("[NavigationService->getDescendants]");
         CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1),
                 filter, false, EnumIncludeRelationships.none, null, null, null));
@@ -772,19 +772,21 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
     public void testRelationshipsAndAllowableActionsReceiving() throws Exception
     {
         NavigationServicePortBindingStub navigationService = getServicesFactory().getNavigationService();
-        String relationshipId = createAndAssertRelationship();
-        LOGGER.info("[MultiFilingService->addObjectToFolder]");
-        getServicesFactory().getMultiFilingServicePort().addObjectToFolder(new AddObjectToFolder(getAndAssertRepositoryId(), relationshipId, folderId, false, null));
-
+        String folderId = createAndAssertFolder();
+        String sourceId = createRelationshipSourceObject(folderId);
+        String targetId = createRelationshipTargetObject(folderId);
+        createAndAssertRelationship(sourceId, targetId, getAndAssertRelationshipTypeId());
+        
         LOGGER.info("[NavigationService->getChildren]");
         GetChildrenResponse childrenResponse = navigationService.getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, true, EnumIncludeRelationships.both,
                 null, null, BigInteger.valueOf(1000), BigInteger.valueOf(0), null));
+        
         LOGGER.info("[NavigationService->getDescendants]");
         CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1),
                 "*", true, EnumIncludeRelationships.both, null, null, null));
         LOGGER.info("[NavigationService->getObjectParents]");
         CmisObjectParentsType[] objectParentsResponse = getServicesFactory().getNavigationService().getObjectParents(
-                new GetObjectParents(getAndAssertRepositoryId(), documentId, "*", true, EnumIncludeRelationships.both, null, null, null));
+                new GetObjectParents(getAndAssertRepositoryId(), sourceId, "*", true, EnumIncludeRelationships.both, null, null, null));
 
         List<CmisObjectType> objects = new LinkedList<CmisObjectType>();
         assertAndAddObjectsToList(objects, childrenResponse.getObjects(), "GetChildren service");
@@ -796,16 +798,17 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             assertNotNull(OBJECT_IS_NULL_MESSAGE, object);
             assertNotNull("Some returned Object Properties are null", object.getProperties());
             assertNotNull("Some returned Object String Properties are null", object.getProperties().getPropertyString());
-
-            assertNotNull("Allowable Actions for Object were not returned", object.getAllowableActions());
+            assertNotNull("Allowable Actions for Object were not returned", object.getAllowableActions());            
+        }
+        
+        objects = new LinkedList<CmisObjectType>();
+        assertAndAddObjectsToList(objects, childrenResponse.getObjects(), "GetChildren service");
+        
+        for (CmisObjectType object : objects)
+        {
             assertNotNull("Relationships Objects for Object were not returned", object.getRelationship());
             assertTrue("No one Relationship Object was returned in Response", object.getRelationship().length > 0);
-
-            if ((object == null) || (object.getRelationship() == null))
-            {
-                break;
-            }
-
+            
             String id = getAndAssertIdPropertyValue(object.getProperties(), PROP_OBJECT_ID);
 
             for (CmisObjectType relationshipObject : object.getRelationship())

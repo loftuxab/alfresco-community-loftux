@@ -177,16 +177,9 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
         assertNotNull("Repository Product Version is undefined", repositoryInfo.getProductVersion());
         assertNotNull("Repository Root Folder Id is undefined", repositoryInfo.getRootFolderId());
         assertFalse("Repository Root Folder Id is empty", "".equals(repositoryInfo.getRootFolderId()));
-        // FIXME: uncomment this when changeToken concept will be resolved
-        // assertNotNull(repositoryInfo.getLatestChangeToken());
         assertNotNull("Repository CMIS Version Supported is undefined", repositoryInfo.getCmisVersionSupported());
-        assertNotNull("Repository Thin Client URI is undefined", repositoryInfo.getThinClientURI());
-        // FIXME: uncomment this when changesIncomplete retrieving API will be added
-        // assertNotNull(repositoryInfo.getChangesIncomplete());
-        // FIXME: uncomment this when aclCapability will be added
-        // assertNotNull(repositoryInfo.getAclCapability());
-        // FIXME: uncomment this when changesOnType will be implemented
-        // assertNotNull("Changes On Type are undefined", repositoryInfo.getChangesOnType());
+        assertNotNull("Repository ACL Capability is undefined", repositoryInfo.getAclCapability());
+        assertNotNull("Changes On Type are undefined", repositoryInfo.getChangesOnType());
         assertNotNull("Repository Principal Anonymous is undefined", repositoryInfo.getPrincipalAnonymous());
         assertNotNull("Repository Principal Anyone is undefined", repositoryInfo.getPrincipalAnyone());
 
@@ -428,7 +421,8 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
         try
         {
             LOGGER.info("[RepositoryService->getTypeDescendants]");
-            getServicesFactory().getRepositoryService().getTypeDescendants(new GetTypeDescendants(getAndAssertRepositoryId(), null, BigInteger.valueOf(0L), false, null));
+            getServicesFactory().getRepositoryService().getTypeDescendants(
+                    new GetTypeDescendants(getAndAssertRepositoryId(), BASE_TYPE_DOCUMENT.getValue(), BigInteger.valueOf(0L), false, null));
             fail("Type Descentants can't be received for Depth equal to '0'");
         }
         catch (Exception e)

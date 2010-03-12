@@ -298,8 +298,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                     EnumServiceException.constraint, generateTestFileName(), documentTypeId, getAndAssertRootFolderId(), properties, TEST_CONTENT, null);
         }
 
-        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
-        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
+        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
+        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -582,8 +582,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 getAndAssertDocumentTypeId(), rootFolderId, null);
         assertNotAllowedObjectException(rootFolderId, false);
 
-        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
-        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
+        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
+        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -646,8 +646,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             String notAllowdSourceTypeId = searchAndAssertNotAllowedSourceForRelationshipTypeId(relationshipTypeId);
             assertRelationshipConstraitException(
-                    "Relationship Creation with the sourceObjectId’s ObjectType is not in the list of “allowedSourceTypes” specified by the Object-Type definition specified by typeId",
-                    EnumServiceException.objectNotFound, notAllowdSourceTypeId, null, relationshipTypeId);
+                    "Relationship Creation with the sourceObjectIdï¿½s ObjectType is not in the list of ï¿½allowedSourceTypesï¿½ specified by the Object-Type definition specified by typeId",
+                    null, notAllowdSourceTypeId, null, relationshipTypeId);
         }
 
         relationshipTypeId = searchAndAssertRelationshipTypeWithAllowedTargetTypes();
@@ -655,12 +655,12 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             String notAllowdTargetTypeId = searchAndAssertNotAllowedSourceForRelationshipTypeId(relationshipTypeId);
             assertRelationshipConstraitException(
-                    "Relationship Creation with the sourceObjectId’s ObjectType is not in the list of “allowedTargetTypes” specified by the Object-Type definition specified by typeId",
-                    EnumServiceException.objectNotFound, null, notAllowdTargetTypeId, relationshipTypeId);
+                    "Relationship Creation with the sourceObjectIdï¿½s ObjectType is not in the list of ï¿½allowedTargetTypesï¿½ specified by the Object-Type definition specified by typeId",
+                    null, null, notAllowdTargetTypeId, relationshipTypeId);
         }
 
-        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
-        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
+        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
+        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -769,8 +769,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("testCreatePolicy was skipped: Policy type is not found");
         }
 
-        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
-        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
+        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
+        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -811,7 +811,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         GetPropertiesResponse response = null;
         try
         {
-            String filter = PROP_NAME + ", " + PROP_OBJECT_ID;
+            String filter = PROP_NAME + "," + PROP_OBJECT_ID;
             LOGGER.info("[ObjectService->getProperties]");
             response = getServicesFactory().getObjectService().getProperties(new GetProperties(getAndAssertRepositoryId(), getAndAssertRootFolderId(), filter, null));
         }
@@ -1341,7 +1341,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             }
             assertTrue("Objects tree was not deleted", response == null || response.getFailedToDelete() == null || response.getFailedToDelete().getObjectIds() == null
                     || response.getFailedToDelete().getObjectIds().length == 0);
-            assertTrue("Multifiled document was not removed", isDocumentInFolder(documentId, getAndAssertRootFolderId()));
+            assertFalse("Multifiled document was not removed", isDocumentInFolder(documentId, getAndAssertRootFolderId()));
 
             folderId = createAndAssertFolder();
             documentId = createAndAssertDocument();
@@ -1596,13 +1596,13 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 getServicesFactory().getObjectService().setContentStream(
                         new SetContentStream(getAndAssertRepositoryId(), documentId, true, null, new CmisContentStreamType(BigInteger.valueOf(TEST_CONTENT.length()),
                                 MIMETYPE_TEXT_PLAIN, generateTestFileName(), TEST_CONTENT.getBytes(ENCODING), null), null)).getObjectId();
-                fail("No Exception was thrown during setting content stream while Object-Type definition specified by the typeId parameter’s “contentStreamAllowed” attribute is set to “not allowed”");
+                fail("No Exception was thrown during setting content stream while Object-Type definition specified by the typeId parameterï¿½s ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½not allowedï¿½");
             }
             catch (Exception e)
             {
                 // TODO according to specification 2 types of exceptions SHOULD be thrown
                 assertTrue(
-                        "Invalid exception was thrown during setting content stream while Object-Type definition specified by the typeId parameter’s “contentStreamAllowed” attribute is set to “not allowed”",
+                        "Invalid exception was thrown during setting content stream while Object-Type definition specified by the typeId parameterï¿½s ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½not allowedï¿½",
                         e instanceof CmisFaultType
                                 && (((CmisFaultType) e).getType().equals(EnumServiceException.constraint) || ((CmisFaultType) e).getType().equals(
                                         EnumServiceException.streamNotSupported)));
@@ -1661,12 +1661,12 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             {
                 LOGGER.info("[ObjectService->deleteContentStream]");
                 getServicesFactory().getObjectService().deleteContentStream(new DeleteContentStream(getAndAssertRepositoryId(), documentId, null, null));
-                fail("No Exception was thrown  during deleting content stream while Object’s Object-Type definition “contentStreamAllowed” attribute is set to “required”");
+                fail("No Exception was thrown  during deleting content stream while Objectï¿½s Object-Type definition ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½requiredï¿½");
             }
             catch (Exception e)
             {
                 assertTrue(
-                        "Invalid exception was thrown during deleting content stream while Object’s Object-Type definition “contentStreamAllowed” attribute is set to “required”",
+                        "Invalid exception was thrown during deleting content stream while Objectï¿½s Object-Type definition ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½requiredï¿½",
                         e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
             }
             LOGGER.info("[ObjectService->deleteObject]");
