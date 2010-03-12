@@ -143,7 +143,7 @@
          var panelDiv = Dom.getFirstChildBy(containerDiv, function(el) { return el.nodeName.toLowerCase() == 'div';});
          this.widgets.panel = new YAHOO.widget.Panel(panelDiv, 
          {
-            width:'420px',
+            width: 0.6 * (parseInt(Dom.getClientRegion().width,10))+'px',
             modal: true,
             constraintoviewport: true,
             draggable: true,

@@ -29,6 +29,7 @@
       theme_advanced_disable: "styleselect",
       extended_valid_elements: "a[href|target|name],font[face|size|color|style],span[class|align|style]"
    <#elseif appearance == "webeditor">
+      width:'',
       plugins: "fullscreen",
       theme_advanced_buttons1: "bold,italic,underline,strikethrough,separator,fontselect,fontsizeselect",
       theme_advanced_buttons2: "link,unlink,image,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bullist,numlist,separator,undo,redo,separator,forecolor,backcolor,separator,fullscreen",
