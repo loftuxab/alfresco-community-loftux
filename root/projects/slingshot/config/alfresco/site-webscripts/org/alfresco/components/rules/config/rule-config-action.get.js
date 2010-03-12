@@ -1,4 +1,5 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/components/rules/config/rule-config.lib.js">
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/config.lib.js">
 
 function main()
 {
@@ -12,7 +13,12 @@ function main()
    // Load constraints for rule types
    var actionConstraints = loadRuleConstraints(c);
    model.constraints = jsonUtils.toJSONString(actionConstraints);
-   
+
+   // Load aspects and types that shall be visible
+   var constraintsFilter = {};
+   constraintsFilter["ac-aspects"] = getDocumentLibraryAspects();
+   constraintsFilter["ac-types"] = getDocumentLibraryTypes();
+   model.constraintsFilter = jsonUtils.toJSONString(constraintsFilter);
 }
 
 main();

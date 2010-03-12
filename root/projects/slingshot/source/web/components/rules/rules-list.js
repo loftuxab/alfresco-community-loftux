@@ -478,13 +478,18 @@
 
             if (rule.owningNode)
             {
-               var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0];
-               a.href = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",
+               var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0],
+                  url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",
                {
                   siteId: this.options.siteId,
                   nodeRef: rule.owningNode.nodeRef
                });
+               a.href = url;
                a.innerHTML = $html(rule.owningNode.name);
+               Event.addListener(a, "click", function (e, u)
+               {
+                  document.location.href = u;
+               }, this, url);
             }
          }
 

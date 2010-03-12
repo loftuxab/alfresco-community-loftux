@@ -8,11 +8,16 @@
       -->
       <remove>
          <action name="copy-to-web-project"/>
-         <action name="transfer-this-tree"/>
+         <action name="transfer-this-tree"/>                                              share
          <action name="transfer-this-node"/>
          <action name="blog-post"/>
          <action name="create-transfer-target"/>
          <action name="transfer-tree-with-cancel"/>
+         <action name="reformat"/>
+         <action name="imageRenderingEngine"/>
+         <action name="freemarkerRenderingEngine"/>
+         <action name="xsltRenderingEngine"/>
+         <action name="compositeRenderingEngine"/>
       </remove>
    </config-definitions>
 
@@ -73,7 +78,9 @@
 
    <customise>
       <item id="select">Select</item>
-      <!-- Specific action filters -->
+      <action name="specialise-type">SpecialiseType</action>
+      <action name="add-features">AddFeatures</action>
+      <action name="remove-features">RemoveFeatures</action>
       <action name="check-in">CheckIn</action>
       <action name="check-out">Checkout</action>
       <action name="copy">Copy</action>

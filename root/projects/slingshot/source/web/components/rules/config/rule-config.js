@@ -168,6 +168,15 @@
          constraints: {},
 
          /**
+          * If a filter is provided for a contraint name only the values given inside this filter will be used in the
+          * cosntraint lists.
+          *
+          * @property constraintsFilter
+          * @type object
+          */
+         constraintsFilter: {},
+
+         /**
           * The form created by the outside component that uses this config handler.
           * This component will hook in to the forms validation process to enable/disable its buttons.
           *
@@ -685,16 +694,33 @@
        * Called to get the constraint options for a constraint.
        *
        * @method _getConstraintValues
-       * @param p_sConstraintName
-       * @param p_oRuleConfig
+       * @param p_oParamDef {object}
+       * @param p_oRuleConfig {object}
        * @return {array} rule constraint values
        */
-      _getConstraintValues: function RuleConfig__getConstraintValues(p_sConstraintName, p_oRuleConfig)
+      _getConstraintValues: function RuleConfig__getConstraintValues(p_oParamDef, p_oRuleConfig)
       {
-         var values = this.options.constraints[p_sConstraintName];
+         var values = this.options.constraints[p_oParamDef.constraint],
+            filter;
+         if (p_oParamDef._constraintFilter)
+         {
+            filter = Alfresco.util.findValueByDotNotation(this.options.constraintsFilter[p_oParamDef.constraint], p_oParamDef._constraintFilter);
+         }
          if (!values)
          {
             values = [];
+         }
+         else if (filter)
+         {
+            var filteredValues = [];
+            for (var i = 0, il = values.length; i <il; i++)
+            {
+               if (Alfresco.util.arrayContains(filter, values[i].value))
+               {
+                  filteredValues.push(values[i]);
+               }
+            }
+            values = filteredValues;
          }
          return values;
       },
@@ -874,7 +900,7 @@
                          * Implement support for the "constraint" by using a select element
                          * that will be multi-valued depending on the paramDef.
                          */
-                        var constraintOptions = this._getConstraintValues(paramDef.constraint, p_oRuleConfig);
+                        var constraintOptions = this._getConstraintValues(paramDef, p_oRuleConfig);
                         controlEl = this._createSelect(paramEl, configDef, paramDef, constraintOptions, value);
                      }
                      else
@@ -1481,7 +1507,7 @@
          {
             if (paramDef.constraint)
             {
-               var constraintValues = this._getConstraintValues(paramDef.constraint, ruleConfig);
+               var constraintValues = this._getConstraintValues(paramDef, ruleConfig);
                for (var i = 0, il = constraintValues.length; i < il; i++)
                {
                   if (constraintValues[i].value == value)

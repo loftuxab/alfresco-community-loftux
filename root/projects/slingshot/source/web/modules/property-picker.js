@@ -70,10 +70,28 @@
           * The transient properties to add to "special" properties.
           *
           * @property transientProperties
-          * @type array
+          * @type object
           * @default {}
           */
          transientProperties: {},
+
+         /**
+          * The classes (aspects & types) that are configured to be visible.
+          *
+          * @property classFilter
+          * @type object
+          * @default {}
+          */
+         classFilter: {
+            aspects:
+            {
+               visible: []
+            },
+            types:
+            {
+               visible: []
+            }
+         },
 
          /**
           * Default property tab configuration.
@@ -107,6 +125,10 @@
                      treeNodes:
                      {
                         url: "{url.proxy}api/classes?cf=aspect",
+                        dataModifier: function (treeNodeObjs, descriptorObj)
+                        {
+                           return this._filterClasses(treeNodeObjs, this.options.classFilter.aspects.visible);
+                        },
                         id: "{node.name}",
                         label: "{node.title}",
                         listItems:
@@ -127,6 +149,10 @@
                      treeNodes:
                      {
                         url: "{url.proxy}api/classes?cf=type",
+                        dataModifier: function (treeNodeObjs, descriptorObj)
+                        {
+                           return this._filterClasses(treeNodeObjs, this.options.classFilter.types.visible);
+                        },
                         id: "{node.name}",
                         label: "{node.title}",
                         listItems:
@@ -196,6 +222,28 @@
       },
 
       /**
+       * Makes sure only classes (aspects & types) that has been configured to be visible in share-config.xml
+       * are displayed.
+       *
+       * @method _filterClasses
+       * @param treeNodeObjs {array}
+       * @param classFilter {array}
+       * @return listItemObjs but with transient properties added if a property of type "d:content" was present
+       */
+      _filterClasses: function PP__filterClasses(treeNodeObjs, classFilter)
+      {
+         var filteredClasses = [];
+         for (var i = 0, il = treeNodeObjs.length; i < il; i++)
+         {
+            if (Alfresco.util.arrayContains(classFilter, treeNodeObjs[i].name))
+            {
+               filteredClasses.push(treeNodeObjs[i]);
+            }
+         }
+         return filteredClasses;
+      },
+
+      /**
        * Adds transient properties to listItemObjs if a property of type "d:content" was present.
        *
        * @method addTransientProperties
@@ -203,7 +251,7 @@
        * @param descriptorObj
        * @return listItemObjs but with transient properties added if a property of type "d:content" was present
        */
-      _addTransientProperties: function (listItemObjs, descriptorObj)
+      _addTransientProperties: function PP__addTransientProperties(listItemObjs, descriptorObj)
       {
          var foundTransientProperties = [],
             tps = this.options.transientProperties;
