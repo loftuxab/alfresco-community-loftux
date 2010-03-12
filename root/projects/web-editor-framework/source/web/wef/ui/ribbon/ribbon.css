@@ -185,12 +185,12 @@
 
 #wef-ribbon #WEF-Ribbon--help button
 {
-   background: transparent url(./images/help.gif) no-repeat 7px 50%;
+   background: transparent url(./images/help.png) no-repeat 7px 50%;
 }
 
 #wef-ribbon #WEF-Ribbon--ribbon-placement span.first-child
 {
-   background: transparent url(./images/orientation.gif) no-repeat 6px 50%;
+   background: transparent url(./images/orientation.png) no-repeat 6px 50%;
 }
 
 #wef-ribbon .wef-tab-toolbar .wef-toolbar .icon-button button
