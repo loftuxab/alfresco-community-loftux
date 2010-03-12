@@ -85,7 +85,7 @@
       {
          if (!Dom.get(this.config.id))
          {
-            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div id="wef-ribbonHeader" class="hd"><h6>'+this.getMessage('ribbon-title', 'wef')+'</h6></div><div id="wef-ribbonBody" class="bd"><div id="wef-toolbar-container"></div></div><div id="wef-ribbonFooter" class="ft"><div id="wef-toolbar-secondary-container"></div></div></div></div>';
+            Dom.get('wef').innerHTML+='<div id="wef-ribbon-container" class="wef-ribbon-container"><div id="wef-ribbon" class="wef-ribbon wef-hide" role="toolbar"><div id="wef-ribbonHeader" class="hd"><h6>'+this.getMessage('ribbon-title', 'wef')+'</h6></div><div id="wef-ribbonBody" class="bd"><div id="wef-toolbar-container" class="wef-hide"></div></div><div id="wef-ribbonFooter" class="ft"><div id="wef-toolbar-secondary-container"></div></div></div></div>';
          }
 
          var panelConfig = 
