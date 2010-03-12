@@ -100,7 +100,8 @@
          this.widgets.toolbars[id] = toolbar;
          if (this.widgets.toolbars.length>0)
          {
-            this.widgets.tabview.set('activeTab',this.widgets.tabview.getTab(0))
+            this.widgets.tabview.set('activeTab',this.widgets.tabview.getTab(0));
+            this.show();
          }
          return toolbar;
       },

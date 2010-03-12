@@ -82,6 +82,7 @@
             <ref bean="wefRibbonCSS" />
             <ref bean="wefRibbonIECSS" />
             <ref bean="wefTabbedToolbar" />
+            <ref bean="yuiAriaContainer" />
          </list>
       </property>
    </bean>
@@ -131,6 +132,7 @@
          <list>
             <ref bean="wefToolbarCSS" />
             <ref bean="yuiAriaButton" />
+            <ref bean="yuiAriaMenu" />
          </list>
       </property>
    </bean>

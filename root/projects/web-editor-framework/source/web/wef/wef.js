@@ -354,8 +354,19 @@
       setMessages: function(name, msg)
       {
          var name = this.config.name+'.'+ name,
-             container = YAHOO.lang.isUndefined(Alfresco) ? SpringSurf.messages.global : Alfresco.messages.global;
-
+             container;
+         if (window['Alfresco'])
+         {
+            container = Alfresco.messages.global;
+         }
+         else if (window['SpringSurf'])
+         {
+            container = SpringSurf.messages.global;
+         }
+         else 
+         {
+            return;
+         }
          container[name] = msg;
       },
 
@@ -368,9 +379,18 @@
       getMessage: function(name, namespace)
       {
          var name = (YAHOO.lang.isUndefined(namespace)) ? this.config.name+'.'+ name : namespace+'.'+name,
-             container = YAHOO.lang.isUndefined(Alfresco) ? SpringSurf.messages.global : Alfresco.messages.global;
-
-         return container[name] || name;
+             container = {};
+             
+         if (window['Alfresco'])
+         {
+            container = Alfresco.messages.global;
+         }
+         else if (window['SpringSurf'])
+         {
+            container = SpringSurf.messages.global;
+         }
+         
+         return container[name] || name; 
       }
    };
 
@@ -479,8 +499,8 @@
        */
       show : function WEF_Widget_show()
       {
-         Dom.addClass(this.config.id, 'wef-show');
-         Dom.removeClass(this.config.id, 'wef-hide');
+         Dom.addClass(this.config.element, 'wef-show');
+         Dom.removeClass(this.config.element, 'wef-hide');
          return this;
       },
 
