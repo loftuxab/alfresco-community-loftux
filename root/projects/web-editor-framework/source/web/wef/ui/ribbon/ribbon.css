@@ -200,7 +200,7 @@
 
 #wef #wef-toolbar-secondary-container .wef-toolbar .icon-button
 {
-   background:transparent url(./images/separator.gif) no-repeat scroll 0 5px;
+   background:transparent url(./images/toolbar-separator.gif) no-repeat scroll 0 5px;
    padding-left:1em;
 }
 #wef #wef-toolbar-secondary-container .wef-toolbar li.first .icon-button
