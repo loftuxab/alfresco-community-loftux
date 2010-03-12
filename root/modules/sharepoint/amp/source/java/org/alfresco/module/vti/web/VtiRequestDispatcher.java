@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.repo.admin.SysAdminParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,7 +50,6 @@ import org.apache.commons.logging.LogFactory;
 */
 public class VtiRequestDispatcher extends HttpServlet
 {
-    
     public static final String VTI_ALFRESCO_CONTEXT = "ALFRESCO-DEPLOYMENT-CONTEXT";
 
     private static final long serialVersionUID = 2257788564135460595L;
@@ -70,10 +70,10 @@ public class VtiRequestDispatcher extends HttpServlet
 
     private List<ActionMapping> customRules;
 
-    private String context = "";
-
     private static Log logger = LogFactory.getLog(VtiRequestDispatcher.class);
     
+    private SysAdminParams sysAdminParams;
+
     /**
      * <p>
      * VtiRequestDispatcher is initialized by list of {@link ActionMapping}.
@@ -139,7 +139,7 @@ public class VtiRequestDispatcher extends HttpServlet
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        request.setAttribute(VTI_ALFRESCO_CONTEXT, context);
+        request.setAttribute(VTI_ALFRESCO_CONTEXT, getContext());
         if (logger.isDebugEnabled())
         {
             logger.debug("Process request");
@@ -147,14 +147,15 @@ public class VtiRequestDispatcher extends HttpServlet
         doActions(request, response);
     }
 
-    /**
-     * <p>Context setter.</p>
-     *
-     * @param context specific context for all requests  
-     */
-    public void setContext(String context)
+    public void setSysAdminParams(SysAdminParams sysAdminParams)
     {
-        this.context = context;
+        this.sysAdminParams = sysAdminParams;
+    }
+
+    
+    private String getContext()
+    {
+        return "/" + sysAdminParams.getAlfrescoContext();   
     }
 
     private void doActions(ServletRequest request, ServletResponse response) throws IOException, ServletException
@@ -277,9 +278,9 @@ public class VtiRequestDispatcher extends HttpServlet
     private String getUri(HttpServletRequest request)
     {
         String uri = request.getRequestURI();
-        if (context != null && uri.startsWith(context))
+        if (getContext() != null && uri.startsWith(getContext()))
         {
-            uri = uri.substring(context.length());
+            uri = uri.substring(getContext().length());
         }
         return uri;
     }

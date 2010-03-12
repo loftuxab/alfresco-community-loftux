@@ -37,6 +37,7 @@ import org.alfresco.module.vti.handler.MethodHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.repo.SessionUser;
+import org.alfresco.repo.admin.SysAdminParams;
 import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.sharepoint.auth.AuthenticationHandler;
 import org.apache.commons.logging.Log;
@@ -63,8 +64,7 @@ public class VtiFilter implements Filter
 
     private org.alfresco.module.vti.handler.AuthenticationHandler authenticationHandler;
     private MethodHandler vtiHandler;
-
-    private String alfrescoContext;
+    private SysAdminParams sysAdminParams;
 
     private static Log logger = LogFactory.getLog(VtiFilter.class);
 
@@ -125,7 +125,7 @@ public class VtiFilter implements Filter
 
             try
             {
-                user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, alfrescoContext);
+                user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, getAlfrescoContext());
             }
             catch (SiteMemberMappingException e)
             {
@@ -152,7 +152,7 @@ public class VtiFilter implements Filter
         {
             if (logger.isDebugEnabled())
                 logger.debug("Checking user ticket");
-            authenticationHandler.checkUserTicket(httpRequest, httpResponse, alfrescoContext, user);
+            authenticationHandler.checkUserTicket(httpRequest, httpResponse, getAlfrescoContext(), user);
 
         }
 
@@ -187,7 +187,7 @@ public class VtiFilter implements Filter
         String if_header = httpRequest.getHeader("If");
 
         if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod)) && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin")
-                && !uri.contains("/_vti_history") && !uri.startsWith(alfrescoContext + "/resources") && if_header == null)
+                && !uri.contains("/_vti_history") && !uri.startsWith(getAlfrescoContext() + "/resources") && if_header == null)
         {
             if (validSiteUrl != null || uri.endsWith(".vti"))
             {
@@ -200,18 +200,18 @@ public class VtiFilter implements Filter
                 logger.debug("Checking is resource exist");
             }
             String decodedUrl = URLDecoder.decode(httpRequest.getRequestURI());
-            if (decodedUrl.length() > alfrescoContext.length())
+            if (decodedUrl.length() > getAlfrescoContext().length())
             {
-                decodedUrl = decodedUrl.substring(alfrescoContext.length() + 1);
+                decodedUrl = decodedUrl.substring(getAlfrescoContext().length() + 1);
             }
 
             try
             {
                 SessionUser user = (SessionUser) httpRequest.getSession().getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE);
 
-                user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, alfrescoContext);
+                user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, getAlfrescoContext());
 
-                if (!authenticationHandler.isSiteMember(httpRequest, alfrescoContext, user.getUserName()))
+                if (!authenticationHandler.isSiteMember(httpRequest, getAlfrescoContext(), user.getUserName()))
                 {
                     Enumeration<String> attributes = httpRequest.getSession().getAttributeNames();
                     while (attributes.hasMoreElements())
@@ -269,7 +269,7 @@ public class VtiFilter implements Filter
             httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
             if (METHOD_GET.equals(httpMethod))
             {
-                if (httpRequest.getRequestURI().startsWith(alfrescoContext + "/resources"))
+                if (httpRequest.getRequestURI().startsWith(getAlfrescoContext() + "/resources"))
                 {
                     httpResponse.setHeader("Cache-Control", "public");
                 }
@@ -318,7 +318,7 @@ public class VtiFilter implements Filter
 
         String[] result;
         String uri = request.getRequestURI();
-        String context = alfrescoContext;
+        String context = getAlfrescoContext();
 
         String[] parts = VtiPathHelper.removeSlashes(uri).split("/");
 
@@ -344,6 +344,11 @@ public class VtiFilter implements Filter
         }
     }
 
+    public void setSysAdminParams(SysAdminParams sysAdminParams)
+    {
+        this.sysAdminParams = sysAdminParams;
+    }
+
     public MethodHandler getVtiHandler()
     {
         return vtiHandler;
@@ -356,12 +361,7 @@ public class VtiFilter implements Filter
 
     public String getAlfrescoContext()
     {
-        return alfrescoContext;
-    }
-
-    public void setAlfrescoContext(String alfrescoContext)
-    {
-        this.alfrescoContext = alfrescoContext;
+        return "/" + sysAdminParams.getAlfrescoContext();
     }
 
     public void setAuthenticationHandler(org.alfresco.module.vti.handler.AuthenticationHandler authenticationHandler)
