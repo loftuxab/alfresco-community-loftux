@@ -83,7 +83,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.4.1-patched.jar" sourcepath="src/ehcache-1.4.1-src-patched.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/ehcache-core-1.7.2.jar" sourcepath="src/ehcache-core-1.7.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.5.11.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.5.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups-2.8.0-b2.jar" sourcepath="src/jgroups-2.8.0-b2.src.zip"/>
 	<classpathentry kind="lib" path="lib/jsr107cache-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-core-0.4.0-incubating.jar"/>
@@ -138,8 +140,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-identity-3.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-jpdl-3.3.1.jar" sourcepath="src/jbpm-jpdl-3.2.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/jutf7-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api-1.5.8.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-jcl-1.5.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar" sourcepath="src/fontbox-0.8.0-incubating-src.jar"/>
