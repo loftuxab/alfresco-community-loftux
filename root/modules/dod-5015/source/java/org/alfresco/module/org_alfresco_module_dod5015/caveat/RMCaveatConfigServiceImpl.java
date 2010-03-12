@@ -94,8 +94,6 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     
     private static final QName DATATYPE_TEXT = DataTypeDefinition.TEXT;
     
-    private static final String RESERVED_TITLE = "RESERVED_TITLE";
-    
     
     /*
      * Caveat Config
@@ -428,8 +426,11 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         String userName = AuthenticationUtil.getRunAsUser();
         if (userName != null)
         {
-            Set<String> userGroupFullNames = authorityService.getAuthoritiesForUser(userName);
-            allowedValues = getRMAllowedValues(userName, userGroupFullNames, constraintName);
+            if (! (AuthenticationUtil.isMtEnabled() && AuthenticationUtil.isRunAsUserTheSystemUser()))
+            {
+                Set<String> userGroupFullNames = authorityService.getAuthoritiesForUser(userName);
+                allowedValues = getRMAllowedValues(userName, userGroupFullNames, constraintName);
+            }
         }
         
         return allowedValues;
@@ -439,7 +440,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     {
         Set<String>allowedValues = new HashSet<String>();
         
-        // note: userName and userGroupNames must not be null        
+        // note: userName and userGroupNames must not be null
         Map<String, List<String>> caveatConstraintDef = caveatConfig.get(constraintName);
         
         if (caveatConstraintDef != null)
@@ -447,7 +448,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
             List<String> direct = caveatConstraintDef.get(userName);
             if(direct != null)
             {
-                allowedValues.addAll(direct);   
+                allowedValues.addAll(direct);
             }
             
             for (String group :  userGroupFullNames)
@@ -455,12 +456,12 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                 List<String> values = caveatConstraintDef.get(group);
                 if(values != null)
                 {
-                    allowedValues.addAll(values);   
+                    allowedValues.addAll(values);
                 }
             }
         }
         
-        List<String>ret = new ArrayList();
+        List<String>ret = new ArrayList<String>();
         ret.addAll(allowedValues);
         return ret;
     }
@@ -566,6 +567,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         if(listName == null)
         {
             // Generate a list name
+            // FIXME: hardcoded namespace
             listName = "rmc:" + UUID.randomUUID().toString();
         }
         
@@ -616,29 +618,8 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         
         QName listQName = QName.createQName(listName, namespaceService);
         
-        // TODO - incremental delete not currently supported, for now change title and set empty list
-        
-        // UnsupportedOperationException
-        //recordsManagementAdminService.removeCustomConstraintDefinition(listQName);
-        
-        List<String> empty = new ArrayList<String>(0);
-        recordsManagementAdminService.changeCustomConstraintValues(listQName, empty);
-        recordsManagementAdminService.changeCustomConstraintTitle(listQName, RESERVED_TITLE);
+        recordsManagementAdminService.removeCustomConstraintDefinition(listQName);
     }
-    
-//    @SuppressWarnings("unused")
-//    private ConstraintDefinition getCustomConstraintDefinition(QName constraintName)
-//    {
-//        List<ConstraintDefinition> defs = recordsManagementAdminService.getCustomConstraintDefinitions();
-//        for(ConstraintDefinition def : defs)
-//        {
-//            if(def.getName().equals(constraintName))
-//            {
-//                return def;
-//            }
-//        }
-//        return null;
-//    }
     
     /**
      * Add a single value to an authority in a list.   The existing values of the list remain.
@@ -803,15 +784,20 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         }
         return obj.toString();    
     }
-
+    
     /**
-     * Get all Constraint Lists  
+     * Get all Constraint Lists
      */
     public Set<RMConstraintInfo> getAllRMConstraints()
     {
         Set<RMConstraintInfo> info = new HashSet<RMConstraintInfo>();
-          
-        List<ConstraintDefinition> defs = recordsManagementAdminService.getCustomConstraintDefinitions();
+        
+        List<ConstraintDefinition> defs = new ArrayList<ConstraintDefinition>(10);
+        for (QName caveatModelQName : caveatModelQNames)
+        {
+            defs.addAll(recordsManagementAdminService.getCustomConstraintDefinitions(caveatModelQName));
+        }
+        
         for(ConstraintDefinition dictionaryDef : defs)
         {
             Constraint con = dictionaryDef.getConstraint();
@@ -848,8 +834,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
      */
     public RMConstraintInfo getRMConstraint(QName listQName)
     {
-        
-        ConstraintDefinition dictionaryDef = recordsManagementAdminService.getCustomConstraintDefinition(listQName);
+        ConstraintDefinition dictionaryDef = dictionaryService.getConstraint(listQName);
         if(dictionaryDef != null)
         {
             Constraint con = dictionaryDef.getConstraint();
@@ -907,7 +892,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                 allowedValueList.add(value);
             }
             
-            ConstraintDefinition dictionaryDef = recordsManagementAdminService.getCustomConstraintDefinition(listQName);
+            ConstraintDefinition dictionaryDef = dictionaryService.getConstraint(listQName);
             Constraint con = dictionaryDef.getConstraint();
             if (con instanceof RMListOfValuesConstraint)
             {

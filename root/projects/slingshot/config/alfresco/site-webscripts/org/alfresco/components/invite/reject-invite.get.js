@@ -15,10 +15,22 @@ function main()
       }
    }
    
+   // fetch the user information from the url
+   var inviteId = page.url.args.inviteId,
+      inviteTicket = page.url.args.inviteTicket,
+      inviteeUserName = page.url.args.inviteeUserName;
+   
    // fetch the invite information, which gives us all information required to display the page
    var theUrl, connector, json, data;
    
-   theUrl = "/api/invite/" + page.url.args.inviteId + "/" + page.url.args.inviteTicket;
+   theUrl = "/api/invite/" + inviteId + "/" + inviteTicket;
+   // for MT share
+   if (inviteeUserName != undefined)
+   {
+      inviteeUserName = encodeURIComponent(inviteeUserName);
+      theUrl = theUrl + '?inviteeUserName=' + inviteeUserName;
+   }
+   
    connector = remote.connect("alfresco-noauth");
    json = connector.call(theUrl);
    if (json.status == 200)
