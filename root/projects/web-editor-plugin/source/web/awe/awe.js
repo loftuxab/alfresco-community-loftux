@@ -107,7 +107,7 @@
          [
             {
                type: 'menu',
-               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/quick-edit.gif" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
+               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/quick-edit.png" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
                value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                icon: true,
@@ -127,8 +127,8 @@
             },
             {
                type: 'push',
-               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/toggle-edit.gif" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
-               value: this.config.namespace + WebEditor.SEPARATOR + 'show-hide-edit-markers',
+               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
+               value: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                icon: true
             }
@@ -312,18 +312,22 @@
 
       onShowHideClick: function WEF_UI_Ribbon_onShowHideClick(e, args)
       {
-         var editMarkers = Selector.query('span.alfresco-content-marker');
+         var editMarkers = Selector.query('span.alfresco-content-marker'),
+             butImg = Dom.get(args[1]+'-button').getElementsByTagName('img')[0];
+         
          this.onShowHideClick.isHidden = this.onShowHideClick.isHidden || false;
-
+         
          if (this.onShowHideClick.isHidden) 
          {
             Dom.setStyle(editMarkers, 'display', '');
             this.onShowHideClick.isHidden = false;
+            butImg.src = butImg.src.replace('-on.png','-off.png')
          }
          else
          {
             Dom.setStyle(editMarkers, 'display', 'none');
             this.onShowHideClick.isHidden = true;
+            butImg.src = butImg.src.replace('-off.png','-on.png')            
          }
       },
 
