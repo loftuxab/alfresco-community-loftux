@@ -598,7 +598,6 @@
     
     
     <!-- RM caveats -->
-    <!-- Caveat read veto is now enforced via the security wrappers for RM -->
     
     <bean id="caveatConfigService" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigServiceImpl">
         <property name="policyComponent" ref="policyComponent"/>
@@ -608,8 +607,17 @@
         <property name="authorityService" ref="authorityService"/>
         <property name="personService" ref="personService"/>
         <property name="nodeService" ref="nodeService"/>
-        <property name="recordsManagementAdminService" ref = "recordsManagementAdminService" />
-        
+        <property name="recordsManagementAdminService" ref = "recordsManagementAdminService"/>
+        <property name="caveatAspects">
+            <list>
+                <value>{http://www.alfresco.org/model/recordsmanagement/1.0}recordComponentIdentifier</value>
+            </list>
+        </property>
+        <property name="caveatModels">
+            <list>
+                <value>{http://www.alfresco.org/model/rmcustom/1.0}rmcustom</value>
+            </list>
+        </property>
     </bean>
     
     <bean id="rmListOfValuesContraintInit" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
