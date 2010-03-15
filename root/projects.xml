@@ -1666,8 +1666,7 @@
    </target>
 
    <target name="assemble-webeditor-war" 
-           depends="package-forms-client-jar, package-webeditor-jar, package-yui270-jar,
-                    package-webeditor-plugin-jar, package-webeditor-framework-jar">
+           depends="package-forms-client-jar, package-webeditor-jar, package-webeditor-plugin-jar">
       <mkdir dir="${dir.project.webeditor.assemble.war}" />
       
       <!-- first copy all required files from webeditor project -->
@@ -1688,7 +1687,7 @@
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
          <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
-                  includes="${includes.webscriptframework.libs.spring-surf}" />
+                  includes="${includes.webeditor.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional" 
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
@@ -1705,8 +1704,7 @@
                   includes="${file.name.jar.webeditor.plugin}" />
          <fileset dir="${dir.project.webframeworkcommons.dist}" 
                   includes="${file.name.jar.formsclient}" />
-         <fileset dir="${dir.projects}/web-editor-framework/build/dist" 
-                  includes="*.jar" />
+         <fileset file="${file.jar.webeditor.yui}" />
       </copy>
    </target>
    
@@ -1768,66 +1766,6 @@
       <echo>Compressing Web Editor Plugin Javascript...</echo>
       <minimize-javascript sourcedir="${dir.project.webeditorplugin.assemble}/META-INF" 
                            destdir="${dir.project.webeditorplugin.assemble}/META-INF" />
-   </target>
-   
-   <!-- ********************************** -->
-   <!-- ** Web Editor Framework Project ** -->
-   <!-- ********************************** -->
-   
-   <!-- NOTE: As this is a temporary project the directory paths are hard coded -->
-   
-   <target name="incremental-webeditor-framework" 
-           depends="package-webeditor-framework-jar" />
-   
-   <target name="build-webeditor-framework" 
-           depends="clean-webeditor-framework, incremental-webeditor-framework" />
-   
-   <target name="clean-webeditor-framework" depends="init">
-      <clean projectdir="${dir.projects}/web-editor-framework" />
-   </target>
-   
-   <target name="compile-webeditor-framework" depends="init">
-      <compile-java projectdir="${dir.projects}/web-editor-framework" />
-   </target>
-   
-   <target name="package-webeditor-framework" depends="package-webeditor-framework-jar" />
-   
-   <target name="package-webeditor-framework-jar" 
-           depends="assemble-webeditor-framework-jar, minimize-webeditor-framework-javascript">
-      <mkdir dir="${dir.projects}/web-editor-framework/build/dist" />
-      
-      <jar jarfile="${dir.projects}/web-editor-framework/build/dist/wef.jar" 
-           basedir="${dir.projects}/web-editor-framework/build/assemble/jar" />
-   </target>
-   
-   <target name="assemble-webeditor-framework-jar" depends="compile-webeditor-framework">
-      <mkdir dir="${dir.projects}/web-editor-framework/build/assemble/jar/META-INF" />
-      <copy todir="${dir.projects}/web-editor-framework/build/assemble/jar">
-         <fileset dir="${dir.projects}/web-editor-framework/build/classes" />
-         <fileset dir="${dir.projects}/web-editor-framework/config" />
-      </copy>
-      <copy todir="${dir.projects}/web-editor-framework/build/assemble/jar/META-INF">
-         <fileset dir="${dir.projects}/web-editor-framework/source/web" />
-      </copy>
-   </target>
-   
-   <target name="minimize-webeditor-framework-javascript" depends="init">
-      <echo>Compressing Web Editor Framework Javascript...</echo>
-      <minimize-javascript sourcedir="${dir.projects}/web-editor-framework/build/assemble/jar/META-INF" 
-                           destdir="${dir.projects}/web-editor-framework/build/assemble/jar/META-INF" />
-   </target>
-   
-   <target name="package-yui270-jar" depends="assemble-yui270-jar">
-      <mkdir dir="${dir.projects}/web-editor-framework/build/dist" />
-      
-      <jar jarfile="${dir.projects}/web-editor-framework/build/dist/yui-2.7.0.jar" 
-           basedir="${dir.projects}/web-editor-framework/build/assemble/yui" />
-   </target>
-   
-   <target name="assemble-yui270-jar" depends="init">
-      <mkdir dir="${dir.projects}/web-editor-framework/build/assemble/yui/META-INF" />
-      <unzip src="${file.zip.webeditor.yui}" 
-             dest="${dir.projects}/web-editor-framework/build/assemble/yui/META-INF" />
    </target>
    
    <!-- *************************************** -->

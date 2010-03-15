@@ -182,13 +182,6 @@
    
    <!-- *** Alfresco *** -->
    
-   <bean id="alfMessages" class="org.springframework.extensions.webeditor.WEFResourceImpl">
-      <property name="name" value="org.alfresco.messages" />
-      <property name="description" value="Localised messages" />
-      <property name="path" value="/service/messages.js?locale=${locale}" />
-      <property name="type" value="js" />
-   </bean>
-   
    <bean id="alfUtils" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.utils" />
       <property name="description" value="Common JavaScript utilities" />
@@ -204,7 +197,6 @@
             <ref bean="yuiAriaContainer" />
             <ref bean="yuiAriaButton" />
             <ref bean="yuiBubbling" />
-            <ref bean="alfMessages" />
          </list>
       </property>
    </bean>

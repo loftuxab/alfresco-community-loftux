@@ -334,21 +334,17 @@
            depends="package-webframeworkcommons,
                     package-webeditor,
                     package-webeditor-plugin,
-                    package-webeditor-framework,
                     deploy-webeditor-tomcat" />
 
    <target name="incremental-webeditor-tomcat-exploded"
            depends="compile-webframeworkcommons,
                     compile-webeditor,
                     compile-webeditor-plugin,
-                    compile-webeditor-framework,
                     deploy-webeditor-tomcat-exploded,
                     minimize-webeditor-deployed-javascript" />
    
    <target name="package-all-webeditor"
-           depends="package-yui270-jar, 
-                    package-webeditor-framework, 
-                    package-forms-client-jar, 
+           depends="package-forms-client-jar, 
                     package-webeditor, 
                     package-webeditor-plugin, 
                     package-webeditor-customersite-sample" />
@@ -410,7 +406,6 @@
    <target name="clean-webeditor-projects" 
               description="Cleans all projects related to the web editor project" 
               depends="clean-webframeworkcommons,
-                       clean-webeditor-framework,
                        clean-webeditor-plugin,
                        clean-webeditor,
                        clean-webeditor-customersite-sample" />
@@ -748,7 +743,6 @@
       <copy todir="${dir.deploy.tomcat.application.webeditor}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webeditor.src.web}" excludes="WEB-INF/awe.tld" />
          <fileset dir="${dir.project.webeditorplugin.src.web}" />
-         <fileset dir="${dir.projects}/web-editor-framework/source/web" />
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
@@ -757,7 +751,6 @@
          <fileset file="${dir.project.webeditor.src.java}/log4j.properties" />
          <fileset dir="${dir.project.webeditor.config}" excludes="**/extension/**" />
          <fileset dir="${dir.project.webeditorplugin.config}" excludes="**/extension/**" />
-         <fileset dir="${dir.projects}/web-editor-framework/config" excludes="**/extension/**" />
          <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
       </copy>
       
@@ -765,7 +758,6 @@
       <copy todir="${dir.deploy.tomcat.application.webeditor}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webeditor.classes}" />
          <fileset dir="${dir.project.webeditorplugin.classes}" />
-         <fileset dir="${dir.projects}/web-editor-framework/build/classes" includes="**/*.class" />
          <fileset dir="${dir.project.jlan.classes}" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" />
       </copy>
@@ -783,7 +775,7 @@
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
-                  includes="${includes.webscriptframework.libs.spring-surf}" />
+                  includes="${includes.webeditor.spring-surf}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
