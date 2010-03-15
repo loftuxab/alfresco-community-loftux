@@ -386,7 +386,7 @@
       
       onHelp: function AWE_onHelp()
       {
-         window.location='http://www.alfresco.com/help/32/labs/sharehelp/';
+         window.open('http://www.alfresco.com/help/32/labs/sharehelp/','wef-help');
       },
 
       onQuickEditMouseOver: function WEF_UI_Ribbon_onQuickEditMouseOver(e, args)
