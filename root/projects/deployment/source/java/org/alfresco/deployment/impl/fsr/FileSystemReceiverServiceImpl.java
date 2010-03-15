@@ -23,7 +23,6 @@ import java.io.File;
 
 
 import org.alfresco.deployment.impl.server.DeploymentCommandQueue;
-import org.springframework.extensions.surf.util.PropertyCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -56,11 +55,14 @@ public class FileSystemReceiverServiceImpl implements FileSystemReceiverService
 	@SuppressWarnings("unchecked")
 	public void init()
 	{
-
-		PropertyCheck.mandatory(this, "dataDirectory", fDataDirectory);
-		PropertyCheck.mandatory(this, "logDirectory", fLogDirectory);
-		PropertyCheck.mandatory(this, "commandQueue", commandQueue);
-
+	    if(fLogDirectory == null)
+	    {
+	        throw new RuntimeException("mandatory parameter logDirectory is null");
+	    }
+	    if(fDataDirectory == null)
+	    {
+	        throw new RuntimeException("mandatory parameter dataDirectory is null");
+	    }
 
 		File log = new File(fLogDirectory);
 		if (!log.exists())
