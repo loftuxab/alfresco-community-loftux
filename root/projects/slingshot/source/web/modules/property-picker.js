@@ -125,10 +125,6 @@
                      treeNodes:
                      {
                         url: "{url.proxy}api/classes?cf=aspect",
-                        dataModifier: function (treeNodeObjs, descriptorObj)
-                        {
-                           return this._filterClasses(treeNodeObjs, this.options.classFilter.aspects.visible);
-                        },
                         id: "{node.name}",
                         label: "{node.title}",
                         listItems:
@@ -149,10 +145,6 @@
                      treeNodes:
                      {
                         url: "{url.proxy}api/classes?cf=type",
-                        dataModifier: function (treeNodeObjs, descriptorObj)
-                        {
-                           return this._filterClasses(treeNodeObjs, this.options.classFilter.types.visible);
-                        },
                         id: "{node.name}",
                         label: "{node.title}",
                         listItems:

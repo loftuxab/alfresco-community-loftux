@@ -358,40 +358,49 @@
          rulePicker.innerHTML = "";
          Dom.removeClass(rulePicker, "");
 
-         var fnSuccess = function RP__pRP_fnSuccess(response, rulePicker)
+         var fnSuccess = function RP__pRP_fnSuccess(response, obj)
          {
-            var rules = response.json.data, element, rule, onclick, i, j;
+            var rules = response.json.data,
+               counter = 0,
+               element,
+               rule,
+               onclick;
 
-            for (i = 0, j = rules.length; i < j; i++)
+            for (var i = 0, il = rules.length; i < il; i++)
             {
                rule = rules[i];
-               element = document.createElement("div");
-               if (i == j - 1)
+               if (rule.owningNode && rule.owningNode.nodeRef == obj.parentNodeRef)
                {
-                  Dom.addClass(element, "last");
-               }
+                  element = document.createElement("div");
 
-               onclick = function RP_pRP_onclick(shortName)
-               {
-                  return function()
+                  onclick = function RP_pRP_onclick(shortName)
                   {
-                     YAHOO.Bubbling.fire("ruleChanged",
+                     return function()
                      {
-                        site: shortName,
-                        eventGroup: me
-                     });
-                  };
-               }(rule.shortName);
+                        YAHOO.Bubbling.fire("ruleChanged",
+                        {
+                           site: shortName,
+                           eventGroup: me
+                        });
+                     };
+                  }(rule.shortName);
 
-               var checkbox = (this.options.mode == RP.MODE_COPY_FROM || this.options.mode == RP.MODE_PICKER) ? '<input type="checkbox" value="' + rule.id + '">' : "",
-                  h4 = '<h4>' + checkbox +  '<span>' + $html(rule.title) + '</span></h4>',
-                  description = '<span class="description">' + $html(rule.description) + '</span>',
-                  span = '<span class="rule">' + h4 + description + '</span>';
+                  var checkbox = (this.options.mode == RP.MODE_COPY_FROM || this.options.mode == RP.MODE_PICKER) ? '<input type="checkbox" value="' + rule.id + '">' : "",
+                     h4 = '<h4>' + checkbox +  '<span>' + $html(rule.title) + '</span></h4>',
+                     description = '<span class="description">' + $html(rule.description) + '</span>',
+                     span = '<span class="rule">' + h4 + description + '</span>';
 
-               element.innerHTML = span;
-               element.onclick = onclick;
-               rulePicker.appendChild(element);
+                  element.innerHTML = span;
+                  element.onclick = onclick;
+                  obj.rulePicker.appendChild(element);
+                  counter++;
+               }
             }
+            if (element)
+            {
+               Dom.addClass(element, "last");
+            }
+            this.widgets.okButton.set("disabled", counter == 0);
          };
 
          var nodeRefAsPath = this.selectedNode.data.nodeRef.replace("://", "/");
@@ -402,9 +411,14 @@
             {
                fn: fnSuccess,
                scope: this,
-               obj: rulePicker
+               obj:
+               {
+                  rulePicker: rulePicker,
+                  parentNodeRef: this.selectedNode.data.nodeRef
+               }
             }
          });
+         this.widgets.okButton.set("disabled", true);
       },
 
 
@@ -424,6 +438,7 @@
       {
          // Clear rules info
          Dom.get(this.id + "-rulePicker").innerHTML = "";
+         this.widgets.okButton.set("disabled", true);         
       },
 
       /**
