@@ -2267,7 +2267,7 @@
                   <include name="**/*Test.java" />
                   <exclude name="**/*SystemTest.java" />
                   <exclude name="**/*RestApiTest.java" />
-                  <exclude name="**/DOD5015Test.java" />
+                  <!-- <exclude name="**/DOD5015Test.java" /> -->
                </patternset>
             </fileset>
          </batchtest>

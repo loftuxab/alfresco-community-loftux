@@ -36,6 +36,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnRemoveReference;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.MatchLogic;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.dictionary.M2Aspect;
@@ -87,6 +88,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     
     private static final String PARAM_ALLOWED_VALUES = "allowedValues";
     private static final String PARAM_CASE_SENSITIVE = "caseSensitive";
+    private static final String PARAM_MATCH_LOGIC = "matchLogic";
     
     public static final String RMA_RECORD = "rma:record";
     
@@ -744,8 +746,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         
         return refQName;
     }
-
-    public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues) 
+    
+    public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues, MatchLogic matchLogic) 
     {
         ParameterCheck.mandatory("constraintName", constraintName);
         ParameterCheck.mandatoryString("title", title);
@@ -766,6 +768,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         newCon.setTitle(title);
         newCon.createParameter(PARAM_ALLOWED_VALUES, allowedValues);
         newCon.createParameter(PARAM_CASE_SENSITIVE, caseSensitive ? "true" : "false");
+        newCon.createParameter(PARAM_MATCH_LOGIC, matchLogic.toString());
         
         writeCustomContentModel(deserializedModel);
         

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -53,6 +53,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.impl.EditReviewAsO
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.MatchLogic;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
@@ -3869,9 +3870,12 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
         
-        // TODO review RM permissions
-        permissionService.setPermission(recordCategory, PermissionService.ALL_AUTHORITIES, RMPermissionModel.VIEW_RECORDS, true);
-        permissionService.setPermission(recordCategory, PermissionService.ALL_AUTHORITIES, RMPermissionModel.READ_RECORDS, true);
+        // set RM capabilities on the file plan - to view & read records
+        setPermission(filePlan, PermissionService.ALL_AUTHORITIES, RMPermissionModel.VIEW_RECORDS, true);
+        setPermission(filePlan, PermissionService.ALL_AUTHORITIES, RMPermissionModel.READ_RECORDS, true);
+        
+        // set RM capabilities on the record folder - to read records
+        setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, RMPermissionModel.READ_RECORDS, true);
         
         setComplete();
         endTransaction();
@@ -3883,10 +3887,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         final String RECORD_NAME = "MyRecord"+System.currentTimeMillis()+".txt";
         final String SOME_CONTENT = "There is some content in this record";
         
-        // TODO review RM permissions
-        //AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
-        
-        NodeRef recordOne = createRecord(recordFolder, RECORD_NAME, SOME_CONTENT);
+        final NodeRef recordOne = createRecord(recordFolder, RECORD_NAME, SOME_CONTENT);
         
         assertEquals(expectedChildCount+1, nodeService.getChildAssocs(recordFolder).size());
         
@@ -3914,12 +3915,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // Set supplemental markings list (on record)
         // TODO - set supplemental markings list (on record folder)
         
-        // TODO review RM permissions
         AuthenticationUtil.runAs(new RunAsWork<Object>()
         {
             public Object doWork()
             {
-                permissionService.setPermission(recordCategory, "dfranco", RMPermissionModel.FILE_RECORDS, true);
+                // set RM capabilities on the file plan - to file records and add/edit properties (ie. edit record)
+                setPermission(filePlan, "dfranco", RMPermissionModel.FILING, true);
+                setPermission(filePlan, "dfranco", RMPermissionModel.EDIT_RECORD_METADATA, true);
                 return null;
             }
         }, "admin");
@@ -3999,8 +4001,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 try
                 {
                     List<String> emptyList = new ArrayList<String>(0);
-                    rmAdminService.addCustomConstraintDefinition(CONSTRAINT_CUSTOM_PRJLIST, "Some Projects", true, emptyList);
-                } 
+                    rmAdminService.addCustomConstraintDefinition(CONSTRAINT_CUSTOM_PRJLIST, "Some Projects", true, emptyList, MatchLogic.AND);
+                }
                 catch (AlfrescoRuntimeException e)
                 {
                     // ignore - ie. assume exception is due to the fact that it already exists
@@ -4031,7 +4033,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 try
                 {
                     // Define a custom "project list" property (for records) - note: multi-valued
-                    rmAdminService.addCustomPropertyDefinition(null, CustomisableRmElement.RECORD.getCorrespondingAspect(),
+                    rmAdminService.addCustomPropertyDefinition(PROP_CUSTOM_PRJLIST, CustomisableRmElement.RECORD.getCorrespondingAspect(),
                             PROP_CUSTOM_PRJLIST.getLocalName(), DataTypeDefinition.TEXT, "Projects",
                             null, null, true, false, false, CONSTRAINT_CUSTOM_PRJLIST);
                 } 
@@ -4119,6 +4121,26 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false, expectedChildCount); // denied by rma:smList  ("NOFORN", "FOUO")
         
         cleanCaveatConfigData();
+    }
+    
+    private void setPermission(NodeRef nodeRef, String authority, String permission, boolean allow)
+    {
+        permissionService.setPermission(nodeRef, authority, permission, allow);
+        if (permission.equals(RMPermissionModel.FILING))
+        {
+            if (rmService.isRecordsManagementContainer(nodeRef) == true)
+            {
+                List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+                for (ChildAssociationRef assoc : assocs)
+                {
+                    NodeRef child = assoc.getChildRef();
+                    if (rmService.isRecordFolder(child) == true || rmService.isRecordsManagementContainer(child) == true)
+                    {
+                        setPermission(child, authority, permission, allow);
+                    }
+                }
+            }
+        }
     }
     
     private void cleanCaveatConfigData()

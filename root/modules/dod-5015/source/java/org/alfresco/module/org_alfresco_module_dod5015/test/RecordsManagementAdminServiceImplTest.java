@@ -38,6 +38,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.MatchLogic;
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.policy.JavaBehaviour;
@@ -667,7 +668,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
                         
                         final QName result = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, conLocalName);
                         
-                        rmAdminService.addCustomConstraintDefinition(result, conTitle, true, allowedValues);
+                        rmAdminService.addCustomConstraintDefinition(result, conTitle, true, allowedValues, MatchLogic.AND);
                         return result;
                     }          
                 });        
