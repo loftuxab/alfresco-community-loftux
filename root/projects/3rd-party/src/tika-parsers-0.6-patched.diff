@@ -1,0 +1,145 @@
+Index: tika-parsers/src/main/java/org/apache/tika/parser/xml/AttributeDependantMetadataHandler.java
+===================================================================
+--- tika-parsers/src/main/java/org/apache/tika/parser/xml/AttributeDependantMetadataHandler.java	(revision 0)
++++ tika-parsers/src/main/java/org/apache/tika/parser/xml/AttributeDependantMetadataHandler.java	(revision 0)
+@@ -0,0 +1,82 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.tika.parser.xml;
++
++import org.apache.tika.metadata.Metadata;
++import org.xml.sax.Attributes;
++import org.xml.sax.helpers.DefaultHandler;
++
++/**
++ * This adds a Metadata entry for a given node.
++ * The textual content of the node is used as the
++ *  value, and the Metadata name is taken from
++ *  an attribute, with a prefix if required. 
++ */
++public class AttributeDependantMetadataHandler extends DefaultHandler {
++
++    private final Metadata metadata;
++
++    private final String nameHoldingAttribute;
++    private final String namePrefix;
++    private String name;
++
++    private final StringBuilder buffer = new StringBuilder();
++
++    public AttributeDependantMetadataHandler(Metadata metadata, String nameHoldingAttribute, String namePrefix) {
++        this.metadata = metadata;
++        this.nameHoldingAttribute = nameHoldingAttribute;
++        this.namePrefix = namePrefix;
++    }
++
++    public void addMetadata(String value) {
++        if(name == null || name.length() == 0) {
++           // We didn't find the attribute which holds the name
++           return;
++        }
++        if (value.length() > 0) {
++            String previous = metadata.get(name);
++            if (previous != null && previous.length() > 0) {
++                value = previous + ", " + value;
++            }
++            metadata.set(name, value);
++        }
++    }
++
++    public void endElement(String uri, String localName, String name) {
++        addMetadata(buffer.toString());
++        buffer.setLength(0);
++    }
++
++    public void startElement(
++            String uri, String localName, String name, Attributes attributes) {
++        String rawName = attributes.getValue(nameHoldingAttribute);
++        if(rawName != null) {
++           if(namePrefix == null) {
++              this.name = rawName;
++           } else {
++              this.name = namePrefix + rawName;
++           }
++        }
++        // All other attributes are ignored
++    }
++
++    
++    public void characters(char[] ch, int start, int length) {
++        buffer.append(ch, start, length);
++    }
++
++}
+Index: tika-parsers/src/main/java/org/apache/tika/parser/odf/OpenDocumentMetaParser.java
+===================================================================
+--- tika-parsers/src/main/java/org/apache/tika/parser/odf/OpenDocumentMetaParser.java	(revision 900752)
++++ tika-parsers/src/main/java/org/apache/tika/parser/odf/OpenDocumentMetaParser.java	(working copy)
+@@ -17,6 +17,7 @@
+ package org.apache.tika.parser.odf;
+ 
+ import org.apache.tika.metadata.Metadata;
++import org.apache.tika.parser.xml.AttributeDependantMetadataHandler;
+ import org.apache.tika.parser.xml.DcXMLParser;
+ import org.apache.tika.parser.xml.MetadataHandler;
+ import org.apache.tika.sax.TeeContentHandler;
+@@ -33,6 +34,8 @@
+ 
+     private static final XPathParser META_XPATH = new XPathParser(
+             "meta", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0");
++    // eg <meta:user-defined meta:name="Info1">Text1</meta:user-defined> becomes custom:Info1=Text1
++    public static final String USER_DEFINED_METADATA_NAME_PREFIX = "custom:"; 
+ 
+     private static ContentHandler getMeta(
+             ContentHandler ch, Metadata md, String name, String element) {
+@@ -44,6 +47,17 @@
+         return new TeeContentHandler(ch, branch);
+     }
+ 
++    private static ContentHandler getUserDefined(
++            ContentHandler ch, Metadata md) {
++        Matcher matcher = new CompositeMatcher(
++                META_XPATH.parse("//meta:user-defined/@meta:name"),
++                META_XPATH.parse("//meta:user-defined//text()"));
++        ContentHandler branch = new MatchingContentHandler(
++              new AttributeDependantMetadataHandler(md, "meta:name", USER_DEFINED_METADATA_NAME_PREFIX),
++              matcher);
++        return new TeeContentHandler(ch, branch);
++    }
++
+     private static ContentHandler getStatistic(
+             ContentHandler ch, Metadata md, String name, String attribute) {
+         Matcher matcher =
+@@ -54,9 +68,18 @@
+     }
+ 
+     protected ContentHandler getContentHandler(ContentHandler ch, Metadata md) {
++        // Process the Dublin Core Attributes 
+         ch = super.getContentHandler(ch, md);
++        // Process the OO Meta Attributes
++        ch = getMeta(ch, md, Metadata.CREATION_DATE, "creation-date");
+         ch = getMeta(ch, md, Metadata.KEYWORDS, "keyword");
++        ch = getMeta(ch, md, Metadata.EDIT_TIME, "editing-duration");
++        ch = getMeta(ch, md, "editing-cycles", "editing-cycles");
++        ch = getMeta(ch, md, "initial-creator", "initial-creator");
+         ch = getMeta(ch, md, "generator", "generator");
++        // Process the user defined Meta Attributes
++        ch = getUserDefined(ch, md);
++        // Process the OO Statistics Attributes
+         ch = getStatistic(ch, md, "nbTab", "table-count");
+         ch = getStatistic(ch, md, "nbObject", "object-count");
+         ch = getStatistic(ch, md, "nbImg", "image-count");

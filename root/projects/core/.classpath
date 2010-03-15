@@ -8,7 +8,7 @@
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/guessencoding-1.0.jar" sourcepath="/3rd Party/src/guessencoding-1.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jta.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jug-lgpl-2.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jug-asl-2.0.0.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/ibatis-2.3.4.726-patched.jar" sourcepath="/3rd Party/src/ibatis-2.3.4.726-patched-src.zip"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/j2ee/servlet.jar"/>
