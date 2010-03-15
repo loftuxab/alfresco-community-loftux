@@ -79,7 +79,7 @@
    
    <target name="generate-javadocs-mbeans" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Virtualization MBean" 
+      <generate-javadocs documenttitle="Alfresco Virtualization MBean ${version.number}" 
                          windowtitle="Alfresco Virtualization MBean" 
                          projectdir="${dir.project.mbeans}" />
    </target>
@@ -169,7 +169,7 @@
    
    <target name="generate-javadocs-deployment" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Deployment Receiver" 
+      <generate-javadocs documenttitle="Alfresco Deployment Receiver ${version.number}" 
                          windowtitle="Alfresco Deployment Receiver" 
                          projectdir="${dir.project.deployment}" />
    </target>
@@ -220,8 +220,8 @@
 	   
 	   <target name="generate-javadocs-wdrdeployment" 
 	           depends="init">
-	      <generate-javadocs documenttitle="Alfresco Web Development Runtime Deployment Receivers" 
-	                         windowtitle="Alfresco Web Development Runtime Deployment Receiver" 
+	      <generate-javadocs documenttitle="Alfresco WCM Runtime Deployment Receivers ${version.number}" 
+	                         windowtitle="Alfresco WCM Development Runtime Deployment Receiver" 
 	                         projectdir="${dir.project.wdrdeployment}" />
 	   </target>
       
@@ -290,7 +290,7 @@
    
    <target name="generate-javadocs-repository" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Repository Specification" 
+      <generate-javadocs documenttitle="Alfresco Repository ${version.number}" 
                          windowtitle="Alfresco Repository" 
                          projectdir="${dir.project.repository}" />
    </target>
@@ -451,8 +451,8 @@
 
    <target name="generate-javadocs-linkvalidation" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Core API Specification" 
-                         windowtitle="Alfresco Core API" 
+      <generate-javadocs documenttitle="Alfresco Link Validation API Specification ${version.number}" 
+                         windowtitle="Alfresco Link Validation API" 
                          projectdir="${dir.project.linkvalidation}"/>
    </target>
 
@@ -560,7 +560,7 @@
    
    <target name="generate-javadocs-remoteapi" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Remote Services API Specification" 
+      <generate-javadocs documenttitle="Alfresco Remote Services API ${version.number}" 
                          windowtitle="Alfresco Remote Services API" 
                          projectdir="${dir.project.remoteapi}" />
    </target>
@@ -809,7 +809,7 @@
    
    <target name="generate-javadocs-jndi" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface)" 
+      <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface) ${version.number}" 
                          windowtitle="Alfresco JNDI" 
                          projectdir="${dir.project.jndi}"/>
    </target>
@@ -1393,7 +1393,7 @@
 
    <target name="generate-javadocs-catalinavirtual" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Catalina Valve" 
+      <generate-javadocs documenttitle="Alfresco Catalina Valve ${version.number}" 
                          windowtitle="Alfresco Catalina Valve" 
                          projectdir="${dir.project.catalinavirtual}"/>
    </target>
@@ -1618,8 +1618,8 @@
    
    <target name="generate-javadocs-slingshot" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Slingshot" 
-                         windowtitle="Alfresco Slingshot" 
+      <generate-javadocs documenttitle="Alfresco Share ${version.number}" 
+                         windowtitle="Alfresco Share" 
                          projectdir="${dir.project.slingshot}"/>
    </target>
 
@@ -1719,7 +1719,7 @@
    </target>
    
    <target name="generate-javadocs-webeditor" depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Editor" 
+      <generate-javadocs documenttitle="Alfresco Web Editor ${version.number}" 
                          windowtitle="Alfresco Web Editor" 
                          projectdir="${dir.project.webeditor}"/>
    </target>
@@ -2052,7 +2052,7 @@
 
    <target name="generate-javadocs-webclient" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Client API Specification" 
+      <generate-javadocs documenttitle="Alfresco Web Client API Specification ${version.number}" 
                          windowtitle="Alfresco Web Client API" 
                          projectdir="${dir.project.webclient}"/>
    </target>
@@ -2960,7 +2960,7 @@
    
    <target name="generate-javadocs-webserviceclient" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Service Client Specification" 
+      <generate-javadocs documenttitle="Alfresco Web Service Client ${version.number}" 
                          windowtitle="Alfresco Web Service Client" 
                          projectdir="${dir.project.webserviceclient}"/>
    	<generate-generated-javadocs documenttitle="Alfresco Web Service Client Specification" 
@@ -3210,7 +3210,7 @@
    
    <target name="generate-javadocs-jlan" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco JLAN API Specification" 
+      <generate-javadocs documenttitle="Alfresco JLAN API Specification ${version.number}" 
                          windowtitle="Alfresco JLAN API" 
                          projectdir="${dir.project.jlan}"/>
    </target>
@@ -3314,7 +3314,7 @@
    
    <target name="generate-javadocs-mobile" 
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Mobile" 
+      <generate-javadocs documenttitle="Alfresco Mobile API ${version.number}" 
                          windowtitle="Alfresco Mobile" 
                          projectdir="${dir.project.mobile}"/>
    </target>
