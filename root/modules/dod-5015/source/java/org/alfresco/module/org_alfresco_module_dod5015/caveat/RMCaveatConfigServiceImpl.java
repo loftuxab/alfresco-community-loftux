@@ -34,6 +34,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.MatchLogic;
 import org.alfresco.repo.content.ContentServicePolicies;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.node.NodeServicePolicies;
@@ -613,6 +614,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                             {
                                 RMListOfValuesConstraint rmCon = ((RMListOfValuesConstraint)con);
                                 String conName = rmCon.getShortName();
+                                MatchLogic matchLogic = rmCon.getMatchLogicEnum();
                                 
                                 if (! caveatConfig.containsKey(conName))
                                 {
@@ -634,7 +636,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                                         propValues = (List<String>)val;
                                     }
                                     
-                                    if (propValues != null && !isAllowed(propValues, allowedValues))
+                                    if (propValues != null && !isAllowed(propValues, allowedValues, matchLogic))
                                     {
                                         if (logger.isDebugEnabled())
                                         {
@@ -653,18 +655,47 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         }
     }
     
-    private boolean isAllowed(List<String> propValues, List<String> userGroupValues)
+    private boolean isAllowed(List<String> propValues, List<String> userGroupValues, MatchLogic matchLogic)
     {
-        // check user/group values match all those on record
-        for (String propValue : propValues)
+        if (matchLogic.equals(MatchLogic.AND))
         {
-            if (! userGroupValues.contains(propValue))
+            // check user/group values match all values on node
+            for (String propValue : propValues)
             {
-                return false;
+                if (! userGroupValues.contains(propValue))
+                {
+                    if (logger.isTraceEnabled())
+                    {
+                        logger.trace("Not allowed: "+propValues+", "+userGroupValues+", "+matchLogic);
+                    }
+                    
+                    return false;
+                }
             }
+            
+            return true;
+        }
+        else if (matchLogic.equals(MatchLogic.OR))
+        {
+            // check user/group values match at least one value on node
+            for (String propValue : propValues)
+            {
+                if (userGroupValues.contains(propValue))
+                {
+                    return true;
+                }
+            }
+            
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Not allowed: "+propValues+", "+userGroupValues+", "+matchLogic);
+            }
+            
+            return false;
         }
         
-        return true;
+        logger.error("Unexpected match logic type: "+matchLogic);
+        return false;
     }
     
     /**
@@ -672,6 +703,11 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
      * @param listName the name of the RMConstraintList
      */
     public RMConstraintInfo addRMConstraint(String listName, String title, String[] values)
+    {
+        return addRMConstraint(listName, title, values, MatchLogic.AND);
+    }
+    
+    public RMConstraintInfo addRMConstraint(String listName, String title, String[] values, MatchLogic matchLogic)
     {
         if(listName == null)
         {
@@ -688,11 +724,10 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         
         QName listQName = QName.createQName(listName, namespaceService);
         
-        // TODO review - constraints cannot be deleted
         // TEMP review - if it already exists then change it for now
         try
         {
-            recordsManagementAdminService.addCustomConstraintDefinition(listQName, title, true, allowedValues);
+            recordsManagementAdminService.addCustomConstraintDefinition(listQName, title, true, allowedValues, matchLogic);
         }
         catch (AlfrescoRuntimeException e)
         {

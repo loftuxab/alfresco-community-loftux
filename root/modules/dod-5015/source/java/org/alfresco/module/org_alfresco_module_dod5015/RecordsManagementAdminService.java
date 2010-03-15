@@ -21,6 +21,8 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.MatchLogic;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -272,8 +274,9 @@ public interface RecordsManagementAdminService
      * @param title the human-readable title e.g. My foo list
      * @param caseSensitive
      * @param allowedValues the allowed values list
+     * @param matchLogic AND (all values must match), OR (at least one values must match)
      */
-    public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues);
+    public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues, MatchLogic matchLogic);
     
     /**
      * Remove custom constraint definition - if not referenced (by any properties)

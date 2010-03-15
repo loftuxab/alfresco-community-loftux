@@ -27,7 +27,6 @@ import java.util.Map;
 import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.ConstraintException;
-import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 
@@ -42,12 +41,19 @@ import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
  */
 public class RMListOfValuesConstraint extends ListOfValuesConstraint
 {
-    private static final String ERR_NO_VALUES = "d_dictionary.constraint.list_of_values.no_values";
+    //private static final String ERR_NO_VALUES = "d_dictionary.constraint.list_of_values.no_values";
     private static final String ERR_NON_STRING = "d_dictionary.constraint.string_length.non_string";
     private static final String ERR_INVALID_VALUE = "d_dictionary.constraint.list_of_values.invalid_value";
     
     private List<String> allowedValues;
     private List<String> allowedValuesUpper;
+    private MatchLogic matchLogic = MatchLogic.AND; // defined match logic used by caveat matching (default = "AND") 
+    
+    public enum MatchLogic
+    {
+        AND, // closed marking - all values must match
+        OR;  // open marking   - at least one value must match
+    }
     
     // note: alternative to static init could be to use 'registered' constraint
     private static RMCaveatConfigService caveatConfigService;
@@ -65,6 +71,7 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
         sb.append("RMListOfValuesConstraint")
           .append("[allowedValues=").append(getAllowedValues())
           .append(", caseSensitive=").append(isCaseSensitive())
+          .append(", matchLogic=").append(getMatchLogic())
           .append("]");
         return sb.toString();
     }
@@ -162,6 +169,21 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
         params.put("allowedValues", getAllowedValues());
         
         return params;
+    }
+    
+    public MatchLogic getMatchLogicEnum()
+    {
+        return matchLogic;
+    }
+    
+    public String getMatchLogic()
+    {
+        return matchLogic.toString();
+    }
+    
+    public void setMatchLogic(String matchLogicStr)
+    {
+        this.matchLogic = MatchLogic.valueOf(matchLogicStr);
     }
     
     @Override
