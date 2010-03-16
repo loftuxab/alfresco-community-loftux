@@ -44,7 +44,7 @@ import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.TargetStatus;
 import org.alfresco.deployment.TargetStatusImpl;
 import org.alfresco.deployment.impl.DeploymentException;
-import org.springframework.extensions.surf.util.PropertyCheck;
+import org.alfresco.util.PropertyCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;

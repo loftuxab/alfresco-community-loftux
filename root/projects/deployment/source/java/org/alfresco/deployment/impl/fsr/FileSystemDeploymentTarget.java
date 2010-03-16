@@ -50,7 +50,7 @@ import org.alfresco.deployment.impl.server.DeploymentState;
 import org.alfresco.deployment.impl.server.Target;
 import org.alfresco.util.Deleter;
 import org.alfresco.util.GUID;
-import org.springframework.extensions.surf.util.PropertyCheck;
+import org.alfresco.util.PropertyCheck;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

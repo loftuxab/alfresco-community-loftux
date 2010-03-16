@@ -19,7 +19,7 @@
 package org.alfresco.deployment.impl.server;
 
 import org.alfresco.deployment.DeploymentTarget;
-import org.springframework.extensions.surf.util.PropertyCheck;
+import org.alfresco.util.PropertyCheck;
 
 /**
  * Utility class to register a deployment target with the deployment engine.
