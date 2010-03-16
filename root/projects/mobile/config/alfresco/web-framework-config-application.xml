@@ -12,17 +12,9 @@
    <config evaluator="string-compare" condition="WebFramework">
       
       <web-framework>
-         
-         <page-mapper>
-            <id>mobile</id>
-            <name>Mobile Page Mapper</name>
-            <description>Mobile Page Mapper</description>
-            <class>org.alfresco.web.site.MobilePageMapper</class>
-         </page-mapper>
-         
+                  
          <!-- Overrides -->
          <framework-defaults>
-            <page-mapper>mobile</page-mapper>
             <user-factory>alfresco</user-factory>       
          </framework-defaults>
          

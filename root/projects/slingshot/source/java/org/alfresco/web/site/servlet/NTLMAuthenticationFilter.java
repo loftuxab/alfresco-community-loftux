@@ -44,9 +44,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.surf.RequestContext;
-import org.springframework.extensions.surf.RequestContextFactory;
+import org.springframework.extensions.surf.RequestContextUtil;
 import org.springframework.extensions.surf.UserFactory;
-import org.springframework.extensions.surf.WebFrameworkServiceRegistry;
 import org.springframework.extensions.surf.exception.ConnectorServiceException;
 import org.springframework.extensions.surf.exception.PlatformRuntimeException;
 import org.springframework.extensions.surf.exception.RequestContextException;
@@ -83,7 +82,7 @@ public class NTLMAuthenticationFilter implements Filter
     
     private ConnectorService connectorService;
     private String endpoint;
-    private ServletContext context;
+    private ServletContext servletContext;
     
     
     /**
@@ -95,7 +94,7 @@ public class NTLMAuthenticationFilter implements Filter
         this.endpoint = args.getInitParameter("endpoint");
         
         // get reference to our ServletContext
-        this.context = args.getServletContext();
+        this.servletContext = args.getServletContext();
         
         if (logger.isInfoEnabled())
             logger.info("NTLMAuthenticationFilter initialised.");
@@ -130,9 +129,7 @@ public class NTLMAuthenticationFilter implements Filter
         try
         {
             // perform a "silent" init - i.e. no user creation or remote connections
-            req.setAttribute(RequestContextFactory.SILENT_INIT, Boolean.TRUE);
-            context = WebFrameworkServiceRegistry.getInstance(this.context).getRequestContextFactory().newInstance(sreq);
-            req.removeAttribute(RequestContextFactory.SILENT_INIT);
+            RequestContextUtil.initRequestContext(getApplicationContext(), (HttpServletRequest)sreq, true);
         }
         catch (RequestContextException ex)
         {
@@ -550,11 +547,19 @@ public class NTLMAuthenticationFilter implements Filter
     {
         if (this.connectorService == null)
         {
-            ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
-            
             // retrieve the connector service
-            this.connectorService = (ConnectorService)context.getBean("connector.service");
+            this.connectorService = (ConnectorService) getApplicationContext().getBean("connector.service");
         }
         return this.connectorService.getConnector(endpoint, session);
+    }
+
+    /**
+     * Retrieves the root application context
+     * 
+     * @return application context
+     */
+    private ApplicationContext getApplicationContext()
+    {
+    	return WebApplicationContextUtils.getWebApplicationContext(servletContext);
     }
 }

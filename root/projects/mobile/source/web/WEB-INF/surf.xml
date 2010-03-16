@@ -22,7 +22,6 @@
          
          <!-- Configure Surf Defaults -->
          <defaults>
-            <page-mapper-factory>webframework.factory.pagemapper.mobile</page-mapper-factory>
             <user-factory>webframework.factory.user.alfresco</user-factory>
          
             <theme>default</theme>
