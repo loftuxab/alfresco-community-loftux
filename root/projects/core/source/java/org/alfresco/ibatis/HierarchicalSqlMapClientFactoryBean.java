@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.springframework.extensions.surf.util.PropertyCheck;
+import org.alfresco.util.PropertyCheck;
 import org.alfresco.util.resource.HierarchicalResourceLoader;
 import org.springframework.core.NestedIOException;
 import org.springframework.core.io.Resource;
@@ -32,8 +32,6 @@ import org.springframework.util.ObjectUtils;
 
 import com.ibatis.common.xml.NodeletException;
 import com.ibatis.sqlmap.client.SqlMapClient;
-import com.ibatis.sqlmap.client.SqlMapClientBuilder;
-import com.ibatis.sqlmap.engine.builder.xml.SqlMapConfigParser;
 import com.ibatis.sqlmap.engine.builder.xml.SqlMapParser;
 
 /**
