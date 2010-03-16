@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.extensions.config.evaluator.Evaluator;
 import org.springframework.extensions.surf.FrameworkUtil;
 import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.ServletUtil;
 import org.springframework.extensions.surf.exception.ConnectorServiceException;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.webscripts.connector.Connector;
@@ -120,7 +121,7 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
         
         RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
         String currentUserId = requestContext.getUserId();
-        HttpSession currentSession = requestContext.getRequest().getSession();
+        HttpSession currentSession = ServletUtil.getSession(true);
         Connector connector = connService.getConnector(ENDPOINT_ID, currentUserId, currentSession);
 
         Response r = connector.call("/api/metadata?nodeRef=" + nodeString + "&shortQNames=true");

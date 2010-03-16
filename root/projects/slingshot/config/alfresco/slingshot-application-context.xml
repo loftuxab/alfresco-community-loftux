@@ -113,20 +113,15 @@
    </bean>
    
    <!-- Slingshot Factory beans -->
-   <bean id="webframework.factory.pagemapper.slingshot" class="org.alfresco.web.site.SlingshotPageMapperFactory" parent="webframework.factory.base" />
    <bean id="webframework.factory.user.slingshot" class="org.alfresco.web.site.SlingshotUserFactory" parent="webframework.factory.base" />
    
    <!-- "no-component" processor -->
    <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
    
-   <!-- override the view resolver to handle Slingshot template URI driven page IDs -->
-   <bean id="pageViewResolver" class="org.alfresco.web.site.SlingshotPageViewResolver" parent="abstractWebFrameworkViewResolver" />
-   
-   
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
- 
+   
    <!--  I18N resources and messages Web Script -->
    <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" />
    

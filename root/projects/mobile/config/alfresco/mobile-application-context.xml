@@ -18,6 +18,9 @@
             <value>classpath:META-INF/spring-surf-config-custom.xml</value>
             <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
             
+            <!-- Mobile Specific Configuration -->
+            <value>classpath:alfresco/web-framework-config-application.xml</value>
+            
             <!-- Surf Autowire Support -->
             <value>webapp:WEB-INF/surf.xml</value>
          </list>
@@ -51,9 +54,6 @@
          </value>
       </property>
    </bean>
-   
-   <!-- Mobile Factory beans -->
-   <bean id="webframework.factory.pagemapper.mobile" class="org.alfresco.web.site.MobilePageMapperFactory" parent="webframework.factory.base" />
    
    <!-- "no-component" processor -->
    <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />

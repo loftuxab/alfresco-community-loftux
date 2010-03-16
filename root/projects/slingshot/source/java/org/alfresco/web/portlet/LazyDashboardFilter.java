@@ -33,10 +33,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.RequestContextUtil;
 import org.springframework.extensions.surf.WebFrameworkServiceRegistry;
 import org.springframework.extensions.surf.exception.RequestContextException;
 import org.springframework.extensions.surf.util.URLDecoder;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Performs lazy creation of dashboard pages when they are requested without requiring redirects, thus making them
@@ -48,8 +51,7 @@ public class LazyDashboardFilter implements Filter
 {
     private static final Pattern PATTERN_DASHBOARD_PATH = Pattern.compile("/user/([^/]*)/dashboard");
     
-    private ServletContext context;
-    
+    private ServletContext servletContext;
     
     /*
      * (non-Javadoc)
@@ -66,12 +68,11 @@ public class LazyDashboardFilter implements Filter
         Matcher matcher;
         if (pathInfo != null && (matcher = PATTERN_DASHBOARD_PATH.matcher(pathInfo)).matches())
         {
-            WebFrameworkServiceRegistry serviceRegistry = WebFrameworkServiceRegistry.getInstance(this.context);
             // Get hold of the context
             RequestContext context;
             try
             {
-                context = serviceRegistry.getRequestContextFactory().newInstance(request);
+                context = RequestContextUtil.initRequestContext(getApplicationContext(),(HttpServletRequest)request);
             }
             catch (RequestContextException e)
             {
@@ -83,6 +84,8 @@ public class LazyDashboardFilter implements Filter
             // test user dashboard page exists?
             if (userid != null && userid.equals(URLDecoder.decode(matcher.group(1))))
             {
+                WebFrameworkServiceRegistry serviceRegistry = context.getServiceRegistry();
+                
                 if (serviceRegistry.getModelObjectService().getPage("user/" + userid + "/dashboard") == null)
                 {
                     // no site found! create initial dashboard for this user...
@@ -103,7 +106,7 @@ public class LazyDashboardFilter implements Filter
     public void init(FilterConfig config) throws ServletException
     {
         // get reference to our ServletContext
-        this.context = config.getServletContext();
+        this.servletContext = config.getServletContext();
     }
 
     /*
@@ -112,5 +115,15 @@ public class LazyDashboardFilter implements Filter
      */
     public void destroy()
     {
+    }
+    
+    /**
+     * Retrieves the root application context
+     * 
+     * @return application context
+     */
+    private ApplicationContext getApplicationContext()
+    {
+    	return WebApplicationContextUtils.getWebApplicationContext(servletContext);
     }
 }
