@@ -382,13 +382,6 @@
       <delete quiet="yes"
               file="${dir.installer.quick}/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
 
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.installer.rm}/output" />
-      <exec dir="${dir.installer.rm}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.rm}"'/>
-      </exec>
-
       <move todir="${dir.continuous.dist}" failonerror="no">
          <fileset dir="${dir.installer.quick}/output">
             <include name="**/*"/>

@@ -3,10 +3,6 @@
     "http://www.liferay.com/dtd/liferay-portlet-app_5_2_0.dtd">
 <liferay-portlet-app>
    <portlet>
-      <portlet-name>SurfPortlet</portlet-name>
-      <user-principal-strategy>screenName</user-principal-strategy>
-   </portlet>
-   <portlet>
       <portlet-name>CMISFolder</portlet-name>
       <user-principal-strategy>screenName</user-principal-strategy>
    </portlet>
