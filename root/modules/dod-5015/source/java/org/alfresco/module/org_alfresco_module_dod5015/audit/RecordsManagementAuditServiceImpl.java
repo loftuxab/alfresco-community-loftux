@@ -75,9 +75,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.extensions.surf.util.ISO8601DateFormat;
-import org.springframework.extensions.surf.util.Pair;
+import org.alfresco.util.Pair;
 import org.springframework.extensions.surf.util.ParameterCheck;
-import org.springframework.extensions.surf.util.PropertyCheck;
+import org.alfresco.util.PropertyCheck;
 
 /**
  * Records Management Audit Service Implementation.
