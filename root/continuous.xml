@@ -866,7 +866,7 @@
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="org.springframework*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="**/ehcache-core-1.7.2.jar" />
+                  includes="**/ehcache-core-2.0.0.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="**/slf4j-api-1.5.11.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
