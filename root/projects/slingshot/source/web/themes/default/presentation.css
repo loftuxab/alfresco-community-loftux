@@ -737,6 +737,11 @@ body.yui-skin-default .categoryview .selected div.ygtvchildren table .ygtvlabel:
    background-image: url(./images/navigation-bg.png);
 }
 
+.yui-skin-default .rules-list a
+{
+   color: #515D6B;
+}
+
 /* Calendar */
 
 .yui-skin-default #calendar .yui-calendar td.calcell.selected a

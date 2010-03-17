@@ -6,7 +6,7 @@
 
 .rule-config .rule-config-header
 {
-   background:#FFFFFF url(../../../yui/assets/skins/default/sprite.png) repeat-x scroll 0 0;
+   background:#FFFFFF url(../../images/header-bg.png) repeat-x scroll 0 0;
    border-bottom: 1px solid #C8C8C8;
    height: 2.2em;
    line-height: 2.2em;
@@ -70,10 +70,21 @@
    font-weight: bold;
 }
 
+.rule-config .rule-config-body
+{
+   padding-top: 4px;
+}
+
+.rule-config .rule-config-body li
+{
+   margin-bottom: 4px;
+}
+
 .rule-config .rule-config-body .name select optgroup
 {
    padding-top: 0.25em;
    padding-bottom: 0.25em;
+   border-bottom:1px dashed #DDDDDD;rela
 }
 
 .rule-config .rule-config-body .parameters,
@@ -121,6 +132,25 @@
 {
    cursor: pointer;
    padding: 0.25em;
+}
+
+.rule-config .rule-config-body .parameters .path,
+.rule-config .rule-config-body .parameters .site
+{
+   background-position: left 50%;
+   background-repeat: no-repeat;
+   padding: 2px 0 2px 20px;
+}
+
+.rule-config .rule-config-body .parameters .path
+{
+   background-image: url(../../documentlibrary/images/folder-closed-16.png);
+}
+
+.rule-config .rule-config-body .parameters .site
+{
+   background-image: url(../../images/site-16.png);
+   margin-left:0.5em;
 }
 
 .rule-config .rule-config-body .parameters .paramtype_d_date     input.datepicker-date,

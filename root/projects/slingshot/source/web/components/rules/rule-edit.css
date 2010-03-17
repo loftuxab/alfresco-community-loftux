@@ -50,6 +50,7 @@
 .rule-edit .form-field.description textarea
 {
    width: 62em;
+   height:2.5em;
 }
 
 .rule-edit .form-field.title label,
@@ -119,8 +120,8 @@
 
 .rule-edit .configuration-separator
 {
-   background-image: url(../images/expanded.png);
+   background-image: url(../images/green-arrow-small.png);
    background-position: center center;
    background-repeat: no-repeat;
-   padding: 1em;
+   padding: 0.4em;
 }

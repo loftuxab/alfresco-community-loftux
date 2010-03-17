@@ -125,7 +125,8 @@
                      Dom.get(this.id + "-" + ruleConfig.name).innerHTML = response.serverResponse.responseText;
 
                      // Get the rest of the configs
-                     this._loadRuleConfigs(ruleConfigs.splice(1));
+                     ruleConfigs.splice(0, 1);
+                     this._loadRuleConfigs(ruleConfigs);
                   },
                   scope: this
                },
@@ -227,6 +228,7 @@
          ruleConfig = this.ruleConfigs[this.id + "-ruleConfigType"];
          ruleConfig.setOptions(
          {
+            siteId: this.options.siteId,
             form: form,
             mode: mode
          });
@@ -253,6 +255,7 @@
          ruleConfig = this.ruleConfigs[this.id + "-ruleConfigIfCondition"];
          ruleConfig.setOptions(
          {
+            siteId: this.options.siteId,
             form: form,
             mode: mode,
             ruleConfigDefinitionKey: "conditionDefinitionName"
@@ -263,6 +266,7 @@
          ruleConfig = this.ruleConfigs[this.id + "-ruleConfigUnlessCondition"];
          ruleConfig.setOptions(
          {
+            siteId: this.options.siteId,
             form: form,
             mode: mode,
             ruleConfigDefinitionKey: "conditionDefinitionName"
@@ -273,6 +277,7 @@
          ruleConfig = this.ruleConfigs[this.id + "-ruleConfigAction"];
          ruleConfig.setOptions(
          {
+            siteId: this.options.siteId,
             form: form,
             mode: mode,
             ruleConfigDefinitionKey: "actionDefinitionName"

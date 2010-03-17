@@ -715,6 +715,11 @@ body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnb
    color: #00AE42;
 }
 
+.yui-skin-greenTheme .rules-list a
+{
+   color: #526A53;
+}
+
 /* Calendar */
 
 .yui-skin-greenTheme #calendar .yui-calendar td.calcell.selected a
