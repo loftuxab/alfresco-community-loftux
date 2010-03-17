@@ -1651,8 +1651,6 @@
    <target name="assemble-webeditor-jar" depends="compile-webeditor">
       <mkdir dir="${dir.project.webeditor.assemble.jar}" />
       <copy todir="${dir.project.webeditor.assemble.jar}">
-         <fileset dir="${dir.project.webeditor.classes}" 
-                  includes="org/alfresco/web/site/**" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" 
                   includes="org/alfresco/web/scripts/servlet/**" />
       </copy>

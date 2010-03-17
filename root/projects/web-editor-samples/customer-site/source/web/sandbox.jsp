@@ -31,7 +31,13 @@
    <head>
       <meta http-equiv="content-type" content="text/html;charset=utf-8" />
       <title>Alfresco Web Editor Demo</title>
+      
+      <!-- Add ydn served yui files for testing sandbox loading -->
+      <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/button/assets/skins/sam/button.css"> 
+      <script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/utilities/utilities.js&2.8.0r4/build/button/button-min.js"></script> 
+      
       <awe:startTemplate />
+      
       <link rel="stylesheet" type="text/css" href="customer.css" />
    </head>
    

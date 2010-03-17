@@ -82,7 +82,7 @@
 
       render: function AWE_render()
       {
-         //innerHTML causes issues with rendering so use DOM
+         // innerHTML causes issues with rendering so use DOM
          var wefEl = Dom.get('wef'),
              div = document.createElement('div');
 
@@ -93,11 +93,14 @@
          div.id = 'wef-panel';
          wefEl.appendChild(div);
 
+         // get the current context path
+         var contextPath = WEF.get("contextPath");
+         
          var tb  = WebEditor.module.Ribbon.addToolbar('WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
          {
             id: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             name: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-            label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
+            label: '<img src="' + contextPath + '/res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
             content: '',
             active: true,
             pluginOwner:this
@@ -107,7 +110,7 @@
          [
             {
                type: 'menu',
-               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/quick-edit.png" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
+               label: '<img src="' + contextPath + '/res/awe/images/quick-edit.png" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
                value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                icon: true,
@@ -127,7 +130,7 @@
             },
             {
                type: 'push',
-               label: '<img src="' + Alfresco.constants.URL_CONTEXT + 'res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
+               label: '<img src="' + contextPath + '/res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
                value: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                icon: true
@@ -189,11 +192,11 @@
          var formUri = null;
          if (o.formId)
          {
-            formUri = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + 'service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?itemKind=node&itemId={nodeRef}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
          }
          else
          {
-            formUri = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + 'service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
+            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?itemKind=node&itemId={nodeRef}&nodeRef={nodeRef}&redirect={redirectUrl}',o);
          }
 
          this.module.getFormPanelInstance('wef-panel').setOptions(
@@ -263,7 +266,7 @@
        * @param args {Object} Args passed into event
        *
        */
-      onLoggedIn: function WEF_UI_Ribbon_onLoggedIn(e, args)
+      onLoggedIn: function AWE_onLoggedIn(e, args)
       {
          this.set('loggedInStatus', args[1].loggedIn);
       },
@@ -276,7 +279,7 @@
        * @param args {Object} Args passed into event
        *
        */
-      onLoggedOut: function WEF_UI_Ribbon_onLoggedOut(e, args)
+      onLoggedOut: function AWE_onLoggedOut(e, args)
       {
          this.set('loggedInStatus', false);
       },
@@ -287,7 +290,7 @@
        * @param e {Object} Object literal describing previous and new value of
        *                   attribute
        */
-      onLoginStatusChangeEvent: function WEF_UI_Ribbon_onLoginStatusChangeEvent(e)
+      onLoginStatusChangeEvent: function AWE_onLoginStatusChangeEvent(e)
       {
          var btn = WebEditor.module.Ribbon.getToolbar(WebEditor.ui.Ribbon.SECONDARY_TOOLBAR).getButtonById(this.config.name + WebEditor.SEPARATOR + 'loggedout');
          if (e.newValue === true) 
@@ -305,12 +308,12 @@
          }
       },
 
-      onQuickEditClick: function WEF_UI_Ribbon_onQuickEditClick(e, args)
+      onQuickEditClick: function AWE_onQuickEditClick(e, args)
       {
          this.loadForm(args[1]);
       },
 
-      onShowHideClick: function WEF_UI_Ribbon_onShowHideClick(e, args)
+      onShowHideClick: function AWE_onShowHideClick(e, args)
       {
          var editMarkers = Selector.query('span.alfresco-content-marker'),
              butImg = Dom.get(args[1]+'-button').getElementsByTagName('img')[0];
@@ -331,7 +334,7 @@
          }
       },
 
-      onLogoutClick: function WEF_UI_Ribbon_onLogoutClick(e, args)
+      onLogoutClick: function AWE_onLogoutClick(e, args)
       {
          var ribbonObj = this;
          Alfresco.util.PopupManager.displayPrompt(
@@ -346,7 +349,7 @@
                   {
                      var config = 
                      {
-                        url: Alfresco.constants.URL_CONTEXT + 'page/dologout',
+                        url: WEF.get("contextPath") + '/page/dologout',
                         method: "GET",
                         successCallback: 
                         {
@@ -389,7 +392,7 @@
          window.open('http://www.alfresco.com/help/32/labs/sharehelp/','wef-help');
       },
 
-      onQuickEditMouseOver: function WEF_UI_Ribbon_onQuickEditMouseOver(e, args)
+      onQuickEditMouseOver: function AWE_onQuickEditMouseOver(e, args)
       {
          if (args.length>0)
          {

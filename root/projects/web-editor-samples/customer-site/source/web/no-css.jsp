@@ -32,7 +32,6 @@
       <meta http-equiv="content-type" content="text/html;charset=utf-8" />
       <title>Alfresco Web Editor Demo</title>
       <awe:startTemplate />
-      <link rel="stylesheet" type="text/css" href="customer.css" />
    </head>
    
    <%@ include file="includes/body.jsp" %>

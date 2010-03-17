@@ -3,28 +3,6 @@
 
 <beans>
    
-   <!-- Override Web Framework Abstract Handler Mappings -->
-   <bean id="webframeworkHandlerMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" abstract="true">
-      <property name="interceptors">
-         <list>
-            <ref bean="requestContextInterceptor"/>
-            <ref bean="themeInterceptor"/>
-         </list>
-      </property>
-      <property name="mappings">
-         <value>
-            /system/**=remoteController
-            /proxy/**=endpointController
-            /resource/**=resourceController
-            /dologin/**=loginController
-            /dologout/**=logoutController
-         </value>
-      </property>
-   </bean>
-   
-   <!-- Web Editor Factory beans -->
-   <bean id="webframework.factory.pagemapper.awe" class="org.alfresco.web.site.WebEditorPageMapperFactory" parent="webframework.factory.base" />
-   
    <!-- "no-component" processor -->
    <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
    
