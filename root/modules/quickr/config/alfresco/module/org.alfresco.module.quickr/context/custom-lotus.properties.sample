@@ -1,0 +1,4 @@
+# Custom Lotus Quickr configuration
+lotus.server.port=6060
+lotus.server.host=quickr-fqhn
+lotus.share.document.url=http://share-fqhn:8080/share/page/site/{0}/document-details?nodeRef={1}

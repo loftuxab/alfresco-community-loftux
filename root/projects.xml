@@ -2136,6 +2136,70 @@
                          projectdir="${dir.module.sharepoint}"/>
    </target>
       
+   <!-- ********************************* -->
+   <!-- ** QuickR Project ** -->
+   <!-- ********************************* -->
+
+   <target name="incremental-quickr"
+           depends="package-quickr" />
+
+   <target name="build-quickr"
+           depends="clean-quickr, incremental-quickr" />
+
+   <target name="clean-quickr"
+           depends="init">
+      <clean projectdir="${dir.module.quickr}" />
+   </target>
+
+   <target name="compile-quickr"
+           depends="init">
+      <compile-java-inc-generated projectdir="${dir.module.quickr}" />
+   </target>
+
+   <target name="package-quickr"
+           depends="package-quickr-war, deploy-webclient-tomcat" />
+
+   <target name="package-quickr-jar"
+           depends="compile-quickr">
+      <mkdir dir="${dir.module.quickr.dist}" />
+      <jar jarfile="${dir.module.quickr.dist}/${file.name.jar.quickr}"
+           basedir="${dir.module.quickr.classes}" encoding="UTF-8" />
+   </target>
+
+   <target name="package-quickr-war"
+           depends="package-quickr-extension">
+      <echo>Installing quickr into WAR...</echo>
+      <install-amp ampfile="${dir.module.quickr.dist}/${file.name.amp.quickr}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-quickr-extension"
+           depends="package-quickr-jar">
+      <zip destfile="${dir.module.quickr.dist}/${file.name.amp.quickr}" update="true" encoding="UTF-8">
+         <zipfileset file="${dir.module.quickr.property}/module.properties"/>
+         <zipfileset file="${dir.module.quickr.property}/file-mapping.properties"/> 
+         <zipfileset file="${dir.module.quickr.dist}/${file.name.jar.quickr}" prefix="lib" />
+         <zipfileset dir="${dir.module.quickr.lib}" prefix="lib" />
+         <zipfileset dir="${dir.module.quickr.config}" prefix="config">
+            <exclude name="**/module.properties" />
+			<exclude name="**/file-mapping.properties" />
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-quickr"
+           depends="compile-quickr">
+      <run-tests projectdir="${dir.module.quickr}" />
+   </target>
+
+   <target name="generate-javadocs-quickr"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco QuickR Extension"
+                         windowtitle="Alfresco QuickR Protocol"
+                         projectdir="${dir.module.quickr}"/>
+   </target>
+   
+      
    <!-- ******************************** -->
    <!-- ** Records Management Project ** -->
    <!-- ******************************** -->
