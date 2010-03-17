@@ -765,6 +765,11 @@ body.yui-skin-hcBlack .categoryview .selected div.ygtvchildren table .ygtvlabel:
    text-decoration: underline;
 }
 
+.yui-skin-hcBlack .rules-list a
+{
+   color: #000000;
+}
+
 /* calendar */
 
 .yui-skin-hcBlack .dayview h2, .weekview h2,

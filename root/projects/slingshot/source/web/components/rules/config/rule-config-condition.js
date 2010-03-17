@@ -552,7 +552,7 @@
       onConfigNameSelectChange: function RuleConfigCondition_onConfigNameSelectChange(p_oEvent, p_eConfigEl)
       {
          // Get or create the list of the 3 last config name selections
-         var selectEl = p_oEvent.target,
+         var selectEl = Event.getTarget(p_oEvent),
             optionEl = selectEl.options[selectEl.selectedIndex],
             selectElDomId = selectEl.getAttribute("id");
          if (!selectElDomId)

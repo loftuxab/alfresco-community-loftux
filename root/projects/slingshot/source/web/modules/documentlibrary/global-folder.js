@@ -104,6 +104,14 @@
          siteId: "",
 
          /**
+          * Current site's title for site view mode.
+          *
+          * @property siteTitle
+          * @type string
+          */
+         siteTitle: "",
+
+         /**
           * ContainerId representing root container in site view mode
           *
           * @property containerId
@@ -549,6 +557,7 @@
                if (obj.site !== null)
                {
                   this.options.siteId = obj.site;
+                  this.options.siteTitle = obj.siteTitle;
                   this._populateContainerPicker();
                   var sites = Selector.query("a", this.id + "-sitePicker"), site, i, j,
                      picker = Dom.get(this.id + "-sitePicker");
@@ -644,6 +653,7 @@
          if (selectedFolder && this.options.viewMode == DLGF.VIEW_MODE_SITE)
          {
             selectedFolder.siteId = this.options.siteId;
+            selectedFolder.siteTitle = this.options.siteTitle;
             selectedFolder.containerId = this.options.containerId;
          }
          
@@ -831,7 +841,7 @@
             
             if (sites.length > 0)
             {
-               firstSite = sites[0].shortName;
+               firstSite = sites[0];
             }
             
             for (i = 0, j = sites.length; i < j; i++)
@@ -843,18 +853,19 @@
                   Dom.addClass(element, "last");
                }
 
-               onclick = function DLGF_pSP_onclick(shortName)
+               onclick = function DLGF_pSP_onclick(site)
                {
                   return function()
                   {
                      YAHOO.Bubbling.fire("siteChanged",
                      {
-                        site: shortName,
+                        site: site.shortName,
+                        siteTitle: site.title,
                         eventGroup: me
                      });
                      return false;
                   };
-               }(site.shortName);
+               }(site);
 
                element.innerHTML = '<a rel="' + site.shortName + '" href="#""><h4>' + $html(site.title) + '</h4>' + '<span>' + $html(site.description) + '</span></a>';
                element.onclick = onclick;
@@ -864,7 +875,8 @@
             // Select current site, or first site retrieved
             YAHOO.Bubbling.fire("siteChanged",
             {
-               site: (this.options.siteId.length > 0) ? this.options.siteId : firstSite,
+               site: (this.options.siteId.length > 0) ? this.options.siteId : firstSite.shortName,
+               siteTitle: (this.options.siteId.length > 0) ? this.options.siteTitle : firstSite.title,
                eventGroup: this,
                scrollTo: true
             });

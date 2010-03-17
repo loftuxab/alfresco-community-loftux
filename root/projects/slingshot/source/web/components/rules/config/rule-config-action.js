@@ -420,7 +420,7 @@
                   var params = this._getParameters(obj.configDef);
                   this.widgets.checkInForm.showDialog(
                   {
-                     version: params.minorChange == "true" ? "minor" : "major",
+                     version: params.minorChange == "false" ? "major" : "minor",
                      comments: params.description
                   });
                });
@@ -467,7 +467,7 @@
                               {
                                  path = this.msg("label.site-path", selectedFolder.siteId, selectedFolder.path);
                               }
-                              Dom.get(this.id + "-" + ctx.configDef._id + "-destinationLabel").appendChild(document.createTextNode($html(path)));
+                              Dom.get(this.id + "-" + ctx.configDef._id + "-destinationLabel").innerHTML = this._buildPathSpanHtml(selectedFolder.path, selectedFolder.siteId, selectedFolder.siteTitle);
                               this._updateSubmitElements(ctx.configDef);
                            }
                         }
@@ -491,7 +491,7 @@
             {
                var enableCheckboxEl,
                   RWA = Alfresco.module.RulesWorkflowAction,
-                  prefix = paramDef._mode == RWA.VIEW_MODE_APPROVAL_STEP ? "approve" : "reject";;
+                  prefix = paramDef._mode == RWA.VIEW_MODE_APPROVAL_STEP ? "approve" : "reject";
                if (paramDef._mode == RWA.VIEW_MODE_REJECTION_STEP)
                {
                   /**
@@ -607,7 +607,7 @@
                      fn: function(obj)
                      {
                         var ctx = this.renderers["arca:category-picker"].currentCtx;
-                        this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "category-aspect", "cm:classifiable");
+                        this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "category-aspect", "cm:generalclassifiable");
                         this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, "category-value", obj.selectedItems[0]);
                         this._updateSubmitElements(ctx.configDef);
                      },

@@ -102,6 +102,14 @@
       options:
       {
          /**
+          * Current siteId.
+          *
+          * @property siteId
+          * @type string
+          */
+         siteId: "",
+
+         /**
           * Set to:
           * - "text" for non editable text representation
           * - "edit" for editable form inputs
@@ -244,7 +252,7 @@
             this.widgets.relationButton = new YAHOO.widget.Button(relationButtonEl,
             {
                type: "menu",
-               menu: this.id + "-" + this.options.configName + "-menubuttonselect",
+               menu: this.id + "-" + this.options.ruleConfigType + "-menubuttonselect",
                menualignment: ["tr", "br"]
             });
          }
@@ -579,8 +587,11 @@
 
                         if ((pass == 1 && !hasWildcard) || (pass == 2 && hasWildcard))
                         {
-                           // Add internal variable for storing the real menu items                           
-                           itemOpt["_menuItems"] = [];
+                           // Add internal variable for storing the real menu items
+                           if (!itemOpt["_menuItems"])
+                           {
+                              itemOpt["_menuItems"] = [];
+                           }
                            menuItems = this._getConfigItems(itemTypeOpt, itemPatternOpt, obj);
                            for (var mii = 0, mil = menuItems.length; mii < mil; mii++)
                            {
@@ -619,7 +630,7 @@
             {
                itemOpt = groupOpt[gii];
                menuItems = itemOpt["_menuItems"];
-               for (mii = 0, miil = menuItems.length; mii < miil; mii++)
+               for (mii = 0, mil = menuItems.length; mii < mil; mii++)
                {
                   if (!optGroupEl)
                   {
@@ -753,70 +764,67 @@
        */
       _createConfigNameUI: function RuleConfig__createConfigNameUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
       {
-         if (p_oSelectEl.length > 0)
+         // Add config element
+         var configEl = this.widgets.configTemplateEl.cloneNode(true);
+         Alfresco.util.generateDomId(configEl);
+         if (p_eRelativeConfigEl)
          {
-            // Add config element
-            var configEl = this.widgets.configTemplateEl.cloneNode(true);
-            Alfresco.util.generateDomId(configEl);
-            if (p_eRelativeConfigEl)
-            {
-               p_eRelativeConfigEl.parentNode.insertBefore(configEl, p_eRelativeConfigEl.nextSibling);
-            }
-            else
-            {
-               Dom.get(this.id + "-configs").appendChild(configEl);
-            }
-
-            // Add config name/type drop down
-            if (!p_oSelectEl.getAttribute("id"))
-            {
-               Alfresco.util.generateDomId(p_oSelectEl);
-            }
-            Event.addListener(p_oSelectEl, "change", this.onConfigNameSelectChange, configEl, this);
-            var configNameContainerEl = Selector.query('div.name', configEl)[0];
-            configNameContainerEl.appendChild(p_oSelectEl);
-
-            // Set values
-            if (p_oRuleConfig.id)
-            {
-               configEl.setAttribute("paramid", p_oRuleConfig.id);
-            }
-            Alfresco.util.setSelectedIndex(p_oSelectEl, p_oRuleConfig[this.options.ruleConfigDefinitionKey]);
-
-            if (this.options.mode == RC.MODE_EDIT)
-            {
-               // Create add button
-               var actionsEl = Selector.query('div.actions', configEl)[0];
-               var addButton = new YAHOO.widget.Button(
-               {
-                  label: "+",
-                  container: actionsEl,
-                  type: "push"
-               });
-               addButton.on("click", this.onAddConfigButtonClick, configEl, this);
-               addButton.addClass("add-config");
-
-               // Create remove button
-               var removeButton = new YAHOO.widget.Button(
-               {
-                  label: "-",
-                  container: actionsEl,
-                  type: "push"
-               });
-               removeButton.on("click", this.onRemoveConfigButtonClick, configEl, this);
-               removeButton.addClass("remove-config");
-            }
-            else if (this.options.mode == RC.MODE_TEXT)
-            {
-               Dom.addClass(p_oSelectEl, "hidden");
-               var nameEl = document.createElement("span");
-               nameEl.appendChild(document.createTextNode(p_oSelectEl.options[p_oSelectEl.selectedIndex].text));
-               configNameContainerEl.appendChild(nameEl);
-            }
-
-            // Return element
-            return configEl;
+            p_eRelativeConfigEl.parentNode.insertBefore(configEl, p_eRelativeConfigEl.nextSibling);
          }
+         else
+         {
+            Dom.get(this.id + "-configs").appendChild(configEl);
+         }
+
+         // Add config name/type drop down
+         if (!p_oSelectEl.getAttribute("id"))
+         {
+            Alfresco.util.generateDomId(p_oSelectEl);
+         }
+         Event.addListener(p_oSelectEl, "change", this.onConfigNameSelectChange, configEl, this);
+         var configNameContainerEl = Selector.query('div.name', configEl)[0];
+         configNameContainerEl.appendChild(p_oSelectEl);
+
+         // Set values
+         if (p_oRuleConfig.id)
+         {
+            configEl.setAttribute("paramid", p_oRuleConfig.id);
+         }
+         Alfresco.util.setSelectedIndex(p_oSelectEl, p_oRuleConfig[this.options.ruleConfigDefinitionKey]);
+
+         if (this.options.mode == RC.MODE_EDIT)
+         {
+            // Create add button
+            var actionsEl = Selector.query('div.actions', configEl)[0];
+            var addButton = new YAHOO.widget.Button(
+            {
+               label: "+",
+               container: actionsEl,
+               type: "push"
+            });
+            addButton.on("click", this.onAddConfigButtonClick, configEl, this);
+            addButton.addClass("add-config");
+
+            // Create remove button
+            var removeButton = new YAHOO.widget.Button(
+            {
+               label: "-",
+               container: actionsEl,
+               type: "push"
+            });
+            removeButton.on("click", this.onRemoveConfigButtonClick, configEl, this);
+            removeButton.addClass("remove-config");
+         }
+         else if (this.options.mode == RC.MODE_TEXT)
+         {
+            Dom.addClass(p_oSelectEl, "hidden");
+            var nameEl = document.createElement("span");
+            nameEl.appendChild(document.createTextNode(p_oSelectEl.options[p_oSelectEl.selectedIndex].text));
+            configNameContainerEl.appendChild(nameEl);
+         }
+
+         // Return element
+         return configEl;         
       },
 
       /**
@@ -1571,7 +1579,7 @@
          }, function (json)
          {
             var item = json.data.items[0];
-            return item.name;
+            return $html(item.name);
          });
       },
 
@@ -1588,11 +1596,50 @@
          var url = nodeRef ? Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + nodeRef.replace("://", "/") : null;
          return this._createResolvableValueSpan(containerEl, id, Alfresco.util.Ajax.GET, url, null, function (json)
          {
-            var location = json.item.location,
-               path = $combine(location.path, location.file);
-            path = location.siteTitle ? this.msg("label.site-path", location.siteTitle, path) : path;
-            return path;
+            var location = json.item.location;
+            return this._buildPathSpanHtml($combine(location.path, location.file), location.site, location.siteTitle);
          });
+      },
+
+      /**
+       * Create html that represent a path and site
+       *
+       * @method _buildPathSpanHtml
+       * @param path
+       * @param file
+       * @param siteId
+       * @param siteTitle
+       * @return {string} html respresenting path and site as span elements
+       */
+      _buildPathSpanHtml: function (fullPath, siteId, siteTitle)
+      {
+         var i = fullPath.lastIndexOf("/"),
+            path = i >= 0 ? fullPath.substring(0, i + 1) : "",
+            name = i >= 0 ? fullPath.substring(i + 1) : fullPath,
+            fullPath = siteId ? this.msg("label.documents") + fullPath : fullPath,
+            siteHtml;
+         if (siteId)
+         {
+            if (name == "" && path == "/")
+            {
+               name = this.msg("label.documents");
+            }
+            else
+            {
+               name = "../" + name;
+            }
+         }
+         else
+         {
+            name = (path != "/" ? "../" : "/") + name;
+         }
+
+         if (siteId && siteId != this.options.siteId)
+         {
+            siteHtml = '<span class="site" title="' + this.msg("tooltip.site", siteTitle ? siteTitle : siteId) + '">' + $html(siteTitle ? siteTitle : siteId) + '</span>';
+         }
+         var pathHtml = '<span class="path" title="' + this.msg("tooltip.path", fullPath) + '">' + $html(name) + '</span>';
+         return pathHtml  + (siteHtml ? siteHtml : "");
       },
 
       /**
@@ -1621,8 +1668,7 @@
                {
                   fn: function (response, obj)
                   {
-                     var displayLabel = obj.displayValueHandler.call(this, response.json);
-                     obj.pathEl.innerHTML = $html(displayLabel);
+                     obj.pathEl.innerHTML = obj.displayValueHandler.call(this, response.json);
                   },
                   obj:
                   {

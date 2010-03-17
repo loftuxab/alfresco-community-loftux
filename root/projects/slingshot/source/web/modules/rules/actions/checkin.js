@@ -205,17 +205,19 @@
          // Display form data from config
          checkinConfig = checkinConfig ? checkinConfig : {};
          var majorEl = Dom.get(this.id + "-version-major"),
-            minorEl = Dom.get(this.id + "-version-minor");
+            minorEl = Dom.get(this.id + "-version-minor"),
+            focusEl;
+
          if (checkinConfig.version == "minor" || checkinConfig.version == null || checkinConfig.version == "")
          {
             minorEl.checked = true;
-            minorEl.focus();
+            focusEl = minorEl;
             majorEl.checked = false;
          }
          else if (checkinConfig.version == "major")
          {
             majorEl.checked = true;
-            majorEl.focus();
+            focusEl = majorEl;
             minorEl.checked = false;
          }         
          Dom.get(this.id + "-comments").value = checkinConfig.comments ? $html(checkinConfig.comments) : "";
@@ -223,6 +225,9 @@
 
          // Show the dialog
          this.widgets.dialog.show();
+
+         // Focus when element is visible so IE is happy
+         focusEl.focus();
       },
 
       /**

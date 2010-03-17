@@ -701,6 +701,11 @@ body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-column
    color: #F6931C;
 }
 
+.yui-skin-yellowTheme .rules-list a
+{
+   color: #666666;
+}
+
 /* Calendar 
 
 .yui-skin-yellowTheme #calendar .yui-calendar td.calcell.selected a

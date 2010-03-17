@@ -157,6 +157,13 @@
           */
          this.loadRuleConfigs();
 
+         // Make sure the compensating script select only is available if rule is run in background
+         var asynchronousCheckboxEl = Dom.get(this.id + "-executeAsynchronously");
+         Event.addListener(asynchronousCheckboxEl, "click", function(p_oEvent, p_oAsynchronousCheckboxEl)
+         {
+            this._toggleScriptLocation(!p_oAsynchronousCheckboxEl.checked);
+         }, asynchronousCheckboxEl, this);
+
          // Create & Edit menues & buttons
          this.widgets.createButton = Alfresco.util.createYUIButton(this, "create-button", function ()
          {
@@ -254,8 +261,16 @@
                }
                rule.action.conditions = this.ruleConfigs[this.id + "-ruleConfigIfCondition"].getRuleConfigs();
                rule.action.conditions.concat(this.ruleConfigs[this.id + "-ruleConfigUnlessCondition"].getRuleConfigs());
+               if (rule.action.conditions.length == 0)
+               {
+                  rule.action.conditions.push(
+                  {
+                     conditionDefinitionName: "no-condition"
+                  });
+               }
                rule.action.actions = this.ruleConfigs[this.id + "-ruleConfigAction"].getRuleConfigs();
-               if (rule.action.compensatingAction.parameterValues.scriptLocation.length == 0)
+               if (!rule.action.compensatingAction.parameterValues || 
+                   rule.action.compensatingAction.parameterValues.scriptLocation.length == 0)
                {
                   // Remove attribute so it doesn't get sent to the server
                   delete rule.action.compensatingAction;
@@ -355,6 +370,7 @@
          }
          var compensatingActionId = Alfresco.util.findValueByDotNotation(rule, "action.compensatingAction.id", null);
          Dom.get(this.id + "-compensatingActionId").value = compensatingActionId ? compensatingActionId : "";
+         this._toggleScriptLocation(!rule.executeAsynchronously);
       },
 
       /**
@@ -423,7 +439,7 @@
       },
 
       /**
-       * Toggles buttons
+       * Toggles disable on buttons
        *
        * @method _toggleButtons
        * @param disable
@@ -434,6 +450,26 @@
          this.widgets.saveButton.set("disabled", disable);
          this.widgets.createButton.set("disabled", disable);
          this.widgets.createAnotherButton.set("disabled", disable);
+      },
+
+      /**
+       * Toggles disable on script loation select
+       *
+       * @method _toggleButtons
+       * @param disable
+       */
+      _toggleScriptLocation: function(disable)
+      {
+         var scriptLocationSelect = Dom.get(this.id + "-scriptLocation");
+         if (disable)
+         {
+            scriptLocationSelect.setAttribute("disabled", true);
+         }
+         else
+         {
+            scriptLocationSelect.removeAttribute("disabled");
+         }
       }
+
    }, true);
 })();

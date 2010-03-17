@@ -1,8 +1,8 @@
 .rule-details .display
 {
-   background-color:#F5F9F4;
-   border:1px solid #C8C8C8;
-   padding:1em;
+   background-color: #F5F9F4;
+   border: 1px solid #C8C8C8;
+   padding: 1em;
 }
 
 .rule-details h2
@@ -12,15 +12,15 @@
 
 .rule-details hr
 {
-   margin-bottom:1em;
-   margin-top:1em;
+   margin-bottom: 1em;
+   margin-top: 1em;
 }
 
 .rule-details em 
 {
-   color:#606060;
-   font-style:normal;
-   font-weight:normal;
+   color: #606060;
+   font-style: normal;
+   font-weight: normal;
 }
 
 .rule-details .actions
@@ -35,29 +35,29 @@
 
 .rule-details .behaviour
 {
-   background-position:0.25em center;
-   background-repeat:no-repeat;
-   padding-bottom:0.25em;
-   padding-left:2em;
-   padding-top:0.25em;
+   background-position: 0.25em center;
+   background-repeat: no-repeat;
+   padding-bottom: 0.25em;
+   padding-left: 2em;
+   padding-top: 0.25em;
 }
 
 .rule-details .behaviour.enabled
 {
-   background-image:url(../images/inherited-on-16.png);
+   background-image: url(../images/inherited-on-16.png);
 }
 
 .rule-details .behaviour.disabled
 {
-   background-image:url(../images/inherited-off-16.png);
+   background-image: url(../images/inherited-off-16.png);
 }
 
 .rule-details .configuration-separator
 {
-   background-image:url(../images/expanded.png);
-   background-position:center center;
-   background-repeat:no-repeat;
-   padding:1em;
+   background-image: url(../images/green-arrow-small.png);
+   background-position: center center;
+   background-repeat: no-repeat;
+   padding: 0.4em;
 }
 
 .rule-details .unless .rule-config
