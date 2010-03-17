@@ -367,7 +367,6 @@
                     generate-taglibdocs-webclient, 
                     generate-javadocs-webserviceclient,
                     generate-javadocs-jlan,
-                    generate-javadocs-mobile,
                     generate-javadocs-slingshot" />
 
    <!-- ****************************************************** -->
