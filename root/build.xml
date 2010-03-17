@@ -259,7 +259,8 @@
                     package-fb-doclib-extension,
                     package-php-extension,
                     package-rm-extension, 
-                    package-truncatemalformedxml-extension" />
+                    package-truncatemalformedxml-extension,
+                    package-quickr-extension" />
                     <!-- package-mediawiki-extension, -->
 
    <target name="distribute-amps" 
@@ -271,7 +272,8 @@
                     package-truncatemalformedxml-extension,
    	                package-sharepoint-extension,
                     package-dod5015-extension,
-   	                package-dod5015-share-extension" >       
+   	                package-dod5015-share-extension, 
+                    package-quickr-extension" >       
    	                <!-- package-rm-extension, -->
       <copy todir="${dir.continuous.dist}">
          <fileset dir="${dir.module.php.dist}"                  includes="${file.name.amp.php}" />
@@ -283,6 +285,7 @@
          <fileset dir="${dir.module.sharepoint.dist}"           includes="${file.name.amp.sharepoint}" />
          <fileset dir="${dir.module.dod5015.dist}"              includes="${file.name.amp.dod5015}" />
          <fileset dir="${dir.module.dod5015.share.dist}"        includes="${file.name.amp.dod5015.share}" />
+         <fileset dir="${dir.module.quickr.dist}"               includes="${file.name.amp.quickr}" />
       </copy>
    </target>
 
