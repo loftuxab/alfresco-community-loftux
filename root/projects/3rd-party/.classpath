@@ -84,7 +84,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ehcache-core-1.7.2.jar" sourcepath="src/ehcache-core-1.7.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.5.11.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.5.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups-2.8.0-b2.jar" sourcepath="src/jgroups-2.8.0-b2.src.zip"/>
@@ -175,5 +174,6 @@
 	<classpathentry kind="lib" path="lib/opencmis-test-browser-0.1-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-abdera-0.5-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsf-2.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ehcache-core-2.0.0.jar" sourcepath="src/ehcache-core-2.0.0-sources.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
