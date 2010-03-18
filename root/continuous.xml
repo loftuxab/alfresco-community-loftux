@@ -79,6 +79,7 @@
                     distribute-docs,
                     distribute-xforms-examples,
                     distribute-extras,
+                    distribute-webeditor,
                     revert-changes" />
 
    <target name="set-build-number"
@@ -1284,6 +1285,28 @@
       <copy todir="${dir.continuous.assemble.docs.taglib}/web-client">
          <fileset dir="${dir.project.webclient.docs.taglib}" />
       </copy>
+   </target>
+   
+   <!-- *********************** -->
+   <!-- ** Webeditor targets ** -->
+   <!-- *********************** -->
+   
+   <target name="distribute-webeditor" depends="set-build-number, continuous-init, package-all-webeditor"
+           description="Distributes the Web Editor files">
+      <mkdir dir="${dir.continuous.dist}" />
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.webeditor}.zip">
+         <zipfileset dir="${dir.project.webeditor.dist}" 
+                     includes="${file.name.jar.webeditor.taglib}, ${file.name.war.webeditor}" />
+         <zipfileset dir="${dir.project.webeditorplugin.dist}" 
+                     includes="${file.name.jar.webeditor.plugin}" />
+         <zipfileset dir="${dir.project.webframeworkcommons.dist}"
+                     includes="${file.name.jar.formsclient}" />
+         <zipfileset dir="${dir.project.webeditorsamples.customersite.dist}"
+                     includes="${file.name.war.webeditor.sample.customersite}" />
+         <zipfileset dir="${dir.project.3rdparty.lib}/spring-surf"
+                     includes="spring-webeditor-*.jar" />
+         <zipfileset file="${file.jar.webeditor.yui}" />
+      </zip>
    </target>
 
 </project>

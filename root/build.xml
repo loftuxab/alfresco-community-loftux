@@ -245,7 +245,9 @@
                     incremental-webclient,  
                     incremental-webserviceclient,
                     incremental-slingshot,
-                    incremental-mobile" />
+                    incremental-mobile,
+                    incremental-webeditor,
+                    incremental-webeditor-plugin" />
 
    <target name="build-modules"
            description="Performs a clean build of all modules"
