@@ -781,7 +781,7 @@
             {
                // Hide parameters and set mandatory value
                this._hideParameters(configDef.parameterDefinitions);
-               this._setParameter(ruleConfig, "category-aspect", "cm:classifiable");
+               this._setParameter(ruleConfig, "category-aspect", "cm:generalclassifiable");
 
                // Make ui display a category picker
                configDef.parameterDefinitions.push(
