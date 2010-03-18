@@ -3212,51 +3212,7 @@ FileGroup ::9B325852-3D6A-41CC-8169-1BAA3B219A86 -setup Install -active Yes -pla
 File ::25892D0D-D03D-47E9-A1C9-51510D0FD198 -directory <%InstallDir%>/amps -name W:/V3.2/root/build/dist/alfresco-dod5015.amp -location ../../build/dist -parent 9B325852-3D6A-41CC-8169-1BAA3B219A86
 File ::73E03E56-FFEC-4153-ACA2-F7CA937EFFAA -directory <%InstallDir%>/amps-share -name W:/V3.2/root/build/dist/alfresco-dod5015-share.amp -location ../../build/dist -parent 9B325852-3D6A-41CC-8169-1BAA3B219A86
 FileGroup ::1554D2EE-E0F0-4758-9A46-121D14DACB28 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows TarArchive ZipArchive} -name Quickr -parent FileGroups
-File ::DCEC4BE7-EA4B-4834-B382-5AC2960CD4C7 -directory <%InstallDir%>/amps -name W:/V3.2/root/projects/installer/quickr/alfresco-quickr-unsupported.amp -location ../../projects/installer/quickr -parent 1554D2EE-E0F0-4758-9A46-121D14DACB28
-File ::E34ACD8B-103D-4E39-83F1-9C13C354EDF7 -type dir -directory <%InstallDir%>/tomcat/shared/classes/alfresco/web-extension/site-webscripts -name W:/V3.2/root/projects/installer/quickr/site-webscripts -location ../../projects/installer/quickr/site-webscripts -parent 1554D2EE-E0F0-4758-9A46-121D14DACB28
-File ::983E5345-5837-4992-A2A1-F034BA59C2D4 -type dir -name .svn -parent E34ACD8B-103D-4E39-83F1-9C13C354EDF7
-File ::621FC074-79FB-42CB-A266-14901950D30C -name entries -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
-File ::129417C2-5578-404F-8400-A47194AFA0C0 -type dir -name prop-base -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
-File ::EE873376-8D7F-4F94-BBC8-161577AB0CA0 -type dir -name props -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
-File ::6B6A57BC-DEEF-4894-8133-70CAC66B62FC -type dir -name text-base -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
-File ::51B9DA1D-B935-481A-8D9A-5A6919719574 -type dir -name tmp -parent 983E5345-5837-4992-A2A1-F034BA59C2D4
-File ::A33E5E07-291A-4A87-AAC7-B8FCBF5185B2 -type dir -name prop-base -parent 51B9DA1D-B935-481A-8D9A-5A6919719574
-File ::5B6CA157-606C-4F6E-8C8F-298FA01E134C -type dir -name props -parent 51B9DA1D-B935-481A-8D9A-5A6919719574
-File ::81E8161D-B4D1-484C-8437-9BA7C83CCCA0 -type dir -name text-base -parent 51B9DA1D-B935-481A-8D9A-5A6919719574
-File ::452577EA-37ED-4A70-9F39-079418E38DD8 -type dir -name org -parent E34ACD8B-103D-4E39-83F1-9C13C354EDF7
-File ::7213416E-8442-4937-B0A7-A6AB84287EAB -type dir -name .svn -parent 452577EA-37ED-4A70-9F39-079418E38DD8
-File ::243E7B27-1E7A-455D-B473-C1D0CE60C03D -name entries -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
-File ::1B104F03-43E6-412F-9FD3-C83D341BBB94 -type dir -name prop-base -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
-File ::F6AD6BB1-8900-47DE-9D03-627E35E82321 -type dir -name props -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
-File ::59F7F97C-9B2E-47D1-97B9-12DF20F30530 -type dir -name text-base -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
-File ::307A51DC-7398-4186-8281-B6954A737F38 -type dir -name tmp -parent 7213416E-8442-4937-B0A7-A6AB84287EAB
-File ::96393DA8-7E7F-4D19-A708-EE2E987F7EC7 -type dir -name prop-base -parent 307A51DC-7398-4186-8281-B6954A737F38
-File ::9FD01338-34A6-41EA-A14D-B3A8BDBCB917 -type dir -name props -parent 307A51DC-7398-4186-8281-B6954A737F38
-File ::E3B0C2DF-5A0C-4147-90DE-0F586E8E32F5 -type dir -name text-base -parent 307A51DC-7398-4186-8281-B6954A737F38
-File ::16577314-B7DD-4ACF-B139-E28177297217 -type dir -name alfresco -parent 452577EA-37ED-4A70-9F39-079418E38DD8
-File ::F60346BD-02A7-4149-9640-0C6E6B5459EE -type dir -name .svn -parent 16577314-B7DD-4ACF-B139-E28177297217
-File ::8A56C924-B2C1-47DA-82C6-61D9A69C723A -name entries -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
-File ::5280F892-84D7-4BE0-9A88-8A29D74A6D26 -type dir -name prop-base -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
-File ::8E464378-C15F-4AAC-8F0B-0EC8C9FC91D4 -type dir -name props -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
-File ::268684A0-D004-4A48-8EF6-350AB11A729B -type dir -name text-base -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
-File ::22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98 -type dir -name tmp -parent F60346BD-02A7-4149-9640-0C6E6B5459EE
-File ::3BD9C452-836F-41C7-9D0B-04357936C515 -type dir -name prop-base -parent 22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98
-File ::73C05E4A-4188-418D-8F1F-5817B8517030 -type dir -name props -parent 22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98
-File ::467A74EC-07F8-4004-A279-1AF7A2D685DE -type dir -name text-base -parent 22FCBE0F-3667-4ACD-9D11-B3A95B3D6B98
-File ::BECB94AC-CC17-4A45-B1D5-4AC36B00503F -type dir -name modules -parent 16577314-B7DD-4ACF-B139-E28177297217
-File ::8843D0A3-6209-4A2C-8B89-C582782F5A39 -name create-site.get.js -parent BECB94AC-CC17-4A45-B1D5-4AC36B00503F
-File ::03C610B9-DDCA-41E1-AD96-C11C884272B2 -name create-site.get.properties -parent BECB94AC-CC17-4A45-B1D5-4AC36B00503F
-File ::2FC28512-4D47-4834-9971-B9B516706523 -type dir -name .svn -parent BECB94AC-CC17-4A45-B1D5-4AC36B00503F
-File ::F93EB14E-6D67-4A83-8F57-7D55BA0AFEBB -name entries -parent 2FC28512-4D47-4834-9971-B9B516706523
-File ::253BEA1E-A32F-436D-A4D9-C42C35CFB339 -type dir -name prop-base -parent 2FC28512-4D47-4834-9971-B9B516706523
-File ::E57FD979-AD88-411B-A8DF-7AFF0E0CD5C3 -type dir -name props -parent 2FC28512-4D47-4834-9971-B9B516706523
-File ::980DB6B7-08DF-4F05-8C6D-787296E5A955 -type dir -name text-base -parent 2FC28512-4D47-4834-9971-B9B516706523
-File ::5BB82899-CD65-4A65-9F23-BCE2AA5A4871 -name create-site.get.js.svn-base -parent 980DB6B7-08DF-4F05-8C6D-787296E5A955
-File ::0B9AC8B4-70C8-4070-99DF-8D6808690460 -name create-site.get.properties.svn-base -parent 980DB6B7-08DF-4F05-8C6D-787296E5A955
-File ::A5C4A6FC-C187-4CD5-9A36-2009613370EA -type dir -name tmp -parent 2FC28512-4D47-4834-9971-B9B516706523
-File ::6E29BD81-E336-49D5-ABF8-B7C845342B14 -type dir -name prop-base -parent A5C4A6FC-C187-4CD5-9A36-2009613370EA
-File ::6C1300A1-06DB-4567-BD42-05EF1A7DEC76 -type dir -name props -parent A5C4A6FC-C187-4CD5-9A36-2009613370EA
-File ::3D215021-06B7-4823-BDAF-8513144D7D5D -type dir -name text-base -parent A5C4A6FC-C187-4CD5-9A36-2009613370EA
+File ::0CB1A076-B18B-40D6-859D-ED1C5A72CE07 -directory <%InstallDir%>/amps -name W:/HEAD/root/build/dist/alfresco-quickr-unsupported.amp -location ../../build/dist -parent 1554D2EE-E0F0-4758-9A46-121D14DACB28
 Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name {Default Component} -parent Components
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name Samples -parent Components
 Component ::3599937E-10E1-4029-8ACB-CCE5D85D306D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name WCM -parent Components
