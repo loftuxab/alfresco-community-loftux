@@ -100,7 +100,7 @@ namespace WcfCmisWSTests
             }
             FileableObject document = createAndAssertObject(getAndAssertRootFolder(), enumVersioningState.major, false);
             string documentId = document.ObjectId;
-            string checkedoutDocumentId = checkOutAndAssert(documentId, document.ObjectTypeId, FileableObject.getContentEtry());
+            string checkedoutDocumentId = checkOutAndAssert(documentId, document.ObjectTypeId, document.ContentStream.stream);
             HashSet<enumServiceException> expectedExceptions = new HashSet<enumServiceException>();
             expectedExceptions.Add(enumServiceException.storage);
             expectedExceptions.Add(enumServiceException.versioning);
@@ -175,10 +175,10 @@ namespace WcfCmisWSTests
             FileableObject documentCreator = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertRootFolder(), getAndAssertDocumentTypeId(),
                     null, enumVersioningState.checkedout, true);
             string documentId = createAndAssertObject(documentCreator, false).ObjectId;
-            documentId = assertCheckIn(documentCreator, false);
+            documentId = checkInAndAssert(documentId, false);
             documentId = checkOutAndAssert(documentId, documentCreator.ObjectTypeId, checkinContentEntry);
             documentCreator.setId(documentId);
-            documentId = assertCheckIn(documentCreator, true);
+            documentId = checkInAndAssert(documentId, true);
             deleteAndAssertObject(documentId);
         }
 
@@ -244,7 +244,7 @@ namespace WcfCmisWSTests
                 }
                 else
                 {
-                    checkedOutDocumentId = assertCheckIn(documentCreator, false);
+                    checkedOutDocumentId = checkInAndAssert(checkedOutDocumentId, false);
                 }
             }
             cancelCheckoutAndDeleteDocumentWithAssertion(checkedOutDocumentId);
@@ -262,24 +262,10 @@ namespace WcfCmisWSTests
             {
                 content = FileableObject.createCmisDocumentContent("test.txt", FileableObject.getContentEtry());
             }
-            checkInAndAssertWithExpectedException(getAndAssertRepositoryId(), document.ObjectId, null, null, null, CHECKIN_COMMENT, enumServiceException.updateConflict, "Not Checked Out Document Id");
+            checkInAndAssertWithExpectedException(getAndAssertRepositoryId(), document.ObjectId, null, null, null, CHECKIN_COMMENT, null, "Not Checked Out Document Id");
             deleteAndAssertObject(document, true);
         }
 
-        public void testPropertiesUpdatingDuringCheckIn()
-        {
-            if (!isVersioningAllowed())
-            {
-                Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
-            }
-            FileableObject document = createAndAssertObject(getAndAssertRootFolder(), enumVersioningState.checkedout, false);
-            document.addProperty(NAME_PROPERTY, FileableObject.generateObjectName(false, string.Empty));
-            document.removeProperty(TYPE_ID_PROPERTY);
-            string documentId = assertCheckIn(document, true, true);
-            cancelCheckoutAndDeleteDocumentWithAssertion(documentId);
-        }
-
-        // NOTE: this test fails because of problem with versioning in transactions of Alfresco
         public void testCheckInContentAgainstPwcUpdatableCapability()
         {
             if (!isVersioningAllowed())
@@ -301,29 +287,7 @@ namespace WcfCmisWSTests
             cmisExtensionType extensions = new cmisExtensionType();
             objectServiceClient.setContentStream(getAndAssertRepositoryId(), ref objectId, true, ref changeToken, changedContent, ref extensions);
             document.setId(objectId);
-            document.setId(assertCheckIn(document, true));
-            cancelCheckoutAndDeleteDocumentWithAssertion(document.ObjectId);
-        }
-
-        public void testCheckInPropertiesAgainstPwcUpdatableCapability()
-        {
-            if (!isVersioningAllowed())
-            {
-                Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
-            }
-            if (!isPwcUpdatable())
-            {
-                Assert.Skip("PWC is Not Updatable");
-            }
-            FileableObject document = createAndAssertObject(getAndAssertRootFolder(), enumVersioningState.checkedout, false);
-            document.addProperty(NAME_PROPERTY, FileableObject.generateObjectName(false, string.Empty));
-            document.removeProperty(TYPE_ID_PROPERTY);
-            string changeToken = null; // TODO
-            cmisExtensionType extensions = new cmisExtensionType();
-            string objectId = document.ObjectId;
-            objectServiceClient.updateProperties(getAndAssertRepositoryId(), ref objectId, ref changeToken, document.getObjectProperties(), ref extensions);
-            document.setId(objectId);
-            document.setId(assertCheckIn(document, true, true));
+            document.setId(checkInAndAssert(objectId, true));
             cancelCheckoutAndDeleteDocumentWithAssertion(document.ObjectId);
         }
 
@@ -340,10 +304,10 @@ namespace WcfCmisWSTests
             FileableObject documentCreator = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertRootFolder(), getAndAssertDocumentTypeId(), null, enumVersioningState.major, true);
             string documentId = createAndAssertObject(documentCreator, false).ObjectId;
             documentId = createAndAssertVersionedDocument(documentId, 6, true);
-            cmisPropertiesType initialMajorVersionProperties = getAndAssertLatestVersionProperties(documentCreator, ANY_PROPERTY_FILTER, true);
+            cmisPropertiesType initialMajorVersionProperties = getAndAssertLatestVersionProperties(documentId, ANY_PROPERTY_FILTER, true);
             documentId = createAndAssertVersionedDocument(documentId, 7, false);
-            getAndAssertLatestVersionProperties(documentCreator, ANY_PROPERTY_FILTER, true);
-            cmisPropertiesType secondMajorVersionProperties = getAndAssertLatestVersionProperties(documentCreator, ANY_PROPERTY_FILTER, true);
+            getAndAssertLatestVersionProperties(documentId, ANY_PROPERTY_FILTER, true);
+            cmisPropertiesType secondMajorVersionProperties = getAndAssertLatestVersionProperties(documentId, ANY_PROPERTY_FILTER, true);
             assertValuesEquality(NAME_PROPERTY, searchAndAssertPropertyByName(initialMajorVersionProperties.Items, NAME_PROPERTY, false), searchAndAssertPropertyByName(secondMajorVersionProperties.Items, NAME_PROPERTY, false));
             assertValuesEquality(MAJOR_VERSION_PROPERTY, searchAndAssertPropertyByName(initialMajorVersionProperties.Items, MAJOR_VERSION_PROPERTY, false), searchAndAssertPropertyByName(secondMajorVersionProperties.Items, MAJOR_VERSION_PROPERTY, false));
             deleteAndAssertObject(documentId, true);
@@ -378,7 +342,7 @@ namespace WcfCmisWSTests
             {
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
-            string documentId = createAndAssertVersionedDocument(null, 6, true);
+            string documentId = createAndAssertVersionedDocument(null, 2, true);
             assertLatestVersionPropertiesReceivingWithExcpectedException(getAndAssertRepositoryId(), documentId, INVALID_FILTER, false, enumServiceException.filterNotValid, "Invalid Properties Filter");
             deleteAndAssertObject(documentId, true);
         }
@@ -392,7 +356,7 @@ namespace WcfCmisWSTests
             FileableObject document = createAndAssertObject(getAndAssertRootFolder(), enumVersioningState.minor, false);
             assertLatestVersionPropertiesReceivingWithExcpectedException(getAndAssertRepositoryId(), document.ObjectId, ANY_PROPERTY_FILTER, true, enumServiceException.objectNotFound, "Major parameter equal to 'true' and without Major Version in Verions Series");
             document.setId(createAndAssertVersionedDocument(document.ObjectId, 3, true));
-            getAndAssertLatestVersionProperties(document, ANY_PROPERTY_FILTER, true);
+            getAndAssertLatestVersionProperties(document.ObjectId, ANY_PROPERTY_FILTER, true);
             deleteAndAssertObject(document.ObjectId);
         }
 
@@ -402,9 +366,9 @@ namespace WcfCmisWSTests
             {
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
-            string filter = OBJECT_IDENTIFIER_PROPERTY + ", " + TYPE_ID_PROPERTY + ", " + NAME_PROPERTY;
+            string filter = OBJECT_IDENTIFIER_PROPERTY + "," + TYPE_ID_PROPERTY + "," + NAME_PROPERTY;
             FileableObject document = createAndAssertObject(getAndAssertRootFolder(), enumVersioningState.major, false);
-            getAndAssertLatestVersionProperties(document, filter, true);
+            getAndAssertLatestVersionProperties(document.ObjectId, filter, true);
             deleteAndAssertObject(document, true);
         }
 
@@ -414,12 +378,12 @@ namespace WcfCmisWSTests
             {
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
-            string versionedDocumentId = createAndAssertVersionedDocument(null, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 5, false);
+            string versionedDocumentId = createAndAssertVersionedDocument(null, 2, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 3, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 2, false);
             try
             {
-                assertVersionsReceiving(versionedDocumentId, ANY_PROPERTY_FILTER, false, false, 18);
+                assertVersionsReceiving(versionedDocumentId, ANY_PROPERTY_FILTER, false, false);
             }
             catch (Exception e)
             {
@@ -434,12 +398,12 @@ namespace WcfCmisWSTests
             {
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
-            string versionedDocumentId = createAndAssertVersionedDocument(null, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 5, false);
+            string versionedDocumentId = createAndAssertVersionedDocument(null, 2, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 3, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 2, false);
             try
             {
-                assertVersionsReceiving(versionedDocumentId, ANY_PROPERTY_FILTER, true, false, 18);
+                assertVersionsReceiving(versionedDocumentId, ANY_PROPERTY_FILTER, true, false);
             }
             catch (Exception e)
             {
@@ -454,13 +418,13 @@ namespace WcfCmisWSTests
             {
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
-            string versionedDocumentId = createAndAssertVersionedDocument(null, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 5, false);
-            string filter = OBJECT_IDENTIFIER_PROPERTY + ", " + TYPE_ID_PROPERTY + ", " + NAME_PROPERTY;
+            string versionedDocumentId = createAndAssertVersionedDocument(null, 2, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 3, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 2, false);
+            string filter = OBJECT_IDENTIFIER_PROPERTY + "," + TYPE_ID_PROPERTY + "," + NAME_PROPERTY;
             try
             {
-                assertVersionsReceiving(versionedDocumentId, filter, false, false, 18);
+                assertVersionsReceiving(versionedDocumentId, filter, false, false);
             }
             catch (Exception e)
             {
@@ -475,14 +439,14 @@ namespace WcfCmisWSTests
             {
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
-            string versionedDocumentId = createAndAssertVersionedDocument(null, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 6, true);
-            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 5, false);
+            string versionedDocumentId = createAndAssertVersionedDocument(null, 2, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 3, true);
+            versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 2, false);
             string checkedOutDocumentId = versionedDocumentId;
             try
             {
                 checkedOutDocumentId = checkOutAndAssert(versionedDocumentId, getAndAssertDocumentTypeId(), checkinContentEntry);
-                assertVersionsReceiving(versionedDocumentId, ANY_PROPERTY_FILTER, false, true, 18);
+                assertVersionsReceiving(versionedDocumentId, ANY_PROPERTY_FILTER, false, true);
             }
             catch (Exception e)
             {
@@ -509,7 +473,7 @@ namespace WcfCmisWSTests
             {
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
-            string versionedDocumentId = createAndAssertVersionedDocument(null, 7, true);
+            string versionedDocumentId = createAndAssertVersionedDocument(null, 2, true);
             assertAllVersionsReceivingWithExpectedException(getAndAssertRepositoryId(), versionedDocumentId, INVALID_FILTER, false, enumServiceException.filterNotValid, "Invalid Properties Filter");
             deleteAndAssertObject(versionedDocumentId, true);
         }
@@ -521,7 +485,7 @@ namespace WcfCmisWSTests
                 Assert.Skip(VERSIONING_NOT_SUPPORTTED_MESSAGE);
             }
             FileableObject folder = createAndAssertFolder(getAndAssertRootFolder());
-            assertAllVersionsReceivingWithExpectedException(getAndAssertRepositoryId(), folder.ObjectId, ANY_PROPERTY_FILTER, false, enumServiceException.invalidArgument, "Folder Object Id");
+            assertAllVersionsReceivingWithExpectedException(getAndAssertRepositoryId(), folder.ObjectId, ANY_PROPERTY_FILTER, false, null, "Folder Object Id");
             deleteAndAssertObject(folder, false);
         }
 
@@ -585,7 +549,10 @@ namespace WcfCmisWSTests
             }
             catch (FaultException<cmisFaultType> e)
             {
-                assertException(e, expectedExceptions);
+                if (expectedExceptions != null && expectedExceptions.Count > 0)
+                {
+                    assertException(e, expectedExceptions);
+                }
             }
             catch (Exception e)
             {
@@ -727,13 +694,12 @@ namespace WcfCmisWSTests
             }
         }
 
-        private void assertVersionsReceiving(string documentId, string filter, bool includeAllowableActions, bool hasPwc, int expectedVersionsAmount)
+        private void assertVersionsReceiving(string documentId, string filter, bool includeAllowableActions, bool hasPwc)
         {
             logger.log("[VersioningService->getAllVersions]");
             logger.log("Receiving all versions Document with Id='" + documentId + "'");
             cmisObjectType[] response = versioningServiceClient.getAllVersions(getAndAssertRepositoryId(), documentId, filter, includeAllowableActions, null);
             Assert.IsNotNull(response, "Get All Versions response is undefined");
-            Assert.IsTrue(((expectedVersionsAmount + ((hasPwc) ? (1) : (0))) == response.Length), ("Received count = " + response.Length + " of cmisObjectType is not equal to expected count = " + expectedVersionsAmount));
             assertVersions(response, filter, includeAllowableActions, hasPwc);
             logger.log("All versions of document receiving was successfully checked");
             logger.log("");

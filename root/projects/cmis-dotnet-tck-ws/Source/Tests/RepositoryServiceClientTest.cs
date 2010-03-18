@@ -133,9 +133,8 @@ namespace WcfCmisWSTests
             }
             try
             {
-                cmisTypeContainer[] types = repositoryServiceClient.getTypeDescendants(getAndAssertRepositoryId(), getAndAssertDocumentTypeId(), "-1", false, null);
                 logger.log("[RepositoryService->getTypeDefinition]");
-                repositoryServiceClient.getTypeDefinition(INVALID_REPOSITORY_ID, types[0].type.id, null);
+                repositoryServiceClient.getTypeDefinition(INVALID_REPOSITORY_ID, null, null);
                 Assert.Fail("Repository with specified Id was not described with RepositoryService");
             }
             catch (FaultException<cmisFaultType> e)
@@ -200,18 +199,14 @@ namespace WcfCmisWSTests
             Assert.AreEqual(repositoryId, repositoryInfo.repositoryId, "repositoryId is not equal to repositoryId from Repository Info request");
             Assert.IsNotNull(repositoryInfo.cmisVersionSupported, "Supported CMIS version is not specified");
             Assert.IsNotNull(repositoryInfo.cmisVersionSupported, "Unsupported CMIS implementation version");
-            Assert.IsNotNull(repositoryInfo.latestChangeLogToken, "Latest Change Log Token is undefined");
             Assert.IsNotNull(repositoryInfo.productName, "Product Name property is undefined");
             Assert.IsNotNull(repositoryInfo.productVersion, "Product Version property is undefined");
             Assert.IsNotNull(repositoryInfo.repositoryDescription, "Repository Description property is undefined");
             Assert.IsNotNull(repositoryInfo.repositoryName, "Repository Name property is undefined");
             Assert.IsNotNull(repositoryInfo.rootFolderId, "Repository Root Folder Id is undefined");
-            Assert.IsNotNull(repositoryInfo.thinClientURI, "Repository Thin Client URI property is undefined");
             Assert.IsNotNull(repositoryInfo.vendorName, "Repository Vendor Name property is undefined");
             Assert.IsNotNull(repositoryInfo.aclCapability, "ACL Capability is undefined");
             Assert.IsNotNull(repositoryInfo.changesIncomplete, "Changes Incomplete is undefined");            
-            Assert.IsNotNull(repositoryInfo.principalAnonymous, "Principal Anonymous is undefined");
-            Assert.IsNotNull(repositoryInfo.principalAnyone, "Principal Anyone is undefined");
 
             assertAndLogRepositoryCapabilities(repositoryInfo);
         }

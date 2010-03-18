@@ -881,7 +881,7 @@ namespace WcfCmisWSTests
             {
                 versionedDocumentId = checkOutAndAssert(versionedDocumentId, documentCreator.ObjectTypeId, contentEntry);
                 documentCreator.setId(versionedDocumentId);
-                versionedDocumentId = assertCheckIn(documentCreator, (finishWithMajor && ((versionsAmount - 1) == i)));
+                versionedDocumentId = checkInAndAssert(versionedDocumentId, (finishWithMajor && ((versionsAmount - 1) == i)));
                 contentEntry = checkinContentEntry;
             }
 
@@ -896,32 +896,29 @@ namespace WcfCmisWSTests
             return versionedDocumentId;
         }
 
-        protected string assertCheckIn(FileableObject document, bool major)
+        protected string checkInAndAssert(string documentId, bool major)
         {
-            return assertCheckIn(document, major, false);
+            return checkInAndAssert(documentId, major, false);
         }
 
-        protected string assertCheckIn(FileableObject document, bool major, bool assertProperties)
+        protected string checkInAndAssert(string documentId, bool major, bool assertProperties)
         {
             if (isVersioningAllowed())
             {
-                assertCheckedOutDocument(document.ObjectId, getAndAssertDocumentTypeId(), null, true);
+                assertCheckedOutDocument(documentId, getAndAssertDocumentTypeId(), null, true);
             }
-            string documentId = document.ObjectId;
             logger.log("[VersioningService->checkIn]");
-            logger.log("Checkining document '" + document.ObjectName + "', documentId='" + documentId + "'");
+            logger.log("Checkining document='" + documentId + "'");
             cmisContentStreamType checkInContent = FileableObject.createCmisDocumentContent((CHANGED_NAME + ".txt"), checkinContentEntry);
             cmisExtensionType extension = new cmisExtensionType();
-            versioningServiceClient.checkIn(getAndAssertRepositoryId(), ref documentId, major, document.getObjectProperties(), ((isContentStreamAllowed()) ? (checkInContent) : (null)), CHECKIN_COMMENT, null, null, null, ref extension);
-            document.setId(documentId);
-            getAndAssertLatestVersionProperties(document, ANY_PROPERTY_FILTER, major);
-            if (isContentStreamAllowed())
-            {
-                receiveAndAssertContentStream(documentId, checkInContent.stream);
-            }
+            versioningServiceClient.checkIn(getAndAssertRepositoryId(), ref documentId, major, new cmisPropertiesType(), ((isContentStreamAllowed()) ? (checkInContent) : (null)), CHECKIN_COMMENT, null, null, null, ref extension);
             if (assertProperties)
             {
-                getAndAssertObjectProperties(documentId, document, true);
+                getAndAssertLatestVersionProperties(documentId, ANY_PROPERTY_FILTER, major);
+                if (isContentStreamAllowed())
+                {
+                    receiveAndAssertContentStream(documentId, checkInContent.stream);
+                }
             }
             logger.log("Document was Checked In successfully");
             logger.log("");
@@ -1610,27 +1607,23 @@ namespace WcfCmisWSTests
             logger.log("Check out was cancelled successfully");
         }
 
-        public cmisPropertiesType getAndAssertLatestVersionProperties(FileableObject versionSeriesObject, string filter, bool major)
+        public cmisPropertiesType getAndAssertLatestVersionProperties(String objectId, string filter, bool major)
         {
             logger.log("[VersioningService->getPropertiesOfLatestVersion]");
-            logger.log("Getting properties of latest version, versionSeriesId='" + versionSeriesObject.ObjectId + "'");
-            cmisPropertiesType response = versioningServiceClient.getPropertiesOfLatestVersion(getAndAssertRepositoryId(), versionSeriesObject.ObjectId, major, filter, null);
-            asserLatestVersionProperties(versionSeriesObject, filter, response, major);
+            logger.log("Getting properties of latest version, versionSeriesId='" + objectId + "'");
+            cmisPropertiesType response = versioningServiceClient.getPropertiesOfLatestVersion(getAndAssertRepositoryId(), objectId, major, filter, null);
+            asserLatestVersionProperties(objectId, filter, response, major);
             logger.log("Properties of latest version were successfully received");
             return response;
         }
 
-        private void asserLatestVersionProperties(FileableObject versionSeriesObject, string filter, cmisPropertiesType response, bool major)
+        private void asserLatestVersionProperties(String objectId, string filter, cmisPropertiesType response, bool major)
         {
             Assert.IsFalse(isValueNotSet(response), "Properties holder Object is undefined");
             if (isValueNotSet(filter) || "".Equals(filter) || ANY_PROPERTY_FILTER.Equals(filter))
             {
-                object actual = searchAndAssertPropertyByName(response.Items, LATEST_VERSION_PROPERTY, false);
-                Assert.IsTrue(((null != actual) && (bool)actual), (versionSeriesObject.ObjectId + " Object is not Latest Version Object"));
-                actual = searchAndAssertPropertyByName(response.Items, NAME_PROPERTY, false);
-                Assert.AreEqual(versionSeriesObject.ObjectName, actual, ("Expected Property: " + versionSeriesObject.ObjectName + ", but actual: " + actual));
-                actual = searchAndAssertPropertyByName(response.Items, OBJECT_IDENTIFIER_PROPERTY, false);
-                Assert.AreEqual(versionSeriesObject.ObjectId, actual, ("Expected Property: " + versionSeriesObject.ObjectId + ", but actual: " + actual));
+                object actual = searchAndAssertPropertyByName(response.Items, major ? MAJOR_VERSION_PROPERTY : LATEST_VERSION_PROPERTY, false);
+                Assert.IsTrue(((null != actual) && (bool)actual), (objectId + " Object is not Latest Version Object"));
                 assertActualVersioningState(response, (major) ? (enumVersioningState.major) : (enumVersioningState.minor));
             }
             else
@@ -1733,6 +1726,10 @@ namespace WcfCmisWSTests
 
         public void assertException(FaultException<cmisFaultType> actualException, HashSet<enumServiceException> expectedExceptions)
         {
+            if (expectedExceptions == null || expectedExceptions.Count < 1)
+            {
+                return;
+            }
             enumServiceException actualExceptionType = enumServiceException.runtime;
             bool found = false;
             if (actualException.Detail != null && actualException.Detail.Nodes != null)

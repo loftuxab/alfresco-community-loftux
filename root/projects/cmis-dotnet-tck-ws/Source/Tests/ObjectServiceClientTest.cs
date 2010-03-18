@@ -103,7 +103,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -134,8 +134,7 @@ namespace WcfCmisWSTests
                     if (e is Assert.AssertionException)
                     {
                         throw e;
-                    }
-                    // TODO: it is necessary to check exception type
+                    }                    
                 }
             }
         }
@@ -194,53 +193,28 @@ namespace WcfCmisWSTests
                     if (e is Assert.AssertionException)
                     {
                         throw e;
-                    }
-                    // TODO: it is necessary to check for type of exception!!!
+                    }                    
                 }
             }
         }
 
+        private void checkDocumentToNotAllowedVersioningAttribute(FileableObject document)
+        {
+            document = createAndAssertObject(document);
+            deleteObjectAndLogIfFailed(document, "Document with Not Allowed Versioning attribute was created but can't be deleted. Error cause message: ");
+            Assert.Fail("Versioning is Not Allowed but Document was created with Versioning input parameter");
+        }
+
         public void testVersionedDocumentCreationAndDeletion()
         {
-            Nullable<enumVersioningState> state = enumVersioningState.minor;
-            FileableObject document = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertRootFolder(), getAndAssertDocumentTypeId(), null, state, false);
-            if (!isVersioningAllowed())
+            FileableObject documentCheckedout = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertRootFolder(), getAndAssertDocumentTypeId(), null, enumVersioningState.checkedout, false);
+            FileableObject documentMinor = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertRootFolder(), getAndAssertDocumentTypeId(), null, enumVersioningState.minor, false);
+            FileableObject documentMajor = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertRootFolder(), getAndAssertDocumentTypeId(), null, enumVersioningState.major, false);
+            if (isVersioningAllowed())
             {
-                try
-                {
-                    document = createAndAssertObject(document);
-                    deleteObjectAndLogIfFailed(document, "Document with Not Allowed Versioning attribute was created but can't be deleted. Error cause message: ");
-                    Assert.Fail("Versioning is Not Allowed but Document was created with Versioning input parameter");
-                }
-                catch (Exception e)
-                {
-                    if (e is Assert.AssertionException)
-                    {
-                        throw e;
-                    }
-                    // TODO: It is necessary to check exception type!!!
-                }
-            }
-            try
-            {
-                assertVersioningStateForNewDocument(document);
-                document.InitialVersion = state = enumVersioningState.major;
-                assertVersioningStateForNewDocument(document);
-                document.InitialVersion = state = enumVersioningState.checkedout;
-                assertVersioningStateForNewDocument(document);
-                document.InitialVersion = state = null;
-                assertVersioningStateForNewDocument(document);
-            }
-            catch (Exception e)
-            {
-                if ((e is Assert.AssertionException) || (e is SkippedException))
-                {
-                    throw e;
-                }
-                else
-                {
-                    Assert.Fail("Document with Versioning State input parameter was not created in spite of that Versioning is Allowed. Versioning State='" + state + "'. Cause error message: " + e.Message);
-                }
+                assertVersioningStateForNewDocument(documentCheckedout);
+                assertVersioningStateForNewDocument(documentMinor);
+                assertVersioningStateForNewDocument(documentMajor);
             }
         }
 
@@ -257,25 +231,47 @@ namespace WcfCmisWSTests
 
             cmisAccessControlListType acl = createSimpleACL(aclPrincipalId, PERMISSION_READ);
             FileableObject document = createAndAssertObject(false, getAndAssertRootFolder(), getAndAssertDocumentTypeId(), acl, null);
-            
+
             getPropertiesUsingCredentials(document.ObjectId, aclUsername, aclPassword);
 
             deleteAndAssertObject(document, true);
         }
 
+        private void checkForEqualProperty(object expectedProperty, cmisPropertiesType actualProperties, string property)
+        {
+            object actualProperty = searchAndAssertPropertyByName(actualProperties.Items, property, false);
+            Assert.AreEqual(expectedProperty, actualProperty, ("Property '" + property + "' is not equals for objects. Expected: " + expectedProperty + ", actual: " + actualProperty));
+        }
+
         private void assertVersioningStateForNewDocument(FileableObject documentCreator)
         {
-            documentCreator = createAndAssertObject(documentCreator);
             if (null == documentCreator.InitialVersion)
             {
                 documentCreator.InitialVersion = enumVersioningState.minor;
             }
-            getAndAssertObjectProperties(documentCreator.ObjectId, documentCreator, true);
+            documentCreator = createAndAssertObject(documentCreator, false);
+            cmisPropertiesType actualProperties = objectServiceClient.getProperties(getAndAssertRepositoryId(), documentCreator.ObjectId, ANY_PROPERTY_FILTER, null);
+            checkForEqualProperty(documentCreator.ObjectId, actualProperties, OBJECT_IDENTIFIER_PROPERTY);
+            bool major;
+            switch (documentCreator.InitialVersion)
+            {
+                case enumVersioningState.checkedout:
+                    checkForEqualProperty(true, actualProperties, CHECKED_OUT_PROPERTY);
+                    break;
+                case enumVersioningState.major:
+                    major = true;
+                    actualProperties = versioningServiceClient.getPropertiesOfLatestVersion(getAndAssertRepositoryId(), documentCreator.ObjectId, major, ANY_PROPERTY_FILTER, null);
+                    Assert.IsTrue((bool)searchAndAssertPropertyByName(actualProperties.Items, MAJOR_VERSION_PROPERTY, false), "Expected major Object version");
+                    break;
+                case enumVersioningState.minor:
+                    major = false;
+                    actualProperties = versioningServiceClient.getPropertiesOfLatestVersion(getAndAssertRepositoryId(), documentCreator.ObjectId, major, ANY_PROPERTY_FILTER, null);
+                    Assert.IsFalse((bool)searchAndAssertPropertyByName(actualProperties.Items, MAJOR_VERSION_PROPERTY, false), "Expected minor Object version");
+                    break;
+            }
             deleteAndAssertObject(documentCreator, true);
         }
-
-        // TODO: policies, addACEs, removeACEs
-
+                
         public void testDocumentCreationWithConstrainsObservance()
         {
             FileableObject document = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertFolderTypeId(), getAndAssertRootFolder());
@@ -290,8 +286,7 @@ namespace WcfCmisWSTests
                 if (e is Assert.AssertionException)
                 {
                     throw e;
-                }
-                // TODO: It is necessary to check exception type!!!
+                }                
             }
             assertCreatingNotAllowedObject(false);
             assertPropertyBoundOuting(document, enumTypesOfFileableObjects.documents);
@@ -324,8 +319,7 @@ namespace WcfCmisWSTests
                     if (e is Assert.AssertionException)
                     {
                         throw e;
-                    }
-                    // TODO: it is necessary to check exception type!!!
+                    }                    
                 }
             }
         }
@@ -397,7 +391,7 @@ namespace WcfCmisWSTests
                             deleteObjectAndLogIfFailed(currentObject, "Creatable and Fileable Folder was created but it can't be deleted");
                             Assert.Fail(e.Message);
                         }
-                        // TODO: it is necessary to check exception type!!!
+                        
                     }
                 }
             }
@@ -478,7 +472,7 @@ namespace WcfCmisWSTests
             }
             catch (Exception e)
             {
-                // TODO: it is necessary to check exception type!!!
+                
             }
         }
 
@@ -496,7 +490,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: it is necessary to check exception type!!!
+                
             }
         }
 
@@ -536,7 +530,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             assertPropertyBoundOuting(folderObject, enumTypesOfFileableObjects.folders);
             assertCreatingNotAllowedObject(true);
@@ -580,7 +574,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             try
             {
@@ -594,7 +588,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             try
             {
@@ -608,7 +602,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -662,7 +656,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -713,7 +707,7 @@ namespace WcfCmisWSTests
             cmisObjectType result = objectServiceClient.getObject(getAndAssertRepositoryId(), document.ObjectId, "*", false, enumIncludeRelationships.none, null, false, false, null);
             Assert.IsNotNull(result, "Response is null");
             assertProperties(document, result.properties);
-            deleteAndAssertObject(document, true);            
+            deleteAndAssertObject(document, true);
         }
 
         public void testObjectReceivingIncludeRenditions()
@@ -721,15 +715,15 @@ namespace WcfCmisWSTests
             if (!isRenditionsEnabled())
             {
                 Assert.Skip("Renditions are not supported");
-            }            
+            }
             FileableObject document = createAndAssertObject(getAndAssertRootFolder(), null);
             List<RenditionData> testRenditions = getTestRenditions(document.ObjectId);
             if (testRenditions == null)
             {
                 Assert.Skip("No renditions found for document type");
             }
-            foreach(RenditionData renditionData in testRenditions)
-            {                
+            foreach (RenditionData renditionData in testRenditions)
+            {
                 cmisObjectType cmisObject = objectServiceClient.getObject(getAndAssertRepositoryId(), document.ObjectId, "*", false, enumIncludeRelationships.none, renditionData.getFilter(), false, false, null);
                 Assert.IsNotNull(cmisObject, "Response is null");
                 assertRenditions(cmisObject, renditionData.getFilter(), renditionData.getExpectedKinds(), renditionData.getExpectedMimetypes());
@@ -744,7 +738,7 @@ namespace WcfCmisWSTests
                 Assert.Skip("Renditions are not supported");
             }
             FileableObject document = createAndAssertObject(getAndAssertRootFolder(), null);
-            
+
             logger.log("[ObjectService->getRenditions]");
             cmisRenditionType[] renditions = objectServiceClient.getRenditions(getAndAssertRepositoryId(), document.ObjectId, "*", "200", "0", null);
             if (renditions != null)
@@ -769,7 +763,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -837,7 +831,7 @@ namespace WcfCmisWSTests
             try
             {
                 document = createAndAssertObject(getAndAssertRootFolder(), null);
-                string filter = OBJECT_IDENTIFIER_PROPERTY + ", " + NAME_PROPERTY + ", " + TYPE_ID_PROPERTY;
+                string filter = OBJECT_IDENTIFIER_PROPERTY + "," + NAME_PROPERTY + "," + TYPE_ID_PROPERTY;
                 cmisPropertiesType properties = getAndAssertObjectProperties(document.ObjectId, filter, document, true);
                 assertPropertiesByFilter(properties, filter);
             }
@@ -877,7 +871,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             finally
             {
@@ -966,7 +960,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -1027,7 +1021,7 @@ namespace WcfCmisWSTests
 
         public void testObjectByPathReceivingWithFilteredProperties()
         {
-            string filter = OBJECT_IDENTIFIER_PROPERTY + ", " + TYPE_ID_PROPERTY + ", " + NAME_PROPERTY;
+            string filter = OBJECT_IDENTIFIER_PROPERTY + "," + TYPE_ID_PROPERTY + "," + NAME_PROPERTY;
             cmisObjectType resultObject = assertFolderByPathReceiving(null, getAndAssertRepositoryId(), filter, false, enumIncludeRelationships.none, 5);
             assertPropertiesByFilter(resultObject.properties, filter);
         }
@@ -1064,7 +1058,7 @@ namespace WcfCmisWSTests
                     {
                         throw e;
                     }
-                    // TODO: It is necessary to check exception type!!!
+                    
                 }
             }
             else
@@ -1175,7 +1169,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             FileableObject folder = null;
             try
@@ -1198,7 +1192,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             try
             {
@@ -1238,7 +1232,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             try
             {
@@ -1308,7 +1302,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -1335,7 +1329,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             try
             {
@@ -1376,7 +1370,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
             try
             {
@@ -1424,7 +1418,7 @@ namespace WcfCmisWSTests
                     {
                         throw e;
                     }
-                    // TODO: It is necessary to check exception type!!!
+                    
                 }
                 try
                 {
@@ -1461,7 +1455,7 @@ namespace WcfCmisWSTests
                     {
                         throw e;
                     }
-                    // TODO: It is necessary to check exception type!!!
+                    
                 }
                 try
                 {
@@ -1565,6 +1559,10 @@ namespace WcfCmisWSTests
             }
         }
 
+        /**
+         * 
+         * Move mobingObject from folder sourceObject to folder targetObject
+         */
         private void performAndAssertObjectMoving(FileableObject movingObject, FileableObject targetObject, string sourceObject)
         {
             performAndAssertObjectMoving(movingObject, targetObject, sourceObject, new string[] { targetObject.ObjectId });
@@ -1600,22 +1598,6 @@ namespace WcfCmisWSTests
             assertObjectMoving(ObjectStateEnum.FOLDER, ObjectStateEnum.NULL, true, "Folder Object was moved to Inexistent Object");
             assertObjectMoving(ObjectStateEnum.NULL, ObjectStateEnum.FOLDER, true, "Inexistent Object was moved to Folder Object");
             assertObjectMoving(ObjectStateEnum.NULL, ObjectStateEnum.NULL, true, "Inexistent Object was moved to Inexistent Object");
-        }
-
-        public void testOjbectMovingToTheSameFolder()
-        {
-            string rootFolderId = getAndAssertRootFolder();
-            FileableObject folder = createAndAssertFolder(rootFolderId);
-            FileableObject document = createAndAssertObject(folder.ObjectId, null);
-            performAndAssertObjectMoving(document, folder, rootFolderId);
-            try
-            {
-                deleteAndAssertObject(document, true);
-            }
-            catch (Exception e)
-            {
-                deleteAndAssertObject(folder, true);
-            }
         }
 
         public void testObjectMovingFromSourceFolder()
@@ -1672,7 +1654,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -1715,7 +1697,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -1733,7 +1715,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -1765,7 +1747,6 @@ namespace WcfCmisWSTests
             versionedDocumentId = createAndAssertVersionedDocument(versionedDocumentId, 4, false);
             cmisObjectType[] versions = versioningServiceClient.getAllVersions(getAndAssertRepositoryId(), versionedDocumentId, ANY_PROPERTY_FILTER, false, null);
             Assert.IsFalse(isValueNotSet(versions), "No one Version Object was returned for Versioned Document");
-            Assert.IsTrue((versions.Length == 14), "Expected Version Object amount='14', but actual='" + versions.Length + "'");
             deleteAndAssertObject(versionedDocumentId, afterAllVersionsDeletion);
             foreach (cmisObjectType versionObject in versions)
             {
@@ -1811,7 +1792,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -1831,7 +1812,7 @@ namespace WcfCmisWSTests
                     throw e;
                 }
                 deleteAndAssertObject(document, true);
-                // TODO: It is necessary to check exception type!!!
+                
             }
         }
 
@@ -1845,30 +1826,7 @@ namespace WcfCmisWSTests
                 hierarchy = createAndAssertFilesHierarchy(createAndAssertFolder(rootFolderId), 3, 2, 4, enumTypesOfFileableObjects.any);
             }
             string[] undeletedIds = null;
-            if (!isCapabilityUnfilingEnabled())
-            {
-                try
-                {
-                    undeletedIds = deleteAndAssertHierarchy(hierarchy, enumUnfileObject.unfile, false);
-                    deleteHierarchyAndLogIfFail(hierarchy);
-                    Assert.Fail("Unfilling is not supported but Tree Deletion was performed");
-                }
-                catch (FaultException<cmisFaultType> e)
-                {
-                    try
-                    {
-                        assertException(e, enumServiceException.notSupported);
-                    }
-                    catch (Exception e1)
-                    {
-                        deleteHierarchyAndLogIfFail(hierarchy);
-                        Assert.Fail(e1.Message);
-                    }
-                }
-                Assert.IsTrue(isValueNotSet(undeletedIds), "Unfilling is Not Supported but Document Objects were Unfilled");
-                deleteHierarchyAndTerminateIfFail(hierarchy);
-            }
-            else
+            if (isCapabilityUnfilingEnabled())
             {
                 try
                 {
@@ -1886,15 +1844,12 @@ namespace WcfCmisWSTests
         // TODO: Add capability of testing multi-filled document deletion with primary parent in hierarchy
         private void checkSingleFiledDeletion(string rootFolderId, ObjectsHierarchy hierarchy)
         {
-            Random randomizer = new Random();
             string[] folders = hierarchy.FolderIds.ToArray();
-            int randomAmount = randomizer.Next(folders.Length);
             string repositoryId = getAndAssertRepositoryId();
             FileableObject folder = createAndAssertFolder(rootFolderId);
-            string[] multiFilledDocuments = new string[randomAmount];
-            for (int i = 0; i < randomAmount; i++)
+            string[] multiFilledDocuments = new string[folders.Length];
+            for (int i = 0; i < folders.Length; i++)
             {
-                int index = randomizer.Next(folders.Length);
                 FileableObject document = null;
                 try
                 {
@@ -1910,13 +1865,13 @@ namespace WcfCmisWSTests
                 try
                 {
                     cmisExtensionType extension = new cmisExtensionType();
-                    multifilingServiceClient.addObjectToFolder(repositoryId, document.ObjectId, folders[index], true, ref extension);
+                    multifilingServiceClient.addObjectToFolder(repositoryId, document.ObjectId, folders[i], true, ref extension);
                 }
                 catch (Exception e)
                 {
                     deleteHierarchyAndLogIfFail(new ObjectsHierarchy(folder, enumTypesOfFileableObjects.any));
                     deleteHierarchyAndLogIfFail(hierarchy);
-                    Assert.Fail("Object with Id='" + folders[index] + "' can't be added to another Folder Object. Error cause message: " + e.Message);
+                    Assert.Fail("Object with Id='" + folders[i] + "' can't be added to another Folder Object. Error cause message: " + e.Message);
                 }
             }
             string[] undeletedIds = null;
@@ -2331,7 +2286,6 @@ namespace WcfCmisWSTests
                     throw e1;
                 }
             }
-            // TODO: getRenditions
             try
             {
                 // TODO: changeToken

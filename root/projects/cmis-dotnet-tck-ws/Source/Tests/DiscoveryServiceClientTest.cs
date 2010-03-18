@@ -204,12 +204,21 @@ namespace WcfCmisWSTests
                 Assert.Skip("Versioning isn't supported or PWCSearchable is not supported");
             }
 
-            FileableObject document = createAndAssertObject(getAndAssertRootFolder(), enumVersioningState.checkedout);
+            FileableObject document = createAndAssertObject(getAndAssertRootFolder(), enumVersioningState.checkedout, false);
             string query = "SELECT * FROM " + getAndAssertDocumentQueryName() + " WHERE  " + OBJECT_IDENTIFIER_PROPERTY + "='" + document.ObjectId + "'";
             cmisObjectType[] response = executeAndAssertQuery(query, PAGE_SIZE, 0, false, false, enumIncludeRelationships.none);
             Assert.IsNotNull(response, "response is null");
             Assert.IsTrue((response.Length >= 1), "Expected PWC was not found");
-            assertObject(document, response[0], false, enumIncludeRelationships.none);
+            bool found = false;
+            foreach (cmisObjectType cmisObject in response)
+            {
+                string objectId = (string)searchAndAssertPropertyByName(cmisObject.properties.Items, OBJECT_IDENTIFIER_PROPERTY, false);
+                if (document.ObjectId.Equals(objectId))
+                {
+                    found = true;
+                }
+            }
+            Assert.IsTrue(found, "WorkingCopy was not found in query results");
             cmisExtensionType extension = new cmisExtensionType();
             versioningServiceClient.cancelCheckOut(getAndAssertRepositoryId(), document.ObjectId, ref extension);
         }
