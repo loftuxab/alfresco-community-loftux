@@ -30,13 +30,14 @@ import javax.servlet.jsp.JspException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.webeditor.taglib.AbstractTemplateTag;
 
 /**
  * Tag used to indicate an editable piece of content.
  * 
  * @author Gavin Cornwell
  */
-public class MarkContentTag extends AbstractWebEditorTag
+public class MarkContentTag extends AbstractTemplateTag
 {
     private static final long serialVersionUID = 1564711937667040715L;
     private static final Log logger = LogFactory.getLog(MarkContentTag.class);
@@ -142,9 +143,9 @@ public class MarkContentTag extends AbstractWebEditorTag
                 String urlPrefix = getWebEditorUrlPrefix();
 
                 // generate a unique id for this marked content
-                List<MarkedContent> markedContent = getMarkedContent();
+                List<MarkedContent> markedContent = AlfrescoTagUtil.getMarkedContent(pageContext.getRequest());
                 String markerIdPrefix = (String) this.pageContext.getRequest().getAttribute(
-                     KEY_MARKER_ID_PREFIX);
+                     AlfrescoTagUtil.KEY_MARKER_ID_PREFIX);
                 String markerId = markerIdPrefix + "-" + (markedContent.size() + 1);
 
                 // create marked content object and store

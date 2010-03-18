@@ -7,6 +7,7 @@
    <jsp-version>2.0</jsp-version>
    <short-name>customer</short-name>
    <display-name>Example customer tag library</display-name>
+   <uri>http://www.alfresco.org/tags/customer</uri>
    <description>
       A tag library to represent a customers web application, allows
       content and properties to be rendered onto a page.

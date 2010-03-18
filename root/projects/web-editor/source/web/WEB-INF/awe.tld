@@ -7,6 +7,7 @@
    <jsp-version>2.0</jsp-version>
    <short-name>awe</short-name>
    <display-name>Alfresco Web Editor</display-name>
+   <uri>http://www.alfresco.org/tags/awe</uri>
    <description>
       Tag library consisting of Alfresco Web Editor tags allowing users
       to mark a template with editable Alfresco content.

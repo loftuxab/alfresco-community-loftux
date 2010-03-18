@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
 --%>
-<%@ taglib uri="/WEB-INF/awe.tld" prefix="awe" %>
-<%@ taglib uri="/WEB-INF/customer.tld" prefix="customer" %>
+<%@ taglib uri="http://www.alfresco.org/tags/awe" prefix="awe" %>
+<%@ taglib uri="http://www.alfresco.org/tags/customer" prefix="customer" %>
 
 <%@ page buffer="16kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>

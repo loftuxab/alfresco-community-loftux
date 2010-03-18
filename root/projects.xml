@@ -1708,8 +1708,10 @@
    
    <target name="package-webeditor-taglib-jar" depends="compile-webeditor">
       <mkdir dir="${dir.project.webeditor.dist}" />
-      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor.taglib}" 
-           basedir="${dir.project.webeditor.classes}" includes="org/alfresco/web/awe/**" />
+      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor.taglib}">
+         <fileset dir="${dir.project.webeditor.classes}" includes="org/alfresco/web/awe/**" />
+         <zipfileset dir="${dir.project.webeditor.src.webinf}" includes="awe.tld" prefix="META-INF" />
+      </jar>
    </target>
    
    <target name="test-webeditor" depends="compile-webeditor">
@@ -1787,23 +1789,27 @@
    
    <target name="package-webeditor-customersite-sample-jar" depends="compile-webeditor-customersite-sample">
       <mkdir dir="${dir.project.webeditorsamples.customersite.dist}" />
-      <jar jarfile="${dir.project.webeditorsamples.customersite.dist}/${file.name.jar.webeditor.sample.customersite}" 
-           basedir="${dir.project.webeditorsamples.customersite.classes}" />
+      <jar jarfile="${dir.project.webeditorsamples.customersite.dist}/${file.name.jar.webeditor.sample.customersite}">
+         <fileset dir="${dir.project.webeditorsamples.customersite.classes}" />
+         <zipfileset dir="${dir.project.webeditorsamples.customersite.src.webinf}" includes="customer.tld" 
+                     prefix="META-INF" />
+      </jar>
    </target>
    
    <target name="package-webeditor-customersite-sample-war" 
            depends="package-webeditor-taglib-jar, package-webeditor-customersite-sample-jar">
       <war warfile="${dir.project.webeditorsamples.customersite.dist}/${file.name.war.webeditor.sample.customersite}" 
            webxml="${dir.project.webeditorsamples.customersite.src.web}/WEB-INF/web.xml">
-         <fileset dir="${dir.project.webeditorsamples.customersite.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webeditorsamples.customersite.src.web}" excludes="WEB-INF/*" />
          <zipfileset file="${dir.project.webeditor.src.java}/log4j.properties" prefix="WEB-INF/classes" />
-         <zipfileset file="${dir.project.webeditor.src.web}/WEB-INF/awe.tld" prefix="WEB-INF" />
          <zipfileset dir="${dir.project.webeditorsamples.customersite.dist}" prefix="WEB-INF/lib"
                      includes="${file.name.jar.webeditor.sample.customersite}" />
          <zipfileset dir="${dir.project.webeditor.dist}" prefix="WEB-INF/lib"
                      includes="${file.name.jar.webeditor.taglib}" />
          <zipfileset dir="${dir.project.3rdparty}/lib/commons" prefix="WEB-INF/lib"
                      includes="commons-httpclient-3.1.jar, commons-logging-1.1.jar, commons-codec-1.3.jar" />
+         <zipfileset dir="${dir.project.3rdparty}/lib/spring-surf" prefix="WEB-INF/lib"
+                     includes="spring-webeditor-client-jsp-1.0.0.CI-SNAPSHOT.jar" />
          <zipfileset dir="${dir.project.3rdparty}/lib" prefix="WEB-INF/lib" includes="json.jar" />
       </war>
    </target>

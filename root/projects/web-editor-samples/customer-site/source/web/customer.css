@@ -19,7 +19,7 @@ h3
 li
 {
    list-style-type: square;
-   margin: 10px 0px 0px 40px;
+   margin: 10px 0px 0px -6px;
 }
 
 a, a:visited
