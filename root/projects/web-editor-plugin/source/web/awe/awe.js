@@ -17,6 +17,11 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Alfresco webditor plugin
+ * @module AWE
+ *  
+ */
 (function() 
 {
    var Dom = YAHOO.util.Dom,
@@ -29,6 +34,13 @@
 
    YAHOO.namespace('org.alfresco.awe.app');
 
+   /**
+    * Alfresco webeditor plugin constructor
+    * @constructor
+    * @class AWE.app
+    * @namespace YAHOO.org.alfresco
+    * @extends WEF.App
+    */
    YAHOO.org.alfresco.awe.app = function()
    {
       YAHOO.org.alfresco.awe.app.superclass.constructor.apply(this, Array.prototype.slice.call(arguments));
@@ -100,7 +112,7 @@
          {
             id: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             name: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
-            label: '<img src="' + contextPath + '/res/awe/images/edit.png" alt="'+ this.getMessage('toolbar-tab-label') +'" />',
+            label: '<img src="' + contextPath + '/res/awe/images/edit.png" alt="'+ this.getMessage('awe.toolbar-tab-label') +'" />',
             content: '',
             active: true,
             pluginOwner:this
@@ -110,7 +122,7 @@
          [
             {
                type: 'menu',
-               label: '<img src="' + contextPath + '/res/awe/images/quick-edit.png" alt="'+ this.getMessage('toolbar-quick-edit-icon-label') +'" />',
+               label: '<img src="' + contextPath + '/res/awe/images/quick-edit.png" alt="'+ this.getMessage('awe.toolbar-quick-edit-icon-label') +'" />',
                value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                icon: true,
@@ -130,7 +142,7 @@
             },
             {
                type: 'push',
-               label: '<img src="' + contextPath + '/res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('toolbar-toggle-markers-icon-label') +'" />',
+               label: '<img src="' + contextPath + '/res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('awe.toolbar-toggle-markers-icon-label') +'" />',
                value: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                icon: true
@@ -142,7 +154,7 @@
          [ 
             {
                type: 'push',
-               label: this.getMessage('toolbar-logout-label'),
+               label: this.getMessage('awe.toolbar-logout-label'),
                value: 'loggedout',
                id: this.config.name + WebEditor.SEPARATOR + 'loggedout',
                icon: true,
