@@ -3905,17 +3905,7 @@ FileGroup ::51145082-8FEC-4322-AF46-85971BAE5438 -setup Install -active Yes -pla
 File ::15180073-8F95-4750-A833-569D15041477 -directory <%InstallDir%>/amps -name W:/V3.2/root/build/dist/alfresco-dod5015.amp -location ../../build/dist -parent 51145082-8FEC-4322-AF46-85971BAE5438
 File ::7A070C91-2102-421D-BA2B-CF81AA85D4E1 -directory <%InstallDir%>/amps-share -name W:/V3.2/root/build/dist/alfresco-dod5015-share.amp -location ../../build/dist -parent 51145082-8FEC-4322-AF46-85971BAE5438
 FileGroup ::A37A40E1-7EFA-4EA9-B765-4E09501DA108 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Linux-x86_64 Solaris-sparc Solaris-x86 Windows TarArchive ZipArchive} -name Quickr -parent FileGroups
-File ::513A579C-0DF7-42AE-82BC-96101F12BC26 -type dir -directory <%InstallDir%>/tomcat/shared/classes/alfresco/web-extension/site-webscripts -name W:/V3.2/root/projects/installer/quickr/site-webscripts -location ../../projects/installer/quickr/site-webscripts -parent A37A40E1-7EFA-4EA9-B765-4E09501DA108
-File ::239F22CC-0555-440B-8FBF-BD265CD06F3E -type dir -name org -parent 513A579C-0DF7-42AE-82BC-96101F12BC26
-File ::E90A7C60-D0A5-4E1E-B05B-74E6CBEDF3CB -type dir -name alfresco -parent 239F22CC-0555-440B-8FBF-BD265CD06F3E
-File ::AC423CF1-3F42-4702-A896-3E09F6D650E8 -type dir -name modules -parent E90A7C60-D0A5-4E1E-B05B-74E6CBEDF3CB
-File ::144A07F5-2EB0-47B6-8F68-888FDEB72F46 -name create-site.get.js -parent AC423CF1-3F42-4702-A896-3E09F6D650E8
-File ::A2EE0448-5DB7-480E-B490-9CFC9935B599 -name create-site.get.properties -parent AC423CF1-3F42-4702-A896-3E09F6D650E8
-File ::DF55BA8B-9603-48DC-9E8C-D9EBF191DAF8 -type dir -name .svn -active 0 -parent AC423CF1-3F42-4702-A896-3E09F6D650E8
-File ::259482AC-62FE-4DB9-80A4-07B4674D2D22 -type dir -name .svn -active 0 -parent E90A7C60-D0A5-4E1E-B05B-74E6CBEDF3CB
-File ::DDFD3526-9A76-4DA9-BBA4-A92B2DE5ADAA -type dir -name .svn -active 0 -parent 239F22CC-0555-440B-8FBF-BD265CD06F3E
-File ::BC1CCA60-C757-45D6-AB26-260ECFCEE79B -type dir -name .svn -active 0 -parent 513A579C-0DF7-42AE-82BC-96101F12BC26
-File ::762154E6-40C1-4E7F-BDCC-305963573028 -directory <%InstallDir%>/amps -name W:/V3.2/root/projects/installer/quickr/alfresco-quickr-unsupported.amp -location ../../projects/installer/quickr -parent A37A40E1-7EFA-4EA9-B765-4E09501DA108
+File ::9B8F02F7-E1C1-4487-BEAF-75182BAFCB90 -directory <%InstallDir%>/amps -name W:/HEAD/root/build/dist/alfresco-quickr-unsupported.amp -location ../../build/dist -parent A37A40E1-7EFA-4EA9-B765-4E09501DA108
 Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 Linux-x86_64 Solaris-x86} -name {Default Component} -parent Components
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 Linux-x86_64 Solaris-x86} -name Samples -parent Components
 Component ::EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 -setup Install -alias Java -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 Linux-x86_64 Solaris-x86} -name Java -parent Components
@@ -3987,14 +3977,14 @@ InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type actio
 InstallComponent 4D5D4BD3-A019-4018-9E97-3302896A80E3 -setup Install -type pane -conditions EB9E210F-8CAB-4AB8-A455-051FD0FFF296 -title {Select Database} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition EB9E210F-8CAB-4AB8-A455-051FD0FFF296 -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id EB9E210F-8CAB-4AB8-A455-051FD0FFF296
 InstallComponent 7B6DA885-8AAD-4546-B2DE-E27FB11227C6 -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
-InstallComponent 30AA76E4-6213-4743-82D1-6843F2451B76 -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
-InstallComponent 9AF7930A-D053-43A4-9EBE-6FBBCC21C251 -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
+InstallComponent 30AA76E4-6213-4743-82D1-6843F2451B76 -setup Install -type action -title {Add Widget} -component AddWidget -active No -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
+InstallComponent 9AF7930A-D053-43A4-9EBE-6FBBCC21C251 -setup Install -type action -title {Add Widget} -component AddWidget -active No -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
 InstallComponent CB7AA532-A1BF-4DF3-9394-576E72EFEC2F -setup Install -type action -title {Add Widget} -component AddWidget -active Yes -parent 4D5D4BD3-A019-4018-9E97-3302896A80E3
 InstallComponent A68A86AB-089F-49D1-9053-94B684A45411 -setup Install -type pane -conditions 33DD3A8B-6D59-4088-A399-B920E97B1CE7 -title {Other DB Details} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 33DD3A8B-6D59-4088-A399-B920E97B1CE7 -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 778A35E3-3F61-4D43-9CA8-D5B28F78F1B2
-InstallComponent DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271 -setup Install -type action -conditions 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5 -title {Set mssql port} -component SetVirtualText -command insert -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411
+InstallComponent DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271 -setup Install -type action -conditions 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5 -title {Set mssql port} -component SetVirtualText -command insert -active No -parent A68A86AB-089F-49D1-9053-94B684A45411
 Condition 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5 -active Yes -parent DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5
-InstallComponent 36381683-C425-4724-A78C-FFB02826072B -setup Install -type action -conditions 5926CF53-F2F1-4573-9565-9A1A05A41128 -title {Set oracleport} -component SetVirtualText -command insert -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411
+InstallComponent 36381683-C425-4724-A78C-FFB02826072B -setup Install -type action -conditions 5926CF53-F2F1-4573-9565-9A1A05A41128 -title {Set oracleport} -component SetVirtualText -command insert -active No -parent A68A86AB-089F-49D1-9053-94B684A45411
 Condition 5926CF53-F2F1-4573-9565-9A1A05A41128 -active Yes -parent 36381683-C425-4724-A78C-FFB02826072B -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5
 InstallComponent F778570D-27D3-4011-82A0-92FB419454AF -setup Install -type action -conditions 61A20815-90B8-4168-B634-8E848E92998F -title {Set postgres port} -component SetVirtualText -command insert -active Yes -parent A68A86AB-089F-49D1-9053-94B684A45411
 Condition 61A20815-90B8-4168-B634-8E848E92998F -active Yes -parent F778570D-27D3-4011-82A0-92FB419454AF -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 853D9C9C-94B2-46C4-93E6-58C9CE17A1F5
@@ -4672,6 +4662,9 @@ false
 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D,Filename
 <%ALF_OO%>/program/soffice.bin
 
+30AA76E4-6213-4743-82D1-6843F2451B76,Active
+No
+
 30AA76E4-6213-4743-82D1-6843F2451B76,Conditions
 {0 conditions}
 
@@ -4691,7 +4684,7 @@ ALF_DB
 150
 
 30AA76E4-6213-4743-82D1-6843F2451B76,Y
-130
+190
 
 319487D5-991A-4544-9CB7-69BDA7BC5617,Conditions
 {0 conditions}
@@ -4794,6 +4787,9 @@ WCM
 
 3615204F-29E3-473F-A769-A74E859BE866,IgnoreErrors
 Yes
+
+36381683-C425-4724-A78C-FFB02826072B,Active
+No
 
 36381683-C425-4724-A78C-FFB02826072B,Conditions
 {1 condition}
@@ -6182,6 +6178,9 @@ INDEXES
 991553B3-06E2-412E-89E5-1829C782E086,NextButton,subst
 1
 
+9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Active
+No
+
 9AF7930A-D053-43A4-9EBE-6FBBCC21C251,Conditions
 {0 conditions}
 
@@ -6774,7 +6773,7 @@ CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,X
 150
 
 CB7AA532-A1BF-4DF3-9394-576E72EFEC2F,Y
-190
+130
 
 CC04C0EA-21F5-464B-977F-6786765F611A,Conditions
 {0 conditions}
@@ -6916,6 +6915,9 @@ D7EEA242-339D-49FC-A5B1-7787B21BA759,X
 
 D7EEA242-339D-49FC-A5B1-7787B21BA759,Y
 160
+
+DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271,Active
+No
 
 DF9C5B19-3E9E-4C4E-AE7C-7587EC57F271,Conditions
 {1 condition}
