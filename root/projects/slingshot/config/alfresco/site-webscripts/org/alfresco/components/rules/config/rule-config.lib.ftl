@@ -38,7 +38,14 @@
 <div class="hidden">
    <li id="${el}-configTemplate" class="config">
       <input type="hidden" name="id" value=""/>
-      <div class="actions"><!-- add and remove buttons will be placed here--></div>
+      <div class="actions">
+         <span class="yui-button yui-push-button add-config">
+            <span class="first-child"><button type="button">+</button></span>
+         </span>
+         <span class="yui-button yui-push-button remove-config">
+            <span class="first-child"><button type="button">-</button></span>
+         </span>
+      </div>
       <div class="name"><!-- select element will be placed in here --></div>
       <div class="parameters"><!-- parameter controls will be placed here--></div>
    </li>

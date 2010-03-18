@@ -339,6 +339,7 @@
          else if (!this.isDraggableProtected(currentDraggable))
          {
             // UP, DOWN, LEFT & RIGHT key events apply only to non protected draggables.
+            var fireMovedEvent = false;
             if (id[1].keyCode === KeyListener.KEY.UP)
             {
                relativeNode = Dom.getPreviousSiblingBy(currentDraggable, this.isRealDraggable);
@@ -347,6 +348,7 @@
                   // Found a draggable above, move the current one above it
                   Dom.insertBefore(currentDraggable, relativeNode);
                   this.focusDraggableAfterDomChange(currentDraggable, true);
+                  fireMovedEvent = true;
                }
             }
             else if (id[1].keyCode === KeyListener.KEY.DOWN)
@@ -357,6 +359,7 @@
                   // Found a draggable below, move the current one beneath it
                   Dom.insertAfter(currentDraggable, relativeNode);
                   this.focusDraggableAfterDomChange(currentDraggable, true);
+                  fireMovedEvent = true;
                }
             }
             else
@@ -395,7 +398,17 @@
                    * element that has the current focus.
                    */
                   this.focusDraggableAfterDomChange(currentDraggable, true);
+                  fireMovedEvent = true;
                }
+            }
+            if (fireMovedEvent)
+            {
+               // Fire event to inform any listening components that draggable has been moved
+               YAHOO.Bubbling.fire("draggableMoved",
+               {
+                  eventGroup: this,
+                  draggable: currentDraggable
+               });
             }
          }
       },
@@ -481,6 +494,13 @@
          }
          // Make sure the new draggable gets the focus.
          this.focusDraggableAfterDomChange(copy, true);
+
+         // Fire event to inform any listening components that draggable has been duplicated
+         YAHOO.Bubbling.fire("draggableDuplicated",
+         {
+            eventGroup: this,
+            draggable: srcEl
+         });
       },
 
       /**
@@ -523,6 +543,12 @@
 
          // Hide the shadow object
          Dom.setStyle(this.shadow, "display", "none");
+
+         // Fire event to inform any listening components that draggable has been deleted
+         YAHOO.Bubbling.fire("draggableDeleted",
+         {
+            eventGroup: this
+         });
       },
 
       /**
@@ -853,12 +879,6 @@
             {
                // It was, delete it
                this.dndComponent.deleteDraggable(srcEl);
-
-               // Fire event to inform any listening components that draggable has been deleted
-               YAHOO.Bubbling.fire("draggableDeleted",
-               {
-                  eventGroup: this.dndComponent
-               });
             }
             // Make sure to remove delete indication from target
             var dropColumn = this.droppedOnEl;
@@ -929,13 +949,6 @@
             {
                // Yes, add it since it was dropped over a none protected target.
                this.dndComponent.copyAndInsertDraggable(srcEl, destUl, this.srcShadow);
-
-               // Fire event to inform any listening components that draggable has been duplicated
-               YAHOO.Bubbling.fire("draggableDuplicated",
-               {
-                  eventGroup: this.dndComponent,
-                  draggable: srcEl
-               });
             }
          }
          else

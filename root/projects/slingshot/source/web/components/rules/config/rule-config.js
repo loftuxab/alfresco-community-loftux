@@ -442,6 +442,7 @@
       {
          p_eConfig.parentNode.removeChild(p_eConfig);
          this._refreshRemoveButtonState();
+         this._updateSubmitElements();
       },
 
       /**
@@ -762,7 +763,7 @@
        * @param p_eRelativeConfigEl {object}
        * @protected
        */
-      _createConfigNameUI: function RuleConfig__createConfigNameUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
+      _createConfigNameUI: function RuleConfig__createConfigNameUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl, p_oRuleConfigs)
       {
          // Add config element
          var configEl = this.widgets.configTemplateEl.cloneNode(true);
@@ -795,28 +796,27 @@
          if (this.options.mode == RC.MODE_EDIT)
          {
             // Create add button
-            var actionsEl = Selector.query('div.actions', configEl)[0];
-            var addButton = new YAHOO.widget.Button(
+            var addButtonEl = Selector.query('div.actions .add-config', configEl, true);
+            var addButton = new YAHOO.widget.Button(addButtonEl,
             {
-               label: "+",
-               container: actionsEl,
                type: "push"
             });
             addButton.on("click", this.onAddConfigButtonClick, configEl, this);
             addButton.addClass("add-config");
 
             // Create remove button
-            var removeButton = new YAHOO.widget.Button(
+            var removeButtonEl = Selector.query('div.actions .remove-config', configEl, true);
+            var removeButton = new YAHOO.widget.Button(removeButtonEl,
             {
-               label: "-",
-               container: actionsEl,
-               type: "push"
+               type: "push",
+               disabled: true
             });
             removeButton.on("click", this.onRemoveConfigButtonClick, configEl, this);
             removeButton.addClass("remove-config");
          }
          else if (this.options.mode == RC.MODE_TEXT)
          {
+            Dom.addClass(Selector.query('div.actions', configEl, true), "hidden");
             Dom.addClass(p_oSelectEl, "hidden");
             var nameEl = document.createElement("span");
             nameEl.appendChild(document.createTextNode(p_oSelectEl.options[p_oSelectEl.selectedIndex].text));
@@ -1045,14 +1045,14 @@
        */
       _refreshRemoveButtonState: function RuleConfig__refreshRemoveButtonState()
       {
-         var configsEl = Dom.get(this.id + "-configs");
-         if (Selector.query("li", configsEl).length > 1)
+         var buttons = Selector.query("li div.actions .remove-config", this.id + "-configs");
+         for (var i = 0, il = buttons.length, buttonId; i < il; i++)
          {
-            Dom.removeClass(configsEl, "single");
-         }
-         else
-         {
-            Dom.addClass(configsEl, "single");
+            buttonId = buttons[i].getAttribute("id");
+            if (buttonId)
+            {
+               YAHOO.widget.Button.getButton(buttonId).set("disabled", i == 0 && buttons.length == 1);
+            }
          }
       },
 
