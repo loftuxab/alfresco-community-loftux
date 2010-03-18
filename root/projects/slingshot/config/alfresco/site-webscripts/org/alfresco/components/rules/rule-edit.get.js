@@ -29,6 +29,7 @@ function main()
       {
          data = eval('(' + result + ')');
          rule = jsonUtils.toJSONString(data);
+         model.ruleTitle = data.title;
       }
    }
    model.rule = rule;

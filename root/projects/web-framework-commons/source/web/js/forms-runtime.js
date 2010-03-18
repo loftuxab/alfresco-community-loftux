@@ -251,7 +251,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             }
             
             // determine if the AJAX and JSON submission should be enabled
-            if (form.enctype && form.enctype === "application/json")
+            if (form.getAttribute("enctype") && form.getAttribute("enctype") == "application/json")
             {
                this.ajaxSubmit = true;
                this.submitAsJSON = true;
