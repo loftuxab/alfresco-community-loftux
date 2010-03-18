@@ -285,7 +285,12 @@
             Dom.addClass(this.id + "-applyToChildren", this.rule.applyToChildren == true ? "enabled" : "disabled");
 
             // Display all rule configs (when, if, unless & action)
-            this.displayRuleConfigs(this.rule, Alfresco.RuleConfig.MODE_TEXT, null);
+            var noOfConfigsArray = this.displayRuleConfigs(this.rule, Alfresco.RuleConfig.MODE_TEXT, null);
+            Dom.removeClass(this.id + "-body", "both-conditions");
+            if (noOfConfigsArray[1] > 0 && noOfConfigsArray[2] > 0 )
+            {
+               Dom.addClass(this.id + "-body", "both-conditions");
+            }
 
             // Display component again
             Alfresco.util.Anim.fadeIn(this.widgets.displayEl);

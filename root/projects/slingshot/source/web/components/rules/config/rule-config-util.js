@@ -209,10 +209,12 @@
        * @method displayRuleConfigs
        * @param rule {object} The object describing the rule with the info to display as rule configs
        * @param mode {string}
+       * @return {array} the number of configs for each of the for config types.
        */
       displayRuleConfigs: function RuleEditUtil_displayRuleConfigs(rule, mode, form)
       {
-         var ruleConfig = null;
+         var ruleConfig = null,
+            result = [];
 
          // Transform types into a config object for event section
          var typeConfigs = [];
@@ -233,6 +235,7 @@
             mode: mode
          });
          ruleConfig.displayRuleConfigs(typeConfigs);
+         result.push(typeConfigs.length);
 
          // Add all conditions to if OR unless config sections
          var ifConditionConfigs = [],
@@ -261,6 +264,7 @@
             ruleConfigDefinitionKey: "conditionDefinitionName"
          });
          ruleConfig.displayRuleConfigs(ifConditionConfigs);
+         result.push(ifConditionConfigs.length);
 
          // Initialise unless condition config
          ruleConfig = this.ruleConfigs[this.id + "-ruleConfigUnlessCondition"];
@@ -272,6 +276,7 @@
             ruleConfigDefinitionKey: "conditionDefinitionName"
          });
          ruleConfig.displayRuleConfigs(unlessConditionConfigs);
+         result.push(unlessConditionConfigs.length);
 
          // Add actions to action section and initilise action config
          ruleConfig = this.ruleConfigs[this.id + "-ruleConfigAction"];
@@ -283,6 +288,9 @@
             ruleConfigDefinitionKey: "actionDefinitionName"
          });
          ruleConfig.displayRuleConfigs(rule.action.actions);
+         result.push(rule.action.actions.length);
+
+         return result;
       }
 
    };
