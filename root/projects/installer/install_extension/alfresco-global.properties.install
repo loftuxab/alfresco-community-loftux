@@ -106,8 +106,14 @@ alfresco_user_store.adminpassword=@@ADMIN_PWD@@
 #authentication.chain=alfrescoNtlm1:alfrescoNtlm
 
 #
-# IMAP
+# URL Generation Parameters (The ${localname} token is replaced by the local server name)
 #-------------
-#imap.server.enabled=true
-#imap.server.port=143
-#imap.server.host=localhost
+#alfresco.context=alfresco
+#alfresco.host=${localname}
+#alfresco.port=8080
+#alfresco.protocol=http
+#
+#share.context=share
+#share.host=${localname}
+#share.port=8080
+#share.protocol=http
