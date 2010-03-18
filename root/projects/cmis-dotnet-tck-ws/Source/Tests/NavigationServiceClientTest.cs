@@ -49,7 +49,7 @@ namespace WcfCmisWSTests
 
         public void testFilteredDescedantsReceving()
         {
-            getAndAssertDescedansts(enumTypesOfFileableObjects.any, HIERARCHY_DEPTH, TYPE_ID_PROPERTY + ", " + NAME_PROPERTY + ", " + OBJECT_IDENTIFIER_PROPERTY, enumVersioningState.none);
+            getAndAssertDescedansts(enumTypesOfFileableObjects.any, HIERARCHY_DEPTH, TYPE_ID_PROPERTY + "," + NAME_PROPERTY + "," + OBJECT_IDENTIFIER_PROPERTY, enumVersioningState.none);
         }
 
         public void testDescedantsRecevingIncludeRenditions()
@@ -96,7 +96,7 @@ namespace WcfCmisWSTests
 
         public void testFilteredFoldersTreeReceving()
         {
-            getAndAssertDescedansts(enumTypesOfFileableObjects.any, HIERARCHY_DEPTH, NAME_PROPERTY + ", " + OBJECT_IDENTIFIER_PROPERTY, enumVersioningState.none);
+            getAndAssertDescedansts(enumTypesOfFileableObjects.any, HIERARCHY_DEPTH, NAME_PROPERTY + "," + OBJECT_IDENTIFIER_PROPERTY, enumVersioningState.none);
         }
 
         public void testChildrenReceving()
@@ -106,7 +106,7 @@ namespace WcfCmisWSTests
 
         public void testFilteredChildrenReceving()
         {
-            getAndAssertChildren(TYPE_ID_PROPERTY + ", " + OBJECT_IDENTIFIER_PROPERTY, 0, MAX_REQUESTED_COUNT);
+            getAndAssertChildren(TYPE_ID_PROPERTY + "," + OBJECT_IDENTIFIER_PROPERTY, 0, MAX_REQUESTED_COUNT);
         }
 
         public void testChildrenRecevingIncludeRenditions()
@@ -296,7 +296,7 @@ namespace WcfCmisWSTests
 
             for (int i = 0; i < documentsAmount; i++)
             {
-                string documentId = createAndAssertObject(folderId, enumVersioningState.checkedout).ObjectId;
+                string documentId = createAndAssertObject(folderId, enumVersioningState.checkedout, false).ObjectId;
                 hierarchy[i + 1] = documentId;
             }
 
@@ -575,10 +575,10 @@ namespace WcfCmisWSTests
             bool anyProperties = false;
             if (filter.Equals(ANY_PROPERTY_FILTER))
             {
-                filter = NAME_PROPERTY + ", " + OBJECT_IDENTIFIER_PROPERTY;
+                filter = NAME_PROPERTY + "," + OBJECT_IDENTIFIER_PROPERTY;
                 anyProperties = true;
             }
-            string[] expectedProperties = filter.Replace(" ", "").Split(", ".ToCharArray());
+            string[] expectedProperties = filter.Replace(" ", "").Split(",".ToCharArray());
             if (!anyProperties)
             {
                 Assert.IsTrue(getSize(properties.Items) == getSize(expectedProperties), "Expected properties size doesn't equal to received properties size");

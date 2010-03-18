@@ -66,7 +66,7 @@ namespace WcfCmisWSTests
 
         public void testFilteredRelationshipsReceiving()
         {
-            string filter = OBJECT_IDENTIFIER_PROPERTY + ", " + TYPE_ID_PROPERTY + ", " + SOURCE_OBJECT_ID + ", " + TARGET_OBJECT_ID;
+            string filter = OBJECT_IDENTIFIER_PROPERTY + "," + TYPE_ID_PROPERTY + "," + SOURCE_OBJECT_ID + "," + TARGET_OBJECT_ID;
             cmisObjectListType response = getAndAssertRelationship(false, enumIncludeRelationships.source, null, filter, false, null, null);
             foreach (cmisObjectType currentObject in response.objects)
             {

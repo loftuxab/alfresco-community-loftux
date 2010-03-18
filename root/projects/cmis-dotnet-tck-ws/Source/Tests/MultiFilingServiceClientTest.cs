@@ -117,8 +117,8 @@ namespace WcfCmisWSTests
             {
                 cmisExtensionType extensions = new cmisExtensionType();
                 multifilingServiceClient.addObjectToFolder(getAndAssertRepositoryId(), childFolder.ObjectId, parentFolder.ObjectId, false, ref extensions);
-                deleteObjectAndLogIfFailed(parentFolder, "Folder Object was created but it can't be deleted. Error cause message: ");
                 deleteObjectAndLogIfFailed(childFolder, "Folder Object was created but it can't be deleted. Error cause message: ");
+                deleteObjectAndLogIfFailed(parentFolder, "Folder Object was created but it can't be deleted. Error cause message: ");
                 Assert.Fail("Folder Object can't be Multi-filled");
             }
             catch (Exception e)
@@ -233,7 +233,7 @@ namespace WcfCmisWSTests
                     deleteAndAssertMultifilledDocument(multiFilledDocument);
                     if (e is FaultException<cmisFaultType>)
                     {
-                        assertException((FaultException<cmisFaultType>)e, enumServiceException.notSupported);
+                        assertException((FaultException<cmisFaultType>)e, null);
                     }
                     else
                     {
