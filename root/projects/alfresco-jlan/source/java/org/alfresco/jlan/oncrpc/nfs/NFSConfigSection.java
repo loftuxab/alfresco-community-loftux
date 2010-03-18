@@ -21,6 +21,7 @@ package org.alfresco.jlan.oncrpc.nfs;
 
 import org.springframework.extensions.config.ConfigElement;
 import org.alfresco.jlan.oncrpc.RpcAuthenticator;
+import org.alfresco.jlan.oncrpc.portmap.PortMapper;
 import org.alfresco.jlan.server.config.ConfigId;
 import org.alfresco.jlan.server.config.ConfigSection;
 import org.alfresco.jlan.server.config.ConfigurationListener;
@@ -45,7 +46,7 @@ public class NFSConfigSection extends ConfigSection {
 
   //  Port mapper port
   
-  private int m_portMapperPort;
+  private int m_portMapperPort = PortMapper.DefaultPort;
   
   //  Mount server port
   
@@ -54,6 +55,10 @@ public class NFSConfigSection extends ConfigSection {
   //  NFS server port
   
   private int m_nfsServerPort;
+  
+  // RPC registration port, 0 = use next free non-privileged port
+  
+  private int m_rpcRegisterPort;
   
   //  NFS debug flags
   
@@ -142,6 +147,15 @@ public class NFSConfigSection extends ConfigSection {
    */
   public final int getNFSServerPort() {
     return m_nfsServerPort;
+  }
+  
+  /**
+   * Return the RPC registration port
+   * 
+   * @return int
+   */
+  public final int getRPCRegistrationPort() {
+	  return m_rpcRegisterPort;
   }
   
   /**
@@ -318,6 +332,26 @@ public class NFSConfigSection extends ConfigSection {
 
     int sts = fireConfigurationChange(ConfigId.NFSServerPort, new Integer(port));
     m_nfsServerPort = port;
+    
+    //  Return the change status
+    
+    return sts;
+  }
+  
+  /**
+   * Set the RPC registration port
+   * 
+   * @param port int
+   * @return int
+   * @throws InvalidConfigurationException
+   */
+  public final int setRPCRegistrationPort(int port)
+    throws InvalidConfigurationException {
+    
+    //  Inform listeners, validate the configuration change
+
+    int sts = fireConfigurationChange(ConfigId.NFSRPCRegistrationPort, new Integer(port));
+    m_rpcRegisterPort = port;
     
     //  Return the change status
     
