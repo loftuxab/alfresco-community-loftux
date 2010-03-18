@@ -12,11 +12,11 @@
    );
 //]]></script>
 <div id="${el}-body" class="rule-edit">
-   <form id="${el}-rule-form" method="" action="">
+   <form id="${el}-rule-form" method="" action="" enctype="application/json">
       <input id="${el}-id" type="hidden" name="id" value=""/> 
       <input type="hidden" name="action.actionDefinitionName" value="composite-action"/>
       
-      <h1 class="edit-header">${msg("header.editRule")}<#if folder??>: ${folder.name}</#if></h1>
+      <h1 class="edit-header">${msg("header.editRule")}<#if ruleTitle??>: ${ruleTitle}</#if></h1>
       <h1 class="create-header">${msg("header.newRule")}</h1>
 
       <div class="caption">
