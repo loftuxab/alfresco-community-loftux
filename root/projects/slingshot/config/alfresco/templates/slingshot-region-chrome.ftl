@@ -1,3 +1,3 @@
-<div id="${htmlid}">
+<div id="${htmlid!""}">
 <@regionInclude/>
 </div>
