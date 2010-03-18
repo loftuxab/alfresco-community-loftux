@@ -350,21 +350,27 @@
          if (checkboxEl && this.options.mode == RC.MODE_EDIT)
          {
             Dom.removeClass(checkboxEl, "hidden");
+            checkboxEl.checked = ruleConfigs.length > 0;
          }
 
          if (!ruleConfigs || ruleConfigs.length == 0)
          {
-            ruleConfigs = [ {} ];
             if (this.options.mode == RC.MODE_TEXT)
             {
                // Hide this component we are in text mode and ther's nothing to display
                Dom.addClass(this.id + "-body", "hidden");
+            }
+            else
+            {
+               ruleConfigs.push({});
+               Dom.addClass(this.id + "-configs", "hidden");
             }
          }
          else
          {
             // There are rule configs to display make sure we are not hiding this component
             Dom.removeClass(this.id + "-body", "hidden");
+            Dom.removeClass(this.id + "-configs", "hidden");
          }
 
          var ruleConfig,
@@ -803,7 +809,7 @@
             });
             addButton.on("click", this.onAddConfigButtonClick, configEl, this);
             addButton.addClass("add-config");
-
+                                                                                     
             // Create remove button
             var removeButtonEl = Selector.query('div.actions .remove-config', configEl, true);
             var removeButton = new YAHOO.widget.Button(removeButtonEl,

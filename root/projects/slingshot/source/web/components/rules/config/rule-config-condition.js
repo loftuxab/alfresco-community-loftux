@@ -224,7 +224,7 @@
          }
          if (propertiesToLoad.length == 0)
          {
-            // No proeprties shall be loaded, call super class directly
+            // No properties shall be loaded, call super class directly
             Alfresco.RuleConfigCondition.superclass.displayRuleConfigs.call(this, ruleConfigs);
          }
          else

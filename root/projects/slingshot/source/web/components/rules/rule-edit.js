@@ -260,7 +260,12 @@
                   rule.ruleType.push(ruleConfigTypes[i].name);
                }
                rule.action.conditions = this.ruleConfigs[this.id + "-ruleConfigIfCondition"].getRuleConfigs();
-               rule.action.conditions.concat(this.ruleConfigs[this.id + "-ruleConfigUnlessCondition"].getRuleConfigs());
+               var unless = this.ruleConfigs[this.id + "-ruleConfigUnlessCondition"].getRuleConfigs();
+               for (i = 0, il = unless.length; i < il; i++)
+               {
+                  unless[i].invertCondition = true;
+                  rule.action.conditions.push(unless[i]);
+               }
                if (rule.action.conditions.length == 0)
                {
                   rule.action.conditions.push(

@@ -77,7 +77,7 @@
 
 .rule-config .rule-config-body li
 {
-   margin-bottom: 4px;
+   padding-bottom: 4px;
 }
 
 .rule-config .rule-config-body .name select optgroup
