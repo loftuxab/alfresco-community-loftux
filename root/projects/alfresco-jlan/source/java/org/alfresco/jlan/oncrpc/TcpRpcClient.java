@@ -21,7 +21,10 @@ package org.alfresco.jlan.oncrpc;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import org.alfresco.jlan.debug.Debug;
 
 /**
  * TCP RPC Client Connection Class
@@ -48,8 +51,40 @@ public class TcpRpcClient extends RpcClient {
     
     //	Connect a socket to the remote server
     
-    Socket sock = new Socket(getServerAddress(), getServerPort());
+    Socket sock = new Socket();
+    sock.setReuseAddress( true);
+    sock.setSoLinger( false, 0);
+    
+    sock.connect( new InetSocketAddress( addr, port));
 
+    //	Create the TCP RPC packet handler for the client connection
+    
+    m_client = new TcpRpcPacketHandler(sock, maxRpcSize);
+  }
+  
+  /**
+   * Class constructor 
+   *
+   * @param addr InetAddress
+   * @param port int
+   * @param fromAddr InetAddress
+   * @param fromPort int
+   * @param maxRpcSize int
+   * @throws IOException
+   */
+  public TcpRpcClient(InetAddress addr, int port,InetAddress fromAddr, int fromPort, int maxRpcSize)
+  	throws IOException {
+    super(addr, port, Rpc.TCP, maxRpcSize);
+    
+    //	Connect a socket to the remote server
+
+    Socket sock = new Socket();
+    sock.setReuseAddress( true);
+    sock.setSoLinger( false, 0);
+    
+   	sock.bind( new InetSocketAddress( fromAddr, fromPort));
+   	sock.connect( new InetSocketAddress( addr, port));
+    
     //	Create the TCP RPC packet handler for the client connection
     
     m_client = new TcpRpcPacketHandler(sock, maxRpcSize);

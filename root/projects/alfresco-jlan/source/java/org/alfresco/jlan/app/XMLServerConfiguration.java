@@ -657,6 +657,20 @@ public class XMLServerConfiguration extends CifsOnlyXMLServerConfiguration {
 			}
 		}
 
+		// Check for an RPC registration port
+
+		elem = findChildNode("RPCRegisterPort", nfs.getChildNodes());
+		if ( elem != null) {
+			try {
+				nfsConfig.setRPCRegistrationPort(Integer.parseInt(getText(elem)));
+				if ( nfsConfig.getRPCRegistrationPort() <= 0 || nfsConfig.getRPCRegistrationPort() >= 65535)
+					throw new InvalidConfigurationException("RPC registration port out of valid range");
+			}
+			catch (NumberFormatException ex) {
+				throw new InvalidConfigurationException("Invalid RPC registration port");
+			}
+		}
+
 		// Check if an RPC authenticator has been specified
 
 		elem = findChildNode("rpcAuthenticator", nfs.getChildNodes());
