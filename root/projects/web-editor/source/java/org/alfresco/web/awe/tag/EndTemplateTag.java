@@ -23,105 +23,62 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
-import javax.servlet.jsp.JspException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Tag used at the end of the body section of a page to indicate the end
  * of a page that potentially contains editable Alfresco content.
  * 
+ * This tag extends the Web Editor end template tag to provide custom script.
+ * 
  * @author Gavin Cornwell
  */
-public class EndTemplateTag extends AbstractWebEditorTag
+public class EndTemplateTag extends org.springframework.extensions.webeditor.taglib.EndTemplateTag
 {
-    private static final long serialVersionUID = -2917015141188997203L;
-    private static final Log logger = LogFactory.getLog(EndTemplateTag.class);
+    private static final long serialVersionUID = 963212275947772271L;
 
     /**
-     * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
+     * @see org.springframework.extensions.webeditor.taglib.EndTemplateTag#includeCustomConfiguration(java.io.Writer)
      */
-    public int doStartTag() throws JspException
+    public void includeCustomConfiguration(Writer out) throws IOException
     {
-        if (isEditingEnabled())
+        // render JavaScript to configure toolbar and edit icons
+        List<MarkedContent> markedContent = AlfrescoTagUtil.getMarkedContent(pageContext.getRequest());
+        
+        out.write("WEF.ConfigRegistry.registerConfig('org.alfresco.awe',{id:'awe',name:'awe',editables:[\n");
+        boolean first = true;
+        for (MarkedContent content : markedContent)
         {
-            try
+            if (first == false)
             {
-                Writer out = pageContext.getOut();
-
-                // get the toolbar location from the request session
-                String toolbarLocation = (String)this.pageContext.getRequest().getAttribute(KEY_TOOLBAR_LOCATION);
-
-                // render JavaScript to configure toolbar and edit icons
-                List<MarkedContent> markedContent = getMarkedContent();
-
-                // render config required for ribbon and marked content
-                out.write("<script type=\"text/javascript\">\n");
-                out.write("WEF.ConfigRegistry.registerConfig('org.springframework.extensions.webeditor.ui.ribbon',\n");
-                out.write("{ position: \"");
-                out.write(toolbarLocation);
-                out.write("\" });\n");
-                out.write("WEF.ConfigRegistry.registerConfig('org.alfresco.awe',{id:'awe',name:'awe',editables:[\n");
-                boolean first = true;
-                for (MarkedContent content : markedContent)
-                {
-                    if (first == false)
-                    {
-                        out.write(",");
-                    }
-                    else
-                    {
-                        first = false;
-                    }
-
-                    out.write("\n{\n   id: \"");
-                    out.write(encode(content.getMarkerId()));
-                    out.write("\",\n   nodeRef: \"");
-                    out.write(encode(content.getContentId()));
-                    out.write("\",\n   title: \"");
-                    out.write(encode(content.getContentTitle()));
-                    out.write("\",\n   nested: ");
-                    out.write(Boolean.toString(content.isNested()));
-                    out.write(",\n   redirectUrl: window.location.href");
-                    if (content.getFormId() != null)
-                    {
-                        out.write(",\n   formId: \"");
-                        out.write(encode(content.getFormId()));
-                        out.write("\"");
-                    }
-                    out.write("\n}");
-                }
-                out.write("]});\n");
-                out.write("\n</script>");
-
-                // request all the resources
-                out.write("<script type=\"text/javascript\" src=\"");
-                out.write(getWebEditorUrlPrefix());
-                out.write("/service/wef/resources\"></script>\n");
-
-                if (logger.isDebugEnabled())
-                    logger.debug("Completed endTemplate rendering for " + markedContent.size() + 
-                        " marked content items with toolbar location of: " + toolbarLocation);
+                out.write(",");
             }
-            catch (IOException ioe)
+            else
             {
-                throw new JspException(ioe.toString());
+                first = false;
             }
+
+            out.write("\n{\n   id: \"");
+            out.write(encode(content.getMarkerId()));
+            out.write("\",\n   nodeRef: \"");
+            out.write(encode(content.getContentId()));
+            out.write("\",\n   title: \"");
+            out.write(encode(content.getContentTitle()));
+            out.write("\",\n   nested: ");
+            out.write(Boolean.toString(content.isNested()));
+            out.write(",\n   redirectUrl: window.location.href");
+            if (content.getFormId() != null)
+            {
+                out.write(",\n   formId: \"");
+                out.write(encode(content.getFormId()));
+                out.write("\"");
+            }
+            out.write("\n}");
         }
-        else if (logger.isDebugEnabled())
+        out.write("]});\n");
+
+        if (logger.isDebugEnabled())
         {
-            logger.debug("Skipping endTemplate rendering as editing is disabled");
+            logger.debug("Completed endTemplate rendering for " + markedContent.size() + 
+                " marked content items with toolbar location of: " + getToolbarLocation());
         }
-
-        return SKIP_BODY;
-    }
-
-    /**
-     * @see javax.servlet.jsp.tagext.TagSupport#release()
-     */
-    public void release()
-    {
-        super.release();
     }
 }

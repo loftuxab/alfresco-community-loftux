@@ -22,110 +22,24 @@ package org.alfresco.web.awe.tag;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.servlet.jsp.JspException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Tag used in the head section of a page to indicate that the page potentially
  * contains editable Alfresco content.
  * 
  * @author Gavin Cornwell
  */
-public class StartTemplateTag extends AbstractWebEditorTag
+public class StartTemplateTag extends org.springframework.extensions.webeditor.taglib.StartTemplateTag
 {
-    private static final long serialVersionUID = -7242916874303242800L;
-    private static final Log logger = LogFactory.getLog(StartTemplateTag.class);
+    private static final long serialVersionUID = 1010262474360098833L;
 
-    private static final String TOP = "top";
-    private static final String LEFT = "left";
-    private static final String RIGHT = "right";
     private static final String ALF = "alf_";
-    
-    private String toolbarLocation = TOP;
 
     /**
-     * Returns the current value for the toolbar location
-     * 
-     * @return Toolbar location
+     * @see org.springframework.extensions.webeditor.taglib.StartTemplateTag#includeCustomConfiguration(java.io.Writer)
      */
-    public String getToolbarLocation()
+    public void includeCustomConfiguration(Writer out) throws IOException
     {
-        return this.toolbarLocation;
-    }
-
-    /**
-     * Sets the toolbar location
-     * 
-     * @param location Toolbar location
-     */
-    public void setToolbarLocation(String location)
-    {
-        if (location.equalsIgnoreCase(TOP))
-        {
-            this.toolbarLocation = TOP;
-        }
-        else if (location.equalsIgnoreCase(LEFT))
-        {
-            this.toolbarLocation = LEFT;
-        }
-        else if (location.equalsIgnoreCase(RIGHT))
-        {
-            this.toolbarLocation = RIGHT;
-        }
-    }
-
-    /**
-     * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
-     */
-    public int doStartTag() throws JspException
-    {
-        if (isEditingEnabled())
-        {
-            try
-            {
-                Writer out = pageContext.getOut();
-
-                // bootstrap WEF
-                out.write("<script type=\"text/javascript\" src=\"");
-                out.write(getWebEditorUrlPrefix());
-                out.write("/service/wef/bootstrap");
-                if (isDebugEnabled())
-                {
-                    out.write("?debug=true");
-                }
-                out.write("\"></script>\n");
-
-                // store the toolbar location into the request session
-                this.pageContext.getRequest().setAttribute(KEY_TOOLBAR_LOCATION, getToolbarLocation());
-
-                // store an id prefix to use in all content marker tags used on the page
-                this.pageContext.getRequest().setAttribute(KEY_MARKER_ID_PREFIX, ALF + System.currentTimeMillis());
-
-                if (logger.isDebugEnabled())
-                    logger.debug("Completed startTemplate rendering");
-            }
-            catch (IOException ioe)
-            {
-                throw new JspException(ioe.toString());
-            }
-        }
-        else if (logger.isDebugEnabled())
-        {
-            logger.debug("Skipping startTemplate rendering as editing is disabled");
-        }
-
-        return SKIP_BODY;
-    }
-
-    /**
-     * @see javax.servlet.jsp.tagext.TagSupport#release()
-     */
-    public void release()
-    {
-        super.release();
-
-        this.toolbarLocation = null;
+        // store an id prefix to use in all content marker tags used on the page
+        this.pageContext.getRequest().setAttribute(AlfrescoTagUtil.KEY_MARKER_ID_PREFIX, ALF + System.currentTimeMillis());
     }
 }

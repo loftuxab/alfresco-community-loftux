@@ -29,18 +29,24 @@ import javax.servlet.ServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.webeditor.taglib.TemplateConstants;
 
+/**
+ * This filter provides AWE-specific context to the Spring Web Editor
+ * tag libraries.
+ * 
+ * @author gavinc
+ * @author muzquiano
+ */
 public class WebEditorFilter implements Filter
 {
-    public static final String KEY_ENABLED = "awe_enabled";
-    public static final String KEY_URL_PREFIX = "awe_url_prefix";
-    public static final String KEY_DEBUG = "awe_debug";
+    private static final Log logger = LogFactory.getLog(WebEditorFilter.class);
+
     public static final String DEFAULT_CONTEXT_PATH = "/awe";
     
     private static final String PARAM_CONTEXT_PATH = "contextPath";
     private static final String PARAM_DEBUG = "debug";
-    private static final Log logger = LogFactory.getLog(WebEditorFilter.class);
-
+    
     private String urlPrefix;
     private boolean debugEnabled = Boolean.FALSE;
 
@@ -50,15 +56,15 @@ public class WebEditorFilter implements Filter
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
                 throws IOException, ServletException
     {
-        // setup the relevant objects in the request
-        request.setAttribute(KEY_ENABLED, Boolean.TRUE);
-        request.setAttribute(KEY_URL_PREFIX, this.urlPrefix);
-        request.setAttribute(KEY_DEBUG, this.debugEnabled);
+        // set up spring web editor tag library objects
+        request.setAttribute(TemplateConstants.REQUEST_ATTR_KEY_WEF_ENABLED, Boolean.TRUE);
+        request.setAttribute(TemplateConstants.REQUEST_ATTR_KEY_URL_PREFIX, this.urlPrefix);
+        request.setAttribute(TemplateConstants.REQUEST_ATTR_KEY_DEBUG_ENABLED, this.debugEnabled);
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Setup request for Web Editor: (urlPrefix: " + this.urlPrefix
-                        + ", debug: " + this.debugEnabled + ")");
+            logger.debug("Setup request for Web Editor: (urlPrefix: " + this.urlPrefix + 
+                        ", debug: " + this.debugEnabled + ")");
         }
 
         chain.doFilter(request, response);
