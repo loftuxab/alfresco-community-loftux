@@ -16,7 +16,7 @@
       new Alfresco.ContentControl("${fieldHtmlId}").setOptions(
       {
          <#if field.disabled>disabled: true,</#if>
-         currentValue: "${field.value}",
+         currentValue: "${field.value?js_string}",
          mandatory: ${field.mandatory?string},
          formMode: "${form.mode}",
          nodeRef: "${context.properties.nodeRef!""}",
@@ -35,7 +35,7 @@
    
    <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
    <textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" columns="${columns}" tabindex="0"
-             <#if field.description??>title="${field.description}"</#if>
+             <#if field.description??>title="${field.description?html}"</#if>
              <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
              <#if field.disabled>disabled="true"</#if>><#if jsDisabled>${field.content?html}</#if></textarea>
 </div>
