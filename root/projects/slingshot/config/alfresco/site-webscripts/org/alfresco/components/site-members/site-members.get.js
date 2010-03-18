@@ -3,9 +3,13 @@ var siteId, theUrl, json, membership, data;
 siteId = page.url.templateArgs.site;
 
 // get the membership info for the current user in the current site
-theUrl = "/api/sites/" + siteId + "/memberships/" + stringUtils.urlEncode(user.name);
-json = remote.call(theUrl);
-membership = eval('(' + json + ')');
+membership = context.properties["memberships"];
+if (!membership)
+{
+   theUrl = "/api/sites/" + siteId + "/memberships/" + stringUtils.urlEncode(user.name);
+   json = remote.call(theUrl);
+   membership = eval('(' + json + ')');
+}
 
 // add the role to the model
 model.currentUserRole = membership.role ? membership.role : "";

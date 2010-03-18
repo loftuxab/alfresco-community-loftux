@@ -43,15 +43,19 @@ function main ()
    {
 	   //If we are, call the repository to see if the user is site manager or not
 	   userIsSiteManager = false;
-	   var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
-	   if (json.status == 200)
-	   {
-	      var obj = eval('(' + json + ')');
-	      if (obj.role)
-	      {
-	         userIsSiteManager = (obj.role == "SiteManager");
-	      }
-	   }
+      var obj = context.properties["memberships"];
+      if (!obj)
+      {
+   	   var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
+   	   if (json.status == 200)
+   	   {
+   	      obj = eval('(' + json + ')');
+   	   }
+   	}
+   	if (obj)
+   	{
+	      userIsSiteManager = (obj.role == "SiteManager");
+   	}
    }
    model.userIsSiteManager = userIsSiteManager;
 }
