@@ -91,6 +91,7 @@
 .form-container .help-icon
 {
    margin-left: 0.4em;
+   position: absolute;
 }
 
 .form-container .help-icon img

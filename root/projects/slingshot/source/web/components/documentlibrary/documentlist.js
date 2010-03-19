@@ -61,7 +61,6 @@
       this.currentPath = "";
       this.currentPage = 1;
       this.totalRecords = 0;
-      this.expectedHistoryEvent = false;
       this.showingMoreActions = false;
       this.state =
       {
@@ -466,16 +465,6 @@
        * @type object
        */
       selectedFiles: null,
-
-      /**
-       * Flag to indicate this HistoryManager event was expected.
-       * An unexpected event means the user has updated the URL hash manually.
-       * 
-       * @property expectedHistoryEvent
-       * @type boolean
-       * @default false
-       */
-      expectedHistoryEvent: null,
 
       /**
        * Current actions menu being shown
@@ -1101,7 +1090,7 @@
          
          this.options.initialFilter = fnDecodeBookmarkedFilter(bookmarkedFilter);
 
-         // Register History Manager path update callback
+         // Register History Manager filter update callback
          YAHOO.util.History.register("filter", bookmarkedFilter, function DL_onHistoryManagerFilterChanged(newFilter)
          {
             Alfresco.logger.debug("HistoryManager: filter changed:" + newFilter);

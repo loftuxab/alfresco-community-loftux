@@ -78,6 +78,15 @@ hr
    min-height: 1.8em;
 }
 
+.yui-t1
+{
+   width: auto;
+}
+.yui-t1 #yui-main
+{
+   margin-left: -50em;
+}
+
 /* Page title and navigation styles */
 
 .page-title
@@ -454,6 +463,11 @@ div.dashlet div.hdr
 .tag
 {
    white-space: nowrap;
+}
+
+.filter h2
+{
+   margin-top: 1em;
 }
 
 .filter ul

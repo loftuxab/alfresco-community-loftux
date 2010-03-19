@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/data-lists</template-type>
+   <properties>
+      <pageFamily>data-lists</pageFamily>
+      <container>dataLists</container>
+   </properties>
+</template-instance>
+

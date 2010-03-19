@@ -1606,6 +1606,11 @@
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/aspects.js" />
       </concat>
 
+      <concat destfile="${dir.project.slingshot.assemble}/js/datalist-actions.js" force="yes" binary="yes">
+         <fileset file="${dir.project.slingshot.src.web}/components/data-lists/actions.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
+      </concat>
+
       <echo>Compressing Slingshot Javascript...</echo>
       <minimize-javascript sourcedir="${dir.project.slingshot.assemble}" 
                            destdir="${dir.project.slingshot.assemble}" />

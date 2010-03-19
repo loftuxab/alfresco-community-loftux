@@ -1,0 +1,16 @@
+#Share #alfresco-CreateList-instance-form .yui-u.first
+{
+   margin-left:1em;
+   text-align:left;
+   width:90%;
+}
+
+#Share #alfresco-CreateList-instance-form .yui-u label
+{
+   display:block;
+}
+
+#Share #alfresco-CreateList-instance-form .yui-u select
+{
+   width:100%;
+}

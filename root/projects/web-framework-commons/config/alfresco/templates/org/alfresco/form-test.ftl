@@ -171,5 +171,11 @@
 
       </div>
 
+   <#-- This function call MUST come after all other component includes. -->
+      <div id="alfresco-yuiloader"></div>
+      <script type="text/javascript">//<![CDATA[
+         Alfresco.util.YUILoaderHelper.loadComponents();
+      //]]></script>
+
    </body>
 </html>

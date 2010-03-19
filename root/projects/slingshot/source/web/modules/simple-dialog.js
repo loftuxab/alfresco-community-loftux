@@ -481,6 +481,7 @@
             }
          });
          this.form.setSubmitAsJSON(true);
+         this.form.setShowSubmitStateDynamically(true, false);
 
          // Initialise the form
          this.form.init();

@@ -16,7 +16,9 @@
             "path": true,
             "page": true,
             "filter": true
-         };
+         },
+            filterDataParam = "filterData";
+         
          for (q in qs)
          {
             if (qs.hasOwnProperty(q) && q in hashParams)
@@ -28,6 +30,15 @@
                else
                {
                   hash += "&" + q + "=" + encodeURIComponent(qs[q]);
+                  if (q === "filter")
+                  {
+                     // Check for filterData in QueryString for the "filter" case
+                     if (qs.hasOwnProperty(filterDataParam))
+                     {
+                        hash += "|" + encodeURIComponent(qs[filterDataParam]);
+                        delete qs[filterDataParam];
+                     }
+                  }
                }
                delete qs[q];
             }
@@ -54,7 +65,7 @@
    </div>
    <div id="bd">
       <@region id=doclibType + "actions-common" scope="template" protected=true />
-      <div class="yui-t1" id="divDocLibraryWrapper">
+      <div class="yui-t1">
          <div id="yui-main">
             <div class="yui-b" id="divDocLibraryDocs">
                <@region id=doclibType + "toolbar" scope="template" protected=true />

@@ -1,0 +1,60 @@
+.datalists .header-bar
+{
+   margin-left: -10px;
+   min-height: 2em;
+   padding: 4px 1em;
+}
+
+.datalists .left
+{
+   float: left;
+}
+
+.datalists .new-list span.first-child
+{
+   background: url(../images/new-list-16.png) no-repeat 12px 4px;
+   padding-left: 24px;
+}
+
+.datalists h2
+{
+   padding-top: 0.5em;
+}
+
+.datalists li
+{
+   background: url(../images/list-16.png) no-repeat 4px 4px;
+   overflow-x: hidden;
+   padding: 4px 0 3px 24px;
+}
+
+.datalists .horiz-rule
+{
+   border-bottom: 1px solid #c0c0c0;
+   margin-left: -10px;
+}
+
+.form-container .form-fields
+{
+   border-bottom: medium none;
+   padding: 1em;
+}
+
+.form-container .form-fields .item-types
+{
+   border: 1px solid #C5D6E2;
+   height: 20em;
+   overflow-x: hidden;
+   overflow-y: auto;
+   padding: 4px 0;
+}
+
+.form-container .form-fields .item-types div
+{
+   background-image: url(../images/list-32.png);
+   background-position: 4px 4px;
+   background-repeat: no-repeat;
+   cursor: pointer;
+   min-height: 44px;
+   padding: 4px 0 4px 44px;
+}
