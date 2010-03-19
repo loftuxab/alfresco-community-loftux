@@ -479,7 +479,7 @@
             if (rule.owningNode)
             {
                var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0],
-                  url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",
+                  url = YAHOO.lang.substitute("folder-rules?nodeRef={nodeRef}",
                {
                   siteId: this.options.siteId,
                   nodeRef: rule.owningNode.nodeRef

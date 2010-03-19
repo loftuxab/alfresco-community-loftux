@@ -122,6 +122,7 @@
          {
             disabled: true
          });
+         this.widgets.doneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneButtonClick);
 
          // Display folder name & appropriate actions if info has been given
          this.isReady = true;
@@ -189,7 +190,7 @@
        */
       onViewLinkedToFolderButtonClick: function RulesLinked_onViewLinkedToFolderButtonClick(type, args)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/folder-rules?nodeRef={nodeRef}",
+         var url = YAHOO.lang.substitute("folder-rules?nodeRef={nodeRef}",
          {
             siteId: this.linkedToFolder.site, 
             nodeRef: this.linkedToFolder.nodeRef
@@ -221,6 +222,20 @@
                nodeRef: this.options.nodeRef.toString()
             }
          }).showDialog();
+      },
+
+
+      /**
+       * Called when user clicks on the done button.
+       * Takes the user to the folders detail page.
+       *
+       * @method onDoneButtonClick
+       * @param type
+       * @param args
+       */
+      onDoneButtonClick: function RulesLinked_onDoneButtonClick(type, args)
+      {
+         this._navigateForward();
       },
 
       /**
@@ -279,6 +294,27 @@
             this.widgets.unlinkRulesButton.set("disabled", false);
             this.widgets.titleEl.innerHTML = this.linkedToFolder.name;
             this.widgets.pathEl.innerHTML = this.linkedToFolder.path;
+         }
+      },
+
+      /**
+       * Displays the corresponding details page for the current folder
+       *
+       * @method _navigateForward
+       * @private
+       */
+      _navigateForward: function EditMetadataMgr__navigateForward()
+      {
+         /* Did we come from the document library? If so, then direct the user back there */
+         if (document.referrer.match(/documentlibrary([?]|$)/) || document.referrer.match(/repository([?]|$)/))
+         {
+            // go back to the referrer page
+            history.go(-1);
+         }
+         else
+         {
+            // go forward to the appropriate details page for the node
+            window.location.href = "folder-details?nodeRef=" + this.options.nodeRef.toString();
          }
       }
 

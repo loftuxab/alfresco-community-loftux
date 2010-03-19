@@ -23,7 +23,7 @@
          <span class="mandatory-indicator">*</span> ${msg("form.required.fields")}
       </div>
 
-      <div class="rule-form">
+      <div class="rule-form theme-bg-color-7 theme-border-3">
 
          <h2>${msg("header.general")}</h2>
          <hr/>
