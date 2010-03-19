@@ -113,6 +113,7 @@
             id: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             name: 'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root',
             label: '<img src="' + contextPath + '/res/awe/images/edit.png" alt="'+ this.getMessage('awe.toolbar-tab-label') +'" />',
+            title: this.getMessage('awe.toolbar-tab-label'),
             content: '',
             active: true,
             pluginOwner:this
@@ -123,6 +124,7 @@
             {
                type: 'menu',
                label: '<img src="' + contextPath + '/res/awe/images/quick-edit.png" alt="'+ this.getMessage('awe.toolbar-quick-edit-icon-label') +'" />',
+               title: this.getMessage('awe.toolbar-quick-edit-icon-label'),
                value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                icon: true,
@@ -143,6 +145,7 @@
             {
                type: 'push',
                label: '<img src="' + contextPath + '/res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('awe.toolbar-toggle-markers-icon-label') +'" />',
+               title: this.getMessage('awe.toolbar-toggle-markers-icon-label'),
                value: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
                icon: true
@@ -155,6 +158,7 @@
             {
                type: 'push',
                label: this.getMessage('awe.toolbar-logout-label'),
+               title: this.getMessage('awe.toolbar-logout-label'),
                value: 'loggedout',
                id: this.config.name + WebEditor.SEPARATOR + 'loggedout',
                icon: true,
@@ -336,13 +340,13 @@
          {
             Dom.setStyle(editMarkers, 'display', '');
             this.onShowHideClick.isHidden = false;
-            butImg.src = butImg.src.replace('-on.png','-off.png')
+            butImg.src = butImg.src.replace('-on.png','-off.png');
          }
          else
          {
             Dom.setStyle(editMarkers, 'display', 'none');
             this.onShowHideClick.isHidden = true;
-            butImg.src = butImg.src.replace('-off.png','-on.png')            
+            butImg.src = butImg.src.replace('-off.png','-on.png');           
          }
       },
 
@@ -401,7 +405,7 @@
       
       onHelp: function AWE_onHelp()
       {
-         window.open('http://www.alfresco.com/help/32/labs/sharehelp/','wef-help');
+         window.open('http://www.alfresco.com/help/32/labs/sharehelp/','wefhelp');
       },
 
       onQuickEditMouseOver: function AWE_onQuickEditMouseOver(e, args)
