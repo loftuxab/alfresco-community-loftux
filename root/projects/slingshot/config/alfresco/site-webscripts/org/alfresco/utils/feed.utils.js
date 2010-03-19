@@ -176,10 +176,11 @@ function parseRssFeed(rss, rssStr, limit)
             
       if (hasMediaExtension)
       {
+         // We only look for the thumbnail as a direct child in RSS
          var thumbnail = item.media::thumbnail;
-         if (thumbnail)
+         if (thumbnail && thumbnail.@url.toString())
          {
-            obj["image"] = item.media::thumbnail.@url.toString();
+            obj["image"] = thumbnail.@url.toString();
          }
 
          var attachment = item.media::content;
@@ -226,9 +227,18 @@ function parseAtomFeed(atom, atomStr, limit)
    default xml namespace = new Namespace("http://www.w3.org/2005/Atom");
    atom = new XML(atomStr);
 
+   // Do we have the media extensions such as thumbnails?
+   var mediaRe = /xmlns\:media="([^"]+)"/;
+   var hasMediaExtension = mediaRe.test(atomStr);
+   if(hasMediaExtension)
+   {
+      var media = new Namespace("http://search.yahoo.com/mrss/");
+   }
+
    var items = [],
       entry,
       link,
+      obj,
       count = 0;
    for each (entry in atom.entry)
    {
@@ -237,12 +247,48 @@ function parseAtomFeed(atom, atomStr, limit)
          break;
       }
 
-      items.push(
-   	{
+      obj = {
    		"title": entry.title.toString(),
    		"description": entry.summary.toString().replace(/(target=)/g, "rel="),
          "link": entry.link[0] ? entry.link[0].@href.toString() : null
-   	});
+   	};
+     
+      if (hasMediaExtension)
+      {
+         // In Atom, it could be a direct child
+         var thumbnail = entry.media::thumbnail;
+         if (thumbnail && thumbnail.@url.toString())
+         {
+            obj["image"] = thumbnail.@url.toString();
+         }
+         else 
+         {
+            // If not, it could be attached to one of the link tags,
+            //  typically a <link rel="alternate">
+            var found = false;
+            for each (link in entry.link)
+            {
+               var rel = link.@rel.toString();
+               if(! found && (!rel || rel == "alternate"))
+               {
+                  // Thumbnail can be on the link, or inside a media:content
+                  thumbnail = link.media::thumbnail;
+                  if (!thumbnail || !thumbnail.@url.toString())
+                  {
+                     thumbnail = link.media::content.media::thumbnail[0];
+                  }
+
+                  if (thumbnail && thumbnail.@url.toString())
+                  {
+                     found = true;
+                     obj["image"] = thumbnail.@url.toString();
+                  }
+               }
+            }
+         }
+      }
+
+      items.push(obj);
 
       ++count;
    }
