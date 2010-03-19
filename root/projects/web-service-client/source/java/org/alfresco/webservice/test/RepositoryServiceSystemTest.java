@@ -21,6 +21,9 @@ package org.alfresco.webservice.test;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.repository.Association;
@@ -220,6 +223,120 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         }
     }    
 
+    /**
+     * Tests the query service call
+     */
+    private String[] getMissingProperties(List<PropertyDefinition> actualProperties, Map<String, NamedValue> searchProperties)
+    {
+        List<String> missingProps = new ArrayList<String>();
+        for(PropertyDefinition propDef : actualProperties)
+        {
+            System.out.print("Checking whether " + propDef.getName() + " exists in search properties...");
+            if(!searchProperties.containsKey(propDef.getName())) {
+                System.out.println("Nope");
+                missingProps.add(propDef.getName());
+            } else {
+                System.out.println("");
+            }
+        }
+        
+        return missingProps.toArray(new String[0]);
+    }
+
+    /**
+     *  Tests that Query returns all the properties for matching nodes
+     */
+    public void testALF649() throws Exception
+    {
+        Query query = new Query(Constants.QUERY_LANG_LUCENE,
+                "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
+
+        QueryResult queryResult = WebServiceFactory.getRepositoryService().query(BaseWebServiceSystemTest.store, query,
+                false);
+        assertNotNull("queryResult should not be null", queryResult);
+
+        ResultSet resultSet = queryResult.getResultSet();
+        assertNotNull("The result set should not be null", resultSet);
+        logger.debug("There are " + resultSet.getTotalRowCount() + " rows:");
+
+        if (resultSet.getTotalRowCount() > 0)
+        {
+            ResultSetRow[] rows = resultSet.getRows();
+            for (int x = 0; x < rows.length; x++)
+            {
+                ResultSetRow row = rows[x];
+                NamedValue[] columns = row.getColumns();
+                for (int y = 0; y < columns.length; y++)
+                {
+                    logger.debug("row " + x + ": "
+                            + row.getColumns(y).getName() + " = "
+                            + row.getColumns(y).getValue());
+                }
+                
+                // Check that the aspects are being set
+                ResultSetRowNode node = row.getNode();
+
+                // Get the actual properties of the node
+                // create a predicate object to to send to describe method
+                Reference ref = new Reference();
+                ref.setStore(BaseWebServiceSystemTest.store);
+                ref.setUuid(node.getId());
+                Predicate predicate = new Predicate(new Reference[] { ref }, null, null);
+                NodeDefinition[] nodeDefs = WebServiceFactory.getRepositoryService().describe(predicate);
+                assertNotNull("SearchTest nodeDefs is null", nodeDefs);
+                assertTrue("SearchTest expected only 1 node match", nodeDefs.length == 1);
+
+                List<PropertyDefinition> nodeProperties = new ArrayList<PropertyDefinition>();
+                
+                ClassDefinition type = nodeDefs[0].getType();
+                assertNotNull("SearchTest node type is null", type);
+                PropertyDefinition[] propDefs = type.getProperties();
+                if(null != propDefs) {
+                    for(PropertyDefinition propDef : propDefs) {
+                        System.out.println("Adding " + propDef.getName() + " to node properties.");
+                        nodeProperties.add(propDef);
+                    }
+                }
+
+                for(ClassDefinition classDef : nodeDefs[0].getAspects()) {
+                    System.out.println("SearchTest classDef name = " + classDef.getName());
+                    propDefs = classDef.getProperties();
+                    if(null != propDefs) {
+                        for(PropertyDefinition propDef : propDefs) {
+                            if(propDef.isMandatory()) {
+                                System.out.println("Adding " + propDef.getName() + " from aspect " + classDef.getName() + " to node properties.");
+                                nodeProperties.add(propDef);
+                            } else {
+                                System.out.println("Property " + propDef.getName() + " from aspect " + classDef.getName() + " is not mandatory, not adding to node properties.");                                
+                            }
+                        }
+                    }
+                }
+
+                // Compare properties
+                Map<String, NamedValue> searchProperties = new HashMap<String, NamedValue>();
+                for(NamedValue column : row.getColumns()) {
+                    System.out.println("Adding " + column.getName() + " to search properties.");
+                    searchProperties.put(column.getName(), column);
+                }
+                String[] missingProperties = getMissingProperties(nodeProperties, searchProperties);
+
+                if(missingProperties.length > 0) {
+                    StringBuilder sb = new StringBuilder("Search results do not include all node properties\n");
+                    for(String missingProp : missingProperties) {
+                        sb.append("Missing property: " + missingProp + "\n");
+                    }
+                    fail(sb.toString());
+                }
+            }
+            
+        } else
+        {
+            logger.debug("The query returned no results");
+            fail("The query returned no results");
+        }
+    }    
+    
     /**
      * Tests the queryParents service method
      */
