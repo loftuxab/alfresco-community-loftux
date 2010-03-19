@@ -176,7 +176,7 @@
        */
       onNewRuleButtonClick: function RulesHeader_onNewRuleButtonClick(type, args)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/rule-edit?nodeRef={nodeRef}",
+         var url = YAHOO.lang.substitute("rule-edit?nodeRef={nodeRef}",
          {
             siteId: this.options.siteId,
             nodeRef: this.options.nodeRef.toString()

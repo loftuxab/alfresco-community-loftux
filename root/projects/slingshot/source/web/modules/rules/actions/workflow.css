@@ -2,3 +2,13 @@
 {
    padding: 0.5em;
 }
+
+.workflow .bd select 
+{
+   width: 8em;
+}
+
+.workflow .bd input[type=text]
+{
+   width: 10em;
+}

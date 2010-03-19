@@ -279,7 +279,7 @@
          var statusLabel = Alfresco.util.blog.generatePostStatusLabel(this, data);
          var authorLink = Alfresco.util.people.generateUserLink(data.author);
           
-         var html = '<div id="' + this.id + '-postview" class="node post postview">';
+         var html = '<div id="' + this.id + '-postview" class="node post postview theme-bg-color-6 theme-border-3">';
          html += Alfresco.util.blog.generateBlogPostActions(this, data, 'div', this.showPublishingActions);
   
          // content

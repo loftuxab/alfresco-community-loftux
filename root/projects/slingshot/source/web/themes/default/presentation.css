@@ -598,7 +598,6 @@ body.yui-skin-default .doclist tr.yui-dt-highlighted
 
 body.yui-skin-default .links-body tr.links-selected-row,
 body.yui-skin-default .over,
-.postview,
 .topicview
 {
    background-color: #f4faff;
@@ -722,7 +721,8 @@ body.yui-skin-default .categoryview .selected div.ygtvchildren table .ygtvlabel:
 .yui-skin-default .doclist .documents a,
 .yui-skin-default .attrValue a,
 .yui-skin-default .detail .item a,
-.yui-skin-default .info .meta-value a
+.yui-skin-default .info .meta-value a,
+.yui-skin-default .rules-none a
 {
    color: #4F94C9;
 }
@@ -849,6 +849,21 @@ div.theme-bg-color-5
    background-color: #2B6EB5;
 }
 
+.theme-bg-color-6,
+div.theme-bg-color-6
+{
+   background-color: #F4FAFF;
+}
+
+/* Used for editing - same as meta data fields */
+
+.theme-bg-color-7,
+div.theme-bg-color-7
+{
+   background-color: #F5FFF2;
+}
+
+
 .theme-bg-1
 {
 
@@ -870,4 +885,9 @@ div.theme-bg-color-5
 .theme-border-2
 {
    border-color: #2B6EB5;
+}
+
+.theme-border-3
+{
+   border: 1px solid #c6c6c6 !important;
 }

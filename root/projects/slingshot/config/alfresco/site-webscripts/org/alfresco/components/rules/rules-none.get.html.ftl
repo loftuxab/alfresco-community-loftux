@@ -8,17 +8,14 @@
       ${messages}
    );
 //]]></script>
-<div id="${el}-body" class="rules-none">
-   <div class="yui-g">
-      <div class="yui-u first">
-         <h2>${msg("header.create-rule")}</h2>
-         <div>${msg("text.create-rule")}</div>
-         <input type="button" id="${el}-createRule-button" value="${msg("button.create-rule")}" tabindex="0"/>
-      </div>
-      <div class="yui-u">
-         <h2>${msg("header.link-to-rule-set")}</h2>
-         <div>${msg("text.link-to-rule-set")}</div>
-         <input type="button" id="${el}-linkToRuleSet-button" value="${msg("button.link-to-rule-set")}" tabindex="0"/>
-      </div>
+<div id="${el}-body" class="rules-none theme-bg-color-6 theme-border-3">
+   <h2>${msg("header")}</h2>
+   <div class="dialog-option">
+      <a href="rule-edit?nodeRef=${page.url.args.nodeRef!""}">${msg("header.create-rule")}</a>
+      <div>${msg("text.create-rule")}</div>
+   </div>
+   <div class="dialog-option">
+      <a id="${el}-linkToRuleSet" href="#">${msg("header.link-to-rule-set")}</a>
+      <div>${msg("text.link-to-rule-set")}</div>
    </div>
 </div>

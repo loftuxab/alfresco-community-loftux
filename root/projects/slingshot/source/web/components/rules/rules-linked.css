@@ -3,6 +3,13 @@
    padding: 1em;
 }
 
+.rules-linked .main-buttons,
+.rules-linked .link-info
+{
+   padding: 1em;
+   width: 62em;
+}
+
 .rules-linked .yui-g
 {
    margin-top: 1em;
@@ -11,11 +18,13 @@
 .rules-linked .yui-g .yui-u
 {
    text-align: right;
+   padding-top: 1em;
 }
 
 .rules-linked .yui-g .yui-u.first
 {
    text-align: left;
+   padding-top:0;   
 }
 
 .rules-linked .yui-g .yui-u.first .info
@@ -25,4 +34,9 @@
    background-repeat: no-repeat;
    line-height: 2em;
    padding-left: 6em;
+}
+
+.rules-linked .main-buttons
+{   
+   text-align: center;
 }

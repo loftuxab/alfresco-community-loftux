@@ -1,14 +1,16 @@
 .rules-none
 {
+   margin: 0 1em 1em;
+   padding: 1em;
+   width: 35em;
+}
+
+.rules-none .dialog-option
+{
    padding-top: 1em;
 }
 
-.rules-none .yui-g .yui-u
+.rules-none .dialog-option a
 {
-   text-align: center;
-}
-
-.rules-none .yui-g .yui-u div
-{
-   padding: 1em;
+   padding-bottom: 0.5em;
 }

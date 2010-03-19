@@ -38,6 +38,16 @@
    overflow: auto;
 }
 
+.rules-list .rules-list-container.inherited
+{
+   height: 10em;   
+}
+
+.rules-list .rules-list-container.folder
+{
+   min-height: 10em;
+}
+
 .rules-list li.message
 {
    padding-left: 0.5em;
@@ -51,6 +61,7 @@
    padding-top: 0.4em;
    background-color: #FBFBFB;
 }
+
 
 .rules-list .rules-list-item:hover
 {
@@ -124,18 +135,18 @@
 
 /* filter = folder */
 
-.rules-list .rules-list-container.folder li .info .inherited,
-.rules-list .rules-list-container.folder li .info .inherited-from,
-.rules-list .rules-list-container.folder li .info .inherited-folder,
-.rules-list .rules-list-container.folder li .description
+.rules-list-item .info .inherited,
+.rules-list-item .info .inherited-from,
+.rules-list-item .info .inherited-folder,
+.rules-list-item .description
 {
    display: none;
 }
 
 /* filter = inherited */
 
-.rules-list .rules-list-container.inherited li .info .inherited,
-.rules-list .rules-list-container.inherited li .description
+.rules-list-item .info .inherited,
+.rules-list-item .description
 {
    display: none;
 }
@@ -143,13 +154,13 @@
 
 /* filter = all */
 
-.rules-list .rules-list-container.all li .info .inherited-from,
-.rules-list .rules-list-container.all li .info .inherited-folder
+.rules-list-item .info .inherited-from,
+.rules-list-item .info .inherited-folder
 {
    display: none;
 }
 
-.rules-list .rules-list-container.all li .description
+.rules-list-item .description
 {
    clear: both;
 }

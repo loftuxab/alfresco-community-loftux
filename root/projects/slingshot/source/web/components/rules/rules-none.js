@@ -30,13 +30,8 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
-
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
 
    /**
     * FolderPath constructor.
@@ -79,7 +74,6 @@
          siteId: ""
       },
 
-
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -88,41 +82,19 @@
        */
       onReady: function RulesNone_onReady()
       {
-         // Create buttons
-         this.widgets.createRuleButton = Alfresco.util.createYUIButton(this, "createRule-button", this.onCreateRuleButtonClick);
-         this.widgets.linkToRuleSetButton = Alfresco.util.createYUIButton(this, "linkToRuleSet-button", this.onLinkToRuleSetButtonClick);
+         Event.addListener(this.id + "-linkToRuleSet", "click", this.onLinkToRuleSetClick, this, this);
       },
 
-
       /**
-       * Called when user clicks on the create rule button.
-       * Takes the user to the new rule page.
+       * Called when user clicks on the link to rules set link.
        *
-       * @method onCreateRuleButtonClick
-       * @param type
-       * @param args
+       * @method onLinkToRuleSetClick
+       * @param event
+       * @param obj
        */
-      onCreateRuleButtonClick: function RulesNone_onCreateRuleButtonClick(type, args)
+      onLinkToRuleSetClick: function RulesNone_onLinkToRuleSetClick(event, obj)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{siteId}/rule-edit?nodeRef={nodeRef}",
-         {
-            siteId: this.options.siteId,
-            nodeRef: this.options.nodeRef
-         });         
-         window.location.href = url;
-      },
 
-
-      /**
-       * Called when user clicks on the create rule button.
-       * Takes the user to the new rule page.
-       *
-       * @method onLinkToRuleSetButtonClick
-       * @param type
-       * @param args
-       */
-      onLinkToRuleSetButtonClick: function RulesNone_onLinkToRuleSetButtonClick(type, args)
-      {
          if (!this.modules.rulesPicker)
          {
             this.modules.rulesPicker = new Alfresco.module.RulesPicker(this.id + "-rulesPicker");
@@ -137,6 +109,9 @@
                nodeRef: this.options.nodeRef.toString()
             }
          }).showDialog();
+
+         // Stop click event
+         Event.stopEvent(e);
       }
 
    });
