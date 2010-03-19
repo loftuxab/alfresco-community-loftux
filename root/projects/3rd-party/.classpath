@@ -143,7 +143,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar" sourcepath="src/fontbox-0.8.0-incubating-src.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/junit-4.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit-4.6.jar" sourcepath="src/junit-4.6-src.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-0.5-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/XmlSchema-1.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.2.jar"/>
