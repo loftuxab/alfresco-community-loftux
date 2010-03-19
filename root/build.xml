@@ -723,6 +723,11 @@
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/aspects.js" />
       </concat>
 
+      <concat destfile="${dir.deploy.tomcat.application.slingshot}/js/datalist-actions.js" force="yes" binary="yes">
+         <fileset file="${dir.project.slingshot.src.web}/components/data-lists/actions.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
+      </concat>
+
       <echo>Compressing Slingshot Javascript...</echo>
       <minimize-javascript sourcedir="${dir.deploy.tomcat.application.slingshot}" 
                            destdir="${dir.deploy.tomcat.application.slingshot}" />

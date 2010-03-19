@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>page</scope>
+   <region-id>datagrid</region-id>
+   <source-id>data-lists</source-id>
+   <url>/components/data-lists/datagrid</url>
+   <properties>
+      <pagination>true</pagination>
+   </properties>
+</component>

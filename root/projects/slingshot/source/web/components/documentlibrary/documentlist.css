@@ -666,9 +666,6 @@
    left: 0;
    width: 1px;
    height: 1px;
-
-
-/* avoid scrollbars */
    visibility: hidden;
 }
 

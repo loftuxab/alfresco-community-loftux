@@ -475,7 +475,7 @@ div.filter
 
 /* When folder, tag, etc. names are too long the layout is destroyed */
 
-#divTopicListFilters,
+#divLeft,
 #divPostListFilters,
 #divDocLibraryFilters,
 #divCalendarFilters,

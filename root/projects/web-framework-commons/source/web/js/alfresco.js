@@ -992,6 +992,29 @@ Alfresco.util.relToTarget = function(p_rootNode)
 };
 
 /**
+ * Sets single or multiple DOM element innerHTML values.
+ * Ensures target element exists in the DOM before attempting to set the label.
+ *
+ * @method populateHTML
+ * @param p_label, p_label, ... {Array} Array with exactly two members:
+ * <pre>
+ *    [0] {String | HTMLElement} Accepts a string to use as an ID for getting a DOM reference, or an actual DOM reference.<br />
+ *    [1] {String} HTML content to populate element if it exists in the DOM. HTML will NOT be escaped.
+ * </pre>
+ */
+Alfresco.util.populateHTML = function()
+{
+   for (var i = 0, ii = arguments.length, el = null; i < ii; i++)
+   {
+      el = YUIDom.get(arguments[i][0]);
+      if (el)
+      {
+         el.innerHTML = arguments[i][1];
+      }
+   }
+};
+
+/**
  * Wrapper to create a YUI Button with common attributes.
  * All supplied object parameters are passed to the button constructor
  * e.g. Alfresco.util.createYUIButton(this, "OK", this.onOK, {type: "submit"});
@@ -2784,8 +2807,7 @@ Alfresco.util.Ajax = function()
          // If a contentType is provided set it in the header
          if (c.requestContentType)
          {
-            YAHOO.util.Connect.setDefaultPostHeader(false);
-            YAHOO.util.Connect.initHeader("Content-Type", c.requestContentType);
+            YAHOO.util.Connect.setDefaultPostHeader(c.requestContentType);
          }
 
          if (c.requestContentType === this.JSON)

@@ -295,8 +295,8 @@
       </forms>
    </config>
 
-   <!-- dl:folder type (Creating Data Lists) -->
-   <config evaluator="model-type" condition="dl:folder">
+   <!-- dl:dataList type (Creating Data Lists) -->
+   <config evaluator="model-type" condition="dl:dataList">
       <forms>
          <!-- Data Lists: Create new Data List -->
          <form id="datalist-new">
@@ -306,7 +306,7 @@
             </field-visibility>
             <create-form template="../data-lists/forms/datalist-new.ftl" />
             <appearance>
-               <field id="cm:title">
+               <field id="cm:title" mandatory="true">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
             </appearance>
@@ -314,10 +314,10 @@
       </forms>
    </config>
 
-   <!-- dl:dataList type -->
+   <!-- dl:todoList type -->
    <config evaluator="model-type" condition="dl:todoList">
       <forms>
-         <!-- Default Create / Edit form -->
+         <!-- Default Create form -->
          <form>
             <field-visibility>
                <show id="dl:todoTitle" />
@@ -326,6 +326,12 @@
                <show id="dl:todoNotes" />
                <show id="dl:assignee" />
             </field-visibility>
+            <create-form template="../data-lists/forms/row-new.ftl" />
+            <appearance>
+               <field id="dl:todoNotes">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+            </appearance>
          </form>
 
          <!-- Data Grid view -->
@@ -336,6 +342,28 @@
                <show id="dl:todoPriority" />
                <show id="dl:assignee" />
             </field-visibility>
+         </form>
+      </forms>
+   </config>
+
+   <!-- cm:content type (existing nodes) -->
+   <config evaluator="node-type" condition="dl:todoList">
+      <forms>
+         <!-- Default View & Edit form -->
+         <form>
+            <field-visibility>
+               <show id="dl:todoTitle" />
+               <show id="dl:todoDueDate" />
+               <show id="dl:todoPriority" />
+               <show id="dl:todoNotes" />
+               <show id="dl:assignee" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/row-edit.ftl" />
+            <appearance>
+               <field id="dl:todoNotes">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+            </appearance>
          </form>
       </forms>
    </config>
