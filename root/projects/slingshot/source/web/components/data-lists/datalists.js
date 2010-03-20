@@ -32,7 +32,8 @@
     */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
-      Selector = YAHOO.util.Selector;
+      Selector = YAHOO.util.Selector,
+      Bubbling = YAHOO.Bubbling;
 
    /**
     * Alfresco Slingshot aliases
@@ -50,6 +51,12 @@
    Alfresco.component.DataLists = function(htmlId)
    {
       Alfresco.component.DataLists.superclass.constructor.call(this, "Alfresco.component.DataLists", htmlId, ["button", "container"]);
+
+      /**
+       * Decoupled event listeners
+       */
+      Bubbling.on("dataListCreated", this.onDataListCreated, this);
+      Bubbling.on("dataListDetailsUpdated", this.onDataListDetailsUpdated, this);
       
       // Initialise prototype properties
       this.dataLists = {};
@@ -131,80 +138,58 @@
       {
          this.widgets.newList = Alfresco.util.createYUIButton(this, "newListButton", this.onNewList);
          // Retrieve the lists from the specified Site & Container
-         this.populateDataLists();
+         this.populateDataLists(
+         {
+            fn: function DataLists_onReady_callback()
+            {
+               this.renderDataLists();
+
+               // Select current list, if relevant
+               if (this.options.listId.length > 0)
+               {
+                  Bubbling.fire("activeDataListChanged",
+                  {
+                     dataList: this.dataLists[this.options.listId],
+                     scrollTo: true
+                  });
+               }
+            },
+            scope: this
+         });
       },
       
       /**
        * Retrieves the Data Lists from the Repo
        *
        * @method populateDataLists
+       * @param callback {Object} Optional callback literal {fn, scope, obj} whose function is invoked once list has been retrieved
        */
-      populateDataLists: function DataLists_populateDataLists()
+      populateDataLists: function DataLists_populateDataLists(p_callback)
       {
-         var listsContainer = Dom.get(this.id + "-lists"),
-            selectedClass = "selected";
-         
-         listsContainer.innerHTML = "";
-         
          /**
           * Success handler for Data Lists request
           * @method fnSuccess
           * @param response {Object} Ajax response object literal
+          * @param obj {Object} Callback object from original function call
           */
-         var fnSuccess = function DataLists_pDL_fnSuccess(response)
+         var fnSuccess = function DataLists_pDL_fnSuccess(response, p_obj)
          {
-            var fnOnClick = function DataLists_pDL_fnOnClick(myDiv, listType)
+            var lists = response.json.datalists,
+               list;
+            
+            this.dataLists = {};
+            this.containerNodeRef = new Alfresco.util.NodeRef(response.json.container);
+            this.widgets.newList.set("disabled", false);
+            
+            for (var i = 0, ii = lists.length; i < ii; i++)
             {
-               return function DataLists_pDL_onClick()
-               {
-                  var lis = Selector.query("li", listsContainer);
-                  Dom.removeClass(lis, selectedClass);
-                  Dom.addClass(this, selectedClass);
-                  return true;
-               };
-            };
-
-            try
-            {
-               var lists = response.json.datalists, container, el, list, i, j;
-               this.dataLists = {};
-               this.containerNodeRef = new Alfresco.util.NodeRef(response.json.container);
-               this.widgets.newList.set("disabled", false);
-               
-               if (lists.length === 0)
-               {
-                  listsContainer.innerHTML = this.msg("message.no-lists");
-                  this.widgets.newList.fireEvent("click");
-               }
-               else
-               {
-                  container = document.createElement("ul");
-                  listsContainer.appendChild(container);
-
-                  for (i = 0, j = lists.length; i < j; i++)
-                  {
-                     list = lists[i];
-                     this.dataLists[list.name] = list;
-                     el = document.createElement("li");
-                     el.innerHTML = '<a title="' + $html(list.description) + '" href="data-lists?list=' + $html(list.name) + '">' + $html(list.title) + '</a>';
-                     el.onclick = fnOnClick();
-                     container.appendChild(el);
-                     if (list.name == this.options.listId)
-                     {
-                        Dom.addClass(el, "selected");
-                        // Select current list
-                        YAHOO.Bubbling.fire("dataListChanged",
-                        {
-                           dataList: list,
-                           scrollTo: true
-                        });
-                     }
-                  }
-               }
+               list = lists[i];
+               this.dataLists[list.name] = list;
             }
-            catch(e)
+            
+            if (p_callback && (typeof p_callback.fn == "function"))
             {
-               listsContainer.innerHTML = '<span class="error">' + this.msg("message.error-unknown") + '</span>';
+               p_callback.fn.call(p_callback.scope || this, p_callback.obj);
             }
          };
 
@@ -234,7 +219,6 @@
                {
                   errorMsg = this.msg("message.error-unknown");
                }
-               listsContainer.innerHTML = '<span class="error">' + errorMsg + '</span>';
             }
          };
          
@@ -244,6 +228,7 @@
             successCallback:
             {
                fn: fnSuccess,
+               obj: p_callback,
                scope: this
             },
             failureCallback:
@@ -252,6 +237,182 @@
                scope: this
             }
          });
+      },
+
+      /**
+       * Renders the Data Lists into the DOM
+       *
+       * @method renderDataLists
+       * @param highlightName {String} Optional name of list to highlight after rendering
+       */
+      renderDataLists: function DataLists_renderDataLists(p_highlightName)
+      {
+         var me = this,
+            listsContainer = Dom.get(this.id + "-lists"),
+            selectedClass = "selected";
+         
+         listsContainer.innerHTML = "";
+         
+         /**
+          * Click handler for selecting Data List
+          * @method fnOnClick
+          */
+         var fnOnClick = function DataLists_renderDataLists_fnOnClick()
+         {
+            return function DataLists_renderDataLists_onClick()
+            {
+               var lis = Selector.query("li", listsContainer);
+               Dom.removeClass(lis, selectedClass);
+               Dom.addClass(this, selectedClass);
+               return true;
+            };
+         };
+
+         /**
+          * Click handler for edit Data List
+          * @method fnEditOnClick
+          * @param listName {String} Name of the Data List
+          */
+         var fnEditOnClick = function DataLists_renderDataLists_fnEditOnClick(listName)
+         {
+            return function DataLists_renderDataLists_onEditClick(e)
+            {
+               me.onEditList(listName);
+               Event.stopEvent(e);
+            };
+         };
+
+         /**
+          * Click handler for edit Data List
+          * @method fnDeleteOnClick
+          * @param listName {String} Name of the Data List
+          */
+         var fnDeleteOnClick = function DataLists_renderDataLists_fnDeleteOnClick(listName)
+         {
+            return function DataLists_renderDataLists_onEditClick(e)
+            {
+               me.onDeleteList(listName);
+               Event.stopEvent(e);
+            };
+         };
+
+         try
+         {
+            var lists = this.dataLists,
+               list,
+               elHighlight = null,
+               container, el, elEdit, elDelete, elLink, elText;
+
+            if (lists.length === 0)
+            {
+               listsContainer.innerHTML = this.msg("message.no-lists");
+               this.widgets.newList.fireEvent("click");
+            }
+            else
+            {
+               container = document.createElement("ul");
+               listsContainer.appendChild(container);
+
+               // Create the DOM structure: <li onclick><a title href><span class='edit' onclick></span><span class='delete' onclick></span>"text"</a></li>
+               for (var index in lists)
+               {
+                  if (lists.hasOwnProperty(index))
+                  {
+                     list = lists[index];
+                     
+                     // Build the DOM elements
+                     el = document.createElement("li");
+                     el.onclick = fnOnClick();
+                     elEdit = document.createElement("span");
+                     elEdit.className = "edit";
+                     elEdit.title = this.msg("label.edit-list");
+                     elEdit.onclick = fnEditOnClick(list.name);
+                     elDelete = document.createElement("span");
+                     elDelete.className = "delete";
+                     elDelete.title = this.msg("label.delete-list");
+                     elDelete.onclick = fnDeleteOnClick(list.name);
+                     elLink = document.createElement("a");
+                     elLink.title = $html(list.description);
+                     elLink.href = "data-lists?list=" + $html(list.name);
+                     elText = document.createTextNode($html(list.title));
+
+                     // Build the DOM structure with the new elements
+                     elLink.appendChild(elDelete);
+                     elLink.appendChild(elEdit);
+                     elLink.appendChild(elText);
+                     el.appendChild(elLink);
+                     container.appendChild(el);
+
+                     // Mark current list as selected
+                     if (list.name == this.options.listId)
+                     {
+                        Dom.addClass(el, "selected");
+                     }
+                     
+                     // Make a note of a highlight request match
+                     if (list.name == p_highlightName)
+                     {
+                        elHighlight = el;
+                     }
+                  }
+               }
+               
+               if (elHighlight)
+               {
+                  Alfresco.util.Anim.pulse(elHighlight);
+               }
+            }
+         }
+         catch(e)
+         {
+            listsContainer.innerHTML = '<span class="error">' + this.msg("message.error-unknown") + '</span>';
+         }
+      },
+
+
+      /**
+       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
+       * Disconnected event handlers for inter-component event notification
+       */
+
+      /**
+       * Data List created event handler
+       *
+       * @method onDataListCreated
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (unused)
+       */
+      onDataListCreated: function DataList_onDataListCreated(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.name !== null))
+         {
+            this.populateDataLists(
+            {
+               fn: function DataList_onDataListCreated_callback(p_obj)
+               {
+                  this.renderDataLists(p_obj);
+               },
+               obj: obj.name,
+               scope: this
+            });
+         }
+      },
+
+      /**
+       * Data List modified event handler
+       *
+       * @method onDataListDetailsUpdated
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (unused)
+       */
+      onDataListDetailsUpdated: function DataList_onDataListDetailsUpdated(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.dataList !== null))
+         {
+            this.renderDataLists(obj.dataList.name);
+         }
       },
 
 
@@ -321,14 +482,13 @@
             p_form.addValidation(p_dialog.id + "_prop_cm_title", Alfresco.forms.validation.mandatory, null, "keyup");
          };
 
-         var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&destination={destination}&mode={mode}&submitType={submitType}&formId={formId}&showCancelButton=true",
+         var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&destination={destination}&mode={mode}&submitType={submitType}&showCancelButton=true",
          {
             itemKind: "type",
             itemId: "dl:dataList",
             destination: destination,
             mode: "create",
-            submitType: "json",
-            formId: "datalist-new"
+            submitType: "json"
          });
 
          // Using Forms Service, so always create new instance
@@ -350,7 +510,7 @@
                fn: function DataLists_onNewList_success(response)
                {
                   var listName = response.config.dataObj["prop_cm_name"];
-                  YAHOO.Bubbling.fire("dataListCreated",
+                  Bubbling.fire("dataListCreated",
                   {
                      name: listName
                   });
@@ -373,6 +533,163 @@
                scope: this
             }
          }).show();
+      },
+
+      /**
+       * Edit List event handler
+       *
+       * @method onEditList
+       * @param listName {string} Name of the list to edit
+       */
+      onEditList: function DataLists_onEditList(p_listName)
+      {
+         var datalist = this.dataLists[p_listName];
+
+         // Intercept before dialog show
+         var doBeforeDialogShow = function DataLists_onEditList_doBeforeDialogShow(p_form, p_dialog)
+         {
+            Alfresco.util.populateHTML(
+               [ p_dialog.id + "-dialogTitle", this.msg("label.edit-list.title") ],
+               [ p_dialog.id + "-dialogHeader", this.msg("label.edit-list.header") ]
+            );
+
+            // Must set a title (UI constraint for usability)
+            p_form.addValidation(p_dialog.id + "_prop_cm_title", Alfresco.forms.validation.mandatory, null, "keyup");
+         };
+
+         var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&mode={mode}&submitType={submitType}&showCancelButton=true",
+         {
+            itemKind: "node",
+            itemId: datalist.nodeRef,
+            mode: "edit",
+            submitType: "json"
+         });
+
+         // Using Forms Service, so always create new instance
+         var editList = new Alfresco.module.SimpleDialog(this.id + "-editList");
+
+         editList.setOptions(
+         {
+            width: "33em",
+            templateUrl: templateUrl,
+            actionUrl: null,
+            destroyOnHide: true,
+            doBeforeDialogShow:
+            {
+               fn: doBeforeDialogShow,
+               scope: this
+            },
+            onSuccess:
+            {
+               fn: function DataLists_onEditList_success(response, p_obj)
+               {
+                  var dataObj = response.config.dataObj;
+                  p_obj.title = dataObj["prop_cm_title"];
+                  p_obj.description = dataObj["prop_cm_description"];
+                  
+                  Bubbling.fire("dataListDetailsUpdated",
+                  {
+                     dataList: p_obj
+                  });
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.edit-list.success", p_obj.title)
+                  });
+               },
+               obj: datalist,
+               scope: this
+            },
+            onFailure:
+            {
+               fn: function DataLists_onEditList_failure(response)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.edit-list.failure")
+                  });
+               },
+               scope: this
+            }
+         }).show();
+      },
+
+      /**
+       * Delete List event handler
+       *
+       * @method onDeleteList
+       * @param listName {string} Name of the list to edit
+       */
+      onDeleteList: function DataLists_onDeleteList(p_listName)
+      {
+         var datalist = this.dataLists[p_listName],
+            me = this;
+
+         var fnActionDeleteConfirm = function DataLists_onDeleteList_confirm(p_datalist)
+         {
+            var nodeRef = new Alfresco.util.NodeRef(p_datalist.nodeRef);
+            
+            Alfresco.util.Ajax.request(
+            {
+               method: Alfresco.util.Ajax.DELETE,
+               url: Alfresco.constants.PROXY_URI + "slingshot/datalists/list/node/" + nodeRef.uri,
+               successCallback:
+               {
+                  fn: function DataLists_onDeleteList_confirm_success(response, p_obj)
+                  {
+                     // If we deleted the current list, then redirect to "data-lists"
+                     if (p_obj.name == this.options.listId)
+                     {
+                        window.location = "data-lists";
+                        return;
+                     }
+
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.delete-list.success")
+                     });
+                     
+                     delete this.dataLists[p_datalist.name];
+                     this.renderDataLists();
+                  },
+                  obj: p_datalist,
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function DataLists_onDeleteList_confirm_failure(response)
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.delete-list.failure")
+                     });
+                  },
+                  scope: this
+               }
+            });
+         };
+
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg("message.delete-list.title"),
+            text: this.msg("message.delete-list.description", $html(datalist.title)),
+            buttons: [
+            {
+               text: this.msg("button.delete"),
+               handler: function DataLists_onDeleteList_delete()
+               {
+                  this.destroy();
+                  fnActionDeleteConfirm.call(me, datalist);
+               }
+            },
+            {
+               text: this.msg("button.cancel"),
+               handler: function DataLists_onDeleteList_cancel()
+               {
+                  this.destroy();
+               },
+               isDefault: true
+            }]
+         });
       }
    });
 })();

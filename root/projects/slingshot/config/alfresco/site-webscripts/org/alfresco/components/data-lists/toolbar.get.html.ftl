@@ -31,7 +31,7 @@
          </div>
       </div>
 
-      <div class="right">
+      <div class="right" style="display: none;">
          <span id="${id}-printButton" class="yui-button yui-push-button print">
              <span class="first-child">
                  <button type="button">${msg('button.print')}</button>

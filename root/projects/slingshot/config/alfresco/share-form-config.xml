@@ -299,7 +299,7 @@
    <config evaluator="model-type" condition="dl:dataList">
       <forms>
          <!-- Data Lists: Create new Data List -->
-         <form id="datalist-new">
+         <form>
             <field-visibility>
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
@@ -314,10 +314,29 @@
       </forms>
    </config>
 
+   <!-- dl:dataList type (Editing Data Lists) -->
+   <config evaluator="node-type" condition="dl:dataList">
+      <forms>
+         <!-- Data Lists: Edit Data List details -->
+         <form>
+            <field-visibility>
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/datalist-edit.ftl" />
+            <appearance>
+               <field id="cm:title" mandatory="true">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
    <!-- dl:todoList type -->
    <config evaluator="model-type" condition="dl:todoList">
       <forms>
-         <!-- Default Create form -->
+         <!-- Create item form -->
          <form>
             <field-visibility>
                <show id="dl:todoTitle" />
@@ -346,10 +365,10 @@
       </forms>
    </config>
 
-   <!-- cm:content type (existing nodes) -->
+   <!-- dl_todoList type (existing nodes) -->
    <config evaluator="node-type" condition="dl:todoList">
       <forms>
-         <!-- Default View & Edit form -->
+         <!-- Data List pop-up edit form -->
          <form>
             <field-visibility>
                <show id="dl:todoTitle" />

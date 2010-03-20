@@ -1,18 +1,18 @@
+<#assign id=args.htmlid>
 <#if formUI == "true">
    <@formLib.renderFormsRuntime formId=formId />
 </#if>
 
-<div id="${args.htmlid}-dialog">
-   <div id="${args.htmlid}-dialogTitle" class="hd"></div>
+<div id="${id}-dialog">
+   <div id="${id}-dialogTitle" class="hd">${msg("title")}</div>
    <div class="bd">
 
       <div id="${formId}-container" class="form-container">
 
-<#-- No full-page edit view for v3.3-
-         <div class="yui-u first edit-dataitem flat-button">
-            <button id="${args.htmlid}-editDataItem" tabindex="0"></button>
+         <div class="yui-g">
+            <h2 id="${args.htmlid}-dialogHeader">${msg("header")}</h2>
          </div>
--->
+
          <#if form.showCaption?exists && form.showCaption>
             <div id="${formId}-caption" class="caption"><span class="mandatory-indicator">*</span>${msg("form.required.fields")}</div>
          </#if>
@@ -20,6 +20,7 @@
          <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl}">
    
             <div id="${formId}-fields" class="form-fields">
+
                <#list form.structure as item>
                   <#if item.kind == "set">
                      <@formLib.renderSet set=item />
@@ -27,6 +28,7 @@
                      <@formLib.renderField field=form.fields[item.id] />
                   </#if>
                </#list>
+
             </div>
 
             <div class="bdft">
