@@ -285,6 +285,9 @@
       _showDialog: function AmSD__showDialog()
       {
          var form = Dom.get(this.id + "-form");
+         
+         // Make sure forms without Share-specific templates render roughly ok
+         Dom.addClass(form, "bd");
 
          // Custom forms validation setup interest registered?
          var doSetupFormsValidation = this.options.doSetupFormsValidation;

@@ -174,15 +174,11 @@
             {
                fn: function DataListToolbar_onNewRow_success(response)
                {
-                  /**
-                   * TODO: Awaiting form modification to return itemId (nodeRef in this case)
-                   *
                   YAHOO.Bubbling.fire("dataItemCreated",
                   {
-                     item: response.config
+                     nodeRef: response.json.persistedObject
                   });
-                   *
-                   */
+
                   Alfresco.util.PopupManager.displayMessage(
                   {
                      text: this.msg("message.new-row.success")

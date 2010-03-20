@@ -57,9 +57,11 @@
          var doBeforeDialogShow = function dlA_onActionDetails_doBeforeDialogShow(p_form, p_dialog)
          {
             // Dialog title
-            var titleDiv = Dom.get(p_dialog.id + "-dialogTitle"),
-               fileSpan = '<span class="light">' + $html(asset.displayName) + '</span>';
-            titleDiv.innerHTML = scope.msg("edit-details.title", fileSpan);
+            var fileSpan = '<span class="light">' + $html(asset.displayName) + '</span>';
+
+            Alfresco.util.populateHTML(
+               [ p_dialog.id + "-dialogTitle", scope.msg("edit-details.title", fileSpan) ]
+            );
 
             // Edit metadata link button
             this.widgets.editMetadata = Alfresco.util.createYUIButton(p_dialog, "editMetadata", null, 

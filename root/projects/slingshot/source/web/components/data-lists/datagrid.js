@@ -38,6 +38,7 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
+      $links = Alfresco.util.activateLinks,
       $combine = Alfresco.util.combinePaths;
 
    /**
@@ -70,18 +71,19 @@
       /**
        * Decoupled event listeners
        */
-      Bubbling.on("dataListChanged", this.onDataListChanged, this);
-      Bubbling.on("metadataRefresh", this.onDataGridRefresh, this);
+      Bubbling.on("activeDataListChanged", this.onActiveDataListChanged, this);
       Bubbling.on("changeFilter", this.onChangeFilter, this);
       Bubbling.on("filterChanged", this.onFilterChanged, this);
+      Bubbling.on("dataListDetailsUpdated", this.onDataListDetailsUpdated, this);
       Bubbling.on("dataItemCreated", this.onDataItemCreated, this);
       Bubbling.on("dataItemUpdated", this.onDataItemUpdated, this);
       Bubbling.on("dataItemsDeleted", this.onDataItemsDeleted, this);
+      Bubbling.on("dataItemsDuplicated", this.onDataGridRefresh, this);
 
       /* Deferred list population until DOM ready */
-      this.deferredListPopulation = new Alfresco.util.Deferred(["onReady", "onDataListChanged"],
+      this.deferredListPopulation = new Alfresco.util.Deferred(["onReady", "onActiveDataListChanged"],
       {
-         fn: this.populateDataList,
+         fn: this.populateDataGrid,
          scope: this
       });
 
@@ -575,21 +577,38 @@
          });
          
       },
-
+      
       /**
-       * Retrieves the Data List from the Repository
+       * Renders Data List metadata, i.e. title and description
        *
-       * @method populateDataList
+       * @method renderDataListMeta
        */
-      populateDataList: function DataGrid_populateDataList()
+      renderDataListMeta: function DataGrid_renderDataListMeta()
       {
          if (this.datalistMeta === null)
          {
             return;
          }
          
-         Dom.get(this.id + "-title").innerHTML = $html(this.datalistMeta.title);
-         Dom.get(this.id + "-description").innerHTML = $html(this.datalistMeta.description);
+         Alfresco.util.populateHTML(
+            [ this.id + "-title", $html(this.datalistMeta.title) ],
+            [ this.id + "-description", $links($html(this.datalistMeta.description)) ]
+         );
+      },
+
+      /**
+       * Retrieves the Data List from the Repository
+       *
+       * @method populateDataGrid
+       */
+      populateDataGrid: function DataGrid_populateDataGrid()
+      {
+         if (this.datalistMeta === null)
+         {
+            return;
+         }
+         
+         this.renderDataListMeta();
          
          // Query the visible columns for this list's item type
          Alfresco.util.Ajax.jsonGet(
@@ -622,16 +641,19 @@
       onDatalistColumns: function DataGrid_onDatalistColumns(response)
       {
          this.datalistColumns = response.json.columns;
+         // Set-up YUI History Managers and Paginator
+         this._setupHistoryManagers();
          // DataSource set-up and event registration
          this._setupDataSource();
          // DataTable set-up and event registration
          this._setupDataTable();
-         // Set-up YUI History Managers
-         this._setupHistoryManagers();
          // Hide "no list" message
          Dom.addClass(this.id + "-selectListMessage", "hidden");
          // Enable item select menu
          this.widgets.itemSelect.set("disabled", false);
+
+         // Continue only when History Manager fires its onReady event
+         YAHOO.util.History.onReady(this.onHistoryManagerReady, this, true);
       },
 
       /**
@@ -727,9 +749,6 @@
             // Display the bottom paginator bar
             Dom.setStyle(this.id + "-datagridBarBottom", "display", "block");
          }
-
-         // Continue only when History Manager fires its onReady event
-         YAHOO.util.History.onReady(this.onHistoryManagerReady, this, true);
 
          // Initialize the browser history management library
          try
@@ -835,7 +854,7 @@
 
          // Add actions as last column
          columnDefinitions.push(
-            { key: "actions", label: this.msg("label.column.actions"), sortable: false, formatter: this.fnRenderCellActions(), width: 104 }
+            { key: "actions", label: this.msg("label.column.actions"), sortable: false, formatter: this.fnRenderCellActions(), width: 80 }
          );
 
          // DataTable definition
@@ -846,7 +865,8 @@
             initialLoad: false,
             dynamicData: false,
             "MSG_EMPTY": this.msg("message.empty"),
-            "MSG_ERROR": this.msg("message.error")
+            "MSG_ERROR": this.msg("message.error"),
+            paginator: this.widgets.paginator
          });
 
          // Update totalRecords with value from server
@@ -905,19 +925,6 @@
                ie6fix.className = ie6fix.className;
             }
 
-            // Update the paginator if it's been created
-            if (this.widgets.paginator)
-            {
-               Alfresco.logger.debug("Setting paginator state: page=" + this.currentPage + ", totalRecords=" + this.totalRecords);
-
-               this.widgets.paginator.setState(
-               {
-                  page: this.currentPage,
-                  totalRecords: this.totalRecords
-               });
-               this.widgets.paginator.render();
-            }
-            
             // Deferred functions specified?
             for (var i = 0, j = this.afterDataGridUpdate.length; i < j; i++)
             {
@@ -1185,6 +1192,117 @@
 
 
       /**
+       * ACTIONS WHICH ARE LOCAL TO THE DATAGRID COMPONENT
+       */
+
+      /**
+       * Edit Data Item pop-up
+       *
+       * @method onActionEdit
+       * @param item {object} Object literal representing one data item
+       */
+      onActionEdit: function DataGrid_onActionEdit(item)
+      {
+         var scope = this;
+         
+         // Intercept before dialog show
+         var doBeforeDialogShow = function DataGrid_onActionEdit_doBeforeDialogShow(p_form, p_dialog)
+         {
+            Alfresco.util.populateHTML(
+               [ p_dialog.id + "-dialogTitle", this.msg("label.edit-row.title") ]
+            );
+
+            /**
+             * No full-page edit view for v3.3
+             *
+            // Data Item Edit Page link button
+            Alfresco.util.createYUIButton(p_dialog, "editDataItem", null, 
+            {
+               type: "link",
+               label: scope.msg("label.edit-row.edit-dataitem"),
+               href: scope.getActionUrls(item).editMetadataUrl
+            });
+             */
+         };
+
+         var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&mode={mode}&submitType={submitType}&showCancelButton=true",
+         {
+            itemKind: "node",
+            itemId: item.nodeRef,
+            mode: "edit",
+            submitType: "json"
+         });
+
+         // Using Forms Service, so always create new instance
+         var editDetails = new Alfresco.module.SimpleDialog(this.id + "-editDetails");
+         editDetails.setOptions(
+         {
+            width: "34em",
+            templateUrl: templateUrl,
+            actionUrl: null,
+            destroyOnHide: true,
+            doBeforeDialogShow:
+            {
+               fn: doBeforeDialogShow,
+               scope: this
+            },
+            onSuccess:
+            {
+               fn: function DataGrid_onActionEdit_success(response)
+               {
+                  // Reload the node's metadata
+                  Alfresco.util.Ajax.jsonPost(
+                  {
+                     url: Alfresco.constants.PROXY_URI + "slingshot/datalists/item/node/" + new Alfresco.util.NodeRef(item.nodeRef).uri,
+                     dataObj: this._buildDataGridParams(),
+                     successCallback:
+                     {
+                        fn: function DataGrid_onActionEdit_refreshSuccess(response)
+                        {
+                           // Fire "itemUpdated" event
+                           Bubbling.fire("dataItemUpdated",
+                           {
+                              item: response.json.item
+                           });
+                           // Display success message
+                           Alfresco.util.PopupManager.displayMessage(
+                           {
+                              text: this.msg("message.details.success")
+                           });
+                        },
+                        scope: this
+                     },
+                     failureCallback:
+                     {
+                        fn: function DataGrid_onActionEdit_refreshFailure(response)
+                        {
+                           Alfresco.util.PopupManager.displayMessage(
+                           {
+                              text: this.msg("message.details.failure")
+                           });
+                        },
+                        scope: this
+                     }
+                  });
+               },
+               scope: this
+            },
+            onFailure:
+            {
+               fn: function DataGrid_onActionEdit_failure(response)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.details.failure")
+                  });
+               },
+               scope: this
+            }
+         }).show();
+      },
+
+
+      /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
@@ -1192,21 +1310,38 @@
       /**
        * Current DataList changed event handler
        *
-       * @method onDataListChanged
+       * @method onActiveDataListChanged
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (unused)
        */
-      onDataListChanged: function DataGrid_onDataListChanged(layer, args)
+      onActiveDataListChanged: function DataGrid_onActiveDataListChanged(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.dataList !== null))
          {
             this.datalistMeta = obj.dataList;
             // Could happen more than once, so check return value of fulfil()
-            if (!this.deferredListPopulation.fulfil("onDataListChanged"))
+            if (!this.deferredListPopulation.fulfil("onActiveDataListChanged"))
             {
-               this.populateDataList();
+               this.populateDataGrid();
             }
+         }
+      },
+
+      /**
+       * Data List modified event handler
+       *
+       * @method onDataListDetailsUpdated
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (unused)
+       */
+      onDataListDetailsUpdated: function DataGrid_onDataListDetailsUpdated(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.dataList !== null))
+         {
+            this.dataListMeta = obj.dataList;
+            this.renderDataListMeta();
          }
       },
 
@@ -1308,15 +1443,45 @@
       onDataItemCreated: function DataGrid_onDataItemCreated(layer, args)
       {
          var obj = args[1];
-         if (obj && (obj.item !== null))
+         if (obj && (obj.nodeRef !== null))
          {
-            this.widgets.dataTable.addRow(obj.item);
-            var recordFound = this._findRecordByParameter(obj.item.nodeRef, "nodeRef");
-            if (recordFound !== null)
+            var nodeRef = new Alfresco.util.NodeRef(obj.nodeRef);
+            // Reload the node's metadata
+            Alfresco.util.Ajax.jsonPost(
             {
-               var el = this.widgets.dataTable.getTrEl(recordFound);
-               Alfresco.util.Anim.pulse(el);
-            }
+               url: Alfresco.constants.PROXY_URI + "slingshot/datalists/item/node/" + nodeRef.uri,
+               dataObj: this._buildDataGridParams(),
+               successCallback:
+               {
+                  fn: function DataGrid_onDataItemCreated_refreshSuccess(response)
+                  {
+                     var item = response.json.item;
+                     var fnAfterUpdate = function DataGrid_onDataItemCreated_refreshSuccess_fnAfterUpdate()
+                     {
+                        var recordFound = this._findRecordByParameter(item.nodeRef, "nodeRef");
+                        if (recordFound !== null)
+                        {
+                           var el = this.widgets.dataTable.getTrEl(recordFound);
+                           Alfresco.util.Anim.pulse(el);
+                        }
+                     };
+                     this.afterDataGridUpdate.push(fnAfterUpdate);
+                     this.widgets.dataTable.addRow(item);
+                  },
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function DataGrid_onDataItemCreated_refreshFailure(response)
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.create.refresh.failure")
+                     });
+                  },
+                  scope: this
+               }
+            });
          }
       },
 
@@ -1354,18 +1519,24 @@
          var obj = args[1];
          if (obj && (obj.items !== null))
          {
+            var recordFound, el,
+               fnCallback = function(record)
+               {
+                  return function DataGrid_onDataItemsDeleted_anim()
+                  {
+                     this.widgets.dataTable.deleteRow(record);
+                  };
+               };
+            
             for (var i = 0, ii = obj.items.length; i < ii; i++)
             {
-               var recordFound = this._findRecordByParameter(obj.items[i].nodeRef, "nodeRef");
+               recordFound = this._findRecordByParameter(obj.items[i].nodeRef, "nodeRef");
                if (recordFound !== null)
                {
-                  var el = this.widgets.dataTable.getTrEl(recordFound);
+                  el = this.widgets.dataTable.getTrEl(recordFound);
                   Alfresco.util.Anim.fadeOut(el,
                   {
-                     callback: function DataGrid_onDataItemsDeleted_anim()
-                     {
-                        this.widgets.dataTable.deleteRow(recordFound);
-                     },
+                     callback: fnCallback(recordFound),
                      scope: this
                   });
                }

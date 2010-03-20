@@ -390,7 +390,7 @@
           * @property vtiServer
           * @type object
           */
-         vtiServer: null
+         vtiServer: {}
       },
 
       /**

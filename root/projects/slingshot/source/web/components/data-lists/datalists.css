@@ -25,7 +25,36 @@
 {
    background: url(../images/list-16.png) no-repeat 4px 4px;
    overflow-x: hidden;
-   padding: 4px 0 3px 24px;
+   padding: 4px 0 4px 24px;
+}
+
+.datalists li a
+{
+   display: block;
+}
+
+.datalists li a span
+{
+   cursor: pointer;
+   display: none;
+   float: right;
+   height: 16px;
+   left: -8px;
+   position: relative;
+   width: 18px;
+}
+.datalists li a span.edit
+{
+   background: url("../images/edit-16.png") no-repeat;
+}
+.datalists li a span.delete
+{
+   background: url("../images/delete-16.png") no-repeat;
+}
+.datalists li a:active span,
+.datalists li a:hover span
+{
+   display: block;
 }
 
 .datalists .horiz-rule
