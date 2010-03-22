@@ -32,7 +32,7 @@
       <#setting locale="en_US" />
       <pubDate>${formatDate(item.modifiedOn)}</pubDate>
       <#setting locale=currentLocale />
-      <#if isMP3><enclosure url="${proxyLink + contentUrl}" length="${item.size}" type="audio/mpeg" /></#if>
+      <#if isMP3><enclosure url="${proxyLink + item.contentUrl}" length="${item.size}" type="audio/mpeg" /></#if>
    </item>
    </#if>
 </#list>
