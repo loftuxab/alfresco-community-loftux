@@ -1339,7 +1339,7 @@
          el.setAttribute("name", "-");
          el.setAttribute("title", paramDef.displayLabel ? paramDef.displayLabel : paramDef.name);
          el.setAttribute("param", paramDef.name);
-         el.setAttribute("value", value ? value : "");
+         el.setAttribute("value", (value != undefined && value != null) ? value : "");
          containerEl.appendChild(el);
          if (paramDef.isMandatory)
          {
