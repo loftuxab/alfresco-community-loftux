@@ -294,6 +294,12 @@
             this.widgets.unlinkRulesButton.set("disabled", false);
             this.widgets.titleEl.innerHTML = this.linkedToFolder.name;
             this.widgets.pathEl.innerHTML = this.linkedToFolder.path;
+
+            if (this.ruleset.inheritedRules && this.ruleset.inheritedRules.length > 0)
+            {
+               Dom.removeClass(this.id + "-inheritedRules", "hidden");
+            }
+
          }
       },
 

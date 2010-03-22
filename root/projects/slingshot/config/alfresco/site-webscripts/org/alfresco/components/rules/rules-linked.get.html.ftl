@@ -9,6 +9,9 @@
    );
 //]]></script>
 <div id="${el}-body" class="rules-linked">
+   <div id="${el}-inheritedRules" class="rules-info theme-bg-color-2 theme-border-3 hidden">
+      <span>${msg("label.folderInheritsRules")}</span>
+   </div>
    <div class="link-info theme-bg-color-6 theme-border-3">
       <h2>${msg("label.linked-to-rules-set")}:</h2>
       <div class="yui-g">

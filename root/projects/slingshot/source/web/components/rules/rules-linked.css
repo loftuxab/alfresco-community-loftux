@@ -3,11 +3,26 @@
    padding: 1em;
 }
 
+.rules-linked .rules-info,
 .rules-linked .main-buttons,
 .rules-linked .link-info
 {
    padding: 1em;
    width: 62em;
+}
+
+.rules-linked .rules-info
+{
+   padding: 0.5em 1em;
+   margin-bottom: 1em;
+}
+
+.rules-linked .rules-info span
+{
+   background-image: url(../site/images/info-16.png);
+   background-position: left center;
+   background-repeat: no-repeat;
+   padding-left: 2em;
 }
 
 .rules-linked .yui-g
@@ -33,7 +48,9 @@
    background-position: left center;
    background-repeat: no-repeat;
    line-height: 2em;
+   padding-bottom: 0.5em;
    padding-left: 6em;
+   padding-top: 1em;
 }
 
 .rules-linked .main-buttons
