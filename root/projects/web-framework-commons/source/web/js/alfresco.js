@@ -2808,6 +2808,7 @@ Alfresco.util.Ajax = function()
          if (c.requestContentType)
          {
             YAHOO.util.Connect.setDefaultPostHeader(c.requestContentType);
+            YAHOO.util.Connect.initHeader("Content-Type", c.requestContentType);
          }
 
          if (c.requestContentType === this.JSON)
