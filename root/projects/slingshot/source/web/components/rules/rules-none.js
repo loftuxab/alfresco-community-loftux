@@ -44,6 +44,9 @@
    {
       Alfresco.RulesNone.superclass.constructor.call(this, "Alfresco.RulesNone", htmlId, ["button"]);
 
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("folderRulesetDetailsAvailable", this.onFolderRulesetDetailsAvailable, this);
+
       return this;
    };
 
@@ -83,6 +86,22 @@
       onReady: function RulesNone_onReady()
       {
          Event.addListener(this.id + "-linkToRuleSet", "click", this.onLinkToRuleSetClick, this, this);
+      },
+
+      /**
+       * Event handler called when the "folderRulesetDetailsAvailable" event is received
+       *
+       * @method onFolderRulesetDetailsAvailable
+       * @param layer
+       * @param args
+       */
+      onFolderRulesetDetailsAvailable: function RulesLinked_onFolderRulesetDetailsAvailable(layer, args)
+      {
+         var ruleset = args[1].folderRulesetDetails;
+         if (ruleset.inheritedRules && ruleset.inheritedRules.length > 0)
+         {
+            Dom.removeClass(this.id + "-inheritedRules", "hidden");  
+         }
       },
 
       /**
