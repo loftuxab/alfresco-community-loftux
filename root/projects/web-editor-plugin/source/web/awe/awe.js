@@ -68,10 +68,8 @@
 
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'loggedoutClick', this.onLogoutClick, this, true);
 
-         //Bubbling.on('WEF'+WEF.SEPARATOR+'afterRender', this.render);
          this.initAttributes(this.config);
          this.registerEditableContent(this.config.editables);
-         this.render();
          return this;
       },
 
