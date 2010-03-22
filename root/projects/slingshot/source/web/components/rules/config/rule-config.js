@@ -345,6 +345,10 @@
        */
       displayRuleConfigs: function RuleConfig_displayRulConfigs(ruleConfigs)
       {
+         Dom.removeClass(this.id + "-body", RC.MODE_EDIT);
+         Dom.removeClass(this.id + "-body", RC.MODE_TEXT);
+         Dom.addClass(this.id + "-body", this.options.mode);
+
          Dom.get(this.id + "-configs").innerHTML = "";
          var checkboxEl = Dom.get(this.id + "-" + this.options.ruleConfigType + "-checkbox");
          if (checkboxEl && this.options.mode == RC.MODE_EDIT)
@@ -954,7 +958,7 @@
                            }, this);
                         }
                      }
-                     
+
                      if (paramDef._type != "hidden")
                      {
                         // Display a label left to the parameter if displayLabel is present
@@ -1533,13 +1537,16 @@
             }
             if (paramDef.type = "d:noderef" && paramDef._type == "path")
             {
-               return this._createPathSpan(containerEl, this.id + "-" + configDef._id + "-" + paramDef.name, value);
+               return this._createPathSpan(containerEl, configDef, paramDef, this.id + "-" + configDef._id + "-" + paramDef.name, value);
             }
             else if (paramDef.type = "d:noderef" && paramDef._type == "category")
             {
-               return this._createCategorySpan(containerEl, this.id + "-" + configDef._id + "-" + paramDef.name, value);
+               return this._createCategorySpan(containerEl, configDef, paramDef, this.id + "-" + configDef._id + "-" + paramDef.name, value);
             }
-
+            if (paramDef._quote)
+            {
+               value = "'" + value + "'";
+            }
             if (msgKey)
             {
                var tmp = this.msg(msgKey, value);
@@ -1565,7 +1572,7 @@
       _createDateSpan: function RC__createDateSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey)
       {
          value = Alfresco.util.formatDate(value);
-         this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey);
+         return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey);
       },
 
       /**
@@ -1576,7 +1583,7 @@
        * @param id {string} Dom ID to be given to span tag
        * @param nodeRef {string} NodeRef of folder
        */
-      _createCategorySpan: function (containerEl, id, nodeRef)
+      _createCategorySpan: function (containerEl, configDef, paramDef, id, nodeRef)
       {
          var url = nodeRef ? Alfresco.constants.PROXY_URI + "api/forms/picker/items" : null;
          return this._createResolvableValueSpan(containerEl, id, Alfresco.util.Ajax.POST, url,
@@ -1585,6 +1592,7 @@
          }, function (json)
          {
             var item = json.data.items[0];
+            item.name = paramDef._quote ? "'" + item.name + "'" : item.name;
             return $html(item.name);
          });
       },
@@ -1597,7 +1605,7 @@
        * @param id {string} Dom ID to be given to span tag
        * @param nodeRef {string} NodeRef of folder
        */
-      _createPathSpan: function (containerEl, id, nodeRef)
+      _createPathSpan: function (containerEl, configDef, paramDef, id, nodeRef)
       {
          var url = nodeRef ? Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + nodeRef.replace("://", "/") : null;
          return this._createResolvableValueSpan(containerEl, id, Alfresco.util.Ajax.GET, url, null, function (json)
@@ -1611,8 +1619,7 @@
        * Create html that represent a path and site
        *
        * @method _buildPathSpanHtml
-       * @param path
-       * @param file
+       * @param fullPath
        * @param siteId
        * @param siteTitle
        * @return {string} html respresenting path and site as span elements
@@ -1622,8 +1629,8 @@
          var i = fullPath.lastIndexOf("/"),
             path = i >= 0 ? fullPath.substring(0, i + 1) : "",
             name = i >= 0 ? fullPath.substring(i + 1) : fullPath,
-            fullPath = siteId ? this.msg("label.documents") + fullPath : fullPath,
             siteHtml;
+         fullPath = siteId ? this.msg("label.documents") + fullPath : fullPath;
          if (siteId)
          {
             if (name == "" && path == "/")
@@ -1932,6 +1939,13 @@
                paramDef._type = "hidden";
             }
          }
+      },
+
+      _quoteAndHideLabel: function (configDef, paramName)
+      {
+         var paramDef = this._getParamDef(configDef, paramName);
+         paramDef.displayLabel = null;
+         paramDef._quote = true;
       },
 
       _setParameter: function (ruleConfig, parameterName, value)

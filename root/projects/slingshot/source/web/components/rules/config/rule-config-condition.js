@@ -614,7 +614,11 @@
          {
             // Find select element and the property parameter
             var propertyName = p_oRuleConfig.parameterValues.property;
-            if (p_oRuleConfig.parameterValues["content-property"])
+            if (configDefinitionName == this.options.compareMimeTypeDefinition.name)
+            {
+               propertyName += ":" + "MIME_TYPE";
+            }
+            else if (p_oRuleConfig.parameterValues["content-property"])
             {
                propertyName += ":" + p_oRuleConfig.parameterValues["content-property"];
             }
@@ -669,6 +673,25 @@
          {
             this._selectConfigName(selectEl, previousSelectedConfigDef.value, previousSelectedConfigDef.rel);
          }
+      },
+
+      /**
+       * @method getConfigCustomisation
+       * @param itemType
+       * @param configDef
+       * @return {object} A RuleConfig parameter renderer
+       * @protected
+       * @override
+       */
+      _getConfigCustomisation: function RuleConfig__getConfigCustomisation(itemType, configDef)
+      {
+         if (this._isComparePropertyDefinition(configDef.name))
+         {
+            itemType = "property";
+         }
+
+         // Super class will handle item & conditions....
+         return Alfresco.RuleConfigCondition.superclass._getConfigCustomisation.call(this, itemType, configDef);
       },
 
       /**
@@ -745,6 +768,11 @@
           */
          HasAspect:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._quoteAndHideLabel(configDef, "aspect");
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
@@ -758,6 +786,11 @@
           */
          IsSubType:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._quoteAndHideLabel(configDef, "type");
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
@@ -775,6 +808,7 @@
             {
                this._getParamDef(configDef, "category-aspect")._type = "hidden";
                this._getParamDef(configDef, "category-value")._type = "category";
+               this._quoteAndHideLabel(configDef, "category-value");
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -797,6 +831,11 @@
           */
          HasTag:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._quoteAndHideLabel(configDef, "tag");
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Hide parameters
@@ -807,6 +846,36 @@
                {
                   type: "arcc:tag-picker"
                });
+               return configDef;
+            }
+         },
+
+         /**
+          * Compare property value
+          */
+         ComparePropertyValue:
+         {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               var pd = this._getParamDef(configDef, "value");
+               if (Alfresco.util.arrayContains(["d:any", "d:text", "d:mltext"], pd.type))
+               {
+                  pd._quote = true;
+               }
+               return configDef;
+            }
+         },
+
+         /**
+          * Compare mime type
+          */
+         CompareMimeType:
+         {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               var vd = this._getParamDef(configDef, "value");
+               vd.displayLabel = this.msg("label.is");
+               vd._quote = true;
                return configDef;
             }
          },
