@@ -19,7 +19,7 @@ db.port=@@DB_PORT@@
 #
 # External locations
 #-------------
-ooo.exe=@@ALF_OO@@/program/soffice
+ooo.exe=@@ALF_OOEXE@@
 ooo.user=@@OOUSER@@
 jodconverter.officeHome=@@ALF_OO@@
 jodconverter.portNumbers=8101
