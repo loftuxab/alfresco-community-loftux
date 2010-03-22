@@ -959,11 +959,11 @@
                         }
                      }
 
-                     if (paramDef._type != "hidden")
+                     if (paramDef._type != "hidden" && paramDef.displayLabel)
                      {
                         // Display a label left to the parameter if displayLabel is present
                         Dom.addClass(controlEl, "param");
-                        this._createLabel(paramDef.displayLabel, controlEl);
+                        this._createLabel(paramDef.displayLabel + (paramDef._hideColon ? "" : ":"), controlEl);
                      }
                   }
                }
@@ -1363,7 +1363,7 @@
             var id = forEl.getAttribute("id") ? forEl.getAttribute("id") : Alfresco.util.generateDomId(forEl),
                   labelEl = document.createElement("label");
             labelEl.setAttribute("for", id);
-            labelEl.appendChild(document.createTextNode(text + ":"));
+            labelEl.appendChild(document.createTextNode(text));
             forEl.parentNode.insertBefore(labelEl, forEl);
             return labelEl;
          }
