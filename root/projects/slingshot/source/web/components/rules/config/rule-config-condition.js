@@ -776,7 +776,9 @@
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
-               this._getParamDef(configDef, "aspect")._constraintFilter = "visible";
+               var ad = this._getParamDef(configDef, "aspect");
+               ad._constraintFilter = "visible";
+               ad.displayLabel = null;
                return configDef;
             }
          },
@@ -794,7 +796,10 @@
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
-               this._getParamDef(configDef, "type")._constraintFilter = "visible";
+               var td = this._getParamDef(configDef, "type");
+               td._constraintFilter = "visible";
+               td.displayLabel = this.msg("label.is");
+               td._hideColon = true;
                return configDef;
             }
          },
@@ -875,7 +880,15 @@
             {
                var vd = this._getParamDef(configDef, "value");
                vd.displayLabel = this.msg("label.is");
+               vd._hideColon = true;
                vd._quote = true;
+               return configDef;
+            },
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               var vd = this._getParamDef(configDef, "value");
+               vd.displayLabel = this.msg("label.is");
+               vd._hideColon = true;
                return configDef;
             }
          },

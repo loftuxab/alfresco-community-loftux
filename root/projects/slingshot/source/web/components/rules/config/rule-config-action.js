@@ -88,7 +88,9 @@
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
-               this._getParamDef(configDef, "aspect-name")._constraintFilter = "addable";
+               var ad = this._getParamDef(configDef, "aspect-name");
+               ad._constraintFilter = "addable";
+               ad.displayLabel = null;
                return configDef;
             }
          },
@@ -103,7 +105,23 @@
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
-               this._getParamDef(configDef, "aspect-name")._constraintFilter = "removeable";
+               var ad = this._getParamDef(configDef, "aspect-name");
+               ad._constraintFilter = "removeable";
+               ad.displayLabel = null;
+               return configDef;
+            }
+         },
+
+         Script:
+         {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._quoteAndHideLabel(configDef, "script-ref");
+               return configDef;
+            },
+            edit: function(configDef, ruleConfig, configEl)
+            {
+               this._getParamDef(configDef, "script-ref").displayLabel = null;
                return configDef;
             }
          },
@@ -193,6 +211,7 @@
                var dfpd = this._getParamDef(configDef, "destination-folder");
                dfpd._type = "path";
                dfpd.displayLabel = this.msg("label.itemsTo");
+               dfpd._hideColon = true;
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
