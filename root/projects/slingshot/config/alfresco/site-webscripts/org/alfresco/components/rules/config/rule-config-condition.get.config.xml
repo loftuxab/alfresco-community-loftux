@@ -140,6 +140,8 @@
    </property-evaluators>
 
    <customise>
+      <property name="compare-mime-type">CompareMimeType</property>
+      <property name="compare-property-value">ComparePropertyValue</property>
       <condition name="is-subtype">IsSubType</condition>
       <condition name="has-aspect">HasAspect</condition>
       <condition name="has-tag">HasTag</condition>

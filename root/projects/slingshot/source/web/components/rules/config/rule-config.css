@@ -14,7 +14,7 @@
 
 .rule-config .rule-config-title
 {
-   padding-left: 0.7em;
+   padding-left: 1em;
    color: #008000;
    float: left;
 }
@@ -61,13 +61,17 @@
 
 .rule-config .rule-config-body .name
 {
-   padding-left: 2.3em;
    display: inline;
 }
 
-.rule-config .rule-config-body .name span
+.rule-config.edit .rule-config-body .name
 {
-   font-weight: bold;
+   padding-left: 2.3em;
+}
+
+.rule-config.text .rule-config-body .name
+{
+   padding-left: 1em;
 }
 
 .rule-config .rule-config-body

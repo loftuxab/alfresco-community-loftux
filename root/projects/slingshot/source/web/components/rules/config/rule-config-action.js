@@ -65,6 +65,11 @@
       {
          SpecialiseType:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._quoteAndHideLabel(configDef, "type-name");
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
@@ -75,6 +80,11 @@
 
          AddFeatures:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._quoteAndHideLabel(configDef, "aspect-name");
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
@@ -85,6 +95,11 @@
 
          RemoveFeatures:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               this._quoteAndHideLabel(configDef, "aspect-name");
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
@@ -175,7 +190,9 @@
             {
                // Hide all parameters since we are using a cusotm ui but set default values
                this._hideParameters(configDef.parameterDefinitions);
-               this._getParamDef(configDef, "destination-folder")._type = "path";
+               var dfpd = this._getParamDef(configDef, "destination-folder");
+               dfpd._type = "path";
+               dfpd.displayLabel = this.msg("label.itemsTo");
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -261,6 +278,7 @@
             {
                this._getParamDef(configDef, "category-aspect")._type = "hidden";
                this._getParamDef(configDef, "category-value")._type = "category";
+               this._quoteAndHideLabel(configDef, "category-value");
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -435,7 +453,7 @@
             {
                this._createLabel(paramDef.displayLabel, containerEl); 
                var nodeRef = ruleConfig.parameterValues ? ruleConfig.parameterValues[paramDef._destinationParam] : null;
-               this._createPathSpan(containerEl, this.id + "-" + configDef._id + "-destinationLabel", nodeRef);
+               this._createPathSpan(containerEl, configDef, paramDef, this.id + "-" + configDef._id + "-destinationLabel", nodeRef);
                this._createButton(containerEl, configDef, paramDef, ruleConfig, function RCA_destinationDialogButton_onClick(type, obj)
                {
                   this.renderers["arca:destination-dialog-button"].currentCtx =
