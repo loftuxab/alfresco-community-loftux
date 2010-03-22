@@ -272,7 +272,7 @@
             ruleInputs = Selector.query("li input[type=hidden][name=id]", this.widgets.rulesListContainerEl);
          for (var i = 0, il = ruleInputs.length; i < il; i++)
          {
-            rules.push(ruleInputs[i].value);
+            rules.push(this.options.nodeRef.storeType + "://" + this.options.nodeRef.storeId + "/" + ruleInputs[i].value);
          }
 
          // Start/stop inherit rules from parent folder
@@ -283,7 +283,10 @@
             {
                actionedUponNode : this.options.nodeRef.toString(),
                actionDefinitionName: "reorder-rules",
-               rules: rules
+               parameterValues:
+               {
+                  rules: rules
+               }
             },
             successCallback:
             {
