@@ -3291,7 +3291,7 @@ InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane 
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
 InstallComponent D0BEA0E1-AE39-46EB-8F94-F52C1A40128D -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
 InstallComponent A4B7881D-0357-4C8F-873B-C9B1E6C2FA6F -setup Install -type action -title {Create Checkbox} -component AddWidget -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {3FCADEE9-5DD9-768C-D188-CC3A6F8121FF B4542FD2-3F94-E787-C87C-253FEECEB594 5F62014D-FF00-1133-0073-1B34152260C9} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {3FCADEE9-5DD9-768C-D188-CC3A6F8121FF B4542FD2-3F94-E787-C87C-253FEECEB594 5F62014D-FF00-1133-0073-1B34152260C9} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
 Condition 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF
 Condition B4542FD2-3F94-E787-C87C-253FEECEB594 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id B4542FD2-3F94-E787-C87C-253FEECEB594
 Condition 5F62014D-FF00-1133-0073-1B34152260C9 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 5F62014D-FF00-1133-0073-1B34152260C9
@@ -5953,6 +5953,7 @@ F03F1387-C847-400B-A135-9A967D979941,StringMap
 "@@ALF_CONTENT@@" "<%Dir <%CONTENT%> forward%>"
 "@@ALF_OO@@" "<%Dir <%ALF_OO%> forward%>"
 "@@OOUSER@@" "<%Dir <%ALF_DATA%>/oouser forward%>"
+"@@ALF_OOEXE@@" "<%Dir <%ALF_OO%> forward%>/MacOS/soffice"
 "#<%ALF_DB%>#" ""
 "@@TOMCATPORT@@" "<%ALF_TOMCATPORT%>"
 "8080" "<%ALF_TOMCATPORT%>"

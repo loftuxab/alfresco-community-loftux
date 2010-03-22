@@ -7105,6 +7105,7 @@ F03F1387-C847-400B-A135-9A967D979941,StringMap
 "@@ALF_INDEXES@@" "<%INDEXES%>"
 "@@ALF_CONTENT@@" "<%CONTENT%>"
 "@@ALF_OO@@" "<%ALF_OO%>"
+"@@ALF_OOEXE@@" "<%ALF_OO%>/program/soffice"
 "@@OOUSER@@" "<%OOUSER%>"
 "#<%ALF_DB%>#" ""
 "8080" "<%ALF_TOMCATPORT%>"
