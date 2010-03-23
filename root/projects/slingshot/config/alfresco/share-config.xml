@@ -43,8 +43,8 @@
 
    <config evaluator="string-compare" condition="HelpPages">
       <help-pages>
-         <share-help>http://www.alfresco.com/help/32/labs/sharehelp/</share-help>
-         <share-tutorial>http://www.alfresco.com/help/32/labs/sharetutorial/</share-tutorial>
+         <share-help>http://www.alfresco.com/help/33/community/sharehelp/</share-help>
+         <share-tutorial>http://www.alfresco.com/help/33/community/sharetutorial/</share-tutorial>
       </help-pages>
    </config>
    
