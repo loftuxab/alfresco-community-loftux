@@ -11,8 +11,8 @@
          </div>
          <div class="field">
             <select id="${args.htmlid}-type" name="type" tabindex="0">
-               <option value="wf:review" selected="selected">Review &amp; Approve</option>
-               <option value="wf:adhoc">Adhoc Task</option>
+               <option value="wf:review" selected="selected">${msg("wf_review.title")}</option>
+               <option value="wf:adhoc">${msg("wf_adhoc.title")}</option>
             </select>
          </div>
          <div class="yui-g">
