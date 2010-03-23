@@ -186,6 +186,7 @@
                list = lists[i];
                this.dataLists[list.name] = list;
             }
+            this.dataLists.length = lists.length;
             
             if (p_callback && (typeof p_callback.fn == "function"))
             {
