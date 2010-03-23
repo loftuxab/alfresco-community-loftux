@@ -150,7 +150,11 @@
             {
                // Hide all parameters but subject
                this._hideParameters(configDef.parameterDefinitions);
-               this._getParamDef(configDef, "subject")._type = null;
+               var sd = this._getParamDef(configDef, "subject");
+               sd._type = null;
+               sd._quote = true;
+               sd._hideColon = true;
+               sd.displayLabel = this.msg("label.sendemail.label.1");
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -166,6 +170,29 @@
 
          CheckIn:
          {
+            text: function(configDef, ruleConfig, configEl)
+            {
+               // Reverse parameter order so version reads first
+               configDef.parameterDefinitions.reverse();
+               var mcd = this._getParamDef(configDef, "minorChange");
+               mcd.displayLabel = this.msg("label.checkin.label.1");
+               mcd.type = "d:text";
+               mcd._hideColon = true;
+               mcd._quote = true;
+               if (ruleConfig.parameterValues["minorChange"] == true)
+               {
+                  ruleConfig.parameterValues["minorChange"] = this.msg("label.checkin.minor");
+               }
+               else
+               {
+                  ruleConfig.parameterValues["minorChange"] = this.msg("label.checkin.major");
+               }
+               var dd = this._getParamDef(configDef, "description");
+               dd.displayLabel = this.msg("label.checkin.label.2");
+               dd._hideColon = true;
+               dd._quote = true;
+               return configDef;
+            },
             edit: function(configDef, ruleConfig, configEl)
             {
                this._hideParameters(configDef.parameterDefinitions);
@@ -183,7 +210,10 @@
             {
                // Hide all parameters except destination-folder that shall be resolved to a path
                this._hideParameters(configDef.parameterDefinitions);
-               this._getParamDef(configDef, "destination-folder")._type = "path";
+               var dfd = this._getParamDef(configDef, "destination-folder");
+               dfd._type = "path";
+               dfd.displayLabel = this.msg("label.itemsTo");
+               dfd._hideColon = true;
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -250,12 +280,50 @@
          {
             text: function(configDef, ruleConfig, configEl)
             {
-               // Hide all parameters but the labels
-               this._hideParameters(configDef.parameterDefinitions);
-               this._getParamDef(configDef, "approve-step")._type = null;
+               var defs = configDef.parameterDefinitions;
+               configDef.parameterDefinitions = [defs[0], defs[2], defs[1], defs[3], defs[5], defs[4]];
+               if (ruleConfig.parameterValues["approve-move"] == true)
+               {
+                  ruleConfig.parameterValues["approve-move"] = this.msg("label.workflow.moves");
+               }
+               else
+               {
+                  ruleConfig.parameterValues["approve-move"] = this.msg("label.workflow.copies");
+               }
+               var asd = this._getParamDef(configDef, "approve-step");
+               asd.displayLabel = this.msg("label.workflow.approve.label.1");
+               asd._hideColon = true;
+               asd._quote = true;
+               var amd = this._getParamDef(configDef, "approve-move");
+               amd.displayLabel = this.msg("label.workflow.approve.label.2");
+               amd.type = "d:text";
+               amd._hideColon = true;
+               var afd = this._getParamDef(configDef, "approve-folder");
+               afd.displayLabel = this.msg("label.workflow.approve.label.3");
+               afd._type = "path";
+               afd._hideColon = true;
                if (ruleConfig.parameterValues && ruleConfig.parameterValues["reject-step"])
                {
-                  this._getParamDef(configDef, "reject-step")._type = null;
+                  if (ruleConfig.parameterValues["reject-move"] == true)
+                  {
+                     ruleConfig.parameterValues["reject-move"] = this.msg("label.workflow.moves");
+                  }
+                  else
+                  {
+                     ruleConfig.parameterValues["reject-move"] = this.msg("label.workflow.copies");
+                  }
+                  var rsd = this._getParamDef(configDef, "reject-step");
+                  rsd.displayLabel = this.msg("label.workflow.reject.label.1");
+                  rsd._hideColon = true;
+                  rsd._quote = true;
+                  var msd = this._getParamDef(configDef, "reject-move");
+                  msd.displayLabel = this.msg("label.workflow.reject.label.2");
+                  msd.type = "d:text";
+                  msd._hideColon = true;
+                  var rfd = this._getParamDef(configDef, "reject-folder");
+                  rfd.displayLabel = this.msg("label.workflow.reject.label.3");
+                  rfd._type = "path";
+                  rfd._hideColon = true;
                }
                return configDef;
             },
@@ -319,8 +387,15 @@
                this._hideParameters(configDef.parameterDefinitions);
 
                // But make mime type and destination folder visible and destination folder resolve the nodeRef to a path
-               this._getParamDef(configDef, "mime-type")._type = null;
-               this._getParamDef(configDef, "destination-folder")._type = "path";
+               var mtd = this._getParamDef(configDef, "mime-type");
+               mtd._type = null;
+               mtd._quote = true;
+               mtd._hideColon = true;
+               mtd.displayLabel = this.msg("label.transform.label.1");
+               var dfd = this._getParamDef(configDef, "destination-folder");
+               dfd._type = "path";
+               dfd._hideColon = true;
+               dfd.displayLabel = this.msg("label.transform.label.2");
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -350,7 +425,10 @@
             {
                // Hide encoding and make destination folder resolve the nodeRef to a path
                this._getParamDef(configDef, "encoding")._type = "hidden";
-               this._getParamDef(configDef, "destination")._type = "path";
+               var dd = this._getParamDef(configDef, "destination");
+               dd._type = "path";
+               dd._hideColon = true;                              
+               dd.displayLabel = this.msg("label.itemsTo");
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
