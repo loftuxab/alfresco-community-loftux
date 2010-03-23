@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DefaultTemplate" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">wcservice/office/</Value>
+      <Value Profile="(Default)">wcs/office/</Value>
     </Setting>
     <Setting Name="ToolbarPosition" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
