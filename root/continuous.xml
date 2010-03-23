@@ -9,6 +9,18 @@
    <property name="build.script" value="build.xml" />
    <import file="${basedir}/${build.script}" />
 
+   <!-- We ant Java 1.6 and Ant 1.7, to make the scripting simple -->
+   <fail message="Ant 1.7 or higher is required to build. ${ant.version} detected">
+     <!-- antversion tag not available in 1.6 which is unhelpful -->
+     <condition><contains string="${ant.version}" substring="1.6." /></condition>
+   </fail>
+   <fail message="Ant 1.7 or higher is required to build. ${ant.version} detected">
+     <condition><not><antversion atleast="1.7" /></not></condition>
+   </fail>
+   <fail message="Java 1.6 or higher is required to build. ${ant.java.version} detected">
+     <condition><equals arg1="${ant.java.version}" arg2="1.5" /></condition>
+   </fail>
+
    <target name="continuous-init" 
            depends="init">
       <property file="continuous.properties"/>
@@ -168,9 +180,87 @@
            depends="-drop-database, 
                     -create-database" />
 
-   <target name="-create-database" 
+   <target name="load-database-properties"
            depends="continuous-init">
-      <property file="${dir.project.repository.config}/alfresco/repository.properties"/>
+      <loadfile property="dev_context" failonerror="false"
+           srcfile="${dir.project.repository.config}/alfresco/extension/dev-context.xml" />
+      <loadfile property="test_context" failonerror="false"
+           srcfile="${dir.project.repository.config}/alfresco/extension/test-context.xml" />
+
+      <!-- Load the repository properties files, in order -->
+      <script language="javascript"> <![CDATA[
+         importClass(java.util.regex.Matcher);
+         importClass(java.util.regex.Pattern);
+         importClass(java.io.File);
+         importClass(java.io.FileInputStream);
+         importClass(java.io.InputStreamReader);
+         importClass(java.io.BufferedReader);
+
+         var repoConfigPath = project.getProperty("dir.project.repository.config");
+
+         var repoPropMatcher = Pattern.compile("<bean id=\"repository-properties\"(.*?)</bean>", Pattern.DOTALL);
+         var locationsMatcher = Pattern.compile("<property name=\"locations\"(.*?)</property>", Pattern.DOTALL);
+         var valueMatcher = Pattern.compile("<value>(.*?)</value>", Pattern.DOTALL);
+
+         for each (var xmlp in ["dev_context","test_context"]) {
+            var xml = project.getProperty(xmlp);
+            if(xml != null) {
+               var rpm = repoPropMatcher.matcher(xml);
+               if(rpm.find()) {
+                   var lm = locationsMatcher.matcher( rpm.group() );
+                   if(lm.find()) {
+                      var vm = valueMatcher.matcher( lm.group() );
+                      while(vm.find()) {
+                         var property = vm.group(1);
+                         var pfn;
+                         if(property.startsWith("classpath:")) {
+                            pfn = repoConfigPath + "/" + property.substring(10);
+                         } else if(property.startsWith("file:")) {
+                            pfn = property.substring(5);
+                         }
+
+                         if(pfn != null) {
+                            var pf = new File(pfn);
+                            if(pf.exists()) {
+                               echoT = project.createTask("echo");
+                               echoT.setMessage("Loading DB property " + property);
+                               echoT.perform();
+
+                               propertyT = project.createTask("property");
+                               propertyT.setFile(pf);
+                               propertyT.perform();
+                            }
+                         }
+                      }
+                   }
+               }
+            }
+         }
+
+         // Try to figure out what database engine they wanted
+         var dbtype = "unknown";
+         var dburl = project.getProperty("db.url");
+         if(dburl.startsWith("jdbc:mysql://")) {
+            dbtype = "mysql";
+         } else if(dburl.startsWith("jdbc:postgresql:")) {
+            dbtype = "postgresql";
+         } else if(dburl.startsWith("jdbc:oracle:")) {
+            dbtype = "oracle";
+         }
+
+         project.setProperty("db.type",dbtype);
+      ]]></script>
+      <echo message="DB Type is ${db.type}"/>
+   </target>
+
+   <target name="-create-database" 
+           depends="continuous-init, load-database-properties">
+       <antcall target="-create-database-${db.type}" />
+   </target>
+   <target name="-create-database-unknown">
+      <fail message="Unknown database type for JDBC url '${db.url}'" />
+   </target>
+   <target name="-create-database-mysql">
       <sql driver="${db.driver}" 
            url="jdbc:mysql:///" 
            classpathref="classpath.compile" 
@@ -181,19 +271,22 @@
          create database if not exists ${db.name}_test;
       </sql>
    </target>
-
-   <target name="-drop-database" 
-           depends="continuous-init">
-      <property file="${dir.project.repository.config}/alfresco/repository.properties"/>
+   <target name="-create-database-postgresql">
       <sql driver="${db.driver}" 
-           url="${db.url}" 
+           url="jdbc:postgresql:template1"
            classpathref="classpath.compile" 
            print="yes"
+           autocommit="yes"
            userid="${db.username}" 
            password="${db.password}">
-         drop database if exists ${db.name};
-         drop database if exists ${db.name}_test;
+         create database ${db.name};
+         create database ${db.name}_test;
       </sql>
+   </target>
+
+   <target name="-drop-database" 
+           depends="continuous-init, load-database-properties">
+       <antcall target="-drop-database-${db.type}" />
 
       <delete verbose="true">
          <fileset dir="${basedir}" 
@@ -208,6 +301,32 @@
       <delete dir="${dir.project.remoteapi}/alf_data" 
               quiet="yes" 
               includeEmptyDirs="true" />
+   </target>
+   <target name="-drop-database-unknown">
+      <fail message="Unknown database type for JDBC url '${db.url}'" />
+   </target>
+   <target name="-drop-database-mysql">
+      <sql driver="${db.driver}" 
+           url="${db.url}" 
+           classpathref="classpath.compile" 
+           print="yes"
+           userid="${db.username}" 
+           password="${db.password}">
+         drop database if exists ${db.name};
+         drop database if exists ${db.name}_test;
+      </sql>
+   </target>
+   <target name="-drop-database-postgresql">
+      <sql driver="${db.driver}" 
+           url="jdbc:postgresql:template1"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           userid="${db.username}" 
+           password="${db.password}">
+         drop database if exists ${db.name};
+         drop database if exists ${db.name}_test;
+      </sql>
    </target>
 
    <!-- ***************** -->
