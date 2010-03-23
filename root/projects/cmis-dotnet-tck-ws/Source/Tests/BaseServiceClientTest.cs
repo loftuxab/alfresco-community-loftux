@@ -84,6 +84,7 @@ namespace WcfCmisWSTests
         private static string baseDocumentTypeId = null;
         private static string baseFolderTypeId = null;
         private static string baseRelationshipTypeId = null;
+        private static string basePolicyTypeId = null;
 
         private static string documentQueryName = null;
         private static System.Nullable<bool> contentStreamAllowed = null;
@@ -97,6 +98,8 @@ namespace WcfCmisWSTests
         private static string relationshipTypeId = null;
         private static string relationshipSourceTypeId = null;
         private static string relationshipTargetTypeId = null;
+        private static string policyTypeId = null;
+        private static string policyControllableTypeId = null;
 
         private static System.Nullable<bool> unfilingEnabled = null;
         private static System.Nullable<bool> multifilingEnabled = null;
@@ -106,6 +109,8 @@ namespace WcfCmisWSTests
         private static System.Nullable<bool> pwcSearchable = null;
         private static System.Nullable<bool> versionSpecificFiling = null;
         private static System.Nullable<bool> renditionsEnabled = null;
+        private static System.Nullable<bool> relationshipsAllowed = null;
+        private static System.Nullable<bool> policiesAllowed = null;
 
         private static System.Nullable<enumCapabilityContentStreamUpdates> contentStreamUpdates = null;
         private static System.Nullable<enumCapabilityJoin> capabilityJoin = null;
@@ -122,6 +127,7 @@ namespace WcfCmisWSTests
         protected static DiscoveryServicePortClient discoveryServiceClient = CmisClientFactory.getInstance().getDiscoveryServiceClient();
         protected static RelationshipServicePortClient relationshipServiceClient = CmisClientFactory.getInstance().getRelationshipServiceClient();
         protected static ACLServicePortClient aclServiceClient = CmisClientFactory.getInstance().getACLServiceClient();
+        protected static PolicyServicePortClient policyServiceClient = CmisClientFactory.getInstance().getPolicyServiceClient();
 
         protected static CmisLogger logger = CmisLogger.getInstance(2);
 
@@ -320,6 +326,24 @@ namespace WcfCmisWSTests
             return (bool)renditionsEnabled;
         }
 
+        public static bool areRelationshipsAllowed()
+        {
+            if (null == relationshipsAllowed)
+            {
+                getAndAssertBaseTypesProperties();
+            }
+            return (null != relationshipsAllowed) ? ((bool)relationshipsAllowed) : (false);
+        }
+
+        public static bool arePoliciesAllowed()
+        {
+            if (null == policiesAllowed)
+            {
+                getAndAssertBaseTypesProperties();
+            }
+            return (null != policiesAllowed) ? ((bool)policiesAllowed) : (false);
+        }
+
         public enumCapabilityACL getCapabilityACL()
         {
             if (capabilityACL == null)
@@ -428,6 +452,24 @@ namespace WcfCmisWSTests
             return relationshipTargetTypeId;
         }
 
+        public string getAndAssertPolicyTypeId()
+        {
+            if (null == policyTypeId)
+            {
+                getAndAssertBaseTypesProperties();
+            }
+            return policyTypeId;
+        }
+
+        public string getAndAssertPolicyControllableTypeId()
+        {
+            if (null == policyControllableTypeId)
+            {
+                getAndAssertBaseTypesProperties();
+            }
+            return policyControllableTypeId;
+        }
+
         public string getAndAssertDocumentQueryName()
         {
             if (documentQueryName == null)
@@ -484,11 +526,13 @@ namespace WcfCmisWSTests
                     baseDocumentTypeId = assertBaseTypeSearch(baseDocumentTypeId, typeDef, typeof(cmisTypeDocumentDefinitionType), "Document");
                     baseFolderTypeId = assertBaseTypeSearch(baseFolderTypeId, typeDef, typeof(cmisTypeFolderDefinitionType), "Folder");
                     baseRelationshipTypeId = assertBaseTypeSearch(baseRelationshipTypeId, typeDef, typeof(cmisTypeRelationshipDefinitionType), "Relationship");
+                    basePolicyTypeId = assertBaseTypeSearch(basePolicyTypeId, typeDef, typeof(cmisTypePolicyDefinitionType), "Policy");
                 }
 
                 Assert.IsNotNull(baseDocumentTypeId, "Base Document Type Id was not found");
                 Assert.IsNotNull(baseFolderTypeId, "Base Folder Type Id was not found");
-                Assert.IsNotNull(baseRelationshipTypeId, "Base Relationship Type Id was not found");
+                policiesAllowed = null != basePolicyTypeId;
+                relationshipsAllowed = null != baseRelationshipTypeId;
             }
 
             if (null == documentTypeId)
@@ -506,19 +550,21 @@ namespace WcfCmisWSTests
                 contentStreamRequired = enumContentStreamAllowed.required.Equals(typeDefinition.contentStreamAllowed);
                 versioningAllowed = typeDefinition.versionable;
                 documentQueryName = typeDefinition.queryName;
+                policyControllableTypeId = (typeDefinition.controllablePolicy) ? (documentTypeId) : (null);
             }
 
             if (null == folderTypeId)
             {
-                folderTypeId = enumerateAndAssertTypesForAction(getAndAssertTypeDescendants(baseFolderTypeId, -1, true), new CreateableAndFilableFolderSearchAction(), true);
-
-                if (folderTypeId == null)
+                folderTypeId = enumerateAndAssertTypesForAction(getAndAssertTypeDescendants(baseFolderTypeId, -1, true), new CreateableAndFilableFolderSearchAction(), false);
+                if (null == folderTypeId)
                 {
                     folderTypeId = baseFolderTypeId;
                 }
+                cmisTypeDefinitionType typeDefinition = getAndAssertTypeDefinition(folderTypeId);
+                policyControllableTypeId = ((null == policyControllableTypeId) && typeDefinition.controllablePolicy) ? (folderTypeId) : (null);
             }
 
-            if (null == relationshipTypeId)
+            if ((null == relationshipTypeId) && (null != baseRelationshipTypeId))
             {
                 relationshipTypeId = enumerateAndAssertTypesForAction(getAndAssertTypeDescendants(baseRelationshipTypeId, -1, true), new BestRelationshipSearchAction(), true);
 
@@ -528,6 +574,11 @@ namespace WcfCmisWSTests
                     relationshipTargetTypeId = documentTypeId;
                     relationshipTypeId = baseRelationshipTypeId;
                 }
+            }
+
+            if ((null == policyTypeId) && (null != basePolicyTypeId))
+            {
+                policyTypeId = enumerateAndAssertTypesForAction(getAndAssertTypeDescendants(basePolicyTypeId, -1, true), new BestPolicyTypeSearchAction(), true);
             }
         }
 
@@ -591,9 +642,24 @@ namespace WcfCmisWSTests
 
         protected class CreateableAndFilableFolderSearchAction : TypeAction
         {
+            private int previousPower = 0;
+
             public override string perform(cmisTypeDefinitionType typeDefinition)
             {
-                return (typeDefinition.creatable && typeDefinition.fileable) ? (typeDefinition.id) : (null);
+                if (typeDefinition.creatable)
+                {
+                    int currentPower = 1;
+                    currentPower += (typeDefinition.fileable) ? (1) : (0);
+                    currentPower += (typeDefinition.controllablePolicy) ? (2) : (0);
+                    currentPower += (typeDefinition.controllableACL) ? (2) : (0);
+                    if (currentPower > previousPower)
+                    {
+                        previousPower = currentPower;
+                        return typeDefinition.id;
+                    }
+                    return null;
+                }
+                return null;
             }
         }
 
@@ -625,6 +691,15 @@ namespace WcfCmisWSTests
                     }
                 }
                 return null;
+            }
+        }
+
+        protected class BestPolicyTypeSearchAction : TypeAction
+        {
+            public override string perform(cmisTypeDefinitionType typeDefinition)
+            {
+                cmisTypePolicyDefinitionType convertedType = (cmisTypePolicyDefinitionType)typeDefinition;
+                return (typeDefinition.creatable) ? (typeDefinition.id) : (null);
             }
         }
 
@@ -665,7 +740,7 @@ namespace WcfCmisWSTests
             else if (typeDefinition is cmisTypeFolderDefinitionType && !baseFolderTypeId.Equals(typeDefinition.id))
             {
                 Assert.IsNotNull(typeDefinition.baseId, ("Invalid Base Type Id was return with Get Type Definition response for " + typeId + " type"));
-                Assert.AreEqual(enumBaseObjectTypeIds.cmisdocument, typeDefinition.baseId, "Folder Type Definition has invalid Base Type Id property. Expected: " + baseFolderTypeId + ", actual: " + typeDefinition.baseId);
+                Assert.AreEqual(enumBaseObjectTypeIds.cmisfolder, typeDefinition.baseId, "Folder Type Definition has invalid Base Type Id property. Expected: " + baseFolderTypeId + ", actual: " + typeDefinition.baseId);
             }
             else if (typeDefinition is cmisTypeRelationshipDefinitionType && !baseRelationshipTypeId.Equals(typeDefinition.id))
             {
@@ -769,24 +844,32 @@ namespace WcfCmisWSTests
             int result = 0;
             if (documentType.creatable)
             {
-                result += 10000;
+                result += 1000000;
             }
             if (documentType.fileable)
             {
-                result += 1000;
+                result += 100000;
             }
             if (documentType.versionable)
             {
-                result += 100;
+                result += 10000;
             }
             bool contentStreamAllowed = enumContentStreamAllowed.allowed.Equals(documentType.contentStreamAllowed) || enumContentStreamAllowed.required.Equals(documentType.contentStreamAllowed);
             if (contentStreamAllowed)
             {
-                result += 10;
+                result += 1000;
             }
             if (documentType.queryable)
             {
-                result += 1;
+                result += 100;
+            }
+            if (documentType.controllableACL)
+            {
+                result += 10;
+            }
+            if (documentType.controllablePolicy)
+            {
+                result += 10;
             }
             return result;
         }
@@ -1212,8 +1295,8 @@ namespace WcfCmisWSTests
         protected string searchForFolderTypeWithAllowingList(string rootFolderId)
         {
             FileableObject folder = createAndAssertFolder(rootFolderId);
-            cmisPropertiesType properties = getAndAssertObjectProperties(folder.ObjectId, folder, true);
-            string[] allowedObjectIds = (string[])searchAndAssertPropertyByName(properties.Items, ALLOWED_CHILDREN_TYPE_IDS, true);
+            cmisPropertiesType properties = getAndAssertObjectProperties(folder.ObjectId, ANY_PROPERTY_FILTER, folder, true);
+            string[] allowedObjectIds = (string[])searchAndAssertPropertyByName(properties.Items, ALLOWED_CHILDREN_TYPE_IDS, true, false);
             object rootFolderTypeId = searchAndAssertPropertyByName(properties.Items, TYPE_ID_PROPERTY, false, false);
             if ((null == allowedObjectIds) || (allowedObjectIds.Length < 1) || isValueNotSet(allowedObjectIds[0]))
             {

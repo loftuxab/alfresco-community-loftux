@@ -298,8 +298,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                     EnumServiceException.constraint, generateTestFileName(), documentTypeId, getAndAssertRootFolderId(), properties, TEST_CONTENT, null);
         }
 
-        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
-        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
+        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
+        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -400,7 +400,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         documentId = cancelCheckOutAndAssert(documentId);
         deleteAndAssertObject(documentId);
     }
-    
+
     public void testDocumentCreatingWithACL() throws Exception
     {
         if (!EnumCapabilityACL.manage.equals(getAndAssertCapabilities().getCapabilityACL()))
@@ -413,26 +413,26 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             logger.info("ACL Credentials or ACL PrincipalId were not set. Test will be skipped...");
             return;
         }
-        
+
         CmisAccessControlListType acList = new CmisAccessControlListType();
         CmisAccessControlPrincipalType principal = new CmisAccessControlPrincipalType(aclPrincipalId, null);
         CmisAccessControlEntryType ace = new CmisAccessControlEntryType(principal, new String[] { PERMISSION_READ }, true, null);
         acList.setPermission(new CmisAccessControlEntryType[] { ace });
 
         String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null, acList, null);
-        
+
         getPropertiesUsingCredentials(documentId, aclUsername, aclPassword);
-        
+
         deleteAndAssertObject(documentId);
-        
+
         acList = new CmisAccessControlListType();
         principal = new CmisAccessControlPrincipalType(aclPrincipalId, null);
         ace = new CmisAccessControlEntryType(principal, new String[] { PERMISSION_WRITE }, true, null);
         acList.setPermission(new CmisAccessControlEntryType[] { ace });
 
-        documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null, acList, null);        
+        documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), getAndAssertRootFolderId(), null, TEST_CONTENT, null, acList, null);
         documentId = updatePropertiesUsingCredentials(documentId, aclUsername, aclPassword);
-        
+
         deleteAndAssertObject(documentId);
 
     }
@@ -532,7 +532,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         String folderId = createAndAssertFolder();
         deleteAndAssertObject(folderId);
     }
-    
+
     public void testFolderCreatingWithACL() throws Exception
     {
         if (!EnumCapabilityACL.manage.equals(getAndAssertCapabilities().getCapabilityACL()))
@@ -545,16 +545,16 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             logger.info("ACL Credentials or ACL PrincipalId were not set. Test will be skipped...");
             return;
         }
-        
+
         CmisAccessControlListType acList = new CmisAccessControlListType();
         CmisAccessControlPrincipalType principal = new CmisAccessControlPrincipalType(aclPrincipalId, null);
         CmisAccessControlEntryType ace = new CmisAccessControlEntryType(principal, new String[] { PERMISSION_READ }, true, null);
         acList.setPermission(new CmisAccessControlEntryType[] { ace });
 
         String folderId = createAndAssertFolder(generateTestFolderName(), getAndAssertFolderTypeId(), getAndAssertRootFolderId(), null, acList, null);
-        
+
         getPropertiesUsingCredentials(folderId, aclUsername, aclPassword);
-                        
+
         deleteAndAssertObject(folderId);
     }
 
@@ -568,11 +568,10 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     {
         String folderTypeId = getAndAssertFolderTypeId();
         String documentId = createAndAssertDocument();
-        assertFolderConstraitException("Folder Creation with none Folder 'parent folder id' input parameter", null, generateTestFolderName(),
-                folderTypeId, documentId, null);
+        assertFolderConstraitException("Folder Creation with none Folder 'parent folder id' input parameter", null, generateTestFolderName(), folderTypeId, documentId, null);
         deleteAndAssertObject(documentId);
-        assertFolderConstraitException("Folder Creation with invalid 'parent folder id' input parameter", null, generateTestFolderName(), folderTypeId,
-                "Invalid Parent Folder Id", null);
+        assertFolderConstraitException("Folder Creation with invalid 'parent folder id' input parameter", null, generateTestFolderName(), folderTypeId, "Invalid Parent Folder Id",
+                null);
     }
 
     public void testFolderCreationConstraintsObservance() throws Exception
@@ -582,8 +581,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 getAndAssertDocumentTypeId(), rootFolderId, null);
         assertNotAllowedObjectException(rootFolderId, false);
 
-        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
-        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
+        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
+        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -646,7 +645,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             String notAllowdSourceTypeId = searchAndAssertNotAllowedSourceForRelationshipTypeId(relationshipTypeId);
             assertRelationshipConstraitException(
-                    "Relationship Creation with the sourceObjectIdï¿½s ObjectType is not in the list of ï¿½allowedSourceTypesï¿½ specified by the Object-Type definition specified by typeId",
+                    "Relationship Creation with the sourceObjectId’s ObjectType is not in the list of “allowedSourceTypes” specified by the Object-Type definition specified by typeId",
                     null, notAllowdSourceTypeId, null, relationshipTypeId);
         }
 
@@ -655,12 +654,12 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         {
             String notAllowdTargetTypeId = searchAndAssertNotAllowedSourceForRelationshipTypeId(relationshipTypeId);
             assertRelationshipConstraitException(
-                    "Relationship Creation with the sourceObjectIdï¿½s ObjectType is not in the list of ï¿½allowedTargetTypesï¿½ specified by the Object-Type definition specified by typeId",
+                    "Relationship Creation with the sourceObjectId’s ObjectType is not in the list of “allowedTargetTypes” specified by the Object-Type definition specified by typeId",
                     null, null, notAllowdTargetTypeId, relationshipTypeId);
         }
 
-        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
-        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
+        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
+        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -769,8 +768,8 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("testCreatePolicy was skipped: Policy type is not found");
         }
 
-        // TODO: ï¿½controllablePolicyï¿½ is set to FALSE and at least one policy is provided
-        // TODO: ï¿½controllableACLï¿½ is set to FALSE and at least one ACE is provided
+        // TODO: “controllablePolicy” is set to FALSE and at least one policy is provided
+        // TODO: “controllableACL” is set to FALSE and at least one ACE is provided
         // TODO: at least one of the permissions is used in an ACE provided which is not supported by the repository
     }
 
@@ -854,7 +853,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
         assertTrue("No properties were returned", response != null && response.getObject() != null && response.getObject().getProperties() != null);
         assertNotNull("No 'Name' property was returned", getStringProperty(response.getObject().getProperties(), PROP_NAME));
     }
-    
+
     public void testGetObjectIncludeRenditions() throws Exception
     {
         if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
@@ -866,9 +865,10 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 for (RenditionData testRendition : testRenditions)
                 {
                     LOGGER.info("[ObjectService->getObject]");
-                    GetObjectResponse response = getServicesFactory().getObjectService().getObject(
-                            new GetObject(getAndAssertRepositoryId(), documentId, PROP_OBJECT_ID, false, EnumIncludeRelationships.none, testRendition.getFilter(), null, null,
-                                    null));
+                    GetObjectResponse response = getServicesFactory().getObjectService()
+                            .getObject(
+                                    new GetObject(getAndAssertRepositoryId(), documentId, PROP_OBJECT_ID, false, EnumIncludeRelationships.none, testRendition.getFilter(), null,
+                                            null, null));
                     assertTrue("Response is empty", response != null && response.getObject() != null);
                     assertRenditions(response.getObject(), testRendition.getFilter(), testRendition.getExpectedKinds(), testRendition.getExpectedMimetypes());
                 }
@@ -988,7 +988,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             LOGGER.info("testGetContentStream was skipped: Content stream isn't allowed");
         }
     }
-    
+
     public void testGetContentStreamForRenditions() throws Exception
     {
         if (isContentStreamAllowed())
@@ -1043,10 +1043,10 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             GetContentStreamResponse response = null;
             String documentId = createAndAssertDocument();
             byte[] byteContent = TEST_CONTENT.getBytes();
-            //firstPortion offset=2, length=7  
+            // firstPortion offset=2, length=7
             byte[] firstPortion = new byte[7];
             System.arraycopy(byteContent, 2, firstPortion, 0, 7);
-            //secondPortion offset=content.length-5
+            // secondPortion offset=content.length-5
             byte[] secondPortion = new byte[6];
             System.arraycopy(byteContent, byteContent.length - 6, secondPortion, 0, 6);
             try
@@ -1153,33 +1153,16 @@ public class CmisObjectServiceClient extends AbstractServiceClient
     }
 
     // FIXME: Maybe cd06 specification have missed notion about un-filling in context of this operation (when sourceFolderId is required)
-    /*public void testMoveObjectUnfiled() throws Exception
-    {
-        if (getAndAssertCapabilities().isCapabilityUnfiling())
-        {
-            String folderId = createAndAssertFolder();
-            String documentId = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), null, null, null, null);
-            try
-            {
-                LOGGER.info("[ObjectService->moveObject]");
-                getServicesFactory().getObjectService().moveObject(new MoveObject(getAndAssertRepositoryId(), documentId, folderId, null, null));
-                fail("No Exception was thrown during moving unfiled object");
-            }
-            catch (Exception e)
-            {
-                assertTrue("Invalid exception was thrown during moving unfiled object", e instanceof CmisFaultType
-                        && ((CmisFaultType) e).getType().equals(EnumServiceException.notSupported));
-            }
-            LOGGER.info("[ObjectService->deleteObject]");
-            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
-            LOGGER.info("[ObjectService->deleteObject]");
-            getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), folderId, false, null));
-        }
-        else
-        {
-            LOGGER.info("testMoveObjectUnfiled was skipped: Unfiling isn't supported");
-        }
-    }*/
+    /*
+     * public void testMoveObjectUnfiled() throws Exception { if (getAndAssertCapabilities().isCapabilityUnfiling()) { String folderId = createAndAssertFolder(); String documentId
+     * = createAndAssertDocument(generateTestFileName(), getAndAssertDocumentTypeId(), null, null, null, null); try { LOGGER.info("[ObjectService->moveObject]");
+     * getServicesFactory().getObjectService().moveObject(new MoveObject(getAndAssertRepositoryId(), documentId, folderId, null, null));
+     * fail("No Exception was thrown during moving unfiled object"); } catch (Exception e) { assertTrue("Invalid exception was thrown during moving unfiled object", e instanceof
+     * CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.notSupported)); } LOGGER.info("[ObjectService->deleteObject]");
+     * getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null)); LOGGER.info("[ObjectService->deleteObject]");
+     * getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), folderId, false, null)); } else {
+     * LOGGER.info("testMoveObjectUnfiled was skipped: Unfiling isn't supported"); } }
+     */
 
     public void testMoveObjectMultiFiled() throws Exception
     {
@@ -1596,13 +1579,13 @@ public class CmisObjectServiceClient extends AbstractServiceClient
                 getServicesFactory().getObjectService().setContentStream(
                         new SetContentStream(getAndAssertRepositoryId(), documentId, true, null, new CmisContentStreamType(BigInteger.valueOf(TEST_CONTENT.length()),
                                 MIMETYPE_TEXT_PLAIN, generateTestFileName(), TEST_CONTENT.getBytes(ENCODING), null), null)).getObjectId();
-                fail("No Exception was thrown during setting content stream while Object-Type definition specified by the typeId parameterï¿½s ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½not allowedï¿½");
+                fail("No Exception was thrown during setting content stream while Object-Type definition specified by the typeId parameter’s “contentStreamAllowed” attribute is set to “not allowed”");
             }
             catch (Exception e)
             {
                 // TODO according to specification 2 types of exceptions SHOULD be thrown
                 assertTrue(
-                        "Invalid exception was thrown during setting content stream while Object-Type definition specified by the typeId parameterï¿½s ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½not allowedï¿½",
+                        "Invalid exception was thrown during setting content stream while Object-Type definition specified by the typeId parameter’s “contentStreamAllowed” attribute is set to “not allowed”",
                         e instanceof CmisFaultType
                                 && (((CmisFaultType) e).getType().equals(EnumServiceException.constraint) || ((CmisFaultType) e).getType().equals(
                                         EnumServiceException.streamNotSupported)));
@@ -1661,12 +1644,12 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             {
                 LOGGER.info("[ObjectService->deleteContentStream]");
                 getServicesFactory().getObjectService().deleteContentStream(new DeleteContentStream(getAndAssertRepositoryId(), documentId, null, null));
-                fail("No Exception was thrown  during deleting content stream while Objectï¿½s Object-Type definition ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½requiredï¿½");
+                fail("No Exception was thrown  during deleting content stream while Object’s Object-Type definition “contentStreamAllowed” attribute is set to “required”");
             }
             catch (Exception e)
             {
                 assertTrue(
-                        "Invalid exception was thrown during deleting content stream while Objectï¿½s Object-Type definition ï¿½contentStreamAllowedï¿½ attribute is set to ï¿½requiredï¿½",
+                        "Invalid exception was thrown during deleting content stream while Object’s Object-Type definition “contentStreamAllowed” attribute is set to “required”",
                         e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.constraint));
             }
             LOGGER.info("[ObjectService->deleteObject]");
@@ -1693,7 +1676,7 @@ public class CmisObjectServiceClient extends AbstractServiceClient
             catch (Exception e)
             {
                 fail(e.toString());
-            }  
+            }
             LOGGER.info("[ObjectService->deleteObject]");
             getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, true, null));
         }

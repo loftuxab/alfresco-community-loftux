@@ -103,7 +103,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -134,7 +134,7 @@ namespace WcfCmisWSTests
                     if (e is Assert.AssertionException)
                     {
                         throw e;
-                    }                    
+                    }
                 }
             }
         }
@@ -193,7 +193,7 @@ namespace WcfCmisWSTests
                     if (e is Assert.AssertionException)
                     {
                         throw e;
-                    }                    
+                    }
                 }
             }
         }
@@ -271,7 +271,7 @@ namespace WcfCmisWSTests
             }
             deleteAndAssertObject(documentCreator, true);
         }
-                
+
         public void testDocumentCreationWithConstrainsObservance()
         {
             FileableObject document = new FileableObject(enumTypesOfFileableObjects.documents, getAndAssertFolderTypeId(), getAndAssertRootFolder());
@@ -286,7 +286,7 @@ namespace WcfCmisWSTests
                 if (e is Assert.AssertionException)
                 {
                     throw e;
-                }                
+                }
             }
             assertCreatingNotAllowedObject(false);
             assertPropertyBoundOuting(document, enumTypesOfFileableObjects.documents);
@@ -319,7 +319,7 @@ namespace WcfCmisWSTests
                     if (e is Assert.AssertionException)
                     {
                         throw e;
-                    }                    
+                    }
                 }
             }
         }
@@ -391,7 +391,7 @@ namespace WcfCmisWSTests
                             deleteObjectAndLogIfFailed(currentObject, "Creatable and Fileable Folder was created but it can't be deleted");
                             Assert.Fail(e.Message);
                         }
-                        
+
                     }
                 }
             }
@@ -472,7 +472,7 @@ namespace WcfCmisWSTests
             }
             catch (Exception e)
             {
-                
+
             }
         }
 
@@ -490,7 +490,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -530,7 +530,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             assertPropertyBoundOuting(folderObject, enumTypesOfFileableObjects.folders);
             assertCreatingNotAllowedObject(true);
@@ -574,7 +574,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             try
             {
@@ -588,7 +588,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             try
             {
@@ -602,7 +602,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -656,7 +656,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -763,7 +763,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -871,7 +871,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             finally
             {
@@ -960,7 +960,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -1058,7 +1058,7 @@ namespace WcfCmisWSTests
                     {
                         throw e;
                     }
-                    
+
                 }
             }
             else
@@ -1169,7 +1169,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             FileableObject folder = null;
             try
@@ -1192,7 +1192,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             try
             {
@@ -1232,7 +1232,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             try
             {
@@ -1302,7 +1302,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -1329,7 +1329,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             try
             {
@@ -1370,7 +1370,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
             try
             {
@@ -1418,7 +1418,7 @@ namespace WcfCmisWSTests
                     {
                         throw e;
                     }
-                    
+
                 }
                 try
                 {
@@ -1455,7 +1455,7 @@ namespace WcfCmisWSTests
                     {
                         throw e;
                     }
-                    
+
                 }
                 try
                 {
@@ -1654,7 +1654,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -1697,7 +1697,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -1715,7 +1715,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -1792,7 +1792,7 @@ namespace WcfCmisWSTests
                 {
                     throw e;
                 }
-                
+
             }
         }
 
@@ -1812,7 +1812,7 @@ namespace WcfCmisWSTests
                     throw e;
                 }
                 deleteAndAssertObject(document, true);
-                
+
             }
         }
 

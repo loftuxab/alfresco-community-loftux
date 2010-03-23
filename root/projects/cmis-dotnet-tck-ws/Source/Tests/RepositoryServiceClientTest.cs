@@ -206,7 +206,7 @@ namespace WcfCmisWSTests
             Assert.IsNotNull(repositoryInfo.rootFolderId, "Repository Root Folder Id is undefined");
             Assert.IsNotNull(repositoryInfo.vendorName, "Repository Vendor Name property is undefined");
             Assert.IsNotNull(repositoryInfo.aclCapability, "ACL Capability is undefined");
-            Assert.IsNotNull(repositoryInfo.changesIncomplete, "Changes Incomplete is undefined");            
+            Assert.IsNotNull(repositoryInfo.changesIncomplete, "Changes Incomplete is undefined");
 
             assertAndLogRepositoryCapabilities(repositoryInfo);
         }

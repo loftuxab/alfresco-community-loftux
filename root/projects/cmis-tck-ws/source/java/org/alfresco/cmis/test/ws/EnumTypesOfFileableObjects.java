@@ -23,7 +23,5 @@ package org.alfresco.cmis.test.ws;
  */
 public enum EnumTypesOfFileableObjects
 {
-    DOCUMENTS,
-    FOLDERS,
-    BOTH
+    DOCUMENTS, FOLDERS, BOTH
 }

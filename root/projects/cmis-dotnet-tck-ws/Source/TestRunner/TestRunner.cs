@@ -58,7 +58,7 @@ namespace WcfCmisWSTests
                 if (method.Name.StartsWith(TEST_METHOD_PREFIX))
                 {
                     statistics.TotalCount++;
-                    string fullname = "'" + targetObjectName + "->" + method.Name + "'";                    
+                    string fullname = "'" + targetObjectName + "->" + method.Name + "'";
                     try
                     {
                         logger.log("Executing test " + fullname);
@@ -99,7 +99,7 @@ namespace WcfCmisWSTests
                                 logger.log("--- WARNING: Releasing of test data was failed. Error message: " + e1.Message);
                             }
                         }
-                        logger.log("Test was passed " + fullname + ". Time: " + spentTime + " ms");                        
+                        logger.log("Test was passed " + fullname + ". Time: " + spentTime + " ms");
                     }
                     catch (SkippedException se)
                     {
@@ -132,7 +132,7 @@ namespace WcfCmisWSTests
                         }
                         logger.log("Test was failed " + fullname + ". Message: " + e.Message);
                         statistics.FailedCount++;
-                    }                    
+                    }
                     logger.log(string.Empty);
                 }
             }

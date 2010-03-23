@@ -303,7 +303,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         assertNotNull("GetDescendants response is NULL", descendantsResponse);
         assertObjectsTree(descendantsResponse, expectedTree);
     }
-    
+
     public void testDescendantsReceivingIncludeRenditions() throws Exception
     {
         if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
@@ -341,7 +341,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         {
             LOGGER.info("testDescendantsReceivingIncludeRenditions was skipped: Renditions are not supported");
         }
-        
+
     }
 
     public void testDepthLimitedDescendantsReceiving() throws Exception
@@ -453,8 +453,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             checkOutResponse = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             LOGGER.info("[VersioningService->checkIn]");
-            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(), new CmisContentStreamType(
-                    BigInteger.valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
+            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger
+                    .valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
 
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
             getServicesFactory().getMultiFilingServicePort().addObjectToFolder(
@@ -507,7 +507,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         assertObjectsFromResponse(childrenResponse.getObjects().getObjects(), 0, expectedObjects.size());
         assertChildren(expectedObjects, childrenResponse.getObjects().getObjects(), true, "GetChildren service");
     }
-    
+
     public void testChildrenReceivingIncludeRenditions() throws Exception
     {
         if (EnumCapabilityRendition.read.equals(getAndAssertCapabilities().getCapabilityRenditions()))
@@ -593,8 +593,8 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             LOGGER.info("[VersioningService->checkOut]");
             checkOutResponse = versioningService.checkOut(new CheckOut(getAndAssertRepositoryId(), documentId, null));
             LOGGER.info("[VersioningService->checkIn]");
-            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(), new CmisContentStreamType(
-                    BigInteger.valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
+            versioningService.checkIn(new CheckIn(getAndAssertRepositoryId(), checkOutResponse.getObjectId(), true, new CmisPropertiesType(), new CmisContentStreamType(BigInteger
+                    .valueOf(0), "text/plain", generateTestFileName(), "Test content".getBytes(), null), "", null, null, null, null));
 
             LOGGER.info("[MultiFilingService->addObjectToFolder]");
             getServicesFactory().getMultiFilingServicePort().addObjectToFolder(
@@ -776,11 +776,11 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
         String sourceId = createRelationshipSourceObject(folderId);
         String targetId = createRelationshipTargetObject(folderId);
         createAndAssertRelationship(sourceId, targetId, getAndAssertRelationshipTypeId());
-        
+
         LOGGER.info("[NavigationService->getChildren]");
         GetChildrenResponse childrenResponse = navigationService.getChildren(new GetChildren(getAndAssertRepositoryId(), folderId, "*", null, true, EnumIncludeRelationships.both,
                 null, null, BigInteger.valueOf(1000), BigInteger.valueOf(0), null));
-        
+
         LOGGER.info("[NavigationService->getDescendants]");
         CmisObjectInFolderContainerType[] descendantsResponse = navigationService.getDescendants(new GetDescendants(getAndAssertRepositoryId(), folderId, BigInteger.valueOf(-1),
                 "*", true, EnumIncludeRelationships.both, null, null, null));
@@ -798,17 +798,17 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             assertNotNull(OBJECT_IS_NULL_MESSAGE, object);
             assertNotNull("Some returned Object Properties are null", object.getProperties());
             assertNotNull("Some returned Object String Properties are null", object.getProperties().getPropertyString());
-            assertNotNull("Allowable Actions for Object were not returned", object.getAllowableActions());            
+            assertNotNull("Allowable Actions for Object were not returned", object.getAllowableActions());
         }
-        
+
         objects = new LinkedList<CmisObjectType>();
         assertAndAddObjectsToList(objects, childrenResponse.getObjects(), "GetChildren service");
-        
+
         for (CmisObjectType object : objects)
         {
             assertNotNull("Relationships Objects for Object were not returned", object.getRelationship());
             assertTrue("No one Relationship Object was returned in Response", object.getRelationship().length > 0);
-            
+
             String id = getAndAssertIdPropertyValue(object.getProperties(), PROP_OBJECT_ID);
 
             for (CmisObjectType relationshipObject : object.getRelationship())
@@ -1000,7 +1000,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
             LOGGER.warn("testGetCheckedoutDocsFolder was skipped: Versioning isn't supported");
         }
     }
-    
+
     public void testGetCheckedoutDocsIncludeRenditions() throws Exception
     {
         if (isVersioningAllowed())
@@ -1013,7 +1013,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
                 {
                     GetCheckedOutDocsResponse response = null;
                     TreeNode<String> objectsTree = createObjectsTree(folderId, EnumVersioningState.checkedout, EnumTypesOfFileableObjects.DOCUMENTS, 1, 2, 3, 1);
-                    Set<String> createdDocuments = objectsTree.getChildren().keySet();                    
+                    Set<String> createdDocuments = objectsTree.getChildren().keySet();
                     for (RenditionData testRendition : testRenditions)
                     {
                         try
@@ -1021,7 +1021,7 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
                             LOGGER.info("[NavigationService->getCheckedOutDocs]");
                             response = getServicesFactory().getNavigationService().getCheckedOutDocs(
                                     new GetCheckedOutDocs(getAndAssertRepositoryId(), folderId, "*", null, false, EnumIncludeRelationships.none, testRendition.getFilter(), null,
-                                            null, null));                            
+                                            null, null));
                         }
                         catch (Exception e)
                         {
@@ -1046,13 +1046,13 @@ public class CmisNavigationServiceClient extends AbstractServiceClient
                     LOGGER.info("testGetObjectIncludeRenditions was skipped: No renditions found for document type");
                 }
                 LOGGER.info("[ObjectService->deleteObject]");
-                getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));                
+                getServicesFactory().getObjectService().deleteObject(new DeleteObject(getAndAssertRepositoryId(), documentId, false, null));
             }
             else
             {
                 LOGGER.info("testGetObjectIncludeRenditions was skipped: Renditions are not supported");
-            }          
-            
+            }
+
         }
         else
         {
