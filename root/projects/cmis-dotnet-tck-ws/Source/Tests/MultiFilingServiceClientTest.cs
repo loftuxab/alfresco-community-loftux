@@ -123,10 +123,10 @@ namespace WcfCmisWSTests
             }
             catch (Exception e)
             {
-                deleteAndAssertObject(parentFolder, true);
-                deleteAndAssertObject(childFolder, true);
                 if (e is FaultException<cmisFaultType>)
                 {
+                    deleteAndAssertObject(parentFolder, true);
+                    deleteAndAssertObject(childFolder, true);
                     HashSet<enumServiceException> expected = new HashSet<enumServiceException>();
                     expected.Add(enumServiceException.invalidArgument);
                     expected.Add(enumServiceException.notSupported);

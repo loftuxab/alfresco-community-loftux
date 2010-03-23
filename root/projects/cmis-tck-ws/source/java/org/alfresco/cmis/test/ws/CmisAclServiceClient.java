@@ -192,7 +192,7 @@ public class CmisAclServiceClient extends AbstractServiceClient
         LOGGER.info("[ACLService->applyACL]");
         aclService.applyACL(new ApplyACL(getAndAssertRepositoryId(), folderId, acList, null, getAndAssertACLPrapagation(), null));
 
-        getPropertiesUsingCredentials(documentId, aclUsername, aclPassword);        
+        getPropertiesUsingCredentials(documentId, aclUsername, aclPassword);
     }
 
     public void testGetACEs() throws Exception
@@ -224,7 +224,7 @@ public class CmisAclServiceClient extends AbstractServiceClient
         {
             assertTrue("Incorrect ACE was returned", receivedAce != null && receivedAce.getPermission() != null && receivedAce.getPrincipal() != null);
             if (receivedAce.getPrincipal().getPrincipalId() != null && receivedAce.getPrincipal().getPrincipalId().equals(aclPrincipalId))
-            {                
+            {
                 for (String permission : receivedAce.getPermission())
                 {
                     assertNotNull("Incorrect permission was returned", permission);
@@ -232,7 +232,7 @@ public class CmisAclServiceClient extends AbstractServiceClient
                     {
                         contains = true;
                     }
-                }                
+                }
             }
         }
         assertTrue("Response doesn't contain expected permission", contains);

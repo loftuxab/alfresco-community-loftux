@@ -25,6 +25,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Configuration;
 using System.Reflection;
 using WcfCmisWSTests.CmisServices;
+using WcfCmisTests;
 
 ///
 /// author: Stas Sokolovsky
@@ -47,6 +48,7 @@ namespace WcfCmisWSTests
             tests.Add("DiscoveryService", new DiscoveryServiceClientTest());
             tests.Add("VersioningService", new VersioningServiceClientTest());
             tests.Add("ACLService", new ACLServiceClientTest());
+            tests.Add("PolicyService", new PolicyServiceClientTest());
         }
 
         static void Main(string[] args)

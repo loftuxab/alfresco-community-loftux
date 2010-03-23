@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
-using System.Collections.Generic;
 using System;
-using WcfCmisWSTests.CmisServices;
-using System.ServiceModel;
 using System.Text;
+using System.ServiceModel;
+using System.Collections.Generic;
 using WcfCmisWSTests.CmisServices;
 
 namespace WcfCmisWSTests

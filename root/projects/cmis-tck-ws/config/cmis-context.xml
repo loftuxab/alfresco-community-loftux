@@ -64,6 +64,13 @@
       parent="abstractServiceClient">
       <constructor-arg ref="cmisACLService" />
    </bean>
+
+   <bean id="cmisPolicyServiceClient"
+      class="org.alfresco.cmis.test.ws.CmisPolicyServiceClient"
+      parent="abstractServiceClient">
+      <constructor-arg ref="cmisPolicyService" />
+   </bean>
+
    <!--
       =========================================================================================================
    -->
@@ -88,6 +95,7 @@
       <property name="navigationServiceDescriptor" ref="cmisNavigationServiceClient" />
       <property name="relationshipServiceDescriptor" ref="cmisRelationshipServiceClient" />
       <property name="aclServiceDescriptor" ref="cmisACLServiceClient" />
+      <property name="policyServiceDescriptor" ref="cmisPolicyServiceClient" />
    </bean>
 
    <!--
@@ -147,6 +155,13 @@
       <constructor-arg value="ACLService" />
       <constructor-arg value="http://docs.oasis-open.org/ns/cmis/ws/200901" />
       <constructor-arg value="${cmis.aclservice.path}" />
+   </bean>
+
+    <bean id="cmisPolicyService" class="org.alfresco.cmis.test.ws.AbstractService">
+      <constructor-arg value="PolicyServicePort" />
+      <constructor-arg value="PolicyService" />
+      <constructor-arg value="http://docs.oasis-open.org/ns/cmis/ws/200901" />
+      <constructor-arg value="${cmis.policyservice.path}" />
    </bean>
 
 </beans>

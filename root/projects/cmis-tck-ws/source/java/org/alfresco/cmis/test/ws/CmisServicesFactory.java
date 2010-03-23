@@ -38,6 +38,8 @@ import org.alfresco.repo.cmis.ws.NavigationServiceLocator;
 import org.alfresco.repo.cmis.ws.NavigationServicePortBindingStub;
 import org.alfresco.repo.cmis.ws.ObjectServiceLocator;
 import org.alfresco.repo.cmis.ws.ObjectServicePortBindingStub;
+import org.alfresco.repo.cmis.ws.PolicyServiceLocator;
+import org.alfresco.repo.cmis.ws.PolicyServicePortBindingStub;
 import org.alfresco.repo.cmis.ws.RelationshipServiceLocator;
 import org.alfresco.repo.cmis.ws.RelationshipServicePortBindingStub;
 import org.alfresco.repo.cmis.ws.RepositoryServiceLocator;
@@ -73,6 +75,7 @@ public class CmisServicesFactory
     private AbstractServiceClient versioningServiceDescriptor;
     private AbstractServiceClient relationshipServiceDescriptor;
     private AbstractServiceClient aclServiceDescriptor;
+    private AbstractServiceClient policyServiceDescriptor;
 
     private Map<String, Stub> servicesCache = new HashMap<String, Stub>();
 
@@ -155,6 +158,11 @@ public class CmisServicesFactory
         this.aclServiceDescriptor = aclServiceDescriptor;
     }
 
+    public void setPolicyServiceDescriptor(AbstractServiceClient policyServiceDescriptor)
+    {
+        this.policyServiceDescriptor = policyServiceDescriptor;
+    }
+
     /**
      * Gets port for Repository Service with the default configured access URL
      * 
@@ -189,25 +197,21 @@ public class CmisServicesFactory
         {
             address = repositoryServiceDescriptor.getServerUrl() + repositoryServiceDescriptor.getService().getPath();
         }
-        RepositoryServicePortBindingStub result = (RepositoryServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = repositoryServiceDescriptor.getUsername();
+            password = repositoryServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        RepositoryServicePortBindingStub result = (RepositoryServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (result == null)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(repositoryServiceDescriptor.getUsername(), repositoryServiceDescriptor.getPassword());
-            }
-            RepositoryServiceLocator locator = new RepositoryServiceLocator(configuration);
+            RepositoryServiceLocator locator = new RepositoryServiceLocator(getEngineConfiguration(username, password));
             locator.setRepositoryServicePortEndpointAddress(address);
             result = (RepositoryServicePortBindingStub) locator.getRepositoryServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
@@ -246,25 +250,21 @@ public class CmisServicesFactory
         {
             address = discoveryServiceDescriptor.getServerUrl() + discoveryServiceDescriptor.getService().getPath();
         }
-        DiscoveryServicePortBindingStub result = (DiscoveryServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = discoveryServiceDescriptor.getUsername();
+            password = discoveryServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        DiscoveryServicePortBindingStub result = (DiscoveryServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (null == result)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(discoveryServiceDescriptor.getUsername(), discoveryServiceDescriptor.getPassword());
-            }
-            DiscoveryServiceLocator locator = new DiscoveryServiceLocator(configuration);
+            DiscoveryServiceLocator locator = new DiscoveryServiceLocator(getEngineConfiguration(username, password));
             locator.setDiscoveryServicePortEndpointAddress(address);
             result = (DiscoveryServicePortBindingStub) locator.getDiscoveryServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
@@ -303,25 +303,21 @@ public class CmisServicesFactory
         {
             address = objectServiceDescriptor.getServerUrl() + objectServiceDescriptor.getService().getPath();
         }
-        ObjectServicePortBindingStub result = (ObjectServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = objectServiceDescriptor.getUsername();
+            password = objectServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        ObjectServicePortBindingStub result = (ObjectServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (null == result)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(objectServiceDescriptor.getUsername(), objectServiceDescriptor.getPassword());
-            }
-            ObjectServiceLocator locator = new ObjectServiceLocator(configuration);
+            ObjectServiceLocator locator = new ObjectServiceLocator(getEngineConfiguration(username, password));
             locator.setObjectServicePortEndpointAddress(address);
             result = (ObjectServicePortBindingStub) locator.getObjectServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
@@ -360,25 +356,21 @@ public class CmisServicesFactory
         {
             address = navigationServiceDescriptor.getServerUrl() + navigationServiceDescriptor.getService().getPath();
         }
-        NavigationServicePortBindingStub result = (NavigationServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = navigationServiceDescriptor.getUsername();
+            password = navigationServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        NavigationServicePortBindingStub result = (NavigationServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (null == result)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(navigationServiceDescriptor.getUsername(), navigationServiceDescriptor.getPassword());
-            }
-            NavigationServiceLocator locator = new NavigationServiceLocator(configuration);
+            NavigationServiceLocator locator = new NavigationServiceLocator(getEngineConfiguration(username, password));
             locator.setNavigationServicePortEndpointAddress(address);
             result = (NavigationServicePortBindingStub) locator.getNavigationServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
@@ -417,25 +409,21 @@ public class CmisServicesFactory
         {
             address = multiFilingServiceDescriptor.getServerUrl() + multiFilingServiceDescriptor.getService().getPath();
         }
-        MultiFilingServicePortBindingStub result = (MultiFilingServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = multiFilingServiceDescriptor.getUsername();
+            password = multiFilingServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        MultiFilingServicePortBindingStub result = (MultiFilingServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (null == result)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(multiFilingServiceDescriptor.getUsername(), multiFilingServiceDescriptor.getPassword());
-            }
-            MultiFilingServiceLocator locator = new MultiFilingServiceLocator(configuration);
+            MultiFilingServiceLocator locator = new MultiFilingServiceLocator(getEngineConfiguration(username, password));
             locator.setMultiFilingServicePortEndpointAddress(address);
             result = (MultiFilingServicePortBindingStub) locator.getMultiFilingServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
@@ -474,25 +462,21 @@ public class CmisServicesFactory
         {
             address = versioningServiceDescriptor.getServerUrl() + versioningServiceDescriptor.getService().getPath();
         }
-        VersioningServicePortBindingStub result = (VersioningServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = versioningServiceDescriptor.getUsername();
+            password = versioningServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        VersioningServicePortBindingStub result = (VersioningServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (null == result)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(versioningServiceDescriptor.getUsername(), versioningServiceDescriptor.getPassword());
-            }
-            VersioningServiceLocator locator = new VersioningServiceLocator(configuration);
+            VersioningServiceLocator locator = new VersioningServiceLocator(getEngineConfiguration(username, password));
             locator.setVersioningServicePortEndpointAddress(address);
             result = (VersioningServicePortBindingStub) locator.getVersioningServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
@@ -531,25 +515,21 @@ public class CmisServicesFactory
         {
             address = relationshipServiceDescriptor.getServerUrl() + relationshipServiceDescriptor.getService().getPath();
         }
-        RelationshipServicePortBindingStub result = (RelationshipServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = relationshipServiceDescriptor.getUsername();
+            password = relationshipServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        RelationshipServicePortBindingStub result = (RelationshipServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (null == result)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(relationshipServiceDescriptor.getUsername(), relationshipServiceDescriptor.getPassword());
-            }
-            RelationshipServiceLocator locator = new RelationshipServiceLocator(configuration);
+            RelationshipServiceLocator locator = new RelationshipServiceLocator(getEngineConfiguration(username, password));
             locator.setRelationshipServicePortEndpointAddress(address);
             result = (RelationshipServicePortBindingStub) locator.getRelationshipServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
@@ -588,29 +568,78 @@ public class CmisServicesFactory
         {
             address = aclServiceDescriptor.getServerUrl() + aclServiceDescriptor.getService().getPath();
         }
-        ACLServicePortBindingStub result = (ACLServicePortBindingStub) servicesCache.get(getUniqueIdentifier(address, username, password));
+        if ((null == username) || (null == password))
+        {
+            username = aclServiceDescriptor.getUsername();
+            password = aclServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        ACLServicePortBindingStub result = (ACLServicePortBindingStub) servicesCache.get(uniqueIdentifier);
         if (null == result)
         {
-            EngineConfiguration configuration = null;
-            if ((null != username) && (null != password))
-            {
-                configuration = getEngineConfiguration(username, password);
-            }
-            else
-            {
-                configuration = getEngineConfiguration(aclServiceDescriptor.getUsername(), aclServiceDescriptor.getPassword());
-            }
-            ACLServiceLocator locator = new ACLServiceLocator(configuration);
+            ACLServiceLocator locator = new ACLServiceLocator(getEngineConfiguration(username, password));
             locator.setACLServicePortEndpointAddress(address);
             result = (ACLServicePortBindingStub) locator.getACLServicePort();
             result.setMaintainSession(true);
             result.setTimeout(TIMEOUT);
-
-            servicesCache.put(getUniqueIdentifier(address, username, password), result);
+            servicesCache.put(uniqueIdentifier, result);
         }
         return result;
     }
-    
+
+    /**
+     * Gets port for Relationship Service with the default configured access URL
+     * 
+     * @return - RelationshipServicePortBindingStub
+     * @throws ServiceException
+     */
+    public PolicyServicePortBindingStub getPolicyService() throws ServiceException
+    {
+        return getPolicyService(policyServiceDescriptor.getServerUrl() + policyServiceDescriptor.getService().getPath(), null, null);
+    }
+
+    public PolicyServicePortBindingStub getPolicyService(String address) throws ServiceException
+    {
+        return getPolicyService(address, null, null);
+    }
+
+    public PolicyServicePortBindingStub getPolicyService(String username, String password) throws ServiceException
+    {
+        return getPolicyService(null, username, password);
+    }
+
+    /**
+     * Gets port for Relationship Service
+     * 
+     * @param address - address where service resides
+     * @return - RelationshipServicePortBindingStub
+     * @throws ServiceException
+     */
+    public PolicyServicePortBindingStub getPolicyService(String address, String username, String password) throws ServiceException
+    {
+        if (null == address)
+        {
+            address = policyServiceDescriptor.getServerUrl() + policyServiceDescriptor.getService().getPath();
+        }
+        if ((null == username) || (null == password))
+        {
+            username = policyServiceDescriptor.getUsername();
+            password = policyServiceDescriptor.getPassword();
+        }
+        String uniqueIdentifier = getUniqueIdentifier(address, username, password);
+        PolicyServicePortBindingStub result = (PolicyServicePortBindingStub) servicesCache.get(uniqueIdentifier);
+        if (null == result)
+        {
+            PolicyServiceLocator locator = new PolicyServiceLocator(getEngineConfiguration(username, password));
+            locator.setPolicyServicePortEndpointAddress(address);
+            result = (PolicyServicePortBindingStub) locator.getPolicyServicePort();
+            result.setMaintainSession(true);
+            result.setTimeout(TIMEOUT);
+            servicesCache.put(uniqueIdentifier, result);
+        }
+        return result;
+    }
+
     public EngineConfiguration getEngineConfiguration(String username, String password)
     {
         final SimpleProvider engineConfiguration;
@@ -642,7 +671,7 @@ public class CmisServicesFactory
                 return passwordCallback;
             }
         };
-       
+
         wsDoAllSender.setOption(WSHandlerConstants.ACTION, WSConstants.USERNAME_TOKEN_LN + " " + WSConstants.TIMESTAMP_TOKEN_LN);
         wsDoAllSender.setOption(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         wsDoAllSender.setOption(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallBackHandler(password));
@@ -653,7 +682,7 @@ public class CmisServicesFactory
         engineConfiguration.setGlobalRequest(wsDoAllSender);
         return engineConfiguration;
     }
-    
+
     public class PasswordCallBackHandler implements CallbackHandler
     {
         private String password;

@@ -50,6 +50,7 @@ import org.alfresco.repo.cmis.ws.CmisTypeContainer;
 import org.alfresco.repo.cmis.ws.CmisTypeDefinitionType;
 import org.alfresco.repo.cmis.ws.CmisTypeDocumentDefinitionType;
 import org.alfresco.repo.cmis.ws.CmisTypeFolderDefinitionType;
+import org.alfresco.repo.cmis.ws.CmisTypePolicyDefinitionType;
 import org.alfresco.repo.cmis.ws.CmisTypeRelationshipDefinitionType;
 import org.alfresco.repo.cmis.ws.CreateDocument;
 import org.alfresco.repo.cmis.ws.CreateDocumentResponse;
@@ -176,6 +177,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     private static String folderTypeId;
     private static String relationshipTypeId;
     private static String policyTypeId;
+    private static String policyControllableTypeId;
     private static CmisTypeDefinitionType relationshipSourceType;
     private static CmisTypeDefinitionType relationshipTargetType;
     private static List<CmisTypeDefinitionType> relationshipSubTypes = new LinkedList<CmisTypeDefinitionType>();
@@ -184,6 +186,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     private static EnumACLPropagation aclPropagation;
     private static boolean versioningAllowed = false;
     private Boolean relationshipsSupported = null;
+    private Boolean policySupported = null;
 
     public AbstractServiceClient()
     {
@@ -829,9 +832,9 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         String caseHint = ((null != exceptionCase) && !"".equals(exceptionCase)) ? (" during " + exceptionCase) : ("");
         if (actual instanceof CmisFaultType)
         {
-            if (null != expected && !expected.isEmpty())
+            if ((null != expected) && !expected.isEmpty())
             {
-                assertTrue(("Invalid exception was thrown" + caseHint + ". "), expected.contains(((CmisFaultType) actual).getType()));
+                assertTrue(("Invalid exception was thrown: " + actual.toString() + caseHint + ". "), expected.contains(((CmisFaultType) actual).getType()));
             }
         }
         else
@@ -970,77 +973,107 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         }
         else
         {
-            if (BASE_TYPE_RELATIONSHIP.getValue().equals(typeId))
+            if (BASE_TYPE_FOLDER.getValue().equals(typeId))
             {
                 calculator = new BaseConditionCalculator()
                 {
-                    private int currentTypeAbility = -1;
+                    private int previousPower = 0;
 
                     @Override
                     public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
                     {
-                        boolean result = false;
-                        if (enumeratedType.isCreatable())
+                        if (super.calculate(currentType, enumeratedType))
                         {
-                            CmisTypeRelationshipDefinitionType relationshipType = (CmisTypeRelationshipDefinitionType) enumeratedType;
-                            String participantTypeId = ((null == relationshipType.getAllowedSourceTypes()) || (relationshipType.getAllowedSourceTypes().length < 1)) ? (getAndAssertFolderTypeId())
-                                    : (relationshipType.getAllowedSourceTypes(0));
-                            final CmisTypeDefinitionType relationshipSourceType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
-                            participantTypeId = ((null == relationshipType.getAllowedTargetTypes()) || (relationshipType.getAllowedTargetTypes().length < 1)) ? (getAndAssertDocumentTypeId())
-                                    : (relationshipType.getAllowedTargetTypes(0));
-                            final CmisTypeDefinitionType relationshipTargetType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
-                            result = (null != relationshipSourceType) && (null != relationshipTargetType);
-                            if (result)
+                            int currentPower = 1;
+                            currentPower += (enumeratedType.isFileable()) ? (1) : (0);
+                            currentPower += (enumeratedType.isQueryable()) ? (1) : (0);
+                            currentPower += (enumeratedType.isControllablePolicy()) ? (2) : (0);
+                            currentPower += (enumeratedType.isControllableACL()) ? (2) : (0);
+                            if (currentPower > previousPower)
                             {
-                                CmisTypeContainer[] subTypes = getAndAssertTypeDescendants(enumeratedType.getId(), -1, false);
-                                final Integer[] currentAbility = new Integer[] { new Integer(0) };
-                                final List<CmisTypeDefinitionType> subTypesList = new LinkedList<CmisTypeDefinitionType>();
-                                enumerateAndAssertTypesHierarchy(subTypes, new BaseConditionCalculator()
-                                {
-                                    @Override
-                                    public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
-                                    {
-                                        if (enumeratedType.isCreatable())
-                                        {
-                                            CmisTypeRelationshipDefinitionType relationshipType = (CmisTypeRelationshipDefinitionType) enumeratedType;
-                                            Set<String> allowedSourceIds = null;
-                                            if (null != relationshipType.getAllowedSourceTypes())
-                                            {
-                                                allowedSourceIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedSourceTypes()));
-                                            }
-                                            Set<String> allowedTargetIds = null;
-                                            if (null != relationshipType.getAllowedTargetTypes())
-                                            {
-                                                allowedTargetIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedTargetTypes()));
-                                            }
-                                            boolean validSubType = ((null == allowedSourceIds) || allowedSourceIds.contains(relationshipSourceType.getId()))
-                                                    && ((null == allowedTargetIds) || allowedTargetIds.contains(relationshipTargetType.getId()));
-                                            if (validSubType)
-                                            {
-                                                currentAbility[0]++;
-                                                subTypesList.add(enumeratedType);
-                                            }
-                                            return validSubType;
-                                        }
-                                        return false;
-                                    }
-                                }, false);
-                                result = currentAbility[0] > currentTypeAbility;
-                                if (result)
-                                {
-                                    currentTypeAbility = currentAbility[0];
-                                    relationshipSubTypes = subTypesList;
-                                    AbstractServiceClient.relationshipSourceType = relationshipSourceType;
-                                    AbstractServiceClient.relationshipTargetType = relationshipTargetType;
-                                }
+                                previousPower = currentPower;
+                                return true;
                             }
+                            return false;
                         }
-                        return result;
+                        return false;
                     }
                 };
             }
+            else
+            {
+                if (BASE_TYPE_RELATIONSHIP.getValue().equals(typeId))
+                {
+                    calculator = new BaseConditionCalculator()
+                    {
+                        private int currentTypeAbility = -1;
+
+                        @Override
+                        public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
+                        {
+                            boolean result = false;
+                            if (enumeratedType.isCreatable())
+                            {
+                                CmisTypeRelationshipDefinitionType relationshipType = (CmisTypeRelationshipDefinitionType) enumeratedType;
+                                String participantTypeId = ((null == relationshipType.getAllowedSourceTypes()) || (relationshipType.getAllowedSourceTypes().length < 1)) ? (getAndAssertFolderTypeId())
+                                        : (relationshipType.getAllowedSourceTypes(0));
+                                final CmisTypeDefinitionType relationshipSourceType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
+                                participantTypeId = ((null == relationshipType.getAllowedTargetTypes()) || (relationshipType.getAllowedTargetTypes().length < 1)) ? (getAndAssertDocumentTypeId())
+                                        : (relationshipType.getAllowedTargetTypes(0));
+                                final CmisTypeDefinitionType relationshipTargetType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
+                                result = (null != relationshipSourceType) && (null != relationshipTargetType);
+                                if (result)
+                                {
+                                    CmisTypeContainer[] subTypes = getAndAssertTypeDescendants(enumeratedType.getId(), -1, false);
+                                    final Integer[] currentAbility = new Integer[] { new Integer(0) };
+                                    final List<CmisTypeDefinitionType> subTypesList = new LinkedList<CmisTypeDefinitionType>();
+                                    enumerateAndAssertTypesHierarchy(subTypes, new BaseConditionCalculator()
+                                    {
+                                        @Override
+                                        public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
+                                        {
+                                            if (enumeratedType.isCreatable())
+                                            {
+                                                CmisTypeRelationshipDefinitionType relationshipType = (CmisTypeRelationshipDefinitionType) enumeratedType;
+                                                Set<String> allowedSourceIds = null;
+                                                if (null != relationshipType.getAllowedSourceTypes())
+                                                {
+                                                    allowedSourceIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedSourceTypes()));
+                                                }
+                                                Set<String> allowedTargetIds = null;
+                                                if (null != relationshipType.getAllowedTargetTypes())
+                                                {
+                                                    allowedTargetIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedTargetTypes()));
+                                                }
+                                                boolean validSubType = ((null == allowedSourceIds) || allowedSourceIds.contains(relationshipSourceType.getId()))
+                                                        && ((null == allowedTargetIds) || allowedTargetIds.contains(relationshipTargetType.getId()));
+                                                if (validSubType)
+                                                {
+                                                    currentAbility[0]++;
+                                                    subTypesList.add(enumeratedType);
+                                                }
+                                                return validSubType;
+                                            }
+                                            return false;
+                                        }
+                                    }, false);
+                                    result = currentAbility[0] > currentTypeAbility;
+                                    if (result)
+                                    {
+                                        currentTypeAbility = currentAbility[0];
+                                        relationshipSubTypes = subTypesList;
+                                        AbstractServiceClient.relationshipSourceType = relationshipSourceType;
+                                        AbstractServiceClient.relationshipTargetType = relationshipTargetType;
+                                    }
+                                }
+                            }
+                            return result;
+                        }
+                    };
+                }
+            }
         }
-        typeId = enumerateAndAssertTypesHierarchy(response, calculator, BASE_TYPE_FOLDER.getValue().equals(typeId));
+        typeId = enumerateAndAssertTypesHierarchy(response, calculator, false);
         if (document)
         {
             LOGGER.info("[RepositoryService->getTypeDefinition]");
@@ -1231,7 +1264,6 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
     protected String searchAndAssertNotFileableType() throws Exception
     {
-
         return enumerateAndAssertTypesHierarchy(getAndAssertTypeDescendants(null, -1, true), new BaseConditionCalculator()
         {
             @Override
@@ -1505,6 +1537,20 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         return typeId;
     }
 
+    protected String getBasePolicyTypeId(GetTypeChildrenResponse response)
+    {
+        String typeId = null;
+        for (CmisTypeDefinitionType typeDef : response.getTypes().getTypes())
+        {
+            if ((typeDef instanceof CmisTypePolicyDefinitionType) && (null == typeDef.getParentId()))
+            {
+                typeId = typeDef.getId();
+                break;
+            }
+        }
+        return typeId;
+    }
+
     protected String getAndAssertRepositoryId()
     {
         if (repositoryId == null)
@@ -1667,6 +1713,24 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         return policyTypeId;
     }
 
+    protected String getAndAssertPolicyControllableTypeId()
+    {
+        if (null == policyControllableTypeId)
+        {
+            CmisTypeDefinitionType typeDefinition = getAndAssertTypeDefinition(getAndAssertDocumentTypeId());
+            if (typeDefinition.isControllablePolicy())
+            {
+                policyControllableTypeId = typeDefinition.getId();
+            }
+            else
+            {
+                typeDefinition = getAndAssertTypeDefinition(getAndAssertFolderTypeId());
+                policyControllableTypeId = (typeDefinition.isControllablePolicy()) ? (typeDefinition.getId()) : (null);
+            }
+        }
+        return policyControllableTypeId;
+    }
+
     protected CmisTypeDefinitionType getAndAssertTypeDefinition(String typeId)
     {
         assertNotNull("Can't receive Type Definition for invalid Type Id", typeId);
@@ -1740,11 +1804,20 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         return relationshipsSupported;
     }
 
+    protected boolean arePoliciesSupported()
+    {
+        if (null == policySupported)
+        {
+            policySupported = null != getBasePolicyTypeId(getAndAssertTypeChildren(null, false, 4L, 0L));
+        }
+        return policySupported;
+    }
+
     private static class BaseConditionCalculator
     {
         public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
         {
-            return enumeratedType.isCreatable(); // TODO: && enumeratedType.isFileable() when dictionary will be corrected
+            return enumeratedType.isCreatable();
         }
     }
 

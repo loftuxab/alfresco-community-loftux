@@ -23,7 +23,6 @@ using System.Text;
 using WcfCmisWSTests.CmisServices;
 using System.ServiceModel;
 
-
 namespace WcfCmisWSTests
 {
     ///
@@ -59,7 +58,7 @@ namespace WcfCmisWSTests
             aclServiceClient.applyACL(getAndAssertRepositoryId(), documentId, acList, null, getACLPropagation(), null);
 
             getPropertiesUsingCredentials(documentId, aclUsername, aclPassword);
-                        
+
         }
 
         public void testWritePermission()
@@ -77,7 +76,7 @@ namespace WcfCmisWSTests
             logger.log("[ACLService->applyACL]");
             aclServiceClient.applyACL(getAndAssertRepositoryId(), documentId, acList, null, getACLPropagation(), null);
 
-            updatePropertiesUsingCredentials(documentId, aclUsername, aclPassword);                       
+            updatePropertiesUsingCredentials(documentId, aclUsername, aclPassword);
         }
 
         public void testPermissionPropagation()
@@ -131,7 +130,7 @@ namespace WcfCmisWSTests
             {
                 Assert.IsTrue(receivedAce != null && receivedAce.permission != null && receivedAce.principal != null, "Incorrect ACE was returned");
                 if (receivedAce.principal.principalId != null && receivedAce.principal.principalId.Equals(aclPrincipalId))
-                {                    
+                {
                     foreach (String permission in receivedAce.permission)
                     {
                         Assert.IsNotNull(permission, "Incorrect permission was returned");
@@ -139,10 +138,10 @@ namespace WcfCmisWSTests
                         {
                             contains = true;
                         }
-                    }                    
+                    }
                 }
             }
-            Assert.IsTrue(contains, "Response doesn't contain expected permission");                       
+            Assert.IsTrue(contains, "Response doesn't contain expected permission");
         }
 
         public void testAddAndRemovePermissionConstraints()
@@ -187,7 +186,7 @@ namespace WcfCmisWSTests
             catch (FaultException<cmisFaultType> e)
             {
             }
-            
+
         }
 
         public void testGetACEsConstraints()

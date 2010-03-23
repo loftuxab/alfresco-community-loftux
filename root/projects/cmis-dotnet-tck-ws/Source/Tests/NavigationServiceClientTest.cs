@@ -57,7 +57,7 @@ namespace WcfCmisWSTests
             if (!isRenditionsEnabled())
             {
                 Assert.Skip("Renditions are not supported");
-            } 
+            }
             FileableObject document = createAndAssertObject(getAndAssertRootFolder(), null);
             List<RenditionData> testRenditions = getTestRenditions(document.ObjectId);
             if (testRenditions == null)
@@ -69,7 +69,7 @@ namespace WcfCmisWSTests
             foreach (RenditionData renditionData in testRenditions)
             {
                 getAndAssertDescedansts(rootFolder, objectsTree, enumTypesOfFileableObjects.any, -1, ANY_PROPERTY_FILTER, enumVersioningState.none, renditionData);
-            }            
+            }
 
             objectServiceClient.deleteTree(getAndAssertRepositoryId(), rootFolder.ObjectId, true, enumUnfileObject.delete, true, null);
             deleteAndAssertObject(document, true);
@@ -114,7 +114,7 @@ namespace WcfCmisWSTests
             if (!isRenditionsEnabled())
             {
                 Assert.Skip("Renditions are not supported");
-            } 
+            }
             FileableObject document = createAndAssertObject(getAndAssertRootFolder(), null);
             List<RenditionData> testRenditions = getTestRenditions(document.ObjectId);
             if (testRenditions == null)
@@ -353,7 +353,7 @@ namespace WcfCmisWSTests
             TreeNode<string> objectsTree = createObjectsTree(rootFolder.ObjectId, versioningState, type, FOLDERS_DEPTH, MINIMAL_CHILDREN, MAXIMUM_CHILDREN, depth);
 
             getAndAssertDescedansts(rootFolder, objectsTree, type, depth, filter, versioningState, null);
-            
+
             objectServiceClient.deleteTree(getAndAssertRepositoryId(), rootFolder.ObjectId, true, enumUnfileObject.delete, true, null);
         }
 

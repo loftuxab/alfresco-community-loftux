@@ -49,6 +49,8 @@ namespace WcfCmisWSTests
 
         private ACLServicePortClient aclServiceClient = null;
 
+        private PolicyServicePortClient policyServiceClient = null;
+
         private static Dictionary<string, CmisClientFactory> factoryCache = new Dictionary<string, CmisClientFactory>();
 
         private static string defaultUsername = "";
@@ -176,6 +178,16 @@ namespace WcfCmisWSTests
             return aclServiceClient;
         }
 
+        public PolicyServicePortClient getPolicyServiceClient()
+        {
+            if (null == policyServiceClient)
+            {
+                policyServiceClient = new PolicyServicePortClient();
+                setCredentials(policyServiceClient, username, password);
+            }
+            return policyServiceClient;
+        }
+
         public string getCurrentUser()
         {
             return username;
@@ -194,5 +206,5 @@ namespace WcfCmisWSTests
         }
 
     }
-
 }
+

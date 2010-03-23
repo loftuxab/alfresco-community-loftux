@@ -130,8 +130,8 @@ namespace WcfCmisWSTests
         public static string Filename
         {
             get { return CmisLogger.filename; }
-            set 
-            { 
+            set
+            {
                 CmisLogger.filename = value;
                 FileInfo file = new FileInfo(CmisLogger.filename);
                 if (file.Exists)
