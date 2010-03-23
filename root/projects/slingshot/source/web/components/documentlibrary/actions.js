@@ -308,6 +308,90 @@
       },
 
       /**
+       * Simple Workflow: Approve.
+       *
+       * @method onActionSimpleApprove
+       * @param asset {object} Object literal representing the file or folder to be actioned
+       */
+      onActionSimpleApprove: function dlA_onActionSimpleApprove(asset)
+      {
+         var displayName = asset.displayName;
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               event:
+               {
+                  name: "metadataRefresh"
+               },
+               message: this.msg("message.simple-workflow.approved", displayName)
+            },
+            failure:
+            {
+               message: this.msg("message.simple-workflow.failure", displayName)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               stem: Alfresco.constants.PROXY_URI + "api/",
+               name: "actionQueue"
+            },
+            config:
+            {
+               requestContentType: Alfresco.util.Ajax.JSON,
+               dataObj:
+               {
+                  actionedUponNode: asset.nodeRef,
+                  actionDefinitionName: "accept-simpleworkflow"
+               }
+            }
+         });
+      },
+
+      /**
+       * Simple Workflow: Reject.
+       *
+       * @method onActionSimpleReject
+       * @param asset {object} Object literal representing the file or folder to be actioned
+       */
+      onActionSimpleReject: function dlA_onActionSimpleReject(asset)
+      {
+         var displayName = asset.displayName;
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               event:
+               {
+                  name: "metadataRefresh"
+               },
+               message: this.msg("message.simple-workflow.rejected", displayName)
+            },
+            failure:
+            {
+               message: this.msg("message.simple-workflow.failure", displayName)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               stem: Alfresco.constants.PROXY_URI + "api/",
+               name: "actionQueue"
+            },
+            config:
+            {
+               requestContentType: Alfresco.util.Ajax.JSON,
+               dataObj:
+               {
+                  actionedUponNode: asset.nodeRef,
+                  actionDefinitionName: "reject-simpleworkflow"
+               }
+            }
+         });
+      },
+
+      /**
        * Upload new version.
        *
        * @method onActionUploadNewVersion
