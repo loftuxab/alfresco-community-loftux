@@ -317,10 +317,20 @@
          {
             originalIsInherited: data.isInherited,
             isInherited: data.isInherited,
+            canReadInherited: data.canReadInherited,
             inherited: data.inherited,
             original: data.direct,
             current: data.direct
          };
+         
+         // Does the user have permissions to read the parent node's permissions?
+         if (!this.permissions.canReadInherited)
+         {
+            this.widgets.dtInherited.set("MSG_EMPTY", this.msg("message.empty.no-permission"));
+         }
+         
+         // Need the inheritance warning?
+         this.inheritanceWarning = !data.isInherited;
          
          // Roles the user is allowed to select from
          this.settableRoles = data.settable;
