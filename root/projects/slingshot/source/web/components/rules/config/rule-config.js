@@ -884,6 +884,10 @@
                for (var i = 0, il = configDef.parameterDefinitions.length; i < il; i++)
                {
                   paramDef = configDef.parameterDefinitions[i];
+                  if (paramDef._type == "hidden" && this.options.mode == RC.MODE_TEXT)
+                  {
+                     continue;
+                  }
                   paramRenderer = this._getParamRenderer(paramDef.type);
                   var fn = paramRenderer[this.options.mode];
                   value = p_oRuleConfig.parameterValues ? p_oRuleConfig.parameterValues[paramDef.name] : null;
@@ -957,12 +961,11 @@
                               addButton: addButton
                            }, this);
                         }
+                        Dom.addClass(controlEl, "param");                                             
                      }
-
                      if (paramDef._type != "hidden" && paramDef.displayLabel)
                      {
                         // Display a label left to the parameter if displayLabel is present
-                        Dom.addClass(controlEl, "param");
                         this._createLabel(paramDef.displayLabel + (paramDef._hideColon ? "" : ":"), controlEl);
                      }
                   }

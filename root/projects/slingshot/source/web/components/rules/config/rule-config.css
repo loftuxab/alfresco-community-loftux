@@ -69,9 +69,10 @@
    padding-left: 2.3em;
 }
 
-.rule-config.text .rule-config-body .name
+.rule-config.text .rule-config-body
 {
    padding-left: 1em;
+   padding-right: 1em;
 }
 
 .rule-config .rule-config-body
@@ -88,7 +89,7 @@
 {
    padding-top: 0.25em;
    padding-bottom: 0.25em;
-   border-bottom:1px dashed #DDDDDD;rela
+   border-bottom:1px dashed #DDDDDD;
 }
 
 .rule-config .rule-config-body .parameters,
