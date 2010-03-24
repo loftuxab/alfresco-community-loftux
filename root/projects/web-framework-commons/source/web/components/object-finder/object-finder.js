@@ -371,6 +371,10 @@
                eventGroup: this
             });
          }
+         else
+         {
+            Dom.get(this.pickerId + "-searchText").focus();
+         }
          
          p_obj.set("disabled", true);
          Event.preventDefault(e);

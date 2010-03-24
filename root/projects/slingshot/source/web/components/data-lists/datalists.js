@@ -122,6 +122,14 @@
       dataLists: null,
 
       /**
+       * Number of data lists in the Repository
+       *
+       * @param dataListsLength
+       * @type Object
+       */
+      dataListsLength: null,
+
+      /**
        * NodeRef of the Data Lists container retrieved from the Repository
        *
        * @param containerNodeRef
@@ -186,7 +194,7 @@
                list = lists[i];
                this.dataLists[list.name] = list;
             }
-            this.dataLists.length = lists.length;
+            this.dataListsLength = lists.length;
             
             if (p_callback && (typeof p_callback.fn == "function"))
             {
@@ -304,7 +312,7 @@
                elHighlight = null,
                container, el, elEdit, elDelete, elLink, elText;
 
-            if (lists.length === 0)
+            if (this.dataListsLength === 0)
             {
                listsContainer.innerHTML = this.msg("message.no-lists");
                this.widgets.newList.fireEvent("click");
@@ -314,7 +322,7 @@
                container = document.createElement("ul");
                listsContainer.appendChild(container);
 
-               // Create the DOM structure: <li onclick><a title href><span class='edit' onclick></span><span class='delete' onclick></span>"text"</a></li>
+               // Create the DOM structure: <li onclick><a class='filter-link' title href><span class='edit' onclick></span><span class='delete' onclick></span>"text"</a></li>
                for (var index in lists)
                {
                   if (lists.hasOwnProperty(index))
@@ -333,6 +341,7 @@
                      elDelete.title = this.msg("label.delete-list");
                      elDelete.onclick = fnDeleteOnClick(list.name);
                      elLink = document.createElement("a");
+                     elLink.className = "filter-link";
                      elLink.title = $html(list.description);
                      elLink.href = "data-lists?list=" + $html(list.name);
                      elText = document.createTextNode($html(list.title));

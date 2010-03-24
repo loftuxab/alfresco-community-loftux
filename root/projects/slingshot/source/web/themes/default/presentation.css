@@ -203,10 +203,35 @@ hr
    background-color: #F9FBFD;
 }
 
-.yui-skin-default .yui-dt-data tr.yui-dt-odd.yui-dt-highlighted,
-.yui-skin-default .yui-dt-data tr.yui-dt-even.yui-dt-highlighted
+/* Data Lists: DataTable (Needs to appear before yui-dt-highlighted rule) */
+
+.yui-skin-default .datagrid tr.yui-dt-even
 {
-   background-color: #F4FAFF;
+   background-color: #ffffff;
+}
+.yui-skin-default .datagrid tr.yui-dt-even td.yui-dt-asc,
+.yui-skin-default .datagrid tr.yui-dt-even td.yui-dt-desc
+{
+   background-color: #f8f8f8;
+}
+
+.yui-skin-default .datagrid tr.yui-dt-odd
+{
+   background-color: #f8f8f8;
+}
+.yui-skin-default .datagrid tr.yui-dt-odd td.yui-dt-asc,
+.yui-skin-default .datagrid tr.yui-dt-odd td.yui-dt-desc
+{
+   background-color: #f0f0f0;
+}
+
+/* End Data Lists */
+
+.yui-skin-default .yui-dt-data tr.yui-dt-highlighted,
+.yui-skin-default .yui-dt-data tr.yui-dt-highlighted td.yui-dt-asc,
+.yui-skin-default .yui-dt-data tr.yui-dt-highlighted td.yui-dt-desc
+{
+   background-color: #f5faff;
    cursor: auto;
 }
 

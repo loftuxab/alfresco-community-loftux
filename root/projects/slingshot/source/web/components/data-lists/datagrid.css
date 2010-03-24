@@ -94,11 +94,6 @@
    border: none;
 }
 
-.datagrid tr.yui-dt-odd
-{
-   background-color: #ffffff;
-}
-
 .datagrid .grid.yui-dt .yui-dt-data td
 {
    border-bottom: 1px dashed #d9d9d9;
