@@ -4,4 +4,7 @@
    <region-id>repo-path</region-id>
    <source-id>folder-rules</source-id>
    <url>/components/folder-details/repo/path</url>
+   <properties>
+      <showIconType>false</showIconType>
+   </properties>
 </component>

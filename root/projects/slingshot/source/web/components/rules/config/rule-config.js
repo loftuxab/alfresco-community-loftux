@@ -1652,7 +1652,7 @@
 
          if (siteId && siteId != this.options.siteId)
          {
-            siteHtml = '<span class="site" title="' + this.msg("tooltip.site", siteTitle ? siteTitle : siteId) + '">' + $html(siteTitle ? siteTitle : siteId) + '</span>';
+            siteHtml = " " + this.msg("label.in") + '<span class="site" title="' + this.msg("tooltip.site", siteTitle ? siteTitle : siteId) + '">' + $html(siteTitle ? siteTitle : siteId) + '</span>';
          }
          var pathHtml = '<span class="path" title="' + this.msg("tooltip.path", fullPath) + '">' + $html(name) + '</span>';
          return pathHtml  + (siteHtml ? siteHtml : "");
@@ -1712,6 +1712,10 @@
                config.dataObj = dataObj;
             }
             Alfresco.util.Ajax.jsonRequest(config);
+         }
+         else
+         {
+            pathEl.innerHTML = this.msg("label.none");
          }
          containerEl.appendChild(pathEl);
          return pathEl;

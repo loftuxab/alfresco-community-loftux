@@ -89,7 +89,15 @@
           * @type string
           */
          label: "",
-         
+
+         /**
+          * Value of the control
+          *
+          * @property value
+          * @type string
+          */
+         value: null,
+
          /**
           * Control-specific custom parameters
           *
@@ -130,9 +138,9 @@
                type: encodeURIComponent(this.options.type),
                name: encodeURIComponent(name),
                label: encodeURIComponent(this.options.label),
-               value: encodeURIComponent(this.options.value)
+               value: (this.options.value ? encodeURIComponent(this.options.value) : "")
             };
-         
+
          this.eventGroup = this.id + "_" + name + "-cntrl";
          var controlParams = this.options.controlParams;
          for (var index in controlParams)
@@ -170,9 +178,28 @@
          if (containerEl)
          {
             containerEl.innerHTML = response.serverResponse.responseText;
+            YAHOO.Bubbling.on("renderCurrentValue", this.onRenderCurrentValue, this);
          }
       },
-      
+
+      /**
+       * Renders current value in reponse to an event
+       *
+       * @method onRenderCurrentValue
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters
+       */
+      onRenderCurrentValue: function ControlWrapper_onRenderCurrentValue(layer, args)
+      {
+         // Check the event is directed towards this instance
+         if ($hasEventInterest(this.id + "_wrapper-" + this.options.type + "-cntrl", args) &&
+             !this.options.value &&
+               args[1].eventGroup && args[1].eventGroup.currentValueMeta && args[1].eventGroup.currentValueMeta.length == 0)
+         {
+            Dom.get(this.id + "_wrapper-" + this.options.type + "-cntrl-currentValueDisplay").innerHTML = this.msg("label.none");
+         }
+      },
+
       /**
        * Form value changed event handler
        *
