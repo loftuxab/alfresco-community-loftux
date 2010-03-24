@@ -247,9 +247,20 @@
          } else if(dburl.startsWith("jdbc:oracle:")) {
             dbtype = "oracle";
          } else if(dburl.startsWith("jdbc:microsoft:sqlserver://")) {
-            dbtype = "mssql";
-            var masterURL = dburl.substring(0, dburl.find(";databaseName=")) +
+            // We need the JDBC connection URL for the master database
+            var masterURL = dburl.substring(0, dburl.indexOf(";databaseName=")) +
                ";databaseName=master";
+
+            var fail = project.createTask("fail");
+            fail.setMessage("The Microsoft SQL Server JDBC driver isn't supported, please use JTDS");
+            fail.perform();
+         } else if(dburl.startsWith("jdbc:jtds:sqlserver://")) {
+            dbtype = "mssql";
+
+            // We need the JDBC connection URL for the master database
+            var slashslash = dburl.indexOf("://");
+            var dbnameslash = dburl.indexOf("/", slashslash+4);
+            var masterURL = dburl.substring(0, dbnameslash) + "/master";
             project.setProperty("db.master.url", masterURL);
          }
 
@@ -311,7 +322,8 @@
            onerror="continue"
            userid="${db.username}" 
            password="${db.password}">
-         create database ${db.name};
+         CREATE DATABASE ${db.name};
+         ALTER DATABASE ${db.name} SET ALLOW_SNAPSHOT_ISOLATION ON;
       </sql>
       <sql driver="${db.driver}" 
            url="${db.master.url}"
@@ -321,7 +333,8 @@
            onerror="continue"
            userid="${db.username}" 
            password="${db.password}">
-         create database ${db.name}_test;
+         CREATE DATABASE ${db.name}_test;
+         ALTER DATABASE ${db.name}_test SET ALLOW_SNAPSHOT_ISOLATION ON;
       </sql>
    </target>
 
