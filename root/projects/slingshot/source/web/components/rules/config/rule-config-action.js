@@ -588,10 +588,11 @@
                         }
                      }, this);
                   }
+                  var path = Dom.get(this.id + "-" + obj.configDef._id + "-destinationLabel").innerHTML;
                   this.widgets.destinationDialog.setOptions(
                   {
                      siteId: this.options.siteId,
-                     path: Dom.get(this.id + "-" + obj.configDef._id + "-destinationLabel").innerHTML
+                     path: (path != this.msg("label.none") ? path : "")  
                   });
                   this.widgets.destinationDialog.showDialog();
                });
@@ -713,6 +714,7 @@
                {
                   type: "category",
                   container: containerEl,
+                  value: (ruleConfig.parameterValues ? ruleConfig.parameterValues["category-value"] : null),
                   controlParams:
                   {
                      multipleSelectMode: false

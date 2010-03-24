@@ -135,18 +135,17 @@
 
 /* filter = folder */
 
-.rules-list-item .info .inherited,
-.rules-list-item .info .inherited-from,
-.rules-list-item .info .inherited-folder,
-.rules-list-item .description
+.rules-list .rules-list-container.folder li .info .inherited,
+.rules-list .rules-list-container.folder li .info .inherited-from,
+.rules-list .rules-list-container.folder li .info .inherited-folder
 {
    display: none;
 }
 
 /* filter = inherited */
 
-.rules-list-item .info .inherited,
-.rules-list-item .description
+.rules-list .rules-list-container.inherited li .info .inherited,
+.rules-list .rules-list-container.inherited li .description
 {
    display: none;
 }
@@ -154,13 +153,13 @@
 
 /* filter = all */
 
-.rules-list-item .info .inherited-from,
-.rules-list-item .info .inherited-folder
+.rules-list .rules-list-container.all li .info .inherited-from,
+.rules-list .rules-list-container.all li .info .inherited-folder
 {
    display: none;
 }
 
-.rules-list-item .description
+.rules-list .rules-list-container.all li .description
 {
    clear: both;
 }

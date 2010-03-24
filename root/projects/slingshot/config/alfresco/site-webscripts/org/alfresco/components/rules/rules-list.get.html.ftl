@@ -35,7 +35,7 @@
             <div class="rule-icon">&nbsp;</div>
             <div class="info">
                <a class="title" href="#">Name</a><span class="inherited">&nbsp;</span><br/>
-               <span class="inherited-from">&nbsp;</span><a class="inherited-folder">&nbsp;</a><br/>
+               <span class="inherited-from">&nbsp;</span><a class="inherited-folder">&nbsp;</a>
                <span class="description">Description of the rules will go here</span>
             </div>
          </li>
