@@ -179,12 +179,8 @@
 
    <target name="load-database-properties"
            depends="continuous-init">
-      <loadfile property="dev_context" failonerror="false"
-           srcfile="${dir.project.repository.config}/alfresco/extension/dev-context.xml" />
-      <loadfile property="test_context" failonerror="false"
-           srcfile="${dir.project.repository.config}/alfresco/extension/test-context.xml" />
-
-      <!-- Load the repository properties files, in order -->
+      <!-- Grab dev-context.xml and test-context.xml, from the repo config + home dir -->
+      <!-- Then, load the repository properties files, in order -->
       <script language="javascript" classpath="${classpath.bsf_javascript}"> <![CDATA[
          importClass(java.util.regex.Matcher);
          importClass(java.util.regex.Pattern);
@@ -194,43 +190,54 @@
          importClass(java.io.BufferedReader);
 
          var fail = project.createTask("fail");
+         var loadfile = project.createTask("loadfile");
+         loadfile.setFailonerror(false);
+         loadfile.setProperty("xml");
+
          var repoConfigPath = project.getProperty("dir.project.repository.config");
 
          var repoPropMatcher = Pattern.compile("<bean id=\"repository-properties\"(.*?)</bean>", Pattern.DOTALL);
          var locationsMatcher = Pattern.compile("<property name=\"locations\"(.*?)</property>", Pattern.DOTALL);
          var valueMatcher = Pattern.compile("<value>(.*?)</value>", Pattern.DOTALL);
 
-         for each (var xmlp in ["dev_context","test_context"]) {
-            var xml = project.getProperty(xmlp);
-            if(xml != null) {
-               var rpm = repoPropMatcher.matcher(xml);
-               if(rpm.find()) {
-                   var lm = locationsMatcher.matcher( rpm.group() );
-                   if(lm.find()) {
-                      var vm = valueMatcher.matcher( lm.group() );
-                      while(vm.find()) {
-                         var property = vm.group(1);
-                         var pfn;
-                         if(property.startsWith("classpath:")) {
-                            pfn = repoConfigPath + "/" + property.substring(10);
-                         } else if(property.startsWith("file:")) {
-                            pfn = property.substring(5);
-                         }
-
-                         if(pfn != null) {
-                            var pf = new File(pfn);
-                            if(pf.exists()) {
-                               echoT = project.createTask("echo");
-                               echoT.setMessage("Loading DB property " + property);
-                               echoT.perform();
-
-                               propertyT = project.createTask("property");
-                               propertyT.setFile(pf);
-                               propertyT.perform();
+         for each (var dirp in ["user.home", "dir.project.repository.config"]) {
+            var dir = project.getProperty(dirp) + "/alfresco/extension/";
+            for each (var xmlc in ["dev-context","test-context"]) {
+               var xmlfile = new File(dir + xmlc + ".xml");
+               loadfile.setSrcFile(xmlfile);
+               loadfile.perform();
+ 
+               var xml = project.getProperty("xml");
+               if(xml != null) {
+                  var rpm = repoPropMatcher.matcher(xml);
+                  if(rpm.find()) {
+                      var lm = locationsMatcher.matcher( rpm.group() );
+                      if(lm.find()) {
+                         var vm = valueMatcher.matcher( lm.group() );
+                         while(vm.find()) {
+                            var property = vm.group(1);
+                            var pfn;
+                            if(property.startsWith("classpath:")) {
+                               pfn = repoConfigPath + "/" + property.substring(10);
+                            } else if(property.startsWith("file:")) {
+                               pfn = property.substring(5);
+                            }
+   
+                            if(pfn != null) {
+                               var pf = new File(pfn);
+                               if(pf.exists()) {
+                                  echoT = project.createTask("echo");
+                                  echoT.setMessage("Loading DB property " + property);
+                                  echoT.perform();
+   
+                                  propertyT = project.createTask("property");
+                                  propertyT.setFile(pf);
+                                  propertyT.perform();
+                               }
                             }
                          }
                       }
-                   }
+                  }
                }
             }
          }
