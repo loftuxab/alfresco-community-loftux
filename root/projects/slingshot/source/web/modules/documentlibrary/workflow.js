@@ -151,7 +151,8 @@
          // Create and render the YUI dialog
          this.widgets.dialog = Alfresco.util.createYUIPanel(dialogDiv,
          {
-            width: this.options.width
+            width: this.options.width,
+            postmethod: "manual"
          },
          {
             type: YAHOO.widget.Dialog
