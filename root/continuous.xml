@@ -246,6 +246,11 @@
             dbtype = "postgresql";
          } else if(dburl.startsWith("jdbc:oracle:")) {
             dbtype = "oracle";
+         } else if(dburl.startsWith("jdbc:microsoft:sqlserver://")) {
+            dbtype = "mssql";
+            var masterURL = dburl.substring(0, dburl.find(";databaseName=")) +
+               ";databaseName=master";
+            project.setProperty("db.master.url", masterURL);
          }
 
          project.setProperty("db.type",dbtype);
@@ -272,14 +277,50 @@
       </sql>
    </target>
    <target name="-create-database-postgresql">
+      <!-- PostGreSQL lacks a "if not exists" for creating databases -->
+      <!-- So, do it as two statements, ignoring errors -->
       <sql driver="${db.driver}" 
            url="jdbc:postgresql:template1"
            classpathref="classpath.compile" 
            print="yes"
            autocommit="yes"
+           onerror="continue"
            userid="${db.username}" 
            password="${db.password}">
          create database ${db.name};
+      </sql>
+      <sql driver="${db.driver}" 
+           url="jdbc:postgresql:template1"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           onerror="continue"
+           userid="${db.username}" 
+           password="${db.password}">
+         create database ${db.name}_test;
+      </sql>
+   </target>
+   <target name="-create-database-mssql">
+      <!-- MS SQL Server lacks a "if not exists" for creating databases -->
+      <!-- So, do it as two statements, ignoring errors -->
+      <sql driver="${db.driver}" 
+           url="${db.master.url}"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           onerror="continue"
+           userid="${db.username}" 
+           password="${db.password}">
+         create database ${db.name};
+      </sql>
+      <sql driver="${db.driver}" 
+           url="${db.master.url}"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           onerror="continue"
+           userid="${db.username}" 
+           password="${db.password}">
          create database ${db.name}_test;
       </sql>
    </target>
@@ -326,6 +367,30 @@
            password="${db.password}">
          drop database if exists ${db.name};
          drop database if exists ${db.name}_test;
+      </sql>
+   </target>
+   <target name="-drop-database-mssql">
+      <!-- MS SQL Server lacks a "if exists" for dropping databases -->
+      <!-- So, do it as two statements, ignoring errors -->
+      <sql driver="${db.driver}" 
+           url="${db.master.url}"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           onerror="continue"
+           userid="${db.username}" 
+           password="${db.password}">
+         drop database ${db.name};
+      </sql>
+      <sql driver="${db.driver}" 
+           url="${db.master.url}"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           onerror="continue"
+           userid="${db.username}" 
+           password="${db.password}">
+         drop database ${db.name}_test;
       </sql>
    </target>
 
