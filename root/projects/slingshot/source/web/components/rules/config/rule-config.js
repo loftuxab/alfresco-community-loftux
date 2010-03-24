@@ -1642,12 +1642,12 @@
             }
             else
             {
-               name = "../" + name;
+               name = ".../" + name;
             }
          }
          else
          {
-            name = (path != "/" ? "../" : "/") + name;
+            name = (path != "/" ? ".../" : "/") + name;
          }
 
          if (siteId && siteId != this.options.siteId)

@@ -767,7 +767,8 @@ body.yui-skin-hcBlack .categoryview .selected div.ygtvchildren table .ygtvlabel:
 .yui-skin-hcBlack .node .userLink a,
 .yui-skin-hcBlack .site-members h3 a,
 .yui-skin-hcBlack .doclist .documents a,
-.yui-skin-hcBlack .attrValue a
+.yui-skin-hcBlack .attrValue a,
+.yui-skin-yellowTheme .rules-none a
 {
    color: #000000;
    text-decoration: underline;
@@ -909,6 +910,20 @@ div.theme-bg-color-5
 
 }
 
+.theme-bg-color-6,
+div.theme-bg-color-6
+{
+   background-color: #F4FAFF;
+}
+
+/* Used for editing - same as meta data fields */
+
+.theme-bg-color-7,
+div.theme-bg-color-7
+{
+   background-color: #F5FFF2;
+}
+
 .theme-bg-1
 {
 
@@ -929,4 +944,9 @@ div.theme-bg-color-5
 .theme-border-2
 {
 
+}
+
+.theme-border-3
+{
+   border: 1px solid #c6c6c6 !important;
 }

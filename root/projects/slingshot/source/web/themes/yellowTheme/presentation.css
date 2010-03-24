@@ -266,7 +266,7 @@ hr
 {
    border-left: 1px solid #c4c5c5;
    border-right: 1px solid #c4c5c5;
-   background-color: #e3ebec;
+   background-color: #F3F3F3;
 }
 
 /* Page title and navigation styles */
@@ -613,7 +613,6 @@ body.yui-skin-yellowTheme .doclist tr.yui-dt-odd.yui-dt-highlighted,
 body.yui-skin-yellowTheme .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-yellowTheme .links-body tr.links-selected-row,
 body.yui-skin-yellowTheme .over,
-.postview,
 .topicview
 {
    background-color: #f5faff; 
@@ -714,7 +713,8 @@ body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-column
 .yui-skin-yellowTheme .doclist .documents a,
 .yui-skin-yellowTheme .attrValue a,
 .yui-skin-yellowTheme .detail .item a,
-.yui-skin-yellowTheme .info .meta-value a
+.yui-skin-yellowTheme .info .meta-value a,
+.yui-skin-yellowTheme .rules-none a
 {
    color: #F6931C;
 }
@@ -836,6 +836,20 @@ div.theme-bg-color-5
    background-color: #2FB42C;
 }
 
+.theme-bg-color-6,
+div.theme-bg-color-6
+{
+   background-color: #F4FAFF;
+}
+
+/* Used for editing - same as meta data fields */
+
+.theme-bg-color-7,
+div.theme-bg-color-7
+{
+   background-color: #F5FFF2;
+}
+
 .theme-bg-1
 {
    
@@ -856,4 +870,9 @@ div.theme-bg-color-5
 .theme-border-2
 {
    border-color: #2FB42C;
+}
+
+.theme-border-3
+{
+   border: 1px solid #c6c6c6 !important;
 }

@@ -42,12 +42,12 @@
 
 .rule-details .behaviour.enabled
 {
-   background-image: url(../images/inherited-on-16.png);
+   background-image: url(../images/enabled-on-16.png);
 }
 
 .rule-details .behaviour.disabled
 {
-   background-image: url(../images/inherited-off-16.png);
+   background-image: url(../images/enabled-off-16.png);
 }
 
 .rule-details .configuration-separator

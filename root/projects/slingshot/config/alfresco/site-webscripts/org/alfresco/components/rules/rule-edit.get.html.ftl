@@ -16,7 +16,7 @@
       <input id="${el}-id" type="hidden" name="id" value=""/> 
       <input type="hidden" name="action.actionDefinitionName" value="composite-action"/>
       
-      <h1 class="edit-header">${msg("header.editRule")}<#if ruleTitle??>: ${ruleTitle}</#if></h1>
+      <h1 class="edit-header">${msg("header.editRule")}<#if ruleTitle??>: ${ruleTitle?html}</#if></h1>
       <h1 class="create-header">${msg("header.newRule")}</h1>
 
       <div class="caption">

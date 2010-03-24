@@ -220,7 +220,7 @@
             focusEl = majorEl;
             minorEl.checked = false;
          }         
-         Dom.get(this.id + "-comments").value = checkinConfig.comments ? $html(checkinConfig.comments) : "";
+         Dom.get(this.id + "-comments").value = checkinConfig.comments ? checkinConfig.comments : "";
          this.widgets.form.updateSubmitElements();
 
          // Show the dialog

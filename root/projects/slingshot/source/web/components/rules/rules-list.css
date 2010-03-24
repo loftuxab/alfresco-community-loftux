@@ -83,12 +83,12 @@
 
 .rules-list-item .active-icon
 {
-   background-image: url(../images/indicator-on-16.png)
+   background-image: url(../images/enabled-on-16.png)
 }
 
 .rules-list-item .active-icon.disabled
 {
-   background-image: url(../images/indicator-off-16.png);
+   background-image: url(../images/enabled-off-16.png);
 }
 
 .rules-list-item .rule-icon
