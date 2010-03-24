@@ -1574,7 +1574,7 @@
        */
       _createDateSpan: function RC__createDateSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey)
       {
-         value = Alfresco.util.formatDate(value);
+         value = Alfresco.util.formatDate(Alfresco.util.fromISO8601(value));
          return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value, msgKey);
       },
 
