@@ -684,6 +684,8 @@
                      	       apply_amps.sh" 
                      prefix="commands"
                      mode="755" />
+         <zipfileset dir="${dir.project.installer.binlin}"
+                     prefix="commands/bin" />
       </tar>
    </target>
 
