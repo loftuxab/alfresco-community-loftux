@@ -542,18 +542,30 @@
                treeNodeObjs = descriptorObj.dataModifier.call(this, treeNodeObjs, descriptorObj);
             }
 
+            // First prepare the node objects with the correct label etc
+            var nodes = [],
+               node;
             for (var j = 0, jl = treeNodeObjs.length; j < jl; j++)
             {
                n = treeNodeObjs[j];
-               var node = new YAHOO.widget.TextNode(
-               {
+               node =  {
                   id: this._getValue(n, "id", descriptorObj, "node"),
                   label: this._getLabel(n, descriptorObj, msgPath, "node"),
                   listItems: n.listItems ? n.listItems : descriptorObj.listItems,
                   treeNodes: n.treeNodes ? n.treeNodes : descriptorObj.treeNodes,
                   node: n
-               }, parent);
+               };
                node.isLeaf = !n.treeNodes;
+               nodes.push(node);
+            }
+
+            // Sort the nodes
+            nodes.sort(this._sortList);
+
+            // Add the nodes to the tree
+            for (j = 0, jl = nodes.length; j < jl; j++)
+            {
+               new YAHOO.widget.TextNode(nodes[j], parent);
             }
          }
       },
@@ -638,7 +650,10 @@
                });
             }
 
-            // Add all files to table
+            // Sort items
+            items.sort(this._sortList);
+
+            // Add all items to table
             dataTable.addRows(items, 0);
          }
       },
@@ -661,6 +676,18 @@
          this.widgets.dialog.show();
       },
 
+      /**
+       * Sort list elements  by label
+       *
+       * @method _sortList
+       * @protected
+       */
+      _sortList: function PP__showDialog(obj1, obj2)
+      {
+         var label1 = obj1.label ? obj1.label.toLowerCase() : "",
+            label2 = obj2.label ? obj2.label.toLowerCase() : "";
+         return (label1 > label2) ? 1 : (label1 < label2) ? -1 : 0;
+      },
 
       /**
        * YUI WIDGET EVENT HANDLERS

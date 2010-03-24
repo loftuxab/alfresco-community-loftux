@@ -249,16 +249,13 @@
                   if (response.json)
                   {
                      this.options.ruleset = response.json.data;
+                     this._fireFolderRulesetDetailsAvailable();
                      var newNoOfRules = this.options.ruleset && this.options.ruleset.rules ? this.options.ruleset.rules.length : 0;
                      if ((newNoOfRules == 0 && p_prevNoOfRules != 0) ||
                          (newNoOfRules != 0 && p_prevNoOfRules == 0))
                      {
                         // Reload page so appropriate components will be displayed in stead of the current ones
                         window.location.reload();
-                     }
-                     else
-                     {
-                        this._fireFolderRulesetDetailsAvailable();
                      }
                   }
                },

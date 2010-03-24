@@ -360,11 +360,11 @@
          this._renderRecipients(this.recipients);
 
          // Subject
-         Dom.get(this.id + "-subject").value = emailFormConfig.subject ? $html(emailFormConfig.subject) : "";
+         Dom.get(this.id + "-subject").value = emailFormConfig.subject ? emailFormConfig.subject : "";
 
          // Message & Template
          var messageEl = Dom.get(this.id + "-message");
-         messageEl.value = emailFormConfig.message && emailFormConfig.message.length > 0 ? $html(emailFormConfig.message) : "";
+         messageEl.value = emailFormConfig.message && emailFormConfig.message.length > 0 ? emailFormConfig.message : "";
          if (emailFormConfig.template)
          {
             var menuItems = this.widgets.useTemplateMenu.getMenu().getItems();

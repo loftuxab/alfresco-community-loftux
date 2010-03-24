@@ -130,7 +130,7 @@
          }).showDialog();
 
          // Stop click event
-         Event.stopEvent(e);
+         Event.stopEvent(event);
       }
 
    });

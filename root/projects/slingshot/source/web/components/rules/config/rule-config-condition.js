@@ -673,6 +673,11 @@
          {
             this._selectConfigName(selectEl, previousSelectedConfigDef.value, previousSelectedConfigDef.rel);
          }
+         else
+         {
+            // There are no previous selections, select first element
+            selectEl.selectedIndex = 0;
+         }
       },
 
       /**

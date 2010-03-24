@@ -470,9 +470,15 @@
          Dom.getElementsByClassName("title", "a", ruleEl)[0].innerHTML = rule.title;
          Dom.getElementsByClassName("description", "span", ruleEl)[0].innerHTML = rule.description;
 
+         var activeIconEl = Dom.getElementsByClassName("active-icon", "div", ruleEl)[0]
          if (rule.disabled)
          {
-            Dom.addClass(Dom.getElementsByClassName("active-icon", "div", ruleEl)[0], "disabled");
+            activeIconEl.setAttribute("title", this.msg("label.inactive"));
+            Dom.addClass(activeIconEl, "disabled");
+         }
+         else
+         {
+            activeIconEl.setAttribute("title", this.msg("label.active"));
          }
          if (inherited)
          {
