@@ -75,12 +75,12 @@ public class MessagesWebScript extends org.springframework.extensions.webscripts
         }
         writer.write(";\r\n");
         
-        // community tracking logo
+        // community logo
         final String serverPath = req.getServerPath();
         final int schemaIndex = serverPath.indexOf(':');
         writer.write("window.setTimeout(function(){(document.getElementById('alfresco-yuiloader')||document.createElement('div')).innerHTML = '<img src=\"");
         writer.write(serverPath.substring(0, schemaIndex));
-        writer.write("://www.alfresco.com/assets/images/common/alfresco_community_horiz30.gif\" alt=\"*\" style=\"display:none\"/>\'}, 100);\r\n");
+        writer.write("://www.alfresco.com/assets/images/logos/community-edition-3.3-share.png\" alt=\"*\" style=\"display:none\"/>\'}, 100);\r\n");
         
         return writer.toString();
     }
