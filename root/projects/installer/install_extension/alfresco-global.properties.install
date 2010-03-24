@@ -46,10 +46,14 @@ alfresco_user_store.adminpassword=@@ADMIN_PWD@@
 #oracle#db.url=jdbc:oracle:thin:@${db.host}:${db.port}:${db.name}
 
 #
-# SQLServer connection (note you must enable TCP protocol on fixed port 1433)
+# SQLServer connection
+# Requires jTDS driver version 1.2.5 and SNAPSHOT isolation mode
+# Enable TCP protocol on fixed port db.port
+# Prepare the database with:
+# ALTER DATABASE db.name SET ALLOW_SNAPSHOT_ISOLATION ON; 
 #
-#mssql#db.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
-#mssql#db.url=jdbc:sqlserver://${db.host}:${db.port};databaseName=${db.name}
+#mssql#db.driver=net.sourceforge.jtds.jdbc.Driver
+#mssql#db.url=jdbc:jtds:sqlserver://${db.host}:${db.port}/${db.name}
 #mssql#db.txn.isolation=4096
 
 #

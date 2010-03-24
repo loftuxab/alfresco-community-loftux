@@ -145,6 +145,12 @@ public class AlfrescoUserGroupServiceHandler extends AbstractAlfrescoUserGroupSe
      */
     public boolean isUserMember(String dwsUrl, String username)
     {
-        return siteService.isMember(dwsUrl, username);
+        // Normalize the user ID taking into account case sensitivity settings
+        String normalized = personService.getUserIdentifier(username);
+        if (normalized == null)
+        {
+            return false;
+        }
+        return siteService.isMember(dwsUrl, normalized);
     }
 }
