@@ -202,10 +202,35 @@ hr
    background-color: #F7FDF8;
 }
 
-.yui-skin-greenTheme .yui-dt-data tr.yui-dt-odd.yui-dt-highlighted,
-.yui-skin-greenTheme .yui-dt-data tr.yui-dt-even.yui-dt-highlighted
+/* Data Lists: DataTable (Needs to appear before yui-dt-highlighted rule) */
+
+.yui-skin-greenTheme .datagrid tr.yui-dt-even
 {
-   background-color: #F5FFF9;
+   background-color: #ffffff;
+}
+.yui-skin-greenTheme .datagrid tr.yui-dt-even td.yui-dt-asc,
+.yui-skin-greenTheme .datagrid tr.yui-dt-even td.yui-dt-desc
+{
+   background-color: #f8f8f8;
+}
+
+.yui-skin-greenTheme .datagrid tr.yui-dt-odd
+{
+   background-color: #f8f8f8;
+}
+.yui-skin-greenTheme .datagrid tr.yui-dt-odd td.yui-dt-asc,
+.yui-skin-greenTheme .datagrid tr.yui-dt-odd td.yui-dt-desc
+{
+   background-color: #f0f0f0;
+}
+
+/* End Data Lists */
+
+.yui-skin-greenTheme .yui-dt-data tr.yui-dt-highlighted,
+.yui-skin-greenTheme .yui-dt-data tr.yui-dt-highlighted td.yui-dt-asc,
+.yui-skin-greenTheme .yui-dt-data tr.yui-dt-highlighted td.yui-dt-desc
+{
+   background-color: #d4f8c4;
    cursor: auto;
 }
 

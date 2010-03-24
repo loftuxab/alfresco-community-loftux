@@ -203,9 +203,9 @@
           *
           * @property splitActionsAt
           * @type int
-          * @default 4
+          * @default 3
           */
-         splitActionsAt: 4
+         splitActionsAt: 3
       },
 
       /**
@@ -372,10 +372,9 @@
        * Return data type-specific formatter
        *
        * @method getCellFormatter
-       * @param dataType {String} Data type
        * @return {function} Function to render read-only value
        */
-      getCellFormatter: function DataGrid_getCellFormatter(dataType)
+      getCellFormatter: function DataGrid_getCellFormatter()
       {
          var scope = this;
          
@@ -449,6 +448,51 @@
             }
 
             elCell.innerHTML = html;
+         };
+      },
+
+      /**
+       * Return data type-specific sorter
+       *
+       * @method getSortFunction
+       * @return {function} Function to sort column by
+       */
+      getSortFunction: function DataGrid_getSortFunction()
+      {
+         /**
+          * Data Type custom sorter
+          *
+          * @method sortFunction
+          * @param a {object} Sort record a
+          * @param b {object} Sort record b
+          * @param desc {boolean} Ascending/descending flag
+          * @param field {String} Field to sort by
+          */
+         return function DataGrid_sortFunction(a, b, desc, field)
+         {
+            var fieldA = a.getData().itemData[field],
+               fieldB = b.getData().itemData[field];
+
+            // Deal with empty values
+            if (!YAHOO.lang.isValue(fieldA))
+            {
+               return (!YAHOO.lang.isValue(fieldB)) ? 0 : 1;
+            }
+            else if (!YAHOO.lang.isValue(fieldB))
+            {
+               return -1;
+            }
+            
+            var valA = fieldA.value,
+               valB = fieldB.value;
+            
+            if (valA.indexOf && valA.indexOf("workspace://SpacesStore") == 0)
+            {
+               valA = fieldA.metadata || fieldA.displayValue;
+               valB = fieldB.metadata || fieldB.displayValue;
+            }
+
+            return YAHOO.util.Sort.compare(valA, valB, desc);
          };
       },
 
@@ -785,7 +829,7 @@
          {
             var column = this.datalistColumns[i],
                columnName = column.name.replace(":", "_"),
-               fieldLookup = (column.type == "property" ? "prop" : "assoc") + "_" + columnName; //1 "itemData." + 
+               fieldLookup = (column.type == "property" ? "prop" : "assoc") + "_" + columnName;
             
             this.dataRequestFields.push(columnName);
             this.dataResponseFields.push(fieldLookup);
@@ -800,7 +844,7 @@
          this.widgets.dataSource.responseSchema =
          {
             resultsList: "items",
-            fields: fields, //1 .concat(this.dataResponseFields),
+            fields: fields,
             metaFields:
             {
                paginationRecordOffset: "startIndex",
@@ -848,6 +892,11 @@
                key: this.dataResponseFields[i],
                label: column.label,
                sortable: true,
+               sortOptions:
+               {
+                  field: column.formsName,
+                  sortFunction: this.getSortFunction()
+               },
                formatter: this.getCellFormatter(column.dataType)
             });
          }
@@ -868,7 +917,7 @@
             "MSG_ERROR": this.msg("message.error"),
             paginator: this.widgets.paginator
          });
-
+         
          // Update totalRecords with value from server
          this.widgets.dataTable.handleDataReturnPayload = function DataGrid_handleDataReturnPayload(oRequest, oResponse, oPayload)
          {

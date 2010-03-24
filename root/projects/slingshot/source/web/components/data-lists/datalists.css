@@ -23,14 +23,16 @@
 
 .datalists li
 {
-   background: url(../images/list-16.png) no-repeat 4px 4px;
    overflow-x: hidden;
-   padding: 4px 0 4px 24px;
+   padding-left: 0px;
 }
 
 .datalists li a
 {
+   background: url(../images/list-16.png) no-repeat 4px 0;
    display: block;
+   margin-left: 16px;
+   padding: 0 0 0 24px;
 }
 
 .datalists li a span
