@@ -17,9 +17,6 @@
    <fail message="Ant 1.7 or higher is required to build. ${ant.version} detected">
      <condition><not><antversion atleast="1.7" /></not></condition>
    </fail>
-   <fail message="Java 1.6 or higher is required to build. ${ant.java.version} detected">
-     <condition><equals arg1="${ant.java.version}" arg2="1.5" /></condition>
-   </fail>
 
    <target name="continuous-init" 
            depends="init">
@@ -188,7 +185,7 @@
            srcfile="${dir.project.repository.config}/alfresco/extension/test-context.xml" />
 
       <!-- Load the repository properties files, in order -->
-      <script language="javascript"> <![CDATA[
+      <script language="javascript" classpath="${classpath.bsf_javascript}"> <![CDATA[
          importClass(java.util.regex.Matcher);
          importClass(java.util.regex.Pattern);
          importClass(java.io.File);
@@ -196,6 +193,7 @@
          importClass(java.io.InputStreamReader);
          importClass(java.io.BufferedReader);
 
+         var fail = project.createTask("fail");
          var repoConfigPath = project.getProperty("dir.project.repository.config");
 
          var repoPropMatcher = Pattern.compile("<bean id=\"repository-properties\"(.*?)</bean>", Pattern.DOTALL);
@@ -240,7 +238,10 @@
          // Try to figure out what database engine they wanted
          var dbtype = "unknown";
          var dburl = project.getProperty("db.url");
-         if(dburl.startsWith("jdbc:mysql://")) {
+         if(dburl == null) {
+            fail.setMessage("No {db.url} property found, which is required");
+            fail.perform();
+         } else if(dburl.startsWith("jdbc:mysql://")) {
             dbtype = "mysql";
          } else if(dburl.startsWith("jdbc:postgresql:")) {
             dbtype = "postgresql";
@@ -251,7 +252,6 @@
             var masterURL = dburl.substring(0, dburl.indexOf(";databaseName=")) +
                ";databaseName=master";
 
-            var fail = project.createTask("fail");
             fail.setMessage("The Microsoft SQL Server JDBC driver isn't supported, please use JTDS");
             fail.perform();
          } else if(dburl.startsWith("jdbc:jtds:sqlserver://")) {
