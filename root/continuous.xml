@@ -181,6 +181,8 @@
            depends="continuous-init">
       <!-- Grab dev-context.xml and test-context.xml, from the repo config + home dir -->
       <!-- Then, load the repository properties files, in order -->
+      <!-- Note - ant property loading works differently to spring, so we -->
+      <!--  need to load in the reverse order! -->
       <script language="javascript" classpath="${classpath.bsf_javascript}"> <![CDATA[
          importClass(java.util.regex.Matcher);
          importClass(java.util.regex.Pattern);
@@ -188,11 +190,11 @@
          importClass(java.io.FileInputStream);
          importClass(java.io.InputStreamReader);
          importClass(java.io.BufferedReader);
+         importClass(java.lang.System);
 
          var fail = project.createTask("fail");
          var loadfile = project.createTask("loadfile");
          loadfile.setFailonerror(false);
-         loadfile.setProperty("xml");
 
          var repoConfigPath = project.getProperty("dir.project.repository.config");
 
@@ -200,39 +202,55 @@
          var locationsMatcher = Pattern.compile("<property name=\"locations\"(.*?)</property>", Pattern.DOTALL);
          var valueMatcher = Pattern.compile("<value>(.*?)</value>", Pattern.DOTALL);
 
+         var propertiesDefs = new Array();
+         var propertiesFiles = new Array();
+         var count = 0;
+
          for each (var dirp in ["user.home", "dir.project.repository.config"]) {
             var dir = project.getProperty(dirp) + "/alfresco/extension/";
             for each (var xmlc in ["dev-context","test-context"]) {
                var xmlfile = new File(dir + xmlc + ".xml");
+               count++;
+
+               loadfile.setProperty("xml"+count);
                loadfile.setSrcFile(xmlfile);
                loadfile.perform();
  
-               var xml = project.getProperty("xml");
+               var xml = project.getProperty("xml"+count);
                if(xml != null) {
                   var rpm = repoPropMatcher.matcher(xml);
                   if(rpm.find()) {
                       var lm = locationsMatcher.matcher( rpm.group() );
                       if(lm.find()) {
-                         var vm = valueMatcher.matcher( lm.group() );
+                         var vm = valueMatcher.matcher( lm.group(0) );
                          while(vm.find()) {
                             var property = vm.group(1);
                             var pfn;
+
+                            // Support things like <value>${foo}</value>
+                            if(property.startsWith("${")) {
+                               var sysProp = property.substring(2, property.length()-1);
+                               property = project.getProperty(sysProp);
+                               if(property == null) {
+                                  fail.setMessage("Can't resolve " + vm.group(0));
+                                  fail.perform();
+                               }
+                            }
+
+                            // Get the FS path to the property file
                             if(property.startsWith("classpath:")) {
                                pfn = repoConfigPath + "/" + property.substring(10);
                             } else if(property.startsWith("file:")) {
                                pfn = property.substring(5);
+                            } else {
+                               pfn = property;
                             }
    
                             if(pfn != null) {
                                var pf = new File(pfn);
                                if(pf.exists()) {
-                                  echoT = project.createTask("echo");
-                                  echoT.setMessage("Loading DB property " + property);
-                                  echoT.perform();
-   
-                                  propertyT = project.createTask("property");
-                                  propertyT.setFile(pf);
-                                  propertyT.perform();
+                                  propertiesDefs.push( property );
+                                  propertiesFiles.push( pf );
                                }
                             }
                          }
@@ -241,6 +259,20 @@
                }
             }
          }
+
+         // Now load the files, in reverse order
+         for(var i=(propertiesFiles.length-1); i>=0; i--) {
+            var pf = propertiesFiles[i];
+            var property = propertiesDefs[i];
+
+            var echoT = project.createTask("echo");
+            echoT.setMessage("Loading DB property " + property);
+            echoT.perform();
+
+            var propertyT = project.createTask("property");
+            propertyT.setFile(pf);
+            propertyT.perform();
+         } 
 
          // Try to figure out what database engine they wanted
          var dbtype = "unknown";
@@ -254,6 +286,17 @@
             dbtype = "postgresql";
          } else if(dburl.startsWith("jdbc:oracle:")) {
             dbtype = "oracle";
+         } else if(dburl.startsWith("jdbc:db2//")) {
+            dbtype = "db2"; // DB2 type 4
+
+            // We need the JDBC connection URL for the default database
+            var slashslash = dburl.indexOf("db2//");
+            var dbnameslash = dburl.indexOf("/", slashslash+6);
+            var masterURL = dburl.substring(0, dbnameslash) + "/default";
+            project.setProperty("db.master.url", masterURL);
+         } else if(dburl.startsWith("jdbc:db2:")) {
+            dbtype = "db2"; // DB2 type 2
+            project.setProperty("db.master.url", "jdbc:db2:default");
          } else if(dburl.startsWith("jdbc:microsoft:sqlserver://")) {
             // We need the JDBC connection URL for the master database
             var masterURL = dburl.substring(0, dburl.indexOf(";databaseName=")) +
@@ -274,6 +317,7 @@
          project.setProperty("db.type",dbtype);
       ]]></script>
       <echo message="DB Type is ${db.type}"/>
+      <echo message="DB Name is ${db.name}"/>
    </target>
 
    <target name="-create-database" 
