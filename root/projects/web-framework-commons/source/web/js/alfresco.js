@@ -2807,7 +2807,7 @@ Alfresco.util.Ajax = function()
          // If a contentType is provided set it in the header
          if (c.requestContentType)
          {
-            YAHOO.util.Connect.setDefaultPostHeader(false);
+            YAHOO.util.Connect.setDefaultPostHeader(c.requestContentType);
             YAHOO.util.Connect.initHeader("Content-Type", c.requestContentType);
          }
 
