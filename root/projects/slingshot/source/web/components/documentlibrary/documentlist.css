@@ -536,15 +536,27 @@
 {
    background-image: url(images/details-16.png);
 }
+.doclist .folder .onActionDetails a
+{
+   background-image: url(images/folder-view-details-16.png);
+}
 
 .doclist .onActionMetadata a
 {
    background-image: url(images/metadata-16.png);
 }
+.doclist .folder .onActionMetadata a
+{
+   background-image: url(images/folder-edit-metadata-16.png);
+}
 
 .doclist .onActionDelete a
 {
    background-image: url(images/remove-16.png);
+}
+.doclist .folder .onActionDelete a
+{
+   background-image: url(images/folder-delete-16.png);
 }
 
 .doclist .onActionDownload a
@@ -576,10 +588,18 @@
 {
    background-image: url(images/copy-to-16.png);
 }
+.doclist .folder .onActionCopyTo a
+{
+   background-image: url(images/folder-copy-to-16.png);
+}
 
 .doclist .onActionMoveTo a
 {
    background-image: url(images/move-to-16.png);
+}
+.doclist .folder .onActionMoveTo a
+{
+   background-image: url(images/folder-move-to-16.png);
 }
 
 .doclist .onActionRequestUnlock a
@@ -605,6 +625,10 @@
 .doclist .onActionManagePermissions a
 {
    background-image: url(images/permissions-16.png);
+}
+.doclist .folder .onActionManagePermissions a
+{
+   background-image: url(images/folder-manage-permissions-16.png);
 }
 
 .doclist .onActionManageAspects a

@@ -1037,6 +1037,7 @@
             }
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            Dom.addClass(elCell.parentNode, oRecord.getData("type"));
 
             elCell.innerHTML = '<div id="' + scope.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
 
