@@ -344,6 +344,7 @@
                <show id="dl:todoPriority" />
                <show id="dl:todoNotes" />
                <show id="dl:assignee" />
+               <show id="dl:attachments" />
             </field-visibility>
             <create-form template="../data-lists/forms/row-new.ftl" />
             <appearance>
@@ -360,6 +361,7 @@
                <show id="dl:todoDueDate" />
                <show id="dl:todoPriority" />
                <show id="dl:assignee" />
+               <show id="dl:attachments" />
             </field-visibility>
          </form>
       </forms>
@@ -376,6 +378,7 @@
                <show id="dl:todoPriority" />
                <show id="dl:todoNotes" />
                <show id="dl:assignee" />
+               <show id="dl:attachments" />
             </field-visibility>
             <edit-form template="../data-lists/forms/row-edit.ftl" />
             <appearance>

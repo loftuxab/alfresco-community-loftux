@@ -416,7 +416,7 @@
                      switch (datalistColumn.dataType.toLowerCase())
                      {
                         case "cm:person":
-                           html += '<a href="' + Alfresco.component.DataGrid.generateUserProfileUrl(oData.metadata) + '">' + $html(oData.displayValue) + '</a>';
+                           html += '<span class="person"><a href="' + Alfresco.component.DataGrid.generateUserProfileUrl(oData.metadata) + '">' + $html(oData.displayValue) + '</a></span>';
                            break;
                         
                         case "datetime":
@@ -428,13 +428,20 @@
                            break;
                      
                         case "cm:content":
-                           html += $html(oData.displayValue);
-                           break;
-                     
+                        case "cm:cmobject":
                         case "cm:folder":
-                           html += $html(oData.displayValue);
+                           oData = YAHOO.lang.isArray(oData) ? oData : [oData];
+                           for (var i = 0, ii = oData.length, d; i < ii; i++)
+                           {
+                              d = oData[i];
+                              html += '<span class="' + d.metadata + '"><a href="' + Alfresco.constants.URL_PAGECONTEXT + (d.metadata == "container" ? 'folder' : 'document') + '-details?nodeRef=' + d.value + '">' + $html(d.displayValue) + '</a></span>';
+                              if (i < ii - 1)
+                              {
+                                 html += "<br />";
+                              }
+                           }
                            break;
-                     
+
                         default:
                            html += $html(oData.displayValue);
                            break;
@@ -473,6 +480,15 @@
             var fieldA = a.getData().itemData[field],
                fieldB = b.getData().itemData[field];
 
+            if (YAHOO.lang.isArray(fieldA))
+            {
+               fieldA = fieldA[0];
+            }
+            if (YAHOO.lang.isArray(fieldB))
+            {
+               fieldB = fieldB[0];
+            }
+
             // Deal with empty values
             if (!YAHOO.lang.isValue(fieldA))
             {
@@ -485,11 +501,11 @@
             
             var valA = fieldA.value,
                valB = fieldB.value;
-            
+
             if (valA.indexOf && valA.indexOf("workspace://SpacesStore") == 0)
             {
-               valA = fieldA.metadata || fieldA.displayValue;
-               valB = fieldB.metadata || fieldB.displayValue;
+               valA = fieldA.displayValue;
+               valB = fieldB.displayValue;
             }
 
             return YAHOO.util.Sort.compare(valA, valB, desc);
@@ -636,7 +652,7 @@
          
          Alfresco.util.populateHTML(
             [ this.id + "-title", $html(this.datalistMeta.title) ],
-            [ this.id + "-description", $links($html(this.datalistMeta.description)) ]
+            [ this.id + "-description", $links($html(this.datalistMeta.description, true)) ]
          );
       },
 

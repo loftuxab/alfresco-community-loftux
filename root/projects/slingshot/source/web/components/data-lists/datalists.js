@@ -144,7 +144,10 @@
        */
       onReady: function DataLists_onReady()
       {
-         this.widgets.newList = Alfresco.util.createYUIButton(this, "newListButton", this.onNewList);
+         this.widgets.newList = Alfresco.util.createYUIButton(this, "newListButton", this.onNewList,
+         {
+            disabled: true
+         });
          // Retrieve the lists from the specified Site & Container
          this.populateDataLists(
          {
@@ -187,7 +190,7 @@
             
             this.dataLists = {};
             this.containerNodeRef = new Alfresco.util.NodeRef(response.json.container);
-            this.widgets.newList.set("disabled", false);
+            this.widgets.newList.set("disabled", !response.json.permissions.create);
             
             for (var i = 0, ii = lists.length; i < ii; i++)
             {
@@ -282,11 +285,14 @@
           * @method fnEditOnClick
           * @param listName {String} Name of the Data List
           */
-         var fnEditOnClick = function DataLists_renderDataLists_fnEditOnClick(listName)
+         var fnEditOnClick = function DataLists_renderDataLists_fnEditOnClick(listName, enabled)
          {
             return function DataLists_renderDataLists_onEditClick(e)
             {
-               me.onEditList(listName);
+               if (enabled)
+               {
+                  me.onEditList(listName);
+               }
                Event.stopEvent(e);
             };
          };
@@ -296,11 +302,14 @@
           * @method fnDeleteOnClick
           * @param listName {String} Name of the Data List
           */
-         var fnDeleteOnClick = function DataLists_renderDataLists_fnDeleteOnClick(listName)
+         var fnDeleteOnClick = function DataLists_renderDataLists_fnDeleteOnClick(listName, enabled)
          {
             return function DataLists_renderDataLists_onEditClick(e)
             {
-               me.onDeleteList(listName);
+               if (enabled)
+               {
+                  me.onDeleteList(listName);
+               }
                Event.stopEvent(e);
             };
          };
@@ -309,6 +318,7 @@
          {
             var lists = this.dataLists,
                list,
+               permissions,
                elHighlight = null,
                container, el, elEdit, elDelete, elLink, elText;
 
@@ -328,23 +338,40 @@
                   if (lists.hasOwnProperty(index))
                   {
                      list = lists[index];
+                     permissions = list.permissions;
                      
                      // Build the DOM elements
                      el = document.createElement("li");
                      el.onclick = fnOnClick();
                      elEdit = document.createElement("span");
-                     elEdit.className = "edit";
-                     elEdit.title = this.msg("label.edit-list");
-                     elEdit.onclick = fnEditOnClick(list.name);
+                     if (permissions["edit"])
+                     {
+                        elEdit.className = "edit";
+                        elEdit.title = this.msg("label.edit-list");
+                        elEdit.onclick = fnEditOnClick(list.name, true);
+                     }
+                     else
+                     {
+                        elEdit.className = "edit-disabled";
+                        elEdit.onclick = fnEditOnClick(list.name, false);
+                     }
                      elDelete = document.createElement("span");
-                     elDelete.className = "delete";
-                     elDelete.title = this.msg("label.delete-list");
-                     elDelete.onclick = fnDeleteOnClick(list.name);
+                     if (permissions["delete"])
+                     {
+                        elDelete.className = "delete";
+                        elDelete.title = this.msg("label.delete-list");
+                        elDelete.onclick = fnDeleteOnClick(list.name, true);
+                     }
+                     else
+                     {
+                        elDelete.className = "delete-disabled";
+                        elDelete.onclick = fnDeleteOnClick(list.name, false);
+                     }
                      elLink = document.createElement("a");
                      elLink.className = "filter-link";
-                     elLink.title = $html(list.description);
+                     elLink.title = list.description;
                      elLink.href = "data-lists?list=" + $html(list.name);
-                     elText = document.createTextNode($html(list.title));
+                     elText = document.createTextNode(list.title);
 
                      // Build the DOM structure with the new elements
                      elLink.appendChild(elDelete);
@@ -559,8 +586,8 @@
          var doBeforeDialogShow = function DataLists_onEditList_doBeforeDialogShow(p_form, p_dialog)
          {
             Alfresco.util.populateHTML(
-               [ p_dialog.id + "-dialogTitle", this.msg("label.edit-list.title") ],
-               [ p_dialog.id + "-dialogHeader", this.msg("label.edit-list.header") ]
+               [ p_dialog.id + "-dialogTitle", this.msg("message.edit-list.title") ],
+               [ p_dialog.id + "-dialogHeader", this.msg("message.edit-list.header") ]
             );
 
             // Must set a title (UI constraint for usability)
@@ -659,6 +686,7 @@
                      });
                      
                      delete this.dataLists[p_datalist.name];
+                     this.dataListsLength--;
                      this.renderDataLists();
                   },
                   obj: p_datalist,

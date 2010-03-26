@@ -12,8 +12,10 @@
    }).setMessages(${messages});
 //]]></script>
 <div id="${id}-body" class="datagrid">
-   <h2 id="${id}-title"></h2>
-   <div id="${id}-description" class="datagrid-description"></div>
+   <div class="datagrid-meta">
+      <h2 id="${id}-title"></h2>
+      <div id="${id}-description" class="datagrid-description"></div>
+   </div>
    <div id="${id}-datagridBar" class="yui-ge datagrid-bar flat-button">
       <div class="yui-u first align-center">
          <div class="item-select">

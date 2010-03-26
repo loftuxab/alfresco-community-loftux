@@ -9,19 +9,22 @@
    
 }
 
+/* DataGrid Metadata */
+.datagrid .datagrid-meta
+{
+   margin-left: 1em;
+}
+
 /* DataGrid bar */
 
 .datagrid .datagrid-bar
 {
-   background-color: #f8f8f8;
-   border-bottom: 1px dashed #c0c0c0;
    margin: 1em -10px;
    padding: 4px 0.5em 2px;
 }
 
 .datagrid .datagrid-bar-bottom
 {
-   border-top: 1px dashed #d9d9d9;
    margin-top: 2em;
    display: none;
 }
@@ -96,7 +99,7 @@
 
 .datagrid .grid.yui-dt .yui-dt-data td
 {
-   border-bottom: 1px dashed #d9d9d9;
+   border-bottom: 1px solid #f0f0f0;
    vertical-align: top;
 }
 
@@ -132,6 +135,26 @@
    font-weight: bold;
    margin: 1em auto;
    padding: 1em;
+}
+
+/* Data Types */
+
+.datagrid span.person
+{
+   background: url(../images/filetypes/generic-user-16.png) no-repeat;
+   padding-left: 20px;
+}
+
+.datagrid span.container
+{
+   background: url(../images/filetypes/generic-folder-16.png) no-repeat;
+   padding-left: 20px;
+}
+
+.datagrid span.document
+{
+   background: url(../images/filetypes/generic-file-16.png) no-repeat;
+   padding-left: 20px;
 }
 
 /* Actions */
@@ -252,7 +275,7 @@
 
 .datagrid .onActionDuplicate a
 {
-   background-image: url(../images/details-16.png);
+   background-image: url(../images/duplicate-row-16.png);
 }
 
 .datagrid .onActionDelete a
