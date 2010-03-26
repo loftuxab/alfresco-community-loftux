@@ -31,7 +31,7 @@
 {
    background: url(../images/list-16.png) no-repeat 4px 0;
    display: block;
-   margin-left: 16px;
+   margin-left: 14px;
    padding: 0 0 0 24px;
 }
 
@@ -49,9 +49,17 @@
 {
    background: url("../images/edit-16.png") no-repeat;
 }
+.datalists li a span.edit-disabled
+{
+   background: url("../images/edit-disabled-16.png") no-repeat;
+}
 .datalists li a span.delete
 {
    background: url("../images/delete-16.png") no-repeat;
+}
+.datalists li a span.delete-disabled
+{
+   background: url("../images/delete-disabled-16.png") no-repeat;
 }
 .datalists li a:active span,
 .datalists li a:hover span

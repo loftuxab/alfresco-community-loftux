@@ -800,24 +800,27 @@ Alfresco.util.decodeHTML = function(html)
  *
  * @method Alfresco.util.encodeHTML
  * @param text {string} The string to be encoded
+ * @param justified {boolean} If true, don't render lines 2..n with an indent
  * @return {string} Safe HTML string
  * @static
  */
-Alfresco.util.encodeHTML = function(text)
+Alfresco.util.encodeHTML = function(text, justified)
 {
    if (text === null || typeof text == "undefined")
    {
       return "";
    }
    
+   var indent = justified === true ? "" : "&nbsp;&nbsp;&nbsp;";
+   
    if (YAHOO.env.ua.ie > 0)
    {
       text = "" + text;
-      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;");
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />" + indent);
    }
    var me = arguments.callee;
    me.text.data = text;
-   return me.div.innerHTML.replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;").replace('"','&quot;');
+   return me.div.innerHTML.replace(/\n/g, "<br />" + indent).replace('"','&quot;');
 };
 Alfresco.util.encodeHTML.div = document.createElement("div");
 Alfresco.util.encodeHTML.text = document.createTextNode("");
