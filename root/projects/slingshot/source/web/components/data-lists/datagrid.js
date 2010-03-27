@@ -413,43 +413,41 @@
                   var datalistColumn = scope.datalistColumns[oColumn.key];
                   if (datalistColumn)
                   {
-                     switch (datalistColumn.dataType.toLowerCase())
+                     oData = YAHOO.lang.isArray(oData) ? oData : [oData];
+                     for (var i = 0, ii = oData.length, data; i < ii; i++)
                      {
-                        case "cm:person":
-                           html += '<span class="person"><a href="' + Alfresco.component.DataGrid.generateUserProfileUrl(oData.metadata) + '">' + $html(oData.displayValue) + '</a></span>';
-                           break;
-                        
-                        case "datetime":
-                           html += Alfresco.util.formatDate(Alfresco.util.fromISO8601(oData.value), scope.msg("date-format.default"));
-                           break;
-                     
-                        case "date":
-                           html += Alfresco.util.formatDate(Alfresco.util.fromISO8601(oData.value), scope.msg("date-format.defaultDateOnly"));
-                           break;
-                     
-                        case "cm:content":
-                        case "cm:cmobject":
-                        case "cm:folder":
-                           oData = YAHOO.lang.isArray(oData) ? oData : [oData];
-                           for (var i = 0, ii = oData.length, d; i < ii; i++)
-                           {
-                              d = oData[i];
-                              html += '<span class="' + d.metadata + '"><a href="' + Alfresco.constants.URL_PAGECONTEXT + (d.metadata == "container" ? 'folder' : 'document') + '-details?nodeRef=' + d.value + '">' + $html(d.displayValue) + '</a></span>';
-                              if (i < ii - 1)
-                              {
-                                 html += "<br />";
-                              }
-                           }
-                           break;
+                        data = oData[i];
 
-                        default:
-                           html += $html(oData.displayValue);
-                           break;
+                        switch (datalistColumn.dataType.toLowerCase())
+                        {
+                           case "cm:person":
+                              html += '<span class="person"><a href="' + Alfresco.component.DataGrid.generateUserProfileUrl(data.metadata) + '">' + $html(data.displayValue) + '</a></span>';
+                              break;
+                        
+                           case "datetime":
+                              html += Alfresco.util.formatDate(Alfresco.util.fromISO8601(data.value), scope.msg("date-format.default"));
+                              break;
+                     
+                           case "date":
+                              html += Alfresco.util.formatDate(Alfresco.util.fromISO8601(data.value), scope.msg("date-format.defaultDateOnly"));
+                              break;
+                     
+                           case "cm:content":
+                           case "cm:cmobject":
+                           case "cm:folder":
+                              html += '<span class="' + data.metadata + '"><a href="' + Alfresco.constants.URL_PAGECONTEXT + (data.metadata == "container" ? 'folder' : 'document') + '-details?nodeRef=' + data.value + '">' + $html(data.displayValue) + '</a></span>';
+                              break;
+
+                           default:
+                              html += $html(data.displayValue);
+                              break;
+                        }
+
+                        if (i < ii - 1)
+                        {
+                           html += "<br />";
+                        }
                      }
-                  }
-                  else
-                  {
-                     html = $html(oData.displayValue);
                   }
                }
             }
