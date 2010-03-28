@@ -464,7 +464,10 @@ Alfresco.util.combinePaths = function()
    var path = "", i, ii;
    for (i = 0, ii = arguments.length; i < ii; i++)
    {
-      path += arguments[i] + (arguments[i] !== "/" ? "/" : "");
+      if (arguments[i])
+      {
+         path += arguments[i] + (arguments[i] !== "/" ? "/" : "");
+      }
    }
    return path.substring(0, path.length - 1).replace(/(^|[^:])\/{2,}/g, "$1/");
 };

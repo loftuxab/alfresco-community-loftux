@@ -32,7 +32,7 @@
 .rule-edit .form-field
 {
    float: left;
-   width: 31em;
+   width: 29em;
 }
 
 .rule-edit .rule-form input[type=text]
@@ -66,28 +66,27 @@
 
 .rule-edit h2,
 .rule-edit .form-field.description,
-.rule-edit .form-field.executeAsynchronously,
-.rule-edit .form-field.scriptLocation,
+.rule-edit .form-field.applyToChildren,
 .rule-edit .main-buttons
 {
    clear: both;
 }
 
-.rule-edit .form-field.disabled
-{
-   padding-bottom: 1em;
-}
-
-.rule-edit .form-field.title,
-.rule-edit .form-field.executeAsynchronously
+.rule-edit .form-field.title
 {
    padding-bottom: 0.5em;
+}
+
+.rule-edit .form-field.scriptLocation,
+.rule-edit .form-field.applyToChildren
+{
+   min-height: 2.5em;
+   line-height: 2.5em;
 }
 
 .rule-edit .form-field.scriptLocation
 {
    margin-left: 1.6em;
-   width: 40em;
 }
 
 .rule-edit .main-buttons

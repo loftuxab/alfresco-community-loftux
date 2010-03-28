@@ -59,6 +59,19 @@ function processScriptConfig(xmlConfig)
    model.customisationsMap = jsonUtils.toJSONString(customisationsMap);
 }
 
+function processGlobalConfig()
+{
+   // Repository Library root node
+   var rootNode = "alfresco://company/home",
+      repoConfig = config.scoped["RepositoryLibrary"]["root-node"];
+   if (repoConfig !== null)
+   {
+      rootNode = repoConfig.value;
+   }
+
+   model.rootNode = rootNode;
+}
+
 function loadRuleConfigDefinitions(xmlConfig)
 {
    // Set the type of the config

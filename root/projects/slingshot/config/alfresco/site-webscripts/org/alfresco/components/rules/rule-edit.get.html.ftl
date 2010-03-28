@@ -62,13 +62,13 @@
             <input id="${el}-disabled" type="checkbox" title="${msg("label.disabled")}" name="disabled" value="true"/>
             <label for="${el}-disabled">${msg("label.disabled")}</label>
          </div>
-         <div class="form-field applyToChildren">
-            <input id="${el}-applyToChildren" type="checkbox" title="${msg("label.applyToChildren")}" name="applyToChildren" value="true"/>
-            <label for="${el}-applyToChildren">${msg("label.applyToChildren")}</label>
-         </div>
          <div class="form-field executeAsynchronously">
             <input id="${el}-executeAsynchronously" type="checkbox" title="${msg("label.executeAsynchronously")}" name="executeAsynchronously" value="true"/>
             <label for="${el}-executeAsynchronously">${msg("label.executeAsynchronously")}</label>
+         </div>
+         <div class="form-field applyToChildren">
+            <input id="${el}-applyToChildren" type="checkbox" title="${msg("label.applyToChildren")}" name="applyToChildren" value="true"/>
+            <label for="${el}-applyToChildren">${msg("label.applyToChildren")}</label>
          </div>
          <div class="form-field scriptLocation">
             <input id="${el}-compensatingActionId" type="hidden" name="action.compensatingAction.id" value="">
