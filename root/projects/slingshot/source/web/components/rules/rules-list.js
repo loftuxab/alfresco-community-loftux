@@ -496,9 +496,9 @@
                a.href = url;
                a.innerHTML = $html(rule.owningNode.name);
                Event.addListener(a, "click", function (e, u)
-               {
+               {                  
                   document.location.href = u;
-               }, this, url);
+               }, url, this);
             }
          }
 

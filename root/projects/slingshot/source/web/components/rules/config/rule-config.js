@@ -110,6 +110,14 @@
          siteId: "",
 
          /**
+          * Repository's rootNode
+          *
+          * @property rootNode
+          * @type Alfresco.util.NodeRef
+          */
+         rootNode: null,
+
+         /**
           * Set to:
           * - "text" for non editable text representation
           * - "edit" for editable form inputs
@@ -1610,52 +1618,15 @@
        */
       _createPathSpan: function (containerEl, configDef, paramDef, id, nodeRef)
       {
-         var url = nodeRef ? Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + nodeRef.replace("://", "/") : null;
-         return this._createResolvableValueSpan(containerEl, id, Alfresco.util.Ajax.GET, url, null, function (json)
+         var pathEl = document.createElement("span");
+         Alfresco.util.setDomId(pathEl, id);
+         containerEl.appendChild(pathEl);
+         new Alfresco.Location(pathEl).setOptions(
          {
-            var location = json.item.location;
-            return this._buildPathSpanHtml($combine(location.path, location.file), location.site, location.siteTitle);
-         });
-      },
-
-      /**
-       * Create html that represent a path and site
-       *
-       * @method _buildPathSpanHtml
-       * @param fullPath
-       * @param siteId
-       * @param siteTitle
-       * @return {string} html respresenting path and site as span elements
-       */
-      _buildPathSpanHtml: function (fullPath, siteId, siteTitle)
-      {
-         var i = fullPath.lastIndexOf("/"),
-            path = i >= 0 ? fullPath.substring(0, i + 1) : "",
-            name = i >= 0 ? fullPath.substring(i + 1) : fullPath,
-            siteHtml;
-         fullPath = siteId ? this.msg("label.documents") + fullPath : fullPath;
-         if (siteId)
-         {
-            if (name == "" && path == "/")
-            {
-               name = this.msg("label.documents");
-            }
-            else
-            {
-               name = ".../" + name;
-            }
-         }
-         else
-         {
-            name = (path != "/" ? ".../" : "/") + name;
-         }
-
-         if (siteId && siteId != this.options.siteId)
-         {
-            siteHtml = " " + this.msg("label.in") + '<span class="site" title="' + this.msg("tooltip.site", siteTitle ? siteTitle : siteId) + '">' + $html(siteTitle ? siteTitle : siteId) + '</span>';
-         }
-         var pathHtml = '<span class="path" title="' + this.msg("tooltip.path", fullPath) + '">' + $html(name) + '</span>';
-         return pathHtml  + (siteHtml ? siteHtml : "");
+            siteId: this.options.siteId,
+            rootNode: this.options.rootNode
+         }).displayByNodeRef(nodeRef);
+         return pathEl;
       },
 
       /**

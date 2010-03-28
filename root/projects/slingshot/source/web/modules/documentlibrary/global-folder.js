@@ -146,7 +146,20 @@
           * @default ""
           */
          path: "",
-
+         
+         /**
+          * Initial node to expand on module load.
+          * 
+          * If given this module will make a call to repo and find the path for the node and figure
+          * out if its inside a site or not. If inside a site the site view mode  will be used, otherwise
+          * it will switch to repo mode.
+          *
+          * @property pathNodeRef
+          * @type string
+          * @default ""
+          */
+         pathNodeRef: null,                  
+               
          /**
           * Width for the dialog
           *
@@ -266,7 +279,7 @@
          else
          {
             // Show the dialog
-            this._showDialog();
+            this._beforeShowDialog();
          }
       },
       
@@ -423,9 +436,64 @@
          };
 
          // Show the dialog
-         this._showDialog();
+         this._beforeShowDialog();
       },
-      
+
+      /**
+       * Internal function called before show dialog function so additional information may be loaded
+       * before _showDialog (which might be overriden) is called.
+       *
+       * @method _beforeShowDialog
+       */
+      _beforeShowDialog: function DLGF__beforeShowDialog()
+      {
+         if (this.options.pathNodeRef)
+         {
+            // If pathNodeRef is given the user of this component doesn't know what viewmode to display
+            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + this.options.pathNodeRef.uri + "/path";
+            if (this.options.nodeRef)
+            {
+               // Repository mode
+               url += "?libraryRoot=" + encodeURIComponent(this.options.nodeRef.toString());
+            }
+            Alfresco.util.Ajax.jsonGet(
+            {
+               url: url,
+               successCallback:
+               {
+                  fn: function(response)
+                  {
+                     if (response.json !== undefined)
+                     {
+                        var locations = response.json;
+                        if (locations.site)
+                        {
+                           this.options.viewMode = DLGF.VIEW_MODE_SITE;
+                           this.options.path = $combine(locations.site.path, locations.site.file);
+                           this.options.siteId = locations.site.site;
+                           this.options.siteTitle = locations.site.siteTitle;
+                        }
+                        else
+                        {
+                           this.options.viewMode = DLGF.VIEW_MODE_REPOSITORY;
+                           this.options.path = $combine(locations.repo.path, locations.repo.file);
+                           this.options.siteId = null;
+                           this.options.siteTitle = null;
+                        }
+                        this._showDialog();
+                     }
+                  },
+                  scope: this
+               },
+               failureMessage: this.msg("message.failure")
+            });
+         }
+         else
+         {
+            this._showDialog();
+         }
+      },
+
       /**
        * Internal show dialog function
        * @method _showDialog
@@ -472,6 +540,7 @@
             {
                if (modeButton.get("checked"))
                {
+                  // Will trigger the path expansion
                   this.setViewMode(viewMode);
                }
                else
@@ -501,11 +570,6 @@
          // Show the dialog
          this.widgets.escapeListener.enable();
          this.widgets.dialog.show();
-
-         if (this.options.path)
-         {
-            this.onPathChanged(this.options.path);
-         }         
       },
       
       /**
@@ -528,7 +592,7 @@
             Dom.addClass(this.id + "-wrapper", "repository-mode");
             // Build the TreeView widget
             this._buildTree(this.options.nodeRef);
-            this.onPathChanged("/");
+            this.onPathChanged(this.options.path ? this.options.path : "/");
          }
       },
 
@@ -761,7 +825,7 @@
        */
       onPathChanged: function DLGF_onPathChanged(path)
       {
-         Alfresco.logger.debug("DLGF_onPathChanged");
+         Alfresco.logger.debug("DLGF_onPathChanged:" + path);
 
          // ensure path starts with leading slash if not the root node
          if (path.charAt(0) != "/")
@@ -802,10 +866,10 @@
          for (var i = 0, j = paths.length; i < j; i++)
          {
             // Push the path onto the list of paths to be expanded
-            expandPath = $combine(expandPath, paths[i]);
+            expandPath = $combine("/", expandPath, paths[i]);
             this.pathsToExpand.push(expandPath);
          }
-
+         Alfresco.logger.debug("DLGF_onPathChanged paths to expand:" + this.pathsToExpand.join(","));
          // Kick off the expansion process by expanding the first unexpanded path
          do
          {
@@ -875,8 +939,8 @@
             // Select current site, or first site retrieved
             YAHOO.Bubbling.fire("siteChanged",
             {
-               site: (this.options.siteId.length > 0) ? this.options.siteId : firstSite.shortName,
-               siteTitle: (this.options.siteId.length > 0) ? this.options.siteTitle : firstSite.title,
+               site: (this.options.siteId && this.options.siteId.length > 0) ? this.options.siteId : firstSite.shortName,
+               siteTitle: (this.options.siteId && this.options.siteId.length > 0) ? this.options.siteTitle : firstSite.title,
                eventGroup: this,
                scrollTo: true
             });

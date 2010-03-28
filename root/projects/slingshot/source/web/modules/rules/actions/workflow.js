@@ -97,6 +97,14 @@
          siteId: "",
 
          /**
+          * Repository's rootNode
+          *
+          * @property rootNode
+          * @type Alfresco.util.NodeRef
+          */
+         rootNode: null,
+
+         /**
           * ContainerId representing root container in site view mode
           *
           * @property containerId
@@ -200,6 +208,13 @@
          // Create and render the YUI dialog
          this.widgets.dialog = Alfresco.util.createYUIPanel(dialogDiv);
 
+         this.widgets.destinationLocation = new Alfresco.Location(this.id + "-destinationLabel");
+         this.widgets.destinationLocation.setOptions(
+         {
+            siteId: this.options.siteId,
+            rootNode: this.options.rootNode
+         });
+
          // Buttons (note: ok button's click will be handled in forms onBeforeAjaxSubmit)
          this.widgets.selectDestinationButton = Alfresco.util.createYUIButton(this, "selectDestination-button", this.onSelectDestinationClick);
          this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
@@ -291,46 +306,14 @@
          Alfresco.util.setSelectedIndex(Dom.get(this.id + "-action"), workflowConfig.action);
 
          // Destination picker
-         Dom.get(this.id + "-nodeRef").value = workflowConfig.nodeRef ? workflowConfig.nodeRef : "";
-         if (!workflowConfig.path && workflowConfig.nodeRef)
-         {
-            // Find the path for the nodeRef
-            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + workflowConfig.nodeRef.uri;
-            if (this.options.siteId == "")
-            {
-               // Repository mode
-               url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
-            }
-            Alfresco.util.Ajax.jsonGet(
-            {
-               url: url,
-               successCallback:
-               {
-                  fn: function(response)
-                  {
-                     if (response.json !== undefined)
-                     {
-                        var folderDetails = response.json.item;
-                        Dom.get(this.id + "-path").value = folderDetails.path ? folderDetails.path : "";
-                        var paths = folderDetails.path.split("/");
-                        Dom.get(this.id + "-destinationLabel").innerHTML = paths.length > 1 ? paths.pop() : "/";
-                     }
-                  },
-                  scope: this
-               },
-               failureMessage: "Failed to load data for folder details"
-            });
-         }
-         else
-         {
-            Dom.get(this.id + "-path").value = "";
-            Dom.get(this.id + "-destinationLabel").innerHTML = this.msg("label.none");
-         }
+         Dom.get(this.id + "-nodeRef").value = workflowConfig.nodeRef ? workflowConfig.nodeRef.toString() : "";
+         this.widgets.destinationLocation.displayByNodeRef(workflowConfig.nodeRef);
 
          // Update submit elements & show the dialog
          this.widgets.form.updateSubmitElements();
          this.widgets.dialog.show();
       },
+
 
       /**
        * YUI WIDGET EVENT HANDLERS
@@ -354,14 +337,16 @@
             {
                siteId: this.options.siteId,
                containerId: this.options.containerId,
-               title: this.msg("title.destinationDialog")
+               title: this.msg("title.destinationDialog"),
+               nodeRef: this.options.rootNode
             });
          }
 
          // Make sure correct path is expanded
+         var pathNodeRef = Dom.get(this.id + "-nodeRef").value;
          this.widgets.destinationDialog.setOptions(
          {
-            path: Dom.get(this.id + "-path").value
+            pathNodeRef: pathNodeRef ? new Alfresco.util.NodeRef(pathNodeRef) : null              
          });
 
          // Show dialog
@@ -386,9 +371,7 @@
             if (obj !== null)
             {
                Dom.get(this.id + "-nodeRef").value = obj.selectedFolder.nodeRef;
-               Dom.get(this.id + "-path").value = obj.selectedFolder.path;
-               var paths = obj.selectedFolder.path.split("/");
-               Dom.get(this.id + "-destinationLabel").innerHTML = paths.length > 1 ? paths.pop() : "/";
+               this.widgets.destinationLocation.displayByNodeRef(obj.selectedFolder.nodeRef);
             }
             this.widgets.form.updateSubmitElements();
          }

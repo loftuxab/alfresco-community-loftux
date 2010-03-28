@@ -589,6 +589,29 @@ body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel-disab
 
 /*end YUI Menu */
 
+/* Location */
+
+.yui-skin-yellowTheme .location-path,
+.yui-skin-yellowTheme .location-site
+{
+   background-position: left 50%;
+   background-repeat: no-repeat;
+   padding: 2px 0 2px 20px;
+}
+
+.yui-skin-yellowTheme .location-path
+{
+   background-image: url(../../components/documentlibrary/images/folder-closed-16.png);
+   margin-left: 0.5em;
+}
+
+.yui-skin-yellowTheme .location-site
+{
+   background-image: url(../../components/images/site-16.png);
+}
+
+/* end Location*/
+
 /* Doclist */
 
 body.yui-skin-yellowTheme .doclist .more-actions a:active,

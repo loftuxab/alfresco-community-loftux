@@ -7,6 +7,7 @@
       <#if (customisationsMap??)>customisationsMap: ${customisationsMap},</#if>
       <#if (constraints??)>constraints: ${constraints},</#if>
       <#if (constraintsFilter??)>constraintsFilter: ${constraintsFilter},</#if>      
+      <#if (rootNode??)>rootNode: "${rootNode}",</#if>
       ruleConfigType: "${ruleConfigType}",
       siteId: "${args.site!""}"
    }).setMessages(

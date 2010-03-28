@@ -325,6 +325,12 @@
                   rfd._type = "path";
                   rfd._hideColon = true;
                }
+               else
+               {
+                  this._getParamDef(configDef, "reject-step")._type = "hidden";
+                  this._getParamDef(configDef, "reject-move")._type = "hidden";
+                  this._getParamDef(configDef, "reject-folder")._type = "hidden";
+               }
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -400,11 +406,9 @@
             },
             edit: function(configDef, ruleConfig, configEl)
             {
-               // Hide all parameters but mime-type
+               // Hide all parameters but mime-type adn set mandatory values
                this._hideParameters(configDef.parameterDefinitions);
                this._getParamDef(configDef, "mime-type")._type = null;
-
-               // todo set appropriate values when known OR hide if they aren't mandatory
                this._setParameter(ruleConfig, "assoc-type", "cm:contains");
                this._setParameter(ruleConfig, "assoc-name", "cm:copy");
 
@@ -564,8 +568,7 @@
                      this.widgets.destinationDialog = new Alfresco.module.DoclibGlobalFolder(this.id + "-destinationDialog");
                      this.widgets.destinationDialog.setOptions(
                      {
-                        title: this.msg("dialog.destination.title"),
-                        viewMode: (this.options.siteId && this.options.siteId !== "") ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY
+                        title: this.msg("dialog.destination.title")
                      });
 
                      YAHOO.Bubbling.on("folderSelected", function (layer, args)
@@ -575,24 +578,19 @@
                            var selectedFolder = args[1].selectedFolder;
                            if (selectedFolder !== null)
                            {
-                              var ctx = this.renderers["arca:destination-dialog-button"].currentCtx,
-                                 path = selectedFolder.path;
+                              var ctx = this.renderers["arca:destination-dialog-button"].currentCtx;
                               this._setHiddenParameter(ctx.configDef, ctx.ruleConfig, ctx.paramDef._destinationParam, selectedFolder.nodeRef);
-                              if (selectedFolder.siteId !== undefined)
-                              {
-                                 path = this.msg("label.site-path", selectedFolder.siteId, selectedFolder.path);
-                              }
-                              Dom.get(this.id + "-" + ctx.configDef._id + "-destinationLabel").innerHTML = this._buildPathSpanHtml(selectedFolder.path, selectedFolder.siteId, selectedFolder.siteTitle);
+                              Alfresco.util.ComponentManager.get(this.id + "-" + ctx.configDef._id + "-destinationLabel").displayByPath(selectedFolder.path, selectedFolder.siteId, selectedFolder.siteTitle);
                               this._updateSubmitElements(ctx.configDef);
                            }
                         }
                      }, this);
                   }
-                  var path = Dom.get(this.id + "-" + obj.configDef._id + "-destinationLabel").innerHTML;
+                  var pathNodeRef = this._getParameters(obj.configDef)["destination-folder"];
                   this.widgets.destinationDialog.setOptions(
                   {
-                     siteId: this.options.siteId,
-                     path: (path != this.msg("label.none") ? path : "")  
+                     nodeRef: this.options.rootNode,
+                     pathNodeRef: pathNodeRef ? new Alfresco.util.NodeRef(pathNodeRef) : null
                   });
                   this.widgets.destinationDialog.showDialog();
                });
@@ -651,7 +649,9 @@
                   }
                   var viewMode = obj.paramDef._mode;
                   this.widgets.simpleWorkflowDialog.setOptions({
-                     viewMode: viewMode
+                     viewMode: viewMode,
+                     siteId: this.options.siteId,
+                     rootNode: this.options.rootNode
                   });
                   var params = this._getParameters(obj.configDef),
                      RWA = Alfresco.module.RulesWorkflowAction,
@@ -660,7 +660,7 @@
                   {
                      label: params[prefix + "-step"],
                      action: (params[prefix + "-move"] == "true" ? "move" : "copy"),
-                     nodeRef: params[prefix + "-folder"]
+                     nodeRef: params[prefix + "-folder"] ? new Alfresco.util.NodeRef(params[prefix + "-folder"]) : null
                   });
                });
 

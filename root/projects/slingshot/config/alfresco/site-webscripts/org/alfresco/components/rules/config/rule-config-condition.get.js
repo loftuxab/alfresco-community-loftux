@@ -5,6 +5,7 @@ function main()
 {
    var c = new XML(config.script);
    processScriptConfig(c);
+   processGlobalConfig();
 
    // Load rule config definitions, or in this case "ActionConditionDefinition:s"
    var actionConditionDefinitions = loadRuleConfigDefinitions(c);

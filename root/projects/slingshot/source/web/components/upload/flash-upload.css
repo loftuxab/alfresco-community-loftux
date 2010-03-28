@@ -80,25 +80,25 @@
 
 /* Add some padding to the file list so it looks centered */
 
-.yui-skin-default .yui-panel .bd .fileUpload-filelist-table
+.flash-upload .bd .fileUpload-filelist-table
 {
    padding: 0.8em;
 }
 
 /* Remove the padding inherited from the panel for divs in the file list */
 
-.fileUpload-filelist-table div.yui-dt-hd
+.flash-upload .fileUpload-filelist-table div.yui-dt-hd
 {
    height: 0;
    padding: 0;
 }
 
-.fileUpload-filelist-table tbody.yui-dt-message td
+.flash-upload .fileUpload-filelist-table tbody.yui-dt-message td
 {
    border: none;
 }
 
-.fileUpload-filelist-table tbody.yui-dt-message tr td div.yui-dt-empty
+.flash-upload .fileUpload-filelist-table tbody.yui-dt-message tr td div.yui-dt-empty
 {
    border: none;
    padding: 0.5em !important;
@@ -106,7 +106,7 @@
 
 /* Create a visible gray line beneath each row */
 
-.fileUpload-filelist-table tbody .yui-dt-liner
+.flash-upload .fileUpload-filelist-table tbody .yui-dt-liner
 {
    border-bottom-style: solid;
    border-bottom-color: #CBCBCB;
@@ -118,14 +118,14 @@
 
 /* Width of the file list - needs to override YUI element style setting */
 
-.fileUpload-filelist-table .yui-dt table
+.flash-upload .fileUpload-filelist-table .yui-dt table
 {
    width: 620px !important;
 }
 
 /* Hide the table header */
 
-.fileUpload-filelist-table .yui-dt table thead
+.flash-upload .fileUpload-filelist-table .yui-dt table thead
 {
    display: none;
 }
@@ -142,7 +142,7 @@
  * If the outer element also has "position: relative;" it works though.
  */
 
-.fileUpload-filelist-table .yui-dt-bd
+.flash-upload .fileUpload-filelist-table .yui-dt-bd
 {
    position: relative;
    width: 620px;
@@ -151,27 +151,27 @@
 
 /* Style left column and its elements */
 
-.fileUpload-filelist-table tbody .col-left
+.flash-upload .fileUpload-filelist-table tbody .col-left
 {
    height: 40px;
    width: 100px;
 }
 
-.fileupload-left-div
+.flash-upload .fileupload-left-div
 {
    text-align: center;
    height: 40px;
    background-color: #FAF9F9;
 }
 
-.fileupload-percentage-span
+.flash-upload .fileupload-percentage-span
 {
    font-weight: bold;
    font-size: 123.1%;
    line-height: 2.5em;
 }
 
-.fileupload-contentType-menu
+.flash-upload .fileupload-contentType-menu
 {
    position: relative;
    top: 10px;
@@ -179,30 +179,30 @@
 
 /* Style center column and its elements */
 
-.fileUpload-filelist-table tbody .col-center
+.flash-upload .fileUpload-filelist-table tbody .col-center
 {
    height: 40px;
    width: 400px;
 }
 
-.fileupload-center-div
+.flash-upload .fileupload-center-div
 {
    background-color: #FFFFFF;
    position: relative;
    height: 40px;
-   padding: 0px 0px 0px 0px;
-   margin: 0px;
+   padding: 0;
+   margin: 0;
    overflow: hidden;
 }
 
-.fileupload-docImage-img
+.flash-upload .fileupload-docImage-img
 {
    position: absolute;
    left: 5px;
    top: 4px;
 }
 
-.fileupload-progressInfo-span
+.flash-upload .fileupload-progressInfo-span
 {
    position: absolute;
    left: 40px;
@@ -211,9 +211,9 @@
    font-size: 108%;
 }
 
-.fileupload-center-div .fileupload-progressSuccess-span,
-.fileupload-center-div .fileupload-progressFailure-span,
-.fileupload-center-div .fileupload-progressFinished-span
+.flash-upload .fileupload-center-div .fileupload-progressSuccess-span,
+.flash-upload .fileupload-center-div .fileupload-progressFailure-span,
+.flash-upload .fileupload-center-div .fileupload-progressFinished-span
 {
    position: absolute;
    top: 0px;
@@ -222,43 +222,43 @@
    width: 400px;
 }
 
-.fileupload-center-div .fileupload-progressSuccess-span
+.flash-upload .fileupload-center-div .fileupload-progressSuccess-span
 {
    background-color: #9AC68C;
 }
 
-.fileupload-center-div .fileupload-progressFinished-span
+.flash-upload .fileupload-center-div .fileupload-progressFinished-span
 {
    background-color: #DCECCC;
 }
 
-.fileupload-center-div .fileupload-progressFailure-span
+.flash-upload .fileupload-center-div .fileupload-progressFailure-span
 {
    background-color: #E98B3C;
 }
 
 /* Style right column and its elements */
 
-.fileUpload-filelist-table tbody .col-right,
-.fileUpload-filelist-table tbody .col-right div.fileupload-right-div
+.flash-upload .fileUpload-filelist-table tbody .col-right,
+.flash-upload .fileUpload-filelist-table tbody .col-right div.fileupload-right-div
 {
    height: 40px;
    width: 130px;
 }
 
-.fileupload-right-div
+.flash-upload .fileupload-right-div
 {
    text-align: center;
    height: 40px;
 }
 
-.fileUpload-filelist-table tbody .col-right
+.flash-upload .fileUpload-filelist-table tbody .col-right
 {
    background-color: #FAF9F9;
    border-style: none;
 }
 
-.fileupload-fileButton-span
+.flash-upload .fileupload-fileButton-span
 {
    position: relative;
    top: 7px;
@@ -270,14 +270,14 @@
    background: url(../images/remove-16.png) 10% 50% no-repeat;
 }
 
-.yui-skin-default .fileUpload-filelist-table.yui-dt.yui-dt-scrollable tbody.yui-dt-data tr.yui-dt-last td
+.flash-upload .fileUpload-filelist-table.yui-dt.yui-dt-scrollable tbody.yui-dt-data tr.yui-dt-last td
 {
    border-bottom: medium none;
 }
 
 /* General styling */
 
-.yui-panel-container .flash-upload
+.flash-upload
 {
    width: 640px;
 }

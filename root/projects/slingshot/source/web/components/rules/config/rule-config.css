@@ -139,25 +139,6 @@
    padding: 0.25em;
 }
 
-.rule-config .rule-config-body .parameters .path,
-.rule-config .rule-config-body .parameters .site
-{
-   background-position: left 50%;
-   background-repeat: no-repeat;
-   padding: 2px 0 2px 20px;
-}
-
-.rule-config .rule-config-body .parameters .path
-{
-   background-image: url(../../documentlibrary/images/folder-closed-16.png);
-}
-
-.rule-config .rule-config-body .parameters .site
-{
-   background-image: url(../../images/site-16.png);
-   margin-left:0.5em;
-}
-
 .rule-config .rule-config-body .parameters .paramtype_d_date     input.datepicker-date,
 .rule-config .rule-config-body .parameters .paramtype_d_datetime input.datepicker-date
 {
