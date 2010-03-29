@@ -1040,13 +1040,13 @@
          <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/error/AlfrescoRuntimeException.class" />
          <fileset dir="${dir.project.core.classes}" 
+                  includes="org/alfresco/util/Pair.class" />
+         <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/util/VersionNumber.class" />
          <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
                   includes="org/springframework/extensions/surf/util/I18NUtil.class" />
          <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
                   includes="org/springframework/extensions/surf/util/ISO8601DateFormat.class" />
-         <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
-                  includes="org/springframework/extensions/surf/util/Pair.class" />
          <fileset dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" 
                            includes="org/springframework/extensions/surf/exception/PlatformRuntimeException.class" />
          <fileset dir="${dir.project.repository.classes}" 
