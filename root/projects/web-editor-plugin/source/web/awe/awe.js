@@ -403,7 +403,7 @@
       
       onHelp: function AWE_onHelp()
       {
-         window.open('http://www.alfresco.com/help/32/labs/sharehelp/','wefhelp');
+         window.open('http://www.alfresco.com/help/33/community/webeditor/','wefhelp');
       },
 
       onQuickEditMouseOver: function AWE_onQuickEditMouseOver(e, args)
