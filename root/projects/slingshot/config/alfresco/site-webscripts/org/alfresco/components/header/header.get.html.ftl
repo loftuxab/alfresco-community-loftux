@@ -17,10 +17,11 @@
    Alfresco.util.createTwister.collapsed = "${collapsedTwisters?html}"
 //]]></script>
 </#if>
+<#assign logo=msg("header.logo")><#if logo="header.logo"><#assign logo="app-logo.png"></#if>
 <div class="header">
    <div class="logo-wrapper">
       <div class="logo">
-         <img src="${url.context}/themes/${theme}/images/app-logo.png" alt="Alfresco Share" />
+         <img src="${url.context}/themes/${theme}/images/${logo}" alt="Alfresco Share" />
       </div>
    </div>
 
