@@ -165,7 +165,7 @@
                   {
                      if (this.widgets.spanEl)
                      {
-                        this.widgets.spanEl.innerHTML = this.msg("message.failure");
+                        this.widgets.spanEl.innerHTML = '<span class="location error">' + this.msg("message.failure") + '</span>';
                      }
                   },
                   scope: this
@@ -174,7 +174,7 @@
          }
          else
          {
-            this.widgets.spanEl.innerHTML = this.msg("location.label.none");
+            this.widgets.spanEl.innerHTML = '<span class="location-none">' + this.msg("location.label.none") + '</span>';
          }
       },
 
