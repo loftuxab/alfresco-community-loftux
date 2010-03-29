@@ -86,6 +86,7 @@
 .header div.logo
 {
    float: left;
+   height: 48px;
 }
 
 .header div.personal-menu
