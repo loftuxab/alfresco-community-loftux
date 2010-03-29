@@ -8,7 +8,7 @@
       -->
       <remove>
          <action name="copy-to-web-project"/>
-         <action name="transfer-this-tree"/>                                              share
+         <action name="transfer-this-tree"/>                                              
          <action name="transfer-this-node"/>
          <action name="blog-post"/>
          <action name="create-transfer-target"/>
@@ -86,7 +86,7 @@
       <action name="copy">Copy</action>
       <action name="move">Move</action>
       <action name="simple-workflow">SimpleWorkflow</action>
-      <action name="mail">SendAnEmail</action>
+      <action name="mail">Mail</action>
       <action name="link-category">LinkCategory</action>
       <action name="script">Script</action>
       <action name="transform">Transform</action>

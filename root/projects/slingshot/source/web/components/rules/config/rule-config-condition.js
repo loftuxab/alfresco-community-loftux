@@ -773,11 +773,6 @@
           */
          HasAspect:
          {
-            text: function(configDef, ruleConfig, configEl)
-            {
-               this._quoteAndHideLabel(configDef, "aspect");
-               return configDef;
-            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
@@ -793,11 +788,6 @@
           */
          IsSubType:
          {
-            text: function(configDef, ruleConfig, configEl)
-            {
-               this._quoteAndHideLabel(configDef, "type");
-               return configDef;
-            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Limit the available types to the ones specified in share-config.xml
@@ -816,9 +806,7 @@
          {
             text: function(configDef, ruleConfig, configEl)
             {
-               this._getParamDef(configDef, "category-aspect")._type = "hidden";
                this._getParamDef(configDef, "category-value")._type = "category";
-               this._quoteAndHideLabel(configDef, "category-value");
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -841,11 +829,6 @@
           */
          HasTag:
          {
-            text: function(configDef, ruleConfig, configEl)
-            {
-               this._quoteAndHideLabel(configDef, "tag");
-               return configDef;
-            },
             edit: function(configDef, ruleConfig, configEl)
             {
                // Hide parameters
@@ -870,7 +853,7 @@
                var pd = this._getParamDef(configDef, "value");
                if (Alfresco.util.arrayContains(["d:any", "d:text", "d:mltext"], pd.type))
                {
-                  pd._quote = true;
+                  configDef._customMessageKey = "customise.compare-property-value.hyphen.text";
                }
                return configDef;
             }
@@ -881,14 +864,6 @@
           */
          CompareMimeType:
          {
-            text: function(configDef, ruleConfig, configEl)
-            {
-               var vd = this._getParamDef(configDef, "value");
-               vd.displayLabel = this.msg("label.is");
-               vd._hideColon = true;
-               vd._quote = true;
-               return configDef;
-            },
             edit: function(configDef, ruleConfig, configEl)
             {
                var vd = this._getParamDef(configDef, "value");
@@ -992,10 +967,6 @@
          "arcc:category-picker":
          {
             currentCtx: {},
-            text: function (containerEl, configDef, paramDef, ruleConfig, value)
-            {
-               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
-            },
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                this.renderers["arcc:category-picker"].currentCtx =
@@ -1035,10 +1006,6 @@
          "arcc:tag-picker":
          {
             currentCtx: {},
-            text: function (containerEl, configDef, paramDef, ruleConfig, value)
-            {
-               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
-            },
             edit: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
                this.renderers["arcc:tag-picker"].currentCtx =

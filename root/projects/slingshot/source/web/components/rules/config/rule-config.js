@@ -119,8 +119,8 @@
 
          /**
           * Set to:
-          * - "text" for non editable text representation
-          * - "edit" for editable form inputs
+          * - MODE_TEXT for non editable text representation
+          * - MODE_EDIT for editable form inputs
           *
           * @property mode
           * @type string
@@ -168,6 +168,7 @@
 
          /**
           * Customisations that may modify the default ui rendering of a rule config.
+          * Contains objects with the rule config name as the key and the name of a member variable in this.customisations as the value.
           *
           * @property customisationsMap
           * @type array
@@ -185,7 +186,7 @@
 
          /**
           * If a filter is provided for a contraint name only the values given inside this filter will be used in the
-          * cosntraint lists.
+          * constraint lists. I.e. a filter is used to make sure only date-valid contstraints are used against a date value.
           *
           * @property constraintsFilter
           * @type object
@@ -331,9 +332,9 @@
       },
 
       /**
-       * Displays ruleConfig rows as described in ruelConfigs.
-       *
+       * Displays ruleConfig rows as described in ruleConfigs.
        * Expects the following format of the ruleConfig array:
+       *
        * [
        *    {
        *       "<match the value of this.options.ruleConfigDefinitionKey>": "<the ruleConfig name to select in the select menu>",
@@ -345,8 +346,9 @@
        *    }
        * ]
        *
+       * Note! This method shall be called after the "ruleConfigReady" event has been fired.
        * Note! Before this method is called the config body will be empty.
-       * This method shall be called after the "ruleConfigReady" event has been fired.
+       * Note! Even if ruleConfigs contains no elements 1 row will always be created.
        *
        * @method displayRuleConfigs
        * @param ruleConfigs {array} An array of rule configurations
@@ -487,7 +489,7 @@
 
 
       /**
-       * Called from the "+" link to create another value for multi valued parameter
+       * Called after the "+" link has been pressed to create another value for multi valued parameter
        *
        * @method addExtraParameter
        */
@@ -781,7 +783,7 @@
        * @param p_eRelativeConfigEl {object}
        * @protected
        */
-      _createConfigNameUI: function RuleConfig__createConfigNameUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl, p_oRuleConfigs)
+      _createConfigNameUI: function RuleConfig__createConfigNameUI(p_oRuleConfig, p_oSelectEl, p_eRelativeConfigEl)
       {
          // Add config element
          var configEl = this.widgets.configTemplateEl.cloneNode(true);
@@ -834,11 +836,20 @@
          }
          else if (this.options.mode == RC.MODE_TEXT)
          {
+            // Hide actions and config name select
             Dom.addClass(Selector.query('div.actions', configEl, true), "hidden");
-            Dom.addClass(p_oSelectEl, "hidden");
             var nameEl = document.createElement("span");
+            Dom.addClass(p_oSelectEl, "hidden");
             nameEl.appendChild(document.createTextNode(p_oSelectEl.options[p_oSelectEl.selectedIndex].text));
             configNameContainerEl.appendChild(nameEl);
+
+            // See if we have custom display message for the row
+            if (this._getCustomisedMessage(this._getSelectedConfigDef(configEl), p_oRuleConfig))
+            {
+               // Hide the name column and also the parameters
+               Dom.addClass(Selector.query('div.name', configEl, true), "hidden");
+               Dom.addClass(Selector.query('div.parameters', configEl, true), "hidden");
+            }
          }
 
          // Return element
@@ -880,6 +891,7 @@
             }
             if (customisationFn)
             {
+               // There was a customisation handler configured
                configDef = customisationFn.call(this, configDef, p_oRuleConfig, configEl, paramsEl);
             }
 
@@ -979,10 +991,107 @@
                   }
                }
             }
+
+            if (this.options.mode == RC.MODE_TEXT)
+            {
+               // Override the default text rendering of the config
+               var message = configDef._customMessageKey ? this.msg(configDef._customMessageKey) : undefined;
+               if (message == configDef._customMessageKey)
+               {
+                  message = this._getCustomisedMessage(configDef, p_oRuleConfig);
+               }
+               if (message)
+               {
+                  this._renderByCustomisedMessage(configEl, message);
+               }
+            }
          }
 
          // Make sure form is re-validated
          this._updateSubmitElements(configDef);
+      },
+
+      /**
+       * Gets a custom message to display rather than the default text layout
+       *
+       * @method _getCustomisedMessage
+       * @param configDef {object} The configDef
+       * @return {string} The message or null if it wasn't found
+       * @protected
+       */
+      _getCustomisedMessage: function RuleConfig__getCustomisedMessage(configDef)
+      {
+         var messageKey = "customise." + configDef.name + "." + this.options.mode,
+            message = this.msg(messageKey);
+         return message != messageKey ? message : null;
+      },
+
+      /**
+       * Creates a message key to use when looking for a custom display message for the config def.
+       * Will create a new parameters div element where it will render the result from the customised message.
+       * It will parse message and will:
+       * - add regular text in message in the new div as span elements
+       * - for each {param.xxx} it finds it check the param name (xxx) and use that name to find the element inside
+       *   the old parameters div and insert that span into the new.
+       *
+       * @method _renderByCustomisedMessage
+       * @param configEl {HTMLElement} The config row
+       * @return {string} The customised message
+       * @protected
+       */
+      _renderByCustomisedMessage: function RuleConfig__renderByCustomisedMessage(configEl, customisedMessage)
+      {
+         var newParametersEl = document.createElement("div"),
+            startIndex,
+            endIndex,
+            token,
+            param,
+            paramValueEl,
+            paramName;
+         Dom.addClass(newParametersEl, "parameters");
+         configEl.insertBefore(newParametersEl, Selector.query("div.parameters", configEl, true));
+         while (customisedMessage)
+         {
+            startIndex = customisedMessage.indexOf("{");
+            endIndex = customisedMessage.indexOf("}");
+            if (startIndex > -1 && endIndex > -1)
+            {
+               token = customisedMessage.substring(0, customisedMessage.indexOf("{"));
+               param = customisedMessage.substring(customisedMessage.indexOf("{") + 1, customisedMessage.indexOf("}"));
+               customisedMessage = customisedMessage.substring(customisedMessage.indexOf("}") + 1);
+            }
+            else
+            {
+               token = customisedMessage;
+               param = null;
+               customisedMessage = null;
+            }
+            if (token)
+            {
+               newParametersEl.appendChild(document.createTextNode(token));
+            }
+            if (param)
+            {
+               if (param.indexOf("param.") == 0)
+               {
+                  paramName = param.substring(param.indexOf(".") + 1);
+                  paramValueEl = Selector.query("div.parameters span.paramname_" + paramName + " span", configEl, true);
+                  if (paramValueEl)
+                  {
+                     var paramWrapperEl = document.createElement("span");
+                     paramWrapperEl.setAttribute("class", paramValueEl.parentNode.getAttribute("class"));
+                     Dom.removeClass(paramValueEl, "param");
+                     Dom.addClass(paramValueEl, "custom-param");
+                     paramWrapperEl.appendChild(paramValueEl);
+                     newParametersEl.appendChild(paramWrapperEl);
+                  }
+               }
+               else if (param == ("name"))
+               {
+                  newParametersEl.appendChild(Selector.query("div.name span", configEl, true));
+               }
+            }
+         }
       },
 
       /**
@@ -993,7 +1102,7 @@
        * @method _getSelectedConfigDef
        * @param configEl
        */
-      _getSelectedConfigDef: function (configEl)
+      _getSelectedConfigDef: function RuleConfig__getSelectedConfigDef(configEl)
       {
          // Find the correct config definition by looking in the config type menu
          var selectEl = Selector.query('select', configEl)[0];
@@ -1011,6 +1120,8 @@
       },
 
       /**
+       * Method that locates the config customisation
+       *
        * @method getConfigCustomisation
        * @param itemType
        * @param configDef
@@ -1052,6 +1163,8 @@
       },
 
       /**
+       * Locates the rule parameter renderer
+       *
        * @method _getParamRenderer
        * @param paramDefType
        * @return {object} A RuleCOnfig parameter renderer
@@ -1062,6 +1175,8 @@
       },
       
       /**
+       * Makes sure that the first config row's '-'/(minus)-button is disabled if there is only one row present
+       *
        * @method _refreshRemoveButtonState
        */
       _refreshRemoveButtonState: function RuleConfig__refreshRemoveButtonState()
@@ -1078,7 +1193,7 @@
       },
 
       /**
-       * Returns true if
+       * Returns true if the object contains an attribute value equal to "*"
        *
        * @method _hasWildcard
        * @param obj {object} The click event
@@ -1554,10 +1669,6 @@
             {
                return this._createCategorySpan(containerEl, configDef, paramDef, this.id + "-" + configDef._id + "-" + paramDef.name, value);
             }
-            if (paramDef._quote)
-            {
-               value = "'" + value + "'";
-            }
             if (msgKey)
             {
                var tmp = this.msg(msgKey, value);
@@ -1603,7 +1714,6 @@
          }, function (json)
          {
             var item = json.data.items[0];
-            item.name = paramDef._quote ? "'" + item.name + "'" : item.name;
             return $html(item.name);
          });
       },
@@ -1639,8 +1749,7 @@
        */
       _createResolvableValueSpan: function (containerEl, id, method, url, dataObj, displayValueHandler)
       {
-         var pathEl = document.createElement("span");
-         Dom.setStyle(pathEl, "margin", "0 0.5em");
+         var pathEl = document.createElement("span");         
          Alfresco.util.setDomId(pathEl, id);
          if (url)
          {
@@ -1917,13 +2026,6 @@
                paramDef._type = "hidden";
             }
          }
-      },
-
-      _quoteAndHideLabel: function (configDef, paramName)
-      {
-         var paramDef = this._getParamDef(configDef, paramName);
-         paramDef.displayLabel = null;
-         paramDef._quote = true;
       },
 
       _setParameter: function (ruleConfig, parameterName, value)
