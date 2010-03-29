@@ -134,6 +134,7 @@ public class AbstractCustomerTag extends TagSupport
     {
         HttpClient client = new HttpClient();
 
+        client.getParams().setAuthenticationPreemptive(true);
         client.getState().setCredentials(new AuthScope(getRepoHost(), getRepoPort()),
                     new UsernamePasswordCredentials(getRepoUsername(), getRepoPassword()));
 
