@@ -78,8 +78,15 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
                 try
                 {
                     String jsonResponseString = callMetadataService(objAsString);
-
-                    result = checkJsonAgainstCondition(condition, jsonResponseString);
+                    
+                    if (jsonResponseString != null)
+                    {
+                        result = checkJsonAgainstCondition(condition, jsonResponseString);
+                    }
+                    else if (getLogger().isWarnEnabled())
+                    {
+                        getLogger().warn("Metadata service response appears to be null!");
+                    }
                 }
                 catch (NotAuthenticatedException ne)
                 {
@@ -137,7 +144,7 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
         // Cache the jsonResponseString in the RequestContext
         if (getLogger().isDebugEnabled())
         {
-            getLogger().debug("Caching metadata for " + nodeString);
+            getLogger().debug("Caching metadata for '" + nodeString + "':\n" + jsonResponseString);
         }
         ThreadLocalRequestContext.getRequestContext().setValue(keyForCachedJson, jsonResponseString);
         
