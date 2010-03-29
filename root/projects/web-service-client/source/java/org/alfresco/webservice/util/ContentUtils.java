@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URL;
@@ -76,13 +77,21 @@ public class ContentUtils
         String strUrl = content.getUrl() + "?ticket=" + ticket;
         
         StringBuilder readContent = new StringBuilder();
+        InputStreamReader is = null;
         try
         {
             // Connect to donwload servlet            
             URL url = new URL(strUrl);
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("Cookie", "JSESSIONID=" + AuthenticationUtils.getAuthenticationDetails().getSessionId() + ";");
-            InputStream is = conn.getInputStream();
+            if (content.getFormat() != null && content.getFormat().getEncoding() != null)
+            {
+                is = new InputStreamReader(conn.getInputStream(), content.getFormat().getEncoding());
+            }
+            else
+            {
+                is = new InputStreamReader(conn.getInputStream());
+            }
             int read = is.read();
             while (read != -1)
             {
@@ -93,6 +102,13 @@ public class ContentUtils
         catch (Exception exception)
         {
             throw new WebServiceException("Unable to get content as string.", exception);
+        }
+        finally
+        {
+            if (is != null)
+            {
+                try { is.close(); } catch (Throwable e) {}
+            } 
         }
         
         // return content as a string
