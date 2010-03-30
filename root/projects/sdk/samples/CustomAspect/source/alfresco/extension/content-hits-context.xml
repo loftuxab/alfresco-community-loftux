@@ -27,7 +27,7 @@
     		<ref bean="transactionService"/>
     	</property>
     	<property name="threadExecuter">
-    		<ref bean="threadPoolExecutor"/>
+         <ref bean="defaultAsyncThreadPool"/>
     	</property>
     </bean>  
       
