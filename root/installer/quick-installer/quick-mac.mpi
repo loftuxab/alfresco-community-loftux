@@ -3291,7 +3291,7 @@ InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane 
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
 InstallComponent D0BEA0E1-AE39-46EB-8F94-F52C1A40128D -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
 InstallComponent A4B7881D-0357-4C8F-873B-C9B1E6C2FA6F -setup Install -type action -title {Create Checkbox} -component AddWidget -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {3FCADEE9-5DD9-768C-D188-CC3A6F8121FF B4542FD2-3F94-E787-C87C-253FEECEB594 5F62014D-FF00-1133-0073-1B34152260C9} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {3FCADEE9-5DD9-768C-D188-CC3A6F8121FF B4542FD2-3F94-E787-C87C-253FEECEB594 5F62014D-FF00-1133-0073-1B34152260C9} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
 Condition 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF
 Condition B4542FD2-3F94-E787-C87C-253FEECEB594 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id B4542FD2-3F94-E787-C87C-253FEECEB594
 Condition 5F62014D-FF00-1133-0073-1B34152260C9 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 5F62014D-FF00-1133-0073-1B34152260C9
@@ -3318,14 +3318,14 @@ InstallComponent A16AE261-F193-431D-87A3-15475394A2F8 -setup Install -type actio
 Condition 791611F8-7C63-43E7-8B71-C174C7010D46 -active Yes -parent A16AE261-F193-431D-87A3-15475394A2F8 -title {String Is Condition} -component StringIsCondition -TreeObject::id 791611F8-7C63-43E7-8B71-C174C7010D46
 InstallComponent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -setup Install -type action -conditions D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -title {Rename File} -component RenameFile -command insert -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
 Condition D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -active Yes -parent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -title {String Is Condition} -component StringIsCondition -TreeObject::id D2FB7E47-AAAA-485D-97D9-BE687D1A7AED
+InstallComponent A6AD15A0-5754-4A70-A4C8-F7D64FE38031 -setup Install -type pane -title {Do Config} -component CustomBlankPane1 -active Yes -parent StandardInstall
+InstallComponent 5BF7D47A-D7A8-4FEF-8490-3FCC7397D7B2 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
+InstallComponent 4189489A-B002-4812-8ED2-5E7555A0F213 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
 InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding AMPs} -component CustomBlankPane1 -operator OR -command insert -active Yes -parent StandardInstall
 Condition 6654B212-DC2E-4B87-87A4-A6651D834356 -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 Condition 5D3CD088-B812-4912-A7BA-38C26DBAEA7B -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 5D3CD088-B812-4912-A7BA-38C26DBAEA7B
 InstallComponent 6FD62EC4-634A-490E-A5B9-AFE1AEBCC406 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B
 InstallComponent 878D8811-5FAA-4580-A208-501610F2711E -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B
-InstallComponent A6AD15A0-5754-4A70-A4C8-F7D64FE38031 -setup Install -type pane -title {Do Config} -component CustomBlankPane1 -active Yes -parent StandardInstall
-InstallComponent 5BF7D47A-D7A8-4FEF-8490-3FCC7397D7B2 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
-InstallComponent 4189489A-B002-4812-8ED2-5E7555A0F213 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
 InstallComponent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent StandardInstall
 InstallComponent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -setup Install -type action -conditions {895E7578-265C-44C3-8943-CF6D99925B9F 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 895E7578-265C-44C3-8943-CF6D99925B9F -active Yes -parent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 895E7578-265C-44C3-8943-CF6D99925B9F
@@ -4604,8 +4604,7 @@ ALF_OO
 {<%AppName%> Samples}
 
 6FD62EC4-634A-490E-A5B9-AFE1AEBCC406,ProgramCommandLine
-{java -jar "<%InstallDir%>/bin/alfresco-mmt.jar" install "<%InstallDir%>/amps" "<%InstallDir%>/tomcat/webapps/alfresco.war" -directory
--nobackup}
+{/bin/sh "<%InstallDir%>/apply_amps.sh" -nowait -nobackup}
 
 6FD62EC4-634A-490E-A5B9-AFE1AEBCC406,WorkingDirectory
 <%InstallDir%>
