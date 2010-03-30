@@ -150,21 +150,6 @@
          // Firefox insertion caret fix
          Alfresco.util.caretFix(this.id + "-form");
 
-         // Register the ESC key to close the dialog
-         var escapeListener = new KeyListener(document, 
-         {
-            keys: KeyListener.KEY.ESCAPE
-         },
-         {
-            fn: function(id, keyEvent)
-            {
-               this.hide();
-            },
-            scope: this,
-            correctScope: true
-         });
-         escapeListener.enable();
-
          // Set the focus on the first field
          this.widgets.panel.focusFirst();
       }
