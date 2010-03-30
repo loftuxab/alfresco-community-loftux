@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.RenditionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.repo.exporter.ACPExportPackageHandler;
@@ -58,6 +59,8 @@ public class ExportPost extends StreamACP
     /**
      * @see org.alfresco.web.scripts.WebScript#execute(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
      */
+    @SuppressWarnings("deprecation")
+    @Override
     public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException
     {
         File tempACPFile = null;
@@ -101,7 +104,8 @@ public class ExportPost extends StreamACP
             {
                 // restrict specific aspects from being returned
                 QName[] excludedAspects = new QName[] { 
-                            ContentModel.ASPECT_THUMBNAILED, 
+                            RenditionModel.ASPECT_RENDITIONED,
+                            ContentModel.ASPECT_THUMBNAILED,
                             RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE,
                             RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH};
                 params.setExcludeAspects(excludedAspects);
