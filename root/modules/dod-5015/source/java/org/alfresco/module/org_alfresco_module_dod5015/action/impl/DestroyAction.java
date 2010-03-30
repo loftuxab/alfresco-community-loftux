@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.RenditionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
 import org.alfresco.repo.content.ContentServicePolicies;
@@ -77,6 +78,7 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase imple
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void executeRecordLevelDisposition(Action action, NodeRef record)
     {
@@ -91,12 +93,21 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase imple
                 this.nodeService.removeProperty(record, prop);
             }
 
-            // Remove the thumbnailed aspect (and its properties and associations) if it is present
-            if (this.nodeService.hasAspect(record, ContentModel.ASPECT_THUMBNAILED))
+            // Remove the renditioned aspect (and its properties and associations) if it is present.
+            //
+            // From Alfresco 3.3 it is the rn:renditioned aspect which defines the
+            // child-association being considered in this method.
+            // Note also that the cm:thumbnailed aspect extends the rn:renditioned aspect.
+            //
+            // We want to remove the rn:renditioned aspect, but due to the possibility
+            // that there is Alfresco 3.2-era data with the cm:thumbnailed aspect
+            // applied, we must consider removing it too.
+            if (this.nodeService.hasAspect(record, RenditionModel.ASPECT_RENDITIONED)
+                    || this.nodeService.hasAspect(record, ContentModel.ASPECT_THUMBNAILED))
             {
-                // Add the ghosted aspect to all the thumbnailed children, so that they will not be archived when the
-                // thumbnailed aspect is removed
-                Set<QName> childAssocTypes = this.dictionaryService.getAspect(ContentModel.ASPECT_THUMBNAILED)
+                // Add the ghosted aspect to all the renditioned children, so that they will not be archived when the
+                // renditioned aspect is removed
+                Set<QName> childAssocTypes = this.dictionaryService.getAspect(RenditionModel.ASPECT_RENDITIONED)
                         .getChildAssociations().keySet();
                 for (ChildAssociationRef child : this.nodeService.getChildAssocs(record))
                 {
@@ -106,7 +117,14 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase imple
                                 .<QName, Serializable> emptyMap());
                     }
                 }
-                this.nodeService.removeAspect(record, ContentModel.ASPECT_THUMBNAILED);
+                if (this.nodeService.hasAspect(record, RenditionModel.ASPECT_RENDITIONED))
+                {
+                    this.nodeService.removeAspect(record, RenditionModel.ASPECT_RENDITIONED);
+                }
+                if (this.nodeService.hasAspect(record, ContentModel.ASPECT_THUMBNAILED))
+                {
+                    this.nodeService.removeAspect(record, ContentModel.ASPECT_THUMBNAILED);
+                }
             }
             
             // Finally, add the ghosted aspect (TODO: Any properties?)

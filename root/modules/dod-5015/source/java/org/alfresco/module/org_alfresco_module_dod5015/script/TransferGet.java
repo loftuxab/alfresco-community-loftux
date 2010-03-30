@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.RenditionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -46,6 +47,7 @@ public class TransferGet extends BaseTransferWebScript
     /** Logger */
     private static Log logger = LogFactory.getLog(TransferGet.class);
     
+    @SuppressWarnings("deprecation")
     @Override
     protected File executeTransfer(NodeRef transferNode,
                 WebScriptRequest req, WebScriptResponse res, 
@@ -59,8 +61,9 @@ public class TransferGet extends BaseTransferWebScript
         params.setCrawlSelf(true);
         params.setCrawlChildNodes(true);
         params.setExportFrom(new Location(itemsToTransfer));
-        QName[] excludedAspects = new QName[] { 
-                    ContentModel.ASPECT_THUMBNAILED, 
+        QName[] excludedAspects = new QName[] {
+                    RenditionModel.ASPECT_RENDITIONED,
+                    ContentModel.ASPECT_THUMBNAILED,
                     RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE,
                     RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH};
         params.setExcludeAspects(excludedAspects);
