@@ -60,19 +60,28 @@ function getConfigAspects(scopedRoot, childName)
 {
    var aspects = [],
       name,
-      configs;
+      configs,
+      aspectConfig;
+   
    try
    {
-      configs = scopedRoot.getChild(childName).childrenMap["aspect"];
+      configs = scopedRoot.getChildren(childName);
       if (configs)
       {
-         for (var i = 0, name; i < configs.size(); i++)
+         for (var i = 0; i < configs.size(); i++)
          {
-            // Get class qname from each config item
-            name = configs.get(i).attributes["name"];
-            if (name)
+            aspectConfig = configs.get(i).childrenMap["aspect"];
+            if (aspectConfig)
             {
-               aspects.push(name.toString());
+               for (var j = 0, name; j < aspectConfig.size(); j++)
+               {
+                  // Get class qname from each config item
+                  name = aspectConfig.get(j).attributes["name"];
+                  if (name)
+                  {
+                     aspects.push(name.toString());
+                  }
+               }
             }
          }
       }

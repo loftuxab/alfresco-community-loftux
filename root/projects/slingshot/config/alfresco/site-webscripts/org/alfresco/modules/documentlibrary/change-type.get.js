@@ -11,7 +11,7 @@ function main()
 function getConfigTypes(scopedRoot, currentType)
 {
    var types = [],
-      configs, typeConfig, typeName;
+       configs, typeConfig, typeName, subTypeConfigs;
 
    try
    {
@@ -25,18 +25,22 @@ function getConfigTypes(scopedRoot, currentType)
             typeName = typeConfig.attributes["name"];
             if (typeName == currentType)
             {
-               configs = typeConfig.children;
-               for (var j = 0; j < configs.size(); j++)
+               subTypeConfigs = typeConfig.childrenMap["subtype"];
+               if (subTypeConfigs)
                {
-                  typeName = configs.get(j).attributes["name"];
-                  if (typeName)
+                  for (var j = 0; j < subTypeConfigs.size(); j++)
                   {
-                     types.push(typeName.toString());
+                     typeName = subTypeConfigs.get(j).attributes["name"];
+                     if (typeName)
+                     {
+                        types.push(typeName.toString());
+                     }
                   }
                }
-               return types;
             }
          }
+         
+         return types;
       }
    }
    catch (e)

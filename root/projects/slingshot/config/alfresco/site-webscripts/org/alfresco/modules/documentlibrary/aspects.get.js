@@ -13,21 +13,29 @@ function main()
 function getConfigAspects(scopedRoot, childName)
 {
    var aspects = [],
-      aspectName,
-      configs;
+       aspectName,
+       configs,
+       aspectConfig;
 
    try
    {
-      configs = scopedRoot.getChild(childName).childrenMap["aspect"];
+      configs = scopedRoot.getChildren(childName);
       if (configs)
       {
-         for (var i = 0, aspectName; i < configs.size(); i++)
+         for (var i = 0; i < configs.size(); i++)
          {
-            // Get aspect qname from each config item
-            aspectName = configs.get(i).attributes["name"];
-            if (aspectName)
+            aspectConfig = configs.get(i).childrenMap["aspect"];
+            if (aspectConfig)
             {
-               aspects.push(aspectName.toString());
+               for (var j = 0, aspectName; j < aspectConfig.size(); j++)
+               {
+                  // Get aspect qname from each config item
+                  aspectName = aspectConfig.get(j).attributes["name"];
+                  if (aspectName)
+                  {
+                     aspects.push(aspectName.toString());
+                  }
+               }
             }
          }
       }
