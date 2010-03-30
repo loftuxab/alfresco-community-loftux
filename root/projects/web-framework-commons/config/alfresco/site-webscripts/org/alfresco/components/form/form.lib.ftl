@@ -20,7 +20,7 @@
                handler : ${constraint.validationHandler}, 
                params : ${constraint.params}, 
                event : "${constraint.event}",
-               message : <#if constraint.message?exists>"${constraint.message}"<#else>null</#if>
+               message : <#if constraint.message?exists>"${constraint.message?js_string}"<#else>null</#if>
             }
             <#if constraint_has_next>,</#if>
             </#list>

@@ -19,7 +19,7 @@
          new Alfresco.RichTextControl("${fieldHtmlId}").setOptions(
          {
             <#if form.mode == "view" || field.disabled>disabled: true,</#if>
-            currentValue: "${field.value}",
+            currentValue: "${field.value?js_string}",
             mandatory: ${field.mandatory?string},
             <@editorParameters field />
          }).setMessages(

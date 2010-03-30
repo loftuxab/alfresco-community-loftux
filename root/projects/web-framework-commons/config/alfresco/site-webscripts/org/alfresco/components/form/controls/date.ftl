@@ -28,7 +28,7 @@
             new Alfresco.DatePicker("${controlId}", "${fieldHtmlId}").setOptions(
             {
                <#if form.mode == "view" || field.disabled>disabled: true,</#if>
-               currentValue: "${field.value}",
+               currentValue: "${field.value?js_string}",
                showTime: ${showTime?string},
                mandatory: ${field.mandatory?string}
             }).setMessages(
