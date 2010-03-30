@@ -39,6 +39,25 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
  */
 public class SerializableTypeHandlerCallback implements TypeHandlerCallback
 {
+    public static final int DEFAULT_SERIALIZABLE_TYPE = Types.LONGVARBINARY;
+    private static volatile int serializableType = DEFAULT_SERIALIZABLE_TYPE;
+
+    /**
+     * @see Types
+     */
+    public static void setSerializableType(int serializableType)
+    {
+        SerializableTypeHandlerCallback.serializableType = serializableType;
+    }
+
+    /**
+     * @return      Returns the SQL type to use for serializable columns
+     */
+    public static int getSerializableType()
+    {
+        return serializableType;
+    }
+
     /**
      * @throws DeserializationException if the object could not be deserialized
      */
@@ -69,7 +88,7 @@ public class SerializableTypeHandlerCallback implements TypeHandlerCallback
     {
         if (parameter == null)
         {
-            setter.setNull(Types.LONGVARBINARY);
+            setter.setNull(SerializableTypeHandlerCallback.serializableType);
         }
         else
         {
