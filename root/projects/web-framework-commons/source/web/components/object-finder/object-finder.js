@@ -1134,7 +1134,7 @@
             }
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("remove-" + this.eventGroup, fnRemoveItemHandler);
+         YAHOO.Bubbling.addDefaultAction("remove-" + this.eventGroup, fnRemoveItemHandler, true);
       },
       
       /**
@@ -1938,7 +1938,7 @@
             }
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("add-" + this.eventGroup, fnAddItemHandler);
+         YAHOO.Bubbling.addDefaultAction("add-" + this.eventGroup, fnAddItemHandler, true);
 
          // Hook create new item action click events (for Compact mode)
          var fnCreateNewItemHandler = function OR__cC_fnCreateNewItemHandler(layer, args)
@@ -1975,7 +1975,7 @@
             }
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("parent-" + this.eventGroup, fnNavigationHandler);
+         YAHOO.Bubbling.addDefaultAction("parent-" + this.eventGroup, fnNavigationHandler, true);
       },
       
       /**
