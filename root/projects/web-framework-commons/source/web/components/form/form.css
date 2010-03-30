@@ -133,6 +133,11 @@
    background-color: #ff6666;
 }
 
+.form-container .error
+{
+   color: #ff6666;
+}
+
 .form-container .viewmode-field .current-values div
 {
    padding: 0.5em;

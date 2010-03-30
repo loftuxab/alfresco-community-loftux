@@ -6,7 +6,7 @@
    new Alfresco.Period("${controlId}", "${fieldHtmlId}").setOptions(
    {
       <#if form.mode == "view" || field.disabled>disabled: true,</#if>
-      currentValue: "${field.value}",
+      currentValue: "${field.value?js_string}",
       mandatory: ${field.mandatory?string},
       data : [
       <#list field.control.params.dataTypeParameters as period>
