@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<page>
-   <title>Form UI Test</title>
-   <description>Form UI component test page</description>
-   <template-instance>form-test</template-instance>
-   <authentication>user</authentication>
-</page>
