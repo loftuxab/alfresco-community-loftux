@@ -41,31 +41,25 @@
    <!-- NOTE: For NTLM, the NTLM Authentication Filter must also be enabled in share web.xml -->
    <!-- NOTE: if utilising a load balancer between web-tier and repository cluster, the "sticky -->
    <!--       sessions" feature of your load balancer must be used -->
+   <!-- Optional keystore contains SSL client certificate + trusted CAs. Used to authenticate share to an external SSO system such as CAS -->
    <!--
    <config evaluator="string-compare" condition="Remote">
         <remote>
-            <!-- SSL client certificate + trusted CAs. Optionally used to authenticate share to an external SSO system such as CAS -->
             <keystore>
                 <path>alfresco/web-extension/alfresco-system.p12</path>
                 <type>pkcs12</type>
                 <password>alfresco-system</password>
             </keystore>
          
-            <connector>
-                <id>alfrescoCookie</id>
-                <name>Alfresco Connector</name>
-                <description>Connects to an Alfresco instance using cookie-based authentication</description>
-                <class>org.alfresco.connector.AlfrescoConnector</class>
-            </connector>
-
             <endpoint>
                 <id>alfresco</id>
                 <name>Alfresco - user access</name>
                 <description>Access to Alfresco Repository WebScripts that require user authentication</description>
-                <connector-id>alfrescoCookie</connector-id>
+                <connector-id>alfresco</connector-id>
                 <endpoint-url>http://localhost:8080/alfresco/wcs</endpoint-url>
                 <identity>user</identity>
                 <external-auth>true</external-auth>
+                <authenticator-id>alfresco-ticket</authenticator-id>
             </endpoint>
             
         </remote>
