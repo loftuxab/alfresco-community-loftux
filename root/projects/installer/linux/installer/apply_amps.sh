@@ -20,4 +20,5 @@ echo "Press control-c to stop this script . . ."
 echo "Press any other key to continue . . ."
 read DUMMY
 rm -rf $CATALINA_HOME/webapps/alfresco
+rm -rf $CATALINA_HOME/webapps/share
 sh $CATALINA_HOME/bin/clean_tomcat.sh

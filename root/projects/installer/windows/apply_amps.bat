@@ -29,4 +29,5 @@ if ""%1"" == ""nowait"" goto nowait2
 pause
 :nowait2
 rmdir /S /Q "%CATALINA_HOME%\webapps\alfresco"
+rmdir /S /Q "%CATALINA_HOME%\webapps\share"
 call "%ALF_HOME%bin\clean_tomcat.bat"
