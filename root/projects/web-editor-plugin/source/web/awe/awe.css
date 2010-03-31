@@ -155,3 +155,9 @@
 {
    width:100%;
 }
+
+#wef-login-panel-form div.form-field label
+{
+   margin-top:1em;
+   display:block;
+}
