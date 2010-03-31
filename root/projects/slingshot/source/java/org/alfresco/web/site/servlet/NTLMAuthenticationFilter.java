@@ -129,40 +129,51 @@ public class NTLMAuthenticationFilter implements Filter
         try
         {
             // perform a "silent" init - i.e. no user creation or remote connections
-            RequestContextUtil.initRequestContext(getApplicationContext(), (HttpServletRequest)sreq, true);
+            context = RequestContextUtil.initRequestContext(getApplicationContext(), (HttpServletRequest)sreq, true);
         }
         catch (RequestContextException ex)
         {
             throw new ServletException(ex);
         }
-        
-        // get the page from the model if any - it may not require authentication
-        Page page = context.getPage();
-        if (page != null && page.getAuthentication() == RequiredAuthentication.none)
-        {
-            if (debug) logger.debug("Unauthenticated page requested - skipping auth filter...");
-            chain.doFilter(sreq, sresp);
-            return;
-        }
-        
+
         // Check if there is an authorization header with an NTLM security blob
         String authHdr = req.getHeader("Authorization");
         boolean reqAuth = (authHdr != null && authHdr.startsWith(AUTH_NTLM));
-        
-        // touch the repo to ensure we still have an authenticated NTLM session
-        if (!reqAuth && session.getAttribute(NTLM_AUTH_DETAILS) != null)
+        boolean cachedNtlm = session.getAttribute(NTLM_AUTH_DETAILS) != null; 
+        // touch the repo to ensure we still have an authenticated  session
+        if ((!reqAuth && cachedNtlm) || AuthenticationUtil.isAuthenticated(req))        
         {
             try
             {
-                Connector conn = getConnector(this.endpoint, session);
-                ConnectorContext ctx = new ConnectorContext(null, getConnectionHeaders(conn));
-                Response remoteRes = conn.call("/touch", ctx, req, null);
+                Response remoteRes;
+                if (cachedNtlm)
+                {
+                    Connector conn = connectorService.getConnector(this.endpoint, session);
+                    ConnectorContext ctx = new ConnectorContext(null, getConnectionHeaders(conn));
+                    remoteRes = conn.call("/touch", ctx, req, null);
+                }
+                else
+                {
+                    Connector conn = connectorService.getConnector(this.endpoint, AuthenticationUtil.getUserId(req),
+                            session);
+                    ConnectorContext ctx = new ConnectorContext();
+                    remoteRes = conn.call("/touch", ctx);
+                }
                 if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
                 {
                     if (debug) logger.debug("Repository session timed out - restarting auth process...");
                     
-                    // restart NTLM login as the repo has timed us out
-                    restartAuthProcess(session, res);
+                    if (cachedNtlm)
+                    {
+                        // restart NTLM login as the repo has timed us out
+                        restartAuthProcess(session, res);
+                    }
+                    else
+                    {
+                       // restart manual login
+                        session.invalidate();
+                        redirectToLoginPage(req, res);
+                    }
                     return;
                 }
                 else
@@ -170,6 +181,7 @@ public class NTLMAuthenticationFilter implements Filter
                     // we have local auth in the session and the repo session is also valid
                     // this means we do not need to perform any further auth handshake
                     if (debug) logger.debug("Authentication not required, chaining ...");
+
                     chain.doFilter(sreq, sresp);
                     return;
                 }
@@ -180,6 +192,16 @@ public class NTLMAuthenticationFilter implements Filter
             }
         }
         
+        // get the page from the model if any - it may not require authentication
+        Page page = context.getPage();
+        if (page != null && page.getAuthentication() == RequiredAuthentication.none)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Unauthenticated page requested - skipping auth filter...");
+            chain.doFilter(sreq, sresp);
+            return;
+        }
+
         // Check if the login page is being accessed, do not intercept the login page
         if (session.getAttribute(LOGIN_PAGE_PASSTHROUGH) != null)
         {
@@ -220,6 +242,9 @@ public class NTLMAuthenticationFilter implements Filter
             {
                 // Process the type 1 NTLM message
                 Type1NTLMMessage type1Msg = new Type1NTLMMessage(ntlmByts);
+                // Start with a fresh session
+                session.invalidate();
+                session = req.getSession();
                 processType1(type1Msg, req, res, session);
             }
             else if (ntlmTyp == NTLM.Type3)
