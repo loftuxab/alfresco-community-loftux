@@ -373,7 +373,23 @@
          }
          else
          {
-            Dom.get(this.pickerId + "-searchText").focus();
+            // get the current search term
+            var searchTermInput = Dom.get(this.pickerId + "-searchText");
+            var searchTerm = searchTermInput.value;
+            if (searchTerm.length >= this.options.minSearchTermLength)
+            {
+               // refresh the previous search
+               YAHOO.Bubbling.fire("refreshItemList",
+               {
+                  eventGroup: this,
+                  searchTerm: searchTerm
+               });
+            }
+            else
+            {
+               // focus ready for a search
+               searchTermInput.focus();
+            }
          }
          
          p_obj.set("disabled", true);
