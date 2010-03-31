@@ -2,7 +2,7 @@
 <component>
    <scope>template</scope>
    <region-id>form-ui</region-id>
-   <source-id>form-test</source-id>
+   <source-id>form-console</source-id>
    <url>/components/form</url>
    <properties>
       <showResetButton>true</showResetButton>

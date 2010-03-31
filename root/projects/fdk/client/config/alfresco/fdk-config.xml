@@ -1,0 +1,241 @@
+<alfresco-config>
+
+   <!-- Share override config to add FDK types and aspects -->
+   <!-- NOTE: Have to use replace="true" at the moment otherwise new items are not picked up -->
+   <config evaluator="string-compare" condition="DocumentLibrary">
+      <aspects>
+         <visible>
+            <aspect name="fdk:exif" />
+         </visible>
+      </aspects>
+      
+      <types>
+         <type name="cm:content">
+            <subtype name="fdk:gadget" />
+            <subtype name="fdk:company" />
+            <subtype name="fdk:everything" />
+         </type>
+      </types>
+   </config>
+   
+   <!-- FDK form configuration -->
+   <config evaluator="node-type" condition="fdk:gadget">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <show id="fdk:make" />
+               <show id="fdk:model" />
+               <show id="fdk:summary" />
+               <show id="fdk:type" />
+               <show id="fdk:subType" />
+               <show id="fdk:rrp" />
+               <show id="fdk:releaseDate" />
+               <show id="fdk:endOfLifeDate" />
+               <show id="fdk:retailers" />
+               <show id="fdk:rating" />
+               <show id="fdk:contact" />
+               <show id="fdk:reviews" />
+               <show id="fdk:company" />
+               <show id="fdk:pressRelease" />
+               <show id="fdk:images" />
+               
+               <!-- exif aspect data, if applied -->
+               <show id="fdk:manufacturer" />
+               <show id="fdk:software" />
+               <show id="fdk:originalDateTime" />
+               <show id="fdk:compression" />
+               <show id="fdk:xResolution" />
+               <show id="fdk:yResolution" />
+               <show id="fdk:resolutionUnit" />
+               <show id="fdk:xPixelDimension" />
+               <show id="fdk:yPixelDimension" />
+               <show id="fdk:flash" />
+            </field-visibility>
+            <appearance>
+               <set id="exif" appearance="title" label="Exif Data" />
+               <field id="fdk:manufacturer" set="exif" />
+               <field id="fdk:software" set="exif" />
+               <field id="fdk:originalDateTime" set="exif" />
+               <field id="fdk:compression" set="exif" />
+               <field id="fdk:xResolution" set="exif" />
+               <field id="fdk:yResolution" set="exif" />
+               <field id="fdk:resolutionUnit" set="exif" />
+               <field id="fdk:xPixelDimension" set="exif" />
+               <field id="fdk:yPixelDimension" set="exif" />
+               <field id="fdk:flash" set="exif" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="fdk:company">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="fdk:email" />
+               <show id="fdk:tel" />
+               <show id="fdk:country" />
+               <show id="fdk:street1" />
+               <show id="fdk:street2" />
+               <show id="fdk:city" />
+               <show id="fdk:county" />
+               <show id="fdk:state" />
+               <show id="fdk:postCode" />
+               <show id="fdk:zip" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="fdk:everything">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:categories" />
+               <show id="cm:taggable" />
+               <show id="fdk:text" />
+               <show id="fdk:textMultiple" />
+               <show id="fdk:mltext" />
+               <show id="fdk:date" />
+               <show id="fdk:dateTime" />
+               <show id="fdk:int" />
+               <show id="fdk:long" />
+               <show id="fdk:double" />
+               <show id="fdk:float" />
+               <show id="fdk:boolean" />
+               <show id="fdk:any" />
+               <show id="fdk:category" />
+               <show id="fdk:period" />
+               <show id="prop:fdk:duplicate" />
+               <show id="fdk:with_underscore" />
+               <show id="fdk:with-dash" />
+               <show id="fdk:qname" />
+               <show id="fdk:noderef" />
+               <show id="fdk:locale" />
+               <show id="fdk:childassocref" />
+               <show id="fdk:assocref" />
+               <show id="fdk:path" />
+               <show id="assoc:fdk:duplicate" />
+               <show id="fdk:user" />
+               <show id="fdk:group" />
+               <show id="fdk:usergroup" />
+               <show id="fdk:contentSingle" />
+               <show id="fdk:contentMultiple" />
+               <show id="fdk:folderSingle" />
+               <show id="fdk:folderMultiple" />
+            </field-visibility>
+            <appearance>
+                <field id="cm:taggable">
+                  <control>
+                     <control-param name="compactMode">true</control-param>
+                     <control-param name="params">aspect=cm:taggable</control-param>
+                     <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
+                     <control-param name="createNewItemIcon">tag</control-param>
+                  </control>
+               </field>
+               <field id="cm:categories">
+                  <control>
+                     <control-param name="compactMode">true</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+         
+         <form id="simple-sets">
+            <field-visibility>
+               <show id="fdk:text" />
+               <show id="fdk:mltext" />
+               <show id="fdk:date" />
+               <show id="fdk:dateTime" />
+               <show id="fdk:int" />
+               <show id="fdk:long" />
+               <show id="fdk:double" />
+               <show id="fdk:float" />
+               <show id="fdk:boolean" />
+               <show id="cm:categories" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="bordered-panel" label="Bordered Panel" />
+               <set id="text" appearance="fieldset" label="Fieldset" />
+               <set id="number" appearance="panel" label="Panel" />
+               <set id="date" appearance="title" label="Title" />
+               <set id="assocs" appearance="" label="Empty String" />
+               <set id="toggle" appearance="whitespace" label="Whitespace" />
+               
+               <field id="fdk:text" set="text" />
+               <field id="fdk:mltext" set="text" />
+               
+               <field id="fdk:boolean" set="toggle" />
+               
+               <field id="fdk:int" set="number" />
+               <field id="fdk:long" set="number" />
+               
+               <field id="fdk:date" set="date" />
+               <field id="fdk:dateTime" set="date" />
+
+               <field id="cm:categories" set="assocs" />
+            </appearance>
+         </form>
+         
+         <form id="nested-sets">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="fdk:text" />
+               <show id="fdk:mltext" />
+               <show id="fdk:boolean" />
+               <show id="fdk:int" />
+               <show id="fdk:long" />
+               <show id="fdk:double" />
+               <show id="fdk:float" />
+            </field-visibility>
+            <appearance>
+               <set id="builtin" appearance="fieldset" label="Built In" />
+               <set id="custom" appearance="fieldset" label="Custom Data" />
+               <set id="text" parent="custom" appearance="panel" label="Text" />
+               <set id="number" parent="custom" appearance="panel" label="Numbers" />
+               
+               <field id="cm:name" set="builtin" />
+               
+               <field id="fdk:text" set="text" />
+               <field id="fdk:mltext" set="text" />
+               <field id="fdk:boolean" set="text" />
+               
+               <field id="fdk:int" set="number" />
+               <field id="fdk:long" set="number" />
+               <field id="fdk:double" set="number" />
+               <field id="fdk:float" set="number" />
+            </appearance>
+         </form>
+         
+         <form id="associations">
+            <field-visibility>
+               <show id="fdk:duplicate" />
+               <show id="fdk:user" />
+               <show id="fdk:group" />
+               <show id="fdk:usergroup" />
+               <show id="fdk:contentSingle" />
+               <show id="fdk:contentMultiple" />
+               <show id="fdk:folderSingle" />
+               <show id="fdk:folderMultiple" />
+            </field-visibility>
+            <appearance>
+               <field id="fdk:folderSingle" read-only="true" />
+               <field id="fdk:contentSingle">
+                  <control>
+                     <control-param name="showTargetLink">true</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+         
+         <form id="empty-config">
+         </form>
+         
+      </forms>
+   </config>
+
+</alfresco-config>

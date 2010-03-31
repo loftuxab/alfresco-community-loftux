@@ -896,6 +896,30 @@
          <mapper type="glob" from="*.js" to="*-min.js"/>
       </apply>
    </target>
+   
+   <target name="deploy-share-fdk" depends="package-fdk-client">
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/${dir.name.webinf}/${dir.name.lib}" 
+            file="${dir.project.fdk.client.dist}/${file.name.jar.fdk}" />
+   </target>
+      
+   <target name="deploy-share-fdk-exploded" depends="init">
+      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.fdk.client.src.web}" />
+      </copy>
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.fdk.client.config}" />
+      </copy>
+   </target>
+   
+   <target name="deploy-repo-fdk-exploded" depends="init">
+      <copy todir="${home.tomcat}/shared/classes" verbose="${copy.verbose}" overwrite="yes">
+         <fileset dir="${dir.project.fdk.repo.config}" includes="**/fdk-*.xml" excludes="**/fdk-context.xml" />
+      </copy>
+      <copy todir="${home.tomcat}/shared/classes/alfresco/extension" verbose="${copy.verbose}" overwrite="yes">
+         <fileset dir="${dir.project.fdk.repo.config}/alfresco/module/org_alfresco_module_fdk" 
+                  includes="fdk-context.xml" />
+      </copy>
+   </target>
 
    <target name="start-tomcat-webclient" 
            description="Starts the Alfresco Tomcat server on Windows" 

@@ -89,6 +89,7 @@
                     distribute-xforms-examples,
                     distribute-extras,
                     distribute-webeditor,
+                    distribute-fdk,
                     revert-changes" />
 
    <target name="set-build-number"
@@ -1557,6 +1558,19 @@
                      includes="spring-webeditor-*.jar" />
          <zipfileset file="${file.jar.webeditor.yui}" />
       </zip>
+   </target>
+   
+   <!-- ***************** -->
+   <!-- ** FDK targets ** -->
+   <!-- ***************** -->
+   
+   <target name="distribute-fdk" depends="set-build-number, continuous-init, incremental-fdk"
+           description="Distributes the Forms Development Kit (FDK) files">
+      <mkdir dir="${dir.continuous.dist}" />
+      <copy todir="${dir.continuous.dist}">
+         <fileset dir="${dir.project.fdk.client.dist}" includes="${file.name.jar.fdk}" />
+         <fileset dir="${dir.project.fdk.repo.dist}" includes="${file.name.amp.fdk}" />
+      </copy>
    </target>
 
 </project>

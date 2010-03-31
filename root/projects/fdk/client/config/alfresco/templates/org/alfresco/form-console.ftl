@@ -14,7 +14,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head>
-      <title>Form Test Page</title>
+      <title>Form Console</title>
       <meta http-equiv="X-UA-Compatible" content="Edge" />
 
       <@link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
@@ -121,7 +121,7 @@
    <body class="yui-skin-default">
       <div id="bd">
          <div class="form-console">
-            <h2>Form Test Page</h2>
+            <h2>Form Console</h2>
             <#if url.args.mode?exists>
                <#assign mode="${url.args.mode}">
             <#else>
@@ -170,8 +170,8 @@
          </div>
 
       </div>
-
-   <#-- This function call MUST come after all other component includes. -->
+      
+      <#-- This function call MUST come after all other component includes. -->
       <div id="alfresco-yuiloader"></div>
       <script type="text/javascript">//<![CDATA[
          Alfresco.util.YUILoaderHelper.loadComponents();

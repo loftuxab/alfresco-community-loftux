@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    
+   <!-- Bootstrap FDK Model -->
+   <bean id="org_alfresco_module_fdk_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+      <property name="models">
+         <list>
+            <value>alfresco/module/org_alfresco_module_fdk/fdk-model.xml</value>
+         </list>
+      </property>
+   </bean>
+   
+   <!-- TODO: Define web client config file to setup Explorer forms for FDK model -->
+   <!-- 
+   <bean id="org_alfresco_module_fdk_config" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init">
+      <property name="configs">
+         <list>
+            <value>classpath:alfresco/module/org_alfresco_module_fdk/web-client-config-fdk.xml</value>
+         </list>
+      </property>
+   </bean>
+   -->
+</beans>
