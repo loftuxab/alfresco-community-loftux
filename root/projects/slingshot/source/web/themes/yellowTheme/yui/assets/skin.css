@@ -477,7 +477,7 @@ cursor: pointer;
 }
 .yui-skin-yellowTheme .yui-calcontainer .yui-cal-nav-mask {
 background-color: #000;
-opacity: 0.25;*filter:alpha(opacity=25);
+opacity: 0.25;filter:alpha(opacity=25);
 }
 .yui-skin-yellowTheme .yui-calcontainer .yui-cal-nav {
 font-family: arial,helvetica,clean,sans-serif;
@@ -886,7 +886,7 @@ text-decoration: none;
 }
 .yui-skin-yellowTheme .mask {
 background-color: #5a4801;
-opacity: .25;*filter:alpha(opacity=25);
+opacity: .25;filter:alpha(opacity=25);
 }
 .yui-skin-yellowTheme .yui-panel-container {
 padding: 0 1px;*padding:2px;
@@ -964,7 +964,7 @@ _bottom: 0;
 _margin-top: 3px;
 _margin-left: -1px;
 background-color: #000;
-opacity: .12;*filter:alpha(opacity=12);
+opacity: .12;filter:alpha(opacity=12);
 }
 .yui-skin-yellowTheme .yui-dialog .ft {
 border-top: none;
@@ -1046,7 +1046,7 @@ bottom: -3px;
 background-color: #000;
 }
 .yui-skin-yellowTheme .yui-tt-shadow-visible {
-opacity: .12;*filter:alpha(opacity=12);
+opacity: .12;filter:alpha(opacity=12);
 }
 .yui-skin-yellowTheme .yui-dt-mask {
 position: absolute;
@@ -1172,7 +1172,7 @@ width: 6px;
 }
 .yui-skin-yellowTheme .yui-dt-mask {
 background-color: #000;
-opacity: .25;*filter:alpha(opacity=25);
+opacity: .25;filter:alpha(opacity=25);
 }
 .yui-skin-yellowTheme .yui-dt-message {
 background-color: #FFF;
@@ -2915,7 +2915,7 @@ background-repeat: no-repeat;
 }
 .yui-skin-yellowTheme .yui-menu-shadow-visible {
 background-color: #000;
-opacity: .12;*filter:alpha(opacity=12);
+opacity: .12;filter:alpha(opacity=12);
 }
 .yui-skin-yellowTheme .yuimenuitem-selected {
 background-color: #B3D4FF;
