@@ -138,6 +138,7 @@ ${head}
 <!-- MSIE CSS fix overrides -->
    <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie6.css" /><![endif]-->
    <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie7.css" /><![endif]-->
+   <!--[if IE 8]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie8.css" /><![endif]-->
 </head>
 </#macro>
 
