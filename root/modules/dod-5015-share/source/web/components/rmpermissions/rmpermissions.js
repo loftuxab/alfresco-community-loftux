@@ -503,16 +503,18 @@
          }
          else
          {
-            // go back to the appropriate details page for the node
-            var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + "site/{site}/{nodeType}-details?nodeRef={nodeRef}";
-            var pageUrl = YAHOO.lang.substitute(uriTemplate,
+            var nodeType = this.options.nodeType;
+            switch (this.options.nodeType)
             {
-               site: encodeURIComponent(this.options.siteId),
-               nodeRef: this.options.nodeRef,
-               nodeType: (this.options.nodeType !== "record" ? this.options.nodeType : "document")
-            });
-            
-            window.location.href = pageUrl;
+               case "record":
+               case "undeclared-record":
+               case "record-nonelec":
+               case "undeclared-record-nonelec":
+                  nodeType = "document";
+                  break;
+            }
+            // go back to the appropriate details page for the node
+            window.location.href = nodeType + "-details?nodeRef=" + this.options.nodeRef;
          }
       }
    });
