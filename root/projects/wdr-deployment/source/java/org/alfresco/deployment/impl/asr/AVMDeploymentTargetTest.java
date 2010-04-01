@@ -424,7 +424,7 @@ public class AVMDeploymentTargetTest extends TestCase
         avmService.setNodeProperty(storeName + ":/scooby", ContentModel.PROP_SUBJECT, new PropertyValue(null, dirSubject)); 
         
         /**
-         * Set various properties of type string, ml_text, boolean, date
+         * Set various properties of type string, mltext (note: will be converted to string), boolean, date
          */
         avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_SUBJECT, new PropertyValue(null, fileSubject));
         avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_TITLE, new PropertyValue(DataTypeDefinition.MLTEXT, "title"));
@@ -450,7 +450,7 @@ public class AVMDeploymentTargetTest extends TestCase
     		assertTrue("Description is missing", willowProps.containsKey(ContentModel.PROP_DESCRIPTION)); 
             assertTrue("Active Property is missing", willowProps.containsKey(ContentModel.PROP_MODEL_ACTIVE)); 
             assertTrue("Published Date property is missing", willowProps.containsKey(ContentModel.PROP_MODEL_PUBLISHED_DATE)); 
-            assertEquals(willowProps.get(ContentModel.PROP_TITLE).getActualTypeString(), "MLTEXT");
+            assertEquals(willowProps.get(ContentModel.PROP_TITLE).getActualTypeString(), "STRING");
             assertEquals(willowProps.get(ContentModel.PROP_MODEL_ACTIVE).getActualTypeString(), "BOOLEAN");
             assertEquals(willowProps.get(ContentModel.PROP_MODEL_PUBLISHED_DATE).getActualTypeString(), "DATE");
             assertEquals(willowProps.get(tempQName).getActualTypeString(), "SERIALIZABLE");
