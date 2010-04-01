@@ -693,7 +693,22 @@ public abstract class AbstractCapability implements Capability
 
     public boolean isFrozen(NodeRef nodeRef)
     {
-        return voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_FROZEN);
+        boolean result = voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_FROZEN);
+        if (result == false && 
+            isRecordFolder(voter.getNodeService().getType(nodeRef)) == true)
+        {
+            // Check that none of the child records are frozen
+            List<NodeRef> rules = voter.getRecordsManagementService().getRecords(nodeRef);
+            for (NodeRef rule : rules)
+            {
+                if (isFrozen(rule) == true)
+                {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     public boolean isDeclared(NodeRef nodeRef)

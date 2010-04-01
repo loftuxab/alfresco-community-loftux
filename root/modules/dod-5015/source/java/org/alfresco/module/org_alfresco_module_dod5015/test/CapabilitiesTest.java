@@ -4609,7 +4609,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -4927,7 +4927,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -5235,7 +5235,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -5499,7 +5499,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -7032,7 +7032,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -7966,7 +7966,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
