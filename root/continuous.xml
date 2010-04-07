@@ -1024,7 +1024,7 @@
       <copy todir="${dir.continuous.assemble.mmt}/lib" 
             flatten="false">
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="**/jug-lgpl-2.0.0.jar" />
+                  includes="**/jug-asl-2.0.0.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="**/truezip.jar" />
       </copy>
