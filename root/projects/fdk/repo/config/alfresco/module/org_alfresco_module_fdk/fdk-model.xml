@@ -77,7 +77,6 @@
     
    <types>
       <type name="fdk:gadget">
-         <title>Gadget</title>
          <parent>cm:content</parent>
          <properties>
             <property name="fdk:make">
@@ -187,7 +186,6 @@
       </type>
       
       <type name="fdk:company">
-         <title>Company</title>
          <parent>cm:content</parent>
          <properties>
             <property name="fdk:email">
@@ -231,7 +229,6 @@
       </type>
       
       <type name="fdk:everything">
-         <title>Everything</title>
          <parent>cm:content</parent>
          <properties>
             <property name="fdk:text">
@@ -401,7 +398,6 @@
    
    <aspects>
       <aspect name="fdk:exif">
-         <title>Exif</title>
          <properties>
             <property name="fdk:manufacturer">
                <type>d:text</type>
@@ -423,12 +419,6 @@
             </property>
             <property name="fdk:resolutionUnit">
                <type>d:text</type>
-            </property>
-            <property name="fdk:xPixelDimension">
-               <type>d:int</type>
-            </property>
-            <property name="fdk:yPixelDimension">
-               <type>d:int</type>
             </property>
             <property name="fdk:flash">
                <type>d:boolean</type>

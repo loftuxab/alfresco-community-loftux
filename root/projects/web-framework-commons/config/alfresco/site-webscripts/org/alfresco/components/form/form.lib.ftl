@@ -31,7 +31,36 @@
       );
    //]]></script>
 </#macro> 
+
+<#macro renderFormContainer formId>
+   <div id="${formId}-container" class="form-container">
+      <#if form.showCaption?exists && form.showCaption>
+         <div id="${formId}-caption" class="caption"><span class="mandatory-indicator">*</span>${msg("form.required.fields")}</div>
+      </#if>
          
+      <#if form.mode != "view">
+         <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl}">
+      </#if>
+      
+      <#if form.mode == "create" && form.destination??>
+         <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination}" />
+      </#if>
+      
+      <#if form.mode != "view" && form.redirect??>
+         <input id="${formId}-redirect" name="alf_redirect" type="hidden" value="${form.redirect}" />
+      </#if>
+      
+      <div id="${formId}-fields" class="form-fields">
+         <#nested>
+      </div>
+         
+      <#if form.mode != "view">
+         <@renderFormButtons formId=formId />
+         </form>
+      </#if>
+   </div>
+</#macro>
+
 <#macro renderFormButtons formId>         
    <div id="${formId}-buttons" class="form-buttons">
       <input id="${formId}-submit" type="submit" value="${msg("form.button.submit.label")}" />

@@ -19,12 +19,113 @@
    </config>
    
    <!-- FDK form configuration -->
-   <config evaluator="node-type" condition="fdk:gadget">
+   
+   <config>
+      <forms>
+         <dependencies>
+            <!-- <css src="/fdk/left-aligned-label.css" /> -->
+            <css src="/yui/tabview/assets/skins/sam/tabview.css" />
+            <css src="/yui/autocomplete/assets/skins/sam/autocomplete.css" />
+            <css src="/yui/container/assets/skins/sam/container.css" />
+            <css src="/fdk/accordion/accordion.css" />
+            <css src="/fdk/exif-accordion.css" />
+            
+            <js src="/yui/tabview/tabview-min.js" />
+            <js src="/yui/animation/animation-min.js" />
+            <js src="/yui/datasource/datasource-min.js" />
+            <js src="/yui/autocomplete/autocomplete-min.js" />
+            <js src="/fdk/accordion/accordion-min.js" />
+         </dependencies>
+      </forms>
+   </config>
+   
+   <config evaluator="model-type" condition="fdk:gadget">
       <forms>
          <form>
             <field-visibility>
                <show id="cm:name" />
-               <show id="cm:title" />
+               <show id="fdk:make" />
+               <show id="fdk:model" />
+               <show id="fdk:type" />
+               <show id="fdk:images" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="model-type" condition="fdk:company">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="fdk:email" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="model-type" condition="fdk:everything">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:content" force="true" />
+            </field-visibility>
+            <appearance>
+               <field id="cm:content">
+                  <control>
+                     <control-param name="editorAppearance">explorer</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="cm:content">
+      <forms>
+         <form>
+            <field-visibility>
+               <!-- exif aspect data, if applied -->
+               <show id="fdk:manufacturer" />
+               <show id="fdk:software" />
+               <show id="fdk:originalDateTime" />
+               <show id="fdk:compression" />
+               <show id="fdk:xResolution" />
+               <show id="fdk:yResolution" />
+               <show id="fdk:resolutionUnit" />
+               <show id="fdk:flash" />
+            </field-visibility>
+            <appearance>
+               <set id="dublin-core" appearance="" template="/fdk/templates/custom-set-dublincore.ftl" />
+               <set id="exif" appearance="" label-id="fdk.tab.label.exif" template="/fdk/templates/custom-set-exif.ftl" />
+               <field id="cm:publisher" set="dublin-core" />
+               <field id="cm:contributor" set="dublin-core" />
+               <field id="cm:type" set="dublin-core" />
+               <field id="cm:identifier" set="dublin-core" />
+               <field id="cm:dcsource" set="dublin-core" />
+               <field id="cm:coverage" set="dublin-core" />
+               <field id="cm:rights" set="dublin-core" />
+               <field id="cm:subject" set="dublin-core" />
+               <field id="fdk:manufacturer" set="exif" />
+               <field id="fdk:software" set="exif" />
+               <field id="fdk:originalDateTime" set="exif" />
+               <field id="fdk:compression" set="exif" />
+               <field id="fdk:xResolution" set="exif" />
+               <field id="fdk:yResolution" set="exif" />
+               <field id="fdk:resolutionUnit" set="exif" />
+               <field id="fdk:flash" set="exif" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="fdk:gadget">
+      <forms>
+         <form>
+            <edit-form template="/fdk/templates/tab-edit-form.ftl" />
+            <field-visibility>
+               <show id="cm:name" />
                <show id="cm:description" />
                <show id="fdk:make" />
                <show id="fdk:model" />
@@ -50,12 +151,30 @@
                <show id="fdk:xResolution" />
                <show id="fdk:yResolution" />
                <show id="fdk:resolutionUnit" />
-               <show id="fdk:xPixelDimension" />
-               <show id="fdk:yPixelDimension" />
                <show id="fdk:flash" />
             </field-visibility>
             <appearance>
-               <set id="exif" appearance="title" label="Exif Data" />
+               <set id="" label-id="fdk.tab.label.details" />
+               <set id="press" label-id="fdk.tab.label.press" />
+               <set id="exif" label-id="fdk.tab.label.exif" />
+               <field id="cm:description">
+                  <control template="/org/alfresco/components/form/controls/richtext.ftl" />
+               </field>
+               <field id="fdk:model">
+                  <control template="/fdk/controls/autocomplete.ftl">
+                     <control-param name="ds">/service/ds/autocomplete/google</control-param>
+                  </control>
+               </field>
+               <field id="fdk:releaseDate" set="press" />
+               <field id="fdk:endOfLifeDate" set="press" />
+               <field id="fdk:retailers" set="press" />
+               <field id="fdk:rating" set="press" />
+               <field id="fdk:contact" set="press" />
+               <field id="fdk:reviews" set="press" />
+               <field id="fdk:company" set="press" />
+               <field id="fdk:pressRelease" set="press" />
+               <field id="fdk:images" set="press" />
+               
                <field id="fdk:manufacturer" set="exif" />
                <field id="fdk:software" set="exif" />
                <field id="fdk:originalDateTime" set="exif" />
@@ -63,9 +182,38 @@
                <field id="fdk:xResolution" set="exif" />
                <field id="fdk:yResolution" set="exif" />
                <field id="fdk:resolutionUnit" set="exif" />
-               <field id="fdk:xPixelDimension" set="exif" />
-               <field id="fdk:yPixelDimension" set="exif" />
                <field id="fdk:flash" set="exif" />
+            </appearance>
+         </form>
+         
+         <!-- Document Library pop-up Edit Metadata form -->
+         <form id="doclib-simple-metadata">
+            <field-visibility>
+               <show id="cm:name" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
+         </form>
+         
+         <!-- Document Library Inline Edit form -->
+         <form id="doclib-inline-edit">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:description" force="true" />
+               <show id="cm:content" force="true" />
+               <show id="mimetype" />
+            </field-visibility>
+            <appearance>
+               <field id="cm:content">
+                  <control>
+                     <control-param name="editorAppearance">explorer</control-param>
+                     <control-param name="forceEditor">true</control-param>
+                  </control>
+               </field>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/hidden.ftl">
+                     <control-param name="contextProperty">mimeType</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -74,6 +222,7 @@
    <config evaluator="node-type" condition="fdk:company">
       <forms>
          <form>
+            <edit-form template="/fdk/templates/2-column-edit-form.ftl" />
             <field-visibility>
                <show id="cm:name" />
                <show id="fdk:email" />
@@ -87,6 +236,44 @@
                <show id="fdk:postCode" />
                <show id="fdk:zip" />
             </field-visibility>
+            <appearance>
+               <field id="fdk:zip" help="Enter a valid ZIP code" />
+            </appearance>
+         </form>
+         
+         <!-- Document Library pop-up Edit Metadata form -->
+         <form id="doclib-simple-metadata">
+            <field-visibility>
+               <show id="cm:name" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
+         </form>
+         
+         <!-- Document Library Inline Edit form -->
+         <form id="doclib-inline-edit">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="cm:content" force="true" />
+               <show id="mimetype" />
+            </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:content">
+                  <control>
+                     <control-param name="editorAppearance">explorer</control-param>
+                     <control-param name="forceEditor">true</control-param>
+                  </control>
+               </field>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/hidden.ftl">
+                     <control-param name="contextProperty">mimeType</control-param>
+                  </control>
+               </field>
+            </appearance>
          </form>
       </forms>
    </config>
@@ -95,6 +282,7 @@
       <forms>
          <form>
             <field-visibility>
+               <show id="cm:name" />
                <show id="cm:categories" />
                <show id="cm:taggable" />
                <show id="fdk:text" />
@@ -140,6 +328,41 @@
                <field id="cm:categories">
                   <control>
                      <control-param name="compactMode">true</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+         
+         <!-- Document Library pop-up Edit Metadata form -->
+         <form id="doclib-simple-metadata">
+            <field-visibility>
+               <show id="cm:name" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
+         </form>
+         
+         <!-- Document Library Inline Edit form -->
+         <form id="doclib-inline-edit">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="cm:content" force="true" />
+               <show id="mimetype" />
+            </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:content">
+                  <control>
+                     <control-param name="editorAppearance">explorer</control-param>
+                     <control-param name="forceEditor">true</control-param>
+                  </control>
+               </field>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/hidden.ftl">
+                     <control-param name="contextProperty">mimeType</control-param>
                   </control>
                </field>
             </appearance>
@@ -234,7 +457,6 @@
          
          <form id="empty-config">
          </form>
-         
       </forms>
    </config>
 

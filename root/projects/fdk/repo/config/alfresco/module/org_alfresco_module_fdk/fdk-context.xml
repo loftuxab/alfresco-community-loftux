@@ -12,14 +12,13 @@
       </property>
    </bean>
    
-   <!-- TODO: Define web client config file to setup Explorer forms for FDK model -->
-   <!-- 
-   <bean id="org_alfresco_module_fdk_config" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init">
-      <property name="configs">
+   <!-- I18N -->
+   <bean id="fdkResourceBundle" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+      <property name="resourceBundles">
          <list>
-            <value>classpath:alfresco/module/org_alfresco_module_fdk/web-client-config-fdk.xml</value>
+            <value>alfresco.module.org_alfresco_module_fdk.fdk-model</value>
          </list>
       </property>
    </bean>
-   -->
+   
 </beans>
