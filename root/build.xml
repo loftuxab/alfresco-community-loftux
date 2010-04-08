@@ -898,7 +898,7 @@
    </target>
    
    <target name="deploy-share-fdk" depends="package-fdk-client">
-      <copy todir="${dir.deploy.tomcat.application.slingshot}/${dir.name.webinf}/${dir.name.lib}" 
+      <copy todir="${home.tomcat.application}/shared/lib" 
             file="${dir.project.fdk.client.dist}/${file.name.jar.fdk}" />
    </target>
       
@@ -913,7 +913,7 @@
    
    <target name="deploy-repo-fdk-exploded" depends="init">
       <copy todir="${home.tomcat}/shared/classes" verbose="${copy.verbose}" overwrite="yes">
-         <fileset dir="${dir.project.fdk.repo.config}" includes="**/fdk-*.xml" excludes="**/fdk-context.xml" />
+         <fileset dir="${dir.project.fdk.repo.config}" includes="**/fdk-*.*" excludes="**/fdk-context.xml" />
       </copy>
       <copy todir="${home.tomcat}/shared/classes/alfresco/extension" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.project.fdk.repo.config}/alfresco/module/org_alfresco_module_fdk" 

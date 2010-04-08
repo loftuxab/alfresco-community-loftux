@@ -19,6 +19,7 @@
 
       <@link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
       <@link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/default/skin.css" />
+      <@link rel="stylesheet" type="text/css" href="${url.context}/res/fdk/form-console.css" />
 
       <script type="text/javascript" src="${url.context}/js/log4javascript.v1.4.1.js"></script>
       <script type="text/javascript" src="${url.context}/yui/yahoo/yahoo-debug.js"></script>
@@ -60,63 +61,6 @@
       <@renderStylesheets />
       
       ${head}
-      
-      <style type="text/css" media="screen">
-         body
-         {
-            text-align: left;
-         }
-         
-         .form-console
-         {
-            padding: 10px; 
-            margin: 10px; 
-            background-color: #f5f9fd;
-            border: 1px dotted #c0c0c0;
-         }
-         
-         .form-console h2
-         {
-            font-family: Helvetica,Arial,sans-serif;
-            font-size: 146.5%;
-         }
-         
-         .form-console fieldset
-         {
-            border: 1px solid black; 
-            margin-top: 10px; 
-            padding: 8px;
-         }
-         
-         .form-console legend
-         {
-            color: black;
-         }
-         
-         .form-console input
-         {
-            margin: 5px 5px 5px 0px;
-         }
-         
-         .form-console .inline-label
-         {
-            margin-right: 5px;
-            margin-left: 5px;
-            font-weight: bold;
-         }
-         
-         .form-console .button
-         {
-            margin-top: 15px;
-         }
-         
-         .form-instance
-         {
-            margin-left: 1.4em; 
-            margin-top: 1.4em;
-         }
-      </style>
-      
    </head>
    <body class="yui-skin-default">
       <div id="bd">
