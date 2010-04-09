@@ -19,6 +19,12 @@
    <import resource="classpath*:alfresco/awe-application-context.xml" />
    <import resource="classpath*:alfresco/web-extension/custom-awe-application-context.xml" />
    
+   <!-- SURF: support for Surf application config -->
+   <import resource="classpath*:org/springframework/extensions/surf/application/*-context.xml" />
+   
+   <!-- SURF: support for custom application configuration overrides -->
+   <import resource="classpath*:org/springframework/extensions/surf/override/*-context.xml" />
+   
    <!-- Set up to auto-resolve to url based views -->   	
    <bean id="handlerMappings" parent="webframeworkHandlerMappings">
       <property name="order" value="0" />
