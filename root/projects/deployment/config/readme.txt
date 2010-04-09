@@ -1,6 +1,6 @@
-Setting up the Alfresco Stand-alone Deployment Receiver
+Setting up the Alfresco Standalone Deployment Receiver
 ------------------------------------------------------------------------
-The automatic installer will install a stand alone deployment receiver.
+The automatic installer will install a standalone deployment receiver.
 
 Here are instructions for manual install.
 
