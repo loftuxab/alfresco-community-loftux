@@ -2228,7 +2228,7 @@ Default file system receiver target:
 {Please enter the RMI port numbers to use }
 
 8C17EC92-75DA-4CD3-97F0-CB38691B9FCB,Subtitle
-{Alfresco server ports}
+{Alfresco <%AppName%> ports}
 
 8C17EC92-75DA-4CD3-97F0-CB38691B9FCB,Title
 {Port Number}
