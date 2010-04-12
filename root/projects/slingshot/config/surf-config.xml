@@ -29,9 +29,8 @@
    <bean id="handlerMappings" parent="webframeworkHandlerMappings">
       <property name="order" value="0" />
       
-      <!-- Remove the default handler for interoperability with other handlers -->
       <property name="defaultHandler">
-         <bean class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
+         <bean class="org.springframework.extensions.surf.mvc.UrlViewController" />
       </property>
    </bean>
 
