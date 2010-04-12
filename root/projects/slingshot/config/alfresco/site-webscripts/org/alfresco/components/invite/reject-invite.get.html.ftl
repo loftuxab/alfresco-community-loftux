@@ -15,7 +15,7 @@
    {
       inviteId: "${page.url.args.inviteId!''}",
       inviteTicket: "${page.url.args.inviteTicket!''}",
-      inviteeUserName: "${page.url.args.inviteeUserName!''}",
+      inviteeUserName: "${(page.url.args.inviteeUserName!'')?html}",
    }).setMessages(
       ${messages}
    );
@@ -23,10 +23,10 @@
 
 <#assign inviter = invite.inviter.userName>
 <#if (invite.inviter.firstName?? || invite.inviter.lastName??)>
-   <#assign inviter = (invite.inviter.firstName!'' + ' ' + invite.inviter.lastName!'')>
+   <#assign inviter = (invite.inviter.firstName!'' + ' ' + invite.inviter.lastName!'')?html>
 </#if>
 <#assign siteName><#if (invite.site.title?? && invite.site.title?length > 0)>${invite.site.title}<#else>${invite.site.shortName}</#if></#assign>
-<#assign siteMarkup><span class="site-name">${siteName}</span></#assign>
+<#assign siteMarkup><span class="site-name">${siteName?html}</span></#assign>
 <div class="reject-invite-body">
    <div id="${args.htmlid}-confirm" class="main-content">
       <div class="question">${msg("reject.question", inviter, siteMarkup)}</div>
