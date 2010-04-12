@@ -27,6 +27,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -72,6 +73,8 @@ public class Target implements Serializable
      * Where metadata is kept for this target.
      */
     private String fMetaDataDirectory;
+    
+    private MetadataCache metadataCache = new MetadataCache();
 
     /**
      * Make one up.
@@ -241,24 +244,74 @@ public class Target implements Serializable
     {
         return fMetaDataDirectory;
     }
-
+    
+    /**
+     * Looks up the metadata for the specified file.
+     * 
+     * Returns the file descriptor from meta-data.
+     * 
+     * @param path
+     * 
+     * @return the file descriptor or null if the file does not exist in the metadata 
+     */
+    public FileDescriptor lookupMetadataFile(String path, String fileName)
+    {
+       try
+       {
+           Set<FileDescriptor> list = getListing(path);
+           for(FileDescriptor file : list)
+           {
+               if(file.getName().equals(fileName))
+               {
+                   logger.debug("lookupMetadataFile : found file in metadata");
+                   // file found in listing
+                   return file;
+               }
+           }
+           
+           logger.debug("lookupMetadataFile : not found metadata : return null");
+           return null;
+       }
+       catch (Exception e)
+       {
+           return null;
+       }
+    }
+    
+    /**
+     * Get the metadata listing for a directory
+     * @param path
+     * @return the listng for the specified directory
+     * @throws DeploymentException - the directory does not exist 
+     */
     public SortedSet<FileDescriptor> getListing(String path)
     {
-        Path cPath = new Path(path);
-        StringBuilder builder = new StringBuilder();
-        builder.append(fMetaDataDirectory);
-        if (cPath.size() != 0)
+        // Have we got the metadata cached ?
+        SortedSet<FileDescriptor> val = metadataCache.lookup(path);
+        
+        if(val != null)
         {
-            for (int i = 0; i < cPath.size(); i++)
-            {
-                builder.append(File.separatorChar);
-                builder.append(cPath.get(i));
-            }
+            return val;
         }
-        builder.append(File.separatorChar);
-        builder.append(MD_NAME);
-        String mdPath = builder.toString();
-        return getDirectory(mdPath).getListing();
+        else
+        {
+            Path cPath = new Path(path);
+            StringBuilder builder = new StringBuilder();
+            builder.append(fMetaDataDirectory);
+            if (cPath.size() != 0)
+            {
+                for (int i = 0; i < cPath.size(); i++)
+                {
+                    builder.append(File.separatorChar);
+                    builder.append(cPath.get(i));
+                }
+            }
+            builder.append(File.separatorChar);
+            builder.append(MD_NAME);
+            String mdPath = builder.toString();
+            val = getDirectory(mdPath).getListing();
+            return metadataCache.put(path, val);
+        }
     }
 
     /**
@@ -267,6 +320,7 @@ public class Target implements Serializable
      */
     public void cloneMetaData(Deployment deployment)
     {
+        metadataCache.clear();
     	String currentmd = null;
        	DirectoryMetaData md = null;
     	
@@ -377,11 +431,13 @@ public class Target implements Serializable
 			putDirectory(currentmd + CLONE, md);
 		}
     }
+    
+    
 
     /**
      * Utility routine to get a metadata object.
      * @param path
-     * @return
+     * @return the directory metadata or DeploymentException if it does not exist.
      */
     private DirectoryMetaData getDirectory(String path)
     {
@@ -437,6 +493,7 @@ public class Target implements Serializable
      */
     public void commitMetaData(Deployment deployment)
     {
+        metadataCache.clear();
         Set<String> toCommit = new HashSet<String>();
         for (DeployedFile file : deployment)
         {
@@ -466,6 +523,7 @@ public class Target implements Serializable
 
     private void recursiveRollbackMetaData(String dir)
     {
+        metadataCache.clear();
         String mdName = dir + File.separatorChar + MD_NAME;
         String clone = mdName + CLONE;
         File dClone = new File(clone);
@@ -508,4 +566,40 @@ public class Target implements Serializable
 		return busy;
 	}
 
+
+	/**
+	 * In memory, thread safe, cache of directory listings
+	 * <p>
+	 * The cache limits the number of entries it contains and discards entries. 
+	 *
+	 * @author Mark Rogers
+	 */
+	private class MetadataCache
+	{
+	    // InternalMap is synchronized so should be safe for multiple threads.
+	    Map<String, SortedSet<FileDescriptor>> internalMap = Collections.synchronizedMap(new HashMap<String, SortedSet<FileDescriptor>>(10));
+	    
+	    SortedSet<FileDescriptor> lookup(String path)
+	    {
+	        return internalMap.get(path);
+	    }
+	    
+	    SortedSet<FileDescriptor> put(String path, SortedSet<FileDescriptor> listing)
+	    {
+	        // Very simple and stupid cache, if it contains more than 10 elements then 
+	        // clear everything else out.
+	        if(internalMap.size() > 10)
+	        {
+	            clear();
+	        }
+	        internalMap.put(path, listing);
+	        return listing;
+	    }
+	    
+	    void clear()
+	    {
+	        internalMap.clear();   
+	    }
+	}
 }
+

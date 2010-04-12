@@ -670,6 +670,19 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
         	File f = PathUtil.getFileForPath(fRootDirectory, path);
 
         	boolean exists = f.exists();
+        	
+        	// Check whether we are overwriting something that is outside our 
+        	// control
+            if(exists && fileSystemReceiverService.isErrorOnOverwrite() )
+            {
+                if (metaDataTarget.lookupMetadataFile(f.getParent(), f.getName()) == null)
+                {
+                    /**
+                     * File exists but is not in metadata
+                     */
+                    throw new DeploymentException("file already exists, path:" + f.getAbsolutePath());
+                }
+            }
     	       
         	DeployedFile file = new DeployedFile(FileType.FILE,
                                              preLocation,
