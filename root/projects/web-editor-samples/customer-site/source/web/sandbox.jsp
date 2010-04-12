@@ -30,14 +30,39 @@
 
    <head>
       <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-      <title>Alfresco Web Editor Demo</title>
+      <title>Alfresco Web Editor Demo (sandbox mode)</title>
       
+      <%
+         //check if yui version is specified in querystring and load that version instead
+         String yuiVersion = "2.7.0";
+         String yuiloaderModuleName = "yuiloader";
+
+         if (request.getParameter("yuiVersion")!=null)
+         {
+            yuiVersion = request.getParameter("yuiVersion");
+         }
+         Float yuiv = Float.parseFloat(yuiVersion.substring(0, yuiVersion.indexOf(".")+1) + yuiVersion.substring(yuiVersion.indexOf(".")).replace(".",""));
+         if (yuiv <= 2.51)
+         {
+            yuiloaderModuleName = "yuiloader-beta";
+         }
+      %>
       <!-- Add ydn served yui files for testing sandbox loading -->
-      <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/button/assets/skins/sam/button.css"> 
-      <script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/utilities/utilities.js&2.8.0r4/build/button/button-min.js"></script> 
-      
+      <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?<%=yuiVersion%>/build/button/assets/skins/sam/button.css"> 
+      <script type="text/javascript" src="http://yui.yahooapis.com/combo?<%=yuiVersion%>/build/yuiloader/<%=yuiloaderModuleName%>-debug.js"></script> 
+
       <awe:startTemplate />
       
+      <script type="text/javascript">
+         /* Force sandbox mode */
+         var c = WEF.get('loaderConfig');
+         if (c.useSandboxLoader!==true)
+         {
+            c.useSandboxLoader=true;
+            WEF.set('loaderConfig', c);
+         }
+      </script>
+            
       <link rel="stylesheet" type="text/css" href="customer.css" />
    </head>
    

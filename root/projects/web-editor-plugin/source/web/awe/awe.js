@@ -492,4 +492,4 @@
    YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT = 'AWE_EditContent_click';
 })();
 
-WEF.register("org.alfresco.awe", YAHOO.org.alfresco.awe.app, {version: "1.0.1", build: "1"});
+WEF.register("org.alfresco.awe", YAHOO.org.alfresco.awe.app, {version: "1.0.1", build: "1"}, YAHOO);
