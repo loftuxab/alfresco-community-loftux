@@ -31,6 +31,11 @@
    var Dom = YAHOO.util.Dom;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+    var $html = Alfresco.util.encodeHTML;
+
+   /**
     * RejectInvite constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -111,9 +116,9 @@
          var url = YAHOO.lang.substitute(window.location.protocol + "//" + window.location.host +
             Alfresco.constants.URL_CONTEXT + "proxy/alfresco-noauth/api/invite/{inviteId}/{inviteTicket}/reject?inviteeUserName={inviteeUserName}",
             {
-               inviteId : this.options.inviteId,
+               inviteId : encodeURIComponent(this.options.inviteId),
                inviteTicket : this.options.inviteTicket,
-               inviteeUserName : this.options.inviteeUserName
+               inviteeUserName : encodeURIComponent(this.options.inviteeUserName)
             });
 
          // make a backend call to decline the request
@@ -127,7 +132,7 @@
                fn: success,
                scope: this
             },
-            failureMessage: this._msg("message.decline.failure")
+            failureMessage: this.msg("message.decline.failure")
          });
       },
 
@@ -144,9 +149,9 @@
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "accept-invite" +
             "?inviteId={inviteId}&inviteTicket={inviteTicket}&inviteeUserName={inviteeUserName}",
             {
-               inviteId : this.options.inviteId,
+               inviteId : encodeURIComponent(this.options.inviteId),
                inviteTicket : this.options.inviteTicket,
-               inviteeUserName : this.options.inviteeUserName
+               inviteeUserName : encodeURIComponent(this.options.inviteeUserName)
             });
          window.location = url;
       }
