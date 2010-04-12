@@ -16,13 +16,15 @@ call "%ALF_HOME%SetPaths.bat"
 del "%ALF_HOME%SetPaths.bat"
 
 :start
-echo This script will apply all the AMPs in %ALF_HOME%amps to the alfresco.war file in %CATALINA_HOME%\webapps
+echo This script will apply all the AMPs in %ALF_HOME%amps to the alfresco.war and share.war files in %CATALINA_HOME%\webapps
 if ""%1"" == ""nowait"" goto nowait1
 echo Press control-c to stop this script . . .
 pause
 :nowait1
 "%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" install "%ALF_HOME%amps" "%CATALINA_HOME%\webapps\alfresco.war" -directory "%2"
 "%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" list "%CATALINA_HOME%\webapps\alfresco.war"
+"%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" install "%ALF_HOME%amps-share" "%CATALINA_HOME%\webapps\share.war" -directory "%2"
+"%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" list "%CATALINA_HOME%\webapps\share.war"
 echo .
 echo About to clean out tomcat/webapps/alfresco directory and temporary files...
 if ""%1"" == ""nowait"" goto nowait2
