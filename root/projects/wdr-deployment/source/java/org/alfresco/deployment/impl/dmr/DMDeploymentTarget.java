@@ -776,7 +776,9 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 			/**
 			 * Open a temporary file to receive the contents.
 			 */
-			File tempFile = TempFileProvider.createTempFile(ticket, "bin");
+    	    File tempDir = TempFileProvider.getLongLifeTempDir(ticket);
+            File tempFile = TempFileProvider.createTempFile(ticket, "bin", tempDir);
+      
 			OutputStream out = new BufferedOutputStream(new FileOutputStream(tempFile));
 
 	   	   /**
