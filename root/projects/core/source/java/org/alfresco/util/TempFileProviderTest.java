@@ -23,12 +23,19 @@ import java.io.File;
 import junit.framework.TestCase;
 
 /**
+ * Unit test for TempFileProvider
+ * 
  * @see org.alfresco.util.TempFileProvider
  * 
  * @author Derek Hulley
  */
 public class TempFileProviderTest extends TestCase
 {
+    /**
+     * test of getTempDir
+     * 
+     * @throws Exception
+     */
     public void testTempDir() throws Exception
     {
         File tempDir = TempFileProvider.getTempDir();
@@ -44,6 +51,12 @@ public class TempFileProviderTest extends TestCase
                 tempFileParent, tempDirParent);
     }
     
+    /**
+     * test create a temporary file 
+     * 
+     * create another file with the same prefix and suffix.
+     * @throws Exception
+     */
     public void testTempFile() throws Exception
     {
         File tempFile = TempFileProvider.createTempFile("AAAA", ".tmp");
@@ -51,5 +64,32 @@ public class TempFileProviderTest extends TestCase
         File tempDir = TempFileProvider.getTempDir();
         assertEquals("Temp file not located in our temp directory",
                 tempDir, tempFileParent);
+        
+        /**
+         * Create another temp file and then delete it.
+         */
+        File tempFile2 = TempFileProvider.createTempFile("AAAA", ".tmp");
+        tempFile2.delete();
+    }
+    
+    /**
+     * test create a temporary file with a directory 
+     * 
+     * create another file with the same prefix and suffix.
+     * @throws Exception
+     */
+    public void testTempFileWithDir() throws Exception
+    {
+        File tempDir = TempFileProvider.getTempDir();
+        File tempFile = TempFileProvider.createTempFile("AAAA", ".tmp", tempDir);
+        File tempFileParent = tempFile.getParentFile();
+        assertEquals("Temp file not located in our temp directory",
+                tempDir, tempFileParent);
+        
+        /**
+         * Create another temp file and then delete it.
+         */
+        File tempFile2 = TempFileProvider.createTempFile("AAAA", ".tmp", tempDir);
+        tempFile2.delete();
     }
 }

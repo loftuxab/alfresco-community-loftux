@@ -29,15 +29,39 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * A helper class that provides temp files, providing a common point to clean
+ * A helper class that provides temporary files, providing a common point to clean
  * them up.
  * 
+ * <p>
+ * The contents of ALFRESCO_TEMP_FILE_DIR [%java.io.tmpdir%/Alfresco] are managed by this 
+ * class.  Temporary files and directories are cleaned by TempFileCleanerJob so that 
+ * after a delay [default 1 hour] the contents of the alfresco temp dir, 
+ * both files and directories are removed.
+ * 
+ * <p>
+ * Some temporary files may need to live longer than 1 hour.   The temp file provider allows special sub folders which 
+ * are cleaned less frequently.    By default, files in the long life folders will remain for 24 hours 
+ * unless cleaned by the application code earlier.
+ * 
+ * <p>
+ * The other contents of %java.io.tmpdir% are not touched by the cleaner job.
+ * 
+ * <p>TempFileCleanerJob Job Data: protectHours, number of hours to keep temporary files, default 1 hour.
+ *  
  * @author derekh
+ * @author mrogers
  */
 public class TempFileProvider
 {
-    /** subdirectory in the temp directory where Alfresco temporary files will go */
+    /** 
+     * subdirectory in the temp directory where Alfresco temporary files will go 
+     */
     public static final String ALFRESCO_TEMP_FILE_DIR = "Alfresco";
+    
+    /**
+     * The prefix for the long life temporary files.
+     */
+    public static final String ALFRESCO_LONG_LIFE_FILE_DIR = "longLife";
 
     /** the system property key giving us the location of the temp directory */
     public static final String SYSTEM_KEY_TEMP_DIR = "java.io.tmpdir";
@@ -52,6 +76,8 @@ public class TempFileProvider
     }
 
     /**
+     * Get the Java Temp dir e.g. java.io.tempdir
+     * 
      * @return Returns the system temporary directory i.e. <code>isDir == true</code>
      */
     public static File getSystemTempDir()
@@ -66,6 +92,9 @@ public class TempFileProvider
     }
     
     /**
+     * Get the Alfresco temp dir, by defaut %java.io.tempdir%/Alfresco.  
+     * Will create the temp dir on the fly if it does not already exist.
+     * 
      * @return Returns a temporary directory, i.e. <code>isDir == true</code>
      */
     public static File getTempDir()
@@ -93,8 +122,76 @@ public class TempFileProvider
         // done
         return tempDir;
     }
+    
+    /**
+     * creates a longer living temp dir.   Files within the longer living 
+     * temp dir will not be garbage collected as soon as "normal" temporary files.
+     * By default long life temp files will live for for 24 hours rather than 1 hour.
+     * <p>
+     * Code using the longer life temporary files should be careful to clean up since 
+     * abuse of this feature may result in out of memory/disk space errors.
+     * @param key can be blank in which case the system will generate a folder to be used by all processes
+     * or can be used to create a unique temporary folder name for a particular process.  At the end of the process 
+     * the client can simply delete the entire temporary folder.  
+     * @return the long life temporary directory
+     */
+    public static File getLongLifeTempDir(String key)
+    {
+        /**
+         * Long life temporary directories have a prefix at the start of the 
+         * folder name.
+         */
+        String folderName = ALFRESCO_LONG_LIFE_FILE_DIR + "_" + key;
+        
+        File tempDir = getTempDir();
+        
+        // append the Alfresco directory
+        File longLifeDir = new File(tempDir, folderName);
+        // ensure that the temp directory exists
+        if (longLifeDir.exists())
+        {
+            // nothing to do
+        }
+        else
+        {
+            // not there yet
+            if (!longLifeDir.mkdirs())
+            {
+                throw new AlfrescoRuntimeException("Failed to create temp directory: " + tempDir);
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Created long life temp directory: " + longLifeDir);
+            }
+        }
+        // done
+        return longLifeDir;
+    }
+    
+    /**
+     * Is this a long life folder ?
+     * @param file
+     * @return true, this is a long life folder.
+     */
+    private static boolean isLongLifeTempDir(File file)
+    {
+        if(file.isDirectory())
+        {
+            if(file.getName().startsWith(ALFRESCO_LONG_LIFE_FILE_DIR))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return false;
+    }
 
     /**
+     * Create a temp file in the alfresco temp dir.
+     * 
      * @return Returns a temp <code>File</code> that will be located in the
      *         <b>Alfresco</b> subdirectory of the default temp directory
      * 
@@ -175,8 +272,10 @@ public class TempFileProvider
             long now = System.currentTimeMillis();
             long aFewHoursBack = now - (3600L * 1000L * protectHours);
             
+            long aLongTimeBack = now - (24 * 3600L * 1000L);
+            
             File tempDir = TempFileProvider.getTempDir();
-            int count = removeFiles(tempDir, aFewHoursBack, false);  // don't delete this directory
+            int count = removeFiles(tempDir, aFewHoursBack, aLongTimeBack, false);  // don't delete this directory
             // done
             if (logger.isDebugEnabled())
             {
@@ -195,7 +294,7 @@ public class TempFileProvider
         public static int removeFiles(long removeBefore)
         {
             File tempDir = TempFileProvider.getTempDir();
-            return removeFiles(tempDir, removeBefore, false);
+            return removeFiles(tempDir, removeBefore, removeBefore, false);
         }
         
         /**
@@ -204,7 +303,7 @@ public class TempFileProvider
          * @param removeDir true if the directory must be removed as well, otherwise false
          * @return Returns the number of files removed
          */
-        private static int removeFiles(File directory, long removeBefore, boolean removeDir)
+        private static int removeFiles(File directory, long removeBefore, long longLifeBefore, boolean removeDir)
         {
             if (!directory.isDirectory())
             {
@@ -222,8 +321,16 @@ public class TempFileProvider
             {
                 if (file.isDirectory())
                 {
-                    // enter subdirectory and clean it out and remove it
-                    removeFiles(file, removeBefore, true);
+                    if(isLongLifeTempDir(file))
+                    {
+                        // long life for this folder and its children
+                        removeFiles(file, longLifeBefore, longLifeBefore, true);   
+                    }
+                    else
+                    {
+                        // enter subdirectory and clean it out and remove it
+                        removeFiles(file, removeBefore, longLifeBefore, true);
+                    }
                 }
                 else
                 {
@@ -236,6 +343,10 @@ public class TempFileProvider
                     // it is a file - attempt a delete
                     try
                     {
+                        if(logger.isDebugEnabled())
+                        {
+                            logger.debug("Deleting temp file: " + file);
+                        }
                         file.delete();
                         count++;
                     }
