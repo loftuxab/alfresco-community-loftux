@@ -57,7 +57,7 @@ var tinymce = {
             // If path to script is relative and a base href was found add that one infront
             if (base && t.baseURL.indexOf('://') == -1)
                t.baseURL = base + t.baseURL;
-
+               
             return t.baseURL;
          }
 
@@ -9743,7 +9743,6 @@ var tinyMCE = window.tinyMCE = tinymce.EditorManager;
                // Check if there is any attributes
                each(dom.getAttribs(n), function(an) {
                   if (an.nodeName.substring(0, 1) != '_' && dom.getAttrib(n, an.nodeName) != '') {
-                     //console.log(dom.getOuterHTML(n), dom.getAttrib(n, an.nodeName));
                      c++;
                   }
                });

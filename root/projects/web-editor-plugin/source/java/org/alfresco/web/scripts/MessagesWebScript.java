@@ -73,7 +73,7 @@ public class MessagesWebScript extends org.springframework.extensions.webscripts
         {
             throw new WebScriptException("Error building messages response.", jsonErr);
         }
-        writer.write(";\r\n");
+        writer.write(";\r\n//Make global for sandbox mode\r\nwindow.Alfresco=Alfresco;\r\n");
         
         return writer.toString();
     }

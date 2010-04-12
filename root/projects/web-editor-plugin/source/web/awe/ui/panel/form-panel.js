@@ -225,4 +225,4 @@
    });
 })();
 
-WEF.register("org.alfresco.awe.ui.form-panel", YAHOO.org.alfresco.awe.ui.FormPanel, {version: "1.0", build: "1"});
+WEF.register("org.alfresco.awe.ui.form-panel", YAHOO.org.alfresco.awe.ui.FormPanel, {version: "1.0", build: "1"}, YAHOO);
