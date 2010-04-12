@@ -15,7 +15,7 @@
    {
       inviteId: "${page.url.args.inviteId!''}",
       inviteTicket: "${page.url.args.inviteTicket!''}",
-      inviteeUserName: "${(page.url.args.inviteeUserName!'')?html}",
+      inviteeUserName: "${(page.url.args.inviteeUserName!'')?js_string}",
    }).setMessages(
       ${messages}
    );
