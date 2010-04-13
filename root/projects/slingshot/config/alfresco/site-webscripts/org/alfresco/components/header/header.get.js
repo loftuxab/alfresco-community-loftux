@@ -129,6 +129,10 @@ function main()
    model.collapsedTwisters = collapsedTwisters;
    model.siteTitle = siteTitle;
    model.repoLibraryVisible = repoLibraryVisible;
+   if (page.url.args["theme"] != undefined)
+   {
+      model.theme = page.url.args["theme"];
+   }
 }
 
 main();
