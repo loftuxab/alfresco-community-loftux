@@ -48,7 +48,7 @@
    </#if>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-   <title>Alfresco Share &raquo; ${pageTitle}</title>
+   <title>${msg("page.title", pageTitle)}</title>
    <meta http-equiv="X-UA-Compatible" content="Edge" />
 
 <!-- Shortcut Icons -->
@@ -96,6 +96,12 @@
    <@link rel="stylesheet" type="text/css" href="${url.context}/css/yui-layout.css" />   
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
    <@script type="text/javascript" src="${url.context}/js/bubbling.v2.1.js"></@script>
+   <script type="text/javascript">//<![CDATA[
+      YAHOO.Bubbling.unsubscribe = function(layer, handler)
+      {
+         this.bubble[layer].unsubscribe(handler);
+      }
+   //]]></script>
    <@script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></@script>
    <#-- NOTE: Do not attempt to load -min.js version of messages.js -->
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
