@@ -1998,7 +1998,13 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		DiskInterface disk = null;
 		TreeConnection tree = null;
 		NetworkFile netFile = null;
-
+		int sts = FileStatus.NotExist;
+		
+        // Flag to indicate if the file should be deleted on close, used if there is an error during the upload
+        // and the file did not exist before the upload
+        
+        boolean deleteOnClose = false;
+        
 		try {
 
 			// Create a temporary tree connection
@@ -2018,7 +2024,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 			// Check if the file exists
 
 			disk = (DiskInterface) ftpPath.getSharedDevice().getInterface();
-			int sts = disk.fileExists(this, tree, ftpPath.getSharePath());
+			sts = disk.fileExists(this, tree, ftpPath.getSharePath());
 
 			if ( sts == FileStatus.DirectoryExists) {
 
@@ -2036,7 +2042,8 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 			FileOpenParams params = new FileOpenParams(ftpPath.getSharePath(), openAction, AccessMode.ReadWrite, 0, 0);
 
-	        // transaction begins in the innards of 'disk'
+	        // Transaction begins in the innards of 'disk'
+			
 	        try 
 	        {
 	            // Are we opening an existing file or creating a new one?
@@ -2190,6 +2197,17 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 				m_dataSess = null;
 			}
 
+			// If the file did not exist before the upload then mark it to delete on close
+			
+			if ( sts != FileStatus.FileExists) {
+			    deleteOnClose = true;
+			    
+			    // DEBUG
+			    
+			    if ( Debug.EnableDbg && hasDebug(DBG_ERROR))
+			        debugPrintln(" Marking file for delete on close (quota exceeded)");
+			}
+			
 			// Indicate that there was an error during writing of the file
 
 	        sendFTPResponse(451, "Disk full or Quota Exceeded");
@@ -2209,6 +2227,11 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		}
 		finally {
 
+		    // Check if the file should be marked for delete on close, only when an error occurs
+		    
+		    if ( netFile != null && deleteOnClose == true)
+		        netFile.setDeleteOnClose( true);
+		        
 			// Close the network file
 
 			if ( netFile != null && disk != null && tree != null)
