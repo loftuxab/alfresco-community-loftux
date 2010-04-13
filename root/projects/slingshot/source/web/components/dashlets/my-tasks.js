@@ -427,7 +427,7 @@
 
             var url = YAHOO.lang.substitute("api/workflow/task/end/{taskId}{transitionId}",
             {
-               taskId: taskId,
+               taskId: encodeURIComponent(taskId),
                transitionId: transitionId
             });
 
