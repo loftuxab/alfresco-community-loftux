@@ -61,6 +61,7 @@
             /system/**=remoteController
             /proxy/**=endpointController
             /resource/**=resourceController
+            /feed/**=feedController
             /dologin/**=loginController
             /dologout/**=logoutController
          </value>

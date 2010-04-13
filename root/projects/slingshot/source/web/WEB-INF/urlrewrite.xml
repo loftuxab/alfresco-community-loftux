@@ -16,6 +16,10 @@
       <to>/page/$1</to>
    </rule>
    <rule>
+      <from>/feedservice/**</from>
+      <to>/page/feed/$1</to>
+   </rule>
+   <rule>
       <from>/system/**</from>
       <to>/page/system/$1</to>
    </rule>
