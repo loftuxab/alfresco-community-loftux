@@ -56,7 +56,6 @@ import org.alfresco.repo.avm.CreateVersionTxnListener;
 import org.alfresco.repo.avm.PurgeStoreTxnListener;
 import org.alfresco.repo.avm.PurgeVersionTxnListener;
 import org.alfresco.repo.avm.util.RawServices;
-import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.security.authentication.AuthenticationContext;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -128,6 +127,8 @@ import org.springframework.context.ApplicationContext;
             .href/mysite/|mywebapp/-2/file_to_hdep/
 
 </pre>
+
+* @deprecated will be removed in future release
 */
 //-----------------------------------------------------------------------------
 public class LinkValidationServiceImpl implements LinkValidationService,
@@ -203,6 +204,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     private Boolean virt_available = null; // null to ensure info/warn on startup
     
     int virt_retry_interval_ = 120000;
+    
+    private Long previousTimeOfDeprecatedError = null;
 
     // The property to set if the service should be enabled/disabled on fail during link validation
     private boolean disableOnFail = false;
@@ -619,15 +622,23 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 }
             }
             else
-            {               
+            {
                 if ( log.isTraceEnabled() )
                 {
                     log.trace("Virtualization server is accessible. LinkValidationService is polling webapps...");
                 }
-    
+                
+                long currentTimeOfDeprecatedError = System.currentTimeMillis();
+                if ((previousTimeOfDeprecatedError == null) || (currentTimeOfDeprecatedError > (previousTimeOfDeprecatedError+(1000*60*60L))))
+                {
+                    // deprecated error
+                    log.error("PLEASE NOTE: The LinkValidationService is deprecated - it will be removed from a future release");
+                    previousTimeOfDeprecatedError = currentTimeOfDeprecatedError;
+                }
+                
                 final HrefValidationProgress progress = new HrefValidationProgress();
                 progress_sleepy = progress;
-    
+                
                 try
                 {
                     RetryingTransactionCallback<Object> callback = new RetryingTransactionCallback<Object>()
