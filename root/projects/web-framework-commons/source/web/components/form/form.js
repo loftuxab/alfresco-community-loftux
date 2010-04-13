@@ -277,7 +277,7 @@
       onJsonPostFailure: function FormUI_onJsonPostFailure(response)
       {
          var errorMsg = this._msg("form.jsonsubmit.failed");
-         if (response.json.message)
+         if (response.json && response.json.message)
          {
             errorMsg = errorMsg + ": " + response.json.message;
          }
