@@ -3,5 +3,4 @@
   <description>Discussions: RSS of List of Topics component</description>
   <url>/components/discussions/rss</url>
   <format default="rss"/>
-  <authentication>user</authentication>
 </webscript>
