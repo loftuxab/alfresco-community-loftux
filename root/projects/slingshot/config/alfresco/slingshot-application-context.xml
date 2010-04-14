@@ -119,6 +119,12 @@
    <!-- "no-component" processor -->
    <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
    
+   <!-- Override WebScript View Resolver - authenticated for admin webscripts via alfresco-feed connector -->
+   <bean id="webscriptViewResolver" class="org.springframework.extensions.webscripts.servlet.mvc.WebScriptViewResolver">
+      <property name="container" ref="webscripts.container" />
+      <property name="authenticatorFactory" ref="webscripts.authenticator.basic" />
+   </bean>
+   
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
