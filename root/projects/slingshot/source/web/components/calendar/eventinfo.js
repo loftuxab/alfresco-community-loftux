@@ -300,7 +300,8 @@
                           Dom.get("fd").value = dateStr;
                           var dateStr = Alfresco.util.formatDate(dte, "dddd, d mmmm yyyy");
                           Dom.get("td").value = dateStr;
-                          Dom.get(this.id+"-from").value = Dom.get(this.id+"-to").value = Alfresco.util.formatDate(dts,'yyyy/mm/dd');
+                          Dom.get(this.id+"-from").value =  Alfresco.util.formatDate(dts,'yyyy/mm/dd');
+                          Dom.get(this.id+"-to").value = Alfresco.util.formatDate(dte,'yyyy/mm/dd');
                           var a = ['what','where','desc'];
                           for (var i=0;i<a.length;i++)
                           {
