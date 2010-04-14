@@ -180,6 +180,27 @@
 
    <target name="load-database-properties"
            depends="continuous-init">
+      <!-- If a DB properties override file was supplied, copy it into place -->
+      <script language="javascript" classpath="${classpath.bsf_javascript}"> <![CDATA[
+         importClass(java.io.File);
+         var repoConfigPath = project.getProperty("dir.project.repository.config");
+         var globalFile = new File(repoConfigPath + "/alfresco/module/tests/alfresco-global.properties" );
+
+         var propfile = project.getProperty("DB_PROPERTIES");
+         if(propfile == null) {
+            // Clean up the old one
+            var del = project.createTask("delete");
+            del.setFile( globalFile );
+            del.perform();
+         } else {
+            // Copy it in
+            var copy = project.createTask("copy");
+            copy.setFile( new File(propfile) );
+            copy.setTofile( globalFile );
+            copy.perform();
+         }
+      ]]></script>
+
       <!-- Grab dev-context.xml and test-context.xml, from the repo config + home dir -->
       <!-- Then, load the repository properties files, in order -->
       <!-- Note - ant property loading works differently to spring, so we -->
@@ -259,6 +280,13 @@
                   }
                }
             }
+         }
+
+         // If they gave a properties override file, that goes first
+         var propfile = project.getProperty("DB_PROPERTIES");
+         if(propfile != null) {
+            propertiesFiles.push( new File(propfile) );
+            propertiesDefs.push( propfile );
          }
 
          // Now load the files, in reverse order
