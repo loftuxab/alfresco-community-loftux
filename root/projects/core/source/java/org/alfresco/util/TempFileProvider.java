@@ -357,16 +357,21 @@ public class TempFileProvider
                 }
             }
             // must we delete the directory we are in?
-            if (removeDir && directory.listFiles().length == 0)
+            if (removeDir)
             {
-                // the directory must be removed and is empty
+                // the directory must be removed if empty
                 try
                 {
-                    directory.delete();
+                    File[] listing = directory.listFiles();
+                    if(listing != null && listing.length == 0)
+                    {
+                        // directory is empty
+                        directory.delete();
+                    }
                 }
                 catch (Throwable e)
                 {
-                    logger.info("Failed to remove temp directory: " + directory);
+                    logger.info("Failed to remove temp directory: " + directory, e);
                 }
             }
             // done
