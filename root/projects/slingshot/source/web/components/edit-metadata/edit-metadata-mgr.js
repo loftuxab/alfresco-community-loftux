@@ -143,25 +143,6 @@
          {
             errorMsg = errorMsg + ": " + response.json.message;
          }
-         else if (response.serverResponse.responseText)
-         {
-            // workaround issue where webscript engine returns HTML
-            // response for integrity exceptions, for now, until it's
-            // fixed properly, parse the HTML for the error detail
-            
-            var constraintIndexStart = response.serverResponse.responseText.indexOf("Constraint: ");
-            if (constraintIndexStart != -1)
-            {
-               // find the end of the error message
-               var errorOnwards = response.serverResponse.responseText.substring(constraintIndexStart + 12);
-               var errorEnd = errorOnwards.indexOf("</td>");
-               if (errorEnd != -1)
-               {
-                  var constraintError = errorOnwards.substring(0, errorEnd);
-                  errorMsg = errorMsg + ": " + constraintError;
-               }
-            }
-         }
             
          Alfresco.util.PopupManager.displayPrompt(
          {
