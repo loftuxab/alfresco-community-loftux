@@ -167,7 +167,7 @@
                </field>
                <field id="fdk:releaseDate" set="press" />
                <field id="fdk:endOfLifeDate" set="press" />
-               <field id="fdk:retailers" set="press" />
+               <field id="fdk:retailers" set="press" help-id="fdk.help.gadget.retailers" />
                <field id="fdk:rating" set="press" />
                <field id="fdk:contact" set="press" />
                <field id="fdk:reviews" set="press" />
@@ -226,8 +226,8 @@
             <field-visibility>
                <show id="cm:name" />
                <show id="fdk:email" />
+               <show id="fdk:url" />
                <show id="fdk:tel" />
-               <show id="fdk:country" />
                <show id="fdk:street1" />
                <show id="fdk:street2" />
                <show id="fdk:city" />
@@ -235,10 +235,8 @@
                <show id="fdk:state" />
                <show id="fdk:postCode" />
                <show id="fdk:zip" />
+               <show id="fdk:country" />
             </field-visibility>
-            <appearance>
-               <field id="fdk:zip" help="Enter a valid ZIP code" />
-            </appearance>
          </form>
          
          <!-- Document Library pop-up Edit Metadata form -->
@@ -330,6 +328,7 @@
                      <control-param name="compactMode">true</control-param>
                   </control>
                </field>
+               <field id="fdk:textMultiple" help="Enter multiple values by separating them with commas" />
             </appearance>
          </form>
          
