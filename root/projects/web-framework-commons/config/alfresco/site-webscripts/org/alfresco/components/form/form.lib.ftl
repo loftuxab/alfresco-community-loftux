@@ -42,11 +42,11 @@
          <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl}">
       </#if>
       
-      <#if form.mode == "create" && form.destination??>
+      <#if form.mode == "create" && form.destination?? && form.destination?length &gt; 0>
          <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination}" />
       </#if>
       
-      <#if form.mode != "view" && form.redirect??>
+      <#if form.mode != "view" && form.redirect?? && form.redirect?length &gt; 0>
          <input id="${formId}-redirect" name="alf_redirect" type="hidden" value="${form.redirect}" />
       </#if>
       
