@@ -110,6 +110,8 @@
        */
       onConfigFeedClick: function RF_onConfigFeedClick(e)
       {
+         Event.stopEvent(e);
+         
          var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/feed/config/" + encodeURIComponent(this.options.componentId);
          
          if (!this.configDialog)

@@ -138,10 +138,10 @@
       {
          if (this.widgets.rssFeed && this.modules.docList)
          {
-            var params = YAHOO.lang.substitute("{type}/node/{nodeRef}/{path}",
+            var params = YAHOO.lang.substitute("{type}/node/{nodeRef}{path}",
             {
                type: this.modules.docList.options.showFolders ? "all" : "documents",
-               nodeRef: "TODO",
+               nodeRef: this.options.nodeRef.uri,
                path: Alfresco.util.encodeURIPath(this.currentPath)
             });
 
@@ -150,6 +150,7 @@
             {
                params += "&filterData=" + encodeURIComponent(this.currentFilter.filterData);             
             }
+            params += "&libraryRoot=" + this.options.nodeRef.toString();
             params += "&format=rss";
             
             this.widgets.rssFeed.set("href", Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/documentlibrary/feed/" + params);

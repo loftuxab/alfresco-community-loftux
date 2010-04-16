@@ -1,6 +1,7 @@
 <#function formatDate date><#return date?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("EEE, dd MMM yyyy HH:mm:ss 'GMT'")></#function>
-<#function location loc><#return absurl(url.context) + "/page/site/" + loc.site + "/documentlibrary?file=" + loc.file + "&amp;path=" + loc.path?url?url></#function>
-<#function displayLocation loc><#return absurl(url.context) + "/page/site/" + loc.site + "/documentlibrary?file=" + loc.file + "&amp;path=" + loc.path></#function>
+<#function siteLoc loc><#if (loc.site?length > 0)><#return "/page/site/" + loc.site + "/documentlibrary"><#else><#return "/page/repository"></#if></#function>
+<#function location loc><#return absurl(url.context) + siteLoc(loc) + "?file=" + loc.file + "&amp;path=" + loc.path?url></#function>
+<#function displayLocation loc><#return absurl(url.context) + siteLoc(loc) + "?file=" + loc.file + "&amp;path=" + loc.path></#function>
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
