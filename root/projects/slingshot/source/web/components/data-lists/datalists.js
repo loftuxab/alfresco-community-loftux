@@ -468,7 +468,7 @@
       onNewList: function DataLists_onNewList(e, p_obj)
       {
          var destination = this.containerNodeRef.nodeRef,
-            selectedClass = "theme-bg-color-2";
+            selectedClass = "theme-bg-selected";
 
          var fnPopulateItemTypes = function DataLists_onNewList_fnPopulateItemTypes(domId, formFieldId, p_form)
          {
@@ -513,10 +513,7 @@
             {
                return (field.value.length > 0);
             };
-            p_form.addValidation(p_dialog.id + "-dataListItemType-field", fnValidateListChoice, null, null, null);
-
-            // Must set a title (UI constraint for usability)
-            p_form.addValidation(p_dialog.id + "_prop_cm_title", Alfresco.forms.validation.mandatory, null, "keyup");
+            p_form.addValidation(p_dialog.id + "-dataListItemType-field", fnValidateListChoice, null, null);
          };
 
          var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&destination={destination}&mode={mode}&submitType={submitType}&showCancelButton=true",

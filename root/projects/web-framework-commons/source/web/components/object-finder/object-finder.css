@@ -14,6 +14,12 @@
    top: 3px;
 }
 
+.yui-panel .object-finder .current-values
+{
+   max-height: 8em;
+   overflow-y: auto;
+}
+
 .object-finder .show-picker
 {
    clear: left;
