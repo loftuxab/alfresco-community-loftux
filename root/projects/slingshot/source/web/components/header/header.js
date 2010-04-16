@@ -296,13 +296,23 @@
       },
 
       /**
-       * Show the create site dialog
+       * Show the Create Site dialog
        *
        * @method showCreateSite
        */
       showCreateSite: function Header_showCreateSite()
       {
          Alfresco.module.getCreateSiteInstance().show();
+      },
+      
+      /**
+       * Show the About Share dialog
+       *
+       * @method showAboutShare
+       */
+      showAboutShare: function Header_showAboutShare()
+      {
+         Alfresco.module.getAboutShareInstance().show();
       },
       
       /**

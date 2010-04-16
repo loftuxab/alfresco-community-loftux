@@ -21,7 +21,7 @@
 <div class="header">
    <div class="logo-wrapper">
       <div class="logo">
-         <img src="${url.context}/themes/${theme}/images/${logo}" alt="Alfresco Share" />
+         <a href="#" onclick="thisHeader.showAboutShare(); return false;"><img src="${url.context}/themes/${theme}/images/${logo}" alt="Alfresco Share" /></a>
       </div>
    </div>
 
