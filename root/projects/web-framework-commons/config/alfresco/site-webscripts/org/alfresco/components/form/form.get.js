@@ -255,7 +255,9 @@ function getFormConfig(itemId, formId)
             // look up the specific form
             formConfig = formsConfig.getForm(formId);
          }
-         else
+         
+         // drop back to default form if formId config missing
+         if (formConfig === null)
          {
             // look up the default form
             formConfig = formsConfig.defaultForm;
@@ -394,7 +396,7 @@ function createFormUIModel(mode, formModel, formConfig)
    }
    
    // determine what method to use when submitting form
-   var mthd = getArgument("method", "POST");
+   var mthd = getArgument("method", "post");
    
    // determine what submisson url to use
    var submissionUrl = null;
