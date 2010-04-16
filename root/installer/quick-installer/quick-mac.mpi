@@ -3421,6 +3421,7 @@ Condition 710736DF-8343-4CA4-79DC-C3D09E164E83 -active Yes -parent 3C654D54-8DFB
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E -setup Install -type action -conditions A846B443-D850-4F08-8E99-F19391B4CD75 -title {Write To GlobalProps} -component WriteTextToFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition A846B443-D850-4F08-8E99-F19391B4CD75 -active Yes -parent E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E -title {File Exists Condition} -component FileExistsCondition -TreeObject::id A846B443-D850-4F08-8E99-F19391B4CD75
+InstallComponent 4D8456C0-3CE8-427B-B138-3F72EFF9181B -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent F376C6A4-27D4-4D71-AF16-3093AD6DCEBA -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 413AC52B-E80B-4C17-9A57-305FAD28BDF2 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC -setup Install -type actiongroup -title {Path Setup} -alias {Path Setup} -active Yes -parent ActionGroupsInstall
@@ -4003,10 +4004,12 @@ Yes
 {0 conditions}
 
 413AC52B-E80B-4C17-9A57-305FAD28BDF2,Files
-<%WebExtensionDir%>/share-config-custom.xml
+{<%WebExtensionDir%>/share-config-custom.xml; <%WebExtensionDir%>/webscript-framework-config-custom.xml}
 
 413AC52B-E80B-4C17-9A57-305FAD28BDF2,StringMap
-{"<visible>false</visible>" "<visible>true</visible>"}
+{"<visible>false</visible>" "<visible>true</visible>"
+"8080" "<%ALF_TOMCATPORT%>"
+"yourserver" "localhost"}
 
 42D178E7-8B68-430F-9E4E-ADEEF20EEFBB,Comment
 {Ask the user if they want to proceed with the uninstall.}
@@ -4088,6 +4091,15 @@ Yes
 
 4C5B630E-A819-4C8D-A223-F10643DC1CDA,String
 <%LaunchApplication%>
+
+4D8456C0-3CE8-427B-B138-3F72EFF9181B,Conditions
+{0 conditions}
+
+4D8456C0-3CE8-427B-B138-3F72EFF9181B,Destination
+<%WebExtensionDir%>/share-config-custom.xml
+
+4D8456C0-3CE8-427B-B138-3F72EFF9181B,Source
+<%WebExtensionDir%>/share-config-custom.xml.sample
 
 4DE485D3-D090-4DF4-9C0B-C613140E5D93,ExitType
 Finish
@@ -5979,10 +5991,10 @@ F376C6A4-27D4-4D71-AF16-3093AD6DCEBA,Conditions
 {0 conditions}
 
 F376C6A4-27D4-4D71-AF16-3093AD6DCEBA,Destination
-<%WebExtensionDir%>/share-config-custom.xml
+<%WebExtensionDir%>/webscript-framework-config-custom.xml
 
 F376C6A4-27D4-4D71-AF16-3093AD6DCEBA,Source
-<%WebExtensionDir%>/share-config-custom.xml.sample
+<%WebExtensionDir%>/webscript-framework-config-custom.xml.sample
 
 F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,BackButton,subst
 1
