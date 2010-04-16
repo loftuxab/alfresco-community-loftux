@@ -33,6 +33,20 @@
    {
       components = YAHOO.lang.isArray(components) ? components : [];
       
+      this.isFormOwner = false;
+
+      if (htmlId !== "null")
+      {
+         /* Defer showing dialog when in Forms Service mode */
+         this.formsServiceDeferred = new Alfresco.util.Deferred(["onTemplateLoaded", "onBeforeFormRuntimeInit"],
+         {
+            fn: this._showDialog,
+            scope: this
+         });
+
+         YAHOO.Bubbling.on("beforeFormRuntimeInit", this.onBeforeFormRuntimeInit, this);
+      }
+      
       return Alfresco.module.SimpleDialog.superclass.constructor.call(
          this,
          "Alfresco.module.SimpleDialog",
@@ -57,6 +71,14 @@
        * @type Alfresco.forms.Form
        */
       form: null,
+      
+      /**
+       * Whether form instance is our own, or created from FormUI component
+       *
+       * @property isFormOwner
+       * @type Boolean
+       */
+      isFormOwner: null,
 
        /**
         * Object container for initialization options
@@ -350,8 +372,11 @@
          }
          
          // Make sure ok button is in the correct state if dialog is reused  
-         this.widgets.okButton.set("disabled", false);
-         this.widgets.cancelButton.set("disabled", false);
+         if (this.isFormOwner)
+         {
+            this.widgets.okButton.set("disabled", false);
+            this.widgets.cancelButton.set("disabled", false);
+         }
          this.form.updateSubmitElements();
 
          this.dialog.show();
@@ -391,7 +416,6 @@
        */
       hide: function AmSD_hide()
       {
-         this.widgets.escapeListener.disable();
          this._hideDialog();
       },
 
@@ -404,6 +428,10 @@
        */
       _hideDialog: function AmSD__hideDialog()
       {
+         if (this.widgets.escapeListener)
+         {
+            this.widgets.escapeListener.disable();
+         }
          var form = Dom.get(this.id + "-form");
          // Undo Firefox caret issue
          Alfresco.util.undoCaretFix(form);
@@ -411,10 +439,14 @@
          if (this.options.destroyOnHide)
          {
             YAHOO.Bubbling.fire("formContainerDestroyed");
+            YAHOO.Bubbling.unsubscribe("beforeFormRuntimeInit", this.onBeforeFormRuntimeInit);
             this.dialog.destroy();
             delete this.dialog;
             delete this.widgets;
-            delete this.form;
+            if (this.isFormOwner)
+            {
+               delete this.form;
+            }
          }
       },
       
@@ -446,14 +478,9 @@
          // Are we controlling a Forms Service-supplied form?
          if (Dom.get(this.id + "-form-submit"))
          {
-            // Yes - OK button is "normal" button
-            this.widgets.okButton = Alfresco.util.createYUIButton(this, "form-submit", null);
-
-            // Cancel button?
-            if (Dom.get(this.id + "-form-cancel"))
-            {
-               this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "form-cancel", this.onCancel);
-            }
+            this.isFormOwner = false;
+            // FormUI component will initialise form, so we'll continue processing later
+            this.formsServiceDeferred.fulfil("onTemplateLoaded");
          }
          else
          {
@@ -465,11 +492,59 @@
 
             // Cancel button
             this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
-         }
 
-         // Form definition
-         this.form = new Alfresco.forms.Form(this.id + "-form");
-         this.form.setSubmitElements(this.widgets.okButton);
+            // Form definition
+            this.isFormOwner = true;
+            this.form = new Alfresco.forms.Form(this.id + "-form");
+            this.form.setSubmitElements(this.widgets.okButton);
+            this.form.setAJAXSubmit(true,
+            {
+               successCallback:
+               {
+                  fn: this.onSuccess,
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: this.onFailure,
+                  scope: this
+               }
+            });
+            this.form.setSubmitAsJSON(true);
+            this.form.setShowSubmitStateDynamically(true, false);
+
+            // Initialise the form
+            this.form.init();
+
+            this._showDialog();
+         }
+      },
+
+      /**
+       * Event handler called when the "beforeFormRuntimeInit" event is received.
+       *
+       * @method onBeforeFormRuntimeInit
+       * @param layer {String} Event type
+       * @param args {Object} Event arguments
+       * <pre>
+       *    args.[1].component: Alfresco.FormUI component instance,
+       *    args.[1].runtime: Alfresco.forms.Form instance
+       * </pre>
+       */
+      onBeforeFormRuntimeInit: function AmSD_onBeforeFormRuntimeInit(layer, args)
+      {
+         var formUI = args[1].component,
+            formsRuntime = args[1].runtime;
+
+         this.widgets.okButton = formUI.buttons.submit;
+         this.widgets.cancelButton = formUI.buttons.cancel;
+         this.widgets.cancelButton.set("onclick",
+         {
+            fn: this.onCancel,
+            scope: this
+         });
+         
+         this.form = formsRuntime;
          this.form.setAJAXSubmit(true,
          {
             successCallback:
@@ -483,13 +558,8 @@
                scope: this
             }
          });
-         this.form.setSubmitAsJSON(true);
-         this.form.setShowSubmitStateDynamically(true, false);
-
-         // Initialise the form
-         this.form.init();
          
-         this._showDialog();
+         this.formsServiceDeferred.fulfil("onBeforeFormRuntimeInit");
       },
 
       /**
@@ -555,8 +625,11 @@
       onFailure: function AmSD_onFailure(response)
       {
          // Make sure ok button is in the correct state if dialog is reused
-         this.widgets.okButton.set("disabled", false);
-         this.widgets.cancelButton.set("disabled", false);
+         if (this.isFormOwner)
+         {
+            this.widgets.okButton.set("disabled", false);
+            this.widgets.cancelButton.set("disabled", false);
+         }
          this.form.updateSubmitElements();
 
          // Invoke the callback if one was supplied
