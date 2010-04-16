@@ -1185,6 +1185,11 @@ div.theme-bg-color-7
    background-color: #f9f9f9;
 }
 
+.theme-bg-selected
+{
+   background-color: #bbccff;
+}
+
 /* Theme border type/colors */
 
 .theme-border-1

@@ -234,7 +234,7 @@
        */
       onActionDeselectAll: function DataListToolbar_onActionDeselectAll()
       {
-         this.modules.dataGrid.selectFiles("selectNone");
+         this.modules.dataGrid.selectItems("selectNone");
       },
 
       /**

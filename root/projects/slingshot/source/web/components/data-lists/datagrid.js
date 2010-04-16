@@ -435,7 +435,9 @@
                            case "cm:content":
                            case "cm:cmobject":
                            case "cm:folder":
-                              html += '<span class="' + data.metadata + '"><a href="' + Alfresco.constants.URL_PAGECONTEXT + (data.metadata == "container" ? 'folder' : 'document') + '-details?nodeRef=' + data.value + '">' + $html(data.displayValue) + '</a></span>';
+                              html += '<a href="' + Alfresco.constants.URL_PAGECONTEXT + (data.metadata == "container" ? 'folder' : 'document') + '-details?nodeRef=' + data.value + '">';
+                              html += '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(data.displayValue, (data.metadata == "container" ? 'cm:folder' : null), 16) + '" width="16" alt="' + $html(data.displayValue) + '" title="' + $html(data.displayValue) + '" />';
+                              html += ' ' + $html(data.displayValue) + '</a>'
                               break;
 
                            default:
@@ -643,7 +645,7 @@
        */
       renderDataListMeta: function DataGrid_renderDataListMeta()
       {
-         if (this.datalistMeta === null)
+         if (!YAHOO.lang.isObject(this.datalistMeta))
          {
             return;
          }
@@ -661,7 +663,7 @@
        */
       populateDataGrid: function DataGrid_populateDataGrid()
       {
-         if (this.datalistMeta === null)
+         if (!YAHOO.lang.isObject(this.datalistMeta))
          {
             return;
          }

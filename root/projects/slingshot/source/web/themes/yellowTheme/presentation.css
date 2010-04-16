@@ -888,6 +888,11 @@ div.theme-bg-color-7
    background-color: #F8F8F8;
 }
 
+.theme-bg-selected
+{
+   background-color: #fff7c9;
+}
+
 /* Theme border type/colors */
 
 .theme-border-1
