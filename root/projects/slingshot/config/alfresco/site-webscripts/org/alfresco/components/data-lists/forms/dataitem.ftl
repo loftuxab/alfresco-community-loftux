@@ -9,6 +9,13 @@
 
       <div id="${formId}-container" class="form-container">
 
+<#-- No full-page edit view for v3.3-
+   <#if form.mode == "edit">
+         <div class="yui-u first edit-dataitem flat-button">
+            <button id="${args.htmlid}-editDataItem" tabindex="0"></button>
+         </div>
+   </#if>
+-->
          <#if form.showCaption?exists && form.showCaption>
             <div id="${formId}-caption" class="caption"><span class="mandatory-indicator">*</span>${msg("form.required.fields")}</div>
          </#if>

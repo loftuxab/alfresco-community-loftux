@@ -545,8 +545,8 @@ Alfresco.util.getFileIcon = function(p_fileName, p_fileType, p_iconSize)
    };
 
    var prefix = "generic",
-      fileType = p_fileType !== undefined ? p_fileType : "cm:content",
-      iconSize = p_iconSize !== undefined ? p_iconSize : 32;
+      fileType = typeof p_fileType === "string" ? p_fileType : "cm:content",
+      iconSize = typeof p_iconSize === "number" ? p_iconSize : 32;
    
    // If type = cm:content, then use extn look-up
    var type = Alfresco.util.getFileIcon.types[fileType];
@@ -566,6 +566,8 @@ Alfresco.util.getFileIcon = function(p_fileName, p_fileType, p_iconSize)
 };
 Alfresco.util.getFileIcon.types =
 {
+   "{http://www.alfresco.org/model/content/1.0}cmobject": "file",
+   "cm:cmobject": "file",
    "{http://www.alfresco.org/model/content/1.0}content": "file",
    "cm:content": "file",
    "{http://www.alfresco.org/model/content/1.0}thumbnail": "file",
@@ -1976,7 +1978,7 @@ Alfresco.util.YUILoaderHelper = function()
             }
             if (isRegistered && (p_oCallback !== null))
             {
-               p_oCallback.call(typeof p_oScope != "undefined" ? p_oScope : window);
+               YAHOO.lang.later(10, p_oScope, p_oCallback);
             }
             else
             {

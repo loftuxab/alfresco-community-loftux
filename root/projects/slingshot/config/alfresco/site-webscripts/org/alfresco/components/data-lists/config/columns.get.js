@@ -68,7 +68,9 @@ function getFormConfig(itemId, formId)
             // look up the specific form
             formConfig = formsConfig.getForm(formId);
          }
-         else
+         
+         // drop back to default form if formId config missing
+         if (formConfig === null)
          {
             // look up the default form
             formConfig = formsConfig.defaultForm;
