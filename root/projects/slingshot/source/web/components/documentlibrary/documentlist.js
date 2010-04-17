@@ -2112,7 +2112,7 @@
          var obj = args[1];
          if ((obj !== null) && (obj.fileName !== null))
          {
-            var recordFound = this._findRecordByParameter(obj.fileName, "fileName");
+            var recordFound = this._findRecordByParameter(obj.fileName, "displayName");
             if (recordFound !== null)
             {
                // Scroll the record into view and highlight it
