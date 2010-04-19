@@ -150,6 +150,13 @@
             }
          ]);
          tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
+         
+         //set up toolbar as a managed attribute so it can be exposed to other plugins
+         this.setAttributeConfig('toolbar',
+         {
+            value: tb
+         });
+         
          tb = WebEditor.module.Ribbon.getToolbar(WebEditor.ui.Ribbon.SECONDARY_TOOLBAR);
          tb.addButtons(
          [ 
