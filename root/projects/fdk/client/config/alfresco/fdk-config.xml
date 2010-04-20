@@ -1,7 +1,6 @@
 <alfresco-config>
 
    <!-- Share override config to add FDK types and aspects -->
-   <!-- NOTE: Have to use replace="true" at the moment otherwise new items are not picked up -->
    <config evaluator="string-compare" condition="DocumentLibrary">
       <aspects>
          <visible>
