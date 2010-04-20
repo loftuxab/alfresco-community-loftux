@@ -67,6 +67,8 @@ public class TempFileProvider
     public static final String SYSTEM_KEY_TEMP_DIR = "java.io.tmpdir";
 
     private static final Log logger = LogFactory.getLog(TempFileProvider.class);
+    
+    private static int MAX_RETRIES = 3;
 
     /**
      * Static class only
@@ -148,24 +150,55 @@ public class TempFileProvider
         // append the Alfresco directory
         File longLifeDir = new File(tempDir, folderName);
         // ensure that the temp directory exists
+        
         if (longLifeDir.exists())
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Already exists: " + longLifeDir);
+            }
             // nothing to do
+            return longLifeDir;
         }
         else
         {
-            // not there yet
-            if (!longLifeDir.mkdirs())
+            /**
+             * We need to create a temporary directory
+             * 
+             * We may have a race condition here if more than one thread attempts to create 
+             * the temp dir.
+             *  
+             * mkdirs can't be synchronized
+             * See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4742723
+             */
+            for(int retry = 0; retry < MAX_RETRIES; retry++)
             {
-                throw new AlfrescoRuntimeException("Failed to create temp directory: " + tempDir);
-            }
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Created long life temp directory: " + longLifeDir);
+                boolean created = longLifeDir.mkdirs();
+            
+                if (created)
+                {
+                    // Yes we created the temp dir
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Created long life temp directory: " + longLifeDir);
+                    }
+                    return longLifeDir;
+                }
+                else
+                {   
+                    if(longLifeDir.exists())
+                    {
+                        // created by another thread, but that's O.K.  
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Another thread created long life temp directory: " + longLifeDir);
+                        }
+                        return longLifeDir;
+                    }
+                }
             }
         }
-        // done
-        return longLifeDir;
+        throw new AlfrescoRuntimeException("Failed to create temp directory: " + longLifeDir);
     }
     
     /**
@@ -328,7 +361,7 @@ public class TempFileProvider
                     }
                     else
                     {
-                        // enter subdirectory and clean it out and remove it
+                        // enter subdirectory and clean it out and remove itsynetics
                         removeFiles(file, removeBefore, longLifeBefore, true);
                     }
                 }
