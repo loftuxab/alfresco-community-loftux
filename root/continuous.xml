@@ -575,7 +575,7 @@
                                apply_amps.bat,
                                README.txt" />
          <zipfileset dir="${dir.project.installer}"
-                     includes="licenses/**,amps/**" />
+                     includes="licenses/**,amps/**,amps-share/**" />
          <zipfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
                      excludes="**/*.sh" />
@@ -614,7 +614,7 @@
                      includes="*.sh" 
                      mode="755" />
          <tarfileset dir="${dir.project.installer}"
-                     includes="licenses/**,amps/**" />
+                     includes="licenses/**,amps/**,amps-share/**" />
          <tarfileset dir="${dir.project.installer.linux}"
                      includes="alfresco.sh,
                      	       apply_amps.sh" 
