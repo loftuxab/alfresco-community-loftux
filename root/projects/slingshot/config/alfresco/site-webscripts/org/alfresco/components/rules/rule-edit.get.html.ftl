@@ -70,11 +70,11 @@
             <input id="${el}-applyToChildren" type="checkbox" title="${msg("label.applyToChildren")}" name="applyToChildren" value="true"/>
             <label for="${el}-applyToChildren">${msg("label.applyToChildren")}</label>
          </div>
-         <div class="form-field scriptLocation">
+         <div class="form-field scriptRef">
             <input id="${el}-compensatingActionId" type="hidden" name="action.compensatingAction.id" value="">
             <input type="hidden" name="action.compensatingAction.actionDefinitionName" value="script">            
-            <label for="${el}-scriptLocation">${msg("label.scriptLocation")}</label>
-            <select id="${el}-scriptLocation" name="action.compensatingAction.parameterValues.scriptLocation" title="${msg("label.scriptLocation")}">
+            <label for="${el}-scriptRef">${msg("label.scriptRef")}</label>
+            <select id="${el}-scriptRef" name="action.compensatingAction.parameterValues.script-ref" title="${msg("label.scriptRef")}">
                <option value="">${msg("label.selectScript")}</option>
                <#list scripts as script>
                <option value="${script.value}">

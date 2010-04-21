@@ -77,14 +77,14 @@
    padding-bottom: 0.5em;
 }
 
-.rule-edit .form-field.scriptLocation,
+.rule-edit .form-field.scriptRef,
 .rule-edit .form-field.applyToChildren
 {
    min-height: 2.5em;
    line-height: 2.5em;
 }
 
-.rule-edit .form-field.scriptLocation
+.rule-edit .form-field.scriptRef
 {
    margin-left: 1.6em;
 }
