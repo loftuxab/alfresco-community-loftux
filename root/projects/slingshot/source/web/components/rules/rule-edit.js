@@ -135,7 +135,7 @@
                   actionDefinitionName: "script",
                   parameterValues:
                   {
-                     scriptLocation: ""
+                     "script-ref": ""
                   }
                }
             }
@@ -161,7 +161,7 @@
          var asynchronousCheckboxEl = Dom.get(this.id + "-executeAsynchronously");
          Event.addListener(asynchronousCheckboxEl, "click", function(p_oEvent, p_oAsynchronousCheckboxEl)
          {
-            this._toggleScriptLocation(!p_oAsynchronousCheckboxEl.checked);
+            this._toggleScriptRef(!p_oAsynchronousCheckboxEl.checked);
          }, asynchronousCheckboxEl, this);
 
          // Create & Edit menues & buttons
@@ -275,7 +275,7 @@
                }
                rule.action.actions = this.ruleConfigs[this.id + "-ruleConfigAction"].getRuleConfigs();
                if (!rule.action.compensatingAction.parameterValues || 
-                   rule.action.compensatingAction.parameterValues.scriptLocation.length == 0)
+                   rule.action.compensatingAction.parameterValues["script-ref"].length == 0)
                {
                   // Remove attribute so it doesn't get sent to the server
                   delete rule.action.compensatingAction;
@@ -368,14 +368,14 @@
          Dom.get(this.id + "-executeAsynchronously").checked = rule.executeAsynchronously;
 
          // Compensating script
-         var scriptLocation = Alfresco.util.findValueByDotNotation(rule, "action.compensatingAction.parameterValues.scriptLocation", null);
-         if (scriptLocation)
+         var scriptRef = Alfresco.util.findValueByDotNotation(rule, "action.compensatingAction.parameterValues.script-ref", null);
+         if (scriptRef)
          {
-            Alfresco.util.setSelectedIndex(Dom.get(this.id + "-scriptLocation"), scriptLocation);
+            Alfresco.util.setSelectedIndex(Dom.get(this.id + "-scriptRef"), scriptRef);
          }
          var compensatingActionId = Alfresco.util.findValueByDotNotation(rule, "action.compensatingAction.id", null);
          Dom.get(this.id + "-compensatingActionId").value = compensatingActionId ? compensatingActionId : "";
-         this._toggleScriptLocation(!rule.executeAsynchronously);
+         this._toggleScriptRef(!rule.executeAsynchronously);
       },
 
       /**
@@ -432,6 +432,11 @@
       {
          this._toggleButtons(false);
          this.widgets.feedbackMessage.hide();
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg("message.failure"),
+            text: this.msg("message.persist-failure")
+         });
       },
 
       _navigateToFoldersPage: function()
@@ -463,16 +468,16 @@
        * @method _toggleButtons
        * @param disable
        */
-      _toggleScriptLocation: function(disable)
+      _toggleScriptRef: function(disable)
       {
-         var scriptLocationSelect = Dom.get(this.id + "-scriptLocation");
+         var scriptRefSelect = Dom.get(this.id + "-scriptRef");
          if (disable)
          {
-            scriptLocationSelect.setAttribute("disabled", true);
+            scriptRefSelect.setAttribute("disabled", true);
          }
          else
          {
-            scriptLocationSelect.removeAttribute("disabled");
+            scriptRefSelect.removeAttribute("disabled");
          }
       }
 
