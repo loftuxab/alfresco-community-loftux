@@ -3,7 +3,7 @@
 # Script for apply AMPs to installed WAR
 # -------
 export CATALINA_HOME=tomcat
-echo "This script will apply all the AMPs in ./amps to the alfresco.war and share.war files in $CATALINA_HOME\webapps"
+echo "This script will apply all the AMPs in ./amps to the alfresco.war and share.war files in $CATALINA_HOME/webapps"
 echo "Press control-c to stop this script . . ."
 echo "Press any other key to continue . . ."
 read RESP
