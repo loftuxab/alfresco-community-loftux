@@ -236,7 +236,6 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      if (targetName && (targetName != "-"))
                      {
                         me._submitInvoked(event);
-                        form.attributes.action.nodeValue = "";
                      }
                      Event.stopEvent(event);
                      return false;
@@ -708,14 +707,22 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       _submitInvoked: function(event)
       {
          if (Alfresco.logger.isDebugEnabled())
-            Alfresco.logger.debug("Submit invoked on form: ", this);
+            Alfresco.logger.debug("Submit invoked on formId: ", this.formId);
          
          // clear any errors that may be visible
          this._clearErrors();
          
          if (this.validateOnSubmit)
          {
-            if (this._runValidations(false))
+            var silent = false;
+            
+            // if dynamic updating is enabled
+            if (this.showSubmitStateDynamically && !this.showSubmitStateDynamicallyErrors)
+            {
+               silent = true;
+            }
+            
+            if (this._runValidations(silent))
             {
                // validation was successful
                // get the form element
@@ -806,6 +813,9 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             {
                // stop the event from continuing and sending the form.
                Event.stopEvent(event);
+               
+               if (Alfresco.logger.isDebugEnabled())
+                  Alfresco.logger.debug("Submission prevented as validation failed");
             }
          }
          else
