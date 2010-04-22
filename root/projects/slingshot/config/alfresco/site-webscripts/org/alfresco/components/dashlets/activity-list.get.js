@@ -18,15 +18,6 @@ function main()
       {
          activity = activityFeed[i];
 
-         if (mode == "site" && site)
-         {
-            // Filter by site
-            if (activity.siteNetwork != site)
-            {
-               continue;
-            }
-         }
-
          if (activity.activitySummaryFormat == "json")
          {
             summary = eval("(" + activity.activitySummary + ")");
@@ -141,6 +132,13 @@ function getActivities()
          excl = "&exclOthers=true";
          break; 
    }
+
+   // Filter by site
+   if (mode == "site" && site)
+   {
+      excl = excl + "&s=" + encodeURI(site);
+   }
+
    result = connector.get("/api/activities/feed/user?format=json" + excl);
 
    if (result.status == 200)
