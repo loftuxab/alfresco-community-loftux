@@ -2212,6 +2212,15 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 
 				diskDev.setAccessControlList(acls);
 
+                // Check if the filesystem uses the file state cache, if so then add to the file state reaper
+                
+                if ( devCtx.hasStateCache()) {
+                    
+                    // Register the state cache with the reaper thread
+                    
+                    filesysConfig.addFileStateCache( name, devCtx.getStateCache());
+                }
+                
 				// Start the filesystem
 
 				devCtx.startFilesystem(diskDev);
