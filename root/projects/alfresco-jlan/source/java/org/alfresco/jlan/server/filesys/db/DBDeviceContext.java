@@ -125,10 +125,6 @@ public class DBDeviceContext extends DiskDeviceContext {
 
 	private FileRequestQueue m_offlineDeleteList;
 
-	// File state cache
-
-	private FileStateCache m_stateCache;
-
 	// File state based lock/oplock manager
 	
 	private FileStateLockManager m_lockManager;
@@ -773,55 +769,6 @@ public class DBDeviceContext extends DiskDeviceContext {
 	}
 
 	/**
-	 * Determine if the connection has a file state cache
-	 * 
-	 * @return boolean
-	 */
-	public final boolean hasStateCache() {
-		return m_stateCache != null ? true : false;
-	}
-
-	/**
-	 * Return the file state cache
-	 * 
-	 * @return FileStateCache
-	 */
-	public final FileStateCache getStateCache() {
-		return m_stateCache;
-	}
-
-	/**
-	 * Enable/disable the file state cache
-	 * 
-	 * @param ena boolean
-	 */
-	public final void enableStateCache(boolean ena) {
-		if ( ena == true) {
-			if ( m_stateCache == null)
-				m_stateCache = new FileStateCache();
-		}
-		else
-			m_stateCache = null;
-	}
-
-	/**
-	 * Remove expired file states from the state cache
-	 * 
-	 * @return int
-	 */
-	public final int removeExpiredFileStates() {
-
-		// Check if there is a file state cache
-
-		if ( hasStateCache() == false)
-			return 0;
-
-		// Remove expired file states from the state cache
-
-		return m_stateCache.removeExpiredFileStates();
-	}
-
-	/**
 	 * File state has expired. The listener can control whether the file state is removed from the
 	 * cache, or not.
 	 * 
@@ -922,13 +869,10 @@ public class DBDeviceContext extends DiskDeviceContext {
 			getDBInterface().shutdownDatabase(this);
 
 		// Check if the file state cache is enabled, if so then release the file states and
-		// associated
-		// resources.
+		// associated resources.
 
-		if ( hasStateCache()) {
-			m_stateCache.removeAllFileStates();
-			getStateCache().shutdownRequest();
-		}
+		if ( hasStateCache()) 
+			getStateCache().removeAllFileStates();
 
 		// Call the base class
 
@@ -959,5 +903,4 @@ public class DBDeviceContext extends DiskDeviceContext {
 			}
 		}
 	}
-
 }

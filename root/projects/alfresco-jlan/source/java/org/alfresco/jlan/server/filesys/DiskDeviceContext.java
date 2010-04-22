@@ -21,6 +21,7 @@ package org.alfresco.jlan.server.filesys;
 
 import org.alfresco.jlan.server.core.DeviceContext;
 import org.alfresco.jlan.server.core.DeviceContextException;
+import org.alfresco.jlan.server.filesys.cache.FileStateCache;
 import org.alfresco.jlan.server.filesys.quota.QuotaManager;
 import org.alfresco.jlan.smb.server.notify.NotifyChangeHandler;
 import org.alfresco.jlan.smb.server.notify.NotifyRequest;
@@ -58,6 +59,10 @@ public class DiskDeviceContext extends DeviceContext {
 
 	private int m_deviceAttribs;
 	
+    // File state cache
+
+    private FileStateCache m_stateCache;
+
 	/**
 	 * Class constructor
 	 */
@@ -321,4 +326,36 @@ public class DiskDeviceContext extends DeviceContext {
 	public void startFilesystem(DiskSharedDevice share)
 		throws DeviceContextException {  
 	}
+	
+    /**
+     * Determine if the connection has a file state cache
+     * 
+     * @return boolean
+     */
+    public final boolean hasStateCache() {
+        return m_stateCache != null ? true : false;
+    }
+
+    /**
+     * Return the file state cache
+     * 
+     * @return FileStateCache
+     */
+    public final FileStateCache getStateCache() {
+        return m_stateCache;
+    }
+
+    /**
+     * Enable/disable the file state cache
+     * 
+     * @param ena boolean
+     */
+    public final void enableStateCache(boolean ena) {
+        if ( ena == true) {
+            if ( m_stateCache == null)
+                m_stateCache = new FileStateCache();
+        }
+        else
+            m_stateCache = null;
+    }
 }

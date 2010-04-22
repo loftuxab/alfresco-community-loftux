@@ -26,6 +26,8 @@ import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.alfresco.jlan.server.core.DeviceContext;
 import org.alfresco.jlan.server.core.SharedDevice;
 import org.alfresco.jlan.server.core.SharedDeviceList;
+import org.alfresco.jlan.server.filesys.cache.FileStateCache;
+import org.alfresco.jlan.server.filesys.cache.FileStateReaper;
 
 /**
  * Filesystems Configuration Section Class
@@ -42,6 +44,10 @@ public class FilesystemsConfigSection extends ConfigSection {
 
   private SharedDeviceList m_shareList;
 
+  // File state reaper, enabled if one or more filesystems uses a file state cache
+  
+  private FileStateReaper m_stateReaper;
+  
   /**
    * Class constructor
    * 
@@ -75,6 +81,24 @@ public class FilesystemsConfigSection extends ConfigSection {
   }
   
   /**
+   * Add a file state cache to the file state reaper thread, to scan for expired file states
+   * 
+   * @param filesysName String
+   * @param stateCache FileStateCache
+   */
+  public synchronized final void addFileStateCache( String filesysName, FileStateCache stateCache) {
+    
+      // Check if the file state reaper has been allocated
+      
+      if ( m_stateReaper == null)
+          m_stateReaper = new FileStateReaper();
+      
+      // Add the state cache to the reaper thread
+      
+      m_stateReaper.addStateCache( filesysName, stateCache);
+  }
+  
+  /**
    * Close the configuration section
    */
   public final void closeConfig() {
@@ -92,9 +116,25 @@ public class FilesystemsConfigSection extends ConfigSection {
         SharedDevice share = shareEnum.nextElement();
         DeviceContext devCtx = share.getContext();
             
-        if ( devCtx != null)
-          devCtx.CloseContext();
+        if ( devCtx != null) {
+            
+            // Remove the filesystem from the file state cache, if enabled
+            
+            if ( m_stateReaper != null)
+                m_stateReaper.removeStateCache( devCtx.getDeviceName());
+            
+            // Close the device context
+        
+            devCtx.CloseContext();
+        }
       }
+      
+      // Close the file state reaper thread
+      
+      if ( m_stateReaper != null) {
+          m_stateReaper.shutdownRequest();
+          m_stateReaper = null;
+      }       
     }
   }
 }
