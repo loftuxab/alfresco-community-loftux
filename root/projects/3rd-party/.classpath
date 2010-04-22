@@ -144,7 +144,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jutf7-1.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/stax-api-1.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar" sourcepath="src/fontbox-0.8.0-incubating-src.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.6.jar" sourcepath="src/junit-4.6-src.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-0.5-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/XmlSchema-1.4.5.jar"/>
@@ -158,7 +157,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webscripts-1.0.0.CI-SNAPSHOT-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-api-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webscripts-api-1.0.0.CI-SNAPSHOT-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer-2009-09-27.jar" sourcepath="src/PDFRenderer-2009-09-27-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.8.0-incubating-12-Nov-09.jar" sourcepath="src/pdfbox-0.8.0-incubating-12-Nov-09-src.jar"/>
 	<classpathentry kind="lib" path="lib/org.springframework.webmvc-3.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/abdera/axiom-impl-1.2.5.jar"/>
 	<classpathentry kind="lib" path="lib/abdera/axiom-api-1.2.5.jar"/>
@@ -178,5 +176,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/bsf-2.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-core-2.0.0.jar" sourcepath="src/ehcache-core-2.0.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webeditor-client-jsp-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webeditor-client-jsp-1.0.0.CI-SNAPSHOT-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pdfbox-1.1.0.jar" sourcepath="src/pdfbox-1.1.0-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/fontbox-1.1.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
