@@ -1537,7 +1537,7 @@
                   constraintOption = constraintOptions[i];
                   optionEl = document.createElement("option");
                   optionEl.setAttribute("value", constraintOption.value);
-                  optionEl.appendChild(document.createTextNode(constraintOption.displayLabel));
+                  optionEl.appendChild(document.createTextNode(constraintOption.displayLabel ? constraintOption.displayLabel : constraintOption.value));
                   if (constraintOption.value == value)
                   {
                      optionEl.setAttribute("selected", "true");
@@ -1656,7 +1656,7 @@
                {
                   if (constraintValues[i].value == value)
                   {
-                     value = constraintValues[i].displayLabel;
+                     value = constraintValues[i].displayLabel ? constraintValues[i].displayLabel : value;
                      break;
                   }
                }
