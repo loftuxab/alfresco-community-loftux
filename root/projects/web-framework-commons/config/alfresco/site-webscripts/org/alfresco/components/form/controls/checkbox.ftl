@@ -14,5 +14,6 @@
              <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if> 
              onchange='javascript:YAHOO.util.Dom.get("${fieldHtmlId}").value=YAHOO.util.Dom.get("${fieldHtmlId}-entry").checked;' />
       <label for="${fieldHtmlId}-entry" class="checkbox">${field.label?html}</label>
+      <@formLib.renderFieldHelp field=field />
    </#if>
 </div>

@@ -39,6 +39,7 @@
       <div id="${controlId}" class="period">
          <span>${msg("form.control.period.type")}</span><select id="${controlId}-type" name="-" tabindex="0"></select>
          <span>${msg("form.control.period.expression")}</span><input id="${controlId}-expression" name="-" type="text" tabindex="0" />
+         <@formLib.renderFieldHelp field=field />
       </div>
    </#if>
 </div>

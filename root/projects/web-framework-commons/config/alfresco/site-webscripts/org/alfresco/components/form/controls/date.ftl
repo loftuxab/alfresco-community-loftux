@@ -51,6 +51,8 @@
          <#if showTime>
             <input id="${controlId}-time" name="-" type="text" class="time-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"<#else>tabindex="0"</#if> />
          </#if>
+         
+         <@formLib.renderFieldHelp field=field />
       
          <div class="format-info">
             <span class="date-format">${msg("form.control.date-picker.display.date.format")}</span>
