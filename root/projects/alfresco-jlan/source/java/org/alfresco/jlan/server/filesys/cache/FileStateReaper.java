@@ -55,7 +55,7 @@ public class FileStateReaper implements Runnable {
     
     // Debug output enabled
     
-    private boolean m_debug = true;
+    private boolean m_debug;
     
     /**
      * Default constructor
