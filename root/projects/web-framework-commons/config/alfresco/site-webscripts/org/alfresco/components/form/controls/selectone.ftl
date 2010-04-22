@@ -25,6 +25,7 @@
                   </#if>
                </#list>
          </select>
+         <@formLib.renderFieldHelp field=field />
       <#else>
          <div id="${fieldHtmlId}" class="missing-options">${msg("form.control.selectone.missing-options")}</div>
       </#if>
