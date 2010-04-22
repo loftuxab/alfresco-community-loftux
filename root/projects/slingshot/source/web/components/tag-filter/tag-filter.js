@@ -95,15 +95,13 @@
           *
           * @property numTags
           * @type int
-          * @default 15
+          * @default -1
           */
-         numTags: 15
+         numTags: -1
       },
 
       /**
        * Fired by YUI when parent element is available for scripting.
-       * Registers event handler on 'onTagRefresh' event. If a component wants to refresh
-       * the tags component, they need to fire this event.
        *
        * @method onReady
        * @override
