@@ -11,8 +11,9 @@
          </div>
          <div class="field">
             <select id="${args.htmlid}-type" name="type" tabindex="0">
-               <option value="wf:review" selected="selected">${msg("wf_review.title")}</option>
-               <option value="wf:adhoc">${msg("wf_adhoc.title")}</option>
+            <#list workflows as w>
+               <option value="${w}"<#if w_index == 0> selected="selected"</#if>>${msg("workflow." + w?replace(":", "_"))}</option>
+            </#list>
             </select>
          </div>
          <div class="yui-g">
