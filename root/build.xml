@@ -9,6 +9,7 @@
 
    <import file="${alfresco.basedir}/macros.xml" />
    <import file="${alfresco.basedir}/projects.xml" />
+	<import file="${enterprise.basedir}/../continuous.xml" />
 
    <!-- For support of the script tag, we have to choose between -->
    <!-- supporting Java 1.5 or Ant 1.6, and we've opted for -->
@@ -247,7 +248,6 @@
                     incremental-webclient,  
                     incremental-webserviceclient,
                     incremental-slingshot,
-                    incremental-mobile,
                     incremental-webeditor,
                     incremental-webeditor-plugin" />
 
@@ -293,6 +293,8 @@
       </copy>
    </target>
 
+   <target name="distribute-command-jars" description="Runs unit tests for all the projects" depends="continuous.assemble-command-jars" />
+	                    
    <target name="build-tomcat" 
            description="Performs a clean build for Tomcat and deploys the Alfresco and application WAR files"
            depends="clean, incremental-tomcat" />

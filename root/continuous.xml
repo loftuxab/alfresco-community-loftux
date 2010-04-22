@@ -76,6 +76,7 @@
                     distribute-mmt,
                     distribute-bm-remote,
                     distribute-amps,
+                    distribute-command-jars,
                     distribute-tomcat,
                     distribute-war,
                     distribute-wcm,
@@ -85,11 +86,11 @@
                     distribute-deployment,
                     distribute-sample-extensions,
                     distribute-installers,
-                    distribute-docs,
                     distribute-xforms-examples,
                     distribute-extras,
                     distribute-webeditor,
                     distribute-fdk,
+                    distribute-docs,
                     revert-changes" />
 
    <target name="set-build-number"
@@ -487,6 +488,21 @@
       </sql>
    </target>
 
+
+   <!-- ******************** -->
+   <!-- ** Bundle targets ** -->
+   <!-- ******************** -->
+
+   <target name="assemble-command-jars"
+           depends="continuous-init">
+           <!--
+      <mkdir dir="${dir.continuous.assemble}/command-jars" />
+      -->
+      <copy file="${dir.continuous.dist}/${file.name.dist.mmt}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-mmt.jar"/>
+      <copy file="${dir.continuous.dist}/${file.name.dist.bm-remote}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-bm.jar"/>
+   </target>
+
+
    <!-- ***************** -->
    <!-- ** WCM targets ** -->
    <!-- ***************** -->
@@ -593,12 +609,8 @@
                      includes="convert.exe" />
          <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin" />
-         <zipfileset dir="${dir.continuous.dist}"
-                     includes="${file.name.dist.mmt}.jar"
-                     fullpath="bin/alfresco-mmt.jar" />
-         <zipfileset dir="${dir.continuous.dist}"
-                     includes="${file.name.dist.bm-remote}.jar"
-                     fullpath="bin/alfresco-bm-remote.jar" />
+         <zipfileset dir="${dir.continuous.assemble}/command-jars"
+                     prefix="bin" />
       </zip>
    </target>
 
@@ -626,12 +638,8 @@
                      excludes="**/*.bat" />
          <tarfileset dir="${dir.project.installer.binlin}"
                      prefix="bin" />
-         <tarfileset dir="${dir.continuous.dist}"
-                     includes="${file.name.dist.mmt}.jar"
-                     fullpath="bin/alfresco-mmt.jar" />
-         <tarfileset dir="${dir.continuous.dist}"
-                     includes="${file.name.dist.bm-remote}.jar"
-                     fullpath="bin/alfresco-bm-remote.jar" />
+         <tarfileset dir="${dir.continuous.assemble}/command-jars"
+                     prefix="bin" />
       </tar>
    </target>
 
@@ -706,8 +714,6 @@
                   includes="${file.name.war.webclient}" />
          <fileset dir="${dir.project.slingshot.dist}"
                   includes="${file.name.war.slingshot}" />
-         <fileset dir="${dir.project.mobile.dist}"
-                  includes="${file.name.war.mobile}" />
       </copy>
 
       <!-- place latest Xalan jars to ensure they are used -->
@@ -801,12 +807,8 @@
          <zipfileset dir="${dir.name.binaries.installer.win32}"
                      prefix="commands/ImageMagick/bin"
                      includes="convert.exe" />
-         <zipfileset dir="${dir.continuous.dist}"
-                     includes="${file.name.dist.mmt}.jar"
-                     fullpath="commands/bin/alfresco-mmt.jar" />
-         <zipfileset dir="${dir.continuous.dist}"
-                     includes="${file.name.dist.bm-remote}.jar"
-                     fullpath="commands/bin/alfresco-bm-remote.jar" />
+         <zipfileset dir="${dir.continuous.assemble}/command-jars"
+                     prefix="commands/bin" />
       </zip>
 
       <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz"
@@ -843,6 +845,8 @@
                      prefix="commands"
                      mode="755" />
          <zipfileset dir="${dir.project.installer.binlin}"
+                     prefix="commands/bin" />
+         <tarfileset dir="${dir.continuous.assemble}/command-jars"
                      prefix="commands/bin" />
       </tar>
    </target>
