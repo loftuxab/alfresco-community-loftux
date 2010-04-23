@@ -9,7 +9,7 @@
 
    <import file="${alfresco.basedir}/macros.xml" />
    <import file="${alfresco.basedir}/projects.xml" />
-	<import file="${enterprise.basedir}/../continuous.xml" />
+   <import file="${alfresco.basedir}/continuous.xml" />
 
    <!-- For support of the script tag, we have to choose between -->
    <!-- supporting Java 1.5 or Ant 1.6, and we've opted for -->
@@ -248,6 +248,7 @@
                     incremental-webclient,  
                     incremental-webserviceclient,
                     incremental-slingshot,
+                    incremental-mobile,
                     incremental-webeditor,
                     incremental-webeditor-plugin" />
 
