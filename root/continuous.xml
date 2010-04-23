@@ -56,7 +56,10 @@
            description="Performs a full clean, runs all tests and creates all distribution files"
            depends="clean-continuous, 
                     clean, 
+                    -reset-database,
                     set-build-number,
+                    init-test,
+                    test,
                     distribute" />
 
    <target name="continuous-without-tests" 
@@ -661,7 +664,7 @@
             <include name="**/*"/>
          </fileset>
       </move>
-            
+
    </target>
 
    <target name="assemble-tomcat"
