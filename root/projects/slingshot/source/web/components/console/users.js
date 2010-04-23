@@ -636,7 +636,6 @@
             
             // Form field validation
             form.addValidation(parent.id + "-create-firstname", Alfresco.forms.validation.mandatory, null, "keyup");
-            form.addValidation(parent.id + "-create-lastname", Alfresco.forms.validation.mandatory, null, "keyup");
             form.addValidation(parent.id + "-create-email", Alfresco.forms.validation.mandatory, null, "keyup");
             form.addValidation(parent.id + "-create-email", Alfresco.forms.validation.email, null, "keyup");
             form.addValidation(parent.id + "-create-username", Alfresco.forms.validation.nodeName, null, "keyup");
@@ -870,7 +869,6 @@
             
             // Form field validation
             form.addValidation(parent.id + "-update-firstname", Alfresco.forms.validation.mandatory, null, "keyup");
-            form.addValidation(parent.id + "-update-lastname", Alfresco.forms.validation.mandatory, null, "keyup");
             form.addValidation(parent.id + "-update-email", Alfresco.forms.validation.mandatory, null, "keyup");
             form.addValidation(parent.id + "-update-email", Alfresco.forms.validation.email, null, "keyup");
             
