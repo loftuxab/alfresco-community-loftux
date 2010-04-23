@@ -9,7 +9,6 @@
 
    <import file="${alfresco.basedir}/macros.xml" />
    <import file="${alfresco.basedir}/projects.xml" />
-   <import file="${alfresco.basedir}/continuous.xml" />
 
    <!-- For support of the script tag, we have to choose between -->
    <!-- supporting Java 1.5 or Ant 1.6, and we've opted for -->
@@ -294,7 +293,20 @@
       </copy>
    </target>
 
-   <target name="distribute-command-jars" description="Runs unit tests for all the projects" depends="continuous.assemble-command-jars" />
+
+   <!-- ******************** -->
+   <!-- ** Bundle targets ** -->
+   <!-- ******************** -->
+
+   <target name="distribute-command-jars"
+           depends="continuous-init">
+           <!--
+      <mkdir dir="${dir.continuous.assemble}/command-jars" />
+      -->
+      <copy file="${dir.continuous.dist}/${file.name.dist.mmt}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-mmt.jar"/>
+      <copy file="${dir.continuous.dist}/${file.name.dist.bm-remote}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-bm.jar"/>
+   </target>
+	  
 	                    
    <target name="build-tomcat" 
            description="Performs a clean build for Tomcat and deploys the Alfresco and application WAR files"

@@ -56,10 +56,7 @@
            description="Performs a full clean, runs all tests and creates all distribution files"
            depends="clean-continuous, 
                     clean, 
-                    -reset-database, 
                     set-build-number,
-                    init-test, 
-                    test, 
                     distribute" />
 
    <target name="continuous-without-tests" 
@@ -489,20 +486,6 @@
    </target>
 
 
-   <!-- ******************** -->
-   <!-- ** Bundle targets ** -->
-   <!-- ******************** -->
-
-   <target name="assemble-command-jars"
-           depends="continuous-init">
-           <!--
-      <mkdir dir="${dir.continuous.assemble}/command-jars" />
-      -->
-      <copy file="${dir.continuous.dist}/${file.name.dist.mmt}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-mmt.jar"/>
-      <copy file="${dir.continuous.dist}/${file.name.dist.bm-remote}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-bm.jar"/>
-   </target>
-
-
    <!-- ***************** -->
    <!-- ** WCM targets ** -->
    <!-- ***************** -->
@@ -678,6 +661,7 @@
             <include name="**/*"/>
          </fileset>
       </move>
+            
    </target>
 
    <target name="assemble-tomcat"
