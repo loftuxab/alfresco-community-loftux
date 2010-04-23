@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 /**
  * User Profile component.
  * 
@@ -155,6 +155,7 @@
          Dom.get(prefix + "email").value = p.email;
          Dom.get(prefix + "skype").value = p.skype;
          Dom.get(prefix + "instantmsg").value = p.instantmsg;
+         Dom.get(prefix + "googleusername").value = p.googleusername;
          Dom.get(prefix + "organization").value = p.organization;
          Dom.get(prefix + "companyaddress1").value = p.companyaddress1;
          Dom.get(prefix + "companyaddress2").value = p.companyaddress2;

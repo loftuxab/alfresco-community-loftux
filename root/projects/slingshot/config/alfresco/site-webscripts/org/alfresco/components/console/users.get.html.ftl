@@ -114,6 +114,10 @@
             <span class="field-label-right">${msg("label.im")}:</span>
             <span id="${el}-view-instantmsg" class="field-value"></span>
          </div>
+         <div class="field-row">
+            <span class="field-label-right">${msg("label.googleusername")}:</span>
+            <span id="${el}-view-googleusername" class="field-value"></span>
+         </div>
          
          <div class="header-bar">${msg("label.companyinfo")}</div>
          <div class="field-row">
