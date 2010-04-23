@@ -24,6 +24,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.extensions.surf.FrameworkUtil;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.exception.ConnectorServiceException;
@@ -64,13 +66,13 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
         return authenticated;
     }
 
-    
-    /**
-     * @see org.alfresco.web.site.AlfrescoUserFactory#constructUser(java.lang.String, Map<String, Boolean>)
+    /* (non-Javadoc)
+     * @see org.springframework.extensions.surf.support.AlfrescoUserFactory#constructUser(org.json.JSONObject, java.util.Map)
      */
-    protected AlfrescoUser constructUser(String userId, Map<String, Boolean> capabilities)
+    @Override
+    protected AlfrescoUser constructUser(JSONObject properties, Map<String, Boolean> capabilities) throws JSONException
     {
-        return new SlingshotUser(userId, capabilities);
+        return new SlingshotUser(properties.getString(CM_USERNAME), capabilities);
     }
 
     /**
@@ -109,6 +111,7 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
             writer.writeValue(CM_MOBILE, user.getMobilePhone());
             writer.writeValue(CM_SKYPE, user.getSkype());
             writer.writeValue(CM_INSTANTMSG, user.getInstantMsg());
+            writer.writeValue(CM_GOOGLEUSERNAME, user.getGoogleUsername());
             writer.writeValue(CM_COMPANYADDRESS1, user.getCompanyAddress1());
             writer.writeValue(CM_COMPANYADDRESS2, user.getCompanyAddress2());
             writer.writeValue(CM_COMPANYADDRESS3, user.getCompanyAddress3());

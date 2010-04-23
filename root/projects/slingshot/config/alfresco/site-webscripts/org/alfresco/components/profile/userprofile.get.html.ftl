@@ -15,6 +15,7 @@
          email :"<#if profile.email??>${profile.email?js_string}</#if>",
          skype: "<#if profile.skype??>${profile.skype?js_string}</#if>",
          instantmsg: "<#if profile.instantMsg??>${profile.instantMsg?js_string}</#if>",
+         googleusername: "<#if profile.googleUsername??>${profile.googleUsername?js_string}</#if>",
          organization: "<#if profile.organization??>${profile.organization?js_string}</#if>",
          companyaddress1: "<#if profile.companyAddress1??>${profile.companyAddress1?js_string}</#if>",
          companyaddress2: "<#if profile.companyAddress2??>${profile.companyAddress2?js_string}</#if>",
@@ -86,6 +87,12 @@
          <div class="row">
             <span class="fieldlabelright">${msg("label.im")}:</span>
             <span class="fieldvalue">${profile.instantMsg?html}</span>
+         </div>
+         </#if>
+         <#if profile.googleUsername?? && profile.googleUsername?length!=0>
+         <div class="row">
+            <span class="fieldlabelright">${msg("label.googleusername")}:</span>
+            <span class="fieldvalue">${profile.googleUsername?html}</span>
          </div>
          </#if>
          
@@ -210,6 +217,10 @@
       <div class="row">
          <span class="label"><label for="${el}-input-instantmsg">${msg("label.im")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-instantmsg" value="" /></span>
+      </div>
+      <div class="row">
+         <span class="label"><label for="${el}-input-googleusername">${msg("label.googleusername")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-googleusername" value="" /></span>
       </div>
       
       <div class="header-bar">${msg("label.companyinfo")}</div>

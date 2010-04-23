@@ -553,6 +553,7 @@
                fnSetter("-view-mobile", person.mobile);
                fnSetter("-view-skype", person.skype);
                fnSetter("-view-instantmsg", person.instantmsg);
+               fnSetter("-view-googleusername", person.googleusername);
                
                // Company section fields
                fnSetter("-view-companyname", person.organization);
