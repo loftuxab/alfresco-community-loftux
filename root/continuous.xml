@@ -665,6 +665,29 @@
          </fileset>
       </move>
 
+      <!-- Bitrock -->
+      
+      <!-- Try and pick appropriate exe - assumes mac=OSX and unix=Linux -->
+      <condition property="platformExe" value="${file.name.bitrock.exe.win}">
+      	 <os family="windows" />
+      </condition>
+      <condition property="platformExe" value="${file.name.bitrock.exe.osx}">
+      	 <os family="mac" />
+      </condition>
+      <condition property="platformExe" value="${file.name.bitrock.exe.linux}">
+      	 <os family="unix" />
+      </condition>
+ 
+      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-osx.txt" failifexecutionfails="false">
+         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-osx-installer.app"'/>
+      </exec>
+      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-linux.txt" failifexecutionfails="false">
+         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-linux-installer.bin"'/>
+      </exec>
+      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-win.txt" failifexecutionfails="false">
+         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-win-installer.exe"'/>
+      </exec>
+            
    </target>
 
    <target name="assemble-tomcat"

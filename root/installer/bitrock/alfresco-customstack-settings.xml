@@ -1,0 +1,32 @@
+<component>
+    <name>alfrescocustomstacksettings</name>
+    <selected>1</selected>
+    <show>0</show>
+    <preBuildActionList>
+        <setInstallerVariable name="component(alfresco).parameter(alfresco_database_name).default" value="alfresco" />
+        <setInstallerVariable name="component(tomcat).parameter(tomcat_dirname).value" value="tomcat" />
+        <setInstallerVariable name="component(script).parameter(ctlscript_unix).value" value="alfresco.sh" />
+        <setInstallerVariable name="component(mysql).show" value="1" />
+        <setInstallerVariable name="component(mysql).selected" value="1" />
+        <setInstallerVariable name="component(mysql).canBeEdited" value="0" />
+        <setInstallerVariable name="component(java).show" value="1" />
+        <setInstallerVariable name="component(java).selected" value="1" />
+        <setInstallerVariable name="component(java).canBeEdited" value="0" />
+    </preBuildActionList>
+    <initializationActionList>
+        <setInstallerVariable name="component(mysql).parameter(mysql_data).parameter(mysql_database_username).value" value="alfresco"/>
+        <setInstallerVariable name="component(mysql).parameter(mysql_data).parameter(mysql_database_password).value" value="alfresco"/>
+        <setInstallerVariable name="component(alfresco).parameter(alfresco_database_name).value" value="alfresco"/>
+        <setInstallerVariable name="component(mysql).parameter(mysql_installation_type).value" value="bundled"/>
+        <setInstallerVariable name="component(mysql).parameter(mysql_installation_type).ask" value="0"/>
+        <setInstallerVariable name="component(mysql).parameter(mysql_data).ask" value="0"/>
+        <setInstallerVariable name="component(mysql).parameter(mysql_allow_empty_root_password).value" value="0"/>
+        <setInstallerVariable name="installdir" value="${env(SYSTEMDRIVE)}\Alfresco" >
+            <ruleList>
+                <platformTest type="windows" />
+            </ruleList>
+        </setInstallerVariable>
+        <setInstallerVariable name="component(baseparamdir).parameter(base_allow_spaces).value" value="0" />
+    </initializationActionList>
+</component>
+
