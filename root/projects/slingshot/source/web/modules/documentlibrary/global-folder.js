@@ -356,16 +356,24 @@
                {
                   var results = Alfresco.util.parseJSON(oResponse.responseText);
                   
-                  if (results.parent && typeof node.data.userAccess == "undefined")
+                  if (results.parent)
                   {
-                     node.data.userAccess = results.parent.userAccess;
-                     node.setUpLabel(
+                     if (node.data.nodeRef.indexOf("alfresco://") === 0)
                      {
-                        label: node.label,
-                        style: results.parent.userAccess.create ? "" : "no-permission"
-                     });
-                  }
+                        node.data.nodeRef = results.parent.nodeRef;
+                     }
 
+                     if (typeof node.data.userAccess == "undefined")
+                     {
+                        node.data.userAccess = results.parent.userAccess;
+                        node.setUpLabel(
+                        {
+                           label: node.label,
+                           style: results.parent.userAccess.create ? "" : "no-permission"
+                        });
+                     }
+                  }
+                  
                   if (results.items)
                   {
                      var item, tempNode;
