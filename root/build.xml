@@ -298,8 +298,7 @@
    <!-- ** Bundle targets ** -->
    <!-- ******************** -->
 
-   <target name="distribute-command-jars"
-           depends="continuous-init">
+   <target name="distribute-command-jars">
            <!--
       <mkdir dir="${dir.continuous.assemble}/command-jars" />
       -->
