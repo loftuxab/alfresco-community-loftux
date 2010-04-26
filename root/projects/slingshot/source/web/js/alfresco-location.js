@@ -123,7 +123,7 @@
          }
          if (nodeRef)
          {
-            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + nodeRef.uri + "/path";
+            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + nodeRef.uri + "/location";
             if (this.options.siteId == "" && this.options.rootNode)
             {
                // Repository mode

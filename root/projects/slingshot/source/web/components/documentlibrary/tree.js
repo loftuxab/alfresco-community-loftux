@@ -28,7 +28,8 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -340,7 +341,8 @@
             filterId: "path",
             filterData: node.data.path
          });
-         
+
+         Event.stopEvent(args.event);
          // Prevent the tree node from expanding (TODO: user preference?)
          return false;
       },
