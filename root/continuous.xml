@@ -679,13 +679,13 @@
       </condition>
  
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-osx.txt" failifexecutionfails="false">
-         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-osx-installer.app"'/>
+         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-osx-installer.app" "alfresco_svn_rootdir=${basedir}"'/>
       </exec>
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-linux.txt" failifexecutionfails="false">
-         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-linux-installer.bin"'/>
+         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-linux-installer.bin" "alfresco_svn_rootdir=${basedir}"'/>
       </exec>
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-win.txt" failifexecutionfails="false">
-         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-win-installer.exe"'/>
+         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-win-installer.exe" "alfresco_svn_rootdir=${basedir}"'/>
       </exec>
             
    </target>

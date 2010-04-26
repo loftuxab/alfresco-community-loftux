@@ -6,7 +6,7 @@
     <version>3.3</version>
     <installerFilename>${product_shortname}-community-${product_version}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <licenseFile></licenseFile>
-    <readmeFile>${alfresco_readme_file}</readmeFile>
+    <readmeFile>README.txt</readmeFile>
     <wrapLicenseFileText>1</wrapLicenseFileText>
     <logoImage>images/alfresco_top_right.png</logoImage>
     <splashImage>images/splash.png</splashImage>

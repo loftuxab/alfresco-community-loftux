@@ -2,14 +2,17 @@
     <name>alfrescobuildsettings</name>
     <show>0</show>
     <preBuildActionList>
-
+        
+        <actionGroup>
+        <actionList>
         <!-- AlfrescoDM build settings -->
         <setInstallerVariable name="alfresco_extensions_source_directory" value="alfresco/extensions" />
         <setInstallerVariable name="alfresco_endorsed_source_directory" value="alfresco/endorsed" />
         <setInstallerVariable name="alfresco_war_source_directory" value="alfresco" />
         <setInstallerVariable name="alfresco_extras_source_directory" value="alfresco" />
         <setInstallerVariable name="alfresco_licenses_directory" value="alfresco/licenses" />
-        <setInstallerVariable name="alfresco_readme_file" value="${build_project_directory}/README.txt" />
+        <!--setInstallerVariable name="alfresco_readme_file" value="${build_project_directory}/README.txt" /-->
+        <!--setInstallerVariable name="project.readmeFile" value="${build_project_directory}/README.txt" /-->
         <setInstallerVariable name="alfresco_on_install_settings_directory" value="bitrock" />
         <setInstallerVariable name="alfresco_on_install_settings_per_platform_directory" value="bitrock/alfresco" />
 
@@ -28,13 +31,20 @@
         <setInstallerVariable name="alfresco_rm_share_source_file" value="alfresco-dod5015-share.amp" />
 
         <!-- BINARIES -->
-        <setInstallerVariable name="binaries_folder" value="${build_project_directory}" />
+        <!--setInstallerVariable name="binaries_folder" value="${build_project_directory}" /-->
 
+        </actionList>
+        <ruleList>
+            <stringTest text="${alfresco_svn_rootdir}" type="empty"/>
+        </ruleList>
+        </actionGroup>
       
         <!-- ALFRESCO BUILD SYSTEM-->
+        <actionGroup>
+        <actionList>
         <!-- AlfrescoDM build settings -->
         <!-- NOTE: licenses directory should also include the licenses provided by BitRock -->
-        <setInstallerVariable name="alfresco_svn_rootdir" value="/Users/paulholmes-higgin/SVN/HEAD/root" />
+        <!--setInstallerVariable name="alfresco_svn_rootdir" value="/home/bitrock/HEAD/root" /-->
 
         <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir}/../../ALF-BINARIES/bitrock/binaries-linux" >
             <ruleList>
@@ -97,6 +107,11 @@
         <setInstallerVariable name="alfresco_rm_source_file" value="${alfresco_amps_source_directory}/alfresco-dod5015.amp" />
         <setInstallerVariable name="alfresco_rm_share_source_file" value="${alfresco_amps_source_directory}/alfresco-dod5015-share.amp" />
         <!-- END ALFRESCO BUILD SYSTEM-->
+        </actionList>
+        <ruleList>
+            <stringTest text="${alfresco_svn_rootdir}" type="empty" negate="yes" />
+        </ruleList>
+        </actionGroup>
 
 
 
@@ -111,4 +126,9 @@
         <setInstallerVariable name="swftools_distribution_folder" value="${binaries_folder}/swftools" />
         <setInstallerVariable name="tomcat_distribution_folder" value="${binaries_folder}/apache-tomcat" />
     </preBuildActionList>
+
+
+    <parameterList>
+        <directoryParameter name="alfresco_svn_rootdir" />
+    </parameterList> 
 </component>
