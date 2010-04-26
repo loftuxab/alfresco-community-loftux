@@ -1331,6 +1331,16 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
             fieldDef.control.params.maxLength = constraintParams.maxLength;
          }
       }
+      else if (constraintId === "REGEX")
+      {
+         // if the cm:name property is being processed switch the validation handler
+         // to the JavaScript specific nodeName handler.
+         if (fieldDef.name === "prop_cm_name")
+         {
+            constraint.validationHandler = "Alfresco.forms.validation.nodeName";
+            constraint.params = "{}";
+         }
+      }
       
       // setup a default help message for the field if appropriate
       setupConstraintHelpText(fieldDef, constraintId, constraintParams);
