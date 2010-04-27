@@ -630,7 +630,7 @@
    </target>
 
    <target name="distribute-installers"
-           depends="continuous-init, set-build-number">
+           depends="continuous-init, set-build-number, distribute-bitrock-installers">
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.installer.quick}/output" />
@@ -665,9 +665,19 @@
          </fileset>
       </move>
 
+   </target>
+
       <!-- Bitrock -->
       
-      <!-- Try and pick appropriate exe - assumes mac=OSX and unix=Linux -->
+   <target name="distribute-bitrock-installers"
+           depends="continuous-init, set-build-number,
+                    set-bitrock-builder,
+                    distribute-bitrock-installer-win,
+                    distribute-bitrock-installer-osx,
+                    distribute-bitrock-installer-linux" />
+
+   <!-- Try and pick appropriate exe - assumes mac=OSX and unix=Linux -->
+   <target name="set-bitrock-builder">
       <condition property="platformExe" value="${file.name.bitrock.exe.win}">
       	 <os family="windows" />
       </condition>
@@ -677,18 +687,26 @@
       <condition property="platformExe" value="${file.name.bitrock.exe.linux}">
       	 <os family="unix" />
       </condition>
- 
+   </target>
+
+   <target name="distribute-bitrock-installer-win" depends="continuous-init, set-bitrock-builder">
+       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-win.txt" failifexecutionfails="false">
+         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-win-installer.exe" "alfresco_svn_rootdir=${basedir}"'/>
+      </exec>
+   </target>
+
+   <target name="distribute-bitrock-installer-osx" depends="continuous-init, set-bitrock-builder">
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-osx.txt" failifexecutionfails="false">
          <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-osx-installer.app" "alfresco_svn_rootdir=${basedir}"'/>
       </exec>
+   </target>
+
+   <target name="distribute-bitrock-installer-linux" depends="continuous-init, set-bitrock-builder">
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-linux.txt" failifexecutionfails="false">
          <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-linux-installer.bin" "alfresco_svn_rootdir=${basedir}"'/>
-      </exec>
-      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-win.txt" failifexecutionfails="false">
-         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-win-installer.exe" "alfresco_svn_rootdir=${basedir}"'/>
-      </exec>
-            
+      </exec>          
    </target>
+
 
    <target name="assemble-tomcat"
            depends="continuous-init, set-build-number">
