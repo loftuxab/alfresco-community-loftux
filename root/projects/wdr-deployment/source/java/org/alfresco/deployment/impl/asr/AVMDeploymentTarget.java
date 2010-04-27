@@ -435,7 +435,7 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 	            	if(file.getType() == FileType.FILE)
 	            	{
 	            		String dst = localStoreName + ":" + file.getPath();
-	            		ContentWriter writer = fAVMService.getContentWriter(dst);
+	            		ContentWriter writer = fAVMService.getContentWriter(dst, true);
 	            		
 	            		File content = new File(file.getPreLocation());
 	            		writer.putContent(content);            		
