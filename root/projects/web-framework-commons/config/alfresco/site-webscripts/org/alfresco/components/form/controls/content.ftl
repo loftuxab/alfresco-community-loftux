@@ -25,6 +25,7 @@
          <#if field.control.params.richMimeTypes??>richMimeTypes: "${field.control.params.richMimeTypes}",</#if>
          <#if field.control.params.imageMimeTypes??>imageMimeTypes: "${field.control.params.imageMimeTypes}",</#if>
          <#if field.control.params.forceEditor??>forceEditor: ${field.control.params.forceEditor},</#if>
+         <#if field.control.params.forceContent??>forceContent: ${field.control.params.forceContent},</#if>
          <@editorParameters field />
       }).setMessages(
          ${messages}

@@ -191,13 +191,34 @@
                docDetailsUrl = scope.getActionUrls(oRecord).documentDetailsUrl;
 
                // Locked / Working Copy handling
-               if (record.lockedByUser === Alfresco.constants.USERNAME)
+               if (record.lockedByUser && record.lockedByUser !== "")
                {
-                  desc += '<div class="info-banner">' + scope.msg("details.banner." + (record.actionSet === "lockOwner" ? "lock-owner" : "editing")) + '</div>';
-               }
-               else if (record.lockedByUser && record.lockedByUser !== "")
-               {
-                  desc += '<div class="info-banner">' + scope.msg("details.banner.locked", '<a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.lockedByUser) + '">' + $html(record.lockedBy) + '</a>') + '</div>';
+                  var lockedByLink = '<a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.lockedByUser) + '">' + $html(record.lockedBy) + '</a>';
+
+                  /* Google Docs Integration */
+                  if (record.custom.googleDocUrl && record.custom.googleDocUrl !== "")
+                  {
+                     if (record.lockedByUser === Alfresco.constants.USERNAME)
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner.google-docs-owner", '<a href="' + record.custom.googleDocUrl + '" target="_blank">' + scope.msg("details.banner.google-docs.link") + '</a>') + '</div>';
+                     }
+                     else
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner.google-docs-locked", lockedByLink, '<a href="' + record.custom.googleDocUrl + '" target="_blank">' + scope.msg("details.banner.google-docs.link") + '</a>') + '</div>';
+                     }
+                  }
+                  /* Regular Working Copy handling */
+                  else
+                  {
+                     if (record.lockedByUser === Alfresco.constants.USERNAME)
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner." + (record.actionSet === "lockOwner" ? "lock-owner" : "editing")) + '</div>';
+                     }
+                     else
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner.locked", lockedByLink) + '</div>';
+                     }
+                  }
                }
 
                desc += '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(scope, oRecord) + '<span id="' + scope.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">';

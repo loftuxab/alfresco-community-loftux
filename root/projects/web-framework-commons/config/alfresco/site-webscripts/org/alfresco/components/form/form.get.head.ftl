@@ -15,7 +15,7 @@
 <@script type="text/javascript" src="${page.url.context}/components/form/date-picker.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/period.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/object-finder/object-finder.js"></@script>
-<script type="text/javascript" src="${page.url.context}/yui/calendar/calendar-min.js"></script>
+<script type="text/javascript" src="${page.url.context}/yui/calendar/calendar-${DEBUG?string("debug", "min")}.js"></script>
 <script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce/tiny_mce.js"></script>
 <@script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/rich-text.js"></@script>

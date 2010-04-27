@@ -127,8 +127,13 @@
        */
       onCreateContentSuccess: function CreateContentMgr_onCreateContentSuccess(response)
       {
-         // TODO: Grab the new nodeRef and pass it on to _navigateForward() to optionally use
-         this._navigateForward();
+         var nodeRef = null;
+         if (response.json && response.json.persistedObject)
+         {
+            // Grab the new nodeRef and pass it on to _navigateForward() to optionally use
+            nodeRef = new Alfresco.util.NodeRef(response.json.persistedObject);
+         }
+         this._navigateForward(nodeRef);
       },
       
       /**
@@ -169,11 +174,17 @@
        *
        * @method _navigateForward
        * @private
+       * @param nodeRef {Alfresco.util.NodeRef} Optional: NodeRef of just-created content item
        */
-      _navigateForward: function CreateContentMgr__navigateForward()
+      _navigateForward: function CreateContentMgr__navigateForward(nodeRef)
       {
+         /* Have we been given a nodeRef from the Forms Service? */
+         if (YAHOO.lang.isObject(nodeRef))
+         {
+            window.location.href = "document-details?nodeRef=" + nodeRef.toString();
+         }
          /* Did we come from the document library? If so, then direct the user back there */
-         if (document.referrer.match(/documentlibrary([?]|$)/) || document.referrer.match(/repository([?]|$)/))
+         else if (document.referrer.match(/documentlibrary([?]|$)/) || document.referrer.match(/repository([?]|$)/))
          {
             // go back to the referrer page
             history.go(-1);

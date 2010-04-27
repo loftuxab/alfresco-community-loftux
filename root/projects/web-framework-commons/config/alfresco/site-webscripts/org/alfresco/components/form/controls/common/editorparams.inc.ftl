@@ -5,6 +5,7 @@
 
    editorParameters:
    {
+<#if appearance != "none">
       height: ${height},
       width: ${width},
       inline_styles: false,
@@ -42,5 +43,6 @@
       theme_advanced_buttons2: null,
       theme_advanced_buttons3: null
    </#if>
+</#if>
    }
 </#macro>

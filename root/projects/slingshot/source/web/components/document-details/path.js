@@ -155,20 +155,47 @@
          {
             var bannerMsg, bannerStatus;
             
-            // Locked / Working Copy handling
-            if (docData.lockedByUser === Alfresco.constants.USERNAME)
+            if (docData.lockedByUser && docData.lockedByUser !== "")
             {
-               bannerStatus = docData.actionSet === "lockOwner" ? "lock-owner" : "editing";
-               bannerMsg = this.msg("banner." + bannerStatus);
-            }
-            else if (docData.lockedByUser && docData.lockedByUser !== "")
-            {
-               bannerStatus = "locked";
-               bannerMsg = this.msg("banner.locked", '<a href="' + Alfresco.util.uriTemplate("userpage",
+               var lockedByLink = '<a href="' + Alfresco.util.uriTemplate("userpage",
                {
                   userid: docData.lockedByUser,
                   pageid: "profile"
-               }) + '" class="theme-color-1">' + $html(docData.lockedBy) + '</a>') + '</div>';
+               }) + '" class="theme-color-1">' + $html(docData.lockedBy) + '</a>';
+
+               /* Google Docs Integration */
+               if (docData.custom.googleDocUrl && docData.custom.googleDocUrl !== "")
+               {
+                  if (docData.lockedByUser === Alfresco.constants.USERNAME)
+                  {
+                     // Google Doc / Owner banner
+                     bannerStatus = "google-docs-owner";
+                     bannerMsg = this.msg("banner.google-docs-owner", '<a href="' + docData.custom.googleDocUrl + '" target="_blank" class="theme-color-1">' +
+                        this.msg("banner.google-docs.link") + '</a>');
+                  }
+                  else
+                  {
+                     // Google Doc / Locked banner
+                     bannerStatus = "google-docs-locked";
+                     bannerMsg = this.msg("banner.google-docs-locked", lockedByLink, '<a href="' + docData.custom.googleDocUrl + '" target="_blank" class="theme-color-1">' +
+                        this.msg("banner.google-docs.link") + '</a>');
+                  }
+               }
+               /* Regular Working Copy handling */
+               else
+               {
+                  if (docData.lockedByUser === Alfresco.constants.USERNAME)
+                  {
+                     // Locked / Working Copy handling
+                     bannerStatus = docData.actionSet === "lockOwner" ? "lock-owner" : "editing";
+                     bannerMsg = this.msg("banner." + bannerStatus);
+                  }
+                  else 
+                  {
+                     bannerStatus = "locked";
+                     bannerMsg = this.msg("banner.locked", lockedByLink);
+                  }
+               }
             }
             
             if (bannerMsg)

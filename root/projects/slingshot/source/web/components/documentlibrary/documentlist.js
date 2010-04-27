@@ -376,8 +376,8 @@
           */
          onlineEditMimetypes:
          {
-            "application/vnd.excel": true,
-            "application/vnd.powerpoint": true,
+            "application/vnd.ms-excel": true,
+            "application/vnd.ms-powerpoint": true,
             "application/msword": true,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": true,
             "application/vnd.openxmlformats-officedocument.presentationml.presentation": true,
@@ -926,13 +926,34 @@
                docDetailsUrl = scope.getActionUrls(oRecord).documentDetailsUrl;
 
                // Locked / Working Copy handling
-               if (record.lockedByUser === Alfresco.constants.USERNAME)
+               if (record.lockedByUser && record.lockedByUser !== "")
                {
-                  desc += '<div class="info-banner">' + scope.msg("details.banner." + (record.actionSet === "lockOwner" ? "lock-owner" : "editing")) + '</div>';
-               }
-               else if (record.lockedByUser && record.lockedByUser !== "")
-               {
-                  desc += '<div class="info-banner">' + scope.msg("details.banner.locked", '<a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.lockedByUser) + '">' + $html(record.lockedBy) + '</a>') + '</div>';
+                  var lockedByLink = '<a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.lockedByUser) + '">' + $html(record.lockedBy) + '</a>';
+
+                  /* Google Docs Integration */
+                  if (record.custom.googleDocUrl && record.custom.googleDocUrl !== "")
+                  {
+                     if (record.lockedByUser === Alfresco.constants.USERNAME)
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner.google-docs-owner", '<a href="' + record.custom.googleDocUrl + '" target="_blank">' + scope.msg("details.banner.google-docs.link") + '</a>') + '</div>';
+                     }
+                     else
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner.google-docs-locked", lockedByLink, '<a href="' + record.custom.googleDocUrl + '" target="_blank">' + scope.msg("details.banner.google-docs.link") + '</a>') + '</div>';
+                     }
+                  }
+                  /* Regular Working Copy handling */
+                  else
+                  {
+                     if (record.lockedByUser === Alfresco.constants.USERNAME)
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner." + (record.actionSet === "lockOwner" ? "lock-owner" : "editing")) + '</div>';
+                     }
+                     else
+                     {
+                        desc += '<div class="info-banner">' + scope.msg("details.banner.locked", lockedByLink) + '</div>';
+                     }
+                  }
                }
                 
                desc += '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(scope, oRecord) + '<span id="' + scope.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">';
@@ -1033,7 +1054,7 @@
                /**
                 * Detailed View
                 */
-                oColumn.width = 180;
+                oColumn.width = 200;
             }
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -1248,7 +1269,7 @@
             { key: "status", label: "Status", sortable: false, formatter: this.fnRenderCellStatus(), width: 16 },
             { key: "thumbnail", label: "Preview", sortable: false, formatter: this.fnRenderCellThumbnail(), width: 100 },
             { key: "fileName", label: "Description", sortable: false, formatter: this.fnRenderCellDescription() },
-            { key: "actions", label: "Actions", sortable: false, formatter: this.fnRenderCellActions(), width: 180 }
+            { key: "actions", label: "Actions", sortable: false, formatter: this.fnRenderCellActions(), width: 200 }
          ];
          
          // DataTable definition
@@ -1724,6 +1745,7 @@
             inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
             managePermissionsUrl: "manage-permissions?nodeRef=" + nodeRef,
             workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
+            viewGoogleDocUrl: custom.googleDocUrl + "\" target=\"_blank",
             originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef),
             explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
@@ -1854,8 +1876,6 @@
             var nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
                displayName = asset.displayName;
 
-            var me = this;
-
             this.modules.actions.genericAction(
             {
                success:
@@ -1872,7 +1892,8 @@
                   {
                      fn: function DL_oAEO_success(data)
                      {
-                        me.state.actionEditOfflineActive = false;
+                        this.state.actionEditOfflineActive = false;
+                        this.options.highlightFile = displayName;
 
                         // The filterChanged event causes the DocList to update, so we need to run these functions afterwards
                         var fnAfterUpdate = function DL_oAEO_success_afterUpdate()
@@ -1928,8 +1949,9 @@
                   {
                      fn: function DL_oAEO_failure()
                      {
-                        me.state.actionEditOfflineActive = false;
-                     }
+                        this.state.actionEditOfflineActive = false;
+                     },
+                     scope: this
                   },
                   message: this.msg("message.edit-offline.failure", displayName)
                },
@@ -1944,6 +1966,146 @@
                }
             });
          }
+      },
+      
+      /**
+       * Checkout to Google Docs.
+       *
+       * @override
+       * @method onActionCheckoutToGoogleDocs
+       * @param asset {object} Object literal representing file or folder to be actioned
+       */
+      onActionCheckoutToGoogleDocs: function DL_onActionCheckoutToGoogleDocs(asset)
+      {
+         var displayName = asset.displayName,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+            
+         var progressPopup = Alfresco.util.PopupManager.displayMessage(
+         {
+            displayTime: 0,
+            effect: null,
+            text: this.msg("message.checkout-google.inprogress", displayName)
+         });
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               event:
+               {
+                  name: "changeFilter",
+                  obj:
+                  {
+                     filterId: "editingMe"
+                  }
+               },
+               callback:
+               {
+                  fn: function DL_oACTGD_success(data)
+                  {
+                     progressPopup.destroy();
+                     this.options.highlightFile = displayName;
+                     
+                     // The filterChanged event causes the DocList to update, so we need to run these functions afterwards
+                     var fnAfterUpdate = function DL_oACTGD_success_afterUpdate()
+                     {
+                        Alfresco.util.PopupManager.displayMessage(
+                        {
+                           text: this.msg("message.checkout-google.success", displayName)
+                        });
+                     };
+                     this.afterDocListUpdate.push(fnAfterUpdate);
+                  },
+                  scope: this
+               }
+            },
+            failure:
+            {
+               callback:
+               {
+                  fn: function DocumentActions_oAEO_failure(data)
+                  {
+                     progressPopup.destroy();
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.checkout-google.failure", displayName)
+                     });
+                  },
+                  scope: this
+               }
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "checkout/node/{nodeRef}",
+               params:
+               {
+                  nodeRef: nodeRef.uri
+               }
+            }
+         });
+      },
+
+      /**
+       * Check in a new version from Google Docs.
+       *
+       * @override
+       * @method onActionCheckinFromGoogleDocs
+       * @param asset {object} Object literal representing the file to be actioned upon
+       */
+      onActionCheckinFromGoogleDocs: function DL_onActionCheckinFromGoogleDocs(asset)
+      {
+         var displayName = asset.displayName,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+
+         var progressPopup = Alfresco.util.PopupManager.displayMessage(
+         {
+            displayTime: 0,
+            effect: null,
+            text: this.msg("message.checkin-google.inprogress", displayName)
+         });
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               event:
+               {
+                  name: "metadataRefresh"
+               },
+               callback:
+               {
+                  fn: function DL_oACFGD_success(data)
+                  {
+                     progressPopup.destroy();
+                     
+                     // The filterChanged event causes the DocList to update, so we need to run these functions afterwards
+                     var fnAfterUpdate = function DL_oACTGD_success_afterUpdate()
+                     {
+                        Alfresco.util.PopupManager.displayMessage(
+                        {
+                           text: this.msg("message.checkin-google.success", displayName)
+                        });
+                     };
+                     this.afterDocListUpdate.push(fnAfterUpdate);
+                  },
+                  scope: this
+               }
+            },
+            failure:
+            {
+               message: this.msg("message.checkin-google.failure", displayName)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "checkin/node/{nodeRef}",
+               params:
+               {
+                  nodeRef: nodeRef.uri
+               }
+            }
+         });
       },
       
       /**

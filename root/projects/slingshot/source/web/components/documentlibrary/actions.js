@@ -288,6 +288,30 @@
       },
 
       /**
+       * Checkout to Google Docs.
+       * NOTE: Placeholder only, clients MUST implement their own checkoutToGoogleDocs action
+       *
+       * @method onActionCheckoutToGoogleDocs
+       * @param asset {object} Object literal representing the file or folder to be actioned
+       */
+      onActionCheckoutToGoogleDocs: function dlA_onActionCheckoutToGoogleDocs(asset)
+      {
+         Alfresco.logger.error("onActionCheckoutToGoogleDocs", "Abstract implementation not overridden");
+      },
+
+      /**
+       * Check in a new version from Google Docs.
+       * NOTE: Placeholder only, clients MUST implement their own checkinFromGoogleDocs action
+       *
+       * @method onActionCheckinFromGoogleDocs
+       * @param asset {object} Object literal representing the file or folder to be actioned
+       */
+      onActionCheckinFromGoogleDocs: function dlA_onActionCheckinFromGoogleDocs(asset)
+      {
+         Alfresco.logger.error("onActionCheckinFromGoogleDocs", "Abstract implementation not overridden");
+      },
+
+      /**
        * Rules.
        *
        * @method onActionRules

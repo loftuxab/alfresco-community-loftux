@@ -267,7 +267,7 @@ var Evaluator =
    /**
     * Asset Evaluator - main entrypoint
     */
-   run: function Evaluator_run(asset)
+   run: function Evaluator_run(asset, isParent)
    {
       var assetType = Evaluator.getAssetType(asset),
          rmNode = rmService.getRecordsManagementNode(asset),
