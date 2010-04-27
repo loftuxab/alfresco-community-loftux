@@ -5,7 +5,6 @@
    <source-id>create-content</source-id>
    <url>/components/form</url>
    <properties>
-      <formId>doclib-create-content</formId>
       <itemKind>type</itemKind>
       <itemId>cm:content</itemId>
       <mode>create</mode>
@@ -13,5 +12,6 @@
       <showCaption>true</showCaption>
       <showCancelButton>true</showCancelButton>
       <editInline>true</editInline>
+      <googleEditable>true</googleEditable>
    </properties>
 </component>

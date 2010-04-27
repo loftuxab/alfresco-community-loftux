@@ -96,7 +96,7 @@ function getDoclist()
    
    if (!filterParams.variablePath)
    {
-      var parentEval = Evaluator.run(parsedArgs.pathNode);
+      var parentEval = Evaluator.run(parsedArgs.pathNode, true);
       // Parent node permissions (and Site role if applicable)
       parent =
       {

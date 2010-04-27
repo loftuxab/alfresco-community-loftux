@@ -124,7 +124,16 @@
           * @property hideNavBar
           * @type boolean
           */
-         hideNavBar: false
+         hideNavBar: false,
+         
+         /**
+          * Google Docs enabled/disabled flag.
+          * 
+          * @property googleDocsEnabled
+          * @type boolean
+          * @default false
+          */
+         googleDocsEnabled: false
       },
       
       /**
@@ -761,10 +770,74 @@
        */
       onUserAccess: function DLTB_onUserAccess(layer, args)
       {
+         var fnSetWidgetAccess = function DLTB_onUserAccess_fnSetWidgetAccess(p_widget, p_userAccess)
+         {
+            var perms, widgetPermissions, orPermissions, orMatch, isMenuItem = false, fnEnable, fnDisable;
+            if (p_widget instanceof YAHOO.widget.MenuItem && p_widget.element.firstChild)
+            {
+               isMenuItem = true;
+               // MenuItems have to store permission values in the <a> tag's "rel" attribute
+               perms = p_widget.element.firstChild.rel;
+               fnEnable = Alfresco.util.bind(p_widget.cfg.setProperty, p_widget.cfg, "className", "");
+               fnDisable = Alfresco.util.bind(p_widget.cfg.setProperty, p_widget.cfg, "className", "hidden");
+            }
+            else
+            {
+               // Buttons store the permission value in the "value" config variable
+               perms = p_widget.get("value");
+               fnEnable = Alfresco.util.bind(p_widget.set, p_widget, "disabled", false);
+               fnDisable = Alfresco.util.bind(p_widget.set, p_widget, "disabled", true);
+            }
+            // Default to enabled: disabled via missing permission
+            fnEnable();
+            if (typeof perms == "string" && perms !== "")
+            {
+               // Comma-separation indicates "AND"
+               widgetPermissions = perms.split(",");
+               for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
+               {
+                  // Pipe-separation is a special case and indicates an "OR" match. The matched permission is stored in "activePermission" on the widget.
+                  if (widgetPermissions[i].indexOf("|") !== -1)
+                  {
+                     orMatch = false;
+                     orPermissions = widgetPermissions[i].split("|");
+                     for (var j = 0, jj = orPermissions.length; j < jj; j++)
+                     {
+                        if (p_userAccess[orPermissions[j]])
+                        {
+                           orMatch = true;
+                           if (!isMenuItem)
+                           {
+                              p_widget.set("activePermission", orPermissions[j], true);
+                           }
+                           break;
+                        }
+                     }
+                     if (!orMatch)
+                     {
+                        fnDisable();
+                        break;
+                     }
+                  }
+                  else if (!p_userAccess[widgetPermissions[i]])
+                  {
+                     fnDisable();
+                     break;
+                  }
+               }
+            }
+         };
+         
          var obj = args[1];
          if (obj && obj.userAccess)
          {
-            var widget, widgetPermissions, index, orPermissions, orMatch;
+            // Fake permission if Google Docs is enabled via config
+            if (this.options.googleDocsEnabled)
+            {
+               obj.userAccess["create-google-doc"] = true;
+            }
+            
+            var widget, index, menuItems;
             for (index in this.widgets)
             {
                if (this.widgets.hasOwnProperty(index))
@@ -773,39 +846,13 @@
                   // Skip if this action specifies "no-access-check"
                   if (widget.get("srcelement").className != "no-access-check")
                   {
-                     // Default to disabled: must be enabled via permission
-                     widget.set("disabled", false);
-                     if (typeof widget.get("value") == "string")
+                     fnSetWidgetAccess(widget, obj.userAccess);
+                     if (widget.getMenu() !== null)
                      {
-                        // Comma-separation indicates "AND"
-                        widgetPermissions = widget.get("value").split(",");
-                        for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
+                        menuItems = widget.getMenu().getItems();
+                        for (var j = 0, jj = menuItems.length; j < jj; j++)
                         {
-                           // Pipe-separation is a special case and indicates an "OR" match. The matched permission is stored in "activePermission" on the widget.
-                           if (widgetPermissions[i].indexOf("|") !== -1)
-                           {
-                              orMatch = false;
-                              orPermissions = widgetPermissions[i].split("|");
-                              for (var j = 0, jj = orPermissions.length; j < jj; j++)
-                              {
-                                 if (obj.userAccess[orPermissions[j]])
-                                 {
-                                    orMatch = true;
-                                    widget.set("activePermission", orPermissions[j], true);
-                                    break;
-                                 }
-                              }
-                              if (!orMatch)
-                              {
-                                 widget.set("disabled", true);
-                                 break;
-                              }
-                           }
-                           else if (!obj.userAccess[widgetPermissions[i]])
-                           {
-                              widget.set("disabled", true);
-                              break;
-                           }
+                           fnSetWidgetAccess(menuItems[j], obj.userAccess);
                         }
                      }
                   }

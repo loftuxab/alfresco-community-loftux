@@ -215,15 +215,27 @@
 
 .toolbar .create-content .html-file
 {
-   background-image: url(images/create-html-file-16.png);
+   background-image: url(../images/filetypes/html-file-16.png);
 }
 .toolbar .create-content .plain-text-file
 {
-   background-image: url(images/create-plain-text-file-16.png);
+   background-image: url(../images/filetypes/text-file-16.png);
 }
 .toolbar .create-content .xml-file
 {
-   background-image: url(images/create-xml-file-16.png);
+   background-image: url(../images/filetypes/xml-file-16.png);
+}
+.toolbar .create-content .doc-file
+{
+   background-image: url(../images/filetypes/doc-file-16.png);
+}
+.toolbar .create-content .xls-file
+{
+   background-image: url(../images/filetypes/xls-file-16.png);
+}
+.toolbar .create-content .ppt-file
+{
+   background-image: url(../images/filetypes/ppt-file-16.png);
 }
 
 .toolbar .new-folder span.first-child

@@ -12,7 +12,8 @@
          <action type="action-link" id="onActionUploadNewVersion" permission="edit" label="actions.document.upload-new-version" />
          <action type="simple-link" id="onActionInlineEdit" permission="edit,inline-edit" href="{inlineEditUrl}" label="actions.document.inline-edit" />
          <action type="action-link" id="onActionEditOnline" permission="edit,online-edit" label="actions.document.edit-online" />
-         <action type="action-link" id="onActionEditOffline" permission="edit" label="actions.document.edit-offline" />
+         <action type="action-link" id="onActionEditOffline" permission="edit,~googledocs-edit" label="actions.document.edit-offline" />
+         <action type="action-link" id="onActionCheckoutToGoogleDocs" permission="edit,googledocs-edit" label="actions.document.checkout-google" />
          <action type="action-link" id="onActionCopyTo" label="actions.document.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.document.move-to" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.document.delete" />
@@ -60,6 +61,19 @@
 
       <actionSet id="link">
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.link.delete" />
+      </actionSet>
+
+      <actionSet id="googleDocLocked">
+         <action type="simple-link" id="onActionView" href="{viewGoogleDocUrl}" label="actions.document.view-google-doc" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionCancelEditing" permission="cancel-checkout" label="actions.document.cancel-editing" />
+      </actionSet>
+
+      <actionSet id="googleDocOwner">
+         <action type="simple-link" id="onActionView" href="{viewGoogleDocUrl}" label="actions.document.view-google-doc" />
+         <action type="action-link" id="onActionCheckinFromGoogleDocs" permission="checkin-from-google" label="actions.document.checkin-google" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
       </actionSet>
    </actionSets>
 </documentList>

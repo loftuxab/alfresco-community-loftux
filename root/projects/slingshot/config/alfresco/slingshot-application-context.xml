@@ -32,6 +32,7 @@
 
             <!-- Share custom config -->
             <value>classpath:alfresco/web-extension/share-config-custom.xml</value>
+            <value>jar:*!/META-INF/share-config-custom.xml</value>
          </list>
       </constructor-arg>
    </bean>

@@ -1887,6 +1887,29 @@ Alfresco.util.cleanBubblingObject = function(callbackObj)
 };
 
 /**
+ * Bind a function to a specific context.
+ *
+ * @method bind
+ * @param fn {function} Function to be bound.
+ * @param context {object} Context to bind function to.
+ * @param arguments {object} Optional arguments to prepend to arguments passed-in when function is actually called
+ * @return {function} Function wrapper.
+ * @static
+ */
+Alfresco.util.bind = function(fn, context)
+{
+   if (!YAHOO.lang.isObject(context))
+   {
+      return fn;
+   }
+   var args = Array.prototype.slice.call(arguments).slice(2);
+   return (function()
+   {
+      return fn.apply(context, args.concat(Array.prototype.slice.call(arguments)));
+   });
+};
+
+/**
  * Wrapper for helping components specify their YUI components.
  * @class Alfresco.util.YUILoaderHelper
  */

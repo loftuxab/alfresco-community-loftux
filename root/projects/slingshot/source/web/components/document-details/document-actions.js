@@ -158,6 +158,7 @@
          {
             downloadUrl: Alfresco.constants.PROXY_URI + recordData.contentUrl + "?a=true",
             viewUrl:  Alfresco.constants.PROXY_URI + recordData.contentUrl + "\" target=\"_blank",
+            viewGoogleDocUrl: custom.googleDocUrl + "\" target=\"_blank",
             documentDetailsUrl: "document-details?nodeRef=" + nodeRef,
             editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
             inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
@@ -311,6 +312,24 @@
             Alfresco.util.PopupManager.displayMessage(
             {
                text: this.msg("message.edit-cancel.success", displayName)
+            });
+         }
+
+         if (window.location.hash == "#checkoutToGoogleDocs")
+         {
+            window.location.hash = "";
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.checkout-google.success", displayName)
+            });
+         }
+         
+         if (window.location.hash == "#checkinFromGoogleDocs")
+         {
+            window.location.hash = "";
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.checkin-google.success", displayName)
             });
          }
       },
@@ -472,7 +491,124 @@
          this.assetData.nodeRef = complete.successful[0].nodeRef;
          window.location = this.getActionUrls().documentDetailsUrl;
       },
+
+      /**
+       * Checkout to Google Docs.
+       *
+       * @override
+       * @method onActionCheckoutToGoogleDocs
+       * @param asset {object} Object literal representing file or folder to be actioned
+       */
+      onActionCheckoutToGoogleDocs: function DocumentActions_onActionCheckoutToGoogleDocs(asset)
+      {
+         var displayName = asset.displayName,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+
+         var progressPopup = Alfresco.util.PopupManager.displayMessage(
+         {
+            displayTime: 0,
+            effect: null,
+            text: this.msg("message.checkout-google.inprogress", displayName)
+         });
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: function DocumentActions_oAEO_success(data)
+                  {
+                     this.assetData.nodeRef = data.json.results[0].nodeRef;
+                     window.location = this.getActionUrls().documentDetailsUrl + "#checkoutToGoogleDocs";
+                  },
+                  scope: this
+               }
+            },
+            failure:
+            {
+               callback:
+               {
+                  fn: function DocumentActions_oAEO_failure(data)
+                  {
+                     progressPopup.destroy();
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.checkout-google.failure", displayName)
+                     });
+                  },
+                  scope: this
+               }
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "checkout/node/{nodeRef}",
+               params:
+               {
+                  nodeRef: nodeRef.uri
+               }
+            }
+         });
+      },
       
+      /**
+       * Check in a new version from Google Docs.
+       *
+       * @override
+       * @method onActionCheckinFromGoogleDocs
+       * @param asset {object} Object literal representing the file to be actioned upon
+       */
+      onActionCheckinFromGoogleDocs: function DocumentActions_onActionCheckinFromGoogleDocs(asset)
+      {
+         var displayName = asset.displayName,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+
+          var progressPopup = Alfresco.util.PopupManager.displayMessage(
+          {
+             displayTime: 0,
+             effect: null,
+             text: this.msg("message.checkin-google.inprogress", displayName)
+          });
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: function DocumentActions_oACE_success(data)
+                  {
+                     this.assetData.nodeRef = data.json.results[0].nodeRef;
+                     window.location = this.getActionUrls().documentDetailsUrl + "#checkinFromGoogleDocs";
+                  },
+                  scope: this
+               }
+            },
+            failure:
+            {
+               fn: function DocumentActions_oAEO_failure(data)
+               {
+                  progressPopup.destroy();
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.checkin-google.failure", displayName)
+                  });
+               },
+               scope: this
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "checkin/node/{nodeRef}",
+               params:
+               {
+                  nodeRef: nodeRef.uri
+               }
+            }
+         });
+      },
+
       /**
        * Delete Asset confirmed.
        *

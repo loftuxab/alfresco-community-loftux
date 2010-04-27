@@ -47,5 +47,20 @@
       <actionSet id="link">
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.document.delete" />
       </actionSet>
+
+      <actionSet id="googleDocLocked">
+         <action type="simple-link" id="onActionView" href="{viewGoogleDocUrl}" label="actions.document.view-google-doc" />
+         <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionCancelEditing" permission="cancel-checkout" label="actions.document.cancel-editing" />
+      </actionSet>
+
+      <actionSet id="googleDocOwner">
+         <action type="simple-link" id="onActionView" href="{viewGoogleDocUrl}" label="actions.document.view-google-doc" />
+         <action type="action-link" id="onActionCheckinFromGoogleDocs" permission="checkin-from-google" label="actions.document.checkin-google" />
+         <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
+         <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
+      </actionSet>
    </actionSets>
 </documentList>

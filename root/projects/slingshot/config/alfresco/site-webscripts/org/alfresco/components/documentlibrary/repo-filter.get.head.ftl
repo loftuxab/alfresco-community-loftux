@@ -1,1 +1,1 @@
-<#include "../component.head.inc">
+<#include "filter.head.ftl">

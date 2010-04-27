@@ -178,5 +178,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-1.1.0.jar" sourcepath="src/pdfbox-1.1.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/fontbox-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/wss4j-patched.jar" sourcepath="src/wss4j-patched-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/gdata-client-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/gdata-core-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/gdata-docs-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/gdata-media-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/google-collect-1.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

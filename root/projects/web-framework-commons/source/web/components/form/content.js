@@ -116,7 +116,16 @@
           * @property forceEditor
           * @type boolean
           */
-         forceEditor: false
+         forceEditor: false,
+
+         /**
+          * Whether (empty) content should be created when editor is hidden, e.g. mimetype unrecognized.
+          * Note: Only relevant when forceEditor = false
+          * 
+          * @property forceContent
+          * @type boolean
+          */
+         forceContent: false
       },
 
       /**
@@ -391,8 +400,11 @@
        */
       _hideField: function ContentControl__hideField()
       {
-         // change the name of the textarea so it is not submitted as new content!
-         Dom.get(this.id).name = "-";
+         if (!this.options.forceContent)
+         {
+            // change the name of the textarea so it is not submitted as new content!
+            Dom.get(this.id).name = "-";
+         }
          
          // hide the whole field
          Dom.get(this.id + "-field").style.display = "none";

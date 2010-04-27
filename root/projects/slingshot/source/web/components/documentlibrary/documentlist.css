@@ -681,6 +681,21 @@
    background-image: url(images/simple-workflow-reject-16.png);
 }
 
+/* Google Docs Actions */
+.doclist .onActionCheckinFromGoogleDocs a
+{
+   background-image: url(images/google-docs-checkin-16.png);
+}
+.doclist .onActionCheckoutToGoogleDocs a
+{
+   background-image: url(images/google-docs-checkout-16.png);
+}
+.doclist .onActionViewGoogleDoc a
+{
+   background-image: url(images/view-in-browser-16.png);
+}
+
+
 /* History Manager */
 
 #yui-history-iframe
