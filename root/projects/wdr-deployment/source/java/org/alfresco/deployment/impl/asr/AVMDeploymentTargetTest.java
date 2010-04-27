@@ -137,14 +137,14 @@ public class AVMDeploymentTargetTest extends TestCase
             String fooText="I am main:/a/b/c/foo";
             
             {
-            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/c/foo");
+            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/c/foo", true);
             	writer.setEncoding("UTF-8");
             	writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
             	writer.putContent("I am main:/a/b/c/foo"); 
             }
             avmService.createFile(storeName + ":/a/b/c", "bar").close();
             {
-            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/c/bar");
+            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/c/bar", true);
             
             	// Force a conversion
             	writer.setEncoding("UTF-16");
@@ -155,7 +155,7 @@ public class AVMDeploymentTargetTest extends TestCase
             String buffyText = "This is test data: Buffy the Vampire Slayer is an Emmy Award-winning and Golden Globe-nominated American cult television series that aired from March 10, 1997 until May 20, 2003. The series was created in 1997 by writer-director Joss Whedon under his production tag, Mutant Enemy Productions with later co-executive producers being Jane Espenson, David Fury, and Marti Noxon. The series narrative follows Buffy Summers (played by Sarah Michelle Gellar), the latest in a line of young women chosen by fate to battle against vampires, demons, and the forces of darkness as the Slayer. Like previous Slayers, Buffy is aided by a Watcher, who guides and trains her. Unlike her predecessors, Buffy surrounds herself with a circle of loyal friends who become known as the Scooby Gang.";
             avmService.createFile(storeName + ":/a/b", "buffy").close();
             {
-            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/buffy");
+            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/buffy", true);
             	// Force a conversion
             	writer.setEncoding("UTF-16");
             	writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
@@ -174,7 +174,7 @@ public class AVMDeploymentTargetTest extends TestCase
             
             avmService.createFile(storeName + ":/a/b", "zander").close();
             {
-            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/zander");
+            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/zander", true);
             
             	// Force a conversion
             	writer.setEncoding("ISO-8859-1");
@@ -281,7 +281,7 @@ public class AVMDeploymentTargetTest extends TestCase
              */
             String updatedBuffyText = "Buffy the Vampire Slayer is a 1992 action-comedy-horror film about \"valley girl\" cheerleader Buffy (Kristy Swanson) chosen by fate to fight and kill vampires. The movie is a light parody which plays on the cliches of typical horror films. It also led to the darker and much more popular TV series of the same name, which starred Sarah Michelle Gellar and was created and executive produced by screenwriter Joss Whedon. Whedon often detailed how the TV series was a much closer rendering of his vision than the movie, which was compromised by commercial concerns and differences in interpretation. The film is now considered a relatively minor chapter in the broader Buffy legacy. When the film was first released, it was moderately successful and received mixed reviews from critics[2].";
             {
-            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/buffy");
+            	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/buffy", true);
             	// Force a conversion
             	writer.setEncoding("UTF-16");
             	writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
