@@ -11,8 +11,7 @@
         <setInstallerVariable name="alfresco_war_source_directory" value="alfresco" />
         <setInstallerVariable name="alfresco_extras_source_directory" value="alfresco" />
         <setInstallerVariable name="alfresco_licenses_directory" value="alfresco/licenses" />
-        <!--setInstallerVariable name="alfresco_readme_file" value="${build_project_directory}/README.txt" /-->
-        <!--setInstallerVariable name="project.readmeFile" value="${build_project_directory}/README.txt" /-->
+        <setInstallerVariable name="project.readmeFile" value="${build_project_directory}/README.txt" />
         <setInstallerVariable name="alfresco_on_install_settings_directory" value="bitrock" />
         <setInstallerVariable name="alfresco_on_install_settings_per_platform_directory" value="bitrock/alfresco" />
 
@@ -31,7 +30,7 @@
         <setInstallerVariable name="alfresco_rm_share_source_file" value="alfresco-dod5015-share.amp" />
 
         <!-- BINARIES -->
-        <!--setInstallerVariable name="binaries_folder" value="${build_project_directory}" /-->
+        <setInstallerVariable name="binaries_folder" value="${build_project_directory}" />
 
         </actionList>
         <ruleList>
@@ -44,7 +43,6 @@
         <actionList>
         <!-- AlfrescoDM build settings -->
         <!-- NOTE: licenses directory should also include the licenses provided by BitRock -->
-        <!--setInstallerVariable name="alfresco_svn_rootdir" value="/home/bitrock/HEAD/root" /-->
 
         <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir}/../../ALF-BINARIES/bitrock/binaries-linux" >
             <ruleList>
@@ -66,7 +64,7 @@
         <setInstallerVariable name="alfresco_war_source_directory" value="${alfresco_svn_rootdir}/build/assemble/tomcat/webapps" />
         <setInstallerVariable name="alfresco_extras_source_directory" value="${alfresco_svn_rootdir}/projects/installer" />
         <setInstallerVariable name="alfresco_licenses_directory" value="${alfresco_svn_rootdir}/installer/bitrock/licenses" />
-        <setInstallerVariable name="alfresco_readme_file" value="${alfresco_svn_rootdir}/installer/bitrock/README.txt" />
+        <setInstallerVariable name="project.readmeFile" value="${alfresco_svn_rootdir}/installer/bitrock/README.txt" />
         <setInstallerVariable name="alfresco_on_install_settings_directory" value="${alfresco_svn_rootdir}/installer/bitrock/bitrock" />
         <setInstallerVariable name="alfresco_on_install_per_platform_directory" value="${alfresco_svn_rootdir}/installer/bitrock/alfresco/linux" >
             <ruleList>
@@ -129,6 +127,6 @@
 
 
     <parameterList>
-        <directoryParameter name="alfresco_svn_rootdir" />
+        <directoryParameter name="alfresco_svn_rootdir" ask="0" />
     </parameterList> 
 </component>
