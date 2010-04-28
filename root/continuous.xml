@@ -699,6 +699,15 @@
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-osx.txt" failifexecutionfails="false">
          <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-osx-installer.app" "alfresco_svn_rootdir=${basedir}"'/>
       </exec>
+      <tar destfile="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app.tar.gz"
+           longfile="gnu"
+           compression="gzip">
+         <tarfileset dir="${dir.continuous.dist}"
+                     includes="${file.name.start}-${file.name.exe.version}-osx-installer.app"
+                     mode="755"/>
+      </tar>
+      <delete quiet="yes"
+              dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app" />
    </target>
 
    <target name="distribute-bitrock-installer-linux" depends="continuous-init, set-bitrock-builder">
