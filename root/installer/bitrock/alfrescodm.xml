@@ -1,6 +1,6 @@
 <component>
     <name>alfresco</name>
-    <description>Alfresco-3.3.G</description>
+    <description>Alfresco</description>
     <detailedDescription>Alfresco is an Enterprise Content Management (ECM) system featuring Document Management, Web Content Management, Collaboration Management, Records Management and Image Management.</detailedDescription>
     <canBeEdited>0</canBeEdited>
     <selected>1</selected>
@@ -146,6 +146,34 @@
             <name>alfrescoproperties</name>
             <platforms>all</platforms>
             <actionList>
+                <actionGroup>
+                    <actionList>
+                        <substitute>
+                            <files>*/alfresco-global.properties</files>
+                            <substitutionList>
+                                <substitution>
+                                    <pattern>@@BITROCK_DB_USER@@</pattern>
+                                    <value>DB.USER</value>
+                                </substitution>
+                                <substitution>
+                                    <pattern>@@BITROCK_DB_PASSWORD@@</pattern>
+                                    <value>DB.PASSWORD</value>
+                                </substitution>
+                                <substitution>
+                                    <pattern>@@BITROCK_DB_NAME@@</pattern>
+                                    <value>DB.NAME</value>
+                                </substitution>
+                                <substitution>
+                                    <pattern>@@BITROCK_MYSQL_PORT@@</pattern>
+                                    <value>3306</value>
+                                </substitution>
+                            </substitutionList>
+                        </substitute>
+                    </actionList>
+                    <ruleList>
+                        <isFalse value="${alfrescomysql_bundled}" />
+                    </ruleList>
+                </actionGroup>
                 <alfrescoConfigure alfrescoFiles="*/alfresco-global.properties" />
             </actionList>
             <distributionFileList>
