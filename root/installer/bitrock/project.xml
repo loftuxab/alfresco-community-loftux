@@ -1,12 +1,12 @@
 <project>
     <vendor>Alfresco Software, Inc.</vendor>
     <compressionAlgorithm>lzma</compressionAlgorithm>
-    <fullName>Alfresco ${alfresco_codeline} Edition Stack</fullName>
+    <fullName>Alfresco Community Edition Stack</fullName>
     <shortName>alfresco</shortName>
-    <version>3.3</version>
+    <version>3.3G-20100415-0</version>
     <installerFilename>${product_shortname}-community-${product_version}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <licenseFile></licenseFile>
-    <readmeFile>README.txt</readmeFile>
+    <readmeFile>${alfresco_readme_file}</readmeFile>
     <wrapLicenseFileText>1</wrapLicenseFileText>
     <logoImage>images/alfresco_top_right.png</logoImage>
     <splashImage>images/splash.png</splashImage>
@@ -31,6 +31,8 @@
 	<include file="base-parameter-admindb.xml" />
 	<include file="base-readme.xml"/>
 	<include file="base-licenses.xml"/>
+
+        <include file="alfresco-mysql-question.xml" />
 
 	<include file="common.xml" />
 	<include file="tomcat-java.xml" />	
@@ -65,15 +67,22 @@
     </parameterList>
 
     <postInstallationActionList>
-	<runProgram>
-	    <progressText>Starting Tomcat...</progressText>
-	    <program>${installdir}/${ctlscript_unix}</program>
-	    <programArguments>start tomcat</programArguments>
-	    <ruleList>
-		<platformTest type="unix" />
-	    </ruleList>
-	</runProgram>
-	<waitForPort port="${application_server_port}" timeout="10000"/>
+        <actionGroup>
+            <actionList>
+                <runProgram>
+                    <progressText>Starting Tomcat...</progressText>
+                    <program>${installdir}/${ctlscript_unix}</program>
+                    <programArguments>start tomcat</programArguments>
+                    <ruleList>
+                        <platformTest type="unix" />
+                    </ruleList>
+                </runProgram>
+                <waitForPort port="${application_server_port}" timeout="10000"/>
+            </actionList>
+            <ruleList>
+                <isTrue value="${alfrescomysql_bundled}" />
+            </ruleList>
+        </actionGroup>
     </postInstallationActionList>
     
     <finalPageActionList>
@@ -105,6 +114,7 @@
 	    <ruleList>
 		<compareText text="${application_server_installation_type}" logic="equals" value="bundled" />
 		<compareText text="${installer_ui}" logic="equals" value="gui"/>
+                <isTrue value="${alfrescomysql_bundled}" />
 	    </ruleList>
 	</actionGroup>
 	<showInfo>

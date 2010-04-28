@@ -1,0 +1,87 @@
+<component>
+    <name>alfrescomysqlquestion</name>
+    <selected>1</selected>
+    <show>0</show>
+    <parameterList>
+        <choiceParameter>
+            <name>alfrescomysql_bundled</name>
+            <title>Database Installation</title>
+            <explanation>Please select which database configuration you wish to use. If you select an existing database you should configure the Alfresco application before the installation.</explanation>
+            <cliOptionShow>0</cliOptionShow>
+            <description/>
+            <displayType>radiobuttons</displayType>
+            <default>1</default>
+            <optionList>
+                <option value="1" text="I wish to use the bundled MySQL database" />
+                <option value="0" text="I wish to use an existing MySQL database" />
+            </optionList>
+            <postShowPageActionList>
+                <actionGroup>
+                    <actionList>
+                        <setInstallerVariable name="component(mysql).selected" value="1" />
+                        <setInstallerVariable name="component(mysqlservice).selected" value="1" />
+                        <setInstallerVariable name="component(alfrescomysqldbcreation).selected" value="1" />
+                        <setInstallerVariable name="component(tomcatservice).parameter(tomcatservice_waittostart).value" value="1" />
+                    </actionList>
+                    <ruleList>
+                        <isTrue value="${alfrescomysqlquestion_bundled}" />
+                    </ruleList>
+                </actionGroup>
+                <actionGroup>
+                    <actionList>
+                        <setInstallerVariable name="component(mysql).selected" value="0" />
+                        <setInstallerVariable name="component(mysqlservice).selected" value="0" />
+                        <setInstallerVariable name="component(alfrescomysqldbcreation).selected" value="0" />
+                        <setInstallerVariable name="component(tomcatservice).parameter(tomcatservice_waittostart).value" value="0" />
+                    </actionList>
+                    <ruleList>
+                        <isFalse value="${alfrescomysqlquestion_bundled}" />
+                    </ruleList>
+                </actionGroup>
+            </postShowPageActionList>
+        </choiceParameter>
+    </parameterList>
+    <readyToInstallActionList>
+        <actionGroup>
+            <actionList>
+                <setInstallerVariable name="component(mysql).selected" value="1" />
+                <setInstallerVariable name="component(mysqlservice).selected" value="1" />
+                <setInstallerVariable name="component(alfrescomysqldbcreation).selected" value="1" />
+            </actionList>
+            <ruleList>
+                <isTrue value="${alfrescomysqlquestion_bundled}" />
+		<compareText text="${installer_ui}" logic="equals" value="unattended"/>
+            </ruleList>
+        </actionGroup>
+        <actionGroup>
+            <actionList>
+                <setInstallerVariable name="component(mysql).selected" value="0" />
+                <setInstallerVariable name="component(mysqlservice).selected" value="0" />
+                <setInstallerVariable name="component(alfrescomysqldbcreation).selected" value="0" />
+            </actionList>
+            <ruleList>
+                <isFalse value="${alfrescomysqlquestion_bundled}" />
+		<compareText text="${installer_ui}" logic="equals" value="unattended"/>
+            </ruleList>
+        </actionGroup>
+    </readyToInstallActionList>
+    <postInstallationActionList>
+        <actionGroup>
+            <actionList>
+                <substitute>
+                    <files>${application_server_directory}/scripts/serviceinstall.bat</files>
+                    <substitutionList>
+                        <substitution>
+                            <pattern>sc start</pattern>
+                            <value>rem sc start</value>
+                        </substitution>
+                    </substitutionList>
+                </substitute>
+            </actionList>
+            <ruleList>
+                <isFalse value="${alfrescomysqlquestion_bundled}" />
+            </ruleList>
+        </actionGroup>
+    </postInstallationActionList>
+</component>
+

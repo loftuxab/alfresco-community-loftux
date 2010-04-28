@@ -6,6 +6,14 @@
     <selected>1</selected>
     <parameterList>
 
+       <booleanParameter>
+            <name>tomcatservice_waittostart</name>
+            <ask>0</ask>
+            <default>1</default>
+            <value>1</value>
+            <cliOptionShow>0</cliOptionShow>
+       </booleanParameter>
+
        <stringParameter>
             <name>tomcatservice_username</name>
             <ask>0</ask>
@@ -92,6 +100,7 @@
         <waitForPort port="${application_server_port}" timeout="30000">
             <ruleList>
                 <platformTest type="windows"/>
+                <isTrue value="${tomcatservice_waittostart}" />
             </ruleList>
         </waitForPort>
     </postInstallationActionList>
