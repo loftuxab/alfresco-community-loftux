@@ -1,1 +1,1 @@
-<#include "filter.head.ftl">
+<#include "filter.get.head.ftl">
