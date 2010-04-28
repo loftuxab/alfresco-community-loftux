@@ -672,8 +672,8 @@
    <target name="distribute-bitrock-installers"
            depends="continuous-init, set-build-number,
                     set-bitrock-builder,
-                    distribute-bitrock-installer-win,
                     distribute-bitrock-installer-osx,
+                    distribute-bitrock-installer-win,
                     distribute-bitrock-installer-linux" />
 
    <!-- Try and pick appropriate exe - assumes mac=OSX and unix=Linux -->
@@ -702,12 +702,11 @@
       <tar destfile="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app.tar.gz"
            longfile="gnu"
            compression="gzip">
-         <tarfileset dir="${dir.continuous.dist}"
-                     includes="${file.name.start}-${file.name.exe.version}-osx-installer.app"
-                     mode="755"/>
+         <tarfileset dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app"
+                     prefix="${file.name.start}-${file.name.exe.version}-osx-installer.app" mode="755"/>
       </tar>
-      <delete quiet="yes"
-              dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app" />
+      <!--delete quiet="yes"
+              dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app" /-->
    </target>
 
    <target name="distribute-bitrock-installer-linux" depends="continuous-init, set-bitrock-builder">
