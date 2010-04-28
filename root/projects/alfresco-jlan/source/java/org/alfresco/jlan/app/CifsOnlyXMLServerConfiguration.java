@@ -2207,6 +2207,7 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 
 				DiskSharedDevice diskDev = new DiskSharedDevice(name, diskDrv, devCtx);
 				diskDev.setComment(comment);
+				diskDev.setConfiguration( this);
 
 				// Add any access controls to the share
 

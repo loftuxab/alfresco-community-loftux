@@ -34,6 +34,8 @@ import org.alfresco.jlan.server.filesys.TreeConnection;
 import org.alfresco.jlan.server.locking.LockManager;
 import org.alfresco.jlan.server.locking.OpLockDetails;
 import org.alfresco.jlan.server.locking.OpLockManager;
+import org.alfresco.jlan.server.thread.ThreadRequestPool;
+import org.alfresco.jlan.server.thread.TimedThreadRequest;
 import org.alfresco.jlan.smb.OpLock;
 import org.alfresco.jlan.smb.SMBStatus;
 import org.alfresco.jlan.smb.server.SMBSrvPacket;
@@ -66,6 +68,53 @@ public class FileStateLockManager implements LockManager, OpLockManager, Runnabl
 	private Thread m_expiryThread;
 	private boolean m_shutdown;
 	
+	// Thread pool and timed thread request
+	
+	private ThreadRequestPool m_threadPool;
+	private OplockExpiryTimedRequest m_threadReq;
+	
+	/**
+	 * Oplock Expiry Checker Timed Thread Request Class
+	 */
+	private class OplockExpiryTimedRequest extends TimedThreadRequest {
+	    
+	    /**
+	     * Constructor
+	     * 
+	     * @param name String
+	     * @param interval long
+	     */
+	    public OplockExpiryTimedRequest(String name, long interval) {
+	        super( name, TimedRequestPaused, interval);
+	    }
+	    
+	    /**
+	     * Expiry checker method
+	     */
+	    protected void runTimedRequest() {
+	        
+	        // Check for expired oplock break requests
+	        
+	        checkExpiredOplockBreaks();
+	        
+	        // If the shutdown flag is set then clear the repeat interval so the timed request
+	        // does not get requeued
+	        
+	        if ( m_shutdown == true) {
+	            
+	            // Clear the repeat interval so the request does not get requeued
+	        
+	            setRepeatInterval( 0L);
+	        }
+	        else if ( m_oplockQueue.size() == 0) {
+	            
+	            // Pause the timed checker request
+	            
+	            setRunAtTime( TimedThreadRequest.TimedRequestPaused);
+	        }
+	    }
+	}
+	
 	/**
 	 * Class constructor
 	 * 
@@ -77,13 +126,6 @@ public class FileStateLockManager implements LockManager, OpLockManager, Runnabl
 		// Create the oplock break queue
 		
 		m_oplockQueue = new Hashtable<String, OpLockDetails>();
-		
-		// Start the oplock break expiry thread
-		
-        m_expiryThread = new Thread(this);
-        m_expiryThread.setDaemon(true);
-        m_expiryThread.setName("OpLockExpire");
-        m_expiryThread.start();
 	}
 	
 	/**
@@ -290,7 +332,13 @@ public class FileStateLockManager implements LockManager, OpLockManager, Runnabl
 		
 		synchronized ( m_oplockQueue) {
 			m_oplockQueue.put( path, oplock);
-			m_oplockQueue.notify();
+			
+			// Inform the checker thread or restart the timed request
+			
+			if ( m_threadPool == null)
+			    m_oplockQueue.notify();
+			else
+			    m_threadReq.restartRequest();
 		}
 	}
 	
@@ -450,5 +498,38 @@ public class FileStateLockManager implements LockManager, OpLockManager, Runnabl
 			catch (Exception ex) {
 			}
 		}
+	}
+	
+	/**
+	 * Start the lock manager
+	 * 
+	 * @param threadName String
+	 * @param threadPool ThreadRequestPool
+	 */
+	public final void startLockManager( String threadName, ThreadRequestPool threadPool) {
+
+	    // Save the thread pool, if specified
+	    
+	    m_threadPool = threadPool;
+	    
+        // If the thread pool has not been specified then use a seperate thread for the oplock expiry checker
+        
+        if ( m_threadPool == null) {
+            
+            // Start the oplock break expiry thread
+            
+            m_expiryThread = new Thread(this);
+            m_expiryThread.setDaemon(true);
+            m_expiryThread.setName(threadName);
+            m_expiryThread.start();
+        }
+        else {
+            
+            // Queue a timed request to the thread pool to run the oplock expiry check
+            
+            m_threadReq = new OplockExpiryTimedRequest( threadName, OpLockBreakTimeout / 1000L);
+            m_threadPool.queueTimedRequest( m_threadReq);
+        }
+	    
 	}
 }
