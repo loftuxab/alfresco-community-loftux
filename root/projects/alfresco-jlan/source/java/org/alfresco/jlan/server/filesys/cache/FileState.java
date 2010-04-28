@@ -134,6 +134,10 @@ public class FileState {
     private long m_modifyDate;
     private long m_changeDate;
 		
+    // File allocation size
+    
+    private long m_allocSize;
+    
     // Filesystem specific object
     
     private Object m_filesysObj;
@@ -854,6 +858,33 @@ public class FileState {
      */
     public final void setFilesystemObject( Object filesysObj) {
     	m_filesysObj = filesysObj;
+    }
+    
+    /**
+     * Check if the allocation size has been set
+     * 
+     * @return boolean
+     */
+    public final boolean hasAllocationSize() {
+        return m_allocSize > 0 ? true : false;
+    }
+    
+    /**
+     * Return the allocation size
+     * 
+     * @return long
+     */
+    public final long getAllocationSize() {
+        return m_allocSize;
+    }
+    
+    /**
+     * Set the allocation size
+     * 
+     * @param allocSize long
+     */
+    public final void setAllocationSize(long allocSize) {
+        m_allocSize = allocSize;
     }
     
 	/**

@@ -21,50 +21,55 @@ package org.alfresco.jlan.server.core;
 
 import org.alfresco.jlan.server.auth.acl.AccessControl;
 import org.alfresco.jlan.server.auth.acl.AccessControlList;
+import org.alfresco.jlan.server.config.ServerConfiguration;
 /**
  * <p>The shared device class is the base class for all shared device implementations.
  *
  * @author gkspencer
  */
-public class SharedDevice implements Comparable {
+public class SharedDevice implements Comparable<SharedDevice> {
 
-  //	Share attribute types
-
-  public static final int Admin 	 = 0x0001;
-  public static final int Hidden 	 = 0x0002;
-  public static final int ReadOnly = 0x0004;
-  public static final int Temporary= 0x0008;
-
-  //	Shared device name
-
-  private String m_name;
-
-  //	Shared device type
-
-  private int m_type;
-
-  //	Comment
-
-  private String m_comment;
-
-  // Device interface and context object
-
-  private DeviceInterface m_interface;
-  private DeviceContext m_drvCtx;
-
-  //	Share attributes
-
-  private int m_attrib;
+    //	Share attribute types
+    
+    public static final int Admin 	= 0x0001;
+    public static final int Hidden 	= 0x0002;
+    public static final int ReadOnly  = 0x0004;
+    public static final int Temporary = 0x0008;
+    
+    //	Shared device name
+    
+    private String m_name;
+    
+    //	Shared device type
+    
+    private int m_type;
+    
+    //	Comment
+    
+    private String m_comment;
+    
+    // Device interface and context object
+    
+    private DeviceInterface m_interface;
+    private DeviceContext m_drvCtx;
+    
+    //	Share attributes
+    
+    private int m_attrib;
+      
+    //	Current and maximum connections to this shared device
+      
+    private int m_maxUses = -1;		//	unlimited
+    private int m_curUses;
   
-  //	Current and maximum connections to this shared device
-  
-  private int m_maxUses = -1;		//	unlimited
-  private int m_curUses;
-  
-	//	Access control list
-	
-	private AccessControlList m_acls;
+   	//  Access control list
+    	
+    private AccessControlList m_acls;
 	  
+    // Server configuration
+      
+    private ServerConfiguration m_config;
+      
   /**
    * SharedDevice constructor.
    *
@@ -182,6 +187,24 @@ public class SharedDevice implements Comparable {
     return m_maxUses;
   }
 
+  /**
+   * Check if the shared device has an assoicated server configuration
+   * 
+   * @return boolean
+   */
+  public final boolean hasConfiguration() {
+      return m_config != null ? true : false;
+  }
+
+  /**
+   * Return the associated server configuration
+   * 
+   * @return ServerConfiguration
+   */
+  public final ServerConfiguration getConfiguration() {
+      return m_config;
+  }
+  
   /**
    * Generates a hash code for the receiver.
    * This method is supported primarily for
@@ -306,6 +329,15 @@ public class SharedDevice implements Comparable {
 	}
 	
 	/**
+	 * Set the associated server configuration
+	 * 
+	 * @param config ServerConfiguration
+	 */
+	public final void setConfiguration(ServerConfiguration config) {
+	    m_config = config;
+	}
+	
+	/**
 	 * Add an access control to the shared device
 	 * 
 	 * @param acl AccessControl
@@ -378,14 +410,10 @@ public class SharedDevice implements Comparable {
 	/**
 	 * Compare this shared device to another shared device using the device name
 	 * 
-	 * @param obj Object
+	 * @param sd SharedDevice
 	 */
-	public int compareTo(Object obj) {
-	  if ( obj instanceof SharedDevice) {
-	    SharedDevice sd = (SharedDevice) obj;
+	public int compareTo(SharedDevice sd) {
 	    return getName().compareTo(sd.getName());
-	  }
-	  return -1;
 	}
 
   /**

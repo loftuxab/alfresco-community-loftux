@@ -22,19 +22,21 @@ package org.alfresco.jlan.server.filesys.db;
 import java.io.File;
 
 import org.alfresco.jlan.debug.Debug;
+import org.alfresco.jlan.server.config.CoreServerConfigSection;
 import org.alfresco.jlan.server.config.InvalidConfigurationException;
+import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.alfresco.jlan.server.core.DeviceContextException;
 import org.alfresco.jlan.server.filesys.DiskDeviceContext;
 import org.alfresco.jlan.server.filesys.DiskSharedDevice;
 import org.alfresco.jlan.server.filesys.FileAttribute;
 import org.alfresco.jlan.server.filesys.FileSystem;
 import org.alfresco.jlan.server.filesys.cache.FileState;
-import org.alfresco.jlan.server.filesys.cache.FileStateCache;
 import org.alfresco.jlan.server.filesys.cache.FileStateLockManager;
 import org.alfresco.jlan.server.filesys.loader.DeleteFileRequest;
 import org.alfresco.jlan.server.filesys.loader.FileLoader;
 import org.alfresco.jlan.server.filesys.loader.FileRequestQueue;
 import org.alfresco.jlan.server.filesys.quota.QuotaManagerException;
+import org.alfresco.jlan.server.thread.ThreadRequestPool;
 import org.alfresco.jlan.util.MemorySize;
 import org.springframework.extensions.config.ConfigElement;
 
@@ -901,6 +903,25 @@ public class DBDeviceContext extends DiskDeviceContext {
 			catch (QuotaManagerException ex) {
 				throw new DeviceContextException(ex.toString());
 			}
+		}
+		
+		// Start the lock manager, use the thread pool if available
+		
+		if ( getLockManager() != null) {
+		    
+		    // Get the thread pool, if available
+		    
+    		ThreadRequestPool threadPool = null;
+    		ServerConfiguration config = disk.getConfiguration();
+    		if ( config != null) {
+    		    CoreServerConfigSection coreConfig = ( CoreServerConfigSection) config.getConfigSection( CoreServerConfigSection.SectionName);
+    		    if ( coreConfig != null)
+    		        threadPool = coreConfig.getThreadPool();
+    		}
+		
+    		// Start the lock manager
+    		
+    		m_lockManager.startLockManager( "OplockExpire_" + disk.getName(), threadPool);
 		}
 	}
 }
