@@ -2337,6 +2337,7 @@
             <pathelement location="${dir.module.dod5015.classes}" />
             <pathelement location="${dir.module.dod5015.config}" />
             <path refid="classpath.unit.test"/>
+            <path refid="classpath.unit.test.extension"/>
          </classpath>
          <formatter type="xml" />
          <batchtest todir="${dir.module.dod5015}/${dir.name.build}/${dir.name.test.results}">
