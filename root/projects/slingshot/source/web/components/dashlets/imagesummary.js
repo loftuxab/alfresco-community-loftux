@@ -20,8 +20,8 @@
 /**
  * Dashboard Image Summary component.
  * 
- * @namespace Alfresco
- * @class Alfresco.ImageSummary
+ * @namespace Alfresco.dashlet
+ * @class Alfresco.dashlet.ImageSummary
  */
 (function()
 {
@@ -34,22 +34,20 @@
     * Dashboard ImageSummary constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.ImageSummary} The new component instance
+    * @return {Alfresco.dashlet.ImageSummary} The new component instance
     * @constructor
     */
-   Alfresco.ImageSummary = function ImageSummary_constructor(htmlId)
+   Alfresco.dashlet.ImageSummary = function ImageSummary_constructor(htmlId)
    {
-      this.name = "Alfresco.ImageSummary";
-      this.id = htmlId;
+      Alfresco.dashlet.ImageSummary.superclass.constructor.call(this, "Alfresco.dashlet.ImageSummary", htmlId);
       
-      Alfresco.util.ComponentManager.register(this);
-      
+      this.itemsPerRow = 0;
       Event.addListener(window, 'resize', this.resizeThumbnailList, this, true);
       
       return this;
    };
 
-   Alfresco.ImageSummary.prototype =
+   YAHOO.extend(Alfresco.dashlet.ImageSummary, Alfresco.component.Base,
    {
       /**
        * Keep track of thumbnail items per row - so don't resize unless actually required
@@ -57,7 +55,7 @@
        * @property itemsPerRow
        * @type integer
        */
-      itemsPerRow: 0,
+      itemsPerRow: null,
       
       /**
        * Fired on window resize event.
@@ -90,5 +88,5 @@
             }
          }
       }
-   };
+   });
 })();

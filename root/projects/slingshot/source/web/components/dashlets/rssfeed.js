@@ -18,7 +18,7 @@
  */
  
 /**
- * Alfresco.RssFeed
+ * Alfresco.dashlet.RssFeed
  *
  * Aggregates events from all the sites the user belongs to.
  * For use on the user's dashboard.
@@ -36,19 +36,20 @@
     * RssFeed constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.RssFeed} The new RssFeed instance
+    * @return {Alfresco.dashlet.RssFeed} The new RssFeed instance
     * @constructor
     */
-   Alfresco.RssFeed = function(htmlId)
+   Alfresco.dashlet.RssFeed = function RssFeed_constructor(htmlId)
    {
-      Alfresco.RssFeed.superclass.constructor.call(this, "Alfresco.RssFeed", htmlId, []);
+      Alfresco.dashlet.RssFeed.superclass.constructor.call(this, "Alfresco.dashlet.RssFeed", htmlId);
+      
       this.configDialog = null;
+      
       return this;
    };
 
-   YAHOO.extend(Alfresco.RssFeed, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.dashlet.RssFeed, Alfresco.component.Base,
    {
-
       /**
        * Object container for initialization options
        *
@@ -120,7 +121,6 @@
             {
                width: "50em",
                templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/feed/config",
-               actionUrl: actionUrl,
                onSuccess:
                {
                   fn: function RssFeed_onConfigFeed_callback(response)
@@ -161,15 +161,11 @@
                }
             });
          }
-         else
+
+         this.configDialog.setOptions(
          {
-            this.configDialog.setOptions(
-            {
-               actionUrl: actionUrl
-            });
-         }
-         this.configDialog.show();
+            actionUrl: actionUrl
+         }).show();
       }
    });
-
 })();

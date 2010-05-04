@@ -199,6 +199,10 @@ span.navigation-separator-alt
 /**
  * Replace default styles for HTML content
  */
+.dashlet .rich-content
+{
+   padding-top: 8px;
+}
 
 .rich-content sub
 {

@@ -1,7 +1,7 @@
 <#import "/org/alfresco/utils/feed.utils.ftl" as feedLib/>
 <#assign DISPLAY_ITEMS = 999>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RssFeed("${args.htmlid}").setOptions(
+   new Alfresco.dashlet.RssFeed("${args.htmlid}").setOptions(
    {
       "componentId": "${instance.object.id}",
       "feedURL": "${uri}", 

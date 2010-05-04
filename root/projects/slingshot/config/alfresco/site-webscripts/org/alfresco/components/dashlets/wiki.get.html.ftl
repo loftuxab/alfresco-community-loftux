@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiDashlet("${args.htmlid}").setOptions(
+   new Alfresco.dashlet.WikiDashlet("${args.htmlid}").setOptions(
    {
       guid: "${instance.object.id}",
       siteId: "${page.url.templateArgs.site!""}",
@@ -10,7 +10,7 @@
    new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 <div class="dashlet wiki">
-   <div class="title" id="${args.htmlid}-title">${msg("label.header-prefix")}<#if wikiLink??> - <a href="wiki-page?title=${wikiLink?url}">${pageTitle!msg("label.header")}</#if></a></div>
+   <div class="title" id="${args.htmlid}-title">${msg("label.header-prefix")}<#if wikiLink??> - <a href="wiki-page?title=${wikiLink?url}">${pageTitle!msg("label.header")}</a></#if></div>
 <#if userIsSiteManager>
    <div class="toolbar">
       <a class="theme-color-1" href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
@@ -18,11 +18,7 @@
 </#if>
    <div class="body scrollablePanel" <#if args.height??>style="height: ${args.height}px;"</#if>>
       <div id="${args.htmlid}-scrollableList" class="rich-content">
-<#if wikipage?exists>
-         ${wikipage}
-<#else>
-		   ${msg("label.noConfig")}
-</#if>
+         ${wikipage!msg("label.noConfig")}
       </div>
-	</div>
+   </div>
 </div>

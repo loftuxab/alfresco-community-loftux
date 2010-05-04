@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-	new Alfresco.SiteLinks("${args.htmlid}").setOptions(
+	new Alfresco.dashlet.SiteLinks("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!''}"
    });

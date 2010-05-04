@@ -1,5 +1,27 @@
-/*
- *** Alfresco.MiniCalendar
+/**
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
+ *
+ * This file is part of Alfresco
+ *
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Mini Calendar component.
+ * 
+ * @namespace Alfresco.dashlet
+ * @class Alfresco.dashlet.MiniCalendar
  */
 (function()
 {
@@ -13,58 +35,26 @@
     */
    var $html = Alfresco.util.encodeHTML;
 
-   Alfresco.MiniCalendar = function(htmlId)
+   Alfresco.dashlet.MiniCalendar = function MiniCalendar_constructor(htmlId)
    {
-      this.name = "Alfresco.MiniCalendar";
-      this.id = htmlId;
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["calendar"], this.onComponentsLoaded, this);
-      
-      return this;
+      return Alfresco.dashlet.MiniCalendar.superclass.constructor.call(this, "Alfresco.dashlet.MiniCalendar", htmlId, ["calendar"]);
    };
    
-   Alfresco.MiniCalendar.prototype =
+   YAHOO.extend(Alfresco.dashlet.MiniCalendar, Alfresco.component.Base,
    {
-      /**
-       * Sets the current site for this component.
-       * 
-       * @property siteId
-       * @type string
-       */
-      setSiteId: function(siteId)
-      {
-         this.siteId = siteId;
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */   
-      onComponentsLoaded: function()
-      {
-         YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
-      },
-      
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initialises components, including YUI widgets.
        *
-       * @method init
+       * @method onReady
        */ 
-      init: function()
+      onReady: function MiniCalendar_onReady()
       {
          /* 
           * Separate the (initial) rendering of the calendar from the data loading.
           * If for some reason the data fails to load, the calendar will still display.
           */
-         var uriEvents = Alfresco.constants.PROXY_URI + "calendar/eventList?site=" + this.siteId;
+         var uriEvents = Alfresco.constants.PROXY_URI + "calendar/eventList?site=" + this.options.siteId;
          
          var callback = 
          {
@@ -81,11 +71,11 @@
        * is loaded successfully.
        *
        * @method onSuccess
-       * @param e {object} DomEvent
+       * @param o {object} Result of AJAX call
        */
-      onSuccess: function(o)
+      onSuccess: function MiniCalendar_onSuccess(o)
       {
-         var noEventHTML = '<div class="detail-list-item first-item last-item"><span>'+this._msg("label.no-items")+'</span></div>';
+         var noEventHTML = '<div class="detail-list-item first-item last-item"><span>' + this.msg("label.no-items") + '</span></div>';
          var eventHTML = '';
          var hasEvents = false;
          try 
@@ -96,16 +86,13 @@
             
             for (var key in eventList)
             {
-
                if (eventList.hasOwnProperty(key))
                {
-                  
                   var dateParts = key.split("/");
                   var date = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0] - 1), dateParts[1]);
                   if (date >= now)
                   {
                      hasEvents = true;                     
-
                      eventHTML += this.renderDay(date, eventList);
                   }
                }
@@ -116,10 +103,17 @@
             // Do nothing
             eventHTML = "Could not load calendar data";
          }
-         Dom.get(this.id + "-eventsContainer").innerHTML = (hasEvents) ? eventHTML : noEventHTML;
+         Dom.get(this.id + "-eventsContainer").innerHTML = hasEvents ? eventHTML : noEventHTML;
       },
-      
-      renderDay: function(date, eventData)
+
+      /**
+       * Render an event
+       *
+       * @method renderDay
+       * @param data {Date} Date to render
+       * @param eventData {object} Event data
+       */
+      renderDay: function MiniCalendar_renderDay(date, eventData)
       {
          var theStupidDate = Alfresco.util.formatDate(date, "m/d/yyyy");
          var theDate = Alfresco.util.toISO8601(date,
@@ -161,34 +155,9 @@
        * @method onFailure
        * @param e {object} DomEvent
        */
-      onFailure: function(o)
+      onFailure: function MiniCalendar_onFailure(o)
       {
-         /* Failed */
-         //alert("Failed to load calendar data.");
-      },
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function Activities__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.MiniCalendar", Array.prototype.slice.call(arguments).slice(1));
-      },
-      /**
-       * Set messages for this component
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       */
-      setMessages: function setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      }      
-   
-   };
+         Dom.get(this.id + "-eventsContainer").innerHTML = "Failed to load calendar data.";
+      }
+   });
 })();

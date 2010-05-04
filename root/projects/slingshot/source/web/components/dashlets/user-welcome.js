@@ -18,11 +18,11 @@
  */
  
 /*
- * Alfresco.UserWelcome
+ * Alfresco.dashlet.UserWelcome
  * Registers a event handler on the 'Remove Me' button to have the component remove itself.
  *
- * @namespace Alfresco
- * @class Alfresco.UserWelcome
+ * @namespace Alfresco.dashlet
+ * @class Alfresco.dashlet.UserWelcome
  */
 (function()
 {
@@ -36,24 +36,19 @@
     * UserWelcome constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.UserWelcome} The new component instance
+    * @return {Alfresco.dashlet.UserWelcome} The new component instance
     * @constructor
     */
-   Alfresco.UserWelcome = function(htmlId)
+   Alfresco.dashlet.UserWelcome = function UserWelcome_constructor(htmlId)
    {
-      this.name = "Alfresco.UserWelcome";
-      this.id = htmlId;
+      Alfresco.dashlet.UserWelcome.superclass.constructor.call(this, "Alfresco.dashlet.UserWelcome", htmlId);
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["grids"], this.onComponentsLoaded, this);
+      this.createSite = null;
       
       return this;
    }
 
-   Alfresco.UserWelcome.prototype =
+   YAHOO.extend(Alfresco.dashlet.UserWelcome, Alfresco.component.Base,
    {
       /**
        * CreateSite module instance.
@@ -64,23 +59,12 @@
       createSite: null,
 
       /**
-		 * Fired by YUILoaderHelper when required component script files have
-		 * been loaded into the browser.
-		 *
-		 * @method onComponentsLoaded
-	    */	
-      onComponentsLoaded: function UW_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-      
-      /**
-	    * Fired by YUI when parent element is available for scripting.
-	    * Initialises components, including YUI widgets.
-	    *
-	    * @method onReady
-	    */ 
-      onReady: function UW_onReady()
+       * Fired by YUI when parent element is available for scripting.
+       * Initialises components, including YUI widgets.
+       *
+       * @method onReady
+       */ 
+      onReady: function UserWelcome_onReady()
       {
          // Listen on clicks for the create site link
          Event.addListener(this.id + "-createSite-button", "click", this.onCreateSiteLinkClick, this, true);
@@ -91,9 +75,9 @@
        * @method onCreateSiteLinkClick
        * @param event {domEvent} DOM event
        */
-      onCreateSiteLinkClick: function(event)
+      onCreateSiteLinkClick: function UserWelcome_onCreateSiteLinkClick(event)
       {
-         // Create the CreateSite module if it doesnt exist
+         // Create the CreateSite module if it doesn't exist
          if (this.createSite === null)
          {
             this.createSite = Alfresco.module.getCreateSiteInstance();
@@ -101,5 +85,5 @@
          // and show it
          this.createSite.show();
       }
-   };
+   });
 })();

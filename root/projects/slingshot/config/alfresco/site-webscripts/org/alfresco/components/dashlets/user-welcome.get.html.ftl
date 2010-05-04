@@ -1,7 +1,7 @@
 <#assign helpPages = config.scoped["HelpPages"]["help-pages"]>
 <#assign tutorialLink = helpPages.getChildValue("share-tutorial")!"">
 <script type="text/javascript">//<![CDATA[
-new Alfresco.UserWelcome("${args.htmlid}");
+new Alfresco.dashlet.UserWelcome("${args.htmlid}");
 //]]></script>
 <div class="dashlet user-welcome">
    <div class="title">${msg("header.userWelcome")}</div>

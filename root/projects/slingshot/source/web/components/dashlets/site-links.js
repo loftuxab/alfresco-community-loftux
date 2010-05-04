@@ -20,8 +20,8 @@
 /**
  * Dashboard SiteLinks component.
  * 
- * @namespace Alfresco
- * @class Alfresco.SiteLinks
+ * @namespace Alfresco.dashlet
+ * @class Alfresco.dashlet.SiteLinks
  */
 (function()
 {
@@ -34,22 +34,15 @@
     * Dashboard SiteLinks constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.SiteLinks} The new component instance
+    * @return {Alfresco.dashlet.SiteLinks} The new component instance
     * @constructor
     */
-   Alfresco.SiteLinks = function Links_constructor(htmlId)
+   Alfresco.dashlet.SiteLinks = function Links_constructor(htmlId)
    {
-      this.name = "Alfresco.SiteLinks";
-      this.id = htmlId;
-
-      Alfresco.util.ComponentManager.register(this);
-
-      Alfresco.util.YUILoaderHelper.require(["container"], this.onComponentsLoaded, this);
-
-      return this;
+      return Alfresco.dashlet.SiteLinks.superclass.constructor.call(this, "Alfresco.dashlet.SiteLinks", htmlId);
    };
 
-   Alfresco.SiteLinks.prototype =
+   YAHOO.extend(Alfresco.dashlet.SiteLinks, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -64,29 +57,6 @@
           * @type String
           * */
          siteId : ""
-      },
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.SiteLinks} returns 'this' for method chaining
-       */
-      setOptions: function SL_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function SL_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
       },
 
       /**
@@ -106,11 +76,12 @@
       onCreateLinkClick: function SL_onCreateLinkButtonClick(e)
       {
          Event.stopEvent(e);
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit",
+         
+         window.location = Alfresco.util.uriTemplate("sitepage",
          {
-            site: this.options.siteId
+            site: this.options.siteId,
+            pageid: "links-linkedit"
          });
-         window.location = url;
       }
-   };
+   });
 })();

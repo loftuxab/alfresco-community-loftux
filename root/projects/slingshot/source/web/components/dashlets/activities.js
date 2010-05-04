@@ -20,8 +20,8 @@
 /**
  * Dashboard Activities common component.
  * 
- * @namespace Alfresco
- * @class Alfresco.Activities
+ * @namespace Alfresco.dashlet
+ * @class Alfresco.dashlet.Activities
  */
 (function()
 {
@@ -47,12 +47,12 @@
     * Dashboard Activities constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.Activities} The new component instance
+    * @return {Alfresco.dashlet.Activities} The new component instance
     * @constructor
     */
-   Alfresco.Activities = function Activities_constructor(htmlId)
+   Alfresco.dashlet.Activities = function Activities_constructor(htmlId)
    {
-      Alfresco.Activities.superclass.constructor.call(this, "Alfresco.Activities", htmlId, ["button", "container"]);
+      Alfresco.dashlet.Activities.superclass.constructor.call(this, "Alfresco.dashlet.Activities", htmlId, ["button", "container"]);
       
       // Preferences service
       this.services.preferences = new Alfresco.service.Preferences();
@@ -60,7 +60,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.Activities, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.dashlet.Activities, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -343,6 +343,6 @@
          this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
       }
    });
-   Alfresco.Activities.FILTER_BYDATE = 'byDate';
-   Alfresco.Activities.FILTER_BYUSER = 'byUser';
+   Alfresco.dashlet.Activities.FILTER_BYDATE = 'byDate';
+   Alfresco.dashlet.Activities.FILTER_BYUSER = 'byUser';
 })();
