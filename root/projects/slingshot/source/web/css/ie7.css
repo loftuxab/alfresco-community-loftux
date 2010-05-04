@@ -90,6 +90,12 @@ textarea
    position: relative;
 }
 
+/* Dashlet resizing with iframes */
+.yui-resize-resizing .scrollablePanel iframe
+{
+   display: none;
+}
+
 /**
  * Dashlets that use a DataTable
  * Fixing MSIE's inability to do anything properly

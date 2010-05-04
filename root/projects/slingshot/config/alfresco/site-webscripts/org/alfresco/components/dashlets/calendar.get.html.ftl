@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.MiniCalendar("${args.htmlid}").setSiteId("${page.url.templateArgs.site!""}").setMessages(
+   new Alfresco.dashlet.MiniCalendar("${args.htmlid}").setOptions(
+   {
+      siteId: "${page.url.templateArgs.site!""}"
+   }).setMessages(
       ${messages}
    );
    new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");

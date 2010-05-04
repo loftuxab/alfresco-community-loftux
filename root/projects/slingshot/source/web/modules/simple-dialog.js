@@ -118,11 +118,11 @@
            *   obj: object, // An object to pass back to the handler.
            *   scope: object // The object to use for the scope of the handler.
            *
-           * @property onSuccessCallback
+           * @property onSuccess
            * @type object
            * @default null
            */
-          onSuccessCallback:
+          onSuccess:
           {
              fn: null,
              obj: null,
@@ -144,11 +144,11 @@
            *   obj: object, // An object to pass back to the handler.
            *   scope: object // The object to use for the scope of the handler.
            *
-           * @property onFailureCallback
+           * @property onFailure
            * @type object
            * @default null
            */
-          onFailureCallback:
+          onFailure:
           {
              fn: null,
              obj: null,
@@ -595,7 +595,7 @@
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: "Operation failed."
+                  text: this.options.failureMessage || "Operation failed."
                });
             }
          }
@@ -610,7 +610,7 @@
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: "Operation succeeded."
+                  text: this.options.successMessage || "Operation succeeded."
                });
             }
          }
@@ -651,7 +651,8 @@
             {
                Alfresco.util.PopupManager.displayPrompt(
                {
-                  text: this.msg("message.failure")
+                  title: this.msg("message.failure"),
+                  text: response.serverResponse
                });
             }
          }

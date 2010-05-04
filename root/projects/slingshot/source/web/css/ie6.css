@@ -169,6 +169,12 @@ div.dashlet .body .clear
    height: 1px;
 }
 
+/* Dashlet resizing with iframes */
+.yui-resize-resizing .scrollablePanel iframe
+{
+   display: none;
+}
+
 /**
  * Page title and navigation
  */
@@ -177,9 +183,6 @@ div.dashlet .body .clear
 {
    height: 2.2em;
    line-height: 2.2em;
-/*
-
-padding-bottom: 2em;*/
 }
 
 .page-title div.title
@@ -564,8 +567,7 @@ div.filter
 div.dashlet.site-profile div.body,
 div.dashlet.wiki div.body,
 div.dashlet.cmis div.body div,
-div.dashlet.rssfeed div.body div.headline,
-div.dashlet.calendar div.body
+div.dashlet.rssfeed div.body div.headline
 {
    padding-left: 8px;
    padding-right: 8px;

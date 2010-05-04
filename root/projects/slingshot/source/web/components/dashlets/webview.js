@@ -20,8 +20,8 @@
 /*
  *** Alfresco WebView Dashlet
  *
- * @namespace Alfresco
- * @class Alfresco.WebView
+ * @namespace Alfresco.dashlet
+ * @class Alfresco.dashlet.WebView
  *
  */
 (function()
@@ -37,9 +37,9 @@
     */
    var $html = Alfresco.util.encodeHTML;
    
-   Alfresco.WebView = function(htmlId)
+   Alfresco.dashlet.WebView = function WebView_constructor(htmlId)
    {
-      Alfresco.WebView.superclass.constructor.call(this, "Alfresco.WebView", htmlId, []);
+      Alfresco.dashlet.WebView.superclass.constructor.call(this, "Alfresco.dashlet.WebView", htmlId);
 
       // Initialise prototype properties
       this.configDialog = null;
@@ -53,7 +53,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.WebView, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.dashlet.WebView, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -63,11 +63,34 @@
        */
       options:
       {
+         /**
+          * ComponentId used for saving configuration
+          * @property componentId
+          * @type string
+          */
          componentId: "",
+         
+         /**
+          * URI for the web page to view
+          * @property webviewURI
+          * @type string
+          */
          webviewURI: "",
+         
+         /**
+          * Dashlet title
+          * @property webviewTitle
+          * @type string
+          */
          webviewTitle: "",
-         webviewHeight: 600,
-         isDefault: 'true'
+         
+         /**
+          * Default web page
+          * @property isDefault
+          * @type boolean
+          * @default true
+          */
+         isDefault: true
       },
       
       /**
@@ -100,9 +123,12 @@
        * Event listener for configuration link click.
        *
        * @method onConfigWebViewClick
+       * @param e {object} HTML event
        */
-      onConfigWebViewClick: function WebView_onConfigWebViewClick(event)
+      onConfigWebViewClick: function WebView_onConfigWebViewClick(e)
       {
+         Event.stopEvent(e);
+         
          var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/webview/config/" + encodeURIComponent(this.options.componentId);
 
          if (!this.configDialog)
@@ -111,7 +137,6 @@
             {
                width: "50em",
                templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/webview/config",
-               actionUrl: actionUrl,
                onSuccess:
                {
                   fn: function WebView_onConfigWebView_callback(response)
@@ -139,12 +164,7 @@
                               this.options.webviewTitle = iframe.attributes["name"].value;
                               titleLink.innerHTML = $html(this.options.webviewTitle);
                            }
-                           if (iframe.attributes["theHeight"])
-                           {
-                              var theHeight = this.options.webviewHeight = iframe.attributes["theHeight"].value;
-                              Dom.setStyle(div, "height", theHeight + "px");
-                           }
-                           this.options.isDefault = 'false';
+                           this.options.isDefault = false;
                         }
                      }
                   },
@@ -170,29 +190,18 @@
                      elem = Dom.get(this.configDialog.id + "-url");
                      if (elem)
                      {
-                        elem.value = (this.options.isDefault=='false') ? this.options.webviewURI : 'http://';
-                     }
-
-                     /* Get the height value */
-                     elem = Dom.get(this.configDialog.id + "-height");
-                     if (elem)
-                     {
-                        elem.value = this.options.webviewHeight;
+                        elem.value = this.options.isDefault ? "http://" : this.options.webviewURI;
                      }
                   },
                   scope: this
                }
             });
          }
-         else
+
+         this.configDialog.setOptions(
          {
-            this.configDialog.setOptions(
-            {
-               actionUrl: actionUrl
-            });
-         }
-         this.configDialog.show();
-         Event.stopEvent(event);
+            actionUrl: actionUrl
+         }).show();
       },
 
       /**
@@ -237,9 +246,8 @@
       _browserDestroysPanel: function WW__browserDestroysPanel()
       {
          // All browsers on Windows (tested w FP 10) and FF2 and below on Mac
-         return (navigator.userAgent.indexOf("Windows") != -1 ||
-                 (navigator.userAgent.indexOf("Macintosh") != -1 && YAHOO.env.ua.gecko > 0 && YAHOO.env.ua.gecko < 1.9));
+         return (navigator.userAgent.indexOf("Windows") !== -1 ||
+                 (navigator.userAgent.indexOf("Macintosh") !== -1 && YAHOO.env.ua.gecko > 0 && YAHOO.env.ua.gecko < 1.9));
       }
-
    });
 })();

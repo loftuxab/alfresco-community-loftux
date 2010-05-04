@@ -232,6 +232,7 @@ Alfresco.widget.DashletResizer.prototype =
    {
       var height = parseInt(Dom.getStyle(this.dashlet, "height"), 10) - this.heightDelta;
       Dom.setStyle(this.dashletBody, "height", height + "px");
+      Dom.setStyle(this.dashletBody.getElementsByTagName("iframe"), "height", height + "px");
    },
 
    /**

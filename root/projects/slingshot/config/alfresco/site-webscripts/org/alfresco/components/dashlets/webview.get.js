@@ -32,4 +32,4 @@ if (!isDefault && !re.test(uri))
 model.webviewTitle = webviewTitle;
 model.uri = uri;
 model.height = height;
-model.isDefault = (isDefault) ? 'true' : 'false';
+model.isDefault = isDefault;

@@ -1,7 +1,25 @@
 /**
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
+ *
+ * This file is part of Alfresco
+ *
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
  * Wiki markup parser. 
- * Very simple parser that converts a subset of wiki markup
- * to HTML.
+ * Very simple parser that converts a subset of wiki markup to HTML.
  * 
  * @namespace Alfresco
  * @class Alfresco.WikiParser
@@ -27,7 +45,7 @@
        * @property URL
        * @type String
        */
-      URL : null,
+      URL: null,
       
       /**
        * Renders wiki markup.
@@ -35,7 +53,7 @@
        * @method parse
        * @param test {String} The text to render
        */
-      parse: function(text, pages)
+      parse: function WikiParser_parse(text, pages)
       {
          pages = pages == null ? [] : pages;
          text = this._renderLinks(text, pages);
@@ -47,10 +65,11 @@
        * them as appropriate.
        * 
        * @method _renderLinks
+       * @private
        * @param s {String} The text to render
        * @param pages {Array} The existing pages on the current site
        */
-      _renderLinks: function(s, pages)
+      _renderLinks: function WikiParser__renderLinks(s, pages)
       {
          if (typeof s == "string")
          {
@@ -84,7 +103,5 @@
          }
          return s;
       }
-      
    };
-   
 })();

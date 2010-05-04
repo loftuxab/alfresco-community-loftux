@@ -2,7 +2,7 @@
    <a href="${url.context}/page/site/${page.url.templateArgs.site}/document-details?nodeRef=${image.nodeRef}" class="theme-color-1">${label}</a>
 </#macro>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.ImageSummary("${args.htmlid}");
+   new Alfresco.dashlet.ImageSummary("${args.htmlid}");
    new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 <div class="dashlet">

@@ -18,12 +18,12 @@
  */
  
 /**
- * Alfresco.WikiDashlet
+ * Alfresco.dashlet.WikiDashlet
  * Aggregates events from all the sites the user belongs to.
  * For use on the user's dashboard.
  *
  * @namespace Alfresco
- * @class Alfresco.WikiDashlet
+ * @class Alfresco.dashlet.WikiDashlet
  */
 (function()
 {
@@ -37,26 +37,19 @@
     * WikiDashlet constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.WikiDashlet} The new WikiDashlet instance
+    * @return {Alfresco.dashlet.WikiDashlet} The new WikiDashlet instance
     * @constructor
     */
-   Alfresco.WikiDashlet = function(htmlId)
+   Alfresco.dashlet.WikiDashlet = function WikiDashlet_constructor(htmlId)
    {
-      this.name = "Alfresco.WikiDashlet";
-      this.id = htmlId;
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
+      Alfresco.dashlet.WikiDashlet.superclass.constructor.call(this, "Alfresco.dashlet.WikiDashlet", htmlId);
       
       this.parser = new Alfresco.WikiParser();
       
       return this;
    };
 
-   Alfresco.WikiDashlet.prototype =
+   YAHOO.extend(Alfresco.dashlet.WikiDashlet, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -92,87 +85,52 @@
       },
 
       /**
-		 * Allows the user to configure the feed for the dashlet.
-		 *
-		 * @property configDialog
-	    * @type DOM node
-		 */
-      configDialog: null,
-		
-      /**
-       * Set multiple initialization options at once.
+       * Wiki mark-up parser instance.
        *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.WikiDashlet} returns 'this' for method chaining
+       * @property parser
+       * @type Alfresco.WikiParser
        */
-      setOptions: function WikiDashlet_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
+      parser: null,
 
       /**
-       * Set messages for this component.
+       * Allows the user to configure the feed for the dashlet.
        *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       * @property configDialog
+       * @type DOM node
        */
-      setMessages: function WikiDashlet_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
+      configDialog: null,
       
       /**
-		 * Fired by YUILoaderHelper when required component script files have
-		 * been loaded into the browser.
-		 *
-		 * @method onComponentsLoaded
-	    */	
-      onComponentsLoaded: function WikiDashlet_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.init, this, true);
-      },
-      
-      /**
-	    * Fired by YUI when parent element is available for scripting.
-	    * Initialises components, including YUI widgets.
-	    *
-	    * @method init
-	    */ 
-      init: function WikiDashlet_init()
+       * Fired by YUI when parent element is available for scripting.
+       * Initialises components, including YUI widgets.
+       *
+       * @method onReady
+       */ 
+      onReady: function WikiDashlet_onReady()
       {
          Event.addListener(this.id + "-wiki-link", "click", this.onConfigFeedClick, this, true);
          
-         this.parser.URL = this._getAbsolutePath();
+         this.parser.URL = Alfresco.util.uriTemplate("sitepage",
+         {
+            site: this.options.siteId,
+            pageid: "wiki-page?title="
+         });
+
          var wikiDiv = Dom.get(this.id + "-scrollableList");
          wikiDiv.innerHTML = this.parser.parse(wikiDiv.innerHTML, this.options.pages);
       },
-		
+      
       /**
-		 * Returns the absolute path (URL) to a wiki page, minus the title of the page.
-		 *
-		 * @method _getAbsolutePath
-		 * @private
-		 */
-      _getAbsolutePath: function WikiDashlet__getAbsolutePath()
-      {
-         return Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=";
-      },
-		
-      /**
-		 * Configuration click handler
-		 *
-		 * @method onConfigFeedClick
-		 * @param e {object} HTML event
-		 */
+       * Configuration click handler
+       *
+       * @method onConfigFeedClick
+       * @param e {object} HTML event
+       */
       onConfigFeedClick: function WikiDashlet_onConfigFeedClick(e)
       {
-         var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/wiki/config/" + encodeURIComponent(this.options.guid);
-         
          Event.stopEvent(e);
+
+         var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/wiki/config/" + encodeURIComponent(this.options.guid);
          
          if (!this.configDialog)
          {
@@ -180,7 +138,6 @@
             {
                width: "50em",
                templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/wiki/config/" + this.options.siteId,
-               actionUrl: actionUrl,
                onSuccess:
                {
                   fn: function WikiDashlet_onConfigFeed_callback(e)
@@ -199,15 +156,11 @@
                }
             });
          }
-         else
+
+         this.configDialog.setOptions(
          {
-            this.configDialog.setOptions(
-            {
-               actionUrl: actionUrl
-            });
-         }
-         
-         this.configDialog.show();
+            actionUrl: actionUrl
+         }).show();
       }
-   };
+   });
 })();
