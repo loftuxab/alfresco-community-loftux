@@ -1,6 +1,6 @@
 <component>
     <name>alfresco</name>
-    <description>Alfresco</description>
+    <description>Alfresco-3.3G-20100415-1</description>
     <detailedDescription>Alfresco is an Enterprise Content Management (ECM) system featuring Document Management, Web Content Management, Collaboration Management, Records Management and Image Management.</detailedDescription>
     <canBeEdited>0</canBeEdited>
     <selected>1</selected>
@@ -171,7 +171,7 @@
                         </substitute>
                     </actionList>
                     <ruleList>
-                        <isFalse value="${alfrescomysql_bundled}" />
+                        <isFalse value="${alfrescomysqlquestion_bundled}" />
                     </ruleList>
                 </actionGroup>
                 <alfrescoConfigure alfrescoFiles="*/alfresco-global.properties" />

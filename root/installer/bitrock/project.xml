@@ -3,7 +3,7 @@
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <fullName>Alfresco Community Edition Stack</fullName>
     <shortName>alfresco</shortName>
-    <version>3.3G-20100415-0</version>
+    <version>3.3G-20100415-1</version>
     <installerFilename>${product_shortname}-community-${product_version}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <licenseFile></licenseFile>
     <readmeFile>${alfresco_readme_file}</readmeFile>
@@ -80,7 +80,7 @@
                 <waitForPort port="${application_server_port}" timeout="10000"/>
             </actionList>
             <ruleList>
-                <isTrue value="${alfrescomysql_bundled}" />
+                <isTrue value="${alfrescomysqlquestion_bundled}" />
             </ruleList>
         </actionGroup>
     </postInstallationActionList>
@@ -114,7 +114,7 @@
 	    <ruleList>
 		<compareText text="${application_server_installation_type}" logic="equals" value="bundled" />
 		<compareText text="${installer_ui}" logic="equals" value="gui"/>
-                <isTrue value="${alfrescomysql_bundled}" />
+                <isTrue value="${alfrescomysqlquestion_bundled}" />
 	    </ruleList>
 	</actionGroup>
 	<showInfo>
