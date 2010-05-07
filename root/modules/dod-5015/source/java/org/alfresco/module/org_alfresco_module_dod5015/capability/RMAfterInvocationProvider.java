@@ -590,7 +590,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
             }
             else
             {
-                for (int i = 0; i < maxSize.intValue(); i++)
+                for (int i = 0; i < returnedObject.length(); i++)
                 {
                     inclusionMask.set(i, true);
                 }
