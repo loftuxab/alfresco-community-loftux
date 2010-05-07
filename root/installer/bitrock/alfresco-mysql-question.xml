@@ -4,7 +4,7 @@
     <show>0</show>
     <parameterList>
         <choiceParameter>
-            <name>alfrescomysql_bundled</name>
+            <name>alfrescomysqlquestion_bundled</name>
             <title>Database Installation</title>
             <explanation>Please select which database configuration you wish to use. If you select an existing database you should configure the Alfresco application before the installation.</explanation>
             <cliOptionShow>0</cliOptionShow>

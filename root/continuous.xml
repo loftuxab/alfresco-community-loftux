@@ -705,8 +705,8 @@
          <tarfileset dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app"
                      prefix="${file.name.start}-${file.name.exe.version}-osx-installer.app" mode="755"/>
       </tar>
-      <!--delete quiet="yes"
-              dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app" /-->
+      <delete quiet="yes"
+              dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app" />
    </target>
 
    <target name="distribute-bitrock-installer-linux" depends="continuous-init, set-bitrock-builder">
