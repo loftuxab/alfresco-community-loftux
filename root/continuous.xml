@@ -316,6 +316,16 @@
             dbtype = "postgresql";
          } else if(dburl.startsWith("jdbc:oracle:")) {
             dbtype = "oracle";
+
+            // Ensure we were given sys credentials too
+            if(project.getProperty("db.master.username") == null) {
+               fail.setMessage("Property db.master.username not given (normally 'sys as sysdba')");
+               fail.perform();
+            }
+            if(project.getProperty("db.master.password") == null) {
+               fail.setMessage("Property db.master.password not given");
+               fail.perform();
+            }
          } else if(dburl.startsWith("jdbc:db2//")) {
             dbtype = "db2"; // DB2 type 4
 
@@ -418,6 +428,20 @@
          ALTER DATABASE ${db.name}_test SET ALLOW_SNAPSHOT_ISOLATION ON;
       </sql>
    </target>
+   <target name="-create-database-oracle">
+      <!-- Really user + schema, rather than oracle database -->
+      <sql driver="${db.driver}" 
+           url="${db.url}"
+           classpathref="classpath.compile" 
+           print="yes"
+           userid="${db.master.username}" 
+           password="${db.master.password}">
+         create user ${db.username} identified by ${db.password};
+         grant create session to ${db.username};
+         create user ${db.username}_test identified by ${db.password};
+         grant create session to ${db.username}_test;
+      </sql>
+   </target>
 
    <target name="-drop-database" 
            depends="continuous-init, load-database-properties">
@@ -485,6 +509,31 @@
            userid="${db.username}" 
            password="${db.password}">
          drop database ${db.name}_test;
+      </sql>
+   </target>
+   <target name="-drop-database-oracle">
+      <!-- Really user + schema, rather than oracle database -->
+      <!-- Oracle lacks a "if exists" for dropping users -->
+      <!-- So, do it as two statements, ignoring errors -->
+      <sql driver="${db.driver}" 
+           url="${db.url}"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           onerror="continue"
+           userid="${db.master.username}" 
+           password="${db.master.password}">
+         drop user ${db.username} cascade;
+      </sql>
+      <sql driver="${db.driver}" 
+           url="${db.url}"
+           classpathref="classpath.compile" 
+           print="yes"
+           autocommit="yes"
+           onerror="continue"
+           userid="${db.master.username}" 
+           password="${db.master.password}">
+         drop user ${db.username}_test cascade;
       </sql>
    </target>
 
