@@ -107,6 +107,7 @@
             <aspect name="emailserver:aliasable" />
             <aspect name="cm:taggable" />
             <aspect name="app:inlineeditable" />
+            <aspect name="gd:googleEditable" />
          </visible>
 
          <!--
@@ -174,7 +175,7 @@
          <!--
             Enable/disable the Google Docs UI integration (Extra types on Create Content menu, Google Docs actions).
          -->
-         <enabled>false</enabled>
+         <enabled>true</enabled>
          
          <!--
             The mimetypes of documents Google Docs allows you to create via the Share interface.
@@ -182,7 +183,7 @@
          -->
          <creatable-types>
             <creatable type="doc">application/msword</creatable>
-            <creatable type="xls">application/vnd.ms-excel</creatable>
+            <creatable type="xls">application/vnd.excel</creatable>
             <creatable type="ppt">application/vnd.ms-powerpoint</creatable>
          </creatable-types>
       </google-docs>
