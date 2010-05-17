@@ -2422,6 +2422,7 @@
                filter: successFilter,
                page: successPage
             };
+         successFilter.doclistFirstTimeNav = false;
          
          // Clear the current document list if the data webscript is taking too long
          var fnShowLoadingMessage = function DL_fnShowLoadingMessage()
