@@ -29,6 +29,12 @@
    </filter>
    
    <filter>
+      <description>MT authentication support - NOTE: does not support portlets</description>
+      <filter-name>MTAuthentationFilter</filter-name>
+      <filter-class>org.alfresco.web.site.servlet.MTAuthenticationFilter</filter-class>
+   </filter>
+   
+   <filter>
       <description>Redirects view and service URLs to the dispatcher servlet.</description>
       <filter-name>UrlRewriteFilter</filter-name>
       <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
@@ -44,6 +50,19 @@
          <param-value>alfresco</param-value>
       </init-param>
    </filter>
+   -->
+   
+   <!-- For NTLM authentication support enable the following mappings -->
+   <!-- after enabling the NTLMAuthenticationFilter filter class above
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/page/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/p/*</url-pattern>
+   </filter-mapping>
    -->
    
    <filter-mapping>
@@ -66,7 +85,7 @@
       <url-pattern>/res/*</url-pattern>
    </filter-mapping>
    
-    <filter-mapping>
+   <filter-mapping>
       <filter-name>UrlRewriteFilter</filter-name>
       <url-pattern>/system/*</url-pattern>
    </filter-mapping>
@@ -92,18 +111,14 @@
       <url-pattern>*.js</url-pattern>
    </filter-mapping>
    
-   <!-- For NTLM authentication support enable the following mappings -->
-   <!-- after enabling the NTLMAuthenticationFilter filter class above
    <filter-mapping>
-      <filter-name>Authentication Filter</filter-name>
+      <filter-name>MTAuthentationFilter</filter-name>
       <url-pattern>/page/*</url-pattern>
    </filter-mapping>
-   
    <filter-mapping>
-      <filter-name>Authentication Filter</filter-name>
+      <filter-name>MTAuthentationFilter</filter-name>
       <url-pattern>/p/*</url-pattern>
    </filter-mapping>
-   -->
    
    <!-- Spring Context Loader listener - the name of the default global context is passed to the DispatcherServlet
         in the servlet definition below - this is to allow the NTLM filter etc. to find the single app context -->

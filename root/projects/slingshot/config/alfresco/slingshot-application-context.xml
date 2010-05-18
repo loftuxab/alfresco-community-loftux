@@ -126,6 +126,9 @@
       <property name="authenticatorFactory" ref="webscripts.authenticator.basic" />
    </bean>
    
+   <!-- Override Page View Resolver - to provide access to http req for MT auth support during view name resolution -->
+   <bean id="pageViewResolver" class="org.alfresco.web.site.SlingshotPageViewResolver" parent="abstractWebFrameworkViewResolver" />
+   
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
