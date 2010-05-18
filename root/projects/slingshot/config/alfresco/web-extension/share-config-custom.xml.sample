@@ -126,5 +126,33 @@
          <evaluate-child-folders>false</evaluate-child-folders>
       </tree>
    </config>
+   
+   <!-- 
+        NTLM authentication config for Share
+        NOTE: you will also need to enable the NTLM authentication filter in Share web.xml
+              change localhost:8080 below to appropriate alfresco server location if required
+   -->
+   <!--
+   <config evaluator="string-compare" condition="Remote">
+      <remote>
+         <connector>
+            <id>alfrescoCookie</id>
+            <name>Alfresco Connector</name>
+            <description>Connects to an Alfresco instance using cookie-based authentication</description>
+            <class>org.springframework.extensions.webscripts.connector.AlfrescoConnector</class>
+         </connector>
+         
+         <endpoint>
+            <id>alfresco</id>
+            <name>Alfresco - user access</name>
+            <description>Access to Alfresco Repository WebScripts that require user authentication</description>
+            <connector-id>alfrescoCookie</connector-id>
+            <endpoint-url>http://localhost:8080/alfresco/wcs</endpoint-url>
+            <identity>user</identity>
+            <external-auth>true</external-auth>
+         </endpoint>
+      </remote>
+   </config>
+   -->
 
 </alfresco-config>
