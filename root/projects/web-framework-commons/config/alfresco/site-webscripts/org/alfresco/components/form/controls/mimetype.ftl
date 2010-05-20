@@ -48,9 +48,9 @@
          <@mimetypeOption mt="application/x-latex" />
          <@mimetypeOption mt="application/x-troff-man" />
          <@mimetypeOption mt="text/mediawiki" />
-         <@mimetypeOption mt="application/vnd.excel" />
+         <@mimetypeOption mt="application/vnd.ms-excel" />
          <@mimetypeOption mt="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-         <@mimetypeOption mt="application/vnd.powerpoint" />
+         <@mimetypeOption mt="application/vnd.ms-powerpoint" />
          <@mimetypeOption mt="application/vnd.openxmlformats-officedocument.presentationml.presentation" />
          <@mimetypeOption mt="application/msword" />
          <@mimetypeOption mt="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
@@ -146,9 +146,9 @@
       <#return "Style Sheet">
    <#elseif mt=="application/zip">
       <#return "ZIP">
-   <#elseif mt=="application/vnd.excel">
+   <#elseif mt=="application/vnd.ms-excel">
       <#return "Microsoft Excel">
-   <#elseif mt=="application/vnd.powerpoint">
+   <#elseif mt=="application/vnd.ms-powerpoint">
       <#return "Microsoft PowerPoint">
    <#elseif mt=="application/msword">
       <#return "Microsoft Word">
