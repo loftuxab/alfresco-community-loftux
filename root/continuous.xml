@@ -185,16 +185,17 @@
       <script language="javascript" classpath="${classpath.bsf_javascript}"> <![CDATA[
          importClass(java.io.File);
          var repoConfigPath = project.getProperty("dir.project.repository.config");
-         var globalFile = new File(repoConfigPath + "/alfresco/module/tests/alfresco-global.properties" );
+         var globalFile = new File(repoConfigPath + "/alfresco/module/test/alfresco-global.properties" );
 
          var propfile = project.getProperty("DB_PROPERTIES");
-         if(propfile == null) {
-            // Clean up the old one
-            var del = project.createTask("delete");
-            del.setFile( globalFile );
-            del.perform();
-         } else {
-            // Copy it in
+
+         // Always clean up the old one
+         var del = project.createTask("delete");
+         del.setFile( globalFile );
+         del.perform();
+
+         if(propfile != null) {
+            // Copy in the new one
             var copy = project.createTask("copy");
             copy.setFile( new File(propfile) );
             copy.setTofile( globalFile );
