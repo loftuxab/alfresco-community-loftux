@@ -1,7 +1,7 @@
 <component>
     <name>alfrescoquickr</name>
     <description>Quickr Connector Support</description>
-    <detailedDescription>Allows Quickr and Lotus Notes to communicate with Alfresco. This extension is a Technology Preview and is unsupported.</detailedDescription>
+    <detailedDescription>Allows Quickr and Lotus Notes to communicate with Alfresco.</detailedDescription>
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>1</show>
@@ -11,9 +11,8 @@
             <title>Quickr Content Services</title>
             <description>Please give details of the Quickr server to use.</description>
             <parameterList>
-                <stringParameter name="alfresco_quickr_host" description="Quick Server" default="localhost" allowEmptyValue="0" />
+                <stringParameter name="alfresco_quickr_host" description="Quickr Server" default="localhost" allowEmptyValue="0" />
 		<stringParameter name="alfresco_quickr_port" description="Port" default="6060" allowEmptyValue="0" />
-                <labelParameter name="alfresco_quickr_explanation" description="Please note that Quickr Content Services is a Technology Preview and not supported for production use." />
             </parameterList>
         </parameterGroup>
     </parameterList>

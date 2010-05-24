@@ -1,7 +1,7 @@
 <component>
     <name>alfresco</name>
-    <description>Alfresco-3.3G-20100415-1</description>
-    <detailedDescription>Alfresco is an Enterprise Content Management (ECM) system featuring Document Management, Web Content Management, Collaboration Management, Records Management and Image Management.</detailedDescription>
+    <description>Alfresco</description>
+    <detailedDescription>Alfresco is an Enterprise Content Management (ECM) system featuring Document Management, Collaboration Management and Image Management.</detailedDescription>
     <canBeEdited>0</canBeEdited>
     <selected>1</selected>
     <show>1</show>
@@ -115,7 +115,7 @@
             <name>libfiles</name>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionFile origin="${alfresco_endorsed_build_directory}/*" allowWildcards="1"/>
+                <distributionFile origin="${alfresco_endorsed_source_directory}/*" allowWildcards="1"/>
             </distributionFileList>
         </folder>
         <folder>

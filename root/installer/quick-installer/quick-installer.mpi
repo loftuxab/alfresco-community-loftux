@@ -231,7 +231,7 @@ QK_VER
 8.0.1
 
 QuickrAmp
-<%InstallDir%>/amps/alfresco-quickr-unsupported.amp
+<%InstallDir%>/amps/alfresco-quickr.amp
 
 RMAmp
 <%InstallDir%>/amps/alfresco-dod5015.amp
@@ -3905,7 +3905,7 @@ FileGroup ::51145082-8FEC-4322-AF46-85971BAE5438 -setup Install -active Yes -pla
 File ::15180073-8F95-4750-A833-569D15041477 -directory <%InstallDir%>/amps -name W:/V3.2/root/build/dist/alfresco-dod5015.amp -location ../../build/dist -parent 51145082-8FEC-4322-AF46-85971BAE5438
 File ::7A070C91-2102-421D-BA2B-CF81AA85D4E1 -directory <%InstallDir%>/amps-share -name W:/V3.2/root/build/dist/alfresco-dod5015-share.amp -location ../../build/dist -parent 51145082-8FEC-4322-AF46-85971BAE5438
 FileGroup ::A37A40E1-7EFA-4EA9-B765-4E09501DA108 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Linux-x86_64 Solaris-sparc Solaris-x86 Windows TarArchive ZipArchive} -name Quickr -parent FileGroups
-File ::9B8F02F7-E1C1-4487-BEAF-75182BAFCB90 -directory <%InstallDir%>/amps -name W:/HEAD/root/build/dist/alfresco-quickr-unsupported.amp -location ../../build/dist -parent A37A40E1-7EFA-4EA9-B765-4E09501DA108
+File ::5AF2AF07-6DB0-4449-A7C7-B45B956A9B78 -directory <%InstallDir%>/amps -name C:/devenv/V3.3/root/build/dist/alfresco-quickr.amp -location ../../build/dist -parent A37A40E1-7EFA-4EA9-B765-4E09501DA108
 Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 Linux-x86_64 Solaris-x86} -name {Default Component} -parent Components
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 Linux-x86_64 Solaris-x86} -name Samples -parent Components
 Component ::EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 -setup Install -alias Java -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows FreeBSD-5-x86 FreeBSD-6-x86 FreeBSD-7-x86 Linux-x86_64 Solaris-x86} -name Java -parent Components
@@ -8488,9 +8488,9 @@ AC90BBF8-AF3B-4891-A805-44A4C9C0DF42,TextToWrite
 lotus.ws.version=<%QK_VER%>
 lotus.server.port=<%QK_PORT%>
 lotus.server.host=<%QK_HOST%>
-lotus.share.document.url=http\://localhost\:8080/share/page/site/{0}/document-details?nodeRef\={1}
-lotus.share.folder.url=http\://localhost\:8080/share/page/site/{0}/documentlibrary\#path\={1}
-lotus.share.site.url=http://localhost:8080/share/page/site/{0}/dashboard}
+lotus.share.document.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/document-details?nodeRef\={1}
+lotus.share.folder.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/documentlibrary\#path\={1}
+lotus.share.site.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/dashboard}
 
 B03FB7D4-B289-4E02-A145-816887FB4999,Caption
 {Please give details of the Quickr server to use.}
