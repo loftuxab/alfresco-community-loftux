@@ -21,6 +21,7 @@ package org.alfresco.module.vti.web;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Enumeration;
 
 import javax.servlet.Filter;
@@ -42,6 +43,7 @@ import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.sharepoint.auth.AuthenticationHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mortbay.jetty.HttpHeaders;
 
 /**
 * <p>VtiFilter filter is used as security filter for checking authentication, 
@@ -97,6 +99,14 @@ public class VtiFilter implements Filter
             {
                 chain.doFilter(request, response);
             }
+        }
+
+        if ((httpRequest.getHeader(HttpHeaders.USER_AGENT) != null && httpRequest.getHeader(HttpHeaders.USER_AGENT).startsWith("Microsoft-WebDAV-MiniRedir/6"))
+                && (METHOD_PROPFIND.equals(httpRequest.getMethod()) || METHOD_OPTIONS.equals(httpRequest.getMethod()))
+                && ("/".equals(httpRequest.getRequestURI()) || getAlfrescoContext().equals(httpRequest.getRequestURI())))
+        {
+            writeResponseForMiniRedir(httpResponse);
+            return;
         }
 
         writeHeaders(httpRequest, httpResponse);
@@ -309,6 +319,27 @@ public class VtiFilter implements Filter
                 httpResponse.setContentType("text/html");
             }
         }
+    }
+
+    private void writeResponseForMiniRedir(HttpServletResponse httpResponse) throws IOException
+    {
+        httpResponse.setHeader("MS-Author-Via", "MS-FP/4.0,DAV");
+        httpResponse.setHeader("MicrosoftOfficeWebServer", "5.0_Collab");
+        httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
+        httpResponse.setHeader("DAV", "1,2");
+        httpResponse.setHeader("Accept-Ranges", "none");
+        httpResponse.setHeader("Cache-Control", "no-cache");
+        httpResponse.setHeader("Allow", "GET, POST, OPTIONS, HEAD, MKCOL, PUT, PROPFIND, PROPPATCH, DELETE, MOVE, COPY, GETLIB, LOCK, UNLOCK");
+
+        OutputStream outputStream = httpResponse.getOutputStream();
+        outputStream.write("<!-- FrontPage Configuration Information\n".getBytes());
+        outputStream.write(" FPVersion=\"6.0.2.9999\"\n".getBytes());
+        outputStream.write("FPShtmlScriptUrl=\"_vti_bin/shtml.dll/_vti_rpc\"\n".getBytes());
+        outputStream.write("FPAuthorScriptUrl=\"_vti_bin/_vti_aut/author.dll\"\n".getBytes());
+        outputStream.write("FPAdminScriptUrl=\"_vti_bin/_vti_adm/admin.dll\"\n".getBytes());
+        outputStream.write("TPScriptUrl=\"_vti_bin/owssvr.dll\"\n".getBytes());
+        outputStream.write("-->".getBytes());
+        outputStream.close();
     }
 
     private boolean validSiteUri(HttpServletRequest request)
