@@ -1,7 +1,7 @@
 <component>
     <name>alfrescowcm</name>
     <description>Alfresco WCM</description>
-    <detailedDescription>Alfresco Web Studio is a visual, drag-and-drop designer for building web sites with the Alfresco Surf platform. Using Alfresco Web Studio, you can quicklycreate custom web sites while leveraging the strengths of the Alfresco Web Content Management runtime and repository.</detailedDescription>
+    <detailedDescription>Alfresco Web Content Management for managing web site content.</detailedDescription>
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>1</show>

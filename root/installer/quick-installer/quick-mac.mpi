@@ -207,7 +207,7 @@ QK_VER
 8.0.1
 
 QuickrAmp
-<%InstallDir%>/amps/alfresco-quickr-unsupported.amp
+<%InstallDir%>/amps/alfresco-quickr.amp
 
 RMAmp
 <%InstallDir%>/amps/alfresco-dod5015.amp
@@ -3212,7 +3212,7 @@ FileGroup ::9B325852-3D6A-41CC-8169-1BAA3B219A86 -setup Install -active Yes -pla
 File ::25892D0D-D03D-47E9-A1C9-51510D0FD198 -directory <%InstallDir%>/amps -name W:/V3.2/root/build/dist/alfresco-dod5015.amp -location ../../build/dist -parent 9B325852-3D6A-41CC-8169-1BAA3B219A86
 File ::73E03E56-FFEC-4153-ACA2-F7CA937EFFAA -directory <%InstallDir%>/amps-share -name W:/V3.2/root/build/dist/alfresco-dod5015-share.amp -location ../../build/dist -parent 9B325852-3D6A-41CC-8169-1BAA3B219A86
 FileGroup ::1554D2EE-E0F0-4758-9A46-121D14DACB28 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows TarArchive ZipArchive} -name Quickr -parent FileGroups
-File ::0CB1A076-B18B-40D6-859D-ED1C5A72CE07 -directory <%InstallDir%>/amps -name W:/HEAD/root/build/dist/alfresco-quickr-unsupported.amp -location ../../build/dist -parent 1554D2EE-E0F0-4758-9A46-121D14DACB28
+File ::F1CEB581-00EA-48A8-A21C-7A5BE58D69E4 -directory <%InstallDir%>/amps -name C:/devenv/V3.3/root/build/dist/alfresco-quickr.amp -location ../../build/dist -parent 1554D2EE-E0F0-4758-9A46-121D14DACB28
 Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name {Default Component} -parent Components
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name Samples -parent Components
 Component ::3599937E-10E1-4029-8ACB-CCE5D85D306D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X MacOS-X} -name WCM -parent Components
@@ -6876,9 +6876,9 @@ E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E,TextToWrite
 lotus.ws.version=<%QK_VER%>
 lotus.server.port=<%QK_PORT%>
 lotus.server.host=<%QK_HOST%>
-lotus.share.document.url=http\://localhost\:8080/share/page/site/{0}/document-details?nodeRef\={1}
-lotus.share.folder.url=http\://localhost\:8080/share/page/site/{0}/documentlibrary\#path\={1}
-lotus.share.site.url=http://localhost:8080/share/page/site/{0}/dashboard}
+lotus.share.document.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/document-details?nodeRef\={1}
+lotus.share.folder.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/documentlibrary\#path\={1}
+lotus.share.site.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/dashboard}
 
 EEE35F50-1F9E-44C8-9E0D-1F865FAAA301,Description
 {Java JDK}
