@@ -48,7 +48,7 @@ public class UpdateDwsDataEndpoint extends AbstractEndpoint
 
     // xml namespace prefix
     private static String prefix = "dws";
-    
+
     /**
      * Constructor
      * 
@@ -58,7 +58,7 @@ public class UpdateDwsDataEndpoint extends AbstractEndpoint
     {
         this.handler = handler;
     }
-    
+
     /**
      * Update dws data for site
      * 
@@ -71,31 +71,31 @@ public class UpdateDwsDataEndpoint extends AbstractEndpoint
         if (logger.isDebugEnabled())
         {
             logger.debug("SOAP method with name " + getName() + " is started.");
-        }  
+        }
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
-        nc.addNamespace(soapUriPrefix, soapUri);          
-        
+        nc.addNamespace(soapUriPrefix, soapUri);
+
         XPath updatesPath = new Dom4jXPath(buildXPath(prefix, "/UpdateDwsData/updates"));
         updatesPath.setNamespaceContext(nc);
         Element updates = (Element) updatesPath.selectSingleNode(soapRequest.getDocument().getRootElement());
-        
+
         Document updatesDocument = DocumentHelper.parseText(updates.getText());
-        XPath setVarPath = new Dom4jXPath("/Batch/Method/SetVar");        
+        XPath setVarPath = new Dom4jXPath("/Batch/Method/SetVar");
         List<Element> list = setVarPath.selectNodes(updatesDocument);
-        
+
         LinkBean link = createLink(list);
         XPath methodPath = new Dom4jXPath("/Batch/Method");
-        CAMLMethod method = CAMLMethod.value(((Element)methodPath.selectSingleNode(updatesDocument)).attributeValue("ID"));
-        
+        CAMLMethod method = CAMLMethod.value(((Element) methodPath.selectSingleNode(updatesDocument)).attributeValue("ID"));
+
         Element root = soapResponse.getDocument().addElement("UpdateDwsDataResponse", namespace);
         Element updateDwsDataResult = root.addElement("UpdateDwsDataResult");
         Element results = updateDwsDataResult.addElement("Results");
         Element result = results.addElement("Result");
         result.addAttribute("ID", method.toString());
         result.addAttribute("Code", "0");
-        
+
         try
         {
             link = handler.updateDwsData(link, method, VtiPathHelper.removeSlashes(getDwsFromUri(soapRequest)));
@@ -106,7 +106,7 @@ public class UpdateDwsDataEndpoint extends AbstractEndpoint
             {
                 result.addElement("Error").addAttribute("ID", "5");
                 return;
-            }            
+            }
             else if (e.getMessage().equals(VtiHandlerException.LIST_NOT_FOUND))
             {
                 result.addElement("Error").addAttribute("ID", "7");
@@ -117,7 +117,7 @@ public class UpdateDwsDataEndpoint extends AbstractEndpoint
                 throw e;
             }
         }
-        
+
         if (method.toString().equals("New"))
         {
             result.addText(generateXml(link));
@@ -127,13 +127,13 @@ public class UpdateDwsDataEndpoint extends AbstractEndpoint
             result.addAttribute("List", "");
             result.addAttribute("Version", "0");
         }
-            
-        if (logger.isDebugEnabled()) 
+
+        if (logger.isDebugEnabled())
         {
             logger.debug("SOAP method with name " + getName() + " is finished.");
         }
     }
-            
+
     /**
      * Create link
      * 
@@ -143,30 +143,30 @@ public class UpdateDwsDataEndpoint extends AbstractEndpoint
     private LinkBean createLink(List<Element> list)
     {
         LinkBean linkBean = new LinkBean();
-            
+
         for (Element element : list)
         {
             String value = element.attribute("Name").getValue();
-            
+            String text = element.getText().replaceAll("\"", "");
+
             if (value.equalsIgnoreCase("urn:schemas-microsoft-com:office:office#URL"))
             {
-                String text = element.getText();
                 int startIndex = text.indexOf(", ");
                 linkBean.setUrl(text.substring(0, startIndex));
                 linkBean.setDescription(text.substring(startIndex + 2));
             }
-            
+
             if (value.equalsIgnoreCase("urn:schemas-microsoft-com:office:office#Comments"))
             {
-                linkBean.setComments(element.getText());
+                linkBean.setComments(text);
             }
-            
+
             if (value.equalsIgnoreCase("ID"))
             {
-                linkBean.setId(element.getText());
-            }      
+                linkBean.setId(text);
+            }
         }
-        
+
         return linkBean;
-    }    
+    }
 }

@@ -2,7 +2,7 @@
    new Alfresco.WikiToolbar("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs["site"]!""}",
-      title: "${page.url.args["title"]!""}",
+      title: "${(page.url.args["title"]!"")?js_string}",
       showBackLink: ${(args.showBackLink == "true")?string}
    }).setMessages(
       ${messages}

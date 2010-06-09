@@ -28,8 +28,8 @@
    new Alfresco.WikiPage("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site}",
-      pageTitle: "${page.url.args["title"]!""}",
-      mode: "${page.url.args["action"]!"view"}",
+      pageTitle: "${(page.url.args["title"]!"")?js_string}",
+      mode: "${(page.url.args["action"]!"view")?js_string}",
       <#if errorState>error: true,</#if>
       tags: [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>],
       pages: [<#list pageList as p>"${p?js_string}"<#if p_has_next>, </#if></#list>],
@@ -46,8 +46,8 @@
       locale: "${locale?substring(0, 2)}",
       permissions:
       {
-         "create": ${(permissions["create"]!false)?string},
-         "edit": ${(permissions["edit"]!false)?string},
+         create: ${(permissions["create"]!false)?string},
+         edit: ${(permissions["edit"]!false)?string},
          "delete": ${(permissions["delete"]!false)?string}
       }
    }).setMessages(
@@ -58,9 +58,7 @@
 <div class="yui-g wikipage-bar">
 
    <div class="title-bar">
-      <div id="${args.htmlid}-viewButtons" class="yui-u first pageTitle">
-         ${page.url.args["title"]?replace("_", " ")}
-      </div>
+      <div id="${args.htmlid}-viewButtons" class="yui-u first pageTitle">${page.url.args["title"]?replace("_", " ")?html}</div>
       <div class="yui-u align-right">
 <#assign action = page.url.args["action"]!"view"> 
 <#assign tabs =
@@ -87,7 +85,7 @@
    <#elseif tab.permitted == false>
          <span class="tabLabelDisabled">${tab.label}</span>
    <#else>
-         <a href="?title=${page.url.args["title"]!""}&amp;action=${tab.action}" class="tabLabel">${tab.label}</a>
+         <a href="?title=${(page.url.args["title"]!"")?url}&amp;action=${tab.action?url}" class="tabLabel">${tab.label}</a>
    </#if>
    <#if tab_has_next>
          <span class="separator">|</span>

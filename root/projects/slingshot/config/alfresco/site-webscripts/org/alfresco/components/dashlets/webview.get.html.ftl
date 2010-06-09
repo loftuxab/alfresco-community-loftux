@@ -11,7 +11,7 @@
 //]]></script>
 <div class="dashlet webview">
    <div class="title">
-      <a id="${args.htmlid}-title-link" class="title-link theme-color-5" <#if !isDefault>href="${uri}"</#if> target="_blank"><#if webviewTitle != "">${webviewTitle?html}<#else>${msg('label.header')}</#if></a>
+      <a id="${args.htmlid}-title-link" class="title-link theme-color-5" <#if !isDefault>href="${uri}"</#if> target="_blank"><#if webviewTitle != "">${webviewTitle?html}<#elseif !isDefault>${uri?html}<#else>${msg('label.header')}</#if></a>
    </div>
 
    <div class="toolbar">
@@ -20,6 +20,7 @@
 
    <div class="body scrollablePanel"<#if args.height??> style="height: ${args.height}px;"</#if> id="${args.htmlid}-iframeWrapper">
        <iframe frameborder="0" scrolling="auto" width="100%" height="100%" src="${uri}"></iframe>
+       <div class="resize-mask"></div>
    </div>
 
 </div>

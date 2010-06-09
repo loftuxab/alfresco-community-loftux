@@ -48,33 +48,39 @@
        */
       setOptions: function DLCMT_setOptions(obj)
       {
-         var dataWebScripts =
+         var myOptions =
          {
-            copy: "copy-to",
-            move: "move-to"
+            allowedViewModes:
+            [
+               Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE,
+               Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY,
+               Alfresco.module.DoclibGlobalFolder.VIEW_MODE_USERHOME
+            ],
+            extendedTemplateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-move-to"
          };
-         
-         if (typeof dataWebScripts[obj.mode] == "undefined")
+
+         if (typeof obj.mode !== "undefined")
          {
-            throw new Error("Alfresco.module.CopyMoveTo: Invalid mode '" + obj.mode + "'");
+            var dataWebScripts =
+            {
+               copy: "copy-to",
+               move: "move-to"
+            };
+            if (typeof dataWebScripts[obj.mode] == "undefined")
+            {
+               throw new Error("Alfresco.module.CopyMoveTo: Invalid mode '" + obj.mode + "'");
+            }
+            myOptions.dataWebScript = dataWebScripts[obj.mode];
          }
          
-         var allowedViewModes =
-         [
-            Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE,
-            Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY
-         ];
-         
-         // Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions((obj.siteId && obj.siteId !== "") ? Alfresco.doclib.MODE_SITE : Alfresco.doclib.MODE_REPOSITORY);
-
-         return Alfresco.module.DoclibCopyMoveTo.superclass.setOptions.call(this, YAHOO.lang.merge(
+         if (typeof obj.workingMode !== "undefined")
          {
-            viewMode: (obj.siteId && obj.siteId !== "") ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY,
-            allowedViewModes: allowedViewModes,
-            extendedTemplateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-move-to",
-            dataWebScript: dataWebScripts[obj.mode]
-         }, obj));
+            myOptions.viewMode = (obj.workingMode == Alfresco.doclib.MODE_SITE) ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY;
+            // Actions module
+            this.modules.actions = new Alfresco.module.DoclibActions(obj.workingMode);
+         }
+
+         return Alfresco.module.DoclibCopyMoveTo.superclass.setOptions.call(this, YAHOO.lang.merge(myOptions, obj));
       },
 
       /**

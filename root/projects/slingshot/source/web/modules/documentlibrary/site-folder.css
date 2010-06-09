@@ -41,6 +41,11 @@
    color: #c0c0c0;
 }
 
+.site-folder .ygtvitem .folders-trimmed
+{
+   color: #f00;
+}
+
 .site-folder .ygtvlabel,
 .site-folder .ygtvlabel:link,
 .site-folder .ygtvlabel:visited,

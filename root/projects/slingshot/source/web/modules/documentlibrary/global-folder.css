@@ -176,6 +176,11 @@
    color: #c0c0c0;
 }
 
+.global-folder .ygtvitem .folders-trimmed
+{
+   color: #f00;
+}
+
 .global-folder .ygtvlabel,
 .global-folder .ygtvlabel:link,
 .global-folder .ygtvlabel:visited,

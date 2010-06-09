@@ -19,6 +19,11 @@
    overflow-x: hidden;
 }
 
+.treeview .ygtvitem .folders-trimmed
+{
+   color: #f00;
+}
+
 .treeview .ygtvlabel,
 .treeview .ygtvlabel:link,
 .treeview .ygtvlabel:visited,

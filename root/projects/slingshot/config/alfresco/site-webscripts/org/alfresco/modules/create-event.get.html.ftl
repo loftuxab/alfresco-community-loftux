@@ -73,11 +73,23 @@
                <!-- end tags -->                    
             </div>
          </div>
+         <div class="yui-g">
+            <h2>${msg("section.documents")}</h2>
+         </div>
+         <div class="yui-gd">
+            <div class="yui-u first"><label for="${args.htmlid}-docfolder">${msg("label.docfolder")}:</label></div>
+            <div class="yui-u" >
+               <input type="text" id="${args.htmlid}-docfolder" name="docfolder" value="${event.docfolder?html}" class="docfolder-input" readonly="true" />
+               <input type="button" id="${args.htmlid}-browse-button" value="${msg("label.browse")}" />
+            </div>
+         </div>	 
          <div class="bdft">
             <input type="submit" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="0" />
             <input type="submit" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="0" />
          </div>
-
+        <#if edit && event.isoutlook == 'false'>
+        <div name="edit-available" id="${args.htmlid}-edit-available" />
+        </#if>
       </form>
 
    </div>

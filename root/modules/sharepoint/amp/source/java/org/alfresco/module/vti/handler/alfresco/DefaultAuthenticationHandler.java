@@ -31,6 +31,7 @@ import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.web.sharepoint.auth.SiteMemberMapper;
 import org.alfresco.web.sharepoint.auth.SiteMemberMappingException;
 import org.apache.commons.logging.Log;
@@ -50,6 +51,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler, Site
     private MethodHandler vtiHandler;
     private UserGroupServiceHandler vtiUserGroupServiceHandler;
     private AuthenticationService authenticationService;
+    private PersonService personService;
     private org.alfresco.web.sharepoint.auth.AuthenticationHandler delegate;
 
     public void forceClientToPromptLogonDetails(HttpServletResponse response)
@@ -103,19 +105,19 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler, Site
         {
             String[] decompsedUrls = vtiHandler.decomposeURL(uri, alfrescoContext);
             dwsName = decompsedUrls[0].substring(decompsedUrls[0].lastIndexOf("/") + 1);
-            
+
             final String buf = dwsName;
-            
-            RunAsWork<Boolean> isSiteMemberRunAsWork = new RunAsWork<Boolean>()            
+
+            RunAsWork<Boolean> isSiteMemberRunAsWork = new RunAsWork<Boolean>()
             {
 
                 public Boolean doWork() throws Exception
-                {                    
-                    return vtiUserGroupServiceHandler.isUserMember(buf, username);
+                {
+                    return vtiUserGroupServiceHandler.isUserMember(buf, personService.getUserIdentifier(username));
                 }
-                
+
             };
-            
+
             return AuthenticationUtil.runAs(isSiteMemberRunAsWork, AuthenticationUtil.SYSTEM_USER_NAME).booleanValue();
         }
         catch (Exception e)
@@ -151,5 +153,10 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler, Site
     public void setAuthenticationService(AuthenticationService authenticationService)
     {
         this.authenticationService = authenticationService;
+    }
+
+    public void setPersonService(PersonService personService) 
+    {
+        this.personService = personService;
     }
 }

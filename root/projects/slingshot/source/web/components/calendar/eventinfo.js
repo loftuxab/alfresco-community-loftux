@@ -168,6 +168,10 @@
            this.widgets.deleteButton.set("disabled", true);
            this.widgets.editButton.set("disabled", true);
          }
+         if (Dom.get(this.id+"-edit-available") == null)
+         {
+           this.widgets.deleteButton.set("disabled", true);
+         }
          //convert iso date to readable human text
          var dateElIds = [this.id+'-startdate',this.id+'-enddate'];
          for (var i=0,len=dateElIds.length;i<len;i++)
@@ -216,6 +220,8 @@
           this._hide();
           this.eventDialog = Alfresco.util.DialogManager.registerDialog('CalendarView.editEvent');
           this.eventDialog.id = this.id+ "-editEvent";
+          this.eventDialog.siteId = this.options.siteId;
+
           // add the tags that are already set on the post
           if (this.eventDialog.tagLibrary == undefined)
           {
@@ -232,7 +238,7 @@
          {
             site : this.options.siteId,
             displayDate :this.options.displayDate,
-            actionUrl : Alfresco.constants.PROXY_URI + this.options.eventUri + "?page=calendar",
+            actionUrl : Alfresco.constants.PROXY_URI + this.options.eventUri + "&page=calendar",
             templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
             templateRequestParams : {
                    site : this.options.siteId,
@@ -256,6 +262,8 @@
                      {
                        YAHOO.util.Dom.removeClass(errorEls[i],'error');                           
                      }
+                     Dom.get(this.id+'-title').disabled = false;
+                     Dom.get(this.id+'-location').disabled = false;
                },
               scope:this.eventDialog
             },
@@ -318,6 +326,19 @@
                           this.tagLibrary.setTags(tags.split(' '));
                           this.form.errorContainer=null;
                           document.getElementsByName('start')[0].disabled = document.getElementsByName('end')[0].disabled = document.getElementsByName('allday')[0].checked;                          
+                          
+                          if (Dom.get(this.id+"-edit-available") == null)
+                          {
+                            Dom.get(this.id+'-title').disabled = true;
+                            Dom.get(this.id+'-location').disabled = true;
+                            Dom.get(this.id+'-start').disabled = true;
+                            Dom.get(this.id+'-end').disabled = true;
+                          }
+                          else
+                          {
+                            Dom.get(this.id+"-form").removeChild(Dom.get(this.id+"-edit-available"));
+                          }
+                                                    
                           //hide mini-cal
                           this.dialog.hideEvent.subscribe(function() {
                              var oCal = Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView');
@@ -390,10 +411,124 @@
                      };
                    }();
 
+                   var browseButton = Alfresco.util.createYUIButton(this, "browse-button", function()
+                   {
+                      if (!this.browsePanel)
+                      {
+                         this.hide();
+                         Alfresco.util.Ajax.request(
+                         {
+                            url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/browse-docfolder",
+                            dataObj: {site: this.siteId},
+                            successCallback:
+                            {
+                               fn: function(response)
+                               {
+                                  var containerDiv = document.createElement("div");
+                                  containerDiv.innerHTML = response.serverResponse.responseText;
+                                  var panelDiv = Dom.getFirstChild(containerDiv);
+                                  this.browsePanel = Alfresco.util.createYUIPanel(panelDiv);
+                               
+                                  var parentDialog = this;
+                                  var selectedDocfolder = Dom.get(parentDialog.id + "-docfolder").value;
+                                  Alfresco.util.createYUIButton(this.browsePanel, "ok", function()
+                                  {
+                                     if (selectedDocfolder.charAt(selectedDocfolder.length - 1) == '/')
+                                     {
+                                        selectedDocfolder = selectedDocfolder.substring(0, selectedDocfolder.length - 1);
+                                     }
+                                     Dom.get(parentDialog.id + "-docfolder").value = selectedDocfolder;
+                                     parentDialog.browsePanel.hide();
+                                     parentDialog.show();
+                                  });
+                                  Alfresco.util.createYUIButton(this.browsePanel, "cancel", function()
+                                  {
+                                     parentDialog.browsePanel.hide();
+                                     parentDialog.show();
+                                  });
+
+                                  Alfresco.util.createTwister("twister");
+                                  var tree = new YAHOO.widget.TreeView("treeview");
+                                  tree.setDynamicLoad(function(node, fnLoadComplete) 
+                                  {
+                                     var nodePath = node.data.path;
+                                     var uri = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode/site/" + $combine(encodeURIComponent(parentDialog.siteId), encodeURIComponent("documentLibrary"), Alfresco.util.encodeURIPath(nodePath));
+                                     var callback =
+                                     {
+                                        success: function (oResponse)
+                                        {
+                                           var results = YAHOO.lang.JSON.parse(oResponse.responseText), item, treeNode;
+                                           if (results.items)
+                                           {
+                                              for (var i = 0, j = results.items.length; i < j; i++)
+                                              {
+                                                 item = results.items[i];
+                                                 item.path = $combine(nodePath, item.name);
+                                                 treeNode = _buildTreeNode(item, node, false);
+                                                 if (!item.hasChildren)
+                                                 {
+                                                    treeNode.isLeaf = true;
+                                                 }
+                                              }
+                                           }
+                                           oResponse.argument.fnLoadComplete();
+                                        },
+ 
+                                        failure: function (oResponse)
+                                        {
+                                           Alfresco.logger.error("", oResponse);
+                                        },
+ 
+                                        argument:
+                                        {
+                                           "node": node,
+                                           "fnLoadComplete": fnLoadComplete
+                                        },
+ 
+                                        scope: this
+                                     };
+                                     YAHOO.util.Connect.asyncRequest('GET', uri, callback);
+                                  });
+
+                                  tree.subscribe("clickEvent", function (args)
+                                  {
+                                     selectedDocfolder =  "documentLibrary" + args.node.data.path;
+                                  });
+                                  tree.subscribe("collapseComplete", function(node)
+                                  {
+                                     selectedDocfolder = "documentLibrary" + node.data.path;
+                                  });
+ 
+                                  var tempNode = _buildTreeNode(
+                                  {
+                                     name: "documentLibrary",
+                                     path: "/",
+                                     nodeRef: ""
+                                  }, tree.getRoot(), false);
+
+                                  tree.render();
+                                  this.browsePanel.show();
+                               },
+                               scope: this
+                            },
+                            failureMessage: "Could not load dialog template from '" + Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/browse-docfolder" + "'.",
+                            scope: this,
+                            execScripts: true
+                         });
+                      }
+                      else
+                      {
+                         this.hide();
+                         this.browsePanel.show();
+                      }
+                   });
+                 
                    /**
                      * Button declarations that, when clicked, display
                      * the calendar date picker widget.
                      */
+                    if (Dom.get(this.id+"-edit-available") != null)
+                    {
                     if (!this.startButton)
                     {
                        this.startButton = new YAHOO.widget.Button(
@@ -423,6 +558,7 @@
                     
                        this.endButton.on("click", this.options.onDateSelectButton);
                        this.endButton.on("keypress", buttonKeypressHandler);                       
+                    }
                     }
                     /* disable time fields if all day is selected */
                    YAHOO.util.Event.addListener(document.getElementsByName('allday')[0], 'click', function(e)
@@ -516,7 +652,7 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + this.event.uri + "?page=calendar",
+            url: Alfresco.constants.PROXY_URI + this.event.uri + "&page=calendar",
             successCallback:
             {
                fn: this.onDeleted,
@@ -621,3 +757,30 @@ Alfresco.module.event.validation.tags = function mandatory(field, args, event, f
 
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent); 
 };
+
+	   
+/**
+ * Alfresco Slingshot aliases
+ */
+var $html = Alfresco.util.encodeHTML,
+   $combine = Alfresco.util.combinePaths;
+
+/**
+ * Build a tree node using passed-in data
+ *
+ * @method _buildTreeNode
+ * @param p_oData {object} Object literal containing required data for new node
+ * @param p_oParent {object} Optional parent node
+ * @param p_expanded {object} Optional expanded/collaped state flag
+ * @return {YAHOO.widget.TextNode} The new tree node
+*/
+function _buildTreeNode(p_oData, p_oParent, p_expanded)
+{
+   return new YAHOO.widget.TextNode(
+   {
+      label: $html(p_oData.name),
+      path: p_oData.path,
+      nodeRef: p_oData.nodeRef,
+      description: p_oData.description
+   }, p_oParent, p_expanded);
+}

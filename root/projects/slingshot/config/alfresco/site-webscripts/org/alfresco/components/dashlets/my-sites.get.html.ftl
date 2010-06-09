@@ -6,6 +6,7 @@
 <#if sites??>
    <#list sites as site>
       {
+         sitePreset: '${site.sitePreset?js_string}',
          shortName: '${site.shortName?js_string}',
          title: '${site.title?js_string}',
          description: '${site.description?js_string}',
@@ -24,8 +25,16 @@
 
 <div class="dashlet my-sites">
    <div class="title">${msg("header.mySites")}</div>
-   <div class="toolbar">
+   <div class="toolbar flat-button">
       <a href="#" id="${args.htmlid}-createSite-button" class="theme-color-1">${msg("link.createSite")}</a>
+      <input id="${args.htmlid}-type" type="button" name="type" value="${msg("filter.all")}" />
+      <select id="${args.htmlid}-type-menu">
+         <option value="all">${msg("filter.all")}</option>
+         <option value="sites">${msg("filter.sites")}</option>
+         <option value="favSites">${msg("filter.favSites")}</option>                
+         <option value="docWorkspaces">${msg("filter.docWorkspaces")}</option>
+         <option value="metWorkspaces">${msg("filter.metWorkspaces")}</option>
+      </select>
    </div>
 <#if sites??>
    <div id="${args.htmlid}-sites" class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>

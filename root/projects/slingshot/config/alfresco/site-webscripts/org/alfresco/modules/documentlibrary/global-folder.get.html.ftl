@@ -7,6 +7,7 @@
             <div id="${args.htmlid}-modeGroup" class="yui-buttongroup">
                <input type="radio" id="${args.htmlid}-site" name="0" value="${msg("button.site")}" checked="checked" />
                <input type="radio" id="${args.htmlid}-repository" name="1" value="${msg("button.repository")}" />
+               <input type="radio" id="${args.htmlid}-userhome" name="2" value="${msg("button.userhome")}" />
             </div>
          </div>
          <div class="site">
@@ -29,8 +30,22 @@
    </div>
 </div>
 <#assign treeConfig = config.scoped["DocumentLibrary"]["tree"]!>
-<#if treeConfig.getChildValue??><#assign evaluateChildFolders = treeConfig.getChildValue("evaluate-child-folders")!"true"></#if>
+<#if treeConfig.getChildValue??>
+   <#assign evaluateChildFoldersSite = treeConfig.getChildValue("evaluate-child-folders")!"true">
+   <#assign maximumFolderCountSite = treeConfig.getChildValue("maximum-folder-count")!"-1">
+</#if>
+<#assign treeConfig = config.scoped["RepositoryLibrary"]["tree"]!>
+<#if treeConfig.getChildValue??>
+   <#assign evaluateChildFoldersRepo = treeConfig.getChildValue("evaluate-child-folders")!"true">
+   <#assign maximumFolderCountRepo = treeConfig.getChildValue("maximum-folder-count")!"-1">
+</#if>
 <script type="text/javascript">//<![CDATA[
    Alfresco.util.addMessages(${messages}, "Alfresco.module.DoclibGlobalFolder");
-   Alfresco.util.ComponentManager.get("${args.htmlid}").options.evaluateChildFolders = ${evaluateChildFolders!"true"};
+   Alfresco.util.ComponentManager.get("${args.htmlid}").setOptions(
+   {
+      evaluateChildFoldersSite: ${evaluateChildFoldersSite!"true"},
+      maximumFolderCountSite: ${(maximumFolderCountSite!"-1")},
+      evaluateChildFoldersRepo: ${evaluateChildFoldersRepo!"true"},
+      maximumFolderCountRepo: ${(maximumFolderCountRepo!"-1")}
+   });
 //]]></script>

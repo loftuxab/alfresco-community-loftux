@@ -97,7 +97,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     {
         this.authorityService = authorityService;
     }
-
+    
     /**
      * Set authentication component
      * 
@@ -107,7 +107,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     {
         this.authenticationComponent = authenticationComponent;
     }
-
+    
     /**
      * Set site service
      * 
@@ -150,7 +150,14 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         {
             if (logger.isDebugEnabled())
                 logger.debug("Redirection to site in browser");
-            redirectTo = pagesMap.get("siteInBrowser");
+            if (req.getParameter("calendar") != null)
+            {
+                redirectTo = pagesMap.get("calendar");
+            }
+            else
+            {
+                redirectTo = pagesMap.get("siteInBrowser");
+            }
 
             String siteName = uri.substring(uri.lastIndexOf('/') + 1);
 
@@ -676,14 +683,23 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         return firstname + " " + lastname;
     }
     
-    public WorkspaceType getWorkspaceType(FileInfo dwsNode) {
+    public WorkspaceType getWorkspaceType(FileInfo dwsNode)
+    {
         SiteInfo siteInfo = siteService.getSite(dwsNode.getName());
         WorkspaceType result = WorkspaceType.EMPTY;
-        if (siteInfo != null && siteInfo.getSitePreset() != null) {
-            if (siteInfo.getSitePreset().equals("site-dashboard")) {
+        if (siteInfo != null && siteInfo.getSitePreset() != null)
+        {
+            if (siteInfo.getSitePreset().equals("site-dashboard"))
+            {
                 result = WorkspaceType.SPS;
-            } else if (siteInfo.getSitePreset().equals("document-workspace")) {
+            }
+            else if (siteInfo.getSitePreset().equals("document-workspace"))
+            {
                 result = WorkspaceType.DWS;
+            }
+            else if (siteInfo.getSitePreset().equals(AlfrescoMeetingServiceHandler.MEETING_WORKSPACE_NAME))
+            {
+                result = WorkspaceType.MWS;
             }
         }
         return result;

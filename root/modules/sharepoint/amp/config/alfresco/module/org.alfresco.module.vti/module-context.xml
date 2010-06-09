@@ -2,7 +2,5 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
 <beans>
-
-	<import resource="classpath:alfresco/module/org.alfresco.module.vti/context/*-context.xml"/>
-	
+    <import resource="classpath:alfresco/module/org.alfresco.module.vti/context/*-context.xml"/>
 </beans>

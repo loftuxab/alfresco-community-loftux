@@ -479,25 +479,27 @@
                      break;
                   
                   case "PRIVATE":
-                     // Must already be a member of the site so show leave action
-                     button.set("label", me.msg("site-finder.leave"));
-                     button.set("onclick",
+                     if (me.memberOfSites[shortName] == "MEMBER")
                      {
-                        fn: me.doLeave,
-                        obj:
+                        // Must already be a member of the site so show leave action
+                        button.set("label", me.msg("site-finder.leave"));
+                        button.set("onclick",
                         {
-                           shortName: shortName,
-                           title: title
-                        },
-                        scope: me
-                     });
+                           fn: me.doLeave,
+                           obj:
+                           {
+                              shortName: shortName,
+                              title: title
+                           },
+                           scope: me
+                        });
 
-                     me.buttons[shortName] =
-                     {
-                        button: button
-                     };
-                     break;
-                  
+                        me.buttons[shortName] =
+                        {
+                           button: button
+                        };
+                        break;
+                     }                  
                   case "MODERATED":
                      // If already a member of the site then show leave action, otherwise show join request
                      if (me.memberOfSites[shortName] == "MEMBER")

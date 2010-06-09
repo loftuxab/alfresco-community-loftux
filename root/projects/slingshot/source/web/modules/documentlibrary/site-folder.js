@@ -115,7 +115,16 @@
           * @type boolean
           * @default true
           */
-         evaluateChildFolders: true
+         evaluateChildFolders: true,
+
+         /**
+          * Maximum folder count configuration setting
+          *
+          * @property maximumFolderCount
+          * @type int
+          * @default -1
+          */
+         maximumFolderCount: -1
       },
       
       /**
@@ -245,6 +254,15 @@
                         {
                            tempNode.isLeaf = true;
                         }
+                     }
+
+                     if (results.resultsTrimmed)
+                     {
+                        tempNode = new YAHOO.widget.TextNode(
+                        {
+                           label: "&lt;" + this.msg("message.folders-trimmed") + "&gt;",
+                           style: "folders-trimmed",
+                        }, node, false);
                      }
                   }
                   
@@ -590,7 +608,7 @@
        _buildTreeNodeUrl: function DLSF__buildTreeNodeUrl(path)
        {
           var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode/site/{site}/{container}{path}";
-          uriTemplate += "?children=" + this.options.evaluateChildFolders;
+          uriTemplate += "?children=" + this.options.evaluateChildFolders + "&max=" + this.options.maximumFolderCount;
 
           var url = YAHOO.lang.substitute(uriTemplate,
           {

@@ -45,9 +45,7 @@
     */
    Alfresco.dashlet.RMA = function RMA_constructor(htmlId)
    {
-      Alfresco.dashlet.RMA.superclass.constructor.call(this, "Alfresco.dashlet.RMA", htmlId, ["container"]);
-
-      return this;
+      return Alfresco.dashlet.RMA.superclass.constructor.call(this, "Alfresco.dashlet.RMA", htmlId);
    };
    
    YAHOO.extend(Alfresco.dashlet.RMA, Alfresco.component.Base,
@@ -77,6 +75,8 @@
        */
       onCreateSite: function RMA_onCreateSite(e, args)
       {
+         Event.stopEvent(e);
+         
          if (this.widgets.feedbackMessage === null)
          {
             this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
@@ -140,6 +140,8 @@
        */
       onLoadTestData: function RMA_onLoadTestData(e, args)
       {
+         Event.stopEvent(e);
+         
          if (this.widgets.feedbackMessage === null)
          {
             this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(

@@ -27,6 +27,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.FormData;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -83,7 +85,7 @@ public class RecordsManagementTypeFormFilter extends RecordsManagementFormFilter
     /*
      * @see org.alfresco.repo.forms.processor.Filter#afterPersist(java.lang.Object, org.alfresco.repo.forms.FormData, java.lang.Object)
      */
-    public void afterPersist(TypeDefinition item, FormData data, NodeRef nodeRef)
+    public void afterPersist(TypeDefinition item, FormData data, final NodeRef nodeRef)
     {
         // Once an RM container type has been persisted generate a default
         // identifer for it.
@@ -93,7 +95,15 @@ public class RecordsManagementTypeFormFilter extends RecordsManagementFormFilter
                 logger.debug("Generating unique identifier for "
                             + this.nodeService.getType(nodeRef).toPrefixString(this.namespaceService));
 
-            this.nodeService.setProperty(nodeRef, RecordsManagementModel.PROP_IDENTIFIER, generateIdentifier(nodeRef));
+            AuthenticationUtil.runAs(
+            		new RunAsWork<Object>()
+            		{
+						public Object doWork() throws Exception 
+						{
+							nodeService.setProperty(nodeRef, RecordsManagementModel.PROP_IDENTIFIER, generateIdentifier(nodeRef));
+							return null;
+						}}, 
+            		AuthenticationUtil.getAdminUserName());                       
         }
     }
 

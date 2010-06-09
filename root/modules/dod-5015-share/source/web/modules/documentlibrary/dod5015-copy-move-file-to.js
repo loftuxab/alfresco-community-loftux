@@ -59,7 +59,7 @@
             file: "add-child"
          };
          
-         if (typeof dataWebScripts[obj.mode] == "undefined")
+         if (obj.mode && typeof dataWebScripts[obj.mode] == "undefined")
          {
             throw new Error("Alfresco.module.RecordsCopyMoveFileTo: Invalid mode '" + obj.mode + "'");
          }
@@ -252,6 +252,7 @@
        {
           var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/{site}/{container}{path}";
           uriTemplate += "?children=" + this.options.evaluateChildFolders;
+          uriTemplate += "&max=" + this.options.maximumFolderCount;
 
           var url = YAHOO.lang.substitute(uriTemplate,
           {

@@ -60,7 +60,7 @@
           var nodeRef = this.options.nodeRef,
             uriTemplate ="slingshot/doclib/treenode/node/" + $combine(encodeURI(nodeRef.uri), Alfresco.util.encodeURIPath(path));
 
-          return  Alfresco.constants.PROXY_URI + uriTemplate + "?perms=false&children=" + this.options.evaluateChildFolders;
+          return Alfresco.constants.PROXY_URI + uriTemplate + "?perms=false&children=" + this.options.evaluateChildFolders + "&max=" + this.options.maximumFolderCount;
        }
    });
 })();

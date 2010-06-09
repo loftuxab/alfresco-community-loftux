@@ -601,7 +601,8 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: asset
+            files: asset,
+            workingMode: this.options.workingMode
          }).showDialog();
       },
 

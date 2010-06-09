@@ -83,7 +83,7 @@ public class VtiSoapResponse extends HttpServletResponseWrapper
         catch (Exception e)
         {
             // ignore
-        }   
+        }  
         
     }
     

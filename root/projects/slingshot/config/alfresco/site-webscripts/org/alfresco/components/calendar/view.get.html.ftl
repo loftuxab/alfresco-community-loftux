@@ -55,7 +55,7 @@
                                 <#if (event.allday) >                              
                                     <div class="vevent allday theme-bg-color-1">
                                         <div>
-                                             <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
+                                             <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}?date=${viewArgs.view.dates[id].id}" class="summary theme-color-1">${event.summary}</a>
                                              <p class="description">${event.description}</p>
                                              <p class="dates"> <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                              - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
@@ -78,7 +78,7 @@
                                          </#if>
 
                                          <li class="vevent ${class}">
-                                               <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
+                                               <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}?date=${viewArgs.view.dates[id].id}" class="summary theme-color-1">${event.summary}</a>
                                                <p class="description">${event.description}</p>
                                                <p class="dates"><span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                                - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                

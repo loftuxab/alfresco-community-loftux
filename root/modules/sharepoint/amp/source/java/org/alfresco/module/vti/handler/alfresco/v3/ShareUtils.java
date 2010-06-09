@@ -81,7 +81,7 @@ public class ShareUtils
     {
         return sysAdminParams.getAlfrescoProtocol() + "://" + sysAdminParams.getAlfrescoHost() + ":" + sysAdminParams.getAlfrescoPort();
     }
-
+    
     /**
      * Creates new site using REST API, http method is sent to appropriate web script
      * 
@@ -111,18 +111,18 @@ public class ShareUtils
 
             if (logger.isDebugEnabled())
                 logger.debug("Create site method returned status: " + createSiteStatus);
-    }
+        }
         catch (Exception e)
-    {
+        {
             if (logger.isDebugEnabled())
                 logger.debug("Fail to create site with name: " + shortName + ". Message: " + e.getMessage());
             throw new RuntimeException(e);
-    }
+        }
         finally
-    {
+        {
             createSiteMethod.releaseConnection();
-    }
-
+        }
+        
         // create title sites component
         createComponent(httpClient, shortName, user, "title", "title/collaboration-title");
 
@@ -141,16 +141,24 @@ public class ShareUtils
         // create component-2-2 sites component
         createComponent(httpClient, shortName, user, "component-2-2", "dashlets/colleagues");
 
-        // create sites dashboard
-        createSiteDashboard(httpClient, shortName, user);
-
         // create documetnLibrary folder
         createDocumentLibrary(httpClient, shortName, user);
 
+        // create sites dashboard
+        createSiteDashboard(httpClient, shortName, user, sitePreset);
+        
+        if ("document-workspace".equalsIgnoreCase(sitePreset))
+        {
         // create links folder
         createLinks(httpClient, shortName, user);
     }
-
+        else
+        {
+            // create component-2-3 sites component
+            createComponent(httpClient, shortName, user, "component-2-3", "dashlets/calendar");
+        }
+    }
+    
     /**
      * Creates site component
      * 
@@ -174,10 +182,10 @@ public class ShareUtils
                             "<source-id>site/" + siteName + "/dashboard</source-id>\n" +
                             "<url>/components/" + componentURL + "</url>\n" +
                         "</component>";
-
+        
         PostMethod postMethod = createPostMethod(url, body, "application/octet-stream");
         try
-    {
+        {
             if (logger.isDebugEnabled())
                 logger.debug("Trying to create site component with name: " + componentName + ". URL: " + postMethod.getURI());
 
@@ -198,7 +206,7 @@ public class ShareUtils
             postMethod.releaseConnection();
         }
     }
-
+    
     /**
      * Creates site dashboard
      * 
@@ -207,20 +215,39 @@ public class ShareUtils
      * @param user current user
      * @throws UnsupportedEncodingException
      */
-    public void createSiteDashboard(HttpClient httpClient, String siteName, SessionUser user) throws UnsupportedEncodingException
+    public void createSiteDashboard(HttpClient httpClient, String siteName, SessionUser user, String sitePreset) throws UnsupportedEncodingException
     {
-        String createSiteDashboardBody = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<page>\n" +
-            "<title>Document Workspace Dashboard</title>\n" +
-            "<title-id>page.workspace.title</title-id>\n" +
-            "<description>Document Workspace dashboard page</description>\n" +
-            "<description-id>page.workspace.description</description-id>\n" +
-            "<template-instance>dashboard-2-columns-wide-left</template-instance>\n" +
-            "<authentication>user</authentication>\n" + 
-            "<properties>\n" +
-                "<sitePages>[{\"pageId\":\"documentlibrary\"}, {\"pageId\":\"links\"}]</sitePages>\n" +
-            "</properties>\n" +
-         "</page>";
+        String createSiteDashboardBody = "";
+        if ("document-workspace".equalsIgnoreCase(sitePreset))
+        {
+            createSiteDashboardBody = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<page>\n" +
+                "<title>Document Workspace Dashboard</title>\n" +
+                "<title-id>page.workspace.title</title-id>\n" +
+                "<description>Document Workspace dashboard page</description>\n" +
+                "<description-id>page.workspace.description</description-id>\n" +
+                "<template-instance>dashboard-2-columns-wide-left</template-instance>\n" +
+                "<authentication>user</authentication>\n" + 
+                "<properties>\n" +
+                    "<sitePages>[{\"pageId\":\"documentlibrary\"}, {\"pageId\":\"links\"}]</sitePages>\n" +
+                "</properties>\n" +
+            "</page>";
+        }
+        else
+        {
+            createSiteDashboardBody = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<page>\n" +
+                "<title>Meeting Workspace Dashboard</title>\n" +
+                "<title-id>page.meeting_workspace.title</title-id>\n" +
+                "<description>Meeting Workspace dashboard page</description>\n" +
+                "<description-id>page.meeting_workspace.description</description-id>\n" +
+                "<template-instance>dashboard-2-columns-wide-left</template-instance>\n" +
+                "<authentication>user</authentication>\n" + 
+                "<properties>\n" +
+                    "<sitePages>[{\"pageId\":\"documentlibrary\"}, {\"pageId\":\"calendar\"}]</sitePages>\n" +
+                "</properties>\n" +
+            "</page>";
+        }
 
         PostMethod createSiteDashboardMethod = createPostMethod(getAlfrescoHostWithPort() + getAlfrescoContext() + "/s/remotestore/create/alfresco/site-data/pages/site/" + siteName
                 + "/dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket(), createSiteDashboardBody, "application/octet-stream");
@@ -246,7 +273,7 @@ public class ShareUtils
             createSiteDashboardMethod.releaseConnection();
         }
     }
-
+    
     /**
      * Creates documentLibrary folder in site
      * 
@@ -262,10 +289,10 @@ public class ShareUtils
         {
             if (logger.isDebugEnabled())
                 logger.debug("Trying to create sites documentLibrary folder. URL: " + createDocumentLibraryFolderMethod.getURI());
-
+            
             int status = httpClient.executeMethod(createDocumentLibraryFolderMethod);
             createDocumentLibraryFolderMethod.getResponseBody();
-
+            
             if (logger.isDebugEnabled())
                 logger.debug("Create sites documentLibrary folder method returned status: " + status);
         }
@@ -280,7 +307,7 @@ public class ShareUtils
             createDocumentLibraryFolderMethod.releaseConnection();
         }
     }
-
+    
     /**
      * Creates links folder in site
      * 
@@ -297,10 +324,10 @@ public class ShareUtils
         {
             if (logger.isDebugEnabled())
                 logger.debug("Trying to create site links folder. URL: " + createLinksFolderMethod.getURI());
-
+            
             int status = httpClient.executeMethod(createLinksFolderMethod);
             createLinksFolderMethod.getResponseBody();
-
+            
             if (logger.isDebugEnabled())
                 logger.debug("Create site links folder method returned status: " + status);
         }
@@ -315,7 +342,7 @@ public class ShareUtils
             createLinksFolderMethod.releaseConnection();
         }
     }
-
+    
     /**
      * Creates POST method
      * 
@@ -333,7 +360,7 @@ public class ShareUtils
 
         return postMethod;
     }
-
+    
     /**
      * Creates GET method
      * 
@@ -345,7 +372,7 @@ public class ShareUtils
         GetMethod getMethod = new GetMethod(url);
         return getMethod;
     }
-
+    
     /**
      * Deletes site using REST API, http method is sent to appropriate web script
      * 
@@ -388,7 +415,7 @@ public class ShareUtils
 
         // deletes navigation component
         deleteSiteComponent(httpClient, shortName, user, "navigation");
-            
+
         // deletes component-2-2 component
         deleteSiteComponent(httpClient, shortName, user, "component-2-2");
 
@@ -470,7 +497,7 @@ public class ShareUtils
             deleteDashboardMethod.releaseConnection();
         }
     }
-
+    
     /**
      * Get share context name
      * 
@@ -480,7 +507,7 @@ public class ShareUtils
     {
         return "/" + sysAdminParams.getShareContext();
     }
-
+    
     /**
      * <p>
      * encode string to share specific manner (all characters with code > 127 will be encoded in %u0... format)
@@ -488,12 +515,12 @@ public class ShareUtils
      * 
      * @param value to encode
      * @return encoded value
-     * @throws UnsupportedEncodingException 
+     * @throws UnsupportedEncodingException
      */
     public static String encode(String value) throws UnsupportedEncodingException
     {
         StringBuilder result = new StringBuilder(value.length());
-        
+
         for (int i = 0; i < value.length(); i++)
         {
             char c = value.charAt(i);
@@ -509,10 +536,10 @@ public class ShareUtils
                 }
                 else
                 {
-                    result.append(URLEncoder.encode(c + ""));                    
-                }   
+                    result.append(URLEncoder.encode(c + ""));
+                }
             }
         }
-        return result.toString();        
+        return result.toString();
     }
 }

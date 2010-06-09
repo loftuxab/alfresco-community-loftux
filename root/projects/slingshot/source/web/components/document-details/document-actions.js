@@ -146,25 +146,43 @@
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
+       * @param fullUrlPath {boolean} Whether to calculate the full URL or not
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function DocumentActions_getActionUrls()
+      getActionUrls: function DocumentActions_getActionUrls(fullUrlPath)
       {
          var recordData = this.assetData,
             nodeRef = recordData.nodeRef,
-            custom = recordData.custom || {};
+            custom = recordData.custom || {},
+            prefix = "";
+
+         if (fullUrlPath)
+         {
+            if (this.options.workingMode == Alfresco.doclib.MODE_SITE)
+            {
+               prefix = Alfresco.util.uriTemplate("sitepage",
+               {
+                  site: this.options.siteId,
+                  pageid: ""
+               });
+            }
+            else
+            {
+               prefix = Alfresco.constants.URL_PAGECONTEXT;
+            }
+         }
 
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + recordData.contentUrl + "?a=true",
             viewUrl:  Alfresco.constants.PROXY_URI + recordData.contentUrl + "\" target=\"_blank",
             viewGoogleDocUrl: custom.googleDocUrl + "\" target=\"_blank",
-            documentDetailsUrl: "document-details?nodeRef=" + nodeRef,
-            editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
-            inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
-            managePermissionsUrl: "manage-permissions?nodeRef=" + nodeRef,
-            workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
-            originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)
+            documentDetailsUrl: prefix + "document-details?nodeRef=" + nodeRef,
+            editMetadataUrl: prefix + "edit-metadata?nodeRef=" + nodeRef,
+            inlineEditUrl: prefix + "inline-edit?nodeRef=" + nodeRef,
+            managePermissionsUrl: prefix + "manage-permissions?nodeRef=" + nodeRef,
+            workingCopyUrl: prefix + "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
+            originalUrl: prefix + "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)
          });
       },
        
@@ -355,7 +373,7 @@
                   fn: function DocumentActions_oAEO_success(data)
                   {
                      this.assetData.nodeRef = data.json.results[0].nodeRef;
-                     window.location = this.getActionUrls().documentDetailsUrl + "#editOffline";
+                     window.location = this.getActionUrls(true).documentDetailsUrl + "#editOffline";
                   },
                   scope: this
                }
@@ -489,7 +507,7 @@
          // Call the normal callback to post the activity data
          this.onNewVersionUploadComplete.call(this, complete);
          this.assetData.nodeRef = complete.successful[0].nodeRef;
-         window.location = this.getActionUrls().documentDetailsUrl;
+         window.location = this.getActionUrls(true).documentDetailsUrl;
       },
 
       /**

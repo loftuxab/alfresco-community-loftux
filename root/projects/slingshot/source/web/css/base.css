@@ -364,6 +364,22 @@ textarea.wide
    margin-right: 1px;
 }
 
+.dashlet .scrollablePanel div.resize-mask
+{
+   display: none;
+}
+.yui-resize-resizing .scrollablePanel div.resize-mask
+{
+   display: block;
+   padding: 0;
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   opacity: 0;
+}
+
 .dashlet .body>div
 {
    padding-left: 8px;

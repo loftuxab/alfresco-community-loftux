@@ -93,6 +93,144 @@
       },
 
       /**
+       * Date drop-down changed event handler
+       * @method onTypeFilterChanged
+       * @param p_oMenuItem {object} Selected menu item
+       */
+      onTypeFilterChanged: function MySites_onTypeFilterChanged(p_oMenuItem)
+      {
+         this.widgets.type.value = p_oMenuItem.value;
+		 this.onTypeFilterClicked();
+      },
+	  
+	  /**
+       * Date button clicked event handler
+       * @method onTypeFilterClicked
+       * @param p_oEvent {object} Dom event
+       */
+      onTypeFilterClicked: function MySites_onTypeFilterClicked(p_oEvent)
+      {
+	  Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/people/"+ Alfresco.constants.USERNAME+ "/sites",
+            successCallback:
+            {
+               fn: this.getPrefs,
+               scope: this
+            }
+         });	 
+      },
+
+      getPrefs: function MySites_getPrefs(p_response)
+      {
+         var items = p_response.json;
+	
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/people/"+ Alfresco.constants.USERNAME + "/preferences?pf=org.alfresco.share.sites",
+            successCallback:
+            {
+               fn: this.onSitesUpdate,
+               scope: this,
+               obj: items
+            }
+         });
+      },
+	  
+      onSitesUpdate: function MySites_onSitesUpdate(p_response, p_items)
+      {
+         var favSites = {};
+         var imapfavSites = {};
+         if (p_response.json.org)
+         {
+            favSites = p_response.json.org.alfresco.share.sites.favourites;
+            imapfavSites = p_response.json.org.alfresco.share.sites.imapFavourites;
+         }
+         var siteManagers, i, j, k, l;
+         for (i = 0, j = p_items.length; i < j; i++)
+         {
+            p_items[i].isSiteManager = false;
+            siteManagers = p_items[i].siteManagers;
+            for (k = 0, l = siteManagers.length; siteManagers && k < l; k++)
+            {
+               if (siteManagers[k] == Alfresco.constants.USERNAME)
+               {
+                  p_items[i].isSiteManager = true;
+                  break;
+               }
+            }
+			 
+            p_items[i].isFavourite = typeof(favSites[p_items[i].shortName]) == "undefined" ? false : favSites[p_items[i].shortName];
+            if (imapfavSites)
+            {
+               p_items[i].isIMAPFavourite = typeof(imapfavSites[p_items[i].shortName]) == "undefined" ? false : imapfavSites[p_items[i].shortName];
+            }
+          }
+
+          this.options.sites = [];
+          var ii =0;
+          for (i = 0, j = p_items.length; i < j; i++)
+          {
+             var site  =
+             {
+                shortName: p_items[i].shortName,
+                title: p_items[i].title,
+                description: p_items[i].description,
+                isFavourite: p_items[i].isFavourite,
+                isIMAPFavourite: p_items[i].isIMAPFavourite,
+                sitePreset: p_items[i].sitePreset,
+                isSiteManager: p_items[i].isSiteManager                    
+             };
+			
+             if(this.filterAccept(site))
+             {
+                this.options.sites[ii] = site;
+                ii++;
+             }
+          }			   
+
+          var successHandler = function MD__oFC_success(sRequest, oResponse, oPayload)
+          {
+             oResponse.results=this.options.sites;
+             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+          };
+		
+          this.widgets.dataSource.sendRequest(this.options.sites,
+          {
+             success: successHandler,
+             scope: this
+          });
+      },
+	  
+      filterAccept: function MySites_filterAccept(site)
+      {
+         filter = this.widgets.type.value;
+         switch (filter)
+         {
+            case "all": return true;
+            case "sites":
+               if (site.sitePreset != "document-workspace" && site.sitePreset != "meeting-workspace") {return true;}
+                  return false;
+	   
+            case "favSites":
+               if ((site.isFavourite == true) || (this.options.imapEnabled && site.isIMAPFavourite == true))
+               {
+                  return true;
+               }
+               return false;
+               
+            case "docWorkspaces":
+               if (site.sitePreset == "document-workspace") {return true;}
+                  return false;
+               break;
+			   
+            case "metWorkspaces":
+               if (site.sitePreset == "meeting-workspace") {return true;}
+                  return false;
+         }
+      },
+	  
+      /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
        */
@@ -100,6 +238,25 @@
       {
          var me = this;
          
+         // Dropdown filter
+         this.widgets.type = new YAHOO.widget.Button(this.id + "-type",
+         {
+            type: "split",
+            menu: this.id + "-type-menu"
+         });
+		 
+         this.widgets.type.on("click", this.onTypeFilterClicked, this, true);
+         this.widgets.type.getMenu().subscribe("click", function (p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               me.widgets.type.set("label", menuItem.cfg.getProperty("text"));
+               me.onTypeFilterChanged.call(me, p_aArgs[1]);
+            }
+         });
+         this.widgets.type.value = "all";         
+		 
          // Listen on clicks for the create site link
          Event.addListener(this.id + "-createSite-button", "click", this.onCreateSiteLinkClick, this, true);
          

@@ -33,7 +33,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.alfresco.web.sharepoint.auth.SiteMemberMappingException;
+
 import org.alfresco.module.vti.handler.MethodHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
@@ -41,6 +41,7 @@ import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.springframework.extensions.surf.util.URLDecoder;
 import org.alfresco.web.sharepoint.auth.AuthenticationHandler;
+import org.alfresco.web.sharepoint.auth.SiteMemberMappingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.HttpHeaders;
@@ -68,12 +69,15 @@ public class VtiFilter implements Filter
     private MethodHandler vtiHandler;
     private SysAdminParams sysAdminParams;
 
+    private String alfrescoContext;
+    
     private static Log logger = LogFactory.getLog(VtiFilter.class);
 
     /**
-     * <p>Process the specified HTTP request, check authentication, resource existence,
-     * access to document workspace and write specific protocol headers to response.</p> 
-     *
+     * <p>
+     * Process the specified HTTP request, check authentication, resource existence, access to document workspace and write specific protocol headers to response.
+     * </p>
+     * 
      * @param request HTTP request
      * @param response HTTP response
      * @param chain filter chain
@@ -109,6 +113,14 @@ public class VtiFilter implements Filter
             return;
         }
 
+        if ((httpRequest.getHeader(HttpHeaders.USER_AGENT) != null && httpRequest.getHeader(HttpHeaders.USER_AGENT).startsWith("Microsoft-WebDAV-MiniRedir/6"))
+                && (METHOD_PROPFIND.equals(httpRequest.getMethod()) || METHOD_OPTIONS.equals(httpRequest.getMethod()))
+                && ("/".equals(httpRequest.getRequestURI()) || alfrescoContext.equals(httpRequest.getRequestURI())))
+        {
+            writeResponseForMiniRedir(httpResponse);
+            return;
+        }
+
         writeHeaders(httpRequest, httpResponse);
 
         if (!checkResourceExistence(httpRequest, httpResponse, chain))
@@ -127,7 +139,7 @@ public class VtiFilter implements Filter
             user = (SessionUser) session.getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE);
 
         String authHeader = httpRequest.getHeader(AuthenticationHandler.HEADER_AUTHORIZATION);
-        
+
         if (user == null || (authHeader != null && authHeader.startsWith(AuthenticationHandler.NTLM_START)))
         {
             if (logger.isDebugEnabled())
@@ -170,8 +182,10 @@ public class VtiFilter implements Filter
     }
 
     /**
-     * <p>Filter initialization.</p> 
-     *
+     * <p>
+     * Filter initialization.
+     * </p>
+     * 
      * @param filterConfig filter configuration
      */
     public void init(FilterConfig filterConfig) throws ServletException
@@ -186,7 +200,7 @@ public class VtiFilter implements Filter
     {
         authenticationHandler = null;
         vtiHandler = null;
-    }
+    }     
 
     @SuppressWarnings("unchecked")
     private boolean checkResourceExistence(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain) throws IOException, ServletException
@@ -196,8 +210,8 @@ public class VtiFilter implements Filter
         Object validSiteUrl = httpRequest.getAttribute("VALID_SITE_URL");
         String if_header = httpRequest.getHeader("If");
 
-        if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod)) && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin")
-                && !uri.contains("/_vti_history") && !uri.startsWith(getAlfrescoContext() + "/resources") && if_header == null)
+        if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod)) && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin") && !uri.contains("/_vti_history")
+                && !uri.startsWith(alfrescoContext + "/resources") && if_header == null)
         {
             if (validSiteUrl != null || uri.endsWith(".vti"))
             {
@@ -311,7 +325,7 @@ public class VtiFilter implements Filter
             String auth = httpRequest.getHeader(AuthenticationHandler.HEADER_AUTHORIZATION);
             if (auth == null || !auth.startsWith(AuthenticationHandler.NTLM_START))
             {
-            httpResponse.setHeader("Connection", "close");
+                httpResponse.setHeader("Connection", "close");
                 httpResponse.setContentType("application/x-vermeer-rpc");
             }
             else
@@ -319,8 +333,8 @@ public class VtiFilter implements Filter
                 httpResponse.setContentType("text/html");
             }
         }
-    }
-
+    }    
+    
     private void writeResponseForMiniRedir(HttpServletResponse httpResponse) throws IOException
     {
         httpResponse.setHeader("MS-Author-Via", "MS-FP/4.0,DAV");
@@ -373,7 +387,7 @@ public class VtiFilter implements Filter
         {
             return false;
         }
-    }
+    }    
 
     public void setSysAdminParams(SysAdminParams sysAdminParams)
     {
@@ -392,9 +406,14 @@ public class VtiFilter implements Filter
 
     public String getAlfrescoContext()
     {
-        return "/" + sysAdminParams.getAlfrescoContext();
+        return alfrescoContext;
     }
 
+    public void setAlfrescoContext(String alfrescoContext)
+    {
+        this.alfrescoContext = alfrescoContext;
+    }
+    
     public void setAuthenticationHandler(org.alfresco.module.vti.handler.AuthenticationHandler authenticationHandler)
     {
         this.authenticationHandler = authenticationHandler;
