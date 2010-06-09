@@ -27,8 +27,8 @@
 
    <!-- Rule Templates -->
    <div style="display:none">
-      <ul>
-         <li id="${el}-ruleTemplate" class="rules-list-item">
+      <ul id="${el}-ruleTemplate" >         
+         <li class="rules-list-item">
             <input type="hidden" class="id" name="id" value=""/>
             <div class="no">&nbsp;</div>
             <div class="active-icon">&nbsp;</div>

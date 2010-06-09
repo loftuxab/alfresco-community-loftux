@@ -12,5 +12,7 @@
 	<classpathentry kind="lib" path="lib/jsr311-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/velocity-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/velocity-dep-1.4.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/axiom-api-1.2.5.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/axiom-impl-1.2.5.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

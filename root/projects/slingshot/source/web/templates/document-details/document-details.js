@@ -188,6 +188,11 @@
       _getDataFailure: function DocumentDetails__getDataFailure(response)
       {
          YAHOO.Bubbling.fire("documentDetailsFailure");
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this.msg("message.item-missing"),
+            modal: true
+         });
       }
    });
 })();

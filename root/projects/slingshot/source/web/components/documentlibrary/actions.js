@@ -100,9 +100,10 @@
                fn: function dlA_onActionDetails_success(response)
                {
                   // Reload the node's metadata
+                  var nodeRef = asset.custom && asset.custom.isWorkingCopy ? asset.custom.workingCopyOriginal : asset.nodeRef;
                   Alfresco.util.Ajax.request(
                   {
-                     url: Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + new Alfresco.util.NodeRef(asset.nodeRef).uri,
+                     url: Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + new Alfresco.util.NodeRef(nodeRef).uri,
                      successCallback:
                      {
                         fn: function dlA_onActionDetails_refreshSuccess(response)
@@ -114,6 +115,9 @@
                            {
                               file: file
                            });
+
+                           // Fire "metadataRefresh" event so list is refreshed since rules might have been triggered on update
+                           YAHOO.Bubbling.fire("metadataRefresh");
 
                            // Fire "tagRefresh" event
                            YAHOO.Bubbling.fire("tagRefresh");

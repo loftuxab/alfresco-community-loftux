@@ -437,10 +437,8 @@
            print="yes"
            userid="${db.master.username}" 
            password="${db.master.password}">
-         create user ${db.username} identified by ${db.password};
-         grant create session to ${db.username};
-         create user ${db.username}_test identified by ${db.password};
-         grant create session to ${db.username}_test;
+         grant connect,resource to ${db.username} identified by ${db.password};
+         grant connect,resource to ${db.username}_test identified by ${db.password};
       </sql>
    </target>
 
@@ -467,7 +465,7 @@
    </target>
    <target name="-drop-database-mysql">
       <sql driver="${db.driver}" 
-           url="jdbc:mysql:///" 
+           url="${db.url}" 
            classpathref="classpath.compile" 
            print="yes"
            userid="${db.username}" 

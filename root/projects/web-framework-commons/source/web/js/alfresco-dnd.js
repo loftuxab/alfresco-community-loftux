@@ -18,7 +18,41 @@
  */
 
 /**
- * Drag n Drop manager.
+ * Drag n Drop manager
+ *
+ * Helper class for making YUI's drag n drop easier to handle for  <ul> & <li> elements.
+ * Supports multiple targets and sources and also provides automatic functionality for
+ * the most common use cases:
+ *
+ * - Reordering inside a list.
+ *   (see rules-list.js & Alfresco.util.DragAndDrop.GROUP_MOVE)
+ *
+ * - Moving an element from one list to another.
+ *   (see customise-dashlets.js & Alfresco.util.DragAndDrop.GROUP_MOVE)
+ *
+ * - Deleting an element by dragging it to "delete" target.
+ *   (see customise-dashlets.js & Alfresco.util.DragAndDrop.GROUP_DELETE)
+ *
+ * - Having a list that act as a factory and creates a copy of the element that is being dragged rather than moving it from the list.
+ *   (see customise-dashlets.js & the "protect" attribute for draggables)
+ *
+ * - Having a maximum number of elements that fit inside a target.
+ *   (see customise-dashlets.js & the "maximum" attribute for targets)
+ *
+ * Also note that as long as a <a href> element is inside the <li> element all functionality
+ * is provided using only the arrow keys. When the <a href> element gets focus it can be:
+ *
+ * - Moved up or down inside the list using the up & down arrow keys
+ * - Moved to another list using the left & right arrow keys
+ * - Deleted by using the delete key
+ * - Getting copied to the first target that hasn't reached its maximum number of elements (see customise-dashlets.js & the "duplicatesOnEnterKey" attribute for draggables)
+ *
+ * WARNING!!
+ * To avoid problems in IE6 & IE7 make sure that you do NOT use the following strategy to create your <li> elements:
+ * Using a <li> element with an id attribute as a "template" and later use HTMLElement.clone to create the actual instances.
+ * Note that it IS ok to use HTMLElement.clone as long as the id attribute ISN'T set.
+ *
+ * Tested in the following browsers: >IE6, >FF3 & >SF3.
  *
  * @namespace Alfresco
  * @cssClass Alfresco.util.DragAndDrop
@@ -108,7 +142,7 @@
    var DD = Alfresco.util.DragAndDrop;
 
    /**
-   * View Mode Constants
+   * Predefined Drag and Drop groups that provides built in functionality.
    */
    YAHOO.lang.augmentObject(DD,
    {
@@ -905,31 +939,52 @@
 
          // Show the proxy element and animate it towards the shadow.
          Dom.setStyle(proxy, "visibility", "");
-         var a = new YAHOO.util.Motion(proxy,
+         var xy = Dom.getXY(this.srcShadow);
+         if (xy)
          {
-            points:
+            var a = new YAHOO.util.Motion(proxy,
             {
-               to: Dom.getXY(this.srcShadow)
-            }
-         }, 0.3, YAHOO.util.Easing.easeOut);
+               points:
+               {
+                  to: xy
+               }
+            }, 0.3, YAHOO.util.Easing.easeOut);
 
-         // Save the scope of this for the callback after the animation.
-         var myThis = this;
+            // Save the scope of this for the callback after the animation.
+            var myThis = this;
 
-         a.onComplete.subscribe(function()
+            a.onComplete.subscribe(function()
+            {
+               var srcShadow = myThis.srcShadow;
+
+               // Hide proxy
+               Dom.setStyle(proxy, "visibility", "hidden");
+
+               // Insert and show the real draggable
+               myThis.insertSrcEl(srcEl);
+
+               // Hide shadow
+               Dom.setStyle(srcShadow, "display", "none");
+            });
+            a.animate();
+         }
+         else
          {
-            var srcShadow = myThis.srcShadow;
+            /**
+             * Skip animations for browsers (IE7 and below) that doesn't return coordinates when proxy
+             * is "thrown" away in a "sloppy" manner towards a clear direction
+             * rather than releasing the proxy "carefully".
+             */
 
             // Hide proxy
             Dom.setStyle(proxy, "visibility", "hidden");
 
             // Insert and show the real draggable
-            myThis.insertSrcEl(srcEl);
+            this.insertSrcEl(srcEl);
 
             // Hide shadow
-            Dom.setStyle(srcShadow, "display", "none");
-         });
-         a.animate();
+            Dom.setStyle(this.srcShadow, "display", "none");
+         }
       },
 
       /**

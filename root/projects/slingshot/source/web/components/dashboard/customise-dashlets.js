@@ -93,6 +93,14 @@
          this.widgets.trashcanListEl = Dom.get(this.id + "-trashcan-img");
          this.widgets.shadowEl = Dom.get(this.id + "-dashlet-li-shadow");
 
+         /**
+          * Base version of the drag and drop config making:
+          * - the "available dashlet list" deleting dashlets when dropped upon it
+          * - the "available dashlet list" protecting its elements by making a copy of the when dragged (rather than moved form the list)
+          * - the "trashcan" delete dashlets when dropped upon it
+          *
+          * Additional draggables and targets will be added below depending on the number of columns on the dashboard.
+          */         
          var dndConfig =
          {
             shadow: this.widgets.shadowEl,
