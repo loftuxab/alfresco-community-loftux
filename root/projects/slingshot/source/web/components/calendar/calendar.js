@@ -43,7 +43,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["calendar", "button"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["calendar", "button", "treeview"], this.onComponentsLoaded, this);
       
       return this;
    }

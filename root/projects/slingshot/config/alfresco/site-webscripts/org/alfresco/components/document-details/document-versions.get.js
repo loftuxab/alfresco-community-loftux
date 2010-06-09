@@ -5,7 +5,7 @@ function main()
    {
       var nodeRef = args.nodeRef;
 
-      // Call the repo for sites the user is a member of
+      // Call the repo to get the document versions
       var result = remote.call("/api/version?nodeRef=" + nodeRef);
 
       // Create javascript objects from the server response

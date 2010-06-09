@@ -590,9 +590,9 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
             }
             else if (getNodeService().hasAspect(fileInfo.getNodeRef(), ContentModel.ASPECT_WORKING_COPY) == false
                     && VtiDocumentHepler.applyFilters(fileInfo.getName(), fileDialogFilterValue))
-            {
-                result.getDialogMetaInfoList().add(getDialogMetaInfo(fileInfo));
-            }             
+            {                
+               result.getDialogMetaInfoList().add(getDialogMetaInfo(fileInfo));                
+            }
         }
 
         if (logger.isDebugEnabled())
@@ -1137,7 +1137,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
      * Returns DialogMetaInfo for FileInfo
      * 
      * @param fileInfo file info ({@link FileInfo})
-     * @return DialogMetaInfo dialog meta info
+     * @return DialogMetaInfo dialog meta info     
      */
     private DialogMetaInfo getDialogMetaInfo(FileInfo fileInfo)
     {

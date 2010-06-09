@@ -48,8 +48,10 @@
     	<property name="sysAdminParams">
             <ref bean="sysAdminParams" />
         </property>
+        <property name="alfrescoContext">
+            <value>${vti.alfresco.deployment.context}</value>
+        </property>
     </bean>
-        
     <bean id="vtiRequestDispatcher" class="org.alfresco.module.vti.web.VtiRequestDispatcher">
         <constructor-arg>
         	<!-- ACTIONS -->
@@ -116,8 +118,11 @@
 			</list>
 		</constructor-arg>
 		<property name="sysAdminParams">
-                    <ref bean="sysAdminParams" />
-                </property>
+           <ref bean="sysAdminParams" />
+        </property>
+        <property name="context">
+            <value>${vti.alfresco.deployment.context}</value>
+        </property>
     </bean>   
   
     <bean id="vtiInfAction" class="org.alfresco.module.vti.web.actions.VtiInfAction">
@@ -192,6 +197,13 @@
         		<entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RenameDws"> <ref bean="renameDwsEndpoint"/> </entry>
         		<entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RemoveDwsUser"> <ref bean="removeDwsUserEndpoint"/> </entry>
         		<entry key="http://schemas.microsoft.com/sharepoint/soap/dws/UpdateDwsData"> <ref bean="updateDwsDataEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/GetMeetingWorkspaces"> <ref bean="getMeetingWorkspacesEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/GetMeetingsInformation"> <ref bean="getMeetingsInformationEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/CreateWorkspace"> <ref bean="createWorkspaceEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/AddMeetingFromICal"> <ref bean="addMeetingFromICalEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/UpdateMeetingFromICal"> <ref bean="updateMeetingFromICalEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/RemoveMeeting"> <ref bean="removeMeetingEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/DeleteWorkspace"> <ref bean="deleteWorkspaceEndpoint"/> </entry>        		
         	</map>
 		</property>
 	</bean>   
@@ -405,21 +417,90 @@
     </bean>
     
     <bean id="updateDwsDataEndpoint" class="org.alfresco.module.vti.web.ws.UpdateDwsDataEndpoint">
-    	<constructor-arg ref="dwsServiceHandler"/>
-    	<property name="name">
-    		<value>UpdateDwsData</value>
-    	</property>
-    	<property name="namespace">
+        <constructor-arg ref="dwsServiceHandler"/>
+        <property name="name">
+            <value>UpdateDwsData</value>
+        </property>
+        <property name="namespace">
             <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+    </bean>    
+    
+    <bean id="getMeetingWorkspacesEndpoint" class="org.alfresco.module.vti.web.ws.GetMeetingWorkspacesEndpoint">
+        <constructor-arg ref="meetingServiceHandler"/>
+        <property name="name">
+            <value>GetMeetingWorkspaces</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/meetings/</value>
+        </property>
+    </bean>
+    
+    <bean id="getMeetingsInformationEndpoint" class="org.alfresco.module.vti.web.ws.GetMeetingsInformationEndpoint">
+        <constructor-arg ref="meetingServiceHandler"/>
+        <property name="name">
+            <value>GetMeetingsInformation</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/meetings/</value>
+        </property>
+    </bean>
+    
+    <bean id="createWorkspaceEndpoint" class="org.alfresco.module.vti.web.ws.CreateWorkspaceEndpoint">
+        <constructor-arg ref="meetingServiceHandler"/>
+        <property name="name">
+            <value>CreateWorkspace</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/meetings/</value>
+        </property>
+    </bean>
+    
+    <bean id="addMeetingFromICalEndpoint" class="org.alfresco.module.vti.web.ws.AddMeetingFromICalEndpoint">
+        <constructor-arg ref="meetingServiceHandler"/>
+        <property name="name">
+            <value>AddMeetingFromICal</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/meetings/</value>
+        </property>
+    </bean>
+    
+    <bean id="updateMeetingFromICalEndpoint" class="org.alfresco.module.vti.web.ws.UpdateMeetingFromICalEndpoint">
+        <constructor-arg ref="meetingServiceHandler"/>
+        <property name="name">
+            <value>UpdateMeetingFromICal</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/meetings/</value>
+        </property>
+    </bean>
+    
+    <bean id="removeMeetingEndpoint" class="org.alfresco.module.vti.web.ws.RemoveMeetingEndpoint">
+        <constructor-arg ref="meetingServiceHandler"/>
+        <property name="name">
+            <value>RemoveMeeting</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/meetings/</value>
+        </property>
+    </bean>
+    
+    <bean id="deleteWorkspaceEndpoint" class="org.alfresco.module.vti.web.ws.DeleteWorkspaceEndpoint">
+        <constructor-arg ref="meetingServiceHandler"/>
+        <property name="name">
+            <value>DeleteWorkspace</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/meetings/</value>
         </property>
     </bean>
     
     <!-- GET VTI SERVER DETAILS -->    
     <bean id="webscript.org.alfresco.vti.vti-server.get" class="org.alfresco.module.vti.web.scripts.VtiServerWebScript" parent="webscript">
-    	<property name="port">
-        	<value>${vti.server.port}</value>
-    	</property>
+        <property name="port">
+            <value>${vti.server.port}</value>
+        </property>
     </bean>
-    
-    
+
 </beans>

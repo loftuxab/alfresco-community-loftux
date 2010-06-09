@@ -12,8 +12,15 @@
    </div>
 </div>
 <#assign treeConfig = config.scoped["DocumentLibrary"]["tree"]!>
-<#if treeConfig.getChildValue??><#assign evaluateChildFolders = treeConfig.getChildValue("evaluate-child-folders")!"true"></#if>
+<#if treeConfig.getChildValue??>
+   <#assign evaluateChildFoldersSite = treeConfig.getChildValue("evaluate-child-folders")!"true">
+   <#assign maximumFolderCountSite = treeConfig.getChildValue("maximum-folder-count")!"-1">
+</#if>
 <script type="text/javascript">//<![CDATA[
    Alfresco.util.addMessages(${messages}, "Alfresco.module.RecordsCopyMoveFileTo");
-   Alfresco.util.ComponentManager.get("${args.htmlid}").options.evaluateChildFolders = ${evaluateChildFolders!"true"};
+   Alfresco.util.ComponentManager.get("${args.htmlid}").setOptions(
+   {
+      evaluateChildFolders: ${evaluateChildFolders!"true"},
+      maximumFolderCount: ${(maximumFolderCount!"-1")}
+   });
 //]]></script>

@@ -41,7 +41,7 @@ public class VtiUtils
     static
     {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        propfindDateFormate.setTimeZone(TimeZone.getTimeZone("GMT"));
+        propfindDateFormate.setTimeZone(TimeZone.getTimeZone("GMT"));    
     }
 
     /**

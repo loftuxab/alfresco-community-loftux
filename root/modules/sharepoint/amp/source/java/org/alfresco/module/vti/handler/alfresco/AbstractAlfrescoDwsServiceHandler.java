@@ -318,7 +318,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         // setting the Links list for current document workspace site
         List<LinkBean> linksList = doGetDwsLinks(dwsInfo);
         dwsData.setLinksList(linksList);
-
+        
         dwsData.setDocLibUrl(host + context + dws + "/documentLibrary.vti");
 
         dwsData.setLastUpdate(lastUpdate);

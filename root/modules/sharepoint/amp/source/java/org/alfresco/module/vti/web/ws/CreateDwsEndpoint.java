@@ -76,7 +76,7 @@ public class CreateDwsEndpoint extends AbstractEndpoint
         titlePath.setNamespaceContext(nc);
         Element title = (Element) titlePath.selectSingleNode(soapRequest.getDocument().getRootElement());
 
-        String parentDws = getDwsForCreationFromUri(soapRequest);           
+        String parentDws = getDwsForCreationFromUri(soapRequest);
         DwsBean dws = handler.createDws(parentDws, null, null, title.getTextTrim(), null, getHost(soapRequest), getContext(soapRequest), (SessionUser) soapRequest.getSession().getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE));
         
         // creating soap response

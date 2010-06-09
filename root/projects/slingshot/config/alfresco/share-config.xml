@@ -75,12 +75,17 @@
    <!-- Document Library config section -->
    <config evaluator="string-compare" condition="DocumentLibrary">
 
-      <!--
-         Whether the folder Tree component should enumerate child folders or not.
-         This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
-      -->
       <tree>
+         <!--
+            Whether the folder Tree component should enumerate child folders or not.
+            This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
+         -->
          <evaluate-child-folders>true</evaluate-child-folders>
+         
+         <!--
+            Optionally limit the number of folders shown in treeview throughout Share.
+         -->
+         <maximum-folder-count>-1</maximum-folder-count>
       </tree>
 
       <!--
@@ -200,12 +205,17 @@
       -->
       <root-node>alfresco://company/home</root-node>
 
-      <!--
-         Whether the folder Tree component should enumerate child folders or not.
-         This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
-      -->
       <tree>
+         <!--
+            Whether the folder Tree component should enumerate child folders or not.
+            This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures.
+         -->
          <evaluate-child-folders>false</evaluate-child-folders>
+
+         <!--
+            Optionally limit the number of folders shown in treeview throughout Share.
+         -->
+         <maximum-folder-count>500</maximum-folder-count>
       </tree>
    </config>
 

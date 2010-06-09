@@ -74,6 +74,8 @@ public class VtiRequestDispatcher extends HttpServlet
     
     private SysAdminParams sysAdminParams;
 
+    private String context = ""; 
+    
     /**
      * <p>
      * VtiRequestDispatcher is initialized by list of {@link ActionMapping}.
@@ -152,12 +154,18 @@ public class VtiRequestDispatcher extends HttpServlet
         this.sysAdminParams = sysAdminParams;
     }
 
+    public void setContext(String context)
+    {
+        this.context = context;
+    }
     
     private String getContext()
     {
         return "/" + sysAdminParams.getAlfrescoContext();   
     }
 
+    
+    
     private void doActions(ServletRequest request, ServletResponse response) throws IOException, ServletException
     {
         HttpServletRequest httpRequest = (HttpServletRequest) request;

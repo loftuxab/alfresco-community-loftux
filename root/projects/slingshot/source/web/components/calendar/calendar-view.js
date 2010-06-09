@@ -243,7 +243,7 @@
             var id = Event.generateId(vEventEl);
             vEventEl.id = id;
             if ((this.calendarView===Alfresco.CalendarView.VIEWTYPE_WEEK) | (this.calendarView===Alfresco.CalendarView.VIEWTYPE_DAY)) {
-                this.calEventConfig.resizable = (Dom.hasClass(vEventEl,'allday')) ? false : true;
+                this.calEventConfig.resizable = (Dom.hasClass(vEventEl,'allday') || Dom.hasClass(vEventEl,'isoutlook')) ? false : true;
             }
               this.calEventConfig.draggable = Dom.hasClass(vEventEl,'allday') ? false : true;
               this.events[id] = new Alfresco.calendarEvent(vEventEl, this.dragGroup,this.calEventConfig);
@@ -378,10 +378,11 @@
                datum.desc = ev.description || '';
                datum.name = ev.title;
                datum.where = ev.where;
+               datum.isoutlook = ev.isoutlook == "true" ? "isoutlook" : "";
                datum.contEl = 'div';
                datum.from = dateFormat(date,dateFormat.masks.isoDate)+'T'+ev.start;
                datum.to =dateFormat(endDate,dateFormat.masks.isoDate)+'T'+ev.end; 
-               datum.uri = '/calendar/event/'+this.options.siteId+'/'+ev.name;
+               datum.uri = '/calendar/event/'+this.options.siteId+'/'+ev.name + '?date=' + dateFormat(date,dateFormat.masks.isoDate);
                datum.hidden ='';
                datum.allday = '';
                datum.el = 'div';
@@ -707,13 +708,14 @@
             "start":calEvent.getData('dtstart').split('T')[1].substring(0,5),
             "todate":dateFormat(dte, "dddd, d mmmm yyyy"),
             "end":calEvent.getData('dtend').split('T')[1].substring(0,5),
-            'tags':calEvent.getData('category')
+            'tags':calEvent.getData('category'),
+            'docfolder': '*NOT_CHANGE*'
         };
 
         Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.PUT,
-            url: Alfresco.constants.PROXY_URI + 'calendar/'+eventUri.split('/calendar/')[1]+'?page=calendar',
+            url: Alfresco.constants.PROXY_URI + 'calendar/'+eventUri.split('/calendar/')[1]+'&page=calendar',
             dataObj : dataObj,
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -1264,7 +1266,7 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper() {
 })();
 
 Alfresco.CalendarHelper.addTemplate('vevent',
-    '<{el} class="vevent {allday} {hidden} theme-bg-color-1 theme-border-2"> ' +
+    '<{el} class="vevent {allday} {hidden} {isoutlook} theme-bg-color-1 theme-border-2"> ' +
 	'<{contEl}>' +
 		'<p class="dates">' +
 		'<span class="dtstart" title="{from}">{start}</span> - ' +
@@ -1390,6 +1392,121 @@ Alfresco.util.DialogManager = ( function () {
                  }
                };
              }();
+
+             var browseButton = Alfresco.util.createYUIButton(this, "browse-button", function()
+             {
+                if (!this.browsePanel)
+                {
+                   this.hide();
+                   Alfresco.util.Ajax.request(
+                   {
+                      url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/browse-docfolder",
+                      dataObj: {site: this.options.site},
+                      successCallback:
+                      {
+                         fn: function(response)
+                         {
+                            var containerDiv = document.createElement("div");
+                            containerDiv.innerHTML = response.serverResponse.responseText;
+                            var panelDiv = Dom.getFirstChild(containerDiv);
+                            this.browsePanel = Alfresco.util.createYUIPanel(panelDiv);
+                            var parentDialog = this;
+                            var selectedDocfolder = Dom.get(parentDialog.id + "-docfolder").value;
+
+                            Alfresco.util.createYUIButton(this.browsePanel, "ok", function()
+                            {
+                               if (selectedDocfolder.charAt(selectedDocfolder.length - 1) == '/')
+                               {
+                                  selectedDocfolder = selectedDocfolder.substring(0, selectedDocfolder.length - 1);
+                               }
+                               Dom.get(parentDialog.id + "-docfolder").value = selectedDocfolder;
+                               parentDialog.browsePanel.hide();
+                               parentDialog.show();
+                            });
+
+                            Alfresco.util.createYUIButton(this.browsePanel, "cancel", function()
+                            {
+                               parentDialog.browsePanel.hide();
+                               parentDialog.show();
+                            });
+
+                            Alfresco.util.createTwister("twister");
+                            var tree = new YAHOO.widget.TreeView("treeview");
+                            tree.setDynamicLoad(function(node, fnLoadComplete) 
+                            {
+                               var nodePath = node.data.path;
+                               var uri = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode/site/" + $combine(encodeURIComponent(parentDialog.options.site), encodeURIComponent("documentLibrary"), Alfresco.util.encodeURIPath(nodePath));
+                               var callback =
+                               {
+                                  success: function (oResponse)
+                                  {
+                                     var results = YAHOO.lang.JSON.parse(oResponse.responseText), item, treeNode;
+                                     if (results.items)
+                                     {
+                                        for (var i = 0, j = results.items.length; i < j; i++)
+                                        {
+                                           item = results.items[i];
+                                           item.path = $combine(nodePath, item.name);
+                                           treeNode = _buildTreeNode(item, node, false);
+                                           if (!item.hasChildren)
+                                           {
+                                              treeNode.isLeaf = true;
+                                           }
+                                        }
+                                     }
+                                     oResponse.argument.fnLoadComplete();
+                                  },
+
+                                  failure: function (oResponse)
+                                  {
+                                     Alfresco.logger.error("", oResponse);
+                                  },
+
+                                  argument:
+                                  {
+                                     "node": node,
+                                     "fnLoadComplete": fnLoadComplete
+                                  },
+
+                                  scope: this
+                               };
+
+                               YAHOO.util.Connect.asyncRequest('GET', uri, callback);
+                            });
+
+                            tree.subscribe("clickEvent", function (args)
+                            {
+                               selectedDocfolder =  "documentLibrary" + args.node.data.path;
+                            });
+
+                            tree.subscribe("collapseComplete", function(node)
+                            {
+                               selectedDocfolder = "documentLibrary" + node.data.path;
+                            });
+
+                            var tempNode = _buildTreeNode(
+                            {
+                               name: "documentLibrary",
+                               path: "/",
+                               nodeRef: ""
+                            }, tree.getRoot(), false);
+
+                            tree.render();
+                            this.browsePanel.show();
+                         },
+                         scope: this
+                      },
+                      failureMessage: "Could not load dialog template from '" + Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/browse-docfolder" + "'.",
+                      scope: this,
+                      execScripts: true
+                   });
+                }
+                else
+                {
+                   this.hide();
+                   this.browsePanel.show();
+                }
+             });
 
             /**
                * Button declarations that, when clicked, display

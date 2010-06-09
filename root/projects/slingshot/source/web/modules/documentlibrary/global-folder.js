@@ -85,7 +85,17 @@
        * @final
        * @default 1
        */
-      VIEW_MODE_REPOSITORY: 1
+      VIEW_MODE_REPOSITORY: 1,
+
+      /**
+       * "User Home" view mode constant.
+       *
+       * @property VIEW_MODE_USERHOME
+       * @type integer
+       * @final
+       * @default 2
+       */
+      VIEW_MODE_USERHOME: 2
    });
 
    YAHOO.extend(Alfresco.module.DoclibGlobalFolder, Alfresco.component.Base,
@@ -137,6 +147,15 @@
           * @default "alfresco://company/home"
           */
          nodeRef: "alfresco://company/home",
+
+         /**
+          * NodeRef representing root container in user home view mode
+          *
+          * @property userHome
+          * @type string
+          * @default "alfresco://user/home"
+          */
+         userHome: "alfresco://user/home",
 
          /**
           * Initial path to expand on module load
@@ -206,17 +225,45 @@
          allowedViewModes:
          [
             DLGF.VIEW_MODE_SITE,
-            DLGF.VIEW_MODE_REPOSITORY
+            DLGF.VIEW_MODE_REPOSITORY,
+            DLGF.VIEW_MODE_USERHOME
          ],
 
          /**
-          * Evaluate child folders flag
+          * Evaluate child folders flag (Site mode)
           *
-          * @property evaluateChildFolders
+          * @property evaluateChildFoldersSite
           * @type boolean
           * @default true
           */
-         evaluateChildFolders: true
+         evaluateChildFoldersSite: true,
+
+         /**
+          * Maximum folder count configuration setting (Site mode)
+          *
+          * @property maximumFolderCountSite
+          * @type int
+          * @default -1
+          */
+         maximumFolderCountSite: -1,
+
+         /**
+          * Evaluate child folders flag (Repo mode)
+          *
+          * @property evaluateChildFoldersRepo
+          * @type boolean
+          * @default true
+          */
+         evaluateChildFoldersRepo: true,
+
+         /**
+          * Maximum folder count configuration setting (Repo mode)
+          *
+          * @property maximumFolderCountRepo
+          * @type int
+          * @default -1
+          */
+         maximumFolderCountRepo: -1
       },
       
       /**
@@ -394,6 +441,15 @@
                         {
                            tempNode.isLeaf = true;
                         }
+                     }
+                     
+                     if (results.resultsTrimmed)
+                     {
+                        tempNode = new YAHOO.widget.TextNode(
+                        {
+                           label: "&lt;" + this.msg("message.folders-trimmed") + "&gt;",
+                           style: "folders-trimmed"
+                        }, node, false);
                      }
                   }
                   
@@ -599,7 +655,7 @@
          {
             Dom.addClass(this.id + "-wrapper", "repository-mode");
             // Build the TreeView widget
-            this._buildTree(this.options.nodeRef);
+            this._buildTree(viewMode == DLGF.VIEW_MODE_USERHOME ? this.options.userHome : this.options.nodeRef);
             this.onPathChanged(this.options.path ? this.options.path : "/");
          }
       },
@@ -817,7 +873,7 @@
          var node = args.node,
             userAccess = node.data.userAccess;
          
-         if ((userAccess && userAccess.create) || (node.data.nodeRef == "") || (node.data.nodeRef == "alfresco://company/home"))
+         if ((userAccess && userAccess.create) || (node.data.nodeRef == "") || (node.data.nodeRef.indexOf("alfresco://") === 0))
          {
             this.onPathChanged(node.data.path);
             this._updateSelectedNode(node);
@@ -909,7 +965,21 @@
          
          var fnSuccess = function DLGF__pSP_fnSuccess(response, sitePicker)
          {
-            var sites = response.json, element, site, onclick, i, j, firstSite = null;
+            var sites = response.json, element, site, i, j, firstSite = null;
+            
+            var fnClick = function DLGF_pSP_onclick(site)
+            {
+               return function()
+               {
+                  YAHOO.Bubbling.fire("siteChanged",
+                  {
+                     site: site.shortName,
+                     siteTitle: site.title,
+                     eventGroup: me
+                  });
+                  return false;
+               };
+            };
             
             if (sites.length > 0)
             {
@@ -925,22 +995,8 @@
                   Dom.addClass(element, "last");
                }
 
-               onclick = function DLGF_pSP_onclick(site)
-               {
-                  return function()
-                  {
-                     YAHOO.Bubbling.fire("siteChanged",
-                     {
-                        site: site.shortName,
-                        siteTitle: site.title,
-                        eventGroup: me
-                     });
-                     return false;
-                  };
-               }(site);
-
                element.innerHTML = '<a rel="' + site.shortName + '" href="#""><h4>' + $html(site.title) + '</h4>' + '<span>' + $html(site.description) + '</span></a>';
-               element.onclick = onclick;
+               element.onclick = fnClick(site);
                sitePicker.appendChild(element);
             }
             
@@ -984,8 +1040,21 @@
          
          var fnSuccess = function DLGF__pSP_fnSuccess(response, containerPicker)
          {
-            var containers = response.json.containers, element, container, onclick, i, j;
+            var containers = response.json.containers, element, container, i, j;
             this.containers = {};
+            
+            var fnClick = function DLGF_pCP_onclick(containerName)
+            {
+               return function()
+               {
+                  YAHOO.Bubbling.fire("containerChanged",
+                  {
+                     container: containerName,
+                     eventGroup: me
+                  });
+                  return false;
+               };
+            };
             
             for (i = 0, j = containers.length; i < j; i++)
             {
@@ -997,21 +1066,8 @@
                   Dom.addClass(element, "last");
                }
 
-               onclick = function DLGF_pCP_onclick(containerName)
-               {
-                  return function()
-                  {
-                     YAHOO.Bubbling.fire("containerChanged",
-                     {
-                        container: containerName,
-                        eventGroup: me
-                     });
-                     return false;
-                  };
-               }(container.name);
-
                element.innerHTML = '<a rel="' + container.name + '" href="#"><h4>' + container.name + '</h4>' + '<span>' + container.description + '</span></a>';
-               element.onclick = onclick;
+               element.onclick = fnClick(container.name);
                containerPicker.appendChild(element);
             }
 
@@ -1060,7 +1116,22 @@
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
 
-         var rootLabel = (this.options.viewMode == DLGF.VIEW_MODE_SITE ? (this.options.containerType == "dod:filePlan" ? "node.root-filePlan" : "node.root-sites") : "node.root-repository");
+         var rootLabel = "location.path.repository";
+         if (this.options.viewMode == DLGF.VIEW_MODE_SITE)
+         {
+            if (this.options.containerType == "dod:filePlan")
+            {
+               rootLabel = "location.path.filePlan";
+            }
+            else
+            {
+               rootLabel = "location.path.documents";
+            }
+         }
+         else if (this.options.viewMode == DLGF.VIEW_MODE_USERHOME)
+         {
+            rootLabel = "location.path.userHome";
+         }
 
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
@@ -1122,37 +1193,47 @@
        * @method _buildTreeNodeUrl
        * @param path {string} Path to query
        */
-       _buildTreeNodeUrl: function DLGF__buildTreeNodeUrl(path)
-       {
-          var uriTemplate = Alfresco.constants.PROXY_URI;
-          if (this.options.viewMode == DLGF.VIEW_MODE_SITE)
-          {
-             if (this.options.containerType == "dod:filePlan")
-             {
-                uriTemplate += "slingshot/doclib/dod5015/treenode/site/{site}/{container}{path}";
-             }
-             else
-             {
-                uriTemplate += "slingshot/doclib/treenode/site/{site}/{container}{path}";
-             }
-          }
-          else
-          {
-             uriTemplate += "slingshot/doclib/treenode/node/{nodeRef}{path}";
-          }
+      _buildTreeNodeUrl: function DLGF__buildTreeNodeUrl(path)
+      {
+         var uriTemplate = Alfresco.constants.PROXY_URI;
+         if (this.options.viewMode == DLGF.VIEW_MODE_SITE)
+         {
+            if (this.options.containerType == "dod:filePlan")
+            {
+               uriTemplate += "slingshot/doclib/dod5015/treenode/site/{site}/{container}{path}";
+            }
+            else
+            {
+               uriTemplate += "slingshot/doclib/treenode/site/{site}/{container}{path}";
+            }
+            uriTemplate += "?children=" + this.options.evaluateChildFoldersSite;
+            uriTemplate += "&max=" + this.options.maximumFolderCountSite;
+         }
+         else
+         {
+            if (this.options.viewMode == DLGF.VIEW_MODE_USERHOME)
+            {
+               uriTemplate += "slingshot/doclib/treenode/node/{userHome}{path}";
+            }
+            else
+            {
+               uriTemplate += "slingshot/doclib/treenode/node/{nodeRef}{path}";
+            }
+            uriTemplate += "?children=" + this.options.evaluateChildFoldersRepo;
+            uriTemplate += "&max=" + this.options.maximumFolderCountRepo;
+         }
 
-          uriTemplate += "?children=" + this.options.evaluateChildFolders;
+         var url = YAHOO.lang.substitute(uriTemplate,
+         {
+            site: encodeURIComponent(this.options.siteId),
+            container: encodeURIComponent(this.options.containerId),
+            nodeRef: this.options.nodeRef.replace(":/", ""),
+            userHome: this.options.userHome.replace(":/", ""),
+            path: Alfresco.util.encodeURIPath(path)
+         });
 
-          var url = YAHOO.lang.substitute(uriTemplate,
-          {
-             site: encodeURIComponent(this.options.siteId),
-             container: encodeURIComponent(this.options.containerId),
-             nodeRef: this.options.nodeRef.replace(":/", ""),
-             path: Alfresco.util.encodeURIPath(path)
-          });
-
-          return url;
-       }
+         return url;
+      }
    });
 
    /* Dummy instance to load optional YUI components early */

@@ -44,7 +44,7 @@ new Alfresco.DocumentVersions("${args.htmlid}").setOptions(
             <div class="actions">
                <span><a href="${url.context}/proxy/alfresco${version.downloadURL}" class="download">${msg("link.download")}</a></span>
                <#if version_index != 0>
-                  <span><a id="${args.htmlid}-revert-a-${version_index}" class="revert" href="#">${msg("link.revert")}</a></span>
+                  <span class="hidden"><a id="${args.htmlid}-revert-a-${version_index}" class="revert" href="#">${msg("link.revert")}</a></span>
                </#if>
             </div>
          </div>

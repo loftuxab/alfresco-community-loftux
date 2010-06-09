@@ -58,7 +58,7 @@ public class DeleteDwsEndpoint extends AbstractEndpoint
     public void execute(VtiSoapRequest soapRequest, VtiSoapResponse soapResponse) throws Exception   {
     	if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is started.");
-    	}       
+    	}
         
         handler.deleteDws(getDwsFromUri(soapRequest), (SessionUser) soapRequest.getSession().getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE));      
         

@@ -10,49 +10,62 @@
         <property name="transactionService" ref="transactionService" />  
         <property name="pathHelper" ref="vtiPathHelper"/>       
     </bean>
-      
+
     <bean id="dwsServiceHandler" class="org.alfresco.module.vti.handler.alfresco.v3.AlfrescoDwsServiceHandler">
-    	<property name="fileFolderService" ref="FileFolderService"/>
-    	<property name="nodeService" ref="NodeService"/>    	
-    	<property name="permissionService" ref="PermissionService"/>
-    	<property name="transactionService" ref="transactionService"/>
-    	<property name="authenticationService" ref="AuthenticationService"/>
-    	<property name="authenticationComponent" ref="AuthenticationComponent" />
-    	<property name="personService" ref="PersonService"/>    	 
-    	<property name="contentService" ref="ContentService" />    	 
-    	<property name="siteService" ref="SiteService" />
-    	<property name="shareUtils" ref="shareUtils" />  
-    	<property name="authorityService" ref="AuthorityService" />
-    	<property name="pathHelper" ref="vtiPathHelper"/>
-    	<property name="pagesMap">
-    		<map>
-    			<entry key="siteInBrowser">
-    				<value>${vti.share.siteInBrowser}</value>
-    			</entry>
-    			<entry key="siteSettings">
-    				<value>${vti.share.siteSettings}</value>
-    			</entry>
-    			<entry key="siteGroupMembership">
-    				<value>${vti.share.siteGroupMembership}</value>
-    			</entry>
-    			<entry key="userInformation">
-    				<value>${vti.share.userInformation}</value>
-    			</entry>
-    			<entry key="documentLibrary">
-    				<value>${vti.share.documentLibrary}</value>
-    			</entry>
-    			<entry key="documentDetails">
-    				<value>${vti.share.documentDetails}</value>
-    			</entry>   			
-    		</map>
-    	</property>	
+        <property name="fileFolderService" ref="FileFolderService"/>
+        <property name="nodeService" ref="NodeService"/>    	
+        <property name="permissionService" ref="PermissionService"/>
+        <property name="transactionService" ref="transactionService"/>
+        <property name="authenticationService" ref="AuthenticationService"/>
+        <property name="authenticationComponent" ref="AuthenticationComponent" />
+        <property name="personService" ref="PersonService"/>
+        <property name="contentService" ref="ContentService" />    	 
+        <property name="siteService" ref="SiteService" />
+        <property name="shareUtils" ref="shareUtils" />  
+        <property name="authorityService" ref="AuthorityService" />
+        <property name="pathHelper" ref="vtiPathHelper"/>
+        <property name="pagesMap">
+            <map>
+                <entry key="siteInBrowser">
+                    <value>${vti.share.siteInBrowser}</value>
+                </entry>
+                <entry key="siteSettings">
+                    <value>${vti.share.siteSettings}</value>
+                </entry>
+                <entry key="siteGroupMembership">
+                    <value>${vti.share.siteGroupMembership}</value>
+                </entry>
+                <entry key="userInformation">
+                    <value>${vti.share.userInformation}</value>
+                </entry>
+                <entry key="documentLibrary">
+                    <value>${vti.share.documentLibrary}</value>
+                </entry>
+                <entry key="documentDetails">
+                    <value>${vti.share.documentDetails}</value>
+                </entry>
+                <entry key="calendar">
+                    <value>${vti.share.calendar}</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="userGroupServiceHandler" class="org.alfresco.module.vti.handler.alfresco.v3.AlfrescoUserGroupServiceHandler">    	
+        <property name="personService" ref="PersonService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="siteService" ref="SiteService" />
+        <property name="transactionService" ref="transactionService" />
     </bean>
     
-    <bean id="userGroupServiceHandler" class="org.alfresco.module.vti.handler.alfresco.v3.AlfrescoUserGroupServiceHandler">    	
-    	<property name="personService" ref="PersonService"/>
-    	<property name="nodeService" ref="NodeService"/> 
-    	<property name="siteService" ref="SiteService" />
-    	<property name="transactionService" ref="transactionService" />   	   	
+    <bean id="meetingServiceHandler" class="org.alfresco.module.vti.handler.alfresco.v3.AlfrescoMeetingServiceHandler">
+        <property name="siteService" ref="SiteService" />
+        <property name="shareUtils" ref="shareUtils" />
+        <property name="authenticationService" ref="AuthenticationService"/>
+        <property name="transactionService" ref="transactionService" />
+        <property name="nodeService" ref="NodeService"/>
+        <property name="personService" ref="PersonService"/>
+        <property name="fileFolderService" ref="FileFolderService" />
     </bean>
 
     <bean id="vtiHandlerTarget" class="org.alfresco.module.vti.handler.alfresco.v3.AlfrescoMethodHandler">
@@ -127,6 +140,7 @@
         <property name="vtiHandler" ref="vtiHandler"/>
         <property name="vtiUserGroupServiceHandler" ref="userGroupServiceHandler"/>    
         <property name="authenticationService" ref="AuthenticationService" />
+        <property name="personService" ref="PersonService" />
         <property name="delegate" ref="SharepointAuthenticationHandler" />   
     </bean>
     

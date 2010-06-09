@@ -46,10 +46,26 @@
       <div class="yui-u first">${msg("label.enddate")}:</div>
       <div class="yui-u" id="${args.htmlid}-enddate"><#if result.to?exists>${result.to?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if><#if result.allday!='true'> ${msg("label.at")} ${result.end!""} </#if></div>
    </div>
+<#if result.recurrence!=''>
+   <div class="yui-gd">
+      <div class="yui-u first">${msg("label.recurrence")}:</div>
+      <div class="yui-u">${result.recurrence}</div>
+   </div>
+</#if>
+   <div class="yui-g">
+      <h2>${msg("label.documents")}</h2>
+   </div>
+   <div class="yui-gd">
+      <div class="yui-u first">${msg("label.docfolder")}:</div>
+      <div class="yui-u docfolder-label" id="${args.htmlid}-docfolder">${result.docfolder}</div>
+   </div>
    <br />
    <div class="bdft">
       <input type="submit" id="${args.htmlid}-edit-button" value="${msg("button.edit")}" />
       <input type="submit" id="${args.htmlid}-delete-button" value="${msg("button.delete")}" />
       <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
    </div>
+   <#if result.isoutlook == 'false'>
+   <div id="${args.htmlid}-edit-available" />
+   </#if>
 </div>

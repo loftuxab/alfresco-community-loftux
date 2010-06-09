@@ -29,7 +29,8 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+      Event = YAHOO.util.Event,
+      Selector = YAHOO.util.Selector;
 
    /**
     * Dashboard DocumentVersions constructor.
@@ -105,7 +106,7 @@
                Event.addListener(reverter, "click", function (event, obj)
                {
                   // Stop browser from using href attribute
-                  Event.preventDefault(event)
+                  Event.preventDefault(event);
 
                   // Find the index of the version link by looking at its id
                   version = versions[obj.versionIndex];
@@ -190,6 +191,15 @@
          if (!workingCopyMode)
          {
             Dom.removeClass(this.id + "-body", "hidden");
+            // Check if user has revert permissions (checkout the node & checkin on parent node)
+            if (args[1].metadata.parent.permissions.userAccess.create && args[1].documentDetails.permissions.userAccess.edit)
+            {
+               var revertEls = Selector.query("a.revert", this.id + "-body");
+               for (i = 0, il = revertEls.length; i < il; i++)
+               {
+                  Dom.removeClass(revertEls[i].parentNode, "hidden");
+               }
+            }
          }
       },
       

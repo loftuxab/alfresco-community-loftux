@@ -149,7 +149,7 @@
                      else
                      {
                         var div = Dom.get(this.id + "-iframeWrapper");
-                        div.innerHTML = response.serverResponse.responseText;
+                        div.innerHTML = response.serverResponse.responseText + '<div class="resize-mask"></div>';
                         var iframe = Dom.getFirstChildBy(div, function(node)
                         {
                            return (node.tagName.toUpperCase() == "IFRAME");
@@ -174,7 +174,6 @@
                {
                   fn: function WebView_doSetupForm_callback(form)
                   {
-                     form.addValidation(this.configDialog.id + "-webviewTitle", Alfresco.forms.validation.mandatory, null, "keyup");
                      form.addValidation(this.configDialog.id + "-url", Alfresco.forms.validation.mandatory, null, "blur");
                      form.addValidation(this.configDialog.id + "-url", Alfresco.forms.validation.url, null, "keyup");
                      form.setShowSubmitStateDynamically(true, false);

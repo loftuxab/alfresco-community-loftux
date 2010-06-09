@@ -949,3 +949,31 @@ div.theme-bg-color-7
 {
    border: 1px solid #c6c6c6 !important;
 }
+
+
+.docfolder-label
+{
+   overflow:auto;
+}
+
+.docfolder-input
+{
+   width: 203px; 
+   vertical-align: top; 
+   margin-top: 2px;
+}
+
+.tree-div
+{
+   height: 200px;
+   overflow: auto;
+   margin-left: 5px;
+}
+
+.ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover
+{
+   background-color: #F9FBFD;
+   cursor: pointer;
+   margin-left: 2px;
+   text-decoration: none;
+}

@@ -101,7 +101,7 @@ public class VtiResourceAction extends HttpServlet implements VtiAction
     private byte[] cacheResource(String resourceLocation, String alfrescoContext) throws IOException
     {
         InputStream input = new FileInputStream(this.getClass().getClassLoader().getResource("").getPath() + resourceLocation);
-
+      
         byte[] result = new byte[input.available()];
         input.read(result);
 

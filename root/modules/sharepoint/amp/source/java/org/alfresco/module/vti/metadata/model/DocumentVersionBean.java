@@ -32,7 +32,7 @@ public class DocumentVersionBean implements Serializable
      *
      */
     private static final long serialVersionUID = 8732427482027589331L;
-
+    
     // version id
     private String id;
 

@@ -283,7 +283,7 @@
                      this._enableRunRulesButton();
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        title: this.msg("label.failure"),
+                        title: this.msg("message.failure"),
                         text: this.msg("message.runRules-failure")
                      });                     
                   },

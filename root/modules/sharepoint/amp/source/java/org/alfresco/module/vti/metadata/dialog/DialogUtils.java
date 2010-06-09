@@ -67,7 +67,7 @@ public class DialogUtils
             }
             if (image == null)
             {
-                image = IMAGE_PREFIX + ext + IMAGE_POSTFIX;
+                image = IMAGE_PREFIX + ext + IMAGE_POSTFIX;                
                 if (DialogUtils.class.getClassLoader().getResourceAsStream("../../" + image) != null)
                 {
                     try
