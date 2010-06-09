@@ -93,6 +93,16 @@
       options:
       {
          /**
+          * Working mode: Site or Repository.
+          * Affects how actions operate, e.g. actvities are not posted in Repository mode.
+          * 
+          * @property workingMode
+          * @type number
+          * @default Alfresco.doclib.MODE_SITE
+          */
+         workingMode: Alfresco.doclib.MODE_SITE,
+
+         /**
           * Current siteId.
           * 
           * @property siteId
@@ -341,10 +351,21 @@
             {
                fn: function DLTB_onNewFolder_failure(response)
                {
-                  Alfresco.util.PopupManager.displayMessage(
+                  if (response)
                   {
-                     text: this.msg("message.new-folder.failure")
-                  });
+                     var folderName = response.config.dataObj["prop_cm_name"];
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.new-folder.failure", folderName)
+                     });
+                  }
+                  else
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.failure")
+                     });
+                  }
                },
                scope: this
             }

@@ -3,7 +3,7 @@
    {
       userId: "${user.name}",
       profile: {
-         isMutable: ${((profile.capabilities.isMutable)!false)?string},
+         isEditable: ${isEditable?string},
          name: "<#if profile.name??>${profile.name?js_string}</#if>",
          lastName: "<#if profile.lastName??>${profile.lastName?js_string}</#if>",
          firstName: "<#if profile.firstName??>${profile.firstName?js_string}</#if>",
@@ -35,7 +35,7 @@
 <#if profile.lastName??><#assign displayname=displayname + " " + profile.lastName></#if>
 <div id="${el}-body" class="profile">
    <div id="${el}-readview" class="hidden">
-      <#if profile.capabilities.isMutable>
+      <#if isEditable>
       <div class="editcolumn">
          <div class="btn-edit"><button id="${el}-button-edit" name="edit">${msg("button.editprofile")}</button></div>
       </div>
@@ -143,7 +143,7 @@
       </div>
    </div>
    
-   <#if profile.capabilities.isMutable>
+   <#if isEditable>
    <div id="${el}-editview" class="hidden">
       <form id="${htmlid}-form" action="${url.context}/service/components/profile/userprofile" method="post">
       
@@ -152,34 +152,24 @@
          <div class="reqcolumn">&nbsp;*</div>
          <div class="rightcolumn">
             <span class="label"><label for="${el}-input-lastName">${msg("label.lastname")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-lastName" value="" /></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-lastName" value="" <@immutablefield field="lastName" /> /></span>
          </div>
          <div class="leftcolumn">
             <span class="label"><label for="${el}-input-firstName">${msg("label.firstname")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-firstName" value="" />&nbsp;*</span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-firstName" value="" <@immutablefield field="firstName" /> />&nbsp;*</span>
          </div>
       </div>
       <div class="drow">
          <div class="reqcolumn">&nbsp;</div>         
          <div class="leftcolumn">
             <span class="label"><label for="${el}-input-jobtitle">${msg("label.jobtitle")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-jobtitle" value="" /></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-jobtitle" value="" <@immutablefield field="jobtitle" /> /></span>
          </div>
          <div class="rightcolumn">
             <span class="label"><label for="${el}-input-location">${msg("label.location")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-location" value="" /></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-location" value="" <@immutablefield field="location" /> /></span>
          </div>
       </div>
-      <!--
-      <div class="drow">
-         <div class="leftcolumn">
-            <span class="label">${msg("label.timezone")}:</span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-timezone" /></span>
-         </div>
-         <div class="rightcolumn">
-         </div>
-      </div>
-      -->
       <div class="row">
          <span class="label"><label for="${el}-input-bio">${msg("label.bio")}:</label></span>
          <span class="input"><textarea id="${el}-input-bio" name="${el}-text-biography" rows="5" cols="60"></textarea></span>
@@ -200,67 +190,61 @@
       <div class="header-bar">${msg("label.contactinfo")}</div>
       <div class="row">
          <span class="label"><label for="${el}-input-telephone">${msg("label.telephone")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-telephone" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-telephone" value="" <@immutablefield field="telephone" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-mobile">${msg("label.mobile")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-mobile" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-mobile" value="" <@immutablefield field="mobile" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-email">${msg("label.email")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-email" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-email" value="" <@immutablefield field="email" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-skype">${msg("label.skype")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-skype" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-skype" value="" <@immutablefield field="skype" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-instantmsg">${msg("label.im")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-instantmsg" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-instantmsg" value="" <@immutablefield field="instantmsg" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-googleusername">${msg("label.googleusername")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-googleusername" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-googleusername" value="" <@immutablefield field="googleusername" /> /></span>
       </div>
       
       <div class="header-bar">${msg("label.companyinfo")}</div>
       <div class="row">
          <span class="label"><label for="${el}-input-organization">${msg("label.name")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-organization" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-organization" value="" <@immutablefield field="organization" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companyaddress1">${msg("label.address")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress1" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress1" value="" <@immutablefield field="companyaddress1" /> /></span>
       </div>
       <div class="row">
          <span class="label"></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress2" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress2" value="" <@immutablefield field="companyaddress2" /> /></span>
       </div>
       <div class="row">
          <span class="label"></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress3" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress3" value="" <@immutablefield field="companyaddress3" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companypostcode">${msg("label.postcode")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companypostcode" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companypostcode" value="" <@immutablefield field="companypostcode" /> /></span>
       </div>
-      <!--
-      <div class="row">
-         <span class="label">${msg("label.map")}:</span>
-         <span class="check"><input type="checkbox" id="${el}-input-showmap" /> ${msg("label.showmap")}</span>
-      </div>
-      -->
       <div class="row">
          <span class="label"><label for="${el}-input-companytelephone">${msg("label.telephone")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companytelephone" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companytelephone" value="" <@immutablefield field="companytelephone" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companyfax">${msg("label.fax")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyfax" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyfax" value="" <@immutablefield field="companyfax" /> /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companyemail">${msg("label.email")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyemail" value="" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyemail" value="" <@immutablefield field="companyemail" /> /></span>
       </div>
       
       <hr/>
@@ -275,3 +259,7 @@
    </#if>
 
 </div>
+
+<#macro immutablefield field>
+<#if profile.nativeUser.isImmutableProperty(field)>disabled="true"</#if>
+</#macro>

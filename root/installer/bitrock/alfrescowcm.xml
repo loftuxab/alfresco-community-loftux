@@ -14,11 +14,11 @@
     <folderList>
         <folder>
             <description>Program Files</description>
-            <destination>${alfrescowcm_virtualtomcat_location}</destination>
+            <destination>${alfrescowcm_virtualtomcat_location}/virtual-tomcat</destination>
             <name>virtualtomcat</name>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionFile origin="${alfrescowcm_source_directory}/*" allowWildcards="1" />
+                <distributionFile origin="${alfrescowcm_source_directory}/virtual-tomcat/*" allowWildcards="1" />
             </distributionFileList>
         </folder>
         <folder>

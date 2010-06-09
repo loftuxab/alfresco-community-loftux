@@ -689,8 +689,6 @@ body.yui-skin-yellowTheme .categoryview .category .ygtvdepthcell
 
 /* filter list link */
 
-.yui-skin-yellowTheme .treeview .selected > table,
-.yui-skin-yellowTheme .categoryview .selected > table,
 .yui-skin-yellowTheme .filter li.selected, 
 .yui-skin-yellowTheme .tags li.selected,
 .archive li.selected,
@@ -698,6 +696,13 @@ body.yui-skin-yellowTheme .categoryview .category .ygtvdepthcell
 body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
 #Share.yui-skin-yellowTheme .treeview .selected,
 #Share.yui-skin-yellowTheme .categoryview .selected
+{
+   background-color: #ffee9e;
+}
+
+/* these rules need to be separate from the above for ie6 */
+.yui-skin-yellowTheme .treeview .selected > table,
+.yui-skin-yellowTheme .categoryview .selected > table
 {
    background-color: #ffee9e;
 }

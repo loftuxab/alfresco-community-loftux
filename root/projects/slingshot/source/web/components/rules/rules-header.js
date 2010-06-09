@@ -257,8 +257,11 @@
                {
                   "actionedUponNode": this.options.nodeRef.toString(),
                   "actionDefinitionName": "execute-all-rules",
-                  "execute-inherited-rules": true, 
-                  "run-all-rules-on-children": (runMode == "run-recursive")
+                  "parameterValues":
+                  {
+                     "execute-inherited-rules": true,
+                     "run-all-rules-on-children": (runMode == "run-recursive")
+                  }
                },
                successCallback:
                {

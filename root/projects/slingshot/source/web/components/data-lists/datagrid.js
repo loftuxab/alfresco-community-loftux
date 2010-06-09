@@ -774,6 +774,7 @@
          /**
           * YUI History - page
           */
+         var me = this;
          var handlePagination = function DataGrid_handlePagination(state, me)
          {
             me.widgets.paginator.setState(state);
@@ -790,6 +791,7 @@
             YAHOO.util.History.register("page", bookmarkedPage, function DataGrid_onHistoryManagerPageChanged(newPage)
             {
                Alfresco.logger.debug("HistoryManager: page changed:" + newPage);
+               me.widgets.paginator.setPage(parseInt(newPage, 10));
             }, null, this);
 
             // YUI Paginator definition
@@ -938,6 +940,11 @@
          this.widgets.dataTable.handleDataReturnPayload = function DataGrid_handleDataReturnPayload(oRequest, oResponse, oPayload)
          {
             me.totalRecords = oResponse.meta.totalRecords;
+            oResponse.meta.pagination = 
+            {
+               rowsPerPage: me.options.pageSize,
+               recordOffset: (me.currentPage - 1) * me.options.pageSize
+            };
             return oResponse.meta;
          };
 
@@ -1213,6 +1220,8 @@
       {
          var recordSet = this.widgets.dataTable.getRecordSet(),
             checks = Selector.query('input[type="checkbox"]', this.widgets.dataTable.getTbodyEl()),
+            aPageRecords = this.widgets.paginator.getPageRecords(),
+            startRecord = aPageRecords[0],
             len = checks.length,
             record, i, fnCheck;
 
@@ -1248,7 +1257,7 @@
 
          for (i = 0; i < len; i++)
          {
-            record = recordSet.getRecord(i);
+            record = recordSet.getRecord(i + startRecord);
             this.selectedItems[record.getData("nodeRef")] = checks[i].checked = fnCheck(record.getData("type"), checks[i].checked);
          }
          
@@ -1455,23 +1464,23 @@
                filter: strFilter
             };
             
-            if (this.options.usePagination)
-            {
-               this.currentPage = 1;
-               objNav.page = "1";
-            }
-
             // Initial navigation won't fire the History event
             if (obj.datagridFirstTimeNav)
             {
                this._updateDataGrid.call(this,
                {
                   filter: filter,
-                  page: 1
+                  page: this.currentPage
                });
             }
             else
             {
+               if (this.options.usePagination)
+               {
+                  this.currentPage = 1;
+                  objNav.page = "1";
+               }
+
                Alfresco.logger.debug("DataGrid_onChangeFilter: objNav = ", objNav);
                YAHOO.util.History.multiNavigate(objNav);
             }
@@ -1724,7 +1733,7 @@
             
             Alfresco.logger.debug("currentFilter was:", this.currentFilter, "now:", successFilter);
             this.currentFilter = successFilter;
-            this.currentPage = 1;
+            this.currentPage = p_obj.page || 1;
             Bubbling.fire("filterChanged", successFilter);
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };

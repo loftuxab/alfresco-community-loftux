@@ -91,8 +91,8 @@
        */
       onReady: function UP_onReady()
       {
-         // Allow edit if the authentication service lets us
-         if (this.options.profile.isMutable)
+         // Allow edit if profile is editable
+         if (this.options.profile.isEditable)
          {
             // Buttons
             this.widgets.upload = Alfresco.util.createYUIButton(this, "button-upload", this.onUpload);

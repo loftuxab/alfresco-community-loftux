@@ -714,7 +714,10 @@ public class RpcPacket {
     int len = DataPacker.getInt(m_buffer, m_pos);
     m_pos += 4;
     if ( len > 0) {
-      System.arraycopy(m_buffer, m_pos, buf, 0, len);
+        if ( len > buf.length)
+            System.arraycopy(m_buffer, m_pos, buf, 0, buf.length);
+        else
+            System.arraycopy(m_buffer, m_pos, buf, 0, len);
       m_pos += len;
     }
     alignPosition();

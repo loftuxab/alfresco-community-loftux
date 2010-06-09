@@ -29,6 +29,7 @@ import org.alfresco.jlan.server.SrvSession;
 import org.alfresco.jlan.server.filesys.DiskInterface;
 import org.alfresco.jlan.server.filesys.FileStatus;
 import org.alfresco.jlan.server.filesys.NetworkFile;
+import org.alfresco.jlan.server.filesys.TransactionalFilesystemInterface;
 import org.alfresco.jlan.server.filesys.TreeConnection;
 
 /**
@@ -198,6 +199,14 @@ public class NetworkFileCache {
 				}
 			}
 		}
+		
+		/**
+		 * Mark the file entry as closed
+		 */
+		public final void markAsClosed() {
+		    if ( m_file != null)
+		        m_closed = true;
+		}
 	};
 
 	/**
@@ -302,18 +311,34 @@ public class NetworkFileCache {
 										
 										m_authenticator.setCurrentUser( fentry.getSession(), fentry.getSession().getNFSClientInformation());
 									
-										// Close the network file
-	
-										fentry.closeFile();
-	
-										// Update the file entry timeout to keep the file in the cache for a while
-	
-										fentry.updateTimeout(System.currentTimeMillis() + m_fileCloseTmo);
-	
-										// DEBUG
-	
-										if (Debug.EnableInfo && hasDebug())
-											Debug.println("NFSFileExpiry: Closed file="	+ fentry.getFile().getFullName() + ", fid="	+ fileId + " (cached)");
+										// Check if the filesystem is transactional, in this case only mark the file as closed
+										
+										if ( fentry.getConnection().getInterface() instanceof TransactionalFilesystemInterface) {
+										    
+										    // Mark the file as closed, wait for second stage expiry to actually close the file
+										    
+										    fentry.markAsClosed();
+
+										    // DEBUG
+									        
+                                            if (Debug.EnableInfo && hasDebug())
+                                                Debug.println("NFSFileExpiry: Marked as closed file=" + fentry.getFile().getFullName() + ", fid=" + fileId + " (cached)");
+										}
+										else {
+										    
+    										// Close the network file
+    	
+    										fentry.closeFile();
+    	
+    										// Update the file entry timeout to keep the file in the cache for a while
+    	
+    										fentry.updateTimeout(System.currentTimeMillis() + m_fileCloseTmo);
+    	
+    										// DEBUG
+    	
+    										if (Debug.EnableInfo && hasDebug())
+    											Debug.println("NFSFileExpiry: Closed file="	+ fentry.getFile().getFullName() + ", fid="	+ fileId + " (cached)");
+										}
 										
 										// Clear the user context
 										

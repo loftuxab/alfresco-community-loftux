@@ -272,7 +272,7 @@ public class MemoryNetworkFile extends NetworkFile implements NetworkFileStateIn
     // Create a dummy file state
         
     if ( m_state == null)
-      m_state = new FileState(getFullName());
+      m_state = new FileState(getFullName(), false);
     return m_state;
   }
 }

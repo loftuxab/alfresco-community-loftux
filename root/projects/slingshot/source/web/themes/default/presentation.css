@@ -704,9 +704,9 @@ body.yui-skin-default .yui-columnbrowser .yui-carousel-content li.yui-columnbrow
    background-color: #D2E5F2;
 }
 
-/* this rule needs to be separate from the above for ie6 */
-
-.yui-skin-default .treeview .selected > table
+/* these rules need to be separate from the above for ie6 */
+.yui-skin-default .treeview .selected > table,
+.yui-skin-default .categoryview .selected > table
 {
    background-color: #D2E5F2;
 }

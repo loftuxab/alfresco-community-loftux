@@ -293,7 +293,7 @@
                {
                   me.onEditList(listName);
                }
-               Event.stopEvent(e);
+               Event.stopEvent(e || window.event);
             };
          };
 
@@ -310,7 +310,7 @@
                {
                   me.onDeleteList(listName);
                }
-               Event.stopEvent(e);
+               Event.stopEvent(e || window.event);
             };
          };
 

@@ -247,7 +247,7 @@
             var userAccess = assetData.permissions.userAccess,
                actionLabels = assetData.actionLabels || {},
                actions = YAHOO.util.Selector.query("div", actionsContainer),
-               action, actionPermissions, i, ii, j, jj, actionAllowed, aTag, spanTag;
+               action, actionPermissions, aP, i, ii, j, jj, actionAllowed, aTag, spanTag;
 
             // Inject special-case permissions for inline editing
             if (assetData.mimetype in this.options.inlineEditMimetypes)
@@ -286,7 +286,9 @@
                   actionPermissions = aTag.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
                   {
-                     if (!userAccess[actionPermissions[j]])
+                     aP = actionPermissions[j];
+                     // Support "negative" permissions
+                     if ((aP.charAt(0) == "~") ? !!userAccess[aP.substring(1)] : !userAccess[aP])
                      {
                         actionAllowed = false;
                         break;

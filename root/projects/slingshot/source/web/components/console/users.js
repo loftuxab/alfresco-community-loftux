@@ -580,10 +580,6 @@
                for (var i = 0, j = person.groups.length; i < j; person.groups[i++].toString = fnGroupToString) {}
                fnSetter("-view-groups", person.groups.join(", "));
                
-               // Button visibility based on account mutability
-               parent.widgets.edituserButton.set("disabled", !person.capabilities.isMutable);
-               parent.widgets.deleteuserButton.set("disabled", !person.capabilities.isMutable);
-               
                // Make main panel area visible
                Dom.setStyle(parent.id + "-view-main", "visibility", "visible");
             };
@@ -1069,6 +1065,13 @@
                {
                   Dom.get(parent.id + id).value = val;
                };
+               var fnDisabler = function(id, propId, map)
+               {
+                  if (map["{http://www.alfresco.org/model/content/1.0}" + propId])
+                  {
+                     Dom.get(parent.id + id).setAttribute("disabled", true);
+                  }
+               };
                
                var person = YAHOO.lang.JSON.parse(res.serverResponse.responseText);
                
@@ -1087,8 +1090,17 @@
                   fullName = firstName + ' ' + (lastName ? lastName : "");
                Dom.get(parent.id + "-update-title").innerHTML = $html(fullName);
                fnSetter("-update-firstname", firstName);
+               fnDisabler("-update-firstname", "firstName", person.immutability);
                fnSetter("-update-lastname", lastName);
+               fnDisabler("-update-lastname", "lastName", person.immutability);
                fnSetter("-update-email", person.email);
+               fnDisabler("-update-email", "email", person.immutability);
+               if (!person.capabilities.isMutable)
+               {
+                  Dom.get(parent.id + "-update-old-password").setAttribute("disabled", true);
+                  Dom.get(parent.id + "-update-password").setAttribute("disabled", true);
+                  Dom.get(parent.id + "-update-verifypassword").setAttribute("disabled", true);
+               }
                fnSetter("-update-old-password", "");
                fnSetter("-update-password", "");
                fnSetter("-update-verifypassword", "");

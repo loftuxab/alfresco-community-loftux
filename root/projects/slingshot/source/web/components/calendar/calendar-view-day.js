@@ -26,12 +26,12 @@
 ( function() 
 {
     
-var Dom = YAHOO.util.Dom,
-    Event = YAHOO.util.Event,
-    Selector = YAHOO.util.Selector,
-    fromISO8601 = Alfresco.util.fromISO8601,
-    toISO8601 = Alfresco.util.toISO8601,
-    dateFormat = Alfresco.thirdparty.dateFormat;
+   var Dom = YAHOO.util.Dom,
+       Event = YAHOO.util.Event,
+       Selector = YAHOO.util.Selector,
+       fromISO8601 = Alfresco.util.fromISO8601,
+       toISO8601 = Alfresco.util.toISO8601,
+       dateFormat = Alfresco.thirdparty.dateFormat;
 
 YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
    /**
@@ -62,7 +62,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
     * @method getEvents
     *  
     */
-   getEvents : function CalendarView_getEvents()
+   getEvents : function CalendarDayView_getEvents()
    {
       Alfresco.util.Ajax.request(
       {
@@ -122,7 +122,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
         var id = Event.generateId(vEventEl);
         vEventEl.id = id;
         //all day
-        if (ev.start===ev.end) 
+        if (ev.isAllDay) 
         {
           this.renderAllDayEvents(vEventEl,ev);
         }
@@ -245,37 +245,6 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
          }
       }
      }
-   },
-   
-   /**
-    * Adjusts height of specifed event depending on its duration
-    *  
-    * @method adjustHeightByHour
-    * @param el {object} Event element to adjust
-    */
-   _adjustHeightByHour : function CalendarWeekView_adjustHeightByHour(el)
-   {
-      var hourHeight = Dom.getRegion(Selector.query('div.hourSegment')[0]).height*2+(1);//1 is a border width
-      var elRegion = Dom.getRegion(el);
-
-      //adjust height dependant on durations
-      var durationObj = hcalendar.parsers['duration'](this.events[el.id].getData('duration'));
-      if (durationObj)
-      {
-         var height = (hourHeight*(durationObj.H||0));
-         if (durationObj.M)
-         {
-             height += (hourHeight*(1/(60/durationObj.M)));
-         }
-         //restrict height so doesn't go over end of container.
-         //add the hourHeight/2 since containerRegion.bottom is half an hourHeight too low.
-         //add the 2 for borders in table.
-         height = Math.round(Math.min(height,( (this.containerRegion.bottom-elRegion.top)+hourHeight/2) + 2));
-         if (el && height)
-         {
-           Dom.setStyle(el,'height',height+'px');              
-         }
-      }
    },
 
    /** 

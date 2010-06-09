@@ -78,7 +78,7 @@
                <option value="">${msg("label.selectScript")}</option>
                <#list scripts as script>
                <option value="${script.value}">
-                  ${script.displayLabel}
+                  ${script.displayLabel?html}
                </option>
                </#list>
             </select>

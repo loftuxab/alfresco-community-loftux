@@ -589,7 +589,7 @@
             // Invoke the callback if one was supplied
             if (this.options.onFailure && typeof this.options.onFailure.fn == "function")
             {
-               this.options.onFailure.fn.call(this.options.onFailure.scope, this.options.onFailure.obj);
+               this.options.onFailure.fn.call(this.options.onFailure.scope, null, this.options.onFailure.obj);
             }
             else
             {
@@ -633,9 +633,9 @@
          this.form.updateSubmitElements();
 
          // Invoke the callback if one was supplied
-         if (typeof this.options.onFailureCallback.fn == "function")
+         if (typeof this.options.onFailure.fn == "function")
          {
-            this.options.onFailureCallback.fn.call(this.options.onFailureCallback.scope, this.options.onFailureCallback.obj);
+            this.options.onFailure.fn.call(this.options.onFailure.scope, response, this.options.onFailure.obj);
          }
          else
          {

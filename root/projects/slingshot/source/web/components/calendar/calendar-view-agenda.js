@@ -248,7 +248,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
          var currPar = Dom.getAncestorByTagName(eventEl,'div');//div            
          if (Dom.hasClass(eventEl,'allday'))
          {
-            this.removeMultipleAllDayEvents(eventEl);
+            this.removeMultipleDayEvents(eventEl);
          }
          eventEl.parentNode.removeChild(eventEl);
    
@@ -264,7 +264,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
        { 
          //move to correct cell
          Dom.removeClass(eventEl,'allday');
-         this.removeMultipleAllDayEvents(eventEl);
+         this.removeMultipleDayEvents(eventEl);
    
          data.el = 'li';  
          //tag with enclosing brackets

@@ -387,6 +387,9 @@ var CalendarScriptHelper = (function()
          var monthview_dates = [];
          //store  user events in array and key array by date
          viewArgs.viewEvents = [];
+			// store user events for other months in an array
+			viewArgs.spanningEvents = [];
+			
          viewArgs.startDate = toISOString(new Date(d.getTime() - ((d.getDate() - 1) * DAY)), {
             selector: 'date'
          });
@@ -407,17 +410,29 @@ var CalendarScriptHelper = (function()
                var ev = events[i];
                eventDate.setTime(fromISOString(ev.when));
                endDate.setTime(fromISOString(ev.endDate));
-               // Check event occurs within the month displayed
-               if ((eventDate.getTime() >= actualFirstDayOfMonth.getTime()) && (eventDate.getTime() < lastDayOfMonth.getTime())) 
+               // Check event should be shown within the month displayed:
+               //  - event starts BEFORE or during the month: eventStart < monthEnd, AND
+               //  - event ends during OR after the month eventEnd > monthStart
+               if (eventDate.getTime() <= lastDayOfMonth.getTime() && endDate >= actualFirstDayOfMonth.getTime())
                {
-                  // build an array indexed by the date
-                  var key = 'ev_' + eventDate.getDate();
-                  if (viewArgs.viewEvents[key] === undefined) 
+					   var icalEvent = convertToIcalFormat(ev, eventDate, endDate);
+						var eventMonth = eventDate.getMonth(); 
+					   var key = 'ev_';
+						if (eventMonth === d.getMonth()) 
+					   {
+						  	 key += eventDate.getDate();						
+						} else 
+						{
+                     icalEvent.isSpannedEvent = true;
+							key = "spannedEvents"; // write events to new array, specifically for events that span multiple months
+						}
+						
+						if (viewArgs.viewEvents[key] === undefined) 
                   {
                      viewArgs.viewEvents[key] = [];
                   }
                   // add event to array
-                  viewArgs.viewEvents[key].push(convertToIcalFormat(ev, eventDate, endDate));
+                  viewArgs.viewEvents[key].push(icalEvent); 
                }
             }
          }

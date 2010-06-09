@@ -809,8 +809,6 @@ body.yui-skin-gdocs .categoryview .category .ygtvdepthcell
 
 /* filter list link */
 
-.yui-skin-gdocs .treeview .selected > table,
-.yui-skin-gdocs .categoryview .selected > table,
 .yui-skin-gdocs .filter li.selected, 
 .yui-skin-gdocs .tags li.selected,
 .archive li.selected,
@@ -818,6 +816,13 @@ body.yui-skin-gdocs .categoryview .category .ygtvdepthcell
 body.yui-skin-gdocs .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
 #Share.yui-skin-gdocs .treeview .selected,
 #Share.yui-skin-gdocs .categoryview .selected
+{
+   background-color: #dee6ff;
+}
+
+/* these rules need to be separate from the above for ie6 */
+.yui-skin-gdocs .treeview .selected > table,
+.yui-skin-gdocs .categoryview .selected > table
 {
    background-color: #dee6ff;
 }

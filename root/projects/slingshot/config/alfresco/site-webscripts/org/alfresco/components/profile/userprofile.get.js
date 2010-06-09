@@ -30,3 +30,6 @@ if (bio != null)
 {
    model.biohtml = stringUtils.replaceLineBreaks(bio);
 }
+
+// editable if request profile is for the current user
+model.isEditable = (profileId == null || profileId == user.id);

@@ -151,6 +151,14 @@ textarea
    height: 206px;
 }
 
+.aspects .list-left,
+.aspects .list-right
+{
+   overflow-y: scroll;
+   padding-right: 16px;
+}
+
+
 /**
  * Calendar
  */
