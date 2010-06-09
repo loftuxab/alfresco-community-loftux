@@ -1040,8 +1040,8 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     rpc.unpackByteArrayWithLength(handle);
 
     String fileName = rpc.unpackUTF8String();
-    
-		//	DEBUG
+
+    //	DEBUG
 
 		if (Debug.EnableInfo && hasDebugFlag(DBG_SEARCH))
 			sess.debugPrintln("Lookup request from " + rpc.getClientDetails() + ", handle=" + NFSHandle.asString(handle) +
@@ -3124,7 +3124,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 				
 				//	Add the search directory details, the '.' directory
 				
-			  rpc.packInt(Rpc.True);
+			    rpc.packInt(Rpc.True);
 				rpc.packLong(dinfo.getFileIdLong() + FILE_ID_OFFSET);
 				rpc.packString(".");
 				rpc.packLong(COOKIE_DOT_DIRECTORY);
@@ -3136,7 +3136,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 				
 				//	Add the parent of the search directory, the '..' directory
 
-			  rpc.packInt(Rpc.True);
+				rpc.packInt(Rpc.True);
 				rpc.packLong(parentInfo.getFileIdLong() + FILE_ID_OFFSET);
 				rpc.packString("..");
 				rpc.packLong(COOKIE_DOTDOT_DIRECTORY);
@@ -3160,12 +3160,19 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 				if ( entryLen > rpc.getAvailableLength() ||
 				    ( rpc.getPosition() + entryLen > maxCount)) {
 					replyFull = true;
+					
+                    //  DEBUG
+	                
+                    if (Debug.EnableInfo && hasDebugFlag(DBG_SEARCH))
+                        sess.debugPrintln("ReadDir response full, restart at=" + finfo.getFileName() + ", resumeId=" + search.getResumeId());
+					
+					search.restartAt( finfo);
 					break;
 				}
 				
 				//	Fill in the entry details
 
-			  rpc.packInt(Rpc.True);
+				rpc.packInt(Rpc.True);
 				rpc.packLong(finfo.getFileIdLong() + FILE_ID_OFFSET);
 				rpc.packUTF8String(finfo.getFileName());
 				rpc.packLong(search.getResumeId() + searchMask);
@@ -3185,7 +3192,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
 			//	Indicate no more file entries in this response
 			
-		  rpc.packInt(Rpc.False);
+			rpc.packInt(Rpc.False);
 		  
 			//	Check if the search is complete
 
@@ -3199,7 +3206,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
 				//	Set the end of search flag
 
-			  rpc.packInt(Rpc.True);
+			    rpc.packInt(Rpc.True);
 
 				//	Close the search, release the search slot
 
@@ -3451,7 +3458,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 				
 				//	Add the search directory details, the '.' directory
 				
-			  rpc.packInt(Rpc.True);
+			    rpc.packInt(Rpc.True);
 				rpc.packLong(dinfo.getFileIdLong() + FILE_ID_OFFSET);
 				rpc.packString(".");
 				rpc.packLong(COOKIE_DOT_DIRECTORY);
@@ -3505,6 +3512,13 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 				if ( entryLen > rpc.getAvailableLength() ||
 				    ( rpc.getPosition() + entryLen > maxCount)) {
 					replyFull = true;
+                    
+                    //  DEBUG
+                    
+                    if (Debug.EnableInfo && hasDebugFlag(DBG_SEARCH))
+                        sess.debugPrintln("ReadDirPlus response full, restart at=" + finfo.getFileName() + ", resumeId=" + search.getResumeId());
+                    
+					search.restartAt( finfo);
 					break;
 				}
 				
@@ -3539,9 +3553,9 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 					fileCache.addPath(finfo.getFileId(), pathBuf.toString());
 				}
         
-        // Reset the file type
-        
-        finfo.setFileType( FileType.RegularFile);
+                // Reset the file type
+                
+                finfo.setFileType( FileType.RegularFile);
 			}
 
 			//	Indicate that there are no more file entries in this response
@@ -4937,7 +4951,9 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
       pathBuf.append(dirPath);
       if (dirPath.endsWith("\\") == false)
         pathBuf.append("\\");
-      pathBuf.append(argPath);
+      
+      if ( argPath.equals( ".") == false)
+          pathBuf.append(argPath);
     }
 
     //	Return the path

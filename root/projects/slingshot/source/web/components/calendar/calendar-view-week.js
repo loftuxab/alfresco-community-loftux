@@ -227,6 +227,28 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
      }
    },
 
+      
+      /**
+       * @method renderMultipleDayTimedEvents
+       *
+       * @param {Object} Referrence to Event Element.
+       */
+      renderMultipleDayTimedEvents: function CalendarWeekView_renderMultipleDayTimedEvents(eventEl)
+      {
+         // TODO: Get this to render multiday events.
+         // This function needs to:
+         // Detect if the eventEl should be repeated
+         var dtstart = Dom.getElementsByClassName("dtstart", "span", eventEl)[0].getAttribute("title");  
+         var dtend = Dom.getElementsByClassName("dtend", "span", eventEl)[0].getAttribute("title");
+         if(!Alfresco.CalendarHelper.isSameDay(dtstart, dtend)) 
+         {
+            console.log("this should repeat: ");
+            console.log(eventEl);
+         }
+         // if it should, repeat it until the last day, ensuring display is correct.
+      
+      },
+      
    /** 
     *  fix table cell border bleedthrough in IE
     * 
@@ -307,37 +329,6 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
       this._fixedHourSegments = newFixedHourSegments;
    },
    
-   /**
-    * Adjusts height of specifed event depending on its duration
-    *  
-    * @method adjustHeightByHour
-    * @param el {object} Event element to adjust
-    */
-   _adjustHeightByHour : function CalendarWeekView_adjustHeightByHour(el)
-   {
-      var hourHeight = YAHOO.util.Dom.getRegion(YAHOO.util.Selector.query('div.hourSegment')[0]).height*2+(1);//1 is a border width
-      var elRegion = YAHOO.util.Dom.getRegion(el);
-
-      //adjust height dependant on durations
-      var durationObj = hcalendar.parsers['duration'](this.events[el.id].getData('duration'));
-      if (durationObj)
-      {
-         var height = (hourHeight*(durationObj.H||0));
-         if (durationObj.M)
-         {
-             height += (hourHeight*(1/(60/durationObj.M)));
-         }
-         //restrict height so doesn't go over end of container.
-         //add the hourHeight/2 since containerRegion.bottom is half an hourHeight too low.
-         //add the 2 for borders in table.
-         height = Math.round(Math.min(height,( (this.containerRegion.bottom-elRegion.top)+hourHeight/2) + 2));
-         if (el && height)
-         {
-           Dom.setStyle(el,'height',height+'px');              
-         }
-      }
-   },
-
   /**
     * Render all day events
     * 
@@ -352,16 +343,15 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
       // put into all day section
       var dayOfWeek = fromISO8601(data.dtstart || data.from).getDay();
       var targetEl = Dom.get('cal-'+(data.dtstart || data.from).split('T')[0]);
+         
+      if (targetEl === null) 
+      {
+         // if the target doesn't exist, use the date of the first cell.
+         targetEl = Dom.get('cal-' + (toISO8601(this.options.startDate)).split('T')[0]);
+      }
       
       // add view for events that span multiple days.
-      this.renderMultipleDay(eventEl,data);
-      targetEl.appendChild(eventEl);
-
-      Dom.addClass(eventEl,'allday');
-      Dom.setStyle(eventEl,'width','100%');
-      Dom.setStyle(eventEl,'height','auto');
-      Dom.setStyle(eventEl,'top','auto');
-      Dom.setStyle(eventEl,'left','auto');              
+      this.renderMultipleDay(eventEl, data);          
 
       return eventEl;
    },
@@ -369,13 +359,16 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
   /**
     * Render event that span multiple days
     * 
-    * @method renderAllDayEvents
+    * @method renderMultipleDay
     * @param eventEl {object} reference to event element
     * @param data {object} Value object of event data
     * 
     */
    renderMultipleDay : function CalendarWeekView_renderMultipleDay(eventEl,data)
    {
+      // TODO: This function duplicates some code in other views, should be rationalised.
+      // TODO: This needs to repeat multiday timed events as well.
+
        if (!data)
        {
           var data = new microformatParser(
@@ -410,36 +403,72 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
              if (YAHOO.lang.isString(startDate))
              {
                 startDate = fromISO8601(startDate);
-             }
-             for (var i=1,len=numDays;i<numDays;i++)
-             {
-                var date = YAHOO.widget.DateMath.add(startDate,YAHOO.widget.DateMath.DAY,i);
-                var dateCell = Dom.get('cal-'+toISO8601(date).split('T')[0]);
-                var targetCell = null;
-                //get target el depending on view
-                if (dateCell)
-                {
-                   targetCell = dateCell;
-                }
-                var multipleAllDayEl = document.createElement('div');
-                multipleAllDayEl.className='allday multipleAllDay theme-bg-color-1 ' + eventEl.id + '-multiple';
-                multipleAllDayEl.id=eventEl.id+'-multiple'+(i+1);
-                if (targetCell)
-                {
-                   var ulEl = targetCell.getElementsByTagName('ul');
-                   if (ulEl.length>0)
-                   {
-                      targetCell.insertBefore(multipleAllDayEl,ulEl[0]);
-                   }
-                   else 
-                   {
-                      targetCell.appendChild(multipleAllDayEl);
-                   }
-                }
-             }
-          }
-       }
-   },
+               }
+               
+               var endDate = (data.to) ? Alfresco.util.fromISO8601(data.to) : data.dtend;
+               if (YAHOO.lang.isString(endDate)) 
+               {
+                  endDate = Alfresco.util.fromISO8601(endDate);
+               }
+               // Check Event Type
+               isAllDayEvent = Alfresco.CalendarHelper.isAllDay(data);
+               // Create continuation icons
+               var continuedFrom = document.createElement("span");
+               continuedFrom.innerHTML = "&lt;";
+               continuedFrom.className = "continuedFrom theme-color-1";
+               var continuedTo = document.createElement("span");
+               continuedTo.innerHTML = "&gt;";
+               continuedTo.className = "continuedTo theme-color-1";
+               
+               for (var i = 1, len = numDays; i < numDays; i++) 
+               {
+                  var date = YAHOO.widget.DateMath.add(startDate, YAHOO.widget.DateMath.DAY, i);
+                  var dateCell = Dom.get('cal-' + Alfresco.util.toISO8601(date).split('T')[0]);
+                  var datePlusOne = YAHOO.widget.DateMath.add(date, YAHOO.widget.DateMath.DAY, 1);
+                  datePlusOne.setSeconds(1);
+                  datePlusOne.setMinutes(0);
+                  datePlusOne.setHours(0);
+                  // Does this event cover the whole day?
+                  var isTimedAllDayEvent = (endDate > datePlusOne && !isAllDayEvent) ? true : false;
+                  var targetCell = null;
+                  //get target el depending on view
+                  if (dateCell) 
+                  {
+                     targetCell = dateCell;
+                  }
+                  if (targetCell) // only generate output if there is a place to put it. 
+                  {
+                     var ulEl = targetCell.getElementsByTagName('ul');
+                     var elId = eventEl.id + '-multiple' + (i + 1);
+                     
+                     if (isAllDayEvent) 
+                     {
+                     
+                        var multipleAllDayEl = document.createElement('div');
+                        multipleAllDayEl.className = 'allday multipleAllDay theme-bg-color-1 ' + eventEl.id + '-multiple';
+                        multipleAllDayEl.id = elId;
+                        
+                        // Display the title on the first cell.
+                        if (i === 1) 
+                        {
+                           multipleAllDayEl.innerHTML = eventEl.innerHTML
+                        }
+                        
+                        
+                        if (ulEl.length > 0) 
+                        {
+                           targetCell.insertBefore(multipleAllDayEl, ulEl[0]);
+                        }
+                        else 
+                        {
+                           targetCell.appendChild(multipleAllDayEl);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
    /**
     * Handler for eventEdited event. Updates event in DOM in response to updated event data.
     * 

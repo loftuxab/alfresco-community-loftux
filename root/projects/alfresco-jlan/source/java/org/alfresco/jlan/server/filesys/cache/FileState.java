@@ -146,12 +146,13 @@ public class FileState {
 	 * Class constructor
 	 * 
 	 * @param fname String
+	 * @param caseSensitive boolean
 	 */
-	public FileState(String fname) {
+	public FileState(String fname, boolean caseSensitive) {
 	  
 	  //	Normalize the file path
 	  
-	  setPath(fname);
+	  setPath(fname, caseSensitive);
 	  setExpiryTime(System.currentTimeMillis() + DefTimeout);
 	  
 	  //	Set the file/folder status
@@ -164,12 +165,13 @@ public class FileState {
 	 * 
 	 * @param fname String
 	 * @param status int
+     * @param caseSensitive boolean
 	 */
-	public FileState(String fname, int status) {
+	public FileState(String fname, int status, boolean caseSensitive) {
 	  
 	  //	Normalize the file path
 	  
-	  setPath(fname);
+	  setPath(fname, caseSensitive);
 	  setExpiryTime(System.currentTimeMillis() + DefTimeout);
 	  
 	  //	Set the file/folder status
@@ -517,13 +519,14 @@ public class FileState {
 	 * Set the file path
 	 * 
 	 * @param path String
+	 * @param caseSensitive boolean
 	 */
-	public final void setPath(String path) {
+	public final void setPath(String path, boolean caseSensitive) {
 
 		//	Split the path into directories and file name, only uppercase the directories to normalize
 		//	the path.
 
-		m_path = normalizePath(path);		
+		m_path = normalizePath(path, caseSensitive);		
 	}
 
     /**
@@ -887,37 +890,60 @@ public class FileState {
         m_allocSize = allocSize;
     }
     
+    /**
+     * Normalize the path to uppercase the directory names and keep the case of the file name.
+     * 
+     * @param path String
+     * @return String
+     */
+    public final static String normalizePath(String path) { 
+        return normalizePath( path, true);
+    }
+    
 	/**
 	 * Normalize the path to uppercase the directory names and keep the case of the file name.
 	 * 
 	 * @param path String
+	 * @param caseSensitive boolean
 	 * @return String
 	 */
-	public final static String normalizePath(String path) {	
+	public final static String normalizePath(String path, boolean caseSensitive) {	
 		
-		//	Split the path into directories and file name, only uppercase the directories to normalize
-		//	the path.
-
-		String normPath = path;
+	    // Check if the file state names should be case sensitive, if not then just uppercase the whole
+	    // path
+	    
+        String normPath = path;
+        
+	    if ( caseSensitive == true) {
+	        
+    		//	Split the path into directories and file name, only uppercase the directories to normalize
+    		//	the path.
     
-		if ( path.length() > 3) {
-			
-			//	Split the path to seperate the folders/file name
-			
-			int pos = path.lastIndexOf(FileName.DOS_SEPERATOR);
-			if ( pos != -1) {
-				
-				//	Get the path and file name parts, normalize the path
-				
-				String pathPart = path.substring(0, pos).toUpperCase();
-				String namePart = path.substring(pos);
-				
-				//	Rebuild the path string
-				
-				normPath = pathPart + namePart;
-			}
-		}
-		
+    		if ( path.length() > 3) {
+    			
+    			//	Split the path to seperate the folders/file name
+    			
+    			int pos = path.lastIndexOf(FileName.DOS_SEPERATOR);
+    			if ( pos != -1) {
+    				
+    				//	Get the path and file name parts, normalize the path
+    				
+    				String pathPart = path.substring(0, pos).toUpperCase();
+    				String namePart = path.substring(pos);
+    				
+    				//	Rebuild the path string
+    				
+    				normPath = pathPart + namePart;
+    			}
+    		}
+	    }
+	    else {
+
+	        // Uppercase the whole path
+	        
+	        normPath = path.toUpperCase();
+	    }
+	    
 		//	Return the normalized path
 		
 		return normPath;

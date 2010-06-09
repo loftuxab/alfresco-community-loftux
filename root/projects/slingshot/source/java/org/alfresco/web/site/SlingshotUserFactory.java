@@ -66,13 +66,11 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
         return authenticated;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.extensions.surf.support.AlfrescoUserFactory#constructUser(org.json.JSONObject, java.util.Map)
-     */
     @Override
-    protected AlfrescoUser constructUser(JSONObject properties, Map<String, Boolean> capabilities) throws JSONException
+    protected AlfrescoUser constructUser(JSONObject properties, Map<String, Boolean> capabilities,
+            Map<String, Boolean> immutability) throws JSONException
     {
-        return new SlingshotUser(properties.getString(CM_USERNAME), capabilities);
+        return new SlingshotUser(properties.getString(CM_USERNAME), capabilities, immutability);
     }
 
     /**

@@ -19,6 +19,7 @@
 package org.alfresco.web.site.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,6 +97,10 @@ public class NTLMAuthenticationFilter implements Filter
         // get reference to our ServletContext
         this.servletContext = args.getServletContext();
         
+        ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(this.servletContext);
+        // retrieve the connector service
+        this.connectorService = (ConnectorService)context.getBean("connector.service");
+
         if (logger.isInfoEnabled())
             logger.info("NTLMAuthenticationFilter initialised.");
     }
@@ -166,7 +171,7 @@ public class NTLMAuthenticationFilter implements Filter
                     if (cachedNtlm)
                     {
                         // restart NTLM login as the repo has timed us out
-                        restartAuthProcess(session, res);
+                        restartAuthProcess(session, req, res);
                     }
                     else
                     {
@@ -201,6 +206,12 @@ public class NTLMAuthenticationFilter implements Filter
             chain.doFilter(sreq, sresp);
             return;
         }
+        if ("login".equals(req.getParameter("pt")) && "default".equals(req.getParameter("f")) &&
+                "/share/page".equals(req.getRequestURI()))
+        {
+            redirectToLoginPage(req, res);
+            return;
+        }
 
         // Check if the login page is being accessed, do not intercept the login page
         if (session.getAttribute(LOGIN_PAGE_PASSTHROUGH) != null)
@@ -229,7 +240,7 @@ public class NTLMAuthenticationFilter implements Filter
             if (debug) logger.debug("New NTLM auth request from " + req.getRemoteHost() + " (" +
                                     req.getRemoteAddr() + ":" + req.getRemotePort() + ")");
             
-            restartAuthProcess(session, res);
+            restartAuthProcess(session, req, res);
         }
         else
         {
@@ -293,7 +304,7 @@ public class NTLMAuthenticationFilter implements Filter
     /**
      * Restart the authentication process for NTLM - clear current security details
      */
-    private void restartAuthProcess(HttpSession session, HttpServletResponse res) throws IOException
+    private void restartAuthProcess(HttpSession session, HttpServletRequest req, HttpServletResponse res) throws IOException
     {
         // Clear any cached logon details from the sessiom
         session.removeAttribute(NTLM_AUTH_DETAILS);
@@ -301,6 +312,19 @@ public class NTLMAuthenticationFilter implements Filter
         // restart the authentication process for NTLM
         res.setHeader(HEADER_WWWAUTHENTICATE, AUTH_NTLM);
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        
+        final PrintWriter out = res.getWriter();
+        out.println("<html><head>");
+        out.println("<meta http-equiv=\"Refresh\" content=\"0; url=" + 
+                req.getContextPath() + "/page?f=default&pt=login" + 
+                "\">"); 
+        out.println("</head><body><p>Please <a href=\"" +
+                req.getContextPath() + "/page?f=default&pt=login" + 
+                "\">log in</a>.</p>");
+        out.println("</body></html>");
+        out.close();
+
+        
         res.flushBuffer();
     }
 
@@ -464,7 +488,7 @@ public class NTLMAuthenticationFilter implements Filter
             
             if (!authenticated)
             {
-                restartAuthProcess(session, res);
+                restartAuthProcess(session, req, res);
             }
             else
             {

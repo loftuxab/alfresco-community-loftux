@@ -32,7 +32,8 @@ public interface FileStateFactoryInterface {
 	 * Create a file state object
 	 * 
 	 * @param path String
+	 * @param caseSensitive boolean
 	 * @return FileState
 	 */
-	public FileState createFileState( String path);
+	public FileState createFileState( String path, boolean caseSensitive);
 }

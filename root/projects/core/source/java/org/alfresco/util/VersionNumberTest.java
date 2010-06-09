@@ -100,16 +100,24 @@ public class VersionNumberTest extends TestCase
         VersionNumber version1 = new VersionNumber("1.2");
         VersionNumber version2 = new VersionNumber("1.2");
         VersionNumber version3 = new VersionNumber("1.2.3");
+        VersionNumber version4 = new VersionNumber("1.11");
         VersionNumber version5 = new VersionNumber("1.3.3");
         VersionNumber version6 = new VersionNumber("2.0");
         VersionNumber version7 = new VersionNumber("2.0.1");
-
+        VersionNumber version8 = new VersionNumber("10.0");
+        VersionNumber version9 = new VersionNumber("10.3");
+        VersionNumber version10 = new VersionNumber("11.1");
+        
         assertEquals(-1, version0.compareTo(version1));
         assertEquals(1, version1.compareTo(version0));
         assertEquals(0, version1.compareTo(version2));
         assertEquals(-1, version2.compareTo(version3));
+        assertEquals(-1, version2.compareTo(version4));
         assertEquals(-1, version3.compareTo(version5));
         assertEquals(1, version6.compareTo(version5));
         assertEquals(-1, version6.compareTo(version7));
+        assertEquals(-1, version1.compareTo(version8));
+        assertEquals(-1, version8.compareTo(version9));
+        assertEquals(-1, version9.compareTo(version10));
     }
 }

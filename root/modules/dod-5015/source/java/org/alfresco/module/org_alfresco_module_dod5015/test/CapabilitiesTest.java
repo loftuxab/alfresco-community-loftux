@@ -6467,8 +6467,8 @@ public class CapabilitiesTest extends TestCase
         // should delete even though transfer is next ..,.
 
         AuthenticationUtil.setFullyAuthenticatedUser(test_user);
-        publicNodeService.deleteNode(recordFolder_1);
-        publicNodeService.deleteNode(record_2);
+        nodeService.deleteNode(recordFolder_1);
+        nodeService.deleteNode(record_2);
 
     }
 

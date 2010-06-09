@@ -78,7 +78,7 @@
         </setInstallerVariable>
 
 
-        <setInstallerVariable name="alfrescowcm_source_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescowcm" />
+        <setInstallerVariable name="alfrescowcm_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble" />
         <setInstallerVariable name="alfrescowcm_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescowcm" />
         <setInstallerVariable name="alfrescowcm_on_install_settings_per_platform_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescowcm/linux" >
             <ruleList>

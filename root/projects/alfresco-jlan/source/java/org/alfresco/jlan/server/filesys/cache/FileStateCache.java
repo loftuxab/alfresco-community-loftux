@@ -66,7 +66,11 @@ public class FileStateCache {
 
 	private FileStateListener m_stateListener;
 
-	// Debug enable and output stream
+	// Case sensitive filesystem
+	
+	private boolean m_caseSensitive;
+	
+	// Debug enable
 
 	private boolean m_debug = false;
 
@@ -75,6 +79,10 @@ public class FileStateCache {
 	 */
 	public FileStateCache() {
 		m_stateCache = new Hashtable<String, FileState>(INITIAL_SIZE);
+		
+		// Default to case sensitive cache for backwards compatability
+		
+		m_caseSensitive = true;
 	}
 
 	/**
@@ -95,6 +103,15 @@ public class FileStateCache {
 		return m_cacheTimer;
 	}
 
+	/**
+	 * Determine if the cache is using case sensitive file names
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isCaseSensitive() {
+	    return m_caseSensitive;
+	}
+	
 	/**
 	 * Return the number of states in the cache
 	 * 
@@ -122,6 +139,15 @@ public class FileStateCache {
 		m_expireInterval = chkIntval;
 	}
 
+	/**
+	 * Enable/disable case sensitive file names
+	 * 
+	 * @param caseSensitive boolean
+	 */
+	public final void setCaseSensitive(boolean caseSensitive) {
+	    m_caseSensitive = caseSensitive;
+	}
+	
 	/**
 	 * Determine if debug output is enabled
 	 * 
@@ -172,7 +198,7 @@ public class FileStateCache {
 	 * @return FileState
 	 */
 	public final synchronized FileState findFileState(String path) {
-		return m_stateCache.get(FileState.normalizePath(path));
+		return m_stateCache.get(FileState.normalizePath(path, isCaseSensitive()));
 	}
 
 	/**
@@ -187,7 +213,7 @@ public class FileStateCache {
 
 		// Find the required file state, if it exists
 
-		FileState state = m_stateCache.get(FileState.normalizePath(path));
+		FileState state = m_stateCache.get(FileState.normalizePath(path, isCaseSensitive()));
 
 		// Check if we should create a new file state
 
@@ -195,7 +221,7 @@ public class FileStateCache {
 
 			// Create a new file state
 
-			state = m_stateFactory.createFileState(path);
+			state = m_stateFactory.createFileState(path, isCaseSensitive());
 
 			// Set the file state timeout and add to the cache
 
@@ -221,7 +247,7 @@ public class FileStateCache {
 
         // Find the required file state, if it exists
 
-        FileState state = m_stateCache.get(FileState.normalizePath(path));
+        FileState state = m_stateCache.get(FileState.normalizePath(path, isCaseSensitive()));
 
         // Check if we should create a new file state
 
@@ -229,7 +255,7 @@ public class FileStateCache {
 
             // Create a new file state
 
-            state = m_stateFactory.createFileState(path);
+            state = m_stateFactory.createFileState(path, isCaseSensitive());
 
             // Set the file state timeout and add to the cache
 
@@ -254,12 +280,12 @@ public class FileStateCache {
 
 		// Find the current file state
 
-		FileState state = m_stateCache.remove(FileState.normalizePath(oldName));
+		FileState state = m_stateCache.remove(FileState.normalizePath(oldName, isCaseSensitive()));
 
 		// Rename the file state and add it back into the cache using the new name
 
 		if ( state != null) {
-			state.setPath(newName);
+			state.setPath(newName, isCaseSensitive());
 			addFileState(state);
 		}
 
@@ -287,7 +313,7 @@ public class FileStateCache {
 
 		// Remove the file state from the cache
 
-		FileState state = m_stateCache.remove(FileState.normalizePath(path));
+		FileState state = m_stateCache.remove(FileState.normalizePath(path, isCaseSensitive()));
 
 		// Check if there is a state listener
 
@@ -321,7 +347,7 @@ public class FileStateCache {
 
 			// Update the file state path and add it back to the cache using the new name
 
-			state.setPath(newPath);
+			state.setPath(newPath, isCaseSensitive());
 			state.setFileStatus(isDir ? FileStatus.DirectoryExists : FileStatus.FileExists);
 
 			m_stateCache.put(state.getPath(), state);

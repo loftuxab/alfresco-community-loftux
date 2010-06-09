@@ -292,8 +292,8 @@
             // Display the title & path
             this.widgets.changeLinkButton.set("disabled", false);
             this.widgets.unlinkRulesButton.set("disabled", false);
-            this.widgets.titleEl.innerHTML = this.linkedToFolder.name;
-            this.widgets.pathEl.innerHTML = this.linkedToFolder.path;
+            this.widgets.titleEl.innerHTML = $html(this.linkedToFolder.name);
+            this.widgets.pathEl.innerHTML = $html(this.linkedToFolder.path);
 
             if (this.ruleset.inheritedRules && this.ruleset.inheritedRules.length > 0)
             {

@@ -35,14 +35,13 @@ public class SlingshotUser extends AlfrescoUser
     /**
      * Instantiates a new user.
      * 
-     * @param id
-     *            the id
-     * @param capabilities
-     *            map of string keyed capabilities given to the user
+     * @param id            The user id
+     * @param capabilities  Map of string keyed capabilities given to the user
+     * @param immutability  Optional map of property qnames to immutability
      */
-    public SlingshotUser(String id, Map<String, Boolean> capabilities)
+    public SlingshotUser(String id, Map<String, Boolean> capabilities, Map<String, Boolean> immutability)
     {
-        super(id, capabilities);
+        super(id, capabilities, immutability);
     }
     
     /**

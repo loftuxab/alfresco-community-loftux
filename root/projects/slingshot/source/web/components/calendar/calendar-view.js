@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * CalendarView base component.
  * Provides common functionality for all Calendar views.
- * 
+ *
  * @namespace Alfresco
  * @class Alfresco.CalendarView
  */
@@ -38,8 +39,7 @@
    /**
     * CalendarView constructor.
     *
-    * @param {String}
-    *            htmlId The HTML id of the parent element
+    * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.CalendarView} The new CalendarView instance
     * @constructor
     */
@@ -134,7 +134,7 @@
          YAHOO.Bubbling.on("viewChanged", this.onViewChanged, this);
          YAHOO.Bubbling.on("dateChanged", this.onCalSelect, this);
          YAHOO.Bubbling.on("formValidationError", this.onFormValidationError, this);
-         if (this.calendarView == Alfresco.CalendarView.VIEWTYPE_DAY | this.calendarView == Alfresco.CalendarView.VIEWTYPE_WEEK) 
+         if (this.calendarView == Alfresco.CalendarView.VIEWTYPE_DAY | this.calendarView == Alfresco.CalendarView.VIEWTYPE_WEEK)
          {
             YAHOO.Bubbling.on("eventResized", this.onEventResized, this);
          }
@@ -154,7 +154,7 @@
          {
             case Alfresco.CalendarView.VIEWTYPE_MONTH:
                this.titleEl.innerHTML = dateFormat(this.options.titleDate, Alfresco.util.message("calendar.dateFormat.month"));
-               // create button on mousover of day cells
+               // create button on mouseover of day cells
                this.addButton = Alfresco.CalendarHelper.renderTemplate('createEventButton', 
                {
                   addEventUrl: Alfresco.constants.URL_CONTEXT + 'components/calendar/images/add-event-16-2.png',
@@ -273,8 +273,7 @@
        * converts data object to template compatible
        *
        * @method convertDataToTemplateData
-       * @param data
-       *            {object} data to convert
+       * @param data {object} data to convert
        * @return {object} data object with template compatible variables
        *
        */
@@ -343,58 +342,30 @@
             }
          }
          data = siteEvents;
-         switch (this.calendarView)
+         // TODO: These take no account of timezone. E.g. day view of 6th June. server time = GMT+1000, event time = 06 JUN 2010 05:00GMT+1000, date returned from server is 05 JUN 2010 19:00GMT+0000. 05 JUN != 06 JUN.
+         comparisonFn = function()
          {
-            case Alfresco.CalendarView.VIEWTYPE_DAY:
-               comparisonFn = function(d)
-               {
-                  var day = this.options.startDate.getDate();
-                  var m = this.options.startDate.getMonth();
-                  var y = this.options.startDate.getFullYear();
-                  
-                  return function(d)
-                  {
-                     return ((d.getMonth() === m) && (y === d.getFullYear()) && (d.getDate() === day));
-                  };
-               }
-.apply(this);
-               break;
-            case Alfresco.CalendarView.VIEWTYPE_WEEK:
-               comparisonFn = function()
-               {
-                  // have to use a copy as YAHOO.widget.DateMath.getWeekNumber
-                  // clears the time of the specified date
-                  var startDateCopy = new Date();
-                  startDateCopy.setTime(this.options.startDate.getTime());
-                  var currentWeek = YAHOO.widget.DateMath.getWeekNumber(startDateCopy);
-                  var y = this.options.startDate.getFullYear();
-                  return function(d)
-                  {
-                     return ((y === d.getFullYear()) && (YAHOO.widget.DateMath.getWeekNumber(d) === currentWeek));
-                  };
-               }
-.apply(this);
-               break;
-            case Alfresco.CalendarView.VIEWTYPE_AGENDA:
-               comparisonFn = function()
-               {
-               
-                  var m = this.options.startDate.getMonth() + 1;
-                  var y = this.options.startDate.getFullYear();
-                  return function(d)
-                  {
-                     return ((y === d.getFullYear()) && (m == (d.getMonth() + 1)));
-                  };
-               }
-.apply(this);
-               break;
-         }
+            var viewStartDate = this.options.startDate;
+            var viewEndDate = this.options.endDate;
+            
+            return function(eventDate, endDate)
+            {
+               // Event can: Start before and finish after display dates
+               var eventSurroundsView = (eventDate < viewStartDate && viewEndDate < endDate);
+               // or: start during
+               var startDuring = (eventDate > viewStartDate && eventDate < viewEndDate);
+               // or: finish during
+               var endDuring = (endDate > viewStartDate && endDate < viewEndDate);
+               return (eventSurroundsView || startDuring || endDuring);
+            };
+         }.apply(this);
+         
          for (var i = 0; i < data.length; i++) 
          {
             var ev = data[i];
             var date = fromISO8601(ev.when);
             var endDate = fromISO8601(ev.endDate);
-            if (comparisonFn(date)) 
+            if (comparisonFn(date, endDate)) 
             {
                var datum = {};
                datum.desc = ev.description || '';
@@ -407,6 +378,8 @@
                datum.uri = '/calendar/event/' + this.options.siteId + '/' + ev.name + '?date=' + dateFormat(date, dateFormat.masks.isoDate);
                datum.hidden = '';
                datum.allday = '';
+               datum.isMultiDay = (datum.from.split("T")[0] !== datum.to.split("T")[0]);
+               datum.isAllDay = (datum.isMultiDay && ev.start === "00:00" && ev.end === "00:00");
                datum.el = 'div';
                datum.duration = Alfresco.CalendarHelper.getDuration(fromISO8601(datum.from), fromISO8601(datum.to));
                var days = datum.duration.match(/([0-9]+)D/);
@@ -430,10 +403,8 @@
        * Adds events to view
        *
        * @method add
-       * @param {String}
-       *            id Identifier of event
-       * @param {Object}
-       *            Event Object
+       * @param {String} id Identifier of event
+       * @param {Object} Event Object
        * @return {Boolean} Status of add operation
        */
       add: function CalendarView_add(id, o)
@@ -445,8 +416,7 @@
        * Removes events from view
        *
        * @method remove
-       * @param {String}
-       *            id Identifier of event
+       * @param {String} id Identifier of event
        * @return {Boolean} Status of removal operation
        */
       remove: function CalendarView_remove(id)
@@ -459,10 +429,8 @@
        *
        * @method update
        *
-       * @param {String}
-       *            id Identifier of event
-       * @param {Object}
-       *            Event Object
+       * @param {String} id Identifier of event
+       * @param {Object} Event Object
        * @return {Boolean} Status of update operation
        */
       update: function CalendarView_update(id, o)
@@ -473,27 +441,21 @@
       /**
        * Remove dom elements that represent multiple day events
        *
-       * @method removeMultipleAllDayEvents
+       * @method removeMultipleDayEvents
        */
-      removeMultipleAllDayEvents: function CalendarView_removeMultipleAllDayEvents(srcEl)
+      removeMultipleDayEvents: function CalendarView_removeMultipleDayEvents(srcEl)
       {
-         var els = Dom.getElementsByClassName('multipleAllDay', 'div');
-         // remove sibling events in other days
+         var els = Dom.getElementsByClassName(srcEl.id + '-multiple');
          for (var i = 0, len = els.length; i < len; i++) 
          {
-            var elem = els[i];
-            if (elem.id.indexOf(srcEl.id) != -1) 
-            {
-               elem.parentNode.removeChild(elem);
-            }
+            els[i].parentNode.removeChild(els[i]);
          }
       },
       /**
        * Returns the current date that the user clicked on
        *
        * @method getClickedDate
-       * @param el
-       *            {DOMElement} the element that was clicked on
+       * @param el {DOMElement} the element that was clicked on
        * @returns {Date}
        */
       getClickedDate: function CalendarView_getClickedDate(el)
@@ -506,27 +468,71 @@
       },
       
       /**
-       * Adjusts height of specifed event depending on its duration
+       * Adjusts height of specified event depending on its duration
        *
        * @method _adjustHeightByHour
-       * @param el
-       *            {object} Event element to adjust
+       * @param el {object} Event element to adjust
        */
       _adjustHeightByHour: function(el)
       {
-         // TODO - get this from css class;
-         var hourHeight = 4.75; // em
-         // adjust height dependant on durations
+         console.log("_adjustHeightByHour");
+         //TODO - get this from css class;
+         var hourHeight = 4.75; //em
+         //adjust height dependent on durations
          if (this.calendarView != Alfresco.CalendarView.VIEWTYPE_MONTH) 
          {
-            var durationObj = hcalendar.parsers['duration'](this.events[el.id].getData('duration'));
-            if (durationObj) 
+            // This needs to work for Week view too...
+            var start = this.events[el.id].getData("dtstart");
+            var startTimes = start.split("T")[1].split(":");
+            var end = this.events[el.id].getData("dtend");
+            var endTimes = end.split("T")[1].split(":");
+            
+            if (start && end) // don't do anything if we can't find the event details 
             {
-               var height = (hourHeight * (durationObj.H || 0));
-               if (durationObj.M) 
+               var startHours = startTimes[0];
+               var endHours = endTimes[0];
+               
+               var startMinutes = startTimes[1];
+               var endMinutes = endTimes[1];
+               
+               var displayDate = this.options.startDate
+               
+               if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_WEEK) 
                {
-                  height += (hourHeight * (1 / (60 / durationObj.M)));
+                  // get current column date.
+                  var parentTd = Dom.getAncestorByTagName(el, "td");
+                  displayDate = Alfresco.util.fromISO8601(parentTd.id.replace("cal-", ""));
                }
+               
+               // if all times are 00:00 then it's an all day event
+               var isAllDay = (parseInt(startHours + startMinutes + endHours + endMinutes) == 0) ? true : false;
+               
+               if (!Alfresco.CalendarHelper.isSameDay(start, displayDate) && !isAllDay) 
+               {
+                  // Set the duration to assume a midnight start time (00:00)
+                  startHours = 0;
+                  startMinutes = 0;
+                  this._addContinuedFromIcon(el);
+               }
+               
+               if (!Alfresco.CalendarHelper.isSameDay(end, displayDate) && !isAllDay) 
+               {
+                  // Set the duration to assume a midnight end time (23:59)
+                  endHours = 23;
+                  endMinutes = 59;
+                  this._addContinuedToIcon(el);
+               }
+               
+               var hours = endHours - startHours;
+               var minutes = endMinutes - startMinutes;
+               
+               var height = (hourHeight * hours);
+               
+               if (minutes !== 0) 
+               {
+                  height += (hourHeight * (1 / (60 / minutes)));
+               }
+               
                if (el && height) 
                {
                   Dom.setStyle(el, 'height', height + 'em');
@@ -535,12 +541,41 @@
          }
       },
       
+      /** Adds the symbol used to show that the event continues from a previous day
+       * @method _addContinuedFromIcon
+       * @param {Object} el
+       */
+      _addContinuedFromIcon: function CalendarView_addContinuedFlag(el)
+      {
+         var startEl = Dom.getElementsByClassName("dtstart", "span", el);
+         iconEl = document.createElement("span");
+         iconEl.innerHTML = "&lt;"
+         iconEl.className = "continuedFrom"
+         Dom.insertBefore(iconEl, startEl[0]);
+         Dom.setStyle(startEl[0], "display", "none")
+      },
+      
+      /**
+       * Adds the symbol used to show that the event continues on the next day
+       *
+       * @method _addContinuedToIcon
+       * @param {Object} el
+       */
+      _addContinuedToIcon: function CalendarView_addContinuedFlag(el)
+      {
+         var endEl = Dom.getElementsByClassName("dtend", "span", el);
+         iconEl = document.createElement("span");
+         iconEl.innerHTML = "&gt;"
+         iconEl.className = "continuedTo"
+         Dom.insertBefore(iconEl, endEl[0]);
+         Dom.setStyle(endEl[0], "display", "none")
+      },
+      
       /**
        * Displays add dialog
        *
        * @method showAddDialog
-       * @param elTarget
-       *            {object} Element in which the event occured (click)
+       * @param elTarget {object} Element in which the event occured (click)
        *
        */
       showAddDialog: function CalendarView_showAddDialog(elTarget)
@@ -658,10 +693,8 @@
        * shows edits or add dialog depending on source of event
        *
        * @method showDialog
-       * @param e
-       *            {object} Event object
-       * @param elTarget
-       *            {object} Element in which event occured
+       * @param e {object} Event object
+       * @param elTarget {object} Element in which event occured
        *
        */
       showDialog: function(e, elTarget)
@@ -675,7 +708,14 @@
          else if (YAHOO.util.Selector.test(elTarget, 'a.summary')) 
          {
             var elPar = Dom.getAncestorByClassName(elTarget, 'vevent');
-            this.editEvent = this.events[elPar.id];
+            // if the event doesn't have a parent with a vevent class, it'll have one with an allday class.
+            if (elPar === null) 
+            {
+               elPar = Dom.getAncestorByClassName(elTarget, 'allday');
+            }
+            // add support for timed events that span multiple days:
+            var elParId = elPar.id.split("-multiple")[0];
+            this.editEvent = this.events[elParId];
             var div = document.createElement('div');
             div.id = 'eventInfoPanel';
             document.body.appendChild(div);
@@ -688,7 +728,7 @@
                   siteId: this.options.siteId,
                   eventUri: 'calendar/' + elTarget.href.split('/calendar/')[1],
                   displayDate: this.currentDate,
-                  event: Dom.getAncestorByClassName(elTarget, 'vevent').id,
+                  event: elParId,
                   permitToEditEvents: this.options.permitToCreateEvents
                });
                
@@ -702,25 +742,20 @@
          }
          
          Event.preventDefault(e);
-         
       },
       
       /**
-       *
        * Updates event to database
        *
        * @method updateEvent
-       * @param calEvent
-       *            {object} The CalendarEvent object to update
+       * @param calEvent {object} The CalendarEvent object to update
        */
       updateEvent: function CalendarView_updateEvent(calEvent)
       {
-      
          var eventUri = Dom.getElementsByClassName('summary', 'a', calEvent.getEl())[0].href;
          var dts = fromISO8601(calEvent.getData('dtstart'));
          var dte = fromISO8601(calEvent.getData('dtend', false));
-         // IE's slowness sometimes means that dtend is incorrectly parsed when
-         // an
+         // IE's slowness sometimes means that dtend is incorrectly parsed when an
          // event is quickly resized.
          // so we must add a recheck. Interim fix.
          if (YAHOO.lang.isNull(dte)) 
@@ -777,8 +812,7 @@
       },
       
       /**
-       * Tests if event is valid for view must be within startdate and
-       * (enddate-1 second) of current view
+       * Tests if event is valid for view must be within startdate and (enddate-1 second) of current view
        *
        * @method date {object} Date to validate
        *
@@ -807,10 +841,8 @@
        * Updates date field in dialog when date in selected in popup calendar
        *
        * @method onDateSelected
-       * @param e
-       *            {object} Event object
-       * @param args
-       *            {object} Event argument object
+       * @param e {object} Event object
+       * @param args {object} Event argument object
        */
       onDateSelected: function CalendarView_onDateSelected(e, args, context)
       {
@@ -834,8 +866,7 @@
       
       /**
        * Fired by YUI when parent element is available for scripting.
-       * Component initialisation, including instantiation of YUI widgets and
-       * event listener binding.
+       * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
        * @method onReady
        */
@@ -911,14 +942,11 @@
       },
       
       /**
-       * Event Delegation handler. Delegates to correct handlers using CSS
-       * selectors
+       * Event Delegation handler. Delegates to correct handlers using CSS selectors
        *
        * @method onInteractionEvent
-       * @param e
-       *            {object} DomEvent
-       * @param args
-       *            {array} event arguments
+       * @param e {object} DomEvent
+       * @param args {array} event arguments
        */
       onInteractionEvent: function CalendarView_onInteractionEvent(e, args)
       {
@@ -983,8 +1011,7 @@
       },
       
       /**
-       * Handler for when calendar view is changed (day|week|month button is
-       * clicked)
+       * Handler for when calendar view is changed (day|week|month button is clicked)
        *
        * @method onViewChanged
        *
@@ -1001,8 +1028,7 @@
        * Handler for when previous or next button is clicked
        *
        * @method onNav
-       * @param e
-       *            {object}
+       * @param e {object}
        *
        */
       onNav: function CalendarView_onNav(e)
@@ -1022,8 +1048,7 @@
        * Handler for when date mini calendar is selected
        *
        * @method onNav
-       * @param e
-       *            {object}
+       * @param e {object}
        *
        */
       onCalSelect: function CalendarView_onCalSelect(e, args)
@@ -1092,11 +1117,8 @@
        *
        * @method onFormValidationError
        *
-       * @param e
-       *            {object} Event object
-       * @param args
-       *            {object} Value object referencing elements that are
-       *            invalid
+       * @param e {object} Event object
+       * @param args {object} Value object referencing elements that are invalid
        */
       onFormValidationError: function CalendarView_onFormValidationError(e, args)
       {
@@ -1144,18 +1166,21 @@
  */
 Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
 {
-   var Dom = YAHOO.util.Dom, Event = YAHOO.util.Event, Sel = YAHOO.util.Selector, fromISO8601 = Alfresco.util.fromISO8601, toISO8601 = Alfresco.util.toISO8601, dateFormat = Alfresco.thirdparty.dateFormat;
+   var Dom = YAHOO.util.Dom,
+       Event = YAHOO.util.Event,
+       Sel = YAHOO.util.Selector,
+       fromISO8601 = Alfresco.util.fromISO8601,
+       toISO8601 = Alfresco.util.toISO8601,
+       dateFormat = Alfresco.thirdparty.dateFormat;
    var templates = [];
+   
    return {
       /**
-       * Calculates end date depending on specified duration, in ISO8601
-       * format
+       * Calculates end date depending on specified duration, in ISO8601 format
        *
        * @method getEndDate
-       * @param dateISO
-       *            {String} startDate in ISO8601 format
-       * @param duration
-       *            {object} Duration object
+       * @param dateISO {String} startDate in ISO8601 format
+       * @param duration {object} Duration object
        */
       getEndDate: function Alfresco_CalendarHelper_getEndDate(dateISO, duration)
       {
@@ -1168,14 +1193,11 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
       },
       
       /**
-       * Correctly determines which hour segment the event element is in.
-       * Returns the hour
+       * Correctly determines which hour segment the event element is in. Returns the hour
        *
        * @method determineHourSegment
-       * @param ePos
-       *            {object} Object containing XY position of element to test
-       * @param el
-       *            {object} Event element
+       * @param ePos {object} Object containing XY position of element to test
+       * @param el {object} Event element
        * @return {string} Hour
        */
       determineHourSegment: function Alfresco_CalendarHelper_determineHourSegment(ePos, el)
@@ -1205,10 +1227,8 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
        *
        *
        * @method getDuration
-       * @param dtStartDate
-       *            {Date} start date
-       * @param dtEndDate
-       *            {Date} end date
+       * @param dtStartDate {Date} start date
+       * @param dtEndDate {Date} end date
        * @return {String} Duration in ical format eg PT2H15M
        */
       getDuration: function Alfresco_CalendarHelper_getDuration(dtStartDate, dtEndDate)
@@ -1264,8 +1284,7 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
        *
        * @method padZeros
        *
-       * @param value
-       *            {Object} value to pad
+       * @param value {Object} value to pad
        * @return {String} padded value
        */
       padZeros: function Alfresco_CalendarHelper_padZeros(value)
@@ -1281,7 +1300,6 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
        * @param field {DOM Object} input element
        * @return d {Date}
        */
-      // TODO: This needs to be modified to support dates in any format...
       getDateFromField: function Alfresco_CalendarHelper_getDateFromField(field)
       {
          var dateString = field.title;
@@ -1290,12 +1308,9 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
       },
       
       /**
-       *
        * Formats the date
-       *
-       * @param field
-       *            {DOM Object} DOM object of element
-       *
+       * 
+       * @param field {DOM Object} DOM object of element
        */
       writeDateToField: function Alfresco_CalendarHelper_writeDateToField(date, field)
       {
@@ -1303,6 +1318,7 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
          field.value = formattedDate;
          field.title = toISO8601(date);
       },
+      
       /**
        * Add an template using specified name as a reference
        */
@@ -1315,27 +1331,23 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
        * Retreives specified template
        *
        * @method getTemplate
-       * @param name
-       *            {string} Name of template to retrieve
+       * @param name {string} Name of template to retrieve
        * @return {string} template
        */
       getTemplate: function Alfresco_CalendarHelper_getTemplate(name)
       {
          return templates[name];
       },
+      
       /**
-       * renders template as a DOM HTML element. Element is *not* added to
-       * document
+       * renders template as a DOM HTML element. Element is *not* added to document
        *
-       * @param name
-       *            Name of template to render
-       * @param data
-       *            Data to render template against
+       * @param name Name of template to render
+       * @param data Data to render template against
        * @return HTMLElement Newly created div
        */
       renderTemplate: function Alfresco_CalendarHelper_renderTemplate(name, data)
       {
-      
          var el = document.createElement('div');
          if (templates[name] && el) 
          {
@@ -1358,16 +1370,49 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
        * Checks whether start date is earlier than end date.
        *
        * @method isValidDate
-       * @param {Date}
-       *            dtStartDate Start date
-       * @param {Date}
-       *            dtEndDate End date
+       * @param {Date} dtStartDate Start date
+       * @param {Date} dtEndDate End date
        *
        * @return {Boolean} flag denoting whether date is valid or not.
        */
       isValidDate: function Alfresco_CalendarHelper_isValidDate(dtStartDate, dtEndDate)
       {
          return dtStartDate.getTime() < dtEndDate.getTime();
+      },
+      
+      /**
+       * Checks to see if the two dates are the same
+       *
+       * @method isSameDay
+       * @param {Date|string} dateOne (either JS Date Object or ISO8601 date string)
+       * @param {Date|string} dateTwo
+       *
+       * @return {Boolean} flag indicating if the dates are the same or not
+       */
+      isSameDay: function Alfresco_CalendarHelper_isSameDay(dateOne, dateTwo)
+      {
+         if (typeof(dateOne) === "string") 
+         {
+            dateOne = fromISO8601(dateOne);
+         }
+         if (typeof(dateTwo) === "string") 
+         {
+            dateTwo = fromISO8601(dateTwo);
+         }
+         return (dateOne.getDate() === dateTwo.getDate() && dateOne.getMonth() === dateTwo.getMonth() && dateOne.getFullYear() === dateTwo.getFullYear());
+      },
+      
+      /**
+       * @method isAllDay
+       * @param {Object} event data object
+       *
+       * @return {Boolean} flag indicating whether event is a timed event or not
+       */
+      isAllDay: function Alfresco_CalendarHelper_isTimedEvent(eventData)
+      {
+         var isSameDay = this.isSameDay(eventData.from, eventData.to);
+         var isMidnight = (eventData.end == eventData.start && "00:00") ? true : false;
+         return (!isSameDay && isMidnight);
       }
    };
 })();
@@ -1400,9 +1445,15 @@ Alfresco.CalendarHelper.addTemplate('taggedTitle', "<span class=\"tagged\">{tagg
  */
 Alfresco.util.DialogManager = (function()
 {
-   var Dom = YAHOO.util.Dom, Event = YAHOO.util.Event, Sel = YAHOO.util.Selector, fromISO8601 = Alfresco.util.fromISO8601, toISO8601 = Alfresco.util.toISO8601, dateFormat = Alfresco.thirdparty.dateFormat;
+  var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Sel = YAHOO.util.Selector,
+      fromISO8601 = Alfresco.util.fromISO8601,
+      toISO8601 = Alfresco.util.toISO8601,
+      dateFormat = Alfresco.thirdparty.dateFormat;
    
    var dialogs = [];
+   
    var dialogConfig = 
    {
       width: "42em",
@@ -1413,11 +1464,8 @@ Alfresco.util.DialogManager = (function()
          {
             var date = new Date();
             // Pretty formatting
-            //var dateStr = dateFormat(this.options.displayDate, Alfresco.util.message("calendar.dateFormat.full"));
             Alfresco.CalendarHelper.writeDateToField(this.options.displayDate, Dom.get("fd"));
-            Alfresco.CalendarHelper.writeDateToField(this.options.displayDate, Dom.get("fd"));
-            //Dom.get("fd").value = dateStr;
-            //Dom.get("td").value = dateStr;
+            //Alfresco.CalendarHelper.writeDateToField(this.options.displayDate, Dom.get("td"));
             Dom.get(this.id + "-from").value = Dom.get(this.id + "-to").value = dateFormat(this.options.displayDate, 'yyyy/mm/dd');
             Dom.get(this.id + "-tag-input-field").disabled = false;
             Dom.get(this.id + "-tag-input-field").tabIndex = 8;
@@ -1681,8 +1729,7 @@ Alfresco.util.DialogManager = (function()
        * called for both the start and end date buttons.
        *
        * @method onDateSelectButton
-       * @param e
-       *            {object} DomEvent
+       * @param e {object} DomEvent
        */
       onDateSelectButton: function onDateSelectButton(e)
       {
@@ -1717,9 +1764,21 @@ Alfresco.util.DialogManager = (function()
          o.oCalendar.cfg.setProperty("WEEKDAYS_SHORT", Alfresco.util.message("days.short").split(","));
          o.oCalendar.cfg.setProperty("WEEKDAYS_MEDIUM", Alfresco.util.message("days.medium").split(","));
          o.oCalendar.cfg.setProperty("WEEKDAYS_LONG", Alfresco.util.message("days.long").split(","));
-         o.oCalendar.cfg.setProperty("MY_LABEL_MONTH_POSITION", Alfresco.util.message("calendar.widget_config.my_label_month_position"));
-         o.oCalendar.cfg.setProperty("MY_LABEL_MONTH_SUFFIX", Alfresco.util.message("calendar.widget_config.my_label_month_suffix"));
-         o.oCalendar.cfg.setProperty("MY_LABEL_YEAR_POSITION", Alfresco.util.message("calendar.widget_config.my_label_year_position"));
+         var monthPos = Alfresco.util.message("calendar.widget_config.my_label_month_position");
+         if (monthPos.length !== 0)
+         {
+            o.oCalendar.cfg.setProperty("MY_LABEL_MONTH_POSITION", parseInt(monthPos));
+         }
+         var monthSuffix = Alfresco.util.message("calendar.widget_config.my_label_month_suffix");
+         if (monthSuffix.length !== 0)
+         {
+            o.oCalendar.cfg.setProperty("MY_LABEL_MONTH_SUFFIX", monthSuffix);
+         }
+         var yearPos = Alfresco.util.message("calendar.widget_config.my_label_year_position");
+         if (yearPos.length !== 0)
+         {
+            o.oCalendar.cfg.setProperty("MY_LABEL_YEAR_POSITION", parseInt(yearPos));
+         }
          o.oCalendar.cfg.setProperty("MY_LABEL_YEAR_SUFFIX", Alfresco.util.message("calendar.widget_config.my_label_year_suffix"));
          o.oCalendar.render();
          o.oCalendar.selectEvent.subscribe(function(type, args)
@@ -1750,8 +1809,7 @@ Alfresco.util.DialogManager = (function()
                   var toDate = Alfresco.CalendarHelper.getDateFromField(Dom.get("td"));
                   if (YAHOO.widget.DateMath.before(toDate, selectedDate)) 
                   {
-                     // ...adjust the toDate if toDate is earlier than the new
-                     // fromDate
+                     //...adjust the toDate if toDate is earlier than the new fromDate
                      var tdEl = Dom.get("td");
                      Alfresco.CalendarHelper.writeDateToField(selectedDate, tdEl)
                      document.getElementsByName('to')[0].value = dateFormat(selectedDate, 'yyyy/mm/dd');
@@ -1774,6 +1832,7 @@ Alfresco.util.DialogManager = (function()
          o.oCalendar.show();
          return false;
       },
+      
       _onDateValidation: function _onDateValidation(field, args, event, form, silent)
       {
          var fromHours = Dom.get(args.obj.id + "-start").value.split(':');
@@ -1788,8 +1847,7 @@ Alfresco.util.DialogManager = (function()
          toDate.setHours(toHours[0]);
          toDate.setMinutes(toHours[1]);
          
-         // allday events; the date and time can be exactly the same so test
-         // for this too
+         //allday events; the date and time can be exactly the same so test for this too
          if (startDate.getTime() === toDate.getTime()) 
          {
             return true;
@@ -1810,6 +1868,7 @@ Alfresco.util.DialogManager = (function()
          return after;
       }
    };
+   
    return {
       registerDialog: function registerDialog(dialogName)
       {

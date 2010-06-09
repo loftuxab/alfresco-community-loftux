@@ -513,9 +513,9 @@ div.filter
    overflow-x: scroll;
 }
 
-.workflow .people-finder .results table
+.workflow .people-finder
 {
-   margin-right: -20px;
+   width: auto;
 }
 
 .details input,
@@ -523,6 +523,51 @@ div.filter
 {
    width: 26em;
 }
+
+.aspects .list-left,
+.aspects .list-right
+{
+   overflow-y: scroll;
+}
+.aspects .yui-g .yui-u
+{
+   width: 47%;
+}
+.aspects .yui-g div.first
+{
+   margin-right: -32px;
+}
+
+/**
+ * Data Lists
+ */
+
+#divRight .toolbar .header-bar
+{
+   margin: 0 -10px;
+   padding-bottom: 2em;
+}
+
+.datagrid a.action-link,
+.datagrid a.simple-link,
+.datagrid a.show-more
+{
+   border: medium none;
+   height: 16px;
+   white-space: nowrap;
+   width: 1px;
+}
+
+.datalists .header-bar
+{
+   padding: 4px 1em 2em;
+}
+
+.datalists li a span
+{
+   display: block;
+}
+
 
 /**
  * Calendar

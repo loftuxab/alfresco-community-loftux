@@ -27,7 +27,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcr-1.0.jar" sourcepath="src/jcr_src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/freemarker-2.3.13.jar" sourcepath="src/freemarker-2.3.13.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/freemarker-2.3.13-patched.jar" sourcepath="src/freemarker-2.3.13-patched.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.4.jar" sourcepath="src/jid3lib-0.5.4-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar" sourcepath="src/htmlparser-1.6-src.zip"/>
@@ -111,17 +111,17 @@
 	<classpathentry kind="lib" path="lib/wstx-asl-3.2.4.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.core-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.beans-3.0.0.jar" sourcepath="src/org.springframework.beans-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.expression-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context-3.0.0.jar" sourcepath="src/org.springframework.context-sources-3.0.0.CI-499.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context.support-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.transaction-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.aop-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.asm-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.jdbc-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.orm-3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.springframework.web-3.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.core-3.0.0.jar" sourcepath="src/org.springframework.core-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.beans-3.0.0.jar" sourcepath="src/org.springframework.beans-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.expression-3.0.0.jar" sourcepath="src/org.springframework.expression-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context-3.0.0.jar" sourcepath="src/org.springframework.context-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.context.support-3.0.0.jar" sourcepath="src/org.springframework.context.support-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.transaction-3.0.0.jar" sourcepath="src/org.springframework.transaction-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.aop-3.0.0.jar" sourcepath="src/org.springframework.aop-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.asm-3.0.0.jar" sourcepath="src/org.springframework.asm-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.jdbc-3.0.0.jar" sourcepath="src/org.springframework.jdbc-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.orm-3.0.0.jar" sourcepath="src/org.springframework.orm-sources-3.0.0.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.web-3.0.0.jar" sourcepath="src/org.springframework.web-sources-3.0.0.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.7-SNAPSHOT-20100204.jar" sourcepath="src/poi-3.7-20100204.zip"/>
@@ -156,7 +156,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webscripts-1.0.0.CI-SNAPSHOT-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webscripts-api-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webscripts-api-1.0.0.CI-SNAPSHOT-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer-2009-09-27.jar" sourcepath="src/PDFRenderer-2009-09-27-src.zip"/>
-	<classpathentry kind="lib" path="lib/org.springframework.webmvc-3.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.webmvc-3.0.0.jar" sourcepath="src/org.springframework.webmvc-sources-3.0.0.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/abdera/axiom-impl-1.2.5.jar"/>
 	<classpathentry kind="lib" path="lib/abdera/axiom-api-1.2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-io-1.4.jar"/>

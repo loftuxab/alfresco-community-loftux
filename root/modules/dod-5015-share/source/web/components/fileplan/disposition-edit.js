@@ -823,14 +823,18 @@
          var usedActionNames = {};
          for (var i = 0; i < actionNames.length; i++)
          {
-            usedActionNames[actionNames[i].value] = true;
+            // transfer action is allowed many times
+            if (actionNames[i].value !== "transfer")
+            {
+               usedActionNames[actionNames[i].value] = true;
+            }
          }
-
+         
          // Clear event menu and disable/enable events in the menu
          var items = this.widgets.createActionButton.getMenu().getItems(),
             item,
             disabled,
-            disableAll = usedActionNames["destroy"] ? true : false,  // "destroy" is in use and it MUST be the last action
+            disableAll = usedActionNames["destroy"],                 // "destroy" is in use and it MUST be the last action
             onlyEnableCutoffRetain = (actionNames.length === 0);     // No actions in use and "cutoff" or "retain" must be first
          for (i = 0; i < items.length; i++)
          {
@@ -842,7 +846,7 @@
              * - OR if only cutoff/retain shall be enabled (and this isn't "cutoff" or "retain")
              */
             disabled = (disableAll) ||
-                       (usedActionNames[item.value] ? true : false) ||
+                       (usedActionNames[item.value]) ||
                        (onlyEnableCutoffRetain && (item.value !== "cutoff" && item.value !== "retain"));
             item.cfg.setProperty("disabled", disabled);
          }

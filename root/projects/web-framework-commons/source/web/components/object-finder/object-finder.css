@@ -80,6 +80,7 @@
 
 .object-finder .picker-header .navigator button span.item-name
 {
+   white-space: nowrap;
 }
 
 .object-finder .picker-header .navigator .navigator-items-list .yuimenuitemlabel

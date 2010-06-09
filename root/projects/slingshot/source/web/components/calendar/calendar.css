@@ -662,6 +662,10 @@ tr.alldayRow td  {
 .vcalendar .vevent .description,
 .vcalendar .vevent .duration,
 .vcalendar .vevent .category,
+.vcalendar .multipleAllDay .location,
+.vcalendar .multipleAllDay .description,
+.vcalendar .multipleAllDay .duration,
+.vcalendar .multipleAllDay .category,
 .vcalendar div.vevent .offset,
 button#addEventButton,
 ul.dayEvents li.hidden,
@@ -675,6 +679,7 @@ div.vevent.allday p.dates
    text-indent:-999em;
 }
 .vcalendar div.vevent.allday p.dates,
+.vcalendar div.multipleAllDay.allday p.dates,
 .monthview .vevent p.dates {
    display:none;
 }
@@ -688,10 +693,12 @@ div.vevent.allday p.dates
 }
 
 div.allday a,
+div.multipleAllDay,
 div.vevent *{
   color:#FFF;
   font:100% Arial;
 }
+div.multipleAllDay,
 div.vevent {
 /*    text-align: right; */
 /*    position:absolute; */
@@ -761,17 +768,20 @@ div.vevent {
 .dayview div.day {
    border-bottom:0;
 }
-div.vevent.allday {
+div.vevent.allday,
+div.multipleAllDay.allday {
    position:static;
    width:100%;
    font-size:100%;
    border-left:0;
 }
+div.multipleAllDay.allday div, 
 div.vevent.allday div {
   padding:5px;
 }
 
-div.allday, div.multipleAllDay {
+div.allday, 
+div.multipleAllDay {
    border:1px solid white;
    border-width:1px 0 0 0;
 }
@@ -1020,4 +1030,22 @@ tr.early {
 /* multiple day proxy elements */
 .multipleAllDay {
    height:26px;
+}
+.continuedTo 
+{
+   float:right;   
+}
+
+div.day .continuedTo 
+{
+   float:none;
+}
+
+.continuedFrom 
+{
+   padding:0 2px;
+}
+.continuedTo,
+.continuedFrom {
+   font-weight:bold;
 }

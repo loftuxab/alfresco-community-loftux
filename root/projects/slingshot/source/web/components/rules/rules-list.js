@@ -354,12 +354,12 @@
          }
          else if (this.options.filter == "folder")
          {
-            this.widgets.rulesListText.innerHTML = this.msg("label.folderRules", this.folderDetails.fileName);
+            this.widgets.rulesListText.innerHTML = $html(this.msg("label.folderRules", this.folderDetails.fileName));
             this.widgets.rulesListBarText.innerHTML = this.msg("info.folderRulesRunOrder");
          }
          else if (this.options.filter == "all")
          {
-            this.widgets.rulesListText.innerHTML = this.msg("label.allRules", this.folderDetails.fileName);
+            this.widgets.rulesListText.innerHTML = $html(this.msg("label.allRules", this.folderDetails.fileName));
             if (this.ruleset.linkedFromRuleSets && this.ruleset.linkedFromRuleSets.length > 0)
             {
                this.widgets.rulesListBarText.innerHTML = this.msg("info.folderLinkedFromRuleSets", this.ruleset.linkedFromRuleSets.length);
@@ -467,8 +467,8 @@
 
          // Display rest of values
          Dom.getElementsByClassName("no", "div", ruleEl)[0].innerHTML = counter;
-         Dom.getElementsByClassName("title", "a", ruleEl)[0].innerHTML = rule.title;
-         Dom.getElementsByClassName("description", "span", ruleEl)[0].innerHTML = rule.description;
+         Dom.getElementsByClassName("title", "a", ruleEl)[0].innerHTML = $html(rule.title);
+         Dom.getElementsByClassName("description", "span", ruleEl)[0].innerHTML = $html(rule.description);
 
          var activeIconEl = Dom.getElementsByClassName("active-icon", "div", ruleEl)[0]
          if (rule.disabled)

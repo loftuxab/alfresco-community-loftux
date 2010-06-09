@@ -32,9 +32,10 @@ public class DefaultFileStateFactory implements FileStateFactoryInterface {
 	 * Create a file state object
 	 * 
 	 * @param path String
+     * @param caseSensitive boolean
 	 * @return FileState
 	 */
-	public FileState createFileState(String path) {
-		return new FileState( path);
+	public FileState createFileState(String path, boolean caseSensitive) {
+		return new FileState( path, caseSensitive);
 	}
 }
