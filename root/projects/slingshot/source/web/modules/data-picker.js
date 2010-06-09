@@ -235,7 +235,7 @@
             if (tabObj.treeNodes)
             {
                this._setupTree(tabObj, tabRootEl);
-            };
+            }
 
             // List
             if (tabObj.listItems)
@@ -550,6 +550,7 @@
                n = treeNodeObjs[j];
                node =  {
                   id: this._getValue(n, "id", descriptorObj, "node"),
+                  title: this._getValue(n, "title", descriptorObj, "node"),
                   label: this._getLabel(n, descriptorObj, msgPath, "node"),
                   listItems: n.listItems ? n.listItems : descriptorObj.listItems,
                   treeNodes: n.treeNodes ? n.treeNodes : descriptorObj.treeNodes,

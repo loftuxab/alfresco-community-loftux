@@ -41,10 +41,8 @@
          <property dataType="d:datetime" name="*"/>
       </group>
       <group>
-         <property dataType="d:text" name="cm:created"/>
-         <property dataType="d:text" name="cm:modified"/>
-      </group>
-      <group>
+         <property dataType="d:text" name="cm:creator"/>
+         <property dataType="d:text" name="cm:modifier"/>
          <property dataType="d:text" name="cm:author"/>
       </group>
       <group>
@@ -77,6 +75,9 @@
       <property>cm:modified</property>
       <property>cm:modifier</property>
       <property>cm:author</property>
+      <property>cm:content:MIME_TYPE</property>
+      <property>cm:content:SIZE</property>
+      <property>cm:content:ENCODING</property>
    </defaults>
 
    <property-evaluators>
@@ -136,6 +137,9 @@
          <evaluator name="GREATER_THAN_EQUAL"/>
          <evaluator name="LESS_THAN"/>
          <evaluator name="LESS_THAN_EQUAL"/>
+      </property>
+      <property type="d:childassocref">
+         <evaluator name="EQUALS"/>
       </property>
    </property-evaluators>
 

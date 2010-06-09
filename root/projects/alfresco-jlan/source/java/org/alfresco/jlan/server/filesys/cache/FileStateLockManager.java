@@ -144,7 +144,7 @@ public class FileStateLockManager implements LockManager, OpLockManager, Runnabl
 		//	Make sure the file implements the file state interface
 		
 		if (( file instanceof NetworkFileStateInterface) == false)
-			throw new IllegalArgumentException("NetworkFile does not implement NetworkFileStateInterface");
+			throw new IllegalArgumentException("NetworkFile does not implement NetworkFileStateInterface, path=" + file.getFullName());
 			
 		//	Get the file state associated with the file
 		

@@ -49,6 +49,7 @@ public abstract class NetworkFile {
 	public static final int DeleteOnClose 		= 0x0002;
 	public static final int DelayedWriteError 	= 0x0004;
 	public static final int Created             = 0x0008;
+	public static final int DelayedClose        = 0x0010;
 
 	// File identifier and parent directory identifier
 
@@ -59,6 +60,10 @@ public abstract class NetworkFile {
 
 	protected long m_uniqueId;
 
+	// File handle id (protocol level id/handle)
+	
+	private int m_protocolId = -1;
+	
 	// File/directory name
 
 	protected String m_name;
@@ -236,6 +241,29 @@ public abstract class NetworkFile {
 		return m_grantedAccess;
 	}
 
+	/**
+	 * Return the granted access as a string
+	 * 
+	 * @return String
+	 */
+	public final String getGrantedAccessAsString() {
+	    String accStr = "Unknown";
+	    
+	    switch ( m_grantedAccess) {
+	        case READONLY:
+	            accStr = "ReadOnly";
+	            break;
+	        case READWRITE:
+	            accStr = "ReadWrite";
+	            break;
+	        case WRITEONLY:
+	            accStr = "WriteOnly";
+	            break;
+	    }
+	    
+	    return accStr;
+	}
+	
 	/**
 	 * Return the allowed file access mode
 	 * 
@@ -433,6 +461,15 @@ public abstract class NetworkFile {
 	}
 
 	/**
+	 * Check if the delayed close is set
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasDelayedClose() {
+	    return (m_flags & DelayedClose) != 0 ? true : false;
+	}
+	
+	/**
 	 * Check if the file was created during the open
 	 * 
 	 * @return boolean
@@ -475,6 +512,15 @@ public abstract class NetworkFile {
 		m_writeCount++;
 	}
 
+	/**
+	 * Return the protocol file id/handle
+	 * 
+	 * @return int
+	 */
+	public final int getProtocolId() {
+	    return m_protocolId;
+	}
+	
 	/**
 	 * Set the file attributes, as specified by the SMBFileAttribute class.
 	 * 
@@ -566,7 +612,7 @@ public abstract class NetworkFile {
 	}
 
 	/**
-	 * set/clear the I/O pending flag
+	 * Set/clear the I/O pending flag
 	 * 
 	 * @param pending boolean
 	 */
@@ -628,6 +674,15 @@ public abstract class NetworkFile {
 		setStatusFlag(DelayedWriteError, err);
 	}
 
+	/**
+	 * Set or clear the delayed close flag
+	 * 
+	 * @param delayClose boolean
+	 */
+	public final void setDelayedClose(boolean delayClose) {
+	    setStatusFlag( DelayedClose, delayClose);
+	}
+	
 	/**
 	 * Set the file modification date/time
 	 * 
@@ -794,6 +849,15 @@ public abstract class NetworkFile {
 		m_uniqueId = path.toUpperCase().hashCode();
 	}
 
+	/**
+	 * Set the protocol level file id/handle
+	 * 
+	 * @param id int
+	 */
+	public final void setProtocolId(int id) {
+	    m_protocolId = id;
+	}
+	
 	/**
 	 * Open the file
 	 * 

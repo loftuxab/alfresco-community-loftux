@@ -42,6 +42,13 @@
          copyFunctions: true
       }));
 
+      // Override options to add an extra "Id" column
+      this.options.dataTableColumnDefinitions.push(
+      {
+         key: "id",
+         sortable: true
+      });      
+
       // Re-register with our own name
       this.name = "Alfresco.module.PropertyPicker";
       Alfresco.util.ComponentManager.reregister(this);
@@ -117,7 +124,8 @@
                         },
                         id: "{item.name}",
                         type: "{item.dataType}",
-                        label: "{item.title}"
+                        label: "{item.title}",
+                        title: "{item.name}"
                      }
                   },
                   {
@@ -126,6 +134,7 @@
                      {
                         url: "{url.proxy}api/classes?cf=aspect",
                         id: "{node.name}",
+                        title: "{node.name}",
                         label: "{node.title}",
                         listItems:
                         {
@@ -136,7 +145,8 @@
                            },
                            id: "{item.name}",
                            type: "{item.dataType}",
-                           label: "{item.title}"
+                           label: "{item.title}",
+                           title: "{item.name}"
                         }
                      }
                   },
@@ -146,6 +156,7 @@
                      {
                         url: "{url.proxy}api/classes?cf=type",
                         id: "{node.name}",
+                        title: "{node.name}",
                         label: "{node.title}",
                         listItems:
                         {
@@ -156,7 +167,8 @@
                            },
                            id: "{item.name}",
                            type: "{item.dataType}",
-                           label: "{item.title}"
+                           label: "{item.title}",
+                           title: "{item.name}"
                         }
                      }
                   }
@@ -246,7 +258,8 @@
       _addTransientProperties: function PP__addTransientProperties(listItemObjs, descriptorObj)
       {
          var foundTransientProperties = [],
-            tps = this.options.transientProperties;
+            tps = this.options.transientProperties,
+            addedTransientProperties = 0;
          for (var i = 0, il = listItemObjs.length; i < il; i++)
          {
             for (var name in tps)
@@ -262,8 +275,8 @@
          {
             var transientProperty = foundTransientProperties[i],
                tpil = transientProperty.properties.length,
-               insertIndex = foundTransientProperties[i].index + (i * tpil),
-               property = Alfresco.util.deepCopy(listItemObjs[foundTransientProperties[i].index]),
+               insertIndex = foundTransientProperties[i].index + addedTransientProperties,
+               property = Alfresco.util.deepCopy(listItemObjs[insertIndex]),
                title = property.title ? property.title : property.name,
                newProperty,
                tpi;
@@ -274,9 +287,10 @@
             for (tpi = 0; tpi < tpil; tpi++)
             {
                newProperty = listItemObjs[insertIndex + tpi + 1];
-               newProperty.title = transientProperty.properties[tpi].displayLabel + " (" + title + ")";
-               newProperty.name = newProperty.name + ":" + transientProperty.properties[tpi].value;
+               newProperty.title = this.msg("label.transientProperty", transientProperty.properties[tpi].displayLabel, property.name);
+               newProperty.name = property.name + ":" + transientProperty.properties[tpi].value;
             }
+            addedTransientProperties += tpil;
          }
          return listItemObjs;
       },

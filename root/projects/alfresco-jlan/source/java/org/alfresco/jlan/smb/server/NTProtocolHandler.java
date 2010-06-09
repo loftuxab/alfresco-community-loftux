@@ -1368,6 +1368,8 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		// Close the file
 
+		boolean delayedClose = false;
+		
 		try {
 
 			// Access the disk interface that is associated with the shared device
@@ -1396,6 +1398,21 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 				
 				disk.closeFile(m_sess, conn, netFile);
 				
+				// Check if the file close has been delayed by the filesystem driver
+				
+				if ( netFile.hasDelayedClose()) {
+				    delayedClose = true;
+				    
+				    // Reset the delayed close status
+				    
+				    netFile.setDelayedClose( false);
+
+				    // DEBUG
+		            
+		            if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
+		                m_sess.debugPrintln("File close delayed [" + smbPkt.getTreeId() + "] fid=" + fid + ", path=" + netFile.getFullName());
+				}
+				
 				// DEBUG
 				
 				if ( startTime != 0L && Debug.EnableInfo && m_sess.hasDebug( SMBSrvSession.DBG_BENCHMARK))
@@ -1404,7 +1421,8 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			
 			// Indicate that the file has been closed
 
-			netFile.setClosed(true);
+			if ( delayedClose == false)
+			    netFile.setClosed(true);
 			
 			// DEBUG
 			
@@ -1441,7 +1459,8 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		// Remove the file from the connections list of open files
 
-		conn.removeFile(fid, getSession());
+		if ( delayedClose == false)
+		    conn.removeFile(fid, getSession());
 
 		// Build the close file response
 
@@ -3488,6 +3507,11 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 					// No more buffer space
 
 					pktDone = true;
+
+					// Debug
+
+		            if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_SEARCH))
+		                m_sess.debugPrintln("Find first response full, restart at " + info.getFileName());
 				}
 			}
 
@@ -3777,6 +3801,11 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 					// No more buffer space
 
 					pktDone = true;
+
+                    // Debug
+
+                    if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_SEARCH))
+                        m_sess.debugPrintln("Find next response full, restart at " + info.getFileName());
 				}
 			}
 

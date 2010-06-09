@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.alfresco.jlan.server.filesys.NetworkFile;
+import org.alfresco.jlan.server.filesys.cache.FileState;
+import org.alfresco.jlan.server.filesys.cache.NetworkFileStateInterface;
 import org.alfresco.jlan.smb.SeekType;
 
 /**
@@ -34,7 +36,7 @@ import org.alfresco.jlan.smb.SeekType;
  * 
  * @author gkspencer
  */
-public class PseudoNetworkFile extends NetworkFile {
+public class PseudoNetworkFile extends NetworkFile implements NetworkFileStateInterface {
   
   // File details
 
@@ -48,6 +50,10 @@ public class PseudoNetworkFile extends NetworkFile {
 
   protected boolean m_eof;
 
+  // Dummy file state, required to implement byte range locking
+  
+  private FileState m_state;
+  
   /**
    * Class constructor.
    * 
@@ -107,6 +113,10 @@ public class PseudoNetworkFile extends NetworkFile {
 
       setClosed(true);
     }
+    
+    // Clear the file state
+    
+    m_state = null;
   }
 
   /**
@@ -299,5 +309,19 @@ public class PseudoNetworkFile extends NetworkFile {
     throws IOException {
 
     // Allow the write, just do not do anything
+  }
+
+  /**
+   * Return a dummy file state for this file
+   * 
+   * @return FileState
+   */
+  public FileState getFileState() {
+        
+    // Create a dummy file state
+        
+    if ( m_state == null)
+      m_state = new FileState(getFullName());
+    return m_state;
   }
 }

@@ -514,7 +514,7 @@
          if (this.options.pathNodeRef)
          {
             // If pathNodeRef is given the user of this component doesn't know what viewmode to display
-            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + this.options.pathNodeRef.uri + "/path";
+            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + this.options.pathNodeRef.uri + "/location";
             if (this.options.nodeRef)
             {
                // Repository mode

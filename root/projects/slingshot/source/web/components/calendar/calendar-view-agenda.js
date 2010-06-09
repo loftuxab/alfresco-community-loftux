@@ -141,7 +141,7 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
    {
        for (var event in events)
        {
-         var date = Alfresco.util.formatDate(Alfresco.util.fromISO8601(events[event][0].from),'dddd, d mmmm');
+         var date = Alfresco.util.formatDate(Alfresco.util.fromISO8601(events[event][0].from), Alfresco.util.message("calendar.dateFormat.agenda"));
          var contDiv = document.createElement('div');
          contDiv.id = 'cal-' + events[event][0].from.split('T')[0];
          var header = Alfresco.CalendarHelper.renderTemplate('agendaDay',{date:date});

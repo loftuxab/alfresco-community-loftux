@@ -50,7 +50,6 @@
       // Instance variables
       this.customisations = YAHOO.lang.merge(this.customisations, Alfresco.RuleConfigAction.superclass.customisations);
       this.renderers = YAHOO.lang.merge(this.renderers, Alfresco.RuleConfigAction.superclass.renderers);
-
       return this;
    };
 
@@ -142,7 +141,7 @@
             text: function(configDef, ruleConfig, configEl)
             {
                // Display minor/major instead of Yes/No
-               if (ruleConfig.parameterValues["minorChange"] == true)
+               if (ruleConfig.parameterValues["minorChange"])
                {
                   ruleConfig.parameterValues["minorChange"] = this.msg("label.checkin.minor");
                }
@@ -150,6 +149,7 @@
                {
                   ruleConfig.parameterValues["minorChange"] = this.msg("label.checkin.major");
                }
+               this._getParamDef(configDef, "minorChange").type = "d:text";
                return configDef;
             },
             edit: function(configDef, ruleConfig, configEl)
@@ -449,7 +449,7 @@
                   var params = this._getParameters(obj.configDef);
                   this.widgets.checkInForm.showDialog(
                   {
-                     version: params.minorChange == "false" ? "major" : "minor",
+                     version: params.minorChange ? "minor" : "major",
                      comments: params.description
                   });
                });
@@ -569,7 +569,7 @@
                   this.widgets.simpleWorkflowDialog.showDialog(
                   {
                      label: params[prefix + "-step"],
-                     action: (params[prefix + "-move"] == "true" ? "move" : "copy"),
+                     action: (params[prefix + "-move"] ? "move" : "copy"),
                      nodeRef: params[prefix + "-folder"] ? new Alfresco.util.NodeRef(params[prefix + "-folder"]) : null
                   });
                });

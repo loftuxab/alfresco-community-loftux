@@ -261,7 +261,7 @@
                         tempNode = new YAHOO.widget.TextNode(
                         {
                            label: "&lt;" + this.msg("message.folders-trimmed") + "&gt;",
-                           style: "folders-trimmed",
+                           style: "folders-trimmed"
                         }, node, false);
                      }
                   }

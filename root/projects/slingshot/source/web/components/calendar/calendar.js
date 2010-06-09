@@ -122,6 +122,10 @@
          this.calendar.cfg.setProperty("WEEKDAYS_SHORT", this._msg("days.short").split(","));
          this.calendar.cfg.setProperty("WEEKDAYS_MEDIUM", this._msg("days.medium").split(","));
          this.calendar.cfg.setProperty("WEEKDAYS_LONG", this._msg("days.long").split(","));
+         this.calendar.cfg.setProperty("MY_LABEL_MONTH_POSITION", this._msg("calendar.widget_config.my_label_month_position"));
+         this.calendar.cfg.setProperty("MY_LABEL_MONTH_SUFFIX", this._msg("calendar.widget_config.my_label_month_suffix"));
+         this.calendar.cfg.setProperty("MY_LABEL_YEAR_POSITION", this._msg("calendar.widget_config.my_label_year_position"));
+         this.calendar.cfg.setProperty("MY_LABEL_YEAR_SUFFIX", this._msg("calendar.widget_config.my_label_year_suffix"));
          this.calendar.render();
          this.calendar.selectEvent.subscribe(this.onDateSelected, this, true);
          

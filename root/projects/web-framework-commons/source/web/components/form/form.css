@@ -48,6 +48,11 @@
    width: auto;
 }
 
+.form-container .number
+{
+   width: 8em;
+}
+
 .form-container .form-field
 {
    margin: 0 0 1em 0;

@@ -410,7 +410,7 @@ public class FileOpenParams {
 	 * @return boolean
 	 */
 	public final boolean isReadWriteAccess() {
-		if (( m_accessMode & AccessMode.NTReadWrite)  != 0)
+		if (( m_accessMode & AccessMode.NTReadWrite)  == AccessMode.NTReadWrite)
 			return true;
 		return false;
 	}

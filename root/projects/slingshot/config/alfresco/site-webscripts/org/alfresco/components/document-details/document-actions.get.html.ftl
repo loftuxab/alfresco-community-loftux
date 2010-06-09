@@ -2,7 +2,8 @@
    new Alfresco.DocumentActions("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${template.properties.container!"documentLibrary"}"
+      containerId: "${template.properties.container!"documentLibrary"}",
+      vtiServer: ${vtiServer}
    }).setMessages(
       ${messages}
    );

@@ -975,6 +975,7 @@ Alfresco.util.setDomId = function(p_el, p_domId)
       {
          // MSIE 6 & 7-safe method
          p_el.attributes["id"].value = p_domId;
+         p_el.setAttribute("id", p_domId);
       }
       else
       {

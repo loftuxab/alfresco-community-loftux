@@ -55,7 +55,6 @@
 
       // Decoupled event listeners
       YAHOO.Bubbling.on("rulePropertySettingsChanged", this.onRulePropertySettingsChanged, this);
-
       return this;
    };
 
@@ -248,7 +247,7 @@
                         for (var ii = 0, iil = instructions.length; ii < iil; ii++)
                         {
                            /**
-                            * Add the new property and marked it as hidden so itjust turns up in menues where
+                            * Add the new property and marked it as hidden so it just turns up in menus where
                             * its the actual value when the config row is added
                             */
                            p = Alfresco.util.deepCopy(newProperty);
@@ -266,7 +265,7 @@
                      // Re create the menu template
                      this.widgets.selectTemplateEl = this._createSelectMenu();
 
-                     // Finally call super class since we now have the proeprty info we need
+                     // Finally call super class since we now have the property info we need
                      Alfresco.RuleConfigCondition.superclass.displayRuleConfigs.call(this, ruleConfigs);
                   },
                   obj: propertyInstructions,
@@ -359,7 +358,7 @@
       },
 
       /**
-       * Called to get the config for a menu item.
+       * Called to get the config definitions that matches a menu item.
        *
        * @method _getConfigItems
        * @param itemType
@@ -460,6 +459,10 @@
             this._getParamDef(descriptor, "value").type = property.dataType;
             descriptor.parameterDefinitions.reverse();
          }
+         if (propertyNameTokens.length == 3 && propertyNameTokens[2] == "SIZE")
+         {
+            this._getParamDef(descriptor, "value")._unit = this.msg("label.sizeUnit");
+         }         
 
          var propertyConfigDef = {
             id: descriptor.name,
@@ -647,11 +650,11 @@
                if (this.options.mode == Alfresco.RuleConfig.MODE_TEXT)
                {
                   // Update the label since we are in text mode
-                  var nameEl = p_oSelectEl.parentNode.getElementsByTagName("span")[0];;
+                  var nameEl = p_oSelectEl.parentNode.getElementsByTagName("span")[0];
                   nameEl.innerHTML = $html(p_oSelectEl.options[p_oSelectEl.selectedIndex].text);
                }
                break;
-            };
+            }
          }
          // Nothing was selected, select the first option instead
          if (adi == adil)
@@ -748,7 +751,7 @@
                   constraint = constraints[i];
                   if (constraint.value == propertyNameTokens[2])
                   {
-                     property.title = constraint.displayLabel + " (" + propertyNameTokens[0] + ":" + propertyNameTokens[1] + ")"; 
+                     property.title = this.msg("label.transientProperty", constraint.displayLabel, propertyNameTokens[0] + ":" + propertyNameTokens[1]); 
                   }
                }
             }
@@ -853,7 +856,7 @@
                var pd = this._getParamDef(configDef, "value");
                if (Alfresco.util.arrayContains(["d:any", "d:text", "d:mltext"], pd.type))
                {
-                  configDef._customMessageKey = "customise.compare-property-value.hyphen.text";
+                  configDef._customMessageKey = "customise.compare-property-value.text.hyphen";
                }
                return configDef;
             }
