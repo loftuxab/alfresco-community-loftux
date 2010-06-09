@@ -410,7 +410,7 @@
       
       onHelp: function AWE_onHelp()
       {
-         window.open('http://www.alfresco.com/help/33/community/webeditor/','wefhelp');
+         window.open('http://www.alfresco.com/help/33/enterprise/webeditor/','wefhelp');
       },
 
       onQuickEditMouseOver: function AWE_onQuickEditMouseOver(e, args)

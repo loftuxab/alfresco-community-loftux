@@ -155,7 +155,7 @@
          this.widgets.rulesListText = Dom.get(this.id + "-rulesListText");
          this.widgets.rulesListBarText = Dom.get(this.id + "-rulesListBarText");
          this.widgets.rulesListContainerEl = Dom.get(this.id + "-rulesListContainer");
-         this.widgets.ruleTemplateEl = Dom.get(this.id + "-ruleTemplate");
+         this.widgets.ruleTemplateEl = Selector.query("li", this.id + "-ruleTemplate", true);
          this.widgets.buttonsContainerEl = Dom.get(this.id + "-buttonsContainer");
          this.widgets.saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveButtonClick,
          {
@@ -323,7 +323,7 @@
       },
 
       /**
-       * Renders the deatils after they have been loaded
+       * Renders the details after they have been loaded
        *
        * @method _displayDetails
        * @private

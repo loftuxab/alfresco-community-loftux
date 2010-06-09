@@ -322,3 +322,15 @@ diff -ru old/com/icegreen/greenmail/util/GreenMailUtil.java new/com/icegreen/gre
      }
 +
  }
+ 
+diff -ru old/com/icegreen/greenmail/imap/ImapRequestLineReader.java new/com/icegreen/greenmail/imap/ImapRequestLineReader.java
+--- old/com/icegreen/greenmail/imap/ImapRequestLineReader.java  2010-05-11 13:49:48.000000000 +0300
++++ new/com/icegreen/greenmail/imap/ImapRequestLineReader.java  2010-05-11 13:48:00.000000000 +0300
+@@ -162,6 +162,7 @@
+             throws ProtocolException {
+         try {
+             output.write('+');
++            output.write(' ');
+             output.write('\r');
+             output.write('\n');
+             output.flush();

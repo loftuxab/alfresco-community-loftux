@@ -89,7 +89,9 @@ function main()
          }
          else
          {
-            model.error = formModel.message;
+            if (logger.isLoggingEnabled())
+               logger.log(formModel.message);
+            model.error = "";
          }
       }
    }

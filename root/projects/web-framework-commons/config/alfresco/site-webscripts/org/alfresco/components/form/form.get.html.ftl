@@ -30,5 +30,3 @@
 <#else>
    <div class="form-container">${msg("form.not.present")}</div>
 </#if>
-
-

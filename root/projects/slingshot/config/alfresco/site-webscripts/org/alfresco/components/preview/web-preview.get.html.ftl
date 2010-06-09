@@ -24,7 +24,7 @@ new Alfresco.WebPreview("${args.htmlid}").setOptions(
    </div>
    <div class="bd">
       <div id="${args.htmlid}-shadow-swf-div" class="preview-swf">
-         <div id="${args.htmlid}-swfPlayerMessage-div">${msg("label.preparingPreviewer")}</div>
+         <div id="${args.htmlid}-swfPlayerMessage-div"><#if (node?exists)>${msg("label.preparingPreviewer")}</#if></div>
       </div>
    </div>
 </div>

@@ -671,12 +671,6 @@
        onDeleted: function EventInfo_onDeleted(e)
        {
           this._hide();
-         
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this._msg("message.delete.success", this.event.name)
-         });
-
           Alfresco.util.PopupManager.displayMessage(
           {
               text: this._msg("message.delete.success", this.event.name)

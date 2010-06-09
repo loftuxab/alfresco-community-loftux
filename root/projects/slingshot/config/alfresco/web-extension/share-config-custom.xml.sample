@@ -52,7 +52,6 @@
             <aspect name="emailserver:aliasable" />
             <aspect name="cm:taggable" />
             <aspect name="app:inlineeditable" />
-            <aspect name="gd:googleEditable" />
          </visible>
 
          <!-- Aspects that a user can add. Same as "visible" if left empty -->
@@ -97,8 +96,8 @@
             Enable/disable the Google Docs UI integration (Extra types on Create Content menu, Google Docs actions).
             If enabled, remember to also make sure the gd:googleEditable aspect is made visible in the <aspects> section above.
          -->
-         <enabled>true</enabled>
-         
+         <enabled>false</enabled>
+
          <!--
             The mimetypes of documents Google Docs allows you to create via the Share interface.
             The I18N label is created from the "type" attribute, e.g. google-docs.doc=Google Docs&trade; Document

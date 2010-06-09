@@ -375,7 +375,8 @@
                 org.alfresco.service.cmr.repository.NodeService.createAssociation=ACL_ALLOW,RM.Assoc.0.1 
                 org.alfresco.service.cmr.repository.NodeService.removeAssociation=ACL_ALLOW,RM.Assoc.0.1 
                 org.alfresco.service.cmr.repository.NodeService.getTargetAssocs=ACL_ALLOW,RM.Read.0
-                org.alfresco.service.cmr.repository.NodeService.getSourceAssocs=ACL_ALLOW,RM.Read.0 
+                org.alfresco.service.cmr.repository.NodeService.getSourceAssocs=ACL_ALLOW,RM.Read.0
+                org.alfresco.service.cmr.repository.NodeService.getAssoc=ACL_ALLOW,RM.Read.0
                 org.alfresco.service.cmr.repository.NodeService.getPath=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0 
                 org.alfresco.service.cmr.repository.NodeService.getPaths=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
                 org.alfresco.service.cmr.repository.NodeService.getStoreArchiveNode=ACL_NODE.0.sys:base.Read,RM_ABSTAIN 
@@ -406,7 +407,8 @@
                 <![CDATA[ 
                 org.alfresco.service.cmr.model.FileFolderService.list=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0,AFTER_RM.FilterNode 
                 org.alfresco.service.cmr.model.FileFolderService.listFiles=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0,AFTER_RM.FilterNode
-                org.alfresco.service.cmr.model.FileFolderService.listFolders=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0,AFTER_RM.FilterNode 
+                org.alfresco.service.cmr.model.FileFolderService.listFolders=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0,AFTER_RM.FilterNode
+                org.alfresco.service.cmr.model.FileFolderService.listDeepFolders=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0,AFTER_RM.FilterNode  
                 org.alfresco.service.cmr.model.FileFolderService.search=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.Read,RM.Read.0,AFTER_RM.FilterNode
                 org.alfresco.service.cmr.model.FileFolderService.searchSimple=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.Read,RM.Read.0,AFTER_RM.FilterNode 
                 org.alfresco.service.cmr.model.FileFolderService.rename=ACL_ALLOW,AFTER_ACL_NODE.sys:base.WriteProperties,RM.Update.0
@@ -414,7 +416,6 @@
                 org.alfresco.service.cmr.model.FileFolderService.copy=ACL_NODE.0.sys:base.ReadProperties,ACL_NODE.1.sys:base.CreateChildren,RM.Read.0,RM.Create.1.0
                 org.alfresco.service.cmr.model.FileFolderService.create=ACL_NODE.0.sys:base.CreateChildren,RM.Create.0.2 
                 org.alfresco.service.cmr.model.FileFolderService.delete=ACL_NODE.0.sys:base.DeleteNode,RM.Delete.0 
-                org.alfresco.service.cmr.model.FileFolderService.makeFolders=ACL_METHOD.ROLE_ADMINISTRATOR,RM_ABSTAIN
                 org.alfresco.service.cmr.model.FileFolderService.getNamePath=ACL_NODE.1.sys:base.ReadProperties,RM.Read.1 
                 org.alfresco.service.cmr.model.FileFolderService.resolveNamePath=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0 
                 org.alfresco.service.cmr.model.FileFolderService.getFileInfo=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
