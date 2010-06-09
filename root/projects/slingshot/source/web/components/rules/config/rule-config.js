@@ -56,7 +56,6 @@
 
       // Decoupled event listeners
       YAHOO.Bubbling.on("mandatoryControlValueUpdated", this.onDatePickerMandatoryControlValueUpdated, this);
-
       return this;
    };
 
@@ -876,7 +875,7 @@
              * Create a copy of the configDef and give it a unique id that also will
              * be applied to the configEl as well to assist ui management
              */
-            configDef = Alfresco.util.deepCopy(configDef);
+            configDef = Alfresco.util.deepCopy(configDef); 
             configDef._id = Alfresco.util.generateDomId(configEl);
 
             // Find the correct customisation renderer
@@ -983,10 +982,20 @@
                         }
                         Dom.addClass(controlEl, "param");                                             
                      }
-                     if (paramDef._type != "hidden" && paramDef.displayLabel)
+                     if (paramDef._type != "hidden")
                      {
-                        // Display a label left to the parameter if displayLabel is present
-                        this._createLabel(paramDef.displayLabel + (paramDef._hideColon ? "" : ":"), controlEl);
+                        if (paramDef.displayLabel)
+                        {
+                           // Display a label left to the parameter if displayLabel is present
+                           this._createLabel(paramDef.displayLabel + (paramDef._hideColon ? "" : ":"), controlEl);
+                        }
+                        if (paramDef._unit) {
+                           // Display a text span to the right of the parameter if unit is present
+                           var unitEl = document.createElement("span");
+                           Dom.addClass(unitEl, "unit");
+                           unitEl.appendChild(document.createTextNode(paramDef._unit));
+                           controlEl.parentNode.appendChild(unitEl);
+                        }
                      }
                   }
                }
@@ -1383,6 +1392,18 @@
          },
 
          "d:noderef":
+         {
+            text: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createValueSpan(containerEl, configDef, paramDef, ruleConfig, value);
+            },
+            edit: function (containerEl, configDef, paramDef, ruleConfig, value)
+            {
+               return this._createInputText(containerEl, configDef, paramDef, [Alfresco.forms.validation.nodeRef], value);
+            }
+         },
+
+         "d:childassocref":
          {
             text: function (containerEl, configDef, paramDef, ruleConfig, value)
             {
@@ -1893,8 +1914,7 @@
 
       _getParameters: function (configDef)
       {
-         var configEl = Dom.get(configDef._id),
-            paramEls = Selector.query("[param]", configEl),
+         var paramEls = Selector.query("[param]", configDef._id),
             params = {},
             paramEl,
             paramName,
@@ -1905,30 +1925,72 @@
          {
             paramEl = paramEls[i];
             paramName = paramEl.getAttribute("param");
-            paramValue = this._getValue(paramEl);
-            paramDef = this._getParamDef(this._getSelectedConfigDef(configEl), paramName);
-            if (paramDef && paramDef.isMultiValued && paramValue && !YAHOO.lang.isArray(paramValue))
+            paramValue = this._getValue(paramEl, paramDef);
+            paramDef = this._getParamDef(configDef, paramName);
+            if (paramDef)
             {
-               paramValue = [paramValue];
-            }
-            previousValue = params[paramName];
-            if (YAHOO.lang.isArray(previousValue))
-            {
+               if (paramDef.isMultiValued && paramValue && !YAHOO.lang.isArray(paramValue))
+               {
+                  paramValue = [paramValue];
+               }
+               // Convert string to proper type
                if (YAHOO.lang.isArray(paramValue))
                {
-                  paramValue = previousValue.concat(paramValue);
+                  for (var j = 0, jl = paramValue; j < jl; j++)
+                  {
+                     paramValue[j] = this._convertType(paramValue[j], paramDef.type);
+                  }
                }
-               else if (paramValue != null)
+               else
                {
-                  paramValue = previousValue.push(paramValue);
+                  paramValue = this._convertType(paramValue, paramDef.type);
                }
-            }
-            if (paramName && paramValue)
-            {
-               params[paramName] = paramValue;
+               previousValue = params[paramName];
+               if (YAHOO.lang.isArray(previousValue))
+               {
+                  if (YAHOO.lang.isArray(paramValue))
+                  {
+                     paramValue = previousValue.concat(paramValue);
+                  }
+                  else if (paramValue != null)
+                  {
+                     paramValue = previousValue.push(paramValue);
+                  }
+               }
+               if (paramName && paramValue != undefined && paramValue != null)
+               {
+                  params[paramName] = paramValue;
+               }
             }
          }
          return params;
+      },
+
+      _convertType: function(paramValue, type)
+      {
+         if (paramValue)
+         {
+            if (Alfresco.util.arrayContains(["d:int", "d:long"], type))
+            {
+               return parseInt(paramValue);
+            }
+            else if (Alfresco.util.arrayContains(["d:float", "d:double"], type))
+            {
+               return parseFloat(paramValue);
+            }
+            else if (Alfresco.util.arrayContains(["d:boolean"], type))
+            {
+               if (paramValue.toLowerCase() == "true")
+               {
+                  return true;
+               }
+               else if (paramValue.toLowerCase() == "false")
+               {
+                  return false;
+               }
+            }
+         }
+         return paramValue;
       },
 
       _getValue: function(el)

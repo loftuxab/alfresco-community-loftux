@@ -29,13 +29,14 @@
    padding-left: 0.5em;
    padding-right: 0.5em;
    border-right: 1px solid #C4C5C5;
-   width: 15.9em;
+   width: 15.85em;
    overflow: auto;
 }
 
 .data-picker .data-picker-list
 {
-   overflow: auto;
+   overflow-x: hidden;
+   overflow-y: auto;
 }
 
 .data-picker .data-picker-list table

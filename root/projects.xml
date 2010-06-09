@@ -1902,7 +1902,7 @@
 
       <copy todir="${dir.project.webclient.assemble}/WEB-INF">
          <fileset dir="${dir.project.webclient.src.webinf}" 
-                  excludes="web.xml,portlet*.xml,alfresco-object.xml" />
+                  excludes="web.xml,alfresco-object.xml" />
          <fileset dir="${dir.project.installer}" 
                   includes="licenses/**" />
          <fileset dir="${dir.project.remoteapi.src.webinf}"/>

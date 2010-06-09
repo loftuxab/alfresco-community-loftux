@@ -13,7 +13,8 @@
 <@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config-action.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/date.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/date-picker.js"></@script>
-<@script type="text/javascript" src="${page.url.context}/yui/calendar/calendar-min.js"></@script>
+<!-- IE doesn't like the calendar module being brought in through module dependency -->
+<@script type="text/javascript" src="${page.url.context}/yui/calendar/calendar.js"></@script>
 <!-- Rule Edit -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/rule-edit.css" />
 <@script type="text/javascript" src="${page.url.context}/components/rules/rule-edit.js"></@script>

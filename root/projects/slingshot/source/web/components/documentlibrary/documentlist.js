@@ -1070,7 +1070,7 @@
             if (scope.doclistMetadata.onlineEditing && (record.mimetype in scope.options.onlineEditMimetypes))
             {
                var loc = record.location;
-               oRecord.setData("onlineEditUrl", window.location.protocol + "//" + window.location.hostname + ":" + scope.options.vtiServer.port + "/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file));
+               oRecord.setData("onlineEditUrl", window.location.protocol.replace(/https/i, "http") + "//" + window.location.hostname + ":" + scope.options.vtiServer.port + "/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file));
             }
          };
       },

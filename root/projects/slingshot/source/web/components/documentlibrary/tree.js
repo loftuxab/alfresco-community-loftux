@@ -200,7 +200,7 @@
                   var results = YAHOO.lang.JSON.parse(oResponse.responseText), item, treeNode;
                   
                   // Update parent node's nodeRef if we didn't have it before
-                  if (results.parent && node.data.nodeRef.length == 0)
+                  if (results.parent && node.data.nodeRef.length === 0)
                   {
                      node.data.nodeRef = results.parent.nodeRef;
                   }
@@ -225,7 +225,7 @@
                      tempNode = new YAHOO.widget.TextNode(
                      {
                         label: "&lt;" + this.msg("message.folders-trimmed") + "&gt;",
-                        style: "folders-trimmed",
+                        style: "folders-trimmed"
                      }, node, false);
                   }
                   

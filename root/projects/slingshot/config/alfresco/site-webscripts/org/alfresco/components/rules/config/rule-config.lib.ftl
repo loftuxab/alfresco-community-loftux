@@ -49,6 +49,7 @@
       </div>
       <div class="name"><!-- select element will be placed in here --></div>
       <div class="parameters"><!-- parameter controls will be placed here--></div>
+      <div class="clear"></div>
    </li>
 </div>
 </#macro>

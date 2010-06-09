@@ -40,7 +40,7 @@
       this.name = "Alfresco.module.RulesPropertyPicker";
       Alfresco.util.ComponentManager.reregister(this);
 
-      // Instance proeprties
+      // Instance properties
       this.preferencesService = new Alfresco.service.Preferences();
 
       // Instance variables
@@ -56,8 +56,9 @@
       var me = this;
       this.options.dataTableColumnDefinitions.push(
       {
-         key: "id",
+         key: "item",
          sortable: false,
+         width: 100,
          formatter: function (elCell, oRecord, oColumn, oData)
          {
             // Make sure we call the renderer with a scope set to the component (rather than the datatable)

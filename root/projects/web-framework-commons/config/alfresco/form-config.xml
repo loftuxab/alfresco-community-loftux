@@ -16,10 +16,10 @@
          <default-controls>
             <type name="text" template="/org/alfresco/components/form/controls/textfield.ftl" />
             <type name="mltext" template="/org/alfresco/components/form/controls/textarea.ftl" />
-            <type name="int" template="/org/alfresco/components/form/controls/textfield.ftl" />
-            <type name="float" template="/org/alfresco/components/form/controls/textfield.ftl" />
-            <type name="double" template="/org/alfresco/components/form/controls/textfield.ftl" />
-            <type name="long" template="/org/alfresco/components/form/controls/textfield.ftl" />
+            <type name="int" template="/org/alfresco/components/form/controls/number.ftl" />
+            <type name="float" template="/org/alfresco/components/form/controls/number.ftl" />
+            <type name="double" template="/org/alfresco/components/form/controls/number.ftl" />
+            <type name="long" template="/org/alfresco/components/form/controls/number.ftl" />
             <type name="boolean" template="/org/alfresco/components/form/controls/checkbox.ftl" />
             <type name="date" template="/org/alfresco/components/form/controls/date.ftl" />
             <type name="datetime" template="/org/alfresco/components/form/controls/date.ftl">

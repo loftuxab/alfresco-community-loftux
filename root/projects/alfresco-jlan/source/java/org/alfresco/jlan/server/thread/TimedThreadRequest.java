@@ -21,6 +21,8 @@ package org.alfresco.jlan.server.thread;
 
 import java.util.Date;
 
+import org.alfresco.jlan.debug.Debug;
+
 /**
  * Timer Thread Request Class
  * 
@@ -192,6 +194,7 @@ public abstract class TimedThreadRequest implements ThreadRequest, Comparable<Ti
              runTimedRequest();
         }
         catch ( Throwable ex) {
+            Debug.println(ex, Debug.Error);
         }
         
         // Check if the timed request should be requeued

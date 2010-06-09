@@ -134,7 +134,7 @@ function main()
                      {
                         name: property.name,
                         dataType: property.dataType,
-                        title: property.title
+                        title: property.title ? property.title : property.name 
                      });
                   }
                   else

@@ -288,7 +288,6 @@ public class CapabilitiesTest extends TestCase
         testTX.commit();
         testTX = transactionService.getUserTransaction();
         testTX.begin();
-
     }
 
     private void setPermission(NodeRef nodeRef, String authority, String permission, boolean allow)
@@ -421,7 +420,6 @@ public class CapabilitiesTest extends TestCase
      */
     protected void tearDown() throws Exception
     {
-
         if (testTX.getStatus() == Status.STATUS_ACTIVE)
         {
             testTX.rollback();
@@ -3528,8 +3526,8 @@ public class CapabilitiesTest extends TestCase
         checkPermission(rm_power_user, filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         checkPermission(rm_user, filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
     }
-
-    public void testAuthorizeAllTransfersCapability()
+    
+    private void setupForTransfer()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
@@ -3767,11 +3765,65 @@ public class CapabilitiesTest extends TestCase
         checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-
+    }
+    
+    private void setupForTransferComplete()
+    {
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        
+        // check each action
+        
+        TransferAction transfer = (TransferAction) ctx.getBean("transfer");
+        assertFalse(transfer.isExecutable(recordFolder_1, null));
+        assertFalse(transfer.isExecutable(record_1, null));
+        assertFalse(transfer.isExecutable(recordFolder_2, null));
+        assertFalse(transfer.isExecutable(record_2, null));
+        
+        TransferCompleteAction transferComplete = (TransferCompleteAction) ctx.getBean("transferComplete");
+        assertTrue(transferComplete.isExecutable(recordFolder_1, null));
+        assertFalse(transferComplete.isExecutable(record_1, null));
+        assertFalse(transferComplete.isExecutable(recordFolder_2, null));
+        assertTrue(transferComplete.isExecutable(record_2, null));
+    }
+    
+    public void testAuthorizeAllTransfersCapability()
+    {
+        setupForTransfer();
+        
         // try and transfer
-
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
+        
+        setupForTransferComplete();
+        
+        // try and complete the transfer
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        
+        recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "transferComplete", null);
+    }
+    
+    public void testAuthorizeAllTransfersCapability_TransferNegative()
+    {
+        setupForTransfer();
+        
+        // try and transfer
+        
         AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
+        
+        // -ve checks (ALF-2749)
+        // note: ideally, each -ve test should be run independently (if we want outer/setup txn to rollback)
+        
         try
         {
             recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "transfer", null);
@@ -3790,8 +3842,7 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-        recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
-
+        
         // check protected properties
 
         // PROP_DISPOSITION_ACTION_STARTED_AT
@@ -3867,30 +3918,31 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-
-        // check each action
-
-        TransferAction transfer = (TransferAction) ctx.getBean("transfer");
-        assertFalse(transfer.isExecutable(recordFolder_1, null));
-        assertFalse(transfer.isExecutable(record_1, null));
-        assertFalse(transfer.isExecutable(recordFolder_2, null));
-        assertFalse(transfer.isExecutable(record_2, null));
-
-        TransferCompleteAction transferComplete = (TransferCompleteAction) ctx.getBean("transferComplete");
-        assertTrue(transferComplete.isExecutable(recordFolder_1, null));
-        assertFalse(transferComplete.isExecutable(record_1, null));
-        assertFalse(transferComplete.isExecutable(recordFolder_2, null));
-        assertTrue(transferComplete.isExecutable(record_2, null));
-
-        // try and complete the transfer
-
+    }
+    
+    public void testAuthorizeAllTransfersCapability_TransferCompleteNegative()
+    {
+        setupForTransfer();
+        
+        // try and transfer
+        
         AuthenticationUtil.setFullyAuthenticatedUser(test_user);
-        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
+        
+        setupForTransferComplete();
+        
+        // try and complete the transfer
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        
+        recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "transferComplete", null);
+        
+        // -ve checks (ALF-2749)
+        // note: ideally, each -ve test should be run independently (if we want outer/setup txn to rollback)
+        
         try
         {
             recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "transferComplete", null);
@@ -3912,7 +3964,7 @@ public class CapabilitiesTest extends TestCase
         try
         {
             // will fail as this is in the same transafer which is now done.
-            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(record_2), "transferComplete", null);
+            recordsManagementActionService.executeRecordsManagementAction(getTransferObject(record_2), "transferComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
@@ -3941,8 +3993,9 @@ public class CapabilitiesTest extends TestCase
 
         }
     }
-
-    private NodeRef getTranferObject(NodeRef fp)
+    
+    
+    private NodeRef getTransferObject(NodeRef fp)
     {
         List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(fp, RecordsManagementModel.ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
         if (assocs.size() > 0)
@@ -3954,8 +4007,8 @@ public class CapabilitiesTest extends TestCase
             return fp;
         }
     }
-
-    public void testAuthorizeNominatedTransfersCapability()
+    
+    private void setupForAccession()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
@@ -4032,7 +4085,7 @@ public class CapabilitiesTest extends TestCase
 
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
         recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
-        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
+        recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "transferComplete", null);
 
         assertTrue(this.nodeService.exists(recordFolder_1));
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
@@ -4205,11 +4258,65 @@ public class CapabilitiesTest extends TestCase
         checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
         checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-
+    }
+    
+    private void setupForAccessionComplete()
+    {
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        
+        // check each action
+        
+        TransferAction transfer = (TransferAction) ctx.getBean("accession");
+        assertFalse(transfer.isExecutable(recordFolder_1, null));
+        assertFalse(transfer.isExecutable(record_1, null));
+        assertFalse(transfer.isExecutable(recordFolder_2, null));
+        assertFalse(transfer.isExecutable(record_2, null));
+        
+        TransferCompleteAction transferComplete = (TransferCompleteAction) ctx.getBean("accessionComplete");
+        assertTrue(transferComplete.isExecutable(recordFolder_1, null));
+        assertFalse(transferComplete.isExecutable(record_1, null));
+        assertFalse(transferComplete.isExecutable(recordFolder_2, null));
+        assertTrue(transferComplete.isExecutable(record_2, null));
+    }
+    
+    public void testAuthorizeNominatedTransfersCapability()
+    {
+        setupForAccession();
+        
         // try accession
-
+        
         AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accession", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "accession", null);
+        
+        setupForAccessionComplete();
+        
+        // try and complete the transfer
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "accessionComplete", null);
+    }
+    
+    public void testAuthorizeNominatedTransfersCapability_AccessionNegative()
+    {
+        setupForAccession();
+        
+        // try accession
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accession", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "accession", null);
+        
+        // -ve checks (ALF-2749)
+        // note: ideally, each -ve test should be run independently (if we want outer/setup txn to rollback)
+        
         try
         {
             recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "accession", null);
@@ -4228,8 +4335,7 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-        recordsManagementActionService.executeRecordsManagementAction(record_2, "accession", null);
-
+        
         // check protected properties
 
         // PROP_DISPOSITION_ACTION_STARTED_AT
@@ -4276,7 +4382,7 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-
+        
         // check cutoff again (it is already cut off)
 
         try
@@ -4305,30 +4411,30 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-
-        // check each action
-
-        TransferAction transfer = (TransferAction) ctx.getBean("accession");
-        assertFalse(transfer.isExecutable(recordFolder_1, null));
-        assertFalse(transfer.isExecutable(record_1, null));
-        assertFalse(transfer.isExecutable(recordFolder_2, null));
-        assertFalse(transfer.isExecutable(record_2, null));
-
-        TransferCompleteAction transferComplete = (TransferCompleteAction) ctx.getBean("accessionComplete");
-        assertTrue(transferComplete.isExecutable(recordFolder_1, null));
-        assertFalse(transferComplete.isExecutable(record_1, null));
-        assertFalse(transferComplete.isExecutable(recordFolder_2, null));
-        assertTrue(transferComplete.isExecutable(record_2, null));
-
-        // try and complete the transfer
-
+    }
+    
+    public void testAuthorizeNominatedTransfersCapability_AccessionCompleteNegative()
+    {
+        setupForAccession();
+        
+        // try accession
+        
         AuthenticationUtil.setFullyAuthenticatedUser(test_user);
-        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "accessionComplete", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accession", null);
+        
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "accession", null);
+        
+        setupForAccessionComplete();
+        
+        // try and complete the transfer
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "accessionComplete", null);
+        
+        // -ve checks (ALF-2749)
+        // note: ideally, each -ve test should be run independently (if we want outer/setup txn to rollback)
+        
         try
         {
             recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "accessionComplete", null);
@@ -4336,11 +4442,11 @@ public class CapabilitiesTest extends TestCase
         }
         catch (AccessDeniedException ade)
         {
-
+            
         }
         catch (AlfrescoRuntimeException are)
         {
-
+            
         }
         try
         {
@@ -4349,57 +4455,57 @@ public class CapabilitiesTest extends TestCase
         }
         catch (AccessDeniedException ade)
         {
-
+            
         }
         catch (AlfrescoRuntimeException are)
         {
-
+            
         }
         try
         {
-            // will fail as this is in the same transafer which is now done.
-            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(record_2), "accessionComplete", null);
+            // will fail as this is in the same transfer which is now done.
+            recordsManagementActionService.executeRecordsManagementAction(getTransferObject(record_2), "accessionComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
         {
-
+            
         }
         catch (AlfrescoRuntimeException are)
         {
-
+            
         }
-
+        
         // try again - should fail
-
+        
         try
         {
-            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "accessionComplete", null);
+            recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "accessionComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
         {
-
+            
         }
         catch (AlfrescoRuntimeException are)
         {
-
+            
         }
         try
         {
-            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(record_2), "accessionComplete", null);
+            recordsManagementActionService.executeRecordsManagementAction(getTransferObject(record_2), "accessionComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
         {
-
+            
         }
         catch (AlfrescoRuntimeException are)
         {
-
+            
         }
     }
-
+    
     public void testChangeOrDeleteReferencesCapability()
     {
         // capability is checked above - just check permission assignments
@@ -6444,7 +6550,7 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
         recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
         // this completes both transfers :-)
-        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
+        recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "transferComplete", null);
 
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
@@ -6460,7 +6566,7 @@ public class CapabilitiesTest extends TestCase
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
 
         // this completes both transfers :-)
-        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
+        recordsManagementActionService.executeRecordsManagementAction(getTransferObject(recordFolder_1), "transferComplete", null);
 
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());

@@ -113,6 +113,10 @@ public class TreeConnection {
 
     m_files[idx] = file;
     m_fileCount++;
+    
+    // Save the protocol level id
+    
+    file.setProtocolId( idx);
     return idx;
   }
 
@@ -320,12 +324,14 @@ public class TreeConnection {
 
     //	Inform listeners of the file closure
 
-		NetworkFileServer fileSrv = (NetworkFileServer) sess.getServer();
-		if ( fileSrv != null)
-			fileSrv.fireCloseFileEvent(sess, m_files[idx]);
+	NetworkFileServer fileSrv = (NetworkFileServer) sess.getServer();
+	if ( fileSrv != null)
+		fileSrv.fireCloseFileEvent(sess, m_files[idx]);
 
     //  Remove the file and update the open file count.
 
+	if ( m_files[idx] != null)
+	    m_files[idx].setProtocolId( -1);
     m_files[idx] = null;
     m_fileCount--;
   }
