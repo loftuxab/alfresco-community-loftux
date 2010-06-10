@@ -137,13 +137,25 @@
    </config>
    
    <!-- 
-        NTLM authentication config for Share
-        NOTE: you will also need to enable the NTLM authentication filter in Share web.xml
-              change localhost:8080 below to appropriate alfresco server location if required
+        Overriding endpoints to reference an Alfresco server with external SSO or NTLM enabled
+        NOTE: For NTLM, the NTLM Authentication Filter must also be enabled in Share web.xml
+              and if utilising a load balancer between web-tier and repository cluster, the "sticky
+              sessions" feature of your load balancer must be used.
+        NOTE: If alfresco server location is not localhost:8080 then also combine changes from the
+              "example port config" section below.
+        *Optional* keystore contains SSL client certificate + trusted CAs.
+        Used to authenticate share to an external SSO system such as CAS
+        Remove the keystore section if not required i.e. for NTLM.
    -->
    <!--
    <config evaluator="string-compare" condition="Remote">
       <remote>
+         <keystore>
+             <path>alfresco/web-extension/alfresco-system.p12</path>
+             <type>pkcs12</type>
+             <password>alfresco-system</password>
+         </keystore>
+         
          <connector>
             <id>alfrescoCookie</id>
             <name>Alfresco Connector</name>
@@ -164,7 +176,8 @@
    </config>
    -->
    
-	<!-- example changing port used to access remote Alfresco server (default is 8080)
+	<!-- example port config used to access remote Alfresco server (default is 8080) -->
+   <!--
    <config evaluator="string-compare" condition="Remote">
       <remote>
          <endpoint>
