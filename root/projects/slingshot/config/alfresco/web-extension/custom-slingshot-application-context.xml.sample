@@ -3,35 +3,6 @@
 
 <beans>
    
-   <!-- Override WebScripts searchpath - to include remote store -->
-   <!-- This enables remote component load via a central Alfresco server -->
-   <!--
-   <bean id="webframework.searchpath" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-            <ref bean="webframework.remotestore.webscripts" />
-            <ref bean="webframework.store.webscripts.custom" />
-            <ref bean="webframework.store.webscripts" />
-            <ref bean="webscripts.store" />
-         </list>
-      </property>
-   </bean>
-   -->
-   
-   <!-- Override Templates and Scripts searchpath - to include remote store -->
-   <!-- This enables remote component load via a central Alfresco server -->
-   <!--
-   <bean id="webframework.templates.searchpath" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-            <ref bean="webframework.remotestore.webscripts" />
-            <ref bean="webframework.store.webscripts.custom" />
-            <ref bean="webframework.store.system-templates" />
-            <ref bean="webframework.store.templates" />
-            <ref bean="webframework.store.webscripts" />
-         </list>
-      </property>
-   </bean>
-   -->
+
 
 </beans>
