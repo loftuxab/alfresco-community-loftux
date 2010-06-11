@@ -28,11 +28,13 @@
             <css src="/yui/container/assets/skins/sam/container.css" />
             <css src="/res/fdk/accordion/accordion.css" />
             <css src="/res/fdk/exif-accordion.css" />
+            <css src="/res/fdk/progress-bar.css" />
             
             <js src="/yui/tabview/tabview-min.js" />
             <js src="/yui/animation/animation-min.js" />
             <js src="/yui/datasource/datasource-min.js" />
             <js src="/yui/autocomplete/autocomplete-min.js" />
+            <js src="/yui/slider/slider-min.js" />
             <js src="/res/fdk/accordion/accordion-min.js" />
          </dependencies>
       </forms>
@@ -160,14 +162,16 @@
                   <control template="/org/alfresco/components/form/controls/richtext.ftl" />
                </field>
                <field id="fdk:model">
-                  <control template="/fdk/controls/autocomplete.ftl">
+                  <control template="/fdk/controls/autocomplete-beta.ftl">
                      <control-param name="ds">/service/ds/autocomplete/google</control-param>
                   </control>
                </field>
                <field id="fdk:releaseDate" set="press" />
                <field id="fdk:endOfLifeDate" set="press" />
                <field id="fdk:retailers" set="press" help-id="fdk.help.gadget.retailers" />
-               <field id="fdk:rating" set="press" />
+               <field id="fdk:rating" set="press">
+                  <control template="/fdk/controls/progressbar-beta.ftl" />
+               </field>
                <field id="fdk:contact" set="press" />
                <field id="fdk:reviews" set="press" />
                <field id="fdk:company" set="press" />
@@ -199,12 +203,18 @@
                <show id="cm:name" />
                <show id="cm:description" force="true" />
                <show id="cm:content" force="true" />
+               <show id="mimetype" />
             </field-visibility>
             <appearance>
                <field id="cm:content">
                   <control>
                      <control-param name="editorAppearance">explorer</control-param>
                      <control-param name="forceEditor">true</control-param>
+                  </control>
+               </field>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/hidden.ftl">
+                     <control-param name="contextProperty">mimeType</control-param>
                   </control>
                </field>
             </appearance>
@@ -247,6 +257,7 @@
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
                <show id="cm:content" force="true" />
+               <show id="mimetype" />
             </field-visibility>
             <appearance>
                <field id="cm:title">
@@ -256,6 +267,11 @@
                   <control>
                      <control-param name="editorAppearance">explorer</control-param>
                      <control-param name="forceEditor">true</control-param>
+                  </control>
+               </field>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/hidden.ftl">
+                     <control-param name="contextProperty">mimeType</control-param>
                   </control>
                </field>
             </appearance>
@@ -334,6 +350,7 @@
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
                <show id="cm:content" force="true" />
+               <show id="mimetype" />
             </field-visibility>
             <appearance>
                <field id="cm:title">
@@ -345,97 +362,12 @@
                      <control-param name="forceEditor">true</control-param>
                   </control>
                </field>
-            </appearance>
-         </form>
-         
-         <form id="simple-sets">
-            <field-visibility>
-               <show id="fdk:text" />
-               <show id="fdk:mltext" />
-               <show id="fdk:date" />
-               <show id="fdk:dateTime" />
-               <show id="fdk:int" />
-               <show id="fdk:long" />
-               <show id="fdk:double" />
-               <show id="fdk:float" />
-               <show id="fdk:boolean" />
-               <show id="cm:categories" />
-            </field-visibility>
-            <appearance>
-               <set id="" appearance="bordered-panel" label="Bordered Panel" />
-               <set id="text" appearance="fieldset" label="Fieldset" />
-               <set id="number" appearance="panel" label="Panel" />
-               <set id="date" appearance="title" label="Title" />
-               <set id="assocs" appearance="" label="Empty String" />
-               <set id="toggle" appearance="whitespace" label="Whitespace" />
-               
-               <field id="fdk:text" set="text" />
-               <field id="fdk:mltext" set="text" />
-               
-               <field id="fdk:boolean" set="toggle" />
-               
-               <field id="fdk:int" set="number" />
-               <field id="fdk:long" set="number" />
-               
-               <field id="fdk:date" set="date" />
-               <field id="fdk:dateTime" set="date" />
-
-               <field id="cm:categories" set="assocs" />
-            </appearance>
-         </form>
-         
-         <form id="nested-sets">
-            <field-visibility>
-               <show id="cm:name" />
-               <show id="fdk:text" />
-               <show id="fdk:mltext" />
-               <show id="fdk:boolean" />
-               <show id="fdk:int" />
-               <show id="fdk:long" />
-               <show id="fdk:double" />
-               <show id="fdk:float" />
-            </field-visibility>
-            <appearance>
-               <set id="builtin" appearance="fieldset" label="Built In" />
-               <set id="custom" appearance="fieldset" label="Custom Data" />
-               <set id="text" parent="custom" appearance="panel" label="Text" />
-               <set id="number" parent="custom" appearance="panel" label="Numbers" />
-               
-               <field id="cm:name" set="builtin" />
-               
-               <field id="fdk:text" set="text" />
-               <field id="fdk:mltext" set="text" />
-               <field id="fdk:boolean" set="text" />
-               
-               <field id="fdk:int" set="number" />
-               <field id="fdk:long" set="number" />
-               <field id="fdk:double" set="number" />
-               <field id="fdk:float" set="number" />
-            </appearance>
-         </form>
-         
-         <form id="associations">
-            <field-visibility>
-               <show id="fdk:duplicate" />
-               <show id="fdk:user" />
-               <show id="fdk:group" />
-               <show id="fdk:usergroup" />
-               <show id="fdk:contentSingle" />
-               <show id="fdk:contentMultiple" />
-               <show id="fdk:folderSingle" />
-               <show id="fdk:folderMultiple" />
-            </field-visibility>
-            <appearance>
-               <field id="fdk:folderSingle" read-only="true" />
-               <field id="fdk:contentSingle">
-                  <control>
-                     <control-param name="showTargetLink">true</control-param>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/hidden.ftl">
+                     <control-param name="contextProperty">mimeType</control-param>
                   </control>
                </field>
             </appearance>
-         </form>
-         
-         <form id="empty-config">
          </form>
       </forms>
    </config>

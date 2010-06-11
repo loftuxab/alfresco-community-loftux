@@ -48,6 +48,19 @@ body
 
 .form-instance
 {
-   margin-left: 1.4em; 
-   margin-top: 1.4em;
+   margin: 1.4em; 
 }
+
+.unit-test-field
+{
+   background-color: black;
+   color: white;
+}
+
+.unit-test-checkbox
+{
+   float: right;
+   margin-right: 90%;
+}
+
+
