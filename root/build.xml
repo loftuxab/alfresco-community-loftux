@@ -922,6 +922,8 @@
       </apply>
    </target>
    
+   <target name="deploy-fdk" depends="deploy-share-fdk, deploy-repo-fdk-exploded" />
+   
    <target name="deploy-share-fdk" depends="package-fdk-client">
       <copy todir="${home.tomcat.application}/shared/lib" 
             file="${dir.project.fdk.client.dist}/${file.name.jar.fdk}" />

@@ -42,6 +42,7 @@
       <script type="text/javascript" src="${url.context}/service/messages.js?locale=en_US"></script>
       <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
       <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
+      <script type="text/javascript" src="${url.context}/res/fdk/fdk.js"></script>
       
       <script type="text/javascript">//<![CDATA[
          Alfresco.constants = Alfresco.constants || {};
@@ -56,6 +57,9 @@
          Alfresco.constants.USERNAME = "admin";
          Alfresco.constants.HTML_EDITOR = "tinyMCE";
          Alfresco.constants.URI_TEMPLATES = {};
+         
+         // register event handler callback
+         YAHOO.Bubbling.on("formContentReady", FDK.formConsoleContentReady, null);
       //]]></script>
       
       <@renderStylesheets />

@@ -5,6 +5,7 @@
    <source-id>form-console</source-id>
    <url>/components/form</url>
    <properties>
-      <showResetButton>true</showResetButton>
+      <showCancelButton>true</showCancelButton>
+      <showResetButton>false</showResetButton>
    </properties>
 </component>

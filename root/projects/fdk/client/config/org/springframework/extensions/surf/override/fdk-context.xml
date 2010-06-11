@@ -18,6 +18,7 @@
       <property name="configs">
          <list>
             <value>classpath:alfresco/fdk-config.xml</value>
+            <value>classpath:alfresco/fdk-unit-tests-config.xml</value>
             <value>classpath:alfresco/web-extension/fdk-config-custom.xml</value>
          </list>
       </property>

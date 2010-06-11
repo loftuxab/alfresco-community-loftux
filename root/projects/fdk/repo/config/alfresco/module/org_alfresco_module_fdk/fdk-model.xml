@@ -301,6 +301,34 @@
             <property name="fdk:with-dash">
                <type>d:text</type>
             </property>
+            <property name="fdk:mandatory">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="fdk:listConstraint">
+               <type>d:text</type>
+               <constraints>
+                  <constraint ref="fdk:type" />
+               </constraints>
+            </property>
+            <property name="fdk:lengthConstraint">
+               <type>d:text</type>
+               <constraints>
+                  <constraint ref="fdk:summary" />
+               </constraints>
+            </property>
+            <property name="fdk:minmaxConstraint">
+               <type>d:text</type>
+               <constraints>
+                  <constraint ref="fdk:percentage" />
+               </constraints>
+            </property>
+            <property name="fdk:regexConstraint">
+               <type>d:text</type>
+               <constraints>
+                  <constraint ref="fdk:email" />
+               </constraints>
+            </property>
          </properties>
          <associations>
             <association name="fdk:duplicate">
