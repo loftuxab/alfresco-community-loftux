@@ -1,5 +1,11 @@
 <alfresco-config>
 
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="kerberos" class="org.alfresco.web.site.servlet.config.KerberosConfigElementReader"/>
+      </element-readers>
+   </plug-ins>
+
    <!-- Global config section -->
    <config>
       <flags>

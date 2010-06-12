@@ -136,10 +136,37 @@
       </tree>
    </config>
    
+   <!-- Kerberos settings -->
+   <config evaluator="string-compare" condition="Kerberos" replace="true">
+      <kerberos>
+         <!--
+            Password for HTTP service account.
+            The account name *must* be built from the HTTP server name, in the format :
+               HTTP/<server_name>@<realm>
+            (NB this is because the web browser requests an ST for the
+            HTTP/<server_name> principal in the current realm, so if we're to decode
+            that ST, it has to match.)
+         -->
+         <password>secret</password>
+         <!--
+            Kerberos realm and KDC address.
+         -->
+         <realm>ALFRESCO.ORG</realm>
+         <!--
+            Service Principal Name to use on the repository tier.
+            This must be like: HTTP/host.name@REALM
+         -->
+         <endpoint-spn>HTTP/repository.server.com@ALFRESCO.ORG</endpoint-spn>
+         <!--
+            JAAS login configuration entry name.
+         -->
+         <config-entry>ShareHTTP</config-entry>
+      </kerberos>
+   </config>
+
    <!-- 
-        Overriding endpoints to reference an Alfresco server with external SSO or NTLM enabled
-        NOTE: For NTLM, the NTLM Authentication Filter must also be enabled in Share web.xml
-              and if utilising a load balancer between web-tier and repository cluster, the "sticky
+        Overriding endpoints to reference an Alfresco server with external SSO enabled
+        NOTE: If utilising a load balancer between web-tier and repository cluster, the "sticky
               sessions" feature of your load balancer must be used.
         NOTE: If alfresco server location is not localhost:8080 then also combine changes from the
               "example port config" section below.
