@@ -40,20 +40,16 @@
       <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
    </filter>
    
-   <!-- For NTLM authentication support use the following filter and the mappings below
    <filter>
+      <description>Share SSO authentication support filter.</description>
       <filter-name>Authentication Filter</filter-name>
-      <description>Share NTLM authentication support filter.</description>
-      <filter-class>org.alfresco.web.site.servlet.NTLMAuthenticationFilter</filter-class>
+      <filter-class>org.alfresco.web.site.servlet.SSOAuthenticationFilter</filter-class>
       <init-param>
          <param-name>endpoint</param-name>
          <param-value>alfresco</param-value>
       </init-param>
    </filter>
-   -->
    
-   <!-- For NTLM authentication support enable the following mappings -->
-   <!-- after enabling the NTLMAuthenticationFilter filter class above
    <filter-mapping>
       <filter-name>Authentication Filter</filter-name>
       <url-pattern>/page/*</url-pattern>
@@ -63,7 +59,6 @@
       <filter-name>Authentication Filter</filter-name>
       <url-pattern>/p/*</url-pattern>
    </filter-mapping>
-   -->
    
    <filter-mapping>
       <filter-name>UrlRewriteFilter</filter-name>
