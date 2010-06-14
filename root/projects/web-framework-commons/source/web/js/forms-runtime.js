@@ -1456,6 +1456,28 @@ Alfresco.forms.validation.repoRegexMatch = function repoRegexMatch(field, args, 
 };
 
 /**
+ * Validation handler for a valid date and time, currently this simply looks for the
+ * presence of the 'invalid' class applied to the relevant field. This implies that this
+ * validation handler must be added after any other handlers that determine validity.
+ *
+ * @method validDateTime
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
+ * @static
+ */
+Alfresco.forms.validation.validDateTime = function validDateTime(field, args, event, form, silent, message)
+{
+   if (Alfresco.logger.isDebugEnabled())
+      Alfresco.logger.debug("Validating field '" + field.id + "' has a valid date and time");
+   
+   return !YAHOO.util.Dom.hasClass(field, "invalid");
+};
+
+/**
  * Validation handler for the repository 'list of values' constraint. As the UI
  * handles this by displaying the list of allowable values this handler is a dummy
  * placeholder.
