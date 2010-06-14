@@ -1,0 +1,368 @@
+Index: tika-parsers/src/test/java/org/apache/tika/parser/mbox/MboxParserTest.java
+===================================================================
+--- tika-parsers/src/test/java/org/apache/tika/parser/mbox/MboxParserTest.java	(revision 954405)
++++ tika-parsers/src/test/java/org/apache/tika/parser/mbox/MboxParserTest.java	(working copy)
+@@ -76,6 +76,7 @@
+             assertEquals("subject", metadata.get(Metadata.SUBJECT));
+             assertEquals("<author@domain.com>", metadata.get(Metadata.AUTHOR));
+             assertEquals("<author@domain.com>", metadata.get(Metadata.CREATOR));
++            assertEquals(null, metadata.get(Metadata.RECIPIENT_ADDRESS));
+             assertEquals("<name@domain.com>", metadata.get("MboxParser-return-path"));
+             assertEquals("Tue, 9 Jun 2009 23:58:45 -0400", metadata.get(Metadata.DATE));
+         } catch (Exception e) {
+@@ -134,6 +135,12 @@
+         try {
+             parser.parse(stream, handler, metadata, new ParseContext());
+ 
++            assertEquals("Re: question about when shuffle/sort start working", metadata.get(Metadata.TITLE));
++            assertEquals("Re: question about when shuffle/sort start working", metadata.get(Metadata.SUBJECT));
++            assertEquals("Jothi Padmanabhan <jothipn@yahoo-inc.com>", metadata.get(Metadata.AUTHOR));
++            assertEquals("Jothi Padmanabhan <jothipn@yahoo-inc.com>", metadata.get(Metadata.CREATOR));
++            assertEquals("core-user@hadoop.apache.org", metadata.get(Metadata.RECIPIENT_ADDRESS));
++            
+             verify(handler).startDocument();
+             verify(handler, times(3)).startElement(eq(XHTMLContentHandler.XHTML), eq("p"), eq("p"), any(Attributes.class));
+             verify(handler, times(3)).endElement(eq(XHTMLContentHandler.XHTML), eq("p"), eq("p"));
+Index: tika-parsers/src/test/java/org/apache/tika/parser/microsoft/OutlookParserTest.java
+===================================================================
+--- tika-parsers/src/test/java/org/apache/tika/parser/microsoft/OutlookParserTest.java	(revision 954405)
++++ tika-parsers/src/test/java/org/apache/tika/parser/microsoft/OutlookParserTest.java	(working copy)
+@@ -52,14 +52,17 @@
+         assertEquals(
+                 "Microsoft Outlook Express 6",
+                 metadata.get(Metadata.TITLE));
+-        // TODO: There's apparently some encoding issue in POI
+-        //assertEquals(
+-        //        "L'\u00C9quipe Microsoft Outlook Express",
+-        //        metadata.get(Metadata.AUTHOR));
++        assertEquals(
++                "Nouvel utilisateur de Outlook Express",
++                metadata.get(Metadata.RECIPIENT_ADDRESS));
++        assertEquals(
++                "L'\u00C9quipe Microsoft Outlook Express",
++                metadata.get(Metadata.AUTHOR));
+ 
+         String content = handler.toString();
++        assertTrue(content.contains(""));
+         assertTrue(content.contains("Microsoft Outlook Express 6"));
+-        //assertTrue(content.contains("L'\u00C9quipe Microsoft Outlook Express"));
++        assertTrue(content.contains("L'\u00C9quipe Microsoft Outlook Express"));
+         assertTrue(content.contains("Nouvel utilisateur de Outlook Express"));
+         assertTrue(content.contains("Messagerie et groupes de discussion"));
+     }
+Index: tika-parsers/src/test/java/org/apache/tika/parser/microsoft/ExcelParserTest.java
+===================================================================
+--- tika-parsers/src/test/java/org/apache/tika/parser/microsoft/ExcelParserTest.java	(revision 954405)
++++ tika-parsers/src/test/java/org/apache/tika/parser/microsoft/ExcelParserTest.java	(working copy)
+@@ -92,7 +92,7 @@
+             assertTrue(content.contains("-1.98E08"));
+ 
+             // Percentage
+-            assertTrue(content.contains("2%"));
++            assertTrue(content.contains("3%"));
+             assertTrue(content.contains("2.50%"));
+ 
+             // Time Format: h:mm
+Index: tika-parsers/src/test/java/org/apache/tika/parser/microsoft/ooxml/OOXMLParserTest.java
+===================================================================
+--- tika-parsers/src/test/java/org/apache/tika/parser/microsoft/ooxml/OOXMLParserTest.java	(revision 954405)
++++ tika-parsers/src/test/java/org/apache/tika/parser/microsoft/ooxml/OOXMLParserTest.java	(working copy)
+@@ -46,6 +46,7 @@
+     public void testExcel() throws Exception {
+         InputStream input = OOXMLParserTest.class
+                 .getResourceAsStream("/test-documents/testEXCEL.xlsx");
++        assertNotNull(input);
+ 
+         Parser parser = new AutoDetectParser();
+         Metadata metadata = new Metadata();
+@@ -99,14 +100,14 @@
+ 
+             // Currency $#,##0.00;[Red]($#,##0.00)
+             assertTrue(content.contains("$1,599.99"));
+-            assertTrue(content.contains("($1,599.99)"));
++            assertTrue(content.contains("$1,599.99)"));
+ 
+             // Scientific 0.00E+00
+             assertTrue(content.contains("1.98E08"));
+             assertTrue(content.contains("-1.98E08"));
+ 
+             // Percentage
+-            assertTrue(content.contains("2%"));
++            assertTrue(content.contains("3%"));
+             assertTrue(content.contains("2.50%"));
+ 
+             // Time Format: h:mm
+@@ -127,6 +128,10 @@
+             // Date/Time Format
+             assertTrue(content.contains("19/01/2008 04:35"));
+ 
++            // Currency $#,##0.00;[Red]($#,##0.00)
++            assertTrue(content.contains("$1,599.99"));
++            assertTrue(content.contains("($1,599.99)"));
++            
+             // Custom Number (0 "dollars and" .00 "cents")
+             assertTrue(content.contains("19 dollars and .99 cents"));
+ 
+Index: tika-parsers/src/main/java/org/apache/tika/parser/mbox/MboxParser.java
+===================================================================
+--- tika-parsers/src/main/java/org/apache/tika/parser/mbox/MboxParser.java	(revision 954405)
++++ tika-parsers/src/main/java/org/apache/tika/parser/mbox/MboxParser.java	(working copy)
+@@ -47,6 +47,7 @@
+     public static final String MBOX_MIME_TYPE = "application/mbox";
+     public static final String MBOX_RECORD_DIVIDER = "From ";
+     private static final Pattern EMAIL_HEADER_PATTERN = Pattern.compile("([^ ]+):[ \t]*(.*)");
++    private static final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile("<(.*@.*)>");
+ 
+     private static final String EMAIL_HEADER_METADATA_PREFIX = MboxParser.class.getSimpleName() + "-";
+     private static final String EMAIL_FROMLINE_METADATA = EMAIL_HEADER_METADATA_PREFIX + "from";
+@@ -191,6 +192,15 @@
+         if (headerTag.equalsIgnoreCase("From")) {
+             metadata.add(Metadata.AUTHOR, headerContent);
+             metadata.add(Metadata.CREATOR, headerContent);
++        } else if (headerTag.equalsIgnoreCase("To") ||
++        	headerTag.equalsIgnoreCase("Cc") ||
++        	headerTag.equalsIgnoreCase("Bcc")) {
++            Matcher address = EMAIL_ADDRESS_PATTERN.matcher(headerContent);
++            if(address.find()) {
++        	metadata.add(Metadata.RECIPIENT_ADDRESS, address.group(1));
++            } else if(headerContent.indexOf('@') > -1) {
++        	metadata.add(Metadata.RECIPIENT_ADDRESS, headerContent);
++            }
+         } else if (headerTag.equalsIgnoreCase("Subject")) {
+             metadata.add(Metadata.SUBJECT, headerContent);
+             metadata.add(Metadata.TITLE, headerContent);
+Index: tika-parsers/src/main/java/org/apache/tika/parser/microsoft/OutlookExtractor.java
+===================================================================
+--- tika-parsers/src/main/java/org/apache/tika/parser/microsoft/OutlookExtractor.java	(revision 954405)
++++ tika-parsers/src/main/java/org/apache/tika/parser/microsoft/OutlookExtractor.java	(working copy)
+@@ -16,14 +16,13 @@
+  */
+ package org.apache.tika.parser.microsoft;
+ 
++import java.io.ByteArrayInputStream;
+ import java.io.IOException;
+-import java.io.InputStream;
+-import java.util.Map;
++import java.text.SimpleDateFormat;
+ 
+-import org.apache.poi.hsmf.datatypes.Chunks;
+-import org.apache.poi.hsmf.datatypes.StringChunk;
++import org.apache.poi.hsmf.MAPIMessage;
++import org.apache.poi.hsmf.datatypes.AttachmentChunks;
+ import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
+-import org.apache.poi.hsmf.parsers.POIFSChunkParser;
+ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+ import org.apache.tika.exception.TikaException;
+ import org.apache.tika.metadata.Metadata;
+@@ -39,66 +38,107 @@
+  * Outlook Message Parser.
+  */
+ class OutlookExtractor {
+-
+-    private final Chunks chunks;
+-
+-    private final POIFSChunkParser parser;
+-
++    private final MAPIMessage msg;
+     private final ParseContext context;
+ 
+-    public OutlookExtractor(
+-            POIFSFileSystem filesystem, ParseContext context)
+-            throws TikaException {
++    public OutlookExtractor(POIFSFileSystem filesystem, ParseContext context) throws TikaException {
+         try {
++            this.msg = new MAPIMessage(filesystem);
+             this.context = context;
+-            this.parser = new POIFSChunkParser(filesystem);
+-            this.chunks = parser.identifyChunks();
+         } catch (IOException e) {
+-            throw new TikaException("Failed to parse Outlook chunks", e);
++            throw new TikaException("Failed to parse Outlook message", e);
+         }
+     }
+ 
+-    @SuppressWarnings("unchecked")
+     public void parse(XHTMLContentHandler xhtml, Metadata metadata)
+             throws TikaException, SAXException {
+-        String subject = getChunk(chunks.subjectChunk);
+-        String from = getChunk(chunks.displayFromChunk);
+-
+-        metadata.set(Metadata.AUTHOR, from);
+-        metadata.set(Metadata.TITLE, subject);
+-        metadata.set(Metadata.SUBJECT, getChunk(chunks.conversationTopic));
+-
+-        xhtml.element("h1", subject);
+-
+-        xhtml.startElement("dl");
+-        header(xhtml, "From", from);
+-        header(xhtml, "To", getChunk(chunks.displayToChunk));
+-        header(xhtml, "Cc", getChunk(chunks.displayCCChunk));
+-        header(xhtml, "Bcc", getChunk(chunks.displayBCCChunk));
+-        xhtml.endElement("dl");
+-
+-        xhtml.element("p", getChunk(chunks.textBodyChunk));
+-
+-        Map<String, InputStream> attachments =  parser.getAttachmentList();
+-        for (String key : attachments.keySet())
+-        {
+-            xhtml.startElement("div", "class", "attachment-entry");
+-            Metadata entrydata = new Metadata();
+-            if (key != null && key.length() > 0) {
+-                entrydata.set(Metadata.RESOURCE_NAME_KEY, key);
+-                xhtml.element("h1", key);
+-            }
+-            try {
+-                // Use the delegate parser to parse this entry
+-                context.get(Parser.class, EmptyParser.INSTANCE).parse(
+-                        attachments.get(key),
+-                        new EmbeddedContentHandler(new BodyContentHandler(xhtml)),
+-                        entrydata,
+-                        context);
+-            } catch (Exception e) {
+-                // Could not parse the entry, just skip the content
+-            }
+-            xhtml.endElement("div");
++        try {
++           msg.setReturnNullOnMissingChunk(true);
++          
++           String subject = msg.getSubject();
++           String from = msg.getDisplayFrom();
++   
++           metadata.set(Metadata.AUTHOR, from);
++           metadata.set(Metadata.TITLE, subject);
++           metadata.set(Metadata.SUBJECT, msg.getConversationTopic());
++           
++           try {
++           for(String recipientAddress : msg.getRecipientEmailAddressList()) {
++               if(recipientAddress != null)
++        	   metadata.add(Metadata.RECIPIENT_ADDRESS, recipientAddress);
++           }
++           } catch(ChunkNotFoundException he) {} // Will be fixed in POI 3.7 Final
++           
++           // Date - try two ways to find it
++           // First try via the proper chunk
++           if(msg.getMessageDate() != null) {
++              metadata.set(Metadata.EDIT_TIME, msg.getMessageDate().getTime().toString());
++              metadata.set(Metadata.LAST_SAVED, msg.getMessageDate().getTime().toString());
++           } else {
++              try {
++                 // Failing that try via the raw headers 
++                 String[] headers = msg.getHeaders();
++                 if(headers != null && headers.length > 0) {
++                     for(String header: headers) {
++                        if(header.toLowerCase().startsWith("date:")) {
++                    	String date = header.substring(header.indexOf(':')+1);
++                            metadata.set(Metadata.EDIT_TIME, date);
++                            metadata.set(Metadata.LAST_SAVED, date);
++                            break;
++                        }
++                     }
++                 }
++              } catch(ChunkNotFoundException he) {
++                 // We can't find the date, sorry...
++              }
++           }
++           
++   
++           xhtml.element("h1", subject);
++   
++           xhtml.startElement("dl");
++           header(xhtml, "From", from);
++           header(xhtml, "To", msg.getDisplayTo());
++           header(xhtml, "Cc", msg.getDisplayCC());
++           header(xhtml, "Bcc", msg.getDisplayBCC());
++           try {
++               header(xhtml, "Recipients", msg.getRecipientEmailAddress());
++           } catch(ChunkNotFoundException e) {}
++           xhtml.endElement("dl");
++   
++           xhtml.element("p", msg.getTextBody());
++           
++           for (AttachmentChunks attachment : msg.getAttachmentFiles()) {
++               xhtml.startElement("div", "class", "attachment-entry");
++               Metadata entrydata = new Metadata();
++               
++               String filename = null;
++               if (attachment.attachLongFileName != null) {
++        	   filename = attachment.attachLongFileName.getValue();
++               } else if (attachment.attachFileName != null) {
++        	   filename = attachment.attachFileName.getValue();
++               }
++               if (filename != null && filename.length() > 0) {
++                   entrydata.set(Metadata.RESOURCE_NAME_KEY, filename);
++                   xhtml.element("h1", filename);
++               }
++               
++               try {
++                   // Use the delegate parser to parse this entry
++                   context.get(Parser.class, EmptyParser.INSTANCE).parse(
++                	   new ByteArrayInputStream(attachment.attachData.getValue()),
++                           new EmbeddedContentHandler(new BodyContentHandler(xhtml)),
++                           entrydata,
++                           context
++                   );
++               } catch (Exception e) {
++                   // Could not parse the entry, just skip the content
++               }
++               xhtml.endElement("div");
++               
++           }
++        } catch(ChunkNotFoundException e) {
++           throw new TikaException("POI MAPIMessage broken - didn't return null on missing chunk", e);
+         }
+     }
+ 
+@@ -109,21 +149,4 @@
+             xhtml.element("dd", value);
+         }
+     }
+-
+-    /**
+-     * Returns the content of the identified string chunk in the
+-     * current document. Returns the empty string if the identified
+-     * chunk does not exist in the current document.
+-     *
+-     * @param chunk string chunk identifier
+-     * @return content of the identified chunk, or the empty string
+-     */
+-    private String getChunk(StringChunk chunk) {
+-        try {
+-            return parser.getDocumentNode(chunk).toString();
+-        } catch (ChunkNotFoundException e) {
+-            return "";
+-        }
+-    }
+-
+ }
+Index: tika-parsers/src/main/java/org/apache/tika/parser/microsoft/ExcelExtractor.java
+===================================================================
+--- tika-parsers/src/main/java/org/apache/tika/parser/microsoft/ExcelExtractor.java	(revision 954405)
++++ tika-parsers/src/main/java/org/apache/tika/parser/microsoft/ExcelExtractor.java	(working copy)
+@@ -42,13 +42,13 @@
+ import org.apache.poi.hssf.record.FormulaRecord;
+ import org.apache.poi.hssf.record.HyperlinkRecord;
+ import org.apache.poi.hssf.record.TextObjectRecord;
+-import org.apache.poi.hssf.record.UnicodeString;
+ import org.apache.poi.hssf.record.LabelRecord;
+ import org.apache.poi.hssf.record.LabelSSTRecord;
+ import org.apache.poi.hssf.record.NumberRecord;
+ import org.apache.poi.hssf.record.RKRecord;
+ import org.apache.poi.hssf.record.Record;
+ import org.apache.poi.hssf.record.SSTRecord;
++import org.apache.poi.hssf.record.common.UnicodeString;
+ import org.apache.poi.poifs.filesystem.DocumentInputStream;
+ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+ import org.apache.tika.sax.XHTMLContentHandler;
+Index: tika-parsers/pom.xml
+===================================================================
+--- tika-parsers/pom.xml	(revision 954405)
++++ tika-parsers/pom.xml	(working copy)
+@@ -35,7 +35,7 @@
+   <url>http://lucene.apache.org/tika/</url>
+ 
+   <properties>
+-    <poi.version>3.6</poi.version>
++    <poi.version>3.7-beta1</poi.version>
+   </properties>
+ 
+   <dependencies>
