@@ -202,6 +202,27 @@
          Event.addListener(this.id + "-time", "keyup", this._handleFieldChange, this, true);
          Event.addListener(this.id + "-icon", "click", this._showPicker, this, true);
          
+         // register a validation handler for the date entry field so that the submit 
+         // button disables when an invalid date is entered
+         YAHOO.Bubbling.fire("registerValidationHandler", 
+         {
+            fieldId: this.id + "-date",
+            handler: Alfresco.forms.validation.validDateTime,
+            when: "keyup"
+         });
+         
+         // register a validation handler for the time entry field (if applicable)
+         // so that the submit button disables when an invalid date is entered
+         if (this.options.showTime)
+         {
+            YAHOO.Bubbling.fire("registerValidationHandler", 
+            {
+               fieldId: this.id + "-time",
+               handler: Alfresco.forms.validation.validDateTime,
+               when: "keyup"
+            });
+         }
+         
          // render the calendar control
          this.widgets.calendar.render();
 

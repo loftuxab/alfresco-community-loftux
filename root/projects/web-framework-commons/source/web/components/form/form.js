@@ -58,6 +58,7 @@
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("metadataRefresh", this.onFormRefresh, this);
       YAHOO.Bubbling.on("mandatoryControlValueUpdated", this.onMandatoryControlValueUpdated, this);
+      YAHOO.Bubbling.on("registerValidationHandler", this.onRegisterValidationHandler, this);
 
       return this;
    };
@@ -350,6 +351,27 @@
          // the value of a mandatory control on the page (usually represented by a hidden field)
          // has been updated, force the forms runtime to check if form state is still valid
          this.formsRuntime.updateSubmitElements();
+      },
+      
+      /**
+       * Register validation handler event handler
+       *
+       * @method onRegisterValidationHandler
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onRegisterValidationHandler: function FormUI_onRegisterValidationHandler(layer, args)
+      {
+         // extract the validation arguments
+         var validation = args[1];
+         
+         // check the minimim required data is provided
+         if (validation && validation.fieldId && validation.handler)
+         {
+            // register with the forms runtime instance
+            this.formsRuntime.addValidation(validation.fieldId, validation.handler, validation.args, 
+                  validation.when, validation.message);
+         }
       },
       
       /**
