@@ -13,7 +13,7 @@
             </#if>
          </div>
 <#escape x as x?html>
-         <div class="namelabel"><a href="${url.context}/page/user/${user.name?url}/profile" class="theme-color-1">${user.properties["firstName"]!""} ${user.properties["lastName"]!""}</a></div>
+         <div class="namelabel"><a href="${url.context}/page/user/profile" class="theme-color-1">${user.properties["firstName"]!""} ${user.properties["lastName"]!""}</a></div>
          <div class="fieldlabel">${user.properties["jobtitle"]!""}</div>
       </div>
       <div class="clear"></div>

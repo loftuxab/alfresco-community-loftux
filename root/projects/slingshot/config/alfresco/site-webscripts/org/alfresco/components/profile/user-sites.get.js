@@ -1,6 +1,14 @@
+/**
+ * User Profile Component - User Sites list
+ */
 
 // Call the repo for sites the user is a member of
-var result = remote.call("/api/people/" + stringUtils.urlEncode(page.url.templateArgs["userid"]) + "/sites?size=100");
+var userId = page.url.templateArgs["userid"];
+if (userId == null)
+{
+   userId = user.id;
+}
+var result = remote.call("/api/people/" + stringUtils.urlEncode(userId) + "/sites?size=100");
 model.sites = [];
 if (result.status == 200)
 {
@@ -8,6 +16,3 @@ if (result.status == 200)
    model.sites = eval('(' + result + ')');
 }
 model.numSites = model.sites.length;
-
-// get activity for user
-// /api/activities/feed/user/loz?s=mobile&format=json

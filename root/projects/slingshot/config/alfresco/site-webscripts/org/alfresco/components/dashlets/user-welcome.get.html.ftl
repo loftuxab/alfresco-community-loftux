@@ -18,7 +18,7 @@ new Alfresco.dashlet.UserWelcome("${args.htmlid}");
       <div class="detail-list-item">
          <h4 class="theme-color-2">${msg("header.userProfile")}</h4>
          <div>${msg("text.userProfile")}</div>
-         <div><a href="${url.context}/page/user/${user.name?url}/profile" class="theme-color-2">${msg("link.userProfile")}</a></div>
+         <div><a href="${url.context}/page/user/profile" class="theme-color-2">${msg("link.userProfile")}</a></div>
       </div>
       <div class="detail-list-item">
          <h4 class="theme-color-2">${msg("header.customiseDashboard")}</h4>

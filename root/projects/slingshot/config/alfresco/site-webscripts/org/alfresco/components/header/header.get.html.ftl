@@ -14,7 +14,7 @@
    }).setMessages(
       ${messages}
    );
-   Alfresco.util.createTwister.collapsed = "${collapsedTwisters?html}"
+   Alfresco.util.createTwister.collapsed = "${collapsedTwisters?js_string}"
 //]]></script>
 </#if>
 <#assign logo=msg("header.logo")><#if logo="header.logo"><#assign logo="app-logo.png"></#if>
@@ -29,7 +29,7 @@
       <#if !user.isGuest>
       <div class="personal-menu">   
          <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name?url}/dashboard">${msg("link.myDashboard")}</a></span>
-         <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.myProfile")}</a></span>
+         <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/profile">${msg("link.myProfile")}</a></span>
          <span id="${args.htmlid}-sites-linkMenuButton" class="link-menu-button">
             <span class="menu-item-icon sites link-menu-button-link"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
             <input id="${args.htmlid}-sites" type="button"/>
