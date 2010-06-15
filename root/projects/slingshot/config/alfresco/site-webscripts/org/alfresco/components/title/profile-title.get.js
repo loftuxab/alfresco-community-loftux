@@ -1,3 +1,7 @@
+/**
+ * User Profile - Title Component
+ */
+
 var profileId = page.url.templateArgs["userid"];
 if (profileId != null)
 {

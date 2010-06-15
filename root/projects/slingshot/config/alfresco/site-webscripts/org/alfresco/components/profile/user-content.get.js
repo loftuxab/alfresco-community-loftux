@@ -1,16 +1,24 @@
+/**
+ * User Profile Component - User Content list
+ */
+
 model.addedContent = [];
 model.modifiedContent = [];
 
 // read config - use default values if not found
 var maxItems = 3,
-   conf = new XML(config.script);
-
+    conf = new XML(config.script);
 if (conf["max-items"] != null)
 {
    maxItems = parseInt(conf["max-items"]);
 }
 
-var result = remote.call("/slingshot/profile/usercontents?user=" + stringUtils.urlEncode(page.url.templateArgs["userid"]) + "&maxResults=" + maxItems);
+var userId = page.url.templateArgs["userid"];
+if (userId == null)
+{
+   userId = user.id;
+}
+var result = remote.call("/slingshot/profile/usercontents?user=" + stringUtils.urlEncode(userId) + "&maxResults=" + maxItems);
 if (result.status == 200)
 {
    // Create javascript objects from the server response

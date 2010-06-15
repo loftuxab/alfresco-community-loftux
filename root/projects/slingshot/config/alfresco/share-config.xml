@@ -30,7 +30,7 @@
          <uri-template id="sitepage">/site/{site}/{pageid}</uri-template>
          <uri-template id="userdashboardpage">/user/{userid}/dashboard</uri-template>
          <uri-template id="userpage">/user/{userid}/{pageid}</uri-template>
-         <uri-template id="userprofilepage">/user/{userid}/profile</uri-template>
+         <uri-template id="userdefaultpage">/user/{pageid}</uri-template>
          <uri-template id="consolepage">/console/{pageid}/{toolid}</uri-template>
       </uri-templates>
    </config>
