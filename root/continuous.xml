@@ -62,6 +62,16 @@
                     test,
                     distribute" />
 
+   <target name="continuous-core" 
+           description="Performs a full clean, runs all tests and creates all patch distribution files"
+           depends="clean-continuous, 
+                    clean, 
+                    -reset-database,
+                    set-build-number,
+                    init-test,
+                    test,
+                    distribute-core" />
+
    <target name="continuous-without-tests" 
            description="Performs a full clean and creates all distribution files"
            depends="clean-continuous, 
@@ -73,25 +83,41 @@
            description="Creates the distribution files for all platforms"
            depends="set-build-number,
                     incremental, 
-                    distribute-mmt,
-                    distribute-bm-remote,
-                    distribute-amps,
-                    distribute-command-jars,
-                    distribute-tomcat,
-                    distribute-war,
-                    distribute-wcm,
+                    distribute-core,
+                    distribute-non-core,
+                    revert-changes" />
+
+   <target name="distribute-patch" 
+           description="Creates the distribution files for all platforms"
+           depends="set-build-number,
+                    incremental, 
+                    distribute-core,
+                    revert-changes" />
+
+   <target name="distribute-non-core" 
+           description="Creates the distribution files for all platforms"
+           depends="distribute-core-amps,
                     distribute-sdk, 
-                    distribute-webserviceclient,
-                    distribute-extensions-office2003,
-                    distribute-deployment,
                     distribute-sample-extensions,
                     distribute-installers,
                     distribute-xforms-examples,
                     distribute-extras,
-                    distribute-webeditor,
                     distribute-fdk,
-                    distribute-docs,
-                    revert-changes" />
+                    distribute-docs" />
+
+   <target name="distribute-core" 
+           description="Creates the patch distribution files for all platforms"
+           depends="distribute-mmt,
+                    distribute-bm-remote,
+                    distribute-core-amps,
+                    distribute-command-jars,
+                    distribute-tomcat,
+                    distribute-war,
+                    distribute-wcm,
+                    distribute-webserviceclient,
+                    distribute-extensions-office2003,
+                    distribute-deployment,
+                    distribute-webeditor" />
 
    <target name="set-build-number"
            depends="continuous-init, set-build-devbox-number, set-revision-number">
