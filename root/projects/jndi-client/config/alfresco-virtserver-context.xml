@@ -117,50 +117,6 @@
     </bean>
 
 
-
-    <!-- The AttributeService -->
-    <bean id="attributeService" 
-          class="org.alfresco.repo.remote.AttributeServiceRemote">
-        <property name="clientTicketHolder">
-            <ref bean="clientTicketHolder"/>
-        </property>
-        <property name="attributeServiceTransport">
-            <ref bean="attributeServiceTransport"/>
-        </property>
-    </bean>
-    <!-- Re-authenticating transport for AttributeService -->
-    <bean id="attributeServiceTransport" 
-          class="org.springframework.aop.framework.ProxyFactoryBean">
-        <property name="proxyInterfaces">
-            <list>
-                <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
-            </list>
-        </property>
-        <property name="target">
-            <ref bean="attributeServiceTransportRaw"/>
-        </property>
-        <property name="interceptorNames">
-            <list>
-                <value>avmReauthenticatingAdvisor</value>
-            </list>
-        </property>
-    </bean>
-    <!-- Raw transport for AttributeServic -->
-    <bean id="attributeServiceTransportRaw" 
-          class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-        <property name="serviceUrl">
-            <value>rmi://${alfresco.rmi.services.host}:${alfresco.rmi.services.port}/attributes</value>
-        </property>
-        <property name="serviceInterface">
-            <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
-        </property>
-        <property name="refreshStubOnConnectFailure">
-            <value>true</value>
-        </property>
-    </bean>
-
-
-
     <!-- The JNDI info bean for jndi-client specific property access -->
     <bean id="jndiInfoBean" 
           class="org.alfresco.jndi.JndiInfoBean">

@@ -1470,8 +1470,6 @@
             file="${dir.project.jndi.dist}/${file.name.jar.jndi}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.jlan.dist}/${file.name.jar.jlan}" />
-      <copy todir="${dir.continuous.assemble.sdk}/lib/server"
-            file="${dir.project.linkvalidation.dist}/${file.name.jar.linkvalidation}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.mbeans.dist}/${file.name.jar.mbeans}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server"
@@ -1654,9 +1652,6 @@
       </copy>
       <copy todir="${dir.continuous.assemble.docs.java}/jndi-client">
          <fileset dir="${dir.project.jndi.docs.java}" />
-      </copy>
-      <copy todir="${dir.continuous.assemble.docs.java}/link-validation">
-         <fileset dir="${dir.project.linkvalidation.docs.java}" />
       </copy>
       <copy todir="${dir.continuous.assemble.docs.java}/mbeans">
          <fileset dir="${dir.project.mbeans.docs.java}" />

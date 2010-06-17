@@ -66,9 +66,9 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.GUID;
-import org.springframework.extensions.surf.util.ParameterCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.surf.util.ParameterCheck;
 
 /**
  * Records Management AdminService Implementation.
@@ -553,6 +553,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 
 		if (assocDef.isChild())
 		{
+		    // TODO:  Ask for a more efficient method such as
+		    //        nodeService.removeChildAssociation(fromNode, toNode, chRef.getTypeQName(), null);
+
 			List<ChildAssociationRef> children = nodeService.getChildAssocs(fromNode);
 			for (ChildAssociationRef chRef : children)
 			{

@@ -86,7 +86,7 @@
     <bean id="recordComponentIdentifierAspect" class="org.alfresco.module.org_alfresco_module_dod5015.identifier.RecordComponentIdentifierAspect" init-method="init">
         <property name="policyComponent" ref="policyComponent"/>
         <property name="nodeService" ref="NodeService"/>
-        <property name="propertyValueComponent" ref="propertyValueComponent"/>
+        <property name="attributeService" ref="attributeService"/>
     </bean>
     
     <!-- Import fixed permission definitions for RM -->

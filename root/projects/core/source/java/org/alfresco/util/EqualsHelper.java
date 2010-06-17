@@ -21,7 +21,9 @@ package org.alfresco.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility class providing helper methods for various types of <code>equals</code> functionality
@@ -161,5 +163,81 @@ public class EqualsHelper
         {
             return null;
         }
+    }
+    
+    /**
+     * Enumeration for results returned by {@link EqualsHelper#getMapComparison(Map, Map) map comparisons}.
+     * 
+     * @author Derek Hulley
+     * @since 3.3
+     */
+    public static enum MapValueComparison
+    {
+        /** The value was missing from both maps */
+        NULL,
+        /** The value was only present in the left map */
+        LEFT_ONLY,
+        /** The value was only present in the right map */
+        RIGHT_ONLY,
+        /** The value was present in both maps and equal */ 
+        EQUAL,
+        /** The value was present in both maps but not equal */
+        NOT_EQUAL
+    }
+    
+    /**
+     * Compare two maps.
+     * <p/>
+     * The return codes that accompany the keys are:
+     * <ul>
+     *    <li>Null:     The value in the left and right maps are equal.</li>
+     *    <li>Zero:     The value was not equal.</li>
+     *    <li>Negative: The left map contained a value but the right didn't.</li>
+     *    <li>Positive: The right map contained a value but the left didn't.</li>
+     * </ul>
+     *  
+     * @param <K>           the map key type
+     * @param <V>           the map value type
+     * @param left          the left side of the comparison 
+     * @param right         the right side of the comparison
+     * @return              Returns a map whose keys are a union of the two maps' keys, along with
+     *                      the value comparison result
+     */
+    public static <K, V> Map<K, MapValueComparison> getMapComparison(Map<K, V> left, Map<K, V> right)
+    {
+        Set<K> keys = new HashSet<K>(left.size() + right.size());
+        keys.addAll(left.keySet());
+        keys.addAll(right.keySet());
+        
+        Map<K, MapValueComparison> diff = new HashMap<K, MapValueComparison>(left.size() + right.size());
+
+        // Iterate over the keys and do the comparisons
+        for (K key : keys)
+        {
+            V leftValue = left.get(key);
+            V rightValue = right.get(key);
+            if (leftValue == null && rightValue == null)
+            {
+                diff.put(key, MapValueComparison.NULL);
+            }
+            else if (leftValue != null && rightValue == null)
+            {
+                diff.put(key, MapValueComparison.LEFT_ONLY);
+            }
+            else if (leftValue == null && rightValue != null)
+            {
+                diff.put(key, MapValueComparison.RIGHT_ONLY);
+            }
+            else if (leftValue.equals(rightValue))
+            {
+                diff.put(key, MapValueComparison.EQUAL);
+            }
+            else
+            {
+                diff.put(key, MapValueComparison.NOT_EQUAL);
+            }
+        }
+        
+        return diff;
     }
 }
