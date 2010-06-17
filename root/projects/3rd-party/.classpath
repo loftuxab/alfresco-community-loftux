@@ -186,7 +186,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/google/gdata-docs-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/google/gdata-media-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/google/google-collect-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/chemistry-abdera-0.1-incubating-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/chemistry-tck-atompub-0.1-incubating-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/chemistry-abdera-0.1-incubating-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-0.1-incubating-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
