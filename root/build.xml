@@ -98,7 +98,6 @@
          <pathelement location="${dir.project.mbeans.classes}" />
          <pathelement location="${dir.project.jndi.classes}" />
          <pathelement location="${dir.project.deployment.classes}" />
-         <pathelement location="${dir.project.linkvalidation.classes}" />
          <pathelement location="${dir.project.remoteapi.classes}" />
          <pathelement location="${dir.project.repository.classes}" />
          <pathelement location="${dir.project.wdrdeployment.classes}" />
@@ -111,7 +110,6 @@
          <pathelement location="${dir.project.repository.config}" />
          <pathelement location="${dir.project.webclient.config}" />
          <pathelement location="${dir.project.deployment.config}" />
-         <pathelement location="${dir.project.linkvalidation.config}" />
          <pathelement location="${dir.project.remoteapi.config}" />
          
          <pathelement location="${dir.project.core}/${dir.name.source}/${dir.name.test.resources}" />
@@ -244,8 +242,7 @@
                     incremental-remoteapi,
                     incremental-webframeworkcommons,
                     incremental-jndi,
-                    incremental-catalinavirtual, 
-                    incremental-linkvalidation" />
+                    incremental-catalinavirtual" />
    
    <target name="incremental" 
            description="Performs an incremental build of all projects"
@@ -397,7 +394,6 @@
                     generate-javadocs-remoteapi, 
                     generate-javadocs-jndi,
                     generate-javadocs-catalinavirtual, 
-                    generate-javadocs-linkvalidation,
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
                     generate-javadocs-webserviceclient,
@@ -431,7 +427,6 @@
                     clean-remoteapi, 
                     clean-jndi, 
                     clean-catalinavirtual, 
-                    clean-linkvalidation,
                     clean-webframeworkcommons,
                     clean-webclient" />
                     
@@ -589,7 +584,6 @@
          <fileset dir="${dir.project.wdrdeployment.classes}" />
          <fileset dir="${dir.project.remoteapi.classes}" />
          <fileset dir="${dir.project.catalinavirtual.classes}" />
-         <fileset dir="${dir.project.linkvalidation.classes}" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" />
          <fileset dir="${dir.project.webclient.classes}" 
                   excludes="**/extension/**" />
@@ -600,8 +594,6 @@
                   includes="log4j.properties" />
          <fileset dir="${dir.project.repository.config}" 
                   excludes="**/extension/**" />
-         <fileset dir="${dir.project.linkvalidation.config}" 
-                  excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.config}"
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.webclient.config}" 
@@ -610,14 +602,6 @@
          <fileset dir="${dir.project.repository.config}" 
                   includes="**/extension/dev-context.xml"/>
       </copy>
-
-      <!-- 
-           Temporary measure to help Eclipse users deal with 
-           link validation dependencies.  This should be cleaned
-           up when the build is transformed into a single project.
-      -->
-      <copy file="${dir.project.linkvalidation.config}/alfresco/alfresco-link-validation-bootstrap-context.xml"
-            todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes/alfresco/extension"/>
 
       <!-- explicitly copy the bootstrap file for remote api to get round dependency issue. -->
       <copy file="${dir.project.remoteapi.config}/alfresco/extension/bootstrap/remote-api-context.xml"

@@ -147,7 +147,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
             public Void execute() throws Throwable
             {
                 // Do some stuff
-                nodeService.setProperty(filePlan, ContentModel.PROP_MODIFIER, "" + System.currentTimeMillis());
+                nodeService.setProperty(filePlan, ContentModel.PROP_TITLE, "File Plan - " + System.currentTimeMillis());
 
                 return null;
             }

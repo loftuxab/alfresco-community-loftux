@@ -338,43 +338,9 @@
 
 
    <!-- ***************************** -->
-   <!-- ** Link Validation Project ** -->
+   <!-- ** Tomcat startup          ** -->
    <!-- ***************************** -->
    
-   <target name="incremental-linkvalidation" 
-           depends="package-linkvalidation" />
-      
-   <target name="build-linkvalidation" 
-           depends="clean-linkvalidation, 
-                    incremental-linkvalidation" />
-   
-   <target name="clean-linkvalidation" 
-           depends="init">
-      <clean projectdir="${dir.project.linkvalidation}" />
-   </target>
-   
-   <target name="compile-linkvalidation" 
-           depends="init">
-      <compile-java projectdir="${dir.project.linkvalidation}" />
-   </target>
-   
-   <target name="package-linkvalidation" 
-           depends="compile-linkvalidation">
-      <mkdir dir="${dir.project.linkvalidation.dist}" />
-      <jar jarfile="${dir.project.linkvalidation.dist}/${file.name.jar.linkvalidation}" 
-           basedir="${dir.project.linkvalidation.classes}" />
-   </target>
-   
-
-   <target name="test-linkvalidation" depends="init">
-      <alfresco-virtual-antcall target="_test-linkvalidation"/>
-   </target>
-
-   <target name="_test-linkvalidation" 
-           depends="compile-linkvalidation">
-      <run-tests projectdir="${dir.project.linkvalidation}" />
-   </target>
-
    <target name="start-tomcat-if-necessary"
            depends="tomcat-check-status" 
            unless="tomcat.started">
@@ -449,14 +415,6 @@
       </java>
       <sleep seconds="2"/>
    </target>
-
-   <target name="generate-javadocs-linkvalidation" 
-           depends="init">
-      <generate-javadocs documenttitle="Alfresco Link Validation API Specification ${version.number}" 
-                         windowtitle="Alfresco Link Validation API" 
-                         projectdir="${dir.project.linkvalidation}"/>
-   </target>
-
 
    
    <!-- ********************* -->
@@ -1912,8 +1870,6 @@
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
-         <fileset dir="${dir.project.linkvalidation.config}"
-                  excludes="**/extension/**" />
          <fileset dir="${dir.project.repository.config}"
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.config}"
@@ -1973,8 +1929,6 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.repository.dist}" 
                   includes="${file.name.jar.repository}" />
-         <fileset dir="${dir.project.linkvalidation.dist}" 
-                  includes="${file.name.jar.linkvalidation}" />
          <fileset dir="${dir.project.mbeans.dist}" 
                   includes="${file.name.jar.mbeans}" />
          <fileset dir="${dir.project.deployment.dist}"

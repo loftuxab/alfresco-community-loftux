@@ -28,9 +28,9 @@ import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
-import org.alfresco.repo.props.PropertyValueComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -51,7 +51,7 @@ public class RecordComponentIdentifierAspect
     
     private PolicyComponent policyComponent;
     private NodeService nodeService;
-    private PropertyValueComponent propertyValueComponent;
+    private AttributeService attributeService;
 
     /**
      * @param policyComponent the policyComponent to set
@@ -72,9 +72,9 @@ public class RecordComponentIdentifierAspect
     /**
      * Set the component to manage the unique properties
      */
-    public void setPropertyValueComponent(PropertyValueComponent propertyValueComponent)
+    public void setAttributeService(AttributeService attributeService)
     {
-        this.propertyValueComponent = propertyValueComponent;
+        this.attributeService = attributeService;
     }
 
     /**
@@ -84,7 +84,7 @@ public class RecordComponentIdentifierAspect
     {
         PropertyCheck.mandatory(this, "policyComponent", policyComponent);
         PropertyCheck.mandatory(this, "nodeService", nodeService);
-        PropertyCheck.mandatory(this, "propertyValueComponent", propertyValueComponent);
+        PropertyCheck.mandatory(this, "attributeService", attributeService);
         
         policyComponent.bindClassBehaviour(
                 OnUpdatePropertiesPolicy.QNAME,
@@ -149,7 +149,7 @@ public class RecordComponentIdentifierAspect
             if (afterId != null)
             {
                 // Just create it
-                propertyValueComponent.createPropertyUniqueContext(CONTEXT_VALUE, contextNodeRef, afterId);
+                attributeService.createAttribute(null, CONTEXT_VALUE, contextNodeRef, afterId);
             }
             else
             {
@@ -161,15 +161,15 @@ public class RecordComponentIdentifierAspect
             if (beforeId != null)
             {
                 // The before value was not null, so remove it
-                propertyValueComponent.deletePropertyUniqueContexts(CONTEXT_VALUE, contextNodeRef, beforeId);
+                attributeService.removeAttribute(CONTEXT_VALUE, contextNodeRef, beforeId);
             }
             // Do a blanket removal in case this is a contextual nodes
-            propertyValueComponent.deletePropertyUniqueContexts(CONTEXT_VALUE, nodeRef);
+            attributeService.removeAttributes(CONTEXT_VALUE, nodeRef);
         }
         else
         {
             // This is a full update
-            propertyValueComponent.updatePropertyUniqueContext(
+            attributeService.updateOrCreateAttribute(
                     CONTEXT_VALUE, contextNodeRef, beforeId,
                     CONTEXT_VALUE, contextNodeRef, afterId);
         }

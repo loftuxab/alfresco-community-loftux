@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import org.alfresco.deployment.DeploymentTarget;
 import org.alfresco.deployment.FSDeploymentRunnable;
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
@@ -43,12 +44,11 @@ import org.alfresco.deployment.impl.server.DeployedFile;
 import org.alfresco.deployment.impl.server.Deployment;
 import org.alfresco.deployment.impl.server.DeploymentReceiverAuthenticator;
 import org.alfresco.deployment.impl.server.DeploymentState;
-import org.alfresco.deployment.DeploymentTarget;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.WCMAppModel;
-import org.alfresco.repo.model.filefolder.FileFolderServiceImpl;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -932,11 +932,19 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 	
 	private void updateAspects(NodeRef dest, Set<String>faspects,  Map<QName, Serializable>propertyMap)
 	{
-	    /**
-	     * Work out the aspects implied by the property definitions.
-	     * for example cm:titled is implied by a cm:title property.
-	     */
 	     Set<QName> impliedAspects = new TreeSet<QName>();
+	     
+	     // Add mandatory aspects to the implied list
+	     List<AspectDefinition> aspectDefs = getDictionaryService().getType(nodeService.getType(dest)).getDefaultAspects(true);
+	     for (AspectDefinition aspectDef : aspectDefs)
+	     {
+	         impliedAspects.add(aspectDef.getName());
+	     }
+	     
+         /**
+          * Work out the aspects implied by the property definitions.
+          * for example cm:titled is implied by a cm:title property.
+          */
 	     for (QName newPropertyQName : propertyMap.keySet())
 	     {
 	            PropertyDefinition propDef = getDictionaryService().getProperty(newPropertyQName);
