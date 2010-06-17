@@ -26,13 +26,13 @@
 (function()
 {
    /**
-	 * YUI Library aliases
-	 */
+    * YUI Library aliases
+    */
    var Dom = YAHOO.util.Dom;
 
    /**
-	 * Alfresco Slingshot aliases
-	 */
+    * Alfresco Slingshot aliases
+    */
    var $html = Alfresco.util.encodeHTML;
 
    var DAY_MS = 24*60*60*1000; 
@@ -53,18 +53,18 @@
    YAHOO.extend(Alfresco.dashlet.MiniCalendar, Alfresco.component.Base,
    {
       /**
-		 * Fired by YUI when parent element is available for scripting.
-		 * Initialises components, including YUI widgets.
-		 * 
-		 * @method onReady
-		 */ 
+       * Fired by YUI when parent element is available for scripting.
+       * Initialises components, including YUI widgets.
+       * 
+       * @method onReady
+       */ 
       onReady: function MiniCalendar_onReady()
       {
          /*
-			 * Separate the (initial) rendering of the calendar from the data
-			 * loading. If for some reason the data fails to load, the calendar
-			 * will still display.
-			 */
+          * Separate the (initial) rendering of the calendar from the data
+          * loading. If for some reason the data fails to load, the calendar
+          * will still display.
+          */
          var uriEvents = Alfresco.constants.PROXY_URI + "calendar/eventList?site=" + this.options.siteId;
          
          var callback = 
@@ -78,13 +78,13 @@
       },
 
       /**
-		 * Event handler that gets fired when the calendar data for the current
-		 * site. is loaded successfully.
-		 * 
-		 * @method onSuccess
-		 * @param o
-		 *            {object} Result of AJAX call
-		 */
+       * Event handler that gets fired when the calendar data for the current
+       * site. is loaded successfully.
+       * 
+       * @method onSuccess
+       * @param o
+       *            {object} Result of AJAX call
+       */
       onSuccess: function MiniCalendar_onSuccess(o)
       {
          var noEventHTML = '<div class="detail-list-item first-item last-item"><span>' + this.msg("label.no-items") + '</span></div>';
@@ -109,14 +109,16 @@
                   {
                      var stringDate = Alfresco.util.formatDate(nextEventDays[0], "m/d/yyyy");
                   }
-                     item.from = stringDate;
-                     item.to = stringDate;
-                     resultEvents.push(item);
+                  item.from = stringDate;
+                  item.to = stringDate;
+                  resultEvents.push(item);
                }
                else
                {
                   if (cloneDate(item.from) >= now)
+                  {
                      resultEvents.push(item);
+                  }
                }
             }
 
@@ -150,14 +152,14 @@
       },
 
       /**
-		 * Render an event
-		 * 
-		 * @method renderDay
-		 * @param data
-		 *            {Date} Date to render
-		 * @param eventData
-		 *            {object} Event data
-		 */
+       * Render an event
+       * 
+       * @method renderDay
+       * @param data
+       *            {Date} Date to render
+       * @param eventData
+       *            {object} Event data
+       */
       renderDay: function MiniCalendar_renderDay(date, eventData)
       {
          var theStupidDate = Alfresco.util.formatDate(date, "m/d/yyyy");
@@ -215,38 +217,38 @@
      },
 
       /**
-		 * Event handler that gets fired when the calendar data for the current
-		 * site. fails to load. Displays an alert informing the user that the
-		 * data didn't load.
-		 * 
-		 * @method onFailure
-		 * @param e
-		 *            {object} DomEvent
-		 */
+       * Event handler that gets fired when the calendar data for the current
+       * site. fails to load. Displays an alert informing the user that the
+       * data didn't load.
+       * 
+       * @method onFailure
+       * @param e
+       *            {object} DomEvent
+       */
       onFailure: function(o)
       {
          Dom.get(this.id + "-eventsContainer").innerHTML = "Failed to load calendar data.";
       },
       /**
-		 * Gets a custom message
-		 * 
-		 * @method _msg
-		 * @param messageId
-		 *            {string} The messageId to retrieve
-		 * @return {string} The custom message
-		 * @private
-		 */
+       * Gets a custom message
+       * 
+       * @method _msg
+       * @param messageId
+       *            {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
       _msg: function Activities__msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.MiniCalendar", Array.prototype.slice.call(arguments).slice(1));
       },
       /**
-		 * Set messages for this component
-		 * 
-		 * @method setMessages
-		 * @param obj
-		 *            {object} Object literal specifying a set of messages
-		 */
+       * Set messages for this component
+       * 
+       * @method setMessages
+       * @param obj
+       *            {object} Object literal specifying a set of messages
+       */
       setMessages: function setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
@@ -254,8 +256,8 @@
       },      
 
       /**
-		 * Return next occurence of provided event after currentDate.
-		 */
+       * Return next occurence of provided event after currentDate.
+       */
       getNextEventStartDates: function getNextEventStartDates(event, currentDate)
       {       
           var rubeResult = [];
@@ -284,8 +286,7 @@
       
           while(needCycle)
           {
-             // Get all events between currentDate and currentDate + event
-				// interval.
+             // Get all events between currentDate and currentDate + event interval.
              // There must be at least one event.
              if (eventParam['FREQ']=="WEEKLY")
              {
@@ -363,22 +364,22 @@
       },
 
       /**
-		 * Return all days between currentDate and endDate when weekly event
-		 * occurs.
-		 * 
-		 * 
-		 * @method resolveStartDatesWeekly
-		 * @param ev
-		 *            {Object} object that represent weekly event
-		 * @eventParam Map of event parameters taken from RRULE
-		 * @param currentDate
-		 *            {Date} first day that event may occur.
-		 * @param endDate
-		 *            {Date} last day that event may occur.
-		 * 
-		 * @return {Array} Array that contains days beetwing currentDate and
-		 *         endDate on wich weekly event occurs
-		 */
+       * Return all days between currentDate and endDate when weekly event
+       * occurs.
+       * 
+       * 
+       * @method resolveStartDatesWeekly
+       * @param ev
+       *            {Object} object that represent weekly event
+       * @eventParam Map of event parameters taken from RRULE
+       * @param currentDate
+       *            {Date} first day that event may occur.
+       * @param endDate
+       *            {Date} last day that event may occur.
+       * 
+       * @return {Array} Array that contains days beetwing currentDate and
+       *         endDate on wich weekly event occurs
+       */
       resolveStartDateWeekly: function resolveStartDateWeekly (ev, eventParam, currentDate, endDate)
       {
          var result = [];
@@ -437,22 +438,22 @@
       },
       
       /**
-		 * Return all days between currentDate and endDate when daily event
-		 * occurs.
-		 * 
-		 * 
-		 * @method resolveStartDaily
-		 * @param ev
-		 *            {Object} object that represent daily event
-		 * @eventParam Map of event parameters taken from RRULE
-		 * @param currentDate
-		 *            {Date} first day when event may occur.
-		 * @param endDate
-		 *            {Date} last day when event may occur.
-		 * 
-		 * @return {Array} Array that contains days beetwing currentDate and
-		 *         endDate on wich daily event occurs
-		 */
+       * Return all days between currentDate and endDate when daily event
+       * occurs.
+       * 
+       * 
+       * @method resolveStartDaily
+       * @param ev
+       *            {Object} object that represent daily event
+       * @eventParam Map of event parameters taken from RRULE
+       * @param currentDate
+       *            {Date} first day when event may occur.
+       * @param endDate
+       *            {Date} last day when event may occur.
+       * 
+       * @return {Array} Array that contains days beetwing currentDate and
+       *         endDate on wich daily event occurs
+       */
       resolveStartDaily: function resolveStartDaily (ev, eventParam, currentDate, endDate)
       {  
          var result = [];
@@ -497,22 +498,22 @@
       },
       
       /**
-		 * Return all days between currentDate and endDate when monthly event
-		 * occurs.
-		 * 
-		 * 
-		 * @method resolveStartMonthly
-		 * @param ev
-		 *            {Object} object that represent monthly event
-		 * @eventParam Map of event parameters taken from RRULE
-		 * @param currentDate
-		 *            {Date} first day when event may occur
-		 * @param endDate
-		 *            {Date} last day when event may occur
-		 * 
-		 * @return {Array} Array that contains days beetwing currentDate and
-		 *         endDate on wich monthly event occurs
-		 */
+       * Return all days between currentDate and endDate when monthly event
+       * occurs.
+       * 
+       * 
+       * @method resolveStartMonthly
+       * @param ev
+       *            {Object} object that represent monthly event
+       * @eventParam Map of event parameters taken from RRULE
+       * @param currentDate
+       *            {Date} first day when event may occur
+       * @param endDate
+       *            {Date} last day when event may occur
+       * 
+       * @return {Array} Array that contains days beetwing currentDate and
+       *         endDate on wich monthly event occurs
+       */
       resolveStartMonthly: function resolveStartMonthly (ev, eventParam, currentDate, endDate)
       {    
          var result = [];
@@ -589,19 +590,19 @@
       },
       
       /**
-		 * Return last day between currentDate and endDate when event may occur.
-		 * 
-		 * 
-		 * @method getLastEventDay
-		 * @param ev
-		 *            {Object} object that represent monthly event
-		 * @param currentDate
-		 *            {Date} first day when event may occur.
-		 * @param endDate
-		 *            {Date} last day when event may occur.
-		 * 
-		 * @return {Date} last day in current month whe event may occur.
-		 */
+       * Return last day between currentDate and endDate when event may occur.
+       * 
+       * 
+       * @method getLastEventDay
+       * @param ev
+       *            {Object} object that represent monthly event
+       * @param currentDate
+       *            {Date} first day when event may occur.
+       * @param endDate
+       *            {Date} last day when event may occur.
+       * 
+       * @return {Date} last day in current month whe event may occur.
+       */
       getLastEventDay: function getLastEventDay (ev, currentDate, endDate)
       {
          var lastEventDay = new Date(endDate);
@@ -625,8 +626,8 @@
       },
       
       /**
-		 * Clone provided date objet
-		 */
+       * Clone provided date objet
+       */
       cloneDate: function cloneDate(date)
       {
           var dateParts = date.split("/");
