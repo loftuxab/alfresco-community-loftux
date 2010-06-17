@@ -9,7 +9,7 @@ if (data !== null)
 {
    for (var i=0,len = data.events.length;i<len;i++)
    {
-     data.events[i].when = CalendarScriptHelper.convertFromISOString(data.events[i].when);
+      data.events[i].when = CalendarScriptHelper.convertFromISOString(data.events[i].when);
    }
    model.eventList = data.events;
 }
