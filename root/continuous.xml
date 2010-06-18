@@ -467,7 +467,6 @@
          grant connect,resource to ${db.username}_test identified by ${db.password};
       </sql>
    </target>
-   
    <target name="-create-database-db2">
        <!-- Use db2 cmdline since no ability to create database via JDBC (not even using procedure call to "admin_cmd") :-( -->
        <exec executable="db2cmd">
@@ -571,11 +570,13 @@
          drop user ${db.username}_test cascade;
       </sql>
    </target>
-   
    <target name="-drop-database-db2">
        <!-- Use db2 cmdline since no ability to drop database via JDBC (not even using procedure call to "admin_cmd") ??? -->
        <exec executable="db2cmd">
          <arg line="db2 drop database ${db.name}"/>
+       </exec>
+       <exec executable="db2cmd">
+         <arg line="db2 drop database ${db.name}_test"/>
        </exec>
    </target>
 
