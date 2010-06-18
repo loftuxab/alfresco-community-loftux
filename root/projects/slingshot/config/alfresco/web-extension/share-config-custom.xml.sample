@@ -15,7 +15,21 @@
          <client-debug-autologging>false</client-debug-autologging>
       </flags>
    </config>
-
+   
+   <config evaluator="string-compare" condition="WebFramework">
+      <web-framework>
+         <!-- SpringSurf Autowire Runtime Settings -->
+         <!-- 
+              Developers can set mode to 'development' to disable; SpringSurf caches,
+              FreeMarker template caching and Rhino JavaScript compilation.
+         -->
+         <autowire>
+            <!-- Pick the mode: "production" or "development" -->
+            <mode>production</mode>
+         </autowire>
+      </web-framework>
+   </config>
+   
    <!-- Document Library config section -->
    <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
 
