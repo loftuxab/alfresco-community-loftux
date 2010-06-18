@@ -467,6 +467,16 @@
          grant connect,resource to ${db.username}_test identified by ${db.password};
       </sql>
    </target>
+   
+   <target name="-create-database-db2">
+       <!-- Use db2 cmdline since no ability to create database via JDBC (not even using procedure call to "admin_cmd") :-( -->
+       <exec executable="db2cmd">
+         <arg line="db2 create database ${db.name} using codeset UTF-8 pagesize 32K"/>
+       </exec>
+       <exec executable="db2cmd">
+         <arg line="db2 create database ${db.name}_test using codeset UTF-8 pagesize 32K"/>
+       </exec>   
+   </target>
 
    <target name="-drop-database" 
            depends="continuous-init, load-database-properties">
@@ -560,6 +570,13 @@
            password="${db.master.password}">
          drop user ${db.username}_test cascade;
       </sql>
+   </target>
+   
+   <target name="-drop-database-db2">
+       <!-- Use db2 cmdline since no ability to drop database via JDBC (not even using procedure call to "admin_cmd") ??? -->
+       <exec executable="db2cmd">
+         <arg line="db2 drop database ${db.name}"/>
+       </exec>
    </target>
 
 
