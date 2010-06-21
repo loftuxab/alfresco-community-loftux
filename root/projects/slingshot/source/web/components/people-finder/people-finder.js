@@ -390,7 +390,7 @@
             var title = oRecord.getData("jobtitle") || "",
                organization = oRecord.getData("organization") || "";
             
-            var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
+            var profileUrl = Alfresco.util.uriTemplate("userdefaultpage",
             {
                userid: userName
             });

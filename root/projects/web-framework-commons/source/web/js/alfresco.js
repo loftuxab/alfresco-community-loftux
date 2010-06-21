@@ -1589,7 +1589,7 @@ Alfresco.util.parseJSON = function(jsonStr, displayError)
 Alfresco.util.uriTemplate = function(templateId, obj, absolute)
 {
    // Check we know about the templateId
-   if (!templateId in Alfresco.constants.URI_TEMPLATES)
+   if (!(templateId in Alfresco.constants.URI_TEMPLATES))
    {
       return null;
    }
