@@ -92,7 +92,7 @@
     */
    Alfresco.AuthorityFinder.generateUserProfileLink = function AuthorityFinder_generateUserProfileLink(userName)
    {
-      var profileUrl = Alfresco.util.uriTemplate("userdefaultpage",
+      var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
       {
          userid: userName
       });
