@@ -444,6 +444,11 @@ public class FormConfigElement extends ConfigElementAdapter
         return getFieldNamesVisibleInMode(Mode.VIEW);
     }
 
+    public List<String> getVisibleCreateFieldNamesForSetAsList(String setId)
+    {
+        return getVisibleFieldNamesFor(setId, Mode.CREATE);
+    }
+    
     /**
      * This method returns an array of fieldNames for those fields which are
      * visible in Create mode and which are also members of the specified set.
@@ -455,7 +460,7 @@ public class FormConfigElement extends ConfigElementAdapter
      */
     public String[] getVisibleCreateFieldNamesForSet(String setId)
     {
-        List <String> result = getVisibleFieldNamesFor(setId, Mode.CREATE);
+        List <String> result = getVisibleCreateFieldNamesForSetAsList(setId);
         if (result == null)
         {
             return null;
@@ -463,9 +468,14 @@ public class FormConfigElement extends ConfigElementAdapter
         return result.toArray(new String[0]);
     }
 
+    public List<String> getVisibleEditFieldNamesForSetAsList(String setId)
+    {
+        return getVisibleFieldNamesFor(setId, Mode.EDIT);
+    }
+    
     public String[] getVisibleEditFieldNamesForSet(String setId)
     {
-        List <String> result = getVisibleFieldNamesFor(setId, Mode.EDIT);
+        List <String> result = getVisibleEditFieldNamesForSetAsList(setId);
         if (result == null)
         {
             return null;
@@ -473,9 +483,14 @@ public class FormConfigElement extends ConfigElementAdapter
         return result.toArray(new String[0]);
     }
 
+    public List<String> getVisibleViewFieldNamesForSetAsList(String setId)
+    {
+        return getVisibleFieldNamesFor(setId, Mode.VIEW);
+    }
+    
     public String[] getVisibleViewFieldNamesForSet(String setId)
     {
-        List <String> result = getVisibleFieldNamesFor(setId, Mode.VIEW);
+        List <String> result = getVisibleViewFieldNamesForSetAsList(setId);
         if (result == null)
         {
             return null;

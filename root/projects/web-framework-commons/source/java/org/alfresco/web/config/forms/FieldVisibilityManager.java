@@ -92,17 +92,6 @@ class FieldVisibilityManager
      */
     void addInstruction(String showOrHide, String fieldId, String modesString)
     {
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder msg = new StringBuilder();
-            msg.append(showOrHide)
-                .append(" ")
-                .append(fieldId)
-                .append(" ")
-                .append(modesString);
-            logger.debug(msg.toString());
-        }
-            	
         this.visibilityInstructions.add(new FieldVisibilityInstruction(showOrHide, fieldId, modesString));
     }
     

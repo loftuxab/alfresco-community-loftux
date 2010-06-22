@@ -32,6 +32,12 @@ public enum Mode
     
     private static Log logger = LogFactory.getLog(Mode.class);
     
+    @Override
+    public String toString()
+    {
+        return super.toString().toLowerCase();
+    }
+
     public static Mode modeFromString(String modeString)
     {
         if ("create".equalsIgnoreCase(modeString)) {

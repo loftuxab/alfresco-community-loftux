@@ -8,19 +8,7 @@
       <#if form.mode == "view" || field.disabled>disabled: true,</#if>
       currentValue: "${field.value?js_string}",
       mandatory: ${field.mandatory?string},
-      data : [
-      <#list field.control.params.dataTypeParameters as period>
-         { 
-            type : "${period.type}",
-            label : "${period.label}", 
-            hasExpression : ${period.hasExpression?string}<#if period.hasExpression>, 
-            expressionMandatory : ${period.expressionMandatory?string}, 
-            expressionType : "${period.expressionType}", 
-            defaultExpression : "${period.defaultExpression}"
-            </#if>
-         }<#if period_has_next>,</#if>
-      </#list> 
-      ]
+      data : ${field.control.params.dataTypeParameters}
    }).setMessages(
       ${messages}
    );

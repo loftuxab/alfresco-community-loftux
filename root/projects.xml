@@ -1409,7 +1409,8 @@
       </copy>
       
       <copy todir="${dir.project.webframeworkcommons.assemble}">
-         <fileset dir="${dir.project.webframeworkcommons.classes}" includes="org/alfresco/web/config/**" />
+         <fileset dir="${dir.project.webframeworkcommons.classes}" 
+                  includes="org/alfresco/web/config/**,org/alfresco/web/scripts/forms/**" />
       </copy>
       
       <!-- copy the forms client context file -->
