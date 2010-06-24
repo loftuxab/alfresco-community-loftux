@@ -49,7 +49,7 @@
          }
          // add view for timed events that span multiple days.
          var timedEvents = Dom.getElementsByClassName('vevent', 'li', Dom.get(this.id));
-         var multiDayTimedEvents = []
+         var multiDayTimedEvents = [];
          for (var i = 0, len = timedEvents.length; i < len; i++) 
          {
             // set up start and finish date objects

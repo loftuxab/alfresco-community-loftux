@@ -199,8 +199,7 @@
          this.modules.peopleFinder.setOptions(
          {
             viewMode: Alfresco.PeopleFinder.VIEW_MODE_COMPACT,
-            singleSelectMode: true,
-            showSelf: true
+            singleSelectMode: true
          });
 
          // Due date checkbox

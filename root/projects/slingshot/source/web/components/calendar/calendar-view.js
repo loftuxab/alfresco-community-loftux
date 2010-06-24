@@ -475,18 +475,21 @@
        */
       _adjustHeightByHour: function(el)
       {
-         console.log("_adjustHeightByHour");
          //TODO - get this from css class;
          var hourHeight = 4.75; //em
          //adjust height dependent on durations
          if (this.calendarView != Alfresco.CalendarView.VIEWTYPE_MONTH) 
          {
-            // This needs to work for Week view too...
-            var start = this.events[el.id].getData("dtstart");
-            var startTimes = start.split("T")[1].split(":");
-            var end = this.events[el.id].getData("dtend");
-            var endTimes = end.split("T")[1].split(":");
-            
+            var start, end = null;
+			   // This needs to work for Week view too...
+            if (this.events[el.id]) 
+				{
+					var start = this.events[el.id].getData("dtstart");
+					var startTimes = start.split("T")[1].split(":");
+					var end = this.events[el.id].getData("dtend");
+					var endTimes = end.split("T")[1].split(":");
+				}
+				
             if (start && end) // don't do anything if we can't find the event details 
             {
                var startHours = startTimes[0];
@@ -1401,7 +1404,32 @@ Alfresco.CalendarHelper = (function Alfresco_CalendarHelper()
          }
          return (dateOne.getDate() === dateTwo.getDate() && dateOne.getMonth() === dateTwo.getMonth() && dateOne.getFullYear() === dateTwo.getFullYear());
       },
-      
+ 
+      /**
+       * Checks to see if the two dates are the same
+       *
+       * @method isBefore
+       * @param {Date|string} dateOne (either JS Date Object or ISO8601 date string)
+       * @param {Date|string} dateTwo
+       *
+       * @return {Boolean} flag indicating if dateOne is earlier than dateTwo or not
+       */      
+		isBefore: function Alfresco_CalendarHelper_isBefore(dateOne, dateTwo) 
+		{
+			
+         if (typeof(dateOne) === "string") 
+         {
+            dateOne = fromISO8601(dateOne);
+         }
+         if (typeof(dateTwo) === "string") 
+         {
+            dateTwo = fromISO8601(dateTwo);
+         }
+			
+			return (dateOne < dateTwo);
+			
+		},
+		
       /**
        * @method isAllDay
        * @param {Object} event data object
