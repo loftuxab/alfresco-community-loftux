@@ -34,6 +34,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
@@ -102,6 +103,7 @@ public class AlfrescoQuickrPathHelper extends AbstractLifecycleBean
     private AuthenticationComponent authenticationComponent;
     private PermissionService permissionService;
     private CheckOutCheckInService checkOutCheckInService;
+    private SysAdminParams sysAdminParams;
 
     public void setRootPath(String rootPath)
     {
@@ -171,6 +173,11 @@ public class AlfrescoQuickrPathHelper extends AbstractLifecycleBean
     public void setCheckOutCheckInService(CheckOutCheckInService checkOutCheckInService)
     {
         this.checkOutCheckInService = checkOutCheckInService;
+    }
+
+    public void setSysAdminParams(SysAdminParams sysAdminParams)
+    {
+        this.sysAdminParams = sysAdminParams;
     }
 
     @Override
@@ -304,7 +311,7 @@ public class AlfrescoQuickrPathHelper extends AbstractLifecycleBean
      */
     public String getShareDocumentUrl()
     {
-        return shareDocumentUrl;
+        return sysAdminParams.getShareProtocol() + "://"+ sysAdminParams.getShareHost() +":"+ sysAdminParams.getSharePort() +"/" + sysAdminParams.getShareContext() + shareDocumentUrl;
     }
 
     /**
@@ -312,12 +319,12 @@ public class AlfrescoQuickrPathHelper extends AbstractLifecycleBean
      */
     public String getShareFolderUrl()
     {
-        return shareFolderUrl;
+        return sysAdminParams.getShareProtocol() + "://"+ sysAdminParams.getShareHost() +":"+ sysAdminParams.getSharePort() +"/" + sysAdminParams.getShareContext() + shareFolderUrl;
     }
 
     public String getShareSiteUrl()
     {
-        return shareSiteUrl;
+        return sysAdminParams.getShareProtocol() + "://"+ sysAdminParams.getShareHost() +":"+ sysAdminParams.getSharePort() +"/" + sysAdminParams.getShareContext() + shareSiteUrl;
     }
 
     /**

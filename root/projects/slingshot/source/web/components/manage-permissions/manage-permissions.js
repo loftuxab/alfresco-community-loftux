@@ -266,7 +266,6 @@
                dataWebScript: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/authority-query?zone=all",
                viewMode: Alfresco.AuthorityFinder.VIEW_MODE_COMPACT,
                singleSelectMode: true,
-               showSelf: true,
                minSearchTermLength: 3
             });
 

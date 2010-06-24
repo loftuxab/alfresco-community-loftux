@@ -8488,9 +8488,9 @@ AC90BBF8-AF3B-4891-A805-44A4C9C0DF42,TextToWrite
 lotus.ws.version=<%QK_VER%>
 lotus.server.port=<%QK_PORT%>
 lotus.server.host=<%QK_HOST%>
-lotus.share.document.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/document-details?nodeRef\={1}
-lotus.share.folder.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/documentlibrary\#path\={1}
-lotus.share.site.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/dashboard}
+lotus.share.document.url=/page/site/{0}/document-details?nodeRef\={1}
+lotus.share.folder.url=/page/site/{0}/documentlibrary\#path\={1}
+lotus.share.site.url=/page/site/{0}/dashboard}
 
 B03FB7D4-B289-4E02-A145-816887FB4999,Caption
 {Please give details of the Quickr server to use.}

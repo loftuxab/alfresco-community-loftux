@@ -468,12 +468,13 @@
       </sql>
    </target>
    <target name="-create-database-db2">
+       <!-- DB name must be <= 8 chars including the _test suffix !!! -->
        <!-- Use db2 cmdline since no ability to create database via JDBC (not even using procedure call to "admin_cmd") :-( -->
        <exec executable="db2cmd">
-         <arg line="db2 create database ${db.name} using codeset UTF-8 pagesize 32K"/>
+         <arg line="/c /i db2 create database ${db.name} using codeset UTF-8 territory default pagesize 32 K"/>
        </exec>
        <exec executable="db2cmd">
-         <arg line="db2 create database ${db.name}_test using codeset UTF-8 pagesize 32K"/>
+         <arg line="/c /i db2 create database ${db.name}_test using codeset UTF-8 territory default pagesize 32 K"/>
        </exec>   
    </target>
 
@@ -573,10 +574,10 @@
    <target name="-drop-database-db2">
        <!-- Use db2 cmdline since no ability to drop database via JDBC (not even using procedure call to "admin_cmd") ??? -->
        <exec executable="db2cmd">
-         <arg line="db2 drop database ${db.name}"/>
+         <arg line="/c /i db2 drop database ${db.name}"/>
        </exec>
        <exec executable="db2cmd">
-         <arg line="db2 drop database ${db.name}_test"/>
+         <arg line="/c /i db2 drop database ${db.name}_test"/>
        </exec>
    </target>
 

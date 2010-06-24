@@ -106,6 +106,9 @@
         <property name="shareSiteUrl">
             <value>${lotus.share.site.url}</value>
         </property>
+        <property name="sysAdminParams">
+            <ref bean="sysAdminParams" />
+        </property>
         <property name="nodeService" ref="NodeService" />
         <property name="searchService" ref="SearchService" />
         <property name="namespaceService" ref="NamespaceService" />

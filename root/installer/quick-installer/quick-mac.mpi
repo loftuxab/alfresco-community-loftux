@@ -6876,9 +6876,9 @@ E514D1EA-A85B-48A4-B1BB-2AFB2BCEEC1E,TextToWrite
 lotus.ws.version=<%QK_VER%>
 lotus.server.port=<%QK_PORT%>
 lotus.server.host=<%QK_HOST%>
-lotus.share.document.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/document-details?nodeRef\={1}
-lotus.share.folder.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/documentlibrary\#path\={1}
-lotus.share.site.url=${share.protocol}\://${share.host}\:${share.port}/${share.context}/page/site/{0}/dashboard}
+lotus.share.document.url=/page/site/{0}/document-details?nodeRef\={1}
+lotus.share.folder.url=/page/site/{0}/documentlibrary\#path\={1}
+lotus.share.site.url=/page/site/{0}/dashboard}
 
 EEE35F50-1F9E-44C8-9E0D-1F865FAAA301,Description
 {Java JDK}

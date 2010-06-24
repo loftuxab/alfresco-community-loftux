@@ -318,7 +318,6 @@
          {
             viewMode: Alfresco.AuthorityFinder.VIEW_MODE_COMPACT,
             singleSelectMode: true,
-            showSelf: true,
             minSearchTermLength: 3
          });
 

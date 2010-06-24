@@ -18,6 +18,7 @@
  */
 package org.alfresco.webservice.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -53,15 +54,9 @@ public class ContentUtils
      */
     public static byte[] convertToByteArray(InputStream inputStream) throws Exception
     {
-        byte[] result = null;
-        
-        if (inputStream.available() > 0)
-        {
-            result = new byte[inputStream.available()];        
-            inputStream.read(result);;
-        }     
-        
-        return result;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        FileCopyUtils.copy(inputStream, out);
+        return out.toByteArray();
     }
     
     /**

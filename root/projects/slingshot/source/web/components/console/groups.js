@@ -564,8 +564,7 @@
             // Set the correct options for our use
             this.modules.searchPeopleFinder.setOptions(
             {
-               singleSelectMode: true,
-               showSelf: true
+               singleSelectMode: true
             });
 
             // Make sure we listen for events when the user selects a person

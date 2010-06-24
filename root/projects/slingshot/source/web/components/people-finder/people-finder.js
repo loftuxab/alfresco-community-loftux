@@ -111,9 +111,9 @@
           * 
           * @property showSelf
           * @type boolean
-          * @default false
+          * @default true
           */
-         showSelf: false,
+         showSelf: true,
          
          /**
           * Number of characters required for a search.
