@@ -181,11 +181,11 @@
             //only show date for allday events otherwise show time too
             if (textvalue.length>1)
             {
-               dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), "dddd, d mmmm yyyy") + ' ' + textvalue[1] + ' ' + textvalue[2];               
+               dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), Alfresco.util.message("calendar.dateFormat.full")) + ' ' + textvalue[1] + ' ' + textvalue[2];               
             }
             else 
             {
-               dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), "dddd, d mmmm yyyy");
+               dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), Alfresco.util.message("calendar.dateFormat.full"));
             }
          }
          //decode html for text values of event
@@ -304,9 +304,9 @@
                           var dte  = Alfresco.util.fromISO8601(editEvent.getData('dtend'));
 
                           // Pretty formatting
-                          var dateStr = Alfresco.util.formatDate(dts, "dddd, d mmmm yyyy");
+                          var dateStr = Alfresco.util.formatDate(dts, Alfresco.util.message("calendar.dateFormat.full"));
                           Dom.get("fd").value = dateStr;
-                          var dateStr = Alfresco.util.formatDate(dte, "dddd, d mmmm yyyy");
+                          var dateStr = Alfresco.util.formatDate(dte, Alfresco.util.message("calendar.dateFormat.full"));
                           Dom.get("td").value = dateStr;
                           Dom.get(this.id+"-from").value =  Alfresco.util.formatDate(dts,'yyyy/mm/dd');
                           Dom.get(this.id+"-to").value = Alfresco.util.formatDate(dte,'yyyy/mm/dd');
