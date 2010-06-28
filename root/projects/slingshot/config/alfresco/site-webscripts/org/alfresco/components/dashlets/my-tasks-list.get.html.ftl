@@ -24,7 +24,7 @@
       <#assign overdue = ((task.dueDate != "") && (dateCompare(date?date, task.dueDate?date("yyyy-MM-dd")) == 1))>
       <#assign dueDate = "" />
       <#if (task.dueDate != "" && task.dueDate?substring(0, 4) != "9999") >
-         <#assign dueDate = task.dueDate?date("yyyy-MM-dd")?string("dd MMM yyyy") />
+         <#assign dueDate = task.dueDate?date("yyyy-MM-dd")?string(msg("date-format.mediumDateFTL")) />
       </#if>
    <div class="detail-list-item <#if task_index = 0>first-item<#elseif !task_has_next>last-item</#if>">
       <div class="task-icon">
