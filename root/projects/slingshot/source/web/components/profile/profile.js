@@ -120,7 +120,6 @@
             
             // Form field validation
             form.addValidation(this.id + "-input-firstName", Alfresco.forms.validation.mandatory, null, "keyup");
-            form.addValidation(this.id + "-input-lastName", Alfresco.forms.validation.mandatory, null, "keyup");
             
             // Initialise the form
             form.init();
