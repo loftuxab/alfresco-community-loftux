@@ -511,7 +511,7 @@ public class DeploymentReceiverEngineImpl implements
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#send(java.lang.String, java.lang.String, java.lang.String)
      */
-    public OutputStream send(String token, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
+    public OutputStream send(String token, boolean create, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
     {
         throw new DeploymentException("Forbidden call.");
     }
@@ -519,7 +519,7 @@ public class DeploymentReceiverEngineImpl implements
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverTransport#getSendToken(java.lang.String, java.lang.String, java.lang.String)
      */
-    public String getSendToken(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
+    public String getSendToken(String ticket, boolean create, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
     {
     	DeploymentTracker tracker = getDeploymentTracker(ticket);
     	try 
@@ -540,7 +540,7 @@ public class DeploymentReceiverEngineImpl implements
             	}
             }
             
-    		OutputStream out = tracker.getTarget().send(ticket, path, guid, encoding, mimeType, aspects, props);
+    		OutputStream out = tracker.getTarget().send(ticket, create, path, guid, encoding, mimeType, aspects, props);
     		
     		String token = getNextHandle(ticket);
     		logger.debug("Open token " + token);

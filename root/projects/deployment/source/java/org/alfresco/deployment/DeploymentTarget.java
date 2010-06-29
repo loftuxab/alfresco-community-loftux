@@ -82,6 +82,7 @@ public interface DeploymentTarget
      * If a file is created via this method then it should overwrite any existing directory on the same path.
      * 
      * @param ticket The deployment ticket, returned by an earlier call to 'begin'
+     * @param create - true - create a new file, false update an existing file.
      * @param path path of the new file 
      * @param guid unique identifier for this particular version of the file
      * @param encoding the encoding of the file
@@ -92,7 +93,7 @@ public interface DeploymentTarget
      * 
      * @throws DeploymentException - unable to send, deployment should be aborted
      */
-    public OutputStream send(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props) throws DeploymentException;
+    public OutputStream send(String ticket, boolean create, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props) throws DeploymentException;
     
     /**
      * Create a directory.

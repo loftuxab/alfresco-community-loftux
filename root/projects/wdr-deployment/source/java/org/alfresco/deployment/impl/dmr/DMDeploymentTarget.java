@@ -673,7 +673,7 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 	/**
 	 * DMR Implementation of Send 
 	 */
-	public OutputStream send(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
+	public OutputStream send(String ticket, boolean create, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
 	{
         final DMDeployment deployment = fDeployments.get(ticket);
         if (deployment == null)

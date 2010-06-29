@@ -67,6 +67,7 @@ public interface DeploymentReceiverService
     /**
      * Send a file to a path.
      * @param ticket
+     * @param create - true new file
      * @param path
      * @param guid
      * @param encoding
@@ -76,7 +77,7 @@ public interface DeploymentReceiverService
      * 
      * @return an open output steam for writing content
      */
-    public OutputStream send(String ticket, String path, String guid, String encoding, String mimeType, Set<String> aspects, Map<String, Serializable> properties);
+    public OutputStream send(String ticket, boolean create, String path, String guid, String encoding, String mimeType, Set<String> aspects, Map<String, Serializable> properties);
         
     /**
      * Create a new directory.
