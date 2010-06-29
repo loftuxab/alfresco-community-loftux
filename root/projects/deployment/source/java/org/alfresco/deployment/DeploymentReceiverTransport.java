@@ -40,7 +40,7 @@ public interface DeploymentReceiverTransport extends DeploymentReceiverService
      * @param guid
      * @return the token to identify this file.
      */
-    public String getSendToken(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props);
+    public String getSendToken(String ticket, boolean create, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props);
     
     /**
      * Tell the deployment receiver that a send is finished.

@@ -652,7 +652,7 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
 	}
 
 
-	public OutputStream send(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
+	public OutputStream send(String ticket, boolean create, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props)
 	{
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
