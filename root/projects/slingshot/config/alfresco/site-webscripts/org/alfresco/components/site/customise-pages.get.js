@@ -70,7 +70,7 @@ for (i = 0; i < availablePages.size(); i++)
       {
          // Resolve I18N strings for title/description
          var title = (p.titleId != null ? msg.get(p.titleId) : p.title);
-         var description = (p.descriptionId != null ? msg.get(p.description) : p.description);
+         var description = (p.descriptionId != null ? msg.get(p.descriptionId) : p.description);
          
          // Create a page object
          pages[pages.length] =
