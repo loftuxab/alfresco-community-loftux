@@ -76,24 +76,6 @@
           * @default ""
           */
          siteTitle: "",
-
-         /**
-          * Current search type.
-          * 
-          * @property searchType
-          * @type string
-          * @default ""
-          */
-         searchType: "",
-         
-         /**
-          * Initial search term, if any.
-          * 
-          * @property initialSearch
-          * @type string
-          * @default ""
-          */
-         initialSearch: "",
          
          /**
           * Favourite sites
@@ -127,7 +109,7 @@
          {
             Dom.setStyle(this.id + "-searchtext", "width", "10em");
          }
-
+         
          Event.addListener(this.id + "-searchtext", "focus", this.focusSearchText, null, this);
          Event.addListener(this.id + "-searchtext", "blur", this.blurSearchText, null, this);
          
@@ -136,25 +118,26 @@
          // register the "enter" event on the search text field
          var zinput = Dom.get(this.id + "-searchtext"),
             me = this;
-
+         
          this.widgets.enterListener = new YAHOO.util.KeyListener(zinput, 
          {
-            keys: 13
+            keys: YAHOO.util.KeyListener.KEY.ENTER
          }, 
          {
             fn: me.doSearch,
             scope: this,
             correctScope: true
          }, "keydown").enable();
-                         
+         
+         // menu button for Advanced Search option (and future saved searches)
          this.widgets.searchButton = new YAHOO.widget.Button(this.id + "-search-tbutton",
          {
             type: "menu",
-            menu: new YAHOO.widget.Menu(this.id + "-searchtogglemenu"),
+            menu: new YAHOO.widget.Menu(this.id + "-adv-search-menu"),
             menualignment: ["tr", "br"]
          });
-         Dom.removeClass(this.id + "-searchtogglemenu", "hidden");
-
+         Dom.removeClass(this.id + "-adv-search-menu", "hidden");
+         
          this.widgets.sitesMenu = new YAHOO.widget.Menu(this.id + "-sites-menu");
          this.widgets.sitesButton = new YAHOO.widget.Button(this.id + "-sites",
          {
@@ -179,7 +162,7 @@
       },
       
       /**
-       * Update image class when sarch box has focus.
+       * Update image class when search box has focus.
        *
        * @method focusSearchText
        */
@@ -187,11 +170,8 @@
       {
          if (Dom.hasClass(this.id + "-searchtext", "gray"))
          {
-            if (this.options.initialSearch.length === 0)
-            {
-               Dom.get(this.id + "-searchtext").value = "";
-               Dom.removeClass(this.id + "-searchtext", "gray");
-            }
+            Dom.get(this.id + "-searchtext").value = "";
+            Dom.removeClass(this.id + "-searchtext", "gray");
          }
          else
          {
@@ -225,23 +205,8 @@
        */
       defaultSearchText: function Header_defaultSearchText()
       {
-         if (this.options.initialSearch.length === 0)
-         {
-            Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
-            Dom.addClass(this.id + "-searchtext", "gray");
-         }
-      },
-
-      /**
-       * Change the search type.
-       *
-       * @method doToggleSearchType
-       * @param newVal {string} New search type from user input
-       */
-      doToggleSearchType: function Header_doToggleSearchType(newVal)
-      {
-         this.options.searchType = newVal;
-         this.defaultSearchText();
+         Dom.get(this.id + "-searchtext").value = this.msg("header.search.searchall");
+         Dom.addClass(this.id + "-searchtext", "gray");
       },
       
       /**
@@ -261,38 +226,15 @@
          }
          else
          {
-            var searchAll =  (this.options.searchType == "all");
-            
             // redirect to the search page
-            var url = Alfresco.constants.URL_CONTEXT + "page/";
+            var url = Alfresco.constants.URL_CONTEXT + "page";
             if (this.options.siteId.length !== 0)
             {
-               url += "site/" + this.options.siteId + "/";
+               url += "/site/" + this.options.siteId;
             }
-            url += "search?t=" + encodeURIComponent(searchTerm);
-            if (this.options.siteId.length !== 0)
-            {
-               url += "&a=" + searchAll;
-            }
+            url += "/search?t=" + encodeURIComponent(searchTerm);
             window.location = url;
          }
-      },
-      
-      /**
-       * Returns the toggle label based on the passed-in search type
-       *
-       * @method _getToggleLabel
-       * @param type {string} Search type
-       * @return {string} i18n message corresponding to search type
-       * @private
-       */
-      _getToggleLabel: function Header__getToggleLabel(type)
-      {
-         if (type == 'all')
-         {
-            return this.msg("header.search.searchall");
-         }
-         return this.msg("header.search.searchsite", this.options.siteTitle);
       },
 
       /**
@@ -414,7 +356,7 @@
          }
          
          // Show/hide "Add to favourites" menu item if we're in a site
-         if (this.options.siteId !== "")
+         if (this.options.siteId.length !== 0)
          {
             Dom.setStyle(this.id + "-addFavourite", "display", this.options.siteId in this.options.favouriteSites ? "none" : "block");
          }

@@ -3,6 +3,83 @@
 	margin: 0 -10px;
 }
 
+.search .search-box
+{
+   margin: 1.25em;
+   height: 2.1em;
+}
+
+.search .search-box div
+{
+   float: left;
+}
+
+.search .search-box input
+{
+   padding: 0.3em;
+}
+
+.search .terms
+{
+   width: 32em;
+}
+
+.search .search-icon span.first-child
+{
+   background: url(../images/search-16.png) no-repeat 12px 4px;
+   padding-left: 24px;
+}
+
+.search .search-bar
+{
+   padding: 4px 0.5em 2px;
+   border-bottom: 1px solid #F0F3F4;
+	border-top: 1px solid #F0F3F4;
+}
+
+.search .search-bar-bottom
+{
+	border-top: none;
+}
+
+.search .search-bar .paginator
+{
+   float: left;
+   margin: 0;
+   padding: 4px 0;
+   text-align: center;
+   width: 60%;
+}
+
+.search .search-info
+{
+   float: left;
+   padding: 0.5em 0 0.6em 1em;
+   width: 20%;
+}
+
+.search .itemname a
+{
+   font-size: 116%;
+}
+
+.search .results
+{
+   margin-right: 1px;
+}
+
+.search .results .details span.tags
+{
+   background-image: url(images/tag-16.png);
+   background-position: 0px 2px;
+   background-repeat: no-repeat;
+}
+
+.search .yui-dt .yui-dt-message
+{
+   display: none;
+}
+
 .search .yui-dt table
 {
 	width: 100%;
@@ -14,24 +91,6 @@
 	display: none;
 }
 
-.search .results
-{
-   margin-right: 1px;
-}
-
-.search .resultbar
-{ 
-	padding: 8px 10px;
-	border-bottom: 1px solid #F0F3F4;
-	border-top: 1px solid #F0F3F4;
-	height: 1.25em;
-}
-
-.search .itemname a
-{
-   font-size: 116%;
-}
-
 .search tr.yui-dt-odd, tr.yui-dt-even
 {
    background-color: #ffffff !important;
@@ -40,11 +99,4 @@
 .search .yui-dt td
 {
    border-bottom: 1px dashed #D7D7D7;
-}
-
-.search .results .details span.tags
-{
-   background-image: url(images/tag-16.png);
-   background-position: 0px 2px;
-   background-repeat: no-repeat;
 }

@@ -57,7 +57,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "paginator", "json"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("onSearch", this.onSearch, this);
@@ -76,7 +76,7 @@
       options:
       {
          /**
-          * siteId to search in, empty if search should be cross-site
+          * Current siteId
           * 
           * @property siteId
           * @type string
@@ -84,18 +84,22 @@
          siteId: "",
          
          /**
-          * Title/name of the site
-          */
-         siteName: "",
-         
-         /**
           * Maximum number of results displayed.
           * 
           * @property maxSearchResults
           * @type int
-          * @default 100
+          * @default 250
           */
-         maxSearchResults: 100,
+         maxSearchResults: 250,
+         
+         /**
+          * Results page size.
+          * 
+          * @property pageSize
+          * @type int
+          * @default 50
+          */
+         pageSize: 50,
          
          /**
           * Search term to use for the initial search
@@ -112,15 +116,6 @@
           * @default ""
           */
          initialSearchTag: "",
-         
-         /**
-          * States whether all sites should be searched.
-          * This field only has an effect if siteId != ""
-          * 
-          * @property initialSearchAll
-          * @type string
-          */
-         initialSearchAll: true,
          
          /**
           * Number of characters required for a search.
@@ -168,14 +163,11 @@
       searchTag: "",
       
       /**
-       * Whether the search was over all sites or just the current one
-       */
-      searchAll: true,
-      
-      /**
        * Number of search results.
        */
       resultsCount: 0,
+      
+      currentPage: 1,
       
       /**
        * True if there are more results than the ones listed in the table.
@@ -227,10 +219,8 @@
        */
       onReady: function Search_onReady()
       {
-         // Toggle scope link
-         var toggleScopeLink = Dom.get(this.id + "-scope-toggle-link");
-         Event.addListener(toggleScopeLink, "click", this.onToggleSearchScope, this, true);
-
+         var me = this;
+         
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/search?";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
@@ -244,20 +234,68 @@
                       "title", "browseUrl", "site", "tags"]
          };
          
+         // YUI Paginator definition
+         var handlePagination = function Search_handlePagination(state, me)
+         {
+            me.currentPage = state.page;
+            me.widgets.paginator.setState(state);
+         };
+         this.widgets.paginator = new YAHOO.widget.Paginator(
+         {
+            containers: [this.id + "-paginator-top", this.id + "-paginator-bottom"],
+            rowsPerPage: this.options.pageSize,
+            initialPage: 1,
+            template: this._msg("pagination.template"),
+            pageReportTemplate: this._msg("pagination.template.page-report"),
+            previousPageLinkLabel: this._msg("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel: this._msg("pagination.nextPageLinkLabel")
+         });
+         this.widgets.paginator.subscribe("changeRequest", handlePagination, this);
+         
          // setup of the datatable.
          this._setupDataTable();
+         
+         // set initial value and register the "enter" event on the search text field
+         var queryInput = Dom.get(this.id + "-search-text");
+         queryInput.value = this.options.initialSearchTerm;
+         
+         this.widgets.enterListener = new YAHOO.util.KeyListener(queryInput, 
+         {
+            keys: YAHOO.util.KeyListener.KEY.ENTER
+         }, 
+         {
+            fn: me._searchEnterHandler,
+            scope: this,
+            correctScope: true
+         }, "keydown").enable();
+         
+         // search YUI button
+         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
          
          // trigger the initial search
          YAHOO.Bubbling.fire("onSearch",
          {
             searchTerm: this.options.initialSearchTerm,
             searchTag: this.options.initialSearchTag,
-            searchAll: (this.options.initialSearchAll == 'true')
+            searchAll: true
          });
          
          // Hook action events
-         Alfresco.util.registerDefaultActionHandler(this.id, "search-tag", "span", this);
-         Alfresco.util.registerDefaultActionHandler(this.id, "search-scope-toggle", "a", this);
+         var fnActionHandler = function Search_fnActionHandler(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
+            if (owner !== null)
+            {
+               if (typeof me[owner.className] == "function")
+               {
+                  args[1].stop = true;
+                  var tagId = owner.id.substring(me.id.length + 1);
+                  me[owner.className].call(me, tagId);
+               }
+            }
+            return true;
+         };
+         YAHOO.Bubbling.addDefaultAction("search-tag", fnActionHandler);
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -402,7 +440,7 @@
                desc += '<div class="details"><span class="tags">' + me._msg("message.tags") + ': ';
                for (i = 0, j = tags.length; i < j; i++)
                {
-                   desc += '<span id="' + me.id + '-searchByTag-' + $html(tags[i]) + '"><a class="search-tag" href="#">' + $html(tags[i]) + '</a> </span>';
+                   desc += '<span id="' + me.id + '-' + $html(tags[i]) + '" class="searchByTag"><a class="search-tag" href="#">' + $html(tags[i]) + '</a> </span>';
                }
                desc += '</span></div>';
             }
@@ -422,8 +460,10 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
-            initialLoad: false
+            renderLoopSize: Alfresco.util.RENDERLOOPSIZE,
+            initialLoad: false,
+            paginator: this.widgets.paginator,
+            MSG_LOADING: ""
          });
 
          // show initial message
@@ -460,11 +500,28 @@
                   oResponse.results = oResponse.results.slice(0, me.options.maxSearchResults);
                }
                me.resultsCount = oResponse.results.length;
-               me.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
+               
+               if (me.resultsCount > me.options.pageSize)
+               {
+                  Dom.removeClass(me.id + "-paginator-top", "hidden");
+                  Dom.removeClass(me.id + "-search-bar-bottom", "hidden");
+               }
             }
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          };
+         
+         // Rendering complete event handler
+         me.widgets.dataTable.subscribe("renderEvent", function()
+         {
+            // Update the paginator
+            me.widgets.paginator.setState(
+            {
+               page: me.currentPage,
+               totalRecords: me.resultsCount
+            });
+            me.widgets.paginator.render();
+         });
       },
 
       /**
@@ -504,18 +561,6 @@
       },
       
       /**
-       * Triggered by the search all/site only link
-       */
-      onToggleSearchScope: function Search_onToggleSearchScope()
-      {
-         var searchAll = !this.searchAll;
-         this.refreshSearch(
-         {
-            searchAll: searchAll
-         });
-      },
-      
-      /**
        * Refresh the search page by full URL refresh
        *
        * @method refreshSearch
@@ -533,21 +578,18 @@
          {
             searchTag = args.searchTag;
          }
-         var searchAll= this.searchAll;
-         if (args.searchAll !== undefined)
-         {
-            searchAll = args.searchAll;
-         }
          
          // redirect to the search page
-         var url = Alfresco.constants.URL_CONTEXT + "page/";
+         var url = Alfresco.constants.URL_CONTEXT + "page";
          if (this.options.siteId.length !== 0)
          {
-            url += "site/" + this.options.siteId + "/";
+            url += "/site/" + this.options.siteId;
          }
-         url += "search?t=" + encodeURIComponent(searchTerm);
-         url += "&tag=" + encodeURIComponent(searchTag);
-         url += "&a=" + searchAll;
+         url += "/search?t=" + encodeURIComponent(searchTerm);
+         if (searchTag.length !== 0)
+         {
+            url += "&tag=" + encodeURIComponent(searchTag);
+         }
          window.location = url;
       },
 
@@ -578,27 +620,38 @@
             {
                searchTag = obj.searchTag;
             }
-            var searchAll= this.searchAll;
-            if (obj.searchAll !== undefined)
-            {
-               searchAll = obj.searchAll;
-            }
-            this._performSearch(searchTerm, searchTag, searchAll);
+            this._performSearch(searchTerm, searchTag);
          }
+      },
+      
+      /**
+       * Event handler that gets fired when user clicks the Search button.
+       *
+       * @method onCancelButtonClick
+       * @param e {object} DomEvent
+       * @param obj {object} Object passed back from addListener method
+       */
+      onSearchClick: function Search_onSearchClick(e, obj)
+      {
+         this.refreshSearch(
+         {
+            searchTag: "",
+            searchTerm: YAHOO.lang.trim(Dom.get(this.id + "-search-text").value)
+         });
       },
 
       /**
-       * Resets the YUI DataTable errors to our custom messages
-       * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
-       *
-       * @method _setDefaultDataTableErrors
-       * @param dataTable {object} Instance of the DataTable
+       * Search text box ENTER key event handler
+       * 
+       * @method _searchEnterHandler
        */
-      _setDefaultDataTableErrors: function Search__setDefaultDataTableErrors(dataTable)
+      _searchEnterHandler: function Search__searchEnterHandler(e, args)
       {
-         var msg = Alfresco.util.message;
-         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.Search"));
-         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.Search"));
+         this.refreshSearch(
+         {
+            searchTag: "",
+            searchTerm: YAHOO.lang.trim(Dom.get(this.id + "-search-text").value)
+         });
       },
       
       /**
@@ -606,7 +659,7 @@
        *
        * @method _performSearch
        */
-      _performSearch: function Search__performSearch(searchTerm, searchTag, searchAll)
+      _performSearch: function Search__performSearch(searchTerm, searchTag)
       {
          var searchTerm = YAHOO.lang.trim(searchTerm);
          var searchTag = YAHOO.lang.trim(searchTag);
@@ -630,11 +683,11 @@
          {
             this.searchTerm = searchTerm;
             this.searchTag = searchTag;
-            this.searchAll = searchAll;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-            // update the result info
-            this._updateSearchInfo();
-            this._updateSearchScopeLink();
+            // update the results info text
+            this._updateResultsInfo();
+            // set focus to search input textbox
+            Dom.get(this.id + "-search-text").focus();
          }
          
          function failureHandler(sRequest, oResponse)
@@ -660,7 +713,7 @@
             }
          }
          
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm, searchTag),
+         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm, searchTag),
          {
             success: successHandler,
             failure: failureHandler,
@@ -669,59 +722,24 @@
       },
       
       /**
-       * Updates the search info field.
-       * 
-       * @param isSearch {boolean} if true, a search is currently being performed, false otherwise
+       * Updates the results info text.
        */
-      _updateSearchInfo: function Search__updateSearchInfo()
+      _updateResultsInfo: function Search__updateResultsInfo()
       {
          // update the search results field
-         var searchFor;
-         if (this.searchTerm.length !== 0)
-         {
-            searchFor = '<b>' + $html(this.searchTerm) + '</b>';
-         }
-         else
-         {
-            searchFor = '<b>' + $html(this.searchTag) + '</b>';
-         }
-         var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + $html(this.options.siteName) + '</b>'));
+         var text;
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)
          {
-            resultsCount = this._msg("search.info.morethan", resultsCount);
+            text = this._msg("search.info.resultinfomore", resultsCount);
          }
-         var text = this._msg("search.info.resultinfo", searchFor, searchIn, resultsCount);
-         if (this.hasMoreResults)
+         else
          {
-            text += " " + this._msg("search.info.onlyshowing", this.resultsCount);
+            text = this._msg("search.info.resultinfo", resultsCount);
          }
          
          // set the text
          Dom.get(this.id + '-search-info').innerHTML = text;
-      },
-      
-      /**
-       * Updates the search scope link
-       */
-      _updateSearchScopeLink: function Search__updateSearchScopeLink()
-      {
-         // only proceed if there's a site to switch to
-         if (this.options.siteId === "")
-         {
-            return;
-         }
-         
-         // update the search results field
-         var text = this.searchAll ? this._msg("search.searchsiteonly", $html(this.options.siteName)) : this._msg("search.searchall");
-         
-         // Update the link text
-         var elem = Dom.get(this.id + '-scope-toggle-link');
-         elem.innerHTML = text;
-         
-         // show the link if it was hidden
-         var container = Dom.get(this.id + '-scope-toggle-container');
-         Dom.removeClass(container, "hidden");
       },
 
       /**
@@ -729,18 +747,30 @@
        *
        * @method _buildSearchParams
        */
-      _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm, searchTag)
+      _buildSearchParams: function Search__buildSearchParams(searchTerm, searchTag)
       {
-         var site = searchAll ? "" : this.options.siteId;
-         var params = YAHOO.lang.substitute("site={site}&term={term}&tag={tag}&maxResults={maxResults}",
+         var params = YAHOO.lang.substitute("term={term}&tag={tag}&maxResults={maxResults}",
          {
-            site: encodeURIComponent(site),
             term: encodeURIComponent(searchTerm),
             tag: encodeURIComponent(searchTag),
             maxResults: this.options.maxSearchResults + 1 // to calculate whether more results were available
          });
          
          return params;
+      },
+      
+      /**
+       * Resets the YUI DataTable errors to our custom messages
+       * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
+       *
+       * @method _setDefaultDataTableErrors
+       * @param dataTable {object} Instance of the DataTable
+       */
+      _setDefaultDataTableErrors: function Search__setDefaultDataTableErrors(dataTable)
+      {
+         var msg = Alfresco.util.message;
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.Search"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.Search"));
       },
       
       /**
@@ -755,55 +785,5 @@
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.Search", Array.prototype.slice.call(arguments).slice(1));
       }
-
    };
 })();
-
-
-/**
- * Register a default action handler for a set of elements described by a common class name.
- * The common enclosing tag should hold an id of the form ${htmlid}-methodToCall-param.
- * 
- * @param htmlId the id of the component
- * @param className the classname that is common to all to be handled elements
- * @param ownerTagName the enclosing element's tag name. This element needs to have
- *        an id of type {htmlid}-methodToCall[-param], the param is optional.
- * @param handlerObject the object that handles the actions. Upon action, the methodToCall of this
- *        object is called, passing in the param as specified in the ownerTagName's id.
- */
-Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
-{         
-   // Hook the tag events
-   YAHOO.Bubbling.addDefaultAction(className, function genericDefaultAction(layer, args)
-   {
-      var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
-      if (owner !== null)
-      {
-         var tmp, parts, action, param;
-         
-         // check that the html id matches, abort otherwise
-         tmp = owner.id;
-         if (tmp.indexOf(htmlId) !== 0)
-         {
-            return true;
-         }
-         tmp = tmp.substring(htmlId.length + 1);
-         parts = tmp.split('-');
-         if (parts.length < 1)
-         {
-            // stop here
-            return true;
-         }
-         // the first entry is the handler method to call
-         action = parts[0];
-         if (typeof handlerObject[action] == "function")
-         {
-            // extract the param part of the id
-            param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
-            handlerObject[action].call(handlerObject, param);
-            args[1].stop = true;
-         }
-      }
-      return true;
-   });
-};
