@@ -29,7 +29,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+       Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -45,19 +45,7 @@
     */
    Alfresco.Search = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.Search";
-      this.id = htmlId;
-      
-      /* Initialise prototype properties */
-      this.widgets = {};
-      this.modules = {};
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "paginator", "json"], this.onComponentsLoaded, this);
+      Alfresco.Search.superclass.constructor.call(this, "Alfresco.Search", htmlId, ["button", "container", "datasource", "datatable", "paginator", "json"]);
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("onSearch", this.onSearch, this);
@@ -65,7 +53,7 @@
       return this;
    };
    
-   Alfresco.Search.prototype =
+   YAHOO.extend(Alfresco.Search, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -124,33 +112,8 @@
           * @type int
           * @default 1
           */
-         minSearchTermLength: 1,
-         
-         /**
-          * Maximum number of items to display in the results list
-          *
-          * @property maxSearchResults
-          * @type int
-          * @default 100
-          */
-         maxSearchResults: 100         
+         minSearchTermLength: 1       
       },
-      
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
       
       /**
        * Search term used for the last search.
@@ -167,6 +130,9 @@
        */
       resultsCount: 0,
       
+      /**
+       * Current visible page index - counts from 1
+       */
       currentPage: 1,
       
       /**
@@ -174,43 +140,6 @@
        */
       hasMoreResults: false,
       
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function Search_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setMessages: function Search_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function Search_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -222,7 +151,7 @@
          var me = this;
          
          // DataSource definition
-         var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/search?";
+         var uriSearchResults = Alfresco.constants.PROXY_URI_RELATIVE + "slingshot/search?";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
@@ -245,10 +174,10 @@
             containers: [this.id + "-paginator-top", this.id + "-paginator-bottom"],
             rowsPerPage: this.options.pageSize,
             initialPage: 1,
-            template: this._msg("pagination.template"),
-            pageReportTemplate: this._msg("pagination.template.page-report"),
-            previousPageLinkLabel: this._msg("pagination.previousPageLinkLabel"),
-            nextPageLinkLabel: this._msg("pagination.nextPageLinkLabel")
+            template: this.msg("pagination.template"),
+            pageReportTemplate: this.msg("pagination.template.page-report"),
+            previousPageLinkLabel: this.msg("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel: this.msg("pagination.nextPageLinkLabel")
          });
          this.widgets.paginator.subscribe("changeRequest", handlePagination, this);
          
@@ -325,7 +254,7 @@
             oColumn.width = 100;
             oColumn.height = 100;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "height", oColumn.height + "px");
+            Dom.setStyle(elCell, "height", oColumn.height + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "center");
             
             var url = me._getBrowseUrlForRecord(oRecord);
@@ -335,7 +264,7 @@
             switch (oRecord.getData("type"))
             {
                case "document":
-                  imageUrl = Alfresco.constants.PROXY_URI + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
+                  imageUrl = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
                   imageUrl += "/content/thumbnails/doclib?c=queue&ph=true";
                   break;
                
@@ -367,7 +296,10 @@
             // Render the cell
             var name = oRecord.getData("displayName");
             var htmlName = $html(name);
-            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
+            var viewUrl = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/content/" + oRecord.getData("nodeRef").replace(":/", "") + "/" + oRecord.getData("name");
+            elCell.innerHTML = '<div class="action-overlay"><a href="' + encodeURI(viewUrl) + '" target="_blank"><img title="' + $html(me.msg("label.viewinbrowser")) +
+                               '" src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/view-in-browser-16.png" width="16" height="16"/></a></div>' +
+                               '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
          };
 
          /**
@@ -388,7 +320,7 @@
             var site = oRecord.getData("site");
             var url = me._getBrowseUrlForRecord(oRecord);
             
-            // title/link to view page
+            // title/link to details page
             var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '" class="theme-color-1">' + $html(oRecord.getData("displayName")) + '</a></h3>';
             
             // description (if any)
@@ -410,25 +342,25 @@
                case "calendarevent":
                case "wikipage":
                case "link":
-                  desc += me._msg("label." + type);
+                  desc += me.msg("label." + type);
                   break;
 
                default:
-                  desc += me._msg("label.unknown");
+                  desc += me.msg("label.unknown");
                   break;
             }
             
             // link to the site and other meta-data details
-            desc += ' ' + me._msg("message.insite");
+            desc += ' ' + me.msg("message.insite");
             desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + $html(site.shortName) + '/dashboard">' + $html(site.title) + '</a>';
             if (oRecord.getData("size") !== -1)
             {
-               desc += ' ' + me._msg("message.ofsize");
+               desc += ' ' + me.msg("message.ofsize");
                desc += ' ' + Alfresco.util.formatFileSize(oRecord.getData("size"));
             }
-            desc += ' ' + me._msg("message.modifiedby");
+            desc += ' ' + me.msg("message.modifiedby");
             desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedBy")) + '</a> ';
-            desc += me._msg("message.modifiedon");
+            desc += me.msg("message.modifiedon");
             desc += ' ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"));
             desc += '</div>';
             
@@ -437,7 +369,7 @@
             if (tags.length !== 0)
             {
                var i, j;
-               desc += '<div class="details"><span class="tags">' + me._msg("message.tags") + ': ';
+               desc += '<div class="details"><span class="tags">' + me.msg("message.tags") + ': ';
                for (i = 0, j = tags.length; i < j; i++)
                {
                    desc += '<span id="' + me.id + '-' + $html(tags[i]) + '" class="searchByTag"><a class="search-tag" href="#">' + $html(tags[i]) + '</a> </span>';
@@ -451,10 +383,10 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "image", label: me._msg("message.preview"), sortable: false, formatter: renderCellThumbnail, width: 100
+            key: "image", label: me.msg("message.preview"), sortable: false, formatter: renderCellThumbnail, width: 100
          },
          {
-            key: "summary", label: me._msg("message.desc"), sortable: false, formatter: renderCellDescription
+            key: "summary", label: me.msg("message.desc"), sortable: false, formatter: renderCellDescription
          }];
 
          // DataTable definition
@@ -667,7 +599,7 @@
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+               text: this.msg("message.minimum-length", this.options.minSearchTermLength)
             });
             return;
          }
@@ -731,11 +663,11 @@
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)
          {
-            text = this._msg("search.info.resultinfomore", resultsCount);
+            text = this.msg("search.info.resultinfomore", resultsCount);
          }
          else
          {
-            text = this._msg("search.info.resultinfo", resultsCount);
+            text = this.msg("search.info.resultinfo", resultsCount);
          }
          
          // set the text
@@ -771,19 +703,6 @@
          var msg = Alfresco.util.message;
          dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.Search"));
          dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.Search"));
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function Search__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.Search", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
