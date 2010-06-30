@@ -44,6 +44,67 @@
                          projectdir="${dir.project.core}"/>
    </target>
    
+   <!-- *********************** -->
+   <!-- ** DataModel Project ** -->
+   <!-- *********************** -->
+   
+   <target name="incremental-datamodel" 
+           depends="package-datamodel" />
+      
+   <target name="build-datamodel" 
+           depends="clean-datamodel, 
+                    incremental-datamodel" />
+   
+   <target name="clean-datamodel" 
+           depends="init">
+      <clean projectdir="${dir.project.datamodel}" />
+   </target>
+   
+   <target name="compile-datamodel" 
+           depends="compile-datamodel-java, 
+                    compile-datamodel-jibx" />
+
+   <target name="compile-datamodel-java" 
+           depends="init">
+      <compile-java projectdir="${dir.project.datamodel}" />
+   </target>
+   
+   <target name="package-datamodel"
+           depends="compile-datamodel">
+      <mkdir dir="${dir.project.datamodel.dist}" />
+      <jar jarfile="${dir.project.datamodel.dist}/${file.name.jar.datamodel}" 
+           basedir="${dir.project.datamodel.classes}" />
+   </target>
+   
+   <target name="test-datamodel" 
+           depends="compile-core">
+      <run-tests projectdir="${dir.project.datamodel}" />
+   </target>
+   
+   <target name="generate-javadocs-datamodel" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Data Model API ${version.number}" 
+                         windowtitle="Alfresco Data Model API" 
+                         projectdir="${dir.project.datamodel}"/>
+   </target>
+
+   <target name="compile-datamodel-jibx" 
+           depends="init">
+      <!-- load the JIBX task definition -->
+      <taskdef name="bind" 
+               classname="org.jibx.binding.ant.CompileTask"
+               classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
+
+      <bind verbose="true" 
+            load="true" 
+            binding="${file.jibx.binding.m2}">
+         <classpath>
+            <pathelement path="${dir.project.core.classes}"/>
+            <pathelement path="${dir.project.datamodel.classes}"/>
+         </classpath>
+      </bind>
+   </target>
+
    <!-- ******************** -->
    <!-- ** MBeans Project ** -->
    <!-- ******************** -->
@@ -129,6 +190,7 @@
            depends="
    				package-deployment-jar, 
    				package-repository,
+   				package-datamodel,
    				package-core">
       <mkdir dir="${dir.project.deployment.assemble}" />
       <copy todir="${dir.project.deployment.assemble}">
@@ -156,6 +218,9 @@
          </fileset>
          <fileset dir="${dir.project.core.dist}">
             <filename name="${file.name.jar.core}" />
+         </fileset>
+         <fileset dir="${dir.project.datamodel.dist}">
+           <filename name="${file.name.jar.datamodel}" />
          </fileset>
          <fileset dir="${dir.project.repository.dist}">
            <filename name="${file.name.jar.repository}" />
@@ -258,19 +323,12 @@
                classname="org.jibx.binding.ant.CompileTask"
                classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
 
-      <bind verbose="false" 
-            load="true" 
-            binding="${file.jibx.binding.m2}">
-         <classpath>
-            <pathelement path="${dir.project.core.classes}"/>
-            <pathelement path="${dir.project.repository.classes}"/>
-         </classpath>
-      </bind>
-      <bind verbose="false" 
+      <bind verbose="true" 
             load="true" 
             binding="${file.jibx.binding.systeminfo}">
          <classpath>
       	    <pathelement path="${dir.project.core.classes}"/>
+      	    <pathelement path="${dir.project.datamodel.classes}"/>
             <pathelement path="${dir.project.repository.classes}"/>
       	 </classpath>
      </bind>
@@ -319,6 +377,8 @@
                   excludes="${dir.name.devenv}/**" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.datamodel.dist}" 
+                  includes="${file.name.jar.datamodel}" />
          <fileset dir="${dir.project.repository.dist}" 
                   includes="${file.name.jar.repository}" />
          <fileset dir="${dir.project.core.src.java}" 
@@ -454,6 +514,9 @@
               includes="${file.name.jar.repository}" />
          <lib dir="${dir.project.core.dist}" 
               includes="${dir.name.jar.core}" />
+         <lib dir="${dir.project.datamodel.dist}" 
+              includes="${file.name.jar.datamodel}" />
+         <classes dir="${dir.project.datamodel.config}"/>
          <classes dir="${dir.project.repository.config}"/>
          <classes file="${dir.project.core.src.java}/log4j.properties" 
                   prefix="WEB-INF/classes" />
@@ -1871,6 +1934,8 @@
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
+         <fileset dir="${dir.project.datamodel.config}"
+                  excludes="**/extension/**" />
          <fileset dir="${dir.project.repository.config}"
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.config}"
@@ -1928,6 +1993,8 @@
                   includes="*.jar"/>
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.datamodel.dist}" 
+                  includes="${file.name.jar.datamodel}" />
          <fileset dir="${dir.project.repository.dist}" 
                   includes="${file.name.jar.repository}" />
          <fileset dir="${dir.project.mbeans.dist}" 

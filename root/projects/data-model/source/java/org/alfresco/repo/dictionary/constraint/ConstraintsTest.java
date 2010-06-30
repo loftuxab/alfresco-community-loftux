@@ -22,15 +22,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.extensions.surf.util.I18NUtil;
 import org.alfresco.repo.dictionary.DictionaryDAOTest;
 import org.alfresco.service.cmr.dictionary.Constraint;
 import org.alfresco.service.cmr.dictionary.ConstraintException;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 /**
  * <b>This file must be saved using UTF-8.</b>

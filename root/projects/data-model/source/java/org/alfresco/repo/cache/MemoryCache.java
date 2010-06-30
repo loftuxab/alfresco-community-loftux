@@ -20,8 +20,8 @@ package org.alfresco.repo.cache;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A cache backed by a simple <code>HashMap</code>.
@@ -37,7 +37,7 @@ public class MemoryCache<K extends Serializable, V extends Object> implements Si
     
     public MemoryCache()
     {
-        map = new HashMap<K, V>(15);
+        map = new ConcurrentHashMap<K, V>(15);
     }
 
     public boolean contains(K key)

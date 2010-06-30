@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.cache.EhCacheAdapter;
+import org.alfresco.repo.cache.MemoryCache;
 import org.alfresco.repo.dictionary.DictionaryDAOImpl.DictionaryRegistry;
 import org.alfresco.repo.dictionary.NamespaceDAOImpl.NamespaceRegistry;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
@@ -881,26 +879,12 @@ public class DiffModelTest extends TestCase
 
     private void initDictionaryCaches(DictionaryDAOImpl dictionaryDAO)
     {
-        CacheManager cacheManager = new CacheManager();
-        
-        Cache dictionaryEhCache = new Cache("dictionaryCache", 50, false, true, 0L, 0L);
-        cacheManager.addCache(dictionaryEhCache);
-        EhCacheAdapter<String, DictionaryRegistry> dictionaryCache = new EhCacheAdapter<String, DictionaryRegistry>();
-        dictionaryCache.setCache(dictionaryEhCache);
-        
-        dictionaryDAO.setDictionaryRegistryCache(dictionaryCache);
+        dictionaryDAO.setDictionaryRegistryCache(new MemoryCache<String, DictionaryRegistry>());
     }
     
     private void initNamespaceCaches(NamespaceDAOImpl namespaceDAO)
     {
-        CacheManager cacheManager = new CacheManager();
-        
-        Cache namespaceEhCache = new Cache("namespaceCache", 50, false, true, 0L, 0L);
-        cacheManager.addCache(namespaceEhCache);
-        EhCacheAdapter<String, NamespaceRegistry> namespaceCache = new EhCacheAdapter<String, NamespaceRegistry>();
-        namespaceCache.setCache(namespaceEhCache);
-        
-        namespaceDAO.setNamespaceRegistryCache(namespaceCache);
+        namespaceDAO.setNamespaceRegistryCache(new MemoryCache<String, NamespaceRegistry>());
     }
     
     public void testDeleteModel()

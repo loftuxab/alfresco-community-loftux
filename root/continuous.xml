@@ -864,6 +864,7 @@
       
       <!-- Add config to shared location -->
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
+         <fileset dir="${dir.project.datamodel.config}/alfresco/extension" />
          <fileset dir="${dir.project.repository.config}/alfresco/extension" />
          <fileset dir="${dir.project.webclient.config}/alfresco/extension" />
       </copy>
@@ -907,6 +908,8 @@
                      includes="${file.name.war.webclient}" />
          <zipfileset dir="${dir.project.slingshot.dist}"
                      includes="${file.name.war.slingshot}" />
+         <zipfileset dir="${dir.project.datamodel.config}/alfresco/extension"
+                     prefix="extensions/extension" />
          <zipfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <zipfileset dir="${dir.project.webclient.config}/alfresco/extension"
@@ -954,6 +957,8 @@
                      includes="${file.name.war.webclient}" />
          <tarfileset dir="${dir.project.slingshot.dist}"
                      includes="${file.name.war.slingshot}" />
+         <tarfileset dir="${dir.project.datamodel.config}/alfresco/extension"
+                     prefix="extensions/extension" />
          <tarfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <tarfileset dir="${dir.project.webclient.config}/alfresco/extension"
@@ -1122,8 +1127,12 @@
       <!-- get the sample extension files -->
       <copy todir="${dir.continuous.assemble.extension-samples}" 
             flatten="false">
+         <fileset dir="${dir.project.datamodel.config}" 
+                  includes="alfresco/extension/**/*" />
          <fileset dir="${dir.project.repository.config}" 
                   includes="alfresco/extension/**/*" />
+         <fileset dir="${dir.project.datamodel.config}" 
+                  includes="alfresco/extension/*.sample" />
          <fileset dir="${dir.project.repository.config}" 
                   includes="alfresco/extension/*.sample" />
       </copy>
@@ -1305,11 +1314,11 @@
                   includes="org/alfresco/i18n/I18NUtil.class" />
          <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/util/GUID.class" />
-         <fileset dir="${dir.project.repository.classes}" 
+         <fileset dir="${dir.project.datamodel.classes}" 
                   includes="org/alfresco/model/ContentModel.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/repo/cache/EhCacheAdapter.class" />
-         <fileset dir="${dir.project.repository.classes}" 
+         <fileset dir="${dir.project.datamodel.classes}" 
                   includes="org/alfresco/repo/cache/SimpleCache.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/repo/remote/FileFolderRemoteClient.class" />
@@ -1317,10 +1326,14 @@
                   includes="org/alfresco/repo/model/filefolder/**/*.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/service/cmr/model/*.class" />
+         <fileset dir="${dir.project.datamodel.classes}" 
+                  includes="org/alfresco/service/cmr/repository/*.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/service/cmr/repository/*.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/service/cmr/remote/*.class" />
+         <fileset dir="${dir.project.datamodel.classes}" 
+                  includes="org/alfresco/service/namespace/*.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/service/namespace/*.class" />
       </copy>
@@ -1440,6 +1453,9 @@
       <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-remote-api-doc.zip">
          <zipfileset dir="${dir.project.remoteapi.docs.java}" />
       </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-datamodel-doc.zip">
+         <zipfileset dir="${dir.project.datamodel.docs.java}" />
+      </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/doc/alfresco-repository-doc.zip">
          <zipfileset dir="${dir.project.repository.docs.java}" />
       </zip>
@@ -1482,6 +1498,8 @@
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.core.dist}/${file.name.jar.core}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
+            file="${dir.project.datamodel.dist}/${file.name.jar.datamodel}" />
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.repository.dist}/${file.name.jar.repository}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.remoteapi.dist}/${file.name.jar.remoteapi}" />
@@ -1509,6 +1527,8 @@
       <copy todir="${dir.continuous.assemble.sdk}/config"
             includeEmptyDirs="false">
          <fileset dir="${dir.project.repository.config}" 
+                  excludes="**/extension/*" />
+         <fileset dir="${dir.project.datamodel.config}" 
                   excludes="**/extension/*" />
 <!--         <fileset dir="${dir.project.webclient.config}" 
                   excludes="**/extension/*" /> -->
@@ -1573,6 +1593,9 @@
       <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-remote-api-src.zip">
          <zipfileset dir="${dir.project.remoteapi.src}" />
          <zipfileset dir="${dir.project.remoteapi.src.generated}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-datamodel-src.zip">
+         <zipfileset dir="${dir.project.datamodel.src}" />
       </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/src/alfresco-repository-src.zip">
          <zipfileset dir="${dir.project.repository.src}" />
@@ -1677,6 +1700,9 @@
       </copy>
       <copy todir="${dir.continuous.assemble.docs.java}/remote-api">
          <fileset dir="${dir.project.remoteapi.docs.java}" />
+      </copy>
+      <copy todir="${dir.continuous.assemble.docs.java}/datamodel">
+         <fileset dir="${dir.project.datamodel.docs.java}" />
       </copy>
       <copy todir="${dir.continuous.assemble.docs.java}/repository">
          <fileset dir="${dir.project.repository.docs.java}" />

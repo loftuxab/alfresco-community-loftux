@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/MBean"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT.jar" sourcepath="/3rd Party/src/spring-webscripts-1.0.0.CI-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/spring-surf/spring-webscripts-1.0.0.CI-SNAPSHOT-tests.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DataModel"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
