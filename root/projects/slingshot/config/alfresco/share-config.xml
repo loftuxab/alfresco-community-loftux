@@ -75,10 +75,10 @@
          <!-- default minimum length for search terms -->
          <min-search-term-length>1</min-search-term-length>
          <!-- default maximum number of results for a search -->
-         <max-search-results>100</max-search-results>
+         <max-search-results>250</max-search-results>
       </search>
    </config>
-
+   
    <!-- Document Library config section -->
    <config evaluator="string-compare" condition="DocumentLibrary">
 

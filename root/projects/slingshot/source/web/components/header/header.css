@@ -113,18 +113,15 @@
 {
    color: default;
    width: 12em;
+   background-image: url(../images/search-16-gray.png);
+   background-repeat: no-repeat;
+   background-position: right center;
+   padding-right: 1.25em;
 }
 
 .header .search-tinput.gray
 {
    color: #999;
-}
-
-.header .search-icon
-{
-   background-image: url(../images/search-16-gray.png);
-   padding: 0.1em 0.2em 0 0.8em;
-   background-repeat: no-repeat;
 }
 
 .header .sites-menu-icon
@@ -135,18 +132,12 @@
    cursor:pointer;
    padding-left:8px;
    position:relative;
-   /*top:1px;*/
 }
 
 .header .sites-menu-icon:hover
 {
    background-color: #B3D4FF;
 }
-
-/* IE6 fix */
-* html .header .search-icon {position: fixed;}
-* html .header .search-site-icon {position: fixed;}
-/* */
 
 
 /* Drop-down menus */
@@ -176,7 +167,6 @@
 {
    border-bottom:1px dashed #DFE9ED;
 }
-
 
 .header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
 {
