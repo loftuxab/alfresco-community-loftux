@@ -79,6 +79,7 @@
             <include name="**/${dir.name.build}/${dir.name.classes}" />
          </dirset>
          <pathelement location="${user.home}"/>
+         <pathelement location="${dir.project.datamodel.config}"/>
          <pathelement location="${dir.project.repository.config}"/>
          <pathelement location="${dir.project.webclient.config}"/>
          <pathelement location="${dir.project.deployment.config}"/>
@@ -93,6 +94,7 @@
          <pathelement location="${user.home}" />
          <pathelement location="${dir.project.core.classes}" />
          <pathelement location="${dir.project.core.src.java}" />
+         <pathelement location="${dir.project.datamodel.classes}" />
          <pathelement location="${dir.project.catalinavirtual.classes}" />
          <pathelement location="${dir.project.jlan.classes}" />
          <pathelement location="${dir.project.mbeans.classes}" />
@@ -107,6 +109,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/junit-4.6.jar" />
          <!-- <pathelement location="${alf.build.location.data}"/> -->
          
+         <pathelement location="${dir.project.datamodel.config}" />
          <pathelement location="${dir.project.repository.config}" />
          <pathelement location="${dir.project.webclient.config}" />
          <pathelement location="${dir.project.deployment.config}" />
@@ -237,6 +240,7 @@
    <target name="incremental-webclient-depends" 
            description="Performs an incremental build of the dependencies of the Alfresco WAR"
            depends="incremental-core,
+                    incremental-datamodel,
                     incremental-jlan,
                     incremental-mbeans,
                     incremental-deployment,
@@ -389,7 +393,8 @@
 
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"
-           depends="generate-javadocs-core, 
+           depends="generate-javadocs-core,
+                    generate-javadocs-datamodel, 
                     generate-javadocs-mbeans,
                     generate-javadocs-deployment,
                     generate-javadocs-repository, 
@@ -422,6 +427,7 @@
    <target name="clean-webclient-projects" 
            description="Cleans all projects related to the webclient project" 
            depends="clean-core,
+                    clean-datamodel,
                     clean-jlan, 
                     clean-mbeans,
                     clean-deployment, 
@@ -580,6 +586,7 @@
       
          <!-- copy class files -->
          <fileset dir="${dir.project.core.classes}" />
+         <fileset dir="${dir.project.datamodel.classes}" />
          <fileset dir="${dir.project.mbeans.classes}" />
          <fileset dir="${dir.project.deployment.classes}" />
          <fileset dir="${dir.project.repository.classes}" 
@@ -595,6 +602,8 @@
          <!-- copy config files -->
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
+         <fileset dir="${dir.project.datamodel.config}" 
+                  excludes="**/extension/**" />
          <fileset dir="${dir.project.repository.config}" 
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.config}"
@@ -1040,7 +1049,8 @@
            description="Runs unit tests for all the projects" 
            depends="clean, 
                     incremental, 
-                    test-core, 
+                    test-core,
+                    test-datamodel, 
                     test-mbeans,
                     test-deployment, 
                     test-repository, 

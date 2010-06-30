@@ -34,7 +34,6 @@ import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.tenant.TenantService;
-import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -1005,7 +1004,7 @@ public class DictionaryDAOImpl implements DictionaryDAO
         
         if (logger.isTraceEnabled())
         {
-            logger.trace("getDictionaryRegistry: not in cache (or threadlocal) - re-init ["+Thread.currentThread().getId()+", "+AlfrescoTransactionSupport.getTransactionId()+"]"+(tenantDomain.equals(TenantService.DEFAULT_DOMAIN) ? "" : " (Tenant: "+tenantDomain+")"));
+            logger.trace("getDictionaryRegistry: not in cache (or threadlocal) - re-init ["+Thread.currentThread().getId()+"]"+(tenantDomain.equals(TenantService.DEFAULT_DOMAIN) ? "" : " (Tenant: "+tenantDomain+")"));
         }
         
         // reset caches - may have been invalidated (e.g. in a cluster)

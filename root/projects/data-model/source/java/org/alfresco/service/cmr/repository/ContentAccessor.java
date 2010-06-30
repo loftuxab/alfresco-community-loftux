@@ -20,8 +20,7 @@ package org.alfresco.service.cmr.repository;
 
 import java.util.Locale;
 
-import org.alfresco.repo.transaction.RetryingTransactionHelper;
-import org.alfresco.service.transaction.TransactionService;
+import org.omg.IOP.TransactionService;
 
 /**
  * Interface for instances that provide read and write access to content.
@@ -44,21 +43,15 @@ public interface ContentAccessor
      * <p>
      * This method can only be used before the content stream has been retrieved.
      * <p>
-     * When the stream has been closed, all listeners will be called
-     * within a {@link #setTransactionService(TransactionService) transaction} -
-     * to this end, a {@link TransactionService} must have been set as well.
+     * When the stream has been closed, all listeners will be called.
+     * The listener is responsible for using a retrying transaction to protect the implementation of the callback when required.
      * 
      * @param listener a listener that will be called for output stream
      *      event notification
      *      
-     * @see #setRetryingTransactionHelper(RetryingTransactionHelper)
      */
     public void addListener(ContentStreamListener listener);
     
-    /**
-     * Set the transaction helper for callbacks.
-     */
-    public void setRetryingTransactionHelper(RetryingTransactionHelper helper);
     
     /**
      * Gets the size of the content that this reader references.

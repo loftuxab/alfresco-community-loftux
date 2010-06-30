@@ -21,8 +21,6 @@ package org.alfresco.service.namespace;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.alfresco.repo.domain.qname.NamespaceEntity;
-
 /**
  * <code>QName</code> represents the qualified name of a Repository item. Each
  * QName consists of a local name qualified by a namespace.
@@ -36,6 +34,8 @@ import org.alfresco.repo.domain.qname.NamespaceEntity;
  */
 public final class QName implements QNamePattern, Serializable, Cloneable, Comparable<QName>
 {
+    public static final String EMPTY_URI_SUBSTITUTE = ".empty";
+    
     private static final long serialVersionUID = 3977016258204348976L;
 
     private final String namespaceURI;                // never null
@@ -227,7 +227,7 @@ public final class QName implements QNamePattern, Serializable, Cloneable, Compa
      */
     private QName(String namespace, String name, String prefix)
     {   
-        this.namespaceURI = ((namespace == null) || (namespace.equals(NamespaceEntity.EMPTY_URI_SUBSTITUTE))) ? NamespaceService.DEFAULT_URI : namespace;
+        this.namespaceURI = ((namespace == null) || (namespace.equals(QName.EMPTY_URI_SUBSTITUTE))) ? NamespaceService.DEFAULT_URI : namespace;
         this.prefix = prefix;
         this.localName = name;
         this.hashCode = 0;
