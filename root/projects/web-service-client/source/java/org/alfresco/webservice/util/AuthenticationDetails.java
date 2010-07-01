@@ -18,6 +18,8 @@
  */
 package org.alfresco.webservice.util;
 
+import java.util.Date;
+
 /**
  * Helper class to contain web service authentication credentials
  * 
@@ -34,8 +36,13 @@ public class AuthenticationDetails
     /** The session id **/
     private String sessionId;
     
+    private Date wsLastTimeUsed;
+    
+    /** Default timeoutInterval = -1 (Tiket is never expired) */
+    private long timeoutInterval = -1;
+    
     /**
-     * Constructor
+     * Constructor with deafault timeoutInterval = -1 (Tiket is never expired)
      * 
      * @param userName  the user name
      * @param ticket    the ticket
@@ -46,6 +53,27 @@ public class AuthenticationDetails
         this.userName = userName;
         this.ticket = ticket;
         this.sessionId = sessionId;
+        
+        wsLastTimeUsed = new Date();
+    }
+    
+    /**
+     * Constructor
+     * 
+     * @param userName  the user name
+     * @param ticket    the ticket
+     * @param sessionId the session id
+     * @param timeoutInterval timeout interval
+     * 
+     */
+    public AuthenticationDetails(String userName, String ticket, String sessionId, long timeoutInterval)
+    {
+        this.userName = userName;
+        this.ticket = ticket;
+        this.sessionId = sessionId;
+        this.timeoutInterval = timeoutInterval;
+        
+        wsLastTimeUsed = new Date();
     }
     
     /**
@@ -77,4 +105,29 @@ public class AuthenticationDetails
     {
         return sessionId;
     }
+
+	public long getTimeoutInterval() {
+		return timeoutInterval;
+	}
+
+	public void setTimeoutInterval(long timeoutInterval) {
+		this.timeoutInterval = timeoutInterval;
+	}
+	
+	/**
+	 * @return if timeoutInterval is not set return false. If current time > (wsLastTimeUsed.getTime() + timeoutInterval) return true
+	 */
+	public final boolean isTimedOut() {
+		if (timeoutInterval < 1)
+			return false;
+		
+		long nowInMillis = (new Date()).getTime();
+		long expirationTimeInMillis = (wsLastTimeUsed.getTime() + timeoutInterval);
+		
+		return (nowInMillis > expirationTimeInMillis);
+	}
+
+	public void resetTimeoutInterval() {
+		wsLastTimeUsed = new Date();
+	}
 }
