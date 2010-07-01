@@ -91,6 +91,42 @@ public class AuthenticationUtils implements CallbackHandler
     }
     
     /**
+     * Start a session
+     * 
+     * @param username
+     * @param password
+     * @param timeoutInterval timeout interval
+     * @throws AuthenticationFault
+     */
+    public static void startSession(String username, String password, long timeoutInterval)
+    	throws AuthenticationFault
+	{
+		startSession(username, password);
+	
+		AuthenticationDetails ad = getAuthenticationDetails();
+		ad.setTimeoutInterval(timeoutInterval);
+	}
+    
+    public static void setAuthenticationDetails(AuthenticationDetails authenticationDetails)
+    {
+    	AuthenticationUtils.authenticationDetails.set(authenticationDetails);
+    }
+    
+    /**
+	 * @return if timeoutInterval is not set return false.
+	 */
+    public static boolean isCurrentTicketTimedOut()
+    {
+    	boolean to = getAuthenticationDetails().isTimedOut();
+    	
+    	if (to)
+    		endSession();
+    	
+    	return to;
+    }
+
+
+    /**
      * Ends the current session
      */
     public static void endSession()
@@ -135,16 +171,6 @@ public class AuthenticationUtils implements CallbackHandler
     public static AuthenticationDetails getAuthenticationDetails()
     {
         return AuthenticationUtils.authenticationDetails.get();
-    }
-    
-    /**
-     * Manually set the authentication details for the current thread
-     * 
-     * @param authenticationDetails     the authentication details
-     */
-    public static void setAuthenticationDetails(AuthenticationDetails authenticationDetails)
-    {
-        AuthenticationUtils.authenticationDetails.set(authenticationDetails);
     }
     
     /**
