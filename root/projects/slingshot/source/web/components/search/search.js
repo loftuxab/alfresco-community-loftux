@@ -106,6 +106,24 @@
          initialSearchTag: "",
          
          /**
+          * States whether all sites should be searched.
+          * This field only has an effect if siteId != ""
+          * 
+          * @property initialSearchAll
+          * @type boolean
+          */
+         initialSearchAll: true,
+         
+         /**
+          * Sort property to use for the initial search.
+          * Empty default value will use score relevance default.
+          * @property initialSort
+          * @type string
+          * @default ""
+          */
+         initialSort: "",
+         
+         /**
           * Number of characters required for a search.
           *
           * @property minSearchTermLength
@@ -124,6 +142,16 @@
        * Search tag used for the last search.
        */
       searchTag: "",
+      
+      /**
+       * Whether the search was over all sites or just the current one
+       */
+      searchAll: true,
+      
+      /**
+       * Search sort used for the last search.
+       */
+      searchSort: "",
       
       /**
        * Number of search results.
@@ -198,15 +226,53 @@
             correctScope: true
          }, "keydown").enable();
          
-         // search YUI button
-         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
-         
          // trigger the initial search
          YAHOO.Bubbling.fire("onSearch",
          {
             searchTerm: this.options.initialSearchTerm,
             searchTag: this.options.initialSearchTag,
-            searchAll: true
+            searchSort: this.options.initialSort,
+            searchAll: this.options.initialSearchAll
+         });
+         
+         // toggle site scope links
+         var toggleLink = Dom.get(this.id + "-site-link");
+         Event.addListener(toggleLink, "click", this.onSiteSearch, this, true);
+         toggleLink = Dom.get(this.id + "-all-sites-link");
+         Event.addListener(toggleLink, "click", this.onAllSiteSearch, this, true);
+         
+         // search YUI button
+         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
+         
+         // menu button for sort options
+         this.widgets.sortButton = new YAHOO.widget.Button(this.id + "-sort-menubutton",
+         {
+            type: "menu", 
+            menu: this.id + "-sort-menu",
+            menualignment: ["tr", "br"],
+            lazyloadmenu: false
+         });
+         // set initially selected sort button label
+         var menuItems = this.widgets.sortButton.getMenu().getItems();
+         for (var m in menuItems)
+         {
+            if (menuItems[m].value === this.options.initialSort)
+            {
+               this.widgets.sortButton.set("label", this.msg("label.sortby", menuItems[m].cfg.getProperty("text")));
+               break;
+            }
+         }
+         // event handler for sort menu
+         this.widgets.sortButton.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               me.refreshSearch(
+               {
+                  searchSort: menuItem.value
+               });
+            }
          });
          
          // Hook action events
@@ -510,6 +576,16 @@
          {
             searchTag = args.searchTag;
          }
+         var searchAll = this.searchAll;
+         if (args.searchAll !== undefined)
+         {
+            searchAll = args.searchAll;
+         }
+         var searchSort = this.searchSort;
+         if (args.searchSort !== undefined)
+         {
+            searchSort = args.searchSort;
+         }
          
          // redirect to the search page
          var url = Alfresco.constants.URL_CONTEXT + "page";
@@ -522,6 +598,11 @@
          {
             url += "&tag=" + encodeURIComponent(searchTag);
          }
+         if (searchSort.length !== 0)
+         {
+            url += "&s=" + searchSort;
+         }
+         url += "&a=" + searchAll;
          window.location = url;
       },
 
@@ -552,7 +633,23 @@
             {
                searchTag = obj.searchTag;
             }
-            this._performSearch(searchTerm, searchTag);
+            var searchAll = this.searchAll;
+            if (obj.searchAll !== undefined)
+            {
+               searchAll = obj.searchAll;
+            }
+            var searchSort = this.searchSort;
+            if (obj.searchSort !== undefined)
+            {
+               searchSort = obj.searchSort;
+            }
+            this._performSearch(
+            {
+               searchTerm: searchTerm,
+               searchTag: searchTag,
+               searchAll: searchAll,
+               searchSort: searchSort
+            });
          }
       },
       
@@ -569,6 +666,28 @@
          {
             searchTag: "",
             searchTerm: YAHOO.lang.trim(Dom.get(this.id + "-search-text").value)
+         });
+      },
+      
+      /**
+       * Click event for site specific search link
+       */
+      onSiteSearch: function Search_onSiteSearch(e, args)
+      {
+         this.refreshSearch(
+         {
+            searchAll: false
+         });
+      },
+      
+      /**
+       * Click event for all sites search link
+       */
+      onAllSiteSearch: function Search_onAllSiteSearch(e, args)
+      {
+         this.refreshSearch(
+         {
+            searchAll: true
          });
       },
 
@@ -590,11 +709,14 @@
        * Updates search results list by calling data webscript with current site and query term
        *
        * @method _performSearch
+       * @param args {object} search args
        */
-      _performSearch: function Search__performSearch(searchTerm, searchTag)
+      _performSearch: function Search__performSearch(args)
       {
-         var searchTerm = YAHOO.lang.trim(searchTerm);
-         var searchTag = YAHOO.lang.trim(searchTag);
+         var searchTerm = YAHOO.lang.trim(args.searchTerm);
+         var searchTag = YAHOO.lang.trim(args.searchTag);
+         var searchAll = args.searchAll;
+         var searchSort = args.searchSort;
          if (searchTag.length === 0 && searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
@@ -611,17 +733,25 @@
          this.widgets.dataTable.set("MSG_EMPTY", "");
          this.widgets.dataTable.render();
          
+         // Success handler
          function successHandler(sRequest, oResponse, oPayload)
          {
+            // update current state on success
             this.searchTerm = searchTerm;
             this.searchTag = searchTag;
+            this.searchAll = searchAll;
+            this.searchSort = searchSort;
+            
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+            
             // update the results info text
             this._updateResultsInfo();
+            
             // set focus to search input textbox
             Dom.get(this.id + "-search-text").focus();
          }
          
+         // Failure handler
          function failureHandler(sRequest, oResponse)
          {
             if (oResponse.status == 401)
@@ -645,7 +775,7 @@
             }
          }
          
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm, searchTag),
+         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm, searchTag, searchSort),
          {
             success: successHandler,
             failure: failureHandler,
@@ -679,12 +809,15 @@
        *
        * @method _buildSearchParams
        */
-      _buildSearchParams: function Search__buildSearchParams(searchTerm, searchTag)
+      _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm, searchTag, searchSort)
       {
-         var params = YAHOO.lang.substitute("term={term}&tag={tag}&maxResults={maxResults}",
+         var site = searchAll ? "" : this.options.siteId;
+         var params = YAHOO.lang.substitute("site={site}&term={term}&tag={tag}&maxResults={maxResults}&sort={sort}",
          {
+            site: encodeURIComponent(site),
             term: encodeURIComponent(searchTerm),
             tag: encodeURIComponent(searchTag),
+            sort: encodeURIComponent(searchSort),
             maxResults: this.options.maxSearchResults + 1 // to calculate whether more results were available
          });
          

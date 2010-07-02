@@ -3,7 +3,7 @@
 	<#if page.url.templateArgs.site??>
       <div>
          <span class="navigation-item backLink">
-            <a href="${url.context}/page/site/${page.url.templateArgs.site}/dashboard">${msg("header.backlink", profile.title?html)}</a>
+            <a href="${url.context}/page/site/${page.url.templateArgs.site}/dashboard">${msg("header.backlink", siteTitle?html)}</a>
          </span>
       </div>
    </#if>

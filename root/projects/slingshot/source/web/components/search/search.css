@@ -3,6 +3,12 @@
 	margin: 0 -10px;
 }
 
+.search .search-sites
+{
+   margin-bottom: -0.75em;
+   padding: 1.25em 0 0 1.25em;
+}
+
 .search .search-box
 {
    margin: 1.25em;
