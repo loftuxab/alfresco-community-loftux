@@ -2356,6 +2356,7 @@
       <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="${dir.module.dod5015}">
          <jvmarg value="-server"/>
          <jvmarg value="-XX:MaxPermSize=256M"/>
+         <jvmarg value="-Dcom.sun.management.jmxremote"/>
          <classpath>
             <pathelement location="${dir.module.dod5015.classes}" />
             <pathelement location="${dir.module.dod5015.config}" />
