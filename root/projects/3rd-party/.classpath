@@ -123,11 +123,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.springframework.orm-3.0.0.jar" sourcepath="src/org.springframework.orm-sources-3.0.0.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.springframework.web-3.0.0.jar" sourcepath="src/org.springframework.web-sources-3.0.0.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-3.7-beta2-20100629.jar" sourcepath="src/poi-3.7-beta2-20100629.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-scratchpad-3.7-beta2-20100629.jar" sourcepath="src/poi-3.7-beta2-20100629.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-3.7-beta2-20100629.jar" sourcepath="src/poi-3.7-beta2-20100629.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-schemas-3.7-beta2-20100629.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-3.7-beta2-20100702.jar" sourcepath="src/poi-3.7-beta2-20100702.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-scratchpad-3.7-beta2-20100702.jar" sourcepath="src/poi-3.7-beta2-20100702.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-3.7-beta2-20100702.jar" sourcepath="src/poi-3.7-beta2-20100702.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-schemas-3.7-beta2-20100702.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-2.4.1.jar"/>
