@@ -1,3 +1,7 @@
+/**
+ * Share Header component GET method
+ */
+
 const PREF_FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
 const PREF_COLLAPSED_TWISTERS = "org.alfresco.share.twisters.collapsed";
 
@@ -128,8 +132,10 @@ function main()
    model.favouriteSites = favouriteSites;
    model.collapsedTwisters = collapsedTwisters;
    model.siteTitle = siteTitle;
+   // Save the site title for downstream components - saves remote calls for Site Profile
+   context.setValue("site-title", siteTitle);
    model.repoLibraryVisible = repoLibraryVisible;
-   if (page.url.args["theme"] != undefined)
+   if (page.url.args["theme"] != null)
    {
       model.theme = page.url.args["theme"];
    }

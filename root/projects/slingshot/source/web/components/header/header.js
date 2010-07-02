@@ -233,6 +233,7 @@
                url += "/site/" + this.options.siteId;
             }
             url += "/search?t=" + encodeURIComponent(searchTerm);
+            url += "&a=true";
             window.location = url;
          }
       },

@@ -1,22 +1,31 @@
-if (page.url.templateArgs.site != undefined)
+/**
+ * Search Title component GET method
+ */
+
+function main()
 {
-   // Call the repository for the site profile
-   var json = remote.call("/api/sites/" + page.url.templateArgs.site);
-
-   var profile =
+   if (page.url.templateArgs.site != null)
    {
-      title: "[Not Found]"
-   };
-
-   if (json.status == 200)
-   {
-      // Create javascript objects from the repo response
-      var obj = eval('(' + json + ')');
-      if (obj && obj.title)
+      // look for request scoped cached site title
+      var siteTitle = context.properties["site-title"];
+      if (siteTitle == null)
       {
-         profile = obj;
+         // Call the repository for the site profile
+         var json = remote.call("/api/sites/" + page.url.templateArgs.site);
+         if (json.status == 200)
+         {
+            // Create javascript objects from the repo response
+            var obj = eval('(' + json + ')');
+            if (obj)
+            {
+               siteTitle = (obj.title.length != 0) ? obj.title : obj.shortName;
+            }
+         }
       }
+      
+      // Prepare the model
+      model.siteTitle = (siteTitle != null ? siteTitle : "");
    }
-   // Prepare the model
-   model.profile = profile;
 }
+
+main();

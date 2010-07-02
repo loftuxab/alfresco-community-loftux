@@ -8,7 +8,6 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       siteTitle: "${siteTitle?js_string}",
-      searchType: "${page.url.templateArgs.site!'all'}", // default search scope
       favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>},
       minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')}
    }).setMessages(
@@ -106,9 +105,9 @@
             <li>
                <a href="#">${msg("header.search.advancedsearch")}</a>
             </li>
-         </ul>            
+         </ul>
       </div>
-   </div>	
+   </div>
    </#if>
 </div>
 <script type="text/javascript">//<![CDATA[
