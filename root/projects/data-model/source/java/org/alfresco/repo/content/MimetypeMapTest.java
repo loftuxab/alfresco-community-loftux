@@ -22,9 +22,8 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.MimetypeService;
-import org.alfresco.util.ApplicationContextHelper;
+import org.alfresco.util.DataModelTestApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -34,15 +33,14 @@ import org.springframework.context.ApplicationContext;
  */
 public class MimetypeMapTest extends TestCase
 {
-    private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+    private static ApplicationContext ctx = DataModelTestApplicationContextHelper.getApplicationContext();
     
     private MimetypeService mimetypeService;
     
     @Override
     public void setUp() throws Exception
     {
-        ServiceRegistry serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        mimetypeService = serviceRegistry.getMimetypeService();
+        mimetypeService =  (MimetypeService)ctx.getBean("mimetypeService");
     }
     
     public void testExtensions() throws Exception
