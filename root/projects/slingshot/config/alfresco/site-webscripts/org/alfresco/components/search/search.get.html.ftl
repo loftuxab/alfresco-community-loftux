@@ -54,7 +54,7 @@
                <option value="cm:modified|false">${msg("label.modified")}</option>
                <option value="cm:creator">${msg("label.creator")}</option>
                <option value="cm:created|false">${msg("label.created")}</option>
-               <option value=".size">${msg("search.sort.size")}</option>
+               <option value=".size|true">${msg("search.sort.size")}</option>
                <option value=".mimetype">${msg("search.sort.mimetype")}</option>
                <option value="TYPE">${msg("search.sort.type")}</option>
             </select>
