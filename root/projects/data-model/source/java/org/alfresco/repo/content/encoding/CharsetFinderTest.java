@@ -19,6 +19,7 @@
 package org.alfresco.repo.content.encoding;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -28,8 +29,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.encoding.CharactersetFinder;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
-import org.alfresco.util.ApplicationContextHelper;
+import org.alfresco.util.DataModelTestApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -40,7 +40,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class CharsetFinderTest extends TestCase
 {
-    private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+    private static ApplicationContext ctx = DataModelTestApplicationContextHelper.getApplicationContext();
     
     private ContentCharsetFinder charsetFinder;
     
@@ -52,9 +52,13 @@ public class CharsetFinderTest extends TestCase
     
     public void testPlainText() throws Exception
     {
-        File file = AbstractContentTransformerTest.loadQuickTestFile("txt");
-        InputStream is = new BufferedInputStream(new FileInputStream(file));
+        String test = "The quick brown fox jumps over the lazy dog" +
+                      "\n\nLe renard brun rapide saute par-dessus le chien paresseux" +
+                      "\n\nDer schnelle braune Fuchs springt über den faulen Hund\n\n" +
+                      "براون وكس السريع يقفز فوق الكلب كسالي";
+        InputStream is = new BufferedInputStream(new ByteArrayInputStream(test.getBytes("UTF-8")));
         Charset charset = charsetFinder.getCharset(is, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         assertNotNull(charset);
+        
     }
 }

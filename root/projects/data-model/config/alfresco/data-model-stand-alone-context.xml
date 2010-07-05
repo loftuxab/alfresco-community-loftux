@@ -91,5 +91,41 @@
     </bean>
     
     <bean id="tenantService" class="org.alfresco.repo.tenant.SingleTServiceImpl" />
-  
+
+    <!-- Characterset decoder -->
+    <bean id="charset.finder" class="org.alfresco.repo.content.encoding.ContentCharsetFinder">
+      <property name="defaultCharset">
+         <value>UTF-8</value>
+      </property>
+      <property name="mimetypeService">
+         <ref bean="mimetypeService"/>
+      </property>
+      <property name="charactersetFinders">
+         <list>
+            <bean class="org.alfresco.encoding.GuessEncodingCharsetFinder" />
+         </list>
+      </property>
+    </bean>
+
+    <bean id="mimetypeService" class="org.alfresco.repo.content.MimetypeMap" init-method="init" >
+      <property name="configService">
+         <ref bean="mimetypeConfigService" />
+      </property>
+      <property name="contentCharsetFinder">
+         <ref bean="charset.finder"/>
+      </property>
+    </bean>  
+    
+    <bean id="mimetypeConfigService" class="org.springframework.extensions.config.xml.XMLConfigService" init-method="init">
+        <constructor-arg>
+            <bean class="org.springframework.extensions.config.source.UrlConfigSource">
+                <constructor-arg>
+                    <list>
+                        <value>classpath:alfresco/mimetype/mimetype-map.xml</value>
+                        <value>classpath:alfresco/mimetype/mimetype-map-openoffice.xml</value>
+                    </list>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+    </bean>
 </beans>
