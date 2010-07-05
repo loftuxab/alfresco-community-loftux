@@ -211,6 +211,14 @@ public class FormUIGet extends DeclarativeWebScript
         {
             model = generateModel(itemKind, itemId, req, status, cache);
         }
+        else
+        {
+            // an item kind and id have not been provided so return a model
+            // with a 'form' entry but set to null, this prevents FreeMarker
+            // adding a default 'form' taglib object to the model.
+            model = new HashMap<String, Object>(1);
+            model.put(MODEL_FORM, null);
+        }
         
         return model;
     }
