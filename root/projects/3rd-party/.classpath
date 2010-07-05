@@ -173,8 +173,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/bsf-2.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-core-2.0.0.jar" sourcepath="src/ehcache-core-2.0.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-surf/spring-webeditor-client-jsp-1.0.0.CI-SNAPSHOT.jar" sourcepath="src/spring-webeditor-client-jsp-1.0.0.CI-SNAPSHOT-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pdfbox-1.1.0.jar" sourcepath="src/pdfbox-1.1.0-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/fontbox-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/drew-image-metadata-extractor-2.4.0-beta-1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/netcdf-java-4.0.41.jar"/>
@@ -187,5 +185,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/google/google-collect-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-abdera-0.1-incubating-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-0.1-incubating-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fontbox-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pdfbox-1.2.0.jar" sourcepath="src/pdfbox-1.2.0-src.zip"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
