@@ -321,13 +321,14 @@
             oColumn.height = 100;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell, "height", oColumn.height + "px");
-            Dom.setStyle(elCell.parentNode, "text-align", "center");
+            Dom.addClass(elCell, "thumbnail-cell");
             
             var url = me._getBrowseUrlForRecord(oRecord);
             var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/generic-result.png';
             
             // use the preview image for a document type
-            switch (oRecord.getData("type"))
+            var dataType = oRecord.getData("type");
+            switch (dataType)
             {
                case "document":
                   imageUrl = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
@@ -362,10 +363,18 @@
             // Render the cell
             var name = oRecord.getData("displayName");
             var htmlName = $html(name);
-            var viewUrl = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/content/" + oRecord.getData("nodeRef").replace(":/", "") + "/" + oRecord.getData("name");
-            elCell.innerHTML = '<div class="action-overlay"><a href="' + encodeURI(viewUrl) + '" target="_blank"><img title="' + $html(me.msg("label.viewinbrowser")) +
-                               '" src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/view-in-browser-16.png" width="16" height="16"/></a></div>' +
-                               '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
+            var html = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
+            if (dataType === "document")
+            {
+               var viewUrl = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/content/" + oRecord.getData("nodeRef").replace(":/", "") + "/" + oRecord.getData("name");
+               html = '<div class="action-overlay">' + 
+                      '<a href="' + encodeURI(viewUrl) + '" target="_blank"><img title="' + $html(me.msg("label.viewinbrowser")) +
+                      '" src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/view-in-browser-16.png" width="16" height="16"/></a>' +
+                      '<a href="' + encodeURI(viewUrl + "?a=true") + '" style="padding-left:4px" target="_blank"><img title="' + $html(me.msg("label.download")) +
+                      '" src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/download-16.png" width="16" height="16"/></a>' + 
+                      '</div>' + html;
+            }
+            elCell.innerHTML = html;
          };
 
          /**

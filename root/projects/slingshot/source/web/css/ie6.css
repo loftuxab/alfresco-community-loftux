@@ -666,3 +666,10 @@ table .yui-dt-empty
 {
    margin-right: -20px !important;
 }
+
+/* Search - hover not supported */
+
+.search .thumbnail-cell > div
+{
+   visibility: visible;
+}
