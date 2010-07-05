@@ -237,9 +237,19 @@ public class ContentData implements Serializable
     }
     
     /**
-     * @return Returns a string of form: <code>contentUrl=xxx;mimetype=xxx;size=xxx;encoding=xxx</code>
+     * @return Returns a string of form: <code>contentUrl=xxx|mimetype=xxx|size=xxx|encoding=xxx|locale=xxx</code>
      */
     public String toString()
+    {
+        return getInfoUrl();
+    }
+    
+    /**
+     * @return Returns a URL containing information on the content including the mimetype, 
+     *         locale, encoding and size, the string is returned in the form:
+     *         <code>contentUrl=xxx|mimetype=xxx|size=xxx|encoding=xxx|locale=xxx</code>
+     */
+    public String getInfoUrl()
     {
         StringBuilder sb = new StringBuilder(80);
         sb.append("contentUrl=").append(contentUrl == null ? "" : contentUrl)
