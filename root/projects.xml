@@ -95,7 +95,7 @@
                classname="org.jibx.binding.ant.CompileTask"
                classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
 
-      <bind verbose="true" 
+      <bind verbose="false" 
             load="true" 
             binding="${file.jibx.binding.m2}">
          <classpath>
@@ -323,7 +323,7 @@
                classname="org.jibx.binding.ant.CompileTask"
                classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
 
-      <bind verbose="true" 
+      <bind verbose="false" 
             load="true" 
             binding="${file.jibx.binding.systeminfo}">
          <classpath>
