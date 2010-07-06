@@ -172,15 +172,19 @@
          if (this.options.mode !== "view")
          {
             // make buttons YUI buttons
-            this.buttons.submit = Alfresco.util.createYUIButton(this, "submit", null,
+            
+            if (Dom.get(this.id + "-submit") !== null)
             {
-               type: "submit"
-            });
-
-            // force the generated button to have a name of "-" so it gets ignored in
-            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
-            Dom.get(this.id + "-submit-button").name = "-";
-
+               this.buttons.submit = Alfresco.util.createYUIButton(this, "submit", null,
+               {
+                  type: "submit"
+               });
+   
+               // force the generated button to have a name of "-" so it gets ignored in
+               // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+               Dom.get(this.id + "-submit-button").name = "-";
+            }
+            
             if (Dom.get(this.id + "-reset") !== null)
             {
                this.buttons.reset = Alfresco.util.createYUIButton(this, "reset", null,

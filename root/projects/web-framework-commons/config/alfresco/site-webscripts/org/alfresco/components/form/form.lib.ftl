@@ -63,12 +63,14 @@
 
 <#macro renderFormButtons formId>         
    <div id="${formId}-buttons" class="form-buttons">
-      <input id="${formId}-submit" type="submit" value="${msg("form.button.submit.label")}" />
+      <#if form.showSubmitButton?exists && form.showSubmitButton>
+         <input id="${formId}-submit" type="submit" value="${msg("form.button.submit.label")}" />&nbsp;
+      </#if>
       <#if form.showResetButton?exists && form.showResetButton>
-         &nbsp;<input id="${formId}-reset" type="reset" value="${msg("form.button.reset.label")}" />
+         <input id="${formId}-reset" type="reset" value="${msg("form.button.reset.label")}" />&nbsp;
       </#if>
       <#if form.showCancelButton?exists && form.showCancelButton>
-         &nbsp;<input id="${formId}-cancel" type="button" value="${msg("form.button.cancel.label")}" />
+         <input id="${formId}-cancel" type="button" value="${msg("form.button.cancel.label")}" />
       </#if>
    </div>
 </#macro>   
