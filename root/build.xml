@@ -185,6 +185,7 @@
          <include name="**/org/alfresco/repo/audit/AuditTestSuite.java" />
          <!-- Content Tests -->
          <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
+         <include name="**/org/alfresco/repo/content/DataModelContentTestSuite.java" />
          <include name="**/org/alfresco/repo/content/ContentFullContextTestSuite.java" />
          <include name="**/org/alfresco/repo/content/ContentMinimalContextTestSuite.java" />
          <include name="**/org/alfresco/repo/content/metadata/xml/XmlMetadataExtracterTest.java" />
