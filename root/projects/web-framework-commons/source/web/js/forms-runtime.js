@@ -569,6 +569,21 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       },
       
       /**
+       * Retrieves the data currently held by the form.
+       * 
+       * @method getFormData
+       * @return An object representing the form data
+       */
+      getFormData: function()
+      {
+         // get the form element
+         var form = Dom.get(this.formId);
+         
+         // build object representation of the form data
+         return this._buildAjaxForSubmit(form);
+      },
+      
+      /**
        * Applies a Key Listener to input fields to ensure tabbing only targets elements
        * that specifically set a "tabindex" attribute.
        * This has only been seen as an issue with the Firefox web browser, so shouldn't be applied otherwise.
