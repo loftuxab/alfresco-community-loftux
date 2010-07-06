@@ -153,6 +153,7 @@ public class FormUIGet extends DeclarativeWebScript
     protected static final String MODEL_SUBMISSION_URL = "submissionUrl";
     protected static final String MODEL_SHOW_CANCEL_BUTTON = "showCancelButton";
     protected static final String MODEL_SHOW_RESET_BUTTON = "showResetButton";
+    protected static final String MODEL_SHOW_SUBMIT_BUTTON = "showSubmitButton";
     protected static final String MODEL_SHOW_CAPTION = "showCaption";
     protected static final String MODEL_DESTINATION = "destination";
     protected static final String MODEL_REDIRECT = "redirect";
@@ -611,6 +612,7 @@ public class FormUIGet extends DeclarativeWebScript
         formUIModel.put(MODEL_SHOW_CAPTION, discoverBooleanParam(context, MODEL_SHOW_CAPTION));
         formUIModel.put(MODEL_SHOW_CANCEL_BUTTON, discoverBooleanParam(context, MODEL_SHOW_CANCEL_BUTTON));
         formUIModel.put(MODEL_SHOW_RESET_BUTTON, discoverBooleanParam(context, MODEL_SHOW_RESET_BUTTON));
+        formUIModel.put(MODEL_SHOW_SUBMIT_BUTTON, discoverBooleanParam(context, MODEL_SHOW_SUBMIT_BUTTON, true));
         
         String destination = getParameter(context.getRequest(), MODEL_DESTINATION);
         if (destination != null && destination.length() > 0)
@@ -776,7 +778,22 @@ public class FormUIGet extends DeclarativeWebScript
      */
     protected boolean discoverBooleanParam(ModelContext context, String name)
     {
-        String value = getParameter(context.getRequest(), name, "false");
+        return discoverBooleanParam(context, name, false);
+    }
+    
+    /**
+     * Returns the value of the given boolean parameter.
+     * 
+     * @param context The context
+     * @param name The name of the parameter
+     * @param defaultValue The default value to use if the parameter 
+     *        is not found
+     * @return The value of parameter, defaultValue is returned if
+     *         the parameter is not found
+     */
+    protected boolean discoverBooleanParam(ModelContext context, String name, boolean defaultValue)
+    {
+        String value = getParameter(context.getRequest(), name, Boolean.toString(defaultValue));
         
         return ("true".equals(value)) ? true : false;
     }
