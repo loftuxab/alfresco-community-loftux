@@ -24,7 +24,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.antlr.gunit.GrammarInfo;
 import org.antlr.gunit.gUnitExecutor;
 import org.antlr.gunit.gUnitLexer;
@@ -58,7 +57,7 @@ public class FTSTest extends TestCase
     
     public void testLexer() throws IOException, RecognitionException
     {
-        ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
+        ClassLoader cl = FTSTest.class.getClassLoader();
         InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/search/impl/parsers/fts_test.gunit");
 
         CharStream input = new ANTLRInputStream(modelStream);

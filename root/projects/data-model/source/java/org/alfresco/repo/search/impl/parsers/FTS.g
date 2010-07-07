@@ -82,7 +82,6 @@ tokens
 @lexer::header
 {
 package org.alfresco.repo.search.impl.parsers;
-import org.alfresco.cmis.CMISQueryException;
 }
 
 @header
@@ -318,7 +317,7 @@ public Token nextTokenImpl() {
             }
             catch (RecognitionException re) 
             {
-                throw new CMISQueryException(getErrorString(re), re);
+                throw new FTSQueryException(getErrorString(re), re);
             }
         }
     }
