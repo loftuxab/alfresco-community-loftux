@@ -21,7 +21,7 @@ package org.alfresco.repo.search.impl.querymodel.impl.lucene;
 import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.search.impl.lucene.ADMLuceneSearcherImpl;
+import org.alfresco.repo.search.impl.lucene.LuceneUtils;
 import org.alfresco.repo.search.impl.querymodel.Column;
 import org.alfresco.repo.search.impl.querymodel.Constraint;
 import org.alfresco.repo.search.impl.querymodel.FunctionEvaluationContext;
@@ -178,7 +178,7 @@ public class LuceneQuery extends BaseQuery implements LuceneQueryBuilder
 
                 if (luceneField != null)
                 {
-                    if (ADMLuceneSearcherImpl.fieldHasTerm(luceneContext.getLuceneQueryParser().getIndexReader(), luceneField))
+                    if (LuceneUtils.fieldHasTerm(luceneContext.getLuceneQueryParser().getIndexReader(), luceneField))
                     {
                         fields[index++] = new SortField(luceneField, (ordering.getOrder() == Order.DESCENDING));
                     }

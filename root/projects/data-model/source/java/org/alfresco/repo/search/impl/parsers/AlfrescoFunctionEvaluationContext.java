@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.springframework.extensions.surf.util.I18NUtil;
 import org.alfresco.repo.search.MLAnalysisMode;
-import org.alfresco.repo.search.SearcherException;
 import org.alfresco.repo.search.impl.lucene.LuceneFunction;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.search.impl.lucene.analysis.DateTimeAnalyser;
@@ -46,6 +44,7 @@ import org.alfresco.service.namespace.QName;
 import org.apache.lucene.index.IndexReader.FieldOption;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 /**
  * Alfrecso function evaluation context for evaluating FTS expressions against lucene.
@@ -165,7 +164,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
                     propertyDef = dictionaryService.getProperty(QName.createQName(field.substring(1, field.length()-5)));
                     if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                     {
-                        throw new SearcherException("Order for .size only supported on content properties");
+                        throw new FTSQueryException("Order for .size only supported on content properties");
                     }
                     else
                     {
@@ -177,7 +176,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
                     propertyDef = dictionaryService.getProperty(QName.createQName(field.substring(1, field.length()-9)));
                     if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                     {
-                        throw new SearcherException("Order for .mimetype only supported on content properties");
+                        throw new FTSQueryException("Order for .mimetype only supported on content properties");
                     }
                     else
                     {
@@ -193,7 +192,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
             {
                 if (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                 {
-                    throw new SearcherException("Order on content properties is not curently supported");
+                    throw new FTSQueryException("Order on content properties is not curently supported");
                 }
                 else if ((propertyDef.getDataType().getName().equals(DataTypeDefinition.MLTEXT)) || (propertyDef.getDataType().getName().equals(DataTypeDefinition.TEXT)))
                 {
@@ -205,7 +204,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
 
                     if (locales.size() > 1)
                     {
-                        throw new SearcherException("Order on text/mltext properties with more than one locale is not curently supported");
+                        throw new FTSQueryException("Order on text/mltext properties with more than one locale is not curently supported");
                     }
 
                     sortLocale = locales.get(0);

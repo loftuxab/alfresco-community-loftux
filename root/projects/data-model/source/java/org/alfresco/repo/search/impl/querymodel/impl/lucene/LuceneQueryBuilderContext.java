@@ -18,8 +18,8 @@
  */
 package org.alfresco.repo.search.impl.querymodel.impl.lucene;
 
+import org.alfresco.repo.search.MLAnalysisMode;
 import org.alfresco.repo.search.impl.lucene.LuceneAnalyser;
-import org.alfresco.repo.search.impl.lucene.LuceneConfig;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -47,9 +47,9 @@ public class LuceneQueryBuilderContext
      * @param indexReader
      */
     public LuceneQueryBuilderContext(DictionaryService dictionaryService, NamespacePrefixResolver namespacePrefixResolver, TenantService tenantService,
-            SearchParameters searchParameters, LuceneConfig config, IndexReader indexReader)
+            SearchParameters searchParameters, MLAnalysisMode defaultSearchMLAnalysisMode, IndexReader indexReader)
     {
-        LuceneAnalyser analyzer = new LuceneAnalyser(dictionaryService, searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters
+        LuceneAnalyser analyzer = new LuceneAnalyser(dictionaryService, searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters
                 .getMlAnalaysisMode());
         lqp = new LuceneQueryParser(searchParameters.getDefaultFieldName(), analyzer);
         lqp.setDefaultOperator(LuceneQueryParser.OR_OPERATOR);
@@ -57,7 +57,7 @@ public class LuceneQueryBuilderContext
         lqp.setNamespacePrefixResolver(namespacePrefixResolver);
         lqp.setTenantService(tenantService);
         lqp.setSearchParameters(searchParameters);
-        lqp.setDefaultSearchMLAnalysisMode(config.getDefaultMLSearchAnalysisMode());
+        lqp.setDefaultSearchMLAnalysisMode(defaultSearchMLAnalysisMode);
         lqp.setIndexReader(indexReader);
         lqp.setAllowLeadingWildcard(true);
         this.namespacePrefixResolver = namespacePrefixResolver;
