@@ -28,9 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.search.SearcherException;
 import org.alfresco.repo.search.impl.lucene.index.CachingIndexReader;
-import org.alfresco.repo.search.impl.lucene.index.IndexInfo;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -60,7 +58,7 @@ public class LeafScorer extends Scorer
     /**
      * The logger.
      */
-    private static Log s_logger = LogFactory.getLog(IndexInfo.class);
+    private static Log s_logger = LogFactory.getLog(LeafScorer.class);
 
     static class Counter
     {
@@ -170,7 +168,7 @@ public class LeafScorer extends Scorer
         }
         catch (IOException e)
         {
-            throw new SearcherException(e);
+            throw new LeafScorerException("IO Error:", e);
         }
 
     }
@@ -374,7 +372,7 @@ public class LeafScorer extends Scorer
             }
             if (parentIds.size() > 1)
             {
-                throw new SearcherException("More than one root node in index: " + parentIds.size());
+                throw new LeafScorerException("More than one root node in index: " + parentIds.size());
             }
             else if (parentIds.size() == 0)
             {

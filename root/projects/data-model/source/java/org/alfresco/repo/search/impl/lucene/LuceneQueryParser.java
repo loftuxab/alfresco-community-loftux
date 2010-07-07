@@ -37,7 +37,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.search.MLAnalysisMode;
-import org.alfresco.repo.search.SearcherException;
 import org.alfresco.repo.search.impl.lucene.analysis.DateTimeAnalyser;
 import org.alfresco.repo.search.impl.lucene.analysis.MLTokenDuplicator;
 import org.alfresco.repo.search.impl.lucene.query.CaseInsensitiveFieldQuery;
@@ -112,7 +111,7 @@ public class LuceneQueryParser extends QueryParser
 
     private SearchParameters searchParameters;
 
-    private LuceneConfig config;
+    private MLAnalysisMode defaultSearchMLAnalysisMode;
 
     private IndexReader indexReader;
 
@@ -134,14 +133,13 @@ public class LuceneQueryParser extends QueryParser
      * @param tenantService
      * @param defaultOperator
      * @param searchParameters
-     * @param config
      * @param indexReader
      * @return - the query
      * @throws ParseException
      *             if the parsing fails
      */
     static public Query parse(String query, String field, Analyzer analyzer, NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService,
-            TenantService tenantService, Operator defaultOperator, SearchParameters searchParameters, LuceneConfig config, IndexReader indexReader) throws ParseException
+            TenantService tenantService, Operator defaultOperator, SearchParameters searchParameters, MLAnalysisMode defaultSearchMLAnalysisMode, IndexReader indexReader) throws ParseException
     {
         if (s_logger.isDebugEnabled())
         {
@@ -153,7 +151,7 @@ public class LuceneQueryParser extends QueryParser
         parser.setDictionaryService(dictionaryService);
         parser.setTenantService(tenantService);
         parser.setSearchParameters(searchParameters);
-        parser.setLuceneConfig(config);
+        parser.setDefaultSearchMLAnalysisMode(defaultSearchMLAnalysisMode);
         parser.setIndexReader(indexReader);
         parser.setAllowLeadingWildcard(true);
         // TODO: Apply locale contstraints at the top level if required for the non ML doc types.
@@ -166,11 +164,11 @@ public class LuceneQueryParser extends QueryParser
     }
 
     /**
-     * @param config
+     * @param defaultSearchMLAnalysisMode
      */
-    public void setLuceneConfig(LuceneConfig config)
+    public void setDefaultSearchMLAnalysisMode(MLAnalysisMode defaultSearchMLAnalysisMode)
     {
-        this.config = config;
+        this.defaultSearchMLAnalysisMode = defaultSearchMLAnalysisMode;
     }
 
     /**
@@ -215,9 +213,9 @@ public class LuceneQueryParser extends QueryParser
         return indexReader;
     }
 
-    public LuceneConfig getConfig()
+    public MLAnalysisMode getDefaultSearchMLAnalysisMode()
     {
-        return config;
+        return defaultSearchMLAnalysisMode;
     }
 
     /**
@@ -443,7 +441,7 @@ public class LuceneQueryParser extends QueryParser
                         }
                         else
                         {
-                            throw new LuceneIndexException("Ambiguous data datype "+string);
+                            throw new LuceneQueryParserException("Ambiguous data datype "+string);
                         }
                     }
                 }
@@ -483,7 +481,7 @@ public class LuceneQueryParser extends QueryParser
                         }
                         else
                         {
-                            throw new LuceneIndexException("Ambiguous data datype "+string);
+                            throw new LuceneQueryParserException("Ambiguous data datype "+string);
                         }
                     }
                 }
@@ -523,7 +521,7 @@ public class LuceneQueryParser extends QueryParser
                         }
                         else
                         {
-                            throw new LuceneIndexException("Ambiguous data datype "+string);
+                            throw new LuceneQueryParserException("Ambiguous data datype "+string);
                         }
                     }
                 }
@@ -563,7 +561,7 @@ public class LuceneQueryParser extends QueryParser
                         }
                         else
                         {
-                            throw new LuceneIndexException("Ambiguous data datype "+string);
+                            throw new LuceneQueryParserException("Ambiguous data datype "+string);
                         }
                     }
                 }
@@ -767,7 +765,7 @@ public class LuceneQueryParser extends QueryParser
                 ClassDefinition target = matchClassDefinition(queryText);
                 if (target == null)
                 {
-                    throw new SearcherException("Invalid type: " + queryText);
+                    throw new LuceneQueryParserException("Invalid type: " + queryText);
                 }
                 return getFieldQuery(target.isAspect() ? "ASPECT" : "TYPE", queryText, analysisMode, luceneFunction);
             }
@@ -776,7 +774,7 @@ public class LuceneQueryParser extends QueryParser
                 TypeDefinition target = matchTypeDefinition(queryText);
                 if (target == null)
                 {
-                    throw new SearcherException("Invalid type: " + queryText);
+                    throw new LuceneQueryParserException("Invalid type: " + queryText);
                 }
                 Collection<QName> subclasses = dictionaryService.getSubTypes(target.getName(), true);
                 BooleanQuery booleanQuery = new BooleanQuery();
@@ -799,7 +797,7 @@ public class LuceneQueryParser extends QueryParser
                 TypeDefinition target = matchTypeDefinition(queryText);
                 if (target == null)
                 {
-                    throw new SearcherException("Invalid type: " + queryText);
+                    throw new LuceneQueryParserException("Invalid type: " + queryText);
                 }
                 QName targetQName = target.getName();
                 TermQuery termQuery = new TermQuery(new Term("TYPE", targetQName.toString()));
@@ -1103,7 +1101,7 @@ public class LuceneQueryParser extends QueryParser
                         if (requiresMLTokenDuplication)
                         {
                             Locale locale = I18NUtil.parseLocale(localeString);
-                            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters
+                            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters
                                     .getMlAnalaysisMode();
                             MLTokenDuplicator duplicator = new MLTokenDuplicator(locale, mlAnalysisMode);
                             Iterator<org.apache.lucene.analysis.Token> it = duplicator.buildIterator(newToken);
@@ -1166,7 +1164,7 @@ public class LuceneQueryParser extends QueryParser
                         if (requiresMLTokenDuplication)
                         {
                             Locale locale = I18NUtil.parseLocale(localeString);
-                            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters
+                            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters
                                     .getMlAnalaysisMode();
                             MLTokenDuplicator duplicator = new MLTokenDuplicator(locale, mlAnalysisMode);
                             Iterator<org.apache.lucene.analysis.Token> it = duplicator.buildIterator(newToken);
@@ -1671,7 +1669,7 @@ public class LuceneQueryParser extends QueryParser
                     if (propertyDef.getDataType().getName().equals(DataTypeDefinition.TEXT))
                     {
                         BooleanQuery booleanQuery = new BooleanQuery();
-                        MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters
+                        MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters
                                 .getMlAnalaysisMode();
                         List<Locale> locales = searchParameters.getLocales();
                         List<Locale> expandedLocales = new ArrayList<Locale>();
@@ -1716,7 +1714,7 @@ public class LuceneQueryParser extends QueryParser
                 else if (propertyDef.getDataType().getName().equals(DataTypeDefinition.TEXT))
                 {
                     BooleanQuery booleanQuery = new BooleanQuery();
-                    MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters.getMlAnalaysisMode();
+                    MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters.getMlAnalaysisMode();
                     List<Locale> locales = searchParameters.getLocales();
                     List<Locale> expandedLocales = new ArrayList<Locale>();
                     for (Locale locale : (((locales == null) || (locales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : locales))
@@ -2735,7 +2733,7 @@ public class LuceneQueryParser extends QueryParser
                 else
                 {
                     
-                    throw new LuceneIndexException("Ambiguous namespace prefix "+prefix);
+                    throw new LuceneQueryParserException("Ambiguous namespace prefix "+prefix);
                     
                 }
             }
@@ -3263,7 +3261,7 @@ public class LuceneQueryParser extends QueryParser
             // Build a sub query for each locale and or the results together - the analysis will take care of
             // cross language matching for each entry
             BooleanQuery booleanQuery = new BooleanQuery();
-            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters.getMlAnalaysisMode();
+            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters.getMlAnalaysisMode();
             List<Locale> locales = searchParameters.getLocales();
             List<Locale> expandedLocales = new ArrayList<Locale>();
             for (Locale locale : (((locales == null) || (locales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : locales))
@@ -3359,7 +3357,7 @@ public class LuceneQueryParser extends QueryParser
             // Build a sub query for each locale and or the results together -
             // - add an explicit condition for the locale
 
-            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters.getMlAnalaysisMode();
+            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters.getMlAnalaysisMode();
 
             if (mlAnalysisMode.includesAll())
             {
@@ -3437,7 +3435,7 @@ public class LuceneQueryParser extends QueryParser
             }
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters.getMlAnalaysisMode();
+            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters.getMlAnalaysisMode();
             List<Locale> locales = searchParameters.getLocales();
             List<Locale> expandedLocales = new ArrayList<Locale>();
             for (Locale locale : (((locales == null) || (locales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : locales))
@@ -3616,7 +3614,7 @@ public class LuceneQueryParser extends QueryParser
             // Build a sub query for each locale and or the results together - the analysis will take care of
             // cross language matching for each entry
             BooleanQuery booleanQuery = new BooleanQuery();
-            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters.getMlAnalaysisMode();
+            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters.getMlAnalaysisMode();
             List<Locale> locales = searchParameters.getLocales();
             List<Locale> expandedLocales = new ArrayList<Locale>();
             for (Locale locale : (((locales == null) || (locales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : locales))
@@ -3650,7 +3648,7 @@ public class LuceneQueryParser extends QueryParser
             }
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? config.getDefaultMLSearchAnalysisMode() : searchParameters.getMlAnalaysisMode();
+            MLAnalysisMode mlAnalysisMode = searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters.getMlAnalaysisMode();
             List<Locale> locales = searchParameters.getLocales();
             List<Locale> expandedLocales = new ArrayList<Locale>();
             for (Locale locale : (((locales == null) || (locales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : locales))
