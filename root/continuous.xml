@@ -723,46 +723,6 @@
    </target>
 
    <target name="distribute-installers"
-           depends="continuous-init, set-build-number, distribute-bitrock-installers">
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.installer.quick}/output" />
-      <mkdir dir="${dir.installer.quick}/output" />
-      <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
-      </exec>
-      <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" --platform Linux-x86 -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
-      </exec>
-      <exec dir="${dir.installer.quick}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
-      </exec>
-      <tar destfile="${dir.continuous.dist}/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOSXInstall.tar.gz"
-           longfile="gnu"
-           compression="gzip">
-         <tarfileset dir="${dir.installer.quick}/output"
-                     includes="Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install"
-                     mode="755"/>
-      </tar>
-      <delete quiet="yes"
-              file="${dir.installer.quick}/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
-
-      <move todir="${dir.continuous.dist}" failonerror="no">
-         <fileset dir="${dir.installer.quick}/output">
-            <include name="**/*"/>
-         </fileset>
-      </move>
-      <move todir="${dir.continuous.dist}" failonerror="no">
-         <fileset dir="${dir.installer.rm}/output">
-            <include name="**/*"/>
-         </fileset>
-      </move>
-
-   </target>
-
-      <!-- Bitrock -->
-      
-   <target name="distribute-bitrock-installers"
            depends="continuous-init, set-build-number,
                     set-bitrock-builder,
                     distribute-bitrock-installer-osx,
