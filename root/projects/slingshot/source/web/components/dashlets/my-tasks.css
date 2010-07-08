@@ -1,60 +1,93 @@
-.my-tasks .task-icon
+
+.my-tasks .scrollableList 
 {
-   float: left;
-   padding-left: 0.25em;
+   padding:0;
 }
 
-.my-tasks .task-details
+.my-tasks .body h4,
+.my-tasks .body div   
 {
-   padding-left: 2.5em;
+   margin-bottom: 0.2em;
 }
 
-.my-tasks .separator
+.my-tasks .body .unassigned-task
 {
-   padding: 0 0.5em;
+   padding: 0.15em;
+   text-transform: uppercase;
+   font-size: 80%;
 }
 
-.my-tasks .priority
+/* Data Table */
+
+.my-tasks .yui-dt table
 {
-   background-color: #e6f0f8;
-   border: 1px solid #0070bb;
-   color: #0070bb;
-   display: block;
-   text-align: center;
-   width: 1.2em;
+   border: medium none;
+   width: 100%;
 }
 
-.my-tasks .priority.overdue
+.my-tasks .yui-dt thead
 {
-   background-color: #fff2e9;
-   border: 1px solid #ff7b28;
-   color: #ff7b28;
+   display: none;
 }
 
-.my-tasks .task-status
+.my-tasks .yui-dt tbody
 {
+   outline: none;
 }
 
-.my-tasks .task-resources
+.my-tasks .yui-dt tr.yui-dt-even,
+.my-tasks .yui-dt tr.yui-dt-odd
 {
-   background-color: #fff;
-   margin: 0.5em 0;
+   background-color: #ffffff;
 }
 
-.my-tasks .task-resource
+.my-tasks .yui-dt td
 {
-   padding: 0.25em;
+   border-bottom: 1px dashed #d9d9d9;
+   border-right: medium none;
+   vertical-align: top;
 }
 
-.my-tasks .resource-spacer
+.my-tasks .yui-dt td .yui-dt-liner
 {
+   padding: 4px 6px;
 }
 
-.my-tasks .task-resource-link
+.my-tasks .yui-dt .yui-dt-message td
 {
+   border: medium none;
 }
 
-.my-tasks .task-resource-link img
+.my-tasks .yui-dt-col-isPooled div
 {
-   margin-bottom: -3px;
+   text-align: center   
+}
+
+.my-tasks .yui-dt-col-isPooled img
+{
+   margin-bottom: 0.5em;
+}
+
+.my-tasks .task-delayed
+{
+   padding-left: 1.5em;
+   background: url(../images/warning-16.png) no-repeat; 
+}
+
+.my-tasks a.edit-task
+{
+   background: url(../images/edit-16.png) no-repeat center;
+   cursor: pointer;
+   padding: 1em;
+   visibility: hidden;
+}
+.my-tasks a.edit-task:active,
+.my-tasks a.edit-task:hover
+{
+   text-decoration: none;
+}
+
+.my-tasks .yui-dt-highlighted a.edit-task
+{
+   visibility: visible;
 }
