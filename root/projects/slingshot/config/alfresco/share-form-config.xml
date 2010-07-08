@@ -905,4 +905,58 @@
       </forms>
    </config>
 
+   <!-- wf:submitReviewTask type workflow form config-->
+   <config evaluator="model-type" condition="wf:submitReviewTask">
+      <forms>
+         <!-- Start workflow form -->
+         <form>
+            <field-visibility>
+               <show id="cm:title" force="true" />
+               <show id="bpm:comment" />
+               <show id="bpm:dueDate" />
+               <show id="bpm:priority" />
+               <show id="bpm:package" />
+            </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="bpm:priority">
+                  <control template="/org/alfresco/components/form/controls/selectone.ftl">
+                     <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- wf:submitAdhocTask type workflow form config-->
+   <config evaluator="model-type" condition="wf:submitAdhocTask">
+      <forms>
+         <!-- Start workflow form -->
+         <form>
+            <field-visibility>
+               <show id="cm:title" force="true" />
+               <show id="bpm:comment" />
+               <show id="bpm:dueDate" />
+               <show id="bpm:priority" />
+               <show id="bpm:assignee" />
+               <show id="bpm:package" />
+               <show id="wf:notifyMe" />               
+            </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="bpm:priority">
+                  <control template="/org/alfresco/components/form/controls/selectone.ftl">
+                     <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
 </alfresco-config>

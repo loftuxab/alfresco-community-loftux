@@ -1,5 +1,0 @@
-<webscript>
-   <shortname>My Tasks List</shortname>
-   <description>Used by My Tasks dashlet to list tasks assigned to the current user</description>
-   <url>/components/dashlets/my-tasks/list</url>
-</webscript>
