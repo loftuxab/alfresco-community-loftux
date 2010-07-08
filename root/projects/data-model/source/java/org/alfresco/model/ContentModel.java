@@ -144,6 +144,14 @@ public interface ContentModel
     static final QName ASPECT_TAGSCOPE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "tagscope");
     static final QName PROP_TAGSCOPE_CACHE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "tagScopeCache");
     
+    // ratings
+    static final QName ASPECT_RATEABLE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "rateable");
+    static final QName ASSOC_RATINGS = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "ratings");
+    static final QName TYPE_RATING = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "rating");
+    static final QName PROP_RATING_SCORE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "ratingScore");
+    static final QName PROP_RATING_SCHEME = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "ratingScheme");
+    static final QName PROP_RATED_AT = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "ratedAt");
+    
     // lock aspect
     public final static QName ASPECT_LOCKABLE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "lockable");
     public final static QName PROP_LOCK_OWNER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "lockOwner");
