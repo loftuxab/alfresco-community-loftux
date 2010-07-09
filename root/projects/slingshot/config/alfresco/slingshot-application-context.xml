@@ -29,6 +29,9 @@
             
             <!-- Share form config -->
             <value>classpath:alfresco/share-form-config.xml</value>
+            
+            <!-- Share workflow form config -->
+            <value>classpath:alfresco/share-workflow-form-config.xml</value>
 
             <!-- Share custom config -->
             <value>classpath:alfresco/web-extension/share-config-custom.xml</value>

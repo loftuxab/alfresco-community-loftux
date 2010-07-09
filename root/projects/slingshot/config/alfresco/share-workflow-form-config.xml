@@ -1,0 +1,54 @@
+<alfresco-config>
+
+   <!-- Ad Hoc Workflow Definition -->
+   <config evaluator="string-compare" condition="jbpm$wf:adhoc">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:workflowDescription" />
+               <show id="bpm:workflowPriority" />
+               <show id="bpm:workflowDueDate" />
+               <show id="packageItems" />
+               <show id="bpm:assignee" />
+               <show id="wf:notifyMe" />               
+            </field-visibility>
+            <appearance>
+               <field id="bpm:comment">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="bpm:priority">
+                  <control>
+                     <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <!-- Review and Approve Workflow Definition -->
+   <config evaluator="string-compare" condition="jbpm$wf:review">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:workflowDescription" />
+               <show id="bpm:workflowPriority" />
+               <show id="bpm:workflowDueDate" />
+               <show id="packageItems" />
+               <show id="bpm:assignee" />
+            </field-visibility>
+            <appearance>
+               <field id="bpm:comment">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="bpm:priority">
+                  <control>
+                     <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+</alfresco-config>

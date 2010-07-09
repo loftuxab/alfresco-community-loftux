@@ -105,7 +105,7 @@
                dataObj:
                {
                   htmlid: this.id + "-startWorkflowForm-" + Alfresco.util.generateDomId(),
-                  itemKind: "type",
+                  itemKind: "workflow",
                   itemId: this.widgets.workflowSelectEl.options[i].value,
                   mode: "edit",
                   submitType: "json",
