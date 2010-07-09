@@ -61,14 +61,14 @@
          var me = this;
          
          // DataSource definition
-         var properties = ["bpm_taskId", "bpm_priority", "bpm_status", "bpm_duedate"];
+         var properties = ["bpm_taskId", "bpm_priority", "bpm_status", "bpm_duedate", "bpm_description"];
          this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/task-instance?properties=" + properties.join(",") ,
          {
             responseType: YAHOO.util.DataSource.TYPE_JSON,
             responseSchema:
             {
                resultsList: "data",
-               fields: ["name", "title", "description", "state", "isPooled", "typeDefinitionTitle", "owner", "properties"]
+               fields: ["name", "state", "isPooled", "typeDefinitionTitle", "owner", "properties"]
             }
          });
 
@@ -97,7 +97,7 @@
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             var taskId = oRecord.getData("properties")["bpm_taskId"],
-               title = oRecord.getData("title"),
+               title = oRecord.getData("properties")["bpm_description"],
                dueDateStr = oRecord.getData("properties")["bpm_duedate"],
                dueDate = dueDateStr ? Alfresco.util.fromISO8601(dueDateStr) : null,
                today = new Date(),
@@ -130,7 +130,7 @@
          var columnDefinitions =
          [
             { key: "isPooled", sortable: false, formatter: renderCellIcons, width: 20 },
-            { key: "description", sortable: false, formatter: renderCellTaskInfo },
+            { key: "typeDefinitionTitle", sortable: false, formatter: renderCellTaskInfo },
             { key: "name", sortable: false, formatter: renderCellActions, width: 20}
          ];
 
