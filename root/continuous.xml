@@ -688,8 +688,10 @@
                      includes="convert.exe" />
          <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin" />
+      	<!--
          <zipfileset dir="${dir.continuous.assemble}/command-jars"
                      prefix="bin" />
+                     -->
       </zip>
    </target>
 
@@ -717,8 +719,9 @@
                      excludes="**/*.bat" />
          <tarfileset dir="${dir.project.installer.binlin}"
                      prefix="bin" />
+      	<!--
          <tarfileset dir="${dir.continuous.assemble}/command-jars"
-                     prefix="bin" />
+                     prefix="bin" /> -->
       </tar>
    </target>
 
@@ -899,8 +902,9 @@
          <zipfileset dir="${dir.name.binaries.installer.win32}"
                      prefix="commands/ImageMagick/bin"
                      includes="convert.exe" />
+      	<!--
          <zipfileset dir="${dir.continuous.assemble}/command-jars"
-                     prefix="commands/bin" />
+                     prefix="commands/bin" /> -->
       </zip>
 
       <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz"
@@ -940,8 +944,9 @@
                      mode="755" />
          <zipfileset dir="${dir.project.installer.binlin}"
                      prefix="commands/bin" />
+      	<!--
          <tarfileset dir="${dir.continuous.assemble}/command-jars"
-                     prefix="commands/bin" />
+                     prefix="commands/bin" /> -->
       </tar>
    </target>
 

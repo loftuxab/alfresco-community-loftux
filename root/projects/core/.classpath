@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="source/java"/>
-	<classpathentry kind="src" path="source/test-resources"/>
+	<classpathentry exported="true" kind="lib" path="source/test-resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/commons/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/quartz-1.6.0.jar"/>

@@ -104,7 +104,7 @@
                var item = eventList[i];
                if (item.recurrenceRule != null)
                {
-                  var nextEventDays = getNextEventStartDates(item, now);
+                  var nextEventDays = this.getNextEventStartDates(item, now);
                   if (nextEventDays.length > 0)
                   {
                      var stringDate = Alfresco.util.formatDate(nextEventDays[0], "m/d/yyyy");
@@ -115,7 +115,7 @@
                }
                else
                {
-                  if (cloneDate(item.from) >= now)
+                  if (this.cloneDate(item.from) >= now)
                   {
                      resultEvents.push(item);
                   }
@@ -140,7 +140,7 @@
 
             for (var key in map)
             {
-               eventHTML += this.renderDay(cloneDate(key), map);
+               eventHTML += this.renderDay(this.cloneDate(key), map);
             }
          }
          catch (e)
@@ -264,7 +264,7 @@
           var result = [];
           var recurrenceRule = event.recurrenceRule;
       
-          var evStart = cloneDate(event.from);
+          var evStart = this.cloneDate(event.from);
       
           // If event starts in future, then start search from its start date
           if (evStart >= currentDate)
@@ -393,7 +393,7 @@
             return result;
          }
       
-         var eventStart = cloneDate(ev.from);
+         var eventStart = this.cloneDate(ev.from);
       
          // Add as much full event cycles as need
          if (eventStart.getTime() < currentDate.getTime())
@@ -425,7 +425,7 @@
       
             while (eventDate.getTime() - lastEventDay.getTime() < DAY_MS)
             {
-               if (eventDate.getTime() >= currentDate.getTime() && eventDate.getTime() >= cloneDate(ev.from).getTime())
+               if (eventDate.getTime() >= currentDate.getTime() && eventDate.getTime() >= this.cloneDate(ev.from).getTime())
                {
                   var dateToAdd = new Date();
                   dateToAdd.setTime(eventDate.getTime())
@@ -466,7 +466,7 @@
             return result;
          }
       // --------------------
-         var eventStart = cloneDate(ev.from);
+         var eventStart = this.cloneDate(ev.from);
       
           // Add as much full event cycles as need
          if (eventStart.getTime() < currentDate.getTime())
@@ -520,7 +520,7 @@
       
          var interval = eventParam['INTERVAL'];
       
-         var eventStart = cloneDate(ev.from);
+         var eventStart = this.cloneDate(ev.from);
       
          var lastEventDay = this.getLastEventDay(ev, currentDate, endDate);
          if (lastEventDay == -1)
@@ -609,9 +609,9 @@
       
          if ((ev.recurrenceLastMeeting) )
          {
-            var lastAllowedDay = cloneDate(ev.recurrenceLastMeeting);
+            var lastAllowedDay = this.cloneDate(ev.recurrenceLastMeeting);
       
-            if (lastAllowedDay.getTime() < currentDate.getTime() || cloneDate(ev.from).getTime() > endDate.getTime())
+            if (lastAllowedDay.getTime() < currentDate.getTime() || this.cloneDate(ev.from).getTime() > endDate.getTime())
             {
                return -1;
             }
