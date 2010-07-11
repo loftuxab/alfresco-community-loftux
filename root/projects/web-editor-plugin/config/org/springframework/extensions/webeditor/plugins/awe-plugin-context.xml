@@ -23,8 +23,7 @@
    </bean>
    
    <!-- Provide AWE form config -->
-   <bean id="aweFormsClientConfig" class="org.springframework.extensions.config.ConfigBootstrap" 
-         init-method="register" depends-on="formsClientConfig">
+   <bean id="aweFormsClientConfig" class="org.springframework.extensions.config.ConfigBootstrap" init-method="register">
       <property name="configService" ref="web.config" />
       <property name="configs">
          <list>

@@ -30,68 +30,56 @@ import java.util.Set;
 public interface TicketComponent
 {
     /**
-     * Register a new ticket. If a session ID is given, an association with that session ID will be recorded for the
-     * returned ticket.
+     * Register a new ticket
      * 
      * @param userName
-     * @param sessionId
-     *            the app server session ID (e.g. HttpSession ID) or <code>null</code> if not applicable.
      * @return - the ticket
      * @throws AuthenticationException
      */
-    public String getNewTicket(String userName, String sessionId) throws AuthenticationException;
+    public String getNewTicket(String userName) throws AuthenticationException;
 
     /**
-     * Gets the current ticket. If a session ID is given, an association with that session ID will be recorded for the
-     * returned ticket.
+     * Get the current ticket
      * 
      * @param userName
-     * @param sessionId
-     *            the app server session ID (e.g. HttpSession ID) or <code>null</code> if not applicable.
      * @param autoCreate
      *            should we create one automatically if there isn't one?
      * @return - the ticket
-     */    
-    public String getCurrentTicket(String userName, String sessionId, boolean autoCreate);
+     */
+    
+    public String getCurrentTicket(String userName, boolean autoCreate);
     
     /**
-     * Check that a certificate is valid and can be used in place of a login. Optionally records an association between
-     * the ticket and a given app server session Id. This is so that we don't expire tickets prematurely referenced by
-     * more than one application server session. Tickets may be rejected because:
+     * Check that a certificate is valid and can be used in place of a login.
+     * 
+     * Tickets may be rejected because:
      * <ol>
-     * <li>The certificate does not exists
-     * <li>The status of the user has changed
+     * <li> The certificate does not exists
+     * <li> The status of the user has changed 
      * <ol>
-     * <li>The user is locked
-     * <li>The account has expired
-     * <li>The credentials have expired
-     * <li>The account is disabled
+     * <li> The user is locked
+     * <li> The account has expired
+     * <li> The credentials have expired
+     * <li> The account is disabled
      * </ol>
-     * <li>The ticket may have expired
+     * <li> The ticket may have expired
      * <ol>
-     * <li>The ticked my be invalid by timed expiry
-     * <li>An attemp to reuse a once only ticket
+     * <li> The ticked my be invalid by timed expiry
+     * <li> An attemp to reuse a once only ticket
      * </ol>
      * </ol>
      * 
      * @param ticket
-     * @param sessionId
-     *            the app server session ID (e.g. HttpSession ID) or <code>null</code> if not applicable.
      * @return - the user name
      * @throws AuthenticationException
      */
-    public String validateTicket(String ticket, String sessionId) throws AuthenticationException;
+    public String validateTicket(String ticket) throws AuthenticationException;
     
     /**
-     * Invalidates a ticket, or disassociates it from an app server session. Once it has been disassociated from all
-     * sessions, the ticket will be invalidated globally.
-     * 
+     * Invalidate the tickets by id
      * @param ticket
-     * @param sessionId
-     *            the app server session ID (e.g. HttpSession ID) or <code>null</code> if the ticket should be
-     *            invalidated globally.
      */
-    public void invalidateTicketById(String ticket, String sessionId);
+    public void invalidateTicketById(String ticket);
     
     /**
      * Invalidate all user tickets

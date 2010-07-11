@@ -21,7 +21,6 @@ package org.alfresco.repo.security.authentication;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -78,30 +77,30 @@ public class InMemoryTicketComponentImpl implements TicketComponent
         this.ticketsCache = ticketsCache;
     }
 
-    public String getNewTicket(String userName, String sessionId) throws AuthenticationException
+    public String getNewTicket(String userName) throws AuthenticationException
     {
         Date expiryDate = null;
         if (ticketsExpire)
         {
             expiryDate = Duration.add(new Date(), validDuration);
         }
-        Ticket ticket = new Ticket(ticketsExpire ? expiryMode : ExpiryMode.DO_NOT_EXPIRE, expiryDate, userName,
-                validDuration, sessionId == null ? Collections.<String> emptySet() : Collections.singleton(sessionId));
+        Ticket ticket = new Ticket(ticketsExpire ? expiryMode : ExpiryMode.DO_NOT_EXPIRE, expiryDate, userName, validDuration);
         ticketsCache.put(ticket.getTicketId(), ticket);
         String ticketString = GRANTED_AUTHORITY_TICKET_PREFIX + ticket.getTicketId();
         currentTicket.set(ticketString);
         return ticketString;
     }
 
-    public String validateTicket(String ticketString, String sessionId) throws AuthenticationException
+    public String validateTicket(String ticketString) throws AuthenticationException
     {
-        String ticketKey = getTicketKey(ticketString);
-        Ticket ticket = this.ticketsCache.get(ticketKey);
+        String ticketKey = getTicketKey(ticketString); 
+        Ticket ticket = ticketsCache.get(ticketKey);
         if (ticket == null)
         {
             throw new AuthenticationException("Missing ticket for " + ticketString);
         }
-        if (ticket.hasExpired())
+        Ticket newTicket = ticket.getNewEntry();
+        if (newTicket == null)
         {
             throw new TicketExpiredException("Ticket expired for " + ticketString);
         }
@@ -111,18 +110,12 @@ public class InMemoryTicketComponentImpl implements TicketComponent
         {
             ticketsCache.remove(ticketKey);
         }
-        // Make sure the association with the session is recorded
-        else if (sessionId != null)
+        else if (newTicket != ticket)
         {
-            Ticket newTicket = ticket.addSessionId(sessionId);
-            if (newTicket != ticket)
-            {
-                ticketsCache.put(ticketKey, newTicket);
-                ticket = newTicket;
-            }
+            ticketsCache.put(ticketKey, newTicket);
         }
         currentTicket.set(ticketString);
-        return ticket.getUserName();
+        return newTicket.getUserName();
     }
 
     /**
@@ -158,31 +151,10 @@ public class InMemoryTicketComponentImpl implements TicketComponent
         return key;
     }
 
-    public void invalidateTicketById(String ticketString, String sessionId)
+    public void invalidateTicketById(String ticketString)
     {
-        String ticketKey = getTicketKey(ticketString);
-        // If we are dissassociating the ticket from an app server session, it may still not be time to expire it, as it
-        // may be in use by other sessions
-        if (sessionId != null)
-        {
-            Ticket ticketObj = ticketsCache.get(ticketKey);
-            if (ticketObj != null)
-            {
-                ticketObj = ticketObj.removeSessionId(sessionId);
-                if (ticketObj == null)
-                {
-                    ticketsCache.remove(ticketKey);
-                }
-                else
-                {
-                    ticketsCache.put(ticketKey, ticketObj);
-                }
-            }
-        }
-        else
-        {
-            ticketsCache.remove(ticketKey);
-        }
+        String key = ticketString.substring(GRANTED_AUTHORITY_TICKET_PREFIX.length());
+        ticketsCache.remove(key);
     }
     
     /*
@@ -197,7 +169,7 @@ public class InMemoryTicketComponentImpl implements TicketComponent
     		Ticket ticket = ticketsCache.get(key);
     		if (ticket != null)
     		{
-        		if ((nonExpiredOnly == false) || (! ticket.hasExpired()))
+        		if ((nonExpiredOnly == false) || (ticket.getNewEntry() != null))
         		{
         			users.add(ticket.getUserName());
         		}
@@ -218,7 +190,7 @@ public class InMemoryTicketComponentImpl implements TicketComponent
     		for (String key : ticketsCache.getKeys())
             {
     			Ticket ticket = ticketsCache.get(key);
-    			if (! ticket.hasExpired())
+    			if (ticket.getNewEntry() != null)
     			{
     				count++;
     			}
@@ -248,7 +220,7 @@ public class InMemoryTicketComponentImpl implements TicketComponent
 	    	for (String key : ticketsCache.getKeys())
 	        {
 	    		Ticket ticket = ticketsCache.get(key);
-	    		if (ticket == null || ticket.hasExpired())
+	    		if (ticket == null || ticket.getNewEntry() == null)
 	    		{
 	    			count++;
 	    			ticketsCache.remove(key);
@@ -322,53 +294,40 @@ public class InMemoryTicketComponentImpl implements TicketComponent
     {
         private static final long serialVersionUID = -5904510560161261049L;
 
-        private ExpiryMode expires;
+        private final ExpiryMode expires;
 
-        private Date expiryDate;
+        private final Date expiryDate;
 
-        private String userName;
+        private final String userName;
 
-        private String ticketId;
+        private final String ticketId;
 
-        private String guid;
+        private final String guid;
         
-        private Duration validDuration;
-        
-        private Set<String> sessionIds;
+        private final Duration validDuration;
 
-        private Ticket(Ticket copy, Set<String> sessionIds)
-        {
-            this.expires = copy.expires;
-            this.expiryDate = copy.expiryDate;
-            this.userName = copy.userName;
-            this.validDuration = copy.validDuration;
-            this.guid = copy.guid;
-            this.ticketId = copy.ticketId;
-            this.sessionIds = sessionIds;            
-        }
-
-        Ticket(ExpiryMode expires, Date expiryDate, String userName, Duration validDuration, Set<String> sessionIds)
+        Ticket(ExpiryMode expires, Date expiryDate, String userName, Duration validDuration)
         {
             this.expires = expires;
             this.expiryDate = expiryDate;
             this.userName = userName;
             this.validDuration = validDuration;
-            this.sessionIds = sessionIds;
             this.guid = UUIDGenerator.getInstance().generateRandomBasedUUID().toString();
 
             String encode = (expires.toString()) + ((expiryDate == null) ? new Date().toString() : expiryDate.toString()) + userName + guid;
             MessageDigest digester;
+            String ticketId;
             try
             {
                 digester = MessageDigest.getInstance("SHA-1");
-                this.ticketId = new String(Hex.encodeHex(digester.digest(encode.getBytes())));
+                ticketId = new String(Hex.encodeHex(digester.digest(encode.getBytes())));
             }
             catch (NoSuchAlgorithmException e)
             {
                 try
                 {
                     digester = MessageDigest.getInstance("MD5");
-                    this.ticketId = new String(Hex.encodeHex(digester.digest(encode.getBytes())));
+                    ticketId = new String(Hex.encodeHex(digester.digest(encode.getBytes())));
                 }
                 catch (NoSuchAlgorithmException e1)
                 {
@@ -383,75 +342,41 @@ public class InMemoryTicketComponentImpl implements TicketComponent
                     bytes[2] = (byte) (value & 0xFF);
                     value >>>= 4;
                     bytes[3] = (byte) (value & 0xFF);
-                    this.ticketId = new String(Hex.encodeHex(bytes));
+                    ticketId = new String(Hex.encodeHex(bytes));
                 }
             }
+            this.ticketId = ticketId;
         }
 
-        public Ticket addSessionId(String sessionId)
-        {
-            if (this.sessionIds.contains(sessionId))
-            {
-                return this;
-            }
-            Set<String> newSessionIds = new HashSet<String>(this.sessionIds.size() * 2 + 2);
-            newSessionIds.addAll(this.sessionIds);
-            newSessionIds.add(sessionId);
-            return new Ticket(this, newSessionIds);
-        }
-
-        public Ticket removeSessionId(String sessionId)
-        {
-            if (this.sessionIds.contains(sessionId))
-            {
-                Set<String> newSessionIds;
-                if (this.sessionIds.size() > 1)
-                {
-                    newSessionIds = new HashSet<String>(this.sessionIds.size() * 2 - 2);
-                    newSessionIds.addAll(this.sessionIds);
-                    newSessionIds.remove(sessionId);
-                    return new Ticket(this, newSessionIds);
-                }
-                return null;
-            }
-            return this;
-        }
-
-        /**
-         * Has the ticket expired
-         * 
-         * @return - if expired
-         */
-        boolean hasExpired()
+        Ticket getNewEntry()
         {
             switch (expires)
             {
                 case AFTER_FIXED_TIME:
                     if ((expiryDate != null) && (expiryDate.compareTo(new Date()) < 0))
                     {
-                        return true;
+                        return null;
                     }
                     else
                     {
-                        return false;
+                        return this;
                     }
                     
                 case AFTER_INACTIVITY:
                     Date now = new Date();
                     if ((expiryDate != null) && (expiryDate.compareTo(now) < 0))
                     {
-                        return true;
+                        return null;
                     }
                     else
                     {
-                        expiryDate = Duration.add(now, validDuration);
-                        return false;
+                        return new Ticket(expires, Duration.add(now, validDuration), userName, validDuration);
                     }
                     
                 case DO_NOT_EXPIRE:
                 default:
-                    return false;
-            }
+                    return this;
+            }            
         }
 
         public boolean equals(Object o)
@@ -493,10 +418,6 @@ public class InMemoryTicketComponentImpl implements TicketComponent
             return userName;
         }
 
-        protected Set<String> getSessionIds()
-        {
-            return sessionIds;
-        }
     }
 
     /**
@@ -549,35 +470,21 @@ public class InMemoryTicketComponentImpl implements TicketComponent
         return ticket.getUserName();
     }
 
-    public String getCurrentTicket(String userName, String sessionId, boolean autoCreate)
+    public String getCurrentTicket(String userName, boolean autoCreate)
     {
-        String ticketString = currentTicket.get();
-        if (ticketString == null)
+        String ticket = currentTicket.get();
+        if (ticket == null)
         {
-            return autoCreate ? getNewTicket(userName, sessionId) : null;
+            return autoCreate ? getNewTicket(userName) : null;
         }
-        String ticketKey = getTicketKey(ticketString);
-        Ticket ticketObj = this.ticketsCache.get(ticketKey);
-        if (ticketObj != null && userName.equals(ticketObj.getUserName()))       
+        String ticketUser = getAuthorityForTicket(ticket);
+        if (userName.equals(ticketUser))
         {
-            if (sessionId != null)
-            {
-                // A current, as yet unclaimed valid ticket. Make the association with the session now
-                if (ticketObj.getSessionIds().isEmpty())
-                {
-                    this.ticketsCache.put(ticketKey, ticketObj.addSessionId(sessionId));
-                }
-                // The ticket is already claimed by at least one other session, so start a new one
-                else
-                {
-                    return autoCreate ? getNewTicket(userName, sessionId) : null;
-                }
-            }
-            return ticketString;
+            return ticket;
         }
         else
         {
-            return autoCreate ? getNewTicket(userName, sessionId) : null;
+            return autoCreate ? getNewTicket(userName) : null;
         }
     }
 

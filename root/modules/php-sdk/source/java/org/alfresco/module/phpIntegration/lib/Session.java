@@ -376,7 +376,7 @@ public class Session implements ScriptObject
         try
         {
         	// Validate for the currently held ticket
-            authenticationService.validate(ticket, null);
+            authenticationService.validate(ticket);
             
             // Do the work in a retrying transaction
             RetryingTransactionCallback<R> callback = new RetryingTransactionCallback<R>()

@@ -529,6 +529,10 @@ public class PassthruServers
           }
         }
         
+        if (passthruServer == null)
+        {
+            Debug.println("No server found for domain " + clientDomain);
+        }
         return passthruServer;
     }
     
