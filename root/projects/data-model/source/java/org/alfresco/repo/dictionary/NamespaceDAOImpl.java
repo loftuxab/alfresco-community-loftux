@@ -576,7 +576,7 @@ public class NamespaceDAOImpl implements NamespaceDAO, DictionaryListener
         return tenantService.getCurrentUserDomain();
     }
     
-    /* package */ class NamespaceRegistry
+    public class NamespaceRegistry
     {
         private List<String> urisCache = new ArrayList<String>(0);
         private Map<String, String> prefixesCache = new HashMap<String, String>(0);
