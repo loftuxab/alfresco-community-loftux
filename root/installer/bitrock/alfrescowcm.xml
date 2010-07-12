@@ -23,6 +23,18 @@
         </folder>
         <folder>
             <description>Program Files</description>
+            <destination>${alfrescowcm_virtualtomcat_location}/virtual-tomcat/conf</destination>
+            <name>virtualtomcatconf</name>
+            <platforms>all</platforms>
+            <distributionFileList>
+                <distributionFile origin="${alfrescowcm_on_install_settings_per_platform_directory}/conf/*" allowWildcards="1" />
+            </distributionFileList>
+            <actionList>
+                 <alfrescoConfigure alfrescoFiles="*/alfresco-virtserver.properties" />
+            </actionList>
+        </folder>
+        <folder>
+            <description>Program Files</description>
             <destination>${alfrescowcm_virtualtomcat_location}</destination>
             <name>virtualtomcatscript</name>
             <platforms>all</platforms>
