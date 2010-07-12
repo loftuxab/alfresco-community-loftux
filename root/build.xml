@@ -561,10 +561,6 @@
       <copy todir="${home.tomcat}/endorsed" 
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
 
-      <!-- copy the hotspot_compiler file to bin directory -->
-      <copy todir="${home.tomcat}/bin" 
-            file="${file.hotspotcompiler}" />
-
       <!-- enable WCM functionality -->
       <copy todir="${home.tomcat}/shared/classes/alfresco/extension" 
             file="${dir.project.installer}/wcm-bootstrap-context.xml" />
@@ -1022,8 +1018,6 @@
       <copy todir="${home.jboss}/server/default/lib" 
             file="${dir.project.3rdparty.lib}/${dir.name.devenv}/${file.name.jar.mysql.connector}" />
 
-      <copy todir="${home.jboss}/bin" 
-            file="${file.hotspotcompiler}" />
    </target>
    
    <target name="start-jboss" 
