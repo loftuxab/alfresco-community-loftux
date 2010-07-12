@@ -1258,7 +1258,7 @@ public class DictionaryDAOImpl implements DictionaryDAO
         return M2ModelDiffs;
     }
     
-    /* package */ class DictionaryRegistry
+    public class DictionaryRegistry
     {
         private Map<String, List<CompiledModel>> uriToModels = new HashMap<String, List<CompiledModel>>(0);
         private Map<QName,CompiledModel> compiledModels = new HashMap<QName,CompiledModel>(0);
