@@ -28,7 +28,7 @@
                   &copy; 2005-2010 Alfresco Software Inc. All rights reserved.
                </span>
             </div>
-            <input type="hidden" id="success" name="success" value="${successUrl}"/>
+            <input type="hidden" id="success" name="success" value="${successUrl?html}"/>
             <input type="hidden" name="failure" value="<#assign link>${url.context}/page/type/login</#assign>${link?html}?error=true"/>
          </fieldset>
       </form>
