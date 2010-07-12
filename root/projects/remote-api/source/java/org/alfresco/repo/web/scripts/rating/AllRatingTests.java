@@ -16,8 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.alfresco.repo.rating;
+package org.alfresco.repo.web.scripts.rating;
 
+import org.alfresco.repo.rating.RatingNodePropertiesTest;
+import org.alfresco.repo.rating.RatingServiceIntegrationTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -32,7 +34,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     RatingNodePropertiesTest.class,
-    RatingServiceIntegrationTest.class
+    RatingServiceIntegrationTest.class,
+    RatingRestApiTest.class
 })
 public class AllRatingTests
 {
