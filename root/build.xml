@@ -320,12 +320,18 @@
    <!-- ** Bundle targets ** -->
    <!-- ******************** -->
 
-   <target name="distribute-command-jars">
+   <target name="assemble-commands">
            <!--
       <mkdir dir="${dir.continuous.assemble}/command-jars" />
       -->
-      <copy file="${dir.continuous.dist}/${file.name.dist.mmt}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-mmt.jar"/>
-      <copy file="${dir.continuous.dist}/${file.name.dist.bm-remote}.jar" tofile="${dir.continuous.assemble}/command-jars/alfresco-bm.jar"/>
+      <copy file="${dir.continuous.dist}/${file.name.dist.mmt}.jar" tofile="${dir.continuous.assemble}/commands/bin/alfresco-mmt.jar"/>
+      <copy file="${dir.continuous.dist}/${file.name.dist.bm-remote}.jar" tofile="${dir.continuous.assemble}/commands/bin/alfresco-bm.jar"/>
+      <copy todir="${dir.continuous.assemble}/commands/bin">
+         <fileset dir="${dir.project.jlan}/jni" />
+      </copy>
+      <copy todir="${dir.continuous.assemble}/commands/bin">
+         <fileset dir="${dir.project.installer}/bin" />
+      </copy>
    </target>
 	  
 	                    
