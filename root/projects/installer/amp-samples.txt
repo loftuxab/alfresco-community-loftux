@@ -1,3 +1,0 @@
-Sample applications and content have been installed.  
-
-If you wish to make sure these are applied, please run the 'apply_amps' utility in the Alfresco installation folder.

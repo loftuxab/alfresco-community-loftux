@@ -110,8 +110,8 @@
            depends="distribute-mmt,
                     distribute-bm-remote,
                     distribute-core-amps,
-                    distribute-command-jars,
-                    distribute-tomcat,
+                    assemble-commands,
+                    assemble-tomcat,
                     distribute-war,
                     distribute-wcm,
                     distribute-webserviceclient,
@@ -599,13 +599,6 @@
                      prefix="virtual-tomcat" />
          <zipfileset dir="${dir.project.installer}"
                      includes="wcm-bootstrap-context.xml" />
-         <zipfileset dir="${dir.project.installer.windows}"
-                     includes="README_wcm.txt,
-                               virtual_start.bat,
-                               virtual_stop.bat,
-                               virtual_alf.bat" />
-         <zipfileset dir="${dir.project.installer}/extras-wcm" 
-                     prefix="extras/wcm" />
       </zip>
    </target>
 
@@ -620,15 +613,8 @@
                      prefix="virtual-tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
-         <tarfileset dir="${dir.project.installer.linux}"
-                     includes="README_wcm.txt" />
          <tarfileset dir="${dir.project.installer}"
                      includes="wcm-bootstrap-context.xml" />
-         <tarfileset dir="${dir.project.installer.linux}"
-                     includes="virtual_alf.sh" 
-                     mode="755" />
-         <tarfileset dir="${dir.project.installer}/extras-wcm"
-                     prefix="extras/wcm" />
       </tar>
    </target>
 
@@ -647,83 +633,46 @@
       <deploy-virtual-tomcat location="${dir.continuous.assemble.virtualtomcat}" />
    </target>
 
-   <!-- ******************** -->
-   <!-- ** Tomcat targets ** -->
-   <!-- ******************** -->
 
-   <target name="distribute-tomcat" 
-           description="Creates the distibution files for Tomcat"
-           depends="assemble-tomcat,
-                    distribute-tomcat-windows,
-                    distribute-tomcat-linux" />
+   <target name="assemble-tomcat"
+           depends="continuous-init, set-build-number">
+      <mkdir dir="${dir.continuous.dist}" />
 
-   <target name="distribute-tomcat-windows">
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.tomcat}.zip">
-         <zipfileset dir="${dir.continuous.assemble.tomcat}"
-                     prefix="tomcat"
-                     excludes="bin/*.sh" />
-         <zipfileset dir="${dir.project.installer.windows}"
-                     includes="alfresco.bat,
-                               alf_start.bat,
-                               restart_alf.bat,
-                               alf_stop.bat,
-                               apply_amps.bat,
-                               README.txt" />
-         <zipfileset dir="${dir.project.installer}"
-                     includes="licenses/**,amps/**,amps-share/**" />
-         <zipfileset dir="${dir.project.installer.extras}"
-                     prefix="extras"
-                     excludes="**/*.sh" />
-         <zipfileset dir="${dir.project.installer.binwin}"
-                     prefix="bin" />
-         <zipfileset dir="${dir.name.binaries.installer.win32}/mysql"
-                     prefix="mysql" />
-         <zipfileset dir="${dir.project.installer.windows}/alf_data"
-                     prefix="alf_data" />
-         <zipfileset dir="${dir.name.binaries.installer.win32}"
-                     prefix="bin"
-                     includes="pdf2swf.exe" />
-         <zipfileset dir="${dir.name.binaries.installer.win32}"
-                     prefix="ImageMagick/bin"
-                     includes="convert.exe" />
-         <zipfileset dir="${dir.project.jlan}/jni"
-                     prefix="bin" />
-      	<!--
-         <zipfileset dir="${dir.continuous.assemble}/command-jars"
-                     prefix="bin" />
-                     -->
-      </zip>
+      <!-- copy project files common to both platforms -->
+      <copy todir="${dir.continuous.assemble.tomcat}/webapps">
+         <fileset dir="${dir.project.webclient.dist}" 
+                  includes="${file.name.war.webclient}" />
+         <fileset dir="${dir.project.slingshot.dist}"
+                  includes="${file.name.war.slingshot}" />
+      </copy>
+
+      <!-- place latest Xalan jars to ensure they are used -->
+      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
+            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
+      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
+            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
+
+      <!-- Add config to shared location -->
+      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
+         <fileset dir="${dir.project.repository.config}/alfresco/extension" />
+         <fileset dir="${dir.project.webclient.config}/alfresco/extension" />
+         <fileset dir="${dir.project.datamodel.config}/alfresco/extension" />
+      </copy>
+      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes"
+         file="${dir.project.repository.config}/alfresco-global.properties.sample" />
+      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/web-extension">
+         <fileset dir="${dir.project.slingshot.config}/alfresco/web-extension" />
+      </copy>
+      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/messages">
+         <fileset dir="${dir.project.installer.messages}" />
+      </copy>
+
    </target>
 
-   <target name="distribute-tomcat-linux">
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.tomcat}.tar.gz" 
-           longfile="gnu" 
-           compression="gzip">
-         <tarfileset dir="${dir.continuous.assemble.tomcat}"
-                     prefix="tomcat" 
-                     excludes="bin/*.sh,bin/*.bat,bin/*.exe" />
-         <tarfileset dir="${dir.continuous.assemble.tomcat}/bin" 
-                     prefix="tomcat/bin"
-                     includes="*.sh" 
-                     mode="755" />
-         <tarfileset dir="${dir.project.installer}"
-                     includes="licenses/**,amps/**,amps-share/**" />
-         <tarfileset dir="${dir.project.installer.linux}"
-                     includes="alfresco.sh,
-                     	       apply_amps.sh" 
-                     mode="755" />
-         <tarfileset dir="${dir.project.installer.linux}"
-                     includes="README.txt" />
-         <tarfileset dir="${dir.project.installer.extras}"
-                     prefix="extras"
-                     excludes="**/*.bat" />
-         <tarfileset dir="${dir.project.installer.binlin}"
-                     prefix="bin" />
-      	<!--
-         <tarfileset dir="${dir.continuous.assemble}/command-jars"
-                     prefix="bin" /> -->
-      </tar>
-   </target>
+      
+   <!-- *********************** -->
+   <!-- ** Installer targets ** -->
+   <!-- *********************** -->
 
    <target name="distribute-installers"
            depends="continuous-init, set-build-number,
@@ -745,110 +694,67 @@
       </condition>
    </target>
 
+
+   <!-- Windows Installers -->
    <target name="distribute-bitrock-installer-win" depends="continuous-init, set-bitrock-builder">
-       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-win.txt" failifexecutionfails="false">
-         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-win-installer.exe" "alfresco_svn_rootdir=${basedir}"'/>
+
+      <!-- Main Installer -->
+       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win.txt" failifexecutionfails="false">
+         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.dist.installer.win}" "alfresco_svn_rootdir=${basedir}"'/>
+      </exec>
+      
+      <!-- Deployment Installer -->
+       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-win.txt" failifexecutionfails="false">
+         <arg line='build deployment.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.win}"'/>
       </exec>
    </target>
 
+
+   <!-- OS X Installers -->
    <target name="distribute-bitrock-installer-osx" depends="continuous-init, set-bitrock-builder">
-      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-osx.txt" failifexecutionfails="false">
-         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-osx-installer.app" "alfresco_svn_rootdir=${basedir}"'/>
+
+      <!-- Main Installer -->
+      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-osx.txt" failifexecutionfails="false">
+         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.dist.installer.osx}" "alfresco_svn_rootdir=${basedir}"'/>
       </exec>
-      <tar destfile="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app.tar.gz"
+      <tar destfile="${dir.continuous.dist}/${file.name.dist.installer.osx}.tar.gz"
            longfile="gnu"
            compression="gzip">
-         <tarfileset dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app"
-                     prefix="${file.name.start}-${file.name.exe.version}-osx-installer.app" mode="755"/>
+         <tarfileset dir="${dir.continuous.dist}/${file.name.dist.installer.osx}"
+                     prefix="${file.name.dist.installer.osx}" mode="755"/>
       </tar>
       <delete quiet="yes"
-              dir="${dir.continuous.dist}/${file.name.start}-${file.name.exe.version}-osx-installer.app" />
-   </target>
+              dir="${dir.continuous.dist}/${file.name.dist.installer.osx}" />
 
-   <target name="distribute-bitrock-installer-linux" depends="continuous-init, set-bitrock-builder">
-      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-bitrock-linux.txt" failifexecutionfails="false">
-         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.start}-${file.name.exe.version}-linux-installer.bin" "alfresco_svn_rootdir=${basedir}"'/>
-      </exec>          
-   </target>
-
-
-   <target name="assemble-tomcat"
-           depends="continuous-init, set-build-number">
-      <mkdir dir="${dir.continuous.dist}" />
-
+      <!-- Deployment Installer -->
+       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-osx.txt" failifexecutionfails="false">
+         <arg line='build deployment.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.osx}"'/>
+      </exec>
+      <tar destfile="${dir.continuous.dist}/${file.name.dist.deployment.osx}.tar.gz"
+           longfile="gnu"
+           compression="gzip">
+         <tarfileset dir="${dir.continuous.dist}/${file.name.dist.deployment.osx}"
+                     prefix="${file.name.dist.deployment.osx}" mode="755"/>
+      </tar>
       <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.continuous.assemble.tomcat}" />
-      <unzip src="${dir.name.binaries}/tomcat/${file.name.distro.tomcat}"
-             dest="${dir.continuous.assemble}" />
-      <move file="${dir.continuous.assemble}/${dir.name.distro.tomcat}" 
-            tofile="${dir.continuous.assemble.tomcat}" />
-      <delete dir="${dir.continuous.assemble.tomcat}/webapps/balancer" />
-      <delete dir="${dir.continuous.assemble.tomcat}/webapps/jsp-examples" />
-      <delete dir="${dir.continuous.assemble.tomcat}/webapps/servlets-examples" />
-      <delete dir="${dir.continuous.assemble.tomcat}/webapps/tomcat-docs" />
-      <delete dir="${dir.continuous.assemble.tomcat}/webapps/webdav" />
-      <delete dir="${dir.continuous.assemble.tomcat}/webapps/ROOT" />
-
-      <!-- make sure the context is set for no serialization -->
-      <copy todir="${dir.continuous.assemble.tomcat}/conf" 
-            file="${dir.project.3rdparty.distro}/context.xml"
-            overwrite="true"/>
-
-      <!-- make sure the server is set for UTF-8 -->
-      <copy todir="${dir.continuous.assemble.tomcat}/conf" 
-            file="${dir.project.3rdparty.distro}/server.xml"
-            overwrite="true"/>
-
-      <!-- copy project files common to both platforms -->
-      <copy todir="${dir.continuous.assemble.tomcat}/webapps">
-         <fileset dir="${dir.project.webclient.dist}" 
-                  includes="${file.name.war.webclient}" />
-         <fileset dir="${dir.project.slingshot.dist}"
-                  includes="${file.name.war.slingshot}" />
-      </copy>
-
-      <!-- place latest Xalan jars to ensure they are used -->
-      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
-            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
-      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
-            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
-
-      <!-- Copy any required common libs -->
-      <copy todir="${dir.continuous.assemble.tomcat}/lib"
-            file="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
-      <copy todir="${dir.continuous.assemble.tomcat}/lib"
-            file="${dir.project.3rdparty.lib}/devenv/${file.name.jar.mysql.connector}" />
-
-      <!-- Add shared loader to Tomcat 6-->
-      <replace file="${dir.continuous.assemble.tomcat}/conf/catalina.properties"
-         token="shared.loader=" 
-         value="shared.loader=${catalina.base}/shared/classes,${catalina.base}/shared/lib/*.jar" />
-      
-      <!-- Add config to shared location -->
-      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
-         <fileset dir="${dir.project.datamodel.config}/alfresco/extension" />
-         <fileset dir="${dir.project.repository.config}/alfresco/extension" />
-         <fileset dir="${dir.project.webclient.config}/alfresco/extension" />
-      </copy>
-      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes">
-         <fileset dir="${dir.project.installer.extension}" />
-      </copy>
-      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/web-extension">
-         <fileset dir="${dir.project.slingshot.config}/alfresco/web-extension" />
-      </copy>
-      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/messages">
-         <fileset dir="${dir.project.installer.messages}" />
-      </copy>
-
-      <!-- rename model files ready for use -->
-      <move tofile="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension/web-client-config-custom.xml"
-            file="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension/web-client-config-custom.xml.sample" />
-      <move tofile="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension/customModel.xml"
-            file="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension/customModel.xml.sample" />
-      <move tofile="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension/exampleModel.xml"
-            file="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension/exampleModel.xml.sample" />
+              dir="${dir.continuous.dist}/${file.name.dist.deployment.osx}" />
    </target>
+
+
+   <!-- Linux Installers -->
+   <target name="distribute-bitrock-installer-linux" depends="continuous-init, set-bitrock-builder">
+   
+      <!-- Main Installer -->
+      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux.txt" failifexecutionfails="false">
+         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Edition" project.installerFilename="${file.name.dist.installer.linux}" "alfresco_svn_rootdir=${basedir}"'/>
+      </exec>          
+
+      <!-- Deployment Installer -->
+       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-win.txt" failifexecutionfails="false">
+         <arg line='build deployment.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.linux}"'/>
+      </exec>
+   </target>
+
 
    <!-- ***************** -->
    <!-- ** WAR targets ** -->
@@ -860,100 +766,33 @@
       <mkdir dir="${dir.continuous.dist}" />
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.war}.zip">
-         <zipfileset dir="${dir.project.jlan}/jni"
-                     prefix="commands/bin"/>
-         <zipfileset dir="${dir.project.installer.extras}"
-                     prefix="extras"
-                     excludes="**/*.sh" />
-         <zipfileset dir="${dir.project.installer}"
+         <zipfileset dir="${dir.installer.bitrock}"
                      includes="licenses/**" />
-         <zipfileset dir="${dir.project.webclient.dist}"
-                     includes="${file.name.war.webclient}" />
-         <zipfileset dir="${dir.project.slingshot.dist}"
-                     includes="${file.name.war.slingshot}" />
-         <zipfileset dir="${dir.project.datamodel.config}/alfresco/extension"
-                     prefix="extensions/extension" />
-         <zipfileset dir="${dir.project.repository.config}/alfresco/extension"
-                     prefix="extensions/extension" />
-         <zipfileset dir="${dir.project.webclient.config}/alfresco/extension"
-                     prefix="extensions/extension" />
-         <zipfileset dir="${dir.project.installer.extension}"
-                     prefix="extensions/extension" />
-         <zipfileset dir="${dir.project.installer.messages}"
-                     prefix="extensions/messages" />
-         <zipfileset dir="${dir.project.slingshot.config}/alfresco/web-extension"
-                     prefix="extensions/web-extension" />
-         <zipfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}"
-                     includes="${file.name.jar.xalan},${file.name.jar.serializer}"
-                     prefix="endorsed" />
-         <zipfileset dir="${dir.project.installer.windows}"
-                     includes="alfresco.bat,
-                               alf_start.bat,
-                               restart_alf.bat,
-                               alf_stop.bat,
-                               apply_amps.bat,
-                               README.txt"
-                     prefix="commands" />
-         <zipfileset dir="${dir.project.installer.binwin}"
-                     prefix="commands/bin" />
-         <zipfileset dir="${dir.name.binaries.installer.win32}"
-                     prefix="commands/bin"
-                     includes="pdf2swf.exe" />
-         <zipfileset dir="${dir.name.binaries.installer.win32}"
-                     prefix="commands/ImageMagick/bin"
-                     includes="convert.exe" />
-      	<!--
-         <zipfileset dir="${dir.continuous.assemble}/command-jars"
-                     prefix="commands/bin" /> -->
+         <zipfileset dir="${dir.installer.bitrock}"
+                     includes="README.txt" />
+         <zipfileset dir="${dir.continuous.assemble.tomcat}"
+                     prefix="web-server" />
+         <zipfileset dir="${dir.continuous.assemble}/commands/bin" 
+                     prefix="bin"
+                     excludes="**/*.sh" />
       </zip>
 
       <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz"
            longfile="gnu"
            compression="gzip">
-         <tarfileset dir="${dir.project.installer.extras}"
-                     prefix="extras"
-                     excludes="**/*.bat" />
-         <tarfileset dir="${dir.project.installer}"
+         <tarfileset dir="${dir.installer.bitrock}"
                      includes="licenses/**" />
-         <tarfileset dir="${dir.project.installer.linux}"
+         <tarfileset dir="${dir.installer.bitrock}"
                      includes="README.txt" />
-         <tarfileset dir="${dir.project.webclient.dist}"
-                     includes="${file.name.war.webclient}" />
-         <tarfileset dir="${dir.project.slingshot.dist}"
-                     includes="${file.name.war.slingshot}" />
-         <tarfileset dir="${dir.project.datamodel.config}/alfresco/extension"
-                     prefix="extensions/extension" />
-         <tarfileset dir="${dir.project.repository.config}/alfresco/extension"
-                     prefix="extensions/extension" />
-         <tarfileset dir="${dir.project.webclient.config}/alfresco/extension"
-                     prefix="extensions/extension" />
-         <tarfileset dir="${dir.project.installer.extension}"
-                     prefix="extensions/extension" />
-         <tarfileset dir="${dir.project.installer.messages}"
-                     prefix="extensions/messages" />
-         <tarfileset dir="${dir.project.slingshot.config}/alfresco/web-extension"
-                     prefix="extensions/web-extension" />
-         <tarfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}"
-                     includes="${file.name.jar.xalan},
-                               ${file.name.jar.serializer}"
-                     prefix="endorsed" />
-         <tarfileset dir="${dir.project.installer.linux}"
-                     includes="alfresco.sh,
-                     	       apply_amps.sh" 
-                     prefix="commands"
-                     mode="755" />
-         <zipfileset dir="${dir.project.installer.binlin}"
-                     prefix="commands/bin" />
-      	<!--
-         <tarfileset dir="${dir.continuous.assemble}/command-jars"
-                     prefix="commands/bin" /> -->
+         <tarfileset dir="${dir.continuous.assemble.tomcat}"
+                     prefix="web-server" />
+         <tarfileset dir="${dir.continuous.assemble}/commands/bin"
+                     prefix="bin" 
+                     excludes="**/*.dll,**/*.bat"
+                     mode="755"/>
       </tar>
    </target>
 
-   <target name="distribute-war-installers"
-           depends="assemble-tomcat">
-
-   </target>
 
    <!-- ******************************** -->
    <!-- ** Web Service Client targets ** -->
@@ -1582,14 +1421,8 @@
       <!-- -->
       <!-- License -->
       <!-- -->
-      <copy todir="${dir.continuous.assemble.sdk}" 
-            file="${dir.project.installer.licenses}/notice.txt"  />
-      <copy todir="${dir.continuous.assemble.sdk}" 
-            file="${dir.project.installer.licenses}/license.txt" />
-      <mkdir dir="${dir.continuous.assemble.sdk}/licenses" />
       <copy todir="${dir.continuous.assemble.sdk}/licenses">
-         <fileset dir="${dir.project.installer.licenses}/3rd-party"
-                  includes="*.*" />
+         <fileset dir="${dir.installer.bitrock}/licenses" />
       </copy>
 
       <!-- -->
