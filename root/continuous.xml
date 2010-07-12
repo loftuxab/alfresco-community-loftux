@@ -646,6 +646,20 @@
                   includes="${file.name.war.slingshot}" />
       </copy>
 
+      <!-- make sure the context is set for no serialization -->
+      <copy todir="${dir.continuous.assemble.tomcat}/conf" 
+            file="${dir.project.3rdparty.distro}/context.xml"/>
+
+      <!-- make sure the server is set for UTF-8 -->
+      <copy todir="${dir.continuous.assemble.tomcat}/conf" 
+            file="${dir.project.3rdparty.distro}/server.xml"/>
+
+      <!-- Copy any required common libs -->
+      <copy todir="${dir.continuous.assemble.tomcat}/lib"
+            file="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
+      <copy todir="${dir.continuous.assemble.tomcat}/lib"
+            file="${dir.project.3rdparty.lib}/devenv/${file.name.jar.mysql.connector}" />
+
       <!-- place latest Xalan jars to ensure they are used -->
       <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
@@ -1185,18 +1199,12 @@
            depends="set-build-number,assemble-sdk">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.sdk}.zip">
          <zipfileset dir="${dir.continuous.assemble.sdk}" />
-         <zipfileset dir="${dir.project.installer.extras}"
-                     prefix="extras" 
-                     excludes="**/*.sh" />
       </zip>
 
       <tar destfile="${dir.continuous.dist}/${file.name.dist.sdk}.tar.gz" 
            longfile="gnu" 
            compression="gzip">
          <tarfileset dir="${dir.continuous.assemble.sdk}" />
-         <tarfileset dir="${dir.project.installer.extras}" 
-                     prefix="extras" 
-                     excludes="**/*.bat" />
       </tar>
    </target>
    
@@ -1236,8 +1244,6 @@
       <copy todir="${dir.continuous.assemble.sdk}/bin">
          <fileset dir="${dir.project.jlan}/jni" 
                   includes="*.dll" />
-         <fileset dir="${dir.project.installer}" 
-                  includes=".hotspot_compiler" />
       </copy>
 
       <!-- -->
