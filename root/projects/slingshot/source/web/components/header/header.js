@@ -38,7 +38,7 @@
 
    Alfresco.Header = function(htmlId)
    {
-      Alfresco.Header.superclass.constructor.call(this, "Alfresco.Header", htmlId);
+      Alfresco.Header.superclass.constructor.call(this, "Alfresco.Header", htmlId, ["button", "menu", "container"]);
       
       // Notifications that the favourite sites have been updated
       YAHOO.Bubbling.on("favouriteSiteAdded", this.onFavouriteSiteAdded, this);
