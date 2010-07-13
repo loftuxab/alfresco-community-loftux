@@ -27,10 +27,12 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionScheduleImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.repo.forms.Field;
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.PropertyFieldDefinition;
 import org.alfresco.repo.forms.processor.node.ContentModelFormProcessor;
+import org.alfresco.repo.forms.processor.node.FieldUtils;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -49,8 +51,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Gavin Cornwell
  */
-public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter<NodeRef> implements
-            RecordsManagementCustomModel
+public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter<NodeRef>
 {
     /** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementNodeFormFilter.class);
@@ -168,7 +169,7 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                     // schedule to determine whether the disposition level can be changed i.e. record 
                     // level or folder level.
                     DispositionSchedule schedule = new DispositionScheduleImpl(this.rmServiceRegistry, this.nodeService, nodeRef);
-                    if (schedule != null && !rmService.canDispositionActionDefinitionsBeRemoved(schedule))
+                    if (!rmService.canDispositionActionDefinitionsBeRemoved(schedule))
                     {
                         protectRecordLevelDispositionPropertyField(form);
                     }
@@ -223,8 +224,8 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
             
             if (propDef != null)
             {
-                ContentModelFormProcessor.generatePropertyField(propDef, form, 
-                            null, this.namespaceService);
+                Field field = FieldUtils.makePropertyField(propDef, null, null, namespaceService);
+                form.addField(field);
             }
             else if (logger.isWarnEnabled())
             {
