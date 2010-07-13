@@ -18,6 +18,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.forms;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +27,12 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry;
+import org.alfresco.repo.forms.Field;
 import org.alfresco.repo.forms.FieldGroup;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.FormData;
 import org.alfresco.repo.forms.processor.AbstractFilter;
-import org.alfresco.repo.forms.processor.node.ContentModelFormProcessor;
+import org.alfresco.repo.forms.processor.node.FieldUtils;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -163,11 +165,9 @@ public abstract class RecordsManagementFormFilter<ItemType> extends AbstractFilt
                 logger.debug("Found " + customProps.size() + " custom property for " + rmTypeCustomAspect);
 
             // setup field definition for each custom property
-            for (PropertyDefinition property : customProps.values())
-            {
-                ContentModelFormProcessor.generatePropertyField(property, form, null, CUSTOM_RM_FIELD_GROUP,
-                            this.namespaceService);
-            }
+            Collection<PropertyDefinition> properties = customProps.values();
+            List<Field> fields = FieldUtils.makePropertyFields(properties, CUSTOM_RM_FIELD_GROUP, namespaceService);
+            form.addFields(fields);
         }
     }
 }
