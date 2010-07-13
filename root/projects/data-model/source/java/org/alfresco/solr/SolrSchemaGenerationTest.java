@@ -109,7 +109,7 @@ public class SolrSchemaGenerationTest extends TestCase
     }
     
 
-    public void testWrite() throws Exception
+    public void xtestWrite() throws Exception
     {
         File out = new File("w:/solrOut.xml");
         if(out.exists())
