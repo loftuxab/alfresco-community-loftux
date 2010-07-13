@@ -1,7 +1,10 @@
+<%@ page session="false" %>
 <%
-  response.sendRedirect(request.getContextPath() + "/page/site-index");
+  response.sendRedirect("page/site-index");
 %>
 <html>
-   <head><title>Alfresco</title></head>
+   <head>
+      <title>Alfresco</title>
+   </head>
    <body></body>
 </html>
