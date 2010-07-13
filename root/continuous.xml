@@ -764,7 +764,7 @@
       </exec>          
 
       <!-- Deployment Installer -->
-       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-win.txt" failifexecutionfails="false">
+       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-linux.txt" failifexecutionfails="false">
          <arg line='build deployment.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.linux}"'/>
       </exec>
    </target>

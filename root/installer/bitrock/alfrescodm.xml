@@ -181,14 +181,6 @@
             </distributionFileList>
         </folder>
         <folder>
-            <name>extras</name>
-            <description>databasescripts</description>
-            <destination>${alfresco_base_application_directory}</destination>
-            <distributionFileList>
-                <distributionDirectory origin="${alfresco_extras_source_directory}/extras" />
-            </distributionFileList>
-        </folder>
-        <folder>
             <name>licenses</name>
             <description>alfrescolicenses</description>
             <destination>${alfresco_base_application_directory}</destination>
