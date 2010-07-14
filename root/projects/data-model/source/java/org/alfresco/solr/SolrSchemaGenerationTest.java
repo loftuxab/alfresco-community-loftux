@@ -18,7 +18,9 @@
  */
 package org.alfresco.solr;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +52,8 @@ import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.xml.sax.SAXException;
 
@@ -109,14 +113,17 @@ public class SolrSchemaGenerationTest extends TestCase
     }
     
 
-    public void xtestWrite() throws Exception
+    public void testWrite() throws Exception
     {
-        File out = new File("w:/solrOut.xml");
-        if(out.exists())
-        {
-            out.delete();
-        }
-        SolrUtil.generateSchema(out, service);
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        format.setNewLineAfterDeclaration(false);
+        format.setIndentSize(3);
+        format.setEncoding("UTF-8");
+        
+        File temp = File.createTempFile("SolrSchemaGenerationTest-", null, null);
+        XMLWriter xmlWriter = new XMLWriter(new BufferedWriter(new FileWriter(temp)), format);
+        SolrUtil.generateSchema(xmlWriter, service);
+        System.out.println("Schema written to: "+temp.getCanonicalPath());
     }
   
 }
