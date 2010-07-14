@@ -40,6 +40,7 @@
 
 .path-nav .separator
 {
+   border: medium none;
    padding: 0 0.5em;
 }
 

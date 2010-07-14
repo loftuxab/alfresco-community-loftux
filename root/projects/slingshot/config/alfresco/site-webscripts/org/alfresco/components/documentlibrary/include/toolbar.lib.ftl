@@ -1,3 +1,4 @@
+<#include "../../../include/alfresco-macros.lib.ftl" />
 <#macro toolbarTemplate>
 <#nested>
 <div id="${args.htmlid}-body" class="toolbar">
@@ -11,7 +12,8 @@
                   <div class="bd">
                      <ul>
                      <#list createContent as content>
-                        <li><a href="create-content?mimeType=${content.mimetype?html}&amp;destination={nodeRef}<#if (content.formid!"") != "">&amp;formId=${content.formid?html}</#if>" rel="${content.permission!""}"><span class="${content.icon}-file">${msg(content.label)}</span></a></li>
+                        <#assign href>create-content?mimeType=${content.mimetype?html}&amp;destination={nodeRef}<#if (content.formid!"") != "">&amp;formId=${content.formid?html}</#if></#assign>
+                        <li><a href="${siteURL(href)}" rel="${content.permission!""}"><span class="${content.icon}-file">${msg(content.label)}</span></a></li>
                      </#list>
                      </ul>
                   </div>

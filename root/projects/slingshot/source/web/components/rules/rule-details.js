@@ -34,7 +34,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $siteURL = Alfresco.util.siteURL;
 
    /**
     * RuleDetails constructor.
@@ -208,10 +209,10 @@
          Dom.setStyle(this.widgets.displayEl, "display", "none");
 
          // Load rule information form server
-         var nodeRefAsUrl = this.folderDetails.nodeRef.replace("://", "/"); // todo: USE rule.owningNode.nodeRef.replace("://", "/")
+         var nodeRef = new Alfresco.util.NodeRef(this.folderDetails.nodeRef); // todo: USE rule.owningNode.nodeRef.replace("://", "/")
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRefAsUrl + "/ruleset/rules/" + this.ruleDetails.id,
+            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + nodeRef.uri + "/ruleset/rules/" + this.ruleDetails.id,
             successCallback:
             {
                fn: function(response)
@@ -310,12 +311,11 @@
          this.widgets.editButton.set("disabled", true);
 
          // Send the user to edit rule page
-         var url = YAHOO.lang.substitute("rule-edit?nodeRef={nodeRef}&ruleId={ruleId}",
+         window.location.href = $siteURL("rule-edit?nodeRef={nodeRef}&ruleId={ruleId}",
          {
             nodeRef: this.options.nodeRef.toString(),
             ruleId: this.ruleDetails.id.toString()
          });
-         window.location.href = url;
       },
 
       /**

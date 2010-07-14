@@ -135,16 +135,20 @@
        * @method getActionUrls
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function DocumentActions_getActionUrls()
+      getActionUrls: function FolderActions_getActionUrls()
       {
          var nodeRef = this.assetData.nodeRef,
-            nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri;
+            nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
+            fnPageURL = Alfresco.util.bind(function(page)
+            {
+               return Alfresco.util.siteURL(page);
+            }, this);
 
          return (
          {
-            editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
-            folderRulesUrl: "folder-rules?nodeRef=" + nodeRef,
-            managePermissionsUrl: "manage-permissions?nodeRef=" + nodeRef,
+            editMetadataUrl: fnPageURL("edit-metadata?nodeRef=" + nodeRef),
+            folderRulesUrl: fnPageURL("folder-rules?nodeRef=" + nodeRef),
+            managePermissionsUrl: fnPageURL("manage-permissions?nodeRef=" + nodeRef),
             explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
       },
@@ -187,6 +191,7 @@
             {
                userAccess.repository = true;
             }
+            userAccess.portlet = Alfresco.constants.PORTLET;
 
             for (i = 0, ii = actions.length; i < ii; i++)
             {
@@ -252,7 +257,7 @@
             displayName = asset.displayName,
             nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
             callbackUrl = this.options.workingMode == Alfresco.doclib.MODE_SITE ? "documentlibrary" : "repository",
-            encodedPath = path.length > 1 ? "?path=" + window.escape(path) : "";
+            encodedPath = path.length > 1 ? "?path=" + encodeURIComponent(path) : "";
          
          this.modules.actions.genericAction(
          {

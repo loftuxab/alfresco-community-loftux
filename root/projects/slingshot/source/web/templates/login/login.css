@@ -46,3 +46,9 @@ input
    font-weight: normal;
    color: #959a9b;
 }
+
+.login-portlet
+{
+   padding: 132px 56px 64px 0px;
+   text-align: center;
+}

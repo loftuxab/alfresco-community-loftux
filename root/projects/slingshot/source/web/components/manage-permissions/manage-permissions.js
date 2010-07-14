@@ -33,7 +33,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $siteURL = Alfresco.util.siteURL;
    
    /**
     * Permissions constructor.
@@ -275,6 +276,9 @@
                type: "checkbox",
                checked: false
             });
+            
+            var btnRegion = Dom.getRegion(this.id + "-addUserGroupButton");
+            Dom.setStyle(this.widgets.authorityFinder, "top", (btnRegion.bottom + 4) + "px");
          }
 
          // Retrieve current permissions and settable roles for this node
@@ -916,7 +920,7 @@
          else
          {
             // go forward to the appropriate details page for the node
-            window.location.href = this.nodeData.type + "-details?nodeRef=" + this.nodeData.nodeRef;
+            window.location.href = $siteURL(this.nodeData.type + "-details?nodeRef=" + this.nodeData.nodeRef);
          }
       }
    });

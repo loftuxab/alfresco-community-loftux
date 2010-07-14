@@ -39,6 +39,7 @@
 .doclist span.separator
 {
    border-right: 1px dotted #457A9C;
+   border-top: medium none;
    margin: 0 4px;
    padding: 2px 0;
    position: relative;
@@ -234,6 +235,11 @@
 .doclist .yui-dt-liner
 {
    padding: 4px;
+}
+
+.doclist .documents.yui-dt tr.yui-dt-first td.yui-dt-empty
+{
+   border-right: medium none;
 }
 
 .doclist .yui-dt-error

@@ -23,198 +23,206 @@
  * @namespace Alfresco.widget
  * @class Alfresco.widget.Resizer
  */
-/**
- * Resizer constructor.
- * 
- * @return {Alfresco.widget.Resizer} The new Alfresco.widget.Resizer instance
- * @constructor
- */
-Alfresco.widget.Resizer = function Resizer_constructor(p_name)
-{
-   // Load YUI Components
-   Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
-   
-   this.name = p_name;
-   
-   // Initialise prototype properties
-   this.widgets = {};
-         
-   return this;
-};
-
-Alfresco.widget.Resizer.prototype =
+(function()
 {
    /**
-    * Minimum Filter Panel height.
-    * 
-    * @property MIN_FILTER_PANEL_HEIGHT
-    * @type int
+    * YUI Library aliases
     */
-   MIN_FILTER_PANEL_HEIGHT: 200,
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
 
    /**
-    * Minimum Filter Panel width.
+    * Resizer constructor.
     * 
-    * @property MIN_FILTER_PANEL_WIDTH
-    * @type int
+    * @return {Alfresco.widget.Resizer} The new Alfresco.widget.Resizer instance
+    * @constructor
     */
-   MIN_FILTER_PANEL_WIDTH: 140,
-
-   /**
-    * Default Filter Panel width.
-    * 
-    * @property DEFAULT_FILTER_PANEL_WIDTH
-    * @type int
-    */
-   DEFAULT_FILTER_PANEL_WIDTH: 160,
-
-   /**
-    * Maximum Filter Panel width.
-    * 
-    * @property MAX_FILTER_PANEL_WIDTH
-    * @type int
-    */
-   MAX_FILTER_PANEL_WIDTH: 500,
-   
-   /**
-    * Object container for storing YUI widget instances.
-    * 
-    * @property widgets
-    * @type object
-    */
-   widgets: null,
-   
-   /**
-    * DOM ID of left-hand container DIV
-    *
-    * @property divLeft
-    * @type string
-    * @default "divLeft"
-    */
-   divLeft: "divLeft",
-
-   /**
-    * DOM ID of right-hand container DIV
-    *
-    * @property divRight
-    * @type string
-    * @default "divRight"
-    */
-   divRight: "divRight",
-   
-   /**
-    * Used to monitor document length
-    *
-    * @property documentHeight
-    * @type int
-    */
-   documentHeight: -1,
-
-   /**
-    * Fired by YUILoaderHelper when required component script files have
-    * been loaded into the browser.
-    *
-    * @method onComponentsLoaded
-    */
-   onComponentsLoaded: function Resizer_onComponentsLoaded()
+   Alfresco.widget.Resizer = function Resizer_constructor(p_name)
    {
-      YAHOO.util.Event.onDOMReady(this.onReady, this, true);
-   },
+      // Load YUI Components
+      Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
 
-   /**
-    * Fired by YUI when parent element is available for scripting.
-    * Template initialisation, including instantiation of YUI widgets and event listener binding.
-    *
-    * @method onReady
-    */
-   onReady: function Resizer_onReady()
+      this.name = p_name;
+
+      // Initialise prototype properties
+      this.widgets = {};
+
+      return this;
+   };
+
+   Alfresco.widget.Resizer.prototype =
    {
-      // Horizontal Resizer
-      this.widgets.horizResize = new YAHOO.util.Resize(this.divLeft,
-      {
-         handles: ["r"],
-         minWidth: this.MIN_FILTER_PANEL_WIDTH,
-         maxWidth: this.MAX_FILTER_PANEL_WIDTH
-      });
+      /**
+       * Minimum Filter Panel height.
+       * 
+       * @property MIN_FILTER_PANEL_HEIGHT
+       * @type int
+       */
+      MIN_FILTER_PANEL_HEIGHT: 200,
 
-      // Before and End resize event handlers
-      this.widgets.horizResize.on("beforeResize", function(eventTarget)
-      {
-         this.onResize(eventTarget.width);
-      }, this, true);
-      this.widgets.horizResize.on("endResize", function(eventTarget)
-      {
-         this.onResize(eventTarget.width);
-      }, this, true);
+      /**
+       * Minimum Filter Panel width.
+       * 
+       * @property MIN_FILTER_PANEL_WIDTH
+       * @type int
+       */
+      MIN_FILTER_PANEL_WIDTH: 140,
 
-      // Recalculate the vertical size on a browser window resize event
-      YAHOO.util.Event.on(window, "resize", function(e)
+      /**
+       * Default Filter Panel width.
+       * 
+       * @property DEFAULT_FILTER_PANEL_WIDTH
+       * @type int
+       */
+      DEFAULT_FILTER_PANEL_WIDTH: 160,
+
+      /**
+       * Maximum Filter Panel width.
+       * 
+       * @property MAX_FILTER_PANEL_WIDTH
+       * @type int
+       */
+      MAX_FILTER_PANEL_WIDTH: 500,
+
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets: null,
+
+      /**
+       * DOM ID of left-hand container DIV
+       *
+       * @property divLeft
+       * @type string
+       * @default "divLeft"
+       */
+      divLeft: "divLeft",
+
+      /**
+       * DOM ID of right-hand container DIV
+       *
+       * @property divRight
+       * @type string
+       * @default "divRight"
+       */
+      divRight: "divRight",
+
+      /**
+       * Used to monitor document length
+       *
+       * @property documentHeight
+       * @type int
+       */
+      documentHeight: -1,
+
+      /**
+       * Fired by YUILoaderHelper when required component script files have
+       * been loaded into the browser.
+       *
+       * @method onComponentsLoaded
+       */
+      onComponentsLoaded: function Resizer_onComponentsLoaded()
       {
-         this.onResize();
-      }, this, true);
-      
-      // Monitor the document height for ajax updates
-      this.documentHeight = YAHOO.util.Dom.getDocumentHeight();
-      
-      YAHOO.lang.later(1000, this, function()
+         YAHOO.util.Event.onDOMReady(this.onReady, this, true);
+      },
+
+      /**
+       * Fired by YUI when parent element is available for scripting.
+       * Template initialisation, including instantiation of YUI widgets and event listener binding.
+       *
+       * @method onReady
+       */
+      onReady: function Resizer_onReady()
       {
-         var h = YAHOO.util.Dom.getDocumentHeight();
-         if (Math.abs(this.documentHeight - h) > 4)
+         // Horizontal Resizer
+         this.widgets.horizResize = new YAHOO.util.Resize(this.divLeft,
          {
-            this.documentHeight = h;
+            handles: ["r"],
+            minWidth: this.MIN_FILTER_PANEL_WIDTH,
+            maxWidth: this.MAX_FILTER_PANEL_WIDTH
+         });
+
+         // Before and End resize event handlers
+         this.widgets.horizResize.on("beforeResize", function(eventTarget)
+         {
+            this.onResize(eventTarget.width);
+         }, this, true);
+         this.widgets.horizResize.on("endResize", function(eventTarget)
+         {
+            this.onResize(eventTarget.width);
+         }, this, true);
+
+         // Recalculate the vertical size on a browser window resize event
+         YAHOO.util.Event.on(window, "resize", function(e)
+         {
             this.onResize();
-         }
-      }, null, true);
-               
-      // Initial size
-      if (YAHOO.env.ua.ie > 0)
-      {
-         this.widgets.horizResize.resize(null, this.widgets.horizResize.get("element").offsetHeight, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-      }
-      else
-      {
-         this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-      }
+         }, this, true);
 
-      this.onResize(this.DEFAULT_FILTER_PANEL_WIDTH);
-   },
+         // Monitor the document height for ajax updates
+         this.documentHeight = Dom.getXY("alf-ft")[1];
 
-   /**
-    * Fired by via resize event listener.
-    *
-    * @method onResize
-    */
-   onResize: function Resizer_onResize(width)
-   {
-      var Dom = YAHOO.util.Dom,
-         cn = Dom.get(this.divLeft).childNodes,
-         handle = cn[cn.length - 1];
-      
-      Dom.setStyle(this.divLeft, "height", "auto");
-      Dom.setStyle(handle, "height", "");
-
-      var h = Dom.getDocumentHeight() - Dom.get("alf-ft").offsetHeight - Dom.get("alf-hd").offsetHeight;
-      
-      if (YAHOO.env.ua.ie === 6)
-      {
-         var hd = Dom.get("alf-hd"), tmpHeight = 0;
-         for (var i = 0, il = hd.childNodes.length; i < il; i++)
+         YAHOO.lang.later(1000, this, function()
          {
-            tmpHeight += hd.childNodes[i].offsetHeight;
+            var h = Dom.getXY("alf-ft")[1];
+            if (Math.abs(this.documentHeight - h) > 4)
+            {
+               this.documentHeight = h;
+               this.onResize();
+            }
+         }, null, true);
+               
+         // Initial size
+         if (YAHOO.env.ua.ie > 0)
+         {
+            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("element").offsetHeight, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
          }
-         h = Dom.get("alf-ft").parentNode.offsetTop - tmpHeight; 
-      }
-      if (h < this.MIN_FILTER_PANEL_HEIGHT)
-      {
-         h = this.MIN_FILTER_PANEL_HEIGHT;
-      }
+         else
+         {
+            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         }
 
-      Dom.setStyle(handle, "height", h + "px");
-      
-      if (width !== undefined)
+         this.onResize(this.DEFAULT_FILTER_PANEL_WIDTH);
+      },
+
+      /**
+       * Fired by via resize event listener.
+       *
+       * @method onResize
+       */
+      onResize: function Resizer_onResize(width)
       {
-         // 8px breathing space for resize gripper
-         Dom.setStyle(this.divRight, "margin-left", 8 + width + "px");
+         var cn = Dom.get(this.divLeft).childNodes,
+            handle = cn[cn.length - 1];
+
+         Dom.setStyle(this.divLeft, "height", "auto");
+         Dom.setStyle(handle, "height", "");
+
+         var h = Dom.getXY("alf-ft")[1] - Dom.getXY("alf-hd")[1] - Dom.get("alf-hd").offsetHeight;
+
+         if (YAHOO.env.ua.ie === 6)
+         {
+            var hd = Dom.get("alf-hd"), tmpHeight = 0;
+            for (var i = 0, il = hd.childNodes.length; i < il; i++)
+            {
+               tmpHeight += hd.childNodes[i].offsetHeight;
+            }
+            h = Dom.get("alf-ft").parentNode.offsetTop - tmpHeight; 
+         }
+         if (h < this.MIN_FILTER_PANEL_HEIGHT)
+         {
+            h = this.MIN_FILTER_PANEL_HEIGHT;
+         }
+
+         Dom.setStyle(handle, "height", h + "px");
+
+         if (width !== undefined)
+         {
+            // 8px breathing space for resize gripper
+            Dom.setStyle(this.divRight, "margin-left", 8 + width + "px");
+         }
       }
-   }
-};
+   };
+})();

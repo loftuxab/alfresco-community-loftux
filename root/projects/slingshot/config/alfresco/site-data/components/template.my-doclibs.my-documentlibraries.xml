@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>my-doclibs</region-id>
+   <source-id>my-documentlibraries</source-id>
+   <url>/components/my-documentlibraries/my-doclibs</url>
+</component>

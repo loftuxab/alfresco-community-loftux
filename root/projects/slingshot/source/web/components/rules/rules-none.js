@@ -113,7 +113,6 @@
        */
       onLinkToRuleSetClick: function RulesNone_onLinkToRuleSetClick(event, obj)
       {
-
          if (!this.modules.rulesPicker)
          {
             this.modules.rulesPicker = new Alfresco.module.RulesPicker(this.id + "-rulesPicker");
@@ -123,7 +122,8 @@
          {
             mode: Alfresco.module.RulesPicker.MODE_LINK_TO,
             siteId: this.options.siteId,
-            files: {
+            files:
+            {
                displayName: this.folderDetails,
                nodeRef: this.options.nodeRef.toString()
             }
@@ -132,6 +132,5 @@
          // Stop click event
          Event.stopEvent(event);
       }
-
    });
 })();

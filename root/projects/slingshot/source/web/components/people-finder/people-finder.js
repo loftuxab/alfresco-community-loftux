@@ -34,7 +34,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $userProfile = Alfresco.util.userProfileLink;
 
    /**
     * PeopleFinder constructor.
@@ -390,11 +391,7 @@
             var title = oRecord.getData("jobtitle") || "",
                organization = oRecord.getData("organization") || "";
             
-            var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
-            {
-               userid: userName
-            });
-            var desc = '<h3 class="itemname"><a href=' + encodeURI(profileUrl) + ' class="theme-color-1" tabindex="0">' + $html(name) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
+            var desc = '<h3 class="itemname">' + $userProfile(userName, name, 'class="theme-color-1" tabindex="0"') + ' <span class="lighter">(' + $html(userName) + ')</span></h3>';
             if (title.length !== 0)
             {
                if (me.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT)

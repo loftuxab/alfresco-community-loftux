@@ -165,7 +165,8 @@
    background-image: url(images/category-16.png);
 }
 
-.toolbar .breadcrumb .label
+.toolbar .breadcrumb .label,
+.toolbar .breadcrumb .folder
 {
    font-weight: normal;
    margin-left: 2px;

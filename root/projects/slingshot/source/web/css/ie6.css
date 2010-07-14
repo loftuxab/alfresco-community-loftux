@@ -43,29 +43,29 @@ textarea.wide
    padding-top: 1px;
 }
 
-#Share .header .link-menu-button
+body .header .link-menu-button
 {
    border: 1px solid #F2F2F2;
    padding-bottom: 2px;
    padding-top: 1px;
 }
 
-#Share span.link-menu-button span.yui-menu-button.yui-menu-button-hover
+body span.link-menu-button span.yui-menu-button.yui-menu-button-hover
 {
    border: 1px solid #7BA9CE;
 }
 
-#Share .link-menu-button.link-menu-button-menu-active
+body .link-menu-button.link-menu-button-menu-active
 {
    border: 1px solid #7BA9CE;
 }
 
-#Share span.link-menu-button.link-menu-button-menu-active span.yui-menu-button
+body span.link-menu-button.link-menu-button-menu-active span.yui-menu-button
 {
    border: 1px solid #FFFFFF;
 }
 
-#Share span.link-menu-button.link-menu-button-menu-active span.yui-menu-button.yui-menu-button-hover
+body span.link-menu-button.link-menu-button-menu-active span.yui-menu-button.yui-menu-button-hover
 {
    border: 1px solid #FFFFFF;
 }
@@ -73,6 +73,15 @@ textarea.wide
 .header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
 {
    text-decoration: none;
+}
+
+/**
+ * Fix empty DIV bug when header & navigation are empty (portlet mode)
+ */
+#unbound-region-portlet-header,
+#unbound-region-portlet-navigation
+{
+   height: 0;
 }
 
 /**
@@ -93,12 +102,12 @@ textarea.wide
 
 /* These messages/dialogs were getting full width if none was specified */
 
-#Share #prompt
+body #prompt
 {
    width: 30em;
 }
 
-#Share #message
+body #message
 {
    width: 30em;
 }
@@ -110,39 +119,39 @@ textarea.wide
  * Set it to use a background color instead.  
  */
 
-#Share .flat-button .yui-button .first-child,
-#Share .flat-button .yui-button
+body .flat-button .yui-button .first-child,
+body .flat-button .yui-button
 {
    border-color: #E3EAEC;
 }
 
-#Share .dashlet .toolbar .yui-button .first-child,
-#Share .dashlet .toolbar .yui-button
+body .dashlet .toolbar .yui-button .first-child,
+body .dashlet .toolbar .yui-button
 {
    border-color: #F6F6F6;
 }
 
-#Share .header .yui-button .first-child,
-#Share .header .yui-button
+body .header .yui-button .first-child,
+body .header .yui-button
 {
    border-color: #F2F2F2;
 }
 
-#Share .dashlet .toolbar .yui-button.yui-button-hover .first-child,
-#Share .dashlet .toolbar .yui-button.yui-button-hover,
-#Share .flat-button      .yui-button.yui-button-hover .first-child,
-#Share .flat-button      .yui-button.yui-button-hover
+body .dashlet .toolbar .yui-button.yui-button-hover .first-child,
+body .dashlet .toolbar .yui-button.yui-button-hover,
+body .flat-button      .yui-button.yui-button-hover .first-child,
+body .flat-button      .yui-button.yui-button-hover
 {
    border-color: #808080;
 }
 
-#Share .header .flat-button      .yui-button.yui-button-hover
+body .header .flat-button      .yui-button.yui-button-hover
 {
    border: 1px solid #7BA9CE;
 }
 
-#Share .sites-wrapper .yui-button.yui-split-button-activeoption,
-#Share .sites-wrapper .yui-button.yui-split-button-hover
+body .sites-wrapper .yui-button.yui-split-button-activeoption,
+body .sites-wrapper .yui-button.yui-split-button-hover
 {
    border: 1px solid #7BA9CE;
 }
@@ -190,7 +199,7 @@ div.dashlet .body .clear
    margin-top: -4px;
 }
 
-#Share .title-button .yui-button
+body .title-button .yui-button
 {
    margin-left: 0.7em;
 }
@@ -205,7 +214,7 @@ div.dashlet .body .clear
  * Re-apply the color for the popup bodies
  */
 
-#Share .yui-panel .bd
+body .yui-panel .bd
 {
    color: #515D6B;
    background-color: #F9FBFD;

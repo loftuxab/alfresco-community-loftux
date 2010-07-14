@@ -39,7 +39,8 @@
     */
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $userProfile = Alfresco.util.userProfileLink;
 
    /**
     * DataGrid constructor.
@@ -99,22 +100,6 @@
     * Augment prototype with Common Actions module
     */
    YAHOO.lang.augmentProto(Alfresco.component.DataGrid, Alfresco.service.DataListActions);
-
-   /**
-    * Generate URL to user profile page
-    *
-    * @method generateUserProfileUrl
-    * @param userName {string} Username
-    * @return {string} URL to profile page
-    */
-   Alfresco.component.DataGrid.generateUserProfileUrl = function DataGrid_generateUserProfileUrl(userName)
-   {
-      return Alfresco.util.uriTemplate("userpage",
-      {
-         userid: userName,
-         pageid: "profile"
-      });
-   };
 
    /**
     * Augment prototype with main class implementation, ensuring overwrite is enabled
@@ -421,7 +406,7 @@
                         switch (datalistColumn.dataType.toLowerCase())
                         {
                            case "cm:person":
-                              html += '<span class="person"><a href="' + Alfresco.component.DataGrid.generateUserProfileUrl(data.metadata) + '">' + $html(data.displayValue) + '</a></span>';
+                              html += '<span class="person">' + $userProfile(data.metadata, data.displayValue) + '</span>';
                               break;
                         
                            case "datetime":

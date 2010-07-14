@@ -34,7 +34,9 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $siteURL = Alfresco.util.siteURL,
+      $userProfile = Alfresco.util.userProfileLink;
    
    /**
     * Path constructor.
@@ -101,26 +103,22 @@
       onDocumentDetailsAvailable: function Path_onDocumentDetailsAvailable(layer, args)
       {
          var docData = args[1].documentDetails,
-            pathHtml = "",
-            rootLinkUrl = this.options.rootPage,
-            baseLinkUrl = rootLinkUrl + "?{file}path=",
-            pathUrl = "/",
-            folders = [];
+            pathHtml,
+            rootLink = this.options.rootPage,
+            pathUrl = "",
+            folders = [],
+            href;
 
          var path = docData.location.path;
 
          // Document Library root node
          if (path.length < 2)
          {
-            pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
-            {
-               file: "file=" + encodeURIComponent(docData.fileName) + "&"
-            });
-            pathHtml += '">' + this.msg(this.options.rootLabelId) + '</a></span>';
+            pathHtml = '<span class="path-link"><a href="' + $siteURL(rootLink + "?file=" + encodeURIComponent(docData.fileName)) + '">' + this.msg(this.options.rootLabelId) + '</a></span>';
          }
          else
          {
-            pathHtml += '<span class="path-link"><a href="' + encodeURI(rootLinkUrl) + '">' + this.msg(this.options.rootLabelId) + '</a></span>';
+            pathHtml = '<span class="path-link"><a href="' + $siteURL(rootLink) + '">' + this.msg(this.options.rootLabelId) + '</a></span>';
             folders = path.substring(1, path.length).split("/");
 
             if (folders.length > 0)
@@ -130,18 +128,13 @@
             
             for (var x = 0, y = folders.length; x < y; x++)
             {
-               pathUrl += window.escape(folders[x]);
-               
-               pathHtml += '<span class="path-link folder"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
-               {
-                  file: (y - x > 1) ? "" : "file=" + encodeURIComponent(docData.fileName) + "&"
-               });
-               pathHtml += encodeURIComponent(pathUrl) + '">' + $html(folders[x]) + '</a></span>';
-               
+               pathUrl += "/" + folders[x];
+               href = rootLink + (y - x < 2 ? "?file=" + encodeURIComponent(docData.fileName) + "&path=" : "?path=") + encodeURIComponent(pathUrl);
+               pathHtml += '<span class="path-link folder"><a href="' + $siteURL(href) + '">' + $html(folders[x]) + '</a></span>';
+
                if (y - x > 1)
                {
                   pathHtml += '<span class="separator"> &gt; </span>';
-                  pathUrl += "/";
                }
             }
          }
@@ -157,11 +150,7 @@
             
             if (docData.lockedByUser && docData.lockedByUser !== "")
             {
-               var lockedByLink = '<a href="' + Alfresco.util.uriTemplate("userpage",
-               {
-                  userid: docData.lockedByUser,
-                  pageid: "profile"
-               }) + '" class="theme-color-1">' + $html(docData.lockedBy) + '</a>';
+               var lockedByLink = $userProfileLink(docData.lockedByUser, docData.lockedBy, 'class="theme-color-1"');
 
                /* Google Docs Integration */
                if (docData.custom.googleDocUrl && docData.custom.googleDocUrl !== "")
@@ -217,25 +206,21 @@
       {
          var folderData = args[1].folderDetails,
             pathHtml = "",
-            rootLinkUrl = this.options.rootPage,
-            baseLinkUrl = rootLinkUrl + "?{file}path=",
-            pathUrl = "/",
-            folders = [];
+            rootLink = this.options.rootPage,
+            pathUrl = "",
+            folders = [],
+            href;
          
          var path = folderData.location.path;
          
          // Document Library root node
          if (path == "/" && folderData.location.file.length > 0)
          {
-            pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
-            {
-               file: "file=" + encodeURIComponent(folderData.fileName) + "&"
-            });
-            pathHtml += '">' + this.msg(this.options.rootLabelId) + '</a></span>';
+            pathHtml = '<span class="path-link"><a href="' + $siteURL(rootLink + "?file=" + encodeURIComponent(folderData.fileName)) + '">' + this.msg(this.options.rootLabelId) + '</a></span>';
          }
          else
          {
-            pathHtml += '<span class="path-link"><a href="' + encodeURI(rootLinkUrl) + '">' + this.msg(this.options.rootLabelId) + '</a></span>';
+            pathHtml = '<span class="path-link"><a href="' + $siteURL(rootLink) + '">' + this.msg(this.options.rootLabelId) + '</a></span>';
          }
 
          path = $combine(path, folderData.location.file);
@@ -246,13 +231,9 @@
 
             for (var x = 0, y = folders.length; x < y; x++)
             {
-               pathUrl += window.escape(folders[x]);
-
-               pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
-               {
-                  file: (y - x == 2) ? "file=" + encodeURIComponent(folderData.fileName) + "&" : ""
-               });
-               pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
+               pathUrl += folders[x];
+               href = rootLink + (y - x == 2 ? "?file=" + encodeURIComponent(folderData.fileName) + "&path=" : "?path=") + encodeURIComponent(pathUrl);
+               pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + $siteURL(href) + '">' + $html(folders[x]) + '</a></span>';
 
                if (y - x > 1)
                {

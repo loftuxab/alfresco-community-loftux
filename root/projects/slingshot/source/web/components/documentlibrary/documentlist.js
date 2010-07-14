@@ -36,7 +36,8 @@
     */
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $userProfile = Alfresco.util.userProfileLink;
 
    /**
     * Preferences
@@ -179,22 +180,6 @@
       return Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "") + "/content/thumbnails/doclib?c=queue&ph=true";
    };
 
-   /**
-    * Generate URL to user profile page
-    *
-    * @method generateUserProfileUrl
-    * @param userName {string} Username
-    * @return {string} URL to profile page
-    */
-   Alfresco.DocumentList.generateUserProfileUrl = function DL_generateUserProfileUrl(userName)
-   {
-      return Alfresco.util.uriTemplate("userpage",
-      {
-         userid: userName,
-         pageid: "profile"
-      });
-   };
-   
    /**
     * Generate favourite indicator
     *
@@ -890,7 +875,7 @@
                    * Simple View
                    */
                   desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
                {
@@ -898,7 +883,7 @@
                    * Detailed View
                    */
                   desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                  desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                  desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                   desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
                   /* Tags */
                   tags = record.tags;
@@ -928,7 +913,7 @@
                // Locked / Working Copy handling
                if (record.lockedByUser && record.lockedByUser !== "")
                {
-                  var lockedByLink = '<a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.lockedByUser) + '">' + $html(record.lockedBy) + '</a>';
+                  var lockedByLink = $userProfile(record.lockedByUser, record.lockedBy);
 
                   /* Google Docs Integration */
                   if (record.custom.googleDocUrl && record.custom.googleDocUrl !== "")
@@ -965,7 +950,7 @@
                    * Simple View
                    */
                   desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
                {
@@ -979,7 +964,7 @@
                       */
                      desc += '<div class="detail">';
                      desc += '<span class="item"><em>' + scope.msg("details.editing-started.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc += '<span class="item"><em>' + scope.msg("details.editing-started.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + scope.msg("details.editing-started.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';
                      desc += '<span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
@@ -992,7 +977,7 @@
                       */
                      desc += '<div class="detail">';
                      desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.version") + '</em> ' + record.version + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';
@@ -1086,7 +1071,7 @@
           * YUI History - filter
           */
          var bookmarkedFilter = YAHOO.util.History.getBookmarkedState("filter");
-         bookmarkedFilter = bookmarkedFilter === null ? "path|/" : (YAHOO.env.ua.gecko > 0) ? bookmarkedFilter : window.escape(bookmarkedFilter);
+         bookmarkedFilter = bookmarkedFilter || "path|/";
 
          try
          {
@@ -1648,6 +1633,7 @@
             {
                userAccess.repository = true;
             }
+            userAccess.portlet = Alfresco.constants.PORTLET;
             
             // Inject the current filterId to allow filter-scoped actions
             userAccess["filter-" + this.currentFilter.filterId] = true;
@@ -1732,21 +1718,25 @@
             nodeRef = recordData.nodeRef,
             nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
             contentUrl = recordData.contentUrl,
-            custom = recordData.custom;
-
+            custom = recordData.custom,
+            fnPageURL = Alfresco.util.bind(function(page)
+            {
+               return Alfresco.util.siteURL(page);
+            }, this);
+         
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + contentUrl + "?a=true",
             viewUrl:  Alfresco.constants.PROXY_URI + contentUrl + "\" target=\"_blank",
-            documentDetailsUrl: "document-details?nodeRef=" + nodeRef,
-            folderDetailsUrl: "folder-details?nodeRef=" + nodeRef,
-            folderRulesUrl: "folder-rules?nodeRef=" + nodeRef,
-            editMetadataUrl: "edit-metadata?nodeRef=" + nodeRef,
-            inlineEditUrl: "inline-edit?nodeRef=" + nodeRef,
-            managePermissionsUrl: "manage-permissions?nodeRef=" + nodeRef,
-            workingCopyUrl: "document-details?nodeRef=" + (custom.workingCopyNode || nodeRef),
+            documentDetailsUrl: fnPageURL("document-details?nodeRef=" + nodeRef),
+            folderDetailsUrl: fnPageURL("folder-details?nodeRef=" + nodeRef),
+            folderRulesUrl: fnPageURL("folder-rules?nodeRef=" + nodeRef),
+            editMetadataUrl: fnPageURL("edit-metadata?nodeRef=" + nodeRef),
+            inlineEditUrl: fnPageURL("inline-edit?nodeRef=" + nodeRef),
+            managePermissionsUrl: fnPageURL("manage-permissions?nodeRef=" + nodeRef),
+            workingCopyUrl: fnPageURL("document-details?nodeRef=" + (custom.workingCopyNode || nodeRef)),
             viewGoogleDocUrl: custom.googleDocUrl + "\" target=\"_blank",
-            originalUrl: "document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef),
+            originalUrl: fnPageURL("document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)),
             explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
          });
       },
@@ -2199,17 +2189,7 @@
          {
             // Should be a filter in the arguments
             var filter = Alfresco.util.cleanBubblingObject(obj),
-               strFilter = YAHOO.lang.substitute("{filterId}|{filterData}", filter, function(p_key, p_value, p_meta)
-               {
-                  return typeof p_value == "undefined" ? "" : window.escape(p_value);
-               }),
-               aFilters = strFilter.split("|");
-            
-            // Remove trailing blank entry
-            if (aFilters[1].length === 0)
-            {
-               strFilter = aFilters[0];
-            }
+               strFilter = window.escape(obj.filterId) + (typeof obj.filterData !== "undefined" ? "|" + window.escape(obj.filterData) : "");
             
             Alfresco.logger.debug("DL_onChangeFilter: ", filter);
 
@@ -2274,6 +2254,7 @@
          var obj = args[1];
          if ((obj !== null) && (obj.fileName !== null))
          {
+            Alfresco.logger.debug("DL_onHighlightFile: ", obj.fileName);
             var recordFound = this._findRecordByParameter(obj.fileName, "displayName");
             if (recordFound !== null)
             {

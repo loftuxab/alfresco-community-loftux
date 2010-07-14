@@ -40,23 +40,7 @@ Alfresco.util.people = {};
  */
 Alfresco.util.people.generateUserLink = function generateUserLink(person)
 {
-   return '<a href="' + Alfresco.util.people.generateUserProfileUrl(person) + '" class="theme-color-1">' + Alfresco.util.people.generateUserDisplayName(person) + '</a>';
-};
-         
-/**
- * Generate URL to user profile page
- *
- * @method Alfresco.util.people.generateUserProfileUrl
- * @param person {object} A person object
- * @return {string} URL to profile page
- */
-Alfresco.util.people.generateUserProfileUrl = function generateUserProfileUrl(person)
-{
-   return Alfresco.util.uriTemplate("userpage",
-   {
-      userid: person.username,
-      pageid: "profile"
-   });
+   return Alfresco.util.userProfileLink(person.username, Alfresco.util.people.generateUserDisplayName(person), 'class="theme-color-1"');
 };
          
 /**
@@ -82,7 +66,7 @@ Alfresco.util.people.generateUserDisplayName = function generateUserDisplayName(
          displayName += person.lastName;
       }
    }
-   return Alfresco.util.encodeHTML(displayName);
+   return displayName;
 };
          
 /**

@@ -34,7 +34,8 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $siteURL = Alfresco.util.siteURL;
    
    /**
     * Alfresco.doclib.Actions implementation
@@ -68,7 +69,7 @@
             {
                type: "link",
                label: scope.msg("edit-details.label.edit-metadata"),
-               href: "edit-metadata?nodeRef=" + asset.nodeRef
+               href: $siteURL("edit-metadata?nodeRef=" + asset.nodeRef)
             });
          };
 

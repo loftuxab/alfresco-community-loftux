@@ -29,7 +29,12 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom;
-      
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $siteURL = Alfresco.util.siteURL;
+
    /**
     * InlineEditMgr constructor.
     * 
@@ -132,8 +137,8 @@
          if (response.json.message)
          {
             errorMsg = errorMsg + ": " + response.json.message;
-         }  
-            
+         }
+
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: this.msg("message.failure"),
@@ -170,7 +175,7 @@
          else
          {
             // go forward to the appropriate details page for the node
-            window.location.href = "document-details?nodeRef=" + this.options.nodeRef.toString();
+            window.location.href = $siteURL("document-details?nodeRef=" + this.options.nodeRef.toString());
          }
       }
    });

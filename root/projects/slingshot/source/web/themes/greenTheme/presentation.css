@@ -360,6 +360,7 @@ span.navigation-separator-alt
 .toolbar .separator
 {
    border-right: 1px dotted #3a6c38;
+   border-top: medium none;
 }
 
 strong
@@ -511,13 +512,13 @@ span.mce_alfresco-imagelibrary
    background-position: center center;
 }
 
-#Share.yui-skin-greenTheme .link-menu-button .yui-button.yui-button-hover
+body.yui-skin-greenTheme .link-menu-button .yui-button.yui-button-hover
 {
    background-color: #FFFFFF;
    border: 1px solid #008F22;
 }
 
-#Share.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+body.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
 {
    border-color: transparent;
    background-color: transparent;
@@ -535,7 +536,7 @@ span.mce_alfresco-imagelibrary
    border-right: 1px #BDBDBD solid;
 }
 
-#Share.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active
+body.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active
 {
    background-color: #FFFFFF;
    border: 1px solid #008F22;
@@ -711,8 +712,8 @@ body.yui-skin-greenTheme .categoryview .category .ygtvdepthcell
 .archive li.selected,
 .tool li.selected,
 body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
-#Share.yui-skin-greenTheme .treeview .selected,
-#Share.yui-skin-greenTheme .categoryview .selected
+body.yui-skin-greenTheme .treeview .selected,
+body.yui-skin-greenTheme .categoryview .selected
 {
    background-color: #D4F8C4;
 }

@@ -38,9 +38,9 @@
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks,
       $combine = Alfresco.util.combinePaths,
-      $jsonDate = Alfresco.util.fromExplodedJSONDate;
+      $jsonDate = Alfresco.util.fromExplodedJSONDate,
+      $userProfile = Alfresco.util.userProfileLink;
 
-   
    /**
     * RecordsDocumentList constructor.
     * 
@@ -256,7 +256,7 @@
                       */
                      desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.series.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
                      // Created by, Modified on
-                     desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.created.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.createdByUser) + '">' + $html(record.createdBy) + '</a></span>';
+                     desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.created.by") + '</em>' + $userProfile(record.createdByUser, record.createdBy) + '</span>';
                      desc += '<span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span></div>';
                   }
                   else
@@ -267,7 +267,7 @@
                      desc += '<div class="detail detail-first"><span class="item"><em>' + scope.msg("details.series.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
                      desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
                      // Created by, Modified on
-                     desc += '<div class="detail detail-last"><span class="item"><em>' + scope.msg("details.created.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.createdByUser) + '">' + $html(record.createdBy) + '</a></span>';
+                     desc += '<div class="detail detail-last"><span class="item"><em>' + scope.msg("details.created.by") + '</em>' + $userProfile(record.createdByUser, record.createdBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span></div>';
                   }
                   break;
@@ -286,7 +286,7 @@
                       */
                      desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.category.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
                      // Created by, Modified on
-                     desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.created.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.createdByUser) + '">' + $html(record.createdBy) + '</a></span>';
+                     desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.created.by") + '</em>' + $userProfile(record.createdByUser, record.createdBy) + '</span>';
                      desc += '<span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span></div>';
                   }
                   else
@@ -301,7 +301,7 @@
                      // Vital Record Indicator
                      desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.category.vital-record-indicator") + '</em> ' + scope.msg(dod5015["rma:vitalRecordIndicator"] ? "label.yes" : "label.no") + '</span></div>';
                      // Created by, Modified on
-                     desc += '<div class="detail detail-last"><span class="item"><em>' + scope.msg("details.created.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.createdByUser) + '">' + $html(record.createdBy) + '</a></span>';
+                     desc += '<div class="detail detail-last"><span class="item"><em>' + scope.msg("details.created.by") + '</em>' + $userProfile(record.createdByUser, record.createdBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span></div>';
                   }
                   break;
@@ -321,7 +321,7 @@
                       */
                      desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.folder.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
                      // Created by, Modified on
-                     desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.created.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.createdByUser) + '">' + $html(record.createdBy) + '</a></span>';
+                     desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.created.by") + '</em>' + $userProfile(record.createdByUser, record.createdBy) + '</span>';
                      desc += '<span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span></div>';
                   }
                   else
@@ -332,7 +332,7 @@
                      desc += '<div class="detail detail-first"><span class="item"><em>' + scope.msg("details.folder.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
                      desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.folder.vital-record-indicator") + '</em> ' + scope.msg(dod5015["rma:vitalRecordIndicator"] ? "label.yes" : "label.no") + '</span></div>';
                      // Created by, Modified on
-                     desc += '<div class="detail detail-last"><span class="item"><em>' + scope.msg("details.created.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.createdByUser) + '">' + $html(record.createdBy) + '</a></span>';
+                     desc += '<div class="detail detail-last"><span class="item"><em>' + scope.msg("details.created.by") + '</em>' + $userProfile(record.createdByUser, record.createdBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span></div>';
                   }
                   break;
@@ -364,7 +364,7 @@
                       * Simple View
                       */
                      desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn) + '</span>';
-                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.mofieioedBy) + '</span></div>';
                   }
                   else
                   {
@@ -372,7 +372,7 @@
                       * Detailed View
                       */
                      desc += '<div class="detail detail-first"><span class="item"><em>' + scope.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn) + '</span>';
-                     desc += '<span class="item"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                     desc += '<span class="item"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                      if (dod5015["rma:transferAccessionIndicator"])
                      {
                         desc += '<div class="detail">' + scope.msg("details.transfer-container.is-accession") + '</div';
@@ -498,7 +498,7 @@
                       * Simple View
                       */
                      desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
-                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                   }
                   else
                   {
@@ -508,7 +508,7 @@
                      desc += '<div class="detail detail-first"><span class="item"><em>' + scope.msg("details.record.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
                      desc += '<div class="detail">';
                      desc +=    '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc +=    '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc +=    '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc +=    '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div>';
                      desc += '<div class="detail detail-last"><span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
@@ -530,7 +530,7 @@
                       * Simple View
                       */
                      desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
-                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                   }
                   else
                   {
@@ -538,7 +538,7 @@
                       * Detailed View
                       */
                      desc += '<div class="detail detail-first"><span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                      desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
                      desc += '</div><div class="detail detail-last">&nbsp;</div>';
                   }
@@ -559,7 +559,7 @@
                       * Simple View
                       */
                      desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
-                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                     desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                   }
                   else
                   {
@@ -568,7 +568,7 @@
                       */
                      desc += '<div class="detail detail-first">';
                      desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail detail-last">';
                      desc += '<span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span>';

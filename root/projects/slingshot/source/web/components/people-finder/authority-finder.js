@@ -34,7 +34,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $userProfile = Alfresco.util.userProfileLink;
 
    /**
     * AuthorityFinder constructor.
@@ -83,23 +84,6 @@
       AUTHORITY_TYPE_GROUPS: "group"
    });
 
-   /**
-    * Generate User Profile link.
-    *
-    * @method generateUserProfileLink
-    * @param userName {string} User name
-    * @return {string} Mark-up for use in href attribute
-    */
-   Alfresco.AuthorityFinder.generateUserProfileLink = function AuthorityFinder_generateUserProfileLink(userName)
-   {
-      var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
-      {
-         userid: userName
-      });
-      
-      return encodeURI(profileUrl);
-   };
-   
    YAHOO.lang.extend(Alfresco.AuthorityFinder, Alfresco.component.Base,
    {
       /**
@@ -407,7 +391,7 @@
                   jobTitle = metadata.jobTitle || "",
                   organization = metadata.organization || "";
                
-               desc = '<h3 class="itemname"><a href=' + Alfresco.AuthorityFinder.generateUserProfileLink(userName) + ' class="theme-color-1">' + $html(oRecord.getData("displayName")) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
+               desc = '<h3 class="itemname">' + $userProfile(userName, oRecord.getData("displayName"), 'class="theme-color-1"') + ' <span class="lighter">(' + $html(userName) + ')</span></h3>';
                if (jobTitle.length > 0)
                {
                   desc += '<div class="detail">' + $html(jobTitle) + '</div>';
@@ -445,7 +429,7 @@
                   jobTitle = metadata.jobTitle || "",
                   organization = metadata.organization || "";
                
-               desc = '<h3 class="itemname"><a href=' + Alfresco.AuthorityFinder.generateUserProfileLink(userName) + ' class="theme-color-1">' + $html(oRecord.getData("displayName")) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
+               desc = '<h3 class="itemname">' + $userProfile(userName, oRecord.getData("displayName"), 'class="theme-color-1"') + ' <span class="lighter">(' + $html(userName) + ')</span></h3>';
                if (jobTitle.length > 0)
                {
                   desc += '<div class="detail"><span>' + me.msg("label.title") + ":</span> " + $html(jobTitle) + '</div>';

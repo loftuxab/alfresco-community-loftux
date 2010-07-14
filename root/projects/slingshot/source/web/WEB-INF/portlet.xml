@@ -9,7 +9,7 @@
 
       <init-param>
          <name>scriptUrl</name>
-         <value>/share/service/sample/cmis/repo</value>
+         <value>/service/sample/cmis/repo</value>
       </init-param>
 
       <supports>
@@ -20,6 +20,48 @@
       <portlet-info>
          <title>CMIS Folder Browser</title>
          <short-title>CMIS Folder</short-title>
+      </portlet-info>
+   </portlet>
+
+   <portlet>
+      <description>Share Document Libraries</description>
+      <portlet-name>ShareDocLib</portlet-name>
+      <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
+
+      <init-param>
+         <name>scriptUrl</name>
+         <value>/page/my-documentlibraries</value>
+      </init-param>
+
+      <supports>
+         <mime-type>text/html</mime-type>
+         <portlet-mode>VIEW</portlet-mode>
+      </supports>
+
+      <portlet-info>
+         <title>My Document Libraries</title>
+         <short-title>Share DocLib</short-title>
+      </portlet-info>
+   </portlet>
+
+   <portlet>
+      <description>Share Repository Library</description>
+      <portlet-name>ShareRepoDocLib</portlet-name>
+      <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
+
+      <init-param>
+         <name>scriptUrl</name>
+         <value>/page/repository</value>
+      </init-param>
+
+      <supports>
+         <mime-type>text/html</mime-type>
+         <portlet-mode>VIEW</portlet-mode>
+      </supports>
+
+      <portlet-info>
+         <title>Repository Library</title>
+         <short-title>Share Repo DocLib</short-title>
       </portlet-info>
    </portlet>
 

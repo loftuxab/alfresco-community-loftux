@@ -35,8 +35,9 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
-   
+   var $html = Alfresco.util.encodeHTML,
+      $siteURL = Alfresco.util.siteURL;
+
    /**
     * RulesHeader constructor.
     *
@@ -176,12 +177,10 @@
        */
       onNewRuleButtonClick: function RulesHeader_onNewRuleButtonClick(type, args)
       {
-         var url = YAHOO.lang.substitute("rule-edit?nodeRef={nodeRef}",
+         window.location.href = $siteURL("rule-edit?nodeRef={nodeRef}",
          {
-            siteId: this.options.siteId,
             nodeRef: this.options.nodeRef.toString()
          });
-         window.location.href = url;
       },
 
       /**
@@ -202,8 +201,9 @@
          this.modules.rulesPicker.setOptions(
          {
             mode: Alfresco.module.RulesPicker.MODE_COPY_FROM,
-            siteId: this.options.siteId,            
-            files: {
+            siteId: this.options.siteId,
+            files:
+            {
                displayName: this.folderDetails,
                nodeRef: this.options.nodeRef.toString()
             }
@@ -223,7 +223,8 @@
       {
          // Display a wait feedback message if the people hasn't been found yet
          this.widgets.runRulesMenu.set("disabled", true);
-         YAHOO.lang.later(2000, this, function(){
+         YAHOO.lang.later(2000, this, function()
+         {
             if (this.isRunning)
             {
                if (!this.widgets.feedbackMessage)
@@ -298,7 +299,6 @@
          Event.preventDefault(aArgs[0]);
       },
 
-
       /**
        * Starts rendering  details has been loaded
        *
@@ -339,6 +339,5 @@
          this.widgets.runRulesMenu.set("disabled", false);
          this.isRunning = false;
       }
-
    });
 })();

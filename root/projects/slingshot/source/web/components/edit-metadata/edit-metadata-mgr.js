@@ -29,6 +29,11 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $siteURL = Alfresco.util.siteURL;
       
    /**
     * EditMetadataMgr constructor.
@@ -180,7 +185,7 @@
          else
          {
             // go forward to the appropriate details page for the node
-            window.location.href = this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
+            window.location.href = $siteURL(this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef);
          }
       }
    });
