@@ -1,6 +1,6 @@
 <#assign helpPages = config.scoped["HelpPages"]["help-pages"]>
 <#assign helpLink = helpPages.getChildValue("share-help")!"">
-<#assign siteActive><#if page.url.templateArgs.site??>true<#else>false</#if></#assign>
+<#assign siteActive = page.url.templateArgs.site??>
 <#assign el=args.htmlid>
 <#if !user.isGuest>
 <script type="text/javascript">//<![CDATA[
@@ -77,7 +77,7 @@
             </#list>
          <#else><li></li></#if>
          </ul>
-         <#assign addFavDisplay><#if (page.url.templateArgs.site?? && !currentSiteIsFav)>block<#else>none</#if></#assign>
+         <#assign addFavDisplay><#if (siteActive && !currentSiteIsFav)>block<#else>none</#if></#assign>
          <ul id="${el}-addFavourite" class="add-favourite-menuitem separator" style="display: ${addFavDisplay}">
             <li style="display: ${addFavDisplay}">
                <a href="#" onclick="thisHeader.addAsFavourite(); return false;">${msg("link.add-favourite", siteTitle?html)}</a>
@@ -103,7 +103,7 @@
       <div class="bd">
          <ul class="last">
             <li>
-               <a href="#">${msg("header.search.advancedsearch")}</a>
+               <a href="${url.context}/page<#if siteActive>/site/${page.url.templateArgs.site}</#if>/advsearch">${msg("header.search.advancedsearch")}</a>
             </li>
          </ul>
       </div>
