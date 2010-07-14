@@ -1,20 +1,23 @@
 <#assign el=args.htmlid>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.StartWorkflow("${el}").setOptions(
-   {
-      nodeRefs: [new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}")],
-      siteId: "${page.url.templateArgs.site!""}"
+   new Alfresco.StartWorkflow("${el}").setOptions({
+      failureMessage: "message.failure",
+      submitButtonMessageKey: "button.startWorkflow",
+      forwardUrl: Alfresco.util.uriTemplate("userdashboardpage", { userid: Alfresco.constants.USERNAME })
    }).setMessages(
       ${messages}
    );
 //]]></script>
-<div id="${el}-body" class="start-workflow">
+<div id="${el}-body" class="form-manager start-workflow">
    <h1>${msg("header")}</h1>
-   <label for="${el}-workflowDefinitions">${msg("label.workflow")}:</label>
-   <select id="${el}-workflowDefinitions" name="taskId" tabindex="0">
-      <#list workflowDefinitions as workflowDefinition>
-         <option value="${workflowDefinition.startTaskId}">${workflowDefinition.title?html}</option>
-      </#list>
-   </select>
-   <div id="${el}-workflowFormContainer"></div>
+   <div>
+      <label for="${el}-workflowDefinitions">${msg("label.workflow")}:</label>
+      <select id="${el}-workflowDefinitions" tabindex="0">
+         <option>${msg("option.selectWorkflow")}</option>
+         <#list workflowDefinitions as workflowDefinition>
+         <option value="${workflowDefinition.name}">${workflowDefinition.title?html}</option>
+         </#list>
+      </select>
+   </div>
 </div>
+<div id="${el}-workflowFormContainer"></div>

@@ -29,13 +29,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Selector = YAHOO.util.Selector,
       Event = YAHOO.util.Event;
-
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML;
 
    /**
     * StartWorkflow constructor.
@@ -46,36 +40,17 @@
     */
    Alfresco.StartWorkflow = function StartWorkflow_constructor(htmlId)
    {
-      Alfresco.StartWorkflow.superclass.constructor.call(this, "Alfresco.StartWorkflow", htmlId, ["button"]);
+      Alfresco.StartWorkflow.superclass.constructor.call(this, htmlId, ["button"]);
+
+      // Re-register with our own name
+      this.name = "Alfresco.StartWorkflow";
+      Alfresco.util.ComponentManager.reregister(this);
+
       return this;
    };
 
-   YAHOO.extend(Alfresco.StartWorkflow, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.StartWorkflow, Alfresco.FormManager,
    {
-      /**
-       * Object container for initialization options
-       *
-       * @property options
-       * @type object
-       */
-      options:
-      {
-         /**
-          * The workflow items
-          *
-          * @property workFlowItems
-          * @type Array of Alfresco.util.NodeRef
-          */
-         workFlowItems: null,
-
-         /**
-          * Current siteId.
-          *
-          * @property siteId
-          * @type string
-          */
-         siteId: ""
-      },
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -87,8 +62,9 @@
       {
          this.widgets.workflowSelectEl = Dom.get(this.id + "-workflowDefinitions");
          Event.addListener(this.widgets.workflowSelectEl, "change", this.onWorkflowSelectChange, null, this);
-         this.onWorkflowSelectChange();
+         return Alfresco.StartWorkflow.superclass.onReady.call(this);
       },
+
 
       /**
        * Called when a workflow definition has been selected
@@ -97,7 +73,7 @@
        */
       onWorkflowSelectChange: function StartWorkflow_onWorkflowSelectChange()
       {
-        var i = this.widgets.workflowSelectEl.selectedIndex;
+         var i = this.widgets.workflowSelectEl.selectedIndex;
          if (i >= 0) {
             Alfresco.util.Ajax.request(
             {
@@ -109,7 +85,6 @@
                   itemId: this.widgets.workflowSelectEl.options[i].value,
                   mode: "edit",
                   submitType: "json",
-                  //formId: "doclib-simple-metadata",
                   showCaption: true,
                   formUI: true,
                   showCancelButton: true
@@ -135,8 +110,11 @@
        */
       onWorkflowFormLoaded: function StartWorkflow_onWorkflowFormLoaded(response)
       {
-         Dom.get(this.id + "-workflowFormContainer").innerHTML = response.serverResponse.responseText;
+         var formEl = Dom.get(this.id + "-workflowFormContainer");
+         formEl.innerHTML = response.serverResponse.responseText;
+         Alfresco.util.YUILoaderHelper.loadComponents();
       }
 
    });
+
 })();

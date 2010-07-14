@@ -1,26 +1,4 @@
-.start-workflow
-{
-   padding: 1em;
-}
-
 .start-workflow h1
 {
-   padding-bottom: 1em;   
-}
-
-.start-workflow .form-container .caption,
-.start-workflow .form-container .form-fields
-{
-   width: 800px;
-}
-
-.start-workflow .form-container .caption
-{
-   text-align: right;
-}
-.start-workflow .form-container .form-fields
-{
-   border: 1px solid #c6c6c6 !important;
-   background-color: #F5FFF2;
-   padding: 1em !important;
+   padding-bottom: 1em;
 }

@@ -9,7 +9,9 @@
       <@region id=doclibType + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <@region id=doclibType + "start-workflow" scope="template" protected=true />
+      <div class="share-form">
+      <@region id=doclibType + "start-workflow" scope="template" protected=true />      
+      </div>
    </div>
 </@>
 

@@ -161,17 +161,6 @@
       </types>
 
       <!--
-         Used by the "Assign Workflow" action.
-
-         For custom workflow definitions, remember to also add the relevant i18n string(s):
-            workflow.wf_mydefinition=My Workflow Definition
-      -->
-      <workflows>
-         <workflow definition="wf:review" />
-         <workflow definition="wf:adhoc" />
-      </workflows>
-
-      <!--
          If set, will present a WebDAV link for the current item on the Document and Folder details pages.
          Also used to generate the "View in Alfresco Explorer" action for folders.
       -->
@@ -224,6 +213,22 @@
          -->
          <maximum-folder-count>500</maximum-folder-count>
       </tree>
+   </config>
+
+   <!-- Workflow config section -->
+   <config evaluator="string-compare" condition="Workflow">
+      <!--
+         A list of workflow definitions that NOT shall be displayed in Share
+      -->
+      <hidden-workflows>
+         <workflow name="jbpm$wcmwf:changerequest"/>
+         <workflow name="jbpm$wf:articleapproval"/>
+         <workflow name="jbpm$inwf:invitation-nominated"/>
+         <workflow name="jbpm$imwf:invitation-moderated"/>
+         <workflow name="jbpm$wcmwf:submit"/>
+         <workflow name="jbpm$wcmwf:submitdirect"/>
+      </hidden-workflows>
+
    </config>
 
 </alfresco-config>

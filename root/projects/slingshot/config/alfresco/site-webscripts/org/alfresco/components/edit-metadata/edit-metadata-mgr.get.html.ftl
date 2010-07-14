@@ -1,14 +1,12 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.EditMetadataMgr("${args.htmlid}").setOptions(
+   new Alfresco.FormManager("${args.htmlid}").setOptions(
    {
-      nodeRef: "${nodeRef!page.url.args.nodeRef}",
-      nodeType: "${nodeType!"document"}",
-      siteId: "${page.url.templateArgs.site!""}"
+      failureMessage: "edit-metadata-mgr.update.failed",
+      forwardUrl: "${nodeType!"document"}-details?nodeRef=${nodeRef!page.url.args.nodeRef}"
    }).setMessages(
       ${messages}
    );
 //]]></script>
-
-<div class="edit-metadata-mgr">
-   <div class="heading">${msg("edit-metadata-mgr.heading")}</div>
+<div class="form-manager">
+   <h1>${msg("edit-metadata-mgr.heading")}</h1>
 </div>
