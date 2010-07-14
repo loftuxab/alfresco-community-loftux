@@ -32,12 +32,20 @@ textarea
 }
 
 /**
+ * Fix empty DIV bug when header & navigation are empty (portlet mode)
+ */
+#unbound-region-portlet-header,
+#unbound-region-portlet-navigation
+{
+   height: 0;
+}
+
+/**
  * Global site footer
  */
 
 .footer-ent
 {
-   position: relative;
    top: -2px;
 }
 
@@ -63,7 +71,7 @@ textarea
    padding-top: 6px;
 }
 
-#Share .title-button .yui-button
+body .title-button .yui-button
 {
    margin: 0 0.7em;
 }
@@ -178,12 +186,12 @@ body.masked div.mask.full-preview-mask
 
 /* Dialogs */
 
-#Share #prompt
+body #prompt
 {
    width: 30em;
 }
 
-#Share .groups.remove-dialog
+body .groups.remove-dialog
 {
    width: 41em;
 }

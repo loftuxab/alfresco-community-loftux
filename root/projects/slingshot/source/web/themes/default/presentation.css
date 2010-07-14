@@ -362,6 +362,7 @@ span.navigation-separator-alt
 .toolbar .separator
 {
    border-right: 1px dotted #457A9C;
+   border-top: medium none;
 }
 
 strong
@@ -512,13 +513,13 @@ span.mce_alfresco-imagelibrary
    background-position: center center;
 }
 
-#Share.yui-skin-default .link-menu-button .yui-button.yui-button-hover
+body.yui-skin-default .link-menu-button .yui-button.yui-button-hover
 {
    background-color: #FFFFFF;
    border: 1px solid #7BA9CE;
 }
 
-#Share.yui-skin-default .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+body.yui-skin-default .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
 {
    border-color: transparent;
    background-color: transparent;
@@ -536,7 +537,7 @@ span.mce_alfresco-imagelibrary
    border-right: 1px #BDBDBD solid;
 }
 
-#Share.yui-skin-default .link-menu-button.link-menu-button-menu-active
+body.yui-skin-default .link-menu-button.link-menu-button-menu-active
 {
    background-color: #FFFFFF;
    border: 1px solid #7BA9CE;

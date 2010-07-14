@@ -36,7 +36,8 @@
     */
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $userProfile = Alfresco.util.userProfileLink;
 
    
    /**
@@ -137,7 +138,7 @@
                    * Simple View
                    */
                   desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
                {
@@ -145,7 +146,7 @@
                    * Detailed View
                    */
                   desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                  desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                  desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                   desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
 
                   /* Categories */
@@ -193,7 +194,7 @@
                // Locked / Working Copy handling
                if (record.lockedByUser && record.lockedByUser !== "")
                {
-                  var lockedByLink = '<a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.lockedByUser) + '">' + $html(record.lockedBy) + '</a>';
+                  var lockedByLink = $userProfile(record.lockedByUser, record.lockedBy);
 
                   /* Google Docs Integration */
                   if (record.custom.googleDocUrl && record.custom.googleDocUrl !== "")
@@ -230,7 +231,7 @@
                    * Simple View
                    */
                   desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                  desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
                {
@@ -244,7 +245,7 @@
                       */
                      desc += '<div class="detail">';
                      desc += '<span class="item"><em>' + scope.msg("details.editing-started.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc += '<span class="item"><em>' + scope.msg("details.editing-started.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + scope.msg("details.editing-started.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';
                      desc += '<span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
@@ -257,7 +258,7 @@
                       */
                      desc += '<div class="detail">';
                      desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
-                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.version") + '</em> ' + record.version + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';

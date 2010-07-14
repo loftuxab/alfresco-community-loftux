@@ -6,6 +6,9 @@
 <@templateBody>
    <div id="alflogin" class="login-panel">
       <div class="login-logo"></div>
+<#if PORTLET>
+      <div class="login-portlet">${msg("message.login-portal")}</div>
+<#else>
       <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/page/dologin" onsubmit="return alfLogin();">
          <fieldset>
             <div style="padding-top:96px">
@@ -23,15 +26,16 @@
             <div style="padding-top:16px">
                <input type="submit" id="btn-login" class="login-button" />
             </div>
-            <div style="padding-top:32px">
-               <span class="login-copyright">
-                  &copy; 2005-2010 Alfresco Software Inc. All rights reserved.
-               </span>
-            </div>
             <input type="hidden" id="success" name="success" value="${successUrl?html}"/>
             <input type="hidden" name="failure" value="<#assign link>${url.context}/page/type/login</#assign>${link?html}?error=true"/>
          </fieldset>
       </form>
+</#if>
+      <div style="padding-top:32px">
+         <span class="login-copyright">
+            &copy; 2005-2010 Alfresco Software Inc. All rights reserved.
+         </span>
+      </div>
    </div>
    
    <script type="text/javascript">//<![CDATA[
@@ -47,26 +51,29 @@
       
       // Prevent the Enter key from causing a double form submission
       var form = Dom.get("loginform");
-      // add the event to the form and make the scope of the handler this form.
-      YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
-      var fnStopEvent = function(id, keyEvent)
+      if (form)
       {
-         if (form.getAttribute("alflogin") == null)
+         // add the event to the form and make the scope of the handler this form.
+         YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
+         var fnStopEvent = function(id, keyEvent)
          {
-            form.setAttribute("alflogin", true);
+            if (form.getAttribute("alflogin") == null)
+            {
+               form.setAttribute("alflogin", true);
+            }
          }
+
+         var enterListener = new YAHOO.util.KeyListener(form,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ENTER
+         }, fnStopEvent, "keydown");
+         enterListener.enable();
+
+         // set I18N labels
+         Dom.get("txt-username").innerHTML = Alfresco.util.message("label.username") + ":";
+         Dom.get("txt-password").innerHTML = Alfresco.util.message("label.password") + ":";
+         Dom.get("btn-login").value = Alfresco.util.message("button.login");
       }
-      
-      var enterListener = new YAHOO.util.KeyListener(form,
-      {
-         keys: YAHOO.util.KeyListener.KEY.ENTER
-      }, fnStopEvent, "keydown");
-      enterListener.enable();
-      
-      // set I18N labels
-      Dom.get("txt-username").innerHTML = Alfresco.util.message("label.username") + ":";
-      Dom.get("txt-password").innerHTML = Alfresco.util.message("label.password") + ":";
-      Dom.get("btn-login").value = Alfresco.util.message("button.login");
       
       // generate and display main login panel
       var panel = new YAHOO.widget.Overlay(YAHOO.util.Dom.get("alflogin"), 
@@ -101,7 +108,8 @@
          isDefault: true
       }]
    });
-</#if>
+
+</#if>   
    //]]></script>
 </@>
 </body>

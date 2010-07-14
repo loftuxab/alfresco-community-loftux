@@ -380,6 +380,7 @@ span.navigation-separator-alt
 .toolbar .separator
 {
    border-right: 1px dotted #3a6c38;
+   border-top: medium none;
 }
 
 strong
@@ -537,13 +538,13 @@ span.mce_alfresco-imagelibrary
    background-position: center center;
 }
 
-#Share.yui-skin-gdocs .link-menu-button .yui-button.yui-button-hover
+body.yui-skin-gdocs .link-menu-button .yui-button.yui-button-hover
 {
    background-color: #FFFFFF;
    border: 1px solid #3c54d3;
 }
 
-#Share.yui-skin-gdocs .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+body.yui-skin-gdocs .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
 {
    border-color: transparent;
    background-color: transparent;
@@ -561,7 +562,7 @@ span.mce_alfresco-imagelibrary
    border-right: 1px #BDBDBD solid;
 }
 
-#Share.yui-skin-gdocs .link-menu-button.link-menu-button-menu-active
+body.yui-skin-gdocs .link-menu-button.link-menu-button-menu-active
 {
    background-color: #FFFFFF;
    border: 1px solid #3c54d3;
@@ -814,8 +815,8 @@ body.yui-skin-gdocs .categoryview .category .ygtvdepthcell
 .archive li.selected,
 .tool li.selected,
 body.yui-skin-gdocs .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
-#Share.yui-skin-gdocs .treeview .selected,
-#Share.yui-skin-gdocs .categoryview .selected
+body.yui-skin-gdocs .treeview .selected,
+body.yui-skin-gdocs .categoryview .selected
 {
    background-color: #dee6ff;
 }

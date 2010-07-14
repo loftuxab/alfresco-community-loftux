@@ -36,7 +36,8 @@
     * Alfresco Slingshot aliases
     */
     var $html = Alfresco.util.encodeHTML,
-       $hasEventInterest = Alfresco.util.hasEventInterest;
+       $hasEventInterest = Alfresco.util.hasEventInterest,
+       $siteURL = Alfresco.util.siteURL;
 
    /**
     * RulesList constructor.
@@ -270,6 +271,7 @@
          // Collect rule ids from hidden input fields
          var rules = [],
             ruleInputs = Selector.query("li input[type=hidden][name=id]", this.widgets.rulesListContainerEl);
+
          for (var i = 0, il = ruleInputs.length; i < il; i++)
          {
             rules.push(this.options.nodeRef.storeType + "://" + this.options.nodeRef.storeId + "/" + ruleInputs[i].value);
@@ -390,6 +392,7 @@
          var inherited,
             folderRulesStartIndex = ruleset.inheritedRules ? ruleset.inheritedRules.length : 0,
             rules = (ruleset.inheritedRules ? ruleset.inheritedRules : []).concat(ruleset.rules ? ruleset.rules : []);
+
          for (var i = 0, ii = rules.length; i < ii; i++)
          {
             inherited = (i < folderRulesStartIndex);
@@ -488,16 +491,16 @@
             if (rule.owningNode)
             {
                var a = Dom.getElementsByClassName("inherited-folder", "a", ruleEl)[0],
-                  url = YAHOO.lang.substitute("folder-rules?nodeRef={nodeRef}",
-               {
-                  siteId: this.options.siteId,
-                  nodeRef: rule.owningNode.nodeRef
-               });
+                  url = $siteURL("folder-rules?nodeRef={nodeRef}",
+                  {
+                     nodeRef: rule.owningNode.nodeRef
+                  });
+
                a.href = url;
                a.innerHTML = $html(rule.owningNode.name);
                Event.addListener(a, "click", function (e, u)
                {                  
-                  document.location.href = u;
+                  window.location.href = u;
                }, url, this);
             }
          }

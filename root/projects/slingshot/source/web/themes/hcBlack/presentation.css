@@ -365,6 +365,7 @@ span.navigation-item a:hover
 span.navigation-separator
 {
    border-right: 1px dotted #4f4f4f;
+   border-top: medium none;
 }
 
 span.navigation-separator-alt
@@ -532,13 +533,13 @@ span.mce_alfresco-imagelibrary
    background-position: center center;
 }
 
-#Share.yui-skin-hcBlack .link-menu-button .yui-button.yui-button-hover
+body.yui-skin-hcBlack .link-menu-button .yui-button.yui-button-hover
 {
    background-color: #FFFFFF;
    border: 1px solid #000;
 }
 
-#Share.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+body.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
 {
    border-color: transparent;
    background-color: transparent;
@@ -556,13 +557,13 @@ span.mce_alfresco-imagelibrary
    border-right: 1px #BDBDBD solid;
 }
 
-#Share.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active
+body.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active
 {
    background-color: #FFFFFF;
    border: 1px solid #000;
 }
 
-#Share.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+body.yui-skin-hcBlack .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
 {
    border-color: transparent;
    background-color: transparent;
@@ -679,8 +680,8 @@ body.yui-skin-hcBlack .over,
    background-color: #F5F5F5;
 }
 
-#Share.yui-skin-hcBlack .my-sites a.favourite-site.enabled,
-#Share.yui-skin-hcBlack .my-sites a.favourite-site
+body.yui-skin-hcBlack .my-sites a.favourite-site.enabled,
+body.yui-skin-hcBlack .my-sites a.favourite-site
 {
    text-decoration: none;
 }

@@ -302,18 +302,15 @@
                firstName = person.firstName,
                lastName = person.lastName,
                linkExtra = "";
+            
             if ((firstName !== undefined) || (lastName !== undefined))
             {
                name = firstName ? firstName + " " : "";
                name += lastName ? lastName : "";
                linkExtra =  ' <span class="lighter">(' + $html(person.userName) + ')</span>';
             }
-            var link = Alfresco.util.uriTemplate("userpage",
-            {
-               userid: person.userName,
-               pageid: "profile"
-            });
-            return '<a href="' + link + '">' + $html(name) + '</a>' + linkExtra;
+
+            return Alfresco.util.userProfileLink(person.userName, name) + linkExtra;
          };
 
          /**

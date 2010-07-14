@@ -36,7 +36,8 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $siteURL = Alfresco.util.siteURL;
 
    /**
     * Preferences
@@ -284,7 +285,13 @@
             anchor.href = YAHOO.lang.substitute(anchor.href,
             {
                nodeRef: this.modules.docList.doclistMetadata.parent.nodeRef
-            })
+            });
+            
+            // Portlet fix: parameter might be encoded
+            if (anchor.href.indexOf("%7BnodeRef%7D") !== -1)
+            {
+               anchor.href = anchor.href.replace("%7BnodeRef%7D", encodeURIComponent(this.modules.docList.doclistMetadata.parent.nodeRef));
+            }
          }
       },
 
@@ -743,7 +750,7 @@
             
             if (this.currentFilter.filterId == "path" || this.currentFilter.filterId == "category")
             {
-               this.currentPath = this.currentFilter.filterData;
+               this.currentPath = $combine("/", this.currentFilter.filterData);
                this._generateBreadcrumb();
 
                // Enable/disable the Folder Up button
@@ -998,7 +1005,7 @@
          this.folderDetailsUrl = null;
          if (obj && obj.metadata && obj.metadata.parent && obj.metadata.parent.nodeRef)
          {
-            this.folderDetailsUrl = "folder-details?nodeRef=" + obj.metadata.parent.nodeRef;
+            this.folderDetailsUrl = $siteURL("folder-details?nodeRef=" + obj.metadata.parent.nodeRef);
          }
       },
       

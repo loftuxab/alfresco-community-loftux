@@ -1577,7 +1577,8 @@ Alfresco.util.parseJSON = function(jsonStr, displayError)
 
 /**
  * Returns a populated URI template, given a TemplateId and an object literal
- * containing the tokens to be substituted
+ * containing the tokens to be substituted.
+ * Understands when the application is hosted in a Portal environment.
  *
  * @method Alfresco.util.uriTemplate
  * @param templateId {string} URI TemplateId from web-framework configuration
@@ -1593,23 +1594,124 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
    {
       return null;
    }
-   
+
    var uri = "",
       template = Alfresco.constants.URI_TEMPLATES[templateId];
-   
-   // Page context end with trailing "/", so remove any leading one from the URI template
-   if (template.charAt(0) == "/")
+
+   // If a site page was requested but no {siteid} given, then use the current site or remove the missing parameter
+   if (template.indexOf("{site}") !== -1)
    {
-      template = template.substring(1);
+      if (obj.hasOwnProperty("site"))
+      {
+         // A site parameter was given - is it valid?
+         if (typeof obj.site !== "string" || obj.site.length === 0)
+         {
+            // Not valid - remove site part of template
+            template = template.replace("/site/{site}", "");
+         }
+      }
+      else
+      {
+         if (Alfresco.constants.SITE.length > 0)
+         {
+            // We're currently in a Site, so generate an in-Site link
+            obj.site = Alfresco.constants.SITE;
+         }
+         else
+         {
+            // No current Site context, so remove from the template
+            template = template.replace("/site/{site}", "");
+         }
+      }
    }
+
+   // Page context ends with trailing "/", so remove any leading one from the URI template
+   uri += Alfresco.util.combinePaths(Alfresco.constants.URL_PAGECONTEXT, YAHOO.lang.substitute(template, obj));
+
+   // Portlet scriptUrl mapping required?
+   if (Alfresco.constants.PORTLET)
+   {
+      // Remove the context prefix
+      if (uri.indexOf(Alfresco.constants.URL_CONTEXT) === 0)
+      {
+         uri = Alfresco.util.combinePaths("/", uri.substring(Alfresco.constants.URL_CONTEXT.length));
+      }
+
+      uri = Alfresco.constants.PORTLET_URL.replace("$$scriptUrl$$", encodeURIComponent(decodeURIComponent(uri)));
+   }
+
    // Absolute URI needs current protocol and host
-   if (absolute)
+   if (absolute && (uri.indexOf(location.protocol + "//") !== 0))
    {
-      uri = location.protocol + "//" + location.host;
+      // Don't use combinePaths in case the PORTLET_URL encoding is fragile
+      if (uri.substring(0, 1) !== "/")
+      {
+         uri = "/" + uri;
+      }
+      uri = location.protocol + "//" + location.host + uri;
    }
-   uri += Alfresco.constants.URL_PAGECONTEXT + YAHOO.lang.substitute(template, obj);
-   
+
    return uri;
+};
+
+/**
+ * Returns a URL to a site page.
+ * If no Site ID is supplied, generates a link to the non-site page.
+ *
+ * @method Alfresco.util.siteURL
+ * @param pageURI {string} Page ID and and QueryString parameters the page might need, e.g.
+ * <pre>
+ *    "folder-details?nodeRef=" + nodeRef
+ * </pre>
+ * @param obj {object} The object literal containing the token values to substitute within the template
+ * @param absolute {boolean} Whether the URL should include the protocol and host
+ * @return {string} The populated URL
+ * @static
+ */
+Alfresco.util.siteURL = function(pageURI, obj, absolute)
+{
+   return Alfresco.util.uriTemplate("sitepage", YAHOO.lang.merge(obj || {},
+   {
+      pageid: pageURI
+   }), absolute);
+};
+
+/**
+ * Generates a link to the user profile page unless the "userprofilepage" uritemplate has
+ * been removed or emptied in share-config-custom.xml
+ * If no fullName is supplied, the userName is displayed instead.
+ *
+ * @method Alfresco.util.userProfileLink
+ * @param userName {string} User Name
+ * @param fullName {string} Full display name. "userName" used if this param is empty or not supplied
+ * @param linkAttr {string} Optional attributes to add to the <a> tag, e.g. "class"
+ * @return {string} The populated HTML Link
+ * @static
+ */
+Alfresco.util.userProfileLink = function(userName, fullName, linkAttr)
+{
+   if (!YAHOO.lang.isString(userName) || userName.length === 0)
+   {
+      return "";
+   }
+   
+   var html = Alfresco.util.encodeHTML(YAHOO.lang.isString(fullName) && fullName.length > 0 ? fullName : userName),
+      template = Alfresco.constants.URI_TEMPLATES["userprofilepage"],
+      uri = "";
+
+   // If the "userprofilepage" template doesn't exist or is empty, or we're in portlet mode we'll just return the user's fullName || userName
+   if (YAHOO.lang.isUndefined(template) || template.length === 0 || Alfresco.constants.PORTLET)
+   {
+      return html;
+   }
+
+   // Generate the link
+   uri = Alfresco.util.uriTemplate("userprofilepage",
+   {
+      userid: userName
+   });
+   
+   return '<a href="' + uri + '" ' + (linkAttr || "") + '>' + html + '</a>';
 };
 
 /**
@@ -1684,7 +1786,7 @@ Alfresco.util.getQueryStringParameters = function(url)
       if (tokens.length >= 2)
       {
          name = tokens[0];
-         value = window.unescape(tokens[1]);
+         value = decodeURIComponent(tokens[1]);
          switch (typeof objParams[name])
          {
             case "undefined":
@@ -1728,13 +1830,13 @@ Alfresco.util.toQueryString = function(p_params)
             {
                if (value.hasOwnProperty(val))
                {
-                  qs += name + "=" + window.escape(value[val]) + "&";
+                  qs += encodeURIComponent(name) + "=" + encodeURIComponent(value[val]) + "&";
                }
             }
          }
          else if (typeof value == "string")
          {
-            qs += name + "=" + window.escape(value) + "&";
+            qs += encodeURIComponent(name) + "=" + encodeURIComponent(value) + "&";
          }
       }
    }

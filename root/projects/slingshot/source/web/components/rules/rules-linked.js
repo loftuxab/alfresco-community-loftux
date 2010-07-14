@@ -28,7 +28,8 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+      $siteURL = Alfresco.util.siteURL;
 
    /**
     * RulesLinked constructor.
@@ -190,12 +191,11 @@
        */
       onViewLinkedToFolderButtonClick: function RulesLinked_onViewLinkedToFolderButtonClick(type, args)
       {
-         var url = YAHOO.lang.substitute("folder-rules?nodeRef={nodeRef}",
+         window.location.href = $siteURL("folder-rules?nodeRef={nodeRef}",
          {
-            siteId: this.linkedToFolder.site, 
+            site: this.linkedToFolder.site, 
             nodeRef: this.linkedToFolder.nodeRef
          });
-         window.location.href = url;
       },
 
       /**
@@ -217,7 +217,8 @@
          {
             mode: Alfresco.module.RulesPicker.MODE_LINK_TO,
             siteId: this.options.siteId,
-            files: {
+            files:
+            {
                displayName: this.folderDetails,
                nodeRef: this.options.nodeRef.toString()
             }
@@ -320,9 +321,8 @@
          else
          {
             // go forward to the appropriate details page for the node
-            window.location.href = "folder-details?nodeRef=" + this.options.nodeRef.toString();
+            window.location.href = $siteURL("folder-details?nodeRef=" + this.options.nodeRef.toString());
          }
       }
-
    });
 })();

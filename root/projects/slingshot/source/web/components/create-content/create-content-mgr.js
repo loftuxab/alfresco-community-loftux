@@ -29,7 +29,12 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom;
-      
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $siteURL = Alfresco.util.siteURL;
+
    /**
     * CreateContentMgr constructor.
     * 
@@ -181,7 +186,7 @@
          /* Have we been given a nodeRef from the Forms Service? */
          if (YAHOO.lang.isObject(nodeRef))
          {
-            window.location.href = "document-details?nodeRef=" + nodeRef.toString();
+            window.location.href = $siteURL("document-details?nodeRef=" + nodeRef.toString());
          }
          /* Did we come from the document library? If so, then direct the user back there */
          else if (document.referrer.match(/documentlibrary([?]|$)/) || document.referrer.match(/repository([?]|$)/))
@@ -192,16 +197,19 @@
          else if (this.options.siteId && this.options.siteId !== "")
          {
             // In a Site, so go back to the document library root
-            window.location.href = Alfresco.util.uriTemplate("sitepage",
-            {
-               site: this.options.siteId,
-               pageid: "documentlibrary"
-            });
+            window.location.href = $siteURL("documentlibrary");
          }
          else
          {
-            // Nowhere sensible to go other than the default page
-            window.location.href = Alfresco.constants.URL_CONTEXT;
+            // Nowhere sensible to go other than the default page unless we're in a portal
+            if (Alfresco.constants.PORTLET)
+            {
+               window.location.href = $siteURL("repository");
+            }
+            else
+            {
+               window.location.href = Alfresco.constants.URL_CONTEXT;
+            }
          }
       }
    });

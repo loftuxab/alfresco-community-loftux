@@ -1,3 +1,4 @@
+<#include "../../include/alfresco-macros.lib.ftl" />
 <#assign el=args.htmlid>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RulesNone("${el}").setOptions(
@@ -15,7 +16,8 @@
    <div class="dialog-options theme-bg-color-6 theme-border-3">
       <h2>${msg("header")}</h2>
       <div class="dialog-option">
-         <a href="rule-edit?nodeRef=${page.url.args.nodeRef!""}">${msg("header.create-rule")}</a>
+         <#assign href>rule-edit?nodeRef=${page.url.args.nodeRef!""}</#assign>
+         <a href="${siteURL(href)}">${msg("header.create-rule")}</a>
          <div>${msg("text.create-rule")}</div>
       </div>
       <div class="dialog-option">

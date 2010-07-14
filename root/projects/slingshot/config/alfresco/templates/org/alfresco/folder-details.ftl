@@ -12,9 +12,9 @@
 
 <@templateBody>
    <div id="alf-hd">
-      <@region id="header" scope="global" protected=true />
-      <@region id=doclibType + "title" scope="template" protected=true />
-      <@region id=doclibType + "navigation" scope="template" protected=true />
+      <@region id=appType + "header" scope="global" protected=true />
+      <@region id=appType + doclibType + "title" scope="template" protected=true />
+      <@region id=appType + doclibType + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
       <@region id=doclibType + "actions-common" scope="template" protected=true />
@@ -48,7 +48,7 @@
             </div>
             <div class="yui-u">
                <@region id=doclibType + "folder-actions" scope="template" protected=true />
-               <@region id=doclibType + "folder-links" scope="template" protected=true />
+               <@region id=appType + doclibType + "folder-links" scope="template" protected=true />
             </div>
          </div>
       </div>

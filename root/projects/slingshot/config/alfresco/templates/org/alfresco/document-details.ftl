@@ -12,9 +12,9 @@
 
 <@templateBody>
    <div id="alf-hd">
-      <@region id="header" scope="global" protected=true />
-      <@region id=doclibType + "title" scope="template" protected=true />
-      <@region id=doclibType + "navigation" scope="template" protected=true />
+      <@region id=appType + "header" scope="global" protected=true />
+      <@region id=appType + doclibType + "title" scope="template" protected=true />
+      <@region id=appType + doclibType + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
       <@region id=doclibType + "actions-common" scope="template" protected=true />
@@ -44,7 +44,7 @@
             </div>
             <div class="yui-u">
                <@region id=doclibType + "document-actions" scope="template" protected=true />
-               <@region id=doclibType + "document-links" scope="template" protected=true />
+               <@region id=appType + doclibType + "document-links" scope="template" protected=true />
                <#if doclibType?starts_with("dod5015")>
                   <@region id=doclibType + "document-references" scope="template" protected=true />                                 
                </#if>

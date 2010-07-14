@@ -32,6 +32,11 @@
       Event = YAHOO.util.Event;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $siteURL = Alfresco.util.siteURL;
+
+   /**
     * RuleEdit constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
@@ -203,12 +208,14 @@
                   url = Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.uri + "/ruleset/rules",
                   successCallback,
                   waitMessage;
+               
                if (ruleId.length > 0)
                {
                   waitMessage = this.msg("message.updating");
                   this.widgets.formEl.attributes.action.nodeValue = url + "/" + ruleId;
                   this.widgets.form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
-                  successCallback = {
+                  successCallback =
+                  {
                      fn: this.onRuleUpdated,
                      scope: this
                   };
@@ -218,7 +225,8 @@
                   waitMessage = this.msg("message.creating");
                   this.widgets.formEl.attributes.action.nodeValue = url;
                   this.widgets.form.setAjaxSubmitMethod(Alfresco.util.Ajax.POST);
-                  successCallback = {
+                  successCallback =
+                  {
                      fn: this.onRuleCreated,
                      scope: this
                   };
@@ -293,7 +301,7 @@
          // Form field validation
          form.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
 
-         // Note" The form will be initialized when the ruleConfig components are ready.
+         // Note: The form will be initialized when the ruleConfig components are ready.
       },
 
       /**
@@ -439,13 +447,18 @@
          });
       },
 
-      _navigateToFoldersPage: function()
+      /**
+       * Navigate to the main folder rules page
+       *
+       * @method _navigateToFoldersPage
+       * @private
+       */
+      _navigateToFoldersPage: function RE__navigateToFoldersPage()
       {
-         var url = YAHOO.lang.substitute("folder-rules?nodeRef={nodeRef}",
+         window.location.href = $siteURL("folder-rules?nodeRef={nodeRef}",
          {
             nodeRef: this.options.nodeRef.toString()
          });
-         window.location.href = url;
       },
 
       /**
@@ -454,7 +467,7 @@
        * @method _toggleButtons
        * @param disable
        */
-      _toggleButtons: function(disable)
+      _toggleButtons: function RE__toggleButtons(disable)
       {
          this.widgets.cancelButton.set("disabled", disable);
          this.widgets.saveButton.set("disabled", disable);
@@ -468,7 +481,7 @@
        * @method _toggleButtons
        * @param disable
        */
-      _toggleScriptRef: function(disable)
+      _toggleScriptRef: function RE__toggleScriptRef(disable)
       {
          var scriptRefSelect = Dom.get(this.id + "-scriptRef");
          if (disable)
@@ -480,6 +493,5 @@
             scriptRefSelect.removeAttribute("disabled");
          }
       }
-
    }, true);
 })();

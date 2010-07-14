@@ -5,6 +5,8 @@
 <#assign AUTOLOGGING=(common.globalConfig("client-debug-autologging", "false") = "true")>
 <#-- allow theme to be specified in url args - helps debugging themes -->
 <#assign theme = (page.url.args.theme)!theme />
+<#-- Portlet container detection -->
+<#assign PORTLET=(context.attributes.portletHost!false)>
 
 <#-- Look up page title from message bundles where possible -->
 <#assign pageTitle = page.title />
@@ -41,6 +43,7 @@
    Includes preloaded YUI assets and essential site-wide libraries.
 -->                                                                           
 <#macro templateHeader doctype="strict">
+<#if !PORTLET>
    <#if doctype = "strict">
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
    <#else>
@@ -50,6 +53,7 @@
 <head>
    <title>${msg("page.title", pageTitle)}</title>
    <meta http-equiv="X-UA-Compatible" content="Edge" />
+</#if>
 
 <!-- Shortcut Icons -->
    <link rel="shortcut icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" /> 
@@ -118,6 +122,13 @@
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
       Alfresco.constants.URL_FEEDSERVICECONTEXT = "${url.context}/feedservice/";
       Alfresco.constants.USERNAME = "${user.name!""}";
+      Alfresco.constants.SITE = "${(page.url.templateArgs.site!"")?js_string}";
+      Alfresco.constants.PAGEID = "${(page.url.templateArgs.pageid!"")?js_string}";
+      Alfresco.constants.PORTLET = ${(context.attributes.portletHost!false)?string};
+      Alfresco.constants.PORTLET_URL = unescape("${(context.attributes.portletUrl!"")?js_string}");
+   <#if PORTLET>
+      document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${url.context}";
+   </#if>
    //]]></script>
    <@script type="text/javascript" src="${url.context}/js/alfresco.js"></@script>
    <@script type="text/javascript" src="${url.context}/js/forms-runtime.js"></@script>
@@ -145,7 +156,9 @@ ${head}
    <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie6.css" /><![endif]-->
    <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie7.css" /><![endif]-->
    <!--[if IE 8]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie8.css" /><![endif]-->
+<#if !PORTLET>
 </head>
+</#if>
 </#macro>
 
 
@@ -167,7 +180,9 @@ ${head}
    Pulls in main template body.
 -->
 <#macro templateBody>
-<body id="Share" class="yui-skin-${theme}">
+<#if !PORTLET>
+<body id="Share" class="yui-skin-${theme} alfresco-share">
+</#if>
    <div class="sticky-wrapper">
       <div id="doc3">
 <#-- Template-specific body markup -->
@@ -189,9 +204,16 @@ ${head}
    </div>
 <#-- This function call MUST come after all other component includes. -->
    <div id="alfresco-yuiloader"></div>
+   <#-- In portlet mode, Share doesn't own the <body> tag -->
    <script type="text/javascript">//<![CDATA[
       Alfresco.util.YUILoaderHelper.loadComponents();
+      if (Alfresco.constants.PORTLET)
+      {
+         YUIDom.addClass(document.body, "yui-skin-${theme} alfresco-share");
+      }
    //]]></script>
+<#if !PORTLET>
 </body>
 </html>
+</#if>
 </#macro>
