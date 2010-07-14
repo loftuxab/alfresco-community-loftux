@@ -42,13 +42,8 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class SolrUtil
 {
-    public static void generateSchema(File file, DictionaryService service) throws IOException, SAXException
+    public static void generateSchema(XMLWriter xmlWriter, DictionaryService service) throws IOException, SAXException
     {
-        OutputFormat format = OutputFormat.createPrettyPrint();
-        format.setNewLineAfterDeclaration(false);
-        format.setIndentSize(3);
-        format.setEncoding("UTF-8");
-        XMLWriter xmlWriter = new XMLWriter(new BufferedWriter(new FileWriter(file)), format);
         xmlWriter.startDocument();
 
         AttributesImpl attrs = new AttributesImpl();
