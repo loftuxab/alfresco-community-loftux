@@ -23,7 +23,7 @@ import org.alfresco.module.vti.handler.MeetingServiceHandler;
 import org.alfresco.module.vti.metadata.model.TimeZoneInformation;
 import org.alfresco.module.vti.metadata.model.TimeZoneInformationDate;
 import org.alfresco.repo.SessionUser;
-import org.alfresco.web.sharepoint.auth.AuthenticationHandler;
+import org.alfresco.repo.webdav.auth.SharepointConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
@@ -95,7 +95,7 @@ public class CreateWorkspaceEndpoint extends AbstractEndpoint
         Element lcid = (Element) lcidPath.selectSingleNode(requestElement);
 
         String siteName = handler.createWorkspace(title.getText(), templateName.getText(), Integer.parseInt(lcid.getText()), getTimeZoneInformation(requestElement),
-                (SessionUser) soapRequest.getSession().getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE));
+                (SessionUser) soapRequest.getSession().getAttribute(SharepointConstants.USER_SESSION_ATTRIBUTE));
 
         // creating soap response
         Element root = soapResponse.getDocument().addElement("CreateWorkspaceResponse", namespace);

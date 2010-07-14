@@ -139,7 +139,6 @@
     <bean id="vtiAuthenticationHandler" class="org.alfresco.module.vti.handler.alfresco.DefaultAuthenticationHandler">
         <property name="vtiHandler" ref="vtiHandler"/>
         <property name="vtiUserGroupServiceHandler" ref="userGroupServiceHandler"/>    
-        <property name="authenticationService" ref="AuthenticationService" />
         <property name="personService" ref="PersonService" />
         <property name="delegate" ref="SharepointAuthenticationHandler" />   
     </bean>

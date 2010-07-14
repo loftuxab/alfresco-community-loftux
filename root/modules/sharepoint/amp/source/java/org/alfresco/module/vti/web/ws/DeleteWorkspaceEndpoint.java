@@ -21,7 +21,7 @@ package org.alfresco.module.vti.web.ws;
 
 import org.alfresco.module.vti.handler.MeetingServiceHandler;
 import org.alfresco.repo.SessionUser;
-import org.alfresco.web.sharepoint.auth.AuthenticationHandler;
+import org.alfresco.repo.webdav.auth.SharepointConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaxen.SimpleNamespaceContext;
@@ -66,7 +66,7 @@ public class DeleteWorkspaceEndpoint extends AbstractEndpoint
         // get site name to delete
         String siteName = getDwsFromUri(soapRequest).substring(1);
 
-        handler.deleteWorkspace(siteName, (SessionUser) soapRequest.getSession().getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE));
+        handler.deleteWorkspace(siteName, (SessionUser) soapRequest.getSession().getAttribute(SharepointConstants.USER_SESSION_ATTRIBUTE));
 
         // creating soap response
         soapResponse.getDocument().addElement("DeleteWorkspaceResponse", namespace);
