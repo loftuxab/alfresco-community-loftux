@@ -4881,3 +4881,175 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       }
    });
 })();
+
+/**
+ * FormManager template.
+ *
+ * @namespace Alfresco
+ * @class Alfresco.FormManager
+ */
+(function()
+{
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom;
+
+   /**
+    * FormManager constructor.
+    *
+    * @param {String} htmlId The HTML id of the parent element
+    * @return {Alfresco.FormManager} The new FormManager instance
+    * @constructor
+    */
+   Alfresco.FormManager = function FormManager_constructor(htmlId, components)
+   {
+      Alfresco.FormManager.superclass.constructor.call(this, "Alfresco.FormManager", htmlId, components);
+
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("formContentReady", this.onFormContentReady, this);
+      YAHOO.Bubbling.on("beforeFormRuntimeInit", this.onBeforeFormRuntimeInit, this);
+
+      return this;
+   };
+
+   YAHOO.extend(Alfresco.FormManager, Alfresco.component.Base,
+   {
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Failure message key.
+          *
+          * @property failureMessageKey
+          * @type string
+          */
+         failureMessageKey: "message.failure",
+
+         /**
+          * Failure message key.
+          *
+          * @property submitButtonMessageKey
+          * @type string
+          */
+         submitButtonMessageKey: "button.save",
+
+         /**
+          * The url to forward to if user didn't come from a document library
+          *
+          * @property forwardUrl
+          * @type string
+          */
+         forwardUrl: null
+      },
+
+      /**
+       * Fired by YUI when parent element is available for scripting.
+       * Template initialisation, including instantiation of YUI widgets and event listener binding.
+       *
+       * @method onReady
+       */
+      onReady: function FormManager_onReady()
+      {
+
+      },
+
+      /**
+       * Event handler called when the "formContentReady" event is received
+       */
+      onFormContentReady: function FormManager_onFormContentReady(layer, args)
+      {
+         // change the default 'Submit' label to be 'Save'
+         var submitButton = args[1].buttons.submit;
+         submitButton.set("label", this.msg(this.options.submitButtonMessageKey));
+
+         // add a handler to the cancel button
+         var cancelButton = args[1].buttons.cancel;
+         cancelButton.addListener("click", this.onCancelButtonClick, null, this);
+      },
+
+      /**
+       * Event handler called when the "beforeFormRuntimeInit" event is received
+       */
+      onBeforeFormRuntimeInit: function FormManager_onBeforeFormRuntimeInit(layer, args)
+      {
+         args[1].runtime.setAJAXSubmit(true,
+         {
+            successCallback:
+            {
+               fn: this.onMetadataUpdateSuccess,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this.onMetadataUpdateFailure,
+               scope: this
+            }
+         });
+      },
+
+      /**
+       * Handler called when the metadata was updated successfully
+       *
+       * @method onMetadataUpdateSuccess
+       * @param response The response from the submission
+       */
+      onMetadataUpdateSuccess: function FormManager_onMetadataUpdateSuccess(response)
+      {
+         this._navigateForward();
+      },
+
+      /**
+       * Handler called when the metadata update operation failed
+       *
+       * @method onMetadataUpdateFailure
+       * @param response The response from the submission
+       */
+      onMetadataUpdateFailure: function FormManager_onMetadataUpdateFailure(response)
+      {
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg(this.options.failureMessageKey),
+            text: (response.json && response.json.message ? response.json.message : this.msg(this.options.failureMessageKey))
+         });
+      },
+
+      /**
+       * Called when user clicks on the cancel button.
+       *
+       * @method onCancelButtonClick
+       * @param type
+       * @param args
+       */
+      onCancelButtonClick: function FormManager_onCancel(type, args)
+      {
+         this._navigateForward();
+      },
+
+      /**
+       * Displays the corresponding details page for the current node
+       *
+       * @method _navigateForward
+       * @private
+       */
+      _navigateForward: function FormManager__navigateForward()
+      {
+         /* Did we come from the document library? If so, then direct the user back there */
+         if (document.referrer.match(/documentlibrary([?]|$)/) || document.referrer.match(/repository([?]|$)/) || this.options.forwardUrl == null)
+         {
+            // go back to the referrer page
+            history.go(-1);
+         }
+         else
+         {
+            // go forward to the appropriate details page for the node
+            window.location.href = this.options.forwardUrl;
+         }
+      }
+   });
+})();

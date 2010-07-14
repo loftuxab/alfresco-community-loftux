@@ -1,7 +1,5 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/edit-metadata/edit-metadata.css" />
-</@>
+<@templateHeader></@>
 
 <@templateBody>
    <div id="alf-hd">
@@ -10,7 +8,7 @@
       <@region id=appType + doclibType + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div class="metadata">
+      <div class="share-form">
          <@region id=doclibType + "edit-metadata-mgr" scope="template" protected=true />
          <@region id=doclibType + "edit-metadata" scope="template" protected=true />
       </div>

@@ -61,6 +61,7 @@
       YAHOO.Bubbling.on("parentChanged", this.onParentChanged, this);
       YAHOO.Bubbling.on("parentDetails", this.onParentDetails, this);
       YAHOO.Bubbling.on("formContainerDestroyed", this.onFormContainerDestroyed, this);
+      YAHOO.Bubbling.on("removeListItem", this.onRemoveListItem, this);
 
       // Initialise prototype properties
       this.pickerId = htmlId + "-picker";
@@ -226,7 +227,34 @@
           * @type string
           * @default ""
           */
-         createNewItemIcon: ""
+         createNewItemIcon: "",
+
+         /**
+          * The display mode to use for the current values.
+          * Allowed values are "items" or "list"
+          *
+          * @property extendedMode
+          * @type string
+          * @default "items"
+          */
+         displayMode: "items",
+
+         /**
+          * The actions to display next to each current value in "list" mode.
+          * When clicked the actions will fire an ÓcurrentValueAction" event with the action and item info as attributes.
+          * {
+          *    name: {String},  // The name of the action (used as a css class name for styling)
+          *    callback: {Object}, // If present will be the name of the event to send
+          *    link: {String},  // If present will set the browser to display the link provided
+          *    label: {String}  // The message label key use to get the display label
+          * }
+          *
+          * @property listActions
+          * @type Array
+          * @default [ { < Config to remove an item > } ]
+          */
+         listActions: [ { name: "remove-list-item", event: "removeListItem", label: "form.control.object-picker.remove-item" } ]
+
       },
 
       /**
@@ -449,6 +477,25 @@
        */
       onOK: function ObjectFinder_onOK(e, p_obj)
       {
+         this._adjustCurrentValues();
+         this._getCurrentValueMeta();
+         this.widgets.escapeListener.disable();
+         this.widgets.dialog.hide();
+         this.widgets.showPicker.set("disabled", false);
+         if (e)
+         {
+            Event.preventDefault(e);
+         }
+      },
+
+      /**
+       * Adjust the current values, added, removed input elements according to the new selections
+       * and fires event to notify form listeners about the changes.
+       *
+       * @method _adjustCurrentValues
+       */
+      _adjustCurrentValues: function ()
+      {
          var addedItems = this.getAddedItems(),
             removedItems = this.getRemovedItems(),
             selectedItems = this.getSelectedItems();
@@ -461,8 +508,7 @@
          
          this.options.currentValue = selectedItems.toString();
          Dom.get(this.currentValueHtmlId).value = this.options.currentValue;
-         this._getCurrentValueMeta();
-         
+
          if (Alfresco.logger.isDebugEnabled())
          {
             Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + this.options.currentValue + "'");
@@ -473,15 +519,7 @@
          {
             YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
          }
-         
-         this.widgets.escapeListener.disable();
-         this.widgets.dialog.hide();
-         this.widgets.showPicker.set("disabled", false);
-         if (e)
-         {
-            Event.preventDefault(e);
-         }
-         
+
          YAHOO.Bubbling.fire("formValueChanged",
          {
             eventGroup: this,
@@ -653,9 +691,14 @@
             else
             {
                var item;
+               if (this.options.displayMode == "list")
+               {
+                  this.widgets.currentValuesDataTable.deleteRows(0, this.widgets.currentValuesDataTable.getRecordSet().getLength());
+               }
                for (var i = 0, ii = items.length; i < ii; i++)
                {
                   item = items[i];
+
                   // Special case for tags, which we want to render differently to categories
                   if (item.type == "cm:category" && item.displayPath.indexOf("/categories/Tags") !== -1)
                   {
@@ -664,17 +707,33 @@
 
                   if (this.options.showLinkToTarget && this.options.targetLinkTemplate !== null)
                   {
-                     displayValue += this.options.objectRenderer.renderItem(item, 16, 
-                        "<div class='inlineable'>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
+                     if (this.options.displayMode == "items")
+                     {
+                        displayValue += this.options.objectRenderer.renderItem(item, 16,
+                              "<div class='inlineable'>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
+                     }
+                     else if (this.options.displayMode == "list")
+                     {
+                        this.widgets.currentValuesDataTable.addRow(item);
+                     }
                   }
                   else
                   {
-                     displayValue += this.options.objectRenderer.renderItem(item, 16, "<div class='inlineable'>{icon} {name}</div>");
+                     if (this.options.displayMode == "items")
+                     {
+                        displayValue += this.options.objectRenderer.renderItem(item, 16, "<div class='inlineable'>{icon} {name}</div>");
+                     }
+                     else if (this.options.displayMode == "list")
+                     {
+                        this.widgets.currentValuesDataTable.addRow(item);
+                     }
                   }
                }
+               if (this.options.displayMode == "items")
+               {
+                  Dom.get(this.id + "-currentValueDisplay").innerHTML = displayValue;
+               }
             }
-
-            Dom.get(this.id + "-currentValueDisplay").innerHTML = displayValue;
          }
       },
 
@@ -833,6 +892,27 @@
          }
       },
 
+
+      /**
+       * Removes selected item from datatable used in "list" mode
+       *
+       * @method onRemoveListItem
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters
+       */
+      onRemoveListItem: function (event, args)
+      {
+         if ($hasEventInterest(this, args))
+         {
+            var data = args[1].value,
+                  rowId = args[1].rowId;
+            this.widgets.currentValuesDataTable.deleteRow(rowId);
+            delete this.selectedItems[data.nodeRef];
+            this.singleSelectedItem = null;
+            this._adjustCurrentValues();
+         }
+      },
+
       /**
        * Returns Icon datacell formatter
        *
@@ -858,6 +938,32 @@
             oColumn.width = iconSize - 6;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
+            elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
+         };
+      },
+
+      /**
+       * Returns Icon with generic width datacell formatter
+       *
+       * @method fnRenderCellGenericIcon
+       */
+      fnRenderCellGenericIcon: function ObjectFinder_fnRenderCellGenericIcon()
+      {
+         var scope = this;
+
+         /**
+          * Icon datacell formatter
+          *
+          * @method renderCellGenericIcon
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectFinder_renderCellGenericIcon(elCell, oRecord, oColumn, oData)
+         {
+            var iconSize = scope.options.compactMode ? 16 : 32;
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
          };
       },
@@ -921,6 +1027,43 @@
          };
       },
 
+      /**
+       * Returns Action item custom datacell formatter
+       *
+       * @method fnRenderCellListActions
+       */
+      fnRenderCellListActions: function ObjectFinder_fnRenderCellListActions()
+      {
+         var scope = this;
+
+         /**
+          * Action item custom datacell formatter
+          *
+          * @method fnRenderCellListActions
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectFinder_fnRenderCellListActions(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            var links = "", listAction, actionEl;
+            for (var i = 0, il = scope.options.listActions.length; i < il; i++)
+            {
+               listAction = scope.options.listActions[i];
+               if (listAction.event)
+               {
+                  links += '<div class="list-action"><a href="#" class="' + listAction.name + ' ' + ' list-action-event-' + scope.eventGroup + ' ' + listAction.event+ '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
+               }
+               else if (listAction.link)
+               {
+                  links += '<div class="list-action"><a href="' + listAction.link + '" class="' + listAction.name + '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
+               }
+            }
+            elCell.innerHTML = links;
+         };
+      },
 
       /**
        * PRIVATE FUNCTIONS
@@ -939,6 +1082,16 @@
          var onSuccess = function OF_rCV_onSuccess(response)
          {
             this.currentValueMeta = response.json.data.items;
+            this.selectedItems = {};
+
+            for (var item in this.currentValueMeta)
+            {
+               if (this.currentValueMeta.hasOwnProperty(item))
+               {
+                  this.selectedItems[this.currentValueMeta[item].nodeRef] = this.currentValueMeta[item];
+               }
+            }
+
             YAHOO.Bubbling.fire("renderCurrentValue",
             {
                eventGroup: this
@@ -970,7 +1123,7 @@
             }
          });
       },
-      
+
       /**
        * Creates the UI Navigation controls
        *
@@ -1072,20 +1225,18 @@
        */
       _createSelectedItemsControls: function ObjectFinder__createSelectedItemsControls()
       {
-         var me = this;
+         var me = this,
+            fields = ["type", "hasChildren", "name", "description", "displayPath", "nodeRef"];
 
          // Setup a DataSource for the selected items list
          this.widgets.dataSource = new YAHOO.util.DataSource([]); 
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
-         this.widgets.dataSource.responseSchema =
-         { 
-            fields: ["type", "hasChildren", "name", "description", "displayPath", "nodeRef"]
-         };
+         this.widgets.dataSource.responseSchema = { fields: fields };
 
-         this.widgets.dataSource.doBeforeParseData = function ObjectFinder_doBeforeParseData(oRequest, oFullResponse)
+         var doBeforeParseDataFunction = function ObjectFinder_doBeforeParseData(oRequest, oFullResponse)
          {
             var updatedResponse = oFullResponse;
-            
+
             if (oFullResponse && oFullResponse.length > 0)
             {
                var items = oFullResponse.data.items;
@@ -1110,11 +1261,13 @@
                   items: items
                };
             }
-            
+
             return updatedResponse;
          };
 
-         // DataTable defintion
+         this.widgets.dataSource.doBeforeParseData = doBeforeParseDataFunction;
+
+         // Picker DataTable defintion
          var columnDefinitions =
          [
             { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellIcon(), width: this.options.compactMode ? 10 : 26 },
@@ -1151,6 +1304,71 @@
             return true;
          };
          YAHOO.Bubbling.addDefaultAction("remove-" + this.eventGroup, fnRemoveItemHandler, true);
+
+         // Add displayMode as class so we can separate the styling of the currentValue element 
+         var currentValueEl = Dom.get(this.id + "-currentValueDisplay");
+         Dom.addClass(currentValueEl, this.options.displayMode);
+
+         if (this.options.displayMode == "list")
+         {
+            // Setup a DataSource for the selected items list
+            var ds = new YAHOO.util.DataSource([]);
+            ds.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+            ds.responseSchema = { fields: fields };
+            ds.doBeforeParseData = doBeforeParseDataFunction;
+
+            // Current values DataTable definition
+            var currentValuesColumnDefinitions =
+            [
+               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellGenericIcon() },
+               { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellName() },
+               { key: "action", label: "Actions", sortable: false, formatter: this.fnRenderCellListActions() }
+            ];
+
+            this.widgets.currentValuesDataTable = new YAHOO.widget.DataTable(this.id + "-currentValueDisplay", currentValuesColumnDefinitions, ds,
+            {
+               MSG_EMPTY: this.msg("form.control.object-picker.selected-items.empty")
+            });
+            this.widgets.currentValuesDataTable .subscribe("rowMouseoverEvent", this.widgets.currentValuesDataTable .onEventHighlightRow);
+            this.widgets.currentValuesDataTable .subscribe("rowMouseoutEvent", this.widgets.currentValuesDataTable .onEventUnhighlightRow);
+
+            Dom.addClass(currentValueEl, "form-element-border");
+            Dom.addClass(currentValueEl, "form-element-background-color");
+
+            // Hook action item click events
+            var fnActionListItemHandler = function OF_cSIC_fnActionListItemHandler(layer, args)
+            {
+               var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+               if (owner !== null)
+               {
+                  var target, rowId, record;
+
+                  target = args[1].target;
+                  rowId = target.offsetParent;
+                  record = me.widgets.currentValuesDataTable.getRecord(rowId);
+                  if (record)
+                  {
+                     var data = record.getData(),
+                        name = args[1].anchor.getAttribute("class").split(" ")[0];
+                     for (var i = 0, il = me.options.listActions.length; i < il; i++)
+                     {
+                        if (me.options.listActions[i].name == name)
+                        {
+                           YAHOO.Bubbling.fire(me.options.listActions[i].event,
+                           {
+                              eventGroup: me,
+                              value: data,
+                              rowId: rowId
+                           });
+                           return true;
+                        }
+                     }
+                  }
+               }
+               return true;
+            };
+            YAHOO.Bubbling.addDefaultAction("list-action-event-" + this.eventGroup, fnActionListItemHandler, true);
+         }
       },
       
       /**
@@ -1165,17 +1383,14 @@
          this.widgets.dataTable.set("MSG_EMPTY", this.msg("form.control.object-picker.selected-items.empty"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
 
-         this.selectedItems = {};
-
-         for (var item in this.currentValueMeta)
+         for (var item in this.selectedItems)
          {
-            if (this.currentValueMeta.hasOwnProperty(item))
+            if (this.selectedItems.hasOwnProperty(item))
             {
-               this.selectedItems[this.currentValueMeta[item].nodeRef] = this.currentValueMeta[item];
                YAHOO.Bubbling.fire("selectedItemAdded",
                {
                   eventGroup: this,
-                  item: this.currentValueMeta[item]
+                  item: this.selectedItems[item]
                });
             }
          }

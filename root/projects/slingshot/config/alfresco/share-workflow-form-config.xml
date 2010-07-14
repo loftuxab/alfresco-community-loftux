@@ -7,7 +7,7 @@
             <field-visibility>
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowPriority" />
-               <show id="bpm:workflowDueDate" />
+               <!--<show id="bpm:workflowDueDate" />-->
                <show id="packageItems" />
                <show id="bpm:assignee" />
                <show id="wf:notifyMe" />               
@@ -19,6 +19,11 @@
                <field id="bpm:priority">
                   <control>
                      <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                  </control>
+               </field>
+               <field id="packageItems" label-id="label.task-items">
+                  <control>
+                     <control-param name="displayMode">list</control-param>
                   </control>
                </field>
             </appearance>
@@ -33,7 +38,7 @@
             <field-visibility>
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowPriority" />
-               <show id="bpm:workflowDueDate" />
+               <!--<show id="bpm:workflowDueDate" />-->
                <show id="packageItems" />
                <show id="bpm:assignee" />
             </field-visibility>
@@ -44,6 +49,11 @@
                <field id="bpm:priority">
                   <control>
                      <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                  </control>
+               </field>
+               <field id="packageItems" label-id="label.task-items">
+                  <control>
+                     <control-param name="displayMode">list</control-param>
                   </control>
                </field>
             </appearance>

@@ -94,18 +94,15 @@
       YAHOO.Bubbling.on("fileCopied", this.onFileAction, this);
       YAHOO.Bubbling.on("fileDeleted", this.onFileAction, this);
       YAHOO.Bubbling.on("fileMoved", this.onFileAction, this);
-      YAHOO.Bubbling.on("fileWorkflowed", this.onFileAction, this);
       YAHOO.Bubbling.on("filePermissionsUpdated", this.onFileAction, this);
       YAHOO.Bubbling.on("folderCopied", this.onFileAction, this);
       YAHOO.Bubbling.on("folderDeleted", this.onFileAction, this);
       YAHOO.Bubbling.on("folderMoved", this.onFileAction, this);
-      YAHOO.Bubbling.on("folderWorkflowed", this.onFileAction, this);
       YAHOO.Bubbling.on("folderPermissionsUpdated", this.onFileAction, this);
       // Multi-file actions
       YAHOO.Bubbling.on("filesCopied", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesDeleted", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesMoved", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("filesWorkflowed", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesPermissionsUpdated", this.onDocListRefresh, this);
 
       return this;

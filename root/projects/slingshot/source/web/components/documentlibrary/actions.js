@@ -619,18 +619,8 @@
        */
       onActionAssignWorkflow: function dlA_onActionAssignWorkflow(asset)
       {
-         if (!this.modules.assignWorkflow)
-         {
-            this.modules.assignWorkflow = new Alfresco.module.DoclibWorkflow(this.id + "-workflow");
-         }
-
-         this.modules.assignWorkflow.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.currentPath,
-            files: asset
-         }).showDialog();
+         // TODO: Do a POST with all selectedItems 
+         document.location.href = "start-workflow";
       },
 
       /**

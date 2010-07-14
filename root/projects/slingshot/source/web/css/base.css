@@ -172,6 +172,43 @@ span.navigation-separator-alt
    padding: 2px 0 0 4px;
 }
 
+/* Standard Share forms using the forms component */
+
+.share-form .form-manager
+{
+   padding: 1.5em 1.5em 0;
+}
+
+.share-form .form-container
+{
+   padding: 0;
+   margin-top: 0;
+}
+
+.share-form .form-container form
+{
+   margin-left: 1.5em;
+   margin-top: 0.5em;
+}
+
+.share-form .form-container .caption
+{
+   margin-left: 720px;
+}
+
+.share-form .form-container .form-fields
+{
+   background-color: #f5fff2;
+   padding: 1em !important;
+   border: 1px solid #c2c2c2 !important;
+   width: 800px;
+}
+
+.share-form .form-container .form-buttons
+{
+   margin-top: 0.5em;
+}
+
 /* Fixed Form-Based Pages */
 
 .page-form-header

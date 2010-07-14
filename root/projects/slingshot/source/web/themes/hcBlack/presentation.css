@@ -408,10 +408,16 @@ em
 select,
 input[type="text"],
 input[type="password"],
-textarea
+textarea,
+.form-element-border
 {
    border: 1px solid #838383;
    font-weight: normal;
+}
+
+.form-element-background-color
+{
+   background-color: #FFFFFF;
 }
 
 #loginform input#username

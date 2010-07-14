@@ -15,7 +15,8 @@
       itemType: "${field.endpointType}",
       multipleSelectMode: ${field.endpointMany?string},
       parentNodeRef: "alfresco://company/home",
-      itemFamily: "node"
+      itemFamily: "node",
+      displayMode: "${field.control.params.displayMode!"items"}"
    });
 })();
 //]]></script>

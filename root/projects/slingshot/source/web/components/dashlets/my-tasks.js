@@ -123,7 +123,7 @@
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             var taskId = oRecord.getData("properties")["bpm_taskId"];
-            elCell.innerHTML = '<a href="view-task?taskId=' + encodeURIComponent(taskId) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</span>';
+            elCell.innerHTML = '<a href="view-task?taskId=' + encodeURIComponent(taskId) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
          };
 
          // DataTable column definitions
