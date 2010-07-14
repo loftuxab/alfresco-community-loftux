@@ -24,13 +24,15 @@
    background-image: url(../images/back-arrow.png);
    background-position: left center;
    background-repeat: no-repeat;
-   color: #333333;
    padding: 0 5px 0 19px;
-   margin-right:5px;
+   margin-right: 5px;
 }
 
-.search-title .backLink a:hover
+.search-title .forwardLink
 {
-   color: #333333;
-   text-decoration: underline;
+   background-image: url(../images/forward-arrow-16.png);
+   background-position: right center;
+   background-repeat: no-repeat;
+   padding: 0 21px 0 5px;
+   margin-right: 5px;
 }
