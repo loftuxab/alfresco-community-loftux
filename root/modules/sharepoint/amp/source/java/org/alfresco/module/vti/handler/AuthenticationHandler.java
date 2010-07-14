@@ -18,6 +18,10 @@
  */
 package org.alfresco.module.vti.handler;
 
+import java.io.IOException;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,36 +39,15 @@ public interface AuthenticationHandler
     /**
      * Authenticate user based on information in http request such as Authorization header or else.
      * 
+     * @param context servlet context
      * @param request http request
      * @param response http response
      * @param alfrescoContext deployment context of alfresco application
      * @return SessionUser information about currently loged in user or null. 
+     * @throws ServletException 
+     * @throws IOException 
+     * @throws SiteMemberMappingException
      */
-    public SessionUser authenticateRequest(HttpServletRequest request, HttpServletResponse httpResponse, String alfrescoContext);
+    public SessionUser authenticateRequest(ServletContext context, HttpServletRequest request, HttpServletResponse response, String alfrescoContext) throws IOException, ServletException;
     
-    /**
-     * Validate user ticket
-     * 
-     * @param httpRequest http request
-     * @param httpResponse http response
-     * @param alfrescoContext deployment context of alfresco application
-     * @param user current user
-     */
-    public void checkUserTicket(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String alfrescoContext, SessionUser user);
-    
-    /**
-     * Check if the given user is a member of the requested site
-     * 
-     * @param request http request to the site
-     * @param alfrescoContext deployment context of alfresco application
-     * @param username name of the user
-     * @return <i>true</i> if user is member of the requested site, otherwise <i>false</i>
-     */
-    public boolean isSiteMember(HttpServletRequest request, String alfrescoContext, String username);
-    
-    /**
-     * Send to user response with http status 401
-     * @param response http response
-     */
-    public void forceClientToPromptLogonDetails(HttpServletResponse response);
 }

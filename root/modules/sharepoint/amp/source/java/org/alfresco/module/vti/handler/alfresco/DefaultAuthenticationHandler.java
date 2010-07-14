@@ -18,22 +18,23 @@
  */
 package org.alfresco.module.vti.handler.alfresco;
 
-import java.util.Enumeration;
+import java.io.IOException;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.alfresco.module.vti.handler.AuthenticationHandler;
 import org.alfresco.module.vti.handler.MethodHandler;
+import org.alfresco.module.vti.handler.SiteMemberMappingException;
 import org.alfresco.module.vti.handler.UserGroupServiceHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.web.sharepoint.auth.SiteMemberMapper;
-import org.alfresco.web.sharepoint.auth.SiteMemberMappingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -43,50 +44,17 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author PavelYur
  */
-public class DefaultAuthenticationHandler implements AuthenticationHandler, SiteMemberMapper
+public class DefaultAuthenticationHandler implements AuthenticationHandler
 {
+    private final static String USER_SESSION_ATTRIBUTE = "_vtiAuthTicket";
 
     private static Log logger = LogFactory.getLog(DefaultAuthenticationHandler.class);
         
     private MethodHandler vtiHandler;
     private UserGroupServiceHandler vtiUserGroupServiceHandler;
-    private AuthenticationService authenticationService;
     private PersonService personService;
-    private org.alfresco.web.sharepoint.auth.AuthenticationHandler delegate;
+    private org.alfresco.repo.webdav.auth.AuthenticationDriver delegate;
 
-    public void forceClientToPromptLogonDetails(HttpServletResponse response)
-    {
-        delegate.forceClientToPromptLogonDetails(response);
-    }
-
-    @SuppressWarnings("unchecked")
-    public void checkUserTicket(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String alfrescoContext, SessionUser user)
-    {
-        try
-        {
-            authenticationService.validate(user.getTicket());
-
-            if (!isSiteMember(httpRequest, alfrescoContext, user.getUserName()))
-            {
-                Enumeration<String> attributes = httpRequest.getSession().getAttributeNames();
-                while (attributes.hasMoreElements())
-                {
-                    String name = (String) attributes.nextElement();
-                    httpRequest.getSession().removeAttribute(name);
-                }
-                throw new Exception("Not a member!!!!");
-            }
-
-            if (logger.isDebugEnabled())
-                logger.debug("Ticket was validated");
-        }
-        catch (Exception ex)
-        {
-            forceClientToPromptLogonDetails(httpResponse);
-            return;
-        }           
-    }
-    
     public boolean isSiteMember(HttpServletRequest request, String alfrescoContext, final String username)
     {
         String uri = request.getRequestURI();
@@ -129,13 +97,31 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler, Site
         }
     }
     
-    public SessionUser authenticateRequest(HttpServletRequest request, HttpServletResponse httpResponse,
-            String alfrescoContext)
+    public SessionUser authenticateRequest(ServletContext context, HttpServletRequest request, HttpServletResponse response,
+            String alfrescoContext) throws IOException, ServletException
     {
-        return delegate.authenticateRequest(request, httpResponse, this, alfrescoContext);
+        if (delegate.authenticateRequest(context, request, response))
+        {
+            HttpSession session = request.getSession(false);
+            if (session == null)
+            {
+                return null;
+            }
+            SessionUser user = (SessionUser) session.getAttribute(USER_SESSION_ATTRIBUTE);
+            if (user == null)
+            {
+                return null;
+            }
+            if(isSiteMember(request, alfrescoContext, user.getUserName()))
+            {
+                return user;
+            }
+            delegate.restartLoginChallenge(context, request, response);            
+        }
+        return null;
     }
     
-    public void setDelegate(org.alfresco.web.sharepoint.auth.AuthenticationHandler delegate)
+    public void setDelegate(org.alfresco.repo.webdav.auth.AuthenticationDriver delegate)
     {
         this.delegate = delegate;
     }
@@ -150,11 +136,6 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler, Site
         this.vtiUserGroupServiceHandler = vtiUserGroupServiceHandler;
     }
     
-    public void setAuthenticationService(AuthenticationService authenticationService)
-    {
-        this.authenticationService = authenticationService;
-    }
-
     public void setPersonService(PersonService personService) 
     {
         this.personService = personService;

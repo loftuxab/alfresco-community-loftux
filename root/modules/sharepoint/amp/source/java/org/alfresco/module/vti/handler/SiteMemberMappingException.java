@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.alfresco.web.sharepoint.auth;
+package org.alfresco.module.vti.handler;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
- * An exception thrown by a {@link SiteMemberMapper}.
+ * An exception thrown by a {@link AuthenticationHandler}.
  * 
  * @author dward
  */
