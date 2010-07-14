@@ -5,7 +5,7 @@
 <div id="${args.htmlid}-body" class="folder-info">
    
    <div class="info-section">
-      <div class="heading">${msg("folder-info.tags")}</div>
+      <div class="heading">${msg("label.tags")}</div>
       
       <div id="${args.htmlid}-tags"></div>
    </div>

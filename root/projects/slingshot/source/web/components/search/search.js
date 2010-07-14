@@ -444,7 +444,7 @@
             if (tags.length !== 0)
             {
                var i, j;
-               desc += '<div class="details"><span class="tags">' + me.msg("message.tags") + ': ';
+               desc += '<div class="details"><span class="tags">' + me.msg("label.tags") + ': ';
                for (i = 0, j = tags.length; i < j; i++)
                {
                    desc += '<span id="' + me.id + '-' + $html(tags[i]) + '" class="searchByTag"><a class="search-tag" href="#">' + $html(tags[i]) + '</a> </span>';
@@ -461,7 +461,7 @@
             key: "image", label: me.msg("message.preview"), sortable: false, formatter: renderCellThumbnail, width: 100
          },
          {
-            key: "summary", label: me.msg("message.desc"), sortable: false, formatter: renderCellDescription
+            key: "summary", label: me.msg("label.description"), sortable: false, formatter: renderCellDescription
          }];
 
          // DataTable definition

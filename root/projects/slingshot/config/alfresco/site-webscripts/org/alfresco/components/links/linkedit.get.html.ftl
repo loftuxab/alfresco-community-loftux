@@ -31,7 +31,7 @@
          <input type="hidden" name="page" value="links-view"/>
          <div class="yui-gd">
             <div class="yui-u first">
-               <label for="${args.htmlid}-title">${msg("form.title")}:</label>
+               <label for="${args.htmlid}-title">${msg("label.title")}:</label>
             </div>
             <div class="yui-u">
                <input class="wide" type="text" id="${args.htmlid}-title" name="title" value="" tabindex="0"/><span class="lbl dot">*</span>
@@ -39,7 +39,7 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first">
-               <label for="${args.htmlid}-description">${msg("form.description")}:</label>
+               <label for="${args.htmlid}-description">${msg("label.description")}:</label>
             </div>
             <div class="yui-u">
                <textarea class="wide" id="${args.htmlid}-description" type="textarea" rows="5" name="description" tabindex="0"></textarea>
@@ -64,7 +64,7 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first">
-               <label for="${args.htmlid}-tag-input-field">${msg("form.tags")}:</label>
+               <label for="${args.htmlid}-tag-input-field">${msg("label.tags")}:</label>
             </div>
             <div class="yui-u">
                <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
