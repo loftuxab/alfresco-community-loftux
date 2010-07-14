@@ -249,12 +249,12 @@
          html += '</div>';
 
          html += '<div class="detail">';
-         html += '<span class="nodeAttrLabel">' + this.msg("link.description") + ": </span>";
+         html += '<span class="nodeAttrLabel">' + this.msg("label.description") + ": </span>";
          html += '<span class="nodeAttrValue">' + $links($html(data.description)) + '</span>';
          html += '</div>';
          
          html += '<div class="nodeFooter">';
-         html += '<span class="nodeAttrLabel tagLabel">' + this.msg("link.tags") + ': </span>';
+         html += '<span class="nodeAttrLabel tagLabel">' + this.msg("label.tags") + ': </span>';
          if (data.tags.length > 0)
          {
             for (var x=0; x < data.tags.length; x++)

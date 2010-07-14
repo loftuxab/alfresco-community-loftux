@@ -41,7 +41,7 @@
 
          <div class="yui-gd">
             <div class="yui-u first">
-               <label for="${args.htmlid}-title">${msg("topicTitle")}:</label>
+               <label for="${args.htmlid}-title">${msg("label.title")}:</label>
             </div>
             <div class="yui-u">
                <input class="wide" type="text" id="${args.htmlid}-title" name="title" size="80" value=""/>
@@ -59,7 +59,7 @@
 
          <div class="yui-gd">
             <div class="yui-u first">
-               <label for="${htmlid}-tag-input-field">${msg("tags")}:</label>
+               <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
             </div>
             <div class="yui-u">
                <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>

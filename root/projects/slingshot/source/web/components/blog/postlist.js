@@ -401,7 +401,7 @@
                html += '<span class="nodeAttrValue"><a href="' + postViewUrl + '">' + me._msg("post.read") + '</a></span>';
                html += '<span class="separator">&nbsp;</span>';
                
-               html += '<span class="nodeAttrLabel tagLabel">' + me._msg("post.tags") +': </span>';
+               html += '<span class="nodeAttrLabel tagLabel">' + me._msg("label.tags") +': </span>';
                if (data.tags.length > 0)
                {
                   for (var x=0; x < data.tags.length; x++)
