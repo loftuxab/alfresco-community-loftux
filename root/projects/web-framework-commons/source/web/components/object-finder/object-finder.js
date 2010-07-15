@@ -341,6 +341,16 @@
             this._createNavigationControls();
             this._createSelectedItemsControls();
             this.widgets.showPicker = Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
+            if (this.options.displayMode == "list")
+            {
+               this.widgets.showPicker.set("label", this.msg("button.add"));
+               var removeAllEl = document.createElement("button");
+               this.widgets.showPicker.get("element").parentNode.appendChild(removeAllEl);
+               this.widgets.removeAllButton = Alfresco.util.createYUIButton(this, null, this.onRemoveAllListItems, {
+                  label: this.msg("button.removeAll"),
+                  disabled: true
+               }, removeAllEl);                        
+            }
             this.widgets.ok = Alfresco.util.createYUIButton(this, "ok", this.onOK);
             this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
             
@@ -421,6 +431,23 @@
          }
          
          p_obj.set("disabled", true);
+         Event.preventDefault(e);
+      },
+
+
+      /**
+       * Removes all list itesm from the current value list used in "list" display mode
+       *
+       * @method onRemoveAllListItems
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onRemoveAllListItems: function ObjectFinder_onRemoveAllListItems(e, p_obj)
+      {
+         this.widgets.currentValuesDataTable.deleteRows(0, this.widgets.currentValuesDataTable.getRecordSet().getLength());
+         this.selectedItems = {};
+         this.singleSelectedItem = null;
+         this._adjustCurrentValues();
          Event.preventDefault(e);
       },
 
@@ -732,6 +759,11 @@
                if (this.options.displayMode == "items")
                {
                   Dom.get(this.id + "-currentValueDisplay").innerHTML = displayValue;
+               }
+               else
+               {
+                  // Enable the remove all button
+                  this.widgets.removeAllButton.set("disabled", false);                  
                }
             }
          }
@@ -1077,6 +1109,11 @@
        */
       _getCurrentValueMeta: function ObjectFinder__getCurrentValueMeta(p_div)
       {
+         if (this.widgets.removeAllButton)
+         {
+            this.widgets.removeAllButton.set("disabled", true);                  
+         }
+
          var arrItems = this.options.currentValue.split(",");
          
          var onSuccess = function OF_rCV_onSuccess(response)
