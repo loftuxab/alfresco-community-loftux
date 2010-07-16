@@ -27,9 +27,36 @@ function main()
       }
    }
    
+   // get the search sorting fields from the config
+   var sortables = config.scoped["Search"]["sorting"].childrenMap["sort"];
+   var sortFields = [];
+   for (var i = 0, sort, label; i < sortables.size(); i++)
+   {
+      sort = sortables.get(i);
+      
+      // resolve label text
+      label = sort.attributes["label"];
+      if (label == null)
+      {
+         label = sort.attributes["labelId"];
+         if (label != null)
+         {
+            label = msg.get(label);
+         }
+      }
+      
+      // create the model object to represent the sort field definition
+      sortFields.push(
+      {
+         type: sort.value,
+         label: label ? label : sort.value
+      });
+   }
+   
    // Prepare the model
    model.siteId = siteId;
    model.siteTitle = (siteTitle != null ? siteTitle : "");
+   model.sortFields = sortFields;
    model.searchTerm = (page.url.args["t"] != null) ? page.url.args["t"] : "";
    model.searchTag = (page.url.args["tag"] != null) ? page.url.args["tag"] : "";
    model.searchSort = (page.url.args["s"] != null) ? page.url.args["s"] : "";

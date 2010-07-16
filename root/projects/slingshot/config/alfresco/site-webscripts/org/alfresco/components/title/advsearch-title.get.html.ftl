@@ -7,10 +7,12 @@
       </span>
    </div>
    </#if>
+   <#if page.url.args.back??>
    <div>
       <span class="navigation-item backLink">
          <a href="#" onclick="history.back();return false;">${msg("header.results")}</a>
       </span>
    </div>
+   </#if>
    <div class="clear"></div>
 </div>

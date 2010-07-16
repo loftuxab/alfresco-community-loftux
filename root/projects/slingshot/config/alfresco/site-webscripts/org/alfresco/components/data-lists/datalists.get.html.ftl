@@ -7,9 +7,9 @@
       listId: "${page.url.args.list!""}",
       listTypes: [<#list listTypes as type>
       {
-         name: "${type.name?html}",
-         title: "${type.title?html}",
-         description: "${type.description?html}"
+         name: "${type.name?js_string}",
+         title: "${type.title?js_string}",
+         description: "${type.description?js_string}"
       }<#if type_has_next>,</#if></#list>]
    }).setMessages(${messages});
 //]]></script>

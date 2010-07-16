@@ -130,7 +130,7 @@
           * @type int
           * @default 1
           */
-         minSearchTermLength: 1       
+         minSearchTermLength: 1
       },
       
       /**

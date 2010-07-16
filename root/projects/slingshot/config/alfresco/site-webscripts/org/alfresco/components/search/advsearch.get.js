@@ -6,30 +6,38 @@ function main()
 {
    // fetch the request params required by the advanced search component template
    var siteId = (page.url.templateArgs["site"] != null) ? page.url.templateArgs["site"] : "";
-   var siteTitle = null;
-   if (siteId.length != 0)
+   
+   // get the search forms from the config
+   var forms = config.scoped["AdvancedSearch"]["advanced-search"].getChild("forms").childrenMap["form"];
+   var searchForms = [];
+   for (var i = 0, form, formId, formDesc; i < forms.size(); i++)
    {
-      // look for request scoped cached site title
-      siteTitle = context.properties["site-title"];
-      if (siteTitle == null)
+      form = forms.get(i);
+      
+      // get optional attributes and resolved description text
+      formId = form.attributes["id"];
+      formDesc = form.attributes["description"];
+      if (formDesc == null)
       {
-         // Call the repository for the site profile
-         var json = remote.call("/api/sites/" + siteId);
-         if (json.status == 200)
+         formDesc = form.attributes["descriptionId"];
+         if (formDesc != null)
          {
-            // Create javascript objects from the repo response
-            var obj = eval('(' + json + ')');
-            if (obj)
-            {
-               siteTitle = (obj.title.length != 0) ? obj.title : obj.shortName;
-            }
+            formDesc = msg.get(formDesc);
          }
       }
+      
+      // create the model object to represent the form definition
+      searchForms.push(
+      {
+         id: formId ? formId : "search",
+         type: form.value,
+         description: formDesc ? formDesc : formId
+      });
    }
    
    // Prepare the model
    model.siteId = siteId;
-   model.siteTitle = (siteTitle != null ? siteTitle : "");
+   model.searchForms = searchForms;
 }
 
 main();
