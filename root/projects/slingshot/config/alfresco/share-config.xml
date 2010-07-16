@@ -77,6 +77,49 @@
          <!-- default maximum number of results for a search -->
          <max-search-results>250</max-search-results>
       </search>
+      
+      <!-- sorting fields and labels -->
+      <!--
+         The 'sort' config element contains the name of the content model field
+         to sort against and can be of the form:
+          . Short QName string e.g. "cm:name"
+          . Pseudo cm:content field starting with a "." e.g. ".size"
+          . Any other valid sortable fts-alfresco special field e.g. "TYPE"
+         The field can be optionally followed by |true or |false to indicate sort direction
+         
+         The element supports the following optional attributes:
+            label = label text to display
+            labelId = I18N label id of label text to display
+      -->
+      <sorting>
+         <sort labelId="label.name">cm:name</sort>
+         <sort labelId="label.title">cm:title</sort>
+         <sort labelId="label.description">cm:description</sort>
+         <sort labelId="label.author">cm:author</sort>
+         <sort labelId="label.modifier">cm:modifier</sort>
+         <sort labelId="label.modified">cm:modified|false</sort>
+         <sort labelId="label.creator">cm:creator</sort>
+         <sort labelId="label.created">cm:created|false</sort>
+         <sort labelId="search.sort.size">.size|true</sort>
+         <sort labelId="search.sort.mimetype">.mimetype</sort>
+         <sort labelId="search.sort.type">TYPE</sort>
+      </sorting>
+   </config>
+   
+   <config evaluator="string-compare" condition="AdvancedSearch">
+      <advanced-search>
+         <!-- Forms for the advanced search type list -->
+         <forms>
+            <!--
+               The 'form' config element supports the following optional attributes:
+                  id = form id, the id of "search" will be assumed if not set
+                  description = description text to display
+                  descriptionId = I18N label id of description text to display
+            -->
+            <form descriptionId="search.form.cm_content">cm:content</form>
+            <form descriptionId="search.form.cm_folder">cm:folder</form>
+         </forms>
+      </advanced-search>
    </config>
    
    <!-- Document Library config section -->

@@ -46,17 +46,9 @@
             </span>
             <select id="${el}-sort-menu" class="yuimenu hidden">
                <option value="">${msg("search.sort.relevance")}</option>
-               <option value="cm:name">${msg("label.name")}</option>
-               <option value="cm:title">${msg("label.title")}</option>
-               <option value="cm:description">${msg("label.description")}</option>
-               <option value="cm:author">${msg("label.author")}</option>
-               <option value="cm:modifier">${msg("label.modifier")}</option>
-               <option value="cm:modified|false">${msg("label.modified")}</option>
-               <option value="cm:creator">${msg("label.creator")}</option>
-               <option value="cm:created|false">${msg("label.created")}</option>
-               <option value=".size|true">${msg("search.sort.size")}</option>
-               <option value=".mimetype">${msg("search.sort.mimetype")}</option>
-               <option value="TYPE">${msg("search.sort.type")}</option>
+               <#list sortFields as sort>
+               <option value="${sort.type}">${sort.label}</option>
+               </#list>
             </select>
          </span>
       </div>

@@ -66,7 +66,19 @@
           * @property siteId
           * @type string
           */
-         siteId: ""    
+         siteId: "",
+         
+         /**
+          * Search Form objects, for example:
+          * {
+          *    id: "advanced-search",
+          *    type: "cm:content"
+          * }
+          * 
+          * @property searchForms
+          * @type Array
+          */
+         searchForms: []
       },
       
       /**
@@ -75,18 +87,28 @@
        *
        * @method onReady
        */
-      onReady: function Search_onReady()
+      onReady: function ADVSearch_onReady()
       {
-         var me = this;
-         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
-      }
+      },
 
       /**
        * DEFAULT ACTION EVENT HANDLERS
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
       
+      /**
+       * Event callback when form template has been loaded
+       *
+       * @method onFormTemplateLoaded
+       * @param response {object} Server response from load template XHR request
+       */
+      onFormTemplateLoaded: function ADVSearch_onFormTemplateLoaded(response)
+      {
+         // Inject the template from the XHR request into a new DIV element
+         var containerDiv = Dom.get(this.id + "-form");
+         containerDiv.innerHTML = response.serverResponse.responseText;
+      }
    });
 })();
