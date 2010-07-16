@@ -8,20 +8,26 @@
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowPriority" />
                <show id="bpm:workflowDueDate" />
-               <show id="packageItems" />
                <show id="bpm:assignee" />
+               <show id="packageItems" />
                <show id="wf:notifyMe" />               
             </field-visibility>
             <appearance>
-               <field id="bpm:comment">
+               <set id="" appearance="title" label-id="workflow.group.general" />
+               <set id="assignee" appearance="title" label-id="workflow.group.assignee" />
+               <set id="other" appearance="title" label-id="workflow.group.other" />
+               
+               <field id="bpm:assignee" label-id="workflow.field.assign_to" set="assignee" />
+               <field id="wf:notifyMe" set="other" />
+               <field id="bpm:workflowDescription" label-id="workflow.field.message">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
-               <field id="bpm:priority">
+               <field id="bpm:workflowPriority">
                   <control>
                      <control-param name="options">1|High,2|Medium,3|Low</control-param>
                   </control>
                </field>
-               <field id="packageItems" label-id="label.task-items">
+               <field id="packageItems" label-id="workflow.field.items" set="assignee">
                   <control>
                      <control-param name="displayMode">list</control-param>
                   </control>
@@ -39,19 +45,23 @@
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowPriority" />
                <show id="bpm:workflowDueDate" />
-               <show id="packageItems" />
                <show id="bpm:assignee" />
+               <show id="packageItems" />
             </field-visibility>
             <appearance>
-               <field id="bpm:comment">
+               <set id="" appearance="title" label-id="workflow.group.general" />
+               <set id="assignee" appearance="title" label-id="workflow.group.assignee" />
+               
+               <field id="bpm:assignee" label-id="workflow.field.reviewer" set="assignee" />
+               <field id="bpm:workflowDescription" label-id="workflow.field.message">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
-               <field id="bpm:priority">
+               <field id="bpm:workflowPriority">
                   <control>
                      <control-param name="options">1|High,2|Medium,3|Low</control-param>
                   </control>
                </field>
-               <field id="packageItems" label-id="label.task-items">
+               <field id="packageItems" label-id="workflow.field.items">
                   <control>
                      <control-param name="displayMode">list</control-param>
                   </control>
@@ -69,20 +79,24 @@
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowPriority" />
                <show id="bpm:workflowDueDate" />
-               <show id="packageItems" />
-               <show id="bpm:groupAssignee" />
                <show id="wf:requiredApprovePercent" />
+               <show id="bpm:groupAssignee" />
+               <show id="packageItems" />
             </field-visibility>
             <appearance>
-               <field id="bpm:comment">
+               <set id="" appearance="title" label-id="workflow.group.general" />
+               <set id="assignee" appearance="title" label-id="workflow.group.assignee" />
+               
+               <field id="bpm:groupAssignee" label-id="workflow.field.reviewer" set="assignee" />
+               <field id="bpm:workflowDescription" label-id="workflow.field.message">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
-               <field id="bpm:priority">
+               <field id="bpm:workflowPriority">
                   <control>
                      <control-param name="options">1|High,2|Medium,3|Low</control-param>
                   </control>
                </field>
-               <field id="packageItems" label-id="label.task-items">
+               <field id="packageItems" label-id="workflow.field.items">
                   <control>
                      <control-param name="displayMode">list</control-param>
                   </control>
