@@ -24,7 +24,7 @@
          <url>/components/navigation/collaboration-navigation</url>
       </component>
       <component>
-         <region-id>workflow</region-id>
+         <region-id>start-workflow</region-id>
          <url>/components/workflow/start</url>
       </component>
    </components>
