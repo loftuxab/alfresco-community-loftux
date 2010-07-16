@@ -3395,24 +3395,24 @@
    <target name="minimize-mobile-javascript"
            depends="init">
       <echo>Compressing Mobile Javascript...</echo>
-   	<concat destfile="${dir.project.mobile.assemble}/js/alf-mobile.js">
+      <concat destfile="${dir.project.mobile.assemble}/js/alf-mobile.js">
          <fileset dir="${dir.project.mobile.assemble}">
             <include name="**/*.js" />
             <exclude name="**/alf-mobile.js" />
             <exclude name="**/*-min.js" />
             <exclude name="**/WEB-INF/**" />
          </fileset>
-   	</concat>
+      </concat>
 
-   	<apply executable="java" parallel="false" dest="${dir.project.mobile.assemble}/js">
-   		<fileset dir="${dir.project.mobile.assemble}/js" includes="alf-mobile.js"/>
-   		<arg line="-jar"/>
-   		<arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
-   		<arg line="-o"/>
-   		<targetfile/>
-   		<srcfile/>
-   		<mapper type="glob" from="*.js" to="*-min.js"/>
-   	</apply>
+      <apply executable="java" parallel="false" dest="${dir.project.mobile.assemble}/js">
+         <fileset dir="${dir.project.mobile.assemble}/js" includes="alf-mobile.js"/>
+         <arg line="-jar"/>
+         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.4-dev.jar"/>
+         <arg line="-o"/>
+         <targetfile/>
+         <srcfile/>
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
    </target>
    
    <target name="generate-javadocs-mobile" 
