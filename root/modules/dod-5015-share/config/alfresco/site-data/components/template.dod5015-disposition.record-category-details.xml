@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>dod5015-disposition</region-id>
-   <source-id>record-category-details</source-id>
-   <url>/components/fileplan/disposition</url>
-</component>

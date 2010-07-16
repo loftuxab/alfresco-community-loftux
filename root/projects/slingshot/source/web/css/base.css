@@ -87,6 +87,11 @@ hr
    margin-left: -50em;
 }
 
+h1.sub-title
+{
+   padding-top: 1em;
+}
+
 /* Page title and navigation styles */
 
 .page-title
@@ -536,4 +541,25 @@ div.dashlet div.hdr
 {
    overflow-x: hidden;
    padding: 4px 0px 3px 20px;
+}
+
+/* Calendar Template */
+
+#divCalendarContent
+{
+   border-left: 2px solid #EAEAEA;   
+   margin-left: 16em;
+}
+
+#divCalendarFilters
+{
+   width: 16em;
+}
+
+/* Document & Folder Details Pages */
+.document-details-comments,
+.folder-details-comments
+{
+   border-right: 1px solid #ccc;
+   padding-bottom: 20px;
 }

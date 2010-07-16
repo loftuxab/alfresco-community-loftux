@@ -448,24 +448,24 @@ div.filter
  * Document Library
  */
 
-#divDocLibraryDocs .toolbar .header-bar
+#alfresco-documentlibrary .toolbar .header-bar,
+#alfresco-repository .toolbar .header-bar
 {
+   margin: 0 -10px;
    padding-bottom: 2em;
 }
 
-#divDocLibraryDocs .toolbar .header-bar,
-#divDocLibraryDocs .toolbar .nav-bar
+#alfresco-documentlibrary .toolbar .nav-bar,
+#alfresco-repository .toolbar .nav-bar
 {
    margin: 0 -10px;
-}
-
-#divDocLibraryDocs .toolbar .nav-bar
-{
    padding-bottom: 1.9em;
 }
 
-#divDocLibraryDocs .toolbar .breadcrumb .crumb,
-#divDocLibraryDocs .toolbar .breadcrumb a.icon
+#alfresco-documentlibrary .toolbar .breadcrumb .crumb,
+#alfresco-documentlibrary .toolbar .breadcrumb a.icon,
+#alfresco-repository .toolbar .breadcrumb .crumb,
+#alfresco-repository .toolbar .breadcrumb a.icon
 {
    border-color: #fff;
 }
@@ -487,11 +487,7 @@ div.filter
 
 /* When folder, tag, etc. names are too long the layout is destroyed */
 
-#divLeft,
-#divPostListFilters,
-#divDocLibraryFilters,
-#divCalendarFilters,
-#divLinkFilters
+#alf-filters
 {
    overflow-x: hidden;
 }
@@ -551,7 +547,7 @@ div.filter
  * Data Lists
  */
 
-#divRight .toolbar .header-bar
+#alf-content .toolbar .header-bar
 {
    margin: 0 -10px;
    padding-bottom: 2em;

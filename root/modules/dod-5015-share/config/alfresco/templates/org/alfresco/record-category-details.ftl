@@ -1,7 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <#assign doclibType="dod5015-">
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/folder-details/folder-details.css" />
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/folder-details.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script>
@@ -16,7 +15,6 @@
    <div id="bd">
       <@region id=doclibType + "actions-common" scope="template" protected=true />
       <@region id=doclibType + "path" scope="template" protected=true />
-
       <div class="yui-gb">
          <div class="yui-u first">
             <div class="folder-details-comments">
@@ -32,7 +30,6 @@
             <@region id=doclibType + "folder-links" scope="template" protected=true />
          </div>
       </div>
-
    </div>
 
    <script type="text/javascript">//<![CDATA[
@@ -42,7 +39,6 @@
       siteId: "${page.url.templateArgs.site!""}"
    });
    //]]></script>
-
 </@>
 
 <@templateFooter>

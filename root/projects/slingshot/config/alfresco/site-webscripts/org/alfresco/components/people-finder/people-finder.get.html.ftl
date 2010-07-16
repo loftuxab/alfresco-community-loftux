@@ -6,7 +6,8 @@
       maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
       setFocus: ${args.setFocus!'false'},
       addButtonSuffix: "${args.addButtonSuffix!''}",
-      dataWebScript: "${(args.dataWebScript!'api/people')?replace("[", "{")?replace("]", "}")}"
+      dataWebScript: "${(args.dataWebScript!'api/people')?replace("[", "{")?replace("]", "}")}",
+      viewMode: ${args.viewMode!"Alfresco.PeopleFinder.VIEW_MODE_DEFAULT"}
    }).setMessages(
       ${messages}
    );

@@ -7,14 +7,10 @@
       <@region id="title" scope="template" protected=true />
       <@region id="navigation" scope="template" protected=true />
    </div>
-   
    <div id="bd">
       <@region id="membersbar" scope="template" protected=true />
-      <div>
-         <@region id="site-groups" scope="template" />
-      </div>
+      <@region id="site-groups" scope="template" />
    </div>
-   <br />
 </@>
 
 <@templateFooter>

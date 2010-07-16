@@ -4,4 +4,10 @@
    <properties>
       <pageFamily>documentlibrary</pageFamily>
    </properties>
+   <components>
+      <component>
+         <region-id>fileplanreport</region-id>
+         <url>/components/fileplan/report</url>
+      </component>
+   </components>
 </template-instance>

@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<page>
-   <title>Collaboration document details page</title>
-   <title-id>page.collaborationDetails.title</title-id>
-   <description>Collaboration site's doclib page</description>
-   <description-id>page.collaborationDetails.description</description-id>
-   <template-instance>collaboration-details</template-instance>
-   <authentication>user</authentication>
-</page>

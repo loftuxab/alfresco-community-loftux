@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>createlink</region-id>
-   <source-id>links-linkedit</source-id>
-   <url>/components/links/linkedit</url>
-   <properties></properties>
-</component>

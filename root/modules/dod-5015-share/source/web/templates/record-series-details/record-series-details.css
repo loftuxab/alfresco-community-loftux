@@ -1,24 +1,10 @@
-/*
-   The styling in this file is temporary to make page look ok until final design is decided.   
-*/
-
-.yui-gb .yui-u
-{
-   margin-left: 0;
-}
-
-.yui-gb div.first
-{
-   margin-right: 1.99%;
-}
-
 .folder-details-comments
 {
-   border-right: none;
+   border-right: medium none;
 }
 
 .folder-links,
 .folder-actions
 {
-   border-right: 1px solid #CCCCCC;
+   border-right: 1px solid #cccccc;
 }

@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
    <template-type>org/alfresco/my-documentlibraries</template-type>
+   <components>
+      <component>
+         <region-id>my-doclibs</region-id>
+         <url>/components/my-documentlibraries/my-doclibs</url>
+      </component>
+   </components>
 </template-instance>

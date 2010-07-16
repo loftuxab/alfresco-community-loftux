@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>toolbar</region-id>
-   <source-id>user-profile</source-id>
-   <url>/components/profile/userprofile-toolbar</url>
-</component>

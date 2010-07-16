@@ -5,4 +5,18 @@
       <pageFamily>links</pageFamily>
       <container>links</container>
    </properties>
+   <components>
+      <component>
+         <region-id>title</region-id>
+         <url>/components/title/collaboration-title</url>
+      </component>
+      <component>
+         <region-id>navigation</region-id>
+         <url>/components/navigation/collaboration-navigation</url>
+      </component>
+      <component>
+         <region-id>linkedit</region-id>
+         <url>/components/links/linkedit</url>
+      </component>
+   </components>
 </template-instance>

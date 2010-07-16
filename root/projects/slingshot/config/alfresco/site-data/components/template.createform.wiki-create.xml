@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>createform</region-id>
-   <source-id>wiki-create</source-id>
-   <url>/components/wiki/createform</url>
-</component>

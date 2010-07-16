@@ -1,7 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
    <@link rel="stylesheet" type="text/css" href="${url.context}/components/blog/postview.css" />
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/folder-details/folder-details.css" />
    <@script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
@@ -22,7 +21,7 @@
 
    <#if doclibType?starts_with("dod5015")>
       <div class="yui-g"> 
-         <div class="yui-u first">
+         <div class="yui-u first share-form">
             <@region id=doclibType + "folder-metadata-header" scope="template" protected=true />
             <@region id=doclibType + "folder-metadata" scope="template" protected=true />
             <@region id=doclibType + "folder-info" scope="template" protected=true />

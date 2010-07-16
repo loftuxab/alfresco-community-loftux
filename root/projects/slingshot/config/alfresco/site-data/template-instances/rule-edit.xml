@@ -4,4 +4,31 @@
    <properties>
       <pageFamily>documentlibrary</pageFamily>
    </properties>
+   <components>
+      <!-- title: normal, portlet, repository & portlet+repository -->
+      <component>
+         <region-id>title</region-id>
+         <url>/components/title/collaboration-title</url>
+      </component>
+      <component>
+         <region-id>portlet-title</region-id>
+         <url>/components/title/portlet-collaboration-title</url>
+      </component>
+      <component>
+         <region-id>repo-title</region-id>
+         <url>/components/title/repository-title</url>
+      </component>
+      <component>
+         <region-id>portlet-repo-title</region-id>
+         <url>/components/title/repository-title</url>
+      </component>
+      <component>
+         <region-id>navigation</region-id>
+         <url>/components/navigation/collaboration-navigation</url>
+      </component>
+      <component>
+         <region-id>rule-edit</region-id>
+         <url>/components/rules/rule-edit</url>
+      </component>
+   </components>
 </template-instance>

@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>view</region-id>
-   <source-id>webview-default</source-id>
-   <url>/components/dashlets/webview-default</url>
-</component>

@@ -11,7 +11,7 @@
 //]]></script>
 <div id="${args.htmlid}-body" class="toolbar flat-button theme-bg-2">
 
-   <div class="navigation-bar <#if (args.showNavigationBar == "false")>hide</#if>">
+   <div class="navigation-bar <#if ((args.showNavigationBar!"false") == "false")>hide</#if>">
       <div>
          <span class="<#if (page.url.args.listViewLinkBack! == "true")>backLink<#else>forwardLink</#if>">
             <a href="${url.context}/page/site/${page.url.templateArgs.site}/blog-postlist">${msg("link.listView")}</a>

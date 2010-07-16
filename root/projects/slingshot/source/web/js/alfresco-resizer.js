@@ -97,18 +97,18 @@
        *
        * @property divLeft
        * @type string
-       * @default "divLeft"
+       * @default "alf-filters"
        */
-      divLeft: "divLeft",
+      divLeft: "alf-filters",
 
       /**
        * DOM ID of right-hand container DIV
        *
        * @property divRight
        * @type string
-       * @default "divRight"
+       * @default "alf-content"
        */
-      divRight: "divRight",
+      divRight: "alf-content",
 
       /**
        * Used to monitor document length
