@@ -924,7 +924,7 @@
       <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.mobile}/js">
          <fileset dir="${dir.deploy.tomcat.application.mobile}/js" includes="alf-mobile.js"/>
          <arg line="-jar"/>
-         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.2.jar"/>
+         <arg path="${dir.project.3rdparty.lib}/devenv/yuicompressor-2.4.4-dev.jar"/>
          <arg line="-o"/>
          <targetfile/>
          <srcfile/>
@@ -1254,7 +1254,7 @@
    <target name="deploy-dod5015-share-exploded"
            depends="init">
       <!-- copy all source files -->
-      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}" overwrite="yes">
+      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
          <fileset dir="${dir.modules}/dod-5015-share/source/web" />
       </copy>
       <!-- copy web scripts, etc. -->
