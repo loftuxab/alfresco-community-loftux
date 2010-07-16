@@ -1,8 +1,9 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/wiki/wiki.css" />
    <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
-   <@script type="text/javascript" src="${url.context}/templates/wiki/wiki.js"></@script>
+   <script type="text/javascript">//<![CDATA[
+      new Alfresco.widget.Resizer("Wiki");
+   //]]></script>
    <@templateHtmlEditorAssets />     
 </@>
 
@@ -13,20 +14,19 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div class="yui-t1" id="divTopicListWrapper">
+      <div class="yui-t1" id="alfresco-wiki">
          <div id="yui-main">
-            <div class="yui-b" id="divTopicListTopics">
+            <div class="yui-b" id="alf-content">
                <@region id="toolbar" scope="template" protected=true />
                <@region id="pagelist" scope="template" protected=true />
             </div>
          </div>
-         <div class="yui-b" id="divTopicListFilters">
+         <div class="yui-b" id="alf-filters">
             <@region id="filter" scope="template" protected=true />
             <@region id="tags" scope="template" protected=true />
          </div>
       </div>
-
-	</div>
+   </div>
 </@>
 
 <@templateFooter>

@@ -1,6 +1,5 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/wiki/wiki.css" />
    <@templateHtmlEditorAssets />  
 </@>
 
@@ -11,9 +10,9 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-	   <@region id="toolbar" scope="template" protected=true />
-		<@region id="wikipage" scope="template" protected=true />
- 	</div>
+      <@region id="toolbar" scope="template" protected=true />
+      <@region id="wikipage" scope="template" protected=true />
+   </div>
 </@>
 
 <@templateFooter>

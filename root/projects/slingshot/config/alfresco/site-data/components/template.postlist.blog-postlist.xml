@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>postlist</region-id>
-   <source-id>blog-postlist</source-id>
-   <url>/components/blog/postlist</url>
-   <properties></properties>
-</component>

@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>disposition-edit</region-id>
-   <source-id>disposition-edit</source-id>
-   <url>/components/fileplan/disposition-edit</url>
-</component>

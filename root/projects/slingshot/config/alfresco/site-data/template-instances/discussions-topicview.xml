@@ -5,4 +5,29 @@
       <pageFamily>discussions-topiclist</pageFamily>
       <container>discussions</container>
    </properties>
+   <components>
+      <component>
+         <region-id>title</region-id>
+         <url>/components/title/collaboration-title</url>
+      </component>
+      <component>
+         <region-id>navigation</region-id>
+         <url>/components/navigation/collaboration-navigation</url>
+      </component>
+      <component>
+         <region-id>toolbar</region-id>
+         <url>/components/discussions/toolbar</url>
+         <properties>
+            <showNavigationBar>true</showNavigationBar>
+         </properties>
+      </component>
+      <component>
+         <region-id>topic</region-id>
+         <url>/components/discussions/topic</url>
+      </component>
+      <component>
+         <region-id>replies</region-id>
+         <url>/components/discussions/replies</url>
+      </component>
+   </components>
 </template-instance>

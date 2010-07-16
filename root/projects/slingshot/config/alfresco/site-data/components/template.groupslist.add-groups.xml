@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>groupslist</region-id>
-   <source-id>add-groups</source-id>
-   <url>/components/invite/groupslist</url>
-</component>

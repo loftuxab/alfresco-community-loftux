@@ -1,5 +1,5 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader></@>
+<@templateHeader />
 
 <@templateBody>
    <div id="alf-hd">

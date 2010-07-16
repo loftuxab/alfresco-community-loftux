@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>postview</region-id>
-   <source-id>blog-postview</source-id>
-   <url>/components/blog/postview</url>
-   <properties></properties>
-</component>

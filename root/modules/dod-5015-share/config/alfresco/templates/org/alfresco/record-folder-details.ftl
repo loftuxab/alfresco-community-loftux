@@ -1,7 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <#assign doclibType="dod5015-">
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/folder-details/folder-details.css" />
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/folder-details.js"></@script>   
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script>

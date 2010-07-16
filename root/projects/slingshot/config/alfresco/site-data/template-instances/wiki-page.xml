@@ -5,4 +5,25 @@
       <pageFamily>wiki</pageFamily>
       <container>wiki</container>
    </properties>
+   <components>
+      <component>
+         <region-id>title</region-id>
+         <url>/components/title/collaboration-title</url>
+      </component>
+      <component>
+         <region-id>navigation</region-id>
+         <url>/components/navigation/collaboration-navigation</url>
+      </component>
+      <component>
+         <region-id>toolbar</region-id>
+         <url>/components/wiki/toolbar</url>
+         <properties>
+            <showBackLink>true</showBackLink>
+         </properties>
+      </component>
+      <component>
+         <region-id>wikipage</region-id>
+         <url>/components/wiki/page</url>
+      </component>
+   </components>
 </template-instance>

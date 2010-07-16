@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>wikipage</region-id>
-   <source-id>wiki</source-id>
-   <url>/components/wiki/page</url>
-</component>

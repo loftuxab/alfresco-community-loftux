@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>page</scope>
-   <region-id>calendar</region-id>
-   <source-id>calendar</source-id>
-   <url>/components/calendar/mycalendar</url>
-</component>

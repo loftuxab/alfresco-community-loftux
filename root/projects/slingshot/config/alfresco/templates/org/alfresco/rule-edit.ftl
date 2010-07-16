@@ -1,8 +1,5 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/rules/rule-edit.css" />
-   <@script type="text/javascript" src="${page.url.context}/templates/rules/rule-edit.js"></@script>
-</@>
+<@templateHeader />
 
 <@templateBody>
    <div id="alf-hd">

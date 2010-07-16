@@ -1,8 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <#import "import/alfresco-layout.ftl" as layout />
-<@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/disposition-edit/disposition-edit.css" />
-</@>
+<@templateHeader />
 
 <@templateBody>
 <div id="bd">

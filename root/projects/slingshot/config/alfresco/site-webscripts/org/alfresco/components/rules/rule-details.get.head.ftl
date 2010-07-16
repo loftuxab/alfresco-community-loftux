@@ -9,7 +9,6 @@
 <@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config-type.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/config/rule-config-condition.css" />
 <@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config-condition.js"></@script>
-<@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/config/rule-config-action.css" />
 <@script type="text/javascript" src="${page.url.context}/components/rules/config/rule-config-action.js"></@script>
 <!-- Rule Details -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/rules/rule-details.css" />

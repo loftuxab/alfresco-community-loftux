@@ -1,8 +1,5 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/edit-metadata/edit-metadata.css" />
-<#--   <@script type="text/javascript" src="${page.url.context}/templates/edit-metadata/edit-metadata.js"></@script> -->
-</@>
+<@templateHeader />
 
 <@templateBody>
    <div id="alf-hd">
@@ -11,11 +8,10 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div class="metadata">
+      <div class="share-form">
          <@region id="new-rmreference" scope="template" protected=true />
       </div>
    </div>
-   
 </@>
 
 <@templateFooter>

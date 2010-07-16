@@ -1,7 +1,5 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/create-content/create-content.css" />
-</@>
+<@templateHeader />
 
 <@templateBody>
    <div id="alf-hd">
@@ -10,9 +8,9 @@
       <@region id=appType + doclibType + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div class="metadata">
-         <@region id=doclibType + "create-content-mgr" scope="template" protected=true />
-         <@region id=doclibType + "create-content" scope="template" protected=true />
+      <div class="share-form">
+         <@region id="create-content-mgr" scope="template" protected=true />
+         <@region id="create-content" scope="template" protected=true />
       </div>
    </div>
    

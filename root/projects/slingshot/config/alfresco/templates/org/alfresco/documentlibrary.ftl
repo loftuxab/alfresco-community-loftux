@@ -1,10 +1,11 @@
 <#include "include/alfresco-template.ftl" />
 <#include "include/documentlibrary.inc.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/documentlibrary/documentlibrary.css" />
    <@documentLibraryJS />
    <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
-   <@script type="text/javascript" src="${url.context}/templates/documentlibrary/documentlibrary.js"></@script>
+   <script type="text/javascript">//<![CDATA[
+      new Alfresco.widget.Resizer("DocumentLibrary");
+   //]]></script>
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
 </@>
 
@@ -16,14 +17,14 @@
    </div>
    <div id="bd">
       <@region id=doclibType + "actions-common" scope="template" protected=true />
-      <div class="yui-t1">
+      <div class="yui-t1" id="alfresco-documentlibrary">
          <div id="yui-main">
-            <div class="yui-b" id="divDocLibraryDocs">
+            <div class="yui-b" id="alf-content">
                <@region id=doclibType + "toolbar" scope="template" protected=true />
                <@region id=doclibType + "documentlist" scope="template" protected=true />
             </div>
          </div>
-         <div class="yui-b" id="divDocLibraryFilters">
+         <div class="yui-b" id="alf-filters">
             <@region id=doclibType + "filter" scope="template" protected=true />
             <@region id=doclibType + "tree" scope="template" protected=true />
             <@region id=doclibType + "tags" scope="template" protected=true />

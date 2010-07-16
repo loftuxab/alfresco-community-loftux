@@ -1,8 +1,9 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/console/console.css" />
    <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
-   <@script type="text/javascript" src="${url.context}/templates/console/console.js"></@script>
+   <script type="text/javascript">//<![CDATA[
+      new Alfresco.widget.Resizer("Console");
+   //]]></script>
 </@>
 
 <@templateBody>
@@ -12,17 +13,17 @@
    </div>
    
    <div id="bd">
-   	<div class="yui-t1" id="divConsoleWrapper">
-   		<div id="yui-main">
-   			<div class="yui-b" id="divConsoleMain">
-   				<@region id="tool" scope="page" protected=true />
-   			</div>
-   		</div>
-   		<div class="yui-b" id="divConsoleTools">
-   			<@region id="tools" scope="template" protected=true />
-   		</div>
-   	</div>
-   </div>	
+      <div class="yui-t1" id="alfresco-console">
+         <div id="yui-main">
+            <div class="yui-b" id="alf-content">
+               <@region id="tool" scope="page" protected=true />
+            </div>
+         </div>
+         <div class="yui-b" id="alf-filters">
+            <@region id="tools" scope="template" protected=true />
+         </div>
+      </div>
+   </div>   
 </@>
 
 <@templateFooter>

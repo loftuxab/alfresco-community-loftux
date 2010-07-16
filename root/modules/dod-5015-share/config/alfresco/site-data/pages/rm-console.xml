@@ -6,4 +6,10 @@
    <description-id>page.rmConsole.description</description-id>
    <template-instance>console</template-instance>
    <authentication>user</authentication>
+   <components>
+      <component>
+         <region-id>title</region-id>
+         <url>/components/title/rm-console</url>
+      </component>
+   </components>
 </page>

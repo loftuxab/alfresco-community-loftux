@@ -1,16 +1,15 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader>
-</@>
+<@templateHeader />
 
 <@templateBody>
    <div id="alf-hd">
-      <@region id="header" scope="global" protected=true />
-      <@region id=doclibType + "title" scope="template" protected=true />
-      <@region id=doclibType + "navigation" scope="template" protected=true />
+      <@region id=appType + "header" scope="global" protected=true />
+      <@region id=appType + doclibType + "title" scope="template" protected=true />
+      <@region id=appType + doclibType + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
       <div class="share-form">
-      <@region id=doclibType + "start-workflow" scope="template" protected=true />      
+         <@region id="start-workflow" scope="template" protected=true />
       </div>
    </div>
 </@>

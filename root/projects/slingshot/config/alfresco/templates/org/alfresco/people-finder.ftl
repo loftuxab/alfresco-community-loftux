@@ -1,19 +1,5 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader>
-   <script type="text/javascript">//<![CDATA[
-   YAHOO.util.Event.onContentReady("bd", function()
-   {
-      // Find the People Finder by name
-      var peopleFinder = Alfresco.util.ComponentManager.findFirst("Alfresco.PeopleFinder");
-   
-      // Set the correct options for our use
-      peopleFinder.setOptions(
-      {
-         viewMode: Alfresco.PeopleFinder.VIEW_MODE_FULLPAGE
-      });
-   });
-   //]]></script>
-</@>
+<@templateHeader />
 
 <@templateBody>
    <div id="alf-hd">

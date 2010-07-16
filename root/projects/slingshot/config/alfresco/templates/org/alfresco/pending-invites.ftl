@@ -1,6 +1,5 @@
 <#include "include/alfresco-template.ftl" />
-<@templateHeader>
-</@>
+<@templateHeader />
 
 <@templateBody>
    <div id="alf-hd">
@@ -10,15 +9,9 @@
    </div>
    
    <div id="bd">
-
-	   <@region id="membersbar" scope="template" protected=true />
-   
-      <div>
-         <@region id="sent-invites" scope="template" />
-      </div>
-	</div>
-	
-    <br />
+      <@region id="membersbar" scope="template" protected=true />
+      <@region id="sent-invites" scope="template" />
+   </div>
 </@>
 
 <@templateFooter>
