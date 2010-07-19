@@ -9,7 +9,7 @@
       usePagination: ${(args.pagination!false)?string},
       showFolders: ${(preferences.showFolders!false)?string},
       simpleView: ${(preferences.simpleView!false)?string},
-      highlightFile: "${page.url.args["file"]!""}",
+      highlightFile: "${(page.url.args["file"]!"")?js_string}",
       vtiServer: ${vtiServer}
    }).setMessages(
       ${messages}

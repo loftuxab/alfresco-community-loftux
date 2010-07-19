@@ -3,7 +3,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RuleEdit("${el}").setOptions(
    {
-      nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}"),
+      nodeRef: new Alfresco.util.NodeRef("${(page.url.args.nodeRef!"")?js_string}"),
       <#if rule??>rule: ${rule},</#if>
       <#if constraints??>constraints: ${constraints},</#if>
       siteId: "${page.url.templateArgs.site!""}"

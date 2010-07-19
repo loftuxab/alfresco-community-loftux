@@ -2,7 +2,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.component.ManagePermissions("${id}").setOptions(
    {
-      nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef}")
+      nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef?js_string}")
    }).setMessages(
       ${messages}
    );

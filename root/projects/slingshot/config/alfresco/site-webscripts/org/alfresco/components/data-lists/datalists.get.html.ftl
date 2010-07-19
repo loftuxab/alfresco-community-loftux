@@ -4,7 +4,7 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${template.properties.container!"dataLists"}",
-      listId: "${page.url.args.list!""}",
+      listId: "${(page.url.args.list!"")?js_string}",
       listTypes: [<#list listTypes as type>
       {
          name: "${type.name?js_string}",

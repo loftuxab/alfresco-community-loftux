@@ -13,8 +13,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RejectInvite("${args.htmlid}").setOptions(
    {
-      inviteId: "${page.url.args.inviteId!''}",
-      inviteTicket: "${page.url.args.inviteTicket!''}",
+      inviteId: "${(page.url.args.inviteId!'')?js_string}",
+      inviteTicket: "${(page.url.args.inviteTicket!'')?js_string}",
       inviteeUserName: "${(page.url.args.inviteeUserName!'')?js_string}",
    }).setMessages(
       ${messages}

@@ -5,9 +5,9 @@
       containerId: "${template.properties.container!'blog'}",
       initialFilter:
       {
-         filterId: "${page.url.args.filterId!'new'}",
-         filterOwner: "${page.url.args.filterOwner!'Alfresco.TopicListFilter'}",
-         filterData: <#if page.url.args.filterData??>"${page.url.args.filterData}"<#else>null</#if>
+         filterId: "${(page.url.args.filterId!'new')?js_string}",
+         filterOwner: "${(page.url.args.filterOwner!'Alfresco.TopicListFilter')?js_string}",
+         filterData: <#if page.url.args.filterData??>"${page.url.args.filterData?js_string}"<#else>null</#if>
       }
    }).setMessages(
       ${messages}
