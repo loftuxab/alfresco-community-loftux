@@ -94,8 +94,6 @@
           */
          var renderCellTaskInfo = function MyTasks_onReady_renderCellTaskInfo(elCell, oRecord, oColumn, oData)
          {
-            Dom.setStyle(elCell, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             var taskId = oRecord.getData("properties")["bpm_taskId"],
                title = oRecord.getData("properties")["bpm_description"],
                dueDateStr = oRecord.getData("properties")["bpm_duedate"],
