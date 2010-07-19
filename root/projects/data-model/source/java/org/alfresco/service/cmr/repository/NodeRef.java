@@ -19,10 +19,14 @@
 package org.alfresco.service.cmr.repository;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.apache.commons.logging.Log;
 
 /**
  * Reference to a node
@@ -88,6 +92,7 @@ public final class NodeRef implements EntityRef, Serializable
         this.id = nodeRef.substring(lastForwardSlash+1);
     }
 
+    @Override
     public String toString()
     {
         return storeRef.toString() + URI_FILLER + id;
@@ -98,6 +103,7 @@ public final class NodeRef implements EntityRef, Serializable
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -119,6 +125,7 @@ public final class NodeRef implements EntityRef, Serializable
     /**
      * Hashes on ID alone.  As the number of copies of a particular node will be minimal, this is acceptable
      */
+    @Override
     public int hashCode()
     {
         return id.hashCode();
@@ -150,6 +157,56 @@ public final class NodeRef implements EntityRef, Serializable
     {
     	Matcher matcher = nodeRefPattern.matcher(nodeRef);
     	return matcher.matches();
+    }
+    
+    /**
+     * Converts a {@link String} containing a comma-separated list of {@link NodeRef} Ids into NodeRefs.
+     * @param values the {@link String} of {@link NodeRef} ids.
+     * @return A {@link List} of {@link NodeRef NodeRefs}.
+     */
+    public static List<NodeRef> getNodeRefs(String values)
+    {
+        return getNodeRefs(values, null);
+    }
+    
+    /**
+     * Converts a {@link String} containing a comma-separated list of {@link NodeRef} Ids into NodeRefs.
+     * If a <code>logger</code> is supplied then invalid ids are logged as warnings.
+     * @param values the {@link String} of {@link NodeRef} ids.
+     * @param logger
+     * @return A {@link List} of {@link NodeRef NodeRefs}.
+     */
+    public static List<NodeRef> getNodeRefs(String values, Log logger)
+    {
+        if(values==null || values.length()==0)
+            return Collections.emptyList();
+        String[] nodeRefIds = values.split(",");
+        List<NodeRef> nodeRefs = new ArrayList<NodeRef>(nodeRefIds.length);
+        for (String nodeRefString : nodeRefIds)
+        {
+            String nodeRefId = nodeRefString.trim();
+            if (NodeRef.isNodeRef(nodeRefId))
+            {
+                NodeRef nodeRef = new NodeRef(nodeRefId);
+                nodeRefs.add(nodeRef);
+            }
+            else if (logger!=null)
+            {
+                logNodeRefError(nodeRefId, logger);
+            }
+        }
+        return nodeRefs;
+    }
+
+    private static void logNodeRefError(String nodeRefId, Log logger)
+    {
+        if (logger.isWarnEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Target Node: ").append(nodeRefId);
+            msg.append(" is not a valid NodeRef and has been ignored.");
+            logger.warn(msg.toString());
+        }
     }
     
     /**
@@ -192,6 +249,7 @@ public final class NodeRef implements EntityRef, Serializable
         }
         
         // debug display string
+        @Override
         public String toString()
         {
             StringBuilder sb = new StringBuilder(50);
