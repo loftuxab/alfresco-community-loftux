@@ -21,97 +21,105 @@ package org.alfresco.solr;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.cache.MemoryCache;
-import org.alfresco.repo.dictionary.DictionaryBootstrap;
-import org.alfresco.repo.dictionary.DictionaryComponent;
-import org.alfresco.repo.dictionary.DictionaryDAOImpl;
-import org.alfresco.repo.dictionary.NamespaceDAOImpl;
-import org.alfresco.repo.dictionary.DictionaryDAOImpl.DictionaryRegistry;
-import org.alfresco.repo.dictionary.NamespaceDAOImpl.NamespaceRegistry;
-import org.alfresco.repo.dictionary.constraint.RegexConstraint;
-import org.alfresco.repo.dictionary.constraint.RegisteredConstraint;
-import org.alfresco.repo.dictionary.constraint.StringLengthConstraint;
-import org.alfresco.repo.tenant.SingleTServiceImpl;
-import org.alfresco.repo.tenant.TenantService;
-import org.alfresco.service.cmr.dictionary.AssociationDefinition;
-import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
-import org.alfresco.service.cmr.dictionary.Constraint;
-import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.repo.dictionary.M2Namespace;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.ModelDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.namespace.QName;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-import org.springframework.extensions.surf.util.I18NUtil;
-import org.xml.sax.SAXException;
-
 
 public class SolrSchemaGenerationTest extends TestCase
 {
     public static final String TEST_RESOURCE_MESSAGES = "alfresco/messages/dictionary-messages";
 
-    private static final String TEST_URL = "http://www.alfresco.org/test/dictionarydaotest/1.0";
+    // private static final String TEST_URL = "http://www.alfresco.org/test/dictionarydaotest/1.0";
     private static final String TEST_MODEL = "org/alfresco/repo/dictionary/dictionarydaotest_model.xml";
+
     private static final String TEST_BUNDLE = "org/alfresco/repo/dictionary/dictionarydaotest_model";
+
     private DictionaryService service;
-    
-    
+
     @Override
     public void setUp()
-    {   
-        // register resource bundles for messages
-        I18NUtil.registerResourceBundle(TEST_RESOURCE_MESSAGES);
-        
-        // Instantiate Dictionary Service
-        TenantService tenantService = new SingleTServiceImpl();   
-        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
-        initNamespaceCaches(namespaceDAO);
-        
-        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
-        dictionaryDAO.setTenantService(tenantService);
-        initDictionaryCaches(dictionaryDAO);
-
-        // Populate with appropriate models
-        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
+    {
+        boolean inRepoContext = false;
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
-        bootstrapModels.add(TEST_MODEL);
-        List<String> labels = new ArrayList<String>();
-        labels.add(TEST_BUNDLE);
-        bootstrap.setModels(bootstrapModels);
-        bootstrap.setLabels(labels);
-        bootstrap.setDictionaryDAO(dictionaryDAO);
-        bootstrap.setTenantService(tenantService);
-        bootstrap.bootstrap();
-        
-        DictionaryComponent component = new DictionaryComponent();
-        component.setDictionaryDAO(dictionaryDAO);
-        service = component;
+        if (inRepoContext)
+        {
+            bootstrapModels.add("alfresco/model/applicationModel.xml");
+            bootstrapModels.add("alfresco/model/blogIntegrationModel.xml");
+            bootstrapModels.add("alfresco/model/calendarModel.xml");
+            bootstrapModels.add("alfresco/model/contentModel.xml");
+            bootstrapModels.add("alfresco/model/datalistModel.xml");
+            bootstrapModels.add("alfresco/model/emailServerModel.xml");
+            bootstrapModels.add("alfresco/model/forumModel.xml");
+            bootstrapModels.add("alfresco/model/imapModel.xml");
+            bootstrapModels.add("alfresco/model/linksModel.xml");
+            bootstrapModels.add("alfresco/model/siteModel.xml");
+            bootstrapModels.add("alfresco/model/systemModel.xml");
+            bootstrapModels.add("alfresco/model/transferModel.xml");
+            bootstrapModels.add("alfresco/model/wcmAppModel.xml");
+            bootstrapModels.add("alfresco/model/wcmModel.xml");
+            
+            //bootstrapModels.add("org/alfresco/repo/security/authentication/userModel.xml");
+            //bootstrapModels.add("org/alfresco/repo/action/actionModel.xml");
+            //bootstrapModels.add("org/alfresco/repo/rule/ruleModel.xml");
+            //bootstrapModels.add("org/alfresco/repo/version/version_model.xml");  
+        }
+        else
+        {
+            bootstrapModels.add(TEST_MODEL);
+        }
+        HashMap<String, M2Model> modelMap = new HashMap<String, M2Model>();
+        for (String bootstrapModel : bootstrapModels)
+        {
+            System.out.println("Loading ..."+bootstrapModel);
+            InputStream modelStream = getClass().getClassLoader().getResourceAsStream(bootstrapModel);
+            M2Model model = M2Model.createModel(modelStream);
+            for (M2Namespace namespace : model.getNamespaces())
+            {
+                modelMap.put(namespace.getUri(), model);
+            }
+        }
+
+        // Load the models ensuring that they are loaded in the correct order
+        HashSet<String> loadedModels = new HashSet<String>();
+        for (M2Model model : modelMap.values())
+        {
+            loadModel(modelMap, loadedModels, model);
+        }
+
     }
-    
-    private void initDictionaryCaches(DictionaryDAOImpl dictionaryDAO)
+
+    private void loadModel(Map<String, M2Model> modelMap, HashSet<String> loadedModels, M2Model model)
     {
-        dictionaryDAO.setDictionaryRegistryCache(new MemoryCache<String, DictionaryRegistry>());
+        String modelName = model.getName();
+        if (loadedModels.contains(modelName) == false)
+        {
+            for (M2Namespace importNamespace : model.getImports())
+            {
+                M2Model importedModel = modelMap.get(importNamespace.getUri());
+                if (importedModel != null)
+                {
+
+                    // Ensure that the imported model is loaded first
+                    loadModel(modelMap, loadedModels, importedModel);
+                }
+            }
+
+            AlfrescoSolrDataModel.getInstance("test").putModel(model);
+            loadedModels.add(modelName);
+        }
     }
-    
-    private void initNamespaceCaches(NamespaceDAOImpl namespaceDAO)
-    {
-        namespaceDAO.setNamespaceRegistryCache(new MemoryCache<String, NamespaceRegistry>());
-    }
-    
 
     public void testWrite() throws Exception
     {
@@ -119,11 +127,11 @@ public class SolrSchemaGenerationTest extends TestCase
         format.setNewLineAfterDeclaration(false);
         format.setIndentSize(3);
         format.setEncoding("UTF-8");
-        
+
         File temp = File.createTempFile("SolrSchemaGenerationTest-", null, null);
         XMLWriter xmlWriter = new XMLWriter(new BufferedWriter(new FileWriter(temp)), format);
-        SolrUtil.generateSchema(xmlWriter, service);
-        System.out.println("Schema written to: "+temp.getCanonicalPath());
+        AlfrescoSolrDataModel.getInstance("test").generateSchema(xmlWriter);
+        System.out.println("Schema written to: " + temp.getCanonicalPath());
     }
-  
+
 }
