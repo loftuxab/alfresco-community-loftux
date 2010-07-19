@@ -3,7 +3,7 @@
    {
       siteId: "${page.url.templateArgs.site}",
       containerId: "links",
-      linkId: "${page.url.args['linkId']}"
+      linkId: "${page.url.args.linkId?js_string}"
    }).setMessages(
       ${messages}
    );

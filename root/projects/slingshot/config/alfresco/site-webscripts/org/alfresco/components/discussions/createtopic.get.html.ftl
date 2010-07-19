@@ -2,9 +2,9 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.CreateTopic("${args.htmlid}").setOptions(
    {
-      topicId: "${page.url.args.topicId!''}",
+      topicId: "${(page.url.args.topicId!'')?js_string}",
       siteId: "${page.url.templateArgs.site!''}",
-      containerId: "${page.url.args.containerId!'discussions'}",
+      containerId: "${(page.url.args.containerId!'discussions')?js_string}",
       editorConfig:
       {
          width: '700',

@@ -3,7 +3,7 @@
    {
       siteId: "${page.url.templateArgs.site}",
       containerId: "blog",
-      postId: "${page.url.args['postId']}"
+      postId: "${page.url.args.postId?js_string}"
    }).setMessages(
       ${messages}
    );

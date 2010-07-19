@@ -2,7 +2,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RulesList("${el}").setOptions(
    {
-      nodeRef: new Alfresco.util.NodeRef("${page.url.args.nodeRef!""}"),
+      nodeRef: new Alfresco.util.NodeRef("${(page.url.args.nodeRef!"")?js_string}"),
       siteId: "${page.url.templateArgs.site!""}",      
       filter: "${args.filter!""}",
       selectDefault: ${args.selectDefault!"false"},

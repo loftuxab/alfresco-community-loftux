@@ -60,7 +60,7 @@
    <div class="title-bar">
       <div id="${args.htmlid}-viewButtons" class="yui-u first pageTitle">${page.url.args["title"]?replace("_", " ")?html}</div>
       <div class="yui-u align-right">
-<#assign action = page.url.args["action"]!"view"> 
+<#assign action = page.url.args.action!"view">
 <#assign tabs =
 [
    { 
@@ -85,7 +85,7 @@
    <#elseif tab.permitted == false>
          <span class="tabLabelDisabled">${tab.label}</span>
    <#else>
-         <a href="?title=${(page.url.args["title"]!"")?url}&amp;action=${tab.action?url}" class="tabLabel">${tab.label}</a>
+         <a href="?title=${(page.url.args.title!"")?url}&amp;action=${tab.action?url}" class="tabLabel">${tab.label}</a>
    </#if>
    <#if tab_has_next>
          <span class="separator">|</span>
@@ -102,7 +102,7 @@
       <div class="page-form-body">
          <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]?url}" method="post">
             <fieldset>
-            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
+            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title?url>
                <input type="hidden" name="context" value="${pageContext?html}" />
                <input type="hidden" name="page" value="wiki-page" />
                <input type="hidden" name="currentVersion" value="${currentVersion}" />

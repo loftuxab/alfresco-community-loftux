@@ -6,7 +6,7 @@
       containerId: "links",
    <#if page.url.args.linkId??>
       editMode: true,
-      linkId: "${page.url.args.linkId?html}"
+      linkId: "${page.url.args.linkId?js_string}"
    <#else>
       editMode: false,
       linkId: ""

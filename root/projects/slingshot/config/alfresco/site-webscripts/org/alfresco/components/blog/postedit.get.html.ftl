@@ -20,7 +20,7 @@
       containerId: "blog",
       <#if page.url.args.postId??>
          editMode: true,
-         postId: "${page.url.args.postId?html}"
+         postId: "${page.url.args.postId?js_string}"
       <#else>
          editMode: false,
          postId: ""

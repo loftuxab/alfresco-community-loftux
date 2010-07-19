@@ -5,7 +5,7 @@
    {
       siteId: "${page.url.templateArgs.site}",
       containerId: "${container}",
-      topicId: "${page.url.args.topicId!''}"
+      topicId: "${(page.url.args.topicId!'')?js_string}"
    }).setMessages(
       ${messages}
    );

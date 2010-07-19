@@ -3,7 +3,7 @@
    new Alfresco.FormManager("${args.htmlid}").setOptions(
    {
       failureMessage: "edit-metadata-mgr.update.failed",
-      forwardUrl: "${siteURL((nodeType!"document") + "-details?nodeRef=" + (nodeRef!page.url.args.nodeRef))}"
+      forwardUrl: "${siteURL((nodeType!"document") + "-details?nodeRef=" + (nodeRef!page.url.args.nodeRef)?js_string)}"
    }).setMessages(
       ${messages}
    );

@@ -26,7 +26,7 @@
    </div>
 
    <div class="action-bar">
-      <#assign hide><#if (page.url.args["title"]! == "")>style="display: none;"</#if></#assign> 
+      <#assign hide><#if (page.url.args.title! == "")>style="display: none;"</#if></#assign>
       <div class="new-page"><button id="${args.htmlid}-create-button">${msg("button.create")}</button></div>
       <div class="separator" ${hide}>&nbsp;</div>
       <div class="delete-page" ${hide}><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
@@ -43,7 +43,7 @@
    <div id="${args.htmlid}-renamepanel" class="rename-panel">
       <div class="hd"><label for="${args.htmlid}-renameTo">${msg("panel.rename.title")}</label></div>
       <div class="bd">
-         <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${(page.url.args["title"]!"")?url}">
+         <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${(page.url.args.title!"")?url}">
             <div class="yui-ge">
                <input type="hidden" id="${args.htmlid}-page" name="page" value="wiki-page" />
                <div class="yui-u first">

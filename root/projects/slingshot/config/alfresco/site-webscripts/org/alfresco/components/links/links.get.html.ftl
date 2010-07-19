@@ -5,9 +5,9 @@
       containerId: "${page.url.templateArgs.container!'links'}",
       initialFilter:
       {
-         filterId: "${page.url.args.filterId!'all'}",
-         filterOwner: "${page.url.args.filterOwner!'Alfresco.LinkFilter'}",
-         filterData: <#if page.url.args.filterData??>"${page.url.args.filterData}"<#else>null</#if>
+         filterId: "${(page.url.args.filterId!'all')?js_string}",
+         filterOwner: "${(page.url.args.filterOwner!'Alfresco.LinkFilter')?js_string}",
+         filterData: <#if page.url.args.filterData??>"${page.url.args.filterData?js_string}"<#else>null</#if>
       }
    });
    links.setMessages(

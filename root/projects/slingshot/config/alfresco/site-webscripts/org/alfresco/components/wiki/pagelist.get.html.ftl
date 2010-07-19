@@ -13,7 +13,7 @@
       {
          "create": ${(permissions["create"]!false)?string}
       },
-      filterId: "${page.url.args.filter!"recentlyModified"}"
+      filterId: "${(page.url.args.filter!"recentlyModified")?js_string}"
    });                                       
 //]]></script>
 <div id="${args.htmlid}-pagelist" class="yui-navset pagelist"> 
