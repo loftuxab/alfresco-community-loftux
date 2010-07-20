@@ -5,9 +5,9 @@
    {
       controlId: "${controlId}",
       pickerId: "selection",
-      nodeRef: "${page.url.args.nodeRef}",
+      nodeRef: "${(page.url.args.nodeRef)?js_string}",
       siteId: "${page.url.templateArgs.site!""}",
-      parentNodeRef: "${page.url.args.parentNodeRef}",
+      parentNodeRef: "${(page.url.args.parentNodeRef)?js_string}",
       docName: "${(page.url.args.docName!"")?js_string}"
    }).setMessages(
       ${messages}
