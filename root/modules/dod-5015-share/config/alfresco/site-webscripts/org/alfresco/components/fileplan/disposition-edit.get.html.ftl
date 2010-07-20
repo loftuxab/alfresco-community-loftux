@@ -3,7 +3,7 @@
       ${messages}
    ).setOptions(
    {
-      nodeRef: "${page.url.args.nodeRef}",
+      nodeRef: "${page.url.args.nodeRef?js_string}",
       siteId: "${page.url.templateArgs.site!""}",
       events:
       {

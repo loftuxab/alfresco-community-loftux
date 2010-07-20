@@ -2,7 +2,7 @@
    <#assign filterId = page.url.args["filter"]!"path">
       initialFilter:
       {
-         filterId: "${filterId}"
+         filterId: "${filterId?js_string}"
       },
 </#macro>
 <!--[if IE]>
@@ -14,12 +14,12 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${args.container!"documentLibrary"}",
-      initialPath: "${page.url.args["path"]!""}",
+      initialPath: "${(page.url.args["path"]!"")?js_string}",
       <@initialFilter />
       usePagination: false,
       showFolders: true,
       simpleView: ${(preferences.simpleView!false)?string},
-      highlightFile: "${page.url.args["file"]!""}"
+      highlightFile: "${(page.url.args["file"]!"")?js_string}"
    }).setMessages(
       ${messages}
    );

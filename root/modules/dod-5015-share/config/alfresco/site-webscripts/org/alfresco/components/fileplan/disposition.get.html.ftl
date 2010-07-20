@@ -1,7 +1,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.Disposition("${args.htmlid}").setOptions(
    {
-      nodeRef: "${page.url.args.nodeRef!""}",
+      nodeRef: "${(page.url.args.nodeRef!"")?js_string}",
       siteId: "${page.url.templateArgs.site!""}",
       dipositionScheduleNodeRef: "${dipositionScheduleNodeRef!""}"
    }).setMessages(

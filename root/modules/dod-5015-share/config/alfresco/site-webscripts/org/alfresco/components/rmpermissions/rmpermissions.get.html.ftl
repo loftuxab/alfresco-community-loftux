@@ -1,9 +1,9 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RecordsPermissions("${args.htmlid}").setOptions({
     siteId: "${page.url.templateArgs.site!""}",
-    nodeRef: "${page.url.args.nodeRef!""}",
-    nodeType: "${page.url.args.nodeType!""}",
-    itemName: "${page.url.args.itemName!""}"
+    nodeRef: "${(page.url.args.nodeRef!"")?js_string}",
+    nodeType: "${(page.url.args.nodeType!"")?js_string}",
+    itemName: "${(page.url.args.itemName!"")?js_string}"
  }).setMessages(${messages});
 //]]></script>
 

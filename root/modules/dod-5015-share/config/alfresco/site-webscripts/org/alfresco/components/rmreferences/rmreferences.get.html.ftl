@@ -2,9 +2,9 @@
    new Alfresco.RM.References("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      nodeRef: "${page.url.args.nodeRef!""}",
-      parentNodeRef: "${page.url.args.parentNodeRef!""}",
-      docName: "${page.url.args.docName!""}"
+      nodeRef: "${(page.url.args.nodeRef!"")?js_string}",
+      parentNodeRef: "${(page.url.args.parentNodeRef!"")?js_string}",
+      docName: "${(page.url.args.docName!"")?js_string}"
    }).setMessages(${messages});
 </script>
 <div id="${args.htmlid}" class="manageReferences">
