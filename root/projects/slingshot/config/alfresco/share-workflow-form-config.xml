@@ -1,5 +1,11 @@
 <alfresco-config>
 
+   <!--
+      When workflows are started some bpm:workflowXxx properties are copied to the task and named bpm:xxx
+      I.e The bpm:workflowDueDate workflow property becomes the bpm:dueDate task property. 
+   -->
+
+
    <!-- Ad Hoc Workflow Definition -->
    <config evaluator="string-compare" condition="jbpm$wf:adhoc">
       <forms>
@@ -30,6 +36,7 @@
                <field id="packageItems" label-id="workflow.field.items" set="assignee">
                   <control>
                      <control-param name="displayMode">list</control-param>
+                     <control-param name="selectedItemsContextProperty">selectedItems</control-param>
                   </control>
                </field>
             </appearance>
@@ -64,6 +71,7 @@
                <field id="packageItems" label-id="workflow.field.items">
                   <control>
                      <control-param name="displayMode">list</control-param>
+                     <control-param name="selectedItemsContextProperty">selectedItems</control-param>
                   </control>
                </field>
             </appearance>
@@ -99,6 +107,7 @@
                <field id="packageItems" label-id="workflow.field.items">
                   <control>
                      <control-param name="displayMode">list</control-param>
+                     <control-param name="selectedItemsContextProperty">selectedItems</control-param>
                   </control>
                </field>
             </appearance>

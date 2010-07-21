@@ -1677,6 +1677,47 @@ Alfresco.util.siteURL = function(pageURI, obj, absolute)
 };
 
 /**
+ * Navigates to a url
+ *
+ * @method Alfresco.util.navigateTo
+ * @param uri {string} THe uri to navigate to
+ * @param method {string} (Optional) Default is "GET"
+ * @param parameters {string|object}
+ * @static
+ */
+Alfresco.util.navigateTo = function(uri, method, parameters)
+{
+   method = method ? method.toUpperCase() : "GET";
+   if (method == "GET")
+   {
+      window.location.href = uri;
+   }
+   else
+   {
+      var form = document.createElement("form");
+      form.method = method;
+      form.action = uri;
+      if (method == "POST" || method == "PUT")
+      {
+         var input;
+         for (var name in parameters)
+         {
+            if (parameters.hasOwnProperty(name))
+            {
+               input = document.createElement("input");
+               input.setAttribute("name", name);
+               input.setAttribute("type", "hidden");
+               input.value = parameters[name];
+               form.appendChild(input);
+            }
+         }         
+      }
+      document.body.appendChild(form);
+      form.submit();
+   }
+};
+
+/**
  * Generates a link to the user profile page unless the "userprofilepage" uritemplate has
  * been removed or emptied in share-config-custom.xml
  * If no fullName is supplied, the userName is displayed instead.

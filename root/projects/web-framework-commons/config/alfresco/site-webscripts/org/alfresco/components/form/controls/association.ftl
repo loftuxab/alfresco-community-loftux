@@ -1,6 +1,18 @@
 <#include "common/picker.inc.ftl" />
 
 <#assign controlId = fieldHtmlId + "-cntrl">
+<#assign fieldValue = "">
+<#if field.control.params.selectedItemsContextProperty??>
+   <#if context.properties[field.control.params.selectedItemsContextProperty]??>
+      <#assign fieldValue = context.properties[field.control.params.selectedItemsContextProperty]>
+   <#elseif args[field.control.params.selectedItemsContextProperty]??>
+      <#assign fieldValue = args[field.control.params.selectedItemsContextProperty]>
+   </#if>
+<#elseif context.properties[field.name]??>
+   <#assign fieldValue = context.properties[field.name]>
+<#else>
+   <#assign fieldValue = field.value>
+</#if>
 
 <script type="text/javascript">//<![CDATA[
 (function()
@@ -12,6 +24,7 @@
       showLinkToTarget: ${field.control.params.showTargetLink},
       targetLinkTemplate: "${url.context}/page/site/${page.url.templateArgs.site!""}/document-details?nodeRef={nodeRef}",
    </#if>
+      <#if fieldValue != "">currentValue: "${fieldValue}",</#if>
       itemType: "${field.endpointType}",
       multipleSelectMode: ${field.endpointMany?string},
       parentNodeRef: "alfresco://company/home",
@@ -24,7 +37,7 @@
 <div class="form-field">
    <#if form.mode == "view">
       <div id="${controlId}" class="viewmode-field">
-         <#if (field.endpointMandatory!false || field.mandatory!false) && field.value == "">
+         <#if (field.endpointMandatory!false || field.mandatory!false) && fieldValue == "">
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
@@ -38,7 +51,7 @@
          <div id="${controlId}-currentValueDisplay" class="current-values"></div>
          
          <#if form.mode != "view" && field.disabled == false>
-            <input type="hidden" id="${fieldHtmlId}" name="-" value="${field.value?html}" />
+            <input type="hidden" id="${fieldHtmlId}" name="-" value="${fieldValue?html}" />
             <input type="hidden" id="${controlId}-added" name="${field.name}_added" />
             <input type="hidden" id="${controlId}-removed" name="${field.name}_removed" />
             <div class="show-picker">
