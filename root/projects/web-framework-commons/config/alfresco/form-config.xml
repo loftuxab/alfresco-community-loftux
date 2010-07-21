@@ -7,6 +7,7 @@
       <evaluators>
          <evaluator id="node-type" class="org.alfresco.web.config.forms.NodeTypeEvaluator" />
          <evaluator id="model-type" class="org.alfresco.web.config.forms.ModelTypeEvaluator" />
+         <evaluator id="task-type" class="org.alfresco.web.config.forms.TaskTypeEvaluator" />
          <evaluator id="aspect" class="org.alfresco.web.config.forms.AspectEvaluator" />
       </evaluators>
    </plug-ins>

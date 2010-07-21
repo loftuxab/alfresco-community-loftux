@@ -31,6 +31,8 @@ import org.json.JSONTokener;
  */
 public class NodeTypeEvaluator extends NodeMetadataBasedEvaluator
 {
+    protected static final String JSON_TYPE = "type";
+    
     private static Log logger = LogFactory.getLog(NodeTypeEvaluator.class);
 
     @Override
@@ -52,18 +54,18 @@ public class NodeTypeEvaluator extends NodeMetadataBasedEvaluator
         try
         {
             JSONObject json = new JSONObject(new JSONTokener(jsonResponseString));
-            Object typeObj = json.get("type");
+            Object typeObj = json.get(JSON_TYPE);
             if (typeObj instanceof String)
             {
                 String typeString = (String) typeObj;
                 result = condition.equals(typeString);
             }
-        } catch (JSONException e)
+        } 
+        catch (JSONException e)
         {
-
             if (getLogger().isWarnEnabled())
             {
-                getLogger().warn("Failed to read JSON response from metadata service.", e);
+                getLogger().warn("Failed to find node type in JSON response from metadata service.", e);
             }
         }
         return result;
