@@ -39,7 +39,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 
 /**
  * Analyse properties according to the property definition. The default is to use the standard tokeniser. The tokeniser
@@ -112,33 +111,73 @@ public class LuceneAnalyser extends Analyzer
     private Analyzer findAnalyser(String fieldName, AnalysisMode analysisMode)
     {
         Analyzer analyser;
-        if (fieldName.equals("PATH"))
+        if (fieldName.equals("ID"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
+        else if (fieldName.equals("TX"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
+        else if (fieldName.equals("PARENT"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
+        else if (fieldName.equals("LINKASPECT"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
+        else if (fieldName.equals("PATH"))
         {
             analyser = new PathAnalyser();
+        }
+        else if (fieldName.equals("ANCESTOR"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
+        else if (fieldName.equals("ISCONTAINER"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
+        else if (fieldName.equals("ISCATEGORY"))
+        {
+            analyser = new VerbatimAnalyser(false);
         }
         else if (fieldName.equals("QNAME"))
         {
             analyser = new PathAnalyser();
         }
+        else if (fieldName.equals("ISROOT"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
         else if (fieldName.equals("PRIMARYASSOCTYPEQNAME"))
         {
             analyser = new PathAnalyser();
+        }
+        else if (fieldName.equals("ISNODE"))
+        {
+            analyser = new VerbatimAnalyser(false);
         }
         else if (fieldName.equals("ASSOCTYPEQNAME"))
         {
             analyser = new PathAnalyser();
         }
+        else if (fieldName.equals("PRIMARYPARENT"))
+        {
+            analyser = new VerbatimAnalyser(false);
+        }
         else if (fieldName.equals("TYPE"))
         {
-            throw new UnsupportedOperationException("TYPE must not be tokenised");
+            analyser = new VerbatimAnalyser(false);
         }
         else if (fieldName.equals("ASPECT"))
         {
-            throw new UnsupportedOperationException("ASPECT must not be tokenised");
+            analyser = new VerbatimAnalyser(false);
         }
-        else if (fieldName.equals("ANCESTOR"))
+        else if (fieldName.equals("FTSSTATUS"))
         {
-            analyser = new WhitespaceAnalyzer();
+            analyser = new VerbatimAnalyser(false);
         }
         else if (fieldName.startsWith("@"))
         {
