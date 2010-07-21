@@ -33,7 +33,9 @@ import org.json.JSONTokener;
  */
 public class AspectEvaluator extends NodeMetadataBasedEvaluator
 {
-    static Log logger = LogFactory.getLog(AspectEvaluator.class);
+    protected static final String JSON_ASPECTS = "aspects";
+    
+    private static Log logger = LogFactory.getLog(AspectEvaluator.class);
 
     @Override
     protected Log getLogger()
@@ -54,7 +56,7 @@ public class AspectEvaluator extends NodeMetadataBasedEvaluator
         try
         {
             JSONObject json = new JSONObject(new JSONTokener(jsonResponseString));
-            Object aspectsObj = json.get("aspects");
+            Object aspectsObj = json.get(JSON_ASPECTS);
             if (aspectsObj instanceof JSONArray)
             {
                 JSONArray aspectsArray = (JSONArray) aspectsObj;
@@ -69,11 +71,12 @@ public class AspectEvaluator extends NodeMetadataBasedEvaluator
                     }
                 }
             }
-        } catch (JSONException e)
+        } 
+        catch (JSONException e)
         {
             if (getLogger().isWarnEnabled())
             {
-                getLogger().warn("Failed to read JSON response from metadata service.", e);
+                getLogger().warn("Failed to find aspects in JSON response from metadata service.", e);
             }
         }
         return result;

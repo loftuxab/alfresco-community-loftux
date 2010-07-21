@@ -1,10 +1,13 @@
 <alfresco-config>
 
+   <!-- ************************************** -->
+   <!-- Workflow Definition Form Configuration -->
+   <!-- ************************************** -->
+   
    <!--
       When workflows are started some bpm:workflowXxx properties are copied to the task and named bpm:xxx
       I.e The bpm:workflowDueDate workflow property becomes the bpm:dueDate task property. 
    -->
-
 
    <!-- Ad Hoc Workflow Definition -->
    <config evaluator="string-compare" condition="jbpm$wf:adhoc">
@@ -109,6 +112,78 @@
                      <control-param name="displayMode">list</control-param>
                      <control-param name="selectedItemsContextProperty">selectedItems</control-param>
                   </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <!-- *********************** -->
+   <!-- Task Form Configuration -->
+   <!-- *********************** -->
+   
+   <config evaluator="task-type" condition="wf:adhocTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:taskId" />
+               <show id="bpm:description" />
+               <show id="bpm:dueDate" />
+               <show id="bpm:priority" />
+               <show id="bpm:status" />
+               <show id="packageItems" />
+               <show id="bpm:comment" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.group.task.info" />
+               <set id="progress" appearance="title" label-id="workflow.group.task.progress" />
+               <set id="response" appearance="title" label-id="workflow.group.response" />
+               
+               <field id="bpm:description" read-only="true" />
+               <field id="bpm:dueDate" read-only="true" />
+               <field id="bpm:priority" read-only="true" />
+               <field id="bpm:status" set="progress" />
+               <field id="packageItems" label-id="workflow.field.items" set="progress">
+                  <control>
+                     <control-param name="displayMode">list</control-param>
+                  </control>
+               </field>
+               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="task-type" condition="wf:reviewTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:taskId" />
+               <show id="bpm:description" />
+               <show id="bpm:dueDate" />
+               <show id="bpm:priority" />
+               <show id="bpm:status" />
+               <show id="packageItems" />
+               <show id="bpm:comment" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.group.task.info" />
+               <set id="progress" appearance="title" label-id="workflow.group.task.progress" />
+               <set id="response" appearance="title" label-id="workflow.group.response" />
+               
+               <field id="bpm:description" read-only="true" />
+               <field id="bpm:dueDate" read-only="true" />
+               <field id="bpm:priority" read-only="true" />
+               <field id="bpm:status" set="progress" />
+               <field id="packageItems" label-id="workflow.field.items" set="progress">
+                  <control>
+                     <control-param name="displayMode">list</control-param>
+                  </control>
+               </field>
+               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
             </appearance>
          </form>

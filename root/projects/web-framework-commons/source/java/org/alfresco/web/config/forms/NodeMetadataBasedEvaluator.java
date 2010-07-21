@@ -18,24 +18,10 @@
  */
 package org.alfresco.web.config.forms;
 
-import java.io.Serializable;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.logging.Log;
-import org.springframework.extensions.config.evaluator.Evaluator;
-import org.springframework.extensions.surf.FrameworkUtil;
-import org.springframework.extensions.surf.RequestContext;
-import org.springframework.extensions.surf.ServletUtil;
 import org.springframework.extensions.surf.exception.ConnectorServiceException;
-import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
-import org.springframework.extensions.webscripts.connector.Connector;
-import org.springframework.extensions.webscripts.connector.ConnectorService;
-import org.springframework.extensions.webscripts.connector.Response;
-import org.springframework.extensions.webscripts.connector.ResponseStatus;
 
 /**
  * This class provides common behaviour for the evaluators which use node-based
@@ -43,12 +29,9 @@ import org.springframework.extensions.webscripts.connector.ResponseStatus;
  * 
  * @author Neil McErlean
  */
-public abstract class NodeMetadataBasedEvaluator implements Evaluator
+public abstract class NodeMetadataBasedEvaluator extends ServiceBasedEvaluator
 {
-    protected static final String ENDPOINT_ID = "alfresco";
     protected static final Pattern nodeRefPattern = Pattern.compile(".+://.+/.+");
-
-    protected abstract Log getLogger();
 
     /**
      * This method checks if the specified condition is matched by the specified
@@ -108,56 +91,6 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
 
     private String callMetadataService(String nodeString) throws ConnectorServiceException
     {
-        // Before making the remote call, we'll check the request-scoped cache in
-        // ThreadLocalRequestContext.
-        StringBuilder builder = new StringBuilder().append("forms.cache.").append(nodeString);
-        String keyForCachedJson = builder.toString();
-        
-        Map<String, Serializable> valuesMap = ThreadLocalRequestContext.getRequestContext().getValuesMap();
-        Serializable cachedResult = valuesMap.get(keyForCachedJson);
-        if (cachedResult != null & cachedResult instanceof String)
-        {
-            if (getLogger().isDebugEnabled())
-            {
-                getLogger().debug("Retrieved cached metadata for " + nodeString);
-            }
-            return (String)cachedResult;
-        }
-
-        ConnectorService connService = FrameworkUtil.getConnectorService();
-        
-        RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
-        String currentUserId = requestContext.getUserId();
-        HttpSession currentSession = ServletUtil.getSession(true);
-        Connector connector = connService.getConnector(ENDPOINT_ID, currentUserId, currentSession);
-
-        Response r = connector.call("/api/metadata?nodeRef=" + nodeString + "&shortQNames=true");
-
-        // check that the service call did not return unauthorized
-        if (r.getStatus().getCode() == ResponseStatus.STATUS_UNAUTHORIZED)
-        {
-           throw new NotAuthenticatedException();
-        }
-        
-        String jsonResponseString = r.getResponse();
-        
-        // Cache the jsonResponseString in the RequestContext
-        if (getLogger().isDebugEnabled())
-        {
-            getLogger().debug("Caching metadata for '" + nodeString + "':\n" + jsonResponseString);
-        }
-        ThreadLocalRequestContext.getRequestContext().setValue(keyForCachedJson, jsonResponseString);
-        
-        return jsonResponseString;
-    }
-    
-    /**
-     * Marker exception to indicate that authentication failed
-     *
-     * @author Gavin Cornwell
-     */
-    class NotAuthenticatedException extends RuntimeException 
-    {
-      private static final long serialVersionUID = 9136927085864150503L;
+        return callService("/api/metadata?nodeRef=" + nodeString + "&shortQNames=true");
     }
 }
