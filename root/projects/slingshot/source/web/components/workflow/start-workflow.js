@@ -53,6 +53,31 @@
    {
 
       /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * The nodeRefs, separated by commas, to display in the workflow forms packageItems control.
+          *
+          * @property selectedItems
+          * @type string
+          */
+         selectedItems: "",
+
+         /**
+          * A nodeRef that represents the context of the workflow
+          *
+          * @property destination
+          * @type string
+          */
+         destination: ""
+      },
+
+      /**
        * Fired by YUI when parent element is available for scripting.
        * Template initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -83,11 +108,13 @@
                   htmlid: this.id + "-startWorkflowForm-" + Alfresco.util.generateDomId(),
                   itemKind: "workflow",
                   itemId: this.widgets.workflowSelectEl.options[i].value,
-                  mode: "edit",
+                  mode: "create",
                   submitType: "json",
                   showCaption: true,
                   formUI: true,
-                  showCancelButton: true
+                  showCancelButton: true,
+                  selectedItems: this.options.selectedItems,
+                  destination: this.options.destination
                },
                successCallback:
                {

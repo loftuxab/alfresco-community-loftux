@@ -3,7 +3,9 @@
    new Alfresco.StartWorkflow("${el}").setOptions({
       failureMessage: "message.failure",
       submitButtonMessageKey: "button.startWorkflow",
-      forwardUrl: Alfresco.util.uriTemplate("userdashboardpage", { userid: Alfresco.constants.USERNAME })
+      forwardUrl: Alfresco.util.uriTemplate("userdashboardpage", { userid: Alfresco.constants.USERNAME }),
+      selectedItems: "${(page.url.args.selectedItems!"")?js_string}",
+      destination: "${(page.url.args.destination!"")?js_string}"
    }).setMessages(
       ${messages}
    );

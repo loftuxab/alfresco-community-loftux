@@ -619,8 +619,24 @@
        */
       onActionAssignWorkflow: function dlA_onActionAssignWorkflow(asset)
       {
-         // TODO: Do a POST with all selectedItems 
-         document.location.href = "start-workflow";
+         var nodeRefs = "";
+         if (YAHOO.lang.isArray(asset))
+         {
+            for (var i = 0, il = asset.length; i < il; i++)
+            {
+               nodeRefs += (i == 0 ? "" : ",") + asset[i].nodeRef;
+            }
+         }
+         else
+         {
+            nodeRefs = asset.nodeRef;
+         }
+         var postBody = { "selectedItems" : nodeRefs};
+         if (this.modules.docList)
+         {
+            postBody.destination = this.modules.docList.doclistMetadata.parent.nodeRef;
+         }
+         Alfresco.util.navigateTo($siteURL("start-workflow"), "POST", postBody);
       },
 
       /**

@@ -61,7 +61,7 @@
          var me = this;
          
          // DataSource definition
-         var properties = ["bpm_taskId", "bpm_priority", "bpm_status", "bpm_duedate", "bpm_description"];
+         var properties = ["bpm_taskId", "bpm_priority", "bpm_status", "bpm_dueDate", "bpm_description"];
          this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/task-instances?properties=" + properties.join(",") ,
          {
             responseType: YAHOO.util.DataSource.TYPE_JSON,
@@ -96,14 +96,14 @@
          {
             var taskId = oRecord.getData("properties")["bpm_taskId"],
                title = oRecord.getData("properties")["bpm_description"],
-               dueDateStr = oRecord.getData("properties")["bpm_duedate"],
+               dueDateStr = oRecord.getData("properties")["bpm_dueDate"],
                dueDate = dueDateStr ? Alfresco.util.fromISO8601(dueDateStr) : null,
                today = new Date(),
                type = oRecord.getData("typeDefinitionTitle"),
                status = oRecord.getData("properties")["bpm_status"],
                assignee = oRecord.getData("owner");
             var titleDesc = '<h4><a href="view-task?taskId=' + encodeURIComponent(taskId) + '" class="theme-color-1" title="' + me.msg("link.viewTask") + '">' + title + '</a></h4>',
-               dateDesc = dueDate ? '<h4><span class="' + (dueDate > today ? "task-delayed" : "") + '">' + Alfresco.util.formatDate(dueDate, "mediumDate") + '</span></h4>' : "",
+               dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '">' + Alfresco.util.formatDate(dueDate, "mediumDate") + '</span></h4>' : "",
                statusDesc = '<div>' + me.msg("label.taskSummary", type, status) + '</div>',
                unassignedDesc = '';
             if (!assignee || !assignee.userName)
