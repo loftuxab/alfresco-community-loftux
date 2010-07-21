@@ -19,17 +19,13 @@
 package org.alfresco.solr;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.cache.MemoryCache;
-import org.alfresco.repo.dictionary.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAOImpl;
-import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.NamespaceDAOImpl;
 import org.alfresco.repo.dictionary.DictionaryDAOImpl.DictionaryRegistry;
@@ -205,7 +201,7 @@ public class AlfrescoSolrDataModel
             }
         }
         
-        NonDictionaryField nonDDField = nonDictionaryFields.get(field);
+        NonDictionaryField nonDDField = nonDictionaryFields.get(field.getName());
         if(nonDDField != null)
         {
             return nonDDField.index;
@@ -234,7 +230,7 @@ public class AlfrescoSolrDataModel
             return propertyDefinition.isStoredInIndex() ? Store.YES : Store.NO;
         }
         
-        NonDictionaryField nonDDField = nonDictionaryFields.get(field);
+        NonDictionaryField nonDDField = nonDictionaryFields.get(field.getName());
         if(nonDDField != null)
         {
             return nonDDField.store;
@@ -264,7 +260,7 @@ public class AlfrescoSolrDataModel
             return false;
         }
         
-        NonDictionaryField nonDDField = nonDictionaryFields.get(field);
+        NonDictionaryField nonDDField = nonDictionaryFields.get(field.getName());
         if(nonDDField != null)
         {
             if((nonDDField.index == Index.ANALYZED_NO_NORMS) || (nonDDField.index == Index.NOT_ANALYZED_NO_NORMS) || (nonDDField.index == Index.NO_NORMS))
@@ -375,6 +371,14 @@ public class AlfrescoSolrDataModel
         }
         xmlWriter.endElement("", "fields", "fields");
 
+        xmlWriter.startElement("", "uniqueKey", "uniqueKey", new AttributesImpl());
+        xmlWriter.write("ID");
+        xmlWriter.endElement("", "uniqueKey", "uniqueKey");
+        
+        xmlWriter.startElement("", "defaultSearchField", "defaultSearchField", new AttributesImpl());
+        xmlWriter.write("ID");
+        xmlWriter.endElement("", "defaultSearchField", "defaultSearchField");
+        
         xmlWriter.endElement("", "schema", "schema");
 
         xmlWriter.endDocument();

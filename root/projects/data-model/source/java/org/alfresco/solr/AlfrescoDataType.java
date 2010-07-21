@@ -140,18 +140,14 @@ public class AlfrescoDataType extends FieldType
         super.init(schema, args);
     }
 
-    @Override
-    public void write(TextResponseWriter arg0, String arg1, Fieldable arg2) throws IOException
+    public void write(XMLWriter xmlWriter, String name, Fieldable f) throws IOException
     {
-        // TODO Auto-generated method stub
-
+        xmlWriter.writeStr(name, f.stringValue());
     }
 
-    @Override
-    public void write(XMLWriter arg0, String arg1, Fieldable arg2) throws IOException
+    public void write(TextResponseWriter writer, String name, Fieldable f) throws IOException
     {
-        // TODO Auto-generated method stub
-
+        writer.writeStr(name, f.stringValue(), true);
     }
 
     @Override
