@@ -33,7 +33,17 @@
    width: 30em;
 }
 
-.form-container input[type="checkbox"]
+.form-container input[type="checkbox"] 
+{
+   width: auto;
+}
+
+.form-container input[type="button"]
+{
+   width: auto;
+}
+
+.form-container input[type="submit"]
 {
    width: auto;
 }
