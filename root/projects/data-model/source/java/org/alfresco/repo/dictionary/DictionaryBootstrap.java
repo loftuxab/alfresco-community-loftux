@@ -18,17 +18,18 @@
  */
 package org.alfresco.repo.dictionary;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.extensions.surf.util.I18NUtil;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 
 /**
@@ -155,6 +156,17 @@ public class DictionaryBootstrap implements DictionaryListener
                 catch(DictionaryException e)
                 {
                     throw new DictionaryException("Could not import bootstrap model " + bootstrapModel, e);
+                }
+                finally
+                {
+                    try
+                    {
+                        modelStream.close();
+                    } 
+                    catch (IOException ioe)
+                    {
+                        logger.warn("Failed to close model input stream for '"+bootstrapModel+"': "+ioe);
+                    }
                 }
             }
             
