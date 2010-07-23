@@ -26,7 +26,7 @@
             <type name="datetime" template="/org/alfresco/components/form/controls/date.ftl">
                <control-param name="showTime">true</control-param>
             </type>
-             <type name="period" template="/org/alfresco/components/form/controls/period.ftl" />
+            <type name="period" template="/org/alfresco/components/form/controls/period.ftl" />
             <type name="any" template="/org/alfresco/components/form/controls/textfield.ftl" />
             <type name="category" template="/org/alfresco/components/form/controls/category.ftl" />
             <type name="association" template="/org/alfresco/components/form/controls/association.ftl" />
@@ -34,6 +34,7 @@
             <type name="association:cm:authority" template="/org/alfresco/components/form/controls/authority.ftl" />
             <type name="association:cm:authorityContainer" template="/org/alfresco/components/form/controls/authority.ftl" />
             <type name="content" template="/org/alfresco/components/form/controls/content.ftl" />
+            <type name="transitions" template="/org/alfresco/components/form/controls/workflow/transitions.ftl" />
             <!-- Data types that should always be rendered read-only -->
             <type name="qname" template="/org/alfresco/components/form/controls/readonly.ftl" />
             <type name="noderef" template="/org/alfresco/components/form/controls/readonly.ftl" />

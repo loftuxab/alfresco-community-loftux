@@ -20,7 +20,7 @@
                handler : ${constraint.validationHandler}, 
                params : ${constraint.params}, 
                event : "${constraint.event}",
-               message : <#if constraint.message?exists>"${constraint.message?js_string}"<#else>null</#if>
+               message : <#if constraint.message??>"${constraint.message?js_string}"<#else>null</#if>
             }
             <#if constraint_has_next>,</#if>
             </#list>
@@ -34,7 +34,7 @@
 
 <#macro renderFormContainer formId>
    <div id="${formId}-container" class="form-container">
-      <#if form.showCaption?exists && form.showCaption>
+      <#if form.showCaption?? && form.showCaption>
          <div id="${formId}-caption" class="caption"><span class="mandatory-indicator">*</span>${msg("form.required.fields")}</div>
       </#if>
          
@@ -63,27 +63,27 @@
 
 <#macro renderFormButtons formId>         
    <div id="${formId}-buttons" class="form-buttons">
-      <#if form.showSubmitButton?exists && form.showSubmitButton>
+      <#if form.showSubmitButton?? && form.showSubmitButton>
          <input id="${formId}-submit" type="submit" value="${msg("form.button.submit.label")}" />&nbsp;
       </#if>
-      <#if form.showResetButton?exists && form.showResetButton>
+      <#if form.showResetButton?? && form.showResetButton>
          <input id="${formId}-reset" type="reset" value="${msg("form.button.reset.label")}" />&nbsp;
       </#if>
-      <#if form.showCancelButton?exists && form.showCancelButton>
+      <#if form.showCancelButton?? && form.showCancelButton>
          <input id="${formId}-cancel" type="button" value="${msg("form.button.cancel.label")}" />
       </#if>
    </div>
 </#macro>   
 
 <#macro renderField field>
-   <#if field.control.template?exists>
+   <#if field.control?? && field.control.template??>
       <#assign fieldHtmlId=args.htmlid + "_" + field.id >
       <#include "${field.control.template}" />
    </#if>
 </#macro>
 
 <#macro renderSet set>
-   <#if set.appearance?exists>
+   <#if set.appearance??>
       <#if set.appearance == "fieldset">
          <fieldset><legend>${set.label}</legend>
       <#elseif set.appearance == "bordered-panel">
@@ -113,7 +113,7 @@
       </#list>
    </#if>
    
-   <#if set.appearance?exists>
+   <#if set.appearance??>
       <#if set.appearance == "fieldset">
          </fieldset>
       <#elseif set.appearance == "panel" || set.appearance == "bordered-panel">

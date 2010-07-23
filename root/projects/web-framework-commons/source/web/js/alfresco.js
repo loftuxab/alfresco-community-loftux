@@ -1546,6 +1546,44 @@ Alfresco.util.undoCaretFix = function(p_formElement)
 };
 
 /**
+ * Submits a form programatically, handling the 
+ * various browser nuances.
+ * 
+ * @method Alfresco.util.submitForm
+ * @param form The form to submit
+ * @static
+ */
+Alfresco.util.submitForm = function(form)
+{
+   var UA = YAHOO.env.ua;
+   var submitTheForm = false;
+   
+   if (form !== null)
+   {
+      if (UA.ie) 
+      {
+         // IE
+         submitTheForm = form.fireEvent("onsubmit");
+      }
+      else 
+      {  
+         // Gecko, Opera, and Safari
+         var event = document.createEvent("HTMLEvents");
+         event.initEvent("submit", true, true);
+         submitTheForm = form.dispatchEvent(event);
+      }
+   
+      if ((UA.ie || UA.webkit) && submitTheForm) 
+      {
+         // for IE and webkit firing the event doesn't submit
+         // the form so we have to do it manually (if the 
+         // submission was not cancelled)
+         form.submit();
+      }
+   }
+}
+
+/**
  * Parses a string to a json object and returns it.
  * If str contains invalid json code that is displayed using displayPrompt().
  *

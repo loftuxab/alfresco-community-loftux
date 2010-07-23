@@ -133,6 +133,7 @@
                <show id="bpm:status" />
                <show id="packageItems" />
                <show id="bpm:comment" />
+               <show id="transitions" />
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.group.task.info" />
@@ -151,6 +152,40 @@
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="transitions" set="response" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="task-type" condition="wf:completedAdhocTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:taskId" />
+               <show id="bpm:description" />
+               <show id="bpm:dueDate" />
+               <show id="bpm:priority" />
+               <show id="packageItems" />
+               <show id="bpm:comment" />
+               <show id="transitions" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.group.task.info" />
+               <set id="response" appearance="title" label-id="workflow.group.response" />
+               
+               <field id="bpm:description" read-only="true" />
+               <field id="bpm:dueDate" read-only="true" />
+               <field id="bpm:priority" read-only="true" />
+               <field id="packageItems" label-id="workflow.field.items">
+                  <control>
+                     <control-param name="displayMode">list</control-param>
+                  </control>
+               </field>
+               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="transitions" set="response" />
             </appearance>
          </form>
       </forms>
@@ -167,6 +202,7 @@
                <show id="bpm:status" />
                <show id="packageItems" />
                <show id="bpm:comment" />
+               <show id="transitions" />
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.group.task.info" />
@@ -185,6 +221,73 @@
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="transitions" set="response" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="task-type" condition="wf:approvedTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:taskId" />
+               <show id="bpm:description" />
+               <show id="bpm:dueDate" />
+               <show id="bpm:priority" />
+               <show id="packageItems" />
+               <show id="bpm:comment" />
+               <show id="transitions" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.group.task.info" />
+               <set id="response" appearance="title" label-id="workflow.group.response" />
+               
+               <field id="bpm:description" read-only="true" />
+               <field id="bpm:dueDate" read-only="true" />
+               <field id="bpm:priority" read-only="true" />
+               <field id="packageItems" label-id="workflow.field.items">
+                  <control>
+                     <control-param name="displayMode">list</control-param>
+                  </control>
+               </field>
+               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="transitions" set="response" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="task-type" condition="wf:rejectedTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:taskId" />
+               <show id="bpm:description" />
+               <show id="bpm:dueDate" />
+               <show id="bpm:priority" />
+               <show id="packageItems" />
+               <show id="bpm:comment" />
+               <show id="transitions" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.group.task.info" />
+               <set id="response" appearance="title" label-id="workflow.group.response" />
+               
+               <field id="bpm:description" read-only="true" />
+               <field id="bpm:dueDate" read-only="true" />
+               <field id="bpm:priority" read-only="true" />
+               <field id="packageItems" label-id="workflow.field.items">
+                  <control>
+                     <control-param name="displayMode">list</control-param>
+                  </control>
+               </field>
+               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="transitions" set="response" />
             </appearance>
          </form>
       </forms>
