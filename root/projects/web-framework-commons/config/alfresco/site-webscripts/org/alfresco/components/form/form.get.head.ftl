@@ -20,6 +20,7 @@
 <@script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/rich-text.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/form/content.js"></@script>
+<@script type="text/javascript" src="${page.url.context}/components/form/workflow/transitions.js"></@script>
 
 <#if config.global.forms?exists && config.global.forms.dependencies?exists && config.global.forms.dependencies.js?exists>
 <#list config.global.forms.dependencies.js as jsFile>
