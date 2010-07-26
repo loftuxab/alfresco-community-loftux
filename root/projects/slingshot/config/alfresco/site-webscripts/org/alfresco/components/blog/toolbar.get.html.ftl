@@ -9,7 +9,7 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar flat-button theme-bg-2">
+<div id="${args.htmlid}-body" class="share-toolbar blog-toolbar flat-button theme-bg-2">
 
    <div class="navigation-bar <#if ((args.showNavigationBar!"false") == "false")>hide</#if>">
       <div>

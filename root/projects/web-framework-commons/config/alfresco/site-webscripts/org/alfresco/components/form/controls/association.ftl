@@ -1,18 +1,6 @@
 <#include "common/picker.inc.ftl" />
 
 <#assign controlId = fieldHtmlId + "-cntrl">
-<#assign fieldValue = "">
-<#if field.control.params.selectedItemsContextProperty??>
-   <#if context.properties[field.control.params.selectedItemsContextProperty]??>
-      <#assign fieldValue = context.properties[field.control.params.selectedItemsContextProperty]>
-   <#elseif args[field.control.params.selectedItemsContextProperty]??>
-      <#assign fieldValue = args[field.control.params.selectedItemsContextProperty]>
-   </#if>
-<#elseif context.properties[field.name]??>
-   <#assign fieldValue = context.properties[field.name]>
-<#else>
-   <#assign fieldValue = field.value>
-</#if>
 
 <script type="text/javascript">//<![CDATA[
 (function()
@@ -24,7 +12,6 @@
       showLinkToTarget: ${field.control.params.showTargetLink},
       targetLinkTemplate: "${url.context}/page/site/${page.url.templateArgs.site!""}/document-details?nodeRef={nodeRef}",
    </#if>
-      <#if fieldValue != "">currentValue: "${fieldValue}",</#if>
       itemType: "${field.endpointType}",
       multipleSelectMode: ${field.endpointMany?string},
       parentNodeRef: "alfresco://company/home",
@@ -35,6 +22,7 @@
 //]]></script>
 
 <div class="form-field">
+   <input type="hidden" id="${fieldHtmlId}" name="-" value="${fieldValue?html}" />
    <#if form.mode == "view">
       <div id="${controlId}" class="viewmode-field">
          <#if (field.endpointMandatory!false || field.mandatory!false) && fieldValue == "">
@@ -51,7 +39,6 @@
          <div id="${controlId}-currentValueDisplay" class="current-values"></div>
          
          <#if form.mode != "view" && field.disabled == false>
-            <input type="hidden" id="${fieldHtmlId}" name="-" value="${fieldValue?html}" />
             <input type="hidden" id="${controlId}-added" name="${field.name}_added" />
             <input type="hidden" id="${controlId}-removed" name="${field.name}_removed" />
             <div class="show-picker">

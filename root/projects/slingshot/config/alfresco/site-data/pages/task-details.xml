@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Task Details</title>
+   <title-id>page.taskDetails.title</title-id>
+   <description>Page displaying task details</description>
+   <description-id>page.taskDetails.description</description-id>
+   <template-instance>task-details</template-instance>
+   <authentication>user</authentication>
+</page>

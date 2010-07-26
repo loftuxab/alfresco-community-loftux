@@ -5,11 +5,19 @@
       <!-- title: normal & portlet mode -->
       <component>
          <region-id>title</region-id>
-         <url>/components/title/repository-title</url>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.repository</title>
+            <title2>title.browser</title2>
+         </properties>
       </component>
       <component>
          <region-id>portlet-title</region-id>
-         <url>/components/title/repository-title</url>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.repository</title>
+            <title2>title.browser</title2>
+         </properties>
       </component>
       <component>
          <region-id>actions-common</region-id>

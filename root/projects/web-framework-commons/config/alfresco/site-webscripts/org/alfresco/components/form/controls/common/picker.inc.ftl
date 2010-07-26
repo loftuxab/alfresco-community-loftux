@@ -1,5 +1,19 @@
 <#assign compactMode = field.control.params.compactMode!false>
 
+<#assign fieldValue = "">
+<#if field.control.params.currentValueContextProperty??>
+   <#if context.properties[field.control.params.currentValueContextProperty]??>
+      <#assign fieldValue = context.properties[field.control.params.currentValueContextProperty]>
+   <#elseif args[field.control.params.currentValueContextProperty]??>
+      <#assign fieldValue = args[field.control.params.currentValueContextProperty]>
+   </#if>
+<#elseif context.properties[field.name]??>
+   <#assign fieldValue = context.properties[field.name]>
+<#else>
+   <#assign fieldValue = field.value>
+USING NORMAL VALUE = ${field.value}  to  ${fieldValue}
+</#if>
+
 <#macro renderPickerJS field picker="picker">
    var ${picker} = new Alfresco.ObjectFinder("${controlId}", "${fieldHtmlId}").setOptions(
    {
@@ -10,7 +24,7 @@
    <#elseif field.endpointMandatory??>
       mandatory: ${field.endpointMandatory?string},
    </#if>
-      currentValue: "${field.value}",
+      currentValue: "${fieldValue}",
       minSearchTermLength: ${args.minSearchTermLength!'1'},
       maxSearchResults: ${args.maxSearchResults!'100'}
    }).setMessages(

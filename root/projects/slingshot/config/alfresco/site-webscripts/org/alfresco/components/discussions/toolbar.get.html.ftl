@@ -8,7 +8,7 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar flat-button theme-bg-2">
+<div id="${args.htmlid}-body" class="share-toolbar discussions-toolbar flat-button theme-bg-2">
 
    <div class="navigation-bar <#if (args.showNavigationBar == "false")>hide</#if>">
       <div>

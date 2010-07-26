@@ -1,0 +1,23 @@
+.task-edit-header
+{
+   clear: both;
+   margin: 0 -10px;
+   height: 34px;
+   padding: 0;
+}
+
+.task-edit-header .actions
+{
+   float: right;
+}
+
+.task-edit-header h1
+{
+   float: left;
+}
+
+.task-edit-header .clear
+{
+   clear: both;
+}
+

@@ -134,10 +134,10 @@
          var path = project.getReference("classpath.unit.test");
          var projPath = project.getProperty("dir.project.3rdparty") + "/";
 
-         is_entry = Pattern.compile("[ \t]*\<classpathentry.*?");
+         var is_entry = Pattern.compile("[ \t]*\<classpathentry.*?");
          //is_exported = Pattern.compile("[ \t]*\<classpathentry.*? exported=[\"\']true[\"\'][ \/].*");
-         is_lib = Pattern.compile(".*? kind=[\"\']lib[\"\'][ \/].*?");
-         get_path = Pattern.compile(".*? path=[\"\'](.*?)[\"\'][ \/].*?");
+         var is_lib = Pattern.compile(".*? kind=[\"\']lib[\"\'][ \/].*?");
+         var get_path = Pattern.compile(".*? path=[\"\'](.*?)[\"\'][ \/].*?");
 
          var f = new BufferedReader(new InputStreamReader(
                  new FileInputStream(new File(projPath + ".classpath"))

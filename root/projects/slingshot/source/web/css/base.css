@@ -169,7 +169,55 @@ span.navigation-separator-alt
    text-align: center;
 }
 
-/* Standard toolbar separator */
+/* Standard toolbar that goes across the whole page */
+
+.share-toolbar
+{
+   clear: both;
+   margin: 0 -10px;
+   height: 34px;
+   padding: 0;
+}
+
+.share-toolbar .navigation-bar,
+.share-toolbar .navigation-bar div,
+.share-toolbar .action-bar,
+.share-toolbar .action-bar div
+{
+   float: left;
+}
+
+.share-toolbar .action-bar,
+.share-toolbar .rss-feed
+{
+   padding: 4px 0.5em;
+}
+
+.share-toolbar .navigation-bar
+{
+   padding: 2px 1em;
+   line-height: 30px;
+   height: 30px;
+   border-right: 2px solid #F0F3F4;
+}
+
+.share-toolbar .navigation-bar div,
+.share-toolbar .rss-feed div
+{
+   vertical-align: middle;
+}
+
+.share-toolbar .backLink a:hover,
+.share-toolbar .forwardLink a:hover
+{
+   text-decoration: underline;
+}
+
+.share-toolbar .separator
+{
+   margin: 4px 10px 0 0;
+   padding: 2px 0 0 4px;
+}
 
 .toolbar .separator
 {
@@ -182,6 +230,7 @@ span.navigation-separator-alt
 .share-form .form-manager
 {
    padding: 1.5em 1.5em 0;
+   width: 800px;
 }
 
 .share-form .form-container
@@ -192,7 +241,7 @@ span.navigation-separator-alt
 
 .share-form .form-container form
 {
-   margin-left: 1.5em;
+   /*margin-left: 1.5em;*/
    margin-top: 0.5em;
 }
 
@@ -212,6 +261,7 @@ span.navigation-separator-alt
 .share-form .form-container .form-buttons
 {
    margin-top: 0.5em;
+   padding-left: 1em;
 }
 
 /* Fixed Form-Based Pages */

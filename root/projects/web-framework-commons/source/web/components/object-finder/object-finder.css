@@ -1,6 +1,6 @@
-
-.object-finder .current-values.list
+.object-finder-list
 {
+   display: block;
    height: 9em;
    width: 30em;
    overflow-x: hidden;
@@ -8,57 +8,57 @@
    margin-bottom: 0.5em;
 }
 
-.object-finder .current-values.list table
+.current-values.object-finder-list table
 {
    width: 28.8em;
    table-layout: fixed;
    border: none;
 }
 
-.object-finder .current-values.list table thead
+.current-values.object-finder-list table thead
 {
    display: none;
 }
 
-.object-finder .current-values.list table td
+.current-values.object-finder-list table td
 {
    border-right-style: none;
 }
 
-.object-finder .current-values.list table td.yui-dt-col-nodeRef
+.current-values.object-finder-list table td.yui-dt-col-nodeRef
 {
    width: 4em;
 }
 
-.object-finder .current-values.list table td.yui-dt-col-name
+.current-values.object-finder-list table td.yui-dt-col-name
 {
    width: 16em;
 }
 
-.object-finder .current-values.list table td.yui-dt-col-action
+.current-values.object-finder-list table td.yui-dt-col-action
 {
    width: 8em;
 }
 
-.object-finder .current-values.list table td.yui-dt-col-action .remove-list-item
+.current-values.object-finder-list table td.yui-dt-col-action .remove-list-item
 {
    padding: 1em 1.5em;
    background: url(../form/images/remove-icon-16.png) no-repeat left;
 }
 
-.object-finder .current-values.items div
+.current-values.object-finder-list div
 {
    float: left;
    padding: 0.5em;
 }
 
-.object-finder .current-values.items img
+.current-values.object-finder-list img
 {
    position: relative;
    top: 3px;
 }
 
-.yui-panel .object-finder .current-values.items
+.yui-panel .object-finder .current-values.object-finder-item
 {
    max-height: 8em;
    overflow-y: auto;

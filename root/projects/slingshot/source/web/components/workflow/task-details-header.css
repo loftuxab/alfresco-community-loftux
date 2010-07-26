@@ -1,0 +1,23 @@
+.task-details-header
+{
+   clear: both;
+   margin: 0 -10px;
+   height: 34px;
+   padding: 0;
+}
+
+.task-details-header .links
+{
+   float: right;
+}
+
+.task-details-header h1
+{
+   float: left;
+}
+
+.task-details-header .clear
+{
+   clear: both;
+}
+

@@ -61,14 +61,14 @@
          var me = this;
          
          // DataSource definition
-         var properties = ["bpm_taskId", "bpm_priority", "bpm_status", "bpm_dueDate", "bpm_description"];
+         var properties = ["bpm_priority", "bpm_status", "bpm_dueDate", "bpm_description"];
          this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/task-instances?properties=" + properties.join(",") ,
          {
             responseType: YAHOO.util.DataSource.TYPE_JSON,
             responseSchema:
             {
                resultsList: "data",
-               fields: ["name", "state", "isPooled", "typeDefinitionTitle", "owner", "properties"]
+               fields: ["id", "name", "state", "isPooled", "typeDefinitionTitle", "owner", "properties"]
             }
          });
 
@@ -94,7 +94,7 @@
           */
          var renderCellTaskInfo = function MyTasks_onReady_renderCellTaskInfo(elCell, oRecord, oColumn, oData)
          {
-            var taskId = oRecord.getData("properties")["bpm_taskId"],
+            var taskId = oRecord.getData("id"),
                title = oRecord.getData("properties")["bpm_description"],
                dueDateStr = oRecord.getData("properties")["bpm_dueDate"],
                dueDate = dueDateStr ? Alfresco.util.fromISO8601(dueDateStr) : null,
@@ -102,7 +102,7 @@
                type = oRecord.getData("typeDefinitionTitle"),
                status = oRecord.getData("properties")["bpm_status"],
                assignee = oRecord.getData("owner");
-            var titleDesc = '<h4><a href="view-task?taskId=' + encodeURIComponent(taskId) + '" class="theme-color-1" title="' + me.msg("link.viewTask") + '">' + title + '</a></h4>',
+            var titleDesc = '<h4><a href="task-details?taskId=' + encodeURIComponent(taskId) + '" class="theme-color-1" title="' + me.msg("link.viewTask") + '">' + title + '</a></h4>',
                dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '">' + Alfresco.util.formatDate(dueDate, "mediumDate") + '</span></h4>' : "",
                statusDesc = '<div>' + me.msg("label.taskSummary", type, status) + '</div>',
                unassignedDesc = '';
@@ -120,8 +120,13 @@
          {
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            var taskId = oRecord.getData("properties")["bpm_taskId"];
-            elCell.innerHTML = '<a href="view-task?taskId=' + encodeURIComponent(taskId) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
+            var taskId = oRecord.getData("id"),
+               owner = oRecord.getData("owner");
+            // todo also check against initiator once its in the REST api response.
+            if (owner && owner.username == Alfresco.constants.USERNAME)
+            {
+               elCell.innerHTML = '<a href="edit-task?taskId=' + encodeURIComponent(taskId) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
+            }
          };
 
          // DataTable column definitions
