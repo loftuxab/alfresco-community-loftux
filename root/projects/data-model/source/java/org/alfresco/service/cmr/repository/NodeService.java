@@ -376,6 +376,14 @@ public interface NodeService
      */
     @Auditable(key = Auditable.Key.ARG_0 ,parameters = {"nodeRef"})
     public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException;
+
+    /**
+     * @param nodeRef
+     * @return Returns the acl id of the node
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    @Auditable(key = Auditable.Key.ARG_0 ,parameters = {"nodeRef"})
+    public Long getNodeAclId(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef
