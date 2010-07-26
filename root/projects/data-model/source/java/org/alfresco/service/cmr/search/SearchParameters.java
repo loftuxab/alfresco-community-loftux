@@ -46,8 +46,6 @@ public class SearchParameters
      */
     private static int DEFAULT_LIMIT = 500;
 
-    private static int DEFAULT_BULK_FETCH_SIZE = 1000;
-
     /*
      * Standard sort definitions for sorting in document and score order.
      */
@@ -129,10 +127,6 @@ public class SearchParameters
 
     private HashSet<String> textAttributes = new HashSet<String>();
 
-    private boolean bulkFetch = true;
-
-    private int bulkFetchSize = DEFAULT_BULK_FETCH_SIZE;
-
     private int maxItems = -1;
 
     private int skipCount = 0;
@@ -168,8 +162,6 @@ public class SearchParameters
      */
     public SearchParameters(QueryOptions options)
     {
-        setBulkFetch(options.getFetchSize() > 0);
-        setBulkFetchSize(options.getFetchSize());
         setSkipCount(options.getSkipCount());
         setMaxPermissionChecks(options.getMaxPermissionChecks());
         setMaxPermissionCheckTimeMillis(options.getMaxPermissionCheckTimeMillis());
@@ -498,46 +490,6 @@ public class SearchParameters
     }
 
     /**
-     * Bulk fetch results in the cache
-     * 
-     * @param bulkFetch
-     */
-    public void setBulkFetch(boolean bulkFetch)
-    {
-        this.bulkFetch = bulkFetch;
-    }
-
-    /**
-     * Do we bulk fetch
-     * 
-     * @return - true if we do
-     */
-    public boolean getBulkFetch()
-    {
-        return bulkFetch;
-    }
-
-    /**
-     * Set the bulk fetch size
-     * 
-     * @param bulkFetchSize
-     */
-    public void setBulkFetchSize(int bulkFetchSize)
-    {
-        this.bulkFetchSize = bulkFetchSize;
-    }
-
-    /**
-     * Get the bulk fetch size.
-     * 
-     * @return the fetch size
-     */
-    public int getBulkFecthSize()
-    {
-        return bulkFetchSize;
-    }
-
-    /**
      * Get the max number of rows for the result set 0 or less is unlimited
      * 
      * @return the maxItems
@@ -686,11 +638,6 @@ public class SearchParameters
         this.maxPermissionChecks = maxPermissionChecks;
     }
 
-    public int getBulkFetchSize()
-    {
-        return bulkFetchSize;
-    }
-
     /**
      * A helper class for sort definition. Encapsulated using the lucene sortType, field name and a flag for
      * ascending/descending.
@@ -786,7 +733,7 @@ public class SearchParameters
     public String toString()
     {
         return "SearchParameters [allAttributes="
-                + allAttributes + ", bulkFetch=" + bulkFetch + ", bulkFetchSize=" + bulkFetchSize + ", defaultFTSFieldOperator=" + defaultFTSFieldOperator
+                + allAttributes + ", defaultFTSFieldOperator=" + defaultFTSFieldOperator
                 + ", defaultFTSOperator=" + defaultFTSOperator + ", defaultFieldName=" + defaultFieldName + ", excludeDataInTheCurrentTransaction="
                 + excludeDataInTheCurrentTransaction + ", language=" + language + ", limit=" + limit + ", limitBy=" + limitBy + ", locales=" + locales + ", maxItems=" + maxItems
                 + ", maxPermissionCheckTimeMillis=" + maxPermissionCheckTimeMillis + ", maxPermissionChecks=" + maxPermissionChecks + ", mlAnalaysisMode=" + mlAnalaysisMode

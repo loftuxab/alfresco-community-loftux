@@ -18,7 +18,7 @@
  */
 package org.alfresco.service.cmr.security;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import org.alfresco.service.Auditable;
@@ -169,7 +169,7 @@ public interface PermissionService
      */
     @Auditable
     public String getOwnerAuthority();
-
+    
     /**
      * Get the All Authorities
      *
@@ -234,6 +234,20 @@ public interface PermissionService
      */
     @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef", "permission" })
     public AccessStatus hasPermission(NodeRef nodeRef, String permission);
+
+    /**
+     * Check if read permission is allowed on an acl (optimised)
+     *
+     * caveats:
+     * doesn't take into account dynamic authorities/groups
+     * doesn't take into account node types/aspects for permissions
+     * 
+     * @param nodeRef -
+     *            the reference to the node
+     * @return access status
+     */
+    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef" })
+    public AccessStatus hasReadPermission(NodeRef nodeRef);
 
     /**
      * Check if a permission is allowed on an acl.
@@ -359,4 +373,6 @@ public interface PermissionService
      */
     @Auditable(key = Auditable.Key.ARG_0, parameters = { "storeRef" })
     public Set<AccessPermission> getAllSetPermissions(StoreRef storeRef);
+    
+    public Set<String> getAuthorisations();
 }

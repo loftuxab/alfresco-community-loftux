@@ -226,27 +226,6 @@ public class QueryOptions
     }
 
     /**
-     * Get the fetch size 0 - no prefetch -1 - prefetch all
-     * 
-     * @return the fetchSize
-     */
-    public int getFetchSize()
-    {
-        return fetchSize;
-    }
-
-    /**
-     * Set the fetch size 0 - no prefetch -1 - prefetch all
-     * 
-     * @param fetchSize
-     *            the fetchSize to set
-     */
-    public void setFetchSize(int fetchSize)
-    {
-        this.fetchSize = fetchSize;
-    }
-
-    /**
      * Get the list of locales to use for the query
      * 
      * @return the locales
