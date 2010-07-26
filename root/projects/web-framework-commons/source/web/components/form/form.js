@@ -59,6 +59,7 @@
       YAHOO.Bubbling.on("metadataRefresh", this.onFormRefresh, this);
       YAHOO.Bubbling.on("mandatoryControlValueUpdated", this.onMandatoryControlValueUpdated, this);
       YAHOO.Bubbling.on("registerValidationHandler", this.onRegisterValidationHandler, this);
+      YAHOO.Bubbling.on("addSubmitElement", this.onAddSubmitElement, this);
 
       return this;
    };
@@ -376,6 +377,22 @@
             this.formsRuntime.addValidation(validation.fieldId, validation.handler, validation.args, 
                   validation.when, validation.message);
          }
+      },
+      
+      /**
+       * Adds a submit element to the form runtime instance
+       * 
+       * @method onAddSubmitElement
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onAddSubmitElement: function FormUI_onAddSubmitElement(layer, args)
+      {
+         // extract the submit element to add
+         var submitElement = args[1];
+         
+         // add to the forms runtime instance
+         this.formsRuntime.addSubmitElement(submitElement);
       },
       
       /**

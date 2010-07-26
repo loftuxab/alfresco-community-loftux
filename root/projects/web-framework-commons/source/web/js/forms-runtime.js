@@ -532,6 +532,25 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       },
       
       /**
+       * Adds the given submitElement to the list of submit elements
+       * for the form.
+       * 
+       * @method addSubmitElement
+       * @param submitElement Object or string representing the submit element
+       */
+      addSubmitElement: function(submitElement)
+      {
+         if (submitElement !== null)
+         {
+            // add the new element to the list
+            this.submitElements.push(submitElement);
+            
+            // force a refresh of the submit state
+            this.updateSubmitElements();
+         }
+      },
+      
+      /**
        * Retrieves the label text for a field
        * 
        * @method getFieldLabel
