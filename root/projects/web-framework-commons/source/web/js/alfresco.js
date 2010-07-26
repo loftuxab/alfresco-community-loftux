@@ -1742,11 +1742,15 @@ Alfresco.util.navigateTo = function(uri, method, parameters)
          {
             if (parameters.hasOwnProperty(name))
             {
-               input = document.createElement("input");
-               input.setAttribute("name", name);
-               input.setAttribute("type", "hidden");
-               input.value = parameters[name];
-               form.appendChild(input);
+               value = parameters[name];
+               if (value)
+               {
+                  input = document.createElement("input");
+                  input.setAttribute("name", name);
+                  input.setAttribute("type", "hidden");
+                  input.value = value;
+                  form.appendChild(input);
+               }
             }
          }         
       }
@@ -5049,7 +5053,10 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 
          // add a handler to the cancel button
          var cancelButton = args[1].buttons.cancel;
-         cancelButton.addListener("click", this.onCancelButtonClick, null, this);
+         if (cancelButton)
+         {
+            cancelButton.addListener("click", this.onCancelButtonClick, null, this);
+         }
       },
 
       /**

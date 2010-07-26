@@ -1,5 +1,5 @@
 <webscript>
-  <shortname>starr-workflow</shortname>
+  <shortname>start-workflow</shortname>
   <description>Displays a form to start a workflow</description>
   <url>/components/workflow/start</url>
 </webscript>

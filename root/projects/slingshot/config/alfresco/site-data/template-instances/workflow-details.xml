@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/workflow-details</template-type>
+   <components>
+      <component>
+         <region-id>title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myWorkflows</title>
+         </properties>
+      </component>
+      <component>
+         <region-id>toolbar</region-id>
+         <url>/components/workflow/task-toolbar</url>
+      </component>
+      <component>
+         <region-id>workflow-details-header</region-id>
+         <url>/components/workflow/workflow-details-header</url>
+      </component>
+      <component>
+         <region-id>workflow-form</region-id>
+         <url>/components/form</url>
+         <properties>
+            <itemKind>workflow</itemKind>
+            <itemId>{workflowId}</itemId>
+            <mode>view</mode>
+            <formUI>true</formUI>
+         </properties>
+      </component>
+   </components>
+</template-instance>

@@ -9,7 +9,7 @@
       <remove>
          <action name="copy-to-web-project"/>
          <action name="transfer-this-tree"/>                                              
-         <action name="transfer-this-node"/>
+         <action name="transfer- this-node"/>
          <action name="blog-post"/>
          <action name="create-transfer-target"/>
          <action name="transfer-tree-with-cancel"/>

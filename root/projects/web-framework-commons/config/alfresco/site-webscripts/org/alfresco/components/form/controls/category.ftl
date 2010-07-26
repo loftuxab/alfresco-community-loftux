@@ -23,7 +23,7 @@
 <div class="form-field inlineable">
    <#if form.mode == "view">
       <div id="${controlId}" class="viewmode-field inlineable">
-         <#if field.mandatory!false && field.value == "">
+         <#if field.mandatory!false && fieldValue == "">
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <#if field.label != ""><span class="viewmode-label">${field.label?html}:</span></#if>
@@ -39,7 +39,7 @@
          <div id="${controlId}-currentValueDisplay" class="current-values inlineable"></div>
          
          <#if form.mode != "view" && field.disabled == false>
-            <input type="hidden" id="${fieldHtmlId}" name="${field.name}" value="${field.value?html}" />
+            <input type="hidden" id="${fieldHtmlId}" name="${field.name}" value="${fieldValue?html}" />
             <div class="show-picker inlineable">
                <span id="${controlId}-showPicker-button" class="yui-button yui-push-button">
                   <span class="first-child">

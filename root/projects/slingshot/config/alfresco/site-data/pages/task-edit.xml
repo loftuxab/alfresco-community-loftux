@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Task Edit</title>
+   <title-id>page.taskEdit.title</title-id>
+   <description>Page for editing task details</description>
+   <description-id>page.taskEdit.description</description-id>
+   <template-instance>task-edit</template-instance>
+   <authentication>user</authentication>
+</page>

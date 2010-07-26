@@ -334,22 +334,45 @@ span.navigation-separator-alt
    border-right: 1px solid #3a6c38;
 }
 
-/* Standard toolbar */
+/* Standard toolbars */
 
+.share-toolbar,
 .toolbar
 {
    border-bottom: 1px solid #ebebeb;
 }
 
+.share-toolbar .action-bar,
 .toolbar .action-bar
 {
    border-right: 1px solid #ebebeb;
 }
 
+.share-toolbar .separator,
 .toolbar .separator
 {
    border-right: 1px dotted #3a6c38;
    border-top: medium none;
+}
+
+.share-toolbar .backLink
+{
+   background-image: url(../../components/images/back-arrow.png);
+   background-position: left center;
+   background-repeat: no-repeat;
+   color: #333333;
+   padding: 0 5px 0 19px;
+   margin-right: 5px;
+}
+
+.share-toolbar .forwardLink
+{
+   background-image: url(../../components/images/forward-arrow-16.png);
+   background-position: right center;
+   background-repeat: no-repeat;
+   color: #333333;
+   padding: 0 21px 0 5px;
+   margin-right: 5px;
 }
 
 strong

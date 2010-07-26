@@ -632,9 +632,9 @@
             nodeRefs = asset.nodeRef;
          }
          var postBody = { "selectedItems" : nodeRefs};
-         if (this.modules.docList)
+         if (this.doclistMetadata)
          {
-            postBody.destination = this.modules.docList.doclistMetadata.parent.nodeRef;
+            postBody.destination = this.doclistMetadata.parent.nodeRef;
          }
          Alfresco.util.navigateTo($siteURL("start-workflow"), "POST", postBody);
       },

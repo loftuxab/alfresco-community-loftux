@@ -1,0 +1,14 @@
+.workflow-details-header .links
+{
+   float: right;
+}
+
+.workflow-details-header h1
+{
+   float: left;
+}
+
+.workflow-details-header .clear
+{
+   clear: both;
+}

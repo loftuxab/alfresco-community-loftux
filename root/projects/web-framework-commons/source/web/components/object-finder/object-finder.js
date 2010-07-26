@@ -329,8 +329,7 @@
        */
       onReady: function ObjectFinder_onReady()
       {
-         this._getCurrentValueMeta();
-         
+         this._createSelectedItemsControls();
          if (this.options.disabled === false)
          {
             if (this.options.compactMode)
@@ -339,7 +338,6 @@
             }
          
             this._createNavigationControls();
-            this._createSelectedItemsControls();
             this.widgets.showPicker = Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
             if (this.options.displayMode == "list")
             {
@@ -367,6 +365,8 @@
             this.widgets.dialog.hideEvent.subscribe(this.onCancel, null, this);
             Dom.addClass(this.pickerId, "object-finder");
          }
+         
+         this._getCurrentValueMeta();
       },
       
       /**
@@ -720,7 +720,11 @@
                var item;
                if (this.options.displayMode == "list")
                {
-                  this.widgets.currentValuesDataTable.deleteRows(0, this.widgets.currentValuesDataTable.getRecordSet().getLength());
+                  var l = this.widgets.currentValuesDataTable.getRecordSet().getLength();
+                  if (l > 0)
+                  {
+                     this.widgets.currentValuesDataTable.deleteRows(0, l);
+                  }                  
                }
                for (var i = 0, ii = items.length; i < ii; i++)
                {
@@ -760,7 +764,7 @@
                {
                   Dom.get(this.id + "-currentValueDisplay").innerHTML = displayValue;
                }
-               else
+               else if (this.options.disabled === false)
                {
                   // Enable the remove all button
                   this.widgets.removeAllButton.set("disabled", false);                  
@@ -1080,20 +1084,24 @@
          return function ObjectFinder_fnRenderCellListActions(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            var links = "", listAction, actionEl;
-            for (var i = 0, il = scope.options.listActions.length; i < il; i++)
+            // While waiting for the package item actions, only render the actions (remove) in non editable mode
+            if (scope.options.disabled === false) 
             {
-               listAction = scope.options.listActions[i];
-               if (listAction.event)
+               var links = "", listAction, actionEl;
+               for (var i = 0, il = scope.options.listActions.length; i < il; i++)
                {
-                  links += '<div class="list-action"><a href="#" class="' + listAction.name + ' ' + ' list-action-event-' + scope.eventGroup + ' ' + listAction.event+ '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
+                  listAction = scope.options.listActions[i];
+                  if (listAction.event)
+                  {
+                     links += '<div class="list-action"><a href="#" class="' + listAction.name + ' ' + ' list-action-event-' + scope.eventGroup + ' ' + listAction.event+ '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
+                  }
+                  else if (listAction.link)
+                  {
+                     links += '<div class="list-action"><a href="' + listAction.link + '" class="' + listAction.name + '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
+                  }
                }
-               else if (listAction.link)
-               {
-                  links += '<div class="list-action"><a href="' + listAction.link + '" class="' + listAction.name + '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
-               }
+               elCell.innerHTML = links;
             }
-            elCell.innerHTML = links;
          };
       },
 
@@ -1262,13 +1270,6 @@
        */
       _createSelectedItemsControls: function ObjectFinder__createSelectedItemsControls()
       {
-         var me = this,
-            fields = ["type", "hasChildren", "name", "description", "displayPath", "nodeRef"];
-
-         // Setup a DataSource for the selected items list
-         this.widgets.dataSource = new YAHOO.util.DataSource([]); 
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
-         this.widgets.dataSource.responseSchema = { fields: fields };
 
          var doBeforeParseDataFunction = function ObjectFinder_doBeforeParseData(oRequest, oFullResponse)
          {
@@ -1302,50 +1303,61 @@
             return updatedResponse;
          };
 
-         this.widgets.dataSource.doBeforeParseData = doBeforeParseDataFunction;
+         var me = this,
+            fields = ["type", "hasChildren", "name", "description", "displayPath", "nodeRef"];
 
-         // Picker DataTable defintion
-         var columnDefinitions =
-         [
-            { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellIcon(), width: this.options.compactMode ? 10 : 26 },
-            { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellName() },
-            { key: "remove", label: "Remove", sortable: false, formatter: this.fnRenderCellRemove(), width: 16 }
-         ];
-         
-         this.widgets.dataTable = new YAHOO.widget.DataTable(this.pickerId + "-selectedItems", columnDefinitions, this.widgets.dataSource,
+         if (this.options.disabled === false)
          {
-            MSG_EMPTY: this.msg("form.control.object-picker.selected-items.empty")
-         });
 
-         // Hook remove item action click events
-         var fnRemoveItemHandler = function OF_cSIC_fnRemoveItemHandler(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
-            if (owner !== null)
+            // Setup a DataSource for the selected items list
+            this.widgets.dataSource = new YAHOO.util.DataSource([]);
+            this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+            this.widgets.dataSource.responseSchema = { fields: fields };
+            this.widgets.dataSource.doBeforeParseData = doBeforeParseDataFunction;
+
+            // Picker DataTable definition
+            var columnDefinitions =
+            [
+               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellIcon(), width: this.options.compactMode ? 10 : 26 },
+               { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellName() },
+               { key: "remove", label: "Remove", sortable: false, formatter: this.fnRenderCellRemove(), width: 16 }
+            ];
+
+            this.widgets.dataTable = new YAHOO.widget.DataTable(this.pickerId + "-selectedItems", columnDefinitions, this.widgets.dataSource,
             {
-               var target, rowId, record;
+               MSG_EMPTY: this.msg("form.control.object-picker.selected-items.empty")
+            });
 
-               target = args[1].target;
-               rowId = target.offsetParent;
-               record = me.widgets.dataTable.getRecord(rowId);
-               if (record)
+            // Hook remove item action click events
+            var fnRemoveItemHandler = function OF_cSIC_fnRemoveItemHandler(layer, args)
+            {
+               var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+               if (owner !== null)
                {
-                  me.widgets.dataTable.deleteRow(rowId);
-                  YAHOO.Bubbling.fire("selectedItemRemoved",
+                  var target, rowId, record;
+
+                  target = args[1].target;
+                  rowId = target.offsetParent;
+                  record = me.widgets.dataTable.getRecord(rowId);
+                  if (record)
                   {
-                     eventGroup: me,
-                     item: record.getData()
-                  });
+                     me.widgets.dataTable.deleteRow(rowId);
+                     YAHOO.Bubbling.fire("selectedItemRemoved",
+                     {
+                        eventGroup: me,
+                        item: record.getData()
+                     });
+                  }
                }
-            }
-            return true;
-         };
-         YAHOO.Bubbling.addDefaultAction("remove-" + this.eventGroup, fnRemoveItemHandler, true);
+               return true;
+            };
+            YAHOO.Bubbling.addDefaultAction("remove-" + this.eventGroup, fnRemoveItemHandler, true);
+         }
 
-         // Add displayMode as class so we can separate the styling of the currentValue element 
+         // Add displayMode as class so we can separate the styling of the currentValue element
          var currentValueEl = Dom.get(this.id + "-currentValueDisplay");
-         Dom.addClass(currentValueEl, this.options.displayMode);
-
+         Dom.addClass(currentValueEl, "object-finder-" + this.options.displayMode);
+         
          if (this.options.displayMode == "list")
          {
             // Setup a DataSource for the selected items list
@@ -1362,7 +1374,18 @@
                { key: "action", label: "Actions", sortable: false, formatter: this.fnRenderCellListActions() }
             ];
 
-            this.widgets.currentValuesDataTable = new YAHOO.widget.DataTable(this.id + "-currentValueDisplay", currentValuesColumnDefinitions, ds,
+            // Make sure the currentValues container is a div rather than a span to make sure it may become a datatable
+            var currentValueId = this.id + "-currentValueDisplay";
+            currentValueEl = Dom.get(currentValueId);
+            if (currentValueEl.tagName.toLowerCase() == "span")
+            {
+               var currentValueDiv = document.createElement("div");
+               currentValueDiv.setAttribute("class", currentValueEl.getAttribute("class"));
+               currentValueEl.parentNode.appendChild(currentValueDiv);
+               currentValueEl.parentNode.removeChild(currentValueEl);
+               currentValueEl = currentValueDiv;
+            }
+            this.widgets.currentValuesDataTable = new YAHOO.widget.DataTable(currentValueEl, currentValuesColumnDefinitions, ds,
             {
                MSG_EMPTY: this.msg("form.control.object-picker.selected-items.empty")
             });

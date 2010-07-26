@@ -1,90 +1,26 @@
-.toolbar
-{
-   clear: both;
-   margin: 0 -10px;
-   height: 34px;
-   padding: 0;
-}
-
-.toolbar .navigation-bar,
-.toolbar .navigation-bar div,
-.toolbar .action-bar,
-.toolbar .action-bar div
-{
-   float: left;
-}
-
-.toolbar .action-bar,
-.toolbar .rss-feed
-{
-   padding: 4px 0.5em;
-}
-
-.toolbar .navigation-bar
-{
-   padding: 2px 1em;
-   line-height: 30px;
-   height: 30px;
-   border-right: 2px solid #F0F3F4;
-}
-
-.toolbar .navigation-bar div,
-.toolbar .rss-feed div
-{
-   vertical-align: middle;
-}
-
-/* Toolbar Buttons */
-
-.toolbar .backLink
-{
-   background-image: url(../images/back-arrow.png);
-   background-position: left center;
-   background-repeat: no-repeat;
-   color: #333333;
-   padding: 0 5px 0 19px;
-   margin-right: 5px;
-}
-
-.toolbar .forwardLink
-{
-   background-image: url(../images/forward-arrow-16.png);
-   background-position: right center;
-   background-repeat: no-repeat;
-   color: #333333;
-   padding: 0 21px 0 5px;
-   margin-right: 5px;
-}
-
-.toolbar .backLink a:hover,
-.toolbar .forwardLink a:hover
-{
-   text-decoration: underline;
-}
-
-.toolbar .new-topic button
+.discussions-toolbar .new-topic button
 {
    background: transparent url(../images/new-blog-16.png) no-repeat 12px 4px;
    padding-left: 32px;
 }
 
-.toolbar .new-topic .yui-button-disabled button
+.discussions-toolbar .new-topic .yui-button-disabled button
 {
    background-image: url(../images/create-discussion-16.png);
 }
 
-.toolbar .rss-feed
+.discussions-toolbar .rss-feed
 {
    float: right;
 }
 
-.toolbar .rss-feed a
+.discussions-toolbar .rss-feed a
 {
    background: transparent url(../images/feed-icon-16.png) no-repeat 12px 4px;
    padding-left: 32px;
 }
 
-.toolbar .hide
+.discussions-toolbar .hide
 {
    display: none;
    padding: 0;

@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Workflow Details</title>
+   <title-id>page.workflowDetails.title</title-id>
+   <description>Page displaying workflow details</description>
+   <description-id>page.workflowDetails.description</description-id>
+   <template-instance>workflow-details</template-instance>
+   <authentication>user</authentication>
+</page>
