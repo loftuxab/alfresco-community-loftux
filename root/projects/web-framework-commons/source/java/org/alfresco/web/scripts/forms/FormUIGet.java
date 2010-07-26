@@ -134,6 +134,7 @@ public class FormUIGet extends DeclarativeWebScript
     
     protected static final String CONTROL_SELECT_MANY = "/org/alfresco/components/form/controls/selectmany.ftl";
     protected static final String CONTROL_SELECT_ONE = "/org/alfresco/components/form/controls/selectone.ftl";
+    protected static final String CONTROL_PARAM_OPTIONS = "options";
     
     protected static final String MODEL_DATA = "data";
     protected static final String MODEL_DEFINITION = "definition";
@@ -1880,26 +1881,35 @@ public class FormUIGet extends DeclarativeWebScript
         {
             // if the constraint is the list of values constraint, force the control
             // template to be selectone.ftl or selectmany.ftl depending on whether
-            // the field has multiple values
-            if (field.isRepeating())
+            // the field has multiple values, but only if an overridden control has
+            // not been supplied
+            if (fieldConfig == null || fieldConfig.getControl() == null || 
+                fieldConfig.getControl().getTemplate() == null)
             {
-                field.getControl().setTemplate(CONTROL_SELECT_MANY);
-            }
-            else
-            {
-                field.getControl().setTemplate(CONTROL_SELECT_ONE);
-            }
-           
-            // setup the options string and set as control params
-            JSONArray options = constraint.getJSONParams().getJSONArray("allowedValues");
-            List<String> optionsList = new ArrayList<String>(options.length());
-            for (int x = 0; x < options.length(); x++)
-            {
-                optionsList.add(options.getString(x));
+                if (field.isRepeating())
+                {
+                    field.getControl().setTemplate(CONTROL_SELECT_MANY);
+                }
+                else
+                {
+                    field.getControl().setTemplate(CONTROL_SELECT_ONE);
+                }
             }
             
-            field.getControl().getParams().put("options", 
-                        StringUtils.collectionToCommaDelimitedString(optionsList));
+            // setup the options string and set as control params, but only if the control
+            // does not already have an "options" parameter
+            if (field.getControl().getParams().containsKey(CONTROL_PARAM_OPTIONS) == false)
+            {
+                JSONArray options = constraint.getJSONParams().getJSONArray("allowedValues");
+                List<String> optionsList = new ArrayList<String>(options.length());
+                for (int x = 0; x < options.length(); x++)
+                {
+                    optionsList.add(options.getString(x));
+                }
+                
+                field.getControl().getParams().put(CONTROL_PARAM_OPTIONS, 
+                            StringUtils.collectionToCommaDelimitedString(optionsList));
+            }
         }
         else if (CONSTRAINT_LENGTH.equals(constraint.getId()))
         {

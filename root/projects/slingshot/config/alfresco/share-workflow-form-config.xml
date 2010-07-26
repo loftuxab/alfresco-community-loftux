@@ -19,7 +19,7 @@
                <show id="bpm:workflowDueDate" />
                <show id="bpm:assignee" />
                <show id="packageItems" />
-               <show id="wf:notifyMe" />               
+               <show id="wf:notifyMe" />
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.group.general" />
@@ -33,7 +33,7 @@
                </field>
                <field id="bpm:workflowPriority">
                   <control>
-                     <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
                   </control>
                </field>
                <field id="packageItems" label-id="workflow.field.items" set="assignee">
@@ -68,7 +68,7 @@
                </field>
                <field id="bpm:workflowPriority">
                   <control>
-                     <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
                   </control>
                </field>
                <field id="packageItems" label-id="workflow.field.items">
@@ -104,7 +104,7 @@
                </field>
                <field id="bpm:workflowPriority">
                   <control>
-                     <control-param name="options">1|High,2|Medium,3|Low</control-param>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
                   </control>
                </field>
                <field id="packageItems" label-id="workflow.field.items">
@@ -142,7 +142,11 @@
                
                <field id="bpm:description" read-only="true" />
                <field id="bpm:dueDate" read-only="true" />
-               <field id="bpm:priority" read-only="true" />
+               <field id="bpm:priority" read-only="true">
+                  <control>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
+                  </control>
+               </field>
                <field id="bpm:status" set="progress" />
                <field id="packageItems" label-id="workflow.field.items" set="progress">
                   <control>
@@ -176,7 +180,11 @@
                
                <field id="bpm:description" read-only="true" />
                <field id="bpm:dueDate" read-only="true" />
-               <field id="bpm:priority" read-only="true" />
+               <field id="bpm:priority" read-only="true">
+                  <control>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
+                  </control>
+               </field>
                <field id="packageItems" label-id="workflow.field.items">
                   <control>
                      <control-param name="displayMode">list</control-param>
@@ -211,7 +219,11 @@
                
                <field id="bpm:description" read-only="true" />
                <field id="bpm:dueDate" read-only="true" />
-               <field id="bpm:priority" read-only="true" />
+               <field id="bpm:priority" read-only="true">
+                  <control>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
+                  </control>
+               </field>
                <field id="bpm:status" set="progress" />
                <field id="packageItems" label-id="workflow.field.items" set="progress">
                   <control>
@@ -245,7 +257,11 @@
                
                <field id="bpm:description" read-only="true" />
                <field id="bpm:dueDate" read-only="true" />
-               <field id="bpm:priority" read-only="true" />
+               <field id="bpm:priority" read-only="true">
+                  <control>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
+                  </control>
+               </field>
                <field id="packageItems" label-id="workflow.field.items">
                   <control>
                      <control-param name="displayMode">list</control-param>
@@ -278,7 +294,11 @@
                
                <field id="bpm:description" read-only="true" />
                <field id="bpm:dueDate" read-only="true" />
-               <field id="bpm:priority" read-only="true" />
+               <field id="bpm:priority" read-only="true">
+                  <control>
+                     <control-param name="options">1|{label.priority.1},2|{label.priority.2},3|{label.priority.3}</control-param>
+                  </control>
+               </field>
                <field id="packageItems" label-id="workflow.field.items">
                   <control>
                      <control-param name="displayMode">list</control-param>
