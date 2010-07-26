@@ -11,7 +11,6 @@
    <#assign fieldValue = context.properties[field.name]>
 <#else>
    <#assign fieldValue = field.value>
-USING NORMAL VALUE = ${field.value}  to  ${fieldValue}
 </#if>
 
 <#macro renderPickerJS field picker="picker">

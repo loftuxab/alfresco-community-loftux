@@ -1,6 +1,10 @@
 <#assign el=args.htmlid>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.TaskEditHeader("${el}").setMessages(
+new Alfresco.TaskEditHeader("${el}").setOptions(
+{
+   submitButtonMessageKey: "button.saveandclose",
+   forwardUrl: Alfresco.util.uriTemplate("userdashboardpage", { userid: Alfresco.constants.USERNAME }),
+}).setMessages(
    ${messages}
 );
 //]]></script>
