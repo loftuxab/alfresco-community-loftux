@@ -144,7 +144,8 @@
                var transitionInfo = transitionPairs[i].split("|");
                
                // add the transition as an object
-               this.options.transitions.push({
+               this.options.transitions.push(
+               {
                   id: transitionInfo[0],
                   label: transitionInfo[1]
                });
@@ -187,9 +188,10 @@
          Dom.get(this.id + "-buttons").appendChild(button);
          
          // create the YUI button and register the event handler
-         Alfresco.util.createYUIButton(this, transition.id, this.onClick);
+         var button = Alfresco.util.createYUIButton(this, transition.id, this.onClick);
          
-         // TODO: register the button as a submitElement with the forms runtime instance
+         // register the button as a submitElement with the forms runtime instance
+         YAHOO.Bubbling.fire("addSubmitElement", button);
       },
       
       /**
