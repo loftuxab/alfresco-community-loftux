@@ -292,5 +292,59 @@
          </form>
       </forms>
    </config>
+   
+   <config evaluator="task-type" condition="inwf:invitePendingTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="inwf:resourceTitle" />
+               <show id="inwf:resourceDescription" />
+               <show id="inwf:inviteeRole" />
+               <show id="transitions" />
+            </field-visibility>
+            <appearance>
+               <field id="inwf:resourceDescription" read-only="true" />
+               <field id="inwf:resourceTitle" read-only="true" />
+               <field id="inwf:inviteeRole" read-only="true" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="task-type" condition="inwf:acceptInviteTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="inwf:resourceTitle" />
+               <show id="inwf:resourceDescription" />
+               <show id="inwf:inviteeRole" />
+               <show id="transitions" />
+            </field-visibility>
+            <appearance>
+               <field id="inwf:resourceDescription" read-only="true" />
+               <field id="inwf:resourceTitle" read-only="true" />
+               <field id="inwf:inviteeRole" read-only="true" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="task-type" condition="inwf:rejectInviteTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="inwf:resourceTitle" />
+               <show id="inwf:resourceDescription" />
+               <show id="inwf:inviteeRole" />
+               <show id="transitions" />
+            </field-visibility>
+            <appearance>
+               <field id="inwf:resourceDescription" read-only="true" />
+               <field id="inwf:resourceTitle" read-only="true" />
+               <field id="inwf:inviteeRole" read-only="true" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
 
 </alfresco-config>
