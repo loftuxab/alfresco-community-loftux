@@ -121,9 +121,11 @@
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             var taskId = oRecord.getData("id"),
-               owner = oRecord.getData("owner");
+               owner = oRecord.getData("owner"),
+               isPooled = oRecord.getData("isPooled");
+            owner = owner ? owner : {};
             // todo also check against initiator once its in the REST api response.
-            if (owner && owner.username == Alfresco.constants.USERNAME)
+            if ((isPooled && !owner.userName ) || (owner.userName == Alfresco.constants.USERNAME))
             {
                elCell.innerHTML = '<a href="edit-task?taskId=' + encodeURIComponent(taskId) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
             }
