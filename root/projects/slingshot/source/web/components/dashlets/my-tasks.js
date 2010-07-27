@@ -127,7 +127,7 @@
             // todo also check against initiator once its in the REST api response.
             if ((isPooled && !owner.userName ) || (owner.userName == Alfresco.constants.USERNAME))
             {
-               elCell.innerHTML = '<a href="edit-task?taskId=' + encodeURIComponent(taskId) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
+               elCell.innerHTML = '<a href="task-edit?taskId=' + encodeURIComponent(taskId) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
             }
          };
 
