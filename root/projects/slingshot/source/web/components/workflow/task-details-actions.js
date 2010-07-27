@@ -58,9 +58,10 @@
        */
       onTaskData: function TDA_onMetadataRefresh(layer, args)
       {
-         var task = args[1];
-         // todo also check against initiator once its in the REST api response
-         if (task.owner && task.owner.userName == Alfresco.constants.USERNAME)
+         var task = args[1],
+            owner = task.owner ? task.owner : {};
+         // todo also check against initiator once its in the REST api response.
+         if ((isPooled && !owner.userName ) || (owner.userName == Alfresco.constants.USERNAME))
          {
             Alfresco.util.createYUIButton(this, "edit", function TDA_onMetadataRefresh_onEditClick()
             {
