@@ -150,7 +150,7 @@
             
             if (docData.lockedByUser && docData.lockedByUser !== "")
             {
-               var lockedByLink = $userProfileLink(docData.lockedByUser, docData.lockedBy, 'class="theme-color-1"');
+               var lockedByLink = $userProfile(docData.lockedByUser, docData.lockedBy, 'class="theme-color-1"');
 
                /* Google Docs Integration */
                if (docData.custom.googleDocUrl && docData.custom.googleDocUrl !== "")
