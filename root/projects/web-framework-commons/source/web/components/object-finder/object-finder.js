@@ -93,6 +93,14 @@
          objectRenderer: null,
 
          /**
+          * The selected value that shall be displayed in ui (but not yet has been persisted)
+          *
+          * @property selectedValue
+          * @type string
+          */
+         selectedValue: "",
+
+         /**
           * The current value
           *
           * @property currentValue
@@ -330,7 +338,7 @@
       onReady: function ObjectFinder_onReady()
       {
          this._createSelectedItemsControls();
-         if (this.options.disabled === false)
+         if (!this.options.disabled)
          {
             if (this.options.compactMode)
             {
@@ -366,7 +374,7 @@
             Dom.addClass(this.pickerId, "object-finder");
          }
          
-         this._getCurrentValueMeta();
+         this._getSelectedItems();
       },
       
       /**
@@ -504,8 +512,6 @@
        */
       onOK: function ObjectFinder_onOK(e, p_obj)
       {
-         this._adjustCurrentValues();
-         this._getCurrentValueMeta();
          this.widgets.escapeListener.disable();
          this.widgets.dialog.hide();
          this.widgets.showPicker.set("disabled", false);
@@ -513,6 +519,11 @@
          {
             Event.preventDefault(e);
          }
+
+         YAHOO.Bubbling.fire("renderCurrentValue",
+         {
+            eventGroup: this
+         });
       },
 
       /**
@@ -527,18 +538,17 @@
             removedItems = this.getRemovedItems(),
             selectedItems = this.getSelectedItems();
          
-         if (this.options.maintainAddedRemovedItems)
+         if (this.options.maintainAddedRemovedItems && !this.options.disabled)
          {
             Dom.get(this.id + "-added").value = addedItems.toString();
             Dom.get(this.id + "-removed").value = removedItems.toString();
          }
-         
-         this.options.currentValue = selectedItems.toString();
-         Dom.get(this.currentValueHtmlId).value = this.options.currentValue;
+
+         Dom.get(this.currentValueHtmlId).value = selectedItems.toString();
 
          if (Alfresco.logger.isDebugEnabled())
          {
-            Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + this.options.currentValue + "'");
+            Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + selectedItems.toString() + "'");
          }
          
          // inform the forms runtime that the control value has been updated (if field is mandatory)
@@ -708,7 +718,9 @@
          // Check the event is directed towards this instance
          if ($hasEventInterest(this, args))
          {
-            var items = this.currentValueMeta,
+            this._adjustCurrentValues();
+
+            var items = this.selectedItems,
                displayValue = "";
 
             if (items === null)
@@ -726,9 +738,9 @@
                      this.widgets.currentValuesDataTable.deleteRows(0, l);
                   }                  
                }
-               for (var i = 0, ii = items.length; i < ii; i++)
+               for (var key in items)
                {
-                  item = items[i];
+                  item = items[key];
 
                   // Special case for tags, which we want to render differently to categories
                   if (item.type == "cm:category" && item.displayPath.indexOf("/categories/Tags") !== -1)
@@ -781,7 +793,7 @@
        * @param args {array} Event parameters (depends on event type)
        */
       onSelectedItemAdded: function ObjectFinder_onSelectedItemAdded(layer, args)
-      {   
+      {
          // Check the event is directed towards this instance
          if ($hasEventInterest(this, args))
          {
@@ -1112,29 +1124,36 @@
       /**
        * Gets current value metadata from the repository
        *
-       * @method _getCurrentValueMeta
+       * @method _getSelectedItems
        * @private
        */
-      _getCurrentValueMeta: function ObjectFinder__getCurrentValueMeta(p_div)
+      _getSelectedItems: function ObjectFinder__getSelectedItems(useOptions)
       {
          if (this.widgets.removeAllButton)
          {
             this.widgets.removeAllButton.set("disabled", true);                  
          }
 
-         var arrItems = this.options.currentValue.split(",");
-         
+         var arrItems = "";
+         if (this.options.selectedValue != "")
+         {
+            arrItems = this.options.selectedValue;
+         }
+         else
+         {
+            arrItems = this.options.currentValue;
+         }
+
          var onSuccess = function OF_rCV_onSuccess(response)
          {
-            this.currentValueMeta = response.json.data.items;
+            var items = response.json.data.items,
+               item;
             this.selectedItems = {};
 
-            for (var item in this.currentValueMeta)
+            for (var i = 0, il = items.length; i < il; i++)
             {
-               if (this.currentValueMeta.hasOwnProperty(item))
-               {
-                  this.selectedItems[this.currentValueMeta[item].nodeRef] = this.currentValueMeta[item];
-               }
+               item = items[i];
+               this.selectedItems[item.nodeRef] = item;
             }
 
             YAHOO.Bubbling.fire("renderCurrentValue",
@@ -1145,7 +1164,7 @@
          
          var onFailure = function OF_rCv_onFailure(response)
          {
-            this.currentValueMeta = null;
+            this.selectedItems = null;
          };
          
          Alfresco.util.Ajax.jsonRequest(
@@ -1154,7 +1173,7 @@
             method: "POST",
             dataObj:
             {
-               items: arrItems
+               items: arrItems.split(",")
             },
             successCallback:
             {
