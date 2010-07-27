@@ -1,17 +1,15 @@
 <#assign compactMode = field.control.params.compactMode!false>
 
-<#assign fieldValue = "">
-<#if field.control.params.currentValueContextProperty??>
-   <#if context.properties[field.control.params.currentValueContextProperty]??>
-      <#assign fieldValue = context.properties[field.control.params.currentValueContextProperty]>
-   <#elseif args[field.control.params.currentValueContextProperty]??>
-      <#assign fieldValue = args[field.control.params.currentValueContextProperty]>
+<#if field.control.params.selectedValueContextProperty??>
+   <#if context.properties[field.control.params.selectedValueContextProperty]??>
+      <#assign selectedValue = context.properties[field.control.params.selectedValueContextProperty]>
+   <#elseif args[field.control.params.selectedValueContextProperty]??>
+      <#assign selectedValue = args[field.control.params.selectedValueContextProperty]>
+   <#elseif context.properties[field.control.params.selectedValueContextProperty]??>
+      <#assign selectedValue = context.properties[field.control.params.selectedValueContextProperty]>
    </#if>
-<#elseif context.properties[field.name]??>
-   <#assign fieldValue = context.properties[field.name]>
-<#else>
-   <#assign fieldValue = field.value>
 </#if>
+<#assign fieldValue = field.value>
 
 <#macro renderPickerJS field picker="picker">
    var ${picker} = new Alfresco.ObjectFinder("${controlId}", "${fieldHtmlId}").setOptions(
@@ -24,6 +22,7 @@
       mandatory: ${field.endpointMandatory?string},
    </#if>
       currentValue: "${fieldValue}",
+      <#if selectedValue??>selectedValue: "${selectedValue}",</#if>
       minSearchTermLength: ${args.minSearchTermLength!'1'},
       maxSearchResults: ${args.maxSearchResults!'100'}
    }).setMessages(
