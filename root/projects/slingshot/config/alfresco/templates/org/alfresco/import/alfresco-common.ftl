@@ -1,10 +1,22 @@
-<#macro uriTemplate>
+<#macro uriTemplates>
    <#assign uriConfig = config.scoped["UriTemplate"]["uri-templates"]>
    <script type="text/javascript">//<![CDATA[
       Alfresco.constants.URI_TEMPLATES =
       {
-   <#list uriConfig.childrenMap["uri-template"] as t>
-         ${t.attributes["id"]}: "${t.value}"<#if t_has_next>,</#if>
+   <#list uriConfig.childrenMap["uri-template"] as c>
+         "${c.attributes["id"]}": "${c.value}"<#if c_has_next>,</#if>
+   </#list>
+      }
+   //]]></script>
+</#macro>
+
+<#macro helpPages>
+   <#assign helpConfig = config.scoped["HelpPages"]["help-pages"]>
+   <script type="text/javascript">//<![CDATA[
+      Alfresco.constants.HELP_PAGES =
+      {
+   <#list helpConfig.children as c>
+         "${c.name}": "${c.value}"<#if c_has_next>,</#if>
    </#list>
       }
    //]]></script>

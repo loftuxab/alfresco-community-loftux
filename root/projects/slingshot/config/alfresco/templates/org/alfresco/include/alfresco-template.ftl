@@ -132,7 +132,8 @@
    //]]></script>
    <@script type="text/javascript" src="${url.context}/js/alfresco.js"></@script>
    <@script type="text/javascript" src="${url.context}/js/forms-runtime.js"></@script>
-   <@common.uriTemplate />
+   <@common.uriTemplates />
+   <@common.helpPages />
    <@common.htmlEditor htmlEditor="tinyMCE"/>
    
    <!-- Share Preference keys -->
