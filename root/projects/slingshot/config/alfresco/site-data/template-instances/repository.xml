@@ -8,7 +8,7 @@
          <url>/components/title/simple-title</url>
          <properties>
             <title>title.repository</title>
-            <title2>title.browser</title2>
+            <subtitle>title.browser</subtitle>
          </properties>
       </component>
       <component>
@@ -16,7 +16,7 @@
          <url>/components/title/simple-title</url>
          <properties>
             <title>title.repository</title>
-            <title2>title.browser</title2>
+            <subtitle>title.browser</subtitle>
          </properties>
       </component>
       <component>
