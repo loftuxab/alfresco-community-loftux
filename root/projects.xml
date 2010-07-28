@@ -2391,6 +2391,10 @@
    <target name="clean-dod5015-share" depends="init">
       <clean projectdir="${dir.module.dod5015.share}" />
    </target>
+
+   <target name="build-dod5015-share"
+      depends="clean-dod5015-share, package-dod5015-share">
+   </target>
    
    <target name="assemble-dod5015-share" depends="init">
       <copy todir="${dir.module.dod5015.share.assemble}">
