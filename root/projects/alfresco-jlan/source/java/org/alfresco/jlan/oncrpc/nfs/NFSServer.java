@@ -705,11 +705,29 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
       DiskInterface disk = (DiskInterface) conn.getSharedDevice().getInterface();
 
+      // Get the network file details, if the file is open
+      
+      NetworkFile netFile = getOpenNetworkFileForHandle(sess, handle, conn);
+      
       //	Get the file information for the specified path
 
       FileInfo finfo = disk.getFileInformation(sess, conn, path);
       if (finfo != null) {
 
+        //  Blend in live file details, if the file is open
+          
+        if ( netFile != null) {
+            
+            // Update file size from open file
+            
+            finfo.setFileSize( netFile.getFileSize());
+
+            //  DEBUG
+
+            if (Debug.EnableInfo && hasDebugFlag(DBG_INFO))
+              sess.debugPrintln("GetAttr added details from open file");
+        }
+            
         //	Pack the file information into the NFS attributes structure
 
         rpc.packInt(NFS.StsSuccess);
@@ -962,7 +980,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 					
 					//	Close the file
 					
-					netFile.close();
+//					netFile.close();
 				}	
 
 				//	DEBUG
@@ -975,6 +993,19 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 			
 			FileInfo newInfo = disk.getFileInformation(sess, conn, path);
 
+			//  Check if the file size was changed
+			
+			if ( fsize != -1L)
+			    newInfo.setFileSize( fsize);
+			else {
+			    
+			    // Check if the file is open, use the current size
+			    
+			    NetworkFile netFile = getOpenNetworkFileForHandle(sess, handle, conn);
+			    if ( netFile != null)
+			        newInfo.setFileSize( netFile.getFileSize());
+			}
+			
 			//	Pack the response
 			
 			rpc.buildResponseHeader();
@@ -1094,10 +1125,20 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
 				if (finfo != null) {
 
-				  //	Pack the response
+				    // Get a handle to the file
+				    
+				    byte[] fHandle = getHandleForFile(sess, handle, conn, fileName);
+				    
+				    // Get the network file details, if the file is open
+				      
+				    NetworkFile netFile = getOpenNetworkFileForHandle(sess, fHandle, conn);
+				    if ( netFile != null)
+				        finfo.setFileSize( netFile.getFileSize());
+				    
+				    //	Pack the response
 				  
-				  rpc.buildResponseHeader();
-				  rpc.packInt(NFS.StsSuccess);
+				    rpc.buildResponseHeader();
+				    rpc.packInt(NFS.StsSuccess);
 				  
 					//	Pack the file handle
 
@@ -1277,6 +1318,12 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 					mask = NFS.AccessRead + NFS.AccessLookup + NFS.AccessExecute;
 				}
 			
+				// Check if the file is open, blend in current file details
+				
+				NetworkFile netFile = getOpenNetworkFileForHandle(sess, handle, conn);
+				if ( netFile != null)
+				    finfo.setFileSize( netFile.getFileSize());
+				
 				// Pack the response
 
 				rpc.buildResponseHeader();
@@ -1522,12 +1569,14 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 			//	Get file information for the path and pack into the reply
 
 			FileInfo finfo = disk.getFileInformation(sess, conn, netFile.getFullName());
+			finfo.setFileSize( netFile.getFileSize());
+			
 			packPostOpAttr(sess, finfo, shareId, rpc);
 		  
-		  //	Save the current position in the response buffer to fill in the length and end of file flag after
-		  //	the read.
+			//	Save the current position in the response buffer to fill in the length and end of file flag after
+			//	the read.
 		  
-		  int bufPos = rpc.getPosition();
+			int bufPos = rpc.getPosition();
 		  
 			//	Read the network file
 
@@ -1681,6 +1730,12 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 			//	Get file information for the path and pack the response
 
 			FileInfo finfo = disk.getFileInformation(sess, conn, path);
+			
+			// Set the current file size from the open file
+			
+			finfo.setFileSize( netFile.getFileSize());
+			
+			// Pack the response
 			
 			rpc.buildResponseHeader();
 			rpc.packInt(NFS.StsSuccess);
@@ -2811,6 +2866,55 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 				//	Get the file details for the file/folder being renamed
 				
 				FileInfo finfo = disk.getFileInformation(sess, conn, oldPath);
+				
+				// Check if the file being renamed is in the open file cache
+				
+				if ( finfo != null && finfo.isDirectory() == false) {
+				    
+				    // Build a handle for the file
+				    
+				    byte[] fHandle = getHandleForFile(sess, fromHandle, conn, fromName);
+				    
+				    // Get the open file
+				    
+				    NetworkFile netFile = getOpenNetworkFileForHandle(sess, fHandle, conn);
+				    if ( netFile != null) {
+				        
+				        // DEBUG
+				        
+	                    if (Debug.EnableInfo && hasDebugFlag(DBG_FILE))
+	                        sess.debugPrintln("  Closing file " + oldPath + " before rename");
+	                    
+				        // Close the file
+				        
+				        disk.closeFile(sess, conn, netFile);
+				        
+				        // Remove the file from the open file cache
+				        
+				        NetworkFileCache fileCache = sess.getFileCache();
+
+				        synchronized (fileCache) {
+
+				            // Remove the file from the open file cache
+				            
+				            fileCache.removeFile( netFile.getFileId());
+				        }
+				    }
+				}
+				
+				// Check if the target exists and it is a file, if so then delete it
+				
+				if ( disk.fileExists(sess, conn, newPath) == FileStatus.FileExists) {
+
+				    // DEBUG
+				    
+	                if (Debug.EnableInfo && hasDebugFlag(DBG_FILE))
+	                    sess.debugPrintln("  Delete existing file before rename, newPath=" + newPath);
+	                
+				    // Delete the existing target file
+				    
+				    disk.deleteFile( sess, conn, newPath);
+				}
 				
 				//	Rename the file/directory
 
@@ -4091,16 +4195,16 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 		      break;
 	    }
 	
-	    // DEBUG
-	    
-	    if ( Debug.EnableDbg && hasDebugFlag( DBG_SESSION))
-	    	Debug.println("[NFS] Found session " + sess);
-
 	    // Setup the user context for this request
 	    
 	    if ( sess != null) {
 		    getRpcAuthenticator().setCurrentUser( sess, sess.getClientInformation());
 		    authFailed = false;
+
+		    // DEBUG
+	        
+	        if ( Debug.EnableDbg && hasDebugFlag( DBG_SESSION))
+	            Debug.println("[NFS] Found session " + sess + ", client=" + sess.getClientInformation());
 	    }
     }
     catch ( Throwable ex)
@@ -4528,6 +4632,88 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
   }
 
   /**
+   * Get the handle for the specified directory handle and file name
+   * 
+   * @param sess NFSSrvSession
+   * @param handle byte[]
+   * @param tree TreeConnection
+   * @param fname String
+   * @return byte[]
+   * @exception BadHandleException
+   * @exception StaleHandleException
+   */
+  protected final byte[] getHandleForFile(NFSSrvSession sess, byte[] handle, TreeConnection tree, String fname)
+    throws BadHandleException, StaleHandleException {
+
+    //  Get the share details via the share id hash
+
+    int shareId = getShareIdFromHandle(handle);
+    ShareDetails details = m_shareDetails.findDetails( shareId);
+
+    //  Check if this is a share handle
+
+    String path = null;
+
+    int dirId  = -1;
+    int fileId = -1;
+
+    if (NFSHandle.isDirectoryHandle(handle)) {
+
+      //    Get the directory id from the handle and get the associated path
+
+      dirId = NFSHandle.unpackDirectoryId(handle);
+      path = details.getFileIdCache().findPath(dirId);
+    }
+    else
+      throw new BadHandleException();
+
+    byte[] fHandle = null;
+    
+    try {
+        
+        //  Get the disk interface from the disk driver
+
+        DiskInterface disk = (DiskInterface) tree.getSharedDevice().getInterface();
+
+        // Build the path to the file
+        
+        String filePath = generatePath( path, fname);
+        
+        //  Check if the file/directory exists
+
+        if ( disk.fileExists(sess, tree, filePath) == FileStatus.FileExists) {
+
+            //  Get file information for the path
+
+            FileInfo finfo = disk.getFileInformation(sess, tree, filePath);
+
+            if (finfo != null) {
+                
+                // Get the file id
+                
+                fileId = finfo.getFileId();
+                
+                // Allocate and build the file handle
+                
+                fHandle = new byte[NFS.FileHandleSize];
+                NFSHandle.packFileHandle( shareId, dirId, fileId, fHandle);
+            }
+        }
+    }
+    catch (Exception ex) {
+    }
+    
+    // Check if hte file handle is valid
+    
+    if ( fHandle == null)
+        throw new BadHandleException();
+    
+    // Return the file handle
+    
+    return fHandle;
+  }
+  
+  /**
    * Get the file id from the specified handle
    * 
    * @param handle byte[]
@@ -4638,6 +4824,45 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     }
 
     //	Return the network file
+
+    return file;
+  }
+
+  /**
+   * Find the required network file using the file handle, or return null if the file has not been opened
+   * 
+   * @param sess NFSSrvSession
+   * @param handle byte[]
+   * @param conn TreeConnection
+   * @return NetworkFile 
+   * @exception BadHandleException      If the handle is not valid
+   * @exception StaleHandleException  If the file id cannot be converted to a path
+   */
+  protected final NetworkFile getOpenNetworkFileForHandle(NFSSrvSession sess, byte[] handle, TreeConnection conn)
+      throws BadHandleException, StaleHandleException {
+
+    //  Check if the handle is a file handle
+
+    if (NFSHandle.isFileHandle(handle) == false)
+      return null;
+
+    //  Get the file id from the handle
+
+    int fileId = getFileIdForHandle(handle);
+
+    //  Get the per session network file cache, use this to synchronize
+
+    NetworkFileCache fileCache = sess.getFileCache();
+    NetworkFile file = null;
+
+    synchronized (fileCache) {
+
+      //    Check the file cache, file may already be open
+
+      file = fileCache.findFile(fileId, sess);
+    }
+
+    //  Return the network file
 
     return file;
   }
