@@ -31,8 +31,8 @@ import org.alfresco.repo.forms.Field;
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.PropertyFieldDefinition;
-import org.alfresco.repo.forms.processor.node.ContentModelFormProcessor;
 import org.alfresco.repo.forms.processor.node.FieldUtils;
+import org.alfresco.repo.forms.processor.node.FormFieldConstants;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -245,7 +245,8 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
      */
     protected void generateDeclaredPropertyField(Form form, NodeRef nodeRef)
     {
-        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_DECLARED;
+        // TODO should this be done using a new FieldProcessor?
+        String dataKeyName = FormFieldConstants.PROP_DATA_PREFIX + TRANSIENT_DECLARED;
         PropertyFieldDefinition declaredField = new PropertyFieldDefinition(TRANSIENT_DECLARED,
                     DataTypeDefinition.BOOLEAN.getLocalName());
         declaredField.setLabel(TRANSIENT_DECLARED);
@@ -265,7 +266,7 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
      */
     protected void generateRecordTypePropertyField(Form form, NodeRef nodeRef)
     {
-        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_RECORD_TYPE;
+        String dataKeyName = FormFieldConstants.PROP_DATA_PREFIX + TRANSIENT_RECORD_TYPE;
         PropertyFieldDefinition recordTypeField = new PropertyFieldDefinition(TRANSIENT_RECORD_TYPE,
                     DataTypeDefinition.TEXT.getLocalName());
         recordTypeField.setLabel(TRANSIENT_RECORD_TYPE);
@@ -321,7 +322,7 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
      */
     protected void generateDispositionInstructionsPropertyField(Form form, NodeRef nodeRef)
     {
-        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_DISPOSITION_INSTRUCTIONS;
+        String dataKeyName = FormFieldConstants.PROP_DATA_PREFIX + TRANSIENT_DISPOSITION_INSTRUCTIONS;
         PropertyFieldDefinition dispInstructionsField = new PropertyFieldDefinition(TRANSIENT_DISPOSITION_INSTRUCTIONS,
                     DataTypeDefinition.TEXT.getLocalName());
         dispInstructionsField.setLabel(TRANSIENT_DISPOSITION_INSTRUCTIONS);
@@ -351,7 +352,7 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
      */
     protected void generateCategoryIdentifierPropertyField(Form form, NodeRef nodeRef)
     {
-        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_CATEGORY_ID;
+        String dataKeyName = FormFieldConstants.PROP_DATA_PREFIX + TRANSIENT_CATEGORY_ID;
         PropertyFieldDefinition categoryIdField = new PropertyFieldDefinition(TRANSIENT_CATEGORY_ID,
                     DataTypeDefinition.TEXT.getLocalName());
         categoryIdField.setLabel(TRANSIENT_CATEGORY_ID);
