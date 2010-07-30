@@ -349,7 +349,7 @@ public class RecordsManagementAuditServiceImpl
      */
     public void clear()
     {
-        auditService.clearAudit(RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME);
+        auditService.clearAudit(RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME, null, null);
         if (logger.isInfoEnabled())
             logger.debug("Records Management audit log has been cleared");
     }
