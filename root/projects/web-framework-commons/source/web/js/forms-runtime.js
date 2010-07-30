@@ -450,7 +450,11 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          var field = Dom.get(fieldId);
          if (field == null)
          {
-            this._showInternalError("element with id of '" + fieldId + "' could not be located.");
+            if (Alfresco.logger.isDebugEnabled())
+            {
+               Alfresco.logger.debug("Ignoring validation for field with id of '" + fieldId + "' as it could not be located.");
+            }
+            
             return;
          }
          
