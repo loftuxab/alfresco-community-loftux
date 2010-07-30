@@ -96,6 +96,7 @@ public class FormUIGet extends DeclarativeWebScript
     protected static final String ALFRESCO_PROXY = "/proxy/alfresco";
     protected static final String CM_NAME_PROP = "prop_cm_name";
     protected static final String MSG_DEFAULT_SET_LABEL = "form.default.set.label";
+    protected static final String INDENT = "   ";
     
     protected static final String SUBMIT_TYPE_MULTIPART = "multipart";
     protected static final String SUBMIT_TYPE_JSON = "json";
@@ -268,8 +269,6 @@ public class FormUIGet extends DeclarativeWebScript
         {
             model = generateErrorModel(formSvcResponse);
         }
-        
-        dumpModel(model);
         
         return model;
     }
@@ -571,7 +570,7 @@ public class FormUIGet extends DeclarativeWebScript
             String jsonResponse = formSvcResponse.getResponse();
             
             if (logger.isDebugEnabled())
-                logger.debug("form definition json = " + jsonResponse);
+                logger.debug("form definition JSON = \n" + jsonResponse);
                 
             // create JSON representation of form defintion from response
             JSONObject formDefinition = new JSONObject(new JSONTokener(jsonResponse));
@@ -636,6 +635,9 @@ public class FormUIGet extends DeclarativeWebScript
         // process the fields to generate the 'fields', 'structure' and 'constraints'
         // properties of the model
         processFields(context, formUIModel);
+        
+        // dump the model for debugging
+        dumpFormUIModel(formUIModel);
         
         return formUIModel;
     }
@@ -2182,18 +2184,87 @@ public class FormUIGet extends DeclarativeWebScript
     }
     
     /**
-     * Dumps the given model to debug output (when debug is enabled).
+     * Dumps the given form UI model to debug output (when debug is enabled).
      * 
-     * @param model The model to dump
+     * @param model The form UI model to dump
      */
-    protected void dumpModel(Map<String, Object> model)
+    protected void dumpFormUIModel(Map<String, Object> model)
     {
         if (logger.isDebugEnabled())
         {
-            // TODO: Format the model nicely for output i.e. as JSON
-            
-            logger.debug("model = " + model);
+            logger.debug("formUIModel = " + dumpMap(model, INDENT));
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected String dumpMap(Map<String, Object> map, String indent)
+    {
+        StringBuilder builder = new StringBuilder();
+        
+        // start
+        builder.append("\n");
+        if (indent.length() > INDENT.length())
+        {
+            builder.append(indent.substring(INDENT.length()));
+        }
+        builder.append("{");
+        
+        // name & values
+        boolean firstKey = true;
+        for (String key : map.keySet())
+        {
+            if (firstKey)
+                firstKey = false;
+            else
+                builder.append(",");
+            
+            builder.append("\n");
+            builder.append(indent);
+            builder.append(key);
+            builder.append(": ");
+            
+            Object value = map.get(key);
+            if (value instanceof String)
+            {
+                builder.append("\"");
+                builder.append(value);
+                builder.append("\"");
+            }
+            else if (value instanceof Map)
+            {
+                builder.append(dumpMap((Map)value, indent + INDENT));
+            }
+            else if (value instanceof List)
+            {
+                boolean firstItem = true;
+                builder.append("\n").append(INDENT).append("[");
+                for (Object item : ((List)value))
+                {
+                    if (firstItem)
+                        firstItem = false;
+                    else
+                        builder.append(",");
+                    
+                    builder.append("\n").append(INDENT).append(INDENT);
+                    builder.append(item);
+                }
+                builder.append("\n").append(INDENT).append("]");
+            }
+            else
+            {
+                builder.append(value);
+            }
+        }
+        
+        // end
+        builder.append("\n");
+        if (indent.length() > INDENT.length())
+        {
+            builder.append(indent.substring(INDENT.length()));
+        }
+        builder.append("}");
+        
+        return builder.toString();
     }
     
     /**
@@ -2430,6 +2501,30 @@ public class FormUIGet extends DeclarativeWebScript
         {
             return this.children;
         }
+        
+        @Override
+        public String toString()
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.append(this.kind);
+            buffer.append("(id=").append(this.id);
+            buffer.append(" appearance=").append(this.appearance);
+            buffer.append(" label=").append(this.label);
+            buffer.append(" template=").append(this.template);
+            buffer.append(" children=[");
+            boolean first = true;
+            for (Element child : this.children)
+            {
+                if (first)
+                    first = false;
+                else
+                    buffer.append(", ");
+                
+                buffer.append(child);
+            }
+            buffer.append("])");
+            return buffer.toString();
+        }
     }
     
     /**
@@ -2638,6 +2733,31 @@ public class FormUIGet extends DeclarativeWebScript
         {
             return this.repeating;
         }
+        
+        @Override
+        public String toString()
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.append(this.kind);
+            buffer.append("(id=").append(this.id);
+            buffer.append(" name=").append(this.name);
+            buffer.append(" configName=").append(this.configName);
+            buffer.append(" type=").append(this.type);
+            buffer.append(" value=").append(this.value);
+            buffer.append(" label=").append(this.label);
+            buffer.append(" description=").append(this.description);
+            buffer.append(" help=").append(this.help);
+            buffer.append(" dataKeyName=").append(this.dataKeyName);
+            buffer.append(" dataType=").append(this.dataType);
+            buffer.append(" endpointDirection=").append(this.endpointDirection);
+            buffer.append(" disabled=").append(this.disabled);
+            buffer.append(" mandatory=").append(this.mandatory);
+            buffer.append(" repeating=").append(this.repeating);
+            buffer.append(" transitory=").append(this.transitory);
+            buffer.append(" ").append(this.control);
+            buffer.append(")");
+            return buffer.toString();
+        }
     }
     
     /**
@@ -2667,6 +2787,16 @@ public class FormUIGet extends DeclarativeWebScript
         public Map<String, String> getParams()
         {
             return this.params;
+        }
+        
+        @Override
+        public String toString()
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.append("control(template=").append(this.template);
+            buffer.append(" params=").append(this.params);
+            buffer.append(")");
+            return buffer.toString();
         }
     }
     
@@ -2753,6 +2883,19 @@ public class FormUIGet extends DeclarativeWebScript
         public void setEvent(String event)
         {
             this.event = event;
+        }
+        
+        @Override
+        public String toString()
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.append("constraint(fieldId=").append(this.fieldId);
+            buffer.append(" id=").append(this.id);
+            buffer.append(" validationHandler=").append(this.validationHandler);
+            buffer.append(" event=").append(this.event);
+            buffer.append(" message=").append(this.message);
+            buffer.append(")");
+            return buffer.toString();
         }
     }
     
