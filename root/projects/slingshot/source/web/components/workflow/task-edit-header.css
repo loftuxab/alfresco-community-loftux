@@ -1,8 +1,6 @@
 .task-edit-header
 {
    clear: both;
-   margin: 0 -10px;
-   height: 34px;
    padding: 0;
 }
 
@@ -14,6 +12,18 @@
 .task-edit-header h1
 {
    float: left;
+}
+
+.task-edit-header .unassigned
+{
+   margin-bottom: 1em;
+   padding: 0.5em 1em;
+}
+
+.task-edit-header .unassigned span
+{
+   background: left no-repeat url(../images/warning-16.png);
+   padding-left: 2em;
 }
 
 .task-edit-header .clear

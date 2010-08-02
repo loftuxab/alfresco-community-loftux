@@ -229,10 +229,16 @@ span.navigation-separator-alt
 
 .share-form .form-manager
 {
-   padding: 1.5em 1.5em 0;
-   width: 800px;
+   padding: 1.5em 0 0 0;
+   width: 827px;
 }
 
+.share-form .form-manager h1
+{
+   padding-left: 0.5em;
+   margin-bottom: 0.75em;
+}
+''
 .share-form .form-container
 {
    padding: 0;
@@ -247,7 +253,8 @@ span.navigation-separator-alt
 
 .share-form .form-container .caption
 {
-   margin-left: 720px;
+   text-align:right;
+   width:820px;
 }
 
 .share-form .form-container .form-fields
