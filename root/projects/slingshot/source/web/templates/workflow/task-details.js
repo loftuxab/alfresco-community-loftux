@@ -76,7 +76,7 @@
        */
       onReady: function TaskDetails_onReady()
       {
-         var url = Alfresco.constants.PROXY_URI + 'api/task-instances/' + encodeURIComponent(this.options.taskId);
+         var url = Alfresco.constants.PROXY_URI + 'api/task-instances/' + encodeURIComponent(this.options.taskId) + "?detailed=true";
          Alfresco.util.Ajax.jsonGet(
          {
             method: "GET",
@@ -95,7 +95,8 @@
       },
       
       /**
-       * Success handler called when the AJAX call to the doclist web script returns successfully
+       * Success handler called when the web script returns successfully.
+       * Will fire an event with data used by the components on the page.
        *
        * @method _getDataSuccess
        * @param response {object} The response object
@@ -111,7 +112,8 @@
       },
 
       /**
-       * Failure handler called when the AJAX call to the doclist web script fails
+       * Failure handler called when the web script fails.
+       * Will display an error message in a prompt dialog.
        *
        * @method _getDataFailure
        * @param response {object} The response object

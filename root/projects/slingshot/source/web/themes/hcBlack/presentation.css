@@ -1019,6 +1019,12 @@ div.theme-bg-color-7
 {
    border: 1px solid #c6c6c6 !important;
 }
+
+.theme-border-4
+{
+   border: 1px solid #DDD6A0;   
+}
+
 .docfolder-label
 {
    overflow:auto;

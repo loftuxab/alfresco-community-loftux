@@ -59,8 +59,8 @@
       onTaskData: function TDH_onMetadataRefresh(layer, args)
       {
          // Set workflow details url and display link
-         var workflowId = "123"; // todo set to something like task.workflowId when rest api is finished
-         workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + encodeURIComponent(workflowId));
+         var workflowId = args[1].workflowInstance.id,
+            workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + encodeURIComponent(workflowId));
          Selector.query(".links a", this.id)[0].setAttribute("href", workflowDetailsUrl);
          Dom.removeClass(Selector.query(".links", this.id), "hidden");
       }

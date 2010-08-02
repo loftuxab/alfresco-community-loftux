@@ -1,6 +1,8 @@
 div.dashlet.site-welcome div.detail-list-item-alt
 {
-   border-bottom: 1px solid #ddd6a0;
+   border-top: none;
+   border-left: none;
+   border-right: none;      
    padding: 7px 9px 5px;
 }
 

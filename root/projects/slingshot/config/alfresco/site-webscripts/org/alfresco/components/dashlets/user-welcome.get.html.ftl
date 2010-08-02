@@ -6,7 +6,7 @@ new Alfresco.dashlet.UserWelcome("${args.htmlid}");
 <div class="dashlet user-welcome">
    <div class="title">${msg("header.userWelcome")}</div>
    <div class="body">
-      <div class="detail-list-item-alt theme-bg-color-2">
+      <div class="detail-list-item-alt theme-bg-color-2 theme-border-4">
          <h4 class="theme-color-2">${msg("header.userDashboard")}</h4>
          <div>${msg("text.userDashboard")}</div>
       </div>
