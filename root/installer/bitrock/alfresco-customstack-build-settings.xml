@@ -61,7 +61,7 @@
         </setInstallerVariable>
         <setInstallerVariable name="alfresco_extensions_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/tomcat/shared/classes/alfresco" />
         <setInstallerVariable name="alfresco_endorsed_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/tomcat/endorsed" />
-        <setInstallerVariable name="alfresco_war_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/tomcat/webapps" />
+        <setInstallerVariable name="alfresco_war_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/web-server/webapps" />
         <setInstallerVariable name="alfresco_extras_source_directory" value="${alfresco_svn_rootdir.unix}/projects/installer" />
         <setInstallerVariable name="alfresco_licenses_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/licenses" />
         <setInstallerVariable name="project.readmeFile" value="${alfresco_svn_rootdir.unix}/installer/bitrock/README.txt" />
