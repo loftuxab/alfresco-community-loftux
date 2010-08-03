@@ -127,11 +127,6 @@
    <!-- Repository Library config section -->
    <config evaluator="string-compare" condition="RepositoryLibrary" replace="true">
       <!--
-         Whether the link to the Repository Library appears in the header component or not.
-      -->
-      <visible>false</visible>
-
-      <!--
          Root nodeRef for top-level folder.
       -->
       <root-node>alfresco://company/home</root-node>

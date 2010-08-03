@@ -3,6 +3,7 @@
    <plug-ins>
       <element-readers>
          <element-reader element-name="kerberos" class="org.alfresco.web.site.servlet.config.KerberosConfigElementReader"/>
+         <element-reader element-name="header" class="org.alfresco.web.config.header.HeaderElementReader"/>
       </element-readers>
    </plug-ins>
 
@@ -19,6 +20,50 @@
          -->
          <client-debug-autologging>false</client-debug-autologging>
       </flags>
+      
+      <header>
+         <app-items>
+            <!-- defaults: icon="{id}.png" label="header.label.{id}" description="header.description.{id}" -->
+            <item type="link" id="my-dashboard">{userdashboardpage}</item>
+            <item type="link" id="my-tasks" condition="false">/user/user-tasks</item>
+            <item type="js" id="sites">Alfresco.module.Sites</item>
+            <item type="link" id="people">/people-finder</item>
+            <item type="link" id="repository">/repository</item>
+            <item type="container" id="more">
+               <container-group id="my">
+                  <item type="link" id="my-workflows" condition="false">/user/user-workflows</item>
+                  <item type="link" id="my-content">/user/user-content</item>
+                  <item type="link" id="my-sites">/user/user-sites</item>
+                  <item type="link" id="my-profile">{userprofilepage}</item>
+                  <item type="js" id="saved-searches" condition="false">Alfresco.module.SavedSearches</item>
+               </container-group>
+               <container-group id="tools" permission="admin">
+                  <item type="link" id="application">/console/admin-console/application</item>
+                  <item type="link" id="groups">/console/admin-console/groups</item>
+                  <item type="link" id="replication-jobs" condition="false">/console/admin-console/replication-jobs</item>
+                  <item type="link" id="users">/console/admin-console/users</item>
+               </container-group>
+            </item>
+         </app-items>
+         <user-items>
+            <item type="container" id="user" icon="">
+               <container-group id="usermenu" label="">
+                  <item type="user" id="status">{userprofilepage}</item>
+                  <item type="link" id="my-profile">{userprofilepage}</item>
+                  <item type="link" id="change-password" condition="!context.externalAuthentication">/user/change-password</item>
+                  <item type="external-link" id="help">{share-help}</item>
+                  <item type="link" id="logout" condition="!context.externalAuthentication">/dologout</item>
+               </container-group>
+            </item>
+            <item type="external-link" id="help" icon="">{share-help}</item>
+         </user-items>
+         <dependencies>
+            <css src="/modules/create-site.css" />
+            <css src="/modules/header/sites.css" />
+            <js src="/modules/create-site.js" />
+            <js src="/modules/header/sites.js" />
+         </dependencies>
+      </header>   
    </config>
 
    <config evaluator="string-compare" condition="UriTemplate">
@@ -234,11 +279,6 @@
 
    <!-- Repository Library config section -->
    <config evaluator="string-compare" condition="RepositoryLibrary">
-      <!--
-         Whether the link to the Repository Library appears in the header component or not.
-      -->
-      <visible>false</visible>
-
       <!--
          Root nodeRef for top-level folder.
       -->

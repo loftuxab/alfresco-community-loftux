@@ -29,7 +29,8 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+      Event = YAHOO.util.Event,
+      Selector = YAHOO.util.Selector;
 
    /**
     * Alfresco Slingshot aliases
@@ -38,15 +39,7 @@
 
    Alfresco.Header = function(htmlId)
    {
-      Alfresco.Header.superclass.constructor.call(this, "Alfresco.Header", htmlId, ["button", "menu", "container"]);
-      
-      // Notifications that the favourite sites have been updated
-      YAHOO.Bubbling.on("favouriteSiteAdded", this.onFavouriteSiteAdded, this);
-      YAHOO.Bubbling.on("favouriteSiteRemoved", this.onFavouriteSiteRemoved, this);
-      YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
-
-      this.preferencesService = new Alfresco.service.Preferences();
-      return this;
+      return Alfresco.Header.superclass.constructor.call(this, "Alfresco.Header", htmlId, ["button", "menu", "container"]);
    };
 
    YAHOO.extend(Alfresco.Header, Alfresco.component.Base,
@@ -78,23 +71,39 @@
          siteTitle: "",
          
          /**
-          * Favourite sites
-          * 
-          * @property favouriteSites
-          * @type object
-          * @default {}
-          */
-         favouriteSites: {},
-
-         /**
           * Number of characters required for a search.
           *
           * @property minSearchTermLength
           * @type int
           * @default 1
           */
-         minSearchTermLength: 1
+         minSearchTermLength: 1,
+         
+         /**
+          * URI replacement tokens
+          * 
+          * @property tokens
+          * @type object
+          * @default {}
+          */
+         tokens: {}
       },
+      
+      /**
+       * Default search text
+       *
+       * @property defaultSearchText
+       * @type string
+       */
+      defaultSearchText: null,
+
+      /**
+       * Last status update time
+       *
+       * @property statusUpdateTime
+       * @type Date
+       */
+      statusUpdateTime: null,
       
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -104,150 +113,16 @@
        */
       onReady: function Header_onReady()
       {
-         /* Temporary fix for 1024x768 resolutions */
-         if (window.screen.width < 1280)
-         {
-            Dom.setStyle(this.id + "-searchtext", "width", "10em");
-         }
-         
-         Event.addListener(this.id + "-searchtext", "focus", this.focusSearchText, null, this);
-         Event.addListener(this.id + "-searchtext", "blur", this.blurSearchText, null, this);
-         
-         this.defaultSearchText();
-         
-         // register the "enter" event on the search text field
-         var zinput = Dom.get(this.id + "-searchtext"),
-            me = this;
-         
-         this.widgets.enterListener = new YAHOO.util.KeyListener(zinput, 
-         {
-            keys: YAHOO.util.KeyListener.KEY.ENTER
-         }, 
-         {
-            fn: me.doSearch,
-            scope: this,
-            correctScope: true
-         }, "keydown").enable();
-         
-         // menu button for Advanced Search option (and future saved searches)
-         this.widgets.searchButton = new YAHOO.widget.Button(this.id + "-search-tbutton",
-         {
-            type: "menu",
-            menu: new YAHOO.widget.Menu(this.id + "-adv-search-menu"),
-            menualignment: ["tr", "br"]
-         });
-         Dom.removeClass(this.id + "-adv-search-menu", "hidden");
-         
-         this.widgets.sitesMenu = new YAHOO.widget.Menu(this.id + "-sites-menu");
-         this.widgets.sitesButton = new YAHOO.widget.Button(this.id + "-sites",
-         {
-            type: "menu",
-            menu: this.widgets.sitesMenu
-         });
-         // Override align() function so menu can be aligned to "Sites" span, not button
-         this.widgets.sitesMenu.align = function align()
-         {
-            this.cfg.config.context.value = [Dom.get(me.id + "-sites-linkMenuButton"), "tl", "bl"];
-            return YAHOO.widget.Menu.superclass.align.apply(this, arguments);
-         };
-         // Listen for show and hide events on the menu so the Sites span can be styled
-         this.widgets.sitesMenu.subscribe("show", function sitesMenu_onShow()
-         {
-            Dom.addClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
-         }, this, true);
-         this.widgets.sitesMenu.subscribe("hide", function sitesMenu_onHide()
-         {
-            Dom.removeClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
-         }, this, true);
-      },
-      
-      /**
-       * Update image class when search box has focus.
-       *
-       * @method focusSearchText
-       */
-      focusSearchText: function Header_focusSearchText()
-      {
-         if (Dom.hasClass(this.id + "-searchtext", "gray"))
-         {
-            Dom.get(this.id + "-searchtext").value = "";
-            Dom.removeClass(this.id + "-searchtext", "gray");
-         }
-         else
-         {
-            Dom.get(this.id + "-searchtext").select();
-         }
-      },
-      
-      /**
-       * Set default search text when box loses focus and is empty.
-       *
-       * @method blurSearchText
-       */
-      blurSearchText: function Header_blurSearchText()
-      {
-         var searchVal = YAHOO.lang.trim(Dom.get(this.id + "-searchtext").value);
-         if (searchVal.length === 0)
-         {
-            /**
-             * Since the blur event occurs before the KeyListener gets
-             * the enter we give the enter listener a chance of testing
-             * against "" instead of the help text.
-             */
-            YAHOO.lang.later(100, this, this.defaultSearchText, []);
-         }
-      }, 
-      
-      /**
-       * Set default search text for search box.
-       *
-       * @method defaultSearchText
-       */
-      defaultSearchText: function Header_defaultSearchText()
-      {
-         Dom.get(this.id + "-searchtext").value = this.msg("header.search.searchall");
-         Dom.addClass(this.id + "-searchtext", "gray");
-      },
-      
-      /**
-       * Will trigger a search, via a page refresh to ensure the Back button works correctly
-       *
-       * @method doSearch
-       */
-      doSearch: function Header_doSearch()
-      {
-         var searchTerm = YAHOO.lang.trim(Dom.get(this.id + "-searchtext").value);
-         if (searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
-         {
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this.msg("message.minimum-length", this.options.minSearchTermLength)
-            });
-         }
-         else
-         {
-            // redirect to the search page
-            var url = Alfresco.constants.URL_CONTEXT + "page";
-            if (this.options.siteId.length !== 0)
-            {
-               url += "/site/" + this.options.siteId;
-            }
-            url += "/search?t=" + encodeURIComponent(searchTerm);
-            url += "&a=true";
-            window.location = url;
-         }
+         this.replaceUriTokens();
+         this.configureSearch();
+         this.configureMyStatus();
       },
 
+
       /**
-       * Show the Create Site dialog
-       *
-       * @method showCreateSite
+       * About Share Handlers
        */
-      showCreateSite: function Header_showCreateSite()
-      {
-         Alfresco.module.getCreateSiteInstance().show();
-      },
-      
+
       /**
        * Show the About Share dialog
        *
@@ -257,156 +132,246 @@
       {
          Alfresco.module.getAboutShareInstance().show();
       },
+
+
+      /**
+       * Header Items Handlers
+       */
+
+      /**
+       * Token replacement for header item URLs
+       *
+       * @method replaceUriTokens
+       */
+      replaceUriTokens: function Header_replaceUriTokens()
+      {
+         var tokens = YAHOO.lang.merge(Alfresco.constants.URI_TEMPLATES, Alfresco.constants.HELP_PAGES, this.options.tokens),
+            links = Selector.query("a", this.id),
+            link;
+         
+         for (var i = 0, ii = links.length; i < ii; i++)
+         {
+            link = links[i];
+            if (link.hasAttribute("templateUri"))
+            {
+               link.href = Alfresco.util.renderUriTemplate(link.attributes.templateUri.value, tokens);
+            }
+         }
+      },
+
+
+      /**
+       * Search Handlers
+       */
       
       /**
-       * Favourite Site has been added
+       * Configure search area
        *
-       * @method onFavouriteSiteAdded
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
+       * @method configureSearch
        */
-      onFavouriteSiteAdded: function Header_onFavouriteSiteAdded(layer, args)
+      configureSearch: function Header_configureSearch()
       {
-         var obj = args[1];
-         if (obj && obj.shortName !== null)
+         this.widgets.searchBox = Dom.get(this.id + "-searchText");
+         this.defaultSearchText = this.msg("header.search.default");
+         
+         Event.addListener(this.widgets.searchBox, "focus", this.onSearchFocus, null, this);
+         Event.addListener(this.widgets.searchBox, "blur", this.onSearchBlur, null, this);
+         
+         this.setDefaultSearchText();
+         
+         // Register the "enter" event on the search text field
+         var me = this;
+         
+         this.widgets.searchEnterListener = new YAHOO.util.KeyListener(this.widgets.searchBox,
          {
-            this.options.favouriteSites[obj.shortName] = obj.title;
-            this._renderFavouriteSites();
+            keys: YAHOO.util.KeyListener.KEY.ENTER
+         }, 
+         {
+            fn: me.submitSearch,
+            scope: this,
+            correctScope: true
+         }, "keydown").enable();
+
+         this.widgets.searchMore = new YAHOO.widget.Button(this.id + "-search_more",
+         {
+            type: "menu",
+            menu: this.id + "-searchmenu_more"
+         });
+      },
+      
+      /**
+       * Update image class when search box has focus.
+       *
+       * @method onSearchFocus
+       */
+      onSearchFocus: function Header_onSearchFocus()
+      {
+         if (this.widgets.searchBox.value == this.defaultSearchText)
+         {
+            Dom.removeClass(this.widgets.searchBox, "faded");
+            this.widgets.searchBox.value = "";
          }
+         else
+         {
+            this.widgets.searchBox.select();
+         }
+      },
+      
+      /**
+       * Set default search text when box loses focus and is empty.
+       *
+       * @method onSearchBlur
+       */
+      onSearchBlur: function Header_onSearchBlur()
+      {
+         var searchText = YAHOO.lang.trim(this.widgets.searchBox.value);
+         if (searchText.length === 0)
+         {
+            /**
+             * Since the blur event occurs before the KeyListener gets
+             * the enter we give the enter listener a chance of testing
+             * against "" instead of the help text.
+             */
+            YAHOO.lang.later(100, this, this.setDefaultSearchText, []);
+         }
+      }, 
+      
+      /**
+       * Set default search text for search box.
+       *
+       * @method setDefaultSearchText
+       */
+      setDefaultSearchText: function Header_setDefaultSearchText()
+      {
+         Dom.addClass(this.widgets.searchBox, "faded");
+         this.widgets.searchBox.value = this.defaultSearchText;
       },
 
       /**
-       * Favourite Site has been removed
+       * Get current search text from search box.
        *
-       * @method onFavouriteSiteAdded
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
+       * @method getSearchText
        */
-      onFavouriteSiteRemoved: function Header_onFavouriteSiteRemoved(layer, args)
+      getSearchText: function Header_getSearchText()
       {
-         var obj = args[1];
-         if (obj && obj.shortName !== null)
+         return YAHOO.lang.trim(this.widgets.searchBox.value);
+      },
+      
+      /**
+       * Will trigger a search, via a page refresh to ensure the Back button works correctly
+       *
+       * @method submitSearch
+       */
+      submitSearch: function Header_submitSearch()
+      {
+         var searchText = this.getSearchText();
+         if (searchText.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
-            if (obj.shortName in this.options.favouriteSites)
+            Alfresco.util.PopupManager.displayMessage(
             {
-               delete this.options.favouriteSites[obj.shortName];
-               this._renderFavouriteSites();
-            }
+               text: this.msg("message.minimum-length", this.options.minSearchTermLength)
+            });
          }
+         else
+         {
+            // Redirect to the search page
+            window.location = $siteURL("search?t=" + encodeURIComponent(searchText));
+         }
+      },
+      
+      
+      /**
+       * My Status handlers
+       */
+      
+      /**
+       * Configure My Status UI
+       *
+       * @method configureMyStatus
+       */
+      configureMyStatus: function Header_configureMyStatus()
+      {
+         this.widgets.statusBox = Dom.get(this.id + "-statusText");
+         this.widgets.statusTime = Dom.get(this.id + "-statusTime");
+         var statusISOTime = this.widgets.statusTime.attributes.title.value;
+         if (statusISOTime !== "")
+         {
+            this.statusUpdateTime = Alfresco.util.fromISO8601(statusISOTime);
+         }
+         this.setStatusRelativeTime();
+
+         // Register the "enter" event on the status text field
+         var me = this;
+         
+         this.widgets.statusEnterListener = new YAHOO.util.KeyListener(this.widgets.statusBox,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ENTER
+         }, 
+         {
+            fn: me.submitStatus,
+            scope: this,
+            correctScope: true
+         }, "keydown").enable();
+
+         this.widgets.submitStatus = new YAHOO.widget.Button(this.id + "-submitStatus");
+         this.widgets.submitStatus.on("click", this.submitStatus, this.widgets.submitStatus, this);
       },
 
       /**
-       * Site has been deleted - maybe remove from favourites menu
+       * Get current status text from textarea.
        *
-       * @method onSiteDeleted
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
+       * @method getStatusText
        */
-      onSiteDeleted: function Header_onSiteDeleted(layer, args)
+      getStatusText: function Header_getStatusText()
       {
-         var obj = args[1];
-         if (obj && obj.site !== null)
-         {
-            if (obj.site.shortName in this.options.favouriteSites)
-            {
-               delete this.options.favouriteSites[obj.site.shortName];
-               this._renderFavouriteSites();
-            }
-         }
+         return YAHOO.lang.trim(this.widgets.statusBox.value);
       },
 
       /**
-       * Renders favourite sites into menu
+       * Updates relative status time display.
        *
-       * @method renderFavouriteSites
-       * @private
+       * @method setStatusRelativeTime
        */
-      _renderFavouriteSites: function Header__renderFavouriteSites()
+      setStatusRelativeTime: function Header_setStatusRelativeTime()
       {
-         var sites = [], site, sitesMenu = this.widgets.sitesMenu, sitesGroup, i, ii;
-         
-         // Create a sorted list of our current favourites
-         for (site in this.options.favouriteSites)
-         {
-            if (this.options.favouriteSites.hasOwnProperty(site))
-            {
-               sites.push(site);
-            }
-         }
-         sites.sort();
-
-         sitesGroup = sitesMenu.getItemGroups()[0];
-         for (i = 0, ii = sitesGroup.length; i < ii; i++)
-         {
-            sitesMenu.removeItem(0, 0, true);
-         }
-         
-         Dom.setStyle(this.id + "-favouritesContainer", "display", sites.length > 0 ? "block" : "none");
-         Dom.setStyle(this.id + "-favouriteSites", "display", site.length > 0 ? "block" : "none");
-
-         for (i = 0, ii = sites.length; i < ii; i++)
-         {
-            sitesMenu.addItem(
-            {
-               text: $html(this.options.favouriteSites[sites[i]]),
-               url: Alfresco.util.uriTemplate("sitedashboardpage",
-               {
-                  site: sites[i]
-               })
-            }, 0);
-         }
-         
-         // Show/hide "Add to favourites" menu item if we're in a site
-         if (this.options.siteId.length !== 0)
-         {
-            Dom.setStyle(this.id + "-addFavourite", "display", this.options.siteId in this.options.favouriteSites ? "none" : "block");
-         }
-         
-         sitesMenu.render();
+         var relativeTime = (this.statusUpdateTime === null) ? this.msg("status.never-updated") : Alfresco.util.relativeTime(this.statusUpdateTime);
+         this.widgets.statusTime.innerHTML = this.msg("status.updated", relativeTime);
       },
-
+      
+      
       /**
-       * Adds the current site as a favourite
+       * Submit status handler
        *
-       * @method addAsFavourite
+       * @method submitStatus
        */
-      addAsFavourite: function Header_addAsFavourite()
+      submitStatus: function Header_submitStatus()
       {
-         var site =
+         Alfresco.util.Ajax.jsonPost(
          {
-            shortName: this.options.siteId,
-            title: this.options.siteTitle
-         },
-            me = this;
-
-         var responseConfig =
-         {
-            failureCallback:
+            url: Alfresco.constants.PROXY_URI + "/slingshot/profile/userstatus",
+            dataObj:
             {
-               fn: function(event, obj)
-               {
-                  Alfresco.util.PopupManager.displayPrompt(
-                  {
-                     text: me.msg("message.siteFavourite.failure")
-                  });
-               },
-               scope: this
+               status: this.getStatusText()
             },
             successCallback:
             {
-               fn: function(event, obj)
-               {
-                  YAHOO.Bubbling.fire("favouriteSiteAdded", obj.site);
-               },
-               scope: this,
-               obj:
-               {
-                  site: site
-               }
-            }
-         };
+               fn: this.onStatusUpdated,
+               scope: this
+            },
+            failureMessage: this.msg("message.status.failure")
+         });
+      },
 
-         this.preferencesService.set(Alfresco.service.Preferences.FAVOURITE_SITES + "." + site.shortName, true, responseConfig);
-      }      
+      /**
+       * Status submitted handler
+       *
+       * @method onStatusUpdated
+       */
+      onStatusUpdated: function Header_onStatusUpdated(response)
+      {
+         this.statusUpdateTime = Alfresco.util.fromISO8601(response.json.userStatusTime.iso8601);
+         this.setStatusRelativeTime();
+         Alfresco.util.PopupManager.displayMessage(this.msg("message.status.success"));
+      }
    });
 })();

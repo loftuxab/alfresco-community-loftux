@@ -33,7 +33,7 @@ import org.springframework.extensions.config.xml.elementreader.ConfigElementRead
  * 
  * @author Neil McErlean.
  */
-class DependenciesElementReader implements ConfigElementReader
+public class DependenciesElementReader implements ConfigElementReader
 {
     public static final String ELEMENT_DEPENDENCIES = "dependencies";
 

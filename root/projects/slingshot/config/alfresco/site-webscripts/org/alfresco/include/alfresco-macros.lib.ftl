@@ -23,3 +23,20 @@
 
    <#return site_url>
 </#function>
+
+<#--
+   I18N Message string using an array of tokens as the second argument
+-->
+<#function msgArgs msgId msgTokens>
+   <#if msgTokens??>
+      <#if msgTokens?is_sequence>
+         <#assign templateTokens><#list msgTokens as token>"${token?string}"<#if token_has_next>,</#if></#list></#assign>
+         <#assign templateSource = r"${msg(msgId," + templateTokens + ")}">
+         <#assign inlineTemplate = [templateSource, "msgArgsTemplate"]?interpret>
+         <#assign returnValue><@inlineTemplate /></#assign>
+         <#return returnValue />
+      </#if>
+      <#return msg(msgId, msgTokens) />
+   </#if>
+   <#return msg(msgId) />
+</#function>

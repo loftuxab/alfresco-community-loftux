@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/j2ee/servlet.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Alfresco JLAN"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Web Framework Commons"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
