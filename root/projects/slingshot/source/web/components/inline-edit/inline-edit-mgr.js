@@ -92,6 +92,9 @@
          // add a handler to the cancel button
          var cancelButton = args[1].buttons.cancel;
          cancelButton.addListener("click", this.onCancelButtonClick, null, this);
+         
+         // add actions for Activity post info
+         this.modules.actions = new Alfresco.module.DoclibActions(this.options.workingMode);
       },
       
       /**
@@ -122,6 +125,12 @@
        */
       onInlineEditSuccess: function InlineEditMgr_onInlineEditSuccess(response)
       {
+         var siteId = this.options.siteId, data = 
+         {
+            fileName: response.config.dataObj.prop_cm_name,
+            nodeRef: this.options.nodeRef.nodeRef
+         };
+         this.modules.actions.postActivity(siteId, "inline-edit", "document-details", data);
          this._navigateForward();
       },
       

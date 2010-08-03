@@ -1965,7 +1965,9 @@
       onActionCheckoutToGoogleDocs: function DL_onActionCheckoutToGoogleDocs(asset)
       {
          var displayName = asset.displayName,
-            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
+            path = asset.location.path,
+            fileName = asset.fileName;
             
          var progressPopup = Alfresco.util.PopupManager.displayMessage(
          {
@@ -2004,6 +2006,18 @@
                      this.afterDocListUpdate.push(fnAfterUpdate);
                   },
                   scope: this
+               },
+               activity:
+               {
+                  siteId: this.options.siteId,
+                  activityType: "google-docs-checkout",
+                  page: "document-details",
+                  activityData:
+                  {
+                     fileName: fileName,
+                     path: path,
+                     nodeRef: nodeRef.nodeRef
+                  }
                }
             },
             failure:
@@ -2043,7 +2057,9 @@
       onActionCheckinFromGoogleDocs: function DL_onActionCheckinFromGoogleDocs(asset)
       {
          var displayName = asset.displayName,
-            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
+            path = asset.location.path,
+            fileName = asset.fileName;
 
          var progressPopup = Alfresco.util.PopupManager.displayMessage(
          {
@@ -2077,6 +2093,18 @@
                      this.afterDocListUpdate.push(fnAfterUpdate);
                   },
                   scope: this
+               },
+               activity:
+               {
+                  siteId: this.options.siteId,
+                  activityType: "google-docs-checkin",
+                  page: "document-details",
+                  activityData:
+                  {
+                     fileName: fileName,
+                     path: path,
+                     nodeRef: nodeRef.nodeRef
+                  }
                }
             },
             failure:
