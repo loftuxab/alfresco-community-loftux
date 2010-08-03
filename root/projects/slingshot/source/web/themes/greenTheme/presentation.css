@@ -447,18 +447,18 @@ span.mce_alfresco-imagelibrary
 
 /* Override YUI Button styles for - flat button style */
 
-.yui-skin-greenTheme .flat-button .yui-button
+.yui-skin-greenTheme div.flat-button span.yui-button
 {
    background: none;
-   border-color: transparent;
+   border: 1px solid transparent;
 }
 
-.yui-skin-greenTheme .flat-button .yui-button .first-child
+.yui-skin-greenTheme div.flat-button span.yui-button span.first-child
 {
    border-color: transparent;
 }
 
-.yui-skin-greenTheme .flat-button .yui-button-hover
+.yui-skin-greenTheme div.flat-button span.yui-button-hover
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #808080;
@@ -466,15 +466,15 @@ span.mce_alfresco-imagelibrary
    border-width: 1px 0;
 }
 
-.yui-skin-greenTheme .flat-button .yui-button-hover .first-child
+.yui-skin-greenTheme div.flat-button span.yui-button-hover span.first-child
 {
    border-color: #808080;
    border-style: solid;
    border-width: 0 1px;
 }
 
-.yui-skin-greenTheme .flat-button .yui-radio-button-checked,
-.yui-skin-greenTheme .flat-button .yui-checkbox-button-checked
+.yui-skin-greenTheme div.flat-button span.yui-radio-button-checked,
+.yui-skin-greenTheme div.flat-button span.yui-checkbox-button-checked
 {
    background: #5FAC34 none;
 }

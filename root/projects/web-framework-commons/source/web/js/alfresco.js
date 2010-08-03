@@ -732,6 +732,74 @@ Alfresco.util.toExplodedJSONDate = function(date)
 };
 
 /**
+ * Generate a relative time between two Date objects.
+ * 
+ * @method Alfresco.util.relativeTime
+ * @param from {Date} JavaScript Date object
+ * @param to {Date} (Optional) JavaScript Date object, defaults to now if not supplied
+ * @return {string} Relative time description
+ * @static
+ */
+Alfresco.util.relativeTime = function(from, to)
+{
+   if (YAHOO.lang.isUndefined(to))
+   {
+      to = new Date();
+   }
+   
+   var $msg = Alfresco.util.message,
+      seconds_ago = ((to - from) / 1000),
+      minutes_ago = Math.floor(seconds_ago / 60);
+
+   if (minutes_ago <= 0)
+   {
+      return $msg("relative.seconds", this, seconds_ago);
+   }
+   if (minutes_ago == 1)
+   {
+      return $msg("relative.minute", this);
+   }
+   if (minutes_ago < 45)
+   {
+      return $msg("relative.minutes", this, minutes_ago);
+   }
+   if (minutes_ago < 90)
+   {
+      return $msg("relative.hour", this);
+   }
+   var hours_ago  = Math.round(minutes_ago / 60);
+   if (minutes_ago < 1440)
+   {
+      return $msg("relative.hours", this, hours_ago);
+   }
+   if (minutes_ago < 2880)
+   {
+      return $msg("relative.day", this);
+   }
+   var days_ago  = Math.round(minutes_ago / 1440);
+   if (minutes_ago < 43200)
+   {
+      return $msg("relative.days", this, days_ago);
+   }
+   if (minutes_ago < 86400)
+   {
+      return $msg("relative.month", this);
+   }
+   var months_ago  = Math.round(minutes_ago / 43200);
+   if (minutes_ago < 525960)
+   {
+      return $msg("relative.months", this, months_ago);
+   }
+   if (minutes_ago < 1051920)
+   {
+      return $msg("relative.year", this);
+   }
+   var years_ago  = Math.round(minutes_ago / 525960);
+   return $msg("relative.years", this, years_ago);
+};
+
+
+/**
  * Pad a value with leading zeros to the specified length.
  * 
  * @method Alfresco.util.pad
@@ -1633,9 +1701,23 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
       return null;
    }
 
-   var uri = "",
-      template = Alfresco.constants.URI_TEMPLATES[templateId];
+   return Alfresco.util.renderUriTemplate(Alfresco.constants.URI_TEMPLATES[templateId], obj, absolute);
+}
 
+/**
+ * Returns a populated URI template, given the URI template and an object literal
+ * containing the tokens to be substituted.
+ * Understands when the application is hosted in a Portal environment.
+ *
+ * @method Alfresco.util.renderUriTemplate
+ * @param template {string} URI Template to be populated
+ * @param obj {object} The object literal containing the token values to substitute
+ * @param absolute {boolean} Whether the URL should include the protocol and host
+ * @return {string|null} The populated URI or null if templateId not found
+ * @static
+ */
+Alfresco.util.renderUriTemplate = function(template, obj, absolute)
+{
    // If a site page was requested but no {siteid} given, then use the current site or remove the missing parameter
    if (template.indexOf("{site}") !== -1)
    {
@@ -1663,8 +1745,14 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
       }
    }
 
-   // Page context ends with trailing "/", so remove any leading one from the URI template
-   uri += Alfresco.util.combinePaths(Alfresco.constants.URL_PAGECONTEXT, YAHOO.lang.substitute(template, obj));
+   var uri = YAHOO.lang.substitute(template, obj),
+      regExp = /^(http|https):\/\//;
+
+   if (!regExp.test(uri))
+   {
+      // Page context required
+      uri = Alfresco.util.combinePaths(Alfresco.constants.URL_PAGECONTEXT, uri);
+   }
 
    // Portlet scriptUrl mapping required?
    if (Alfresco.constants.PORTLET)

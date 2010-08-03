@@ -141,3 +141,43 @@
        }
    };
 })();
+
+/**
+ * Patch Button to not hide Menus if the item being clicked on has a submenu, or the Menu has been configured to remain open.
+ * The patch gives the Button the same behaviour as the native Menu; Button overrides certain Menu functions.
+ * Required by: Header component's User Menu when clicking in the "My Status" text box.
+ * Patches: YUI 2.8.1
+ */
+(function()
+{
+   var _SUBMENU = "submenu",
+      _KEEP_OPEN = "keepopen";
+
+   /**
+   * @method _onMenuClick
+   * @description "click" event handler for the button's menu.
+   * @private
+   * @param {String} p_sType String representing the name of the event  
+   * that was fired.
+   * @param {Array} p_aArgs Array of arguments sent when the event 
+   * was fired.
+   */
+   YAHOO.widget.Button.prototype._onMenuClick = function (p_sType, p_aArgs)
+   {
+      var oItem = p_aArgs[1],
+      oSrcElement;
+
+      if (oItem) {
+         this.set("selectedMenuItem", oItem);
+         oSrcElement = this.get("srcelement");
+         if (oSrcElement && oSrcElement.type == "submit") {
+            this.submitForm();
+         }
+         
+         var oMenu = this._menu;
+         if (oMenu && !oItem.cfg.getProperty(_SUBMENU) && !oMenu.cfg.getProperty(_KEEP_OPEN)) {
+            this._hideMenu();
+         }
+      }
+   };
+})();

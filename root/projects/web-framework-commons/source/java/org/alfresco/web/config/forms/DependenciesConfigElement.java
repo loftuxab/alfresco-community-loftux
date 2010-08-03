@@ -117,13 +117,13 @@ public class DependenciesConfigElement extends ConfigElementAdapter
         }
 
         DependenciesConfigElement otherDepsElement = (DependenciesConfigElement) configElement;
-
         DependenciesConfigElement result = new DependenciesConfigElement();
 
         if (otherDepsElement.cssDependencies.isEmpty() == false)
         {
             result.addCssDependencies(otherDepsElement.cssDependencies);
-        } else
+        }
+        else
         {
             result.addCssDependencies(this.cssDependencies);
         }
@@ -131,7 +131,8 @@ public class DependenciesConfigElement extends ConfigElementAdapter
         if (otherDepsElement.jsDependencies.isEmpty() == false)
         {
             result.addJsDependencies(otherDepsElement.jsDependencies);
-        } else
+        }
+        else
         {
             result.addJsDependencies(this.jsDependencies);
         }
