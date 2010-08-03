@@ -439,7 +439,7 @@ span.mce_alfresco-imagelibrary
 .yui-skin-yellowTheme div.flat-button span.yui-button
 {
    background: none;
-   border: 1px solid transparent;
+   border-color: transparent;
 }
 
 .yui-skin-yellowTheme div.flat-button span.yui-button span.first-child
@@ -451,15 +451,11 @@ span.mce_alfresco-imagelibrary
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #808080;
-   border-style: solid;
-   border-width: 1px 0;
 }
 
 .yui-skin-yellowTheme div.flat-button span.yui-button-hover span.first-child
 {
    border-color: #808080;
-   border-style: solid;
-   border-width: 0 1px;
 }
 
 .yui-skin-yellowTheme div.flat-button span.yui-radio-button-checked,
