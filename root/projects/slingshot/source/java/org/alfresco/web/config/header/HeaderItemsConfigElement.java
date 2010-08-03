@@ -156,7 +156,7 @@ public class HeaderItemsConfigElement extends ConfigElementAdapter
         String label = this.label;
         if (label == null)
         {
-            label = "header.label.".concat(this.getId());
+            label = "header.".concat(this.getId()).concat(".label");
             this.label = label;
         }
         return label;
