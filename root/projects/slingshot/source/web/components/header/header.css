@@ -132,13 +132,13 @@
 .header .user-items span.yui-button
 {
    background: none;
-   border: medium none;
+   border-width: 0px;
 }
 
 .header .user-items span.yui-button span.first-child
 {
    background-repeat: no-repeat;
-   border: medium none;
+   border-width: 0px;
 }
 
 .header .user-items div.yuimenu div.bd ul li.yuimenuitem span.yuimenuitemlabel
@@ -219,4 +219,14 @@
 .header .user-items span.user-status div.user-status-time
 {
    width: 15em;
+}
+
+.header .user-items span.user-status span.yui-button
+{
+   border-width: 1px 0px;
+}
+
+.header .user-items span.user-status span.yui-button span.first-child
+{
+   border-width: 0px 1px;
 }

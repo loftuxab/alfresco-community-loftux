@@ -147,14 +147,16 @@
       {
          var tokens = YAHOO.lang.merge(Alfresco.constants.URI_TEMPLATES, Alfresco.constants.HELP_PAGES, this.options.tokens),
             links = Selector.query("a", this.id),
-            link;
+            link,
+            attr;
          
          for (var i = 0, ii = links.length; i < ii; i++)
          {
             link = links[i];
-            if (link.hasAttribute("templateUri"))
+            attr = Dom.getAttribute(link, "templateUri");
+            if (attr != null)
             {
-               link.href = Alfresco.util.renderUriTemplate(link.attributes.templateUri.value, tokens);
+               link.href = Alfresco.util.renderUriTemplate(attr, tokens);
             }
          }
       },

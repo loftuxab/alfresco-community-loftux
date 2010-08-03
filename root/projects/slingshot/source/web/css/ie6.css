@@ -16,64 +16,29 @@ textarea.wide
  * Global site header
  */
 
-.header .logo-wrapper
+body .header .user-items div.search-box
 {
-   margin-bottom: -1px;
-   margin-right: -3px;
+   width: 15em;
 }
 
-.header .menu-wrapper
+body .header div.yuimenu div.bd ul li.yuimenuitem span.yuimenuitemlabel a
 {
-   height: 18px;
-   line-height: 18px;
-   padding-bottom: 8px;
+   display: inline-block;
 }
 
-.header .personal-menu
+body .header span.app-items span.yui-menu-button
 {
-   height: 18px;
-   padding-top: 6px;
-   padding-bottom: 6px;
+   left: 2px;
+   position: relative;
+   top: 2px;
 }
 
-.header div.util-menu
+body .header .user-items div.search-box input
 {
-   margin: 4px 5px 0 0;
-   margin-top: 4px;
-   padding-top: 1px;
+   border-width: 0px;
+   padding: 2px;
 }
 
-body .header .link-menu-button
-{
-   border: 1px solid #F2F2F2;
-   padding-bottom: 2px;
-   padding-top: 1px;
-}
-
-body span.link-menu-button span.yui-menu-button.yui-menu-button-hover
-{
-   border: 1px solid #7BA9CE;
-}
-
-body .link-menu-button.link-menu-button-menu-active
-{
-   border: 1px solid #7BA9CE;
-}
-
-body span.link-menu-button.link-menu-button-menu-active span.yui-menu-button
-{
-   border: 1px solid #FFFFFF;
-}
-
-body span.link-menu-button.link-menu-button-menu-active span.yui-menu-button.yui-menu-button-hover
-{
-   border: 1px solid #FFFFFF;
-}
-
-.header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
-{
-   text-decoration: none;
-}
 
 /**
  * Fix empty DIV bug when header & navigation are empty (portlet mode)
@@ -119,10 +84,31 @@ body #message
  * Set it to use a background color instead.  
  */
 
-body .flat-button .yui-button .first-child,
-body .flat-button .yui-button
+body.alfresco-share div.flat-button span.yui-button,
+body.alfresco-share .header .user-items span.user-status span.yui-button
 {
-   border-color: #E3EAEC;
+   border-width: 0;
+   padding: 1px;
+}
+
+body.alfresco-share div.flat-button span.yui-button span.first-child,
+body.alfresco-share .header .user-items span.user-status span.yui-button span.first-child
+{
+   border-width: 0;
+}
+
+
+body.alfresco-share div.flat-button span.yui-button-hover,
+body.alfresco-share .header .user-items span.user-status span.yui-button-hover
+{
+   border-width: 1px 0;
+   padding: 0;
+}
+
+body.alfresco-share div.flat-button span.yui-button-hover span.first-child,
+body.alfresco-share .header .user-items span.user-status span.yui-button-hover span.first-child
+{
+   border-width: 0 1px;
 }
 
 body .dashlet .toolbar .yui-button .first-child,
@@ -138,16 +124,9 @@ body .header .yui-button
 }
 
 body .dashlet .toolbar .yui-button.yui-button-hover .first-child,
-body .dashlet .toolbar .yui-button.yui-button-hover,
-body .flat-button      .yui-button.yui-button-hover .first-child,
-body .flat-button      .yui-button.yui-button-hover
+body .dashlet .toolbar .yui-button.yui-button-hover
 {
    border-color: #808080;
-}
-
-body .header .flat-button      .yui-button.yui-button-hover
-{
-   border: 1px solid #7BA9CE;
 }
 
 body .sites-wrapper .yui-button.yui-split-button-activeoption,

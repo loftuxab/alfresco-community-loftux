@@ -6,32 +6,6 @@ textarea
 }
 
 /**
- * Global site header
- */
-
-.header .personal-menu
-{
-   padding-top: 6px;
-}
-
-.header div.util-menu
-{
-   margin-top: 4px;
-   padding-top: 1px;
-}
-
-.header .link-menu-button
-{
-   padding-bottom: 3px;
-   padding-top: 1px;
-}
-
-.header .search-site-icon
-{
-   top: -2px;
-}
-
-/**
  * Fix empty DIV bug when header & navigation are empty (portlet mode)
  */
 #unbound-region-portlet-header,
