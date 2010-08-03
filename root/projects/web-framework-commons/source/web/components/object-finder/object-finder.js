@@ -249,10 +249,10 @@
 
          /**
           * The actions to display next to each current value in "list" mode.
-          * When clicked the actions will fire an ÓcurrentValueAction" event with the action and item info as attributes.
+          * When clicked the actions will fire a "currentValueAction" event with the action and item info as attributes.
           * {
           *    name: {String},  // The name of the action (used as a css class name for styling)
-          *    callback: {Object}, // If present will be the name of the event to send
+          *    event: {Object}, // If present will be the name of the event to send
           *    link: {String},  // If present will set the browser to display the link provided
           *    label: {String}  // The message label key use to get the display label
           * }
@@ -262,7 +262,6 @@
           * @default [ { < Config to remove an item > } ]
           */
          listActions: [ { name: "remove-list-item", event: "removeListItem", label: "form.control.object-picker.remove-item" } ]
-
       },
 
       /**
@@ -352,7 +351,8 @@
                this.widgets.showPicker.set("label", this.msg("button.add"));
                var removeAllEl = document.createElement("button");
                this.widgets.showPicker.get("element").parentNode.appendChild(removeAllEl);
-               this.widgets.removeAllButton = Alfresco.util.createYUIButton(this, null, this.onRemoveAllListItems, {
+               this.widgets.removeAllButton = Alfresco.util.createYUIButton(this, null, this.onRemoveAllListItems,
+               {
                   label: this.msg("button.removeAll"),
                   disabled: true
                }, removeAllEl);                        
@@ -732,11 +732,7 @@
                var item;
                if (this.options.displayMode == "list")
                {
-                  var l = this.widgets.currentValuesDataTable.getRecordSet().getLength();
-                  if (l > 0)
-                  {
-                     this.widgets.currentValuesDataTable.deleteRows(0, l);
-                  }                  
+                  this.widgets.currentValuesDataTable.getRecordSet().reset();
                }
                for (var key in items)
                {
