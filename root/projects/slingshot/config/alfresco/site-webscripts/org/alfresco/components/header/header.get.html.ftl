@@ -37,7 +37,7 @@ ${header.js}
       <div class="search-box">
          <span id="${id}-search_more" class="yui-button yui-menu-button">
             <span class="first-child" style="background-image: url(${url.context}/components/images/header/search-menu.png)">
-               <button type="button" title="${msg("header.description.search")}" tabindex="0"></button>
+               <button type="button" title="${msg("header.search.description")}" tabindex="0"></button>
             </span>
          </span>
          <input id="${id}-searchText" type="text" maxlength="1024" />
@@ -45,7 +45,7 @@ ${header.js}
       <div id="${id}-searchmenu_more" class="yuimenu yui-overlay yui-overlay-hidden">
          <div class="bd">
             <ul class="first-of-type">
-               <li><span style="background-image: url(${url.context}/components/images/header/advanced-search.png)"><a title="${msg("header.description.advanced-search")}" href="advsearch">${msg("header.label.advanced-search")}</a></span></li>
+               <li><span style="background-image: url(${url.context}/components/images/header/advanced-search.png)"><a title="${msg("header.advanced-search.description")}" href="advsearch">${msg("header.advanced-search.label")}</a></span></li>
             </ul>
          </div>
       </div>

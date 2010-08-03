@@ -106,7 +106,7 @@
       <div class="flat-button">
          <span id="${id}-submitStatus" class="yui-button yui-push-button">
             <span class="first-child">
-               <button type="button" tabindex="0"><span>${msg("header.label.submit-status")}</span></button>
+               <button type="button" tabindex="0" title="${msg("header.submit-status.description")}"><span>${msg("header.submit-status.label")}</span></button>
             </span>
          </span>
       </div>

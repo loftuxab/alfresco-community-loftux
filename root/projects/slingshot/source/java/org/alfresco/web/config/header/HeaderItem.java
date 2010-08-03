@@ -115,7 +115,7 @@ public class HeaderItem
         String label = this.attributes.get(ATTR_LABEL);
         if (label == null)
         {
-            label = "header.label.".concat(this.getId());
+            label = "header.".concat(this.getId()).concat(".label");
             this.attributes.put(ATTR_LABEL, label);
         }
         return label;
@@ -126,7 +126,7 @@ public class HeaderItem
         String description = this.attributes.get(ATTR_DESCRIPTION);
         if (description == null)
         {
-            description = "header.description.".concat(this.getId());
+            description = "header.".concat(this.getId()).concat(".description");
             this.attributes.put(ATTR_DESCRIPTION, description);
         }
         return description;

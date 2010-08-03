@@ -23,7 +23,7 @@
       
       <header>
          <app-items>
-            <!-- defaults: icon="{id}.png" label="header.label.{id}" description="header.description.{id}" -->
+            <!-- defaults: icon="{id}.png" label="header.{id}.label" description="header.{id}.description" -->
             <item type="link" id="my-dashboard">{userdashboardpage}</item>
             <item type="link" id="my-tasks" condition="false">/user/user-tasks</item>
             <item type="js" id="sites">Alfresco.module.Sites</item>
