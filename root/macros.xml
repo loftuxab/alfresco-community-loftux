@@ -19,6 +19,7 @@
    <macrodef name="compile-java" description="Compiles Java source files in the given project">
       <attribute name="projectdir" />
       <attribute name="compileExcludes" default="" />
+      <element name="addPath" optional="yes" />
       <sequential>
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.classes}" />
          <javac destdir="@{projectdir}/${dir.name.build}/${dir.name.classes}" fork="true"
@@ -29,6 +30,7 @@
             <classpath>
             <path refid="classpath.compile"/>
             <path refid="classpath.compile.extension"/>
+            <addPath/>
          </classpath>
 
             <!-- To run javac with Xlint:unchecked, uncomment the line below  -->
