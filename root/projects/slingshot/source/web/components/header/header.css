@@ -208,6 +208,9 @@
    outline: medium none;
    padding: 0 10px 4px !important;
    position: absolute;
+   width: 64px;
+   height: 64px;
+   overflow: hidden;
 }
 
 .header .user-items span.user-status
