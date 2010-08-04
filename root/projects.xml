@@ -77,7 +77,7 @@
    </target>
    
    <target name="test-datamodel" 
-           depends="compile-core">
+           depends="compile-datamodel">
       <run-tests projectdir="${dir.project.datamodel}" />
    </target>
    
@@ -834,6 +834,55 @@
       <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface) ${version.number}" 
                          windowtitle="Alfresco JNDI" 
                          projectdir="${dir.project.jndi}"/>
+   </target>
+
+
+
+   <!-- ****************** -->
+   <!-- ** SOLR Project ** -->
+   <!-- ****************** -->
+   
+   <target name="incremental-solr" 
+           depends="package-solr" />
+      
+   <target name="build-solr" 
+           depends="clean-solr, 
+                    incremental-solr" />
+   
+   <target name="clean-solr" 
+           depends="init">
+      <clean projectdir="${dir.project.solr}" />
+   </target>
+   
+   <target name="compile-solr" 
+           depends="compile-solr-java" />
+
+   <target name="compile-solr-java" 
+           depends="init">
+      <compile-java projectdir="${dir.project.solr}" >
+         <addPath>
+            <path refid="classpath.compile.solr" />
+         </addPath>
+      </compile-java>
+   </target>
+   
+   <target name="package-solr"
+           depends="compile-solr">
+      <mkdir dir="${dir.project.solr.dist}" />
+      <jar jarfile="${dir.project.solr.dist}/${file.name.jar.solr}" 
+           basedir="${dir.project.solr.classes}" />
+   </target>
+   
+   <target name="test-solr" 
+           depends="compile-solr">
+      <run-tests projectdir="${dir.project.solr}" />
+   </target>
+   
+   <target name="generate-javadocs-solr" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco SOLR integration ${version.number}" 
+                         windowtitle="Alfresco SOLR Integration" 
+                         projectdir="${dir.project.solr}"/>
    </target>
 
 

@@ -73,6 +73,12 @@
      <!-- Extension point for overriding -->
       <path id="classpath.compile.extension"/>
 
+      <path id="classpath.compile.solr">
+         <fileset dir="${dir.project.solr.lib}">
+            <include name="**/*.jar" />
+         </fileset>
+      </path>
+
       <path id="classpath.unit.test">
          <!--
          <dirset dir="${dir.projects}">
@@ -262,7 +268,8 @@
                     incremental-slingshot,
                     incremental-mobile,
                     incremental-webeditor,
-                    incremental-webeditor-plugin" />
+                    incremental-webeditor-plugin,
+                    incremental-solr" />
 
    <target name="build-modules"
            description="Performs a clean build of all modules"
@@ -415,7 +422,8 @@
                     generate-taglibdocs-webclient, 
                     generate-javadocs-webserviceclient,
                     generate-javadocs-jlan,
-                    generate-javadocs-slingshot" />
+                    generate-javadocs-slingshot,
+                    generate-javadocs-solr" />
 
    <!-- ****************************************************** -->
    <!-- ****************** Cleaning targets ****************** -->
@@ -431,7 +439,8 @@
                     clean-slingshot-projects,
                     clean-mobile-projects,
                     clean-webeditor-projects,
-                    clean-webserviceclient" />
+                    clean-webserviceclient, 
+                    clean-solr" />
                     
    <target name="clean-webclient-projects" 
            description="Cleans all projects related to the webclient project" 
@@ -1063,7 +1072,8 @@
                     test-webframeworkcommons, 
                     test-webclient, 
                     test-webserviceclient,
-                    test-dod5015" />
+                    test-dod5015,
+                    test-solr" />
 
    <target name="run-junit-test" 
            description="Runs a single JUnit test. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir] [-Dstoponerror=[yes|no]]"
