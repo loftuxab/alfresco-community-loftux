@@ -351,19 +351,18 @@
    <config evaluator="task-type" condition="inwf:invitePendingTask">
       <forms>
          <form>
+            <view-form template="/org/alfresco/components/form/invite-task-form.ftl" />
+            <edit-form template="/org/alfresco/components/form/invite-task-form.ftl" />
             <field-visibility>
                <show id="inwf:resourceTitle" />
                <show id="inwf:resourceDescription" />
                <show id="inwf:inviteeRole" />
+               <show id="bpm:priority" />
                <show id="bpm:comment" />
                <show id="transitions" />
             </field-visibility>
             <appearance>
                <set id="response" appearance="title" label-id="workflow.group.response" />
-               
-               <field id="inwf:resourceDescription" read-only="true" />
-               <field id="inwf:resourceTitle" read-only="true" />
-               <field id="inwf:inviteeRole" read-only="true" />
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
@@ -376,24 +375,16 @@
    <config evaluator="task-type" condition="inwf:acceptInviteTask">
       <forms>
          <form>
+            <view-form template="/org/alfresco/components/form/invite-accepted-task-form.ftl" />
+            <edit-form template="/org/alfresco/components/form/invite-accepted-task-form.ftl" />
             <field-visibility>
                <show id="inwf:resourceTitle" />
                <show id="inwf:resourceDescription" />
-               <show id="inwf:inviteeRole" />
-               <show id="bpm:comment" />
+               <show id="inwf:inviteeFirstName" />
+               <show id="inwf:inviteeLastName" />
+               <show id="bpm:priority" />
                <show id="transitions" />
             </field-visibility>
-            <appearance>
-               <set id="response" appearance="title" label-id="workflow.group.response" />
-               
-               <field id="inwf:resourceDescription" read-only="true" />
-               <field id="inwf:resourceTitle" read-only="true" />
-               <field id="inwf:inviteeRole" read-only="true" />
-               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
-                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
-               </field>
-               <field id="transitions" set="response" />
-            </appearance>
          </form>
       </forms>
    </config>
@@ -401,24 +392,16 @@
    <config evaluator="task-type" condition="inwf:rejectInviteTask">
       <forms>
          <form>
+            <view-form template="/org/alfresco/components/form/invite-rejected-task-form.ftl" />
+            <edit-form template="/org/alfresco/components/form/invite-rejected-task-form.ftl" />
             <field-visibility>
                <show id="inwf:resourceTitle" />
                <show id="inwf:resourceDescription" />
-               <show id="inwf:inviteeRole" />
-               <show id="bpm:comment" />
+               <show id="inwf:inviteeFirstName" />
+               <show id="inwf:inviteeLastName" />
+               <show id="bpm:priority" />
                <show id="transitions" />
             </field-visibility>
-            <appearance>
-               <set id="response" appearance="title" label-id="workflow.group.response" />
-               
-               <field id="inwf:resourceDescription" read-only="true" />
-               <field id="inwf:resourceTitle" read-only="true" />
-               <field id="inwf:inviteeRole" read-only="true" />
-               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
-                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
-               </field>
-               <field id="transitions" set="response" />
-            </appearance>
          </form>
       </forms>
    </config>
