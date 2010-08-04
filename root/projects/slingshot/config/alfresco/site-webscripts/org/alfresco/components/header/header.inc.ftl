@@ -33,7 +33,7 @@
    <#if (item.value?starts_with("http"))><#assign attrHref>href="${item.value}"</#assign>
    <#elseif (item.value?length > 0)><#assign attrHref>templateUri="${item.value}" href="#"</#assign>
    </#if>
-<#assign label = msg(item.label)><#if label?contains("{")><#assign label = msgArgs(item.label, labelTokens)></#if>
+<#assign label = msg(item.label)><#if label?contains("{")><#assign label = msgArgs(item.label, labelTokens)?html></#if>
 <span id="${itemId}" class="yui-button">
    <span class="first-child" ${attrStyle!""}>
    <#if item.type = "container">
@@ -99,9 +99,9 @@
    <#else>
       <#assign avatar>${url.context}/components/images/no-user-photo-64.png</#assign>
    </#if>
-   <a class="avatar" ${attrTitle} ${attrHref} tabindex="0"><img src="${avatar}" alt="avatar" height="64" width="64" /></a>
+   <a class="avatar" ${attrHref} tabindex="0"><img src="${avatar}" alt="avatar" /></a>
    <span class="user-status">
-      <textarea id="${id}-statusText" tabindex="0">${userStatus}</textarea>
+      <textarea id="${id}-statusText" tabindex="0">${userStatus?html}</textarea>
       <div id="${id}-statusTime" class="user-status-time" title="${userStatusTime?html}"></div>
       <div class="flat-button">
          <span id="${id}-submitStatus" class="yui-button yui-push-button">
