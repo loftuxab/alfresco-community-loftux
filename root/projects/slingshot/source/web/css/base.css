@@ -620,3 +620,38 @@ div.dashlet div.hdr
    border-right: 1px solid #ccc;
    padding-bottom: 20px;
 }
+
+/* Invite Task Form */
+.invite-task-title
+{
+   font-size: 108%;
+}
+
+.invite-task-title img
+{
+   vertical-align: -8px;
+   margin-right: 4px;
+}
+
+.invite-task-subtitle
+{
+   margin-top: 1em;
+   margin-left: 34px;
+}
+
+.invite-task-role
+{
+   margin-top: 1em;
+   margin-bottom: 1em;
+   margin-left: 34px;
+}
+
+.invite-task-priority
+{
+   text-align: right;
+}
+
+.invite-task-controls
+{
+   margin-top: 1em;
+}
