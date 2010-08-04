@@ -2,30 +2,52 @@
 <template-instance>
    <template-type>org/alfresco/workflow-details</template-type>
    <components>
+
+      <!-- Task context components -->
       <component>
-         <region-id>title</region-id>
+         <region-id>task-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myTasks</title>
+         </properties>
+      </component>
+      <component>
+         <region-id>task-toolbar</region-id>
+         <url>/components/workflow/task-toolbar</url>
+      </component>
+            
+      <!-- Workflow context components -->
+      <component>
+         <region-id>workflow-title</region-id>
          <url>/components/title/simple-title</url>
          <properties>
             <title>title.myWorkflows</title>
          </properties>
       </component>
       <component>
-         <region-id>toolbar</region-id>
-         <url>/components/workflow/task-toolbar</url>
+         <region-id>workflow-toolbar</region-id>
+         <url>/components/workflow/workflow-toolbar</url>
       </component>
+
+      <!-- Workflow form, header & actions -->
       <component>
          <region-id>workflow-details-header</region-id>
          <url>/components/workflow/workflow-details-header</url>
       </component>
       <component>
          <region-id>workflow-form</region-id>
-         <url>/components/form</url>
+         <url>/components/workflow/workflow-form</url>
+      </component>
+      <component>
+         <region-id>data-loader</region-id>
+         <url>/components/data/data-loader</url>
          <properties>
-            <itemKind>workflow</itemKind>
-            <itemId>{workflowId}</itemId>
-            <mode>view</mode>
-            <formUI>true</formUI>
+            <url>api/workflow-instances/{workflowId}?detailed=true</url>
+            <eventName>workflowDetailedData</eventName>
+            <eventData>data</eventData>
+            <encodeURIComponents>true</encodeURIComponents>
          </properties>
       </component>
+
    </components>
 </template-instance>

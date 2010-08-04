@@ -43,7 +43,7 @@
       Alfresco.TaskDetailsActions.superclass.constructor.call(this, "Alfresco.TaskDetailsActions", htmlId, ["button"]);
 
       /* Decoupled event listeners */
-      YAHOO.Bubbling.on("taskData", this.onTaskData, this);
+      YAHOO.Bubbling.on("taskDetailedData", this.onTaskDetailsData, this);
 
       return this;
    };
@@ -52,11 +52,11 @@
    {
 
       /**
-       * Event handler called when the "taskData" event is received
+       * Event handler called when the "taskDetailedData" event is received
        *
-       * @method: onTaskData
+       * @method: onTaskDetailsData
        */
-      onTaskData: function TDA_onMetadataRefresh(layer, args)
+      onTaskDetailsData: function TDA_onTaskDetailsData(layer, args)
       {
          var task = args[1],
             owner = task.owner ? task.owner : {};

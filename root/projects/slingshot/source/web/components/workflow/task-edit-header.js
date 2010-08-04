@@ -53,7 +53,7 @@
       Alfresco.util.ComponentManager.reregister(this);
 
       /* Decoupled event listeners */
-      YAHOO.Bubbling.on("taskData", this.onTaskData, this);
+      YAHOO.Bubbling.on("taskDetailedData", this.onTaskDetailedData, this);
 
       return this;
    };
@@ -61,14 +61,14 @@
    YAHOO.extend(Alfresco.TaskEditHeader, Alfresco.FormManager,
    {
       /**
-       * Event handler called when the "taskData" event is received
+       * Event handler called when the "taskDetailedData" event is received
        *
-       * @method: onTaskData
+       * @method: onTaskDetailedData
        */
-      onTaskData: function TEH_onMetadataRefresh(layer, args)
+      onTaskDetailedData: function TEH_onTaskDetailedData(layer, args)
       {
          var task = args[1];
-         Dom.get(this.id + "-title").innerHTML = $html(task.title);
+         Selector.query("h1 span", this.id, true).innerHTML = $html(task.title);
          if (task && task.owner && task.owner.userName)
          {
             // Task is assigned
