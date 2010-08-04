@@ -187,6 +187,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-0.1-incubating-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fontbox-1.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-1.2.1.jar" sourcepath="src/pdfbox-1.2.1-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/apache-solr-core-1.4.1.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
