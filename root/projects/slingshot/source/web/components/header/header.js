@@ -35,7 +35,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $siteURL = Alfresco.util.siteURL;
 
    Alfresco.Header = function(htmlId)
    {
@@ -302,19 +303,6 @@
          }
          this.setStatusRelativeTime();
 
-         // Register the "enter" event on the status text field
-         var me = this;
-         
-         this.widgets.statusEnterListener = new YAHOO.util.KeyListener(this.widgets.statusBox,
-         {
-            keys: YAHOO.util.KeyListener.KEY.ENTER
-         }, 
-         {
-            fn: me.submitStatus,
-            scope: this,
-            correctScope: true
-         }, "keydown").enable();
-
          this.widgets.submitStatus = new YAHOO.widget.Button(this.id + "-submitStatus");
          this.widgets.submitStatus.on("click", this.submitStatus, this.widgets.submitStatus, this);
       },
@@ -373,7 +361,10 @@
       {
          this.statusUpdateTime = Alfresco.util.fromISO8601(response.json.userStatusTime.iso8601);
          this.setStatusRelativeTime();
-         Alfresco.util.PopupManager.displayMessage(this.msg("message.status.success"));
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this.msg("message.status.success")
+         });
       }
    });
 })();
