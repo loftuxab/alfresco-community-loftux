@@ -32,6 +32,12 @@
       Selector = YAHOO.util.Selector;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+    var $html = Alfresco.util.encodeHTML;
+
+
+   /**
     * TaskDetailsHeader constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
@@ -43,7 +49,7 @@
       Alfresco.TaskDetailsHeader.superclass.constructor.call(this, "Alfresco.TaskDetailsHeader", htmlId, ["button"]);
 
       /* Decoupled event listeners */
-      YAHOO.Bubbling.on("taskData", this.onTaskData, this);
+      YAHOO.Bubbling.on("taskDetailedData", this.onTaskDetailsData, this);
 
       return this;
    };
@@ -52,17 +58,22 @@
    {
 
       /**
-       * Event handler called when the "taskData" event is received
+       * Event handler called when the "taskDetailedData" event is received
        *
-       * @method: onTaskData
+       * @method: onTaskDetailsData
        */
-      onTaskData: function TDH_onMetadataRefresh(layer, args)
+      onTaskDetailsData: function TDH_onTaskDetailsData(layer, args)
       {
          // Set workflow details url and display link
-         var workflowId = args[1].workflowInstance.id,
-            workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + encodeURIComponent(workflowId));
-         Selector.query(".links a", this.id)[0].setAttribute("href", workflowDetailsUrl);
-         Dom.removeClass(Selector.query(".links", this.id), "hidden");
+         var task = args[1],
+            taskId = task.id,
+            taskName = task.properties["bpm_description"],
+            workflowId = task.workflowInstance.id,
+            workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + encodeURIComponent(workflowId) +
+                  "&taskId=" + encodeURIComponent(taskId));
+         Selector.query(".links a", this.id, true).setAttribute("href", workflowDetailsUrl);
+         Dom.removeClass(Selector.query(".links", this.id, true), "hidden");
+         Selector.query("h1 span", this.id, true).innerHTML = $html(taskName);
       }
 
    });

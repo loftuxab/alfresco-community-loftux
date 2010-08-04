@@ -2,6 +2,7 @@
 {
    clear: both;
    padding: 0;
+   min-height: 4em;
 }
 
 .task-edit-header .actions
@@ -22,8 +23,8 @@
 
 .task-edit-header .unassigned span
 {
-   background: left no-repeat url(../images/warning-16.png);
-   padding-left: 2em;
+   background: left no-repeat url(../images/info-16.png);
+   padding:1em 2em;
 }
 
 .task-edit-header .clear

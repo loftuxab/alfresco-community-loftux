@@ -26,5 +26,15 @@
             <showCancelButton>true</showCancelButton>
          </properties>
       </component>
+      <component>
+         <region-id>data-loader</region-id>
+         <url>/components/data/data-loader</url>
+         <properties>
+            <url>api/task-instances/{taskId}?detailed=true</url>
+            <eventName>taskDetailedData</eventName>
+            <eventData>data</eventData>
+            <encodeURIComponents>true</encodeURIComponents>            
+         </properties>
+      </component>
    </components>
 </template-instance>

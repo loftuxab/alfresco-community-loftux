@@ -19,7 +19,7 @@ new Alfresco.TaskEditHeader("${el}").setOptions(
          <button id="${el}-release">${msg("button.release")}</button>
       </span>
    </div>
-   <h1>${msg("header")}<span id="${el}-title"></span></h1>
+   <h1>${msg("header")}: <span></span></h1>
    <div class="clear"></div>
    <div class="unassigned hidden theme-bg-color-2 theme-border-4"><span>${msg("message.unassigned")}</span></div>
 </div>

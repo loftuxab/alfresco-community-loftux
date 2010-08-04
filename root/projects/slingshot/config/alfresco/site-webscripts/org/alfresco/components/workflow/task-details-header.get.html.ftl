@@ -10,6 +10,6 @@ new Alfresco.TaskDetailsHeader("${el}").setMessages(
       &nbsp;|&nbsp;
       <a href="">${msg("label.workflowDetails")}</a>
    </div>
-   <h1>${msg("header")}</h1>
+   <h1>${msg("header")}: <span></span></h1>
    <div class="clear"></div>
 </div>

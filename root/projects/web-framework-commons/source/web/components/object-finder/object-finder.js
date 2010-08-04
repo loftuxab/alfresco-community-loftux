@@ -537,34 +537,36 @@
          var addedItems = this.getAddedItems(),
             removedItems = this.getRemovedItems(),
             selectedItems = this.getSelectedItems();
-         
-         if (this.options.maintainAddedRemovedItems && !this.options.disabled)
+
+         if (!this.options.disabled)
          {
-            Dom.get(this.id + "-added").value = addedItems.toString();
-            Dom.get(this.id + "-removed").value = removedItems.toString();
+            if (this.options.maintainAddedRemovedItems)
+            {
+               Dom.get(this.id + "-added").value = addedItems.toString();
+               Dom.get(this.id + "-removed").value = removedItems.toString();
+            }
+            Dom.get(this.currentValueHtmlId).value = selectedItems.toString();
+            if (Alfresco.logger.isDebugEnabled())
+            {
+               Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + selectedItems.toString() + "'");
+            }
+                                 
+            // inform the forms runtime that the control value has been updated (if field is mandatory)
+            if (this.options.mandatory)
+            {
+               YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
+            }
+
+            YAHOO.Bubbling.fire("formValueChanged",
+            {
+               eventGroup: this,
+               addedItems: addedItems,
+               removedItems: removedItems,
+               selectedItems: selectedItems,
+               selectedItemsMetaData: Alfresco.util.deepCopy(this.selectedItems)
+            });
          }
 
-         Dom.get(this.currentValueHtmlId).value = selectedItems.toString();
-
-         if (Alfresco.logger.isDebugEnabled())
-         {
-            Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + selectedItems.toString() + "'");
-         }
-         
-         // inform the forms runtime that the control value has been updated (if field is mandatory)
-         if (this.options.mandatory)
-         {
-            YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
-         }
-
-         YAHOO.Bubbling.fire("formValueChanged",
-         {
-            eventGroup: this,
-            addedItems: addedItems,
-            removedItems: removedItems,
-            selectedItems: selectedItems,
-            selectedItemsMetaData: Alfresco.util.deepCopy(this.selectedItems)
-         });
       },
 
       /**
