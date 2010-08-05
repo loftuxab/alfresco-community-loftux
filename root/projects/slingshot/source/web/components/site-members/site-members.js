@@ -243,7 +243,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["userName", "firstName", "lastName", "role", "avatar", "jobtitle", "organization"]
+             fields: ["userName", "firstName", "lastName", "role", "avatar", "jobtitle", "organization", "userStatus", "userStatusTime"]
          };
          this.widgets.dataSource.doBeforeParseData = function SiteMembers_doBeforeParseData(oRequest , oFullResponse)
          {
@@ -251,46 +251,28 @@
                
             if (oFullResponse)
             {
-               var items = [];
+               var items = [],
+                  memberData, member;
                
                // create a data format that the DataTable can use
                for (var x = 0, xx = oFullResponse.length; x < xx; x++)
                {
-                  var memberData = oFullResponse[x];
+                  memberData = oFullResponse[x];
                   
                   // create object to represent member
-                  var member =
-                  {
-                     "userName": memberData.authority.userName,
-                     "firstName": memberData.authority.firstName,
-                     "lastName": memberData.authority.lastName,
-                     "role": memberData.role
-                  };
-                  
-                  // add optional metadata
-                  if (memberData.authority.avatar !== undefined)
-                  {
-                     member.avatar = memberData.authority.avatar;
-                  }
-                  
-                  if (memberData.authority.jobtitle !== undefined)
-                  {
-                     member.jobtitle = memberData.authority.jobtitle;
-                  }
-                  
-                  if (memberData.authority.organization !== undefined)
-                  {
-                     member.organization = memberData.authority.organization;
-                  }
+                  member = memberData.authority;
+                  member.role = memberData.role;
                   
                   // add member to list
                   items.push(member);
                }
                
                // Sort the memeber list by name
-               items.sort(function (membership1, membership2){
+               items.sort(function (membership1, membership2)
+               {
                   var name1 = membership1.firstName + membership1.lastName,
                      name2 = membership2.firstName + membership2.lastName;
+                  
                   return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
                });
                
@@ -382,6 +364,7 @@
             var userName = oRecord.getData("userName"),
                userUrl = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile",
                avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+            
             if (oRecord.getData("avatar") !== undefined)
             {
                avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
@@ -405,7 +388,9 @@
             var userName = oRecord.getData("userName"),
                name = userName,
                firstName = oRecord.getData("firstName"),
-               lastName = oRecord.getData("lastName");
+               lastName = oRecord.getData("lastName"),
+               userStatus = oRecord.getData("userStatus"),
+               userStatusTime = oRecord.getData("userStatusTime");
 
             if ((firstName !== undefined) || (lastName !== undefined))
             {
@@ -425,6 +410,10 @@
             if (organization.length > 0)
             {
                desc += '<div><span class="attr-name">' + me._msg('label.company') + ':</span>&nbsp;<span class="attr-value">' + $html(organization) + '</span></div>';
+            }
+            if (typeof userStatus != "undefined")
+            {
+               desc += '<div class="user-status">' + $html(userStatus) + ' <span>(' + Alfresco.util.relativeTime(Alfresco.util.fromISO8601(userStatusTime.iso8601)) + ')</span></div>';
             }
             
             elCell.innerHTML = desc;
@@ -554,19 +543,12 @@
          };
 
          // DataTable column defintions
-         var columnDefinitions = [
-         {
-            key: "userName", label: "User Name", sortable: false, formatter: renderCellAvatar, width: 64
-         },
-         {
-            key: "bio", label: "Bio", sortable: false, formatter: renderCellDescription
-         },
-         {
-            key: "role", label: "Select Role", formatter: renderCellRoleSelect, width: 140
-         },
-         {
-            key: "uninvite", label: "Uninvite", formatter: renderCellUninvite, width: 80
-         }
+         var columnDefinitions =
+         [
+            { key: "userName", label: "User Name", sortable: false, formatter: renderCellAvatar, width: 64 },
+            { key: "bio", label: "Bio", sortable: false, formatter: renderCellDescription },
+            { key: "role", label: "Select Role", formatter: renderCellRoleSelect, width: 140 },
+            { key: "uninvite", label: "Uninvite", formatter: renderCellUninvite, width: 80 }
          ];
 
          // DataTable definition

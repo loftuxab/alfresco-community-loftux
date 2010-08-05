@@ -244,7 +244,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "people",
-             fields: ["userName", "avatar", "firstName", "lastName", "organization", "jobtitle", "email"]
+             fields: ["userName", "avatar", "firstName", "lastName", "organization", "jobtitle", "email", "userStatus", "userStatusTime"]
          };
 
          this.widgets.dataSource.doBeforeParseData = function PeopleFinder_doBeforeParseData(oRequest, oFullResponse)
@@ -380,7 +380,9 @@
             var userName = oRecord.getData("userName"),
                name = userName,
                firstName = oRecord.getData("firstName"),
-               lastName = oRecord.getData("lastName");
+               lastName = oRecord.getData("lastName"),
+               userStatus = oRecord.getData("userStatus"),
+               userStatusTime = oRecord.getData("userStatusTime");
             
             if ((firstName !== undefined) || (lastName !== undefined))
             {
@@ -413,6 +415,10 @@
                {
                   desc += '<div class="detail"><span>' + me.msg("label.company") + ":</span> " + $html(organization) + '</div>';
                }
+            }
+            if (typeof userStatus != "undefined" && me.options.viewMode !== Alfresco.PeopleFinder.VIEW_MODE_COMPACT)
+            {
+               desc += '<div class="user-status">' + $html(userStatus) + ' <span>(' + Alfresco.util.relativeTime(Alfresco.util.fromISO8601(userStatusTime.iso8601)) + ')</span></div>';
             }
             elCell.innerHTML = desc;
          };
