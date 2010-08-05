@@ -1638,6 +1638,47 @@ public class LuceneQueryParser extends QueryParser
     public Query getRangeQuery(String field, String part1, String part2, boolean includeLower, boolean includeUpper, AnalysisMode analysisMode, LuceneFunction luceneFunction)
             throws ParseException
     {
+        if (field.equals("TEXT"))
+        {
+            Set<String> text = searchParameters.getTextAttributes();
+            if ((text == null) || (text.size() == 0))
+            {
+                Collection<QName> contentAttributes = dictionaryService.getAllProperties(DataTypeDefinition.CONTENT);
+                BooleanQuery query = new BooleanQuery();
+                for (QName qname : contentAttributes)
+                {
+                    // The super implementation will create phrase queries etc if required
+                    Query part = getRangeQuery("@" + qname.toString(), part1, part2, includeLower, includeUpper, analysisMode, luceneFunction);
+                    if (part != null)
+                    {
+                        query.add(part, Occur.SHOULD);
+                    }
+                    else
+                    {
+                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                    }
+                }
+                return query;
+            }
+            else
+            {
+                BooleanQuery query = new BooleanQuery();
+                for (String fieldName : text)
+                {
+                    Query part = getRangeQuery(fieldName, part1, part2, includeLower, includeUpper, analysisMode, luceneFunction);
+                    if (part != null)
+                    {
+                        query.add(part, Occur.SHOULD);
+                    }
+                    else
+                    {
+                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                    }
+                }
+                return query;
+            }
+
+        }
 
         if (field.startsWith("@"))
         {

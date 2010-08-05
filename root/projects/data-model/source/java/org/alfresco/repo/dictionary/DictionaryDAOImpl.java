@@ -178,59 +178,50 @@ public class DictionaryDAOImpl implements DictionaryDAO
         {
             logger.debug("Init Dictionary: ["+Thread.currentThread()+"] "+(tenantDomain.equals(TenantService.DEFAULT_DOMAIN) ? "" : " (Tenant: "+tenantDomain+")"));
         }
-        
         try
         {
-            return AuthenticationUtil.runAs(new RunAsWork<DictionaryRegistry>()
+            writeLock.lock();
+            
+            try
             {
-                public DictionaryRegistry doWork()
+                return AuthenticationUtil.runAs(new RunAsWork<DictionaryRegistry>()
                 {
-                    try
+                    public DictionaryRegistry doWork()
                     {
-                        DictionaryRegistry dictionaryRegistry = initDictionaryRegistry(tenantDomain);
-                        
-                        if (dictionaryRegistry == null)
-                        {
-                            // unexpected
-                            throw new AlfrescoRuntimeException("Failed to init dictionaryRegistry " + tenantDomain);
-                        }
-                        
                         try
                         {
-                            writeLock.lock();
+                            DictionaryRegistry dictionaryRegistry = initDictionaryRegistry(tenantDomain);
+                            
+                            if (dictionaryRegistry == null)
+                            {
+                                // unexpected
+                                throw new AlfrescoRuntimeException("Failed to init dictionaryRegistry " + tenantDomain);
+                            }
+                            
                             dictionaryRegistryCache.put(tenantDomain, dictionaryRegistry);
+                            return dictionaryRegistry;
                         }
                         finally
                         {
-                            writeLock.unlock();
-                        }
-                        
-                        return dictionaryRegistry;
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            readLock.lock();
                             if (dictionaryRegistryCache.get(tenantDomain) != null)
                             {
                                 removeDataDictionaryLocal(tenantDomain);
                             }
                         }
-                        finally
-                        {
-                            readLock.unlock();
-                        }
                     }
+                }, tenantService.getDomainUser(AuthenticationUtil.getSystemUserName(), tenantDomain));
+            }
+            finally
+            {
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Init Dictionary: model count = "+(getModels() != null ? getModels().size() : 0) +" in "+(System.currentTimeMillis()-startTime)+" msecs ["+Thread.currentThread()+"] "+(tenantDomain.equals(TenantService.DEFAULT_DOMAIN) ? "" : " (Tenant: "+tenantDomain+")"));
                 }
-            }, tenantService.getDomainUser(AuthenticationUtil.getSystemUserName(), tenantDomain));
+            }
         }
         finally
         {
-            if (logger.isInfoEnabled())
-            {
-                logger.info("Init Dictionary: model count = "+(getModels() != null ? getModels().size() : 0) +" in "+(System.currentTimeMillis()-startTime)+" msecs ["+Thread.currentThread()+"] "+(tenantDomain.equals(TenantService.DEFAULT_DOMAIN) ? "" : " (Tenant: "+tenantDomain+")"));
-            }
+            writeLock.unlock();
         }
     }
     

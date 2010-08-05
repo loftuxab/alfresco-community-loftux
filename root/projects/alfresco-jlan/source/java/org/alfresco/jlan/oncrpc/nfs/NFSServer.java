@@ -4664,6 +4664,13 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
       dirId = NFSHandle.unpackDirectoryId(handle);
       path = details.getFileIdCache().findPath(dirId);
     }
+    else if ( NFSHandle.isShareHandle(handle)) {
+        
+        // Use the root path
+        
+        dirId = 0;
+        path = "\\";
+    }
     else
       throw new BadHandleException();
 

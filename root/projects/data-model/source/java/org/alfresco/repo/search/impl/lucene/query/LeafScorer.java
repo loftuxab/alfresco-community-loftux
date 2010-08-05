@@ -1000,6 +1000,10 @@ public class LeafScorer extends Scorer
 
     private boolean isCategorised(AspectDefinition aspDef)
     {
+        if(aspDef == null)
+        {
+            return false;
+        }
         AspectDefinition current = aspDef;
         while (current != null)
         {

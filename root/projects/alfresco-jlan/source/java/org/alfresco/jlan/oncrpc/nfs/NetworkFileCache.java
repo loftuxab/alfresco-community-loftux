@@ -376,14 +376,21 @@ public class NetworkFileCache {
 
 										if ( disk.fileExists( fentry.getSession(), fentry.getConnection(), netFile.getFullName()) != FileStatus.NotExist) {
 											
-											// Close the file
-										
-											disk.closeFile(fentry.getSession(),	fentry.getConnection(),	netFile);
-
-											// DEBUG
-	
-											if (Debug.EnableInfo && hasDebug())
-												Debug.println("NFSFileExpiry: Closed file="	+ fentry.getFile().getFullName() + ", fid="	+ fileId + " (removed)");
+										    // Check if the file has already been closed
+										    
+										    if ( netFile.isClosed() == false) {
+										    
+										        // Close the file
+										        
+    											disk.closeFile(fentry.getSession(),	fentry.getConnection(),	netFile);
+    
+    											// DEBUG
+    	
+    											if (Debug.EnableInfo && hasDebug())
+    												Debug.println("NFSFileExpiry: Closed file="	+ fentry.getFile().getFullName() + ", fid="	+ fileId + " (removed)");
+										    }
+										    else if ( Debug.EnableInfo && hasDebug())
+										        Debug.println("NFSFileExpiry: File already closed, file=" + fentry.getFile().getFullName() + ", fid=" + fileId);
 										}
 										else if ( Debug.EnableInfo && hasDebug())
 											Debug.println("NFSFileExpiry: File deleted before close, " + netFile.getFullName());
@@ -392,7 +399,7 @@ public class NetworkFileCache {
 										
 										m_authenticator.setCurrentUser( fentry.getSession(), null);
 									} 
-									catch (IOException ex) {
+									catch (Exception ex) {
 
 										// DEBUG
 										
