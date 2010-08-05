@@ -621,6 +621,20 @@
    </target>
 
 
+   <target name="assemble-commands"
+           depends="package-bm-remote, package-mmt">
+           
+      <mkdir dir="${dir.continuous.assemble.commands}" />
+      <copy todir="${dir.continuous.assemble.commands}">
+         <fileset dir="${dir.project.jlan}/jni" />
+      </copy>
+      <copy todir="${dir.continuous.assemble.commands}">
+         <fileset dir="${dir.project.installer}/bin" />
+      </copy>
+      
+   </target>
+	  
+	                    
    <target name="assemble-tomcat"
            depends="continuous-init, set-build-number">
       <mkdir dir="${dir.continuous.dist}" />

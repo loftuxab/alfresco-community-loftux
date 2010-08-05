@@ -337,20 +337,6 @@
    <!-- ** Bundle targets ** -->
    <!-- ******************** -->
 
-   <target name="assemble-commands"
-           depends="package-bm-remote, package-mmt">
-           
-      <mkdir dir="${dir.continuous.assemble.commands}" />
-      <copy todir="${dir.continuous.assemble.commands}">
-         <fileset dir="${dir.project.jlan}/jni" />
-      </copy>
-      <copy todir="${dir.continuous.assemble.commands}">
-         <fileset dir="${dir.project.installer}/bin" />
-      </copy>
-      
-   </target>
-	  
-	                    
    <target name="build-tomcat" 
            description="Performs a clean build for Tomcat and deploys the Alfresco and application WAR files"
            depends="clean, incremental-tomcat" />
