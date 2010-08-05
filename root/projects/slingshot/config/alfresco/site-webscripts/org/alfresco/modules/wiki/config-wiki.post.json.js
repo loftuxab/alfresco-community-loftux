@@ -2,13 +2,13 @@
 
 if (!json.isNull("wikipage"))
 {
-   var wikipage = String(json.get("wikipage"));   
+   var wikipage = String(json.get("wikipage"));
    model.pagecontent = getPageText(wikipage);
    model.title = wikipage.replace(/_/g, " ");
 }
 else
 {
-   model.pagecontent = "No page is configured";
+   model.pagecontent = msg.get("message.nopage");
    model.title = "";
 }
 
@@ -25,13 +25,15 @@ function getPageText(wikipage)
    var result = connector.get(uri);
    if (result.status == status.STATUS_OK)
    {
-      return result.response;
+      /**
+       * Always strip unsafe tags here.
+       * The config to option this is currently webscript-local elsewhere, so this is the safest option
+       * until the config can be moved to share-config scope in a future version.
+       */
+      return stringUtils.stripUnsafeHTML(result.response);
    }
    else
    {
       return "";
-   }   
+   }
 }
-
-
-
