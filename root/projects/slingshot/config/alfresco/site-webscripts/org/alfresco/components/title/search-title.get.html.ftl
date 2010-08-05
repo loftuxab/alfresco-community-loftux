@@ -2,7 +2,7 @@
    <h1 class="theme-color-3"><span>${msg("header.searchresults")}</span></h1>
    <div>
       <span class="navigation-item forwardLink">
-         <a href="${url.context}/page<#if page.url.templateArgs.site??>/site/${page.url.templateArgs.site}</#if>/advsearch?back=true">${msg("header.advanced")}</a>
+         <a href="${url.context}/page<#if page.url.templateArgs.site??>/site/${page.url.templateArgs.site}</#if>/advsearch?back=${page.url.queryString?url}">${msg("header.advanced")}</a>
       </span>
    </div>
    <#if page.url.templateArgs.site??>

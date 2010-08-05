@@ -665,7 +665,7 @@
       /**
        * Event handler that gets fired when user clicks the Search button.
        *
-       * @method onCancelButtonClick
+       * @method onSearchClick
        * @param e {object} DomEvent
        * @param obj {object} Object passed back from addListener method
        */
@@ -680,6 +680,8 @@
       
       /**
        * Click event for site specific search link
+       * 
+       * @method onSiteSearch
        */
       onSiteSearch: function Search_onSiteSearch(e, args)
       {
@@ -691,6 +693,8 @@
       
       /**
        * Click event for all sites search link
+       * 
+       * @method onAllSiteSearch
        */
       onAllSiteSearch: function Search_onAllSiteSearch(e, args)
       {
@@ -794,6 +798,8 @@
       
       /**
        * Updates the results info text.
+       * 
+       * @method _updateResultsInfo
        */
       _updateResultsInfo: function Search__updateResultsInfo()
       {
