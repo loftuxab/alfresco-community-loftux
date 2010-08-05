@@ -527,17 +527,28 @@ div.dashlet div.hdr
 
 .dashlet .detail-list-item .avatar img
 {
-   width: 32px;
+   width: 48px;
 }
 
-.dashlet .detail-list-item .details,
-.dashlet .detail-list-item .person
+.dashlet .detail-list-item .details
 {
    padding-left: 40px;
 }
 
+.dashlet .detail-list-item .person
+{
+   padding-left: 54px;
+}
+
 .dashlet .detail-list-item .details2
 {
+   padding-left: 20px;
+}
+
+.dashlet .detail-list-item .user-status
+{
+   background-position: 0 1px;
+   background-repeat: no-repeat;
    padding-left: 20px;
 }
 
@@ -654,4 +665,18 @@ div.dashlet div.hdr
 .invite-task-controls
 {
    margin-top: 1em;
+}
+
+/* User Status */
+div.user-status
+{
+   background-image: url(../components/images/status-16.png);
+   background-position: 0 1px;
+   background-repeat: no-repeat;
+   padding-left: 20px;
+}
+
+div.user-status span
+{
+   color: #808080;
 }

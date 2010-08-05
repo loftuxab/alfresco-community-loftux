@@ -12,7 +12,8 @@
          </div>
          <div class="person">
             <h4><a href="${url.context}/page/user/${m.authority.userName?url}/profile" class="theme-color-1">${m.authority.firstName?html} <#if m.authority.lastName??>${m.authority.lastName?html}</#if></a></h4>
-            <span>${msg("role." + m.role)}</span>
+            <div>${msg("role." + m.role)}</div>
+            <div class="user-status">${(m.authority.userStatus!"")?html}</div>
          </div>
       </div>
    </#list>
