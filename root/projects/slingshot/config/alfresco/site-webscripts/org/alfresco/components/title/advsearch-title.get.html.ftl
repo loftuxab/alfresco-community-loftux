@@ -10,7 +10,7 @@
    <#if page.url.args.back??>
    <div>
       <span class="navigation-item backLink">
-         <a href="#" onclick="history.back();return false;">${msg("header.results")}</a>
+         <a href="${url.context}/page/search?${page.url.args.back?html}">${msg("header.results")}</a>
       </span>
    </div>
    </#if>

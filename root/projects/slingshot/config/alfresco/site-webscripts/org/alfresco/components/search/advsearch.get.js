@@ -10,19 +10,30 @@ function main()
    // get the search forms from the config
    var forms = config.scoped["AdvancedSearch"]["advanced-search"].getChild("forms").childrenMap["form"];
    var searchForms = [];
-   for (var i = 0, form, formId, formDesc; i < forms.size(); i++)
+   for (var i = 0, form, formId, label, desc; i < forms.size(); i++)
    {
       form = forms.get(i);
       
-      // get optional attributes and resolved description text
+      // get optional attributes and resolve label/description text
       formId = form.attributes["id"];
-      formDesc = form.attributes["description"];
-      if (formDesc == null)
+      
+      label = form.attributes["label"];
+      if (label == null)
       {
-         formDesc = form.attributes["descriptionId"];
-         if (formDesc != null)
+         label = form.attributes["labelId"];
+         if (label != null)
          {
-            formDesc = msg.get(formDesc);
+            label = msg.get(label);
+         }
+      }
+      
+      desc = form.attributes["description"];
+      if (desc == null)
+      {
+         desc = form.attributes["descriptionId"];
+         if (desc != null)
+         {
+            desc = msg.get(desc);
          }
       }
       
@@ -31,7 +42,8 @@ function main()
       {
          id: formId ? formId : "search",
          type: form.value,
-         description: formDesc ? formDesc : formId
+         label: label ? label : form.value,
+         description: desc ? desc : ""
       });
    }
    

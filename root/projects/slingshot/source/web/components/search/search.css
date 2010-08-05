@@ -25,7 +25,7 @@
    padding: 0.3em;
 }
 
-.search .terms
+.search .search-box .terms
 {
    width: 32em;
 }
@@ -127,4 +127,78 @@
 .search .yui-dt td
 {
    border-bottom: 1px dashed #D7D7D7;
+}
+
+
+/* Advanced Search specific styles */
+
+.search .selected-form
+{
+   float: left;
+   min-width: 20em;
+}
+
+.search .selected-form li
+{
+   background-image: url(../images/expanded.png);
+   background-position: 98% center;
+   background-repeat: no-repeat;
+}
+
+.search .form-list
+{
+   position: absolute;
+   top: 3.5em
+}
+
+.search .form-list .item
+{
+   border-top: solid 1px lightgrey;
+}
+
+.search .form-type-name
+{
+   font-size: 116%;
+   padding: 0.15em;
+}
+
+.search .form-type-description
+{
+   font-size: 93%;
+   padding: 0.2em;
+}
+
+.search .form-row
+{
+   margin: 1.5em 0 1.5em 1.5em;
+}
+
+.search .form-row span.lookfor
+{
+   padding-top: 1em;
+}
+
+.search .form-row a:active,
+.search .form-row a:hover
+{
+   text-decoration: none;
+}
+
+.search .form-container
+{
+   margin-left: 0.75em;
+}
+
+.search .keywords-box
+{
+   background-color: #F5FFF2;
+   margin-left: 1.5em;
+   border: 1px solid #C2C2C2;
+   padding: 1em;
+   width: 800px;
+}
+
+.search .keywords-box .terms
+{
+   width: 60em;
 }

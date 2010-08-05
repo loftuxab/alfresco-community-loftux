@@ -72,7 +72,9 @@
           * Search Form objects, for example:
           * {
           *    id: "advanced-search",
-          *    type: "cm:content"
+          *    type: "cm:content",
+          *    label: "Content",
+          *    description: "All types of content"
           * }
           * 
           * @property searchForms
@@ -89,6 +91,79 @@
        */
       onReady: function ADVSearch_onReady()
       {
+         var me = this,
+            domId = this.id + "-form-list",
+            elList = Dom.get(domId);
+         
+         // search YUI button
+         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
+         
+         // generate list of forms
+         var fnOnFormClick = function ADVSearch_fnOnFormClick(form)
+         {
+            return function onClick()
+            {
+               // update selected form label, description
+               var elSelected = Dom.get(me.id + "-selected-form-link");
+               var desc = $html(form.description);
+               elSelected.innerHTML = '<div class="form-type-name">' + $html(form.label) + '</div>' +
+                                      '<div class="form-type-description">' + (desc.length !== 0 ? desc : "&nbsp;") + '</div>';
+               
+               // hide list of forms now user has selected something
+               Dom.addClass(elList.parentNode, "hidden");
+               
+               // render the appropriate form template
+               me.renderFormTemplate(form);
+               
+               return false;
+            };
+         };
+         
+         var elItem, elLink;
+         for (var i=0, j=this.options.searchForms.length, form; i<j; i++)
+         {
+            form = this.options.searchForms[i];
+            elItem = document.createElement("li");
+            elLink = document.createElement("a");
+            elLink.href = "#";
+            elLink.onclick = fnOnFormClick(form);
+            var desc = $html(form.description);
+            elLink.innerHTML = '<div class="form-type-name">' + $html(form.label) + '</div>' +
+                               '<div class="form-type-description">' + (desc.length !== 0 ? desc : "&nbsp;") + '</div>';
+            elItem.appendChild(elLink);
+            elList.appendChild(elItem);
+            
+            if (i === 0)
+            {
+               // update initially selected item
+               Dom.get(this.id + "-selected-form-type").innerHTML = $html(form.label);
+               desc = $html(form.description);
+               Dom.get(this.id + "-selected-form-desc").innerHTML = (desc.length !== 0 ? desc : "&nbsp;");
+               
+               // event hander for the item showing the currently selected
+               // drops down and hides the list when clicked
+               var elSelected = Dom.get(me.id + "-selected-form-link");
+               elSelected.onclick = function()
+               {
+                  if (Dom.hasClass(elList.parentNode, "hidden"))
+                  {
+                     Dom.removeClass(elList.parentNode, "hidden");
+                  }
+                  else
+                  {
+                     Dom.addClass(elList.parentNode, "hidden");
+                  }
+               };
+            }
+            else
+            {
+               Dom.addClass(elItem, "item");
+            }
+         }
+         
+         // render initial form template
+         this.renderFormTemplate(this.options.searchForms[0]);
+         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -99,16 +174,93 @@
        */
       
       /**
-       * Event callback when form template has been loaded
-       *
-       * @method onFormTemplateLoaded
-       * @param response {object} Server response from load template XHR request
+       * Loads or retrieves from cache the Form template for a given content type
+       * 
+       * @method renderFormTemplate
+       * @param form {Object} Form descriptor to render template for
        */
-      onFormTemplateLoaded: function ADVSearch_onFormTemplateLoaded(response)
+      renderFormTemplate: function ADVSearch_renderFormTemplate(form)
       {
-         // Inject the template from the XHR request into a new DIV element
          var containerDiv = Dom.get(this.id + "-form");
-         containerDiv.innerHTML = response.serverResponse.responseText;
+         
+         var visibleFormFn = function()
+         {
+            // hide visible form if any
+            for (var i=0, c=containerDiv.children; i<c.length; i++)
+            {
+               if (!Dom.hasClass(c[i], "hidden"))
+               {
+                  Dom.addClass(c[i], "hidden");
+                  break;
+               }
+            }
+            
+            // display cached form element
+            Dom.removeClass(form.htmlid, "hidden");
+            
+            // reset focus to search input textbox
+            Dom.get(this.id + "-search-text").focus();
+         };
+         
+         if (!form.htmlid)
+         {
+            // load the form component for the appropriate type
+            var formUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind=type&itemId={itemId}&formId={formId}&mode=edit&showSubmitButton=false&showCancelButton=false",
+            {
+               itemId: form.type,
+               formId: form.id
+            });
+            var formData =
+            {
+               htmlid: this.id
+            };
+            Alfresco.util.Ajax.request(
+            {
+               url: formUrl,
+               dataObj: formData,
+               successCallback:
+               {
+                  fn: function ADVSearch_onFormTemplateLoaded(response)
+                  {
+                     // Inject the template from the XHR request into a new DIV element
+                     var htmlid = this.id + form.type;
+                     var formDiv = document.createElement("div");
+                     formDiv.id = htmlid;
+                     Dom.addClass(formDiv, "hidden");
+                     formDiv.innerHTML = response.serverResponse.responseText;
+                     
+                     // cache htmlid so we know the form is present on the form
+                     form.htmlid = htmlid;
+                     containerDiv.appendChild(formDiv);
+                     
+                     visibleFormFn.call(this);
+                     
+                     // init YUI onReady method for components in form
+                     Alfresco.util.YUILoaderHelper.loadComponents();
+                  },
+                  scope: this
+               },
+               failureMessage: "Could not load form component '" + formUrl + "'.",
+               scope: this,
+               execScripts: true
+            });
+         }
+         else
+         {
+            visibleFormFn.call(this);
+         }
+      },
+      
+      /**
+       * Event handler that gets fired when user clicks the Search button.
+       *
+       * @method onSearchClick
+       * @param e {object} DomEvent
+       * @param obj {object} Object passed back from addListener method
+       */
+      onSearchClick: function ADVSearch_onSearchClick(e, obj)
+      {
+         
       }
    });
 })();

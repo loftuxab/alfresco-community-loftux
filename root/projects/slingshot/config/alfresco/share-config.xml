@@ -134,7 +134,7 @@
          
          The element supports the following optional attributes:
             label = label text to display
-            labelId = I18N label id of label text to display
+            labelId = I18N message id of label text to display
       -->
       <sorting>
          <sort labelId="label.name">cm:name</sort>
@@ -156,13 +156,18 @@
          <!-- Forms for the advanced search type list -->
          <forms>
             <!--
-               The 'form' config element supports the following optional attributes:
+               The 'form' config element contains the name of the model type
+               of the form to display.
+               
+               The element supports the following optional attributes:
                   id = form id, the id of "search" will be assumed if not set
+                  label = label text to display - defaults to model type if not set
+                  labelId = I18N message id of label text to display
                   description = description text to display
-                  descriptionId = I18N label id of description text to display
+                  descriptionId = I18N message id of description text to display
             -->
-            <form descriptionId="search.form.cm_content">cm:content</form>
-            <form descriptionId="search.form.cm_folder">cm:folder</form>
+            <form labelId="search.form.label.cm_content" descriptionId="search.form.desc.cm_content">cm:content</form>
+            <form labelId="search.form.label.cm_folder" descriptionId="search.form.desc.cm_folder">cm:folder</form>
          </forms>
       </advanced-search>
    </config>
