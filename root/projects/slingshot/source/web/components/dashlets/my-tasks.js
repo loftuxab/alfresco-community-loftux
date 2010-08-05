@@ -102,7 +102,7 @@
                type = oRecord.getData("typeDefinitionTitle"),
                status = oRecord.getData("properties")["bpm_status"],
                assignee = oRecord.getData("owner");
-            var titleDesc = '<h4><a href="task-details?taskId=' + encodeURIComponent(taskId) + '" class="theme-color-1" title="' + me.msg("link.viewTask") + '">' + title + '</a></h4>',
+            var titleDesc = '<h4><a href="task-details?taskId=' + taskId + '" class="theme-color-1" title="' + me.msg("link.viewTask") + '">' + title + '</a></h4>',
                dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '">' + Alfresco.util.formatDate(dueDate, "mediumDate") + '</span></h4>' : "",
                statusDesc = '<div>' + me.msg("label.taskSummary", type, status) + '</div>',
                unassignedDesc = '';
@@ -127,7 +127,7 @@
                   (owner.userName == Alfresco.constants.USERNAME) ||
                   (task.workflowInstance && task.workflowInstance.initiator && task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
             {
-               elCell.innerHTML = '<a href="task-edit?taskId=' + encodeURIComponent(task.id) + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
+               elCell.innerHTML = '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
             }
          };
 
@@ -167,6 +167,5 @@
             scope: this
          });
       }
-
    });
 })();

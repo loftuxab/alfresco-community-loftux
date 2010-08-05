@@ -36,7 +36,6 @@
     */
     var $html = Alfresco.util.encodeHTML;
 
-
    /**
     * TaskDetailsHeader constructor.
     *
@@ -56,7 +55,6 @@
 
    YAHOO.extend(Alfresco.TaskDetailsHeader, Alfresco.component.Base,
    {
-
       /**
        * Event handler called when the "taskDetailedData" event is received
        *
@@ -69,13 +67,11 @@
             taskId = task.id,
             taskName = task.properties["bpm_description"],
             workflowId = task.workflowInstance.id,
-            workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + encodeURIComponent(workflowId) +
-                  "&taskId=" + encodeURIComponent(taskId));
+            workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + workflowId + "&taskId=" + taskId);
+         
          Selector.query(".links a", this.id, true).setAttribute("href", workflowDetailsUrl);
          Dom.removeClass(Selector.query(".links", this.id, true), "hidden");
          Selector.query("h1 span", this.id, true).innerHTML = $html(taskName);
       }
-
    });
-
 })();

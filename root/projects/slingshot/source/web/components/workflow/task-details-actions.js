@@ -50,7 +50,6 @@
 
    YAHOO.extend(Alfresco.TaskDetailsActions, Alfresco.component.Base,
    {
-
       /**
        * Event handler called when the "taskDetailedData" event is received
        *
@@ -67,12 +66,10 @@
          {
             Alfresco.util.createYUIButton(this, "edit", function TDA_onMetadataRefresh_onEditClick()
             {
-               window.location.href = Alfresco.util.siteURL("task-edit?taskId=" + encodeURIComponent(task.id));
+               window.location.href = Alfresco.util.siteURL("task-edit?taskId=" + task.id);
             });
             Dom.removeClass(Selector.query(".actions", this.id), "hidden");
          }
       }
-
    });
-
 })();

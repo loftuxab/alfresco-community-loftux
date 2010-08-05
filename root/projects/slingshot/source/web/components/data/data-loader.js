@@ -33,8 +33,7 @@
     */
    Alfresco.DataLoader = function DataLoader_constructor(htmlid)
    {
-      Alfresco.DataLoader.superclass.constructor.call(this, "Alfresco.DataLoader", htmlid, ["button"]);
-      return this;
+      return Alfresco.DataLoader.superclass.constructor.call(this, "Alfresco.DataLoader", htmlid, ["button"]);
    };
    
    YAHOO.extend(Alfresco.DataLoader, Alfresco.component.Base,
@@ -91,16 +90,7 @@
           * @type boolean
           * @default true
           */
-         useProxy: true,
-
-         /**
-          * When set to true the proxy uri will prefix:ed to the value of the "url" option
-          *
-          * @property encodeURIComponents
-          * @type boolean
-          * @default true
-          */
-         encodeURIComponents: false
+         useProxy: true
       },
 
       /**
@@ -111,16 +101,8 @@
        */
       onReady: function DataLoader_onReady()
       {
-         var url = "";
-         if (this.options.useProxy)
-         {
-            url += Alfresco.constants.PROXY_URI;
-         }
-         url += this.options.url;
-         if (this.options.encodeURIComponents)
-         {
-            url = Alfresco.util.encodeURIComponents(url);
-         }
+         var url = encodeURI(Alfresco.util.combinePaths(this.options.useProxy ? Alfresco.constants.PROXY_URI : "", this.options.url));
+
          Alfresco.util.Ajax.jsonGet(
          {
             method: "GET",
