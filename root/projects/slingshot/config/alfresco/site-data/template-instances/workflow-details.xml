@@ -45,7 +45,6 @@
             <url>api/workflow-instances/{workflowId}?detailed=true</url>
             <eventName>workflowDetailedData</eventName>
             <eventData>data</eventData>
-            <encodeURIComponents>true</encodeURIComponents>
          </properties>
       </component>
 

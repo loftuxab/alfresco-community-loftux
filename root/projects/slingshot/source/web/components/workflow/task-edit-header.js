@@ -100,7 +100,5 @@
             Dom.removeClass(Selector.query(".info.unassigned", this.id), "hidden");
          }
       }
-
    });
-
 })();

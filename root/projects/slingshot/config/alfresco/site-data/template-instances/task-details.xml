@@ -38,7 +38,6 @@
             <url>api/task-instances/{taskId}?detailed=true</url>
             <eventName>taskDetailedData</eventName>
             <eventData>data</eventData>
-            <encodeURIComponents>true</encodeURIComponents>
          </properties>
       </component>
    </components>

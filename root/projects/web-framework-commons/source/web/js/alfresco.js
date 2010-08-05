@@ -900,57 +900,6 @@ Alfresco.util.encodeHTML.text = document.createTextNode("");
 Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
 
 /**
- * Encodes a complete url (or just a "path").
- * In other words it will leave all "/", "?", "=" and "&":s intact (if placed in their assumed logical position)
- * but encode all values in between.
- *
- * Examples:
- *
- * /api/test/$id?swedishLetters=ŒŠš
- * >>> /api/test/%24id?swedishLetters=%C3%A5%C3%A4%C3%B6
- *
- * http://localhost:8081/share/proxy/alfresco/api/task-instances/jbpm$56?detailed=true
- * >>> http://localhost:8081/share/proxy/alfresco/api/task-instances/jbpm%2456?detailed=true
- *
- * @method Alfresco.util.encodeURIComponents
- * @param url {string} The url to be encoded
- * @return {string} Encoded URI string.
- * @static
- */
-Alfresco.util.encodeURIComponents = function(url)
-{
-   var result = "",
-      protocolIndex = url.indexOf("://");
-   if (protocolIndex != 0) {
-      var pathIndex = url.indexOf("/", protocolIndex + 4)
-      if (pathIndex > 0) {
-         result = url.substring(0, pathIndex);
-         url = url.substring(pathIndex + 1);
-      }
-   }
-   var tokens = url.split("?"),
-      paths = tokens[0].split("/"),
-      args = tokens.length > 1 ? tokens[1].split("&") : "";
-   for (var i = 0, il = paths.length; i < il; i++)
-   {
-      result += "/" + encodeURIComponent(paths[i])
-   }
-   i = 0;
-   il = args.length;
-   for (; i < il; i++)
-   {
-      var attr = args[i].split("=");
-      result += (i == 0 ? "?" : "&") + encodeURIComponent(attr[0]);
-      if (attr.length > 1)
-      {
-         result += "=" + encodeURIComponent(attr[1])
-      }
-   }
-   return result;
-};
-
-
-/**
  * Encodes a folder path string for use in a REST URI.
  * First performs a encodeURI() pass so that the '/' character is maintained
  * as the path must be intact as URI elements. Then encodes further characters
@@ -965,7 +914,6 @@ Alfresco.util.encodeURIPath = function(text)
 {
    return encodeURI(text).replace(/#/g, "%23").replace(/&/g, "%26").replace(/\=/g, "%3D");
 };
-
 
 /**
  * Scans a text string for links and injects HTML mark-up to activate them.
