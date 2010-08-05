@@ -2163,62 +2163,62 @@
    <!-- ** Sharepoint Protocol Project ** -->
    <!-- ********************************* -->
 
-   <target name="incremental-sharepoint"
-           depends="package-sharepoint" />
+   <target name="incremental-spp"
+           depends="package-spp" />
 
-   <target name="build-sharepoint"
-           depends="clean-sharepoint, incremental-sharepoint" />
+   <target name="build-spp"
+           depends="clean-spp, incremental-spp" />
 
-   <target name="clean-sharepoint"
+   <target name="clean-spp"
            depends="init">
-      <clean projectdir="${dir.module.sharepoint}" />
+      <clean projectdir="${dir.module.spp}" />
    </target>
 
-   <target name="compile-sharepoint"
+   <target name="compile-spp"
            depends="init">
-      <compile-java projectdir="${dir.module.sharepoint}" />
+      <compile-java projectdir="${dir.module.spp}" />
    </target>
 
-   <target name="package-sharepoint"
-           depends="package-sharepoint-war, deploy-webclient-tomcat" />
+   <target name="package-spp"
+           depends="package-spp-war, deploy-webclient-tomcat" />
 
-   <target name="package-sharepoint-jar"
-           depends="compile-sharepoint">
-      <mkdir dir="${dir.module.sharepoint.dist}" />
-      <jar jarfile="${dir.module.sharepoint.dist}/${file.name.jar.sharepoint}"
-           basedir="${dir.module.sharepoint.classes}" encoding="UTF-8" />
+   <target name="package-spp-jar"
+           depends="compile-spp">
+      <mkdir dir="${dir.module.spp.dist}" />
+      <jar jarfile="${dir.module.spp.dist}/${file.name.jar.spp}"
+           basedir="${dir.module.spp.classes}" encoding="UTF-8" />
    </target>
 
-   <target name="package-sharepoint-war"
-           depends="package-sharepoint-extension">
+   <target name="package-spp-war"
+           depends="package-spp-extension">
       <echo>Installing Sharepoint (vti) into WAR...</echo>
-      <install-amp ampfile="${dir.module.sharepoint.dist}/${file.name.amp.sharepoint}"
+      <install-amp ampfile="${dir.module.spp.dist}/${file.name.amp.spp}"
                    warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <target name="package-sharepoint-extension"
-           depends="package-sharepoint-jar">
-      <zip destfile="${dir.module.sharepoint.dist}/${file.name.amp.sharepoint}" update="true" encoding="UTF-8">
-         <zipfileset file="${dir.module.sharepoint.property}/module.properties"/>
-         <zipfileset file="${dir.module.sharepoint.dist}/${file.name.jar.sharepoint}" prefix="lib" />
-         <zipfileset dir="${dir.module.sharepoint.lib}" prefix="lib" />
-         <zipfileset dir="${dir.module.sharepoint.config}" prefix="config">
+   <target name="package-spp-extension"
+           depends="package-spp-jar">
+      <zip destfile="${dir.module.spp.dist}/${file.name.amp.spp}" update="true" encoding="UTF-8">
+         <zipfileset file="${dir.module.spp.property}/module.properties"/>
+         <zipfileset file="${dir.module.spp.dist}/${file.name.jar.spp}" prefix="lib" />
+         <zipfileset dir="${dir.module.spp.lib}" prefix="lib" />
+         <zipfileset dir="${dir.module.spp.config}" prefix="config">
             <exclude name="**/module.properties" />
             <exclude name="**/vti-handler-alfresco2-context.xml.sample" />
          </zipfileset>
       </zip>
    </target>
 
-   <target name="test-sharepoint"
-           depends="compile-sharepoint">
-      <run-tests projectdir="${dir.module.sharepoint}" />
+   <target name="test-spp"
+           depends="compile-spp">
+      <run-tests projectdir="${dir.module.spp}" />
    </target>
 
-   <target name="generate-javadocs-sharepoint"
+   <target name="generate-javadocs-spp"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Sharepoint Protocol (vti) Extension"
                          windowtitle="Alfresco Sharepoint Protocol"
-                         projectdir="${dir.module.sharepoint}"/>
+                         projectdir="${dir.module.spp}"/>
    </target>
 
    <!-- ********************************* -->

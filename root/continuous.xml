@@ -21,7 +21,6 @@
    <target name="continuous-init" 
            depends="init">
       <property file="continuous.properties"/>
-      <property file="community.properties"/>
    </target>
 	
    <target name="bootstrap-wcm-test" depends="continuous-init" >
@@ -98,19 +97,15 @@
            description="Creates the distribution files for all platforms"
            depends="distribute-core-amps,
                     distribute-sdk, 
-                    distribute-sample-extensions,
                     distribute-installers,
-                    distribute-xforms-examples,
                     distribute-extras,
                     distribute-fdk,
                     distribute-docs" />
 
    <target name="distribute-core" 
            description="Creates the patch distribution files for all platforms"
-           depends="distribute-mmt,
-                    distribute-bm-remote,
+           depends="assemble-commands,
                     distribute-core-amps,
-                    assemble-commands,
                     assemble-tomcat,
                     distribute-war,
                     distribute-wcm,
@@ -588,34 +583,26 @@
 
    <target name="distribute-wcm" 
            description="Creates the distibution files for WCM"
-           depends="assemble-virtual,
-                    distribute-wcm-windows,
-                    distribute-wcm-linux" />
-
-
-   <target name="distribute-wcm-windows">
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.wcm}.zip">
-         <zipfileset dir="${dir.continuous.assemble.virtualtomcat}"
-                     prefix="virtual-tomcat" />
-         <zipfileset dir="${dir.project.installer}"
-                     includes="wcm-bootstrap-context.xml" />
-      </zip>
-   </target>
-
-   <target name="distribute-wcm-linux">
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.wcm}.tar.gz" 
-           longfile="gnu" 
-           compression="gzip">
+           depends="assemble-virtual">
+      <tar destfile="${dir.continuous.assemble}/temp.tar" 
+           longfile="gnu">
          <tarfileset dir="${dir.continuous.assemble.virtualtomcat}" 
                      prefix="virtual-tomcat"
-                     excludes="**/bin/*.sh,**/bin/*.bat" />
+                     excludes="**/bin/*.sh" />
          <tarfileset dir="${dir.continuous.assemble.virtualtomcat}/bin"
                      prefix="virtual-tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
          <tarfileset dir="${dir.project.installer}"
                      includes="wcm-bootstrap-context.xml" />
+         <tarfileset dir="${dir.project.webclient.xforms.examples}"
+                     prefix="wcm-examples"
+                     excludes="unit-tests/**" />
       </tar>
+	  <zip destfile="${dir.continuous.dist}/${file.name.dist.wcm}.zip">
+        <tarfileset src="${dir.continuous.assemble}/temp.tar"/>
+      </zip>
+      <delete quiet="yes" file="${dir.continuous.assemble}/temp.tar" />
    </target>
 
    <target name="assemble-virtual"
@@ -781,21 +768,8 @@
            depends="continuous-init" >
       <mkdir dir="${dir.continuous.dist}" />
 
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.war}.zip">
-         <zipfileset dir="${dir.installer.bitrock}"
-                     includes="licenses/**" />
-         <zipfileset dir="${dir.installer.bitrock}"
-                     includes="README.txt" />
-         <zipfileset dir="${dir.continuous.assemble.tomcat}"
-                     prefix="web-server" />
-         <zipfileset dir="${dir.continuous.assemble}/commands/bin" 
-                     prefix="bin"
-                     excludes="**/*.sh" />
-      </zip>
-
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz"
-           longfile="gnu"
-           compression="gzip">
+      <tar destfile="${dir.continuous.assemble}/temp.tar" 
+           longfile="gnu">
          <tarfileset dir="${dir.installer.bitrock}"
                      includes="licenses/**" />
          <tarfileset dir="${dir.installer.bitrock}"
@@ -806,7 +780,15 @@
                      prefix="bin" 
                      excludes="**/*.dll,**/*.bat"
                      mode="755"/>
+         <tarfileset dir="${dir.continuous.assemble}/commands/bin"
+                     prefix="bin" 
+                     includes="**/*.dll,**/*.bat"/>
       </tar>
+	  <zip destfile="${dir.continuous.dist}/${file.name.dist.war}.zip">
+        <tarfileset src="${dir.continuous.assemble}/temp.tar"/>
+      </zip>
+      <delete quiet="yes" file="${dir.continuous.assemble}/temp.tar" />
+
    </target>
 
 
@@ -823,15 +805,9 @@
          <zipfileset dir="${dir.project.webserviceclient.dist}" />
          <zipfileset dir="${dir.project.webserviceclient.config}/alfresco" 
                      prefix="alfresco"/>
+         <fileset file="${dir.project.webserviceclient}/README_ws_client.txt" />
       </zip>
 
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.webserviceclient}.tar.gz" 
-           longfile="gnu" 
-           compression="gzip">
-         <tarfileset dir="${dir.project.webserviceclient.dist}" />
-         <tarfileset dir="${dir.project.webserviceclient.config}/alfresco" 
-                     prefix="alfresco"/>
-      </tar>
    </target>
 
    <!-- *************************** -->
@@ -843,14 +819,23 @@
            depends="distribute-extensions-office2003-word,
                     distribute-extensions-office2003-excel,
                     distribute-extensions-office2003-powerpoint,
-                    distribute-extensions-office2003-all" />
+                    distribute-extensions-office2003-all" >
 
+      <mkdir dir="${dir.continuous.dist}" />
+
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-bundle}.zip">
+         <zipfileset file="${dir.continuous.assemble}/${file.name.dist.extension-office2003-word}.zip" />
+         <zipfileset file="${dir.continuous.assemble}/${file.name.dist.extension-office2003-excel}.zip" />
+         <zipfileset file="${dir.continuous.assemble}/${file.name.dist.extension-office2003-powerpoint}.zip" />
+         <zipfileset file="${dir.continuous.assemble}/${file.name.dist.extension-office2003-all}.zip" />
+      </zip>
+   </target>
    <target name="distribute-extensions-office2003-word"
            description="Creates the Word 2003 Extensions distribution files"
            depends="continuous-init">
-      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble}" />
 
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-word}.zip">
+      <zip destfile="${dir.continuous.assemble}/${file.name.dist.extension-office2003-word}.zip">
          <zipfileset dir="${dir.project.extension.office.word2003}"
                      includes="readme.rtf,
                                setup.exe,
@@ -864,9 +849,9 @@
    <target name="distribute-extensions-office2003-excel"
            description="Creates the Excel 2003 Extensions distribution files"
            depends="continuous-init">
-      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble}" />
 
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-excel}.zip">
+      <zip destfile="${dir.continuous.assemble}/${file.name.dist.extension-office2003-excel}.zip">
          <zipfileset dir="${dir.project.extension.office.excel2003}"
                      includes="readme.rtf,
                                setup.exe,
@@ -880,9 +865,9 @@
    <target name="distribute-extensions-office2003-powerpoint"
            description="Creates the PowerPoint 2003 Extensions distribution files"
            depends="continuous-init">
-      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble}" />
 
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-powerpoint}.zip">
+      <zip destfile="${dir.continuous.assemble}/${file.name.dist.extension-office2003-powerpoint}.zip">
          <zipfileset dir="${dir.project.extension.office.powerpoint2003}"
                      includes="readme.rtf,
                                setup.exe,
@@ -896,9 +881,9 @@
    <target name="distribute-extensions-office2003-all"
            description="Creates the 3-in-1 Office 2003 Extensions distribution files"
            depends="continuous-init">
-      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble}" />
 
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-all}.zip">
+      <zip destfile="${dir.continuous.assemble}/${file.name.dist.extension-office2003-all}.zip">
          <zipfileset dir="${dir.project.extension.office.all2003}"
                      includes="readme.rtf,
                                setup.exe,
@@ -919,73 +904,8 @@
       <mkdir dir="${dir.continuous.dist}" />
       <copy file="${dir.project.deployment.dist}/${file.name.zip.deployment}"
             tofile="${dir.continuous.dist}/${file.name.dist.deployment}.zip" />
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.installer.deploy}/output" />
-      <exec dir="${dir.installer.deploy}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.deploy}"'/>
-      </exec>
-      <move todir="${dir.continuous.dist}" failonerror="false">
-         <fileset dir="${dir.installer.deploy}/output">
-            <include name="**/*"/>
-         </fileset>
-      </move>
    </target>
    
-
-   <!-- ******************************* -->
-   <!-- ** Sample Extensions targets ** -->
-   <!-- ******************************* -->
-   
-   <target name="assemble-sample-extensions" 
-           depends="continuous-init">
-
-      <!-- Create the required directory structure -->
-      <mkdir dir="${dir.continuous.dist}" />
-      <mkdir dir="${dir.continuous.assemble.extension-samples}" />
-
-      <!-- get the sample extension files -->
-      <copy todir="${dir.continuous.assemble.extension-samples}" 
-            flatten="false">
-         <fileset dir="${dir.project.datamodel.config}" 
-                  includes="alfresco/extension/**/*" />
-         <fileset dir="${dir.project.repository.config}" 
-                  includes="alfresco/extension/**/*" />
-         <fileset dir="${dir.project.datamodel.config}" 
-                  includes="alfresco/extension/*.sample" />
-         <fileset dir="${dir.project.repository.config}" 
-                  includes="alfresco/extension/*.sample" />
-      </copy>
-   </target>
-   
-   <target name="distribute-sample-extensions" 
-           depends="assemble-sample-extensions"
-           description="Creates a jar file containing the alfresco sample extensions">
-      <mkdir dir="${dir.continuous.dist}" />
-
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.sample-extensions}.zip">
-         <zipfileset dir="${dir.continuous.assemble.extension-samples}" />
-      </zip>
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.sample-extensions}.tar.gz" 
-           longfile="gnu" 
-           compression="gzip">
-         <tarfileset dir="${dir.continuous.assemble.extension-samples}" />
-      </tar>
-   </target>
-   
-   <target name="distribute-xforms-examples" depends="continuous-init"
-           description="Creates an archive of all XForms samples and tests">
-      <mkdir dir="${dir.continuous.dist}" />
-
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.xforms-examples}.zip">
-         <zipfileset dir="${dir.project.webclient.xforms.examples}" excludes="unit-tests/**" />
-      </zip>
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.xforms-examples}.tar.gz" 
-           longfile="gnu" 
-           compression="gzip">
-         <tarfileset dir="${dir.project.webclient.xforms.examples}" excludes="unit-tests/**" />
-      </tar>
-   </target>
 
    <!-- ************************************ -->
    <!-- ** Module Management Tool targets ** -->
@@ -1066,17 +986,14 @@
       <delete dir="${dir.continuous.assemble.mmt}/tmp-spring-surf" />
    </target>
    
-   <target name="distribute-mmt" 
+   <target name="package-mmt" 
            depends="assemble-mmt"
            description="Creates the Alfresco Module Management Tool distribution file for all platforms">
-      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble.commands}" />
 
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.mmt}.jar">
+      <zip destfile="${dir.continuous.assemble.commands}/${file.name.dist.mmt}.jar">
          <zipfileset dir="${dir.continuous.assemble.mmt}" />
       </zip>
-      <!-- Version-independent name for installers and bundles -->
-      <copy file="${dir.continuous.dist}/${file.name.dist.mmt}.jar"
-            tofile="${dir.continuous.dist}/alfresco-mmt.jar" />
    </target>
 
    <!-- ************************************ -->
@@ -1182,12 +1099,12 @@
 
    </target>
    
-   <target name="distribute-bm-remote" 
+   <target name="package-bm-remote" 
            depends="assemble-bm-remote"
            description="Creates the Alfresco Remote Benchmark Tool distribution file for all platforms">
-      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble.commands}" />
 
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.bm-remote}.jar">
+      <zip destfile="${dir.continuous.assemble.commands}/${file.name.dist.bm-remote}.jar">
          <zipfileset dir="${dir.continuous.assemble.bm-remote}" />
       </zip>
    </target>
@@ -1203,11 +1120,6 @@
          <zipfileset dir="${dir.continuous.assemble.sdk}" />
       </zip>
 
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.sdk}.tar.gz" 
-           longfile="gnu" 
-           compression="gzip">
-         <tarfileset dir="${dir.continuous.assemble.sdk}" />
-      </tar>
    </target>
    
    <target name="verify-sdk" 
@@ -1555,10 +1467,11 @@
    <target name="distribute-fdk" depends="set-build-number, continuous-init, incremental-fdk"
            description="Distributes the Forms Development Kit (FDK) files">
       <mkdir dir="${dir.continuous.dist}" />
-      <copy todir="${dir.continuous.dist}">
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.fdk}.zip">
          <fileset dir="${dir.project.fdk.client.dist}" includes="${file.name.jar.fdk}" />
          <fileset dir="${dir.project.fdk.repo.dist}" includes="${file.name.amp.fdk}" />
-      </copy>
+         <fileset file="${dir.project.fdk}/README_fdk.txt" />
+      </zip>
    </target>
 
 </project>
