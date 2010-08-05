@@ -14,6 +14,8 @@
       <@menuItem item p_type />
       <#if p_type = "user" && item_has_next><span class="separator">&nbsp;</span></#if>
    </#list>
+   <!-- Remove first comma -->
+   <#if js?starts_with(",")><#assign js = js?substring(1)></#if>
 </#macro>
 
 <#--
@@ -37,13 +39,13 @@
 <span id="${itemId}" class="yui-button">
    <span class="first-child" ${attrStyle!""}>
    <#if item.type = "container">
-      <#assign js>${js} new YAHOO.widget.Button("${itemId}", { type: "menu", menu: "${itemMenuId}" }).getMenu().cfg.setProperty("keepopen", true);</#assign>
+      <#assign js>${js}, (function(){ var btn = new YAHOO.widget.Button("${itemId}", { type: "menu", menu: "${itemMenuId}", lazyloadmenu: false }); btn.getMenu().cfg.setProperty("keepopen", true); return btn; })()</#assign>
       <button ${attrTitle!""} tabindex="0">${label}</button>
    <#elseif item.type = "js">
-      <#assign js>${js} new ${item.value}("${itemId}").setOptions({ siteId: "${page.url.templateArgs.site!""}" });</#assign>
+      <#assign js>${js}, (function(){ var module = new ${item.value}("${itemId}"); module.setOptions({ siteId: "${page.url.templateArgs.site!""}" }); return module;})()</#assign>
       <button ${attrTitle!""} tabindex="0">${label}</button>
    <#else>
-      <#assign js>${js} new YAHOO.widget.Button("${itemId}");</#assign>
+      <#assign js>${js}, new YAHOO.widget.Button("${itemId}")</#assign>
       <#assign attrTarget><#if item.type = "external-link">target="_blank"</#if></#assign>
       <a ${attrTitle!""} ${attrHref} tabindex="0" ${attrTarget!""}>${label}</a>
    </#if>
@@ -93,7 +95,7 @@
       </#if>
    </#if>
 <#if item.type = "user">
-<li class="user-menuitem">
+<li class="user-menuitem HEADER-MARKER">
    <#if user.properties.avatar??>
       <#assign avatar>${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force</#assign>
    <#else>
@@ -112,7 +114,6 @@
       </div>
    </span>
 </li>   
-   <#assign js>${js} new YAHOO.widget.Button("${id}-user-status");</#assign>
 <#else>
    <#assign attrTarget><#if item.type = "external-link">target="_blank"</#if></#assign>
 <li><span ${attrStyle}><a ${attrTitle} ${attrHref} tabindex="0" ${attrTarget!""}>${msg(item.label!"")}</a></span>
