@@ -18,10 +18,10 @@
  */
  
 /**
- * Global Header
+ * Sites Module
  * 
- * @namespace Alfresco
- * @class Alfresco.Header
+ * @namespace Alfresco.module
+ * @class .description
 */
 (function()
 {

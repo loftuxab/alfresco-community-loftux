@@ -6,7 +6,7 @@
 <#assign logo=msg("header.logo")><#if logo="header.logo"><#assign logo="app-logo.png"></#if>
 <#if !user.isGuest>
 <script type="text/javascript">//<![CDATA[
-   var ${jsid} = new Alfresco.Header("${id}").setOptions(
+   var ${jsid} = new Alfresco.component.Header("${id}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
       siteTitle: "${siteTitle?js_string}",
@@ -29,7 +29,7 @@
       <span id="${id}-appItems" class="app-items"><@header.renderItems config.global.header.appItems id "app" /></span>
    </span>
 <script type="text/javascript">//<![CDATA[
-${header.js}
+   ${jsid}.setAppItems([${header.js}]);
 //]]></script>
 
    <span id="${id}-userItems" class="user-items">
@@ -51,7 +51,7 @@ ${header.js}
       </div>
    </span>
 <script type="text/javascript">//<![CDATA[
-${header.js}
+   ${jsid}.setUserItems([${header.js}]);
 //]]></script>
 </div>
 <#else>

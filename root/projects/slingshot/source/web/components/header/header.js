@@ -21,7 +21,7 @@
  * Global Header
  * 
  * @namespace Alfresco
- * @class Alfresco.Header
+ * @class Alfresco.component.Header
 */
 (function()
 {
@@ -38,12 +38,12 @@
    var $html = Alfresco.util.encodeHTML,
       $siteURL = Alfresco.util.siteURL;
 
-   Alfresco.Header = function(htmlId)
+   Alfresco.component.Header = function(htmlId)
    {
-      return Alfresco.Header.superclass.constructor.call(this, "Alfresco.Header", htmlId, ["button", "menu", "container"]);
+      return Alfresco.component.Header.superclass.constructor.call(this, "Alfresco.component.Header", htmlId, ["button", "menu", "container"]);
    };
 
-   YAHOO.extend(Alfresco.Header, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.component.Header, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -89,7 +89,23 @@
           */
          tokens: {}
       },
-      
+
+      /**
+       * Application Item YAHOO.widget instances
+       *
+       * @property appItems
+       * @type Array
+       */
+      appItems: null,
+
+      /**
+       * User Item YAHOO.widget instances
+       *
+       * @property userItems
+       * @type Array
+       */
+      userItems: null,
+
       /**
        * Default search text
        *
@@ -117,6 +133,26 @@
          this.replaceUriTokens();
          this.configureSearch();
          this.configureMyStatus();
+      },
+      
+      /**
+       * Called by header rendering code to register Application Item YAHOO.widget instances
+       *
+       * @method setAppItems
+       */
+      setAppItems: function Header_setAppItems(items)
+      {
+         this.appItems = items;
+      },
+
+      /**
+       * Called by header rendering code to register User Item YAHOO.widget instances
+       *
+       * @method setUserItems
+       */
+      setUserItems: function Header_setUserItems(items)
+      {
+         this.userItems = items;
       },
 
 
@@ -302,6 +338,40 @@
             this.statusUpdateTime = Alfresco.util.fromISO8601(statusISOTime);
          }
          this.setStatusRelativeTime();
+
+         // Find and siable the menuItem containing the My Status elements
+         Alfresco.util.bind(function Header_configureMyStatus_fnDisableUserMenu()
+         {
+            var allItems = this.userItems.concat(this.appItems),
+               item;
+
+            for (var i = 0, ii = allItems.length; i < ii; i++)
+            {
+               item = allItems[i];
+               if (item instanceof YAHOO.widget.Button && YAHOO.lang.isFunction(item.getMenu) && item.getMenu() !== null)
+               {
+                  var menuItems = item.getMenu().getItems(),
+                     menuItem;
+
+                  for (var j = 0, jj = menuItems.length; j < jj; j++)
+                  {
+                     menuItem = menuItems[j];
+                     if (Dom.hasClass(menuItem.element, "HEADER-MARKER"))
+                     {
+                        // Found the menu item, now disable it to remove default event handler behaviour
+                        menuItem.cfg.setProperty("disabled", true);
+                        return;
+                     }
+                  }
+               }
+            }
+         }, this)();
+
+         // Stop the "click" event propagating to the menu handlers
+         Event.on(this.widgets.statusBox, "click", function(p_oEvent)
+         {
+            Event.stopEvent(p_oEvent);
+         });
 
          this.widgets.submitStatus = new YAHOO.widget.Button(this.id + "-submitStatus");
          this.widgets.submitStatus.on("click", this.submitStatus, this.widgets.submitStatus, this);
