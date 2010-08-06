@@ -16,10 +16,12 @@ if exist @@BITROCK_INSTALLDIR@@\jetty\scripts\servicerun.bat (start /MIN @@BITRO
 if exist @@BITROCK_INSTALLDIR@@\subversion\scripts\servicerun.bat (start /MIN @@BITROCK_INSTALLDIR@@\subversion\scripts\servicerun.bat START)
 rem RUBY_APPLICATION_START
 if exist @@BITROCK_INSTALLDIR@@\lucene\scripts\servicerun.bat (start /MIN @@BITROCK_INSTALLDIR@@\lucene\scripts\servicerun.bat START)
+if exist @@BITROCK_INSTALLDIR@@\third_application\scripts\servicerun.bat (start /MIN @@BITROCK_INSTALLDIR@@\third_application\scripts\servicerun.bat START)
 goto end
 
 :stop
 
+if exist @@BITROCK_INSTALLDIR@@\third_application\scripts\servicerun.bat (start /MIN @@BITROCK_INSTALLDIR@@\third_application\scripts\servicerun.bat STOP)
 if exist @@BITROCK_INSTALLDIR@@\lucene\scripts\servicerun.bat (start /MIN @@BITROCK_INSTALLDIR@@\lucene\scripts\servicerun.bat STOP)
 rem RUBY_APPLICATION_STOP
 if exist @@BITROCK_INSTALLDIR@@\subversion\scripts\servicerun.bat (start /MIN @@BITROCK_INSTALLDIR@@\subversion\scripts\servicerun.bat STOP)

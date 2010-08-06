@@ -64,6 +64,7 @@
 		<compareText text="${installer_ui}" logic="equals" value="unattended"/>
             </ruleList>
         </actionGroup>
+	<setInstallerVariable name="component(mysql).parameter(mysql_data).parameter(mysql_database_password).value" value="${mysql_root_password}"/>
     </readyToInstallActionList>
     <postInstallationActionList>
         <actionGroup>

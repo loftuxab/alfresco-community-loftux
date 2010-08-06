@@ -47,6 +47,21 @@
             <default>${product_shortname} Tomcat Service</default>
             <ask>0</ask>
         </stringParameter>
+	<!-- boot, auto, system, demand, disabled-->
+	<stringParameter>
+	    <name>tomcatservice_startup</name>
+	    <ask>0</ask>
+	    <default>auto</default>
+	    <value>auto</value>
+	    <cliOptionShow>0</cliOptionShow>
+	</stringParameter>
+	<booleanParameter>
+	    <name>tomcatservice_notstart</name>
+	    <ask>0</ask>
+	    <default>0</default>
+	    <value>0</value>
+	    <cliOptionShow>0</cliOptionShow>
+	</booleanParameter>
     </parameterList>
     <readyToInstallActionList>
         <getUniqueWindowsServiceName>
@@ -82,6 +97,18 @@
             <programArguments>INSTALL</programArguments>
             <ruleList>
                 <platformTest type="windows"/>
+		<isFalse value="${tomcatservice_notstart}" />
+                <compareValues value1="${tomcatservice_username}" logic="equals" value2=""/>
+            </ruleList>
+        </runProgram>
+
+        <runProgram abortOnError="0" showMessageOnError="0">
+            <progressText>Installing Tomcat as a Windows service with name ${tomcat_unique_service_name}</progressText>
+            <program>${application_server_directory.dos}\scripts\serviceinstall.bat</program>
+            <programArguments>INSTALL STOP</programArguments>
+            <ruleList>
+                <platformTest type="windows"/>
+		<isTrue value="${tomcatservice_notstart}" />
                 <compareValues value1="${tomcatservice_username}" logic="equals" value2=""/>
             </ruleList>
         </runProgram>
@@ -100,9 +127,19 @@
         <waitForPort port="${application_server_port}" timeout="30000">
             <ruleList>
                 <platformTest type="windows"/>
+		<isFalse value="${tomcatservice_notstart}" />
                 <isTrue value="${tomcatservice_waittostart}" />
             </ruleList>
         </waitForPort>
+
+	<runProgram>
+	    <program>sc</program>
+	    <programArguments>config ${tomcat_unique_service_name} start= ${tomcatservice_startup}</programArguments>
+	    <ruleList>
+		<platformTest type="windows"/>
+		<compareText text="${tomcatservice_startup}" logic="does_not_equal" value="auto" />
+	    </ruleList>
+	</runProgram>
     </postInstallationActionList>
 </component>
 

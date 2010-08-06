@@ -12,7 +12,7 @@ Copyrighted by BitRock
     <name>java</name>
     <description>java</description>
     <canBeEdited>0</canBeEdited>
-    <detailedDescription>Java Component required to run the Alfresco server.</detailedDescription>
+    <detailedDescription/>
     <selected>1</selected>
     <show>0</show>
     <initializationActionList>

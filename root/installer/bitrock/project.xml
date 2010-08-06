@@ -50,6 +50,7 @@
         <include file="alfresco-sharepoint.xml" />
         <include file="alfresco-records-management.xml" />
         <include file="alfresco-quickr.xml" />
+	<include file="base-unix-service.xml" />
 
 	<include file="openoffice.xml"/>
 	<include file="imagemagick.xml"/>
@@ -67,7 +68,28 @@
     </parameterList>
 
     <postInstallationActionList>
-        <actionGroup>
+	<actionGroup>
+	    <actionList>
+		<runProgram>
+		    <progressText>Stoping MySQL...</progressText>
+		    <program>${installdir}/${ctlscript_unix}</program>
+		    <programArguments>stop mysql</programArguments>
+		    <ruleList>
+			<platformTest type="unix" />
+                    </ruleList>
+                </runProgram>
+		<runProgram>
+		    <progressText>Stoping MySQL...</progressText>
+		    <program>${mysql_root_directory.dos}\scripts\servicerun.bat</program>
+		    <programArguments>STOP</programArguments>
+		    <ruleList>
+			<platformTest type="windows" />
+                    </ruleList>
+                </runProgram>
+		<waitForPort port="${database_port}" timeout="10000" state="free" />
+	    </actionList>
+	</actionGroup>
+        <!--<actionGroup>
             <actionList>
                 <runProgram>
                     <progressText>Starting Tomcat...</progressText>
@@ -82,7 +104,7 @@
             <ruleList>
                 <isTrue value="${alfrescomysqlquestion_bundled}" />
             </ruleList>
-        </actionGroup>
+        </actionGroup>-->
     </postInstallationActionList>
     
     <finalPageActionList>
@@ -104,6 +126,39 @@
 	<actionGroup>
 	    <progressText>Launch ${product_fullname} Share now?</progressText>
 	    <actionList>
+		<showProgressDialog title="Starting servers ..." >
+		    <actionList>
+			<runProgram>
+			    <progressText>Starting servers. Please be patient.</progressText>
+			    <program>${installdir}/${ctlscript_unix}</program>
+			    <programArguments>start &amp;</programArguments>
+			    <ruleList>
+				<platformTest type="unix" />
+			    </ruleList>
+			</runProgram>
+			<actionGroup>
+                            <actionList>
+				<foreach values="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20" variables="iteration" progressText="Starting servers. Please be patient">
+                                    <actionList>
+                                        <wait ms="1000" />
+				    </actionList>
+				</foreach>
+			    </actionList>
+                            <ruleList>
+                                <platformTest type="unix" />
+			    </ruleList>
+			</actionGroup>
+			<runProgram>
+			    <progressText>Starting servers. Please be patient.</progressText>
+			    <program>${installdir}/servicerun.bat</program>
+			    <programArguments>START</programArguments>
+			    <ruleList>
+				<platformTest type="windows" />
+			    </ruleList>
+			</runProgram>
+		    </actionList>
+		</showProgressDialog>
+		<waitForPort port="${application_server_port}" timeout="10000" />
 		<launchBrowser> 
 		    <url>http://${application_server_domain}:${application_server_port}/share</url>
 		    <ruleList>

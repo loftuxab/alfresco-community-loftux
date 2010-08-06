@@ -27,6 +27,13 @@ System variables provided by this component:
             <name>imagemagick_root_directory</name>
             <cliOptionName>imagemagick_root_directory</cliOptionName>
         </directoryParameter>
+        <stringParameter>
+            <ask>0</ask>
+            <description>IMAGEMAGICK version</description>
+            <name>imagemagick_version</name>
+            <value>@@BITROCK_IMAGEMAGICK_VERSION@@</value>
+            <default>@@BITROCK_IMAGEMAGICK_VERSION@@</default>
+        </stringParameter>
     </parameterList>
     <readyToInstallActionList>
         <setInstallerVariable name="imagemagick_root_directory" value="${installdir}/common">
@@ -67,9 +74,9 @@ System variables provided by this component:
             <value>##### IMAGEMAGICK ENV #####
 MAGICK_HOME="${imagemagick_root_directory}"
 export MAGICK_HOME
-MAGICK_CONFIGURE_PATH="${imagemagick_root_directory}/lib/ImageMagick-6.5.1/config:${imagemagick_root_directory}/share/ImageMagick-6.5.1/config"
+MAGICK_CONFIGURE_PATH="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config:${imagemagick_root_directory}/share/ImageMagick-${imagemagick_version}/config"
 export MAGICK_CONFIGURE_PATH
-MAGICK_CODER_MODULE_PATH="${imagemagick_root_directory}/lib/ImageMagick-6.5.1/modules-Q16/coders"
+MAGICK_CODER_MODULE_PATH="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/modules-Q16/coders"
 export MAGICK_CODER_MODULE_PATH
 
 </value>
@@ -81,6 +88,7 @@ export MAGICK_CODER_MODULE_PATH
             <value>rem ##### IMAGEMAGICK ENV #####
 set MAGICK_HOME=${imagemagick_root_directory.dos}
 set MAGICK_CODER_MODULE_PATH=${imagemagick_root_directory.dos}\modules\coders
+set MAGICK_CONFIGURE_PATH=${imagemagick_root_directory.dos}\config
 </value>
             <ruleList>
                 <platformTest type="windows"/>
@@ -117,7 +125,7 @@ set MAGICK_CODER_MODULE_PATH=${imagemagick_root_directory.dos}\modules\coders
         <folder>
             <name>imagemagickUnix</name>
             <destination>${imagemagick_root_directory}</destination>
-            <platforms>linux osx</platforms>
+            <platforms>linux linux-x64 osx</platforms>
             <distributionFileList>
                 <distributionDirectory origin="${imagemagick_distribution_folder_unix}/bin" />
                 <distributionDirectory origin="${imagemagick_distribution_folder_unix}/lib" />

@@ -40,6 +40,7 @@ TODO LIST
             <default>bundledAndExisting</default>
             <value>bundledAndExisting</value>
         </stringParameter>
+<booleanParameter name="tomcat_show_ports" value="0" ask="0" />
 
 <!-- Hidden Paramter. Needs to be directory to work in unix -->
 
@@ -61,6 +62,7 @@ TODO LIST
             <value>no</value>
             <ask>0</ask>
         </booleanParameter>
+        <booleanParameter ask="0" name="tomcat_existing_required_running" value="1" />
         <choiceParameter>
             <name>tomcat_installation_type</name>
             <title>Please select the Tomcat configuration you wish to use</title>
@@ -255,6 +257,15 @@ Tomcat 5.5 is recommended.</text>
                             <ruleList>
                                 <portTest port="${tomcat_server_port}" condition="can_bind"/>
                                 <compareText text="${tomcat_installation_type}" logic="equals" value="existing"/>
+                                <isTrue value="${tomcat_existing_required_running}" />
+                            </ruleList>
+                        </throwError>
+                        <throwError>
+                            <text>Unable to bind to the server port. Please make sure that Tomcat is not running.</text>
+                            <ruleList>
+                                <portTest port="${tomcat_server_port}" condition="cannot_bind"/>
+                                <compareText text="${tomcat_installation_type}" logic="equals" value="existing"/>
+                                <isFalse value="${tomcat_existing_required_running}" />
                             </ruleList>
                         </throwError>
                     </validationActionList>
@@ -294,9 +305,9 @@ Tomcat 5.5 is recommended.</text>
                     <value/>
                     <ask>1</ask>
                     <description>Tomcat SSL Port</description>
-                    <ruleList>
+                    <!--<ruleList>
                         <portTest condition="cannot_bind" port="${tomcat_server_ssl_port}"/>
-                    </ruleList>
+                    </ruleList>-->
                     <validationActionList>
                         <throwError>
                             <text>Unable to bind to the given port number. Please select another one.</text>
@@ -353,7 +364,7 @@ Tomcat 5.5 is recommended.</text>
             </parameterList>
             <ruleEvaluationLogic>or</ruleEvaluationLogic>
             <ruleList>
-                <compareText text="${tomcat_show_ports}" logic="equals" value="yes"/>
+                <isTrue value="${tomcat_show_ports}" />
                 <compareText text="${tomcat_installation_type}" logic="equals" value="existing"/>
                 <portTest condition="cannot_bind" port="${tomcat_server_port}"/>
                 <portTest condition="cannot_bind" port="${tomcat_server_shutdown_port}"/>
