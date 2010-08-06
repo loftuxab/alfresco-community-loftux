@@ -8,6 +8,7 @@
     <desktopShortcutList/>
     <initializationActionList/>
     <parameterList>
+	<booleanParameter name="openoffice_show_ports" value="0" ask="0" />
         <directoryParameter>
             <ask>0</ask>
             <description>OpenOffice installation directory</description>
@@ -42,10 +43,24 @@
             </validationActionList>
             <ruleEvaluationLogic>or</ruleEvaluationLogic>
             <ruleList>
-                <compareText text="${openoffice_show_ports}" value="yes"/>
+                <isTrue value="${openoffice_show_ports}" />
                 <portTest condition="cannot_bind" port="${openoffice_port}"/>
             </ruleList>
         </stringParameter>
+	<stringParameter>
+	    <name>openofficeservice_startup</name>
+	    <ask>0</ask>
+	    <default>auto</default>
+	    <value>auto</value>
+	    <cliOptionShow>0</cliOptionShow>
+	</stringParameter>
+	<booleanParameter>
+	    <name>openofficeservice_notstart</name>
+	    <ask>0</ask>
+	    <default>0</default>
+	    <value>0</value>
+	    <cliOptionShow>0</cliOptionShow>
+	</booleanParameter>
     </parameterList>
     <readyToInstallActionList>
         <setInstallerVariable name="openoffice_execute_abort_action_list" value="1"/>
@@ -143,6 +158,9 @@
                     <progressText>Starting OpenOffice...</progressText>
                     <program>${openoffice_directory}/scripts/ctl.sh</program>
                     <programArguments>start</programArguments>
+		    <ruleList>
+			<isFalse value="${openofficeservice_notstart}" />			
+		    </ruleList>
                 </runProgram>
             </actionList>
             <ruleList>
@@ -183,13 +201,40 @@
                         </substitution>
                     </substitutionList>
                 </substitute>
-                <runProgram>
-                    <progressText>Installing OpenOffice as a Windows service with name ${OpenOfficeUniqueServiceName}</progressText>
-                    <program>${openoffice_directory}\scripts\serviceinstall.bat</program>
-                    <programArguments>INSTALL</programArguments>
-                </runProgram>
-                <waitForPort port="${openoffice_port}" timeout="15000"/>
-            </actionList>
+		<actionGroup>
+		    <actionList>
+			<runProgram>
+			    <progressText>Installing OpenOffice as a Windows service with name ${OpenOfficeUniqueServiceName}</progressText>
+			    <program>${openoffice_directory}\scripts\serviceinstall.bat</program>
+			    <programArguments>INSTALL</programArguments>
+			</runProgram>
+			<waitForPort port="${openofficeservice_port}" timeout="15000"/>
+		    </actionList>
+		    <ruleList>
+			<isFalse value="${openofficeservice_notstart}" />
+		    </ruleList>
+		</actionGroup>
+		<actionGroup>
+		    <actionList>
+			<runProgram>
+			    <progressText>Installing OpenOffice as a Windows service with name ${OpenOfficeUniqueServiceName}</progressText>
+			    <program>${openoffice_directory}\scripts\serviceinstall.bat</program>
+			    <programArguments>INSTALL STOP</programArguments>
+			</runProgram>
+		    </actionList>
+		    <ruleList>
+			<isTrue value="${openofficeservice_notstart}" />
+		    </ruleList>
+		</actionGroup>
+		<runProgram>
+		    <program>sc</program>
+		    <programArguments>config ${OpenOfficeUniqueServiceName} start= ${openofficeservice_startup}</programArguments>
+		    <ruleList>
+			<platformTest type="windows"/>
+			<compareText text="${openofficeservice_startup}" logic="does_not_equal" value="auto" />
+		    </ruleList>
+		</runProgram>
+	    </actionList>
             <ruleList>
                 <compareText logic="equals" text="${platform_name}" value="windows"/>
             </ruleList>

@@ -13,6 +13,13 @@
             <default>${product_shortname}MySQL</default>
             <ask>0</ask>
         </stringParameter>
+	<stringParameter>
+	    <name>mysqlservice_startup</name>
+	    <ask>0</ask>
+	    <default>auto</default>
+	    <value>auto</value>
+	    <cliOptionShow>0</cliOptionShow>
+	</stringParameter>
     </parameterList>
     <postInstallationActionList>
         <actionGroup>
@@ -49,9 +56,20 @@
                     <customErrorMessage>Unable to install MySQL as a service with name ${mysql_unique_service_name}</customErrorMessage>
                 </runProgram>
                 <waitForPort port="${database_port}" timeout="10000"/>
+		<runProgram>
+		    <program>sc</program>
+		    <programArguments>config ${mysql_unique_service_name} start= ${mysqlservice_startup}</programArguments>
+		    <ruleList>
+			<platformTest type="windows"/>
+			<compareText text="${mysqlservice_startup}" logic="does_not_equal" value="auto" />
+		    </ruleList>
+		</runProgram>
             </actionList>
+            <ruleEvaluationLogic>and</ruleEvaluationLogic>
             <ruleList>
                 <platformTest type="windows"/>
+                <compareText text="${component(mysql).parameter(mysql_installation_type).value}" logic="equals" value="bundled"/>
+                <compareText text="${component(mysql).parameter(mysql_upgrade).value}" logic="equals" value="0"/>
             </ruleList>
         </actionGroup>
     </postInstallationActionList>

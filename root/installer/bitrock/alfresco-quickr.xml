@@ -14,6 +14,11 @@
                 <stringParameter name="alfresco_quickr_host" description="Quickr Server" default="localhost" allowEmptyValue="0" />
 		<stringParameter name="alfresco_quickr_port" description="Port" default="6060" allowEmptyValue="0" />
             </parameterList>
+	    <ruleEvaluationLogic>or</ruleEvaluationLogic>
+	    <ruleList>
+		<compareText text="${alfresco_show_ports}" value="yes"/>
+                <portTest condition="cannot_bind" port="${alfresco_quickr_port}"/>
+	    </ruleList>
         </parameterGroup>
     </parameterList>
 

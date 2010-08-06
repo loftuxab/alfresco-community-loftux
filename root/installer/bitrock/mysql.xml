@@ -96,6 +96,13 @@ System variables provided by this component:
             <default>1</default>
             <value>1</value>
         </stringParameter>
+        <!-- If we want to restrict for instance russians charaters, we need to set mysql_ascii_password to 1. Notice that ascii accepts dot, comma, quotes, tc, so you may want to combine this with the mysql_alphanumeric_password -->
+        <stringParameter>
+            <name>mysql_ascii_password</name>
+            <ask>0</ask>
+            <default>0</default>
+            <value>0</value>
+        </stringParameter>
 <!-- hidden parameter -->
 <stringParameter>
             <name>mysql_installation_type_options</name>
@@ -365,6 +372,21 @@ System variables provided by this component:
                     <descriptionRetype>Re-enter password</descriptionRetype>
                     <width>30</width>
                     <validationActionList>
+                        <throwError>
+                            <text>Please use ascii alphanumeric characters only</text>
+                            <ruleList>
+                                <isTrue value="${mysql_ascii_password}" />
+                                <isTrue value="${mysql_alphanumeric_password}"/>
+                                <compareText text="${mysql_root_password}" logic="does_not_equal" value=""/>
+                                <ruleGroup>
+                                    <ruleEvaluationLogic>or</ruleEvaluationLogic>
+                                    <ruleList>
+                                        <stringTest text="${mysql_root_password}" type="not_ascii" />
+                                        <stringTest text="${mysql_root_password}" type="not_alphanumeric"/>
+                                    </ruleList>
+                                </ruleGroup>
+                            </ruleList>                             
+                        </throwError>
                         <throwError>
                             <text>Please use alphanumeric characters only</text>
                             <ruleList>
@@ -901,6 +923,8 @@ System variables provided by this component:
             <ruleList>
                 <platformTest type="windows"/>
                 <compareText text="${component(mysql).parameter(mysql_post_installation_script).value}" logic="does_not_equal" value="0"/>
+                <compareText text="${component(mysql).parameter(mysql_installation_type).value}" logic="equals" value="bundled"/>
+                <compareText text="${component(mysql).parameter(mysql_upgrade).value}" logic="equals" value="0"/>
             </ruleList>
         </actionGroup>
     </postInstallationActionList>
