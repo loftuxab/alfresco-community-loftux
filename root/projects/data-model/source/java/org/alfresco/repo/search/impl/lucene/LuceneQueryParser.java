@@ -101,6 +101,126 @@ import com.werken.saxpath.XPathReader;
  */
 public class LuceneQueryParser extends QueryParser
 {
+    /**
+     * 
+     */
+    private static final String FIELD_FTSSTATUS = "FTSSTATUS";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ISNOTNULL = "ISNOTNULL";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ISNULL = "ISNULL";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ISUNSET = "ISUNSET";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ALL = "ALL";
+
+    /**
+     * 
+     */
+    private static final String PROPERTY_FIELD_PREFIX = "@";
+
+    /**
+     * 
+     */
+    private static final String FIELD_EXACTASPECT = "EXACTASPECT";
+
+    /**
+     * 
+     */
+    private static final String FIELD_EXACTTYPE = "EXACTTYPE";
+
+    /**
+     * 
+     */
+    private static final String FIELD_TYPE = "TYPE";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ASPECT = "ASPECT";
+
+    /**
+     * 
+     */
+    private static final String FIELD_CLASS = "CLASS";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ASSOCTYPEQNAME = "ASSOCTYPEQNAME";
+
+    /**
+     * 
+     */
+    private static final String FIELD_PRIMARYASSOCTYPEQNAME = "PRIMARYASSOCTYPEQNAME";
+
+    /**
+     * 
+     */
+    private static final String FIELD_QNAME = "QNAME";
+
+    /**
+     * 
+     */
+    private static final String FIELD_PRIMARYPARENT = "PRIMARYPARENT";
+
+    /**
+     * 
+     */
+    private static final String FIELD_PARENT = "PARENT";
+
+    /**
+     * 
+     */
+    private static final String FIELD_TX = "TX";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ISNODE = "ISNODE";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ISCONTAINER = "ISCONTAINER";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ISROOT = "ISROOT";
+
+    /**
+     * 
+     */
+    private static final String FIELD_ID = "ID";
+
+    /**
+     * 
+     */
+    private static final String FIELD_TEXT = "TEXT";
+
+    /**
+     * 
+     */
+    private static final String FIELD_PATH_WITH_REPEATS = "PATH_WITH_REPEATS";
+
+    /**
+     * 
+     */
+    private static final String FIELD_PATH = "PATH";
+
     private static Log s_logger = LogFactory.getLog(LuceneQueryParser.class);
 
     private NamespacePrefixResolver namespacePrefixResolver;
@@ -345,7 +465,7 @@ public class LuceneQueryParser extends QueryParser
      */
     public Query getSpanQuery(String field, String first, String last, int slop, boolean inOrder)
     {
-        if (field.equals("TEXT"))
+        if (field.equals(FIELD_TEXT))
         {
             Set<String> text = searchParameters.getTextAttributes();
             if ((text == null) || (text.size() == 0))
@@ -354,7 +474,7 @@ public class LuceneQueryParser extends QueryParser
                 BooleanQuery query = new BooleanQuery();
                 for (QName qname : contentAttributes)
                 {
-                    Query part = getSpanQuery("@" + qname.toString(), first, last, slop, inOrder);
+                    Query part = getSpanQuery(PROPERTY_FIELD_PREFIX + qname.toString(), first, last, slop, inOrder);
                     query.add(part, Occur.SHOULD);
                 }
                 return query;
@@ -370,13 +490,13 @@ public class LuceneQueryParser extends QueryParser
                 return query;
             }
         }
-        else if (field.startsWith("@"))
+        else if (field.startsWith(PROPERTY_FIELD_PREFIX))
         {
             SpanQuery firstTerm = new SpanTermQuery(new Term(field, first));
             SpanQuery lastTerm = new SpanTermQuery(new Term(field, last));
             return new SpanNearQuery(new SpanQuery[] { firstTerm, lastTerm }, slop, inOrder);
         }
-        else if (field.equals("ALL"))
+        else if (field.equals(FIELD_ALL))
         {
             Set<String> all = searchParameters.getAllAttributes();
             if ((all == null) || (all.size() == 0))
@@ -385,7 +505,7 @@ public class LuceneQueryParser extends QueryParser
                 BooleanQuery query = new BooleanQuery();
                 for (QName qname : contentAttributes)
                 {
-                    Query part = getSpanQuery("@" + qname.toString(), first, last, slop, inOrder);
+                    Query part = getSpanQuery(PROPERTY_FIELD_PREFIX + qname.toString(), first, last, slop, inOrder);
                     query.add(part, Occur.SHOULD);
                 }
                 return query;
@@ -408,7 +528,7 @@ public class LuceneQueryParser extends QueryParser
             BooleanQuery query = new BooleanQuery();
             for (QName qname : contentAttributes)
             {
-                Query part = getSpanQuery("@" + qname.toString(), first, last, slop, inOrder);
+                Query part = getSpanQuery(PROPERTY_FIELD_PREFIX + qname.toString(), first, last, slop, inOrder);
                 query.add(part, Occur.SHOULD);
             }
             return query;
@@ -596,7 +716,6 @@ public class LuceneQueryParser extends QueryParser
     }
     
    
-    
     /**
      * @param field
      * @param queryText
@@ -609,378 +728,111 @@ public class LuceneQueryParser extends QueryParser
     {
         try
         {
-            if (field.equals("PATH"))
+            if (field.equals(FIELD_PATH))
             {
-                XPathReader reader = new XPathReader();
-                LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNamespacePrefixResolver(namespacePrefixResolver);
-                handler.setDictionaryService(dictionaryService);
-                reader.setXPathHandler(handler);
-                reader.parse(queryText);
-                PathQuery pathQuery = handler.getQuery();
-                pathQuery.setRepeats(false);
-                return pathQuery;
+                return createPathQuery(queryText, false);
             }
-            else if (field.equals("PATH_WITH_REPEATS"))
+            else if (field.equals(FIELD_PATH_WITH_REPEATS))
             {
-                XPathReader reader = new XPathReader();
-                LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNamespacePrefixResolver(namespacePrefixResolver);
-                handler.setDictionaryService(dictionaryService);
-                reader.setXPathHandler(handler);
-                reader.parse(queryText);
-                PathQuery pathQuery = handler.getQuery();
-                pathQuery.setRepeats(true);
-                return pathQuery;
+                return createPathQuery(queryText, true);
             }
-            else if (field.equals("TEXT"))
+            else if (field.equals(FIELD_TEXT))
             {
-                Set<String> text = searchParameters.getTextAttributes();
-                if ((text == null) || (text.size() == 0))
-                {
-                    Collection<QName> contentAttributes = dictionaryService.getAllProperties(DataTypeDefinition.CONTENT);
-                    BooleanQuery query = new BooleanQuery();
-                    for (QName qname : contentAttributes)
-                    {
-                        // The super implementation will create phrase queries etc if required
-                        Query part = getFieldQuery("@" + qname.toString(), queryText, analysisMode, luceneFunction);
-                        if (part != null)
-                        {
-                            query.add(part, Occur.SHOULD);
-                        }
-                        else
-                        {
-                            query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
-                        }
-                    }
-                    return query;
-                }
-                else
-                {
-                    BooleanQuery query = new BooleanQuery();
-                    for (String fieldName : text)
-                    {
-                        Query part = getFieldQuery(fieldName, queryText, analysisMode, luceneFunction);
-                        if (part != null)
-                        {
-                            query.add(part, Occur.SHOULD);
-                        }
-                        else
-                        {
-                            query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
-                        }
-                    }
-                    return query;
-                }
-
+                return createTextQuery(queryText, analysisMode, luceneFunction);
             }
-            else if (field.equals("ID"))
+            else if (field.equals(FIELD_ID))
             {
-                if (tenantService.isTenantUser() && (queryText.contains(StoreRef.URI_FILLER)))
-                {
-                    // assume NodeRef, since it contains StorRef URI filler
-                    queryText = tenantService.getName(new NodeRef(queryText)).toString();
-                }
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createIdQuery(queryText);
             }
-            else if (field.equals("ISROOT"))
+            else if (field.equals(FIELD_ISROOT))
             {
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createIsRootQuery(queryText);
             }
-            else if (field.equals("ISCONTAINER"))
+            else if (field.equals(FIELD_ISCONTAINER))
             {
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createIsContainerQuery(queryText);
             }
-            else if (field.equals("ISNODE"))
+            else if (field.equals(FIELD_ISNODE))
             {
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createIsNodeQuery(queryText);
             }
-            else if (field.equals("TX"))
+            else if (field.equals(FIELD_TX))
             {
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createTransactionQuery(queryText);
             }
-            else if (field.equals("PARENT"))
+            else if (field.equals(FIELD_PARENT))
             {
-                if (tenantService.isTenantUser() && (queryText.contains(StoreRef.URI_FILLER)))
-                {
-                    // assume NodeRef, since it contains StoreRef URI filler
-                    queryText = tenantService.getName(new NodeRef(queryText)).toString();
-                }
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createParentQuery(queryText);
             }
-            else if (field.equals("PRIMARYPARENT"))
+            else if (field.equals(FIELD_PRIMARYPARENT))
             {
-                if (tenantService.isTenantUser() && (queryText.contains(StoreRef.URI_FILLER)))
-                {
-                    // assume NodeRef, since it contains StoreRef URI filler
-                    queryText = tenantService.getName(new NodeRef(queryText)).toString();
-                }
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createPrimaryParentQuery(queryText);
             }
-            else if (field.equals("QNAME"))
+            else if (field.equals(FIELD_QNAME))
             {
-                XPathReader reader = new XPathReader();
-                LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNamespacePrefixResolver(namespacePrefixResolver);
-                handler.setDictionaryService(dictionaryService);
-                reader.setXPathHandler(handler);
-                reader.parse("//" + queryText);
-                return handler.getQuery();
+                return createQNameQuery(queryText);
             }
-            else if (field.equals("PRIMARYASSOCTYPEQNAME"))
+            else if (field.equals(FIELD_PRIMARYASSOCTYPEQNAME))
             {
-                XPathReader reader = new XPathReader();
-                LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNamespacePrefixResolver(namespacePrefixResolver);
-                handler.setDictionaryService(dictionaryService);
-                reader.setXPathHandler(handler);
-                reader.parse("//" + queryText);
-                PathQuery query = handler.getQuery();
-                query.setPathField("PATH");
-                query.setQnameField("PRIMARYASSOCTYPEQNAME");
-                return query;
+                return createPrimaryAssocTypeQNameQuery(queryText);
             }
-            else if (field.equals("ASSOCTYPEQNAME"))
+            else if (field.equals(FIELD_ASSOCTYPEQNAME))
             {
-                XPathReader reader = new XPathReader();
-                LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNamespacePrefixResolver(namespacePrefixResolver);
-                handler.setDictionaryService(dictionaryService);
-                reader.setXPathHandler(handler);
-                reader.parse("//" + queryText);
-                PathQuery query = handler.getQuery();
-                query.setPathField("PATH");
-                query.setQnameField("PRIMARYASSOCTYPEQNAME");
-                return query;
+                return createAssocTypeQNameQuery(queryText);
             }
-            else if (field.equals("CLASS"))
+            else if (field.equals(FIELD_CLASS))
             {
                 ClassDefinition target = matchClassDefinition(queryText);
                 if (target == null)
                 {
                     throw new LuceneQueryParserException("Invalid type: " + queryText);
                 }
-                return getFieldQuery(target.isAspect() ? "ASPECT" : "TYPE", queryText, analysisMode, luceneFunction);
+                return getFieldQuery(target.isAspect() ? FIELD_ASPECT : FIELD_TYPE, queryText, analysisMode, luceneFunction);
             }
-            else if (field.equals("TYPE"))
+            else if (field.equals(FIELD_TYPE))
             {
-                TypeDefinition target = matchTypeDefinition(queryText);
-                if (target == null)
-                {
-                    throw new LuceneQueryParserException("Invalid type: " + queryText);
-                }
-                Collection<QName> subclasses = dictionaryService.getSubTypes(target.getName(), true);
-                BooleanQuery booleanQuery = new BooleanQuery();
-                for (QName qname : subclasses)
-                {
-                    TypeDefinition current = dictionaryService.getType(qname);
-                    if (target.getName().equals(current.getName()) || current.getIncludedInSuperTypeQuery())
-                    {
-                        TermQuery termQuery = new TermQuery(new Term(field, qname.toString()));
-                        if (termQuery != null)
-                        {
-                            booleanQuery.add(termQuery, Occur.SHOULD);
-                        }
-                    }
-                }
-                return booleanQuery;
+                return createTypeQuery(queryText, false);
             }
-            else if (field.equals("EXACTTYPE"))
+            else if (field.equals(FIELD_EXACTTYPE))
             {
-                TypeDefinition target = matchTypeDefinition(queryText);
-                if (target == null)
-                {
-                    throw new LuceneQueryParserException("Invalid type: " + queryText);
-                }
-                QName targetQName = target.getName();
-                TermQuery termQuery = new TermQuery(new Term("TYPE", targetQName.toString()));
-                return termQuery;
-
+                return createTypeQuery(queryText, true);
             }
-            else if (field.equals("ASPECT"))
+            else if (field.equals(FIELD_ASPECT))
             {
-                AspectDefinition target = matchAspectDefinition(queryText);
-                if (target == null)
-                {
-                    // failed to find the aspect in the dictionary
-                    throw new AlfrescoRuntimeException("Unknown aspect specified in query: " + queryText);
-                }
-
-                Collection<QName> subclasses = dictionaryService.getSubAspects(target.getName(), true);
-
-                BooleanQuery booleanQuery = new BooleanQuery();
-                for (QName qname : subclasses)
-                {
-                    AspectDefinition current = dictionaryService.getAspect(qname);
-                    if (target.getName().equals(current.getName()) || current.getIncludedInSuperTypeQuery())
-                    {
-                        TermQuery termQuery = new TermQuery(new Term(field, qname.toString()));
-                        if (termQuery != null)
-                        {
-                            booleanQuery.add(termQuery, Occur.SHOULD);
-                        }
-                    }
-                }
-                return booleanQuery;
+                return createAspectQuery(queryText, false);
             }
-            else if (field.equals("EXACTASPECT"))
+            else if (field.equals(FIELD_EXACTASPECT))
             {
-                AspectDefinition target = matchAspectDefinition(queryText);
-                if (target == null)
-                {
-                    // failed to find the aspect in the dictionary
-                    throw new AlfrescoRuntimeException("Unknown aspect specified in query: " + queryText);
-                }
-
-                QName targetQName = target.getName();
-                TermQuery termQuery = new TermQuery(new Term("ASPECT", targetQName.toString()));
-
-                return termQuery;
+                return createAspectQuery(queryText, true);
             }
-            else if (field.startsWith("@"))
+            else if (field.startsWith(PROPERTY_FIELD_PREFIX))
             {
                 Query query = attributeQueryBuilder(field, queryText, new FieldQuery(), analysisMode, luceneFunction);
                 return query;
             }
-            else if (field.equals("ALL"))
+            else if (field.equals(FIELD_ALL))
             {
-                Set<String> all = searchParameters.getAllAttributes();
-                if ((all == null) || (all.size() == 0))
-                {
-                    Collection<QName> contentAttributes = dictionaryService.getAllProperties(null);
-                    BooleanQuery query = new BooleanQuery();
-                    for (QName qname : contentAttributes)
-                    {
-                        // The super implementation will create phrase queries etc if required
-                        Query part = getFieldQuery("@" + qname.toString(), queryText, analysisMode, luceneFunction);
-                        if (part != null)
-                        {
-                            query.add(part, Occur.SHOULD);
-                        }
-                        else
-                        {
-                            query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
-                        }
-                    }
-                    return query;
-                }
-                else
-                {
-                    BooleanQuery query = new BooleanQuery();
-                    for (String fieldName : all)
-                    {
-                        Query part = getFieldQuery(fieldName, queryText, analysisMode, luceneFunction);
-                        if (part != null)
-                        {
-                            query.add(part, Occur.SHOULD);
-                        }
-                        else
-                        {
-                            query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
-                        }
-                    }
-                    return query;
-                }
-
+                return createAllQuery(queryText, analysisMode, luceneFunction);
             }
-            else if (field.equals("ISUNSET"))
+            else if (field.equals(FIELD_ISUNSET))
             {
-                PropertyDefinition pd = matchPropertyDefinition(queryText);
-                if (pd != null)
-                {
-                    ClassDefinition containerClass = pd.getContainerClass();
-                    QName container = containerClass.getName();
-                    BooleanQuery query = new BooleanQuery();
-                    String classType = containerClass.isAspect() ? "ASPECT" : "TYPE";
-                    Query typeQuery = getFieldQuery(classType, container.toString(), analysisMode, luceneFunction);
-                    Query presenceQuery = getWildcardQuery("@" + pd.getName().toString(), "*");
-                    if ((typeQuery != null) && (presenceQuery != null))
-                    {
-                        query.add(typeQuery, Occur.MUST);
-                        query.add(presenceQuery, Occur.MUST_NOT);
-                    }
-                    return query;
-                }
-                else
-                {
-                    return getFieldQueryImpl(field, queryText, analysisMode, luceneFunction);
-                }
-
+                return createIsUnsetQuery(queryText, analysisMode, luceneFunction);
             }
-            else if (field.equals("ISNULL"))
+            else if (field.equals(FIELD_ISNULL))
             {
-                PropertyDefinition pd = matchPropertyDefinition(queryText);
-                if (pd != null)
-                {
-                    BooleanQuery query = new BooleanQuery();
-                    Query presenceQuery = getWildcardQuery("@" + pd.getName().toString(), "*");
-                    if (presenceQuery != null)
-                    {
-                        query.add(new MatchAllDocsQuery(), Occur.MUST);
-                        query.add(presenceQuery, Occur.MUST_NOT);
-                    }
-                    return query;
-                }
-                else
-                {
-                    return getFieldQueryImpl(field, queryText, analysisMode, luceneFunction);
-                }
-
+                return createIsNullQuery(queryText, analysisMode, luceneFunction);
             }
-            else if (field.equals("ISNOTNULL"))
+            else if (field.equals(FIELD_ISNOTNULL))
             {
-                PropertyDefinition pd = matchPropertyDefinition(queryText);
-                if (pd != null)
-                {
-                    ClassDefinition containerClass = pd.getContainerClass();
-                    QName container = containerClass.getName();
-                    BooleanQuery query = new BooleanQuery();
-                    String classType = containerClass.isAspect() ? "ASPECT" : "TYPE";
-                    Query typeQuery = getFieldQuery(classType, container.toString(), analysisMode, luceneFunction);
-                    Query presenceQuery = getWildcardQuery("@" + pd.getName().toString(), "*");
-                    if ((typeQuery != null) && (presenceQuery != null))
-                    {
-                        // query.add(typeQuery, Occur.MUST);
-                        query.add(presenceQuery, Occur.MUST);
-                    }
-                    return query;
-                }
-                else
-                {
-                    return getFieldQueryImpl(field, queryText, analysisMode, luceneFunction);
-                }
-
+                return createIsNotNull(queryText, analysisMode, luceneFunction);
             }
             else if (matchDataTypeDefinition(field) != null)
             {
-                Collection<QName> contentAttributes = dictionaryService.getAllProperties(matchDataTypeDefinition(field).getName());
-                BooleanQuery query = new BooleanQuery();
-                for (QName qname : contentAttributes)
-                {
-                    // The super implementation will create phrase queries etc if required
-                    Query part = getFieldQuery("@" + qname.toString(), queryText, analysisMode, luceneFunction);
-                    if (part != null)
-                    {
-                        query.add(part, Occur.SHOULD);
-                    }
-                    else
-                    {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
-                    }
-                }
-                return query;
+                return createDataTypeDefinitionQuery(field, queryText, analysisMode, luceneFunction);
             }
-            else if (field.equals("FTSSTATUS"))
+            else if (field.equals(FIELD_FTSSTATUS))
             {
-                TermQuery termQuery = new TermQuery(new Term(field, queryText));
-                return termQuery;
+                return createTermQuery(field, queryText);
             }
             else
             {
@@ -993,6 +845,365 @@ public class LuceneQueryParser extends QueryParser
             throw new ParseException("Failed to parse XPath...\n" + e.getMessage());
         }
 
+    }
+
+    protected Query createDataTypeDefinitionQuery(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
+    {
+        Collection<QName> contentAttributes = dictionaryService.getAllProperties(matchDataTypeDefinition(field).getName());
+        BooleanQuery query = new BooleanQuery();
+        for (QName qname : contentAttributes)
+        {
+            // The super implementation will create phrase queries etc if required
+            Query part = getFieldQuery(PROPERTY_FIELD_PREFIX + qname.toString(), queryText, analysisMode, luceneFunction);
+            if (part != null)
+            {
+                query.add(part, Occur.SHOULD);
+            }
+            else
+            {
+                query.add(createNoMatchQuery(), Occur.SHOULD);
+            }
+        }
+        return query;
+    }
+
+    protected Query createIsNotNull(String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
+    {
+        PropertyDefinition pd = matchPropertyDefinition(queryText);
+        if (pd != null)
+        {
+            ClassDefinition containerClass = pd.getContainerClass();
+            QName container = containerClass.getName();
+            BooleanQuery query = new BooleanQuery();
+            String classType = containerClass.isAspect() ? FIELD_ASPECT : FIELD_TYPE;
+            Query typeQuery = getFieldQuery(classType, container.toString(), analysisMode, luceneFunction);
+            Query presenceQuery = getWildcardQuery(PROPERTY_FIELD_PREFIX + pd.getName().toString(), "*");
+            if ((typeQuery != null) && (presenceQuery != null))
+            {
+                // query.add(typeQuery, Occur.MUST);
+                query.add(presenceQuery, Occur.MUST);
+            }
+            return query;
+        }
+        else
+        {
+            return getFieldQueryImpl(FIELD_ISNOTNULL, queryText, analysisMode, luceneFunction);
+        }
+    }
+
+    protected Query createIsNullQuery(String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
+    {
+        PropertyDefinition pd = matchPropertyDefinition(queryText);
+        if (pd != null)
+        {
+            BooleanQuery query = new BooleanQuery();
+            Query presenceQuery = getWildcardQuery(PROPERTY_FIELD_PREFIX + pd.getName().toString(), "*");
+            if (presenceQuery != null)
+            {
+                query.add(new MatchAllDocsQuery(), Occur.MUST);
+                query.add(presenceQuery, Occur.MUST_NOT);
+            }
+            return query;
+        }
+        else
+        {
+            return getFieldQueryImpl(FIELD_ISNULL, queryText, analysisMode, luceneFunction);
+        }
+    }
+
+    protected Query createIsUnsetQuery(String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
+    {
+        PropertyDefinition pd = matchPropertyDefinition(queryText);
+        if (pd != null)
+        {
+            ClassDefinition containerClass = pd.getContainerClass();
+            QName container = containerClass.getName();
+            BooleanQuery query = new BooleanQuery();
+            String classType = containerClass.isAspect() ? FIELD_ASPECT : FIELD_TYPE;
+            Query typeQuery = getFieldQuery(classType, container.toString(), analysisMode, luceneFunction);
+            Query presenceQuery = getWildcardQuery(PROPERTY_FIELD_PREFIX + pd.getName().toString(), "*");
+            if ((typeQuery != null) && (presenceQuery != null))
+            {
+                query.add(typeQuery, Occur.MUST);
+                query.add(presenceQuery, Occur.MUST_NOT);
+            }
+            return query;
+        }
+        else
+        {
+            return getFieldQueryImpl(FIELD_ISUNSET, queryText, analysisMode, luceneFunction);
+        }
+    }
+
+    protected Query createAllQuery(String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
+    {
+        Set<String> all = searchParameters.getAllAttributes();
+        if ((all == null) || (all.size() == 0))
+        {
+            Collection<QName> contentAttributes = dictionaryService.getAllProperties(null);
+            BooleanQuery query = new BooleanQuery();
+            for (QName qname : contentAttributes)
+            {
+                // The super implementation will create phrase queries etc if required
+                Query part = getFieldQuery(PROPERTY_FIELD_PREFIX + qname.toString(), queryText, analysisMode, luceneFunction);
+                if (part != null)
+                {
+                    query.add(part, Occur.SHOULD);
+                }
+                else
+                {
+                    query.add(createNoMatchQuery(), Occur.SHOULD);
+                }
+            }
+            return query;
+        }
+        else
+        {
+            BooleanQuery query = new BooleanQuery();
+            for (String fieldName : all)
+            {
+                Query part = getFieldQuery(fieldName, queryText, analysisMode, luceneFunction);
+                if (part != null)
+                {
+                    query.add(part, Occur.SHOULD);
+                }
+                else
+                {
+                    query.add(createNoMatchQuery(), Occur.SHOULD);
+                }
+            }
+            return query;
+        }
+    }
+
+    protected Query createAspectQuery(String queryText, boolean exactOnly)
+    {
+        AspectDefinition target = matchAspectDefinition(queryText);
+        if (target == null)
+        {
+            // failed to find the aspect in the dictionary
+            throw new AlfrescoRuntimeException("Unknown aspect specified in query: " + queryText);
+        }
+
+        if(exactOnly)
+        {
+            QName targetQName = target.getName();
+            TermQuery termQuery = new TermQuery(new Term(FIELD_ASPECT, targetQName.toString()));
+
+            return termQuery;
+        }
+        else
+        {
+            Collection<QName> subclasses = dictionaryService.getSubAspects(target.getName(), true);
+
+            BooleanQuery booleanQuery = new BooleanQuery();
+            for (QName qname : subclasses)
+            {
+                AspectDefinition current = dictionaryService.getAspect(qname);
+                if (target.getName().equals(current.getName()) || current.getIncludedInSuperTypeQuery())
+                {
+                    TermQuery termQuery = new TermQuery(new Term(FIELD_ASPECT, qname.toString()));
+                    if (termQuery != null)
+                    {
+                        booleanQuery.add(termQuery, Occur.SHOULD);
+                    }
+                }
+            }
+            return booleanQuery;
+        }
+        
+        
+
+
+     
+    }
+
+    protected Query createTypeQuery(String queryText, boolean exactOnly)
+    {
+        TypeDefinition target = matchTypeDefinition(queryText);
+        if (target == null)
+        {
+            throw new LuceneQueryParserException("Invalid type: " + queryText);
+        }
+        if(exactOnly)
+        {
+            QName targetQName = target.getName();
+            TermQuery termQuery = new TermQuery(new Term(FIELD_TYPE, targetQName.toString()));
+            return termQuery;
+        }
+        else
+        {
+            Collection<QName> subclasses = dictionaryService.getSubTypes(target.getName(), true);
+            BooleanQuery booleanQuery = new BooleanQuery();
+            for (QName qname : subclasses)
+            {
+                TypeDefinition current = dictionaryService.getType(qname);
+                if (target.getName().equals(current.getName()) || current.getIncludedInSuperTypeQuery())
+                {
+                    TermQuery termQuery = new TermQuery(new Term(FIELD_TYPE, qname.toString()));
+                    if (termQuery != null)
+                    {
+                        booleanQuery.add(termQuery, Occur.SHOULD);
+                    }
+                }
+            }
+            return booleanQuery;
+        }
+    }
+
+    protected Query createAssocTypeQNameQuery(String queryText) throws SAXPathException
+    {
+        // This was broken and using only FIELD_PRIMARYASSOCTYPEQNAME
+        // The field was also not indexed correctly.
+        // We do both for backward compatability ...
+        BooleanQuery booleanQuery = new BooleanQuery();
+        
+        XPathReader reader = new XPathReader();
+        LuceneXPathHandler handler = new LuceneXPathHandler();
+        handler.setNamespacePrefixResolver(namespacePrefixResolver);
+        handler.setDictionaryService(dictionaryService);
+        reader.setXPathHandler(handler);
+        reader.parse("//" + queryText);
+        PathQuery query = handler.getQuery();
+        query.setPathField(FIELD_PATH);
+        query.setQnameField(FIELD_ASSOCTYPEQNAME);
+        
+        booleanQuery.add(query, Occur.SHOULD);
+        booleanQuery.add(createPrimaryAssocTypeQNameQuery(queryText), Occur.SHOULD);
+        
+        return booleanQuery;
+    }
+    
+    protected Query createPrimaryAssocTypeQNameQuery(String queryText) throws SAXPathException
+    {
+        XPathReader reader = new XPathReader();
+        LuceneXPathHandler handler = new LuceneXPathHandler();
+        handler.setNamespacePrefixResolver(namespacePrefixResolver);
+        handler.setDictionaryService(dictionaryService);
+        reader.setXPathHandler(handler);
+        reader.parse("//" + queryText);
+        PathQuery query = handler.getQuery();
+        query.setPathField(FIELD_PATH);
+        query.setQnameField(FIELD_PRIMARYASSOCTYPEQNAME);
+        return query;
+    }
+
+    protected Query createQNameQuery(String queryText) throws SAXPathException
+    {
+        XPathReader reader = new XPathReader();
+        LuceneXPathHandler handler = new LuceneXPathHandler();
+        handler.setNamespacePrefixResolver(namespacePrefixResolver);
+        handler.setDictionaryService(dictionaryService);
+        reader.setXPathHandler(handler);
+        reader.parse("//" + queryText);
+        return handler.getQuery();
+    }
+
+    protected Query createTransactionQuery(String queryText)
+    {
+        return createTermQuery(FIELD_TX, queryText);
+    }
+    
+    protected Query createIsNodeQuery(String queryText)
+    {
+        return createTermQuery(FIELD_ISNODE, queryText);
+    }
+    
+    protected Query createIsContainerQuery(String queryText)
+    {
+        return createTermQuery(FIELD_ISCONTAINER, queryText);
+    }
+
+    
+    protected Query createIsRootQuery(String queryText)
+    {
+        return createTermQuery(FIELD_ISROOT, queryText);
+    }
+
+    private Query createTermQuery(String field, String queryText)
+    {
+        TermQuery termQuery = new TermQuery(new Term(field, queryText));
+        return termQuery;
+    }
+  
+    protected Query createPrimaryParentQuery(String queryText)
+    {
+       return createNodeRefQuery(FIELD_PRIMARYPARENT, queryText);
+    }
+    
+    protected Query createParentQuery(String queryText)
+    {
+       return createNodeRefQuery(FIELD_PARENT, queryText);
+    }
+    
+    protected Query createIdQuery(String queryText)
+    {
+       return createNodeRefQuery(FIELD_ID, queryText);
+    }
+    
+    private Query createNodeRefQuery(String field, String queryText)
+    {
+        if (tenantService.isTenantUser() && (queryText.contains(StoreRef.URI_FILLER)))
+        {
+            // assume NodeRef, since it contains StorRef URI filler
+            queryText = tenantService.getName(new NodeRef(queryText)).toString();
+        }
+        return createTermQuery(field, queryText);
+    }
+
+
+    protected Query createPathQuery(String queryText, boolean withRepeats) throws SAXPathException
+    {
+        XPathReader reader = new XPathReader();
+        LuceneXPathHandler handler = new LuceneXPathHandler();
+        handler.setNamespacePrefixResolver(namespacePrefixResolver);
+        handler.setDictionaryService(dictionaryService);
+        reader.setXPathHandler(handler);
+        reader.parse(queryText);
+        PathQuery pathQuery = handler.getQuery();
+        pathQuery.setRepeats(withRepeats);
+        return pathQuery;
+    }
+    
+    protected Query createTextQuery(String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
+    {
+        Set<String> text = searchParameters.getTextAttributes();
+        if ((text == null) || (text.size() == 0))
+        {
+            Collection<QName> contentAttributes = dictionaryService.getAllProperties(DataTypeDefinition.CONTENT);
+            BooleanQuery query = new BooleanQuery();
+            for (QName qname : contentAttributes)
+            {
+                // The super implementation will create phrase queries etc if required
+                Query part = getFieldQuery(PROPERTY_FIELD_PREFIX + qname.toString(), queryText, analysisMode, luceneFunction);
+                if (part != null)
+                {
+                    query.add(part, Occur.SHOULD);
+                }
+                else
+                {
+                    query.add(createNoMatchQuery(), Occur.SHOULD);
+                }
+            }
+            return query;
+        }
+        else
+        {
+            BooleanQuery query = new BooleanQuery();
+            for (String fieldName : text)
+            {
+                Query part = getFieldQuery(fieldName, queryText, analysisMode, luceneFunction);
+                if (part != null)
+                {
+                    query.add(part, Occur.SHOULD);
+                }
+                else
+                {
+                    query.add(createNoMatchQuery(), Occur.SHOULD);
+                }
+            }
+            return query;
+        }
     }
 
     private Query getFieldQueryImpl(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
@@ -1010,7 +1221,7 @@ public class LuceneQueryParser extends QueryParser
         boolean requiresMLTokenDuplication = false;
         String testText = queryText;
         String localeString = null;
-        if (field.startsWith("@"))
+        if (field.startsWith(PROPERTY_FIELD_PREFIX))
         {
             if ((queryText.length() > 0) && (queryText.charAt(0) == '\u0000'))
             {
@@ -1638,7 +1849,7 @@ public class LuceneQueryParser extends QueryParser
     public Query getRangeQuery(String field, String part1, String part2, boolean includeLower, boolean includeUpper, AnalysisMode analysisMode, LuceneFunction luceneFunction)
             throws ParseException
     {
-        if (field.equals("TEXT"))
+        if (field.equals(FIELD_TEXT))
         {
             Set<String> text = searchParameters.getTextAttributes();
             if ((text == null) || (text.size() == 0))
@@ -1648,14 +1859,14 @@ public class LuceneQueryParser extends QueryParser
                 for (QName qname : contentAttributes)
                 {
                     // The super implementation will create phrase queries etc if required
-                    Query part = getRangeQuery("@" + qname.toString(), part1, part2, includeLower, includeUpper, analysisMode, luceneFunction);
+                    Query part = getRangeQuery(PROPERTY_FIELD_PREFIX + qname.toString(), part1, part2, includeLower, includeUpper, analysisMode, luceneFunction);
                     if (part != null)
                     {
                         query.add(part, Occur.SHOULD);
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
@@ -1672,7 +1883,7 @@ public class LuceneQueryParser extends QueryParser
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
@@ -1680,17 +1891,17 @@ public class LuceneQueryParser extends QueryParser
 
         }
 
-        if (field.startsWith("@"))
+        if (field.startsWith(PROPERTY_FIELD_PREFIX))
         {
             String fieldName;
             PropertyDefinition propertyDef = matchPropertyDefinition(field.substring(1));
             if(propertyDef != null)
             {
-                fieldName = "@" + propertyDef.getName();
+                fieldName = PROPERTY_FIELD_PREFIX + propertyDef.getName();
             }
             else
             {
-                fieldName = expandAttributeFieldNamex(field);
+                fieldName = expandAttributeFieldName(field);
             }
             
             IndexTokenisationMode tokenisationMode = IndexTokenisationMode.TRUE;
@@ -1871,7 +2082,7 @@ public class LuceneQueryParser extends QueryParser
                                 }
                                 else
                                 {
-                                    return new TermQuery(new Term("NO_TOKENS", "__"));
+                                    return createNoMatchQuery();
                                 }
                             }
                         }
@@ -1915,7 +2126,7 @@ public class LuceneQueryParser extends QueryParser
                                 }
                                 else
                                 {
-                                    return new TermQuery(new Term("NO_TOKENS", "__"));
+                                    return createNoMatchQuery();
                                 }
                             }
                         }
@@ -1978,7 +2189,7 @@ public class LuceneQueryParser extends QueryParser
 
         if (booleanQuery.getClauses().length == 0)
         {
-            booleanQuery.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+            booleanQuery.add(createNoMatchQuery(), Occur.SHOULD);
         }
     }
 
@@ -2009,7 +2220,7 @@ public class LuceneQueryParser extends QueryParser
             else
             {
                 // No match
-                return new TermQuery(new Term("NO_TOKENS", "__"));
+                return createNoMatchQuery();
             }
         case UPPER:
             if (testLowerTermText.equals(testLowerTermText.toUpperCase()) && testUpperTermText.equals(testUpperTermText.toUpperCase()))
@@ -2019,7 +2230,7 @@ public class LuceneQueryParser extends QueryParser
             else
             {
                 // No match
-                return new TermQuery(new Term("NO_TOKENS", "__"));
+                return createNoMatchQuery();
             }
         default:
             throw new UnsupportedOperationException("Unsupported Lucene Function " + luceneFunction);
@@ -2058,7 +2269,7 @@ public class LuceneQueryParser extends QueryParser
 
         if (booleanQuery.getClauses().length == 0)
         {
-            booleanQuery.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+            booleanQuery.add(createNoMatchQuery(), Occur.SHOULD);
         }
     }
 
@@ -2099,7 +2310,7 @@ public class LuceneQueryParser extends QueryParser
                                     }
                                     else
                                     {
-                                        return new TermQuery(new Term("NO_TOKENS", "__"));
+                                        return createNoMatchQuery();
                                     }
                                 }
                                 else
@@ -2720,9 +2931,9 @@ public class LuceneQueryParser extends QueryParser
         }
     }
 
-    private String expandAttributeFieldNamex(String field)
+    private String expandAttributeFieldName(String field)
     {
-        return "@"+expandQName(field.substring(1));
+        return PROPERTY_FIELD_PREFIX+expandQName(field.substring(1));
     }
 
     private String expandQName(String qnameString)
@@ -2825,11 +3036,11 @@ public class LuceneQueryParser extends QueryParser
     @Override
     public Query getPrefixQuery(String field, String termStr) throws ParseException
     {
-        if (field.startsWith("@"))
+        if (field.startsWith(PROPERTY_FIELD_PREFIX))
         {
             return attributeQueryBuilder(field, termStr, new PrefixQuery(), AnalysisMode.PREFIX, LuceneFunction.FIELD);
         }
-        else if (field.equals("TEXT"))
+        else if (field.equals(FIELD_TEXT))
         {
             Set<String> text = searchParameters.getTextAttributes();
             if ((text == null) || (text.size() == 0))
@@ -2839,14 +3050,14 @@ public class LuceneQueryParser extends QueryParser
                 for (QName qname : contentAttributes)
                 {
                     // The super implementation will create phrase queries etc if required
-                    Query part = getPrefixQuery("@" + qname.toString(), termStr);
+                    Query part = getPrefixQuery(PROPERTY_FIELD_PREFIX + qname.toString(), termStr);
                     if (part != null)
                     {
                         query.add(part, Occur.SHOULD);
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
@@ -2863,13 +3074,13 @@ public class LuceneQueryParser extends QueryParser
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
             }
         }
-        else if (field.equals("ID"))
+        else if (field.equals(FIELD_ID))
         {
             boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
             try
@@ -2882,7 +3093,7 @@ public class LuceneQueryParser extends QueryParser
                 setLowercaseExpandedTerms(lowercaseExpandedTerms);
             }
         }
-        else if (field.equals("PARENT"))
+        else if (field.equals(FIELD_PARENT))
         {
             boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
             try
@@ -2909,12 +3120,12 @@ public class LuceneQueryParser extends QueryParser
 
     private Query getWildcardQuery(String field, String termStr, AnalysisMode analysisMode) throws ParseException
     {
-        if (field.startsWith("@"))
+        if (field.startsWith(PROPERTY_FIELD_PREFIX))
         {
             return attributeQueryBuilder(field, termStr, new WildcardQuery(), analysisMode, LuceneFunction.FIELD);
         }
 
-        else if (field.equals("TEXT"))
+        else if (field.equals(FIELD_TEXT))
         {
             Set<String> text = searchParameters.getTextAttributes();
             if ((text == null) || (text.size() == 0))
@@ -2924,14 +3135,14 @@ public class LuceneQueryParser extends QueryParser
                 for (QName qname : contentAttributes)
                 {
                     // The super implementation will create phrase queries etc if required
-                    Query part = getWildcardQuery("@" + qname.toString(), termStr);
+                    Query part = getWildcardQuery(PROPERTY_FIELD_PREFIX + qname.toString(), termStr);
                     if (part != null)
                     {
                         query.add(part, Occur.SHOULD);
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
@@ -2948,13 +3159,13 @@ public class LuceneQueryParser extends QueryParser
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
             }
         }
-        else if (field.equals("ID"))
+        else if (field.equals(FIELD_ID))
         {
             boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
             try
@@ -2967,7 +3178,7 @@ public class LuceneQueryParser extends QueryParser
                 setLowercaseExpandedTerms(lowercaseExpandedTerms);
             }
         }
-        else if (field.equals("PARENT"))
+        else if (field.equals(FIELD_PARENT))
         {
             boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
             try
@@ -2989,12 +3200,12 @@ public class LuceneQueryParser extends QueryParser
     @Override
     public Query getFuzzyQuery(String field, String termStr, float minSimilarity) throws ParseException
     {
-        if (field.startsWith("@"))
+        if (field.startsWith(PROPERTY_FIELD_PREFIX))
         {
             return attributeQueryBuilder(field, termStr, new FuzzyQuery(minSimilarity), AnalysisMode.FUZZY, LuceneFunction.FIELD);
         }
 
-        else if (field.equals("TEXT"))
+        else if (field.equals(FIELD_TEXT))
         {
             Set<String> text = searchParameters.getTextAttributes();
             if ((text == null) || (text.size() == 0))
@@ -3004,14 +3215,14 @@ public class LuceneQueryParser extends QueryParser
                 for (QName qname : contentAttributes)
                 {
                     // The super implementation will create phrase queries etc if required
-                    Query part = getFuzzyQuery("@" + qname.toString(), termStr, minSimilarity);
+                    Query part = getFuzzyQuery(PROPERTY_FIELD_PREFIX + qname.toString(), termStr, minSimilarity);
                     if (part != null)
                     {
                         query.add(part, Occur.SHOULD);
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
@@ -3028,13 +3239,13 @@ public class LuceneQueryParser extends QueryParser
                     }
                     else
                     {
-                        query.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                        query.add(createNoMatchQuery(), Occur.SHOULD);
                     }
                 }
                 return query;
             }
         }
-        else if (field.equals("ID"))
+        else if (field.equals(FIELD_ID))
         {
             boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
             try
@@ -3047,7 +3258,7 @@ public class LuceneQueryParser extends QueryParser
                 setLowercaseExpandedTerms(lowercaseExpandedTerms);
             }
         }
-        else if (field.equals("PARENT"))
+        else if (field.equals(FIELD_PARENT))
         {
             boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
             try
@@ -3249,12 +3460,12 @@ public class LuceneQueryParser extends QueryParser
             {
                 tokenisationMode = IndexTokenisationMode.TRUE;
             }
-            expandedFieldName = "@"+propertyDef.getName()+ending;
+            expandedFieldName = PROPERTY_FIELD_PREFIX+propertyDef.getName()+ending;
             propertyQName = propertyDef.getName();
         }
         else
         {
-            expandedFieldName = expandAttributeFieldNamex(field);
+            expandedFieldName = expandAttributeFieldName(field);
             propertyQName = QName.createQName(propertyFieldName);
         }
         
@@ -3434,7 +3645,7 @@ public class LuceneQueryParser extends QueryParser
                             }
                             else
                             {
-                                subQuery.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                                subQuery.add(createNoMatchQuery(), Occur.SHOULD);
                             }
                         }
                         else
@@ -3446,7 +3657,7 @@ public class LuceneQueryParser extends QueryParser
                             }
                             else
                             {
-                                subQuery.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+                                subQuery.add(createNoMatchQuery(), Occur.SHOULD);
                             }
                         }
                     }
@@ -3463,7 +3674,7 @@ public class LuceneQueryParser extends QueryParser
                 }
                 else
                 {
-                    return new TermQuery(new Term("NO_TOKENS", "__"));
+                    return createNoMatchQuery();
                 }
             }
 
@@ -3577,7 +3788,7 @@ public class LuceneQueryParser extends QueryParser
             }
             else
             {
-                return new TermQuery(new Term("NO_TOKENS", "__"));
+                return createNoMatchQuery();
             }
         }
     }
@@ -3596,7 +3807,7 @@ public class LuceneQueryParser extends QueryParser
 
         if (booleanQuery.getClauses().length == 0)
         {
-            booleanQuery.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+            booleanQuery.add(createNoMatchQuery(), Occur.SHOULD);
         }
     }
 
@@ -3612,7 +3823,7 @@ public class LuceneQueryParser extends QueryParser
         }
         else
         {
-            booleanQuery.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+            booleanQuery.add(createNoMatchQuery(), Occur.SHOULD);
         }
     }
 
@@ -3729,7 +3940,7 @@ public class LuceneQueryParser extends QueryParser
 
         if (booleanQuery.getClauses().length == 0)
         {
-            booleanQuery.add(new TermQuery(new Term("NO_TOKENS", "__")), Occur.SHOULD);
+            booleanQuery.add(createNoMatchQuery(), Occur.SHOULD);
         }
     }
 
@@ -3751,7 +3962,7 @@ public class LuceneQueryParser extends QueryParser
             else
             {
                 // No match
-                return new TermQuery(new Term("NO_TOKENS", "__"));
+                return createNoMatchQuery();
             }
         case UPPER:
             if (testText.equals(testText.toUpperCase()))
@@ -3761,12 +3972,17 @@ public class LuceneQueryParser extends QueryParser
             else
             {
                 // No match
-                return new TermQuery(new Term("NO_TOKENS", "__"));
+                return createNoMatchQuery();
             }
         default:
             throw new UnsupportedOperationException("Unsupported Lucene Function " + luceneFunction);
 
         }
+    }
+
+    protected TermQuery createNoMatchQuery()
+    {
+        return new TermQuery(new Term("NO_TOKENS", "__"));
     }
 
     public static void main(String[] args) throws ParseException, java.text.ParseException
