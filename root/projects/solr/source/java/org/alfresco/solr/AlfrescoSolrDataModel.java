@@ -19,7 +19,10 @@
 package org.alfresco.solr;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -36,13 +39,28 @@ import org.alfresco.repo.search.impl.lucene.LuceneAnalyser;
 import org.alfresco.repo.search.impl.lucene.LuceneFunction;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.search.impl.lucene.analysis.DateTimeAnalyser;
+import org.alfresco.repo.search.impl.parsers.AlfrescoFunctionEvaluationContext;
+import org.alfresco.repo.search.impl.parsers.FTSParser;
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
+import org.alfresco.repo.search.impl.querymodel.Constraint;
+import org.alfresco.repo.search.impl.querymodel.Ordering;
+import org.alfresco.repo.search.impl.querymodel.QueryEngineResults;
+import org.alfresco.repo.search.impl.querymodel.QueryModelFactory;
+import org.alfresco.repo.search.impl.querymodel.QueryOptions;
+import org.alfresco.repo.search.impl.querymodel.QueryOptions.Connective;
+import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryBuilder;
+import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryBuilderContext;
+import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryModelFactory;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.search.LimitBy;
+import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO9075;
 import org.apache.lucene.document.Field;
@@ -53,6 +71,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.function.FieldScoreQuery;
 import org.apache.solr.schema.SchemaField;
 import org.dom4j.io.XMLWriter;
 import org.xml.sax.SAXException;
@@ -479,6 +498,7 @@ public class AlfrescoSolrDataModel
 
     public LuceneQueryParser getLuceneQueryParser(String defaultField, String query, Operator defaultOperator,  IndexReader indexReader)
     {
+        // TODO: Ordering
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
         searchParameters.setQuery(query);
@@ -494,6 +514,66 @@ public class AlfrescoSolrDataModel
         parser.setAllowLeadingWildcard(true);
         
         return parser;
+    }
+    
+    public Query getFTSQuery(String defaultField, String query, Operator defaultOperator,  IndexReader indexReader) throws ParseException
+    {
+        QueryModelFactory factory = new LuceneQueryModelFactory();
+        AlfrescoFunctionEvaluationContext functionContext = new AlfrescoFunctionEvaluationContext(namespaceDAO,dictionaryComponent,
+                NamespaceService.CONTENT_MODEL_1_0_URI);
+
+        FTSParser.Mode mode;
+
+        if(defaultOperator == Operator.AND)
+        {
+            mode = FTSParser.Mode.DEFAULT_CONJUNCTION;
+        }
+        else
+        {
+            mode = FTSParser.Mode.DEFAULT_DISJUNCTION;
+        }
+
+        Constraint constraint = FTSQueryParser.buildFTS(query, factory, functionContext, null, null, mode,defaultOperator == Operator.OR ? Connective.OR : Connective.AND,
+                new HashMap<String, String>(), defaultField);
+        org.alfresco.repo.search.impl.querymodel.Query queryModelQuery = factory.createQuery(null, null, constraint, new ArrayList<Ordering>());
+
+        LuceneQueryBuilder builder = (LuceneQueryBuilder) queryModelQuery;
+        
+        /* 
+         * Used for:
+         * locale
+         * TEXT
+         * ALL
+         * default ML mode
+         * namespace
+         */
+        
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.setMlAnalaysisMode(getMLAnalysisMode());
+        searchParameters.setNamespace( NamespaceService.CONTENT_MODEL_1_0_URI);
+        
+        LuceneQueryBuilderContext luceneContext = new LuceneQueryBuilderContext(dictionaryComponent, namespaceDAO, tenantService, searchParameters, getMLAnalysisMode(),
+                indexReader);
+        
+        Set<String> selectorGroup = null;
+        if (queryModelQuery.getSource() != null)
+        {
+            List<Set<String>> selectorGroups = queryModelQuery.getSource().getSelectorGroups(functionContext);
+
+            if (selectorGroups.size() == 0)
+            {
+                throw new UnsupportedOperationException("No selectors");
+            }
+
+            if (selectorGroups.size() > 1)
+            {
+                throw new UnsupportedOperationException("Advanced join is not supported");
+            }
+
+            selectorGroup = selectorGroups.get(0);
+        }
+        Query luceneQuery = builder.buildQuery(selectorGroup, luceneContext, functionContext);
+        return luceneQuery; 
     }
 
 }
