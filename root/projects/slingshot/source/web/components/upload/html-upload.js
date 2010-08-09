@@ -79,7 +79,8 @@
          thumbnails: null,
          uploadURL: null,
          username: null,
-         suppressRefreshEvent: false
+         suppressRefreshEvent: false,
+         adobeFlashEnabled: true
       };
       this.showConfig = {};
 
@@ -262,7 +263,7 @@
          {
             this.showConfig.uploadDirectory = "/";
          }
-
+         
          // Enable the Esc key listener
          this.widgets.escapeListener.enable();
 
@@ -401,8 +402,13 @@
          }
          else
          {
-            // Show the help label for single uploads
-            Dom.removeClass(this.widgets.singleUploadTip, "hidden");
+            // Only show the "Install Flash" message if Flash is enabled via config
+            Dom.addClass(this.widgets.singleUploadTip, "hidden");
+            if (this.showConfig.adobeFlashEnabled)
+            {
+               // Show the help label for single uploads
+               Dom.removeClass(this.widgets.singleUploadTip, "hidden");
+            }
             Dom.addClass(this.widgets.singleUpdateTip, "hidden");
          }
 
