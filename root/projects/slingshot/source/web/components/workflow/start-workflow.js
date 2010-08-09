@@ -139,7 +139,6 @@
       {
          var formEl = Dom.get(this.id + "-workflowFormContainer");
          formEl.innerHTML = response.serverResponse.responseText;
-         Alfresco.util.YUILoaderHelper.loadComponents();
       }
 
    });
