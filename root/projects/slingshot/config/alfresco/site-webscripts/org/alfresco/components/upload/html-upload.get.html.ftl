@@ -20,10 +20,8 @@
          <input type="hidden" id="${args.htmlid}-failureCallback-hidden" name="failureCallback" value=""/>
          <input type="hidden" id="${args.htmlid}-failureScope-hidden" name="failureScope" value=""/>
 
-         <p>
-            <span id="${args.htmlid}-singleUploadTip-span">${msg("label.singleUploadTip")}</span>
-            <span id="${args.htmlid}-singleUpdateTip-span">${msg("label.singleUpdateTip")}</span>
-         </p>
+         <p id="${args.htmlid}-singleUploadTip-span">${msg("label.singleUploadTip")}</p>
+         <p id="${args.htmlid}-singleUpdateTip-span">${msg("label.singleUpdateTip")}</p>
 
          <div>
             <div class="yui-g">
