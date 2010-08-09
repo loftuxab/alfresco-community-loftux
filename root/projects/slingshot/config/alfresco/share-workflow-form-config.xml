@@ -35,8 +35,7 @@
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
                <field id="packageItems" label-id="workflow.field.items" set="assignee">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
+                  <control template="/org/alfresco/components/form/packageitems.ftl">
                      <control-param name="selectedValueContextProperty">selectedItems</control-param>
                   </control>
                </field>
@@ -68,8 +67,7 @@
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
                <field id="packageItems" label-id="workflow.field.items">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
+                  <control template="/org/alfresco/components/form/packageitems.ftl">
                      <control-param name="selectedValueContextProperty">selectedItems</control-param>
                   </control>
                </field>
@@ -102,8 +100,7 @@
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
                <field id="packageItems" label-id="workflow.field.items">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
+                  <control template="/org/alfresco/components/form/packageitems.ftl">
                      <control-param name="selectedValueContextProperty">selectedItems</control-param>
                   </control>
                </field>
@@ -280,9 +277,7 @@
                
                <field id="bpm:status" set="progress" />
                <field id="packageItems" label-id="workflow.field.items" set="progress">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
-                  </control>
+                  <control template="/org/alfresco/components/form/packageitems.ftl"/>
                </field>
                
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
@@ -326,9 +321,7 @@
                </field>
                
                <field id="packageItems" label-id="workflow.field.items">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
-                  </control>
+                  <control template="/org/alfresco/components/form/packageitems.ftl"/>
                </field>
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
@@ -374,9 +367,7 @@
                
                <field id="bpm:status" set="progress" />
                <field id="packageItems" label-id="workflow.field.items" set="progress">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
-                  </control>
+                  <control template="/org/alfresco/components/form/packageitems.ftl"/>
                </field>
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
@@ -419,9 +410,7 @@
                </field>
                
                <field id="packageItems" label-id="workflow.field.items">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
-                  </control>
+                  <control template="/org/alfresco/components/form/packageitems.ftl"/>
                </field>
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
@@ -464,9 +453,7 @@
                </field>
                
                <field id="packageItems" label-id="workflow.field.items">
-                  <control>
-                     <control-param name="displayMode">list</control-param>
-                  </control>
+                  <control template="/org/alfresco/components/form/packageitems.ftl"/>
                </field>
                <field id="bpm:comment" label-id="workflow.field.comment" set="response">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />

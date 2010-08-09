@@ -22,10 +22,9 @@
 //]]></script>
 
 <div class="form-field">
-   <input type="hidden" id="${fieldHtmlId}" name="-" value="${fieldValue?html}" />
    <#if form.mode == "view">
       <div id="${controlId}" class="viewmode-field">
-         <#if (field.endpointMandatory!false || field.mandatory!false) && fieldValue == "">
+         <#if (field.endpointMandatory!false || field.mandatory!false) && field.value == "">
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
@@ -38,16 +37,11 @@
          
          <div id="${controlId}-currentValueDisplay" class="current-values"></div>
          
-         <#if form.mode != "view" && field.disabled == false>
+         <#if field.disabled == false>
+            <input type="hidden" id="${fieldHtmlId}" name="-" value="${field.value?html}" />
             <input type="hidden" id="${controlId}-added" name="${field.name}_added" />
             <input type="hidden" id="${controlId}-removed" name="${field.name}_removed" />
-            <div class="show-picker">
-               <span id="${controlId}-showPicker-button" class="yui-button yui-push-button">
-                  <span class="first-child">
-                     <button>${msg("button.select")}</button>
-                  </span>
-               </span>
-            </div>
+            <div id="${controlId}-itemGroupActions" class="show-picker"></div>
          
             <@renderPickerHTML controlId />
          </#if>

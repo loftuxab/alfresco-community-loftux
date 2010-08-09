@@ -1,8 +1,7 @@
 .object-finder-list
 {
    display: block;
-   height: 9em;
-   width: 30em;
+   height: 9.5em;
    overflow-x: hidden;
    overflow-y: scroll;
    margin-bottom: 0.5em;
@@ -10,7 +9,7 @@
 
 .current-values.object-finder-list table
 {
-   width: 28.8em;
+   width: 100%;
    table-layout: fixed;
    border: none;
 }
@@ -27,17 +26,34 @@
 
 .current-values.object-finder-list table td.yui-dt-col-nodeRef
 {
-   width: 4em;
+   width: 10%;
+}
+
+.current-values.object-finder-list table td.yui-dt-col-nodeRef .yui-dt-liner div
+{
+   text-align: center;
+}
+
+.current-values.object-finder-list table td.yui-dt-col-name .yui-dt-liner div
+{
+   display: block;
 }
 
 .current-values.object-finder-list table td.yui-dt-col-name
 {
-   width: 16em;
+
 }
 
 .current-values.object-finder-list table td.yui-dt-col-action
 {
-   width: 8em;
+   width: 30%;
+}
+
+.current-values.object-finder-list table td.yui-dt-col-name .yui-dt-liner div
+{
+   padding-left: 0;
+   padding-right: 0;
+   padding-bottom: 0;
 }
 
 .current-values.object-finder-list table td.yui-dt-col-action .remove-list-item
@@ -46,9 +62,14 @@
    background: url(../form/images/remove-icon-16.png) no-repeat left;
 }
 
+.current-values.object-finder-list table td.yui-dt-col-action .view_more_document_actions
+{
+   padding: 1em 1.5em;
+   background: url(../form/images/plus-16.png) no-repeat left;
+}
+
 .current-values.object-finder-list div
 {
-   float: left;
    padding: 0.5em;
 }
 
