@@ -53,8 +53,7 @@
       <input type="text" class="terms" name="${el}-search-text" id="${el}-search-text" value="" maxlength="1024" />
    </div>
    
-   <div class="share-form form-container">
-      <div id="${el}-form" class="form-fields"></div>
+   <div id="${el}-forms" class="forms-container form-fields">
    </div>
    
 </div>
