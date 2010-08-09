@@ -17,7 +17,7 @@
 
    <#if form.data['prop_bpm_packageItemActionGroup']?? && form.data['prop_bpm_packageItemActionGroup']?is_string && form.data['prop_bpm_packageItemActionGroup']?length &gt; 0>
       <#local packageItemActionGroup = form.data['prop_bpm_packageItemActionGroup']>
-      <#local viewMoreActionsLink>function(item){ return Alfresco.constants.URL_PAGECONTEXT + (item.site ? "site/" + item.site : "") + "document-details?nodeRef=" + item.nodeRef; }</#local>
+      <#local viewMoreActionsLink>function(item){ return Alfresco.constants.URL_PAGECONTEXT + (item.site ? "site/" + item.site + "/": "") + "document-details?nodeRef=" + item.nodeRef; }</#local>
       <#local viewMoreAction = { "name": "view_more_document_actions", "label": "form.control.object-picker.workflow.view_more_document_actions", "link": viewMoreActionsLink }>
       <#if packageItemActionGroup == "read_package_item_actions" || packageItemActionGroup == "edit_package_item_actions">
          <#local actions = actions + [viewMoreAction]>
