@@ -1,17 +1,16 @@
 <#assign compactMode = field.control.params.compactMode!false>
 
-<#if field.control.params.selectedValueContextProperty??>
-   <#if context.properties[field.control.params.selectedValueContextProperty]??>
-      <#assign selectedValue = context.properties[field.control.params.selectedValueContextProperty]>
-   <#elseif args[field.control.params.selectedValueContextProperty]??>
-      <#assign selectedValue = args[field.control.params.selectedValueContextProperty]>
-   <#elseif context.properties[field.control.params.selectedValueContextProperty]??>
-      <#assign selectedValue = context.properties[field.control.params.selectedValueContextProperty]>
-   </#if>
-</#if>
-<#assign fieldValue = field.value>
-
 <#macro renderPickerJS field picker="picker">
+   <#if field.control.params.selectedValueContextProperty??>
+      <#if context.properties[field.control.params.selectedValueContextProperty]??>
+         <#local renderPickerJSSelectedValue = context.properties[field.control.params.selectedValueContextProperty]>
+      <#elseif args[field.control.params.selectedValueContextProperty]??>
+         <#local renderPickerJSSelectedValue = args[field.control.params.selectedValueContextProperty]>
+      <#elseif context.properties[field.control.params.selectedValueContextProperty]??>
+         <#local renderPickerJSSelectedValue = context.properties[field.control.params.selectedValueContextProperty]>
+      </#if>
+   </#if>
+
    var ${picker} = new Alfresco.ObjectFinder("${controlId}", "${fieldHtmlId}").setOptions(
    {
       <#if form.mode == "view" || field.disabled>disabled: true,</#if>
@@ -21,8 +20,8 @@
    <#elseif field.endpointMandatory??>
       mandatory: ${field.endpointMandatory?string},
    </#if>
-      currentValue: "${fieldValue}",
-      <#if selectedValue??>selectedValue: "${selectedValue}",</#if>
+      currentValue: "${field.value}",
+      <#if renderPickerJSSelectedValue??>selectedValue: "${renderPickerJSSelectedValue}",</#if>
       minSearchTermLength: ${args.minSearchTermLength!'1'},
       maxSearchResults: ${args.maxSearchResults!'100'}
    }).setMessages(

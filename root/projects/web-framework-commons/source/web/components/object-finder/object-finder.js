@@ -97,8 +97,9 @@
           *
           * @property selectedValue
           * @type string
+          * @default null
           */
-         selectedValue: "",
+         selectedValue: null,
 
          /**
           * The current value
@@ -248,20 +249,52 @@
          displayMode: "items",
 
          /**
-          * The actions to display next to each current value in "list" mode.
-          * When clicked the actions will fire a "currentValueAction" event with the action and item info as attributes.
+          * The actions to display next to each item/current value in "list" mode.
+          * - if "event" has been set: A click will fire an event with name as defined by "event" and item info as attribute.
+          * - if "link" has been set: A normal html link will be displayed with href set to the value of "link"
           * {
           *    name: {String},  // The name of the action (used as a css class name for styling)
           *    event: {Object}, // If present will be the name of the event to send
-          *    link: {String},  // If present will set the browser to display the link provided
+          *    link: {String|function},  // If present will set the browser to display the link provided
           *    label: {String}  // The message label key use to get the display label
           * }
           *
           * @property listActions
           * @type Array
-          * @default [ { < Config to remove an item > } ]
+          * @default [ ] // Note! If allowRemoveAction equals true and
+          *                       options.disabled is false and
+          *                       displayMode equals "list"
+          *                       a remove action will be added
           */
-         listActions: [ { name: "remove-list-item", event: "removeListItem", label: "form.control.object-picker.remove-item" } ]
+         listItemActions: [ ],
+
+         /**
+          * Determines if items shall be removable in "list" display mode
+          *
+          * @property allowRemoveAction
+          * @type boolean
+          * @default true
+          */
+         allowRemoveAction: true,
+
+
+         /**
+          * Determines if an "Remove all" button shall be displayed in "list" display mode
+          *
+          * @property allowRemoveAllAction
+          * @type boolean
+          * @default true
+          */
+         allowRemoveAllAction: true,
+
+         /**
+          * Determines if an "Add/Select" button shall be displayed that will display an items picker
+          *
+          * @property allowAddAction
+          * @type boolean
+          * @default true
+          */
+         allowAddAction: true
       },
 
       /**
@@ -339,30 +372,53 @@
          this._createSelectedItemsControls();
          if (!this.options.disabled)
          {
+            // Control is NOT in view mode
             if (this.options.compactMode)
             {
                Dom.addClass(this.pickerId, "compact");
             }
          
             this._createNavigationControls();
-            this.widgets.showPicker = Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
-            if (this.options.displayMode == "list")
+            var itemGroupActionsContainerEl = Dom.get(this.id + "-itemGroupActions");
+            if (itemGroupActionsContainerEl)
             {
-               this.widgets.showPicker.set("label", this.msg("button.add"));
-               var removeAllEl = document.createElement("button");
-               this.widgets.showPicker.get("element").parentNode.appendChild(removeAllEl);
-               this.widgets.removeAllButton = Alfresco.util.createYUIButton(this, null, this.onRemoveAllListItems,
+               // Create an "Add/Select" button that will display a picker to add items
+               if (this.options.allowAddAction)
                {
-                  label: this.msg("button.removeAll"),
-                  disabled: true
-               }, removeAllEl);                        
+                  var addButtonEl = document.createElement("button");
+                  itemGroupActionsContainerEl.appendChild(addButtonEl);
+                  this.widgets.addButton = Alfresco.util.createYUIButton(this, null, this.onAddButtonClick,
+                  {
+                     label: this.options.displayMode == "list" ? this.msg("button.add") : this.msg("button.select"),
+                     disabled: true
+                  }, addButtonEl);
+               }
+               // Create a "Remove all" button to remove all items (if component is in "list" mode)
+               if (this.options.allowRemoveAllAction && this.options.displayMode == "list")
+               {
+                  var removeAllButtonEl = document.createElement("button");
+                  itemGroupActionsContainerEl.appendChild(removeAllButtonEl);
+                  this.widgets.removeAllButton = Alfresco.util.createYUIButton(this, null, this.onRemoveAllButtonClick,
+                  {
+                     label: this.msg("button.removeAll"),
+                     disabled: true
+                  }, removeAllButtonEl);
+               }
+            }
+            if (this.options.allowRemoveAction && this.options.displayMode == "list")
+            {
+               this.options.listItemActions.push(
+               {
+                  name: "remove-list-item",
+                  event: "removeListItem",
+                  label: "form.control.object-picker.remove-item"
+               });
             }
             this.widgets.ok = Alfresco.util.createYUIButton(this, "ok", this.onOK);
             this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
             
             // force the generated buttons to have a name of "-" so it gets ignored in
-            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
-            Dom.get(this.id + "-showPicker-button-button").name = "-";
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable            
             Dom.get(this.id + "-ok-button").name = "-";
             Dom.get(this.id + "-cancel-button").name = "-";
             
@@ -374,17 +430,17 @@
             Dom.addClass(this.pickerId, "object-finder");
          }
          
-         this._getSelectedItems();
+         this._loadSelectedItems();
       },
       
       /**
-       * Show picker button click handler
+       * Add button click handler, shows picker
        *
-       * @method onShowPicker
+       * @method onAddButtonClick
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onShowPicker: function ObjectFinder_onShowPicker(e, p_obj)
+      onAddButtonClick: function ObjectFinder_onAddButtonClick(e, p_obj)
       {
          // Register the ESC key to close the dialog
          if (!this.widgets.escapeListener)
@@ -446,11 +502,11 @@
       /**
        * Removes all list itesm from the current value list used in "list" display mode
        *
-       * @method onRemoveAllListItems
+       * @method onRemoveAllButtonClick
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onRemoveAllListItems: function ObjectFinder_onRemoveAllListItems(e, p_obj)
+      onRemoveAllButtonClick: function ObjectFinder_onRemoveAllButtonClick(e, p_obj)
       {
          this.widgets.currentValuesDataTable.deleteRows(0, this.widgets.currentValuesDataTable.getRecordSet().getLength());
          this.selectedItems = {};
@@ -514,7 +570,7 @@
       {
          this.widgets.escapeListener.disable();
          this.widgets.dialog.hide();
-         this.widgets.showPicker.set("disabled", false);
+         this.widgets.addButton.set("disabled", false);
          if (e)
          {
             Event.preventDefault(e);
@@ -580,7 +636,7 @@
       {
          this.widgets.escapeListener.disable();
          this.widgets.dialog.hide();
-         this.widgets.showPicker.set("disabled", false);
+         this.widgets.addButton.set("disabled", false);
          if (e)
          {
             Event.preventDefault(e);
@@ -734,7 +790,11 @@
                var item;
                if (this.options.displayMode == "list")
                {
-                  this.widgets.currentValuesDataTable.getRecordSet().reset();
+                  var l = this.widgets.currentValuesDataTable.getRecordSet().getLength();
+                  if (l > 0)
+                  {
+                     this.widgets.currentValuesDataTable.deleteRows(0, l);
+                  }
                }
                for (var key in items)
                {
@@ -774,12 +834,8 @@
                {
                   Dom.get(this.id + "-currentValueDisplay").innerHTML = displayValue;
                }
-               else if (this.options.disabled === false)
-               {
-                  // Enable the remove all button
-                  this.widgets.removeAllButton.set("disabled", false);                  
-               }
             }
+            this._enableActions();
          }
       },
 
@@ -1073,41 +1129,81 @@
          };
       },
 
+
       /**
        * Returns Action item custom datacell formatter
        *
-       * @method fnRenderCellListActions
+       * @method fnRenderCellListItemName
        */
-      fnRenderCellListActions: function ObjectFinder_fnRenderCellListActions()
+      fnRenderCellListItemName: function ObjectFinder_fnRenderCellListItemName()
       {
          var scope = this;
 
          /**
           * Action item custom datacell formatter
           *
-          * @method fnRenderCellListActions
+          * @method fnRenderCellListItemActions
           * @param elCell {object}
           * @param oRecord {object}
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         return function ObjectFinder_fnRenderCellListActions(elCell, oRecord, oColumn, oData)
+         return function ObjectFinder_fnRenderCellListItemActions(elCell, oRecord, oColumn, oData)
          {
+            var template = '<h3 class="name">{name}</h3>';
+            template += '<div class="description">{description}</div>';
+            template += '<div class="viewmode-label">' + scope.msg("form.control.object-picker.modified-on") + ': {modified}</div>';
+            elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), 0, template);
+         };
+      },
+
+
+      /**
+       * Returns Action item custom datacell formatter
+       *
+       * @method fnRenderCellListItemActions
+       */
+      fnRenderCellListItemActions: function ObjectFinder_fnRenderCellListItemActions()
+      {
+         var scope = this;
+
+         /**
+          * Action item custom datacell formatter
+          *
+          * @method fnRenderCellListItemActions
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function ObjectFinder_fnRenderCellListItemActions(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
             // While waiting for the package item actions, only render the actions (remove) in non editable mode
             if (scope.options.disabled === false) 
             {
-               var links = "", listAction, actionEl;
-               for (var i = 0, il = scope.options.listActions.length; i < il; i++)
+               var links = "", link, listAction, actionEl;
+               for (var i = 0, il = scope.options.listItemActions.length; i < il; i++)
                {
-                  listAction = scope.options.listActions[i];
+                  listAction = scope.options.listItemActions[i];
                   if (listAction.event)
                   {
                      links += '<div class="list-action"><a href="#" class="' + listAction.name + ' ' + ' list-action-event-' + scope.eventGroup + ' ' + listAction.event+ '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
                   }
-                  else if (listAction.link)
+                  else
                   {
-                     links += '<div class="list-action"><a href="' + listAction.link + '" class="' + listAction.name + '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
+                     link = null;
+                     if (YAHOO.lang.isFunction(listAction.link))
+                     {
+                        link = listAction.link.call(this, oRecord.getData());
+                     }
+                     else if (YAHOO.lang.isString(listAction.link))
+                     {
+                        link = YAHOO.lang.substitute(listAction.link, oRecord.getData());
+                     }
+                     links += '<div class="list-action"><a href="' + link + '" class="' + listAction.name + '" title="' + scope.msg(listAction.label) + '" tabindex="0">' + scope.msg(listAction.label) + '</a></div>';
                   }
                }
                elCell.innerHTML = links;
@@ -1120,20 +1216,15 @@
        */
 
       /**
-       * Gets current value metadata from the repository
+       * Gets selected or current value's metadata from the repository
        *
-       * @method _getSelectedItems
+       * @method _loadSelectedItems
        * @private
        */
-      _getSelectedItems: function ObjectFinder__getSelectedItems(useOptions)
+      _loadSelectedItems: function ObjectFinder__loadSelectedItems(useOptions)
       {
-         if (this.widgets.removeAllButton)
-         {
-            this.widgets.removeAllButton.set("disabled", true);                  
-         }
-
          var arrItems = "";
-         if (this.options.selectedValue != "")
+         if (this.options.selectedValue)
          {
             arrItems = this.options.selectedValue;
          }
@@ -1164,26 +1255,33 @@
          {
             this.selectedItems = null;
          };
-         
-         Alfresco.util.Ajax.jsonRequest(
+
+         if (arrItems != "")
          {
-            url: Alfresco.constants.PROXY_URI + "api/forms/picker/items",
-            method: "POST",
-            dataObj:
+            Alfresco.util.Ajax.jsonRequest(
             {
-               items: arrItems.split(",")
-            },
-            successCallback:
-            {
-               fn: onSuccess,
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: onFailure,
-               scope: this
-            }
-         });
+               url: Alfresco.constants.PROXY_URI + "api/forms/picker/items",
+               method: "POST",
+               dataObj:
+               {
+                  items: arrItems.split(",")
+               },
+               successCallback:
+               {
+                  fn: onSuccess,
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: onFailure,
+                  scope: this
+               }
+            });
+         }
+         else
+         {
+            this._enableActions();
+         }
       },
 
       /**
@@ -1386,9 +1484,9 @@
             // Current values DataTable definition
             var currentValuesColumnDefinitions =
             [
-               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellGenericIcon() },
-               { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellName() },
-               { key: "action", label: "Actions", sortable: false, formatter: this.fnRenderCellListActions() }
+               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellGenericIcon()},
+               { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellListItemName() },
+               { key: "action", label: "Actions", sortable: false, formatter: this.fnRenderCellListItemActions(), width: "5em" }
             ];
 
             // Make sure the currentValues container is a div rather than a span to make sure it may become a datatable
@@ -1427,11 +1525,11 @@
                   {
                      var data = record.getData(),
                         name = args[1].anchor.getAttribute("class").split(" ")[0];
-                     for (var i = 0, il = me.options.listActions.length; i < il; i++)
+                     for (var i = 0, il = me.options.listItemActions.length; i < il; i++)
                      {
-                        if (me.options.listActions[i].name == name)
+                        if (me.options.listItemActions[i].name == name)
                         {
-                           YAHOO.Bubbling.fire(me.options.listActions[i].event,
+                           YAHOO.Bubbling.fire(me.options.listItemActions[i].event,
                            {
                               eventGroup: me,
                               value: data,
@@ -1523,10 +1621,32 @@
        * 
        * @method _inAuthorityMode
        * @return true if the picker is being used to find authorities i.e. users and groups
+       * @private
        */
       _inAuthorityMode: function ObjectFinder__inAuthorityMode()
       {
          return (this.options.itemFamily == "authority");
+      },
+
+
+      /**
+       * Determines whether the picker is in 'authority' mode.
+       *
+       * @method _enableActions
+       * @private
+       */
+      _enableActions: function ObjectFinder__enableActions()
+      {
+         if (this.widgets.removeAllButton)
+         {
+            // Enable the remove all button
+            this.widgets.removeAllButton.set("disabled", false);
+         }
+         if (this.widgets.addButton)
+         {
+            // Enable the add button
+            this.widgets.addButton.set("disabled", false);                  
+         }
       }
    });
 })();
