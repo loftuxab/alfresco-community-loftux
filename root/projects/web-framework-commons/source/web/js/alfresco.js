@@ -2303,7 +2303,7 @@ Alfresco.util.YUILoaderHelper = function()
        */
       loadComponents: function YLH_loadComponents()
       {
-         if (yuiLoader !== null)
+         if (yuiLoader !== null && callbacks.length > 0)
          {
             yuiLoader.insert(null, "js");
          }
@@ -3356,9 +3356,25 @@ Alfresco.util.Ajax = function()
        * @private
        */
       _successHandlerPostExec: function(serverResponse)
-      {       
+      {
          // Get the config that was used in the request() method
          var config = serverResponse.argument.config;
+
+         if (config.execScripts)
+         {
+            /**
+             * Scripts in the loaded template have now been executed, if they required a missing YUI module, that module
+             * will now have been placed on the yuiLoader queue. To make sure the modules on the queue gets loaded
+             * we need to tell YUILoaderHelper to start loading the modules by calling loadComponents().
+             *
+             * Note! The caller of the external scripts shall NOT expect the brought in components to have got their
+             * onReady methods called if they required yui modules that wasn't previously loaded.
+             * A safer approach is to let the brought in components fire a "custom ready event" at the end of their
+             * "onReady" method, that the caller can listen to.
+             */
+            Alfresco.util.YUILoaderHelper.loadComponents();
+         }
+         
          var callback = config.successCallback;
          if (callback && typeof callback.fn == "function")
          {
