@@ -47,6 +47,8 @@
    {
       Alfresco.AdvancedSearch.superclass.constructor.call(this, "Alfresco.AdvancedSearch", htmlId, ["button", "container"]);
       
+      YAHOO.Bubbling.on("beforeFormRuntimeInit", this.onBeforeFormRuntimeInit, this);
+      
       return this;
    };
    
@@ -82,6 +84,11 @@
           */
          searchForms: []
       },
+      
+      /**
+       * Currently visible Search Form object
+       */
+      currentForm: null,
       
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -181,7 +188,10 @@
        */
       renderFormTemplate: function ADVSearch_renderFormTemplate(form)
       {
-         var containerDiv = Dom.get(this.id + "-form");
+         // update current form state
+         this.currentForm = form;
+         
+         var containerDiv = Dom.get(this.id + "-forms");
          
          var visibleFormFn = function()
          {
@@ -204,6 +214,16 @@
          
          if (!form.htmlid)
          {
+            // generate child container div for this form
+            var htmlid = this.id + "_" + containerDiv.children.length;
+            var formDiv = document.createElement("div");
+            formDiv.id = htmlid;
+            Dom.addClass(formDiv, "hidden");
+            Dom.addClass(formDiv, "share-form");
+            
+            // cache htmlid so we know the form is present on the form
+            form.htmlid = htmlid;
+            
             // load the form component for the appropriate type
             var formUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind=type&itemId={itemId}&formId={formId}&mode=edit&showSubmitButton=false&showCancelButton=false",
             {
@@ -212,7 +232,7 @@
             });
             var formData =
             {
-               htmlid: this.id
+               htmlid: htmlid
             };
             Alfresco.util.Ajax.request(
             {
@@ -222,21 +242,11 @@
                {
                   fn: function ADVSearch_onFormTemplateLoaded(response)
                   {
-                     // Inject the template from the XHR request into a new DIV element
-                     var htmlid = this.id + form.type;
-                     var formDiv = document.createElement("div");
-                     formDiv.id = htmlid;
-                     Dom.addClass(formDiv, "hidden");
+                     // Inject the template from the XHR request into the child container div
                      formDiv.innerHTML = response.serverResponse.responseText;
-                     
-                     // cache htmlid so we know the form is present on the form
-                     form.htmlid = htmlid;
                      containerDiv.appendChild(formDiv);
                      
                      visibleFormFn.call(this);
-                     
-                     // init YUI onReady method for components in form
-                     Alfresco.util.YUILoaderHelper.loadComponents();
                   },
                   scope: this
                },
@@ -260,7 +270,19 @@
        */
       onSearchClick: function ADVSearch_onSearchClick(e, obj)
       {
+         // retrieve form data structure directly from the runtime
+         var formData = this.currentForm.runtime.getFormData();
          
+         // TODO: search based on supplied keywords and form data fields
+      },
+      
+      /**
+       * Event handler called when the "beforeFormRuntimeInit" event is received
+       */
+      onBeforeFormRuntimeInit: function CreateContentMgr_onBeforeFormRuntimeInit(layer, args)
+      {
+         // extract the current form runtime - so we can reference it later
+         this.currentForm.runtime = args[1].runtime;
       }
    });
 })();
