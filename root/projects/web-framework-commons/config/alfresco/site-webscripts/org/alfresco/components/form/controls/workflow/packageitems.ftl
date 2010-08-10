@@ -1,4 +1,4 @@
-<#include "controls/association.ftl" />
+<#include "/org/alfresco/components/form/controls/association.ftl" />
 
 <#macro setPackageItemOptions field>
 
@@ -38,10 +38,11 @@
    <script type="text/javascript">//<![CDATA[
    (function()
    {
-      <#-- Modify the properties on the object finder created by association control -->
+      <#-- Modify the properties on the object finder created by association control-->
       var picker = Alfresco.util.ComponentManager.get("${controlId}");
       picker.setOptions(
       {
+         itemType: "cm:content",
          displayMode: "${field.control.params.displayMode!"list"}",
          listItemActions: [
          <#list actions as action>
