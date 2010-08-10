@@ -2300,12 +2300,16 @@ Alfresco.util.YUILoaderHelper = function()
       /**
        * Called by template once all component dependencies have been registered. Should be just before the </body> closing tag.
        * @method loadComponents
+       * @param p_pageLoad {Boolean} Whether the function is being called from the page footer, or elsewhere. Only the footer is allowed to use "true" here.
        */
-      loadComponents: function YLH_loadComponents()
+      loadComponents: function YLH_loadComponents(p_pageLoad)
       {
-         if (yuiLoader !== null && callbacks.length > 0)
+         if (initialLoaderComplete || p_pageLoad === true)
          {
-            yuiLoader.insert(null, "js");
+            if (yuiLoader !== null && callbacks.length > 0)
+            {
+               yuiLoader.insert(null, "js");
+            }
          }
       },
 
