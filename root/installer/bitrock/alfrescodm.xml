@@ -150,19 +150,28 @@
                     <actionList>
                         <substitute>
                             <files>*/alfresco-global.properties</files>
+			    <type>regexp</type>
                             <substitutionList>
+				<substitution>
+				    <pattern>db.driver=.*$</pattern>
+				    <value>db.driver=${jdbc_driver}</value>
+				</substitution>
                                 <substitution>
                                     <pattern>@@BITROCK_DB_USER@@</pattern>
-                                    <value>DB.USER</value>
+                                    <value>${jdbc_username}</value>
                                 </substitution>
                                 <substitution>
                                     <pattern>@@BITROCK_DB_PASSWORD@@</pattern>
-                                    <value>DB.PASSWORD</value>
+                                    <value>${jdbc_password}</value>
                                 </substitution>
                                 <substitution>
                                     <pattern>@@BITROCK_DB_NAME@@</pattern>
-                                    <value>DB.NAME</value>
+                                    <value>${jdbc_database}</value>
                                 </substitution>
+				<substitution>
+				    <pattern>db.url=.*$</pattern>
+				    <value>db.url=${jdbc_url}</value>
+				</substitution>
                                 <substitution>
                                     <pattern>@@BITROCK_MYSQL_PORT@@</pattern>
                                     <value>3306</value>

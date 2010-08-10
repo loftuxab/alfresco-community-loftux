@@ -434,6 +434,38 @@ exit $RETVAL
                                 <compareText text="${component(openofficecomponent).selected}" logic="equals" value="1"/>
                             </ruleList>
                         </writeFile>
+			<!-- Install services on OS X: Mongrel needs to be started as a daemon-->
+			<writeFile>
+                            <path>/Library/LaunchDaemons/${baseunixservice_script_name}-mongrel.plist</path>
+                            <text>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+&lt;plist version="1.0"&gt;
+&lt;dict&gt;
+        &lt;key&gt;Label&lt;/key&gt;
+        &lt;string&gt;${baseunixservice_script_name}-mongrel&lt;/string&gt;
+	&lt;key&gt;WorkingDirectory&lt;/key&gt;
+        &lt;string&gt;${ruby_application_root}&lt;/string&gt;
+        &lt;key&gt;EnvironmentVariables&lt;/key&gt;
+        &lt;dict&gt;
+          &lt;key&gt;RAILS_ENV&lt;/key&gt;
+          &lt;string&gt;production&lt;/string&gt;
+	&lt;/dict&gt;
+        &lt;key&gt;ProgramArguments&lt;/key&gt;
+        &lt;array&gt;
+                &lt;string&gt;${ruby_root_directory}/bin/mongrel_rails&lt;/string&gt;
+                &lt;string&gt;start&lt;/string&gt;
+        &lt;/array&gt;
+	&lt;key&gt;RunAtLoad&lt;/key&gt;
+        &lt;true/&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
+</text>
+                            <ruleList>
+                                <componentTest name="mongrel" logic="exists" />
+                                <compareText text="${component(mongrel).selected}" logic="equals" value="1"/>
+                            </ruleList>
+                        </writeFile>
+
                     </actionList>
                     <ruleList>
                         <platformTest type="osx"/>
