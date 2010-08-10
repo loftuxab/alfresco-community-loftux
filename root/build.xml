@@ -1125,6 +1125,26 @@
          <param name="stoponerror" value="yes" />
       </antcall>
       
+      <!-- Run Field Processor tests -->
+      <antcall target="run-junit-test">
+         <param name="testcase" value="org.alfresco.repo.forms.processor.node.FieldProcessorTest" />
+         <param name="projectdir" value="${dir.project.repository}" />
+         <param name="stoponerror" value="yes" />
+      </antcall>
+      
+      <!-- Run Form Processor tests -->
+      <antcall target="run-junit-test">
+         <param name="testcase" value="org.alfresco.repo.forms.processor.workflow.TaskFormProcessorTest" />
+         <param name="projectdir" value="${dir.project.repository}" />
+         <param name="stoponerror" value="yes" />
+      </antcall>
+      
+      <antcall target="run-junit-test">
+         <param name="testcase" value="org.alfresco.repo.forms.processor.workflow.WorkflowFormProcessorTest" />
+         <param name="projectdir" value="${dir.project.repository}" />
+         <param name="stoponerror" value="yes" />
+      </antcall>
+      
       <!-- run REST API tests -->
       <antcall target="run-junit-test">
          <param name="testcase" value="org.alfresco.repo.web.scripts.forms.FormRestApiGet_Test" />
