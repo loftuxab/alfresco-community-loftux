@@ -534,6 +534,7 @@
          // Fire the personSelected bubble event
          YAHOO.Bubbling.fire("personSelected",
          {
+            eventGroup: this,
             userName: userName,
             firstName: p_obj.getData("firstName"),
             lastName: p_obj.getData("lastName"),

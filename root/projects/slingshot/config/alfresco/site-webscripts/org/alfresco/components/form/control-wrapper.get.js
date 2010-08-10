@@ -44,7 +44,7 @@ function getControlFields(type)
       case "category":
          control.params =
          {
-            compactMode: true,
+            compactMode: true
          };
          if (args.multipleSelectMode !== null)
          {

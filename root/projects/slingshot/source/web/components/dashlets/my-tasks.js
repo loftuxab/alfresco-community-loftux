@@ -125,7 +125,7 @@
             if (task.state == "IN_PROGRESS" &&
                   ((task.isPooled && !owner.userName) ||
                   (owner.userName == Alfresco.constants.USERNAME) ||
-                  (task.workflowInstance && task.workflowInstance.initiator && task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
+                  (task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
             {
                elCell.innerHTML = '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
             }
