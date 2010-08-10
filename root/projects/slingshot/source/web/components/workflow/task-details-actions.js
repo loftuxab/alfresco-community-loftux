@@ -62,7 +62,7 @@
          if (task.state == "IN_PROGRESS" &&
                ((task.isPooled && !owner.userName) ||
                (owner.userName == Alfresco.constants.USERNAME) ||
-               (task.workflowInstance && task.workflowInstance.initiator && task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
+               (task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
          {
             Alfresco.util.createYUIButton(this, "edit", function TDA_onMetadataRefresh_onEditClick()
             {

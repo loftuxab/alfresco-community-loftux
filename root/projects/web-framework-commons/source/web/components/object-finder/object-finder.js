@@ -1150,10 +1150,15 @@
           */
          return function ObjectFinder_fnRenderCellListItemActions(elCell, oRecord, oColumn, oData)
          {
-            var template = '<h3 class="name">{name}</h3>';
+            var item = oRecord.getData(),
+               modifiedOn = item.modified ? Alfresco.util.formatDate(Alfresco.util.fromISO8601(item.modified)) : null,
+               template = '<h3 class="name">{name}</h3>';
             template += '<div class="description">{description}</div>';
-            template += '<div class="viewmode-label">' + scope.msg("form.control.object-picker.modified-on") + ': {modified}</div>';
-            elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), 0, template);
+            if (modifiedOn)
+            {
+               template += '<div class="viewmode-label">' + scope.msg("form.control.object-picker.modified-on") + ': ' + modifiedOn + '</div>';
+            }
+            elCell.innerHTML = scope.options.objectRenderer.renderItem(item, 0, template);
          };
       },
 
