@@ -55,7 +55,7 @@
       
       <attribute>
          <name>title</name>
-         <required>true</required>
+         <required>false</required>
          <rtexprvalue>true</rtexprvalue>
          <description>
             The title of the content, used as the alt tag for the edit link, in the drop down

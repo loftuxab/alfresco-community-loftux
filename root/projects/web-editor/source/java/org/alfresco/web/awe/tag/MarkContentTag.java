@@ -146,25 +146,31 @@ public class MarkContentTag extends AbstractTemplateTag
                 List<MarkedContent> markedContent = AlfrescoTagUtil.getMarkedContent(pageContext.getRequest());
                 String markerIdPrefix = (String) this.pageContext.getRequest().getAttribute(
                      AlfrescoTagUtil.KEY_MARKER_ID_PREFIX);
-                String markerId = markerIdPrefix + "-" + (markedContent.size() + 1);
+
+                String redirectUrl = calculateRedirectUrl();
+                String editMarkerId = markerIdPrefix + "-" + (markedContent.size() + 1);
 
                 // create marked content object and store
-                MarkedContent content = new MarkedContent(markerId, this.contentId, this.contentTitle, 
+                MarkedContent content = new MarkedContent(editMarkerId, this.contentId, this.contentTitle, 
                      this.formId, this.nestedMarker);
                 markedContent.add(content);
 
-                // render edit link for content
                 out.write("<span class=\"alfresco-content-marker\" id=\"");
-                out.write(markerId);
-                out.write("\"><a href=\"");
+                out.write(editMarkerId);
+                out.write("\">");
+
+                // render edit link for content
+                out.write("<a class=\"alfresco-content-edit\" href=\"");
                 out.write(urlPrefix);
                 out.write("/page/metadata?nodeRef=");
                 out.write(this.contentId);
                 out.write("&js=off");
-                out.write("&title=");
-                out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
+                if(this.contentTitle != null)
+                {
+                    out.write("&title=");
+                    out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
+                }
 
-                String redirectUrl = calculateRedirectUrl();
                 if (redirectUrl != null)
                 {
                     out.write("&redirect=");
@@ -180,13 +186,82 @@ public class MarkContentTag extends AbstractTemplateTag
                 out.write("\"><img src=\"");
                 out.write(urlPrefix);
                 out.write("/res/awe/images/edit.png\" alt=\"");
-                out.write(encode(this.contentTitle));
+                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
                 out.write("\" title=\"");
-                out.write(encode(this.contentTitle));
-                out.write("\"border=\"0\" /></a></span>\n");
+                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
+                out.write("\"border=\"0\" /></a>");
+
+                // render create link for content
+                out.write("<a class=\"alfresco-content-new\" href=\"");
+                out.write(urlPrefix);
+                out.write("/page/metadata?nodeRef=");
+                out.write(this.contentId);
+                out.write("&js=off");
+                if(this.contentTitle != null)
+                {
+                    out.write("&title=");
+                    out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
+                }
+
+                if (redirectUrl != null)
+                {
+                    out.write("&redirect=");
+                    out.write(calculateRedirectUrl());
+                }
+
+                if (this.formId != null)
+                {
+                    out.write("&formId=");
+                    out.write(this.formId);
+                }
+
+                out.write("\"><img src=\"");
+                out.write(urlPrefix);
+                out.write("/res/awe/images/new.png\" alt=\"");
+                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
+                out.write("\" title=\"");
+                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
+                out.write("\"border=\"0\" /></a>");
+                
+                // render delete link for content
+                out.write("<a class=\"alfresco-content-delete\" href=\"");
+                out.write(urlPrefix);
+                // TODO
+                out.write("/page/metadata?nodeRef=");
+                out.write(this.contentId);
+                out.write("&js=off");
+                if(this.contentTitle != null)
+                {
+                    out.write("&title=");
+                    out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
+                }
+
+                if (redirectUrl != null)
+                {
+                    out.write("&redirect=");
+                    out.write(calculateRedirectUrl());
+                }
+
+                if (this.formId != null)
+                {
+                    out.write("&formId=");
+                    out.write(this.formId);
+                }
+
+                out.write("\"><img src=\"");
+                out.write(urlPrefix);
+                out.write("/res/awe/images/delete.png\" alt=\"");
+                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
+                out.write("\" title=\"");
+                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
+                out.write("\"border=\"0\" /></a>");
+                
+                out.write("</span>\n");
 
                 if (logger.isDebugEnabled())
+                {
                     logger.debug("Completed markContent rendering for: " + content);
+                }
             }
             catch (IOException ioe)
             {

@@ -50,6 +50,24 @@
    border-width: 0 1px;
 }
 
+/*
+span.alfresco-content-marker
+{
+    margin: 0 0 5px 0;
+}
+*/
+a.alfresco-content-new,
+a.alfresco-content-edit,
+a.alfresco-content-delete
+{
+    margin: 0 5px 0 0
+}
+
+span.alfresco-content-marker hide
+{
+    display: hidden;
+}
+
 #awe--show-hide-edit-markers,
 #awe--show-hide-edit-markers span.first-child,
 #awe--quickedit,

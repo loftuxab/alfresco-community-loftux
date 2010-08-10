@@ -55,11 +55,6 @@ public class MarkedContent
             throw new IllegalArgumentException("contentId is a mandatory parameter"); 
         }
 
-        if (contentTitle == null || contentTitle.length() == 0) 
-        { 
-            throw new IllegalArgumentException("contentTitle is a mandatory parameter"); 
-        }
-
         this.markerId = markerId;
         this.contentId = contentId;
         this.contentTitle = contentTitle;
