@@ -29,11 +29,12 @@
             <type name="period" template="/org/alfresco/components/form/controls/period.ftl" />
             <type name="any" template="/org/alfresco/components/form/controls/textfield.ftl" />
             <type name="category" template="/org/alfresco/components/form/controls/category.ftl" />
+            <type name="content" template="/org/alfresco/components/form/controls/content.ftl" />
             <type name="association" template="/org/alfresco/components/form/controls/association.ftl" />
             <type name="association:cm:person" template="/org/alfresco/components/form/controls/authority.ftl" />
             <type name="association:cm:authority" template="/org/alfresco/components/form/controls/authority.ftl" />
             <type name="association:cm:authorityContainer" template="/org/alfresco/components/form/controls/authority.ftl" />
-            <type name="content" template="/org/alfresco/components/form/controls/content.ftl" />
+            <type name="association:packageItems" template="/org/alfresco/components/form/controls/workflow/packageitems.ftl" />
             <type name="transitions" template="/org/alfresco/components/form/controls/workflow/transitions.ftl" />
             <!-- Data types that should always be rendered read-only -->
             <type name="qname" template="/org/alfresco/components/form/controls/readonly.ftl" />
