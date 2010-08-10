@@ -749,12 +749,9 @@ body.yui-skin-hcBlack .categoryview .category .ygtvdepthcell
 
 /* filter list link */
 
-.yui-skin-hcBlack .treeview .selected,
-.yui-skin-hcBlack .categoryview .selected,
-.yui-skin-hcBlack .filter li.selected,
-.yui-skin-hcBlack .tags li.selected,
-.archive li.selected,
-.tool li.selected,
+.yui-skin-hcBlack li.selected,
+body.yui-skin-hcBlack .treeview .selected,
+body.yui-skin-hcBlack .categoryview .selected,
 body.yui-skin-hcBlack .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
 {
    background-color: #000;

@@ -715,13 +715,10 @@ body.yui-skin-yellowTheme .categoryview .category .ygtvdepthcell
 
 /* filter list link */
 
-.yui-skin-yellowTheme .filter li.selected, 
-.yui-skin-yellowTheme .tags li.selected,
-.archive li.selected,
-.tool li.selected,
-body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
+.yui-skin-yellowTheme li.selected, 
 body.yui-skin-yellowTheme .treeview .selected,
-body.yui-skin-yellowTheme .categoryview .selected
+body.yui-skin-yellowTheme .categoryview .selected,
+body.yui-skin-yellowTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
 {
    background-color: #ffee9e;
 }

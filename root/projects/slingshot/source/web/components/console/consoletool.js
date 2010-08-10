@@ -41,6 +41,12 @@
    Alfresco.ConsoleTool = function(htmlId)
    {
       this.id = htmlId;
+      this.widgets = {};
+      this.modules = {};
+      this.services = {};
+      this.popups = {};
+      this.panels = [];
+      this.currentPanelId = "";
       
       /* History navigation event */
       YAHOO.Bubbling.on("stateChanged", this.onStateChanged, this);
@@ -70,7 +76,7 @@
           * @property widgets
           * @type object
           */
-         widgets: {},
+         widgets: null,
 
          /**
           * Object container for storing module instances.
@@ -78,7 +84,7 @@
           * @property modules
           * @type object
           */
-         modules: {},
+         modules: null,
 
          /**
           * Object container for storing form instances.
@@ -86,7 +92,7 @@
           * @property forms
           * @type object
           */
-         forms: {},
+         forms: null,
 
          /**
           * Event handler - called once only when panel first initialised
@@ -135,28 +141,12 @@
    YAHOO.extend(Alfresco.ConsoleTool, Alfresco.component.Base,
    {
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: {},
-      
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: {},
-      
-      /**
        * Object container for storing YUI pop dialog instances.
        * 
        * @property popups
        * @type object
        */
-      popups: {},
+      popups: null,
       
       /**
        * List of the available UI panel handler objects; such as Search, View, Edit etc.
@@ -164,7 +154,7 @@
        * @property panels
        * @type array
        */
-      panels: [],
+      panels: null,
       
       /**
        * The current UI panel ID on display
@@ -172,7 +162,7 @@
        * @property currentPanelId
        * @type string
        */
-      currentPanelId: "",
+      currentPanelId: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.

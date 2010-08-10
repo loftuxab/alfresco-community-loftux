@@ -3116,30 +3116,21 @@ Alfresco.util.Ajax = function()
             YAHOO.util.Connect.initHeader("Content-Type", c.requestContentType);
          }
 
-         if (c.requestContentType === this.JSON)
+         // Encode dataObj depending on request method and contentType.
+         // Note: GET requests are always queryString encoded.
+         if (c.dataObj)
          {
             if (c.method.toUpperCase() === this.GET)
             {
-               if (c.dataObj)
-               {
-                  throw new Error("Parameter 'method' can not be 'GET' when trying to submit data in dataObj with contentType '" + c.requestContentType + "'");
-               }
+               // Encode the dataObj and put it in the url
+               c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, true);
             }
             else
             {
-               // If json is used encode the dataObj parameter and put it in the body
-               c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj || {});
-            }
-         }
-         else
-         {
-            if (c.dataObj)
-            {
-               // Normal URL parameters
-               if (c.method.toUpperCase() === this.GET)
+               if (c.requestContentType === this.JSON)
                {
-                  // Encode the dataObj and put it in the url
-                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, true);
+                  // If json is used encode the dataObj parameter and put it in the body
+                  c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj || {});
                }
                else
                {
@@ -3148,7 +3139,7 @@ Alfresco.util.Ajax = function()
                }
             }
          }
-         
+
          if (c.dataForm !== null)
          {
             // Set the form on the connection manager
@@ -3208,7 +3199,7 @@ Alfresco.util.Ajax = function()
       /**
        * Helper function for pure json requests, where both the request and
        * response are using json. Will result in a call to request() with
-       * requestContentType and responseContentType set to JSON and method set to GET.
+       * responseContentType set to JSON and method set to GET.
        *
        * @method request
        * @param config {object} Description of the request that should be made
@@ -3250,7 +3241,7 @@ Alfresco.util.Ajax = function()
       /**
        * Helper function for pure json requests, where both the request and
        * response are using json. Will result in a call to request() with
-       * requestContentType and responseContentType set to JSON and method set to DELETE.
+       * responseContentType set to JSON and method set to DELETE.
        *
        * @method request
        * @param config {object} Description of the request that should be made
@@ -3603,12 +3594,14 @@ Alfresco.util.Anim = function()
        *                         // fadeIn or fadeOut, default is true.
        *    callback: null,      // A function that will get called after the fade
        *    scope: this,         // The scope the callback function will get called in
+       *    period: 0.5          // Period over which animation occurs (seconds)
        */
       fadeAttributes:
       {
          adjustDisplay: true,
          callback: null,
-         scope: this
+         scope: this,
+         period: 0.5
       },
 
       /**
@@ -3681,9 +3674,10 @@ Alfresco.util.Anim = function()
          }
 
          // Put variables in scope so they can be used in the callback below
-         var fn = attributes.callback;
-         var scope = attributes.scope;
-         var myEl = el;
+         var fn = attributes.callback,
+            scope = attributes.scope,
+            myEl = el;
+         
          if (supportsOpacity)
          {
             // Do the fade (from value/opacity has already been set above)
@@ -3693,7 +3687,8 @@ Alfresco.util.Anim = function()
                {
                   to: fadeIn ? (YAHOO.env.ua.webkit > 0 ? 0.99 : 1) : 0
                }
-            }, 0.5);
+            }, attributes.period);
+            
             fade.onComplete.subscribe(function(e)
             {
                if (!fadeIn && adjustDisplay)
