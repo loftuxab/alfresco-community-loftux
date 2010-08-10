@@ -50,6 +50,7 @@ import org.alfresco.repo.search.impl.querymodel.QueryOptions;
 import org.alfresco.repo.search.impl.querymodel.QueryOptions.Connective;
 import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryBuilder;
 import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryBuilderContext;
+import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryBuilderContextImpl;
 import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryModelFactory;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
 import org.alfresco.repo.tenant.TenantService;
@@ -103,15 +104,15 @@ public class AlfrescoSolrDataModel
         addNonDictionaryField("TX", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("PARENT", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
         addNonDictionaryField("LINKASPECT", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
-        addNonDictionaryField("PATH", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
+        addNonDictionaryField("PATH", Store.YES, Index.ANALYZED_NO_NORMS, TermVector.NO, true);
         addNonDictionaryField("ANCESTOR", Store.NO, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
         addNonDictionaryField("ISCONTAINER", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("ISCATEGORY", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
-        addNonDictionaryField("QNAME", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
+        addNonDictionaryField("QNAME", Store.YES, Index.ANALYZED, TermVector.NO, true);
         addNonDictionaryField("ISROOT", Store.NO, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
-        addNonDictionaryField("PRIMARYASSOCTYPEQNAME", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
+        addNonDictionaryField("PRIMARYASSOCTYPEQNAME", Store.YES, Index.ANALYZED, TermVector.NO, false);
         addNonDictionaryField("ISNODE", Store.NO, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
-        addNonDictionaryField("ASSOCTYPEQNAME", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
+        addNonDictionaryField("ASSOCTYPEQNAME", Store.YES, Index.ANALYZED, TermVector.NO, true);
         addNonDictionaryField("PRIMARYPARENT", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("TYPE", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("ASPECT", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
@@ -503,7 +504,7 @@ public class AlfrescoSolrDataModel
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
         searchParameters.setQuery(query);
         LuceneAnalyser analyzer = new LuceneAnalyser(getDictionaryService(), getMLAnalysisMode());
-        LuceneQueryParser parser = new LuceneQueryParser(defaultField, analyzer);
+        SolrQueryParser parser = new SolrQueryParser(defaultField, analyzer);
         parser.setDefaultOperator(defaultOperator);
         parser.setNamespacePrefixResolver(namespaceDAO);
         parser.setDictionaryService(dictionaryComponent);
@@ -552,7 +553,7 @@ public class AlfrescoSolrDataModel
         searchParameters.setMlAnalaysisMode(getMLAnalysisMode());
         searchParameters.setNamespace( NamespaceService.CONTENT_MODEL_1_0_URI);
         
-        LuceneQueryBuilderContext luceneContext = new LuceneQueryBuilderContext(dictionaryComponent, namespaceDAO, tenantService, searchParameters, getMLAnalysisMode(),
+        LuceneQueryBuilderContextSolrImpl luceneContext = new LuceneQueryBuilderContextSolrImpl(dictionaryComponent, namespaceDAO, tenantService, searchParameters, getMLAnalysisMode(),
                 indexReader);
         
         Set<String> selectorGroup = null;

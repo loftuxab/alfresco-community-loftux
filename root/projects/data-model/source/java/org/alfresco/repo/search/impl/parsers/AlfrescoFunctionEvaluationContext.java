@@ -81,6 +81,9 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         EXPOSED_FIELDS.add("ISUNSET");
         EXPOSED_FIELDS.add("ISNULL");
         EXPOSED_FIELDS.add("ISNOTNULL");
+        EXPOSED_FIELDS.add("FTSSTATUS");
+        EXPOSED_FIELDS.add("ASSOCTYPEQNAME");
+        EXPOSED_FIELDS.add("PRIMARYASSOCTYPEQNAME");
     }
 
     /**

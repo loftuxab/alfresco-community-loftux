@@ -28,9 +28,9 @@
                 excludes="@{compileExcludes}" >
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <classpath>
+            <addPath/>
             <path refid="classpath.compile"/>
             <path refid="classpath.compile.extension"/>
-            <addPath/>
          </classpath>
 
             <!-- To run javac with Xlint:unchecked, uncomment the line below  -->

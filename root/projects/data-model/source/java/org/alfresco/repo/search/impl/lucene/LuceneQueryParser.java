@@ -104,128 +104,128 @@ public class LuceneQueryParser extends QueryParser
     /**
      * 
      */
-    private static final String FIELD_FTSSTATUS = "FTSSTATUS";
+    public static final String FIELD_FTSSTATUS = "FTSSTATUS";
 
     /**
      * 
      */
-    private static final String FIELD_ISNOTNULL = "ISNOTNULL";
+    public static final String FIELD_ISNOTNULL = "ISNOTNULL";
 
     /**
      * 
      */
-    private static final String FIELD_ISNULL = "ISNULL";
+    public static final String FIELD_ISNULL = "ISNULL";
 
     /**
      * 
      */
-    private static final String FIELD_ISUNSET = "ISUNSET";
+    public static final String FIELD_ISUNSET = "ISUNSET";
 
     /**
      * 
      */
-    private static final String FIELD_ALL = "ALL";
+    public static final String FIELD_ALL = "ALL";
 
     /**
      * 
      */
-    private static final String PROPERTY_FIELD_PREFIX = "@";
+    public static final String PROPERTY_FIELD_PREFIX = "@";
 
     /**
      * 
      */
-    private static final String FIELD_EXACTASPECT = "EXACTASPECT";
+    public static final String FIELD_EXACTASPECT = "EXACTASPECT";
 
     /**
      * 
      */
-    private static final String FIELD_EXACTTYPE = "EXACTTYPE";
+    public static final String FIELD_EXACTTYPE = "EXACTTYPE";
 
     /**
      * 
      */
-    private static final String FIELD_TYPE = "TYPE";
+    public static final String FIELD_TYPE = "TYPE";
 
     /**
      * 
      */
-    private static final String FIELD_ASPECT = "ASPECT";
+    public static final String FIELD_ASPECT = "ASPECT";
 
     /**
      * 
      */
-    private static final String FIELD_CLASS = "CLASS";
+    public static final String FIELD_CLASS = "CLASS";
 
     /**
      * 
      */
-    private static final String FIELD_ASSOCTYPEQNAME = "ASSOCTYPEQNAME";
+    public static final String FIELD_ASSOCTYPEQNAME = "ASSOCTYPEQNAME";
 
     /**
      * 
      */
-    private static final String FIELD_PRIMARYASSOCTYPEQNAME = "PRIMARYASSOCTYPEQNAME";
+    public static final String FIELD_PRIMARYASSOCTYPEQNAME = "PRIMARYASSOCTYPEQNAME";
 
     /**
      * 
      */
-    private static final String FIELD_QNAME = "QNAME";
+    public static final String FIELD_QNAME = "QNAME";
 
     /**
      * 
      */
-    private static final String FIELD_PRIMARYPARENT = "PRIMARYPARENT";
+    public static final String FIELD_PRIMARYPARENT = "PRIMARYPARENT";
 
     /**
      * 
      */
-    private static final String FIELD_PARENT = "PARENT";
+    public static final String FIELD_PARENT = "PARENT";
 
     /**
      * 
      */
-    private static final String FIELD_TX = "TX";
+    public static final String FIELD_TX = "TX";
 
     /**
      * 
      */
-    private static final String FIELD_ISNODE = "ISNODE";
+    public static final String FIELD_ISNODE = "ISNODE";
 
     /**
      * 
      */
-    private static final String FIELD_ISCONTAINER = "ISCONTAINER";
+    public static final String FIELD_ISCONTAINER = "ISCONTAINER";
 
     /**
      * 
      */
-    private static final String FIELD_ISROOT = "ISROOT";
+    public static final String FIELD_ISROOT = "ISROOT";
 
     /**
      * 
      */
-    private static final String FIELD_ID = "ID";
+    public static final String FIELD_ID = "ID";
 
     /**
      * 
      */
-    private static final String FIELD_TEXT = "TEXT";
+    public static final String FIELD_TEXT = "TEXT";
 
     /**
      * 
      */
-    private static final String FIELD_PATH_WITH_REPEATS = "PATH_WITH_REPEATS";
+    public static final String FIELD_PATH_WITH_REPEATS = "PATH_WITH_REPEATS";
 
     /**
      * 
      */
-    private static final String FIELD_PATH = "PATH";
+    public static final String FIELD_PATH = "PATH";
 
     private static Log s_logger = LogFactory.getLog(LuceneQueryParser.class);
 
-    private NamespacePrefixResolver namespacePrefixResolver;
+    protected NamespacePrefixResolver namespacePrefixResolver;
 
-    private DictionaryService dictionaryService;
+    protected DictionaryService dictionaryService;
 
     private TenantService tenantService;
 

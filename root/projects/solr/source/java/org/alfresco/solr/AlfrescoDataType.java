@@ -179,7 +179,7 @@ public class AlfrescoDataType extends FieldType
 
         Field f = new Field(field.getName(), val, getFieldStore(field, val), getFieldIndex(field, val), getFieldTermVec(field, val));
         f.setOmitNorms(getOmitNorms(field, val));
-        // Our lucene is not new enough .....f.setOmitTermFreqAndPositions(field.omitTf());
+        f.setOmitTermFreqAndPositions(field.omitTf());
         // Ignore index time boost
         // f.setBoost(boost);
         return f;

@@ -18,65 +18,24 @@
  */
 package org.alfresco.repo.search.impl.querymodel.impl.lucene;
 
-import org.alfresco.repo.search.MLAnalysisMode;
-import org.alfresco.repo.search.impl.lucene.LuceneAnalyser;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
-import org.alfresco.repo.tenant.TenantService;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
-import org.apache.lucene.index.IndexReader;
 
 /**
- * @author andyh
+ * @author Andy
+ *
  */
-public class LuceneQueryBuilderContext
+public interface LuceneQueryBuilderContext
 {
-    private LuceneQueryParser lqp;
-
-    private NamespacePrefixResolver namespacePrefixResolver;
-
-    /**
-     * Context for building lucene queries
-     * 
-     * @param dictionaryService
-     * @param namespacePrefixResolver
-     * @param tenantService
-     * @param searchParameters
-     * @param config
-     * @param indexReader
-     */
-    public LuceneQueryBuilderContext(DictionaryService dictionaryService, NamespacePrefixResolver namespacePrefixResolver, TenantService tenantService,
-            SearchParameters searchParameters, MLAnalysisMode defaultSearchMLAnalysisMode, IndexReader indexReader)
-    {
-        LuceneAnalyser analyzer = new LuceneAnalyser(dictionaryService, searchParameters.getMlAnalaysisMode() == null ? defaultSearchMLAnalysisMode : searchParameters
-                .getMlAnalaysisMode());
-        lqp = new LuceneQueryParser(searchParameters.getDefaultFieldName(), analyzer);
-        lqp.setDefaultOperator(LuceneQueryParser.OR_OPERATOR);
-        lqp.setDictionaryService(dictionaryService);
-        lqp.setNamespacePrefixResolver(namespacePrefixResolver);
-        lqp.setTenantService(tenantService);
-        lqp.setSearchParameters(searchParameters);
-        lqp.setDefaultSearchMLAnalysisMode(defaultSearchMLAnalysisMode);
-        lqp.setIndexReader(indexReader);
-        lqp.setAllowLeadingWildcard(true);
-        this.namespacePrefixResolver = namespacePrefixResolver;
-    }
 
     /**
      * @return - the parser
      */
-    public LuceneQueryParser getLuceneQueryParser()
-    {
-        return lqp;
-    }
+    public abstract LuceneQueryParser getLuceneQueryParser();
 
     /**
      * @return - the namespace prefix resolver
      */
-    public NamespacePrefixResolver getNamespacePrefixResolver()
-    {
-        return namespacePrefixResolver;
-    }
+    public abstract NamespacePrefixResolver getNamespacePrefixResolver();
 
 }
