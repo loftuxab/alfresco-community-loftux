@@ -181,6 +181,14 @@
    
    <!-- *** Alfresco *** -->
    
+   <bean id="yuiJSON" class="org.springframework.extensions.webeditor.WEFResourceImpl">
+      <property name="name" value="com.yahoo.json" />
+      <property name="description" value="JSON library" />
+      <property name="path" value="/res/yui/json/json.js" />
+      <property name="type" value="js" />
+      <property name="variableName" value="YAHOO.JSON" />
+   </bean>
+   
    <bean id="alfUtils" class="org.springframework.extensions.webeditor.WEFResourceImpl">
       <property name="name" value="org.alfresco.utils" />
       <property name="description" value="Common JavaScript utilities" />
@@ -188,6 +196,7 @@
       <property name="type" value="js" />
       <property name="dependencies">
          <list>
+            <ref bean="yuiJSON" />
             <ref bean="yuiUtilities" />
             <ref bean="yuiAnimation" />
             <ref bean="yuiSelector" />

@@ -52,33 +52,230 @@
       {
          YAHOO.org.alfresco.awe.app.superclass.init.apply(this);
 
+         YAHOO.Bubbling.unsubscribe = function(layer, handler)
+         {
+            this.bubble[layer].unsubscribe(handler);
+         }
+
          // handle events
          // edit content icon event
          Bubbling.on(YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT, function onEditContent_click(e, args) 
          {
-            this.loadForm(args[1]);
+            this.loadEditForm(args[1]);
+         }, this);
+         Bubbling.on(YAHOO.org.alfresco.awe.app.AWE_NEW_CONTENT_CLICK_EVENT, function onNewContent_click(e, args) 
+         {
+            this.loadCreateForm(args[1]);
+         }, this);
+         Bubbling.on(YAHOO.org.alfresco.awe.app.AWE_DELETE_CONTENT_CLICK_EVENT, function onDeleteContent_click(e, args) 
+         {
+            this.confirmDeleteNode(args[1]);
          }, this);
 
          // login/logoff
          Bubbling.on('awe'+WEF.SEPARATOR+'loggedIn', this.onLoggedIn, this, true);
          Bubbling.on('awe'+WEF.SEPARATOR+'loggedout', this.onLoggedOut, this, true);
 
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'quickcreateClick', this.onNewClick, this, true);
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'quickeditClick', this.onQuickEditClick, this, true);
+         Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'quickdeleteClick', this.onQuickDeleteClick, this, true);
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markersClick', this.onShowHideClick, this, true);
 
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'loggedoutClick', this.onLogoutClick, this, true);
 
          this.initAttributes(this.config);
-         this.registerEditableContent(this.config.editables);
+         this.getNodeInfo();
+
          return this;
+      },
+      
+      deleteNode: function AWE_App_deleteNode(editable)
+      {
+         var storeType = null;
+         var storeId = null;
+         var uuid = null;
+
+         var remainder = null;
+         var nodeRef = editable.nodeRef;
+	     if(nodeRef === null)
+	     {
+            // TODO
+	     }
+
+         // TODO could use a reg exp here
+         var storeTypeIdx = nodeRef.indexOf('://');
+	     storeType = nodeRef.substring(0, storeTypeIdx);
+         remainder = nodeRef.substring(storeTypeIdx + 3);
+
+	     var storeIdIdx = remainder.indexOf('/');
+	     storeId = remainder.substring(0, storeIdIdx);
+         uuid = remainder.substring(storeIdIdx + 1);
+
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + 'api/node/' + storeType + '/' + storeId + '/' + uuid,
+            method: Alfresco.util.Ajax.DELETE,
+            noReloadOnAuthFailure: true,
+            dataObj:
+            {
+            },
+            redirectUrl: editable.redirectUrl,
+            successCallback:
+            {
+               fn: this.onNodeDeleted,
+               scope: this
+            },
+            object:
+            {
+               editable: editable
+            },
+            failureCallback:
+            {
+               fn: function AWE_fn(args)
+               {
+                  if (args.serverResponse.status == 401)
+                  {
+                     this.login({
+                        fn: function retryDeleteNode()
+                        {
+                           this.deleteNode(editable);
+                        },
+                        scope: this
+                     });
+                  }
+                  else
+                  {
+                     this.handleAJAXErrors(args);
+                  }
+               },
+               scope: this
+            },
+            execScripts: true
+         });      
+      },
+      
+      handleAJAXErrors: function AWE_App_handleAJAXErrors(args)
+      {
+         Alfresco.util.PopupManager.displayPrompt({
+            title: Alfresco.util.message("message.error.title", this.name),
+            text: args.serverResponse.message || Alfresco.util.message('message.error.fatal')
+         });
+      },
+      
+      onNodeDeleted: function AWE_App_onNodeDelete(args)
+      {
+         var nodeDeletedMessage = Alfresco.util.PopupManager.displayMessage({
+                  text: this.getMessage('message.confirm.nodeDeleted'),
+                  spanClass: "wait",
+                  effect: null
+                  });
+         document.location.replace(args.config.redirectUrl);
+      },
+      
+      confirmDeleteNode: function AWE_App_confirmDeleteNode(editable)
+      {
+         var msg = Alfresco.util.message.call(this, 'message.confirm.delete', '', editable.title);
+	     var me = this;
+         var configDialog = Alfresco.util.PopupManager.displayPrompt({
+                  text: msg,
+                  modal: true,
+                  close: true,
+                  spanClass: "wait",
+                  displayTime: 0,
+                  buttons: [
+                        {
+                           text: this.getMessage("button.ok"),
+                           handler: function AWE_deleteNode_Ok()
+                           {
+                              this.destroy();
+                              me.deleteNode(editable);
+                           },
+                           isDefault: true
+                        },
+                        {
+                           text: this.getMessage("button.cancel"),
+                           handler: function AWE_deleteNode_cancel()
+                           {
+                              this.destroy();
+                           }
+                        }]
+               });
+      },
+
+      getNodeInfo: function AWE_App_getNodeInfo()
+      {
+         Bubbling.unsubscribe('awe'+WEF.SEPARATOR+'loggedIn', this.getNodeInfo);
+
+         var editables = this.get('editables');
+         if(editables != null && editables != undefined && editables.length > 0)
+	     {
+	        return;
+	     }
+
+         // get node info for each marked content node
+         var nodeRefsArray = [];
+         for (var i = 0; i < this.config.editables.length; i++) 
+         {
+            var config = this.config.editables[i];
+            nodeRefsArray.push(config.nodeRef);
+         }
+
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + 'api/bulkmetadata',
+            method: Alfresco.util.Ajax.POST,
+            responseContentType: Alfresco.util.Ajax.JSON,
+            requestContentType: Alfresco.util.Ajax.JSON,
+            noReloadOnAuthFailure: true,
+            dataObj:
+            {
+               nodeRefs: nodeRefsArray
+            },
+            successCallback:
+            {
+               fn: this.onNodesLoaded,
+               scope: this
+            },
+            object:
+            {
+               config: this.config
+            },
+            failureCallback: 
+            {
+               fn: function handleErrors(args)
+               {
+                  if (args.serverResponse.status == 401)
+                  {
+                     this.login({
+                        fn: this.getNodeInfo,
+                        scope: this
+                     });
+                  }
+                  else
+                  {
+                     this.handleAJAXErrors(args);
+                  }
+               },
+               scope: this
+            },
+            execScripts: true
+         });
+      },
+
+      onNodesLoaded: function AWE_App_nodesLoaded(o)
+      {
+         var config = o.config.object.config;
+         var nodes = o.json.nodes;
+         this.registerEditableContent(config.editables, nodes);
+		 this.render();
       },
 
       initAttributes : function AWE_App_initAttributes(attr)
       {
          this.setAttributeConfig('editables',
          {
-            value: attr.editables,
-            validator: YAHOO.lang.isArray 
+            value: [],
+            validator: YAHOO.lang.isObject 
          });
 
          this.setAttributeConfig('loggedInStatus',
@@ -93,11 +290,20 @@
       render: function AWE_render()
       {
          // innerHTML causes issues with rendering so use DOM
-         var wefEl = Dom.get('wef'),
-             div = document.createElement('div');
-
-         div.id = 'wef-login-panel';
-         wefEl.appendChild(div);
+	     var wefEl = Dom.get('wef');
+	     var div = Dom.get('wef-login-panel');
+	     if(div == null)
+	     {
+	        div = document.createElement('div');
+	        div.id = 'wef-login-panel';
+	        wefEl.appendChild(div);
+	     }
+	     
+         var editables = this.get('editables');
+         if(editables == null || editables.length == 0)
+         {
+            return;
+         }
 
          div = document.createElement('div');
          div.id = 'wef-panel';
@@ -119,6 +325,15 @@
 
          tb.addButtons(
          [
+             {
+               type: 'menu',
+               label: '<img src="' + contextPath + '/res/awe/images/quick-new.png" alt="'+ this.getMessage('awe.toolbar-quick-new-icon-label') +'" />',
+               title: this.getMessage('awe.toolbar-quick-new-icon-label'),
+               value: this.config.name + WebEditor.SEPARATOR + 'quickcreate',
+               id: this.config.name + WebEditor.SEPARATOR + 'quickcreate',
+               icon: true,
+               menu: this.renderCreateContentMenu(this.get('editables'))
+            },
             {
                type: 'menu',
                label: '<img src="' + contextPath + '/res/awe/images/quick-edit.png" alt="'+ this.getMessage('awe.toolbar-quick-edit-icon-label') +'" />',
@@ -126,19 +341,16 @@
                value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
                icon: true,
-               menu: function renderEditableContentMenu(markers)
-               {
-                  var menuConfig = [];
-                  for (var p in markers) 
-                  {
-                     menuConfig.push(
-                     {
-                        text: markers[p].title,
-                        value: markers[p]
-                     });
-                  }
-                  return menuConfig;
-               }(this.config.editables)
+               menu: this.renderEditableContentMenu(this.get('editables'))
+            },
+            {
+               type: 'menu',
+               label: '<img src="' + contextPath + '/res/awe/images/quick-delete.png" alt="'+ this.getMessage('awe.toolbar-quick-delete-icon-label') +'" />',
+               title: this.getMessage('awe.toolbar-quick-delete-icon-label'),
+               value: this.config.name + WebEditor.SEPARATOR + 'quickdelete',
+               id: this.config.name + WebEditor.SEPARATOR + 'quickdelete',
+               icon: true,
+               menu: this.renderDeleteContentMenu(this.get('editables'))
             },
             {
                type: 'push',
@@ -150,7 +362,8 @@
             }
          ]);
          tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
-         
+         tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickdelete').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
+
          //set up toolbar as a managed attribute so it can be exposed to other plugins
          this.setAttributeConfig('toolbar',
          {
@@ -172,6 +385,62 @@
          ]);
 
          this.refresh(['loggedInStatus']);
+      },
+
+      renderCreateContentMenu: function AWE_renderCreateContentMenu(editables)
+      {
+         var types = {};
+	     var menuConfig = [];
+	     for (var p in editables) 
+	     {
+	        var editable = editables[p].config;
+	        if(types[editable.type] == null)
+	        {
+		       var o = Alfresco.util.deepCopy(editable);
+		       types[editable.type] = o;
+            }
+	     }
+
+         for(var t in types)
+	     {
+            var type = types[t];
+            menuConfig.push({
+               text: Alfresco.util.message.call(this, 'message.create', '', type.typeTitle),
+               value: type
+            });
+         }
+
+         return menuConfig;
+      },
+
+      renderEditableContentMenu: function AWE_renderEditableContentMenu(editables)
+      {
+         var menuConfig = [];
+         for (var p in editables) 
+         {
+            var editable = editables[p].config;
+            menuConfig.push(
+            {
+	           text: Alfresco.util.message.call(this, 'message.edit', '', editable.title),
+               value: editable
+            });
+         }
+         return menuConfig;
+      },
+
+      renderDeleteContentMenu: function AWE_renderDeleteContentMenu(editables)
+      {
+         var menuConfig = [];
+         for (var p in editables) 
+         {
+            var editable = editables[p].config;
+            menuConfig.push(
+            {
+               text: Alfresco.util.message.call(this, 'message.delete', '', editable.title),
+               value: editable
+            });
+         }
+         return menuConfig;
       },
 
       /**
@@ -197,9 +466,9 @@
       },
 
       /**
-       * Loads a form
+       * Loads an edit form
        *
-       * @method loadForm
+       * @method loadEditForm
        * @param o {object} Config object; must have an dom element id and a nodeRef properties
        *                   e.g 
        *                   {
@@ -207,7 +476,7 @@
        *                      nodeRef: '..'   // NodeRef of content
        *                   }
        */
-      loadForm : function AWE_loadForm(o)
+      loadEditForm : function AWE_loadEditForm(o)
       {
          // formId is optional so use appropriate substitute string
          var formUri = null;
@@ -227,54 +496,159 @@
             formUri: formUri,
             nodeRef: o.nodeRef,
             domContentId: o.id,
-            title: o.title,
+            title: Alfresco.util.message.call(this, 'message.edit', '', o.title),
             nested: o.nested,
             redirectUrl: o.redirectUrl
          }).show();
       },
 
       /**
+       * Loads a create form
+       *
+       * @method loadCreateForm
+       * @param o {object} Config object; must have an dom element id and a nodeRef properties
+       *                   e.g 
+       *                   {
+       *                      id: 'elementId' // Id of content element,
+       *                      nodeRef: '..'   // NodeRef of content
+       *                   }
+       */
+      loadCreateForm : function AWE_loadCreateForm(o)
+      {
+         // formId is optional so use appropriate substitute string
+         var formUri = null;
+         if (o.formId)
+         {
+            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?mode=create&mimeType={mimeType}&itemKind=type&itemId={shortType}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}&destination={parentNodeRef}',o);
+         }
+         else
+         {
+            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?mode=create&mimeType={mimeType}&itemKind=type&itemId={shortType}&nodeRef={nodeRef}&redirect={redirectUrl}&destination={parentNodeRef}',o);
+         }
+
+         this.module.getFormPanelInstance('wef-panel').setOptions(
+         {
+            formName: 'wefPanel',
+	        formId: o.formId,
+	        formUri: encodeURI(formUri),
+            mimeType: o.mimeType,
+            parentNodeRef: o.parentNodeRef,
+            type: o.type,
+            domContentId: o.id,
+            title: Alfresco.util.message.call(this, 'message.create', '', o.typeTitle),
+	        name: o.name,
+            nested: o.nested,
+            redirectUrl: o.redirectUrl
+         }).show();
+      },
+      
+      /**
        * Registers editable content on page. Adds click events to load form.
        *
        * @method registerEditableContent
        *
        */
-      registerEditableContent : function AWE_registerEditableContent(configs)
+      registerEditableContent : function AWE_registerEditableContent(configs, nodes)
       {
          var editables = {};
-         for (var i=0,len = configs.length; i<len; i++)
+         for (var i=0,len = nodes.length; i<len; i++)
          {
             var config = configs[i];
+            var node = nodes[i];
             var id = config.id;
-            var elem = Selector.query('a', Dom.get(id), true);
+            var markerSpan = Dom.get(id);
+
+            if(node.error)
+            {
+               if(node.errorCode == 'invalidNodeRef')
+               {
+                  // ignore invalid nodes
+                  Dom.addClass(markerSpan, 'hide');
+               }
+
+               // TODO better handling here
+               continue;
+            }
+
+            var editableConfig = Alfresco.util.deepCopy(node);
+            editableConfig.id = id;
+            editableConfig.nested = config.nested;
+            editableConfig.redirectUrl = config.redirectUrl;
+            editableConfig.formId = config.formId;
+            
+            // construct the title. The title from the markup takes precedence,
+            // then the node title, then the node name.
+            if(config.title && config.title != '')
+            {
+                editableConfig.title = config.title;
+            }
+            else if(!editableConfig.title)
+            {
+               editableConfig.title = editableConfig.name;
+            }
+
+            editables[id] = 
+            {
+               config: editableConfig
+            };
+
+            var elem = Selector.query('a.alfresco-content-edit', markerSpan, true);
             if (elem)
             {
-               editables[config.id] = 
+               var imgElem = Selector.query('img', elem, true);
+               if(imgElem)
                {
-                  elem: elem,
-                  config:
-                  {
-                     id: id,
-                     title: config.title,
-                     formId: config.formId,
-                     redirectUrl: config.redirectUrl,
-                     nodeRef: config.nodeRef,
-                     nested: config.nested
-                  }
-               };
+                  imgElem.setAttribute("title", this.getMessage('message.edit') + ' ' + editableConfig.title); 
+               }
 
                Event.on(elem, 'click', function AWE_EDIT_CONTENT_CLICK_EVENT(e, o)
                {
                   Event.preventDefault(e);
                   Bubbling.fire(YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT, o);
                },
-               editables[config.id].config);
+               editables[id].config);
+            }
+
+            var newElem = Selector.query('a.alfresco-content-new', markerSpan, true);
+            if (newElem)
+            {
+               var imgElem = Selector.query('img', newElem, true);
+               if(imgElem)
+               {
+                  // TODO i18n
+                  imgElem.setAttribute("title", this.getMessage('message.create') + ' ' + editableConfig.title); 
+               }
+
+               Event.on(newElem, 'click', function AWE_NEW_CONTENT_CLICK_EVENT(e, o)
+               {
+                  Event.preventDefault(e);
+                  Bubbling.fire(YAHOO.org.alfresco.awe.app.AWE_NEW_CONTENT_CLICK_EVENT, o);
+               },
+               editables[id].config);
+            }
+
+            var deleteElem = Selector.query('a.alfresco-content-delete', markerSpan, true);
+            if (deleteElem)
+            {
+               var imgElem = Selector.query('img', deleteElem, true);
+               if(imgElem)
+               {
+                  // TODO i18n
+                  imgElem.setAttribute("title", this.getMessage('message.delete') + ' ' + editableConfig.title); 
+               }
+
+               Event.on(deleteElem, 'click', function AWE_DELETE_CONTENT_CLICK_EVENT(e, o)
+               {
+                  Event.preventDefault(e);
+                  Bubbling.fire(YAHOO.org.alfresco.awe.app.AWE_DELETE_CONTENT_CLICK_EVENT, o);
+               },
+               editables[id].config);
             }
          }
          this.set('editables', editables);
       },
 
-      getEditableContentMarkers :  function AWE_getEditableContentMarkers()
+      getEditableContentMarkers : function AWE_getEditableContentMarkers()
       {
          return this.get('editables');
       },
@@ -329,9 +703,19 @@
          }
       },
 
+      onNewClick: function AWE_onNewClick(e, args)
+      {
+         this.loadCreateForm(args[1]);
+      },
+      
       onQuickEditClick: function AWE_onQuickEditClick(e, args)
       {
-         this.loadForm(args[1]);
+         this.loadEditForm(args[1]);
+      },
+
+      onQuickDeleteClick: function AWE_onQuickDeleteClick(e, args)
+      {
+         this.confirmDeleteNode(args[1]);
       },
 
       onShowHideClick: function AWE_onShowHideClick(e, args)
@@ -496,7 +880,9 @@
       component: {}
    });
 
+   YAHOO.org.alfresco.awe.app.AWE_NEW_CONTENT_CLICK_EVENT = 'AWE_NewContent_click';
    YAHOO.org.alfresco.awe.app.AWE_EDIT_CONTENT_CLICK_EVENT = 'AWE_EditContent_click';
+   YAHOO.org.alfresco.awe.app.AWE_DELETE_CONTENT_CLICK_EVENT = 'AWE_DeleteContent_click';
 })();
 
 WEF.register("org.alfresco.awe", YAHOO.org.alfresco.awe.app, {version: "1.0.1", build: "1"}, YAHOO);

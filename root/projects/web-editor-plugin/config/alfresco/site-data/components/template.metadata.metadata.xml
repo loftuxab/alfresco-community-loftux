@@ -5,8 +5,8 @@
    <source-id>metadata</source-id>
    <url>/components/form?js={js}&amp;title={title}&amp;redirect={redirect}&amp;formId={formId}</url>
    <properties>
-      <itemKind>node</itemKind>
-      <itemId>{nodeRef}</itemId>
+      <itemKind>{itemKind}</itemKind>
+      <itemId>{itemId}</itemId>
       <showCaption>true</showCaption>
    </properties>
 </component>
