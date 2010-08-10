@@ -438,14 +438,14 @@ System variables provided by this component:
                                     <mysqlDatabaseQuery connectionId="mysql" sql="show databases" /> -->
                                 <runProgram>
                                     <program>${mysql_binary_directory}/mysql</program>
-                                    <programArguments>-u root -p${mysql_root_password} -P${mysql_port} -h${mysql_hostname} -e "show databases;"</programArguments>
+                                    <programArguments>-u root -p${mysql_root_password.password} -P${mysql_port} -h${mysql_hostname} -e "show databases;"</programArguments>
                                     <ruleList>
                                         <platformTest type="unix"/>
                                     </ruleList>
                                 </runProgram>
                                 <runProgram>
                                     <program>${mysql_binary_directory}/mysql.exe</program>
-                                    <programArguments>-u root -p${mysql_root_password} -P${mysql_port} -h${mysql_hostname} -e "show databases;"</programArguments>
+                                    <programArguments>-u root -p${mysql_root_password.password} -P${mysql_port} -h${mysql_hostname} -e "show databases;"</programArguments>
                                     <ruleList>
                                         <platformTest type="windows"/>
                                     </ruleList>
@@ -801,7 +801,7 @@ System variables provided by this component:
             <actionList>
                 <runProgram progressText="Initializing MySQL Database. This could take a couple of minutes.">
                     <program>${mysql_root_directory}/scripts/myscript.sh</program>
-                    <programArguments>${mysql_root_directory} ${mysql_root_password}</programArguments>
+                    <programArguments>${mysql_root_directory} ${mysql_root_password.password}</programArguments>
                     <abortOnError>0</abortOnError>
                     <showMessageOnError>1</showMessageOnError>
                 </runProgram>
@@ -822,7 +822,7 @@ System variables provided by this component:
                                 </exit>    
                                 <runProgram progressText="Initializing MySQL Database. This could take a couple of minutes.">
                                     <program>${mysql_root_directory}/scripts/myscript.sh</program>
-                                    <programArguments>${mysql_root_directory} ${mysql_root_password}</programArguments>
+                                    <programArguments>${mysql_root_directory} ${mysql_root_password.password}</programArguments>
                                     <abortOnError>0</abortOnError>
                                     <showMessageOnError>0</showMessageOnError>
                                 </runProgram>
@@ -900,7 +900,7 @@ System variables provided by this component:
                 <waitForPort port="${mysql_port}" timeout="30000" progressText="Waiting for MySQL to Start."/>
                 <runProgram>
                     <program>${mysql_root_directory}/scripts/myscript.bat</program>
-                    <programArguments>${mysql_root_password}</programArguments>
+                    <programArguments>${mysql_root_password.password}</programArguments>
                     <abortOnError>0</abortOnError>
                     <showMessageOnError>1</showMessageOnError>
                 </runProgram>
@@ -911,7 +911,7 @@ System variables provided by this component:
                 <runProgram>
                     <progressText>Shutting down MySQL</progressText>
                     <program>${installdir}\mysql\bin\mysqladmin.exe</program>
-                    <programArguments>--defaults-file=${installdir.dos}\mysql\my.ini -u ${mysql_root_user} --password=${mysql_root_password} shutdown</programArguments>
+                    <programArguments>--defaults-file=${installdir.dos}\mysql\my.ini -u ${mysql_root_user} --password=${mysql_root_password.password} shutdown</programArguments>
                     <abortOnError>0</abortOnError>
                     <showMessageOnError>1</showMessageOnError>
                 </runProgram>

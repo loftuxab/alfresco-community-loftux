@@ -20,7 +20,8 @@ Copyrighted by BitRock
             <actionList>
                 <autodetectJava>
                     <abortOnError>0</abortOnError>
-                    <showMessageOnError>This release was packaged to run on J2SE 5.0. Please install a compatible Java version and try again.</showMessageOnError>
+                    <showMessageOnError>1</showMessageOnError>
+                    <customErrorMessage>This release was packaged to run on J2SE 5.0. Please install a compatible Java version and try again.</customErrorMessage>
                     <promptUser>0</promptUser>
                     <validVersionList>
                         <validVersion>

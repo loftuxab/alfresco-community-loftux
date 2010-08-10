@@ -19,6 +19,7 @@
 
     <componentList>
         <include file="alfresco-customstack-build-settings.xml" />
+        <include file="alfresco-build-settings.xml" />
         <include file="alfresco-functions.xml" />
 
         <include file="alfresco-linux-building-on-windows-patch.xml" />

@@ -13,7 +13,7 @@
             <default>1</default>
             <optionList>
                 <option value="1" text="I wish to use the bundled MySQL database" />
-                <option value="0" text="I wish to use an existing MySQL database" />
+                <option value="0" text="I wish to use an existing database" />
             </optionList>
             <postShowPageActionList>
                 <actionGroup>
@@ -40,6 +40,42 @@
                 </actionGroup>
             </postShowPageActionList>
         </choiceParameter>
+	<parameterGroup>
+	    <name>alfrescomysqlquestion_existing</name>
+	    <title>Database configuration</title>
+	    <explanation></explanation>
+	    <parameterList>
+		<stringParameter>
+		    <name>jdbc_url</name>
+		    <description>JDBC URL</description>
+		    <default>jdbc:mysql://localhost/alfresco</default>
+		</stringParameter>
+		<stringParameter>
+		    <name>jdbc_driver</name>
+		    <description>JDBC Driver</description>
+		    <default>org.gjt.mm.mysql.Driver</default>
+		</stringParameter>
+		<stringParameter>
+		    <name>jdbc_database</name>
+		    <description>Database name</description>
+		    <default>alfresco</default>
+		</stringParameter>
+		<stringParameter>
+		    <name>jdbc_username</name>
+		    <description>Username</description>
+		    <default></default>
+		</stringParameter>
+		<passwordParameter>
+		    <name>jdbc_password</name>
+		    <description>Password</description>
+		    <descriptionRetype>Re-enter</descriptionRetype>
+		    <default></default>
+		</passwordParameter>
+	    </parameterList>
+	    <ruleList>
+		<isFalse value="${alfrescomysqlquestion_bundled}" />
+	    </ruleList>
+	</parameterGroup>
     </parameterList>
     <readyToInstallActionList>
         <actionGroup>
