@@ -1585,9 +1585,6 @@
        */
       onEventHighlightRow: function DL_onEventHighlightRow(oArgs)
       {
-         // Call through to get the row highlighted by YUI
-         this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
-
          // elRename is the element id of the rename file link
          // var elRename = Dom.get(this.id + "-rename-" + oArgs.target.id);
 
@@ -1595,8 +1592,11 @@
          var elActions = Dom.get(this.id + "-actions-" + oArgs.target.id);
 
          // Inject the correct action elements into the actionsId element
-         if (elActions.firstChild === null)
+         if (elActions && elActions.firstChild === null)
          {
+            // Call through to get the row highlighted by YUI
+            this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
+
             // Retrieve the actionSet for this asset
             var record = this.widgets.dataTable.getRecord(oArgs.target.id),
                actionSet = record.getData("actionSet");
@@ -1754,7 +1754,7 @@
          var elActions = Dom.get(this.id + "-actions-" + (oArgs.target.id));
 
          // Don't hide unless the More Actions drop-down is showing, or a dialog mask is present
-         if (!this.showingMoreActions || Dom.hasClass(document.body, "masked"))
+         if (elActions && !this.showingMoreActions || Dom.hasClass(document.body, "masked"))
          {
             // Just hide the action links, rather than removing them from the DOM
             // Dom.addClass(renameId, "hidden");

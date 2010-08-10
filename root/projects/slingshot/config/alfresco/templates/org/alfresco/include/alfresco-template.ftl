@@ -207,7 +207,7 @@ ${head}
    <div id="alfresco-yuiloader"></div>
    <#-- In portlet mode, Share doesn't own the <body> tag -->
    <script type="text/javascript">//<![CDATA[
-      Alfresco.util.YUILoaderHelper.loadComponents();
+      Alfresco.util.YUILoaderHelper.loadComponents(true);
       if (Alfresco.constants.PORTLET)
       {
          YUIDom.addClass(document.body, "yui-skin-${theme} alfresco-share");
