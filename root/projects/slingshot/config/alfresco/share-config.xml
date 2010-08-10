@@ -40,7 +40,7 @@
                <container-group id="tools" permission="admin">
                   <item type="link" id="application">/console/admin-console/application</item>
                   <item type="link" id="groups">/console/admin-console/groups</item>
-                  <item type="link" id="replication-jobs" condition="false">/console/admin-console/replication-jobs</item>
+                  <item type="link" id="replication-jobs">/console/admin-console/replication-jobs</item>
                   <item type="link" id="users">/console/admin-console/users</item>
                </container-group>
             </item>
@@ -77,7 +77,8 @@
          <uri-template id="userpage">/user/{userid}/{pageid}</uri-template>
          <uri-template id="userprofilepage">/user/{userid}/profile</uri-template>
          <uri-template id="userdefaultpage">/user/{pageid}</uri-template>
-         <uri-template id="consolepage">/console/{pageid}/{toolid}</uri-template>
+         <uri-template id="consoletoolpage">/console/{pageid}/{toolid}</uri-template>
+         <uri-template id="consolepage">/console/{pageid}</uri-template>
       </uri-templates>
    </config>
 

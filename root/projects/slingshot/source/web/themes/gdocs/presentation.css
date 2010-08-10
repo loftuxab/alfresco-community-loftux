@@ -835,13 +835,10 @@ body.yui-skin-gdocs .categoryview .category .ygtvdepthcell
 
 /* filter list link */
 
-.yui-skin-gdocs .filter li.selected, 
-.yui-skin-gdocs .tags li.selected,
-.archive li.selected,
-.tool li.selected,
-body.yui-skin-gdocs .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
+.yui-skin-gdocs li.selected, 
 body.yui-skin-gdocs .treeview .selected,
-body.yui-skin-gdocs .categoryview .selected
+body.yui-skin-gdocs .categoryview .selected,
+body.yui-skin-gdocs .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
 {
    background-color: #dee6ff;
 }
