@@ -40,7 +40,7 @@ public class CachingTermPositions implements TermPositions
 
     TermPositions delegate;
 
-    CachingTermPositions(TermPositions delegate)
+    public CachingTermPositions(TermPositions delegate)
     {
         this.delegate = delegate;
     }
