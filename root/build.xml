@@ -206,11 +206,9 @@
          <exclude name="**/org/alfresco/repo/version/**/*Test.java" />
          <include name="**/org/alfresco/repo/version/VersionTestSuite.java" />
          <!-- AVM Tests -->
-         <!--
          <exclude name="**/org/alfresco/repo/avm/**/*Test.java" />
          <exclude name="**/org/alfresco/repo/avm/**/*TestP.java" />
          <include name="**/org/alfresco/repo/avm/AVMTestSuite.java" />
-         -->
          <!-- Workflow Tests -->
          <exclude name="**/org/alfresco/repo/workflow/**/*Test.java" />
          <include name="**/org/alfresco/repo/workflow/WorkflowTestSuite.java" />
