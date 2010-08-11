@@ -7,10 +7,10 @@
       </span>
    </div>
    </#if>
-   <#if page.url.args.back??>
+   <#if backlink??>
    <div>
       <span class="navigation-item backLink">
-         <a href="${url.context}/page/search?${page.url.args.back?html}">${msg("header.results")}</a>
+         <a href="search?${backlink?html}">${msg("header.results")}</a>
       </span>
    </div>
    </#if>

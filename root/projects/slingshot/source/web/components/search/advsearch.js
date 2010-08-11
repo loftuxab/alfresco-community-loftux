@@ -273,7 +273,14 @@
          // retrieve form data structure directly from the runtime
          var formData = this.currentForm.runtime.getFormData();
          
-         // TODO: search based on supplied keywords and form data fields
+         // build and execute url for search page
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "search?t={terms}&q={query}",
+         {
+            terms: encodeURIComponent(Dom.get(this.id + "-search-text").value),
+            query: encodeURIComponent(YAHOO.lang.JSON.stringify(formData))
+         });
+         
+         window.location.href = url;
       },
       
       /**
