@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.repo.search.impl.lucene.query.AbsoluteStructuredFieldPosition;
+import org.alfresco.repo.search.impl.lucene.query.DescendantAndSelfStructuredFieldPosition;
+import org.alfresco.repo.search.impl.lucene.query.RelativeStructuredFieldPosition;
+import org.alfresco.repo.search.impl.lucene.query.SelfAxisStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.StructuredFieldPosition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.apache.lucene.index.IndexReader;
@@ -135,27 +139,47 @@ public class SolrPathQuery extends Query
     public String toString()
     {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<PATH>:");
-        int i = 0;
-        for (StructuredFieldPosition sfp : pathStructuredFieldPositions)
+        stringBuilder.append("PATH:");
+        for(int i = 0; i < pathStructuredFieldPositions.size(); i+=2)
         {
-            if (i % 2 == 0)
+            if(pathStructuredFieldPositions.get(i) instanceof AbsoluteStructuredFieldPosition)
             {
-                stringBuilder.append('/');
+                stringBuilder.append("/");
+                if((pathStructuredFieldPositions.get(i).getTermText() == null) && (pathStructuredFieldPositions.get(i+1).getTermText() == null))
+                {
+                    stringBuilder.append("*");
+                }
+                else
+                {
+                    stringBuilder.append(pathStructuredFieldPositions.get(i).getTermText() == null ? "*" : pathStructuredFieldPositions.get(i).getTermText());
+                    stringBuilder.append(":");
+                    stringBuilder.append(pathStructuredFieldPositions.get(i+1).getTermText() == null ? "*" : pathStructuredFieldPositions.get(i+1).getTermText());
+                    
+                }
             }
-            else
+            else if(pathStructuredFieldPositions.get(i) instanceof DescendantAndSelfStructuredFieldPosition)
             {
-                stringBuilder.append(':');
+                stringBuilder.append("//");
             }
-            if (sfp.matchesAll())
+            else if(pathStructuredFieldPositions.get(i) instanceof RelativeStructuredFieldPosition)
             {
-                stringBuilder.append("*");
+                stringBuilder.append("/");
+                if((pathStructuredFieldPositions.get(i).getTermText() == null) && (pathStructuredFieldPositions.get(i+1).getTermText() == null))
+                {
+                    stringBuilder.append("*");
+                }
+                else
+                {
+                    stringBuilder.append(pathStructuredFieldPositions.get(i).getTermText() == null ? "*" : pathStructuredFieldPositions.get(i).getTermText());
+                    stringBuilder.append(":");
+                    stringBuilder.append(pathStructuredFieldPositions.get(i+1).getTermText() == null ? "*" : pathStructuredFieldPositions.get(i+1).getTermText());
+                    
+                }
             }
-            else
+            else if(pathStructuredFieldPositions.get(i) instanceof SelfAxisStructuredFieldPosition)
             {
-                stringBuilder.append(sfp.getTermText());
+                stringBuilder.append(".");
             }
-            i++;
         }
         return stringBuilder.toString();
     }
@@ -306,5 +330,51 @@ public class SolrPathQuery extends Query
     {
         this.repeats = repeats;
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((pathField == null) ? 0 : pathField.hashCode());
+        result = prime * result + ((pathStructuredFieldPositions == null) ? 0 : pathStructuredFieldPositions.hashCode());
+        result = prime * result + (repeats ? 1231 : 1237);
+        result = prime * result + unitSize;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SolrPathQuery other = (SolrPathQuery) obj;
+        if (pathField == null)
+        {
+            if (other.pathField != null)
+                return false;
+        }
+        else if (!pathField.equals(other.pathField))
+            return false;
+        if (pathStructuredFieldPositions == null)
+        {
+            if (other.pathStructuredFieldPositions != null)
+                return false;
+        }
+        else if (!pathStructuredFieldPositions.equals(other.pathStructuredFieldPositions))
+            return false;
+        if (repeats != other.repeats)
+            return false;
+        if (unitSize != other.unitSize)
+            return false;
+        return true;
+    }
+    
+    
+
 
 }

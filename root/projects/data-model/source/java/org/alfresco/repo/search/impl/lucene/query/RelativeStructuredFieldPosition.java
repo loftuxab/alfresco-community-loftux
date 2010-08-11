@@ -93,4 +93,30 @@ public class RelativeStructuredFieldPosition extends AbstractStructuredFieldPosi
     {
         return "Relative Named child";
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + relativePosition;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RelativeStructuredFieldPosition other = (RelativeStructuredFieldPosition) obj;
+        if (relativePosition != other.relativePosition)
+            return false;
+        return true;
+    }
+    
+    
 }
