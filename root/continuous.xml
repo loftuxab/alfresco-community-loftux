@@ -470,14 +470,14 @@
        </exec>
        <!-- increase logfilsz for certain unit tests that run large txns (see ALF-4241) -->
        <exec executable="db2cmd">
-         <arg line="/c /i db2 update database configuration for ${db.name} using logfilsz 4096"/>
+         <arg line="/c /i db2 update database configuration for ${db.name} using logfilsiz 4096"/>
        </exec>
        <exec executable="db2cmd">
          <arg line="/c /i db2 create database ${db.name}_test using codeset UTF-8 territory default pagesize 32 K"/>
        </exec>
        <!-- increase logfilsz for certain unit tests that run large txns (see ALF-4241) -->
        <exec executable="db2cmd">
-         <arg line="/c /i db2 update database configuration for ${db.name}_test using logfilsz 4096"/>
+         <arg line="/c /i db2 update database configuration for ${db.name}_test using logfilsiz 4096"/>
        </exec>
    </target>
 
