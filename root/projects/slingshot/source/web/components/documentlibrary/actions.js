@@ -619,22 +619,37 @@
        */
       onActionAssignWorkflow: function dlA_onActionAssignWorkflow(asset)
       {
-         var nodeRefs = "";
+         var nodeRefs = "",
+            destination = null;
          if (YAHOO.lang.isArray(asset))
          {
+            var sameParent = true;
             for (var i = 0, il = asset.length; i < il; i++)
             {
                nodeRefs += (i == 0 ? "" : ",") + asset[i].nodeRef;
+               if (sameParent && i > 0)
+               {
+                  sameParent = asset[i - 1].location.parent.nodeRef == asset[i].location.parent.nodeRef;
+               }
+            }
+            if (sameParent && asset.length > 0)
+            {
+               destination = asset[i - 1].location.parent.nodeRef;
+            }
+            else
+            {
+               destination = Alfresco.util.findValueByDotNotation(this, "modules.docList.doclistMetadata.container")
             }
          }
          else
          {
-            nodeRefs = asset.nodeRef;
+            nodeRefs = asset.nodeRef;                          
+            destination = asset.location.parent.nodeRef;
          }
          var postBody = { "selectedItems" : nodeRefs};
-         if (this.doclistMetadata)
+         if (destination)
          {
-            postBody.destination = this.doclistMetadata.parent.nodeRef;
+            postBody.destination = destination;
          }
          Alfresco.util.navigateTo($siteURL("start-workflow"), "POST", postBody);
       },

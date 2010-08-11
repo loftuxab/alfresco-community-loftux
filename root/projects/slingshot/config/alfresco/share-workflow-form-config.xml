@@ -35,11 +35,7 @@
                <field id="bpm:workflowPriority">
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
-               <field id="packageItems" set="items">
-                  <control>
-                     <control-param name="selectedValueContextProperty">selectedItems</control-param>
-                  </control>
-               </field>
+               <field id="packageItems" set="items"/>
             </appearance>
          </form>
       </forms>
@@ -68,11 +64,7 @@
                <field id="bpm:workflowPriority">
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
-               <field id="packageItems" set="items">
-                  <control>
-                     <control-param name="selectedValueContextProperty">selectedItems</control-param>
-                  </control>
-               </field>
+               <field id="packageItems" set="items"/>
             </appearance>
          </form>
       </forms>
@@ -102,11 +94,7 @@
                <field id="bpm:workflowPriority">
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
-               <field id="packageItems" set="items">
-                  <control>
-                     <control-param name="selectedValueContextProperty">selectedItems</control-param>
-                  </control>
-               </field>
+               <field id="packageItems" set="items"/>
             </appearance>
          </form>
       </forms>
