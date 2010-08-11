@@ -177,11 +177,15 @@
                   task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)
             {
                // Task is owner or initiator
-               if (task.state == "IN_PROGRESS" && (!task.properties.hasOwnProperty("bpm_reassignable") || task.properties["bpm_reassignable"] == true))
+               if (task.state == "IN_PROGRESS" && !task.isPooled &&
+                   (!task.properties.hasOwnProperty("bpm_reassignable") || 
+                     task.properties["bpm_reassignable"] == null || 
+                     task.properties["bpm_reassignable"] == true))
                {
                   this.widgets.reassignButton = Alfresco.util.createYUIButton(this, "reassign", this.onReassignButtonClick);
                   Dom.removeClass(Selector.query(".actions .reassign", this.id), "hidden");
                }
+               
                if (task.isPooled)
                {
                   this.widgets.releaseButton = Alfresco.util.createYUIButton(this, "release", this.onReleaseButtonClick);
