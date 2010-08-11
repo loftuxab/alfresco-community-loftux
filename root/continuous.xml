@@ -468,9 +468,17 @@
        <exec executable="db2cmd">
          <arg line="/c /i db2 create database ${db.name} using codeset UTF-8 territory default pagesize 32 K"/>
        </exec>
+       <!-- increase logfilsz for certain unit tests that run large txns (see ALF-4241) -->
+       <exec executable="db2cmd">
+         <arg line="/c /i db2 update database configuration ${db.name} using logfilsz 4096"/>
+       </exec>
        <exec executable="db2cmd">
          <arg line="/c /i db2 create database ${db.name}_test using codeset UTF-8 territory default pagesize 32 K"/>
-       </exec>   
+       </exec>
+       <!-- increase logfilsz for certain unit tests that run large txns (see ALF-4241) -->
+       <exec executable="db2cmd">
+         <arg line="/c /i db2 update database configuration ${db.name}_test using logfilsz 4096"/>
+       </exec>
    </target>
 
    <target name="-drop-database" 
