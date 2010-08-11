@@ -2306,7 +2306,7 @@ Alfresco.util.YUILoaderHelper = function()
       {
          if (initialLoaderComplete || p_pageLoad === true)
          {
-            if (yuiLoader !== null && callbacks.length > 0)
+            if (yuiLoader !== null)
             {
                yuiLoader.insert(null, "js");
             }
