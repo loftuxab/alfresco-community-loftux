@@ -14,6 +14,7 @@
    var ${picker} = new Alfresco.ObjectFinder("${controlId}", "${fieldHtmlId}").setOptions(
    {
       <#if form.mode == "view" || field.disabled>disabled: true,</#if>
+      field: "${field.name}",
       compactMode: ${compactMode?string},
    <#if field.mandatory??>
       mandatory: ${field.mandatory?string},
