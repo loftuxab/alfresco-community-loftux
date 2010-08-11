@@ -26,6 +26,16 @@ function main()
       // Prepare the model
       model.siteTitle = (siteTitle != null ? siteTitle : "");
    }
+   
+   // Build search results back link from supplied args
+   if (page.url.args["st"] != null || page.url.args["stag"] != null)
+   {
+      var query = "t=" + (page.url.args["st"] != null ? encodeURIComponent(page.url.args["st"]) : "") +
+                  "&tag=" + (page.url.args["stag"] != null ? encodeURIComponent(page.url.args["stag"]) : "") +
+                  "&s=" + (page.url.args["ss"] != null ? encodeURIComponent(page.url.args["ss"]) : "") +
+                  "&a=" + (page.url.args["sa"] != null ? encodeURIComponent(page.url.args["sa"]) : "");
+      model.backlink = query;
+   }
 }
 
 main();

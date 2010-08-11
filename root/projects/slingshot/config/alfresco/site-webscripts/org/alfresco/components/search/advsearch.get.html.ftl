@@ -21,6 +21,7 @@
       <div class="yui-u first">
          <span class="lookfor">${msg("label.lookfor")}:</span>
          
+         <#-- component to show list of forms, displays current form -->
          <div style="position:relative">
             <div class="selected-form theme-bg-2 theme-border-3">
                <ul>
@@ -33,6 +34,7 @@
                </ul>
             </div>
             
+            <#-- pop-up list of available forms -->
             <div class="form-list theme-bg-2 theme-border-3 hidden">
                <ul id="${el}-form-list"></ul>
             </div>
@@ -48,11 +50,13 @@
       </div>
    </div>
    
+   <#-- keywords entry box -->
    <div class="keywords-box">
       <div>${msg("label.keywords")}:</div>
-      <input type="text" class="terms" name="${el}-search-text" id="${el}-search-text" value="" maxlength="1024" />
+      <input type="text" class="terms" name="${el}-search-text" id="${el}-search-text" value="${(page.url.args["st"]!"")?html}" maxlength="1024" />
    </div>
    
+   <#-- container for forms retrieved via ajax -->
    <div id="${el}-forms" class="forms-container form-fields">
    </div>
    
