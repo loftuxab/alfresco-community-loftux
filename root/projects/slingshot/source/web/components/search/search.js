@@ -124,6 +124,14 @@
          initialSort: "",
          
          /**
+          * Advanced Search query - forms data json format based search.
+          * @property searchQuery
+          * @type string
+          * @default ""
+          */
+         searchQuery: "",
+         
+         /**
           * Number of characters required for a search.
           *
           * @property minSearchTermLength
@@ -730,7 +738,8 @@
          var searchTag = YAHOO.lang.trim(args.searchTag);
          var searchAll = args.searchAll;
          var searchSort = args.searchSort;
-         if (searchTag.length === 0 && searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
+         if (this.options.searchQuery.length === 0 &&
+             searchTag.length === 0 && searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -827,12 +836,13 @@
       _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm, searchTag, searchSort)
       {
          var site = searchAll ? "" : this.options.siteId;
-         var params = YAHOO.lang.substitute("site={site}&term={term}&tag={tag}&maxResults={maxResults}&sort={sort}",
+         var params = YAHOO.lang.substitute("site={site}&term={term}&tag={tag}&maxResults={maxResults}&sort={sort}&query={query}",
          {
             site: encodeURIComponent(site),
             term: encodeURIComponent(searchTerm),
             tag: encodeURIComponent(searchTag),
             sort: encodeURIComponent(searchSort),
+            query: encodeURIComponent(this.options.searchQuery),
             maxResults: this.options.maxSearchResults + 1 // to calculate whether more results were available
          });
          
