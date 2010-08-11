@@ -7,6 +7,7 @@
       initialSearchTag: "${searchTag?js_string}",
       initialSearchAll: ${searchAll?string},
       initialSort: "${searchSort?js_string}",
+      searchQuery: "${searchQuery?js_string}",
       minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
       maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}
    }).setMessages(

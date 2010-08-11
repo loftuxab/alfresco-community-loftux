@@ -273,6 +273,11 @@
          // retrieve form data structure directly from the runtime
          var formData = this.currentForm.runtime.getFormData();
          
+         // add DD type to form data structure
+         formData.datatype = this.currentForm.type;
+         
+         // TODO: add site to search page url
+         
          // build and execute url for search page
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "search?t={terms}&q={query}",
          {

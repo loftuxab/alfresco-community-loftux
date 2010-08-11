@@ -61,6 +61,8 @@ function main()
    model.searchTag = (page.url.args["tag"] != null) ? page.url.args["tag"] : "";
    model.searchSort = (page.url.args["s"] != null) ? page.url.args["s"] : "";
    model.searchAll = (page.url.args["a"] == "true");
+   // Advanced search forms based json query
+   model.searchQuery = (page.url.args["q"] != null) ? page.url.args["q"] : "";
 }
 
 main();
