@@ -68,6 +68,7 @@
       this.columns = [];
       this.currentValueMeta = [];
       this.selectedItems = [];
+      this.isReady = false;
       
       this.options.objectRenderer = new Alfresco.ObjectRenderer(this);
 
@@ -108,7 +109,15 @@
           * @type string
           */
          currentValue: "",
-         
+
+         /**
+          * The name of the field that the object finder displays
+          *
+          * @property field
+          * @type string
+          */
+         field: null,
+
          /**
           * The type of the item to find
           *
@@ -331,6 +340,14 @@
       selectedItems: null,
 
       /**
+       * Determines if this component is ready (to be called from outside)
+       *
+       * @property isReady
+       * @type boolean
+       */
+      isReady: false,
+
+      /**
        * Set multiple initialization options at once.
        *
        * @override
@@ -359,6 +376,18 @@
          Alfresco.ObjectFinder.superclass.setMessages.call(this, obj);
          this.options.objectRenderer.setMessages(obj);
          return this;
+      },
+
+      /**
+       * Set messages for this component.
+       *
+       * @method selectItems
+       * @param items {Array} Array of item ids to populate the current value with
+       */
+      selectItems: function ObjectFinder_selectItems(items)
+      {
+         this.options.selectedValue = items;
+         this._loadSelectedItems();
       },
       
       /**
@@ -590,12 +619,12 @@
        */
       _adjustCurrentValues: function ()
       {
-         var addedItems = this.getAddedItems(),
-            removedItems = this.getRemovedItems(),
-            selectedItems = this.getSelectedItems();
-
          if (!this.options.disabled)
          {
+            var addedItems = this.getAddedItems(),
+               removedItems = this.getRemovedItems(),
+               selectedItems = this.getSelectedItems();
+
             if (this.options.maintainAddedRemovedItems)
             {
                Dom.get(this.id + "-added").value = addedItems.toString();
@@ -621,8 +650,10 @@
                selectedItems: selectedItems,
                selectedItemsMetaData: Alfresco.util.deepCopy(this.selectedItems)
             });
-         }
 
+            this._enableActions();
+
+         }
       },
 
       /**
@@ -1153,7 +1184,10 @@
             var item = oRecord.getData(),
                modifiedOn = item.modified ? Alfresco.util.formatDate(Alfresco.util.fromISO8601(item.modified)) : null,
                template = '<h3 class="name">{name}</h3>';
-            template += '<div class="description">{description}</div>';
+            if (item.description)
+            {
+               template += '<div class="description">{description}</div>';
+            }
             if (modifiedOn)
             {
                template += '<div class="viewmode-label">' + scope.msg("form.control.object-picker.modified-on") + ': ' + modifiedOn + '</div>';
@@ -1644,13 +1678,22 @@
       {
          if (this.widgets.removeAllButton)
          {
-            // Enable the remove all button
-            this.widgets.removeAllButton.set("disabled", false);
+            // Enable the remove all button if there is any items
+            this.widgets.removeAllButton.set("disabled", this.widgets.currentValuesDataTable.getRecordSet().getLength() == 0);
          }
          if (this.widgets.addButton)
          {
             // Enable the add button
             this.widgets.addButton.set("disabled", false);                  
+         }
+
+         if (!this.options.disabled && !this.isReady)
+         {
+            YAHOO.Bubbling.fire("objectFinderReady",
+            {
+               eventGroup: this
+            });
+            this.isReady = true;
          }
       }
    });

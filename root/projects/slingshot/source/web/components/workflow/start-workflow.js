@@ -46,6 +46,8 @@
       this.name = "Alfresco.StartWorkflow";
       Alfresco.util.ComponentManager.reregister(this);
 
+      YAHOO.Bubbling.on("objectFinderReady", this.onObjectFinderReady, this);
+
       return this;
    };
 
@@ -90,6 +92,21 @@
          return Alfresco.StartWorkflow.superclass.onReady.call(this);
       },
 
+      /**
+       * Will populate the form packageItem's objectFinder with selectedItems when its ready
+       *
+       * @method onObjectFinderReady
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters
+       */
+      onObjectFinderReady: function StartWorkflow_onObjectFinderReady(layer, args)
+      {
+         var objectFinder = args[1].eventGroup;
+         if (objectFinder.options.field == "assoc_packageItems" && objectFinder.eventGroup.indexOf(this.id) == 0)
+         {
+            objectFinder.selectItems(this.options.selectedItems);
+         }
+      },
 
       /**
        * Called when a workflow definition has been selected
@@ -113,7 +130,6 @@
                   showCaption: true,
                   formUI: true,
                   showCancelButton: true,
-                  selectedItems: this.options.selectedItems,
                   destination: this.options.destination
                },
                successCallback:
