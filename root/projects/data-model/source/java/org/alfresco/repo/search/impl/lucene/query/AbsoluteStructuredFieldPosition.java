@@ -105,4 +105,30 @@ public class AbsoluteStructuredFieldPosition extends AbstractStructuredFieldPosi
     {
         return "Absolute Named child";
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + requiredPosition;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        AbsoluteStructuredFieldPosition other = (AbsoluteStructuredFieldPosition) obj;
+        if (requiredPosition != other.requiredPosition)
+            return false;
+        return true;
+    }
+    
+    
 }
