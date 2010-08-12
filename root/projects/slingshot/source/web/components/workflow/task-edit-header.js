@@ -198,7 +198,7 @@
             // Task is unassigned
             this.widgets.claimButton = Alfresco.util.createYUIButton(this, "claim", this.onClaimButtonClick);
             Dom.removeClass(Selector.query(".actions .claim", this.id), "hidden");
-            Dom.removeClass(Selector.query(".info.unassigned", this.id), "hidden");
+            Dom.removeClass(Selector.query(".unassigned-message", this.id), "hidden");
          }
       },
 
