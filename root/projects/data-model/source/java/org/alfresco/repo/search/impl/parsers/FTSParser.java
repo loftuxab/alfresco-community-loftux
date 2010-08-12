@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2010-07-07 14:54:30
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2010-08-11 21:23:02
 
 package org.alfresco.repo.search.impl.parsers;
 
@@ -14,7 +14,7 @@ import org.antlr.runtime.tree.*;
 
 public class FTSParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "FTS", "DISJUNCTION", "CONJUNCTION", "NEGATION", "TERM", "EXACT_TERM", "PHRASE", "SYNONYM", "RANGE", "PROXIMITY", "DEFAULT", "MANDATORY", "OPTIONAL", "EXCLUDE", "FIELD_DISJUNCTION", "FIELD_CONJUNCTION", "FIELD_NEGATION", "FIELD_GROUP", "FIELD_DEFAULT", "FIELD_MANDATORY", "FIELD_OPTIONAL", "FIELD_EXCLUDE", "FG_TERM", "FG_EXACT_TERM", "FG_PHRASE", "FG_SYNONYM", "FG_PROXIMITY", "FG_RANGE", "FIELD_REF", "INCLUSIVE", "EXCLUSIVE", "QUALIFIER", "PREFIX", "NAME_SPACE", "BOOST", "FUZZY", "TEMPLATE", "PLUS", "BAR", "MINUS", "LPAREN", "RPAREN", "PERCENT", "COMMA", "TILDA", "DECIMAL_INTEGER_LITERAL", "CARAT", "COLON", "EQUALS", "FTSPHRASE", "ID", "FTSWORD", "FTSPRE", "FTSWILD", "NOT", "TO", "FLOATING_POINT_LITERAL", "STAR", "DOTDOT", "LSQUARE", "LT", "RSQUARE", "GT", "AT", "URI", "QUESTION_MARK", "OR", "AND", "AMP", "EXCLAMATION", "F_ESC", "F_URI_ALPHA", "F_URI_DIGIT", "F_URI_OTHER", "F_HEX", "F_URI_ESC", "DOT", "LCURL", "RCURL", "DOLLAR", "DECIMAL_NUMERAL", "INWORD", "START_RANGE_I", "START_RANGE_F", "DIGIT", "EXPONENT", "ZERO_DIGIT", "NON_ZERO_DIGIT", "E", "SIGNED_INTEGER", "WS"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "FTS", "DISJUNCTION", "CONJUNCTION", "NEGATION", "TERM", "EXACT_TERM", "PHRASE", "SYNONYM", "RANGE", "PROXIMITY", "DEFAULT", "MANDATORY", "OPTIONAL", "EXCLUDE", "FIELD_DISJUNCTION", "FIELD_CONJUNCTION", "FIELD_NEGATION", "FIELD_GROUP", "FIELD_DEFAULT", "FIELD_MANDATORY", "FIELD_OPTIONAL", "FIELD_EXCLUDE", "FG_TERM", "FG_EXACT_TERM", "FG_PHRASE", "FG_SYNONYM", "FG_PROXIMITY", "FG_RANGE", "FIELD_REF", "INCLUSIVE", "EXCLUSIVE", "QUALIFIER", "PREFIX", "NAME_SPACE", "BOOST", "FUZZY", "TEMPLATE", "PLUS", "BAR", "MINUS", "LPAREN", "RPAREN", "PERCENT", "COMMA", "TILDA", "DECIMAL_INTEGER_LITERAL", "CARAT", "COLON", "EQUALS", "FTSPHRASE", "ID", "FTSWORD", "FTSPRE", "FTSWILD", "NOT", "TO", "FLOATING_POINT_LITERAL", "STAR", "DOTDOT", "LSQUARE", "LT", "RSQUARE", "GT", "AT", "URI", "DOT", "QUESTION_MARK", "OR", "AND", "AMP", "EXCLAMATION", "F_ESC", "F_URI_ALPHA", "F_URI_DIGIT", "F_URI_OTHER", "F_HEX", "F_URI_ESC", "LCURL", "RCURL", "DOLLAR", "DECIMAL_NUMERAL", "INWORD", "START_RANGE_I", "START_RANGE_F", "DIGIT", "EXPONENT", "ZERO_DIGIT", "NON_ZERO_DIGIT", "E", "SIGNED_INTEGER", "WS"
     };
     public static final int PREFIX=36;
     public static final int LT=64;
@@ -25,7 +25,7 @@ public class FTSParser extends Parser {
     public static final int FUZZY=39;
     public static final int FIELD_DISJUNCTION=18;
     public static final int EQUALS=52;
-    public static final int F_URI_ALPHA=75;
+    public static final int F_URI_ALPHA=76;
     public static final int FG_EXACT_TERM=27;
     public static final int NOT=58;
     public static final int FIELD_EXCLUDE=25;
@@ -33,8 +33,8 @@ public class FTSParser extends Parser {
     public static final int NAME_SPACE=37;
     public static final int RPAREN=45;
     public static final int FLOATING_POINT_LITERAL=60;
-    public static final int EXCLAMATION=73;
-    public static final int QUESTION_MARK=69;
+    public static final int EXCLAMATION=74;
+    public static final int QUESTION_MARK=70;
     public static final int ZERO_DIGIT=90;
     public static final int FIELD_OPTIONAL=24;
     public static final int SYNONYM=11;
@@ -49,9 +49,9 @@ public class FTSParser extends Parser {
     public static final int FTSPHRASE=53;
     public static final int FIELD_CONJUNCTION=19;
     public static final int INCLUSIVE=33;
-    public static final int OR=70;
+    public static final int OR=71;
     public static final int GT=66;
-    public static final int F_HEX=78;
+    public static final int F_HEX=79;
     public static final int DECIMAL_INTEGER_LITERAL=49;
     public static final int FTSPRE=56;
     public static final int FG_PHRASE=28;
@@ -59,7 +59,7 @@ public class FTSParser extends Parser {
     public static final int TERM=8;
     public static final int DOLLAR=83;
     public static final int START_RANGE_I=86;
-    public static final int AMP=72;
+    public static final int AMP=73;
     public static final int FG_PROXIMITY=30;
     public static final int EXACT_TERM=9;
     public static final int START_RANGE_F=87;
@@ -67,21 +67,21 @@ public class FTSParser extends Parser {
     public static final int MANDATORY=15;
     public static final int EXCLUSIVE=34;
     public static final int ID=54;
-    public static final int AND=71;
+    public static final int AND=72;
     public static final int LPAREN=44;
     public static final int BOOST=38;
     public static final int AT=67;
     public static final int TILDA=48;
     public static final int DECIMAL_NUMERAL=84;
     public static final int COMMA=47;
-    public static final int F_URI_DIGIT=76;
+    public static final int F_URI_DIGIT=77;
     public static final int SIGNED_INTEGER=93;
     public static final int FIELD_DEFAULT=22;
     public static final int CARAT=50;
     public static final int PLUS=41;
     public static final int DIGIT=88;
-    public static final int DOT=80;
-    public static final int F_ESC=74;
+    public static final int DOT=69;
+    public static final int F_ESC=75;
     public static final int EXCLUDE=17;
     public static final int PERCENT=46;
     public static final int NON_ZERO_DIGIT=91;
@@ -99,9 +99,9 @@ public class FTSParser extends Parser {
     public static final int OPTIONAL=16;
     public static final int COLON=51;
     public static final int LCURL=81;
-    public static final int F_URI_OTHER=77;
+    public static final int F_URI_OTHER=78;
     public static final int NEGATION=7;
-    public static final int F_URI_ESC=79;
+    public static final int F_URI_ESC=80;
     public static final int TEMPLATE=40;
     public static final int RCURL=82;
     public static final int FIELD_MANDATORY=23;
@@ -1380,7 +1380,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: boost, ftsTest
+                    // elements: ftsTest, boost
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1452,7 +1452,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: boost, ftsTest
+                    // elements: ftsTest, boost
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1596,7 +1596,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ftsTest, boost
+                    // elements: boost, ftsTest
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1929,7 +1929,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ftsTerm, fuzzy
+                    // elements: fuzzy, ftsTerm
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1994,7 +1994,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ftsExactTerm, fuzzy
+                    // elements: fuzzy, ftsExactTerm
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -2059,7 +2059,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ftsPhrase, slop
+                    // elements: slop, ftsPhrase
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -3013,7 +3013,7 @@ public class FTSParser extends Parser {
 
 
             // AST REWRITE
-            // elements: fieldReference, ftsWord
+            // elements: ftsWord, fieldReference
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3477,28 +3477,7 @@ public class FTSParser extends Parser {
             {
             // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:548:9: ( fieldReference COLON )?
             int alt28=2;
-            switch ( input.LA(1) ) {
-                case AT:
-                    {
-                    alt28=1;
-                    }
-                    break;
-                case ID:
-                    {
-                    int LA28_2 = input.LA(2);
-
-                    if ( (LA28_2==COLON) ) {
-                        alt28=1;
-                    }
-                    }
-                    break;
-                case URI:
-                    {
-                    alt28=1;
-                    }
-                    break;
-            }
-
+            alt28 = dfa28.predict(input);
             switch (alt28) {
                 case 1 :
                     // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:548:10: fieldReference COLON
@@ -3527,7 +3506,7 @@ public class FTSParser extends Parser {
 
 
             // AST REWRITE
-            // elements: fieldReference, ftsFieldGroupRange
+            // elements: ftsFieldGroupRange, fieldReference
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3629,7 +3608,7 @@ public class FTSParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ftsFieldGroupDisjunction, fieldReference
+            // elements: fieldReference, ftsFieldGroupDisjunction
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -4894,7 +4873,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: fuzzy, ftsFieldGroupExactTerm
+                    // elements: ftsFieldGroupExactTerm, fuzzy
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -4959,7 +4938,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ftsFieldGroupPhrase, slop
+                    // elements: slop, ftsFieldGroupPhrase
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5848,7 +5827,7 @@ public class FTSParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: range_right, ftsRangeWord, ftsRangeWord, range_left
+                    // elements: range_left, ftsRangeWord, range_right, ftsRangeWord
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6220,7 +6199,7 @@ public class FTSParser extends Parser {
 
 
             // AST REWRITE
-            // elements: identifier, uri, prefix
+            // elements: uri, identifier, prefix
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -6369,7 +6348,7 @@ public class FTSParser extends Parser {
 
 
             // AST REWRITE
-            // elements: uri, identifier, prefix
+            // elements: uri, prefix, identifier
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -6592,31 +6571,96 @@ public class FTSParser extends Parser {
     };
 
     // $ANTLR start "identifier"
-    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:751:1: identifier : ID ;
+    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:751:1: identifier : ( ID -> ID | id1= ID DOT id2= ID ->);
     public final FTSParser.identifier_return identifier() throws RecognitionException {
         FTSParser.identifier_return retval = new FTSParser.identifier_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
+        Token id1=null;
+        Token id2=null;
         Token ID163=null;
+        Token DOT164=null;
 
+        Object id1_tree=null;
+        Object id2_tree=null;
         Object ID163_tree=null;
+        Object DOT164_tree=null;
+        RewriteRuleTokenStream stream_DOT=new RewriteRuleTokenStream(adaptor,"token DOT");
+        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
 
         try {
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:752:9: ( ID )
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:753:9: ID
-            {
-            root_0 = (Object)adaptor.nil();
+            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:752:9: ( ID -> ID | id1= ID DOT id2= ID ->)
+            int alt57=2;
+            alt57 = dfa57.predict(input);
+            switch (alt57) {
+                case 1 :
+                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:753:9: ID
+                    {
+                    ID163=(Token)match(input,ID,FOLLOW_ID_in_identifier5766); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_ID.add(ID163);
 
-            ID163=(Token)match(input,ID,FOLLOW_ID_in_identifier5766); if (state.failed) return retval;
-            if ( state.backtracking==0 ) {
-            ID163_tree = (Object)adaptor.create(ID163);
-            adaptor.addChild(root_0, ID163_tree);
+
+
+                    // AST REWRITE
+                    // elements: ID
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    if ( state.backtracking==0 ) {
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 754:17: -> ID
+                    {
+                        adaptor.addChild(root_0, stream_ID.nextNode());
+
+                    }
+
+                    retval.tree = root_0;}
+                    }
+                    break;
+                case 2 :
+                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:756:11: id1= ID DOT id2= ID
+                    {
+                    id1=(Token)match(input,ID,FOLLOW_ID_in_identifier5824); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_ID.add(id1);
+
+                    DOT164=(Token)match(input,DOT,FOLLOW_DOT_in_identifier5826); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_DOT.add(DOT164);
+
+                    id2=(Token)match(input,ID,FOLLOW_ID_in_identifier5830); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_ID.add(id2);
+
+
+
+                    // AST REWRITE
+                    // elements: 
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    if ( state.backtracking==0 ) {
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 757:17: ->
+                    {
+                        adaptor.addChild(root_0, new CommonTree(new CommonToken(FTSLexer.ID, (id1!=null?id1.getText():null)+(DOT164!=null?DOT164.getText():null)+(id2!=null?id2.getText():null))));
+
+                    }
+
+                    retval.tree = root_0;}
+                    }
+                    break;
+
             }
-
-            }
-
             retval.stop = input.LT(-1);
 
             if ( state.backtracking==0 ) {
@@ -6642,27 +6686,27 @@ public class FTSParser extends Parser {
     };
 
     // $ANTLR start "ftsWord"
-    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:756:1: ftsWord : ( ID | FTSWORD | FTSPRE | FTSWILD | NOT | TO | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL | STAR | QUESTION_MARK );
+    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:760:1: ftsWord : ( ID | FTSWORD | FTSPRE | FTSWILD | NOT | TO | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL | STAR | QUESTION_MARK );
     public final FTSParser.ftsWord_return ftsWord() throws RecognitionException {
         FTSParser.ftsWord_return retval = new FTSParser.ftsWord_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token set164=null;
+        Token set165=null;
 
-        Object set164_tree=null;
+        Object set165_tree=null;
 
         try {
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:757:9: ( ID | FTSWORD | FTSPRE | FTSWILD | NOT | TO | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL | STAR | QUESTION_MARK )
+            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:761:9: ( ID | FTSWORD | FTSPRE | FTSWILD | NOT | TO | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL | STAR | QUESTION_MARK )
             // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:
             {
             root_0 = (Object)adaptor.nil();
 
-            set164=(Token)input.LT(1);
+            set165=(Token)input.LT(1);
             if ( input.LA(1)==DECIMAL_INTEGER_LITERAL||(input.LA(1)>=ID && input.LA(1)<=STAR)||input.LA(1)==QUESTION_MARK ) {
                 input.consume();
-                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set164));
+                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set165));
                 state.errorRecovery=false;state.failed=false;
             }
             else {
@@ -6699,27 +6743,27 @@ public class FTSParser extends Parser {
     };
 
     // $ANTLR start "number"
-    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:770:1: number : ( DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL );
+    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:774:1: number : ( DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL );
     public final FTSParser.number_return number() throws RecognitionException {
         FTSParser.number_return retval = new FTSParser.number_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token set165=null;
+        Token set166=null;
 
-        Object set165_tree=null;
+        Object set166_tree=null;
 
         try {
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:771:9: ( DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL )
+            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:775:9: ( DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL )
             // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:
             {
             root_0 = (Object)adaptor.nil();
 
-            set165=(Token)input.LT(1);
+            set166=(Token)input.LT(1);
             if ( input.LA(1)==DECIMAL_INTEGER_LITERAL||input.LA(1)==FLOATING_POINT_LITERAL ) {
                 input.consume();
-                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set165));
+                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set166));
                 state.errorRecovery=false;state.failed=false;
             }
             else {
@@ -6756,27 +6800,27 @@ public class FTSParser extends Parser {
     };
 
     // $ANTLR start "ftsRangeWord"
-    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:776:1: ftsRangeWord : ( ID | FTSWORD | FTSPRE | FTSWILD | FTSPHRASE | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL );
+    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:780:1: ftsRangeWord : ( ID | FTSWORD | FTSPRE | FTSWILD | FTSPHRASE | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL );
     public final FTSParser.ftsRangeWord_return ftsRangeWord() throws RecognitionException {
         FTSParser.ftsRangeWord_return retval = new FTSParser.ftsRangeWord_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token set166=null;
+        Token set167=null;
 
-        Object set166_tree=null;
+        Object set167_tree=null;
 
         try {
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:777:9: ( ID | FTSWORD | FTSPRE | FTSWILD | FTSPHRASE | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL )
+            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:781:9: ( ID | FTSWORD | FTSPRE | FTSWILD | FTSPHRASE | DECIMAL_INTEGER_LITERAL | FLOATING_POINT_LITERAL )
             // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:
             {
             root_0 = (Object)adaptor.nil();
 
-            set166=(Token)input.LT(1);
+            set167=(Token)input.LT(1);
             if ( input.LA(1)==DECIMAL_INTEGER_LITERAL||(input.LA(1)>=FTSPHRASE && input.LA(1)<=FTSWILD)||input.LA(1)==FLOATING_POINT_LITERAL ) {
                 input.consume();
-                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set166));
+                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set167));
                 state.errorRecovery=false;state.failed=false;
             }
             else {
@@ -6813,67 +6857,67 @@ public class FTSParser extends Parser {
     };
 
     // $ANTLR start "or"
-    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:789:1: or : ( OR | BAR BAR );
+    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:793:1: or : ( OR | BAR BAR );
     public final FTSParser.or_return or() throws RecognitionException {
         FTSParser.or_return retval = new FTSParser.or_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token OR167=null;
-        Token BAR168=null;
+        Token OR168=null;
         Token BAR169=null;
+        Token BAR170=null;
 
-        Object OR167_tree=null;
-        Object BAR168_tree=null;
+        Object OR168_tree=null;
         Object BAR169_tree=null;
+        Object BAR170_tree=null;
 
         try {
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:790:9: ( OR | BAR BAR )
-            int alt57=2;
-            int LA57_0 = input.LA(1);
+            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:794:9: ( OR | BAR BAR )
+            int alt58=2;
+            int LA58_0 = input.LA(1);
 
-            if ( (LA57_0==OR) ) {
-                alt57=1;
+            if ( (LA58_0==OR) ) {
+                alt58=1;
             }
-            else if ( (LA57_0==BAR) ) {
-                alt57=2;
+            else if ( (LA58_0==BAR) ) {
+                alt58=2;
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 57, 0, input);
+                    new NoViableAltException("", 58, 0, input);
 
                 throw nvae;
             }
-            switch (alt57) {
+            switch (alt58) {
                 case 1 :
-                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:791:9: OR
+                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:795:9: OR
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    OR167=(Token)match(input,OR,FOLLOW_OR_in_or6092); if (state.failed) return retval;
+                    OR168=(Token)match(input,OR,FOLLOW_OR_in_or6181); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    OR167_tree = (Object)adaptor.create(OR167);
-                    adaptor.addChild(root_0, OR167_tree);
+                    OR168_tree = (Object)adaptor.create(OR168);
+                    adaptor.addChild(root_0, OR168_tree);
                     }
 
                     }
                     break;
                 case 2 :
-                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:792:11: BAR BAR
+                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:796:11: BAR BAR
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    BAR168=(Token)match(input,BAR,FOLLOW_BAR_in_or6104); if (state.failed) return retval;
-                    if ( state.backtracking==0 ) {
-                    BAR168_tree = (Object)adaptor.create(BAR168);
-                    adaptor.addChild(root_0, BAR168_tree);
-                    }
-                    BAR169=(Token)match(input,BAR,FOLLOW_BAR_in_or6106); if (state.failed) return retval;
+                    BAR169=(Token)match(input,BAR,FOLLOW_BAR_in_or6193); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
                     BAR169_tree = (Object)adaptor.create(BAR169);
                     adaptor.addChild(root_0, BAR169_tree);
+                    }
+                    BAR170=(Token)match(input,BAR,FOLLOW_BAR_in_or6195); if (state.failed) return retval;
+                    if ( state.backtracking==0 ) {
+                    BAR170_tree = (Object)adaptor.create(BAR170);
+                    adaptor.addChild(root_0, BAR170_tree);
                     }
 
                     }
@@ -6905,67 +6949,67 @@ public class FTSParser extends Parser {
     };
 
     // $ANTLR start "and"
-    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:795:1: and : ( AND | AMP AMP );
+    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:799:1: and : ( AND | AMP AMP );
     public final FTSParser.and_return and() throws RecognitionException {
         FTSParser.and_return retval = new FTSParser.and_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token AND170=null;
-        Token AMP171=null;
+        Token AND171=null;
         Token AMP172=null;
+        Token AMP173=null;
 
-        Object AND170_tree=null;
-        Object AMP171_tree=null;
+        Object AND171_tree=null;
         Object AMP172_tree=null;
+        Object AMP173_tree=null;
 
         try {
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:796:9: ( AND | AMP AMP )
-            int alt58=2;
-            int LA58_0 = input.LA(1);
+            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:800:9: ( AND | AMP AMP )
+            int alt59=2;
+            int LA59_0 = input.LA(1);
 
-            if ( (LA58_0==AND) ) {
-                alt58=1;
+            if ( (LA59_0==AND) ) {
+                alt59=1;
             }
-            else if ( (LA58_0==AMP) ) {
-                alt58=2;
+            else if ( (LA59_0==AMP) ) {
+                alt59=2;
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 58, 0, input);
+                    new NoViableAltException("", 59, 0, input);
 
                 throw nvae;
             }
-            switch (alt58) {
+            switch (alt59) {
                 case 1 :
-                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:797:9: AND
+                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:801:9: AND
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    AND170=(Token)match(input,AND,FOLLOW_AND_in_and6139); if (state.failed) return retval;
+                    AND171=(Token)match(input,AND,FOLLOW_AND_in_and6228); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    AND170_tree = (Object)adaptor.create(AND170);
-                    adaptor.addChild(root_0, AND170_tree);
+                    AND171_tree = (Object)adaptor.create(AND171);
+                    adaptor.addChild(root_0, AND171_tree);
                     }
 
                     }
                     break;
                 case 2 :
-                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:798:11: AMP AMP
+                    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:802:11: AMP AMP
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    AMP171=(Token)match(input,AMP,FOLLOW_AMP_in_and6151); if (state.failed) return retval;
-                    if ( state.backtracking==0 ) {
-                    AMP171_tree = (Object)adaptor.create(AMP171);
-                    adaptor.addChild(root_0, AMP171_tree);
-                    }
-                    AMP172=(Token)match(input,AMP,FOLLOW_AMP_in_and6153); if (state.failed) return retval;
+                    AMP172=(Token)match(input,AMP,FOLLOW_AMP_in_and6240); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
                     AMP172_tree = (Object)adaptor.create(AMP172);
                     adaptor.addChild(root_0, AMP172_tree);
+                    }
+                    AMP173=(Token)match(input,AMP,FOLLOW_AMP_in_and6242); if (state.failed) return retval;
+                    if ( state.backtracking==0 ) {
+                    AMP173_tree = (Object)adaptor.create(AMP173);
+                    adaptor.addChild(root_0, AMP173_tree);
                     }
 
                     }
@@ -6997,27 +7041,27 @@ public class FTSParser extends Parser {
     };
 
     // $ANTLR start "not"
-    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:801:1: not : ( NOT | EXCLAMATION );
+    // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:805:1: not : ( NOT | EXCLAMATION );
     public final FTSParser.not_return not() throws RecognitionException {
         FTSParser.not_return retval = new FTSParser.not_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token set173=null;
+        Token set174=null;
 
-        Object set173_tree=null;
+        Object set174_tree=null;
 
         try {
-            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:802:9: ( NOT | EXCLAMATION )
+            // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:806:9: ( NOT | EXCLAMATION )
             // W:\\alfresco\\HEAD\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:
             {
             root_0 = (Object)adaptor.nil();
 
-            set173=(Token)input.LT(1);
+            set174=(Token)input.LT(1);
             if ( input.LA(1)==NOT||input.LA(1)==EXCLAMATION ) {
                 input.consume();
-                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set173));
+                if ( state.backtracking==0 ) adaptor.addChild(root_0, (Object)adaptor.create(set174));
                 state.errorRecovery=false;state.failed=false;
             }
             else {
@@ -7441,6 +7485,7 @@ public class FTSParser extends Parser {
     protected DFA19 dfa19 = new DFA19(this);
     protected DFA20 dfa20 = new DFA20(this);
     protected DFA26 dfa26 = new DFA26(this);
+    protected DFA28 dfa28 = new DFA28(this);
     protected DFA29 dfa29 = new DFA29(this);
     protected DFA32 dfa32 = new DFA32(this);
     protected DFA31 dfa31 = new DFA31(this);
@@ -7455,6 +7500,7 @@ public class FTSParser extends Parser {
     protected DFA47 dfa47 = new DFA47(this);
     protected DFA54 dfa54 = new DFA54(this);
     protected DFA56 dfa56 = new DFA56(this);
+    protected DFA57 dfa57 = new DFA57(this);
     static final String DFA1_eotS =
         "\27\uffff";
     static final String DFA1_eofS =
@@ -7462,7 +7508,7 @@ public class FTSParser extends Parser {
     static final String DFA1_minS =
         "\1\51\3\0\2\uffff\17\0\2\uffff";
     static final String DFA1_maxS =
-        "\1\111\3\0\2\uffff\17\0\2\uffff";
+        "\1\112\3\0\2\uffff\17\0\2\uffff";
     static final String DFA1_acceptS =
         "\4\uffff\2\2\17\uffff\1\3\1\1";
     static final String DFA1_specialS =
@@ -7471,7 +7517,7 @@ public class FTSParser extends Parser {
     static final String[] DFA1_transitionS = {
             "\1\23\1\24\1\3\1\21\1\uffff\1\22\1\uffff\1\15\1\12\2\uffff"+
             "\1\14\1\2\1\6\3\12\1\1\1\16\1\12\1\10\1\uffff\1\17\1\20\2\uffff"+
-            "\1\11\1\13\1\10\1\25\1\4\1\5\1\7",
+            "\1\11\1\13\1\uffff\1\10\1\25\1\4\1\5\1\7",
             "\1\uffff",
             "\1\uffff",
             "\1\uffff",
@@ -7884,7 +7930,7 @@ public class FTSParser extends Parser {
     static final String DFA5_minS =
         "\1\51\25\uffff";
     static final String DFA5_maxS =
-        "\1\111\25\uffff";
+        "\1\112\25\uffff";
     static final String DFA5_acceptS =
         "\1\uffff\2\2\23\1";
     static final String DFA5_specialS =
@@ -7892,7 +7938,7 @@ public class FTSParser extends Parser {
     static final String[] DFA5_transitionS = {
             "\1\24\1\4\1\25\1\22\1\2\1\23\1\uffff\1\16\1\11\2\uffff\1\14"+
             "\1\15\1\7\3\11\1\5\1\17\1\11\1\13\1\uffff\1\20\1\21\2\uffff"+
-            "\1\10\1\12\1\13\1\3\2\uffff\1\6",
+            "\1\10\1\12\1\uffff\1\13\1\3\2\uffff\1\6",
             "",
             "",
             "",
@@ -7956,7 +8002,7 @@ public class FTSParser extends Parser {
     static final String DFA4_minS =
         "\1\51\1\uffff\1\52\37\uffff";
     static final String DFA4_maxS =
-        "\1\111\1\uffff\1\105\37\uffff";
+        "\1\112\1\uffff\1\106\37\uffff";
     static final String DFA4_acceptS =
         "\1\uffff\1\1\1\uffff\21\2\1\1\15\2";
     static final String DFA4_specialS =
@@ -7964,11 +8010,11 @@ public class FTSParser extends Parser {
     static final String[] DFA4_transitionS = {
             "\1\22\1\2\1\23\1\20\1\uffff\1\21\1\uffff\1\14\1\7\2\uffff\1"+
             "\12\1\13\1\5\3\7\1\3\1\15\1\7\1\11\1\uffff\1\16\1\17\2\uffff"+
-            "\1\6\1\10\1\11\1\1\2\uffff\1\4",
+            "\1\6\1\10\1\uffff\1\11\1\1\2\uffff\1\4",
             "",
             "\1\24\1\uffff\1\40\1\uffff\1\41\1\uffff\1\34\1\27\2\uffff"+
             "\1\32\1\33\1\25\3\27\2\35\1\27\1\31\1\uffff\1\36\1\37\2\uffff"+
-            "\1\26\1\30\1\31",
+            "\1\26\1\30\1\uffff\1\31",
             "",
             "",
             "",
@@ -8042,7 +8088,7 @@ public class FTSParser extends Parser {
     static final String DFA8_minS =
         "\1\51\1\uffff\1\52\43\uffff";
     static final String DFA8_maxS =
-        "\1\111\1\uffff\1\105\43\uffff";
+        "\1\112\1\uffff\1\106\43\uffff";
     static final String DFA8_acceptS =
         "\1\uffff\1\2\1\uffff\2\2\23\1\1\2\15\1";
     static final String DFA8_specialS =
@@ -8050,11 +8096,11 @@ public class FTSParser extends Parser {
     static final String[] DFA8_transitionS = {
             "\1\26\1\2\1\27\1\24\1\4\1\25\1\uffff\1\20\1\13\2\uffff\1\16"+
             "\1\17\1\11\3\13\1\7\1\21\1\13\1\15\1\uffff\1\22\1\23\2\uffff"+
-            "\1\12\1\14\1\15\1\1\1\5\1\6\1\10",
+            "\1\12\1\14\1\uffff\1\15\1\1\1\5\1\6\1\10",
             "",
             "\1\30\1\uffff\1\44\1\uffff\1\45\1\uffff\1\40\1\33\2\uffff"+
             "\1\36\1\37\1\31\3\33\2\41\1\33\1\35\1\uffff\1\42\1\43\2\uffff"+
-            "\1\32\1\34\1\35",
+            "\1\32\1\34\1\uffff\1\35",
             "",
             "",
             "",
@@ -8132,7 +8178,7 @@ public class FTSParser extends Parser {
     static final String DFA7_minS =
         "\1\51\24\uffff";
     static final String DFA7_maxS =
-        "\1\111\24\uffff";
+        "\1\112\24\uffff";
     static final String DFA7_acceptS =
         "\1\uffff\2\1\22\2";
     static final String DFA7_specialS =
@@ -8140,7 +8186,7 @@ public class FTSParser extends Parser {
     static final String[] DFA7_transitionS = {
             "\1\22\1\23\1\24\1\20\1\uffff\1\21\1\uffff\1\14\1\7\2\uffff"+
             "\1\12\1\13\1\5\3\7\1\3\1\15\1\7\1\11\1\uffff\1\16\1\17\2\uffff"+
-            "\1\6\1\10\1\11\1\uffff\1\1\1\2\1\4",
+            "\1\6\1\10\1\uffff\1\11\1\uffff\1\1\1\2\1\4",
             "",
             "",
             "",
@@ -8203,7 +8249,7 @@ public class FTSParser extends Parser {
     static final String DFA15_minS =
         "\1\51\1\0\21\uffff";
     static final String DFA15_maxS =
-        "\1\111\1\0\21\uffff";
+        "\1\112\1\0\21\uffff";
     static final String DFA15_acceptS =
         "\2\uffff\1\1\15\2\1\3\1\4\1\5";
     static final String DFA15_specialS =
@@ -8211,7 +8257,7 @@ public class FTSParser extends Parser {
     static final String[] DFA15_transitionS = {
             "\1\20\1\21\1\22\1\16\1\uffff\1\17\1\uffff\1\12\1\5\2\uffff"+
             "\1\10\1\11\1\3\3\5\1\1\1\13\1\5\1\7\1\uffff\1\14\1\15\2\uffff"+
-            "\1\4\1\6\1\7\3\uffff\1\2",
+            "\1\4\1\6\1\uffff\1\7\3\uffff\1\2",
             "\1\uffff",
             "",
             "",
@@ -8339,80 +8385,56 @@ public class FTSParser extends Parser {
         }
     }
     static final String DFA21_eotS =
-        "\162\uffff";
+        "\165\uffff";
     static final String DFA21_eofS =
-        "\1\uffff\1\24\1\uffff\1\24\3\uffff\1\57\1\uffff\1\24\4\uffff\1"+
-        "\24\76\uffff\2\24\36\uffff\1\24\4\uffff";
+        "\1\uffff\1\25\1\uffff\1\25\3\uffff\1\60\1\uffff\1\25\5\uffff\1"+
+        "\25\77\uffff\2\25\36\uffff\1\25\5\uffff";
     static final String DFA21_minS =
-        "\1\54\1\51\1\66\1\51\1\66\2\uffff\1\51\1\uffff\1\51\4\uffff\1\51"+
-        "\1\54\31\uffff\2\63\34\uffff\4\0\1\51\1\uffff\2\51\1\54\12\uffff"+
-        "\1\51\22\uffff\1\51\4\uffff";
+        "\1\54\1\51\1\66\1\51\1\66\2\uffff\1\51\1\uffff\1\51\4\uffff\1\66"+
+        "\1\51\1\54\31\uffff\2\63\30\uffff\1\63\1\51\1\0\4\uffff\3\0\1\uffff"+
+        "\2\51\1\66\1\54\11\uffff\1\51\15\uffff\1\63\4\uffff\1\51\5\uffff";
     static final String DFA21_maxS =
-        "\1\105\1\111\1\104\1\111\1\66\2\uffff\1\111\1\uffff\1\111\4\uffff"+
-        "\1\111\1\105\31\uffff\2\63\34\uffff\4\0\1\111\1\uffff\2\111\1\105"+
-        "\12\uffff\1\111\22\uffff\1\111\4\uffff";
+        "\1\106\1\112\1\104\1\112\1\66\2\uffff\1\112\1\uffff\1\112\4\uffff"+
+        "\1\66\1\112\1\106\31\uffff\2\105\30\uffff\1\63\1\112\1\0\4\uffff"+
+        "\3\0\1\uffff\2\112\1\66\1\106\11\uffff\1\112\15\uffff\1\63\4\uffff"+
+        "\1\112\5\uffff";
     static final String DFA21_acceptS =
-        "\5\uffff\1\2\1\3\1\uffff\1\5\1\uffff\2\6\1\10\1\11\2\uffff\30\2"+
-        "\1\6\2\uffff\30\4\4\2\5\uffff\1\7\3\uffff\1\1\11\2\1\uffff\14\2"+
-        "\1\1\5\2\1\uffff\4\2";
+        "\5\uffff\1\2\1\3\1\uffff\1\5\1\uffff\2\6\1\10\1\11\3\uffff\30\2"+
+        "\1\6\2\uffff\30\4\3\uffff\4\2\3\uffff\1\7\4\uffff\11\2\1\uffff\14"+
+        "\2\1\1\1\uffff\4\2\1\uffff\5\2";
     static final String DFA21_specialS =
-        "\107\uffff\1\1\1\4\1\2\1\0\1\3\46\uffff}>";
+        "\105\uffff\1\3\1\0\4\uffff\1\2\1\1\1\4\47\uffff}>";
     static final String[] DFA21_transitionS = {
             "\1\14\1\uffff\1\15\1\uffff\1\10\1\3\2\uffff\1\6\1\7\1\1\3\3"+
-            "\2\11\1\3\1\5\1\uffff\1\12\1\13\2\uffff\1\2\1\4\1\5",
-            "\1\46\1\27\1\47\1\44\1\25\1\45\1\uffff\1\20\1\34\1\21\1\17"+
-            "\1\37\1\40\1\32\3\34\1\30\1\41\1\34\1\16\1\50\1\42\1\43\2\uffff"+
-            "\1\33\1\35\1\36\1\26\1\22\1\23\1\31",
-            "\1\51\15\uffff\1\4",
-            "\1\46\1\27\1\47\1\44\1\25\1\45\1\uffff\1\20\1\34\1\21\1\uffff"+
-            "\1\37\1\40\1\32\3\34\1\30\1\41\1\34\1\16\1\50\1\42\1\43\2\uffff"+
-            "\1\33\1\35\1\36\1\26\1\22\1\23\1\31",
-            "\1\52",
+            "\2\11\1\3\1\5\1\uffff\1\12\1\13\2\uffff\1\2\1\4\1\uffff\1\5",
+            "\1\47\1\30\1\50\1\45\1\26\1\46\1\uffff\1\21\1\35\1\22\1\20"+
+            "\1\40\1\41\1\33\3\35\1\31\1\42\1\35\1\17\1\51\1\43\1\44\2\uffff"+
+            "\1\34\1\36\1\16\1\37\1\27\1\23\1\24\1\32",
+            "\1\52\15\uffff\1\4",
+            "\1\47\1\30\1\50\1\45\1\26\1\46\1\uffff\1\21\1\35\1\22\1\uffff"+
+            "\1\40\1\41\1\33\3\35\1\31\1\42\1\35\1\17\1\51\1\43\1\44\2\uffff"+
+            "\1\34\1\36\1\uffff\1\37\1\27\1\23\1\24\1\32",
+            "\1\53",
             "",
             "",
-            "\1\101\1\62\1\102\1\77\1\60\1\100\1\uffff\1\53\1\67\1\54\1"+
-            "\uffff\1\72\1\73\1\65\3\67\1\63\1\74\1\67\1\71\1\50\1\75\1\76"+
-            "\2\uffff\1\66\1\70\1\71\1\61\1\55\1\56\1\64",
+            "\1\102\1\63\1\103\1\100\1\61\1\101\1\uffff\1\54\1\70\1\55"+
+            "\1\uffff\1\73\1\74\1\66\3\70\1\64\1\75\1\70\1\72\1\51\1\76\1"+
+            "\77\2\uffff\1\67\1\71\1\uffff\1\72\1\62\1\56\1\57\1\65",
             "",
-            "\1\46\1\27\1\47\1\44\1\25\1\45\1\uffff\1\20\1\34\1\21\1\uffff"+
-            "\1\37\1\40\1\32\3\34\1\30\1\41\1\34\1\16\1\uffff\1\42\1\43\2"+
-            "\uffff\1\33\1\35\1\36\1\26\1\22\1\23\1\31",
-            "",
-            "",
-            "",
-            "",
-            "\1\46\1\27\1\47\1\113\1\25\1\45\1\uffff\1\103\1\111\1\104"+
-            "\1\uffff\1\37\1\40\1\110\3\111\1\107\1\112\1\111\1\36\1\uffff"+
-            "\1\42\1\43\2\uffff\1\33\1\35\1\36\1\26\1\105\1\106\1\31",
-            "\1\114\4\uffff\1\116\3\uffff\1\7\1\115\3\116\2\5\1\116\1\5"+
-            "\1\uffff\1\12\1\13\4\uffff\1\5",
+            "\1\47\1\30\1\50\1\45\1\26\1\46\1\uffff\1\21\1\35\1\22\1\uffff"+
+            "\1\40\1\41\1\33\3\35\1\31\1\42\1\35\1\17\1\uffff\1\43\1\44\2"+
+            "\uffff\1\34\1\36\1\uffff\1\37\1\27\1\23\1\24\1\32",
             "",
             "",
             "",
             "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\17",
-            "\1\117",
+            "\1\104",
+            "\1\47\1\30\1\50\1\105\1\26\1\46\1\uffff\1\107\1\114\1\110"+
+            "\1\uffff\1\40\1\41\1\113\3\114\1\106\1\115\1\114\1\37\1\uffff"+
+            "\1\43\1\44\2\uffff\1\34\1\36\1\uffff\1\37\1\27\1\111\1\112\1"+
+            "\32",
+            "\1\116\4\uffff\1\120\3\uffff\1\7\1\117\3\120\2\5\1\120\1\5"+
+            "\1\uffff\1\12\1\13\5\uffff\1\5",
             "",
             "",
             "",
@@ -8437,6 +8459,39 @@ public class FTSParser extends Parser {
             "",
             "",
             "",
+            "",
+            "\1\20\21\uffff\1\16",
+            "\1\122\21\uffff\1\121",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\1\20",
+            "\1\145\1\146\1\125\1\143\1\151\1\144\1\uffff\1\137\1\134\2"+
+            "\uffff\1\136\1\124\1\130\3\150\1\123\1\140\1\150\1\132\1\uffff"+
+            "\1\141\1\142\2\uffff\1\133\1\135\1\uffff\1\132\1\147\1\126\1"+
+            "\127\1\131",
+            "\1\uffff",
             "",
             "",
             "",
@@ -8444,19 +8499,16 @@ public class FTSParser extends Parser {
             "\1\uffff",
             "\1\uffff",
             "\1\uffff",
-            "\1\uffff",
-            "\1\143\1\144\1\123\1\141\1\147\1\142\1\uffff\1\135\1\132\2"+
-            "\uffff\1\134\1\122\1\126\3\146\1\121\1\136\1\146\1\130\1\uffff"+
-            "\1\137\1\140\2\uffff\1\131\1\133\1\130\1\145\1\124\1\125\1\127",
             "",
-            "\1\46\1\27\1\47\1\44\1\25\1\45\1\uffff\1\20\1\34\1\21\1\117"+
-            "\1\37\1\40\1\32\3\34\1\30\1\41\1\34\1\36\1\50\1\42\1\43\2\uffff"+
-            "\1\33\1\35\1\36\1\26\1\22\1\23\1\31",
-            "\1\46\1\27\1\47\1\44\1\25\1\45\1\uffff\1\20\1\34\1\21\1\uffff"+
-            "\1\37\1\40\1\32\3\34\1\30\1\41\1\34\1\36\1\50\1\42\1\43\2\uffff"+
-            "\1\33\1\35\1\36\1\26\1\22\1\23\1\31",
-            "\1\114\4\uffff\1\116\3\uffff\1\7\4\116\2\5\1\116\1\5\1\uffff"+
-            "\1\12\1\13\4\uffff\1\5",
+            "\1\47\1\30\1\50\1\45\1\26\1\46\1\uffff\1\21\1\35\1\22\1\122"+
+            "\1\40\1\41\1\33\3\35\1\31\1\42\1\35\1\37\1\51\1\43\1\44\2\uffff"+
+            "\1\34\1\36\1\121\1\37\1\27\1\23\1\24\1\32",
+            "\1\47\1\30\1\50\1\45\1\26\1\46\1\uffff\1\21\1\35\1\22\1\uffff"+
+            "\1\40\1\41\1\33\3\35\1\31\1\42\1\35\1\37\1\51\1\43\1\44\2\uffff"+
+            "\1\34\1\36\1\uffff\1\37\1\27\1\23\1\24\1\32",
+            "\1\152",
+            "\1\116\4\uffff\1\120\3\uffff\1\7\4\120\2\5\1\120\1\5\1\uffff"+
+            "\1\12\1\13\5\uffff\1\5",
             "",
             "",
             "",
@@ -8466,11 +8518,10 @@ public class FTSParser extends Parser {
             "",
             "",
             "",
-            "",
-            "\1\143\1\157\1\123\1\141\1\155\1\142\1\uffff\1\151\1\146\1"+
-            "\152\1\uffff\1\134\1\122\1\126\3\146\1\121\1\136\1\146\1\160"+
-            "\1\150\1\137\1\140\2\uffff\1\131\1\133\1\130\1\156\1\153\1\154"+
-            "\1\127",
+            "\1\145\1\156\1\125\1\143\1\157\1\144\1\uffff\1\153\1\150\1"+
+            "\154\1\uffff\1\136\1\124\1\130\3\150\1\123\1\140\1\150\1\162"+
+            "\1\163\1\141\1\142\2\uffff\1\133\1\135\1\uffff\1\132\1\155\1"+
+            "\160\1\161\1\131",
             "",
             "",
             "",
@@ -8484,14 +8535,16 @@ public class FTSParser extends Parser {
             "",
             "",
             "",
+            "\1\122",
             "",
             "",
             "",
             "",
+            "\1\47\1\30\1\50\1\45\1\26\1\46\1\uffff\1\164\1\114\1\110\1"+
+            "\uffff\1\40\1\41\1\113\3\114\1\106\1\115\1\114\1\37\1\uffff"+
+            "\1\43\1\44\2\uffff\1\34\1\36\1\uffff\1\37\1\27\1\111\1\112\1"+
+            "\32",
             "",
-            "\1\46\1\27\1\47\1\44\1\25\1\45\1\uffff\1\161\1\111\1\104\1"+
-            "\uffff\1\37\1\40\1\110\3\111\1\107\1\112\1\111\1\36\1\uffff"+
-            "\1\42\1\43\2\uffff\1\33\1\35\1\36\1\26\1\105\1\106\1\31",
             "",
             "",
             "",
@@ -8535,120 +8588,120 @@ public class FTSParser extends Parser {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA21_74 = input.LA(1);
+                        int LA21_70 = input.LA(1);
 
                          
-                        int index21_74 = input.index();
+                        int index21_70 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred2_FTS()) ) {s = 80;}
+                        if ( (synpred2_FTS()) ) {s = 105;}
 
-                        else if ( (true) ) {s = 70;}
+                        else if ( (true) ) {s = 104;}
 
                          
-                        input.seek(index21_74);
+                        input.seek(index21_70);
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA21_71 = input.LA(1);
+                        int LA21_76 = input.LA(1);
 
                          
-                        int index21_71 = input.index();
+                        int index21_76 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred2_FTS()) ) {s = 80;}
+                        if ( (synpred2_FTS()) ) {s = 105;}
 
-                        else if ( (true) ) {s = 70;}
+                        else if ( (true) ) {s = 104;}
 
                          
-                        input.seek(index21_71);
+                        input.seek(index21_76);
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
-                        int LA21_73 = input.LA(1);
-
-                         
-                        int index21_73 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred2_FTS()) ) {s = 80;}
-
-                        else if ( (true) ) {s = 70;}
-
-                         
-                        input.seek(index21_73);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 3 : 
                         int LA21_75 = input.LA(1);
 
                          
                         int index21_75 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (LA21_75==NOT) ) {s = 81;}
+                        if ( (synpred2_FTS()) ) {s = 105;}
 
-                        else if ( (LA21_75==FTSPHRASE) ) {s = 82;}
-
-                        else if ( (LA21_75==MINUS) ) {s = 83;}
-
-                        else if ( (LA21_75==AND) ) {s = 84;}
-
-                        else if ( (LA21_75==AMP) ) {s = 85;}
-
-                        else if ( (LA21_75==ID) ) {s = 86;}
-
-                        else if ( (LA21_75==EXCLAMATION) ) {s = 87;}
-
-                        else if ( (LA21_75==STAR||LA21_75==QUESTION_MARK) ) {s = 88;}
-
-                        else if ( (LA21_75==AT) ) {s = 89;}
-
-                        else if ( (LA21_75==DECIMAL_INTEGER_LITERAL) ) {s = 90;}
-
-                        else if ( (LA21_75==URI) ) {s = 91;}
-
-                        else if ( (LA21_75==EQUALS) ) {s = 92;}
-
-                        else if ( (LA21_75==TILDA) ) {s = 93;}
-
-                        else if ( (LA21_75==TO) ) {s = 94;}
-
-                        else if ( (LA21_75==LSQUARE) ) {s = 95;}
-
-                        else if ( (LA21_75==LT) ) {s = 96;}
-
-                        else if ( (LA21_75==LPAREN) ) {s = 97;}
-
-                        else if ( (LA21_75==PERCENT) ) {s = 98;}
-
-                        else if ( (LA21_75==PLUS) ) {s = 99;}
-
-                        else if ( (LA21_75==BAR) ) {s = 100;}
-
-                        else if ( (LA21_75==OR) ) {s = 101;}
-
-                        else if ( ((LA21_75>=FTSWORD && LA21_75<=FTSWILD)||LA21_75==FLOATING_POINT_LITERAL) ) {s = 102;}
-
-                        else if ( (LA21_75==RPAREN) && (synpred2_FTS())) {s = 103;}
+                        else if ( (true) ) {s = 104;}
 
                          
                         input.seek(index21_75);
                         if ( s>=0 ) return s;
                         break;
-                    case 4 : 
-                        int LA21_72 = input.LA(1);
+                    case 3 : 
+                        int LA21_69 = input.LA(1);
 
                          
-                        int index21_72 = input.index();
+                        int index21_69 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred2_FTS()) ) {s = 80;}
+                        if ( (LA21_69==NOT) ) {s = 83;}
 
-                        else if ( (true) ) {s = 70;}
+                        else if ( (LA21_69==FTSPHRASE) ) {s = 84;}
+
+                        else if ( (LA21_69==MINUS) ) {s = 85;}
+
+                        else if ( (LA21_69==AND) ) {s = 86;}
+
+                        else if ( (LA21_69==AMP) ) {s = 87;}
+
+                        else if ( (LA21_69==ID) ) {s = 88;}
+
+                        else if ( (LA21_69==EXCLAMATION) ) {s = 89;}
+
+                        else if ( (LA21_69==STAR||LA21_69==QUESTION_MARK) ) {s = 90;}
+
+                        else if ( (LA21_69==AT) ) {s = 91;}
+
+                        else if ( (LA21_69==DECIMAL_INTEGER_LITERAL) ) {s = 92;}
+
+                        else if ( (LA21_69==URI) ) {s = 93;}
+
+                        else if ( (LA21_69==EQUALS) ) {s = 94;}
+
+                        else if ( (LA21_69==TILDA) ) {s = 95;}
+
+                        else if ( (LA21_69==TO) ) {s = 96;}
+
+                        else if ( (LA21_69==LSQUARE) ) {s = 97;}
+
+                        else if ( (LA21_69==LT) ) {s = 98;}
+
+                        else if ( (LA21_69==LPAREN) ) {s = 99;}
+
+                        else if ( (LA21_69==PERCENT) ) {s = 100;}
+
+                        else if ( (LA21_69==PLUS) ) {s = 101;}
+
+                        else if ( (LA21_69==BAR) ) {s = 102;}
+
+                        else if ( (LA21_69==OR) ) {s = 103;}
+
+                        else if ( ((LA21_69>=FTSWORD && LA21_69<=FTSWILD)||LA21_69==FLOATING_POINT_LITERAL) ) {s = 104;}
+
+                        else if ( (LA21_69==RPAREN) && (synpred2_FTS())) {s = 105;}
 
                          
-                        input.seek(index21_72);
+                        input.seek(index21_69);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 4 : 
+                        int LA21_77 = input.LA(1);
+
+                         
+                        int index21_77 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred2_FTS()) ) {s = 105;}
+
+                        else if ( (true) ) {s = 104;}
+
+                         
+                        input.seek(index21_77);
                         if ( s>=0 ) return s;
                         break;
             }
@@ -8666,7 +8719,7 @@ public class FTSParser extends Parser {
     static final String DFA17_minS =
         "\1\51\1\61\32\uffff\1\0\2\uffff";
     static final String DFA17_maxS =
-        "\1\111\1\105\32\uffff\1\0\2\uffff";
+        "\1\112\1\106\32\uffff\1\0\2\uffff";
     static final String DFA17_acceptS =
         "\2\uffff\32\2\1\uffff\1\2\1\1";
     static final String DFA17_specialS =
@@ -8674,8 +8727,9 @@ public class FTSParser extends Parser {
     static final String[] DFA17_transitionS = {
             "\1\27\1\10\1\30\1\25\1\6\1\26\1\uffff\1\1\1\15\1\2\1\uffff"+
             "\1\20\1\21\1\13\3\15\1\11\1\22\1\15\1\17\1\uffff\1\23\1\24\2"+
-            "\uffff\1\14\1\16\1\17\1\7\1\3\1\4\1\12",
-            "\1\34\4\uffff\1\32\5\35\1\34\1\35\5\uffff\1\31\1\33\1\35",
+            "\uffff\1\14\1\16\1\uffff\1\17\1\7\1\3\1\4\1\12",
+            "\1\34\4\uffff\1\32\5\35\1\34\1\35\5\uffff\1\31\1\33\1\uffff"+
+            "\1\35",
             "",
             "",
             "",
@@ -8773,7 +8827,7 @@ public class FTSParser extends Parser {
     static final String DFA18_minS =
         "\1\51\1\61\32\uffff\1\0\2\uffff";
     static final String DFA18_maxS =
-        "\1\111\1\105\32\uffff\1\0\2\uffff";
+        "\1\112\1\106\32\uffff\1\0\2\uffff";
     static final String DFA18_acceptS =
         "\2\uffff\32\2\1\uffff\1\2\1\1";
     static final String DFA18_specialS =
@@ -8781,8 +8835,9 @@ public class FTSParser extends Parser {
     static final String[] DFA18_transitionS = {
             "\1\27\1\10\1\30\1\25\1\6\1\26\1\uffff\1\1\1\15\1\2\1\uffff"+
             "\1\20\1\21\1\13\3\15\1\11\1\22\1\15\1\17\1\uffff\1\23\1\24\2"+
-            "\uffff\1\14\1\16\1\17\1\7\1\3\1\4\1\12",
-            "\1\34\4\uffff\1\32\5\35\1\34\1\35\5\uffff\1\31\1\33\1\35",
+            "\uffff\1\14\1\16\1\uffff\1\17\1\7\1\3\1\4\1\12",
+            "\1\34\4\uffff\1\32\5\35\1\34\1\35\5\uffff\1\31\1\33\1\uffff"+
+            "\1\35",
             "",
             "",
             "",
@@ -8880,7 +8935,7 @@ public class FTSParser extends Parser {
     static final String DFA19_minS =
         "\1\51\1\61\27\uffff\1\0\5\uffff";
     static final String DFA19_maxS =
-        "\1\111\1\105\27\uffff\1\0\5\uffff";
+        "\1\112\1\106\27\uffff\1\0\5\uffff";
     static final String DFA19_acceptS =
         "\2\uffff\27\2\1\uffff\4\2\1\1";
     static final String DFA19_specialS =
@@ -8888,8 +8943,8 @@ public class FTSParser extends Parser {
     static final String[] DFA19_transitionS = {
             "\1\27\1\10\1\30\1\25\1\6\1\26\1\uffff\1\1\1\15\1\2\1\uffff"+
             "\1\20\1\21\1\13\3\15\1\11\1\22\1\15\1\17\1\uffff\1\23\1\24\2"+
-            "\uffff\1\14\1\16\1\17\1\7\1\3\1\4\1\12",
-            "\1\31\4\uffff\1\33\7\35\5\uffff\1\32\1\34\1\35",
+            "\uffff\1\14\1\16\1\uffff\1\17\1\7\1\3\1\4\1\12",
+            "\1\31\4\uffff\1\33\7\35\5\uffff\1\32\1\34\1\uffff\1\35",
             "",
             "",
             "",
@@ -8987,7 +9042,7 @@ public class FTSParser extends Parser {
     static final String DFA20_minS =
         "\1\51\1\61\32\uffff\1\0\2\uffff";
     static final String DFA20_maxS =
-        "\1\111\1\105\32\uffff\1\0\2\uffff";
+        "\1\112\1\106\32\uffff\1\0\2\uffff";
     static final String DFA20_acceptS =
         "\2\uffff\32\2\1\uffff\1\2\1\1";
     static final String DFA20_specialS =
@@ -8995,8 +9050,9 @@ public class FTSParser extends Parser {
     static final String[] DFA20_transitionS = {
             "\1\27\1\10\1\30\1\25\1\6\1\26\1\uffff\1\1\1\15\1\2\1\uffff"+
             "\1\20\1\21\1\13\3\15\1\11\1\22\1\15\1\17\1\uffff\1\23\1\24\2"+
-            "\uffff\1\14\1\16\1\17\1\7\1\3\1\4\1\12",
-            "\1\34\4\uffff\1\32\5\35\1\34\1\35\5\uffff\1\31\1\33\1\35",
+            "\uffff\1\14\1\16\1\uffff\1\17\1\7\1\3\1\4\1\12",
+            "\1\34\4\uffff\1\32\5\35\1\34\1\35\5\uffff\1\31\1\33\1\uffff"+
+            "\1\35",
             "",
             "",
             "",
@@ -9088,23 +9144,24 @@ public class FTSParser extends Parser {
         }
     }
     static final String DFA26_eotS =
-        "\36\uffff";
+        "\37\uffff";
     static final String DFA26_eofS =
-        "\2\uffff\1\11\33\uffff";
+        "\2\uffff\1\12\34\uffff";
     static final String DFA26_minS =
-        "\1\61\1\uffff\1\51\33\uffff";
+        "\1\61\1\uffff\1\51\34\uffff";
     static final String DFA26_maxS =
-        "\1\105\1\uffff\1\111\33\uffff";
+        "\1\106\1\uffff\1\112\34\uffff";
     static final String DFA26_acceptS =
-        "\1\uffff\1\1\1\uffff\1\1\31\2\1\1";
+        "\1\uffff\1\1\1\uffff\1\1\1\2\1\1\30\2\1\1";
     static final String DFA26_specialS =
-        "\36\uffff}>";
+        "\37\uffff}>";
     static final String[] DFA26_transitionS = {
-            "\1\4\4\uffff\1\2\7\4\5\uffff\1\1\1\3\1\4",
+            "\1\4\4\uffff\1\2\7\4\5\uffff\1\1\1\3\1\uffff\1\4",
             "",
-            "\1\33\1\14\1\34\1\31\1\12\1\32\1\uffff\1\5\1\21\1\6\1\35\1"+
-            "\24\1\25\1\17\3\21\1\15\1\26\1\21\1\23\1\uffff\1\27\1\30\2\uffff"+
-            "\1\20\1\22\1\23\1\13\1\7\1\10\1\16",
+            "\1\34\1\15\1\35\1\32\1\13\1\33\1\uffff\1\6\1\22\1\7\1\36\1"+
+            "\25\1\26\1\20\3\22\1\16\1\27\1\22\1\24\1\uffff\1\30\1\31\2\uffff"+
+            "\1\21\1\23\1\5\1\24\1\14\1\10\1\11\1\17",
+            "",
             "",
             "",
             "",
@@ -9167,6 +9224,65 @@ public class FTSParser extends Parser {
             return "512:9: ( fieldReference COLON )?";
         }
     }
+    static final String DFA28_eotS =
+        "\12\uffff";
+    static final String DFA28_eofS =
+        "\12\uffff";
+    static final String DFA28_minS =
+        "\1\61\1\uffff\1\63\7\uffff";
+    static final String DFA28_maxS =
+        "\1\104\1\uffff\1\105\7\uffff";
+    static final String DFA28_acceptS =
+        "\1\uffff\1\1\1\uffff\1\1\3\2\2\1\1\2";
+    static final String DFA28_specialS =
+        "\12\uffff}>";
+    static final String[] DFA28_transitionS = {
+            "\1\4\3\uffff\1\4\1\2\3\4\2\uffff\1\4\2\uffff\1\5\1\6\2\uffff"+
+            "\1\1\1\3",
+            "",
+            "\1\10\12\uffff\1\11\6\uffff\1\7",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+    };
+
+    static final short[] DFA28_eot = DFA.unpackEncodedString(DFA28_eotS);
+    static final short[] DFA28_eof = DFA.unpackEncodedString(DFA28_eofS);
+    static final char[] DFA28_min = DFA.unpackEncodedStringToUnsignedChars(DFA28_minS);
+    static final char[] DFA28_max = DFA.unpackEncodedStringToUnsignedChars(DFA28_maxS);
+    static final short[] DFA28_accept = DFA.unpackEncodedString(DFA28_acceptS);
+    static final short[] DFA28_special = DFA.unpackEncodedString(DFA28_specialS);
+    static final short[][] DFA28_transition;
+
+    static {
+        int numStates = DFA28_transitionS.length;
+        DFA28_transition = new short[numStates][];
+        for (int i=0; i<numStates; i++) {
+            DFA28_transition[i] = DFA.unpackEncodedString(DFA28_transitionS[i]);
+        }
+    }
+
+    class DFA28 extends DFA {
+
+        public DFA28(BaseRecognizer recognizer) {
+            this.recognizer = recognizer;
+            this.decisionNumber = 28;
+            this.eot = DFA28_eot;
+            this.eof = DFA28_eof;
+            this.min = DFA28_min;
+            this.max = DFA28_max;
+            this.accept = DFA28_accept;
+            this.special = DFA28_special;
+            this.transition = DFA28_transition;
+        }
+        public String getDescription() {
+            return "548:9: ( fieldReference COLON )?";
+        }
+    }
     static final String DFA29_eotS =
         "\22\uffff";
     static final String DFA29_eofS =
@@ -9174,7 +9290,7 @@ public class FTSParser extends Parser {
     static final String DFA29_minS =
         "\1\51\2\uffff\16\0\1\uffff";
     static final String DFA29_maxS =
-        "\1\111\2\uffff\16\0\1\uffff";
+        "\1\112\2\uffff\16\0\1\uffff";
     static final String DFA29_acceptS =
         "\1\uffff\2\1\16\uffff\1\2";
     static final String DFA29_specialS =
@@ -9182,7 +9298,7 @@ public class FTSParser extends Parser {
         "\14\1\15\1\16\1\uffff}>";
     static final String[] DFA29_transitionS = {
             "\1\16\1\17\1\20\1\15\3\uffff\1\11\1\5\2\uffff\1\7\1\10\4\5"+
-            "\1\3\1\12\1\5\1\6\1\uffff\1\13\1\14\4\uffff\1\6\1\21\1\1\1\2"+
+            "\1\3\1\12\1\5\1\6\1\uffff\1\13\1\14\5\uffff\1\6\1\21\1\1\1\2"+
             "\1\4",
             "",
             "",
@@ -9509,14 +9625,14 @@ public class FTSParser extends Parser {
     static final String DFA32_minS =
         "\1\51\20\uffff";
     static final String DFA32_maxS =
-        "\1\111\20\uffff";
+        "\1\112\20\uffff";
     static final String DFA32_acceptS =
         "\1\uffff\1\2\17\1";
     static final String DFA32_specialS =
         "\21\uffff}>";
     static final String[] DFA32_transitionS = {
             "\1\17\1\3\1\20\1\16\1\1\2\uffff\1\12\1\6\2\uffff\1\10\1\11"+
-            "\4\6\1\4\1\13\1\6\1\7\1\uffff\1\14\1\15\4\uffff\1\7\1\2\2\uffff"+
+            "\4\6\1\4\1\13\1\6\1\7\1\uffff\1\14\1\15\5\uffff\1\7\1\2\2\uffff"+
             "\1\5",
             "",
             "",
@@ -9576,18 +9692,18 @@ public class FTSParser extends Parser {
     static final String DFA31_minS =
         "\1\51\1\uffff\1\52\27\uffff";
     static final String DFA31_maxS =
-        "\1\111\1\uffff\1\105\27\uffff";
+        "\1\112\1\uffff\1\106\27\uffff";
     static final String DFA31_acceptS =
         "\1\uffff\1\1\1\uffff\15\2\1\1\11\2";
     static final String DFA31_specialS =
         "\32\uffff}>";
     static final String[] DFA31_transitionS = {
             "\1\16\1\2\1\17\1\15\3\uffff\1\11\1\5\2\uffff\1\7\1\10\4\5\1"+
-            "\3\1\12\1\5\1\6\1\uffff\1\13\1\14\4\uffff\1\6\1\1\2\uffff\1"+
+            "\3\1\12\1\5\1\6\1\uffff\1\13\1\14\5\uffff\1\6\1\1\2\uffff\1"+
             "\4",
             "",
             "\1\20\1\uffff\1\31\3\uffff\1\25\1\21\2\uffff\1\23\1\24\4\21"+
-            "\2\26\1\21\1\22\1\uffff\1\27\1\30\4\uffff\1\22",
+            "\2\26\1\21\1\22\1\uffff\1\27\1\30\5\uffff\1\22",
             "",
             "",
             "",
@@ -9653,18 +9769,18 @@ public class FTSParser extends Parser {
     static final String DFA35_minS =
         "\1\51\1\uffff\1\52\32\uffff";
     static final String DFA35_maxS =
-        "\1\111\1\uffff\1\105\32\uffff";
+        "\1\112\1\uffff\1\106\32\uffff";
     static final String DFA35_acceptS =
         "\1\uffff\1\2\1\uffff\1\2\17\1\1\2\11\1";
     static final String DFA35_specialS =
         "\35\uffff}>";
     static final String[] DFA35_transitionS = {
             "\1\21\1\2\1\22\1\20\1\3\2\uffff\1\14\1\10\2\uffff\1\12\1\13"+
-            "\4\10\1\6\1\15\1\10\1\11\1\uffff\1\16\1\17\4\uffff\1\11\1\1"+
+            "\4\10\1\6\1\15\1\10\1\11\1\uffff\1\16\1\17\5\uffff\1\11\1\1"+
             "\1\4\1\5\1\7",
             "",
             "\1\23\1\uffff\1\34\3\uffff\1\30\1\24\2\uffff\1\26\1\27\4\24"+
-            "\2\31\1\24\1\25\1\uffff\1\32\1\33\4\uffff\1\25",
+            "\2\31\1\24\1\25\1\uffff\1\32\1\33\5\uffff\1\25",
             "",
             "",
             "",
@@ -9733,14 +9849,14 @@ public class FTSParser extends Parser {
     static final String DFA34_minS =
         "\1\51\20\uffff";
     static final String DFA34_maxS =
-        "\1\111\20\uffff";
+        "\1\112\20\uffff";
     static final String DFA34_acceptS =
         "\1\uffff\2\1\16\2";
     static final String DFA34_specialS =
         "\21\uffff}>";
     static final String[] DFA34_transitionS = {
             "\1\16\1\17\1\20\1\15\3\uffff\1\11\1\5\2\uffff\1\7\1\10\4\5"+
-            "\1\3\1\12\1\5\1\6\1\uffff\1\13\1\14\4\uffff\1\6\1\uffff\1\1"+
+            "\1\3\1\12\1\5\1\6\1\uffff\1\13\1\14\5\uffff\1\6\1\uffff\1\1"+
             "\1\2\1\4",
             "",
             "",
@@ -9800,14 +9916,14 @@ public class FTSParser extends Parser {
     static final String DFA41_minS =
         "\1\51\1\0\15\uffff";
     static final String DFA41_maxS =
-        "\1\111\1\0\15\uffff";
+        "\1\112\1\0\15\uffff";
     static final String DFA41_acceptS =
         "\2\uffff\1\1\11\2\1\3\1\4\1\5";
     static final String DFA41_specialS =
         "\1\0\1\1\15\uffff}>";
     static final String[] DFA41_transitionS = {
             "\1\14\1\15\1\16\1\13\3\uffff\1\7\1\3\2\uffff\1\5\1\6\4\3\1"+
-            "\1\1\10\1\3\1\4\1\uffff\1\11\1\12\4\uffff\1\4\3\uffff\1\2",
+            "\1\1\10\1\3\1\4\1\uffff\1\11\1\12\5\uffff\1\4\3\uffff\1\2",
             "\1\uffff",
             "",
             "",
@@ -9928,36 +10044,36 @@ public class FTSParser extends Parser {
         "\130\uffff";
     static final String DFA46_minS =
         "\1\54\1\51\2\uffff\1\51\1\uffff\1\51\3\uffff\1\51\53\uffff\3\0"+
-        "\1\51\1\uffff\1\51\26\uffff\1\51\5\uffff";
+        "\1\51\1\uffff\1\51\24\uffff\1\51\7\uffff";
     static final String DFA46_maxS =
-        "\1\105\1\111\2\uffff\1\111\1\uffff\1\111\3\uffff\1\111\53\uffff"+
-        "\3\0\1\111\1\uffff\1\111\26\uffff\1\111\5\uffff";
+        "\1\106\1\112\2\uffff\1\112\1\uffff\1\112\3\uffff\1\112\53\uffff"+
+        "\3\0\1\112\1\uffff\1\112\24\uffff\1\112\7\uffff";
     static final String DFA46_acceptS =
-        "\2\uffff\1\2\1\3\1\uffff\1\5\1\uffff\2\6\1\7\1\uffff\1\6\23\2\23"+
-        "\4\4\2\4\uffff\1\1\1\uffff\1\1\25\2\1\uffff\5\2";
+        "\2\uffff\1\2\1\3\1\uffff\1\5\1\uffff\2\6\1\7\1\uffff\23\2\1\6\23"+
+        "\4\4\2\4\uffff\1\1\1\uffff\1\1\23\2\1\uffff\7\2";
     static final String DFA46_specialS =
-        "\66\uffff\1\2\1\0\1\1\1\3\36\uffff}>";
+        "\66\uffff\1\3\1\1\1\2\1\0\36\uffff}>";
     static final String[] DFA46_transitionS = {
             "\1\11\3\uffff\1\5\1\1\2\uffff\1\3\1\4\4\1\2\6\1\1\1\2\1\uffff"+
-            "\1\7\1\10\4\uffff\1\2",
-            "\1\35\1\22\1\36\1\34\1\20\2\uffff\1\14\1\25\1\15\1\uffff\1"+
-            "\27\1\30\4\25\1\23\1\31\1\25\1\12\1\13\1\32\1\33\4\uffff\1\26"+
-            "\1\21\1\16\1\17\1\24",
+            "\1\7\1\10\5\uffff\1\2",
+            "\1\34\1\21\1\35\1\33\1\17\2\uffff\1\13\1\24\1\14\1\uffff\1"+
+            "\26\1\27\4\24\1\22\1\30\1\24\1\12\1\36\1\31\1\32\5\uffff\1\25"+
+            "\1\20\1\15\1\16\1\23",
             "",
             "",
             "\1\60\1\45\1\61\1\57\1\43\2\uffff\1\37\1\50\1\40\1\uffff\1"+
-            "\52\1\53\4\50\1\46\1\54\1\50\1\51\1\13\1\55\1\56\4\uffff\1\51"+
+            "\52\1\53\4\50\1\46\1\54\1\50\1\51\1\36\1\55\1\56\5\uffff\1\51"+
             "\1\44\1\41\1\42\1\47",
             "",
-            "\1\35\1\22\1\36\1\34\1\20\2\uffff\1\14\1\25\1\15\1\uffff\1"+
-            "\27\1\30\4\25\1\23\1\31\1\25\1\12\1\uffff\1\32\1\33\4\uffff"+
-            "\1\26\1\21\1\16\1\17\1\24",
+            "\1\34\1\21\1\35\1\33\1\17\2\uffff\1\13\1\24\1\14\1\uffff\1"+
+            "\26\1\27\4\24\1\22\1\30\1\24\1\12\1\uffff\1\31\1\32\5\uffff"+
+            "\1\25\1\20\1\15\1\16\1\23",
             "",
             "",
             "",
-            "\1\35\1\22\1\36\1\71\1\20\2\uffff\1\62\1\67\1\63\1\uffff\1"+
-            "\27\1\30\4\67\1\66\1\70\1\67\1\26\1\uffff\1\32\1\33\4\uffff"+
-            "\1\26\1\21\1\64\1\65\1\24",
+            "\1\34\1\21\1\35\1\71\1\17\2\uffff\1\62\1\67\1\63\1\uffff\1"+
+            "\26\1\27\4\67\1\66\1\70\1\67\1\25\1\uffff\1\31\1\32\5\uffff"+
+            "\1\25\1\20\1\64\1\65\1\23",
             "",
             "",
             "",
@@ -10006,13 +10122,11 @@ public class FTSParser extends Parser {
             "\1\uffff",
             "\1\112\1\113\1\114\1\111\1\74\2\uffff\1\105\1\73\2\uffff\1"+
             "\103\1\104\4\101\1\77\1\106\1\101\1\102\1\uffff\1\107\1\110"+
-            "\4\uffff\1\102\1\115\1\75\1\76\1\100",
+            "\5\uffff\1\102\1\115\1\75\1\76\1\100",
             "",
-            "\1\112\1\121\1\114\1\111\1\122\2\uffff\1\116\1\101\1\117\1"+
-            "\uffff\1\103\1\104\4\101\1\77\1\106\1\101\1\125\1\126\1\107"+
-            "\1\110\4\uffff\1\102\1\120\1\123\1\124\1\100",
-            "",
-            "",
+            "\1\112\1\126\1\114\1\111\1\120\2\uffff\1\121\1\101\1\122\1"+
+            "\uffff\1\103\1\104\4\101\1\77\1\106\1\101\1\117\1\116\1\107"+
+            "\1\110\5\uffff\1\102\1\125\1\123\1\124\1\100",
             "",
             "",
             "",
@@ -10033,9 +10147,11 @@ public class FTSParser extends Parser {
             "",
             "",
             "",
-            "\1\35\1\22\1\36\1\34\1\20\2\uffff\1\127\1\67\1\63\1\uffff"+
-            "\1\27\1\30\4\67\1\66\1\70\1\67\1\26\1\uffff\1\32\1\33\4\uffff"+
-            "\1\26\1\21\1\64\1\65\1\24",
+            "\1\34\1\21\1\35\1\33\1\17\2\uffff\1\127\1\67\1\63\1\uffff"+
+            "\1\26\1\27\4\67\1\66\1\70\1\67\1\25\1\uffff\1\31\1\32\5\uffff"+
+            "\1\25\1\20\1\64\1\65\1\23",
+            "",
+            "",
             "",
             "",
             "",
@@ -10080,51 +10196,6 @@ public class FTSParser extends Parser {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA46_55 = input.LA(1);
-
-                         
-                        int index46_55 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred8_FTS()) ) {s = 58;}
-
-                        else if ( (true) ) {s = 53;}
-
-                         
-                        input.seek(index46_55);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 : 
-                        int LA46_56 = input.LA(1);
-
-                         
-                        int index46_56 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred8_FTS()) ) {s = 58;}
-
-                        else if ( (true) ) {s = 53;}
-
-                         
-                        input.seek(index46_56);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 2 : 
-                        int LA46_54 = input.LA(1);
-
-                         
-                        int index46_54 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred8_FTS()) ) {s = 58;}
-
-                        else if ( (true) ) {s = 53;}
-
-                         
-                        input.seek(index46_54);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 3 : 
                         int LA46_57 = input.LA(1);
 
                          
@@ -10173,6 +10244,51 @@ public class FTSParser extends Parser {
                         input.seek(index46_57);
                         if ( s>=0 ) return s;
                         break;
+                    case 1 : 
+                        int LA46_55 = input.LA(1);
+
+                         
+                        int index46_55 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred8_FTS()) ) {s = 58;}
+
+                        else if ( (true) ) {s = 53;}
+
+                         
+                        input.seek(index46_55);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 2 : 
+                        int LA46_56 = input.LA(1);
+
+                         
+                        int index46_56 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred8_FTS()) ) {s = 58;}
+
+                        else if ( (true) ) {s = 53;}
+
+                         
+                        input.seek(index46_56);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 3 : 
+                        int LA46_54 = input.LA(1);
+
+                         
+                        int index46_54 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred8_FTS()) ) {s = 58;}
+
+                        else if ( (true) ) {s = 53;}
+
+                         
+                        input.seek(index46_54);
+                        if ( s>=0 ) return s;
+                        break;
             }
             if (state.backtracking>0) {state.failed=true; return -1;}
             NoViableAltException nvae =
@@ -10188,16 +10304,16 @@ public class FTSParser extends Parser {
     static final String DFA42_minS =
         "\1\51\1\61\22\uffff\1\0\2\uffff";
     static final String DFA42_maxS =
-        "\1\111\1\105\22\uffff\1\0\2\uffff";
+        "\1\112\1\106\22\uffff\1\0\2\uffff";
     static final String DFA42_acceptS =
         "\2\uffff\22\2\1\uffff\1\2\1\1";
     static final String DFA42_specialS =
         "\24\uffff\1\0\2\uffff}>";
     static final String[] DFA42_transitionS = {
             "\1\22\1\7\1\23\1\21\1\5\2\uffff\1\1\1\12\1\2\1\uffff\1\14\1"+
-            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\4\uffff\1\13"+
+            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\5\uffff\1\13"+
             "\1\6\1\3\1\4\1\11",
-            "\1\24\4\uffff\6\25\1\24\1\25\7\uffff\1\25",
+            "\1\24\4\uffff\6\25\1\24\1\25\10\uffff\1\25",
             "",
             "",
             "",
@@ -10287,16 +10403,16 @@ public class FTSParser extends Parser {
     static final String DFA43_minS =
         "\1\51\1\61\22\uffff\1\0\2\uffff";
     static final String DFA43_maxS =
-        "\1\111\1\105\22\uffff\1\0\2\uffff";
+        "\1\112\1\106\22\uffff\1\0\2\uffff";
     static final String DFA43_acceptS =
         "\2\uffff\22\2\1\uffff\1\2\1\1";
     static final String DFA43_specialS =
         "\24\uffff\1\0\2\uffff}>";
     static final String[] DFA43_transitionS = {
             "\1\22\1\7\1\23\1\21\1\5\2\uffff\1\1\1\12\1\2\1\uffff\1\14\1"+
-            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\4\uffff\1\13"+
+            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\5\uffff\1\13"+
             "\1\6\1\3\1\4\1\11",
-            "\1\24\4\uffff\6\25\1\24\1\25\7\uffff\1\25",
+            "\1\24\4\uffff\6\25\1\24\1\25\10\uffff\1\25",
             "",
             "",
             "",
@@ -10386,16 +10502,16 @@ public class FTSParser extends Parser {
     static final String DFA44_minS =
         "\1\51\1\61\22\uffff\1\0\2\uffff";
     static final String DFA44_maxS =
-        "\1\111\1\105\22\uffff\1\0\2\uffff";
+        "\1\112\1\106\22\uffff\1\0\2\uffff";
     static final String DFA44_acceptS =
         "\2\uffff\22\2\1\uffff\1\2\1\1";
     static final String DFA44_specialS =
         "\24\uffff\1\0\2\uffff}>";
     static final String[] DFA44_transitionS = {
             "\1\22\1\7\1\23\1\21\1\5\2\uffff\1\1\1\12\1\2\1\uffff\1\14\1"+
-            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\4\uffff\1\13"+
+            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\5\uffff\1\13"+
             "\1\6\1\3\1\4\1\11",
-            "\1\24\4\uffff\10\25\7\uffff\1\25",
+            "\1\24\4\uffff\10\25\10\uffff\1\25",
             "",
             "",
             "",
@@ -10485,16 +10601,16 @@ public class FTSParser extends Parser {
     static final String DFA45_minS =
         "\1\51\1\61\22\uffff\1\0\2\uffff";
     static final String DFA45_maxS =
-        "\1\111\1\105\22\uffff\1\0\2\uffff";
+        "\1\112\1\106\22\uffff\1\0\2\uffff";
     static final String DFA45_acceptS =
         "\2\uffff\22\2\1\uffff\1\2\1\1";
     static final String DFA45_specialS =
         "\24\uffff\1\0\2\uffff}>";
     static final String[] DFA45_transitionS = {
             "\1\22\1\7\1\23\1\21\1\5\2\uffff\1\1\1\12\1\2\1\uffff\1\14\1"+
-            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\4\uffff\1\13"+
+            "\15\4\12\1\10\1\16\1\12\1\13\1\uffff\1\17\1\20\5\uffff\1\13"+
             "\1\6\1\3\1\4\1\11",
-            "\1\24\4\uffff\6\25\1\24\1\25\7\uffff\1\25",
+            "\1\24\4\uffff\6\25\1\24\1\25\10\uffff\1\25",
             "",
             "",
             "",
@@ -10580,22 +10696,22 @@ public class FTSParser extends Parser {
     static final String DFA47_eotS =
         "\104\uffff";
     static final String DFA47_eofS =
-        "\1\4\15\uffff\1\42\61\uffff\1\42\3\uffff";
+        "\1\4\15\uffff\1\42\60\uffff\1\42\4\uffff";
     static final String DFA47_minS =
         "\1\51\15\uffff\1\51\13\uffff\1\51\1\0\4\uffff\2\0\1\uffff\1\0\11"+
-        "\uffff\1\51\22\uffff\1\51\3\uffff";
+        "\uffff\1\51\21\uffff\1\51\4\uffff";
     static final String DFA47_maxS =
-        "\1\111\15\uffff\1\111\13\uffff\1\111\1\0\4\uffff\2\0\1\uffff\1"+
-        "\0\11\uffff\1\111\22\uffff\1\111\3\uffff";
+        "\1\112\15\uffff\1\112\13\uffff\1\112\1\0\4\uffff\2\0\1\uffff\1"+
+        "\0\11\uffff\1\112\21\uffff\1\112\4\uffff";
     static final String DFA47_acceptS =
         "\1\uffff\15\2\1\uffff\13\2\2\uffff\4\2\2\uffff\1\2\1\uffff\11\2"+
-        "\1\uffff\14\2\1\1\5\2\1\uffff\3\2";
+        "\1\uffff\14\2\1\1\4\2\1\uffff\4\2";
     static final String DFA47_specialS =
-        "\32\uffff\1\1\1\4\4\uffff\1\3\1\2\1\uffff\1\0\40\uffff}>";
+        "\32\uffff\1\4\1\3\4\uffff\1\2\1\0\1\uffff\1\1\40\uffff}>";
     static final String[] DFA47_transitionS = {
             "\1\27\1\7\1\30\1\25\1\5\1\26\1\uffff\1\21\1\14\1\1\1\uffff"+
             "\1\17\1\20\1\12\3\14\1\10\1\22\1\14\1\16\1\uffff\1\23\1\24\2"+
-            "\uffff\1\13\1\15\1\31\1\6\1\2\1\3\1\11",
+            "\uffff\1\13\1\15\1\uffff\1\31\1\6\1\2\1\3\1\11",
             "",
             "",
             "",
@@ -10611,7 +10727,7 @@ public class FTSParser extends Parser {
             "",
             "\1\27\1\7\1\30\1\32\1\5\1\26\1\uffff\1\34\1\43\1\35\1\uffff"+
             "\1\17\1\20\1\40\3\43\1\33\1\41\1\43\1\31\1\uffff\1\23\1\24\2"+
-            "\uffff\1\13\1\15\1\31\1\6\1\36\1\37\1\11",
+            "\uffff\1\13\1\15\1\uffff\1\31\1\6\1\36\1\37\1\11",
             "",
             "",
             "",
@@ -10625,7 +10741,7 @@ public class FTSParser extends Parser {
             "",
             "\1\66\1\67\1\46\1\64\1\72\1\65\1\uffff\1\60\1\55\2\uffff\1"+
             "\57\1\45\1\51\3\71\1\44\1\61\1\71\1\53\1\uffff\1\62\1\63\2\uffff"+
-            "\1\54\1\56\1\53\1\70\1\47\1\50\1\52",
+            "\1\54\1\56\1\uffff\1\53\1\70\1\47\1\50\1\52",
             "\1\uffff",
             "",
             "",
@@ -10644,10 +10760,9 @@ public class FTSParser extends Parser {
             "",
             "",
             "",
-            "\1\66\1\77\1\46\1\64\1\100\1\65\1\uffff\1\74\1\71\1\75\1\uffff"+
-            "\1\57\1\45\1\51\3\71\1\44\1\61\1\71\1\103\1\73\1\62\1\63\2\uffff"+
-            "\1\54\1\56\1\53\1\76\1\101\1\102\1\52",
-            "",
+            "\1\66\1\76\1\46\1\64\1\77\1\65\1\uffff\1\73\1\71\1\74\1\uffff"+
+            "\1\57\1\45\1\51\3\71\1\44\1\61\1\71\1\102\1\103\1\62\1\63\2"+
+            "\uffff\1\54\1\56\1\uffff\1\53\1\75\1\100\1\101\1\52",
             "",
             "",
             "",
@@ -10667,7 +10782,8 @@ public class FTSParser extends Parser {
             "",
             "\1\27\1\7\1\30\1\25\1\5\1\26\1\uffff\1\21\1\43\1\35\1\uffff"+
             "\1\17\1\20\1\40\3\43\1\33\1\41\1\43\1\31\1\uffff\1\23\1\24\2"+
-            "\uffff\1\13\1\15\1\31\1\6\1\36\1\37\1\11",
+            "\uffff\1\13\1\15\1\uffff\1\31\1\6\1\36\1\37\1\11",
+            "",
             "",
             "",
             ""
@@ -10710,6 +10826,21 @@ public class FTSParser extends Parser {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
+                        int LA47_33 = input.LA(1);
+
+                         
+                        int index47_33 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred13_FTS()) ) {s = 58;}
+
+                        else if ( (true) ) {s = 57;}
+
+                         
+                        input.seek(index47_33);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 1 : 
                         int LA47_35 = input.LA(1);
 
                          
@@ -10724,7 +10855,37 @@ public class FTSParser extends Parser {
                         input.seek(index47_35);
                         if ( s>=0 ) return s;
                         break;
-                    case 1 : 
+                    case 2 : 
+                        int LA47_32 = input.LA(1);
+
+                         
+                        int index47_32 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred13_FTS()) ) {s = 58;}
+
+                        else if ( (true) ) {s = 57;}
+
+                         
+                        input.seek(index47_32);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 3 : 
+                        int LA47_27 = input.LA(1);
+
+                         
+                        int index47_27 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred13_FTS()) ) {s = 58;}
+
+                        else if ( (true) ) {s = 57;}
+
+                         
+                        input.seek(index47_27);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 4 : 
                         int LA47_26 = input.LA(1);
 
                          
@@ -10781,51 +10942,6 @@ public class FTSParser extends Parser {
                         input.seek(index47_26);
                         if ( s>=0 ) return s;
                         break;
-                    case 2 : 
-                        int LA47_33 = input.LA(1);
-
-                         
-                        int index47_33 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred13_FTS()) ) {s = 58;}
-
-                        else if ( (true) ) {s = 57;}
-
-                         
-                        input.seek(index47_33);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 3 : 
-                        int LA47_32 = input.LA(1);
-
-                         
-                        int index47_32 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred13_FTS()) ) {s = 58;}
-
-                        else if ( (true) ) {s = 57;}
-
-                         
-                        input.seek(index47_32);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 : 
-                        int LA47_27 = input.LA(1);
-
-                         
-                        int index47_27 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred13_FTS()) ) {s = 58;}
-
-                        else if ( (true) ) {s = 57;}
-
-                         
-                        input.seek(index47_27);
-                        if ( s>=0 ) return s;
-                        break;
             }
             if (state.backtracking>0) {state.failed=true; return -1;}
             NoViableAltException nvae =
@@ -10835,28 +10951,31 @@ public class FTSParser extends Parser {
         }
     }
     static final String DFA54_eotS =
-        "\45\uffff";
+        "\50\uffff";
     static final String DFA54_eofS =
-        "\6\uffff\1\21\36\uffff";
+        "\10\uffff\1\22\37\uffff";
     static final String DFA54_minS =
-        "\1\66\1\63\1\uffff\1\54\2\uffff\1\51\36\uffff";
+        "\1\66\1\63\1\uffff\1\66\1\54\1\63\2\uffff\1\51\37\uffff";
     static final String DFA54_maxS =
-        "\1\104\1\63\1\uffff\1\105\2\uffff\1\111\36\uffff";
+        "\1\104\1\105\1\uffff\1\66\1\106\1\63\2\uffff\1\112\37\uffff";
     static final String DFA54_acceptS =
-        "\2\uffff\1\2\1\uffff\2\3\1\uffff\5\3\1\1\30\3";
+        "\2\uffff\1\2\3\uffff\2\3\1\uffff\4\3\1\1\30\3\1\1\1\3";
     static final String DFA54_specialS =
-        "\45\uffff}>";
+        "\50\uffff}>";
     static final String[] DFA54_transitionS = {
             "\1\1\15\uffff\1\2",
-            "\1\3",
+            "\1\4\21\uffff\1\3",
             "",
-            "\1\4\4\uffff\1\7\3\uffff\1\5\1\6\3\7\2\10\1\7\1\10\1\uffff"+
-            "\1\11\1\12\4\uffff\1\10",
+            "\1\5",
+            "\1\6\4\uffff\1\11\3\uffff\1\7\1\10\3\11\2\12\1\11\1\12\1\uffff"+
+            "\1\13\1\14\5\uffff\1\12",
+            "\1\4",
             "",
             "",
-            "\1\43\1\24\1\44\1\41\1\22\1\42\1\uffff\1\15\1\31\1\16\1\14"+
-            "\1\34\1\35\1\27\3\31\1\25\1\36\1\31\1\33\1\13\1\37\1\40\2\uffff"+
-            "\1\30\1\32\1\33\1\23\1\17\1\20\1\26",
+            "\1\44\1\25\1\45\1\42\1\23\1\43\1\uffff\1\16\1\32\1\17\1\46"+
+            "\1\35\1\36\1\30\3\32\1\26\1\37\1\32\1\34\1\47\1\40\1\41\2\uffff"+
+            "\1\31\1\33\1\15\1\34\1\24\1\20\1\21\1\27",
+            "",
             "",
             "",
             "",
@@ -10923,22 +11042,24 @@ public class FTSParser extends Parser {
         }
     }
     static final String DFA56_eotS =
-        "\35\uffff";
+        "\37\uffff";
     static final String DFA56_eofS =
-        "\1\uffff\1\7\33\uffff";
+        "\1\uffff\1\10\34\uffff\1\10";
     static final String DFA56_minS =
-        "\1\66\1\51\33\uffff";
+        "\1\66\1\51\1\uffff\1\66\32\uffff\1\51";
     static final String DFA56_maxS =
-        "\1\104\1\111\33\uffff";
+        "\1\104\1\112\1\uffff\1\66\32\uffff\1\112";
     static final String DFA56_acceptS =
-        "\2\uffff\1\2\1\1\31\3";
+        "\2\uffff\1\2\1\uffff\1\1\31\3\1\uffff";
     static final String DFA56_specialS =
-        "\35\uffff}>";
+        "\37\uffff}>";
     static final String[] DFA56_transitionS = {
             "\1\1\15\uffff\1\2",
-            "\1\32\1\12\1\33\1\30\1\10\1\31\1\34\1\24\1\17\1\4\1\3\1\22"+
-            "\1\23\1\15\3\17\1\13\1\25\1\17\1\21\1\uffff\1\26\1\27\2\uffff"+
-            "\1\16\1\20\1\21\1\11\1\5\1\6\1\14",
+            "\1\33\1\13\1\34\1\31\1\11\1\32\1\35\1\25\1\20\1\5\1\4\1\23"+
+            "\1\24\1\16\3\20\1\14\1\26\1\20\1\22\1\uffff\1\27\1\30\2\uffff"+
+            "\1\17\1\21\1\3\1\22\1\12\1\6\1\7\1\15",
+            "",
+            "\1\36",
             "",
             "",
             "",
@@ -10965,7 +11086,9 @@ public class FTSParser extends Parser {
             "",
             "",
             "",
-            ""
+            "\1\33\1\13\1\34\1\31\1\11\1\32\1\35\1\25\1\20\1\5\1\4\1\23"+
+            "\1\24\1\16\3\20\1\14\1\26\1\20\1\22\1\uffff\1\27\1\30\2\uffff"+
+            "\1\17\1\21\1\uffff\1\22\1\12\1\6\1\7\1\15"
     };
 
     static final short[] DFA56_eot = DFA.unpackEncodedString(DFA56_eotS);
@@ -11001,6 +11124,85 @@ public class FTSParser extends Parser {
             return "728:9: ( prefix | uri )?";
         }
     }
+    static final String DFA57_eotS =
+        "\35\uffff";
+    static final String DFA57_eofS =
+        "\1\uffff\1\7\33\uffff";
+    static final String DFA57_minS =
+        "\1\66\1\51\33\uffff";
+    static final String DFA57_maxS =
+        "\1\66\1\112\33\uffff";
+    static final String DFA57_acceptS =
+        "\2\uffff\1\2\32\1";
+    static final String DFA57_specialS =
+        "\35\uffff}>";
+    static final String[] DFA57_transitionS = {
+            "\1\1",
+            "\1\32\1\12\1\33\1\30\1\10\1\31\1\34\1\24\1\17\1\4\1\3\1\22"+
+            "\1\23\1\15\3\17\1\13\1\25\1\17\1\21\1\uffff\1\26\1\27\2\uffff"+
+            "\1\16\1\20\1\2\1\21\1\11\1\5\1\6\1\14",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+    };
+
+    static final short[] DFA57_eot = DFA.unpackEncodedString(DFA57_eotS);
+    static final short[] DFA57_eof = DFA.unpackEncodedString(DFA57_eofS);
+    static final char[] DFA57_min = DFA.unpackEncodedStringToUnsignedChars(DFA57_minS);
+    static final char[] DFA57_max = DFA.unpackEncodedStringToUnsignedChars(DFA57_maxS);
+    static final short[] DFA57_accept = DFA.unpackEncodedString(DFA57_acceptS);
+    static final short[] DFA57_special = DFA.unpackEncodedString(DFA57_specialS);
+    static final short[][] DFA57_transition;
+
+    static {
+        int numStates = DFA57_transitionS.length;
+        DFA57_transition = new short[numStates][];
+        for (int i=0; i<numStates; i++) {
+            DFA57_transition[i] = DFA.unpackEncodedString(DFA57_transitionS[i]);
+        }
+    }
+
+    class DFA57 extends DFA {
+
+        public DFA57(BaseRecognizer recognizer) {
+            this.recognizer = recognizer;
+            this.decisionNumber = 57;
+            this.eot = DFA57_eot;
+            this.eof = DFA57_eof;
+            this.min = DFA57_min;
+            this.max = DFA57_max;
+            this.accept = DFA57_accept;
+            this.special = DFA57_special;
+            this.transition = DFA57_transition;
+        }
+        public String getDescription() {
+            return "751:1: identifier : ( ID -> ID | id1= ID DOT id2= ID ->);";
+        }
+    }
  
 
     public static final BitSet FOLLOW_ftsDisjunction_in_ftsQuery535 = new BitSet(new long[]{0x0000000000000000L});
@@ -11008,36 +11210,36 @@ public class FTSParser extends Parser {
     public static final BitSet FOLLOW_cmisExplicitDisjunction_in_ftsDisjunction596 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsExplicitDisjunction_in_ftsDisjunction611 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsImplicitDisjunction_in_ftsDisjunction626 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ftsImplicitConjunction_in_ftsExplicitDisjunction659 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000040L});
-    public static final BitSet FOLLOW_or_in_ftsExplicitDisjunction662 = new BitSet(new long[]{0xBFF35E0000000000L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_ftsImplicitConjunction_in_ftsExplicitDisjunction664 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000040L});
-    public static final BitSet FOLLOW_cmisConjunction_in_cmisExplicitDisjunction748 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000040L});
-    public static final BitSet FOLLOW_or_in_cmisExplicitDisjunction751 = new BitSet(new long[]{0x3FE2080000000000L,0x0000000000000038L});
-    public static final BitSet FOLLOW_cmisConjunction_in_cmisExplicitDisjunction753 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000040L});
-    public static final BitSet FOLLOW_or_in_ftsImplicitDisjunction838 = new BitSet(new long[]{0xBFF35E0000000000L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_ftsExplicitConjunction_in_ftsImplicitDisjunction841 = new BitSet(new long[]{0xBFF35E0000000002L,0x00000000000003F9L});
-    public static final BitSet FOLLOW_ftsPrefixed_in_ftsExplicitConjunction928 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000180L});
-    public static final BitSet FOLLOW_and_in_ftsExplicitConjunction931 = new BitSet(new long[]{0xBFF35E0000000000L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_ftsPrefixed_in_ftsExplicitConjunction933 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000180L});
-    public static final BitSet FOLLOW_and_in_ftsImplicitConjunction1018 = new BitSet(new long[]{0xBFF35E0000000000L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_ftsPrefixed_in_ftsImplicitConjunction1021 = new BitSet(new long[]{0xBFF35E0000000002L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_cmisPrefixed_in_cmisConjunction1105 = new BitSet(new long[]{0x3FE2080000000002L,0x0000000000000038L});
-    public static final BitSet FOLLOW_not_in_ftsPrefixed1197 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_ftsImplicitConjunction_in_ftsExplicitDisjunction659 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000080L});
+    public static final BitSet FOLLOW_or_in_ftsExplicitDisjunction662 = new BitSet(new long[]{0xBFF35E0000000000L,0x0000000000000759L});
+    public static final BitSet FOLLOW_ftsImplicitConjunction_in_ftsExplicitDisjunction664 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000080L});
+    public static final BitSet FOLLOW_cmisConjunction_in_cmisExplicitDisjunction748 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000080L});
+    public static final BitSet FOLLOW_or_in_cmisExplicitDisjunction751 = new BitSet(new long[]{0x3FE2080000000000L,0x0000000000000058L});
+    public static final BitSet FOLLOW_cmisConjunction_in_cmisExplicitDisjunction753 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000080L});
+    public static final BitSet FOLLOW_or_in_ftsImplicitDisjunction838 = new BitSet(new long[]{0xBFF35E0000000000L,0x0000000000000759L});
+    public static final BitSet FOLLOW_ftsExplicitConjunction_in_ftsImplicitDisjunction841 = new BitSet(new long[]{0xBFF35E0000000002L,0x00000000000007D9L});
+    public static final BitSet FOLLOW_ftsPrefixed_in_ftsExplicitConjunction928 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000300L});
+    public static final BitSet FOLLOW_and_in_ftsExplicitConjunction931 = new BitSet(new long[]{0xBFF35E0000000000L,0x0000000000000759L});
+    public static final BitSet FOLLOW_ftsPrefixed_in_ftsExplicitConjunction933 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000300L});
+    public static final BitSet FOLLOW_and_in_ftsImplicitConjunction1018 = new BitSet(new long[]{0xBFF35E0000000000L,0x0000000000000759L});
+    public static final BitSet FOLLOW_ftsPrefixed_in_ftsImplicitConjunction1021 = new BitSet(new long[]{0xBFF35E0000000002L,0x0000000000000759L});
+    public static final BitSet FOLLOW_cmisPrefixed_in_cmisConjunction1105 = new BitSet(new long[]{0x3FE2080000000002L,0x0000000000000058L});
+    public static final BitSet FOLLOW_not_in_ftsPrefixed1197 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsTest_in_ftsPrefixed1199 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsPrefixed1201 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsTest_in_ftsPrefixed1265 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsPrefixed1267 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PLUS_in_ftsPrefixed1331 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_PLUS_in_ftsPrefixed1331 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsTest_in_ftsPrefixed1333 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsPrefixed1335 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BAR_in_ftsPrefixed1399 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_BAR_in_ftsPrefixed1399 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsTest_in_ftsPrefixed1401 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsPrefixed1403 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_ftsPrefixed1467 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_MINUS_in_ftsPrefixed1467 = new BitSet(new long[]{0xBFF3500000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsTest_in_ftsPrefixed1469 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsPrefixed1471 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_cmisTest_in_cmisPrefixed1556 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_cmisPrefixed1616 = new BitSet(new long[]{0x3FE2000000000000L,0x0000000000000038L});
+    public static final BitSet FOLLOW_MINUS_in_cmisPrefixed1616 = new BitSet(new long[]{0x3FE2000000000000L,0x0000000000000058L});
     public static final BitSet FOLLOW_cmisTest_in_cmisPrefixed1618 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupProximity_in_ftsTest1708 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsTerm_in_ftsTest1768 = new BitSet(new long[]{0x0001000000000002L});
@@ -11050,7 +11252,7 @@ public class FTSParser extends Parser {
     public static final BitSet FOLLOW_fuzzy_in_ftsTest2003 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsRange_in_ftsTest2068 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroup_in_ftsTest2128 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_ftsTest2160 = new BitSet(new long[]{0xBFF35E0000000000L,0x00000000000003F9L});
+    public static final BitSet FOLLOW_LPAREN_in_ftsTest2160 = new BitSet(new long[]{0xBFF35E0000000000L,0x00000000000007D9L});
     public static final BitSet FOLLOW_ftsDisjunction_in_ftsTest2162 = new BitSet(new long[]{0x0000200000000000L});
     public static final BitSet FOLLOW_RPAREN_in_ftsTest2164 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_template_in_ftsTest2196 = new BitSet(new long[]{0x0000000000000002L});
@@ -11070,49 +11272,49 @@ public class FTSParser extends Parser {
     public static final BitSet FOLLOW_CARAT_in_boost2712 = new BitSet(new long[]{0x1002000000000000L});
     public static final BitSet FOLLOW_number_in_boost2714 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_fieldReference_in_ftsTerm2796 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_COLON_in_ftsTerm2798 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000038L});
+    public static final BitSet FOLLOW_COLON_in_ftsTerm2798 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000058L});
     public static final BitSet FOLLOW_ftsWord_in_ftsTerm2802 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsWord_in_cmisTerm2858 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_EQUALS_in_ftsExactTerm2911 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000038L});
+    public static final BitSet FOLLOW_EQUALS_in_ftsExactTerm2911 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000058L});
     public static final BitSet FOLLOW_ftsTerm_in_ftsExactTerm2913 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_fieldReference_in_ftsPhrase2967 = new BitSet(new long[]{0x0008000000000000L});
     public static final BitSet FOLLOW_COLON_in_ftsPhrase2969 = new BitSet(new long[]{0x0020000000000000L});
     public static final BitSet FOLLOW_FTSPHRASE_in_ftsPhrase2973 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_FTSPHRASE_in_cmisPhrase3029 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TILDA_in_ftsSynonym3082 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000038L});
+    public static final BitSet FOLLOW_TILDA_in_ftsSynonym3082 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000058L});
     public static final BitSet FOLLOW_ftsTerm_in_ftsSynonym3084 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_fieldReference_in_ftsRange3138 = new BitSet(new long[]{0x0008000000000000L});
     public static final BitSet FOLLOW_COLON_in_ftsRange3140 = new BitSet(new long[]{0x93E2000000000000L,0x0000000000000019L});
     public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsRange3144 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_fieldReference_in_ftsFieldGroup3200 = new BitSet(new long[]{0x0008000000000000L});
     public static final BitSet FOLLOW_COLON_in_ftsFieldGroup3202 = new BitSet(new long[]{0x0000100000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroup3204 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000003F9L});
+    public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroup3204 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000007D9L});
     public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroup3206 = new BitSet(new long[]{0x0000200000000000L});
     public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroup3208 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupExplicitDisjunction_in_ftsFieldGroupDisjunction3294 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupImplicitDisjunction_in_ftsFieldGroupDisjunction3309 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3342 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000040L});
-    public static final BitSet FOLLOW_or_in_ftsFieldGroupExplicitDisjunction3345 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3347 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000040L});
-    public static final BitSet FOLLOW_or_in_ftsFieldGroupImplicitDisjunction3432 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000003F9L});
-    public static final BitSet FOLLOW_ftsFieldGroupExplicitConjunction_in_ftsFieldGroupImplicitDisjunction3435 = new BitSet(new long[]{0xBFF31E0000000002L,0x00000000000003F9L});
-    public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction3522 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000180L});
-    public static final BitSet FOLLOW_and_in_ftsFieldGroupExplicitConjunction3525 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction3527 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000180L});
-    public static final BitSet FOLLOW_and_in_ftsFieldGroupImplicitConjunction3612 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupImplicitConjunction3615 = new BitSet(new long[]{0xBFF31E0000000002L,0x00000000000003B9L});
-    public static final BitSet FOLLOW_not_in_ftsFieldGroupPrefixed3705 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3342 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000080L});
+    public static final BitSet FOLLOW_or_in_ftsFieldGroupExplicitDisjunction3345 = new BitSet(new long[]{0xBFF31E0000000000L,0x0000000000000759L});
+    public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3347 = new BitSet(new long[]{0x0000040000000002L,0x0000000000000080L});
+    public static final BitSet FOLLOW_or_in_ftsFieldGroupImplicitDisjunction3432 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000007D9L});
+    public static final BitSet FOLLOW_ftsFieldGroupExplicitConjunction_in_ftsFieldGroupImplicitDisjunction3435 = new BitSet(new long[]{0xBFF31E0000000002L,0x00000000000007D9L});
+    public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction3522 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000300L});
+    public static final BitSet FOLLOW_and_in_ftsFieldGroupExplicitConjunction3525 = new BitSet(new long[]{0xBFF31E0000000000L,0x0000000000000759L});
+    public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction3527 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000300L});
+    public static final BitSet FOLLOW_and_in_ftsFieldGroupImplicitConjunction3612 = new BitSet(new long[]{0xBFF31E0000000000L,0x0000000000000759L});
+    public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupImplicitConjunction3615 = new BitSet(new long[]{0xBFF31E0000000002L,0x0000000000000759L});
+    public static final BitSet FOLLOW_not_in_ftsFieldGroupPrefixed3705 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed3707 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed3709 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed3773 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed3775 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PLUS_in_ftsFieldGroupPrefixed3839 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_PLUS_in_ftsFieldGroupPrefixed3839 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed3841 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed3843 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BAR_in_ftsFieldGroupPrefixed3907 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_BAR_in_ftsFieldGroupPrefixed3907 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed3909 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed3911 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_ftsFieldGroupPrefixed3975 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000039L});
+    public static final BitSet FOLLOW_MINUS_in_ftsFieldGroupPrefixed3975 = new BitSet(new long[]{0xBFF3100000000000L,0x0000000000000059L});
     public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed3977 = new BitSet(new long[]{0x0004000000000002L});
     public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed3979 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupProximity_in_ftsFieldGroupTest4070 = new BitSet(new long[]{0x0000000000000002L});
@@ -11125,14 +11327,14 @@ public class FTSParser extends Parser {
     public static final BitSet FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest4355 = new BitSet(new long[]{0x0001000000000002L});
     public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4365 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest4430 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroupTest4490 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000003F9L});
+    public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroupTest4490 = new BitSet(new long[]{0xBFF31E0000000000L,0x00000000000007D9L});
     public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest4492 = new BitSet(new long[]{0x0000200000000000L});
     public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroupTest4494 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsWord_in_ftsFieldGroupTerm4547 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactTerm4580 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000038L});
+    public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactTerm4580 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000058L});
     public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm4582 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase4635 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupSynonym4668 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000038L});
+    public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupSynonym4668 = new BitSet(new long[]{0x3FC2000000000000L,0x0000000000000058L});
     public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym4670 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity4723 = new BitSet(new long[]{0x2000000000000000L});
     public static final BitSet FOLLOW_proximityGroup_in_ftsFieldGroupProximity4733 = new BitSet(new long[]{0x1FC2000000000000L});
@@ -11166,15 +11368,18 @@ public class FTSParser extends Parser {
     public static final BitSet FOLLOW_COLON_in_prefix5604 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_URI_in_uri5685 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ID_in_identifier5766 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_identifier5824 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_DOT_in_identifier5826 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_ID_in_identifier5830 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_ftsWord0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_number0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_ftsRangeWord0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OR_in_or6092 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BAR_in_or6104 = new BitSet(new long[]{0x0000040000000000L});
-    public static final BitSet FOLLOW_BAR_in_or6106 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_AND_in_and6139 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_AMP_in_and6151 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_AMP_in_and6153 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_OR_in_or6181 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BAR_in_or6193 = new BitSet(new long[]{0x0000040000000000L});
+    public static final BitSet FOLLOW_BAR_in_or6195 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_AND_in_and6228 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_AMP_in_and6240 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000200L});
+    public static final BitSet FOLLOW_AMP_in_and6242 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_not0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_not_in_synpred1_FTS1192 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ftsFieldGroupProximity_in_synpred2_FTS1703 = new BitSet(new long[]{0x0000000000000002L});

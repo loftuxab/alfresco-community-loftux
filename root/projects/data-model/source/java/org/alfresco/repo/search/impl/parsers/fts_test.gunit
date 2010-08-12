@@ -125,7 +125,7 @@ ftsTest:
 "woof*woof" ->"(TERM woof*woof)"
 "woof * woof" ->"(PROXIMITY woof PROXIMITY woof)"
 "*woof*woof*" ->"(TERM *woof*woof*)"
-
+"cm:content.mimetype:*" -> "(TERM * (FIELD_REF content.mimetype (PREFIX cm)))"
 
 ftsTerm:
 "name:woof" -> "woof (FIELD_REF name)"
@@ -226,6 +226,7 @@ uri:
 identifier:
 "banana"   OK
 "name"   OK
+"content.mimetypr" OK
 
 ftsWord:
 "OR"       FAIL

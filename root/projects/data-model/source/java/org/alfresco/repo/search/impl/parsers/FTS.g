@@ -751,6 +751,10 @@ uri
 identifier
         :
         ID
+                ->
+                        ID
+        | id1=ID DOT id2=ID
+                ->      {new CommonTree(new CommonToken(FTSLexer.ID, $id1.text+$DOT.text+$id2.text))}
         ;
 
 ftsWord
