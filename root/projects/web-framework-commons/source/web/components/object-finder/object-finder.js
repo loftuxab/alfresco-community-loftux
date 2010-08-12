@@ -1689,11 +1689,11 @@
 
          if (!this.options.disabled && !this.isReady)
          {
+            this.isReady = true;
             YAHOO.Bubbling.fire("objectFinderReady",
             {
                eventGroup: this
             });
-            this.isReady = true;
          }
       }
    });
