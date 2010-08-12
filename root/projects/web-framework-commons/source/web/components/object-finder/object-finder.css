@@ -79,6 +79,13 @@
    top: 3px;
 }
 
+.object-finder .inlineable div
+{
+   display: inline-block;
+   float: none;
+   padding: 4px;
+}
+
 .yui-panel .object-finder .current-values.object-finder-item
 {
    max-height: 8em;

@@ -842,7 +842,7 @@
                      if (this.options.displayMode == "items")
                      {
                         displayValue += this.options.objectRenderer.renderItem(item, 16,
-                              "<div class='inlineable'>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
+                              "<div>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
                      }
                      else if (this.options.displayMode == "list")
                      {
@@ -853,7 +853,7 @@
                   {
                      if (this.options.displayMode == "items")
                      {
-                        displayValue += this.options.objectRenderer.renderItem(item, 16, "<div class='inlineable'>{icon} {name}</div>");
+                        displayValue += this.options.objectRenderer.renderItem(item, 16, "<div>{icon} {name}</div>");
                      }
                      else if (this.options.displayMode == "list")
                      {
