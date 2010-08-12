@@ -169,7 +169,8 @@
 
 /* Details Form */
 
-.form-container .edit-metadata a
+.form-container .edit-metadata a,
+.form-container .edit-metadata a:visited
 {
    background: transparent url(images/edit-metadata-16.png) no-repeat 12px 4px;
    padding-left: 32px;
