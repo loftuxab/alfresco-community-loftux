@@ -15,7 +15,7 @@
 
       <#-- Summary -->
       <div id="${id}-summary" style="display: none;">
-         <h2>Summary</h2>
+         <h2>${msg("header.summary")}</h2>
          <div style="border: 1px solid black;" class="job-summary">
             <div id="${id}-jobCount"><strong>12 Jobs</strong></div>
             <ul id="${id}-jobSummary">
@@ -27,10 +27,10 @@
             </ul>
          </div>
       </div>
-
+      
       <#-- Jobs -->
       <div id="${id}-jobs">
-         <h2>Jobs</h2>
+         <h2>${msg("header.jobs")}</h2>
          <div class="yui-gd">
             
             <div class="yui-u first jobs-list-container">
@@ -77,7 +77,7 @@
                      </span>
                   </div>
                   <div id="${id}-jobDetail" class="job-detail">
-                     <p>${msg("label.no-job-selected")}</p>
+                     <div class="message">${msg("label.no-job-selected")}</div>
                   </div>
                </div>
             </div>
@@ -97,15 +97,15 @@
                <button type="button" tabindex="0">${msg("button.refresh")}</button>
             </span>
          </span>
-         <span id="${id}-viewReport" class="yui-button yui-push-button">
+         <span id="${id}-viewReport" class="yui-button yui-button-disabled yui-link-button">
             <span class="first-child">
-               <button type="button" tabindex="0" {viewReportLink}>${msg("button.view-report")}</button>
+               <a tabindex="0" href="{viewReportLink}">${msg("button.view-report")}</a>
             </span>
          </span>
       </div>
       <div>
          <h3>${msg("label.status")}</h3>
-         <div class="{statusClass}">{statusText}</div>
+         <div class="job-status">{statusText}</div>
       </div>
       <hr />
       <h3>${msg("label.payload")}</h3>
@@ -113,4 +113,5 @@
          {payloadHTML}
       </div>
    </div>
+
 </div>
