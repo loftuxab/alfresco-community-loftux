@@ -63,27 +63,27 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
 
     static
     {
-        EXPOSED_FIELDS.add("PATH");
-        EXPOSED_FIELDS.add("TEXT");
-        EXPOSED_FIELDS.add("ID");
-        EXPOSED_FIELDS.add("ISROOT");
-        EXPOSED_FIELDS.add("ISNODE");
-        EXPOSED_FIELDS.add("TX");
-        EXPOSED_FIELDS.add("PARENT");
-        EXPOSED_FIELDS.add("PRIMARYPARENT");
-        EXPOSED_FIELDS.add("QNAME");
-        EXPOSED_FIELDS.add("CLASS");
-        EXPOSED_FIELDS.add("TYPE");
-        EXPOSED_FIELDS.add("EXACTTYPE");
-        EXPOSED_FIELDS.add("ASPECT");
-        EXPOSED_FIELDS.add("EXACTASPECT");
-        EXPOSED_FIELDS.add("ALL");
-        EXPOSED_FIELDS.add("ISUNSET");
-        EXPOSED_FIELDS.add("ISNULL");
-        EXPOSED_FIELDS.add("ISNOTNULL");
-        EXPOSED_FIELDS.add("FTSSTATUS");
-        EXPOSED_FIELDS.add("ASSOCTYPEQNAME");
-        EXPOSED_FIELDS.add("PRIMARYASSOCTYPEQNAME");
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_PATH);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_TEXT);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ID);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ISROOT);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ISNODE);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_TX);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_PARENT);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_PRIMARYPARENT);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_QNAME);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_CLASS);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_TYPE);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_EXACTTYPE);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ASPECT);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_EXACTASPECT);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ALL);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ISUNSET);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ISNULL);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ISNOTNULL);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_FTSSTATUS);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ASSOCTYPEQNAME);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_PRIMARYASSOCTYPEQNAME);
     }
 
     /**
@@ -155,28 +155,28 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         String field = getLuceneFieldName(propertyName);
         // need to find the real field to use
         Locale sortLocale = null;
-        if (field.startsWith("@"))
+        if (field.startsWith(LuceneQueryParser.PROPERTY_FIELD_PREFIX))
         {
             PropertyDefinition propertyDef = dictionaryService.getProperty(QName.createQName(field.substring(1)));
 
             // Handle .size and .mimetype
             if(propertyDef == null)
             {   
-                if(field.endsWith(".size"))
+                if(field.endsWith(LuceneQueryParser.FIELD_SIZE_SUFFIX))
                 {
-                    propertyDef = dictionaryService.getProperty(QName.createQName(field.substring(1, field.length()-5)));
+                    propertyDef = dictionaryService.getProperty(QName.createQName(field.substring(1, field.length()-LuceneQueryParser.FIELD_SIZE_SUFFIX.length())));
                     if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                     {
-                        throw new FTSQueryException("Order for .size only supported on content properties");
+                        throw new FTSQueryException("Order for "+LuceneQueryParser.FIELD_SIZE_SUFFIX+" only supported on content properties");
                     }
                     else
                     {
                         return field;
                     }
                 }
-                else if (field.endsWith(".mimetype"))
+                else if (field.endsWith(LuceneQueryParser.FIELD_MIMETYPE_SUFFIX))
                 {
-                    propertyDef = dictionaryService.getProperty(QName.createQName(field.substring(1, field.length()-9)));
+                    propertyDef = dictionaryService.getProperty(QName.createQName(field.substring(1, field.length()-LuceneQueryParser.FIELD_MIMETYPE_SUFFIX.length())));
                     if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                     {
                         throw new FTSQueryException("Order for .mimetype only supported on content properties");
@@ -225,7 +225,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
                     for (Object current : lqp.getIndexReader().getFieldNames(FieldOption.INDEXED))
                     {
                         String currentString = (String) current;
-                        if (currentString.startsWith(field) && currentString.endsWith(".sort"))
+                        if (currentString.startsWith(field) && currentString.endsWith(LuceneQueryParser.FIELD_SORT_SUFFIX))
                         {
                             String fieldLocale = currentString.substring(field.length() + 1, currentString.length() - 5);
                             if (allowableLocales.contains(fieldLocale))
@@ -262,7 +262,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
                     String analyserClassName = dataType.getAnalyserClassName();
                     if (analyserClassName.equals(DateTimeAnalyser.class.getCanonicalName()))
                     {
-                        field = field + ".sort";
+                        field = field + LuceneQueryParser.FIELD_SORT_SUFFIX;
                     }
                 }
             }
@@ -312,7 +312,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
 
     public String getLuceneFieldName(String propertyName)
     {
-        if (propertyName.startsWith("@"))
+        if (propertyName.startsWith(LuceneQueryParser.PROPERTY_FIELD_PREFIX))
         {
             // Leave it to the query parser to expand
             return propertyName;
@@ -320,14 +320,15 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
 
         if (propertyName.startsWith("{"))
         {
-            QName qname = QName.createQName(propertyName);
-            if (dictionaryService.getProperty(qname) != null)
+            QName fullQName = QName.createQName(propertyName);
+            QName propertyQName = stripSuffixes(fullQName);
+            if (dictionaryService.getProperty(propertyQName) != null)
             {
-                return "@" + qname.toString();
+                return LuceneQueryParser.PROPERTY_FIELD_PREFIX + fullQName.toString();
             }
             else
             {
-                throw new FTSQueryException("Unknown property: " + propertyName);
+                throw new FTSQueryException("Unknown property: " + fullQName.toString());
             }
         }
 
@@ -335,14 +336,15 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         if (index != -1)
         {
             // Try as a property, if invalid pass through
-            QName qname = QName.createQName(propertyName, namespacePrefixResolver);
-            if (dictionaryService.getProperty(qname) != null)
+            QName fullQName = QName.createQName(propertyName, namespacePrefixResolver);
+            QName propertyQName = stripSuffixes(fullQName);
+            if (dictionaryService.getProperty(propertyQName) != null)
             {
-                return "@" + qname.toString();
+                return LuceneQueryParser.PROPERTY_FIELD_PREFIX + fullQName.toString();
             }
             else
             {
-                throw new FTSQueryException("Unknown property: " + propertyName);
+                throw new FTSQueryException("Unknown property: " + fullQName.toString());
             }
         }
 
@@ -350,14 +352,15 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         if (index != -1)
         {
             // Try as a property, if invalid pass through
-            QName qname = QName.createQName(propertyName.substring(0, index), propertyName.substring(index + 1), namespacePrefixResolver);
-            if (dictionaryService.getProperty(qname) != null)
+            QName fullQName = QName.createQName(propertyName.substring(0, index), propertyName.substring(index + 1), namespacePrefixResolver);
+            QName propertyQName = stripSuffixes(fullQName);
+            if (dictionaryService.getProperty(propertyQName) != null)
             {
-                return "@" + qname.toString();
+                return LuceneQueryParser.PROPERTY_FIELD_PREFIX + fullQName.toString();
             }
             else
             {
-                throw new FTSQueryException("Unknown property: " + propertyName);
+                throw new FTSQueryException("Unknown property: " + fullQName.toString());
             }
         }
 
@@ -366,18 +369,67 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
             return propertyName;
         }
 
-        QName qname = QName.createQName(defaultNamespace, propertyName);
-        if (dictionaryService.getProperty(qname) != null)
+        QName fullQName = QName.createQName(defaultNamespace, propertyName);
+        QName propertyQName = stripSuffixes(fullQName);
+        if (dictionaryService.getProperty(propertyQName) != null)
         {
-            return "@" + qname.toString();
+            return LuceneQueryParser.PROPERTY_FIELD_PREFIX + fullQName.toString();
         }
         else
         {
-            throw new FTSQueryException("Unknown property: " + propertyName);
+            throw new FTSQueryException("Unknown property: " + fullQName.toString());
         }
 
     }
-
+    
+    public QName stripSuffixes(QName qname)
+    {
+        String field = qname.toString();
+        if(field.endsWith(LuceneQueryParser.FIELD_SIZE_SUFFIX))
+        {
+            QName propertyField = QName.createQName(field.substring(0, field.length()-LuceneQueryParser.FIELD_SIZE_SUFFIX.length()));
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyField);
+            if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
+            {
+                throw new FTSQueryException(LuceneQueryParser.FIELD_SIZE_SUFFIX+" only supported on content properties");
+            }
+            else
+            {
+                return propertyField;
+            }
+        }
+        else if(field.endsWith(LuceneQueryParser.FIELD_LOCALE_SUFFIX))
+        {
+            QName propertyField = QName.createQName(field.substring(0, field.length()-LuceneQueryParser.FIELD_LOCALE_SUFFIX.length()));
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyField);
+            if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
+            {
+                throw new FTSQueryException(LuceneQueryParser.FIELD_LOCALE_SUFFIX+" only supported on content properties");
+            }
+            else
+            {
+                return propertyField;
+            }
+        }
+        else if(field.endsWith(LuceneQueryParser.FIELD_MIMETYPE_SUFFIX))
+        {
+            QName propertyField = QName.createQName(field.substring(0, field.length()-LuceneQueryParser.FIELD_MIMETYPE_SUFFIX.length()));
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyField);
+            if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
+            {
+                throw new FTSQueryException(LuceneQueryParser.FIELD_MIMETYPE_SUFFIX+" only supported on content properties");
+            }
+            else
+            {
+                return propertyField;
+            }
+        }
+        else
+        {
+            return qname;
+        }
+    }
+    
     public LuceneFunction getLuceneFunction(FunctionArgument functionArgument)
     {
         throw new UnsupportedOperationException();

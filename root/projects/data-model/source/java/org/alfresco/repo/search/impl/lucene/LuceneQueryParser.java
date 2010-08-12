@@ -104,6 +104,31 @@ public class LuceneQueryParser extends QueryParser
     /**
      * 
      */
+    public static final String FIELD_NO_LOCALE_SUFFIX = ".no_locale";
+
+    /**
+     * 
+     */
+    public static final String FIELD_SORT_SUFFIX = ".sort";
+
+    /**
+     * 
+     */
+    public static final String FIELD_LOCALE_SUFFIX = ".locale";
+
+    /**
+     * 
+     */
+    public static final String FIELD_SIZE_SUFFIX = ".size";
+
+    /**
+     * 
+     */
+    public static final String FIELD_MIMETYPE_SUFFIX = ".mimetype";
+
+    /**
+     * 
+     */
     public static final String FIELD_FTSSTATUS = "FTSSTATUS";
 
     /**
@@ -1940,7 +1965,7 @@ public class LuceneQueryParser extends QueryParser
 
                             if (tokenisationMode == IndexTokenisationMode.BOTH)
                             {
-                                textFieldName = textFieldName + "." + locale + ".sort";
+                                textFieldName = textFieldName + "." + locale + FIELD_SORT_SUFFIX;
                             }
 
                             addLocaleSpecificUntokenisedTextRangeFunction(field, part1, part2, includeLower, includeUpper, luceneFunction, booleanQuery, mlAnalysisMode, locale,
@@ -1987,11 +2012,11 @@ public class LuceneQueryParser extends QueryParser
                                 {
                                     if (locale.toString().length() == 0)
                                     {
-                                        textFieldName = textFieldName + ".no_locale";
+                                        textFieldName = textFieldName + FIELD_NO_LOCALE_SUFFIX;
                                     }
                                     else
                                     {
-                                        textFieldName = textFieldName + "." + locale + ".sort";
+                                        textFieldName = textFieldName + "." + locale + FIELD_SORT_SUFFIX;
                                     }
 
                                 }
@@ -3429,20 +3454,20 @@ public class LuceneQueryParser extends QueryParser
         // Get type info etc
         String propertyFieldName = null;
         String ending = "";
-        if (field.endsWith(".mimetype"))
+        if (field.endsWith(FIELD_MIMETYPE_SUFFIX))
         {
             propertyFieldName = field.substring(1, field.length() - 9);
-            ending = ".mimetype";
+            ending = FIELD_MIMETYPE_SUFFIX;
         }
-        else if (field.endsWith(".size"))
+        else if (field.endsWith(FIELD_SIZE_SUFFIX))
         {
             propertyFieldName = field.substring(1, field.length() - 5);
-            ending = ".size";
+            ending = FIELD_SIZE_SUFFIX;
         }
-        else if (field.endsWith(".locale"))
+        else if (field.endsWith(FIELD_LOCALE_SUFFIX))
         {
             propertyFieldName = field.substring(1, field.length() - 7);
-            ending = ".locale";
+            ending = FIELD_LOCALE_SUFFIX;
         }
         else
         {
@@ -3479,7 +3504,7 @@ public class LuceneQueryParser extends QueryParser
         }
 
         // Mime type
-        if (expandedFieldName.endsWith(".mimetype"))
+        if (expandedFieldName.endsWith(FIELD_MIMETYPE_SUFFIX))
         {
             if ((propertyDef != null) && (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT)))
             {
@@ -3487,7 +3512,7 @@ public class LuceneQueryParser extends QueryParser
             }
 
         }
-        else if (expandedFieldName.endsWith(".size"))
+        else if (expandedFieldName.endsWith(FIELD_SIZE_SUFFIX))
         {
             if ((propertyDef != null) && (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT)))
             {
@@ -3495,7 +3520,7 @@ public class LuceneQueryParser extends QueryParser
             }
 
         }
-        else if (expandedFieldName.endsWith(".locale"))
+        else if (expandedFieldName.endsWith(FIELD_LOCALE_SUFFIX))
         {
             if ((propertyDef != null) && (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT)))
             {
@@ -3533,11 +3558,11 @@ public class LuceneQueryParser extends QueryParser
                         {
                             if (locale.toString().length() == 0)
                             {
-                                mlFieldName = mlFieldName + ".no_locale";
+                                mlFieldName = mlFieldName + FIELD_NO_LOCALE_SUFFIX;
                             }
                             else
                             {
-                                mlFieldName = mlFieldName + "." + locale + ".sort";
+                                mlFieldName = mlFieldName + "." + locale + FIELD_SORT_SUFFIX;
                             }
                         }
 
@@ -3634,7 +3659,7 @@ public class LuceneQueryParser extends QueryParser
                     for (Locale locale : (expandedLocales))
                     {
                         StringBuilder builder = new StringBuilder();
-                        builder.append(expandedFieldName).append(".locale");
+                        builder.append(expandedFieldName).append(FIELD_LOCALE_SUFFIX);
                         String localeString = locale.toString();
                         if (localeString.indexOf("*") == -1)
                         {
@@ -3705,7 +3730,7 @@ public class LuceneQueryParser extends QueryParser
                         IndexTokenisationMode tm = propertyDef.getIndexTokenisationMode();
                         if ((tm != null) && (tm == IndexTokenisationMode.BOTH))
                         {
-                            textFieldName = textFieldName + "." + locale + ".sort";
+                            textFieldName = textFieldName + "." + locale + FIELD_SORT_SUFFIX;
                         }
 
                     }
@@ -3832,7 +3857,7 @@ public class LuceneQueryParser extends QueryParser
     {
 
         // Mime type
-        if (expandedFieldName.endsWith(".mimetype"))
+        if (expandedFieldName.endsWith(FIELD_MIMETYPE_SUFFIX))
         {
             if ((propertyDef != null) && (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT)))
             {
@@ -3840,7 +3865,7 @@ public class LuceneQueryParser extends QueryParser
             }
 
         }
-        else if (expandedFieldName.endsWith(".size"))
+        else if (expandedFieldName.endsWith(FIELD_SIZE_SUFFIX))
         {
             if ((propertyDef != null) && (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT)))
             {
@@ -3848,7 +3873,7 @@ public class LuceneQueryParser extends QueryParser
             }
 
         }
-        else if (expandedFieldName.endsWith(".locale"))
+        else if (expandedFieldName.endsWith(FIELD_LOCALE_SUFFIX))
         {
             if ((propertyDef != null) && (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT)))
             {
@@ -3879,7 +3904,7 @@ public class LuceneQueryParser extends QueryParser
 
                 if (tokenisationMode == IndexTokenisationMode.BOTH)
                 {
-                    mlFieldName = mlFieldName + "." + locale + ".sort";
+                    mlFieldName = mlFieldName + "." + locale + FIELD_SORT_SUFFIX;
                 }
 
                 addLocaleSpecificUntokenisedMLOrTextFunction(expandedFieldName, queryText, luceneFunction, booleanQuery, mlAnalysisMode, locale, mlFieldName);
@@ -3913,7 +3938,7 @@ public class LuceneQueryParser extends QueryParser
 
                 if (tokenisationMode == IndexTokenisationMode.BOTH)
                 {
-                    textFieldName = textFieldName + "." + locale + ".sort";
+                    textFieldName = textFieldName + "." + locale + FIELD_SORT_SUFFIX;
                 }
 
                 addLocaleSpecificUntokenisedMLOrTextFunction(expandedFieldName, queryText, luceneFunction, booleanQuery, mlAnalysisMode, locale, textFieldName);
