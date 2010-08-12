@@ -338,6 +338,40 @@
       </forms>
    </config>
 
+   <!-- trx:transferTarget content type (editing) -->
+   <config evaluator="node-type" condition="trx:transferTarget">
+      <forms>
+         <form>
+              <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="trx:endpointhost" />
+               <show id="trx:endpointport" />
+               <show id="trx:endpointpath" />
+               <show id="trx:endpointprotocol" />
+               <show id="trx:username" for-mode="edit"/>
+               <show id="trx:password" for-mode="edit"/>
+               <show id="trx:enabled" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="trx:password">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl">
+                     <control-param name="password">true</control-param>
+                  </control>
+               </field>
+               <field id="trx:enabled" label="Transfer Target is enabled">
+                  <control template="/org/alfresco/components/form/controls/checkbox.ftl" />
+               </field>
+            </appearance>          
+         </form>
+      </forms>   
+   </config>
+
    <!-- dl:dataList type (Creating Data Lists) -->
    <config evaluator="model-type" condition="dl:dataList">
       <forms>
