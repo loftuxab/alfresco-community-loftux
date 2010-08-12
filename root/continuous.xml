@@ -59,7 +59,8 @@
                     set-build-number,
                     init-test,
                     test,
-                    distribute" />
+                    distribute,
+                    generate-checksums" />
 
    <target name="continuous-core" 
            description="Performs a full clean, runs all tests and creates all patch distribution files"
@@ -69,14 +70,16 @@
                     set-build-number,
                     init-test,
                     test,
-                    distribute-core" />
+                    distribute-core,
+                    generate-checksums" />
 
    <target name="continuous-without-tests" 
            description="Performs a full clean and creates all distribution files"
            depends="clean-continuous, 
                     clean, 
                     -reset-database, 
-                    distribute" />
+                    distribute,
+                    generate-checksums" />
 
    <target name="distribute" 
            description="Creates the distribution files for all platforms"
