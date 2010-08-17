@@ -1,4 +1,9 @@
 <#assign el=args.htmlid>
+<script type="text/javascript">//<![CDATA[
+new Alfresco.WorkflowDetailsHeader("${el}").setMessages(
+   ${messages}
+);
+//]]></script>
 <div id="${el}-body" class="form-manager workflow-details-header">
    <#if page.url.args.taskId??>
    <div class="links">

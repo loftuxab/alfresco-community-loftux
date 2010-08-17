@@ -638,7 +638,7 @@
             }
             else
             {
-               destination = Alfresco.util.findValueByDotNotation(this, "modules.docList.doclistMetadata.container")
+               destination = this.modules.docList.doclistMetadata.container;
             }
          }
          else

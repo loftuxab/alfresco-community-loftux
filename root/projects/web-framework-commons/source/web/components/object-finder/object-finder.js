@@ -1543,8 +1543,8 @@
             {
                MSG_EMPTY: this.msg("form.control.object-picker.selected-items.empty")
             });
-            this.widgets.currentValuesDataTable .subscribe("rowMouseoverEvent", this.widgets.currentValuesDataTable .onEventHighlightRow);
-            this.widgets.currentValuesDataTable .subscribe("rowMouseoutEvent", this.widgets.currentValuesDataTable .onEventUnhighlightRow);
+            this.widgets.currentValuesDataTable.subscribe("rowMouseoverEvent", this.widgets.currentValuesDataTable.onEventHighlightRow);
+            this.widgets.currentValuesDataTable.subscribe("rowMouseoutEvent", this.widgets.currentValuesDataTable.onEventUnhighlightRow);
 
             Dom.addClass(currentValueEl, "form-element-border");
             Dom.addClass(currentValueEl, "form-element-background-color");

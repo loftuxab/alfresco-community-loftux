@@ -15,10 +15,7 @@
    <div id="bd">
       <div class="share-form">
          <@region id="workflow-details-header" scope="template" />
-         <@region id="workflow-summary" scope="template" />
          <@region id="workflow-form" scope="template" />
-         <@region id="workflow-current-tasks" scope="template" />
-         <@region id="workflow-history" scope="template" />
       </div>
    </div>
 </@>
