@@ -22,21 +22,24 @@
          <span class="lookfor">${msg("label.lookfor")}:</span>
          
          <#-- component to show list of forms, displays current form -->
-         <div style="position:relative">
-            <div class="selected-form theme-bg-2 theme-border-3">
+         <span class="selected-form-button">
+            <span id="${el}-selected-form-button" class="yui-button yui-menu-button">
+               <span class="first-child">
+                  <button type="button" tabindex="0" title="${searchForms[0].description?html}">${searchForms[0].label?html}</button>
+               </span>
+            </span>
+         </span>
+         <#-- menu list of available forms -->
+         <div id="${el}-selected-form-list" class="yuimenu">
+            <div class="bd">
                <ul>
+                  <#list searchForms as f>
                   <li>
-                     <a id="${el}-selected-form-link" href="#">
-                        <div id="${el}-selected-form-type" class="form-type-name"></div>
-                        <div id="${el}-selected-form-desc" class="form-type-description"></div>
-                     </a>
+                     <span class="form-type-name">${f.label?html}</span>
+                     <span class="form-type-description">${f.description?html}</span>
                   </li>
+                  </#list>
                </ul>
-            </div>
-            
-            <#-- pop-up list of available forms -->
-            <div class="form-list theme-bg-2 theme-border-3 hidden">
-               <ul id="${el}-form-list"></ul>
             </div>
          </div>
       </div>

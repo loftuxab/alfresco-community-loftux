@@ -132,30 +132,6 @@
 
 /* Advanced Search specific styles */
 
-.search .selected-form
-{
-   float: left;
-   min-width: 20em;
-}
-
-.search .selected-form li
-{
-   background-image: url(../images/expanded.png);
-   background-position: 98% center;
-   background-repeat: no-repeat;
-}
-
-.search .form-list
-{
-   position: absolute;
-   top: 3.5em
-}
-
-.search .form-list .item
-{
-   border-top: solid 1px lightgrey;
-}
-
 .search .form-type-name
 {
    font-size: 116%;
@@ -175,13 +151,8 @@
 
 .search .form-row span.lookfor
 {
-   padding-top: 1em;
-}
-
-.search .form-row a:active,
-.search .form-row a:hover
-{
-   text-decoration: none;
+   float: left;
+   padding-top: 0.4em;
 }
 
 .search .forms-container
@@ -201,4 +172,37 @@
 .search .keywords-box .terms
 {
    width: 60em;
+}
+
+/* Forms list button and menu styles */
+
+.search .yuimenu .bd
+{
+   zoom: normal;
+   border: 1px solid #84B4D5;
+   background-color: #FFFFFF;
+   padding: 0;
+}
+
+.search .yuimenu .bd ul
+{
+   padding: 0px;
+   cursor: pointer;
+}
+
+.search .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
+{
+   cursor: pointer;
+}
+
+.search .selected-form-button span.yui-button
+{
+   background: none;
+   border-width: 0px;
+}
+
+.search .selected-form-button span.yui-button span.first-child
+{
+   background-repeat: no-repeat;
+   border-width: 0px;
 }
