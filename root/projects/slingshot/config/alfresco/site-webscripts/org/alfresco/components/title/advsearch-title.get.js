@@ -28,12 +28,14 @@ function main()
    }
    
    // Build search results back link from supplied args
-   if (page.url.args["st"] != null || page.url.args["stag"] != null)
+   var args = page.url.args;
+   if (args["st"] != null || args["stag"] != null)
    {
-      var query = "t=" + (page.url.args["st"] != null ? encodeURIComponent(page.url.args["st"]) : "") +
-                  "&tag=" + (page.url.args["stag"] != null ? encodeURIComponent(page.url.args["stag"]) : "") +
-                  "&s=" + (page.url.args["ss"] != null ? encodeURIComponent(page.url.args["ss"]) : "") +
-                  "&a=" + (page.url.args["sa"] != null ? encodeURIComponent(page.url.args["sa"]) : "");
+      var query = "t=" + (args["st"] != null ? encodeURIComponent(args["st"]) : "") +
+                  "&tag=" + (args["stag"] != null ? encodeURIComponent(args["stag"]) : "") +
+                  "&s=" + (args["ss"] != null ? encodeURIComponent(args["ss"]) : "") +
+                  "&a=" + (args["sa"] != null ? encodeURIComponent(args["sa"]) : "") +
+                  "&q=" + (args["sq"] != null ? encodeURIComponent(args["sq"]) : "");
       model.backlink = query;
    }
 }

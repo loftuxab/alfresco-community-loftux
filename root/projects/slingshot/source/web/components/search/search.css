@@ -129,6 +129,18 @@
    border-bottom: 1px dashed #D7D7D7;
 }
 
+.search .search-bar span.yui-button
+{
+   background: none;
+   border-width: 0px;
+}
+
+.search .search-bar span.yui-button span.first-child
+{
+   background-repeat: no-repeat;
+   border-width: 0px;
+}
+
 
 /* Advanced Search specific styles */
 

@@ -571,7 +571,8 @@
          this.refreshSearch(
          {
             searchTag: param,
-            searchTerm: ""
+            searchTerm: "",
+            searchQuery: ""
          });
       },
       
@@ -603,6 +604,11 @@
          {
             searchSort = args.searchSort;
          }
+         var searchQuery = this.options.searchQuery;
+         if (args.searchQuery !== undefined)
+         {
+            searchQuery = args.searchQuery;
+         }
          
          // redirect to the search page
          var url = Alfresco.constants.URL_CONTEXT + "page";
@@ -619,7 +625,7 @@
          {
             url += "&s=" + searchSort;
          }
-         url += "&a=" + searchAll;
+         url += "&a=" + searchAll + "&q=" + searchQuery;
          window.location = url;
       },
 
@@ -682,7 +688,8 @@
          this.refreshSearch(
          {
             searchTag: "",
-            searchTerm: YAHOO.lang.trim(Dom.get(this.id + "-search-text").value)
+            searchTerm: YAHOO.lang.trim(Dom.get(this.id + "-search-text").value),
+            searchQuery: ""
          });
       },
       
@@ -722,7 +729,8 @@
          this.refreshSearch(
          {
             searchTag: "",
-            searchTerm: YAHOO.lang.trim(Dom.get(this.id + "-search-text").value)
+            searchTerm: YAHOO.lang.trim(Dom.get(this.id + "-search-text").value),
+            searchQuery: ""
          });
       },
       
