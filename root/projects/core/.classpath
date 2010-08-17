@@ -4,7 +4,7 @@
 	<classpathentry exported="true" kind="lib" path="source/test-resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/commons/commons-logging-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/quartz-1.6.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/quartz-1.8.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/guessencoding-1.0.jar" sourcepath="/3rd Party/src/guessencoding-1.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jta.jar"/>
