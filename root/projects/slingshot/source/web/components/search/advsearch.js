@@ -104,69 +104,23 @@
          
          // search YUI button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
-         
-         // generate list of forms
-         var fnOnFormClick = function ADVSearch_fnOnFormClick(form)
+         this.widgets.formButton = new YAHOO.widget.Button(this.id + "-selected-form-button",
          {
-            return function onClick()
-            {
-               // update selected form label, description
-               var elSelected = Dom.get(me.id + "-selected-form-link");
-               var desc = $html(form.description);
-               elSelected.innerHTML = '<div class="form-type-name">' + $html(form.label) + '</div>' +
-                                      '<div class="form-type-description">' + (desc.length !== 0 ? desc : "&nbsp;") + '</div>';
-               
-               // hide list of forms now user has selected something
-               Dom.addClass(elList.parentNode, "hidden");
-               
-               // render the appropriate form template
-               me.renderFormTemplate(form);
-               
-               return false;
-            };
-         };
+            type: "menu",
+            menu: this.id + "-selected-form-list"
+         });
          
-         var elItem, elLink;
-         for (var i=0, j=this.options.searchForms.length, form; i<j; i++)
+         // event handler for form menu
+         this.widgets.formButton.getMenu().subscribe("click", function(p_sType, p_aArgs)
          {
-            form = this.options.searchForms[i];
-            elItem = document.createElement("li");
-            elLink = document.createElement("a");
-            elLink.href = "#";
-            elLink.onclick = fnOnFormClick(form);
-            var desc = $html(form.description);
-            elLink.innerHTML = '<div class="form-type-name">' + $html(form.label) + '</div>' +
-                               '<div class="form-type-description">' + (desc.length !== 0 ? desc : "&nbsp;") + '</div>';
-            elItem.appendChild(elLink);
-            elList.appendChild(elItem);
+            // update selected item menu button label
+            var form = me.options.searchForms[p_aArgs[1].index];
+            me.widgets.formButton.set("label", form.label);
+            me.widgets.formButton.set("title", form.description);
             
-            if (i === 0)
-            {
-               // update initially selected item
-               Dom.get(this.id + "-selected-form-type").innerHTML = $html(form.label);
-               desc = $html(form.description);
-               Dom.get(this.id + "-selected-form-desc").innerHTML = (desc.length !== 0 ? desc : "&nbsp;");
-               
-               // event hander for the item showing the currently selected
-               // drops down and hides the list when clicked
-               var elSelected = Dom.get(me.id + "-selected-form-link");
-               elSelected.onclick = function()
-               {
-                  if (Dom.hasClass(elList.parentNode, "hidden"))
-                  {
-                     Dom.removeClass(elList.parentNode, "hidden");
-                  }
-                  else
-                  {
-                     Dom.addClass(elList.parentNode, "hidden");
-                  }
-               };
-            }
-            else
-            {
-               Dom.addClass(elItem, "item");
-            }
-         }
+            // render the appropriate form template
+            me.renderFormTemplate(form);
+         });
          
          // render initial form template
          this.renderFormTemplate(this.options.searchForms[0]);
