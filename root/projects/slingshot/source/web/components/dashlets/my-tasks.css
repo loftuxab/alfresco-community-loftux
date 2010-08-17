@@ -81,6 +81,7 @@
    padding: 1em;
    visibility: hidden;
 }
+
 .my-tasks a.edit-task:active,
 .my-tasks a.edit-task:hover
 {

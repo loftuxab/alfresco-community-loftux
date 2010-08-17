@@ -42,7 +42,7 @@
          <region-id>data-loader</region-id>
          <url>/components/data/data-loader</url>
          <properties>
-            <url>api/workflow-instances/{workflowId}?detailed=true</url>
+            <url>api/workflow-instances/{workflowId}?includeTasks=true</url>
             <eventName>workflowDetailedData</eventName>
             <eventData>data</eventData>
          </properties>

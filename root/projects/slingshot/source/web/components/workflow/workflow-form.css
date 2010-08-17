@@ -1,0 +1,25 @@
+.workflow-form .workflow-history h3
+{
+   margin-top: 2em;
+   margin-bottom: 0.5em;
+}
+
+.workflow-form .current-tasks h3
+{
+   margin-bottom: 0.5em;
+   margin-top: 2em;
+}
+
+.workflow-form .workflow-history table,
+.workflow-form .current-tasks table   
+{
+   width: 100%;
+}
+
+.workflow-form .current-tasks table a.edit-task
+{
+   background: url("../images/edit-16.png") no-repeat scroll left center transparent;
+   cursor: pointer;
+   padding-left: 1.5em;
+}
+

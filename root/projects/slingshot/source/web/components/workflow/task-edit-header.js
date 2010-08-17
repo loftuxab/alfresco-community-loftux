@@ -247,7 +247,7 @@
        */
       _updateTaskProperties: function TEH__updateTaskProperties(properties, action)
       {
-         this._toggleActionButtons(true);
+         this._disableActionButtons(true);
          YAHOO.lang.later(2000, this, function()
          {
             if (this.isRunning)
@@ -283,7 +283,6 @@
                   fn: function(response, action)
                   {
                      this.isRunning = false;
-                     this._toggleActionButtons(false);
                      var data = response.json.data;
                      if (data)
                      {
@@ -312,7 +311,7 @@
                   fn: function(response)
                   {
                      this.isRunning = false;
-                     this._toggleActionButtons(false);
+                     this._disableActionButtons(false);
                      Alfresco.util.PopupManager.displayPrompt(
                      {
                         title: this.msg("message.failure"),
@@ -325,7 +324,7 @@
          }
       },
 
-      _toggleActionButtons: function(disabled)
+      _disableActionButtons: function(disabled)
       {
          if (this.widgets.reassignButton)
          {

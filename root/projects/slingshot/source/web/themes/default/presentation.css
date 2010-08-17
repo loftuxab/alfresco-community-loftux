@@ -404,14 +404,28 @@ em
    color: #CC2200 !important;
 }
 
+/* Share forms */
+
+.share-form .form-container .form-fields
+{
+   border: 1px solid #c2c2c2 !important;
+   background-color: #f5fff2;
+}
+
 select,
 input[type="text"],
 input[type="password"],
 textarea,
-.form-element-border
+.form-element-border,
+.share-form .yui-dt table   
 {
    border: 1px solid #C5D6E2;
    font-weight: normal;
+}
+
+.share-form .yui-dt table td.yui-dt-last 
+{
+   border-right: none;
 }
 
 .form-element-background-color

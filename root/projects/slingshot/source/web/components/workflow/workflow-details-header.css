@@ -1,10 +1,13 @@
 .workflow-details-header .links
 {
+   width: 30%;
    float: right;
+   text-align: right;
 }
 
 .workflow-details-header h1
 {
+   width: 65%;
    float: left;
 }
 

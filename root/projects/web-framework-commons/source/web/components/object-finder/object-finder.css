@@ -62,10 +62,10 @@
    background: url(../form/images/remove-icon-16.png) no-repeat left;
 }
 
-.current-values.object-finder-list table td.yui-dt-col-action .view_more_document_actions
+.current-values.object-finder-list table td.yui-dt-col-action .view_more_actions
 {
    padding: 1em 1.5em;
-   background: url(../form/images/plus-16.png) no-repeat left;
+   background: url(../form/images/forward-arrow-16.png) no-repeat left;
 }
 
 .current-values.object-finder-list div
