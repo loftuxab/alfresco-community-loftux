@@ -3122,7 +3122,7 @@ Alfresco.util.Ajax = function()
 
          // Encode dataObj depending on request method and contentType.
          // Note: GET requests are always queryString encoded.
-         if (c.dataObj)
+         if (c.requestContentType === this.JSON)
          {
             if (c.method.toUpperCase() === this.GET)
             {
@@ -3131,10 +3131,19 @@ Alfresco.util.Ajax = function()
             }
             else
             {
-               if (c.requestContentType === this.JSON)
+               // If json is used encode the dataObj parameter and put it in the body
+               c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj || {});
+            }
+         }
+         else
+         {
+            if (c.dataObj)
+            {
+               // Normal URL parameters
+               if (c.method.toUpperCase() === this.GET)
                {
-                  // If json is used encode the dataObj parameter and put it in the body
-                  c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj || {});
+                  // Encode the dataObj and put it in the url
+                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, true);
                }
                else
                {
