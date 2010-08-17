@@ -82,7 +82,15 @@
           * @property searchForms
           * @type Array
           */
-         searchForms: []
+         searchForms: [],
+         
+         /**
+          * Previously saved query, if any
+          * 
+          * @property savedQuery
+          * @type string
+          */
+         savedQuery: ""
       },
       
       /**
@@ -102,13 +110,35 @@
             domId = this.id + "-form-list",
             elList = Dom.get(domId);
          
-         // search YUI button
+         // see if a saved query json string is provided
+         var defaultForm = this.options.searchForms[0];
+         if (this.options.savedQuery.length !== 0)
+         {
+            var savedQuery = YAHOO.lang.JSON.parse(this.options.savedQuery);
+            if (savedQuery.datatype)
+            {
+               for (var f in this.options.searchForms)
+               {
+                  var form = this.options.searchForms[f];
+                  if (form.type === savedQuery.datatype)
+                  {
+                     // found previous form datatype - use as first form to display
+                     defaultForm = form;
+                     break;
+                  }
+               }
+            }
+         }
+         
+         // search YUI button and menus
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
          this.widgets.formButton = new YAHOO.widget.Button(this.id + "-selected-form-button",
          {
             type: "menu",
             menu: this.id + "-selected-form-list"
          });
+         this.widgets.formButton.set("label", defaultForm.label);
+         this.widgets.formButton.set("title", defaultForm.description);
          
          // event handler for form menu
          this.widgets.formButton.getMenu().subscribe("click", function(p_sType, p_aArgs)
@@ -123,7 +153,8 @@
          });
          
          // render initial form template
-         this.renderFormTemplate(this.options.searchForms[0]);
+         // TODO: from previous query!
+         this.renderFormTemplate(defaultForm);
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");

@@ -9,7 +9,8 @@
          type: "${f.type}",
          label: "${f.label?js_string}",
          description: "${f.description?js_string}"
-      }<#if f_has_next>,</#if></#list>]
+      }<#if f_has_next>,</#if></#list>],
+      savedQuery: "${(page.url.args["sq"]!"")?js_string}"
    }).setMessages(
       ${messages}
    );
@@ -25,7 +26,7 @@
          <span class="selected-form-button">
             <span id="${el}-selected-form-button" class="yui-button yui-menu-button">
                <span class="first-child">
-                  <button type="button" tabindex="0" title="${searchForms[0].description?html}">${searchForms[0].label?html}</button>
+                  <button type="button" tabindex="0"></button>
                </span>
             </span>
          </span>

@@ -41,17 +41,15 @@
          <div id="${el}-paginator-top" class="paginator hidden"></div>
       </div>
       <div class="yui-u align-right">
-         <span class="flat-button">
-            <span class="yui-button yui-push-button" id="${el}-sort-menubutton">
-               <span class="first-child"><button></button></span>
-            </span>
-            <select id="${el}-sort-menu" class="yuimenu hidden">
-               <option value="">${msg("search.sort.relevance")}</option>
-               <#list sortFields as sort>
-               <option value="${sort.type}">${sort.label}</option>
-               </#list>
-            </select>
+         <span class="yui-button yui-push-button" id="${el}-sort-menubutton">
+            <span class="first-child"><button></button></span>
          </span>
+         <select id="${el}-sort-menu" class="yuimenu hidden">
+            <option value="">${msg("search.sort.relevance")}</option>
+            <#list sortFields as sort>
+            <option value="${sort.type}">${sort.label}</option>
+            </#list>
+         </select>
       </div>
    </div>
    

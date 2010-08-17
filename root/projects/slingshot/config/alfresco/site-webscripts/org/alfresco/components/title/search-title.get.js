@@ -28,12 +28,14 @@ function main()
    }
    
    // Build the Advanced Search link - construct with args to return here
-   if (page.url.args["t"] != null || page.url.args["tag"] != null)
+   var args = page.url.args;
+   if (args["t"] != null || args["tag"] != null || args["q"] != null)
    {
-      var query = "st=" + (page.url.args["t"] != null ? encodeURIComponent(page.url.args["t"]) : "") +
-                  "&stag=" + (page.url.args["tag"] != null ? encodeURIComponent(page.url.args["tag"]) : "") +
-                  "&ss=" + (page.url.args["s"] != null ? encodeURIComponent(page.url.args["s"]) : "") +
-                  "&sa=" + (page.url.args["a"] != null ? encodeURIComponent(page.url.args["a"]) : "");
+      var query = "st=" + (args["t"] != null ? encodeURIComponent(args["t"]) : "") +
+                  "&stag=" + (args["tag"] != null ? encodeURIComponent(args["tag"]) : "") +
+                  "&ss=" + (args["s"] != null ? encodeURIComponent(args["s"]) : "") +
+                  "&sa=" + (args["a"] != null ? encodeURIComponent(args["a"]) : "") +
+                  "&sq=" + (args["q"] != null ? encodeURIComponent(args["q"]) : "");
       model.advsearchlink = query;
    }
 }
