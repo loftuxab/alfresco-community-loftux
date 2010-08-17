@@ -37,3 +37,17 @@
       </#if>
    </div>
 </#macro>
+
+<#macro hideSaveCloseButton formId>
+<#if form.mode =="edit">
+   <script type="text/javascript">//<![CDATA[
+   (function()
+   {
+      YAHOO.util.Event.onContentReady("${formId}-submit-button", function()
+      {
+         YAHOO.util.Dom.setStyle("${formId}-submit", "display", "none");
+      });
+   })();
+   //]]></script>
+</#if>
+</#macro>
