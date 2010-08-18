@@ -21,7 +21,7 @@
       <label for="${fieldHtmlId}">${msg("form.control.encoding.label")}:</label>
       <#-- TODO: Make this control make an AJAX callback to get list of encodings OR use dataTypeParamters structure -->
       <select id="${fieldHtmlId}" name="${field.name}" tabindex="0"
-              <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>>
+              <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>>
          <option value="">${msg("form.control.encoding.unknown")}</option>
          <@encodingOption enc="ISO-8859-1" />
          <@encodingOption enc="MacRoman" />

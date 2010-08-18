@@ -1,5 +1,5 @@
-<#if field.control.params.rows?exists><#assign rows=field.control.params.rows><#else><#assign rows=2></#if>
-<#if field.control.params.columns?exists><#assign columns=field.control.params.columns><#else><#assign columns=60></#if>
+<#if field.control.params.rows??><#assign rows=field.control.params.rows><#else><#assign rows=2></#if>
+<#if field.control.params.columns??><#assign columns=field.control.params.columns><#else><#assign columns=60></#if>
 
 <div class="form-field">
    <#if form.mode == "view">
@@ -18,9 +18,9 @@
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
       <textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" cols="${columns}" tabindex="0"
-                <#if field.description?exists>title="${field.description}"</#if>
-                <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
-                <#if field.disabled>disabled="true"</#if>>${field.value?html}</textarea>
+                <#if field.description??>title="${field.description}"</#if>
+                <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
+                <#if field.disabled && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true")>disabled="true"</#if>>${field.value?html}</textarea>
       <@formLib.renderFieldHelp field=field />
    </#if>
 </div>

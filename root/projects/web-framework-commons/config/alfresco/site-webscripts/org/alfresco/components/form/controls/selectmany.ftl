@@ -1,5 +1,5 @@
 <#include "/org/alfresco/components/form/controls/common/utils.inc.ftl" />
-<#if field.control.params.size?exists><#assign size=field.control.params.size><#else><#assign size=5></#if>
+<#if field.control.params.size??><#assign size=field.control.params.size><#else><#assign size=5></#if>
 
 <div class="form-field">
    <#if form.mode == "view">
@@ -13,12 +13,12 @@
    <#else>
       <label for="${fieldHtmlId}-entry">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
       <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="${field.value?string}" />
-      <#if field.control.params.options?exists && field.control.params.options != "">
+      <#if field.control.params.options?? && field.control.params.options != "">
          <select id="${fieldHtmlId}-entry" name="-" multiple="multiple" size="${size}" tabindex="0"
                onchange="javascript:Alfresco.util.updateMultiSelectListValue('${fieldHtmlId}-entry', '${fieldHtmlId}', <#if field.mandatory>true<#else>false</#if>);"
-               <#if field.description?exists>title="${field.description}"</#if> 
-               <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
-               <#if field.disabled>disabled="true"</#if>>
+               <#if field.description??>title="${field.description}"</#if> 
+               <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
+               <#if field.disabled && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true")>disabled="true"</#if>>
                <#list field.control.params.options?split(",") as nameValue>
                   <#if nameValue?index_of("|") == -1>
                      <option value="${nameValue?html}"<#if (field.value?string?index_of(nameValue) != -1)> selected="selected"</#if>>${nameValue?html}</option>
