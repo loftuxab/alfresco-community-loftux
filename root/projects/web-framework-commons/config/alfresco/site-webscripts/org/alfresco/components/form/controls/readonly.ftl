@@ -8,6 +8,6 @@
       <label for="${fieldHtmlId}">${field.label?html}:</label>
       <input id="${fieldHtmlId}" type="text" value="${field.value?html}" disabled="true"
              title="${msg("form.field.not.editable")}"
-             <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if> />
+             <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if> />
    </#if>
 </div>

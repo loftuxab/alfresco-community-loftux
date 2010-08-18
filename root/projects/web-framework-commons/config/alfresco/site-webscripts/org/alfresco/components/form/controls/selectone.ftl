@@ -10,12 +10,12 @@
       </div>
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-      <#if field.control.params.options?exists && field.control.params.options != "">
+      <#if field.control.params.options?? && field.control.params.options != "">
          <select id="${fieldHtmlId}" name="${field.name}" tabindex="0"
-               <#if field.description?exists>title="${field.description}"</#if>
-               <#if field.control.params.size?exists>size="${field.control.params.size}"</#if> 
-               <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
-               <#if field.disabled>disabled="true"</#if>>
+               <#if field.description??>title="${field.description}"</#if>
+               <#if field.control.params.size??>size="${field.control.params.size}"</#if> 
+               <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
+               <#if field.disabled  && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true")>disabled="true"</#if>>
                <#list field.control.params.options?split(",") as nameValue>
                   <#if nameValue?index_of("|") == -1>
                      <option value="${nameValue?html}"<#if nameValue == field.value?string> selected="selected"</#if>>${nameValue?html}</option>
