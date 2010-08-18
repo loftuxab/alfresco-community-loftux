@@ -1856,10 +1856,12 @@ Alfresco.util.navigateTo = function(uri, method, parameters)
  * @param userName {string} User Name
  * @param fullName {string} Full display name. "userName" used if this param is empty or not supplied
  * @param linkAttr {string} Optional attributes to add to the <a> tag, e.g. "class"
+ * @param disableLink {string} Optional attribute instructing the link to be disabled
+ *                             (ie returning a span element rather than an a href element) 
  * @return {string} The populated HTML Link
  * @static
  */
-Alfresco.util.userProfileLink = function(userName, fullName, linkAttr)
+Alfresco.util.userProfileLink = function(userName, fullName, linkAttr, disableLink)
 {
    if (!YAHOO.lang.isString(userName) || userName.length === 0)
    {
@@ -1881,8 +1883,15 @@ Alfresco.util.userProfileLink = function(userName, fullName, linkAttr)
    {
       userid: userName
    });
-   
-   return '<a href="' + uri + '" ' + (linkAttr || "") + '>' + html + '</a>';
+
+   if (disableLink)
+   {
+      return '<span>' + userName + '</span>';
+   }
+   else
+   {
+      return '<a href="' + uri + '" ' + (linkAttr || "") + '>' + html + '</a>';
+   }
 };
 
 /**
