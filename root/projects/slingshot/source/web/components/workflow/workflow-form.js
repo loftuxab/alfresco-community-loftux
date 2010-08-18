@@ -20,6 +20,17 @@
 /**
  * WorkflowForm component.
  *
+ * The workflow details page form is actually a form display of the workflow's start task and data form the workflow itself.
+ * To be able to display all this information the following approach is taken:
+ *
+ * 1. The page loads with a url containing the workflowId.
+ * 2. Since we actually want to display the start task the data-loader compment has been bound into the page,
+ *    instructed to load detailed workflow data, so we can get the start task instance id needed to request the form.
+ * 3. A dynamically/ajax loaded form is brought in using the start task id which gives us a form with the
+ *    "More Info", "Roles" and "Items" sections.
+ * 4. Once this form is loaded the additional sections "Summary", "General", "Current Tasks" & "Workflow History"
+ *    are inserted inside the form.
+ *
  * @namespace Alfresco
  * @class Alfresco.WorkflowForm
  */
@@ -108,6 +119,28 @@
       {
          if (this.isReady && this.workflow)
          {
+            // First set the values in our prepared form sections
+            Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
+            Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
+            var initiator = this.workflow.initiator;
+            Dom.get(this.id + "-startedBy").innerHTML = Alfresco.util.userProfileLink(
+                  initiator.userName, initiator.firstName + " " + initiator.lastName, null, !initiator.firstName);
+            var dueDate = Alfresco.util.fromISO8601(this.workflow.dueDate);
+            if (dueDate)
+            {
+               Dom.get(this.id + "-due").innerHTML = Alfresco.util.formatDate(dueDate);
+            }
+            var completedDate = Alfresco.util.fromISO8601(this.workflow.endDate);
+            Dom.get(this.id + "-completed").innerHTML = $html(completedDate ? Alfresco.util.formatDate(completedDate) : this.msg("label.notCompleted"));
+            var startDate = Alfresco.util.fromISO8601(this.workflow.startDate);
+            if (startDate)
+            {
+               Dom.get(this.id + "-started").innerHTML = Alfresco.util.formatDate(completedDate);
+            }
+            var priorityMap = { "1": "high", "2": "medium", "3": "low" };
+            Dom.get(this.id + "-priority").innerHTML = this.msg("priority." + priorityMap[this.workflow.priority + ""]);
+            Dom.get(this.id + "-type").innerHTML = $html(this.workflow.title);
+            Dom.get(this.id + "-status").innerHTML = $html(this.workflow.isActive ? this.msg("label.inProgress") : this.msg("label.completed"));
 
             // Load workflow's start task which "represents" the workflow
             Alfresco.util.Ajax.request(
@@ -145,6 +178,14 @@
          // Insert the form html
          var formEl = Dom.get(this.id + "-body");
          formEl.innerHTML = response.serverResponse.responseText;
+
+         // Insert the summary & general sections in the top of the form
+         var formFieldsEl = Selector.query(".form-fields", this.id, true),
+            workflowSummaryEl = Dom.get(this.id + "-summary-form-section"),
+            generalSummaryEl = Dom.get(this.id + "-general-form-section");
+
+         formFieldsEl.insertBefore(generalSummaryEl, Dom.getFirstChild(formFieldsEl));
+         //formFieldsEl.insertBefore(workflowSummaryEl, generalSummaryEl);
 
          // Remove current tasks and display workflow history if component is ready
          var tasks = this.workflow.tasks, historyTasks = [], currentTasks = [];
@@ -193,7 +234,7 @@
           */
          var renderCellType = function WorkflowHistory_onReady_renderCellType(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = $html(oRecord.getData("title"));
+            elCell.innerHTML = '<a href="' + Alfresco.constants.PAGE_CONTEXT + 'task-details?taskId=' + oRecord.getData("id") + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
          };
 
          /**
@@ -202,7 +243,19 @@
          var renderCellOwner = function WorkflowHistory_onReady_renderCellOwner(elCell, oRecord, oColumn, oData)
          {
             var owner = oRecord.getData("owner");
-            elCell.innerHTML = $html(owner ? me.msg("field.owner", owner.firstName, owner.lastName) : "");
+            if (owner.userName)
+            {
+               if (owner.firstName)
+               {
+                  var displayName = $html(me.msg("field.owner", owner.firstName, owner.lastName)),
+                     link = '<a href="' + Alfresco.constants.PAGE_CONTEXT + 'user/' + owner.userName + '/profile" title="' + me.msg("link.title.user", displayName) + '">' + displayName + '</a>';
+                  elCell.innerHTML = link;
+               }
+               else
+               {
+                  elCell.innerHTML = '<span title="' + me.msg("link.title.userDeleted", owner.userName) + '">' + $html(owner.userName) + '</span>';
+               }
+            }
          };
 
          /**
@@ -263,15 +316,8 @@
          };
 
          // Create header and data table elements
-         var currentTasksContainerEl = document.createElement("div"),
-               currentTasksHeaderEl = document.createElement("h3"),
-               currentTasksTasksEl = document.createElement("div");
-         Dom.addClass(currentTasksContainerEl, "current-tasks");
-         Dom.addClass(currentTasksTasksEl, "form-element-background-color");
-         currentTasksHeaderEl.innerHTML = this.msg("header.currentTasks");
-         currentTasksContainerEl.appendChild(currentTasksHeaderEl);
-         currentTasksContainerEl.appendChild(currentTasksTasksEl);
-
+         var currentTasksContainerEl = Dom.get(this.id + "-currentTasks-form-section"),
+            currentTasksTasksEl = Selector.query("div", currentTasksContainerEl, true);
 
          // DataTable column definitions for current tasks
          var currentTasksColumnDefinitions =
@@ -295,7 +341,6 @@
             MSG_EMPTY: this.msg("label.noTasks")
          });
 
-
          // DataTable column definitions workflow history
          var historyColumnDefinitions =
          [
@@ -307,14 +352,8 @@
          ];
 
          // Create header and data table elements
-         var historyContainerEl = document.createElement("div"),
-               historyHeaderEl = document.createElement("h3"),
-               historyTasksEl = document.createElement("div");
-         Dom.addClass(historyContainerEl, "workflow-history");
-         Dom.addClass(historyTasksEl, "form-element-background-color");
-         historyHeaderEl.innerHTML = this.msg("header.workflowHistory");
-         historyContainerEl.appendChild(historyHeaderEl);
-         historyContainerEl.appendChild(historyTasksEl);
+         var historyContainerEl = Dom.get(this.id + "-workflowHistory-form-section"),
+            historyTasksEl = Selector.query("div", historyContainerEl, true);
 
          // Create workflow history data table filled with history tasks
          var workflowHistoryDS = new YAHOO.util.DataSource(historyTasks);

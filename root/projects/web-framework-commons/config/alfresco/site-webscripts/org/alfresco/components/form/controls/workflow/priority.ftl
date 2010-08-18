@@ -4,9 +4,9 @@
       <div class="viewmode-field">
          <span class="viewmode-label">${field.label?html}:</span>
          <span class="viewmode-value">
-         <#if field.value?string == "1">${msg("form.control.priority.high")}
-         <#elseif field.value?string == "2">${msg("form.control.priority.medium")}
-         <#elseif field.value?string == "3">${msg("form.control.priority.low")}
+         <#if field.value?string == "1">${msg("priority.high")}
+         <#elseif field.value?string == "2">${msg("priority.medium")}
+         <#elseif field.value?string == "3">${msg("priority.low")}
          <#else>${field.value?html}</#if>
          </span>
       </div>
@@ -16,9 +16,9 @@
             <#if field.description?exists>title="${field.description}"</#if>
             <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
             <#if field.disabled>disabled="true"</#if>>
-            <option value="1"<#if field.value?string == "1"> selected="selected"</#if>>${msg("form.control.priority.high")}</option>
-            <option value="2"<#if field.value?string == "2"> selected="selected"</#if>>${msg("form.control.priority.medium")}</option>
-            <option value="3"<#if field.value?string == "3"> selected="selected"</#if>>${msg("form.control.priority.low")}</option>
+            <option value="1"<#if field.value?string == "1"> selected="selected"</#if>>${msg("priority.high")}</option>
+            <option value="2"<#if field.value?string == "2"> selected="selected"</#if>>${msg("priority.medium")}</option>
+            <option value="3"<#if field.value?string == "3"> selected="selected"</#if>>${msg("priority.low")}</option>
       </select>
    </#if>
 </div>

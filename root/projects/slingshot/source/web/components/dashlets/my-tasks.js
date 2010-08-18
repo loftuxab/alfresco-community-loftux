@@ -80,8 +80,10 @@
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             var priority = oRecord.getData("properties")["bpm_priority"],
+               priorityMap = { "1": "high", "2": "medium", "3": "low" },
+               priorityKey = priorityMap[priority + ""],
                pooledTask = oRecord.getData("isPooled");
-            var desc = '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/priority-' + priority + '-16.png" title="' + me.msg("label.priority", me.msg("label.priority." + priority)) + '"/>';
+            var desc = '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/priority-' + priorityKey + '-16.png" title="' + me.msg("label.priority", me.msg("priority." + priorityKey)) + '"/>';
             if (pooledTask)
             {
                desc += '<br/><img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/pooled-task-16.png" title="' + me.msg("label.pooledTask") + '"/>';
