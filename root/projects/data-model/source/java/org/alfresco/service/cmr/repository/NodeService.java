@@ -544,9 +544,7 @@ public interface NodeService
             throws InvalidNodeRefException;
 
     /**
-     * Retrieve immediate children of a given node where the child nodes are in the given inclusive list
-     * and not in the given exclusive list.
-     * 
+     * Retrieve immediate children of a given node where the child nodes are in the given inclusive list.
      * @param nodeRef           the parent node - usually a <b>container</b>
      * @param childNodeTypes    the types that the children may be.  Subtypes are not automatically calculated
      *                          and the list must therefore be exhaustive.
@@ -555,6 +553,23 @@ public interface NodeService
      */
     @Auditable(key = Auditable.Key.ARG_0 ,parameters = {"nodeRef", "childNodeTypes"})
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, Set<QName> childNodeTypeQNames);
+    
+    /**
+     * Retrieve the immediate children of a given node based on a value of a property of those 
+     * children.
+     * <p> 
+     * If the property is multi-valued then will match on any one values.
+     * @param nodeRef the parent node - usually a <b>container</b>
+     * @param propertyQName the fully qualified name of the property
+     * @param value the value to search for. Must be a simple type such as String, number, Date or Boolean, it cannot be a collection, 
+     * a content property or MLText. 
+     * @return Returns a list of <code>ChildAssociationRef</code> instances.
+     */
+    @Auditable(key = Auditable.Key.ARG_0 ,parameters = {"nodeRef", "propertyQName", "value"})
+    public List<ChildAssociationRef> getChildAssocsByPropertyValue(
+            NodeRef nodeRef,
+            QName propertyQName,
+            Serializable value);
     
     /**
      * Get the node with the given name within the context of the parent node.  The name
