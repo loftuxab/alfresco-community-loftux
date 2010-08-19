@@ -268,6 +268,11 @@ public interface ContentModel
     static final QName ASPECT_REFERENCES_NODE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "referencesnode");
     static final QName PROP_NODE_REF = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "noderef");
     
+    // Geographic Aspect.
+    static final QName ASPECT_GEOGRAPHIC = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "geographic");
+    static final QName PROP_LATITUDE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "latitude");
+    static final QName PROP_LONGITUDE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "longitude");
+    
     // Multilingual Type
     static final QName TYPE_MULTILINGUAL_CONTAINER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "mlContainer");
     static final QName ASSOC_MULTILINGUAL_CHILD = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "mlChild");
