@@ -13,29 +13,53 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
    <#-- Will be inserted in the top of the form after its been loaded through ajax -->
    <div id="${el}-summary-form-section">
       <div class="set-title">${msg("header.summary")}</div>
-      <div class="form-element-background-color form-element-border">
-         <div class="yui-g">
-            <div class="yui-u first">
-               <div id="${el}-statusSummary"></div>
-               <div id="${el}-dueSummary"></div>
-               <div id="${el}-prioritySummary"></div>
+      <div class="form-element-background-color form-element-border summary">
+         <div class="summary-icons">
+            <div id="${el}-statusSummary" class="status"></div>
+            <div id="${el}-dueSummary" class="due"></div>
+            <div id="${el}-prioritySummary" class="priority"></div>
+         </div>
+         <div class="recent-task form-element-border">
+            <div class="yui-gc">
+               <div class="yui-u first">
+                  <h3>${msg("label.mostRecentlyCompletedTask")}</h3>
+               </div>
+               <div class="yui-u current-tasks">
+                  <a href="#current-tasks">${msg("link.currentTasks")}</a>
+               </div>
             </div>
+
+            <div>
+               <a id="${el}-titleSummary" href=""></a>
+            </div>
+
+            <div id="${el}-typeSummary"></div>
+
+            <div class="yui-g">
+               <div class="yui-u first">
+                  <span class="viewmode-label">${msg("label.completedOn")}:</span>
+                  <span class="viewmode-value" id="${el}-completedOn"></span>
+               </div>
+               <div class="yui-u">
+                  <span class="viewmode-label">${msg("label.outcome")}:</span>
+                  <span class="viewmode-value" id="${el}-outcome"></span>
+               </div>
+            </div>
+
+            <div>
+               <div id="${el}-taskOwnersComment" class="task-comment form-element-border"></div>
+               <div id="${el}-taskOwnersCommentLink"></div>
+            </div>
+
          </div>
-         <div class="yui-u">
-            <h3>${msg("label.mostRecentlyCompletedTask")}</h3>            
-         </div>
+         <div class="clear"></div>
       </div>
+
    </div>
 
    <#-- Will be inserted above "More Info" in the form after its been loaded through ajax -->
    <div id="${el}-general-form-section">
       <div class="set-title">${msg("header.general")}</div>
-      <div class="form-field">
-         <div class="viewmode-field">
-            <span class="viewmode-label">${msg("label.title")}:</span>
-            <span class="viewmode-value" id="${el}-title"></span>
-         </div>
-      </div>
       <div class="form-field">
          <div class="viewmode-field">
             <span class="viewmode-label">${msg("label.description")}:</span>
@@ -104,6 +128,7 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
 
    <#-- Will be inserted below "Items" in the form after its been loaded through ajax -->
    <div id="${el}-currentTasks-form-section" class="current-tasks">
+      <a name="current-tasks"></a>
       <h3>${msg("header.currentTasks")}</h3>
       <div class="form-element-background-color"></div>
    </div>

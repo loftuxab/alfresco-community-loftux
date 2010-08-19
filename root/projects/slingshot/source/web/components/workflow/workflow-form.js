@@ -23,13 +23,14 @@
  * The workflow details page form is actually a form display of the workflow's start task and data form the workflow itself.
  * To be able to display all this information the following approach is taken:
  *
- * 1. The page loads with a url containing the workflowId.
- * 2. Since we actually want to display the start task the data-loader compment has been bound into the page,
- *    instructed to load detailed workflow data, so we can get the start task instance id needed to request the form.
- * 3. A dynamically/ajax loaded form is brought in using the start task id which gives us a form with the
+ * 1. The page loads with a url containing the workflowId as an argument.
+ * 2. Since we actually want to display the start task the data-loader component has been bound in to the bottom of the page,
+ *    instructed to load detailed workflow data based on the workflowId url argument,
+ *    so we can get the startTaskInstanceId needed to request the form.
+ * 3. A dynamically/ajax loaded form is brought in using the startTaskInstanceId which gives us a start task form with the
  *    "More Info", "Roles" and "Items" sections.
- * 4. Once this form is loaded the additional sections "Summary", "General", "Current Tasks" & "Workflow History"
- *    are inserted inside the form.
+ * 4. However we shall also display info from the workflow itsel, so once the form is loaded and inserted in to the Dom,
+ *    the additional sections "Summary", "General", "Current Tasks" & "Workflow History" are inserted inside the form.
  *
  * @namespace Alfresco
  * @class Alfresco.WorkflowForm
@@ -119,28 +120,70 @@
       {
          if (this.isReady && this.workflow)
          {
-            // First set the values in our prepared form sections
-            Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
-            Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
-            var initiator = this.workflow.initiator;
+            var startTask;
+            for (var i = 0, il = this.workflow.tasks.length; i < il; i++)
+            {
+               if (this.workflow.tasks[i].id == this.workflow.startTaskInstanceId)
+               {
+                  startTask = this.workflow.tasks[i];
+               }
+            }
+
+            // Set values in the "Summary" & "General" form sections
+            Dom.get(this.id + "-titleSummary").innerHTML = $html(startTask.title);
+
+            Dom.get(this.id + "-typeSummary").innerHTML = $html(this.workflow.title);
+
+            Dom.get(this.id + "-taskOwnersComment").innerHTML = $html(startTask.properties.bpm_description);
+
+            var taskOwner = startTask.owner,
+               taskOwnerLink = Alfresco.util.userProfileLink(taskOwner.userName, taskOwner.firstName + " " + taskOwner.lastName, null, !taskOwner.firstName);            
+            Dom.get(this.id + "-taskOwnersCommentLink").innerHTML = this.msg("label.taskOwnersCommentLink", taskOwnerLink);            
+
+            Dom.get(this.id + "-description").innerHTML = $html(startTask.properties.bpm_description);
+
+            var initiator = this.workflow.initiator || {};
             Dom.get(this.id + "-startedBy").innerHTML = Alfresco.util.userProfileLink(
-                  initiator.userName, initiator.firstName + " " + initiator.lastName, null, !initiator.firstName);
+                  initiator.userName || this.msg("label.usernameDeleted"), initiator.firstName + " " + initiator.lastName, null, !initiator.firstName);
+
             var dueDate = Alfresco.util.fromISO8601(this.workflow.dueDate);
             if (dueDate)
             {
+               Dom.get(this.id + "-dueSummary").innerHTML = Alfresco.util.formatDate(dueDate);
                Dom.get(this.id + "-due").innerHTML = Alfresco.util.formatDate(dueDate);
             }
-            var completedDate = Alfresco.util.fromISO8601(this.workflow.endDate);
-            Dom.get(this.id + "-completed").innerHTML = $html(completedDate ? Alfresco.util.formatDate(completedDate) : this.msg("label.notCompleted"));
+            else
+            {
+               Dom.get(this.id + "-dueSummary").innerHTML = this.msg("label.none");
+               Dom.get(this.id + "-due").innerHTML = this.msg("label.none");
+            }
+
+            var taskCompletionDate = Alfresco.util.fromISO8601(startTask.properties.bpm_completionDate);
+            Dom.get(this.id + "-completedOn").innerHTML = $html(taskCompletionDate ? Alfresco.util.formatDate(taskCompletionDate) : this.msg("label.notCompleted"));
+
+            Dom.get(this.id + "-outcome").innerHTML = $html(startTask.properties.outcome);
+
+            var workflowCompletedDate = Alfresco.util.fromISO8601(this.workflow.endDate);
+            Dom.get(this.id + "-completed").innerHTML = $html(workflowCompletedDate ? Alfresco.util.formatDate(workflowCompletedDate) : this.msg("label.notCompleted"));
+
             var startDate = Alfresco.util.fromISO8601(this.workflow.startDate);
             if (startDate)
             {
-               Dom.get(this.id + "-started").innerHTML = Alfresco.util.formatDate(completedDate);
+               Dom.get(this.id + "-started").innerHTML = Alfresco.util.formatDate(startDate);
             }
-            var priorityMap = { "1": "high", "2": "medium", "3": "low" };
-            Dom.get(this.id + "-priority").innerHTML = this.msg("priority." + priorityMap[this.workflow.priority + ""]);
-            Dom.get(this.id + "-type").innerHTML = $html(this.workflow.title);
-            Dom.get(this.id + "-status").innerHTML = $html(this.workflow.isActive ? this.msg("label.inProgress") : this.msg("label.completed"));
+
+            var priorityMap = { "1": "high", "2": "medium", "3": "low" },
+               priorityKey = priorityMap[this.workflow.priority + ""],
+               priority = this.msg("priority." + priorityKey),
+               priorityLabel = this.msg("label.priority", priority);
+            var prioritySummaryEl = Dom.get(this.id + "-prioritySummary");
+            Dom.addClass(prioritySummaryEl, priorityKey);
+            prioritySummaryEl.innerHTML = priorityLabel;
+            Dom.get(this.id + "-priority").innerHTML = priority;
+
+            var status = this.workflow.isActive ? this.msg("label.inProgress") : this.msg("label.completed");
+            Dom.get(this.id + "-statusSummary").innerHTML = $html(status);
+            Dom.get(this.id + "-status").innerHTML = $html(status);
 
             // Load workflow's start task which "represents" the workflow
             Alfresco.util.Ajax.request(
@@ -185,7 +228,7 @@
             generalSummaryEl = Dom.get(this.id + "-general-form-section");
 
          formFieldsEl.insertBefore(generalSummaryEl, Dom.getFirstChild(formFieldsEl));
-         //formFieldsEl.insertBefore(workflowSummaryEl, generalSummaryEl);
+         formFieldsEl.insertBefore(workflowSummaryEl, generalSummaryEl);
 
          // Remove current tasks and display workflow history if component is ready
          var tasks = this.workflow.tasks, historyTasks = [], currentTasks = [];
@@ -263,7 +306,7 @@
           */
          var renderCellDateCompleted = function WorkflowHistory_onReady_renderCellDateCompleted(elCell, oRecord, oColumn, oData)
          {
-            var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties")["bpm_completionDate"]);
+            var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties").bpm_completionDate);
             elCell.innerHTML = Alfresco.util.formatDate(completionDate);
          };
 
@@ -272,7 +315,7 @@
           */
          var renderCellDueDate = function WorkflowHistory_onReady_renderCellDueDate(elCell, oRecord, oColumn, oData)
          {
-            var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties")["bpm_dueDate"]);
+            var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties").bpm_dueDate);
             elCell.innerHTML = Alfresco.util.formatDate(completionDate);
          };
 
@@ -281,7 +324,7 @@
           */
          var renderCellStatus = function WorkflowHistory_onReady_renderCellStatus(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = oRecord.getData("properties")["bpm_status"];
+            elCell.innerHTML = $html(oRecord.getData("properties").bpm_status);
          };
 
          /**
@@ -289,7 +332,7 @@
           */
          var renderCellOutcome = function WorkflowHistory_onReady_renderCellOutcome(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = $html(oRecord.getData("properties")["bpm_outcome"]);
+            elCell.innerHTML = $html(oRecord.getData("properties").bpm_outcome);
          };
 
          /**
@@ -297,7 +340,7 @@
           */
          var renderCellComment = function WorkflowHistory_onReady_renderCellComment(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = $html(oRecord.getData("properties")["bpm_comment"]);
+            elCell.innerHTML = $html(oRecord.getData("properties").bpm_comment);
          };
 
          /**
