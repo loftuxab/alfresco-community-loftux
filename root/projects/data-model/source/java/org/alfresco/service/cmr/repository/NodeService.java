@@ -555,14 +555,28 @@ public interface NodeService
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, Set<QName> childNodeTypeQNames);
     
     /**
-     * Retrieve the immediate children of a given node based on a value of a property of those 
+     * Retrieve the immediate children of a given node based on the value of a property of those 
      * children.
      * <p> 
-     * If the property is multi-valued then will match on any one values.
+     * If the property to be searched is multi-valued then will match on any one values.
+     * <p>
+     * Please note, the following system maintained properties that cannot be used with this method.
+     * <ul>
+     * <li>cm:name - use getChildByName instead</li>
+     * <li>cm:created </li>
+     * <li>cm:creator </li>
+     * <li>cm:modified</li>
+     * <li>cm:modifier</li>
+     * <li>sys:node-uuid</li>
+     * <li>sys:node-dbid</li>
+     * <li>sys:store-identifier</li>
+     * <li>sys:store-protocol</li>
+     * <ul>
+     * 
      * @param nodeRef the parent node - usually a <b>container</b>
      * @param propertyQName the fully qualified name of the property
-     * @param value the value to search for. Must be a simple type such as String, number, Date or Boolean, it cannot be a collection, 
-     * a content property or MLText. 
+     * @param value the value to search for. Must be a simple type such as String, Number, Date or Boolean, it cannot be a collection, 
+     * a content property, MLText or a float. 
      * @return Returns a list of <code>ChildAssociationRef</code> instances.
      */
     @Auditable(key = Auditable.Key.ARG_0 ,parameters = {"nodeRef", "propertyQName", "value"})
