@@ -573,11 +573,12 @@ public interface NodeService
      * <li>sys:store-protocol</li>
      * <ul>
      * 
-     * @param nodeRef the parent node - usually a <b>container</b>
-     * @param propertyQName the fully qualified name of the property
-     * @param value the value to search for. Must be a simple type such as String, Number, Date or Boolean, it cannot be a collection, 
-     * a content property, MLText or a float. 
-     * @return Returns a list of <code>ChildAssociationRef</code> instances.
+     * @param nodeRef           the parent node - usually a <b>container</b>
+     * @param propertyQName     the fully qualified name of the property
+     * @param value             the value to search for. Must be a simple type such as
+     *                          String, Number, Date or Boolean, it cannot be a collection, 
+     *                          a content property, MLText or a float. 
+     * @return                  Returns a list of <code>ChildAssociationRef</code> instances.
      */
     @Auditable(key = Auditable.Key.ARG_0 ,parameters = {"nodeRef", "propertyQName", "value"})
     public List<ChildAssociationRef> getChildAssocsByPropertyValue(
