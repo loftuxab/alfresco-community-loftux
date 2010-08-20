@@ -7,7 +7,7 @@
    <h1>${msg("header." + mode, jobName)}</h1>
 </div>
 
-<#if mode == "edit" && !(jobDetail??)>
+<#if mode == "edit" && !(jobDetail.name??)>
    <div class="error">${msg("message.no-job-details", jobName)}</div>
 <#else>
 <script type="text/javascript">//<![CDATA[
@@ -32,7 +32,7 @@
             </div>
             <div class="form-field">
                <label for="${id}-prop_description">${msg("label.description")}:</label>
-               <textarea id="${id}-prop_description" name="description" rows="2" cols="60" tabindex="0" title="${msg("label.description")}">${jobDetail.description?html}</textarea>
+               <textarea id="${id}-prop_description" name="description" rows="2" cols="60" tabindex="0" title="${msg("label.description")}">${(jobDetail.description!"")?html}</textarea>
             </div>
 
             <div class="set-title">${msg("label.set.payload")}</div>
