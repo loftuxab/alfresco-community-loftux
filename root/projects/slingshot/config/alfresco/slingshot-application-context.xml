@@ -30,6 +30,9 @@
             <!-- Share form config -->
             <value>classpath:alfresco/share-form-config.xml</value>
             
+            <!-- Share Data List form config -->
+            <value>classpath:alfresco/share-datalist-form-config.xml</value>
+
             <!-- Share workflow form config -->
             <value>classpath:alfresco/share-workflow-form-config.xml</value>
 

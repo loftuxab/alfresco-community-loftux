@@ -63,7 +63,7 @@
             <js src="/modules/create-site.js" />
             <js src="/modules/header/sites.js" />
          </dependencies>
-      </header>   
+      </header>
    </config>
 
    <config evaluator="string-compare" condition="UriTemplate">
