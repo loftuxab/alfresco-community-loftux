@@ -584,7 +584,9 @@ Alfresco.util.getFileIcon.types =
    "{http://www.alfresco.org/model/site/1.0}sites": "site",
    "st:sites": "site",
    "{http://www.alfresco.org/model/site/1.0}site": "site",
-   "st:site": "site"
+   "st:site": "site",
+   "{http://www.alfresco.org/model/transfer/1.0}transferTarget": "server",
+   "trx:transferTarget": "server"
 };
 
 /**
@@ -1856,7 +1858,7 @@ Alfresco.util.navigateTo = function(uri, method, parameters)
  * @param userName {string} User Name
  * @param fullName {string} Full display name. "userName" used if this param is empty or not supplied
  * @param linkAttr {string} Optional attributes to add to the <a> tag, e.g. "class"
- * @param disableLink {string} Optional attribute instructing the link to be disabled
+ * @param disableLink {boolean} Optional attribute instructing the link to be disabled
  *                             (ie returning a span element rather than an a href element) 
  * @return {string} The populated HTML Link
  * @static
@@ -1873,9 +1875,9 @@ Alfresco.util.userProfileLink = function(userName, fullName, linkAttr, disableLi
       uri = "";
 
    // If the "userprofilepage" template doesn't exist or is empty, or we're in portlet mode we'll just return the user's fullName || userName
-   if (YAHOO.lang.isUndefined(template) || template.length === 0 || Alfresco.constants.PORTLET)
+   if (disableLink || YAHOO.lang.isUndefined(template) || template.length === 0 || Alfresco.constants.PORTLET)
    {
-      return html;
+      return '<span>' + html + '</span>';
    }
 
    // Generate the link
@@ -1884,14 +1886,7 @@ Alfresco.util.userProfileLink = function(userName, fullName, linkAttr, disableLi
       userid: userName
    });
 
-   if (disableLink)
-   {
-      return '<span>' + userName + '</span>';
-   }
-   else
-   {
-      return '<a href="' + uri + '" ' + (linkAttr || "") + '>' + html + '</a>';
-   }
+   return '<a href="' + uri + '" ' + (linkAttr || "") + '>' + html + '</a>';
 };
 
 /**
@@ -3707,7 +3702,7 @@ Alfresco.util.Anim = function()
             {
                opacity:
                {
-                  to: fadeIn ? (YAHOO.env.ua.webkit > 0 ? 0.99 : 1) : 0
+                  to: fadeIn ? 1 : 0
                }
             }, attributes.period);
             

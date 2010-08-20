@@ -14,7 +14,8 @@
    </#if>
       itemType: "${field.endpointType}",
       multipleSelectMode: ${field.endpointMany?string},
-      parentNodeRef: "alfresco://company/home",
+      parentNodeRef: "${field.control.params.parentNodeRef!"alfresco://company/home"}",
+      parentXPath: "${field.control.params.parentXPath!""}",
       itemFamily: "node",
       displayMode: "${field.control.params.displayMode!"items"}"
    });
@@ -31,7 +32,7 @@
          <span id="${controlId}-currentValueDisplay" class="viewmode-value current-values"></span>
       </div>
    <#else>
-      <label for="${controlId}">${field.label?html}:<#if field.endpointMandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
+      <label for="${controlId}">${field.label?html}:<#if field.endpointMandatory!false || field.mandatory!false><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
       
       <div id="${controlId}" class="object-finder">
          

@@ -14,7 +14,7 @@
       <@menuItem item p_type />
       <#if p_type = "user" && item_has_next><span class="separator">&nbsp;</span></#if>
    </#list>
-   <!-- Remove first comma -->
+   <#-- Remove first comma -->
    <#if js?starts_with(",")><#assign js = js?substring(1)></#if>
 </#macro>
 

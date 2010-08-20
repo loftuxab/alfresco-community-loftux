@@ -4,10 +4,13 @@
 <input id="yui-history-field" type="hidden" />
 
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.ConsoleReplicationJobs("${args.htmlid}").setMessages(${messages});
+   new Alfresco.ConsoleReplicationJobs("${args.htmlid?js_string}").setOptions(
+   {
+      jobName: "${(page.url.args.jobName!"")?js_string}"
+   }).setMessages(${messages});
 //]]></script>
 
-<#assign id = args.htmlid>
+<#assign id = args.htmlid?html>
 <div id="${id}-body" class="replication">
 
    <!-- Main panel -->
@@ -16,15 +19,17 @@
       <#-- Summary -->
       <div id="${id}-summary" style="display: none;">
          <h2>${msg("header.summary")}</h2>
-         <div style="border: 1px solid black;" class="job-summary">
-            <div id="${id}-jobCount"><strong>12 Jobs</strong></div>
-            <ul id="${id}-jobSummary">
-               <li class="successful">9 jobs successful</li>
-               <li class="failed">1 job failed</li>
-               <li class="running">1 job running</li>
-               <li class="cancelled">No cancelled jobs</li>
-               <li class="none">1 job has no status</li>
-            </ul>
+         <div class="container-panel">
+            <div id="${id}-jobSummary" class="job-summary">
+               <div class="job-count">{jobCount}</div>
+               <ul>
+                  <li class="completed">9 jobs successful</li>
+                  <li class="failed">1 job failed</li>
+                  <li class="running">1 job running</li>
+                  <li class="cancelled">No cancelled jobs</li>
+                  <li class="none">1 job has no status</li>
+               </ul>
+            </div>
          </div>
       </div>
       
@@ -53,7 +58,7 @@
             </div>
             
             <div class="yui-u job-detail-container">
-               <div class="container-panel">
+               <div id="${id}-jobDetailContainer" class="container-panel">
                   <div class="flat-button job-buttons" style="float: right;">
                      <span id="${id}-run" class="yui-button yui-push-button">
                         <span class="first-child">
@@ -105,7 +110,7 @@
       </div>
       <div>
          <h3>${msg("label.status")}</h3>
-         <div class="job-status">{statusText}</div>
+         <div id="${id}-jobStatus" class="job-status">{statusText}</div>
       </div>
       <hr />
       <h3>${msg("label.payload")}</h3>

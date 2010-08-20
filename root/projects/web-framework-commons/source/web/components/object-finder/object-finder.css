@@ -1,7 +1,7 @@
 .object-finder-list
 {
    display: block;
-   height: 11.5em;
+   max-height: 20em;
    overflow-x: hidden;
    overflow-y: scroll;
    margin-bottom: 0.5em;
@@ -26,7 +26,7 @@
 
 .current-values.object-finder-list table td.yui-dt-col-nodeRef
 {
-   width: 10%;
+   width: 54px;
 }
 
 .current-values.object-finder-list table td.yui-dt-col-nodeRef .yui-dt-liner div

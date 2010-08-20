@@ -67,6 +67,7 @@
    background-image: url(../images/enabled-indicator-off-16.png);
 }
 
+.replication .job-summary ul li,
 .replication .jobs-list ul li a,
 .replication .job-detail div.job-status div
 {
@@ -75,38 +76,32 @@
    padding: 2px 0 2px 20px;
 }
 /* New|Running|CancelRequested|Completed|Failed|Cancelled|Pending */
-.replication .jobs-list ul li a.new,
-.replication .job-detail div.new
+.replication .new,
+.replication .none
 {
    background-image: url(../images/job-no-status-16.png);
 }
-.replication .jobs-list ul li a.running,
-.replication .job-detail div.running
+.replication .running
 {
    background-image: url(../images/job-running-16.png);
 }
-.replication .jobs-list ul li a.cancelrequested,
-.replication .job-detail div.cancelrequested
+.replication .cancelrequested
 {
    background-image: url(../images/job-running-16.png);
 }
-.replication .jobs-list ul li a.completed,
-.replication .job-detail div.completed
+.replication .completed
 {
    background-image: url(../images/job-success-16.png);
 }
-.replication .jobs-list ul li a.failed,
-.replication .job-detail div.failed
+.replication .failed
 {
    background-image: url(../images/job-failed-16.png);
 }
-.replication .jobs-list ul li a.cancelled,
-.replication .job-detail div.cancelled
+.replication .cancelled
 {
    background-image: url(../images/job-cancelled-16.png);
 }
-.replication .jobs-list ul li a.pending,
-.replication .job-detail div.pending
+.replication .pending
 {
    background-image: url(../images/job-running-16.png);
 }

@@ -45,7 +45,7 @@
     */
    Alfresco.module.ControlWrapper = function(htmlId)
    {
-      Alfresco.module.ControlWrapper.superclass.constructor.call(this, "Alfresco.ControlWrapper", htmlId);
+      Alfresco.module.ControlWrapper.superclass.constructor.call(this, "Alfresco.ControlWrapper", htmlId, "json");
       
       if (htmlId !== "null")
       {
@@ -104,7 +104,15 @@
           * @property controlParams
           * @type object
           */
-         controlParams: null,
+         controlParams: {},
+         
+         /**
+          * Field-specific custom parameters
+          *
+          * @property field
+          * @type object
+          */
+         field: {},
          
          /**
           * Container element.
@@ -134,31 +142,27 @@
          var name = this.options.name || "wrapper-" + this.options.type,
             dataObj =
             {
-               htmlid: encodeURIComponent(this.id),
-               type: encodeURIComponent(this.options.type),
-               name: encodeURIComponent(name),
-               label: encodeURIComponent(this.options.label),
-               value: (this.options.value ? encodeURIComponent(this.options.value) : "")
+               htmlid: this.id,
+               type: this.options.type,
+               name: name,
+               label: this.options.label,
+               value: this.options.value || "",
+               controlParams: YAHOO.lang.JSON.stringify(this.options.controlParams),
+               field: YAHOO.lang.JSON.stringify(this.options.field)
             };
 
          this.eventGroup = this.id + "_" + name + "-cntrl";
-         var controlParams = this.options.controlParams;
-         for (var index in controlParams)
-         {
-            if (controlParams.hasOwnProperty(index))
-            {
-               dataObj[index] = encodeURIComponent(controlParams[index]);
-            }
-         }
-         
+
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + "components/form/control-wrapper",
+            method: Alfresco.util.Ajax.POST,
             dataObj: dataObj,
             successCallback:
             {
                fn: this.onTemplateLoaded,
-               scope: this
+               scope: this,
+               obj: fnCallback
             },
             failureMessage: "Could not load control-wrapper template.",
             execScripts: true
@@ -171,32 +175,19 @@
        * @method onTemplateLoaded
        * @param response {object} Server response from load template XHR request
        */
-      onTemplateLoaded: function ControlWrapper_onTemplateLoaded(response)
+      onTemplateLoaded: function ControlWrapper_onTemplateLoaded(response, fnCallback)
       {
          // Inject the template from the XHR request into a new DIV element
          var containerEl = Dom.get(this.options.container);
          if (containerEl)
          {
             containerEl.innerHTML = response.serverResponse.responseText;
-            YAHOO.Bubbling.on("renderCurrentValue", this.onRenderCurrentValue, this);
          }
-      },
 
-      /**
-       * Renders current value in reponse to an event
-       *
-       * @method onRenderCurrentValue
-       * @param layer {object} Event fired (unused)
-       * @param args {array} Event parameters
-       */
-      onRenderCurrentValue: function ControlWrapper_onRenderCurrentValue(layer, args)
-      {
-         // Check the event is directed towards this instance
-         if ($hasEventInterest(this.id + "_wrapper-" + this.options.type + "-cntrl", args) &&
-             !this.options.value &&
-               args[1].eventGroup && args[1].eventGroup.currentValueMeta && args[1].eventGroup.currentValueMeta.length == 0)
+         if (fnCallback && typeof fnCallback.fn == "function")
          {
-            Dom.get(this.id + "_wrapper-" + this.options.type + "-cntrl-currentValueDisplay").innerHTML = this.msg("label.none");
+            // Execute the callback in the relevant scope
+            fnCallback.fn.call((typeof fnCallback.scope == "object" ? fnCallback.scope : this), fnCallback.obj);
          }
       },
 
