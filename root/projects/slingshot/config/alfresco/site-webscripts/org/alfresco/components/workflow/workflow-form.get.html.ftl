@@ -44,11 +44,15 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
                </div>
             </div>
 
-            <div>
-               <div id="${el}-taskOwnersCommentLink"></div>
-               <div id="${el}-taskOwnersComment" class="task-comment form-element-border"></div>
+            <div class="yui-gf">
+               <div class="yui-u first avatar">
+                  <img id="${el}-taskOwnersAvatar" src="" alt="${msg("label.avatar")}">
+               </div>
+               <div class="yui-u">
+                  <div id="${el}-taskOwnersComment" class="task-comment form-element-border"></div>
+                  <div id="${el}-taskOwnersCommentLink"></div>
+               </div>
             </div>
-
          </div>
          <div class="clear"></div>
       </div>

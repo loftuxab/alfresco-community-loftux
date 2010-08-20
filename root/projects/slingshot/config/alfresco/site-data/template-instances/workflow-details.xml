@@ -39,6 +39,10 @@
          <url>/components/workflow/workflow-form</url>
       </component>
       <component>
+         <region-id>workflow-details-actions</region-id>
+         <url>/components/workflow/workflow-details-actions</url>
+      </component>
+      <component>
          <region-id>data-loader</region-id>
          <url>/components/data/data-loader</url>
          <properties>

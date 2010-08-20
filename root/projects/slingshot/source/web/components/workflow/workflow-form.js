@@ -135,10 +135,12 @@
             Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
             
-            Dom.get(this.id + "-taskOwnersComment").innerHTML = $html(startTask.properties.bpm_comment);
+            Dom.get(this.id + "-taskOwnersComment").innerHTML = $html(startTask.properties.bpm_comment || this.msg("label.none"));
 
-            var taskOwner = startTask.owner,
-               taskOwnerLink = Alfresco.util.userProfileLink(taskOwner.userName, taskOwner.firstName + " " + taskOwner.lastName, null, !taskOwner.firstName);            
+            var taskOwner = startTask.owner || {},
+               taskOwnerAvatar = taskOwner.avatar,
+               taskOwnerLink = Alfresco.util.userProfileLink(taskOwner.userName, taskOwner.firstName + " " + taskOwner.lastName, null, !taskOwner.firstName);
+            Dom.get(this.id + "-taskOwnersAvatar").setAttribute("src", taskOwnerAvatar ? Alfresco.constants.PROXY_URI + taskOwnerAvatar  + "?c=force" : Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png")            
             Dom.get(this.id + "-taskOwnersCommentLink").innerHTML = this.msg("label.taskOwnersCommentLink", taskOwnerLink);            
 
             var initiator = this.workflow.initiator || {};
@@ -409,6 +411,9 @@
          // Display tables
          Selector.query(".form-fields", this.id, true).appendChild(currentTasksContainerEl);
          Selector.query(".form-fields", this.id, true).appendChild(historyContainerEl);
+
+         // Fire event so other components knows the form finally has been loaded
+         YAHOO.Bubbling.fire("workflowFormReady", this);         
       }
 
    });

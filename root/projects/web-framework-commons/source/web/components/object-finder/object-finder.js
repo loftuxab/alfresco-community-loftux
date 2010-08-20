@@ -308,11 +308,19 @@
          /**
           * Determines if an "Add/Select" button shall be displayed that will display an items picker
           *
-          * @property allowAddAction
+          * @property allowSelectAction
           * @type boolean
           * @default true
           */
-         allowAddAction: true
+         allowSelectAction: true,
+
+         /**
+          * The action for the select button that trigegrs the object finder dialog
+          *
+          * @property selectActionLabel
+          * @type string
+          */
+         selectActionLabel: null
       },
 
       /**
@@ -413,13 +421,13 @@
             if (itemGroupActionsContainerEl)
             {
                // Create an "Add/Select" button that will display a picker to add items
-               if (this.options.allowAddAction)
+               if (this.options.allowSelectAction)
                {
                   var addButtonEl = document.createElement("button");
                   itemGroupActionsContainerEl.appendChild(addButtonEl);
                   this.widgets.addButton = Alfresco.util.createYUIButton(this, null, this.onAddButtonClick,
                   {
-                     label: this.options.displayMode == "list" ? this.msg("button.add") : this.msg("button.select"),
+                     label: this.options.selectActionLabel,
                      disabled: true
                   }, addButtonEl);
                }
@@ -2187,7 +2195,7 @@
                   button = new YAHOO.widget.Button(
                   {
                      type: "button",
-                     label: scope.msg("button.add") + " >>",
+                     label: (scope.objectFinder.options.multipleSelectMode ? scope.msg("button.add") : scope.msg("button.select")) + " >>",
                      name: containerId + "-button",
                      container: containerId,
                      onclick:
@@ -2368,7 +2376,7 @@
          [
             { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderItemIcon(), width: this.options.compactMode ? 10 : 26 },
             { key: "name", label: "Item", sortable: false, formatter: this.fnRenderItemName() },
-            { key: "add", label: "Add", sortable: false, formatter: this.fnRenderCellAdd(), width: this.options.compactMode ? 16 : 80 }
+            { key: "add", label: "Add", sortable: false, formatter: this.fnRenderCellAdd(), width: this.options.compactMode ? 16 : 85 }
          ];
          
          var initialMessage = this.msg("form.control.object-picker.items-list.loading");

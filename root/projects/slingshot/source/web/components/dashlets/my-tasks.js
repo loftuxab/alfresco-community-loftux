@@ -46,12 +46,29 @@
    Alfresco.dashlet.MyTasks = function MyTasks_constructor(htmlId)
    {
       Alfresco.dashlet.MyTasks.superclass.constructor.call(this, "Alfresco.dashlet.MyTasks", htmlId, ["button", "container", "datasource", "datatable", "animation"]);
-
       return this;
    };
 
    YAHOO.extend(Alfresco.dashlet.MyTasks, Alfresco.component.Base,
    {
+
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Task types not to display
+          *
+          * @property hiddenTaskTypes
+          * @type object
+          */
+         hiddenTaskTypes: null
+      },
+
       /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
@@ -72,6 +89,26 @@
                fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable"]
             }
          });
+         this.widgets.dataSource.doBeforeParseData = function SiteFinder_doBeforeParseData(oRequest , oFullResponse)
+         {
+            // Make sure only allowed tasks are visisble by skipping the ones configured to be hidden
+            if (oFullResponse)
+            {
+               var allTasks = oFullResponse.data || [],
+                     allowedTasks = [];
+               for (var i = 0, il = allTasks.length; i < il; i++)
+               {
+                  if (!Alfresco.util.arrayContains(me.options.hiddenTaskTypes, allTasks[i].type))
+                  {
+                     allowedTasks.push(allTasks[i]);
+                  }
+               }
+               return {
+                  data: allowedTasks
+               };
+            }
+            return oFullResponse;
+         };
 
          /**
           * Priority & pooled icons custom datacell formatter

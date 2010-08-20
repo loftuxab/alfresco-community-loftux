@@ -332,6 +332,9 @@
          <workflow name="jbpm$wcmwf:submitdirect"/>
       </hidden-workflows>
 
+      <hidden-tasks>
+         <task type="wcmwf:reviewTask"/>
+      </hidden-tasks>
    </config>
 
 </alfresco-config>

@@ -59,7 +59,8 @@
          ],
          allowRemoveAction: ${allowRemoveAction?string},
          allowRemoveAllAction: ${allowRemoveAllAction?string},
-         allowAddAction: ${allowAddAction?string}
+         allowSelectAction: ${allowAddAction?string},
+         selectActionLabel: "${field.control.params.selectActionLabel!msg("button.add")}"
       });
    })();
    //]]></script>

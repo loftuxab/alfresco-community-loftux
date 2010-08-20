@@ -24,6 +24,7 @@
       currentValue: "${field.value}",
       <#if field.control.params.valueType??>valueType: "${field.control.params.valueType}",</#if>
       <#if renderPickerJSSelectedValue??>selectedValue: "${renderPickerJSSelectedValue}",</#if>
+      selectActionLabel: "${field.control.params.selectActionLabel!msg("button.select")}",
       minSearchTermLength: ${args.minSearchTermLength!'1'},
       maxSearchResults: ${args.maxSearchResults!'100'}
    }).setMessages(
