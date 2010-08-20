@@ -68,7 +68,7 @@
             responseSchema:
             {
                resultsList: "data",
-               fields: ["id", "name", "state", "isPooled", "typeDefinitionTitle", "owner", "properties"]
+               fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable"]
             }
          });
 
@@ -101,7 +101,7 @@
                dueDateStr = oRecord.getData("properties")["bpm_dueDate"],
                dueDate = dueDateStr ? Alfresco.util.fromISO8601(dueDateStr) : null,
                today = new Date(),
-               type = oRecord.getData("typeDefinitionTitle"),
+               type = oRecord.getData("title"),
                status = oRecord.getData("properties")["bpm_status"],
                assignee = oRecord.getData("owner");
             var titleDesc = '<h4><a href="task-details?taskId=' + taskId + '" class="theme-color-1" title="' + me.msg("link.viewTask") + '">' + title + '</a></h4>',
@@ -122,12 +122,8 @@
          {
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            var task = oRecord.getData(),
-               owner = task.owner ? task.owner : {};
-            if (task.state == "IN_PROGRESS" &&
-                  ((task.isPooled && !owner.userName) ||
-                  (owner.userName == Alfresco.constants.USERNAME) ||
-                  (task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
+            var task = oRecord.getData();
+            if (task.isEditable)
             {
                elCell.innerHTML = '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
             }
@@ -137,7 +133,7 @@
          var columnDefinitions =
          [
             { key: "isPooled", sortable: false, formatter: renderCellIcons, width: 20 },
-            { key: "typeDefinitionTitle", sortable: false, formatter: renderCellTaskInfo },
+            { key: "title", sortable: false, formatter: renderCellTaskInfo },
             { key: "name", sortable: false, formatter: renderCellActions, width: 20}
          ];
 

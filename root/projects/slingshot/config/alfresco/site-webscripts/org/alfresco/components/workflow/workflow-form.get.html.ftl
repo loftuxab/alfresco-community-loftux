@@ -12,7 +12,7 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
 
    <#-- Will be inserted in the top of the form after its been loaded through ajax -->
    <div id="${el}-summary-form-section">
-      <div class="set-title">${msg("header.summary")}</div>
+      <h3>${msg("header.summary")}</h3>
       <div class="form-element-background-color form-element-border summary">
          <div class="summary-icons">
             <div id="${el}-statusSummary" class="status"></div>
@@ -33,8 +33,6 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
                <a id="${el}-titleSummary" href=""></a>
             </div>
 
-            <div id="${el}-typeSummary"></div>
-
             <div class="yui-g">
                <div class="yui-u first">
                   <span class="viewmode-label">${msg("label.completedOn")}:</span>
@@ -47,8 +45,8 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
             </div>
 
             <div>
-               <div id="${el}-taskOwnersComment" class="task-comment form-element-border"></div>
                <div id="${el}-taskOwnersCommentLink"></div>
+               <div id="${el}-taskOwnersComment" class="task-comment form-element-border"></div>
             </div>
 
          </div>
@@ -60,6 +58,12 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
    <#-- Will be inserted above "More Info" in the form after its been loaded through ajax -->
    <div id="${el}-general-form-section">
       <div class="set-title">${msg("header.general")}</div>
+      <div class="form-field">
+         <div class="viewmode-field">
+            <span class="viewmode-label">${msg("label.title")}:</span>
+            <span class="viewmode-value" id="${el}-title"></span>
+         </div>
+      </div>
       <div class="form-field">
          <div class="viewmode-field">
             <span class="viewmode-label">${msg("label.description")}:</span>
@@ -112,16 +116,10 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
          <div class="yui-u">
             <div class="form-field">
                <div class="viewmode-field">
-                  <span class="viewmode-label">${msg("label.type")}:</span>
-                  <span class="viewmode-value" id="${el}-type"></span>
+                  <span class="viewmode-label">${msg("label.status")}:</span>
+                  <span class="viewmode-value" id="${el}-status"></span>
                </div>
             </div>
-         </div>
-      </div>
-      <div class="form-field">
-         <div class="viewmode-field">
-            <span class="viewmode-label">${msg("label.status")}:</span>
-            <span class="viewmode-value" id="${el}-status"></span>
          </div>
       </div>
    </div>
@@ -135,7 +133,7 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
 
    <#-- Will be inserted in the bottom of the form after its been loaded through ajax -->
    <div id="${el}-workflowHistory-form-section" class="workflow-history">
-      <h3>${msg("header.workflowHistory")}</h3>
+      <h3>${msg("header.history")}</h3>
       <div class="form-element-background-color"></div>
    </div>
 
