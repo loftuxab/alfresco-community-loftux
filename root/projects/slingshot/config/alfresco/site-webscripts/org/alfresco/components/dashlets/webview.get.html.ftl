@@ -11,7 +11,7 @@
 //]]></script>
 <div class="dashlet webview">
    <div class="title">
-      <a id="${args.htmlid}-title-link" class="title-link theme-color-5" <#if !isDefault>href="${uri}"</#if> target="_blank"><#if webviewTitle != "">${webviewTitle?html}<#elseif !isDefault>${uri?html}<#else>${msg('label.header')}</#if></a>
+      <a id="${args.htmlid}-title-link" class="title-link" <#if !isDefault>href="${uri}"</#if> target="_blank"><#if webviewTitle != "">${webviewTitle?html}<#elseif !isDefault>${uri?html}<#else>${msg('label.header')}</#if></a>
    </div>
 
    <div class="toolbar">
