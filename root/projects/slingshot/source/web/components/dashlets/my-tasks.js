@@ -62,7 +62,8 @@
          
          // DataSource definition
          var properties = ["bpm_priority", "bpm_status", "bpm_dueDate", "bpm_description"];
-         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/task-instances?properties=" + properties.join(",") ,
+         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + 
+               "api/task-instances?authority=" + Alfresco.constants.USERNAME  + "&properties=" + properties.join(","),
          {
             responseType: YAHOO.util.DataSource.TYPE_JSON,
             responseSchema:
