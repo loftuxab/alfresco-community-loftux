@@ -1,7 +1,7 @@
 function main()
 {
    // Model variables
-   var jobDetail = null;
+   var jobDetail = {};
    
    var jobName = page.url.args.jobName;
    if (jobName != null)
