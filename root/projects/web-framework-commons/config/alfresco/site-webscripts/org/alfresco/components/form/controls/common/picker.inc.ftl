@@ -22,6 +22,7 @@
       mandatory: ${field.endpointMandatory?string},
    </#if>
       currentValue: "${field.value}",
+      <#if field.control.params.valueType??>valueType: "${field.control.params.valueType}",</#if>
       <#if renderPickerJSSelectedValue??>selectedValue: "${renderPickerJSSelectedValue}",</#if>
       minSearchTermLength: ${args.minSearchTermLength!'1'},
       maxSearchResults: ${args.maxSearchResults!'100'}

@@ -659,7 +659,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          for (var x = 0, xx = this.submitElements.length; x < xx; x++)
          {
             var currentItem = this.submitElements[x];
-            if (currentItem) {
+            if (currentItem)
+            {
               if (typeof currentItem == "string")
               {
                  // get the element with the id and set the disabled attribute

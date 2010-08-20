@@ -7,10 +7,8 @@
       <@region id="title" scope="page" protected=true />
    </div>
    <div id="bd">
-      <div class="yui-t1">
-         <div id="yui-main">
-            <@region id="replication-job" scope="template" protected=true />
-         </div>
+      <div class="share-form">
+         <@region id="replication-job" scope="template" protected=true />
       </div>
    </div>
 </@>

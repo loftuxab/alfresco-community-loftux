@@ -8,14 +8,13 @@
    <@renderPickerJS field "picker" />
    picker.setOptions(
    {
+   <#if field.control.params.showTargetLink??>
+      showLinkToTarget: ${field.control.params.showTargetLink},
+      targetLinkTemplate: "${url.context}/page/site/${page.url.templateArgs.site!""}/document-details?nodeRef={nodeRef}",
+   </#if>
       itemType: "${field.endpointType}",
       multipleSelectMode: ${field.endpointMany?string},
-      parentNodeRef: "alfresco://user/home",
       itemFamily: "authority"
-      <#if field.control.params.showTargetLink??>
-      , showLinkToTarget: ${field.control.params.showTargetLink},
-      targetLinkTemplate: "${url.context}/page/site/${page.url.templateArgs.site!""}/document-details?nodeRef={nodeRef}"
-      </#if>
    });
 })();
 //]]></script>

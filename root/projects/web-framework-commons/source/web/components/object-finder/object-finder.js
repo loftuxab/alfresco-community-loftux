@@ -36,7 +36,8 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $hasEventInterest = Alfresco.util.hasEventInterest;
+      $hasEventInterest = Alfresco.util.hasEventInterest,
+      $combine = Alfresco.util.combinePaths;
    
    /**
     * ObjectFinder constructor.
@@ -66,8 +67,7 @@
       // Initialise prototype properties
       this.pickerId = htmlId + "-picker";
       this.columns = [];
-      this.currentValueMeta = [];
-      this.selectedItems = [];
+      this.selectedItems = {};
       this.isReady = false;
       
       this.options.objectRenderer = new Alfresco.ObjectRenderer(this);
@@ -94,7 +94,7 @@
          objectRenderer: null,
 
          /**
-          * The selected value that shall be displayed in ui (but not yet has been persisted)
+          * The selected value to be displayed (but not yet persisted)
           *
           * @property selectedValue
           * @type string
@@ -109,6 +109,16 @@
           * @type string
           */
          currentValue: "",
+         
+         /**
+          * Value type.
+          * Whether values are passed into and out of the control as nodeRefs or other data types
+          *
+          * @property valueType
+          * @type string
+          * @default "nodeRef"
+          */
+         valueType: "nodeRef",
 
          /**
           * The name of the field that the object finder displays
@@ -286,7 +296,6 @@
           */
          allowRemoveAction: true,
 
-
          /**
           * Determines if an "Remove all" button shall be displayed in "list" display mode
           *
@@ -315,14 +324,6 @@
        */
       columns: null,
 
-      /**
-       * The current value of the association including metadata
-       *
-       * @property currentValueMeta
-       * @type array
-       */
-      currentValueMeta: null,
-      
       /**
        * Single selected item, for when in single select mode
        * 
@@ -379,7 +380,7 @@
       },
 
       /**
-       * Set messages for this component.
+       * Populate selected items.
        *
        * @method selectItems
        * @param items {Array} Array of item ids to populate the current value with
@@ -447,7 +448,7 @@
             this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
             
             // force the generated buttons to have a name of "-" so it gets ignored in
-            // JSON submit. TODO: remove this when JSON submit behaviour is configurable            
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
             Dom.get(this.id + "-ok-button").name = "-";
             Dom.get(this.id + "-cancel-button").name = "-";
             
@@ -479,7 +480,7 @@
                keys: KeyListener.KEY.ESCAPE
             },
             {
-               fn: function(eventName, keyEvent)
+               fn: function ObjectFinder_onAddButtonClick_fn(eventName, keyEvent)
                {
                   this.onCancel();
                },
@@ -551,7 +552,7 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onFolderUp: function DLTB_onFolderUp(e, p_obj)
+      onFolderUp: function ObjectFinder_onFolderUp(e, p_obj)
       {
          var item = p_obj.get("value");
 
@@ -571,7 +572,7 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onCreateNewOK: function DLTB_onCreateNewOK(e, p_obj)
+      onCreateNewOK: function ObjectFinder_onCreateNewOK(e, p_obj)
       {
          Event.preventDefault(e);
       },
@@ -583,7 +584,7 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onCreateNewCancel: function DLTB_onCreateNewCancel(e, p_obj)
+      onCreateNewCancel: function ObjectFinder_onCreateNewCancel(e, p_obj)
       {
          Event.preventDefault(e);
       },
@@ -617,7 +618,7 @@
        *
        * @method _adjustCurrentValues
        */
-      _adjustCurrentValues: function ()
+      _adjustCurrentValues: function ObjectFinder__adjustCurrentValues()
       {
          if (!this.options.disabled)
          {
@@ -652,7 +653,6 @@
             });
 
             this._enableActions();
-
          }
       },
 
@@ -1033,7 +1033,7 @@
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters
        */
-      onRemoveListItem: function (event, args)
+      onRemoveListItem: function ObjectFinder_onRemoveListItem(event, args)
       {
          if ($hasEventInterest(this, args))
          {
@@ -1184,6 +1184,7 @@
             var item = oRecord.getData(),
                modifiedOn = item.modified ? Alfresco.util.formatDate(Alfresco.util.fromISO8601(item.modified)) : null,
                template = '<h3 class="name">{name}</h3>';
+
             if (item.description)
             {
                template += '<div class="description">{description}</div>';
@@ -1272,7 +1273,7 @@
             arrItems = this.options.currentValue;
          }
 
-         var onSuccess = function OF_rCV_onSuccess(response)
+         var onSuccess = function ObjectFinder__loadSelectedItems_onSuccess(response)
          {
             var items = response.json.data.items,
                item;
@@ -1290,7 +1291,7 @@
             });
          };
          
-         var onFailure = function OF_rCv_onFailure(response)
+         var onFailure = function ObjectFinder__loadSelectedItems_onFailure(response)
          {
             this.selectedItems = null;
          };
@@ -1303,7 +1304,8 @@
                method: "POST",
                dataObj:
                {
-                  items: arrItems.split(",")
+                  items: arrItems.split(","),
+                  itemValueType: this.options.valueType
                },
                successCallback:
                {
@@ -1424,8 +1426,7 @@
        */
       _createSelectedItemsControls: function ObjectFinder__createSelectedItemsControls()
       {
-
-         var doBeforeParseDataFunction = function ObjectFinder_doBeforeParseData(oRequest, oFullResponse)
+         var doBeforeParseDataFunction = function ObjectFinder__createSelectedItemsControls_doBeforeParseData(oRequest, oFullResponse)
          {
             var updatedResponse = oFullResponse;
 
@@ -1483,7 +1484,7 @@
             });
 
             // Hook remove item action click events
-            var fnRemoveItemHandler = function OF_cSIC_fnRemoveItemHandler(layer, args)
+            var fnRemoveItemHandler = function ObjectFinder__createSelectedItemsControls_fnRemoveItemHandler(layer, args)
             {
                var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
                if (owner !== null)
@@ -1550,7 +1551,7 @@
             Dom.addClass(currentValueEl, "form-element-background-color");
 
             // Hook action item click events
-            var fnActionListItemHandler = function OF_cSIC_fnActionListItemHandler(layer, args)
+            var fnActionListItemHandler = function ObjectFinder__createSelectedItemsControls_fnActionListItemHandler(layer, args)
             {
                var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
                if (owner !== null)
@@ -1771,7 +1772,19 @@
           * @property parentNodeRef
           * @type string
           */
-         parentNodeRef: "alfresco://company/home",
+         parentNodeRef: "",
+
+         /**
+          * Parent XPath for initial browse location.
+          * If set, the control will request the nodeRef of the first node returned from the XPath query
+          * and use it in place of the parentNodeRef parameter above. This setting has priority over the
+          * parentNodeRef setting, unless empty or null.
+          * e.g. "/app:company_home/app:dictionary"
+          *
+          * @property parentXPath
+          * @type string
+          */
+         parentXPath: "",
 
          /**
           * The type of the item to find
@@ -1907,7 +1920,7 @@
       {
          var me = this;
          
-         var renderHelper = function(p_key, p_value, p_metadata)
+         var renderHelper = function ObjectRenderer_renderItem_renderHelper(p_key, p_value, p_metadata)
          {
             if (p_key.toLowerCase() == "icon")
             {
@@ -2141,7 +2154,7 @@
                   });
                }
                return;
-            }
+            } 
 
             if (oRecord.getData("selectable"))
             {
@@ -2162,7 +2175,7 @@
                   Dom.setStyle(elCell.parentNode, "text-align", "right");
                   elCell.innerHTML = '<span id="' + containerId + '"></span>';
 
-                  var onItemAdded = function OR__cC_rCAB_onItemAdded(event, p_obj)
+                  var onItemAdded = function ObjectRenderer_renderCellAdd_onItemAdded(event, p_obj)
                   {
                      YAHOO.Bubbling.fire("selectedItemAdded",
                      {
@@ -2200,7 +2213,7 @@
        *
        * @method onCreateNewItem
        */
-      onCreateNewItem: function ObjectFinder_onCreateNewItem()
+      onCreateNewItem: function ObjectRenderer_onCreateNewItem()
       {
          var elInput = Dom.get(this.createNewItemId),
             uri = $combine("/", this.options.createNewItemUri).substring(1),
@@ -2225,7 +2238,7 @@
                },
                successCallback:
                {
-                  fn: function(p_obj)
+                  fn: function ObjectRenderer_onCreateNewItem_successCallback(p_obj)
                   {
                      var response = p_obj.json;
                      if (response && response.nodeRef)
@@ -2285,14 +2298,15 @@
          var me = this;
 
          // DataSource definition  
-         var pickerChildrenUrl = Alfresco.constants.PROXY_URI + "api/forms/picker/" + this.options.itemFamily + "/";
+         var pickerChildrenUrl = Alfresco.constants.PROXY_URI + "api/forms/picker/" + this.options.itemFamily;
          this.widgets.dataSource = new YAHOO.util.DataSource(pickerChildrenUrl);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["type", "hasChildren", "name", "description", "displayPath", "nodeRef", "selectable"]
+             fields: ["type", "hasChildren", "name", "description", "displayPath", "nodeRef", "selectable"],
+             metaFields: { parent: "parent" }
          };
 
          this.widgets.dataSource.doBeforeParseData = function ObjectRenderer_doBeforeParseData(oRequest, oFullResponse)
@@ -2341,6 +2355,7 @@
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
                {
+                  parent: oFullResponse.data.parent,
                   items: items
                };
             }
@@ -2379,7 +2394,7 @@
                   keys: KeyListener.KEY.ENTER
                },
                {
-                  fn: function(eventName, keyEvent, obj)
+                  fn: function ObjectRenderer__createControls_fn(eventName, keyEvent, obj)
                   {
                      this.onCreateNewItem();
                      Event.stopEvent(keyEvent[1]);
@@ -2393,7 +2408,7 @@
          }, this, true);
          
          // Hook add item action click events (for Compact mode)
-         var fnAddItemHandler = function OR__cC_fnAddItemHandler(layer, args)
+         var fnAddItemHandler = function ObjectRenderer__createControls_fnAddItemHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
@@ -2417,7 +2432,7 @@
          YAHOO.Bubbling.addDefaultAction("add-" + this.eventGroup, fnAddItemHandler, true);
 
          // Hook create new item action click events (for Compact mode)
-         var fnCreateNewItemHandler = function OR__cC_fnCreateNewItemHandler(layer, args)
+         var fnCreateNewItemHandler = function ObjectRenderer__createControls_fnCreateNewItemHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
@@ -2429,7 +2444,7 @@
          YAHOO.Bubbling.addDefaultAction("create-new-item-" + this.eventGroup, fnCreateNewItemHandler);
 
          // Hook navigation action click events
-         var fnNavigationHandler = function OR__cC_fnNavigationHandler(layer, args)
+         var fnNavigationHandler = function ObjectRenderer__createControls_fnNavigationHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
@@ -2467,14 +2482,14 @@
          this.widgets.dataTable.set("MSG_EMPTY", this.msg("form.control.object-picker.items-list.loading"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
          
-         var successHandler = function ObjectRenderer__uI_successHandler(sRequest, oResponse, oPayload)
+         var successHandler = function ObjectRenderer__updateItems_successHandler(sRequest, oResponse, oPayload)
          {
-            this.options.parentNodeRef = nodeRef;
+            this.options.parentNodeRef = oResponse.meta.parent ? oResponse.meta.parent.nodeRef : nodeRef;
             this.widgets.dataTable.set("MSG_EMPTY", this.msg("form.control.object-picker.items-list.empty"));
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };
          
-         var failureHandler = function ObjectRenderer__uI_failureHandler(sRequest, oResponse)
+         var failureHandler = function ObjectRenderer__updateItems_failureHandler(sRequest, oResponse)
          {
             if (oResponse.status == 401)
             {
@@ -2495,11 +2510,17 @@
             }
          };
          
-         var url = nodeRef.replace("://", "/") + "/children?selectableType=" + this.options.itemType +
+         var url = $combine("/", nodeRef.replace("://", "/"), "children") + "?selectableType=" + this.options.itemType +
                "&searchTerm=" + encodeURIComponent(searchTerm) + "&size=" + this.options.maxSearchResults;
+
+         if (this.options.parentXPath && this.options.parentXPath !== "")
+         {
+            url += "&xpath=" + encodeURIComponent(this.options.parentXPath);
+            this.options.parentXPath = null;
+         }
          if (this.options.params)
          {
-            url += "&" + this.options.params;
+            url += "&" + encodeURIComponent(this.options.params);
          }
          this.widgets.dataSource.sendRequest(url,
          {
@@ -2515,7 +2536,7 @@
        * @method _inAuthorityMode
        * @return true if the picker is being used to find authorities i.e. users and groups
        */
-      _inAuthorityMode: function ObjectFinder__inAuthorityMode()
+      _inAuthorityMode: function ObjectRenderer__inAuthorityMode()
       {
          return (this.options.itemFamily == "authority");
       }

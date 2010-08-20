@@ -146,6 +146,23 @@
       selectedJob: null,
       
       /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Job Name - selects and highlights selected job upon initial page load
+          * 
+          * @property jobName
+          * @type string
+          */
+         jobName: ""
+      },
+
+      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
@@ -193,7 +210,7 @@
                         }
                      }
                   }
-                  this.populateJobsList();
+                  this.populateJobsList(this.options.jobName);
                },
                scope: this
             },
@@ -202,7 +219,7 @@
                fn: function()
                {
                   // Populate the jobs list anyway
-                  this.populateJobsList();
+                  this.populateJobsList(this.options.jobName);
                },
                scope: this
             }
@@ -251,7 +268,7 @@
        * @method renderJobsList
        * @param p_aJobs {Array} Array of replication jobs
        */
-      renderJobsList: function ConsoleReplicationJobs_renderJobsList(p_aJobs, p_highlightName)
+      renderJobsList: function ConsoleReplicationJobs_renderJobsList(p_aJobs)
       {
          if (!YAHOO.lang.isArray(p_aJobs))
          {
@@ -328,22 +345,18 @@
                   el.appendChild(elLink);
                   container.appendChild(el);
 
-                  // Mark current list as selected
-                  if (this.selectedJob && this.selectedJob.name == job.name)
+                  if (job.name == this.options.jobName)
                   {
+                     // Fake a user selection for this job
+                     Dom.addClass(el, "selected");
+                     this.options.jobName = null;
+                     YAHOO.lang.later(100, this, this.onJobSelected, [job, false]);
+                  }
+                  else if (this.selectedJob && this.selectedJob.name == job.name)
+                  {
+                     // Mark current list as selected
                      Dom.addClass(el, "selected");
                   }
-                  
-                  // Make a note of a highlight request match
-                  if (job.name == p_highlightName)
-                  {
-                     elHighlight = el;
-                  }
-               }
-               
-               if (elHighlight)
-               {
-                  Alfresco.util.Anim.pulse(elHighlight);
                }
             }
          }
@@ -358,7 +371,7 @@
        *
        * @method onJobSelected
        * @param job {object} Job definition object literal
-       * @param p_fadeIn {Boolean} If set to true, then fade the panel in
+       * @param p_fadeIn {Boolean} If set to true, then fade the status panel in
        */
       onJobSelected: function ConsoleReplicationJobs_onJobSelected(job, p_fadeIn)
       {
@@ -370,21 +383,21 @@
             {
                fn: function ConsoleReplicationJobs_onJobSelected_successCallback(response)
                {
-                  if (p_fadeIn == true)
+                  if (response && response.json && response.json.data)
                   {
-                     Alfresco.util.Anim.fadeIn(this.id + "-jobDetail",
-                     {
-                        period: 0.2
-                     });
-                  }
-                  else
-                  {
-                     Dom.setStyle(this.id + "-jobDetail", "opacity", 1);
-                  }
-                  if (response && response.json)
-                  {
-                     this.selectedJob = response.json;
+                     this.selectedJob = response.json.data;
                      this.renderJobDetail();
+                     if (p_fadeIn == true)
+                     {
+                        Alfresco.util.Anim.fadeIn(this.id + "-jobStatus",
+                        {
+                           period: 0.2
+                        });
+                     }
+                     else
+                     {
+                        Dom.setStyle(this.id + "-jobStatus", "opacity", 1);
+                     }
                   }
                   else
                   {
@@ -565,7 +578,7 @@
          
          Alfresco.util.Ajax.jsonPost(
          {
-            url: Alfresco.constants.PROXY_URI + "/api/running-replication-actions?name=" + encodeURIComponent(this.selectedJob.name),
+            url: Alfresco.constants.PROXY_URI + "api/running-replication-actions?name=" + encodeURIComponent(this.selectedJob.name),
             successCallback:
             {
                fn: function ConsoleReplicationJobs_onRunJob_successCallback()
@@ -599,7 +612,19 @@
        */
       onEditJob: function ConsoleReplicationJobs_onEditJob(e, p_obj)
       {
+         if (this.selectedJob === null)
+         {
+            this.updateButtonStatus();
+            return;
+         }
          
+         var url = Alfresco.util.uriTemplate("consolepage",
+         {
+            pageid: "replication-job"
+         });
+         url += "?jobName=" + encodeURIComponent(this.selectedJob.name);
+         
+         window.location.href = url;
       },
       
       /**
@@ -613,6 +638,7 @@
       {
          if (this.selectedJob === null)
          {
+            this.updateButtonStatus();
             return;
          }
          
@@ -688,7 +714,7 @@
             return;
          }
 
-         Alfresco.util.Anim.fadeOut(this.id + "-jobDetail",
+         Alfresco.util.Anim.fadeOut(this.id + "-jobStatus",
          {
             adjustDisplay: false,
             callback: function()

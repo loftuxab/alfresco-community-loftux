@@ -1,0 +1,118 @@
+/**
+ * Supported Forms controls
+ */
+var supportedControlTypes =
+{
+   "association": true,
+   "category": true,
+   "tag": true,
+   "checkbox": false,
+   "content": false,
+   "date": false,
+   "encoding": false,
+   "mimetype": false,
+   "period": false,
+   "readonly": false,
+   "richtext": false,
+   "selectmany": false,
+   "selectone": false,
+   "size": false,
+   "textarea": false,
+   "textfield": false
+};
+
+/**
+ * Apply all properties of supplier to receiver object
+ *
+ * @method merge
+ * @param r {Object} Receiver object
+ * @param s {Object} Supplier object
+ * @return {Object} Augmented object
+ */
+function merge(r, s)
+{
+   if (s && r)
+   {
+      for (var p in s)
+      { 
+         r[p] = s[p];
+      }
+   }
+   return r;
+}
+
+/**
+ * Main entrypoint
+ *
+ * @method main
+ */
+function main()
+{
+   // Input arguments
+   var type = args.type || decodeURIComponent(page.url.args.type),
+      name = args.name || ("wrapped-" + type);
+
+   // Output variables
+   var field =
+   {
+      configName: name,
+      disabled: false,
+      id: name,
+      name: name,
+      label: args.label || "",
+      mandatory: (args.mandatory || "false") == "true",
+      control:
+      {
+         template: "controls/" + type + ".ftl",
+         params: jsonUtils.toObject(args.controlParams || "{}")
+      },
+      value: args.value || ""
+   };
+   
+   var fieldArgs = args.field;
+   if (fieldArgs != null)
+   {
+      field = merge(field, jsonUtils.toObject(fieldArgs));
+   }
+   
+   var form =
+   {
+      mode: args.mode || "edit",
+      data: jsonUtils.toObject(args.formData || "{}")
+   };
+
+   switch (String(type).toLowerCase())
+   {
+      case "association":
+         if (field.endpointType == null)
+         {
+            field.endpointType = "cm:cmobject";
+         }
+         if (field.endpointMany == null)
+         {
+            field.endpointMany = true;
+         }
+         break;
+
+      case "category":
+         if (control.params.compactMode == null)
+         {
+            control.params.compactMode = true;
+         }
+         break;
+
+      case "tag":
+         control.template = "controls/category.ftl";
+         if (control.params.hasOwnProperty.compactMode == null)
+         {
+            control.params.compactMode = true;
+         }
+         control.params.params = "aspect=cm:taggable";
+         break;
+   }
+
+   model.form = form;
+   model.field = field;
+}
+
+main();
