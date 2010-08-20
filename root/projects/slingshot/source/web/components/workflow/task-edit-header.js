@@ -129,7 +129,8 @@
          // Set the correct options for our use
          this.widgets.peopleFinder.setOptions(
          {
-            singleSelectMode: true
+            singleSelectMode: true,
+            addButtonLabel: this.msg("button.select")
          });
 
          // Make sure we listen for events when the user selects a person

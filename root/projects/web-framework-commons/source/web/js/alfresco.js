@@ -126,6 +126,15 @@ Alfresco.widget = Alfresco.widget || {};
 Alfresco.admin = Alfresco.admin || {};
 
 /**
+ * Alfresco top-level action namespace.
+ * Used as a namespace for common functionality reused by multiple components. 
+ *
+ * @namespace Alfresco
+ * @class Alfresco.action
+ */
+Alfresco.action = Alfresco.action || {};
+
+/**
  * Alfresco top-level doclib namespace.
  *
  * @namespace Alfresco

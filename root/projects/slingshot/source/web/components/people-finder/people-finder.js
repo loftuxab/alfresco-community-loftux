@@ -143,6 +143,15 @@
           */
          setFocus: false,
 
+
+         /**
+          * Label to add button .
+          *
+          * @property addButtonLabel
+          * @type string
+          */
+         addButtonLabel: null,
+
          /**
           * Suffix to add button label.
           *
@@ -447,7 +456,7 @@
                var button = new YAHOO.widget.Button(
                {
                   type: "button",
-                  label: me.msg("button.add") + " " + me.options.addButtonSuffix,
+                  label: (me.options.addButtonLabel ? me.options.addButtonLabel : me.msg("button.add")) + " " + me.options.addButtonSuffix,
                   name: me.id + "-selectbutton-" + userName,
                   container: me.id + '-select-' + userName,
                   tabindex: 0,

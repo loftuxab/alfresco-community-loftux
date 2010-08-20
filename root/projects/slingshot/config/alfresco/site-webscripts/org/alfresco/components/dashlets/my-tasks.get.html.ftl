@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.dashlet.MyTasks("${args.htmlid}").setMessages(
+   new Alfresco.dashlet.MyTasks("${args.htmlid}").setOptions(
+   {
+      hiddenTaskTypes: [<#list hiddenTaskTypes as type>"${type}"<#if type_has_next>, </#if></#list>]
+   }).setMessages(
       ${messages}
    );
    new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");

@@ -16,6 +16,7 @@
       <div class="share-form">
          <@region id="workflow-details-header" scope="template" />
          <@region id="workflow-form" scope="template" />
+         <@region id="workflow-details-actions" scope="template" />
       </div>
    </div>
 </@>
