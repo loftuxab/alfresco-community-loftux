@@ -170,35 +170,27 @@
 
          // Display actions and create yui buttons
          Selector.query("h1 span", this.id, true).innerHTML = $html(task.title);
-         if (task.owner && task.owner.userName)
+         
+         if (task.isReassignable)
          {
-            // Task is assigned
-            if (task.owner.userName == Alfresco.constants.USERNAME ||
-                  task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)
-            {
-               // Task is owner or initiator
-               if (task.state == "IN_PROGRESS" && !task.isPooled &&
-                   (!task.properties.hasOwnProperty("bpm_reassignable") || 
-                     task.properties["bpm_reassignable"] == null || 
-                     task.properties["bpm_reassignable"] == true))
-               {
-                  this.widgets.reassignButton = Alfresco.util.createYUIButton(this, "reassign", this.onReassignButtonClick);
-                  Dom.removeClass(Selector.query(".actions .reassign", this.id), "hidden");
-               }
-               
-               if (task.isPooled)
-               {
-                  this.widgets.releaseButton = Alfresco.util.createYUIButton(this, "release", this.onReleaseButtonClick);
-                  Dom.removeClass(Selector.query(".actions .release", this.id), "hidden");
-               }
-            }
+            // Task is reassignable
+            this.widgets.reassignButton = Alfresco.util.createYUIButton(this, "reassign", this.onReassignButtonClick);
+            Dom.removeClass(Selector.query(".actions .reassign", this.id), "hidden");
          }
-         else
+         
+         if (task.isClaimable)
          {
-            // Task is unassigned
+            // Task is claimable
             this.widgets.claimButton = Alfresco.util.createYUIButton(this, "claim", this.onClaimButtonClick);
             Dom.removeClass(Selector.query(".actions .claim", this.id), "hidden");
             Dom.removeClass(Selector.query(".unassigned-message", this.id), "hidden");
+         }
+         
+         if (task.isReleasable)
+         {
+            // Task is releasable
+            this.widgets.releaseButton = Alfresco.util.createYUIButton(this, "release", this.onReleaseButtonClick);
+            Dom.removeClass(Selector.query(".actions .release", this.id), "hidden");
          }
       },
 

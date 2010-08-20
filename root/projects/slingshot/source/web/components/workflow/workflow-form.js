@@ -132,15 +132,14 @@
             // Set values in the "Summary" & "General" form sections
             Dom.get(this.id + "-titleSummary").innerHTML = $html(startTask.title);
 
-            Dom.get(this.id + "-typeSummary").innerHTML = $html(this.workflow.title);
-
-            Dom.get(this.id + "-taskOwnersComment").innerHTML = $html(startTask.properties.bpm_description);
+            Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
+            Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
+            
+            Dom.get(this.id + "-taskOwnersComment").innerHTML = $html(startTask.properties.bpm_comment);
 
             var taskOwner = startTask.owner,
                taskOwnerLink = Alfresco.util.userProfileLink(taskOwner.userName, taskOwner.firstName + " " + taskOwner.lastName, null, !taskOwner.firstName);            
             Dom.get(this.id + "-taskOwnersCommentLink").innerHTML = this.msg("label.taskOwnersCommentLink", taskOwnerLink);            
-
-            Dom.get(this.id + "-description").innerHTML = $html(startTask.properties.bpm_description);
 
             var initiator = this.workflow.initiator || {};
             Dom.get(this.id + "-startedBy").innerHTML = Alfresco.util.userProfileLink(
@@ -161,7 +160,7 @@
             var taskCompletionDate = Alfresco.util.fromISO8601(startTask.properties.bpm_completionDate);
             Dom.get(this.id + "-completedOn").innerHTML = $html(taskCompletionDate ? Alfresco.util.formatDate(taskCompletionDate) : this.msg("label.notCompleted"));
 
-            Dom.get(this.id + "-outcome").innerHTML = $html(startTask.properties.outcome);
+            Dom.get(this.id + "-outcome").innerHTML = $html(startTask.outcome);
 
             var workflowCompletedDate = Alfresco.util.fromISO8601(this.workflow.endDate);
             Dom.get(this.id + "-completed").innerHTML = $html(workflowCompletedDate ? Alfresco.util.formatDate(workflowCompletedDate) : this.msg("label.notCompleted"));
@@ -286,7 +285,7 @@
          var renderCellOwner = function WorkflowHistory_onReady_renderCellOwner(elCell, oRecord, oColumn, oData)
          {
             var owner = oRecord.getData("owner");
-            if (owner.userName)
+            if (owner != null && owner.userName)
             {
                if (owner.firstName)
                {
@@ -332,7 +331,7 @@
           */
          var renderCellOutcome = function WorkflowHistory_onReady_renderCellOutcome(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = $html(oRecord.getData("properties").bpm_outcome);
+            elCell.innerHTML = $html(oRecord.getData("outcome"));
          };
 
          /**
@@ -348,11 +347,8 @@
           */
          var renderCellCurrentTasksActions = function WorkflowHistory_onReady_renderCellCurrentTasksActions(elCell, oRecord, oColumn, oData)
          {
-            var task = oRecord.getData(),
-               owner = task.owner ? task.owner : {};
-            if (((task.isPooled && !owner.userName) ||
-                  (owner.userName == Alfresco.constants.USERNAME) ||
-                  (task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
+            var task = oRecord.getData();
+            if (task.isEditable)
             {
                elCell.innerHTML = '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + me.msg("link.title.task-edit") + '">' + me.msg("actions.edit") + '</a>';
             }
@@ -365,7 +361,7 @@
          // DataTable column definitions for current tasks
          var currentTasksColumnDefinitions =
          [
-            { key: "typeDefinitionTitle", label: this.msg("column.type"), formatter: renderCellType },
+            { key: "type", label: this.msg("column.type"), formatter: renderCellType },
             { key: "owner", label: this.msg("column.assignedTo"), formatter: renderCellOwner },
             { key: "id", label: this.msg("column.dueDate"), formatter: renderCellDueDate },
             { key: "state", label: this.msg("column.status"), formatter: renderCellStatus },
@@ -377,7 +373,7 @@
          currentTasksDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
          currentTasksDS.responseSchema =
          {
-            fields: [ "title", "typeDefinitionTitle", "owner", "id", "state", "isPooled", "properties"]
+            fields: [ "title", "type", "owner", "id", "state", "isPooled", "isEditable", "properties"]
          };
          this.widgets.dataTable = new YAHOO.widget.DataTable(currentTasksTasksEl, currentTasksColumnDefinitions, currentTasksDS,
          {
@@ -387,7 +383,7 @@
          // DataTable column definitions workflow history
          var historyColumnDefinitions =
          [
-            { key: "typeDefinitionTitle", label: this.msg("column.type"), formatter: renderCellType },
+            { key: "type", label: this.msg("column.type"), formatter: renderCellType },
             { key: "owner", label: this.msg("column.userGroup"), formatter: renderCellOwner },
             { key: "id", label: this.msg("column.dateCompleted"), formatter: renderCellDateCompleted },
             { key: "state", label: this.msg("column.outcome"), formatter: renderCellOutcome },
@@ -403,7 +399,7 @@
          workflowHistoryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
          workflowHistoryDS.responseSchema =
          {
-            fields: [ "title", "typeDefinitionTitle", "owner", "id", "state", "properties"]
+            fields: [ "title", "type", "owner", "id", "state", "properties", "outcome"]
          };
          this.widgets.dataTable = new YAHOO.widget.DataTable(historyTasksEl, historyColumnDefinitions, workflowHistoryDS,
          {

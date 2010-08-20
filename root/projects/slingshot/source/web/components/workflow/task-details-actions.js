@@ -57,12 +57,8 @@
        */
       onTaskDetailsData: function TDA_onTaskDetailsData(layer, args)
       {
-         var task = args[1],
-            owner = task.owner ? task.owner : {};
-         if (task.state == "IN_PROGRESS" &&
-               ((task.isPooled && !owner.userName) ||
-               (owner.userName == Alfresco.constants.USERNAME) ||
-               (task.workflowInstance.initiator.userName == Alfresco.constants.USERNAME)))
+         var task = args[1];
+         if (task.isEditable)
          {
             Alfresco.util.createYUIButton(this, "edit", function TDA_onMetadataRefresh_onEditClick()
             {
