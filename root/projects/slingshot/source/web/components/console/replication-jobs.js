@@ -19,7 +19,7 @@
 
 /**
  * ConsoleReplicationJobs tool component.
- * 
+ *
  * @namespace Alfresco
  * @class Alfresco.ConsoleReplicationJobs
  */
@@ -31,7 +31,7 @@
    var Dom = YAHOO.util.Dom,
        Event = YAHOO.util.Event,
        Selector = YAHOO.util.Selector;
-   
+
    /**
     * Alfresco Slingshot aliases
     */
@@ -46,7 +46,7 @@
 
    /**
     * ConsoleReplicationJobs constructor.
-    * 
+    *
     * @param {String} htmlId The HTML id üof the parent element
     * @return {Alfresco.ConsoleReplicationJobs} The new ConsoleReplicationJobs instance
     * @constructor
@@ -55,28 +55,28 @@
    {
       this.name = "Alfresco.ConsoleReplicationJobs";
       Alfresco.ConsoleReplicationJobs.superclass.constructor.call(this, htmlId);
-      
+
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
-      
+
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "json", "history"], this.onComponentsLoaded, this);
-      
+
       /* Define panel handlers */
       var parent = this;
-      
+
       /* Initialise prototype properties */
       this.jobListLookup = {};
       this.selectedJob = null;
-      
+
       // NOTE: the panel registered first is considered the "default" view and is displayed first
-      
+
       /* Replication Panel Handler */
       ReplicationPanelHandler = function ReplicationPanelHandler_constructor()
       {
          ReplicationPanelHandler.superclass.constructor.call(this, "replication");
       };
-      
+
       YAHOO.extend(ReplicationPanelHandler, Alfresco.ConsolePanelHandler,
       {
          /**
@@ -84,7 +84,7 @@
           *
           * @method onLoad
           */
-         onLoad: function onLoad()
+         onLoad: function ReplicationPanelHandler_onLoad()
          {
             // Buttons
             parent.widgets.createJob = Alfresco.util.createYUIButton(parent, "create", null,
@@ -127,10 +127,10 @@
          }
       });
       new ReplicationPanelHandler();
-      
+
       return this;
    };
-   
+
    YAHOO.extend(Alfresco.ConsoleReplicationJobs, Alfresco.ConsoleTool,
    {
       /**
@@ -144,7 +144,7 @@
        * @property selectedJob
        */
       selectedJob: null,
-      
+
       /**
        * Object container for initialization options
        *
@@ -155,7 +155,7 @@
       {
          /**
           * Job Name - selects and highlights selected job upon initial page load
-          * 
+          *
           * @property jobName
           * @type string
           */
@@ -172,7 +172,7 @@
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
-      
+
       /**
        * Fired by YUI when parent element is available for scripting.
        *
@@ -190,7 +190,7 @@
          {
             successCallback:
             {
-               fn: function(p_oResponse)
+               fn: function ConsoleReplicationJobs_onReady_successCallback(p_oResponse)
                {
                   var sortByPreference = Alfresco.util.findValueByDotNotation(p_oResponse.json, PREF_SORTBY, null);
                   if (sortByPreference !== null)
@@ -216,7 +216,7 @@
             },
             failureCallback:
             {
-               fn: function()
+               fn: function ConsoleReplicationJobs_onReady_failureCallback()
                {
                   // Populate the jobs list anyway
                   this.populateJobsList(this.options.jobName);
@@ -225,7 +225,7 @@
             }
          });
       },
-      
+
       /**
        * Call remote API to retrieve list of Job Definitions
        *
@@ -274,11 +274,11 @@
          {
             return;
          }
-         
+
          var me = this,
             jobsContainer = Dom.get(this.id + "-jobsList"),
             selectedClass = "selected";
-         
+
          jobsContainer.innerHTML = "";
          this.jobListLookup = {};
 
@@ -319,7 +319,7 @@
                for (var i = 0, ii = p_aJobs.length; i < ii; i++)
                {
                   job = p_aJobs[i];
-                  
+
                   // Build the DOM elements
                   el = document.createElement("li");
                   el.className = job.enabled ? "enabled" : "disabled";
@@ -334,9 +334,9 @@
                   elLink = document.createElement("a");
                   elLink.className = (job.status || "none").toLowerCase();
                   elLink.href = "#";
-                  
+
                   elSpan = document.createElement("span");
-                  
+
                   elText = document.createTextNode(job.name);
 
                   // Build the DOM structure with the new elements
@@ -421,7 +421,7 @@
       renderJobDetail: function ConsoleReplicationJobs_renderJobDetail()
       {
          var elJob = Dom.get(this.id + "-jobDetail");
-         
+
          if (this.selectedJob === null)
          {
             elJob.innerHTML = '<div class="message">' + this._msg("label.no-job-selected") + '</div>';
@@ -433,6 +433,10 @@
                startedAt = "", endedAt = "",
                status = "", statusText = "",
                jobHTML = "";
+
+            // Name / description
+            job.name = $html(job.name);
+            job.description = $html(job.description);
 
             // Enabled/disabled
             job.enabledClass = job.enabled ? "enabled" : "disabled";
@@ -450,22 +454,31 @@
 
             // Status
             status = (job.status || "none").toLowerCase();
-            statusText = '<div class="' + status + '">' + this._msg("label.status." + status, startedAt, endedAt) + '</div>';
+            statusText = '<div class="' + $html(status) + '">' + this._msg("label.status." + status, startedAt, endedAt) + '</div>';
             statusText += job.failureMessage !== null ? '<div class="warning">' + $html(job.failureMessage) + '</div>' : "";
             job.statusText = statusText;
 
-            // View Report link
-            job.viewReportLink = "#";
+            // View Report links
+            job.viewReportLocalLink = "#";
+            job.viewReportRemoteLink = "#";
             if (job.transferLocalReport !== null)
             {
-               job.viewReportLink = $siteURL("document-details?nodeRef=" + job.transferLocalReport);
+               job.viewReportLocalLink = $siteURL("document-details?nodeRef=" + $html(job.transferLocalReport));
             }
+            if (job.transferRemoteReport !== null)
+            {
+               job.viewReportRemoteLink = $siteURL("document-details?nodeRef=" + $html(job.transferRemoteReport));
+            }
+
+            // Transfer Target
+            job.targetNameClass = (job.targetName === null) ? "warning" : "server";
+            job.targetName = $html(job.targetName) || this._msg("label.transfer-target.none");
 
             // Payload
             var payloadHTML = "", payload,
                fnDetailsPageURL = Alfresco.util.bind(function(payload)
                {
-                  return Alfresco.util.siteURL((payload.isFolder ? "folder" : "document") + "-details?nodeRef=" + payload.nodeRef);
+                  return Alfresco.util.siteURL((payload.isFolder ? "folder" : "document") + "-details?nodeRef=" + $html(payload.nodeRef));
                }, this);
 
             if (job.payload && job.payload.length > 0)
@@ -478,7 +491,7 @@
             }
             else
             {
-               payloadHTML = '<div>' + this.msg("label.payload.none") + '</div>';
+               payloadHTML = '<div class="warning">' + this.msg("label.payload.none") + '</div>';
             }
             job.payloadHTML = payloadHTML;
 
@@ -491,33 +504,50 @@
                this.widgets.refreshJob.destroy();
                this.widgets.refreshJob = null;
             }
-            if (this.widgets.viewReport instanceof YAHOO.widget.Button)
+            if (this.widgets.viewReportLocal instanceof YAHOO.widget.Button)
             {
-               this.widgets.viewReport.destroy();
-               this.widgets.viewReport = null;
+               this.widgets.viewReportLocal.destroy();
+               this.widgets.viewReportLocal = null;
+            }
+            if (this.widgets.viewReportRemote instanceof YAHOO.widget.Button)
+            {
+               this.widgets.viewReportRemote.destroy();
+               this.widgets.viewReportRemote = null;
             }
 
             // Inject new HTML & attach new button instances
             elJob.innerHTML = jobHTML;
             this.widgets.refreshJob = Alfresco.util.createYUIButton(this, "refresh", this.onRefreshJob);
-            this.widgets.viewReport = Alfresco.util.createYUIButton(this, "viewReport", this.onViewReport,
+            this.widgets.viewReportLocal = Alfresco.util.createYUIButton(this, "viewReportLocal", this.onViewReportLocal,
             {
                type: "link"
             });
             if (job.transferLocalReport === null)
             {
-               Dom.addClass(this.id + "-viewReport", "yui-button-disabled");
+               Dom.addClass(this.id + "-viewReportLocal", "yui-button-disabled");
             }
             else
             {
-               Dom.removeClass(this.id + "-viewReport", "yui-button-disabled");
+               Dom.removeClass(this.id + "-viewReportLocal", "yui-button-disabled");
+            }
+            this.widgets.viewReportRemote = Alfresco.util.createYUIButton(this, "viewReportRemote", this.onViewReportRemote,
+            {
+               type: "link"
+            });
+            if (job.transferRemoteReport === null)
+            {
+               Dom.addClass(this.id + "-viewReportRemote", "yui-button-disabled");
+            }
+            else
+            {
+               Dom.removeClass(this.id + "-viewReportRemote", "yui-button-disabled");
             }
          }
-         
+
          // Update button status
          this.updateButtonStatus();
       },
-      
+
       /**
        * Updates button status depending on selected job status
        *
@@ -536,9 +566,9 @@
 
          var status = this.selectedJob.status,
             enabled = this.selectedJob.enabled;
-         
+
          this.widgets.runJob.set("disabled", status === "Running" || status === "CancelRequested" || status === "Pending" || !enabled);
-         this.widgets.cancelJob.set("disabled", status !== "Running");
+         this.widgets.cancelJob.set("disabled", status !== "Running" || this.selectedJob.executionDetails === null);
          this.widgets.editJob.set("disabled", false);
          this.widgets.deleteJob.set("disabled", false);
       },
@@ -575,7 +605,7 @@
             this.updateButtonStatus();
             return;
          }
-         
+
          Alfresco.util.Ajax.jsonPost(
          {
             url: Alfresco.constants.PROXY_URI + "api/running-replication-actions?name=" + encodeURIComponent(this.selectedJob.name),
@@ -590,7 +620,7 @@
             failureMessage: this._msg("message.run.failure", this.selectedJob.name)
          });
       },
-      
+
       /**
        * Cancel job button click handler
        *
@@ -600,9 +630,46 @@
        */
       onCancelJob: function ConsoleReplicationJobs_onCancelJob(e, p_obj)
       {
-         
+         if (this.selectedJob === null || this.selectedJob.executionDetails === null)
+         {
+            this.updateButtonStatus();
+            return;
+         }
+
+         Alfresco.util.Ajax.jsonDelete(
+         {
+            url: Alfresco.constants.PROXY_URI + encodeURI(this.selectedJob.executionDetails),
+            successCallback:
+            {
+               fn: function ConsoleReplicationJobs_onCancelJob_successCallback()
+               {
+                  this.onRefreshJob();
+               },
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: function ConsoleReplicationJobs_onCancelJob_failureCallback(response)
+               {
+                  var failureMessage = this._msg("message.unknown-error");
+                  if (response && response.json && response.json.message)
+                  {
+                     failureMessage = response.json.message;
+                  }
+
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     title: this._msg("message.cancel.failure", this.selectedJob.name),
+                     text: failureMessage
+                  });
+
+                  this.onRefreshJob();
+               },
+               scope: this
+            }
+         });
       },
-      
+
       /**
        * Edit job button click handler
        *
@@ -617,16 +684,16 @@
             this.updateButtonStatus();
             return;
          }
-         
+
          var url = Alfresco.util.uriTemplate("consolepage",
          {
             pageid: "replication-job"
          });
          url += "?jobName=" + encodeURIComponent(this.selectedJob.name);
-         
+
          window.location.href = url;
       },
-      
+
       /**
        * Delete job button click handler
        *
@@ -641,9 +708,9 @@
             this.updateButtonStatus();
             return;
          }
-         
+
          var me = this;
-         
+
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: this.msg("message.confirm.delete.title"),
@@ -680,7 +747,7 @@
          {
             return;
          }
-         
+
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
@@ -717,7 +784,7 @@
          Alfresco.util.Anim.fadeOut(this.id + "-jobStatus",
          {
             adjustDisplay: false,
-            callback: function()
+            callback: function ConsoleReplicationJobs_onRefreshJob_callback()
             {
                this.onJobSelected(this.selectedJob, true);
             },
@@ -725,7 +792,7 @@
             period: 0.2
          });
       },
-      
+
       /**
        * View Report button click handler
        *

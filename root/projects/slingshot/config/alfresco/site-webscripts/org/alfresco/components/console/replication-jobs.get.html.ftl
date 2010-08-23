@@ -102,15 +102,25 @@
                <button type="button" tabindex="0">${msg("button.refresh")}</button>
             </span>
          </span>
-         <span id="${id}-viewReport" class="yui-button yui-button-disabled yui-link-button">
+         <span id="${id}-viewReportLocal" class="yui-button yui-button-disabled yui-link-button">
             <span class="first-child">
-               <a tabindex="0" href="{viewReportLink}">${msg("button.view-report")}</a>
+               <a tabindex="0" href="{viewReportLocalLink}">${msg("button.view-report.local")}</a>
+            </span>
+         </span>
+         <span id="${id}-viewReportRemote" class="yui-button yui-button-disabled yui-link-button">
+            <span class="first-child">
+               <a tabindex="0" href="{viewReportRemoteLink}">${msg("button.view-report.remote")}</a>
             </span>
          </span>
       </div>
       <div>
          <h3>${msg("label.status")}</h3>
          <div id="${id}-jobStatus" class="job-status">{statusText}</div>
+      </div>
+      <hr />
+      <h3>${msg("label.transfer-target")}</h3>
+      <div class="transfer-target">
+         <div class="{targetNameClass}">{targetName}</div>
       </div>
       <hr />
       <h3>${msg("label.payload")}</h3>
