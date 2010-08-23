@@ -1,5 +1,5 @@
 <#include "../../include/alfresco-macros.lib.ftl" />
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
 new Alfresco.WorkflowDetailsActions("${el}").setOptions(
    {

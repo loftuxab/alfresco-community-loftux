@@ -1,4 +1,4 @@
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
 new Alfresco.TaskDetailsHeader("${el}").setMessages(
    ${messages}
