@@ -35,6 +35,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Weight;
+import org.apache.solr.search.SolrIndexReader;
 
 /**
  * An extension to the Lucene query set. This query supports structured queries against paths. The field must have been
@@ -285,7 +286,11 @@ public class SolrPathQuery extends Query
         @Override
         public Scorer scorer(IndexReader reader, boolean arg1, boolean arg2) throws IOException
         {
-            return SolrPathScorer.createPathScorer(getSimilarity(searcher), SolrPathQuery.this, reader, this, dictionarySertvice, repeats);
+            if(!(reader instanceof SolrIndexReader))
+            {
+                throw new IllegalStateException("Must have a SolrIndexReader");
+            }
+            return SolrPathScorer.createPathScorer(getSimilarity(searcher), SolrPathQuery.this, (SolrIndexReader)reader, this, dictionarySertvice, repeats);
         }
     }
 

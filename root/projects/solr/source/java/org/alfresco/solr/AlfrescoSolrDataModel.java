@@ -111,12 +111,13 @@ public class AlfrescoSolrDataModel
         addNonDictionaryField("QNAME", Store.YES, Index.ANALYZED, TermVector.NO, true);
         addNonDictionaryField("ISROOT", Store.NO, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("PRIMARYASSOCTYPEQNAME", Store.YES, Index.ANALYZED, TermVector.NO, false);
-        addNonDictionaryField("ISNODE", Store.NO, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
+        addNonDictionaryField("ISNODE", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("ASSOCTYPEQNAME", Store.YES, Index.ANALYZED, TermVector.NO, true);
         addNonDictionaryField("PRIMARYPARENT", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("TYPE", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
         addNonDictionaryField("ASPECT", Store.YES, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, true);
         addNonDictionaryField("FTSSTATUS", Store.NO, Index.NOT_ANALYZED_NO_NORMS, TermVector.NO, false);
+        addNonDictionaryField("DBID", Store.YES, Index.ANALYZED_NO_NORMS, TermVector.NO, false);
 
     }
 

@@ -229,6 +229,11 @@ public class LuceneQueryParser extends QueryParser
     /**
      * 
      */
+    public static final String FIELD_DBID = "DBID";
+    
+    /**
+     * 
+     */
     public static final String FIELD_ID = "ID";
 
     /**
@@ -769,6 +774,10 @@ public class LuceneQueryParser extends QueryParser
             {
                 return createIdQuery(queryText);
             }
+            else if (field.equals(FIELD_DBID))
+            {
+                return createDbidQuery(queryText);
+            }
             else if (field.equals(FIELD_ISROOT))
             {
                 return createIsRootQuery(queryText);
@@ -870,6 +879,15 @@ public class LuceneQueryParser extends QueryParser
             throw new ParseException("Failed to parse XPath...\n" + e.getMessage());
         }
 
+    }
+
+    /**
+     * @param queryText
+     * @return
+     */
+    private Query createDbidQuery(String queryText) throws ParseException
+    {
+        return getFieldQueryImpl(FIELD_DBID, queryText, AnalysisMode.DEFAULT, LuceneFunction.FIELD);
     }
 
     protected Query createDataTypeDefinitionQuery(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException

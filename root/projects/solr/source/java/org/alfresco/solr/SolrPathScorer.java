@@ -32,6 +32,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Weight;
+import org.apache.solr.search.SolrIndexReader;
 
 public class SolrPathScorer extends Scorer
 {
@@ -44,8 +45,9 @@ public class SolrPathScorer extends Scorer
     }
   
 
-    public static SolrPathScorer createPathScorer(Similarity similarity, SolrPathQuery solrPathQuery, IndexReader reader, Weight weight, DictionaryService dictionarySertvice, boolean repeat) throws IOException
+    public static SolrPathScorer createPathScorer(Similarity similarity, SolrPathQuery solrPathQuery, SolrIndexReader reader, Weight weight, DictionaryService dictionarySertvice, boolean repeat) throws IOException
     {
+        
         StructuredFieldPosition last = null;
         if(solrPathQuery.getPathStructuredFieldPositions().size() > 0)
         {
