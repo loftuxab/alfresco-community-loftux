@@ -30,27 +30,27 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
             </div>
 
             <div>
-               <a id="${el}-titleSummary" href=""></a>
+               <a id="${el}-recentTaskTitle" href=""></a>
             </div>
 
             <div class="yui-g">
                <div class="yui-u first">
                   <span class="viewmode-label">${msg("label.completedOn")}:</span>
-                  <span class="viewmode-value" id="${el}-completedOn"></span>
+                  <span class="viewmode-value" id="${el}-recentTaskCompletedOn"></span>
                </div>
                <div class="yui-u">
                   <span class="viewmode-label">${msg("label.outcome")}:</span>
-                  <span class="viewmode-value" id="${el}-outcome"></span>
+                  <span class="viewmode-value" id="${el}-recentTaskOutcome"></span>
                </div>
             </div>
 
             <div class="yui-gf">
                <div class="yui-u first avatar">
-                  <img id="${el}-taskOwnersAvatar" src="" alt="${msg("label.avatar")}">
+                  <img id="${el}-recentTaskOwnersAvatar" src="" alt="${msg("label.avatar")}">
                </div>
                <div class="yui-u">
-                  <div id="${el}-taskOwnersComment" class="task-comment form-element-border"></div>
-                  <div id="${el}-taskOwnersCommentLink"></div>
+                  <div id="${el}-recentTaskOwnersComment" class="task-comment form-element-border"></div>
+                  <div id="${el}-recentTaskOwnersCommentLink"></div>
                </div>
             </div>
          </div>
