@@ -50,7 +50,7 @@ public class SolrSchemaGenerationTest extends TestCase
     @Override
     public void setUp()
     {
-        boolean inRepoContext = false;
+        boolean inRepoContext = true;
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
         if (inRepoContext)

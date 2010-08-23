@@ -115,6 +115,10 @@ public class LuceneAnalyser extends Analyzer
         {
             analyser = new VerbatimAnalyser(false);
         }
+        if (fieldName.equals("DBID"))
+        {
+            analyser = new LongAnalyser();
+        }
         else if (fieldName.equals("TX"))
         {
             analyser = new VerbatimAnalyser(false);
