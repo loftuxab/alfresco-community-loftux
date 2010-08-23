@@ -118,15 +118,16 @@
          <div id="${id}-jobStatus" class="job-status">{statusText}</div>
       </div>
       <hr />
+      <h3>${msg("label.schedule")}</h3>
+      <div class="schedule">{scheduleHTML}</div>
+      <hr />
       <h3>${msg("label.transfer-target")}</h3>
       <div class="transfer-target">
          <div class="{targetNameClass}">{targetName}</div>
       </div>
       <hr />
       <h3>${msg("label.payload")}</h3>
-      <div class="payload">
-         {payloadHTML}
-      </div>
+      <div class="payload">{payloadHTML}</div>
    </div>
 
 </div>

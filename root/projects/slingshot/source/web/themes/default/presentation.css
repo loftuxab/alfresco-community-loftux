@@ -235,9 +235,10 @@ hr
    cursor: auto;
 }
 
-.yui-skin-default .yui-dt-message
+.yui-skin-default .yui-dt-message,
+.yui-skin-default .yui-dt-message tr.yui-dt-highlighted
 {
-   background-color: inherit;
+   background-color: white;
 }
 
 /* Style the default message  */

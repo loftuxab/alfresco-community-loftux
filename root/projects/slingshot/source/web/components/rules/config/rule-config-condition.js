@@ -999,7 +999,7 @@
                      scope: this
                   }
                });
-               picker.show();
+               picker.render();
             }
          },
 
@@ -1021,7 +1021,8 @@
                var onNodeRefTagLoaded = function (containerEl, nodeRefTag)
                {
                   var picker = new Alfresco.module.ControlWrapper(Alfresco.util.generateDomId());
-                  var options = {
+                  var options =
+                  {
                      type: "tag",
                      container: containerEl,
                      controlParams:
@@ -1046,7 +1047,7 @@
                      options.value = nodeRefTag;
                   }
                   picker.setOptions(options);
-                  picker.show();
+                  picker.render();
                };
 
                var tag = ruleConfig.parameterValues ? ruleConfig.parameterValues["tag"] : null

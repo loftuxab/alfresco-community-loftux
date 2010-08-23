@@ -245,9 +245,10 @@ hr
    cursor: auto;
 }
 
-.yui-skin-gdocs .yui-dt-message
+.yui-skin-gdocs .yui-dt-message,
+.yui-skin-gdocs .yui-dt-message tr.yui-dt-highlighted
 {
-   background-color: transparent;
+   background-color: white;
 }
 
 /* Style the default message  */
@@ -426,7 +427,7 @@ em
 .share-form .form-container .form-fields
 {
    border: 1px solid #c2c2c2 !important;
-   background-color: #f5fff2;
+   background-color: #eff3fa;
 }
 
 select,

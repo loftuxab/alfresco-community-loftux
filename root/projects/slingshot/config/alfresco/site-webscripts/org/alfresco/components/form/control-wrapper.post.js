@@ -5,10 +5,9 @@ var supportedControlTypes =
 {
    "association": true,
    "category": true,
-   "tag": true,
    "checkbox": false,
    "content": false,
-   "date": false,
+   "date": true,
    "encoding": false,
    "mimetype": false,
    "period": false,
@@ -17,6 +16,7 @@ var supportedControlTypes =
    "selectmany": false,
    "selectone": false,
    "size": false,
+   "tag": true,
    "textarea": false,
    "textfield": false
 };

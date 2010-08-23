@@ -641,7 +641,7 @@
                      scope: this
                   }
                });
-               picker.show();
+               picker.render();
             }
          }
       }

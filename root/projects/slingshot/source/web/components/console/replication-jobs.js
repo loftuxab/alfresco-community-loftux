@@ -470,6 +470,21 @@
                job.viewReportRemoteLink = $siteURL("document-details?nodeRef=" + $html(job.transferRemoteReport));
             }
 
+            // Schedule
+            var schedule = job.schedule;
+            if (schedule)
+            {
+               var startDate = Alfresco.util.formatDate(Alfresco.util.fromISO8601(schedule.start.iso8601)),
+                  dateValue = schedule.intervalCount,
+                  dateUnit = this._msg("date-unit." + (dateValue === 1 ? "single." : "plural.") + schedule.intervalPeriod.toLowerCase());
+
+               job.scheduleHTML = this._msg("label.schedule.details", startDate, (dateValue === 1 ? "" : dateValue + " "), dateUnit);
+            }
+            else
+            {
+               job.scheduleHTML = this._msg("label.schedule.none");
+            }
+
             // Transfer Target
             job.targetNameClass = (job.targetName === null) ? "warning" : "server";
             job.targetName = $html(job.targetName) || this._msg("label.transfer-target.none");

@@ -1,6 +1,15 @@
 <#assign jobName = page.url.args.jobName!"">
 <#assign mode = (jobName = "")?string("create", "edit")>
 <#assign action = url.context + "/proxy/alfresco/api/replication-definition" + (jobName = "")?string("s", "/" + jobName?url)>
+<#assign intervalPeriods =
+{
+   "Second": msg("option.seconds"),
+   "Minute": msg("option.minutes"),
+   "Hour": msg("option.hours"),
+   "Day": msg("option.days"),
+   "Week": msg("option.weeks"),
+   "Month": msg("option.months")
+}>
 
 <#assign id = args.htmlid?html>
 <div id="${id}-body" class="form-manager replication-job">
@@ -41,8 +50,24 @@
             <div class="set-title">${msg("label.set.transfer-target")}</div>
             <div id="${id}-transferTargetContainer"></div>
 
-            <div class="set-title" style="display:none;">${msg("label.set.schedule")}</div>
-            <div id="${id}-scheduleContainer"></div>
+            <div class="set-title">${msg("label.set.schedule")}</div>
+            <div class="form-field">
+               <input id="${id}-scheduleEnabled" type="checkbox" tabindex="0" name="-" title="${msg("label.schedule-job")}" <#if jobDetail.schedule!false>checked="checked"</#if>>
+               <label for="${id}-scheduleEnabled" class="checkbox">${msg("label.schedule-job")}</label>
+            </div>
+            <div id="${id}-scheduleContainer" class="hidden">
+               <div id="${id}-scheduleStartContainer"></div>
+               <div class="form-field">
+                  <label for="${id}-prop_intervalCount">${msg("label.repeat")}:<span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></label>
+                  <input type="text" id="${id}-prop_intervalCount" name="schedule.intervalCount" tabindex="0" title="${msg("label.repeat-count")}" class="number" value="${((jobDetail.schedule.intervalCount)!"")?html}" />
+                  <select id="${id}-prop_intervalPeriod" name="schedule.intervalPeriod" tabindex="0" title="${msg("label.repeat-period")}">
+                     <option value="-">${msg("option.none")}</option>
+                  <#list intervalPeriods?keys as ip>
+                     <option value="${ip?html}"<#if ip == (jobDetail.schedule.intervalPeriod)!""> selected="selected"</#if>>${(intervalPeriods[ip])?html}</option>
+                  </#list>
+                  </select>
+               </div>
+            </div>
 
             <div class="set-title">${msg("label.set.other")}</div>
             <div class="form-field">
