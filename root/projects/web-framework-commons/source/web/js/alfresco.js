@@ -594,6 +594,8 @@ Alfresco.util.getFileIcon.types =
    "st:sites": "site",
    "{http://www.alfresco.org/model/site/1.0}site": "site",
    "st:site": "site",
+   "{http://www.alfresco.org/model/transfer/1.0}transferGroup": "server-group",
+   "trx:transferGroup": "server-group",
    "{http://www.alfresco.org/model/transfer/1.0}transferTarget": "server",
    "trx:transferTarget": "server"
 };
