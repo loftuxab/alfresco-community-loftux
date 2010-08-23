@@ -491,6 +491,7 @@
                fn: function ObjectFinder_onAddButtonClick_fn(eventName, keyEvent)
                {
                   this.onCancel();
+                  Event.stopEvent(keyEvent[1]);
                },
                scope: this,
                correctScope: true
@@ -2528,7 +2529,7 @@
          }
          if (this.options.params)
          {
-            url += "&" + encodeURIComponent(this.options.params);
+            url += "&" + encodeURI(this.options.params);
          }
          this.widgets.dataSource.sendRequest(url,
          {
