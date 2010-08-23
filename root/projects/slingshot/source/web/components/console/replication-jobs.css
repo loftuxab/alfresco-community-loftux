@@ -69,9 +69,10 @@
 
 .replication .job-summary ul li,
 .replication .jobs-list ul li a,
-.replication .job-detail div.job-status div
+.replication .job-detail div.job-status div,
+.replication .job-detail div.transfer-target div
 {
-   background-position: 0 50%;
+   background-position: 0 2px;
    background-repeat: no-repeat;
    padding: 2px 0 2px 20px;
 }
@@ -122,7 +123,8 @@
 .replication .job-detail h2,
 .replication .job-detail h3
 {
-   margin-bottom: 0.5em;
+   margin-bottom: 1em;
+   padding-top: 0.3em;
 }
 
 .replication .job-detail hr
@@ -136,6 +138,11 @@
    background-position: 2px 50%;
    background-repeat: no-repeat;
    padding: 4px 4px 4px 20px;
+}
+
+.replication .job-detail div.server
+{
+   background-image: url(../images/filetypes/generic-server-16.png);
 }
 
 /* Job Detail - Payload */

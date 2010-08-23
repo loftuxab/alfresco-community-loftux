@@ -275,6 +275,11 @@
             max: 256,
             crop: true
          }, "keyup");
+         this.form.addValidation(this.id + "-prop_description", Alfresco.forms.validation.length,
+         {
+            max: 512,
+            crop: true
+         }, "keyup");
 
          this.form.setSubmitElements(this.widgets.submitButton);
          this.form.setAJAXSubmit(true,
@@ -318,7 +323,10 @@
          p_config.dataObj.payload = this.payload || [];
          delete p_config.dataObj["payload_added"];
          delete p_config.dataObj["payload_removed"];
-         p_config.dataObj.targetName = this.targetName;
+         if (this.targetName !== null)
+         {
+            p_config.dataObj.targetName = this.targetName;
+         }
          delete p_config.dataObj["targetName_added"];
          delete p_config.dataObj["targetName_removed"];
          p_config.dataObj["enabled"] = (p_config.dataObj["enabled"] == "true");
