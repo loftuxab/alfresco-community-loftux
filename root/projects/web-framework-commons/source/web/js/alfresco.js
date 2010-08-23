@@ -4687,7 +4687,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
 };
 
 /**
- * Datalist rendering loop size constant
+ * YUI DataTable rendering loop size constant
  */
 Alfresco.util.RENDERLOOPSIZE = 25;
 
