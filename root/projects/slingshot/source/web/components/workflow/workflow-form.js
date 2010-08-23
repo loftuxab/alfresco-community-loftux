@@ -62,6 +62,8 @@
       Alfresco.WorkflowForm.superclass.constructor.call(this, "Alfresco.WorkflowForm", htmlId, ["button", "container", "datasource", "datatable"]);
       this.isReady = false;
       this.workflow = null;
+      this.currentTasks = [];
+      this.historyTasks = [];
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("workflowDetailedData", this.onWorkflowDetailedData, this);
@@ -87,6 +89,22 @@
        * @type {Object}
        */
       workflow: null,
+
+      /**
+       * Sorted list of current tasks
+       *
+       * @property currentTasks
+       * @type {Array}
+       */
+      currentTasks: null,
+
+      /**
+       * Sorted list of workflow history
+       *
+       * @property historyTasks
+       * @type {Array}
+       */
+      historyTasks: null,
 
       /**
        * Fired by YUI when parent element is available for scripting
@@ -120,28 +138,69 @@
       {
          if (this.isReady && this.workflow)
          {
-            var startTask;
-            for (var i = 0, il = this.workflow.tasks.length; i < il; i++)
+            // Split the task list in current and history tasks and save the most recent one
+            var tasks = this.workflow.tasks, recentTask;
+            for (var i = 0, il = tasks.length; i < il; i++)
+            {
+               if (tasks[i].state == "COMPLETED")
+               {
+                  this.historyTasks.push(tasks[i]);
+               }
+               else
+               {
+                  this.currentTasks.push(tasks[i]);
+               }
+            }
+
+            var sortByDate = function(dateStr1, dateStr2)
+            {
+               var date1 = Alfresco.util.fromISO8601(dateStr1),
+                  date2 = Alfresco.util.fromISO8601(dateStr2);
+               if (date1 && date2)
+               {
+                  return date1 < date2 ? 1 : -1;
+               }
+               else
+               {
+                  return !date1 ? 1 : -1;
+               }
+            };
+
+            // Sort tasks by completion date
+            this.currentTasks.sort(function(task1, task2)
+            {
+               return sortByDate(task1.properties.bpm_dueDate, task2.properties.bpm_dueDate);
+            });
+
+            // Sort tasks by completion date
+            this.historyTasks.sort(function(task1, task2)
+            {
+               return sortByDate(task1.properties.bpm_completionDate, task2.properties.bpm_completionDate);
+            });
+            // Save the most recent task
+            recentTasks = this.historyTasks.length > 0 ? this.historyTasks[0] : { properties: {} };
+
+            for (i = 0, il = this.workflow.tasks.length; i < il; i++)
             {
                if (this.workflow.tasks[i].id == this.workflow.startTaskInstanceId)
                {
-                  startTask = this.workflow.tasks[i];
+                  recentTask = this.workflow.tasks[i];
                }
             }
 
             // Set values in the "Summary" & "General" form sections
-            Dom.get(this.id + "-titleSummary").innerHTML = $html(startTask.title);
+            Dom.get(this.id + "-recentTaskTitle").innerHTML = $html(recentTask.title || "");
 
             Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
             
-            Dom.get(this.id + "-taskOwnersComment").innerHTML = $html(startTask.properties.bpm_comment || this.msg("label.none"));
+            Dom.get(this.id + "-recentTaskOwnersComment").innerHTML = $html(recentTask.properties.bpm_description || this.msg("label.noComment"));
 
-            var taskOwner = startTask.owner || {},
+            var taskOwner = recentTask.owner || {},
                taskOwnerAvatar = taskOwner.avatar,
                taskOwnerLink = Alfresco.util.userProfileLink(taskOwner.userName, taskOwner.firstName + " " + taskOwner.lastName, null, !taskOwner.firstName);
-            Dom.get(this.id + "-taskOwnersAvatar").setAttribute("src", taskOwnerAvatar ? Alfresco.constants.PROXY_URI + taskOwnerAvatar  + "?c=force" : Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png")            
-            Dom.get(this.id + "-taskOwnersCommentLink").innerHTML = this.msg("label.taskOwnersCommentLink", taskOwnerLink);            
+            Dom.get(this.id + "-recentTaskOwnersAvatar").setAttribute("src", taskOwnerAvatar ? Alfresco.constants.PROXY_URI + taskOwnerAvatar  + "?c=force" : Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png")
+            Dom.get(this.id + "-recentTaskOwnersCommentLink").innerHTML = this.msg("label.recentTaskOwnersCommentLink", taskOwnerLink);
 
             var initiator = this.workflow.initiator || {};
             Dom.get(this.id + "-startedBy").innerHTML = Alfresco.util.userProfileLink(
@@ -159,10 +218,10 @@
                Dom.get(this.id + "-due").innerHTML = this.msg("label.none");
             }
 
-            var taskCompletionDate = Alfresco.util.fromISO8601(startTask.properties.bpm_completionDate);
-            Dom.get(this.id + "-completedOn").innerHTML = $html(taskCompletionDate ? Alfresco.util.formatDate(taskCompletionDate) : this.msg("label.notCompleted"));
+            var taskCompletionDate = Alfresco.util.fromISO8601(recentTask.properties.bpm_completionDate);
+            Dom.get(this.id + "-recentTaskCompletedOn").innerHTML = $html(taskCompletionDate ? Alfresco.util.formatDate(taskCompletionDate) : this.msg("label.notCompleted"));
 
-            Dom.get(this.id + "-outcome").innerHTML = $html(startTask.outcome);
+            Dom.get(this.id + "-recentTaskOutcome").innerHTML = $html(recentTask.outcome || "");
 
             var workflowCompletedDate = Alfresco.util.fromISO8601(this.workflow.endDate);
             Dom.get(this.id + "-completed").innerHTML = $html(workflowCompletedDate ? Alfresco.util.formatDate(workflowCompletedDate) : this.msg("label.notCompleted"));
@@ -230,46 +289,6 @@
 
          formFieldsEl.insertBefore(generalSummaryEl, Dom.getFirstChild(formFieldsEl));
          formFieldsEl.insertBefore(workflowSummaryEl, generalSummaryEl);
-
-         // Remove current tasks and display workflow history if component is ready
-         var tasks = this.workflow.tasks, historyTasks = [], currentTasks = [];
-         for (var i = 0, il = tasks.length; i < il; i++)
-         {
-            if (tasks[i].state == "COMPLETED")
-            {
-               historyTasks.push(tasks[i]);
-            }
-            else
-            {
-               currentTasks.push(tasks[i]);
-            }
-         }
-
-         var sortByDate = function(dateStr1, dateStr2)
-         {
-            var date1 = Alfresco.util.fromISO8601(dateStr1),
-               date2 = Alfresco.util.fromISO8601(dateStr2);
-            if (date1 && date2)
-            {
-               return date1 < date2 ? 1 : -1;
-            }
-            else
-            {
-               return !date1 ? 1 : -1;
-            }
-         };
-
-         // Sort tasks by completion date
-         currentTasks.sort(function(task1, task2)
-         {
-            return sortByDate(task1.properties.bpm_dueDate, task2.properties.bpm_dueDate);
-         });
-
-         // Sort tasks by completion date
-         historyTasks.sort(function(task1, task2)
-         {
-            return sortByDate(task1.properties.bpm_completionDate, task2.properties.bpm_completionDate);
-         });
 
          var me = this;
 
@@ -371,7 +390,7 @@
          ];
 
          // Create current tasks data table filled with current tasks
-         var currentTasksDS = new YAHOO.util.DataSource(currentTasks);
+         var currentTasksDS = new YAHOO.util.DataSource(this.currentTasks);
          currentTasksDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
          currentTasksDS.responseSchema =
          {
@@ -397,7 +416,7 @@
             historyTasksEl = Selector.query("div", historyContainerEl, true);
 
          // Create workflow history data table filled with history tasks
-         var workflowHistoryDS = new YAHOO.util.DataSource(historyTasks);
+         var workflowHistoryDS = new YAHOO.util.DataSource(this.historyTasks);
          workflowHistoryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
          workflowHistoryDS.responseSchema =
          {
