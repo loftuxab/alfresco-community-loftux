@@ -132,12 +132,12 @@
       },
 
       /**
-       * Show method. Prompts loading of Forms control via wrapper.
+       * Render method. Prompts loading of Forms control via wrapper.
        *
-       * @method show
+       * @method render
        * @param fnCallback {object} Callback for successful request, should have the following form: {fn: fnHandler, scope: functionScope, obj: optionalParam}
        */
-      show: function ControlWrapper_show(fnCallback)
+      render: function ControlWrapper_render(fnCallback)
       {
          var name = this.options.name || "wrapper-" + this.options.type,
             dataObj =

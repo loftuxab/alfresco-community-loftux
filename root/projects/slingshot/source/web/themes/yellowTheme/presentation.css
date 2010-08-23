@@ -221,9 +221,10 @@ hr
    cursor: auto;
 }
 
-.yui-skin-yellowTheme .yui-dt-message
+.yui-skin-yellowTheme .yui-dt-message,
+.yui-skin-yellowTheme .yui-dt-message tr.yui-dt-highlighted
 {
-   background-color: inherit;
+   background-color: white;
 }
 
 /* Style the default message  */
@@ -396,7 +397,7 @@ em
 .share-form .form-container .form-fields
 {
    border: 1px solid #c2c2c2 !important;
-   background-color: #f5fff2;
+   background-color: #fffff2;
 }
 
 select,

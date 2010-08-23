@@ -115,14 +115,22 @@
           * @type Array
           */
          payload: [],
-         
+
          /**
           * Target Name from an existing Job
           *
           * @property targetName
           * @type string
           */
-         targetName: ""
+         targetName: "",
+
+         /**
+          * Schedule Start from an existing Job
+          *
+          * @property scheduleStart
+          * @type string (iso8601 date)
+          */
+         scheduleStart: ""
       },
 
       /**
@@ -154,14 +162,19 @@
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "form-cancel", this.onCancel);
 
          /* Defer initializing Forms Runtime until all controls loaded */
-         this.controlsLoadedDeferred = new Alfresco.util.Deferred(["onPayloadControl", "onTransferTargetControl"],
+         this.controlsLoadedDeferred = new Alfresco.util.Deferred(["onPayloadControl", "onTransferTargetControl", "onScheduleStartControl"],
          {
-            fn: this.onControlsLoaded,
+            fn: this.onFormControlsLoaded,
             scope: this
          });
          
          this.createPayloadControl(this.id + "-payloadContainer");
          this.createTransferTargetControl(this.id + "-transferTargetContainer");
+         this.createScheduleStartControl(this.id + "-scheduleStartContainer");
+         
+         this.widgets.scheduleCheckbox = Dom.get(this.id + "-scheduleEnabled");
+         this.widgets.scheduleContainer = Dom.get(this.id + "-scheduleContainer");
+         Event.addListener(this.widgets.scheduleCheckbox, "change", this.onScheduleChange, this, true);
       },
       
       /**
@@ -198,7 +211,7 @@
                scope: this
             }
          });
-         this.widgets.payload.show(
+         this.widgets.payload.render(
          {
             fn: function ReplicationJob_createPayloadControl_callback()
             {
@@ -247,11 +260,41 @@
                scope: this
             }
          });
-         this.widgets.transferTarget.show(
+         this.widgets.transferTarget.render(
          {
-            fn: function ReplicationJob__createTransferTargetControl_callback()
+            fn: function ReplicationJob_createTransferTargetControl_callback()
             {
                this.controlsLoadedDeferred.fulfil("onTransferTargetControl");
+            },
+            scope: this
+         });
+      },
+      
+      /**
+       * Generate the Schedule Start control
+       *
+       * @method createScheduleStartControl
+       * @param p_id {String} DOM ID of container element in which to render the control
+       */
+      createScheduleStartControl: function ReplicationJob_createScheduleStartControl(p_id)
+      {
+         this.widgets.scheduleStart = new Alfresco.module.ControlWrapper(Alfresco.util.generateDomId()).setOptions(
+         {
+            name: "schedule.start.iso8601",
+            type: "date",
+            container: Dom.get(p_id),
+            label: this.msg("label.start-date"),
+            value: this.options.scheduleStart,
+            field:
+            {
+               mandatory: true
+            }
+         });
+         this.widgets.scheduleStart.render(
+         {
+            fn: function ReplicationJob_createScheduleStartControl_callback()
+            {
+               this.controlsLoadedDeferred.fulfil("onScheduleStartControl");
             },
             scope: this
          });
@@ -260,14 +303,16 @@
       /**
        * Form controls loaded deferred event handler
        *
-       * @method onControlsLoaded
+       * @method onFormControlsLoaded
        */
-      onControlsLoaded: function ReplicationJob_onControlsLoaded()
+      onFormControlsLoaded: function ReplicationJob_onFormControlsLoaded()
       {
+         var scope = this;
+
          // Form definition
          this.form = new Alfresco.forms.Form(this.id + "-form");
          
-         // Validators
+         // Validator - Name
          this.form.addValidation(this.id + "-prop_name", Alfresco.forms.validation.mandatory, null, "blur");
          this.form.addValidation(this.id + "-prop_name", Alfresco.forms.validation.nodeName, null, "keyup");
          this.form.addValidation(this.id + "-prop_name", Alfresco.forms.validation.length,
@@ -275,11 +320,30 @@
             max: 256,
             crop: true
          }, "keyup");
+
+         // Validator - Description
          this.form.addValidation(this.id + "-prop_description", Alfresco.forms.validation.length,
          {
             max: 512,
             crop: true
          }, "keyup");
+
+         // Validator - Interval Count
+         this.form.addValidation(this.id + "-prop_intervalCount", Alfresco.forms.validation.length,
+         {
+            max: 4,
+            crop: true
+         }, "keyup");
+         this.form.addValidation(this.id + "-prop_intervalCount", function ReplicationJob_onFormControlsLoaded_fnValidateIntervalCount(field, args, event, form, silent, message)
+         {
+            return !(scope.isScheduleEnabled() && isNaN(parseInt(field.value, 10)));
+         }, null, "blur");
+
+         // Validator - Interval Period
+         this.form.addValidation(this.id + "-prop_intervalPeriod", function ReplicationJob_onFormControlsLoaded_fnValidateIntervalPeriod(field, args, event, form, silent, message)
+         {
+            return !(scope.isScheduleEnabled() && field.options[field.selectedIndex].value == "-");
+         }, null, "change");
 
          this.form.setSubmitElements(this.widgets.submitButton);
          this.form.setAJAXSubmit(true,
@@ -308,6 +372,9 @@
 
          // Initialise the form
          this.form.init();
+
+         // Focus name field
+         Dom.get(this.id + "-prop_name").focus();
       },
 
       /**
@@ -330,7 +397,40 @@
          delete p_config.dataObj["targetName_added"];
          delete p_config.dataObj["targetName_removed"];
          p_config.dataObj["enabled"] = (p_config.dataObj["enabled"] == "true");
+         if (!this.isScheduleEnabled())
+         {
+            p_config.dataObj.schedule = null;
+         }
          return true;
+      },
+      
+      /**
+       * Schedule enabled evaluator
+       *
+       * @method isScheduleEnabled
+       */
+      isScheduleEnabled: function ReplicationJob_isScheduleEnabled()
+      {
+         return (this.widgets.scheduleCheckbox.checked);
+      },
+      
+      /**
+       * Schedule Checkbox onChange event handler
+       *
+       * @method onScheduleChange
+       */
+      onScheduleChange: function ReplicationJob_onScheduleChange(p_event)
+      {
+         if (this.isScheduleEnabled())
+         {
+            Dom.removeClass(this.widgets.scheduleContainer, "hidden");
+         }
+         else
+         {
+            Dom.addClass(this.widgets.scheduleContainer, "hidden");
+         }
+         
+         this.form.updateSubmitElements();
       },
 
       /**
