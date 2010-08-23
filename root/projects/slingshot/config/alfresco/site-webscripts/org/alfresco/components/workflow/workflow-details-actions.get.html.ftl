@@ -1,6 +1,10 @@
+<#include "../../include/alfresco-macros.lib.ftl" />
 <#assign el=args.htmlid>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.WorkflowDetailsActions("${el}").setMessages(
+new Alfresco.WorkflowDetailsActions("${el}").setOptions(
+   {
+      forwardUrl: "${siteURL("my-tasks")}"
+   }).setMessages(
    ${messages}
 );
 //]]></script>

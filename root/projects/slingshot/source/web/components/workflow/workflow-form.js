@@ -47,7 +47,9 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $siteURL = Alfresco.util.siteURL,
+      $userProfileLink = Alfresco.util.userProfileLink;
 
    /**
     * WorkflowForm constructor.
@@ -178,15 +180,7 @@
                return sortByDate(task1.properties.bpm_completionDate, task2.properties.bpm_completionDate);
             });
             // Save the most recent task
-            recentTasks = this.historyTasks.length > 0 ? this.historyTasks[0] : { properties: {} };
-
-            for (i = 0, il = this.workflow.tasks.length; i < il; i++)
-            {
-               if (this.workflow.tasks[i].id == this.workflow.startTaskInstanceId)
-               {
-                  recentTask = this.workflow.tasks[i];
-               }
-            }
+            recentTask = this.historyTasks.length > 0 ? this.historyTasks[0] : { properties: {} };
 
             // Set values in the "Summary" & "General" form sections
             Dom.get(this.id + "-recentTaskTitle").innerHTML = $html(recentTask.title || "");
@@ -194,7 +188,7 @@
             Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
             
-            Dom.get(this.id + "-recentTaskOwnersComment").innerHTML = $html(recentTask.properties.bpm_description || this.msg("label.noComment"));
+            Dom.get(this.id + "-recentTaskOwnersComment").innerHTML = $html(recentTask.properties.bpm_comment || this.msg("label.noComment"));
 
             var taskOwner = recentTask.owner || {},
                taskOwnerAvatar = taskOwner.avatar,
@@ -293,36 +287,28 @@
          var me = this;
 
          /**
-          *
+          * Render task type as link
           */
          var renderCellType = function WorkflowHistory_onReady_renderCellType(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = '<a href="' + Alfresco.constants.PAGE_CONTEXT + 'task-details?taskId=' + oRecord.getData("id") + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
+            elCell.innerHTML = '<a href="' + $siteURL('task-details?taskId=' + oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
          };
 
          /**
-          *
+          * Render task owner as link
           */
          var renderCellOwner = function WorkflowHistory_onReady_renderCellOwner(elCell, oRecord, oColumn, oData)
          {
             var owner = oRecord.getData("owner");
             if (owner != null && owner.userName)
             {
-               if (owner.firstName)
-               {
-                  var displayName = $html(me.msg("field.owner", owner.firstName, owner.lastName)),
-                     link = '<a href="' + Alfresco.constants.PAGE_CONTEXT + 'user/' + owner.userName + '/profile" title="' + me.msg("link.title.user", displayName) + '">' + displayName + '</a>';
-                  elCell.innerHTML = link;
-               }
-               else
-               {
-                  elCell.innerHTML = '<span title="' + me.msg("link.title.userDeleted", owner.userName) + '">' + $html(owner.userName) + '</span>';
-               }
+               var displayName = $html(me.msg("field.owner", owner.firstName, owner.lastName));
+               elCell.innerHTML = $userProfileLink(owner.userName, displayName, null, !owner.firstName);
             }
          };
 
          /**
-          *
+          * Render task completed date
           */
          var renderCellDateCompleted = function WorkflowHistory_onReady_renderCellDateCompleted(elCell, oRecord, oColumn, oData)
          {
@@ -331,7 +317,7 @@
          };
 
          /**
-          *
+          * Render task due date
           */
          var renderCellDueDate = function WorkflowHistory_onReady_renderCellDueDate(elCell, oRecord, oColumn, oData)
          {
@@ -340,7 +326,7 @@
          };
 
          /**
-          *
+          * Render task status
           */
          var renderCellStatus = function WorkflowHistory_onReady_renderCellStatus(elCell, oRecord, oColumn, oData)
          {
@@ -348,7 +334,7 @@
          };
 
          /**
-          *
+          * Render task outcome
           */
          var renderCellOutcome = function WorkflowHistory_onReady_renderCellOutcome(elCell, oRecord, oColumn, oData)
          {
@@ -356,7 +342,7 @@
          };
 
          /**
-          *
+          *  Render task comment
           */
          var renderCellComment = function WorkflowHistory_onReady_renderCellComment(elCell, oRecord, oColumn, oData)
          {
@@ -364,7 +350,7 @@
          };
 
          /**
-          *
+          * Render actions available for current tasks 
           */
          var renderCellCurrentTasksActions = function WorkflowHistory_onReady_renderCellCurrentTasksActions(elCell, oRecord, oColumn, oData)
          {
