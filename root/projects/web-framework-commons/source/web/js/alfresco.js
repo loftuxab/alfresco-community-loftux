@@ -5093,7 +5093,16 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 })();
 
 /**
- * FormManager template.
+ * FormManager component.
+ *
+ * Component that helps the management on a form on a page.
+ *
+ * Set options to customise:
+ *  - the label of the submit button
+ *  - the failure message if form submission failed
+ *  - the page that the user shall visit if not coming from the document library
+ *
+ * ...or override it's onFormContentReady method to perform additional customisation.
  *
  * @namespace Alfresco
  * @class Alfresco.FormManager
@@ -5150,7 +5159,8 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          submitButtonMessageKey: "button.save",
 
          /**
-          * The url to forward to if user didn't come from a document library
+          * The url to forward to if user didn't come from a list page:
+          * the document library, my-workflows or my-tasks
           *
           * @property forwardUrl
           * @type string
@@ -5252,16 +5262,23 @@ Alfresco.util.RENDERLOOPSIZE = 25;
        */
       _navigateForward: function FormManager__navigateForward()
       {
-         /* Did we come from the document library? If so, then direct the user back there */
-         if (document.referrer.match(/documentlibrary([?]|$)/) || document.referrer.match(/repository([?]|$)/) || this.options.forwardUrl == null)
+         // If user came from a "list" page?
+         if (document.referrer.match(/documentlibrary([?]|$)/) ||
+               document.referrer.match(/repository([?]|$)/) ||
+               document.referrer.match(/my-workflows([?]|$)/) ||
+               document.referrer.match(/my-tasks([?]|$)/)) 
          {
-            // go back to the referrer page
+            // Yes, then go back to the referrer page
             history.go(-1);
          }
-         else
+         else if (this.options.forwardUrl != null)
          {
-            // go forward to the appropriate details page for the node
+            // No, the go forward to the appropriate page for the node, i.e. a details page or a list page if it exists
             window.location.href = this.options.forwardUrl;
+         }
+         else {
+            // User didn't come from a list page but no page was suggested to where to go from here, fallback to the previous page
+            history.go(-1);
          }
       }
    });

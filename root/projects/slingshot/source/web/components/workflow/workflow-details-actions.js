@@ -60,7 +60,7 @@
    /**
     * Extend from Alfresco.component.Base to reuse functionality to decide where to navigate after cancel
     */
-   YAHOO.extend(Alfresco.WorkflowDetailsActions, Alfresco.FormManager)
+   YAHOO.extend(Alfresco.WorkflowDetailsActions, Alfresco.FormManager);
 
    /**
     * Augment prototype with Common Workflow actions to reuse cancel workflow
