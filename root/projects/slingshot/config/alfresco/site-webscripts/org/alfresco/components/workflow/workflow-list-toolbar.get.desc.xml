@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>List Toolbar</shortname>
+   <description>Toolbar for the workflow and task list</description>
+   <url>/components/workflow/workflow-list-toolbar</url>
+</webscript>

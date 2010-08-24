@@ -1,0 +1,6 @@
+<filters>
+   <filter id="priority" data="" label="link.any" />
+   <filter id="priority" data="priority=1" label="priority.high" />
+   <filter id="priority" data="priority=2" label="priority.medium" />
+   <filter id="priority" data="priority=3" label="priority.low" />
+</filters>
