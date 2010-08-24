@@ -23,7 +23,7 @@
       <div class="images">
          <div class="item">
             <div class="thumbnail">
-               <a href="${url.context}/proxy/alfresco/api/node/content/${nodeRefUrl}/${image.name?url}" rel="lightbox" title="${image.title?html} - ${msg("text.modified-by", image.modifier)} ${image.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm:ss")}"><img src="${url.context}/proxy/alfresco/api/node/${nodeRefUrl}/content/thumbnails/doclib?c=force"/></a>
+               <a href="${url.context}/proxy/alfresco/api/node/content/${nodeRefUrl}/${image.name?url}" rel="lightbox" title="${image.title?html} - ${msg("text.modified-by", image.modifier)} ${xmldate(image.modifiedOn)?string(msg("date-format.defaultFTL"))}"><img src="${url.context}/proxy/alfresco/api/node/${nodeRefUrl}/content/thumbnails/doclib?c=force"/></a>
             </div>
             <div class="details">
                <@detailsUrl image detailsmsg />
