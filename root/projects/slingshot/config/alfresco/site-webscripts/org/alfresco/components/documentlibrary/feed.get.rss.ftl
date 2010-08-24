@@ -1,4 +1,4 @@
-<#function formatDate date><#return date?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("EEE, dd MMM yyyy HH:mm:ss 'GMT'")></#function>
+<#function formatDate date><#return xmldate(date)?string(msg("date-format.defaultFTL"))></#function>
 <#function siteLoc loc><#if (loc.site?length > 0)><#return "/page/site/" + loc.site + "/documentlibrary"><#else><#return "/page/repository"></#if></#function>
 <#function location loc><#return absurl(url.context) + siteLoc(loc) + "?file=" + loc.file + "&amp;path=" + loc.path?url></#function>
 <#function displayLocation loc><#return absurl(url.context) + siteLoc(loc) + "?file=" + loc.file + "&amp;path=" + loc.path></#function>
@@ -31,7 +31,7 @@
       <guid isPermaLink="false">${item.nodeRef}</guid>
       <#assign currentLocale=locale />
       <#setting locale="en_US" />
-      <pubDate>${formatDate(item.modifiedOn)}</pubDate>
+      <pubDate>${item.modifiedOn}</pubDate>
       <#setting locale=currentLocale />
       <#if isMP3><enclosure url="${proxyLink + item.contentUrl}" length="${item.size}" type="audio/mpeg" /></#if>
    </item>

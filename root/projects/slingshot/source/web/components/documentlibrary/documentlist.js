@@ -37,7 +37,8 @@
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks,
       $combine = Alfresco.util.combinePaths,
-      $userProfile = Alfresco.util.userProfileLink;
+      $userProfile = Alfresco.util.userProfileLink,
+      $date = function $date(date, format) { return Alfresco.util.formatDate(Alfresco.util.fromISO8601(date), format) };
 
    /**
     * Preferences
@@ -46,7 +47,6 @@
       PREF_SHOW_FOLDERS = PREFERENCES_DOCLIST + ".showFolders",
       PREF_SIMPLE_VIEW = PREFERENCES_DOCLIST + ".simpleView";
 
-   
    /**
     * DocumentList constructor.
     * 
@@ -871,7 +871,7 @@
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn, "dd mmmm yyyy") + '</span>';
                   desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
@@ -879,7 +879,7 @@
                   /**
                    * Detailed View
                    */
-                  desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
+                  desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn) + '</span>';
                   desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                   desc += '<div class="detail"><span class="item"><em>' + scope.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
                   /* Tags */
@@ -946,7 +946,7 @@
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn, "dd mmmm yyyy") + '</span>';
                   desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
@@ -960,7 +960,7 @@
                       * Working Copy
                       */
                      desc += '<div class="detail">';
-                     desc += '<span class="item"><em>' + scope.msg("details.editing-started.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
+                     desc += '<span class="item"><em>' + scope.msg("details.editing-started.on") + '</em> ' + $date(record.modifiedOn) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.editing-started.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';
@@ -973,7 +973,7 @@
                       * Non-Working Copy
                       */
                      desc += '<div class="detail">';
-                     desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
+                     desc += '<span class="item"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.modified.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.version") + '</em> ' + record.version + '</span>';
                      desc += '<span class="item"><em>' + scope.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
@@ -1257,7 +1257,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: this.options.usePagination ? 16 : 32,
+            renderLoopSize: this.options.usePagination ? 16 : Alfresco.util.RENDERLOOPSIZE,
             initialLoad: false,
             dynamicData: true,
             MSG_EMPTY: this.msg("message.loading")
@@ -1294,10 +1294,6 @@
                {
                   me._setDefaultDataTableErrors(me.widgets.dataTable);
                }
-            }
-            else if (oResponse.results && !me.options.usePagination)
-            {
-               this.renderLoopSize = Alfresco.util.RENDERLOOPSIZE;
             }
             
             // We don't get an renderEvent for an empty recordSet, but we'd like one anyway
@@ -1364,6 +1360,17 @@
             
             // Register preview tooltips
             this.widgets.previewTooltip.cfg.setProperty("context", this.previewTooltips);
+            
+            // YUI Bug #2286608
+            // http://yuilibrary.com/projects/yui2/ticket/2286608
+            if (this.widgets.dataTable.getRecordSet().getLength() === 0)
+            {
+               this.widgets.dataTable.set("renderLoopSize", 0);
+            }
+            else
+            {
+               this.widgets.dataTable.set("renderLoopSize", this.options.usePagination ? 16 : Alfresco.util.RENDERLOOPSIZE);
+            }
             
          }, this, true);
          
@@ -1585,8 +1592,8 @@
        */
       onEventHighlightRow: function DL_onEventHighlightRow(oArgs)
       {
-         // elRename is the element id of the rename file link
-         // var elRename = Dom.get(this.id + "-rename-" + oArgs.target.id);
+         // Call through to get the row highlighted by YUI
+         this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
 
          // elActions is the element id of the active table cell where we'll inject the actions
          var elActions = Dom.get(this.id + "-actions-" + oArgs.target.id);
@@ -1594,9 +1601,6 @@
          // Inject the correct action elements into the actionsId element
          if (elActions && elActions.firstChild === null)
          {
-            // Call through to get the row highlighted by YUI
-            this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
-
             // Retrieve the actionSet for this asset
             var record = this.widgets.dataTable.getRecord(oArgs.target.id),
                actionSet = record.getData("actionSet");
@@ -1696,7 +1700,6 @@
          {
             this.currentActionsMenu = elActions;
             // Show the actions
-            // Dom.removeClass(elRename, "hidden");
             Dom.removeClass(elActions, "hidden");
             this.deferredActionsMenu = null;
          }
@@ -1720,7 +1723,7 @@
             {
                return Alfresco.util.siteURL(page);
             }, this);
-         
+
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + contentUrl + "?a=true",

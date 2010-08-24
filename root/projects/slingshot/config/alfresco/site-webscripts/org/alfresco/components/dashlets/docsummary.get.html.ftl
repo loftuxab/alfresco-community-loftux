@@ -27,7 +27,7 @@
             <div class="details">
                <h4><@doclibUrl doc /></h4>
                <div>
-                  ${msg("text.modified-by", modifiedBy)} ${msg("text.modified-on", doc.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string(msg("date-format.defaultFTL")))}
+                  ${msg("text.modified-by", modifiedBy)} ${msg("text.modified-on", xmldate(doc.modifiedOn)?string(msg("date-format.defaultFTL")))}
                </div>
             </div>
          </div>
