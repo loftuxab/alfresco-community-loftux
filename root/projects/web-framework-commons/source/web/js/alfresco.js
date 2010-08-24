@@ -1526,8 +1526,10 @@ Alfresco.util.copyMessages = function(p_source, p_destination)
 
 /**
  * Resolve a messageId into a message.
- * If a messageScope is supplied, that container will be searched first
- * followed by the "global" message scope.
+ * If a messageScope is supplied, that container will be searched first, followed by the "global" message scope.
+ * Note: Implementation follows single-quote quirks of server implementations whereby I18N messages containing
+ *       one or more tokens must use two single-quotes in order to display one.
+ *       See: http://download.oracle.com/javase/1.5.0/docs/api/java/text/MessageFormat.html
  *
  * @method Alfresco.util.message
  * @param p_messageId {string} Message id to resolve
@@ -1562,7 +1564,7 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
    }
    
    // Search/replace tokens
-   var tokens;
+   var tokens = [];
    if ((arguments.length == 3) && (typeof arguments[2] == "object"))
    {
       tokens = arguments[2];
@@ -1570,6 +1572,12 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
    else
    {
       tokens = Array.prototype.slice.call(arguments).slice(2);
+   }
+   
+   // Emulate server-side I18NUtils implementation
+   if (YAHOO.lang.isArray(tokens) && tokens.length > 0)
+   {
+      msg = msg.replace(/''/g, "'");
    }
    msg = YAHOO.lang.substitute(msg, tokens);
    
