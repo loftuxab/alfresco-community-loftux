@@ -24,7 +24,8 @@
    {
       jobName: "${jobName?js_string}",
       payload: [<#list jobDetail.payload![] as p>"${p.nodeRef?js_string}"<#if p_has_next>,</#if></#list>],
-      targetName: "${(jobDetail.targetName!"")?js_string}"
+      targetName: "${(jobDetail.targetName!"")?js_string}",
+      scheduleStart: "${((jobDetail.schedule.start.iso8601)!"")?js_string}"
    }).setMessages(${messages});
 //]]></script>
 
@@ -52,7 +53,7 @@
 
             <div class="set-title">${msg("label.set.schedule")}</div>
             <div class="form-field">
-               <input id="${id}-scheduleEnabled" type="checkbox" tabindex="0" name="-" title="${msg("label.schedule-job")}" <#if jobDetail.schedule!false>checked="checked"</#if>>
+               <input id="${id}-scheduleEnabled" type="checkbox" tabindex="0" name="-" title="${msg("label.schedule-job")}" <#if jobDetail.schedule??>checked="checked"</#if>>
                <label for="${id}-scheduleEnabled" class="checkbox">${msg("label.schedule-job")}</label>
             </div>
             <div id="${id}-scheduleContainer" class="hidden">
