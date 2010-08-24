@@ -4966,7 +4966,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
                {
                   filterOwner: me.name,
                   filterId: filterId,
-                  filterData: filterData
+                  filterData: me.resolveFilterData(filterData)
                });
 
                // If a function has been provided which corresponds to the filter Id, then call it
@@ -4980,6 +4980,17 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 
             return true;
          });
+      },
+
+      /**
+       * Override this method to resolve unresolved data from the clicked filter.
+       *
+       * @method resolveFilterData
+       * @param filterData {object} The data to send out in the event that could contain unresolved data
+       */
+      resolveFilterData: function BaseFilter_resolveFilterData(filterData)
+      {
+         return filterData;
       },
 
       /**
@@ -5098,6 +5109,73 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          }
       }
    });
+})();
+
+
+/**
+ * DateFilter.
+ *
+ * @namespace Alfresco.component
+ * @class Alfresco.component.DateFilter
+ */
+(function()
+{
+
+   Alfresco.component.DateFilter = function(name, id, components)
+   {
+      Alfresco.component.DateFilter.superclass.constructor.apply(this, arguments);
+      return this;
+   };
+
+   YAHOO.extend(Alfresco.component.DateFilter, Alfresco.component.BaseFilter,
+   {
+
+      /**
+       * Assumes the filter data may contain date instructions where the instructions are placed inside curly brackets:
+       * "param={now}" - the current date time in iso8601 format
+       * "param={1}" - the current date (time set to end of day) and rolled l days forward
+       * "param={-2}" - the current date (time set to end of day) and rolled 2 days backward
+       *
+       * @method resolveFilterData
+       * @param filterData {object} The data to send out in the event that could contain unresolved data
+       * @override
+       */
+      resolveFilterData: function DateFilter_resolveFilterData(filterData)
+      {
+         if (YAHOO.lang.isString(filterData))
+         {
+            var unresolvedTokens = filterData.match(/{[^}]+}/g);
+            if (unresolvedTokens)
+            {
+               var resolvedTokens = {},
+                     name, value, date;
+               for (var i = 0, il = unresolvedTokens.length; i < il; i++)
+               {
+                  name = unresolvedTokens[i].substring(1, unresolvedTokens[i].length - 1);
+                  value = name;
+                  date = new Date();
+                  if (value == "now")
+                  {
+                     value = date;
+                  }
+                  else if (/^[\-\+]?\d+$/.test(value))
+                  {
+                     date.setHours(11);
+                     date.setMinutes(59);
+                     date.setSeconds(59);
+                     date.setMilliseconds(999);
+                     date.setDate(date.getDate() + parseInt(value));
+                     value = date;
+                  }
+                  resolvedTokens[name] = Alfresco.util.isDate(value) ? Alfresco.util.toISO8601(value) :  value;
+               }
+               filterData = YAHOO.lang.substitute(filterData, resolvedTokens);
+            }
+         }
+         return filterData;
+      }
+   });
+
 })();
 
 /**

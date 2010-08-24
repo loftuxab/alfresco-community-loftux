@@ -1,0 +1,5 @@
+<filters>
+   <filter id="assignee" data="" label="link.any" />
+   <filter id="assignee" data="" label="link.me"/>
+   <filter id="assignee" data="" label="link.unassigned" />
+</filters>
