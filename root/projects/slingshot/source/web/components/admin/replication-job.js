@@ -285,6 +285,10 @@
             container: Dom.get(p_id),
             label: this.msg("label.start-date"),
             value: this.options.scheduleStart,
+            controlParams:
+            {
+               showTime: "true"
+            },
             field:
             {
                mandatory: true
@@ -372,6 +376,9 @@
 
          // Initialise the form
          this.form.init();
+         
+         // Initialise schedule hidden div state
+         this.onScheduleChange();
 
          // Focus name field
          Dom.get(this.id + "-prop_name").focus();
