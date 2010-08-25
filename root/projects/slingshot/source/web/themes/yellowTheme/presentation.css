@@ -213,7 +213,6 @@ hr
 
 /* End Data Lists */
 
-.yui-skin-yellowTheme .yui-dt-data tr.yui-dt-highlighted,
 .yui-skin-yellowTheme .yui-dt-data tr.yui-dt-highlighted td.yui-dt-asc,
 .yui-skin-yellowTheme .yui-dt-data tr.yui-dt-highlighted td.yui-dt-desc
 {
@@ -673,6 +672,7 @@ body.yui-skin-yellowTheme .doclist .action-set .highlighted
    border: 1px solid #d88119; 
 }
 
+body.yui-skin-yellowTheme .yui-dt-data tr.yui-dt-highlighted,
 body.yui-skin-yellowTheme .doclist tr.yui-dt-odd.yui-dt-highlighted,
 body.yui-skin-yellowTheme .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-yellowTheme .links-body tr.links-selected-row,

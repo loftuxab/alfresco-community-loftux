@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Task List</shortname>
+  <description>Component for displaying tasks</description>
+  <url>/components/workflow/task-list</url>
+</webscript>
