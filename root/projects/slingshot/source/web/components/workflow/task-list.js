@@ -280,7 +280,7 @@
             var desc = '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/priority-' + priorityKey + '-16.png" title="' + scope.msg("label.priority", scope.msg("priority." + priorityKey)) + '"/>';
             if (pooledTask)
             {
-               desc += '<br/><img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/pooled-task-16.png" title="' + me.msg("label.pooledTask") + '"/>';
+               desc += '<br/><img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/pooled-task-16.png" title="' + scope.msg("label.pooledTask") + '"/>';
             }
             elCell.innerHTML = desc;
          };
@@ -531,7 +531,7 @@
             responseSchema:
             {
                resultsList: "data",
-               fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable"]
+               fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable", "workflowInstance"]
             },
             metaFields:
             {
