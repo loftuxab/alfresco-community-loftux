@@ -14,8 +14,7 @@
    </#if>
       itemType: "${field.endpointType}",
       multipleSelectMode: ${field.endpointMany?string},
-      parentNodeRef: "${field.control.params.parentNodeRef!"alfresco://company/home"}",
-      parentXPath: "${field.control.params.parentXPath!""}",
+      parentNodeRef: "alfresco://company/home",
       itemFamily: "node",
       displayMode: "${field.control.params.displayMode!"items"}"
    });

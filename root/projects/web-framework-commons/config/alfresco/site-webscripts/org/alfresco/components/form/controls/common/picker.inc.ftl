@@ -21,6 +21,10 @@
    <#elseif field.endpointMandatory??>
       mandatory: ${field.endpointMandatory?string},
    </#if>
+   <#if field.control.params.startLocation??>
+      startLocation: "${field.control.params.startLocation}",
+      <#if args.itemId??>currentItem: "${args.itemId?js_string}",</#if>
+   </#if>
       currentValue: "${field.value}",
       <#if field.control.params.valueType??>valueType: "${field.control.params.valueType}",</#if>
       <#if renderPickerJSSelectedValue??>selectedValue: "${renderPickerJSSelectedValue}",</#if>

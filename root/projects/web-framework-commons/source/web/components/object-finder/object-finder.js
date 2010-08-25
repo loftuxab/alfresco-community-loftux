@@ -111,6 +111,14 @@
          currentValue: "",
          
          /**
+          * The id of the item being edited
+          * 
+          * @property currentItem
+          * @type string
+          */
+         currentItem: null,
+         
+         /**
           * Value type.
           * Whether values are passed into and out of the control as nodeRefs or other data types
           *
@@ -320,7 +328,25 @@
           * @property selectActionLabel
           * @type string
           */
-         selectActionLabel: null
+         selectActionLabel: null,
+         
+         /**
+          * Specifies the location the object finder should start, the following
+          * values are supported:
+          * 
+          * - {companyhome}
+          * - {userhome}
+          * - {siteshome}
+          * - {doclib}
+          * - {self}
+          * - {parent}
+          * - A NodeRef
+          * - An XPath
+          * 
+          * @property startLocation
+          * @type string
+          */
+         startLocation: null
       },
 
       /**
@@ -1761,6 +1787,7 @@
 
       // Initialise prototype properties
       this.addItemButtons = {};
+      this.startLocationResolved = false;
 
       return this;
    };
@@ -1782,18 +1809,6 @@
           * @type string
           */
          parentNodeRef: "",
-
-         /**
-          * Parent XPath for initial browse location.
-          * If set, the control will request the nodeRef of the first node returned from the XPath query
-          * and use it in place of the parentNodeRef parameter above. This setting has priority over the
-          * parentNodeRef setting, unless empty or null.
-          * e.g. "/app:company_home/app:dictionary"
-          *
-          * @property parentXPath
-          * @type string
-          */
-         parentXPath: "",
 
          /**
           * The type of the item to find
@@ -1877,6 +1892,15 @@
        * @type string
        */
       createNewItemId: null,
+      
+      /**
+       * Flag to indicate whether the start location (if present)
+       * has been resolved yet or not
+       * 
+       * @property startLocationResolved
+       * @type boolean
+       */
+      startLocationResolved: false,
       
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -2519,24 +2543,24 @@
             }
          };
          
-         var url = $combine("/", nodeRef.replace("://", "/"), "children") + "?selectableType=" + this.options.itemType +
-               "&searchTerm=" + encodeURIComponent(searchTerm) + "&size=" + this.options.maxSearchResults;
-
-         if (this.options.parentXPath && this.options.parentXPath !== "")
+         // build the url to call the pickerchildren data webscript
+         var url = this._generatePickerChildrenUrlPath(nodeRef) + this._generatePickerChildrenUrlParams(searchTerm);
+         
+         if (Alfresco.logger.isDebugEnabled())
          {
-            url += "&xpath=" + encodeURIComponent(this.options.parentXPath);
-            this.options.parentXPath = null;
+            Alfresco.logger.debug("Generated pickerchildren url fragment: " + url);
          }
-         if (this.options.params)
-         {
-            url += "&" + encodeURI(this.options.params);
-         }
+         
+         // call the pickerchildren data webscript
          this.widgets.dataSource.sendRequest(url,
          {
             success: successHandler,
             failure: failureHandler,
             scope: this
          });
+         
+         // the start location is now resolved
+         this.startLocationResolved = true;
       },
       
       /**
@@ -2548,6 +2572,127 @@
       _inAuthorityMode: function ObjectRenderer__inAuthorityMode()
       {
          return (this.options.itemFamily == "authority");
+      },
+      
+      /**
+       * Generates the path fragment of the pickerchildren webscript URL.
+       * 
+       * @method _generatePickerChildrenUrlPath
+       * @param nodeRef NodeRef of the parent
+       * @return The generated URL
+       */
+      _generatePickerChildrenUrlPath: function ObjectRenderer__generatePickerChildrenUrlPath(nodeRef)
+      {
+         var pathStart = nodeRef,
+             pathEnd = "children";
+         
+         if (!this.startLocationResolved && this.options.startLocation)
+         {
+            if (Alfresco.logger.isDebugEnabled())
+            {
+               Alfresco.logger.debug("Resolving startLocation of '" + this.options.startLocation + "'");
+            }
+            
+            if (this.options.startLocation.charAt(0) == "{")
+            {
+               if (this.options.startLocation == "{companyhome}")
+               {
+                  pathStart = "alfresco://company/home";
+               }
+               else if (this.options.startLocation == "{userhome}")
+               {
+                  pathStart = "alfresco://user/home";
+               }
+               else if (this.options.startLocation == "{siteshome}")
+               {
+                  pathStart = "alfresco://sites/home";
+               }
+               else if (this.options.startLocation == "{self}")
+               {
+                  if (this.options.currentItem && this.options.currentItem != null)
+                  {
+                     pathStart = this.options.currentItem;
+                  }
+                  else if (Alfresco.logger.isDebugEnabled())
+                  {
+                     Alfresco.logger.warn("To use a start location of {self} a 'currentItem' parameter is required");
+                  }
+               }
+               else if (this.options.startLocation == "{doclib}")
+               {
+                  if (this.options.currentItem && this.options.currentItem != null)
+                  {
+                     // we need to find the document library the node being edited
+                     // is located within
+                     pathStart = this.options.currentItem;
+                     pathEnd = "doclib";
+                  }
+                  else if (Alfresco.logger.isDebugEnabled())
+                  {
+                     Alfresco.logger.warn("To use a start location of {doclib} a 'currentItem' parameter is required");
+                  }
+               }
+               else if (this.options.startLocation == "{parent}")
+               {
+                  if (this.options.currentItem && this.options.currentItem != null)
+                  {
+                     // we want to find all the siblings of the node being edited
+                     pathStart = this.options.currentItem;
+                     pathEnd = "siblings";
+                  }
+                  else if (Alfresco.logger.isDebugEnabled())
+                  {
+                     Alfresco.logger.warn("To use a start location of {parent} a 'currentItem' parameter is required");
+                  }
+               }
+               else if (Alfresco.logger.isDebugEnabled())
+               {
+                  Alfresco.logger.warn("Unrecognised startLocation option detected '" + this.options.startLocation + "'");
+               }
+            }
+            else if (this.options.startLocation.charAt(0) == "/")
+            {
+               // start location is an XPath, this will be passed as a parameter
+               // so set pathStart to empty string
+               pathStart = "";
+            }
+            else
+            {
+               // start location must be a hardcoded nodeRef
+               pathStart = this.options.startLocation;
+            }
+         }
+         
+         // generate the path portion of the url
+         return $combine("/", pathStart.replace("://", "/"), pathEnd);
+      },
+      
+      /**
+       * Generates the query parameters for the pickerchildren webscript URL.
+       * 
+       * @method _generatePickerChildrenUrlParams
+       * @param searchTerm The search term
+       * @return The generated URL
+       */
+      _generatePickerChildrenUrlParams: function ObjectRenderer__generatePickerChildrenUrlPath(searchTerm)
+      {
+         var params = "?selectableType=" + this.options.itemType + "&searchTerm=" + encodeURIComponent(searchTerm) + 
+                      "&size=" + this.options.maxSearchResults;
+         
+         // if an XPath start location has been provided and it has not been resolved 
+         // yet, pass it to the pickerchildren script as a parameter
+         if (!this.startLocationResolved && this.options.startLocation &&
+              this.options.startLocation.charAt(0) == "/")
+         {
+            params += "&xpath=" + encodeURIComponent(this.options.startLocation);
+         }
+         
+         if (this.options.params)
+         {
+            params += "&" + encodeURI(this.options.params);
+         }
+         
+         return params;
       }
    });
 })();
