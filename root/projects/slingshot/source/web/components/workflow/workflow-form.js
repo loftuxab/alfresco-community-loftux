@@ -291,7 +291,7 @@
           */
          var renderCellType = function WorkflowHistory_onReady_renderCellType(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = '<a href="' + $siteURL('task-details?taskId=' + oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
+            elCell.innerHTML = '<a href="task-details?taskId=' + oRecord.getData("id") + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
          };
 
          /**
