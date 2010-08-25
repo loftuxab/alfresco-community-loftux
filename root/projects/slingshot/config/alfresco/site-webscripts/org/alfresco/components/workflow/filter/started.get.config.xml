@@ -1,7 +1,7 @@
 <filters>
    <!-- The number/instruction in '{}' will be resolved by Alfresco.component.DateFilter -->
    <filter id="started" data="" label="link.any" />
-   <filter id="started" data="startedAfter={-1}&amp;startedBefore={7}" label="link.last7days" />
-   <filter id="started" data="startedAfter={-1}&amp;startedBefore={14}" label="link.last14days" />
-   <filter id="started" data="startedAfter={-1}&amp;startedBefore={28}" label="link.last28days" />
+   <filter id="started" data="startedAfter={-7}" label="link.last7days" />
+   <filter id="started" data="startedAfter={-14}" label="link.last14days" />
+   <filter id="started" data="startedAfter={-28}" label="link.last28days" />
 </filters>

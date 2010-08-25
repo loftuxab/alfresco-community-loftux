@@ -227,7 +227,6 @@ hr
 
 /* End Data Lists */
 
-.yui-skin-default .yui-dt-data tr.yui-dt-highlighted,
 .yui-skin-default .yui-dt-data tr.yui-dt-highlighted td.yui-dt-asc,
 .yui-skin-default .yui-dt-data tr.yui-dt-highlighted td.yui-dt-desc
 {
@@ -694,6 +693,7 @@ body.yui-skin-default .doclist tr.yui-dt-highlighted
    background-color: #f4faff;
 }
 
+body.yui-skin-default .yui-dt-data tr.yui-dt-highlighted,
 body.yui-skin-default .links-body tr.links-selected-row,
 body.yui-skin-default .over,
 .topicview

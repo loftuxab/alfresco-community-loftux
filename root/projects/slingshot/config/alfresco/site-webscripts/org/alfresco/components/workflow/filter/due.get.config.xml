@@ -5,4 +5,5 @@
    <filter id="due" data="dueAfter={0}&amp;dueBefore={1}" label="link.tomorrow" />
    <filter id="due" data="dueAfter={0}&amp;dueBefore={8}" label="link.next7days" />
    <filter id="due" data="dueBefore={now}" label="link.overdue" />
+   <filter id="due" data="dueBefore=null" label="link.noDate" />
 </filters>

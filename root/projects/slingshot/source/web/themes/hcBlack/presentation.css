@@ -252,7 +252,6 @@ body.yui-skin-hcBlack .dashlet .body a:hover
 
 /* End Data Lists */
 
-.yui-skin-hcBlack .yui-dt-data tr.yui-dt-highlighted,
 .yui-skin-hcBlack .yui-dt-data tr.yui-dt-highlighted td.yui-dt-asc,
 .yui-skin-hcBlack .yui-dt-data tr.yui-dt-highlighted td.yui-dt-desc
 {
@@ -706,6 +705,7 @@ body.yui-skin-hcBlack .doclist .action-set .highlighted
    border: 1px solid #000000;
 }
 
+body.yui-skin-hcBlack .yui-dt-data tr.yui-dt-highlighted,
 body.yui-skin-hcBlack .doclist tr.yui-dt-odd.yui-dt-highlighted,
 body.yui-skin-hcBlack .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-hcBlack .links-body tr.links-selected-row,

@@ -65,8 +65,9 @@
           *
           * @property hiddenTaskTypes
           * @type object
+          * @default []
           */
-         hiddenTaskTypes: null
+         hiddenTaskTypes: []
       },
 
       /**
@@ -80,7 +81,8 @@
          // DataSource definition
          var properties = ["bpm_priority", "bpm_status", "bpm_dueDate", "bpm_description"];
          this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + 
-               "api/task-instances?authority=" + Alfresco.constants.USERNAME  + "&properties=" + properties.join(","),
+               "api/task-instances?authority=" + encodeURIComponent(Alfresco.constants.USERNAME) +
+               "&properties=" + properties.join(","),
          {
             responseType: YAHOO.util.DataSource.TYPE_JSON,
             responseSchema:
@@ -89,9 +91,11 @@
                fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable"]
             }
          });
+
+         // TODO: Remove this filtering and add the hidden tasks to the url instead
          this.widgets.dataSource.doBeforeParseData = function SiteFinder_doBeforeParseData(oRequest , oFullResponse)
          {
-            // Make sure only allowed tasks are visisble by skipping the ones configured to be hidden
+            // Make sure only allowed tasks are visible by skipping the ones configured to be hidden
             if (oFullResponse)
             {
                var allTasks = oFullResponse.data || [],

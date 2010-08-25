@@ -30,11 +30,9 @@
          <region-id>toolbar</region-id>
          <url>/components/workflow/workflow-list-toolbar</url>
       </component>
-      <!--
       <component>
          <region-id>list</region-id>
          <url>/components/workflow/task-list</url>
       </component>
-      -->
    </components>
 </template-instance>

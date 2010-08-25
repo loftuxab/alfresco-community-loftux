@@ -237,7 +237,6 @@ hr
 
 /* End Data Lists */
 
-.yui-skin-gdocs .yui-dt-data tr.yui-dt-highlighted,
 .yui-skin-gdocs .yui-dt-data tr.yui-dt-highlighted td.yui-dt-asc,
 .yui-skin-gdocs .yui-dt-data tr.yui-dt-highlighted td.yui-dt-desc
 {
@@ -722,6 +721,7 @@ body.yui-skin-gdocs .doclist .action-set .highlighted
    border: 1px solid #6688EE;
 }
 
+body.yui-skin-gdocs .yui-dt-data tr.yui-dt-highlighted,
 body.yui-skin-gdocs .doclist tr.yui-dt-odd.yui-dt-highlighted,
 body.yui-skin-gdocs .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-gdocs .links-body tr.links-selected-row,

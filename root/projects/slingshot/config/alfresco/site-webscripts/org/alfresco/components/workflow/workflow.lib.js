@@ -13,6 +13,7 @@ function getWorkflowTypes()
       {
          try
          {
+            // TODO: Remove this filtering and add the hidden tasks to the url instead
             if (hiddenWorkflows)
             {
                for (var hi = 0, hil = hiddenWorkflows.size(); hi < hil; hi++)
