@@ -42,6 +42,9 @@
       var picker = Alfresco.util.ComponentManager.get("${controlId}");
       picker.setOptions(
       {
+         <#if form.mode == "create" && form.destination?? && form.destination?length &gt; 0>
+         startLocation: "${form.destination?js_string}",
+         </#if>
          itemType: "cm:content",
          displayMode: "${field.control.params.displayMode!"list"}",
          listItemActions: [
@@ -66,4 +69,5 @@
    //]]></script>
 
 </#macro>
-<@setPackageItemOptions field/>
+
+<@setPackageItemOptions field />
