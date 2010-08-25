@@ -238,7 +238,7 @@
             value: this.options.targetName,
             controlParams:
             {
-               parentXPath: "/app:company_home/app:dictionary/app:transfers/app:transfer_groups/cm:default",
+               startLocation: "/app:company_home/app:dictionary/app:transfers/app:transfer_groups/cm:default",
                valueType: "xpath;/app:company_home/app:dictionary/app:transfers/app:transfer_groups//cm:%VALUE%"
             },
             field:
