@@ -43,6 +43,17 @@
     */
    var PREFERENCES_REPLICATIONJOBS = "org.alfresco.share.admin.replicationJobs",
        PREF_SORTBY = PREFERENCES_REPLICATIONJOBS + ".sortBy";
+   
+   /**
+    * Status Constants
+    */
+   var STATUS_CANCELLED = "Cancelled",
+      STATUS_CANCELREQUESTED = "CancelRequested",
+      STATUS_COMPLETED = "Completed",
+      STATUS_FAILED = "Failed",
+      STATUS_NEW = "New",
+      STATUS_PENDING = "Pending",
+      STATUS_RUNNING = "Running";
 
    /**
     * ConsoleReplicationJobs constructor.
@@ -66,8 +77,19 @@
       var parent = this;
 
       /* Initialise prototype properties */
-      this.jobListLookup = {};
+      this.jobList = [];
+      this.jobListIdToName = {};
+      this.jobListNameToId = {};
       this.selectedJob = null;
+      this.summaryStatusOrder = [STATUS_FAILED, STATUS_COMPLETED, STATUS_RUNNING, STATUS_CANCELLED, STATUS_NEW];
+      this.summaryStatusMap = {};
+      this.summaryStatusMap[STATUS_FAILED] = STATUS_FAILED;
+      this.summaryStatusMap[STATUS_COMPLETED] = STATUS_COMPLETED;
+      this.summaryStatusMap[STATUS_RUNNING] = STATUS_RUNNING;
+      this.summaryStatusMap[STATUS_PENDING] = STATUS_RUNNING;
+      this.summaryStatusMap[STATUS_CANCELREQUESTED] = STATUS_RUNNING;
+      this.summaryStatusMap[STATUS_CANCELLED] = STATUS_CANCELLED;
+      this.summaryStatusMap[STATUS_NEW] = STATUS_NEW;
 
       // NOTE: the panel registered first is considered the "default" view and is displayed first
 
@@ -134,16 +156,43 @@
    YAHOO.extend(Alfresco.ConsoleReplicationJobs, Alfresco.ConsoleTool,
    {
       /**
-       * Job List Lookup
-       * @property jobListLookup
+       * Job List
+       * @property jobList
+       * @type {Array}
        */
-      jobListLookup: null,
+      jobList: null,
+
+      /**
+       * Job List Lookup from DOM ID of Job List <li> tag to Job Name
+       * @property jobListIdToName
+       * @type {Object}
+       */
+      jobListIdToName: null,
+
+      /**
+       * Job List Lookup from Job Name to DOM ID of Job List <li> tag
+       * @property jobListNameToId
+       * @type {Object}
+       */
+      jobListNameToId: null,
 
       /**
        * Currently selected job
        * @property selectedJob
        */
       selectedJob: null,
+
+      /**
+       * Display order for summary panel
+       * @property summaryStatusOrder
+       */
+      summaryStatusOrder: null,
+
+      /**
+       * Mapping of status for display in summary panel
+       * @property summaryStatusMap
+       */
+      summaryStatusMap: null,
 
       /**
        * Object container for initialization options
@@ -246,7 +295,8 @@
                {
                   if (response && response.json && response.json.data)
                   {
-                     this.renderJobsList(response.json.data);
+                     this.jobList = response.json.data;
+                     this.renderJobsList();
                   }
                   else
                   {
@@ -266,21 +316,22 @@
        * Render the list of jobs
        *
        * @method renderJobsList
-       * @param p_aJobs {Array} Array of replication jobs
        */
-      renderJobsList: function ConsoleReplicationJobs_renderJobsList(p_aJobs)
+      renderJobsList: function ConsoleReplicationJobs_renderJobsList()
       {
-         if (!YAHOO.lang.isArray(p_aJobs))
+         if (!YAHOO.lang.isArray(this.jobList))
          {
             return;
          }
 
          var me = this,
+            jobs = this.jobList,
             jobsContainer = Dom.get(this.id + "-jobsList"),
             selectedClass = "selected";
 
          jobsContainer.innerHTML = "";
-         this.jobListLookup = {};
+         this.jobListIdToName = {};
+         this.jobListNameToId = {};
 
          /**
           * Click handler for selecting list item
@@ -293,9 +344,9 @@
                var lis = Selector.query("li", jobsContainer);
                Dom.removeClass(lis, selectedClass);
                Dom.addClass(this, selectedClass);
-               if (me.jobListLookup.hasOwnProperty(this.id))
+               if (me.jobListIdToName.hasOwnProperty(this.id))
                {
-                  me.onJobSelected(me.jobListLookup[this.id]);
+                  me.onJobSelected(me.jobListIdToName[this.id]);
                }
                return false;
             };
@@ -306,9 +357,9 @@
             var elHighlight = null,
                job, container, el, elLink, elSpan, elText, id;
 
-            if (p_aJobs.length === 0)
+            if (jobs.length === 0)
             {
-               jobsContainer.innerHTML = this.msg("message.no-jobs");
+               jobsContainer.innerHTML = this.msg("label.no-jobs");
             }
             else
             {
@@ -316,20 +367,22 @@
                jobsContainer.appendChild(container);
 
                // Create the DOM structure: <li onclick class='{selected}'><a class='{enabled/disabled}' title href><span class='{status}'>"Job Name"</span></a></li>
-               for (var i = 0, ii = p_aJobs.length; i < ii; i++)
+               for (var i = 0, ii = jobs.length; i < ii; i++)
                {
-                  job = p_aJobs[i];
+                  job = jobs[i];
 
                   // Build the DOM elements
                   el = document.createElement("li");
                   el.className = job.enabled ? "enabled" : "disabled";
+                  el.title = this._msg("job." + el.className);
                   if (this.selectedJob !== null && this.selectedJob.name == job.name)
                   {
                      el.className += " selected";
                   }
                   el.onclick = fnOnClick();
                   id = Alfresco.util.generateDomId(el);
-                  this.jobListLookup[id] = job;
+                  this.jobListIdToName[id] = job.name;
+                  this.jobListNameToId[job.name] = id;
 
                   elLink = document.createElement("a");
                   elLink.className = (job.status || "none").toLowerCase();
@@ -350,7 +403,7 @@
                      // Fake a user selection for this job
                      Dom.addClass(el, "selected");
                      this.options.jobName = null;
-                     YAHOO.lang.later(100, this, this.onJobSelected, [job, false]);
+                     YAHOO.lang.later(100, this, this.onJobSelected, [job.name, false]);
                   }
                   else if (this.selectedJob && this.selectedJob.name == job.name)
                   {
@@ -365,20 +418,47 @@
             jobsContainer.innerHTML = '<span class="error">' + this.msg("message.error-unknown") + '</span>';
          }
       },
+      
+      /**
+       * Find the index of a job in the current jobList given its name
+       *
+       * @method findJobIndexByName
+       * @param jobName {String} Job name
+       * @return {Number|null} Found job's index in this.jobList array or null
+       */
+      findJobIndexByName: function ConsoleReplicationJobs_findJobIndexByName(jobName)
+      {
+         for (var i = 0, ii = this.jobList.length; i < ii; i++)
+         {
+            if (this.jobList[i].name == jobName)
+            {
+               return i;
+            }
+         }
+         return null;
+      },
 
       /**
        * Job selected event handler
        *
        * @method onJobSelected
-       * @param job {object} Job definition object literal
+       * @param jobName {String} Job definition name
        * @param p_fadeIn {Boolean} If set to true, then fade the status panel in
        */
-      onJobSelected: function ConsoleReplicationJobs_onJobSelected(job, p_fadeIn)
+      onJobSelected: function ConsoleReplicationJobs_onJobSelected(jobName, p_fadeIn)
       {
-         this.selectedJob = job;
+         var jobIndex = this.findJobIndexByName(jobName);
+
+         if (jobIndex === null)
+         {
+            return;
+         }
+         
+         this.selectedJob = this.jobList[jobIndex];
+
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI + "api/replication-definition/" + encodeURIComponent(job.name),
+            url: Alfresco.constants.PROXY_URI + "api/replication-definition/" + encodeURIComponent(jobName),
             successCallback:
             {
                fn: function ConsoleReplicationJobs_onJobSelected_successCallback(response)
@@ -409,7 +489,7 @@
                },
                scope: this
             },
-            failureMessage: this._msg("message.get-job-details.failure", job.name)
+            failureMessage: this._msg("message.get-job-details.failure", jobName)
          });
       },
 
@@ -457,6 +537,13 @@
             statusText = '<div class="' + $html(status) + '">' + this._msg("label.status." + status, startedAt, endedAt) + '</div>';
             statusText += job.failureMessage !== null ? '<div class="warning">' + $html(job.failureMessage) + '</div>' : "";
             job.statusText = statusText;
+            
+            // Update status within Job List panel
+            var aTag = Selector.query("a", this.jobListNameToId[job.name])[0];
+            if (aTag !== null)
+            {
+               aTag.className = $html(status);
+            }
 
             // View Report links
             job.viewReportLocalLink = "#";
@@ -561,6 +648,9 @@
 
          // Update button status
          this.updateButtonStatus();
+         
+         // Update Summary panel
+         this.updateSummaryPanel();
       },
 
       /**
@@ -582,10 +672,64 @@
          var status = this.selectedJob.status,
             enabled = this.selectedJob.enabled;
 
-         this.widgets.runJob.set("disabled", status === "Running" || status === "CancelRequested" || status === "Pending" || !enabled);
-         this.widgets.cancelJob.set("disabled", status !== "Running" || this.selectedJob.executionDetails === null);
+         this.widgets.runJob.set("disabled", status === STATUS_RUNNING || status === STATUS_CANCELREQUESTED || status === STATUS_PENDING || !enabled);
+         this.widgets.cancelJob.set("disabled", status !== STATUS_RUNNING || this.selectedJob.executionDetails === null);
          this.widgets.editJob.set("disabled", false);
          this.widgets.deleteJob.set("disabled", false);
+      },
+
+      /**
+       * Updates summary panel based on client-side copy of Job List
+       *
+       * @method updateSummaryPanel
+       */
+      updateSummaryPanel: function ConsoleReplicationJobs_updateSummaryPanel()
+      {
+         var panel = Dom.get(this.id + "-jobSummary"),
+            jobCount = this.jobList.length,
+            html = "";
+
+         if (panel === null)
+         {
+            return;
+         }
+
+         if (jobCount === 0)
+         {
+            html = '<div class="job-count">' + this._msg("label.no-jobs") + '</div>';
+         }
+         else
+         {
+            var objStatus = {},
+               job, i, status, statusLC
+               fnSumStatus = function(p_oStatus, status)
+               {
+                  p_oStatus[status] = (p_oStatus.hasOwnProperty(status) ? ++p_oStatus[status] : 1);
+               };
+
+            html = '<div class="job-count">' + this._msg("label.summary.job-count", jobCount) + '</div>';
+            
+            // Add up the unique status values
+            for (i = 0; i < jobCount; i++)
+            {
+               job = this.jobList[i];
+               fnSumStatus(objStatus, this.summaryStatusMap[job.status]);
+            }
+            
+            // Desired display order: Failed, Completed, Running, Cancelled, New
+            html += '<ul>';
+            for (i = 0; i < this.summaryStatusOrder.length; i++)
+            {
+               status = this.summaryStatusOrder[i];
+               if (objStatus.hasOwnProperty(status))
+               {
+                  statusLC = status.toLowerCase();
+                  html += '<li class="' + statusLC + '">' + this._msg("label.summary." + statusLC, objStatus[status]) + '</li>';
+               }
+            }
+         }
+         
+         panel.innerHTML = html;
       },
 
       /**
@@ -801,7 +945,7 @@
             adjustDisplay: false,
             callback: function ConsoleReplicationJobs_onRefreshJob_callback()
             {
-               this.onJobSelected(this.selectedJob, true);
+               this.onJobSelected(this.selectedJob.name, true);
             },
             scope: this,
             period: 0.2

@@ -697,6 +697,11 @@
    background-image: url(images/view-in-browser-16.png);
 }
 
+.doclist .onActionViewSourceRepository a
+{
+   background-image: url(images/view-transferred-original-16.png);
+}
+
 
 /* History Manager */
 
