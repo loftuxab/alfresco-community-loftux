@@ -49,7 +49,7 @@
       Alfresco.component.TaskList.superclass.constructor.call(this, "Alfresco.component.TaskList", htmlId, ["button", "menu", "container", "datasource", "datatable", "paginator", "json", "history"]);
 
       // Initialise prototype properties
-      this.currentPage = 1;
+      this.currentPage = 0;
       this.totalRecords = 0;
       this.currentFilter =
       {
@@ -100,7 +100,7 @@
           * @property initialPage
           * @type int
           */
-         initialPage: 1,
+         initialPage: 0,
 
          /**
           * Number of items per page
@@ -138,11 +138,11 @@
       },
 
       /**
-       * Current page being browsed.
+       * Current page being browsed. (will become skipCount)
        * 
        * @property currentPage
        * @type int
-       * @default 1
+       * @default 0
        */
       currentPage: null,
       
@@ -701,8 +701,8 @@
                filter: strFilter
             };
 
-            this.currentPage = 1;
-            objNav.page = "1";
+            this.currentPage = 0;
+            objNav.page = "0";
 
             // Initial navigation won't fire the History event
             if (obj.doclistFirstTimeNav)
@@ -710,7 +710,7 @@
                this._updateDocList.call(this,
                {
                   filter: filter,
-                  page: 1
+                  page: 0
                });
             }
             else
