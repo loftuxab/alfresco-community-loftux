@@ -6,7 +6,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.ConsoleReplicationJobs("${args.htmlid?js_string}").setOptions(
    {
-      jobName: "${(page.url.args.jobName!"")?js_string}"
+      jobName: "${(page.url.args.jobName!"")?js_string}",
+      targetGroupPath: "${(targetGroupPath!"")?js_string}"
    }).setMessages(${messages});
 //]]></script>
 
@@ -114,7 +115,7 @@
       <hr />
       <h3>${msg("label.transfer-target")}</h3>
       <div class="transfer-target">
-         <div class="{targetNameClass}">{targetName}</div>
+         <div class="{targetNameClass}">{targetHTML}</div>
       </div>
       <hr />
       <h3>${msg("label.payload")}</h3>

@@ -208,7 +208,15 @@
           * @property jobName
           * @type string
           */
-         jobName: ""
+         jobName: "",
+
+         /**
+          * Target Group path - used to generate link on Transfer Target name
+          *
+          * @property targetGroupPath
+          * @type string
+          */
+         targetGroupPath: ""
       },
 
       /**
@@ -459,8 +467,6 @@
          {
             return;
          }
-         
-         this.selectedJob = this.jobList[jobIndex];
 
          Alfresco.util.Ajax.jsonGet(
          {
@@ -471,7 +477,8 @@
                {
                   if (response && response.json && response.json.data)
                   {
-                     this.selectedJob = response.json.data;
+                     this.jobList[jobIndex] = response.json.data;
+                     this.selectedJob = this.jobList[jobIndex];
                      this.renderJobDetail();
                      if (p_fadeIn == true)
                      {
@@ -518,6 +525,7 @@
                elTemplate = Dom.get(this.id + "-jobTemplate"),
                startedAt = "", endedAt = "",
                status = "", statusText = "",
+               transferTargetUrl = "",
                jobHTML = "";
 
             // Name / description
@@ -541,7 +549,7 @@
             // Status
             status = (job.status || "none").toLowerCase();
             statusText = '<div class="' + $html(status) + '">' + this._msg("label.status." + status, startedAt, endedAt) + '</div>';
-            statusText += job.failureMessage !== null ? '<div class="warning">' + $html(job.failureMessage) + '</div>' : "";
+            statusText += job.failureMessage ? '<div class="warning">' + $html(job.failureMessage) + '</div>' : "";
             job.statusText = statusText;
             
             // Update status within Job List panel
@@ -579,8 +587,21 @@
             }
 
             // Transfer Target
-            job.targetNameClass = (job.targetName === null) ? "warning" : "server";
-            job.targetName = $html(job.targetName) || this._msg("label.transfer-target.none");
+            if (job.targetName === null)
+            {
+               job.targetNameClass = "warning";
+               job.targetHTML = this._msg("label.transfer-target.none");
+            }
+            else
+            {
+               transferTargetUrl = $siteURL("repository?file={file}&filter=path&filterData={path}",
+               {
+                  file: encodeURIComponent(job.targetName),
+                  path: encodeURIComponent(this.options.targetGroupPath)
+               });
+               job.targetNameClass = "server";
+               job.targetHTML = '<a href="' + transferTargetUrl + '">' + $html(job.targetName) + '</a>';
+            }
 
             // Payload
             var payloadHTML = "", payload,
