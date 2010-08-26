@@ -758,6 +758,33 @@
             }
          });
          this.modules.changeType.show();
+      },
+      
+      /**
+       * View in source Repository URL helper
+       *
+       * @method viewInSourceRepositoryURL
+       * @param asset {object} Object literal representing the file or folder to be actioned
+       */
+      viewInSourceRepositoryURL: function dlA_viewInSourceRepositoryURL(asset)
+      {
+         var nodeRef = asset.nodeRef,
+            type = asset.type,
+            repoId = asset.location.repositoryId,
+            url = this.options.replicationUrlMapping[repoId],
+            siteUrl;
+         
+         if (!repoId || !url)
+         {
+            return "#";
+         }
+         
+         // Generate a URL to the relevant details page
+         siteUrl = Alfresco.util.siteURL(type + "-details?nodeRef=" + nodeRef);
+         // Strip off this webapp's context as the mapped one might be different
+         siteUrl = siteUrl.substring(Alfresco.constants.URL_CONTEXT.length);
+         
+         return $combine(url, "/", siteUrl);
       }
    };
 })();

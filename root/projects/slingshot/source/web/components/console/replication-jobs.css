@@ -26,6 +26,11 @@
    padding: 0.5em;
 }
 
+.replication .summary-panel
+{
+   margin-bottom: 1em;
+}
+
 /* Firefox line-height bug fix */
 @-moz-document url-prefix()
 {
@@ -35,16 +40,24 @@
    }
 }
 
+/* Smaller buttons */
+.replication .yui-button button,
+.replication .yui-button a
+{
+   font-size: 85%;
+}
+
 /* Job Summary */
 
 .replication .job-summary ul
 {
-   
+   padding: 1em;
 }
 
 .replication .job-summary ul li
 {
    display: inline;
+   margin: 0 1em;
 }
 
 /* Job List */
@@ -123,7 +136,7 @@
 .replication .job-detail h2,
 .replication .job-detail h3
 {
-   margin-bottom: 1em;
+   margin-bottom: 0.5em;
    padding-top: 0.3em;
 }
 
@@ -138,6 +151,11 @@
    background-position: 2px 50%;
    background-repeat: no-repeat;
    padding: 4px 4px 4px 20px;
+}
+
+.replication .job-detail div.job-status
+{
+   padding-top: 0.5em;
 }
 
 .replication .job-detail div.server

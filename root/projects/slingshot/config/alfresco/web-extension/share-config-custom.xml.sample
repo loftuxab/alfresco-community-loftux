@@ -29,7 +29,20 @@
          </autowire>
       </web-framework>
    </config>
-   
+
+   <config evaluator="string-compare" condition="Replication">
+      <share-urls>
+         <!--
+            To discover a Repository Id, browse to the remote server's CMIS landing page at:
+              http://{server}:{port}/alfresco/service/cmis/index.html
+            The Repository Id field is found under the "CMIS Repository Information" expandable panel.
+
+            Example config entry:
+              <share-url repositoryId="622f9533-2a1e-48fe-af4e-ee9e41667ea4">http://new-york-office:8080/share/</share-url>
+         -->
+      </share-urls>
+   </config>
+
    <!-- Document Library config section -->
    <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
 

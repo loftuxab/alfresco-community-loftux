@@ -1450,8 +1450,14 @@
 
          var typeMapping =
          {
-            selectDocuments: "document",
-            selectFolders: "folder"
+            selectDocuments:
+            {
+               "document": true
+            },
+            selectFolders:
+            {
+               "folder": true
+            }
          };
 
          switch (p_selectType)
@@ -1737,7 +1743,8 @@
             workingCopyUrl: fnPageURL("document-details?nodeRef=" + (custom.workingCopyNode || nodeRef)),
             viewGoogleDocUrl: custom.googleDocUrl + "\" target=\"_blank",
             originalUrl: fnPageURL("document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)),
-            explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
+            explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank",
+            sourceRepositoryUrl: this.viewInSourceRepositoryURL(recordData) + "\" target=\"_blank"
          });
       },
 

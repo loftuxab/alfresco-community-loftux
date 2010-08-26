@@ -3149,8 +3149,11 @@ Alfresco.util.Ajax = function()
          {
             if (c.method.toUpperCase() === this.GET)
             {
-               // Encode the dataObj and put it in the url
-               c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, true);
+               if (c.dataObj)
+               {
+                  // Encode the dataObj and put it in the url
+                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, true);
+               }
             }
             else
             {

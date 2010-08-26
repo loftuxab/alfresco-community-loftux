@@ -78,6 +78,39 @@ function main()
    }
 
    model.repositoryUrl = repositoryUrl;
+   
+   // Share URL mapping for Replication Service
+   var replicationConfig = config.scoped["Replication"]["share-urls"];
+   model.replicationUrlMappingJSON = jsonUtils.toJSONString(getReplicationUrlMapping(replicationConfig));
+}
+
+function getReplicationUrlMapping(scopedRoot)
+{
+   var mapping = {},
+       configs, urlConfig, repositoryId;
+
+   try
+   {
+      configs = scopedRoot.getChildren("share-url");
+      if (configs)
+      {
+         for (var i = 0; i < configs.size(); i++)
+         {
+            // Get repositoryId and Share URL from each config entry
+            urlConfig = configs.get(i);
+            repositoryId = urlConfig.attributes["repositoryId"];
+            if (repositoryId)
+            {
+               mapping[repositoryId] = urlConfig.value.toString();
+            }
+         }
+      }
+   }
+   catch (e)
+   {
+   }
+
+   return mapping;
 }
 
 main();

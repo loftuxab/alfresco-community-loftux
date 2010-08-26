@@ -17,19 +17,10 @@
    <div id="${id}-replication" class="hidden">
 
       <#-- Summary -->
-      <div id="${id}-summary" style="display: none;">
+      <div id="${id}-summary" class="summary-panel">
          <h2>${msg("header.summary")}</h2>
          <div class="container-panel">
-            <div id="${id}-jobSummary" class="job-summary">
-               <div class="job-count">{jobCount}</div>
-               <ul>
-                  <li class="completed">9 jobs successful</li>
-                  <li class="failed">1 job failed</li>
-                  <li class="running">1 job running</li>
-                  <li class="cancelled">No cancelled jobs</li>
-                  <li class="none">1 job has no status</li>
-               </ul>
-            </div>
+            <div id="${id}-jobSummary" class="job-summary"></div>
          </div>
       </div>
       
@@ -40,7 +31,7 @@
             
             <div class="yui-u first jobs-list-container">
                <div class="container-panel">
-                  <div class="flat-button bottom-border">
+                  <div class="bottom-border">
                      <span id="${id}-create" class="yui-button yui-push-button">
                         <span class="first-child">
                            <a tabindex="0" href="${url.context}/page/console/replication-job">${msg("button.create-job")}</a>
@@ -59,7 +50,7 @@
             
             <div class="yui-u job-detail-container">
                <div id="${id}-jobDetailContainer" class="container-panel">
-                  <div class="flat-button job-buttons" style="float: right;">
+                  <div class="job-buttons" style="float: right;">
                      <span id="${id}-run" class="yui-button yui-push-button">
                         <span class="first-child">
                            <button type="button" tabindex="0">${msg("button.run-job")}</button>
@@ -96,7 +87,7 @@
       <div>{description}</div>
       <div class="{enabledClass}">{enabledText}</div>
       <hr />
-      <div class="flat-button" style="float: right;">
+      <div style="float: right;">
          <span id="${id}-refresh" class="yui-button yui-push-button">
             <span class="first-child">
                <button type="button" tabindex="0">${msg("button.refresh")}</button>
