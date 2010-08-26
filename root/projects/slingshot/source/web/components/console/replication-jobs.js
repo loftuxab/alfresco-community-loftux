@@ -259,7 +259,7 @@
                         }
                      }
                   }
-                  this.populateJobsList(this.options.jobName);
+                  this.populateJobsList(true);
                },
                scope: this
             },
@@ -268,7 +268,7 @@
                fn: function ConsoleReplicationJobs_onReady_failureCallback()
                {
                   // Populate the jobs list anyway
-                  this.populateJobsList(this.options.jobName);
+                  this.populateJobsList(true);
                },
                scope: this
             }
@@ -279,8 +279,9 @@
        * Call remote API to retrieve list of Job Definitions
        *
        * @method populateJobsList
+       * @param selectFirstJob {boolean} True to select first job in jobList
        */
-      populateJobsList: function ConsoleReplicationJobs_populateJobsList()
+      populateJobsList: function ConsoleReplicationJobs_populateJobsList(selectFirstJob)
       {
          Alfresco.util.Ajax.jsonGet(
          {
@@ -296,7 +297,12 @@
                   if (response && response.json && response.json.data)
                   {
                      this.jobList = response.json.data;
+                     if (selectFirstJob && this.options.jobName === "" && this.jobList.length > 0)
+                     {
+                        this.options.jobName = this.jobList[0].name;
+                     }
                      this.renderJobsList();
+                     this.updateSummaryPanel();
                   }
                   else
                   {
@@ -724,7 +730,7 @@
                if (objStatus.hasOwnProperty(status))
                {
                   statusLC = status.toLowerCase();
-                  html += '<li class="' + statusLC + '">' + this._msg("label.summary." + statusLC, objStatus[status]) + '</li>';
+                  html += '<li class="' + $html(statusLC) + '">' + this._msg("label.summary." + statusLC, objStatus[status]) + '</li>';
                }
             }
          }
