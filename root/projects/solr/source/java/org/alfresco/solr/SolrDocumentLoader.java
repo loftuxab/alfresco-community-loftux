@@ -23,6 +23,10 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ISO9075;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -124,7 +128,9 @@ public class SolrDocumentLoader
         doc.addField("@{http://www.alfresco.org/model/content/1.0}creator", "Andy");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modified", "2010-07-21T10:52:00.000Z");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modifier", "Andy");
-        doc.addField("PATH", "/cm:folder_"+i+"/cm:leaf_"+j);
+        QName first = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "folder_"+i);
+        QName second = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "leaf_"+j);
+        doc.addField("PATH", "/" + ISO9075.getXPathName(first)+"/" + ISO9075.getXPathName(second));
         return doc;
     }
     
@@ -153,7 +159,8 @@ public class SolrDocumentLoader
         doc.addField("@{http://www.alfresco.org/model/content/1.0}creator", "Andy");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modified", "2010-07-21T10:52:00.000Z");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modifier", "Andy");
-        doc.addField("PATH", "/cm:folder_"+i);
+        QName first = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "folder_"+i);
+        doc.addField("PATH", "/" + ISO9075.getXPathName(first));
         return doc;
     }
     
@@ -167,14 +174,14 @@ public class SolrDocumentLoader
         doc.addField("ISROOT", "T"); 
         doc.addField("ISNODE", "T"); 
         doc.addField("DBID", "0");
-        doc.addField("PATH","/");
+        doc.addField("PATH", "/");
         return doc;
     }
     
     public static SolrInputDocument createRootPathDocument()
     {
         SolrInputDocument doc = new SolrInputDocument();
-        doc.addField("PATH","/");
+        doc.addField("PATH", "/");
         doc.addField("ID", "Root-Path"); 
         doc.addField("TX", "TX-1"); 
         doc.addField("DBID", "0"); 
