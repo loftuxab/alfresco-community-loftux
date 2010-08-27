@@ -14,11 +14,21 @@
                 <compareText text="${platform_name}"  logic="equals" value="linux" />
             </ruleList>
         </setInstallerVariable>
+        <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-linux-x64" > 
+            <ruleList> 
+                <compareText text="${platform_name}"  logic="equals" value="linux-x64" /> 
+            </ruleList> 
+        </setInstallerVariable> 
         <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-windows" >
             <ruleList>
                 <compareText text="${platform_name}"  logic="equals" value="windows" />
             </ruleList>
         </setInstallerVariable>
+        <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-windows-x64" > 
+            <ruleList> 
+		<compareText text="${project.installerFilename}" logic="contains" value="win-x64"/> 
+            </ruleList> 
+        </setInstallerVariable> 
         <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-osx-x86" >
             <ruleList>
                 <compareText text="${platform_name}"  logic="equals" value="osx" />

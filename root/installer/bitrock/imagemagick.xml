@@ -31,8 +31,8 @@ System variables provided by this component:
             <ask>0</ask>
             <description>IMAGEMAGICK version</description>
             <name>imagemagick_version</name>
-            <value>@@BITROCK_IMAGEMAGICK_VERSION@@</value>
-            <default>@@BITROCK_IMAGEMAGICK_VERSION@@</default>
+            <value>6.5.1</value>
+            <default>6.5.1</default>
         </stringParameter>
     </parameterList>
     <readyToInstallActionList>
