@@ -35,7 +35,7 @@
 	<throwError>
 	    <text>This installer is for Windows 64 bit.  Please download the Windows 32 bit version.</text>
 	    <ruleList>
-		<compareText text="${project.installerFilename}" logic="contains" value="windows-x64"/>
+		<compareText text="${project.installerFilename}" logic="contains" value="win-x64"/>
 		<platformTest type="windows"/>
                 <platformTest type="windows-x64" negate="1"/>
 	    </ruleList>

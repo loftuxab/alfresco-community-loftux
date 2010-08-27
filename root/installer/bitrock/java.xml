@@ -25,11 +25,30 @@ Copyrighted by BitRock
                     <promptUser>0</promptUser>
                     <validVersionList>
                         <validVersion>
-                            <requireJDK>1</requireJDK>
+                            <requireJDK>${java_required_jdk}</requireJDK>
                             <maxVersion/>
                             <minVersion>${java_min_version}</minVersion>
                         </validVersion>
                     </validVersionList>
+                    <ruleList>
+                        <isFalse value="${java_required_or_abort}" />
+                    </ruleList>
+                </autodetectJava>
+                <autodetectJava>
+                    <abortOnError>1</abortOnError>
+                    <showMessageOnError>1</showMessageOnError>
+                    <customErrorMessage>This release was packaged to run on J2SE 5.0. Please install a compatible Java version and try again.</customErrorMessage>
+                    <promptUser>0</promptUser>
+                    <validVersionList>
+                        <validVersion>
+                            <requireJDK>${java_required_jdk}</requireJDK>
+                            <maxVersion/>
+                            <minVersion>${java_min_version}</minVersion>
+                        </validVersion>
+                    </validVersionList>
+                    <ruleList>
+                        <isTrue value="${java_required_or_abort}" />
+                    </ruleList>
                 </autodetectJava>
 
 <!-- Compatible java version -->
@@ -172,6 +191,8 @@ Copyrighted by BitRock
             <value/>
             <ask>0</ask>
         </stringParameter>
+        <booleanParameter name="java_required_or_abort" value="0" ask="0" />
+        <booleanParameter name="java_required_jdk" value="1" ask="0" />
         <directoryParameter>
             <name>java_home_directory</name>
             <value/>
