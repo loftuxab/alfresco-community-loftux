@@ -62,6 +62,7 @@ public class EqualsHelper
     
     private static final int BUFFER_SIZE = 1024;
     /**
+     * Performs a byte-level comparison between two streams.
      * 
      * @param left         the left stream.  This is closed at the end of the operation.
      * @param right        an right stream.  This is closed at the end of the operation.
@@ -119,7 +120,7 @@ public class EqualsHelper
      * @param actual                the map in hand
      * @param expected              the map expected
      * @return                      Returns a difference report or <tt>null</tt> if there were no
-     *                              differences.  The message starts with a new line and it neatly
+     *                              differences.  The message starts with a new line and is neatly
      *                              formatted.
      */
     public static String getMapDifferenceReport(Map<?, ?> actual, Map<?, ?> expected)
