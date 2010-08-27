@@ -108,7 +108,6 @@
       <forms>
          <form>
             <field-visibility>
-               <show id="bpm:workflowDescription" />
                <show id="wf:notifyMe" />
                <show id="bpm:assignee" />
                <show id="packageItems" />
@@ -118,9 +117,6 @@
                <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                
-               <field id="bpm:workflowDescription" label-id="workflow.field.message">
-                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
-               </field>
                <field id="wf:notifyMe" />
                <field id="bpm:assignee" label-id="workflow.field.assign_to" set="assignee" />
                <field id="packageItems" set="items" />
@@ -133,18 +129,13 @@
       <forms>
          <form>
             <field-visibility>
-               <show id="bpm:workflowDescription" />
                <show id="bpm:assignee" />
                <show id="packageItems" />
             </field-visibility>
             <appearance>
-               <set id="" appearance="title" label-id="workflow.set.workflow.more_info" />
                <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                
-               <field id="bpm:workflowDescription" label-id="workflow.field.message">
-                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
-               </field>
                <field id="bpm:assignee" label-id="workflow.field.reviewer" set="assignee" />
                <field id="packageItems" set="items" />
             </appearance>
@@ -156,7 +147,6 @@
       <forms>
          <form>
             <field-visibility>
-               <show id="bpm:workflowDescription" />
                <show id="wf:requiredApprovePercent" />
                <show id="bpm:groupAssignee" />
                <show id="packageItems" />
@@ -166,9 +156,6 @@
                <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                
-               <field id="bpm:workflowDescription" label-id="workflow.field.message">
-                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
-               </field>
                <field id="wf:requiredApprovePercent" />
                <field id="bpm:groupAssignee" label-id="workflow.field.reviewer" set="assignee" />
                <field id="packageItems" set="items" />

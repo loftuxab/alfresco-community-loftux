@@ -12,9 +12,10 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
 
    <#-- Will be inserted in the top of the form after its been loaded through ajax -->
    <div id="${el}-summary-form-section">
-      <h3>${msg("header.summary")}</h3>
+      <h3>${msg("header.workflowSummary")}</h3>
       <div class="form-element-background-color form-element-border summary">
          <div class="summary-icons">
+            <h3>${msg("label.general")}</h3>
             <div id="${el}-statusSummary" class="status"></div>
             <div id="${el}-dueSummary" class="due"></div>
             <div id="${el}-prioritySummary" class="priority"></div>
@@ -25,7 +26,7 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
                   <h3>${msg("label.mostRecentlyCompletedTask")}</h3>
                </div>
                <div class="yui-u current-tasks">
-                  <a href="#current-tasks">${msg("link.currentTasks")}</a>
+                  <a href="#current-tasks">${msg("link.viewCurrentTasks")}</a>
                </div>
             </div>
 
@@ -49,8 +50,8 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
                   <img id="${el}-recentTaskOwnersAvatar" src="" alt="${msg("label.avatar")}">
                </div>
                <div class="yui-u">
-                  <div id="${el}-recentTaskOwnersComment" class="task-comment form-element-border"></div>
                   <div id="${el}-recentTaskOwnersCommentLink"></div>
+                  <div id="${el}-recentTaskOwnersComment" class="task-comment form-element-border"></div>
                </div>
             </div>
          </div>
@@ -61,7 +62,7 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
 
    <#-- Will be inserted above "More Info" in the form after its been loaded through ajax -->
    <div id="${el}-general-form-section">
-      <div class="set-title">${msg("header.general")}</div>
+      <div class="set-title">${msg("header.generalInfo")}</div>
       <div class="form-field">
          <div class="viewmode-field">
             <span class="viewmode-label">${msg("label.title")}:</span>
@@ -124,6 +125,12 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
                   <span class="viewmode-value" id="${el}-status"></span>
                </div>
             </div>
+         </div>
+      </div>
+      <div class="form-field">
+         <div class="viewmode-field">
+            <span class="viewmode-label">${msg("label.message")}:</span>
+            <span class="viewmode-value" id="${el}-message"></span>
          </div>
       </div>
    </div>

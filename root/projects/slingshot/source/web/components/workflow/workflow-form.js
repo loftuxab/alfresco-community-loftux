@@ -187,6 +187,7 @@
 
             Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
+            Dom.get(this.id + "-message").innerHTML = $html(recentTask.properties.bpm_description);
             
             Dom.get(this.id + "-recentTaskOwnersComment").innerHTML = $html(recentTask.properties.bpm_comment || this.msg("label.noComment"));
 
@@ -203,12 +204,12 @@
             var dueDate = Alfresco.util.fromISO8601(this.workflow.dueDate);
             if (dueDate)
             {
-               Dom.get(this.id + "-dueSummary").innerHTML = Alfresco.util.formatDate(dueDate);
+               Dom.get(this.id + "-dueSummary").innerHTML = this.msg("label.dueOn", Alfresco.util.formatDate(dueDate));
                Dom.get(this.id + "-due").innerHTML = Alfresco.util.formatDate(dueDate);
             }
             else
             {
-               Dom.get(this.id + "-dueSummary").innerHTML = this.msg("label.none");
+               Dom.get(this.id + "-dueSummary").innerHTML = this.msg("label.noDueDate");
                Dom.get(this.id + "-due").innerHTML = this.msg("label.none");
             }
 
@@ -229,13 +230,13 @@
             var priorityMap = { "1": "high", "2": "medium", "3": "low" },
                priorityKey = priorityMap[this.workflow.priority + ""],
                priority = this.msg("priority." + priorityKey),
-               priorityLabel = this.msg("label.priority", priority);
+               priorityLabel = this.msg("label.priorityLevel", priority);
             var prioritySummaryEl = Dom.get(this.id + "-prioritySummary");
             Dom.addClass(prioritySummaryEl, priorityKey);
             prioritySummaryEl.innerHTML = priorityLabel;
             Dom.get(this.id + "-priority").innerHTML = priority;
 
-            var status = this.workflow.isActive ? this.msg("label.inProgress") : this.msg("label.completed");
+            var status = this.workflow.isActive ? this.msg("label.workflowIsInProgress") : this.msg("label.workflowIsComplete");
             Dom.get(this.id + "-statusSummary").innerHTML = $html(status);
             Dom.get(this.id + "-status").innerHTML = $html(status);
 

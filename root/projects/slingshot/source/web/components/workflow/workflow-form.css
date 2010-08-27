@@ -16,6 +16,7 @@
 .workflow-form .summary .status
 {
    background-image: url(../images/workflow-20.png);
+   margin-top: 1em;
 }
 
 .workflow-form .summary .due
@@ -68,7 +69,6 @@
 .workflow-form .summary .recent-task .avatar
 {
    text-align: center;
-   padding-top: 0.5em;
 }
 
 .workflow-form .summary .recent-task .task-comment
