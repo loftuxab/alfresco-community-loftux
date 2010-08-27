@@ -352,7 +352,7 @@
                <show id="trx:endpointprotocol" />
                <show id="trx:username" for-mode="edit"/>
                <show id="trx:password" for-mode="edit"/>
-               <show id="trx:enabled" />
+               <show id="trx:enabled" force="true" />
             </field-visibility>
             <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
             <appearance>
@@ -364,9 +364,7 @@
                      <control-param name="password">true</control-param>
                   </control>
                </field>
-               <field id="trx:enabled" label="Transfer Target is enabled">
-                  <control template="/org/alfresco/components/form/controls/checkbox.ftl" />
-               </field>
+               <field id="trx:enabled" label="Transfer Target is enabled" />
             </appearance>
          </form>
       </forms>
