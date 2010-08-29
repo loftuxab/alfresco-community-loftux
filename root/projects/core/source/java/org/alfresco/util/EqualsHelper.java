@@ -174,15 +174,13 @@ public class EqualsHelper
      */
     public static enum MapValueComparison
     {
-        /** The value was missing from both maps */
-        NULL,
-        /** The value was only present in the left map */
+        /** The key was only present in the left map */
         LEFT_ONLY,
-        /** The value was only present in the right map */
+        /** The key was only present in the right map */
         RIGHT_ONLY,
-        /** The value was present in both maps and equal */ 
+        /** The key was present in both maps and the values were equal */ 
         EQUAL,
-        /** The value was present in both maps but not equal */
+        /** The key was present in both maps but not equal */
         NOT_EQUAL
     }
     
@@ -191,10 +189,10 @@ public class EqualsHelper
      * <p/>
      * The return codes that accompany the keys are:
      * <ul>
-     *    <li>Null:     The value in the left and right maps are equal.</li>
-     *    <li>Zero:     The value was not equal.</li>
-     *    <li>Negative: The left map contained a value but the right didn't.</li>
-     *    <li>Positive: The right map contained a value but the left didn't.</li>
+     *    <li>{@link MapValueComparison#LEFT_ONLY}</li>
+     *    <li>{@link MapValueComparison#RIGHT_ONLY}</li>
+     *    <li>{@link MapValueComparison#EQUAL}</li>
+     *    <li>{@link MapValueComparison#NOT_EQUAL}</li>
      * </ul>
      *  
      * @param <K>           the map key type
@@ -215,27 +213,43 @@ public class EqualsHelper
         // Iterate over the keys and do the comparisons
         for (K key : keys)
         {
+            boolean leftHasKey = left.containsKey(key);
+            boolean rightHasKey = right.containsKey(key);
             V leftValue = left.get(key);
             V rightValue = right.get(key);
-            if (leftValue == null && rightValue == null)
+            if (leftHasKey)
             {
-                diff.put(key, MapValueComparison.NULL);
+                if (!rightHasKey)
+                {
+                    diff.put(key, MapValueComparison.LEFT_ONLY);
+                }
+                else if (EqualsHelper.nullSafeEquals(leftValue, rightValue))
+                {
+                    diff.put(key, MapValueComparison.EQUAL);
+                }
+                else
+                {
+                    diff.put(key, MapValueComparison.NOT_EQUAL);
+                }
             }
-            else if (leftValue != null && rightValue == null)
+            else if (rightHasKey)
             {
-                diff.put(key, MapValueComparison.LEFT_ONLY);
-            }
-            else if (leftValue == null && rightValue != null)
-            {
-                diff.put(key, MapValueComparison.RIGHT_ONLY);
-            }
-            else if (leftValue.equals(rightValue))
-            {
-                diff.put(key, MapValueComparison.EQUAL);
+                if (!leftHasKey)
+                {
+                    diff.put(key, MapValueComparison.RIGHT_ONLY);
+                }
+                else if (EqualsHelper.nullSafeEquals(leftValue, rightValue))
+                {
+                    diff.put(key, MapValueComparison.EQUAL);
+                }
+                else
+                {
+                    diff.put(key, MapValueComparison.NOT_EQUAL);
+                }
             }
             else
             {
-                diff.put(key, MapValueComparison.NOT_EQUAL);
+                // How is it here?
             }
         }
         
