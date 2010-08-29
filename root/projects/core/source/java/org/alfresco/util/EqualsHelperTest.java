@@ -82,20 +82,26 @@ public class EqualsHelperTest extends TestCase
         // NOT_EQUAL
         left.put(1, "A");
         right.put(1, "B");
-        // NULL
+        // EQUAL
         left.put(2, null);
         right.put(2, null);
-        // RIGHT_ONLY
+        // NOT_EQUAL
         left.put(3, null);
         right.put(3, "B");
-        // LEFT_ONLY
+        // NOT_EQUAL
         left.put(4, "A");
         right.put(4, null);
+        // RIGHT_ONLY
+        right.put(5, "B");
+        // LEFT_ONLY
+        left.put(6, "A");
         Map<Integer, MapValueComparison> diff = EqualsHelper.getMapComparison(left, right);
         assertEquals("'EQUAL' check failed", MapValueComparison.EQUAL, diff.get(0));
         assertEquals("'NOT_EQUAL' check failed", MapValueComparison.NOT_EQUAL, diff.get(1));
-        assertEquals("'NULL' check failed", MapValueComparison.NULL, diff.get(2));
-        assertEquals("'RIGHT_ONLY' check failed", MapValueComparison.RIGHT_ONLY, diff.get(3));
-        assertEquals("'LEFT_ONLY' check failed", MapValueComparison.LEFT_ONLY, diff.get(4));
+        assertEquals("'EQUAL' check failed", MapValueComparison.EQUAL, diff.get(2));
+        assertEquals("'NOT_EQUAL' check failed", MapValueComparison.NOT_EQUAL, diff.get(3));
+        assertEquals("'NOT_EQUAL' check failed", MapValueComparison.NOT_EQUAL, diff.get(4));
+        assertEquals("'RIGHT_ONLY' check failed", MapValueComparison.RIGHT_ONLY, diff.get(5));
+        assertEquals("'LEFT_ONLY' check failed", MapValueComparison.LEFT_ONLY, diff.get(6));
     }
 }
