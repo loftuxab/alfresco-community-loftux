@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><project xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd" xmlns="http://maven.apache.org/DECORATION/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bannerLeft>
+    <name>Spring Surf - v. 1.0.0.CI-SNAPSHOT</name>
+    <href>http://www.springsource.org/extensions/se-surf</href>
+  </bannerLeft>
+  <publishDate position="navigation-bottom" format="MM-dd-yy" />
+  <poweredBy>
+    <logo img="http://www.springsurf.org/images/logo/PoweredBySurf.png" name="Spring Surf" href="http://www.springsurf.org" />
+    <logo img="http://maven.apache.org/images/logos/maven-feather.png" name="Maven" href="http://maven.apache.org" />
+  </poweredBy>
+  <skin>
+    <groupId>org.springframework.maven.skins</groupId>
+    <artifactId>maven-spring-skin</artifactId>
+    <version>1.0.5</version>
+  </skin>
+  <body>
+    <links>
+      <item name="Spring Source" href="http://springsource.org/" />
+      <item name="Spring Roo Addon" href="spring-surf-devtools/spring-surf-roo-addon/index.html" />
+    </links>
+    <menu name="Modules" inherit="bottom" ref="modules">
+      <item name="Spring Surf Core" href="spring-surf-core/spring-surf-core/index.html" />
+      <item name="Spring Surf Core - Configuration Service" href="spring-surf-core/spring-surf-core-configservice/index.html" />
+      <item name="Spring Web Scripts" href="spring-webscripts/spring-webscripts/index.html" />
+      <item name="Spring Web Scripts - API" href="spring-webscripts/spring-webscripts-api/index.html" />
+      <item name="Spring Web Scripts - Application" href="spring-webscripts/spring-webscripts-application/index.html" />
+      <item name="Spring Web Scripts - Test Application" href="spring-webscripts/spring-webscripts-application-test/index.html" />
+      <item name="Spring Surf" href="spring-surf/spring-surf/index.html" />
+      <item name="Spring Surf - API" href="spring-surf/spring-surf-api/index.html" />
+      <item name="Spring Surf Tools - Document Generation Maven Plugin" href="spring-surf-devtools/spring-surf-doc-plugin/index.html" />
+      <item name="Spring Web Scripts - Documentation" href="spring-webscripts/spring-webscripts-documentation/index.html" />
+      <item name="Spring Web Scripts - Groovy Addon" href="spring-webscripts-addons/spring-webscripts-addon-groovy/index.html" />
+      <item name="Spring Web Scripts - PHP Addon" href="spring-webscripts-addons/spring-webscripts-addon-php/index.html" />
+      <item name="Spring Surf - Editor Plugin" href="spring-surf/spring-surf-editor/index.html" />
+      <item name="Spring Surf - Application" href="spring-surf/spring-surf-application/index.html" />
+      <item name="Spring Surf - Test Application" href="spring-surf/spring-surf-application-test/index.html" />
+      <item name="Spring Surf - Documentation" href="spring-surf/spring-surf-documentation/index.html" />
+      <item name="Spring Surf - Portlet" href="spring-surf/spring-surf-portlet/index.html" />
+      <item name="Spring Surf - Portlet Test Application" href="spring-surf-applications/spring-surf-portlet-test/index.html" />
+      <item name="Spring Web Editor" href="spring-webeditor/spring-webeditor/index.html" />
+      <item name="Spring Web Editor Client - JSP Tag Library" href="spring-webeditor-client/spring-webeditor-client-jsp/index.html" />
+      <item name="Spring Web Editor Plugin - Sample" href="spring-webeditor-plugins/spring-webeditor-plugin-sample/index.html" />
+      <item name="Spring Web Editor Plugin - Surf" href="spring-webeditor-plugins/spring-webeditor-plugin-surf/index.html" />
+      <item name="Spring Web Editor - Application" href="spring-webeditor/spring-webeditor-application/index.html" />
+      <item name="Spring Web Editor - Application Test" href="spring-webeditor/spring-webeditor-application-test/index.html" />
+      <item name="Spring Surf Application - QuickStart" href="spring-surf-applications/spring-surf-application-quickstart/index.html" />
+      <item name="Spring Surf Application - PetClinic" href="spring-surf-applications/spring-surf-application-petclinic/index.html" />
+      <item name="Spring Surf Application - Spring Travel" href="spring-surf-applications/spring-surf-application-spring-travel/index.html" />
+      <item name="Spring Surf Tools - Roo Addon" href="spring-surf-devtools/spring-surf-roo-addon/index.html" />
+      <item name="Spring Surf Integration Tests - Surf Platform" href="spring-surf/spring-surf-test-integration/index.html" />
+    </menu>
+    <menu inherit="bottom" ref="parent" />
+    <menu ref="reports" />
+  </body>
+</project>

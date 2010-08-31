@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page> 
+   <id>contact</id>
+   <description>contact us page with form</description>    
+   <title>title.contact</title>
+   <template-instance>two-block</template-instance>
+   <authentication>none</authentication>
+   <components>
+      <component>
+         <region-id>left1</region-id>
+         <url>/contact/form</url>
+      </component>       
+      <component>
+         <region-id>right1</region-id>
+         <url>/content/narrow</url>
+         <properties>
+  	     	<asset>/contact.html</asset>
+    	 </properties>         
+      </component>       
+   </components>
+</page>

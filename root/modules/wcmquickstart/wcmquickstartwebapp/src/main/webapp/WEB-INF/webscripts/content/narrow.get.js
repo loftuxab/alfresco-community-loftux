@@ -1,0 +1,1 @@
+model.asset = webSite.getAssetByPath(args.asset);

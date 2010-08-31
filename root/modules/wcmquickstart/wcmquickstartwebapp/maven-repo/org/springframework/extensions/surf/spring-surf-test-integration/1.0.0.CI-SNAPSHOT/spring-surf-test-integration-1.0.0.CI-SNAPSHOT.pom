@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.extensions.surf</groupId>
+		<artifactId>spring-surf-parent</artifactId>
+		<version>1.0.0.CI-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<artifactId>spring-surf-test-integration</artifactId>
+	<name>Spring Surf Integration Tests - Surf Platform</name>
+	<url>spring-surf/${project.artifactId}</url>
+	<packaging>jar</packaging>
+	
+	<!--
+		Test Configurations
+		
+		mvn install -Ptomcat5x
+		mvn install -Ptomcat6x
+		mvn install -Pjboss51x 
+	-->
+	
+	<!-- Project Configuration -->
+	<properties>
+		<tomcat6x.url>http://www.apache.org/dist/tomcat/tomcat-6/v6.0.20/bin/apache-tomcat-6.0.20.zip</tomcat6x.url>
+		<tomcat5x.url>http://www.apache.org/dist/tomcat/tomcat-5/v5.5.28/bin/apache-tomcat-5.5.28.zip</tomcat5x.url>
+		<jboss51x.url>http://downloads.sourceforge.net/project/jboss/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA.zip?use_mirror=superb-dca2</jboss51x.url>
+		<cargo.jvmargs><![CDATA[-Xmx1024M -XX:MaxPermSize=512m]]></cargo.jvmargs>
+		<cargo.standalone>false</cargo.standalone>
+		<servlet.port>5150</servlet.port>
+		<skip.integration.tests>true</skip.integration.tests>
+		<test.pause>false</test.pause>
+<!--		<temp.dir>${java.io.tmpdir}</temp.dir> -->
+		<temp.dir>/buildtmp</temp.dir>
+		
+		<!-- MacOS Specific Properties -->
+		<java16.home>/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home</java16.home>
+		<java15.home>/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home</java15.home>
+		<!-- End of MacOS Specific Properties -->
+
+	</properties>
+
+	<!-- Selenium Repositories -->
+	<repositories>
+		<repository>
+			<id>openqa-releases</id>
+			<name>Openqa Release Repository</name>
+			<url>http://nexus.openqa.org/content/repositories/releases</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>openqa-snapshots</id>
+			<name>Openqa Snapshot Repository</name>
+			<url>http://nexus.openqa.org/content/repositories/snapshots</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>ignore</checksumPolicy>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
+	
+	<!-- Dependencies -->
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.extensions.surf</groupId>
+			<artifactId>spring-surf-application-test</artifactId>
+			<version>1.0.0.CI-SNAPSHOT</version>
+			<type>war</type>
+		</dependency>	
+		<dependency>
+			<groupId>org.springframework.extensions.surf</groupId>
+			<artifactId>spring-surf</artifactId>
+			<version>1.0.0.CI-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>			
+
+		<!-- For integration tests -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium.client-drivers</groupId>
+            <artifactId>selenium-java-client-driver</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
+        </dependency>  	
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>3.0.0.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>	
+	
+	<!-- Profiles -->
+	<profiles>
+		<profile>
+			<id>debug</id>
+			<properties>
+				<cargo.jvmargs><![CDATA[-Xmx1024M -XX:MaxPermSize=512m -Xdebug -Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y]]></cargo.jvmargs>
+				<skip.integration.tests>false</skip.integration.tests>
+			</properties>
+		</profile>
+		<profile>
+			<id>standalone</id>
+			<properties>
+				<test.pause>true</test.pause>
+				<skip.integration.tests>false</skip.integration.tests>
+			</properties>
+		</profile>		
+		<profile>
+			<id>mac-integration-test</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<selenium.browser>*safari</selenium.browser>
+			</properties>
+		</profile>
+		
+		<!-- Use this target to test Tomcat 5.x on Java 1.6 -->		
+		<profile>
+			<id>tomcat6x</id>
+			<properties>
+				<skip.integration.tests>false</skip.integration.tests>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<version>1.0</version>
+						<configuration>
+							<wait>false</wait>
+							<container>
+								<containerId>tomcat6x</containerId>
+								<zipUrlInstaller>
+								  <url>${tomcat6x.url}</url>
+								  <installDir>${temp.dir}/cargo/installs</installDir>
+								</zipUrlInstaller>
+								<type>installed</type>
+								<timeout>480000</timeout>
+							</container>
+							<configuration>
+								<home>target/tomcat6x</home>
+								<properties>
+									<cargo.logging>high</cargo.logging>
+									<cargo.servlet.port>${servlet.port}</cargo.servlet.port>
+									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
+									<cargo.java.home>${java16.home}</cargo.java.home>
+								</properties>
+								<type>standalone</type>
+							</configuration>
+							<deployer>
+								<deployables>
+									<deployable>
+										<groupId>org.springframework.extensions.surf</groupId>
+										<artifactId>spring-surf-application-test</artifactId>
+										<type>war</type>
+										<properties>
+											<context>test</context>
+										</properties>
+								        <pingURL>http://localhost:${servlet.port}/test/res/images/logo/PoweredBySurf.png</pingURL>
+										<pingTimeout>240000</pingTimeout>
+									</deployable>
+								</deployables>
+							</deployer>
+						</configuration>
+						<executions>
+							<execution>
+								<id>start-container</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>deploy</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-container</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>					
+				</plugins>
+			</build>
+		</profile>
+		
+		<!-- Use this target to test Tomcat 5.x on Java 1.5 -->
+		<profile>
+			<id>tomcat5x</id>
+			<properties>
+				<skip.integration.tests>false</skip.integration.tests>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<version>1.0</version>
+						<configuration>
+							<wait>false</wait>
+							<container>
+								<containerId>tomcat5x</containerId>
+								<zipUrlInstaller>
+								  <url>${tomcat5x.url}</url>
+								  <installDir>${temp.dir}/cargo/installs</installDir>
+								</zipUrlInstaller>
+								<type>installed</type>
+								<timeout>480000</timeout>
+							</container>
+							<configuration>
+								<home>target/tomcat5x</home>
+								<properties>
+									<cargo.logging>high</cargo.logging>
+									<cargo.servlet.port>${servlet.port}</cargo.servlet.port>
+									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
+									<cargo.java.home>${java15.home}</cargo.java.home>
+								</properties>
+								<type>standalone</type>
+							</configuration>
+							<deployer>
+								<deployables>
+									<deployable>
+										<groupId>org.springframework.extensions.surf</groupId>
+										<artifactId>spring-surf-application-test</artifactId>
+										<type>war</type>
+										<properties>
+											<context>test</context>
+										</properties>
+								        <pingURL>http://localhost:${servlet.port}/test/res/images/logo/PoweredBySurf.png</pingURL>
+										<pingTimeout>240000</pingTimeout>
+									</deployable>
+								</deployables>
+							</deployer>
+						</configuration>
+						<executions>
+							<execution>
+								<id>start-container</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>deploy</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-container</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<!-- Use this target to test JBoss 5.1 on Java 1.6 -->
+		<profile>
+			<id>jboss51x</id>
+			<properties>
+				<skip.integration.tests>false</skip.integration.tests>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<version>1.0</version>
+						<configuration>
+							<wait>false</wait>
+							<container>
+								<containerId>jboss5x</containerId>
+								<zipUrlInstaller>
+									<url>${jboss51x.url}</url>
+									<installDir>${temp.dir}/cargo/installs</installDir>
+								</zipUrlInstaller>
+								<type>installed</type>
+								<timeout>600000</timeout>
+							</container>
+							<configuration>
+								<home>${project.build.directory}/jboss51x</home>
+								<properties>
+									<cargo.logging>low</cargo.logging>
+									<cargo.jboss.configuration>default</cargo.jboss.configuration>
+									<cargo.servlet.port>${servlet.port}</cargo.servlet.port>
+									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
+									<cargo.rmi.port>1099</cargo.rmi.port>
+									<cargo.java.home>${java16.home}</cargo.java.home>
+								</properties>
+								<deployables>
+									<deployable>
+										<groupId>org.springframework.extensions.surf</groupId>
+										<artifactId>spring-surf-application-test</artifactId>
+										<type>war</type>
+										<properties>
+											<context>/test</context>
+										</properties>
+								        <pingURL>http://localhost:${servlet.port}/test/res/images/logo/PoweredBySurf.png</pingURL>
+										<pingTimeout>240000</pingTimeout>
+									</deployable>
+								</deployables>
+								<configfiles>
+									<configfile>
+										<file>src/test/resources/jboss51x/jboss-log4j.xml</file>
+										<todir>conf</todir>
+									</configfile>
+									<configfile>
+										<file>src/test/resources/jboss51x/war-deployers-jboss-beans.xml</file>
+										<todir>deployers/jbossweb.deployer/META-INF</todir>
+									</configfile>
+								</configfiles>								
+							</configuration>
+						</configuration>
+						<executions>
+							<execution>
+								<id>start-container</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>deploy</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-container</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>additionalplugins</id>			
+			<activation>
+				<property>
+					<!-- Temporary solution for always active profile -->
+					<!-- See: http://jira.codehaus.org/browse/MNG-4533 -->
+			    	<name>!dummy</name>
+			  	</property>
+			</activation>
+			<build>
+				<plugins>
+								
+					<!-- Set up tests to run during the integration test phase -->
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+							<systemProperties>
+								<property>
+									<name>servlet.port</name>
+									<value>${servlet.port}</value>
+								</property>
+								<property>
+									<name>test.pause</name>
+									<value>${test.pause}</value>
+								</property>
+								<property>
+									<name>selenium.browser</name>
+									<value>${selenium.browser}</value>
+								</property>
+							</systemProperties>					
+						</configuration>
+						<executions>
+							<execution>
+								<id>unit-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>${skip.integration.tests}</skip>
+									<excludes>
+										<exclude>**/integration/**</exclude>
+									</excludes>
+								</configuration>
+							</execution>
+							<execution>
+								<id>integration-tests</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>${skip.integration.tests}</skip>
+									<includes>
+										<include>**/integration/**</include>
+									</includes>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>			
+
+					<!-- Selenium Test Server -->
+					<plugin>
+		                <groupId>org.codehaus.mojo</groupId>
+		                <artifactId>selenium-maven-plugin</artifactId>
+						<version>1.0</version>
+		                <executions>
+		                    <execution>
+		                        <phase>pre-integration-test</phase>
+		                        <goals>
+		                            <goal>start-server</goal>
+		                        </goals>
+		                        <configuration>
+		                        	<skip>false</skip>
+		                            <background>true</background>
+		                        </configuration>
+		                    </execution>
+		                </executions>
+		            </plugin>
+
+				</plugins>
+			</build>
+		</profile>
+		
+	</profiles>
+ 	
+</project>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.chemistry.opencmis</groupId>
+  <artifactId>chemistry-opencmis</artifactId>
+  <version>0.1.0-incubating-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20100618.190008</timestamp>
+      <buildNumber>12</buildNumber>
+    </snapshot>
+    <lastUpdated>20100618190012</lastUpdated>
+  </versioning>
+</metadata>
