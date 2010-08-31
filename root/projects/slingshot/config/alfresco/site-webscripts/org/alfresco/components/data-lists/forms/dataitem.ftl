@@ -12,7 +12,7 @@
 <#-- No full-page edit view for v3.3-
    <#if form.mode == "edit">
          <div class="yui-u first edit-dataitem flat-button">
-            <button id="${args.htmlid}-editDataItem" tabindex="0"></button>
+            <button id="${id}-editDataItem" tabindex="0"></button>
          </div>
    </#if>
 -->

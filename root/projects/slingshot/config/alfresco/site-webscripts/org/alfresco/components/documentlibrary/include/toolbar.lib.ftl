@@ -1,14 +1,15 @@
 <#include "../../../include/alfresco-macros.lib.ftl" />
 <#macro toolbarTemplate>
 <#nested>
-<div id="${args.htmlid}-body" class="toolbar">
+<#assign el=args.htmlid?html>
+<div id="${el}-body" class="toolbar">
 
-   <div id="${args.htmlid}-headerBar" class="header-bar flat-button theme-bg-2">
+   <div id="${el}-headerBar" class="header-bar flat-button theme-bg-2">
       <div class="left">
          <div class="hideable toolbar-hidden DocListTree">
             <div class="create-content">
-               <button id="${args.htmlid}-createContent-button" name="createContent">${msg("button.create-content")}</button>
-               <div id="${args.htmlid}-createContent-menu" class="yuimenu">
+               <button id="${el}-createContent-button" name="createContent">${msg("button.create-content")}</button>
+               <div id="${el}-createContent-menu" class="yuimenu">
                   <div class="bd">
                      <ul>
                      <#list createContent as content>
@@ -22,16 +23,16 @@
             <div class="separator">&nbsp;</div>
          </div>
          <div class="hideable toolbar-hidden DocListTree">
-            <div class="new-folder"><button id="${args.htmlid}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>
+            <div class="new-folder"><button id="${el}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
          <div class="hideable toolbar-hidden DocListTree">
-            <div class="file-upload"><button id="${args.htmlid}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
+            <div class="file-upload"><button id="${el}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
          <div class="selected-items hideable toolbar-hidden DocListTree DocListFilter TagFilter DocListCategories">
-            <button class="no-access-check" id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
-            <div id="${args.htmlid}-selectedItems-menu" class="yuimenu">
+            <button class="no-access-check" id="${el}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
+            <div id="${el}-selectedItems-menu" class="yuimenu">
                <div class="bd">
                   <ul>
                   <#list actionSet as action>
@@ -45,19 +46,19 @@
          </div>
       </div>
       <div class="right">
-         <div class="customize" style="display: none;"><button id="${args.htmlid}-customize-button" name="customize">${msg("button.customize")}</button></div>
-         <div class="hide-navbar"><button id="${args.htmlid}-hideNavBar-button" name="hideNavBar">${msg("button.navbar.hide")}</button></div>
-         <div class="rss-feed"><button id="${args.htmlid}-rssFeed-button" name="rssFeed">${msg("link.rss-feed")}</button></div>
+         <div class="customize" style="display: none;"><button id="${el}-customize-button" name="customize">${msg("button.customize")}</button></div>
+         <div class="hide-navbar"><button id="${el}-hideNavBar-button" name="hideNavBar">${msg("button.navbar.hide")}</button></div>
+         <div class="rss-feed"><button id="${el}-rssFeed-button" name="rssFeed">${msg("link.rss-feed")}</button></div>
       </div>
    </div>
 
-   <div id="${args.htmlid}-navBar" class="nav-bar flat-button theme-bg-4">
+   <div id="${el}-navBar" class="nav-bar flat-button theme-bg-4">
       <div class="hideable toolbar-hidden DocListTree DocListCategories">
-         <div class="folder-up"><button class="no-access-check" id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
+         <div class="folder-up"><button class="no-access-check" id="${el}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
          <div class="separator">&nbsp;</div>
       </div>
-      <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable toolbar-hidden DocListTree DocListCategories"></div>
-      <div id="${args.htmlid}-description" class="description hideable toolbar-hidden DocListFilter TagFilter"></div>
+      <div id="${el}-breadcrumb" class="breadcrumb hideable toolbar-hidden DocListTree DocListCategories"></div>
+      <div id="${el}-description" class="description hideable toolbar-hidden DocListFilter TagFilter"></div>
    </div>
 
 </div>

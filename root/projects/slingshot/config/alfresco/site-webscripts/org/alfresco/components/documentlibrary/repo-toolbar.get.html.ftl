@@ -1,7 +1,7 @@
 <#include "include/toolbar.lib.ftl" />
 <@toolbarTemplate>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RepositoryDocListToolbar("${args.htmlid}").setOptions(
+   new Alfresco.RepositoryDocListToolbar("${args.htmlid?js_string}").setOptions(
    {
       nodeRef: new Alfresco.util.NodeRef("${rootNode}"),
       hideNavBar: ${(preferences.hideNavBar!false)?string},

@@ -1,5 +1,6 @@
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   Alfresco.util.ComponentManager.get("${args.htmlid}").setOptions(
+   Alfresco.util.ComponentManager.get("${el}").setOptions(
    {
       roles:
       {
@@ -9,8 +10,8 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-dialog" class="permissions">
-   <div id="${args.htmlid}-title" class="hd"></div>
+<div id="${el}-dialog" class="permissions">
+   <div id="${el}-title" class="hd"></div>
    <div class="bd">
       <p/>
       <div class="yui-g">
@@ -21,8 +22,8 @@
          <div class="yui-gd">
             <div class="yui-u first right"><label>${msg("group." + group)} ${msg("label.have")}</label></div>
             <div class="yui-u flat-button">
-               <button id="${args.htmlid}-${group?lower_case}" value="${permissionGroups[group_index]}" class="site-group"></button>
-               <select id="${args.htmlid}-${group?lower_case}-select">
+               <button id="${el}-${group?lower_case}" value="${permissionGroups[group_index]}" class="site-group"></button>
+               <select id="${el}-${group?lower_case}-select">
    <#list siteRoles as siteRole>
                   <option value="${siteRole}">${msg("role." + siteRole)}</option>
    </#list>
@@ -34,7 +35,7 @@
       <div class="actions">
          <div class="yui-gd">
             <div class="yui-u first reset-btn">
-               <button id="${args.htmlid}-reset-all">${msg("label.reset-all")}</button>
+               <button id="${el}-reset-all">${msg("label.reset-all")}</button>
             </div>
             <div class="yui-u">
                <label>${msg("label.mangerdefaults")}</label>
@@ -43,8 +44,8 @@
       </div>
       <p/>
       <div class="bdft">
-         <input type="button" id="${args.htmlid}-ok" value="${msg("button.save")}" tabindex="0" />
-         <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="0" />
+         <input type="button" id="${el}-ok" value="${msg("button.save")}" tabindex="0" />
+         <input type="button" id="${el}-cancel" value="${msg("button.cancel")}" tabindex="0" />
       </div>
    </div>
 </div>

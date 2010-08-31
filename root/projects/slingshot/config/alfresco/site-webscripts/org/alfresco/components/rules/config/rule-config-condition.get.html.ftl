@@ -1,5 +1,5 @@
 <#import "rule-config.lib.ftl" as configLib/>
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?html>
 <#assign mode=args.mode!"if">
 <#assign msgKey=(ruleConfigType + "." + mode)>
 <#if mode == "if">

@@ -3,11 +3,12 @@
 <![endif]-->
 <input id="yui-history-field" type="hidden" />
 
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.ConsoleUsers("${args.htmlid}").setOptions(
+   new Alfresco.ConsoleUsers("${el}").setOptions(
    {
-      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
-      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
+      minSearchTermLength: ${(args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length'))?js_string},
+      maxSearchResults: ${(args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results'))?js_string},
       minUsernameLength: ${config.scoped['Users']['users'].getChildValue('username-min-length')},
       minPasswordLength: ${config.scoped['Users']['users'].getChildValue('password-min-length')}
    }).setMessages(
@@ -15,7 +16,7 @@
    );
 //]]></script>
 
-<#assign el=args.htmlid>
+<#assign el=el>
 <div id="${el}-body" class="users">
 
    <!-- Search panel -->

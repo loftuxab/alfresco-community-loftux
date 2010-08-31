@@ -1,4 +1,4 @@
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?html>
 <div id="${el}-dialog" class="data-picker">
    <div class="hd">
       <span id="${el}-title"></span></div>
@@ -13,4 +13,3 @@
 <script type="text/javascript">//<![CDATA[
 Alfresco.util.addMessages(${messages}, "Alfresco.module.DataPicker");
 //]]></script>
-

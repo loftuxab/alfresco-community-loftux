@@ -1,7 +1,8 @@
+<#assign el=args.htmlid?html>
 <#assign helpPages = config.scoped["HelpPages"]["help-pages"]>
 <#assign tutorialLink = helpPages.getChildValue("share-tutorial")!"">
 <script type="text/javascript">//<![CDATA[
-new Alfresco.dashlet.UserWelcome("${args.htmlid}");
+new Alfresco.dashlet.UserWelcome("${el}");
 //]]></script>
 <div class="dashlet user-welcome">
    <div class="title">${msg("header.userWelcome")}</div>
@@ -28,7 +29,7 @@ new Alfresco.dashlet.UserWelcome("${args.htmlid}");
       <div class="detail-list-item last-item">
          <h4 class="theme-color-2">${msg("header.createSite")}</h4>
          <div>${msg("text.createSite")}</div>
-         <div><a id="${args.htmlid}-createSite-button" href="#" class="theme-color-2">${msg("link.createSite")}</a></div>
+         <div><a id="${el}-createSite-button" href="#" class="theme-color-2">${msg("link.createSite")}</a></div>
       </div>
       <div class="clear"></div>
    </div>

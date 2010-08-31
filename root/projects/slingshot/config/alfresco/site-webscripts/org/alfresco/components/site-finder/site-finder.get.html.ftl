@@ -1,9 +1,10 @@
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.SiteFinder("${args.htmlid}").setOptions(
+   new Alfresco.SiteFinder("${el}").setOptions(
    {
       currentUser: "${user.id}",
-      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
-      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
+      minSearchTermLength: ${(args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length'))?js_string},
+      maxSearchResults: ${(args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results'))?js_string},
       inviteData: [
    <#list inviteData as invite>
       {
@@ -13,23 +14,23 @@
       }<#if invite_has_next>,</#if>
    </#list>
       ],
-      setFocus: ${args.setFocus!'false'}
+      setFocus: ${(args.setFocus!'false')?js_string}
    }).setMessages(
       ${messages}
    );
 //]]></script>
 
-<div id="${args.htmlid}-body" class="site-finder">
+<div id="${el}-body" class="site-finder">
 	
-	<div class="title"><label for="${args.htmlid}-term">${msg("site-finder.heading")}</label></div>
+	<div class="title"><label for="${el}-term">${msg("site-finder.heading")}</label></div>
 	
    <div class="finder-wrapper">
       <div class="search-bar theme-bg-color-3">
-         <div class="search-text"><input type="text" id="${args.htmlid}-term" class="search-term" maxlength="256" /></div>
-         <div class="search-button"><button id="${args.htmlid}-button">${msg("site-finder.search-button")}</button></div>
+         <div class="search-text"><input type="text" id="${el}-term" class="search-term" maxlength="256" /></div>
+         <div class="search-button"><button id="${el}-button">${msg("site-finder.search-button")}</button></div>
       </div>
 
-      <div id="${args.htmlid}-sites" class="results"></div>
+      <div id="${el}-sites" class="results"></div>
    </div>
 	
 </div>

@@ -1,3 +1,4 @@
+<#assign el=args.htmlid?html>
 <!-- Event Info Panel -->
 <script type="text/javascript">//<![CDATA[
    Alfresco.util.addMessages(${messages}, "Alfresco.EventInfo");
@@ -40,11 +41,11 @@
 </#if>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.startdate")}:</div>
-      <div class="yui-u" id="${args.htmlid}-startdate"><#if result.from?exists>${result.from?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if><#if result.allday!='true'> ${msg("label.at")} ${result.start!""} </#if></div>
+      <div class="yui-u" id="${el}-startdate"><#if result.from?exists>${result.from?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if><#if result.allday!='true'> ${msg("label.at")} ${result.start!""} </#if></div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.enddate")}:</div>
-      <div class="yui-u" id="${args.htmlid}-enddate"><#if result.to?exists>${result.to?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if><#if result.allday!='true'> ${msg("label.at")} ${result.end!""} </#if></div>
+      <div class="yui-u" id="${el}-enddate"><#if result.to?exists>${result.to?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if><#if result.allday!='true'> ${msg("label.at")} ${result.end!""} </#if></div>
    </div>
 <#if result.recurrence!=''>
    <div class="yui-gd">
@@ -57,15 +58,15 @@
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.docfolder")}:</div>
-      <div class="yui-u docfolder-label" id="${args.htmlid}-docfolder">${result.docfolder}</div>
+      <div class="yui-u docfolder-label" id="${el}-docfolder">${result.docfolder}</div>
    </div>
    <br />
    <div class="bdft">
-      <input type="submit" id="${args.htmlid}-edit-button" value="${msg("button.edit")}" />
-      <input type="submit" id="${args.htmlid}-delete-button" value="${msg("button.delete")}" />
-      <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
+      <input type="submit" id="${el}-edit-button" value="${msg("button.edit")}" />
+      <input type="submit" id="${el}-delete-button" value="${msg("button.delete")}" />
+      <input type="submit" id="${el}-cancel-button" value="${msg("button.cancel")}" />
    </div>
    <#if result.isoutlook == 'false'>
-   <div id="${args.htmlid}-edit-available" />
+   <div id="${el}-edit-available" />
    </#if>
 </div>

@@ -3,9 +3,9 @@
 <#if error?exists>
    <div class="error">${error}</div>
 <#elseif form?exists>
-   <#assign formId=args.htmlid + "-form">
+   <#assign formId=args.htmlid?js_string + "-form">
    <#assign formUI><#if args.formUI??>${args.formUI}<#else>true</#if></#assign>
-      
+   
    <#if form.viewTemplate?? && form.mode == "view">
       <#include "${form.viewTemplate}" />
    <#elseif form.editTemplate?? && form.mode == "edit">

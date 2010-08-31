@@ -9,7 +9,7 @@
       <#if (constraintsFilter??)>constraintsFilter: ${constraintsFilter},</#if>      
       <#if (rootNode??)>rootNode: "${rootNode}",</#if>
       ruleConfigType: "${ruleConfigType}",
-      siteId: "${args.site!""}"
+      siteId: "${(args.site!"")?js_string}"
    }).setMessages(
       ${messages}
    );

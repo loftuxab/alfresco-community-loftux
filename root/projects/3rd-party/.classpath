@@ -23,7 +23,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/bcprov-jdk15-1.45.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bcmail-jdk15-1.45.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jmagick/JMagick.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/opensaml-1.0.1.jar"/>
@@ -93,7 +92,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-extensions-json-0.4.0-incubating.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-i18n-0.4.0-incubating.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-parser-0.4.0-incubating.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/cxf-2.2.2-patched.jar" sourcepath="C:/apache-cxf-2.2.5-src/"/>
+	<classpathentry exported="true" kind="lib" path="lib/cxf-2.2.2-patched.jar" sourcepath="src/apache-cxf-2.2.2-patched-src.zip"/>
 	<classpathentry kind="lib" path="lib/FastInfoset-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/geronimo-activation_1.1_spec-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/geronimo-annotation_1.0_spec-1.1.1.jar"/>
@@ -104,8 +103,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-xjc-2.1.7.jar"/>
 	<classpathentry kind="lib" path="lib/jaxws-api-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/neethi-2.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/saaj-api-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/saaj-impl-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/stax-utils-20060502.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j-1.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/wstx-asl-3.2.4.jar"/>
@@ -187,5 +184,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-0.1-incubating-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fontbox-1.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-1.2.1.jar" sourcepath="src/pdfbox-1.2.1-src.zip"/>
+	<classpathentry kind="lib" path="lib/urlrewritefilter-3.1.0.jar" sourcepath="src/urlrewritefilter-3.1.0-src.zip"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

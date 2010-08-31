@@ -1,4 +1,4 @@
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?html>
 <div id="${el}-dialog" class="checkin">
    <div class="hd">${msg("header")}</div>
    <div class="bd">

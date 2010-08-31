@@ -3408,7 +3408,9 @@ Alfresco.util.Ajax = function()
          var callback = config.successCallback;
          if (callback && typeof callback.fn == "function")
          {
-            var contentType = serverResponse.getResponseHeader["Content-Type"] || config.responseContentType;
+            var contentType = serverResponse.getResponseHeader["Content-Type"] ||
+                              serverResponse.getResponseHeader["content-type"] ||
+                              config.responseContentType;
             // User provided a custom successHandler
             var json = null;
 

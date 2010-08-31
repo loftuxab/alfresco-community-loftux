@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.component.BaseFilter("Alfresco.TopicListFilter", "${args.htmlid}");
+   new Alfresco.component.BaseFilter("Alfresco.TopicListFilter", "${args.htmlid?js_string}");
 //]]></script>
 <div class="filter topiclist-filter">
    <h2>${msg("header.browsetopics")}</h2>

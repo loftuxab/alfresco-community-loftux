@@ -1,4 +1,4 @@
-<div id="${args.htmlid}-body" class="tool tools-link">
+<div id="${args.htmlid?html}-body" class="tool tools-link">
    <h2>${msg("header.tools")}</h2>
    <ul class="toolLink">
       <#list tools as tool>
