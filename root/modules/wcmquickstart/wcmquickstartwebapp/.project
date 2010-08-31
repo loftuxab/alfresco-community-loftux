@@ -33,7 +33,6 @@
 	</buildSpec>
 	<natures>
 		<nature>com.springsource.server.ide.facet.core.plannature</nature>
-		<nature>com.springsource.server.ide.facet.core.bundlenature</nature>
 		<nature>org.eclipse.ajdt.ui.ajnature</nature>
 		<nature>org.maven.ide.eclipse.maven2Nature</nature>
 		<nature>com.springsource.sts.roo.core.nature</nature>
