@@ -1,7 +1,7 @@
-function toRepoType(appType)
+function toRepoType(contentType)
 {
    var type = "";
-   switch (String(appType))
+   switch (String(contentType))
    {
       case "dod5015":
          type = "dod:filePlan";
@@ -23,7 +23,7 @@ function fromRepoType(repoType)
          break;
       case "ws:websiteContainer":
     	 type = "wcmqs";
-    	 break;    		 
+    	 break;   
    }
    return type;
 }
@@ -34,7 +34,7 @@ function getLocationType()
    var siteId = page.url.templateArgs.site,
       containerId = template.properties.container,
       containerType = "cm:folder",
-      appType = "";
+      contentType = "";
 
    if (siteId !== null)
    {
@@ -49,11 +49,11 @@ function getLocationType()
             // Save the overridden page title into the request context
             context.setValue("page-titleId", doclibMeta.titleId);
          }
-         appType = doclibMeta.type;
+         contentType = doclibMeta.type;
       }
 
       var connector = remote.connect("alfresco");
-      result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId + "?type=" + toRepoType(appType));
+      result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId + "?type=" + toRepoType(contentType));
       if (result.status == 200)
       {
          var data = eval('(' + result + ')');
@@ -73,6 +73,7 @@ var objLocation = getLocationType(),
    scopeType = objLocation.siteId !== null ? "" : "repo-";
 
 model.doclibType = doclibType == "" ? scopeType : doclibType + "-";
+model.appType = context.attributes.portletHost ? "portlet-" : "";
 
 // Repository Library root node
 var rootNode = "alfresco://company/home",
