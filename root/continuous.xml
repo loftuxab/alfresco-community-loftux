@@ -720,6 +720,9 @@
       <condition property="platformExe" value="${file.name.bitrock.exe.linux}">
       	 <os family="unix" />
       </condition>
+      
+      <echo message="Using binaries_folder=${dir.name.binaries}"/>
+
    </target>
 
 
