@@ -1,0 +1,12 @@
+BUILD
+
+"mvn install" should build the wcmqs.war file.
+
+The project contains a snapshot of Spring Surf and Open CMIS in a local maven repository. These were 
+built from the source and then the relevant directories within the $HOME/.m2 maven repository copied 
+under the project repo in maven-repo. 
+
+INSTALLATION
+
+If the wcmqs.war is deployed to a different servlet container to the Alfresco repository then the web
+editor application needs to be deployed with it. This can be found as the awe.war file under directory webeditor.

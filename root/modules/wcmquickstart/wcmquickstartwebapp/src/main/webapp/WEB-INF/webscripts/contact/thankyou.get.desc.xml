@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Contact Post Successful</shortname>
+  <description>Take input of a contact message</description>
+  <url>/contact/thankyou</url>
+</webscript>

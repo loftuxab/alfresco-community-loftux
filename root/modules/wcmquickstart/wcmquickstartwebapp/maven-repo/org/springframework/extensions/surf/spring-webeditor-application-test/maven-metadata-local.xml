@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.springframework.extensions.surf</groupId>
+  <artifactId>spring-webeditor-application-test</artifactId>
+  <version>1.0.0.CI-SNAPSHOT</version>
+  <versioning>
+    <versions>
+      <version>1.0.0.CI-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20100828083623</lastUpdated>
+  </versioning>
+</metadata>

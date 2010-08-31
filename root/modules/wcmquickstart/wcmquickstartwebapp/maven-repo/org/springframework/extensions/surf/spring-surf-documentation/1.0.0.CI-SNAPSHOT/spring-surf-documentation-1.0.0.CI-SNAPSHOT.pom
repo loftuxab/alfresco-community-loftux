@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.extensions.surf</groupId>
+		<artifactId>spring-surf-parent</artifactId>
+		<version>1.0.0.CI-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<groupId>org.springframework.extensions.surf</groupId>
+	<artifactId>spring-surf-documentation</artifactId>
+	<version>1.0.0.CI-SNAPSHOT</version>
+	<name>Spring Surf - Documentation</name>
+	<description>Spring Surf - Documentation</description>
+	<url>spring-surf/${project.artifactId}</url>
+	<packaging>jar</packaging>
+
+	<build>
+		<plugins>
+			 <plugin>
+				<groupId>org.springframework.extensions.surf</groupId>
+				<artifactId>spring-surf-doc-plugin</artifactId>
+				<version>1.0.0.CI-SNAPSHOT</version>
+				<dependencies>
+				    <dependency>
+			            <groupId>javax.servlet.jsp</groupId>
+			            <artifactId>jsp-api</artifactId>
+			            <version>2.1</version>
+			            <scope>provided</scope>
+			        </dependency>
+					<dependency>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+						<version>2.5</version>
+						<scope>provided</scope>
+					</dependency>
+    				<dependency>
+			            <groupId>org.tuckey</groupId>
+			            <artifactId>urlrewritefilter</artifactId>
+			            <version>3.1.0</version>
+			        </dependency>
+				</dependencies>
+				<executions>
+				  <execution>
+					<id>generatewsdoc</id>
+					<phase>pre-site</phase>
+					<configuration>
+						<itemElementType>itemizedlist</itemElementType>
+					</configuration>	
+					<goals>
+					  <goal>generate-webscript-doc</goal>
+					</goals>
+				  </execution>
+				  <execution>
+					<id>generatejsdoc</id>
+					<phase>pre-site</phase>
+					<configuration>
+						<basePackages>org.springframework.extensions</basePackages>
+					</configuration>	
+					<goals>
+					  <goal>generate-javascript-doc</goal>
+					</goals>
+				  </execution>
+				  <execution>
+					<id>generatejsapidoc</id>
+					<phase>pre-site</phase>
+					<configuration>
+						<itemElementType>itemizedlist</itemElementType>
+						<basePackages>org.springframework.extensions</basePackages>
+					</configuration>	
+					<goals>
+					  <goal>generate-javascript-api-doc</goal>
+					</goals>
+				  </execution>
+				  <execution>
+					<id>generatetpdoc</id>
+					<phase>pre-site</phase>
+					<configuration>
+						<basePackages>org.springframework.extensions</basePackages>
+					</configuration>	
+					<goals>
+					  <goal>generate-template-doc</goal>
+					</goals>
+				  </execution>
+				  <execution>
+					<id>generatetpapidoc</id>
+					<phase>pre-site</phase>
+					<configuration>
+						<basePackages>org.springframework.extensions</basePackages>
+					</configuration>	
+					<goals>
+					  <goal>generate-template-api-doc</goal>
+					</goals>
+				  </execution>
+				</executions>
+		  	</plugin>		
+			
+		</plugins>
+	</build>
+
+	<dependencies>
+	</dependencies>
+
+</project>

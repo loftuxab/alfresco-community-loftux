@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.springframework.extensions.surf</groupId>
+  <artifactId>spring-surf-core-configservice</artifactId>
+  <version>1.0.0.CI-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20100828083234</lastUpdated>
+  </versioning>
+</metadata>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page> 
+   <id>rsspage</id>
+   <template-instance>rss</template-instance>
+   <authentication>none</authentication>
+</page>

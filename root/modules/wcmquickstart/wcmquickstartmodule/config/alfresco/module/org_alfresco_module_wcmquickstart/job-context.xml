@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="org_alfresco_module_wcmquickstart_processReceivedFeedbackTrigger" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+			  <property name="targetObject">
+			  	<bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.FeedbackProcessor">
+			  		<property name="nodeService" ref="nodeService" />
+			  		<property name="searchService" ref="searchService" />
+			  		<property name="txHelper" ref="retryingTransactionHelper" />
+                    <property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper" />
+			  	</bean>
+			  </property>
+			  <property name="targetMethod" value="run"/>
+			</bean>
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+        	<!-- The default is to check every 30 seconds. May well want to reduce the frequency on a production box. -->
+            <value>0/30 * * * * ?</value>
+        </property>
+    </bean>
+
+    <bean id="org_alfresco_module_wcmquickstart_processAssetAvailabilityTrigger" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+            <bean
+                class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                <property name="targetObject">
+                    <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.AvailabilityProcessor">
+                        <property name="nodeService" ref="nodeService" />
+                        <property name="searchService" ref="searchService" />
+                        <property name="txHelper" ref="retryingTransactionHelper" />
+                        <property name="behaviourFilter" ref="policyBehaviourFilter" />
+                    </bean>
+                </property>
+                <property name="targetMethod" value="run" />
+            </bean>
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+            <!-- Normally check at midnight each day. -->
+            <value>0/30 * * * * ?</value>
+<!--             <value>0 0 0 * * ?</value>  -->
+        </property>
+    </bean>
+
+    <bean id="org_alfresco_module_wcmquickstart_processPublishingQueues" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+              <property name="targetObject">
+                <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.PublishQueueProcessor">
+                    <property name="searchService" ref="searchService" />
+                    <property name="transactionService" ref="TransactionService" />
+                    <property name="publishService" ref="org_alfresco_module_wcmquickstart_publishingService" />
+                </bean>
+              </property>
+              <property name="targetMethod" value="run"/>
+            </bean>
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+            <!-- The default is to check every 2 minutes. May well want to reduce the frequency on a production box. -->
+            <value>0 0/2 * * * ?</value>
+        </property>
+    </bean>
+
+              
+</beans>

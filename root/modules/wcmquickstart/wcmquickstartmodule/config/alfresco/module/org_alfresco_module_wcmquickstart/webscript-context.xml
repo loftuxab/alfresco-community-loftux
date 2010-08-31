@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="webscript.org.alfresco.module.wcmquickstart.assetcollection.get" 
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.AssetCollectionGet" 
+          parent="webscript">
+       <property name="nodeService" ref="NodeService"/>       
+       <property name="fileFolderService" ref="FileFolderService"/>
+    </bean>
+              
+    <bean id="webscript.org.alfresco.module.wcmquickstart.websiteinfo.get" 
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.WebsiteInfoGet" 
+          parent="webscript">
+       <property name="nodeService" ref="NodeService"/>       
+       <property name="searchService" ref="SearchService"/>
+       <property name="siteService" ref="SiteService"/>
+       <property name="namespaceService" ref="NamespaceService"/>
+       <property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper" />
+    </bean>
+              
+    <bean id="webscript.org.alfresco.module.wcmquickstart.fixwebassets1.get" 
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.FixWebAssets1" 
+          parent="webscript">
+       <property name="nodeService" ref="NodeService"/>       
+       <property name="searchService" ref="SearchService"/>
+    </bean>
+              
+    <bean id="webscript.org.alfresco.module.wcmquickstart.fixwebassets2.get" 
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.FixWebAssets2" 
+          parent="webscript">
+       <property name="nodeService" ref="NodeService"/>       
+       <property name="searchService" ref="SearchService"/>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.wcmquickstart.loadwebsitedata.get" 
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.LoadWebSiteDataGet" 
+          parent="webscript">       
+        <property name="importerService" ref="ImporterService"/>        
+        <property name="siteService" ref="SiteService"/>     
+        <property name="nodeService" ref="NodeService"/>
+        <property name="fileFolderService" ref="FileFolderService"/>
+        <property name="importFileLocation" value="${wcmqs.importFileLocation}"/>
+    </bean>
+    
+     <bean id="webscript.org.alfresco.module.wcmquickstart.updatewebsiterenditions.get" 
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.UpdateWebSiteRenditionsGet" 
+          parent="webscript">
+       <property name="nodeService" ref="NodeService"/>    
+       <property name="siteService" ref="SiteService"/>    
+       <property name="dictionaryService" ref="DictionaryService"/>    
+       <property name="fileFolderService" ref="FileFolderService"/>
+       <property name="renditionHelper" ref="wcmquickstartmodule_renditionHelper"/>
+    </bean>
+    
+     <bean id="webscript.org.alfresco.module.wcmquickstart.webassetpreviewer.get" 
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.WebAssetPreviewerGet" 
+          parent="webscript">
+       <property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper"/>
+    </bean>
+              
+</beans>

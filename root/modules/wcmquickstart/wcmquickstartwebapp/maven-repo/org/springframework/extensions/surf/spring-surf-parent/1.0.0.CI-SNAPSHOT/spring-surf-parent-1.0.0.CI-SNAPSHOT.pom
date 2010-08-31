@@ -1,0 +1,876 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.extensions.surf</groupId>
+	<artifactId>spring-surf-parent</artifactId>
+	<version>1.0.0.CI-SNAPSHOT</version>
+	<name>Spring Surf Modules</name>
+	<packaging>pom</packaging>
+	<modules>
+	
+		<!-- Spring Surf Platform Services -->
+		<module>spring-surf-core/spring-surf-core</module>
+		<module>spring-surf-core/spring-surf-core-configservice</module>
+		
+		<!-- Spring Web Scripts -->
+		<module>spring-webscripts/spring-webscripts</module>
+		<module>spring-webscripts/spring-webscripts-api</module>
+		<module>spring-webscripts/spring-webscripts-application</module>				
+		<module>spring-webscripts/spring-webscripts-application-test</module>
+		<module>spring-webscripts/spring-webscripts-documentation</module>
+		
+		<!-- Spring Web Scripts Addons -->
+		<module>spring-webscripts-addons/spring-webscripts-addon-groovy</module>
+		<module>spring-webscripts-addons/spring-webscripts-addon-php</module>
+								
+		<!-- Spring Surf -->
+		<module>spring-surf/spring-surf</module>
+		<module>spring-surf/spring-surf-api</module>
+		<module>spring-surf/spring-surf-editor</module>
+		<module>spring-surf/spring-surf-application</module>
+		<module>spring-surf/spring-surf-application-test</module>
+		<module>spring-surf/spring-surf-documentation</module>
+		<module>spring-surf/spring-surf-portlet</module>
+		<module>spring-surf/spring-surf-portlet-test</module>
+		
+		<!-- Spring Web Editor -->
+		<module>spring-webeditor/spring-webeditor</module>
+		<module>spring-webeditor-client/spring-webeditor-client-jsp</module>
+		<module>spring-webeditor-plugins/spring-webeditor-plugin-sample</module>		
+		<module>spring-webeditor-plugins/spring-webeditor-plugin-surf</module>
+		<module>spring-webeditor/spring-webeditor-application</module>
+		<module>spring-webeditor/spring-webeditor-application-test</module>
+		
+		<!-- Spring Surf Sample Applications -->
+		<module>spring-surf-applications/spring-surf-application-quickstart</module>
+		<module>spring-surf-applications/spring-surf-application-petclinic</module>
+		<module>spring-surf-applications/spring-surf-application-spring-travel</module>
+				
+		<!-- Spring Surf Developer Tools -->
+		<module>spring-surf-devtools/spring-surf-doc-plugin</module>
+		<module>spring-surf-devtools/spring-surf-roo-addon</module>
+		<!--
+		<module>spring-surf-devtools/spring-surf-eclipse-extensions</module>
+		-->
+		<!-- Spring Surf Automated Tests -->
+		<module>spring-surf-tests/spring-surf-test-integration</module>
+		
+	</modules>
+	<description>SURF Spring extension project, aggregates and configuration information about all Spring SURF and Spring Webscripts modules</description>
+	<organization>
+		<name>SpringSource, Inc</name>
+		<url>http://www.springsource.com/</url>
+	</organization>
+	<inceptionYear>2009</inceptionYear>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:svn:https://src.springframework.org/svn/se-surf/trunk</connection>
+		<developerConnection>scm:svn:https://src.springframework.org/svn/se-surf/trunk</developerConnection>
+		<url>https://src.springframework.org/svn/se-surf/trunk</url>
+	</scm>
+    <issueManagement>
+        <system>jira</system>
+        <url><![CDATA[ http://jira.springframework.org/secure/BrowseProject.jspa?id=10390 ]]></url>
+    </issueManagement>
+    <ciManagement>
+        <system>bamboo</system>
+        <url>https://build.springsource.org/browse/EXT-SURFNIGHTLY</url>
+    </ciManagement>    	
+	<distributionManagement>
+		<repository>
+			<id>spring-extensions-milestone</id>
+			<name>Spring Extensions Milestone Repository</name>
+			<url>s3://extensions.springframework.org/milestone</url>
+		</repository>
+		<snapshotRepository>
+      <id>spring-extensions-snapshot</id>
+      <name>Spring Extensions Snapshot Repository</name>
+      <url>s3://extensions.springframework.org/snapshot</url>
+    </snapshotRepository>
+    <site>
+	    <id>springsurf.org</id>
+	    <name>Spring Surf Project Site</name>
+	    <url>scpexe://www.springsurf.org/var/www/sites/${project.version}</url>
+	    <!--
+	     <url>file:///Users/drq/dev/spring/site</url>
+	    -->
+	  </site>
+	</distributionManagement>
+	<repositories>
+			<!-- Spring Enterprise Bundle Repositories -->
+		<repository>
+		    <id>com.springsource.repository.bundles.release</id>
+		    <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+		    <url>http://repository.springsource.com/maven/bundles/release</url>
+		</repository>
+		<repository>
+		    <id>com.springsource.repository.bundles.external</id>
+		    <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+		    <url>http://repository.springsource.com/maven/bundles/external</url>
+		</repository> 
+		<repository>
+		    <id>com.springsource.private.repository.bundles.release</id>
+		    <name>SpringSource Enterprise Bundle Repository - SpringSource Private External Bundle Releases</name>
+		    <url>http://private.repository.springsource.com/maven/bundles/external</url>
+		</repository>
+		<repository>
+		    <id>com.springsource.repository.bundles.milestone</id>
+		    <name>SpringSource Enterprise Bundle Repository - External Bundle Milestones</name>
+		    <url>http://repository.springsource.com/maven/bundles/milestone</url>
+		</repository>
+		<repository>
+		    <id>com.springsource.repository.bundles.snapshot</id>
+		    <name>SpringSource Enterprise Bundle Repository - Nightly Snapshots</name>
+		    <url> http://repository.springsource.com/maven/bundles/snapshot</url>
+		</repository>
+		<repository>
+		    <id>maven.springframework.org.milestone</id>
+		    <name>Spring Framework Maven Repository - Milestone Releases</name>
+		    <url>http://maven.springframework.org/milestone</url>
+		</repository>
+		<repository>
+		    <id>maven.springframework.org.snapshot</id>
+		    <name>Spring Framework Maven Repository - Nightly Snapshots</name>
+		    <url>http://maven.springframework.org/snapshot</url>
+		</repository>
+
+		<!-- Spring Extensions Snapshot Repository -->
+		<repository>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>snapshot.extensions.springframework.org</id>
+			<name>SpringSource S3 Extensions Snapshot Maven Repository</name>
+			<url>http://extensions.springframework.org/snapshot</url>
+		</repository>
+		
+		<!-- Spring Extensions Milestone Repository -->
+		<repository>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>milestone.extensions.springframework.org</id>
+			<name>SpringSource S3 Extensions Milestone Maven Repository</name>
+			<url>http://extensions.springframework.org/milestone</url>
+		</repository>
+
+		<!-- Alfresco Community Maven Repositories -->
+		<repository>
+                        <id>alfresco-public-snapshots</id>
+                        <url>http://maven.alfresco.com/nexus/content/groups/public-snapshots</url>
+                        <releases>
+                                <enabled>false</enabled>
+                        </releases>
+                        <snapshots>
+                                <enabled>true</enabled>
+                        </snapshots>
+		</repository>
+		<repository>
+                        <id>alfresco-public-releases</id>
+                        <url>http://maven.alfresco.com/nexus/content/groups/public</url>
+                </repository>
+
+	</repositories>
+	<pluginRepositories>
+		
+		<!-- To help with managing license files -->
+		<pluginRepository>
+			<id>mc-release</id>
+			<url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
+		</pluginRepository>
+		<pluginRepository>
+      <id>Codehaus repository</id>
+      <url>http://repository.codehaus.org/</url>
+    </pluginRepository>
+		<pluginRepository>
+      <id>Codehaus snapshots repository</id>
+      <url>http://snapshots.repository.codehaus.org/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>		
+	</pluginRepositories>
+	<developers>
+		<developer>
+			<id>davidc</id>
+			<email>david.caruana@alfresco.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>Alfresco Software Limited</organization>
+			<organizationUrl>http://www.alfresco.com</organizationUrl>
+		</developer>
+		<developer>
+			<id>kevinr</id>
+			<email>kevin.roast@alfresco.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>Alfresco Software Limited</organization>
+			<organizationUrl>http://www.alfresco.com</organizationUrl>
+		</developer>
+		<developer>
+			<id>royw</id>
+			<email>roy.wetherall@alfresco.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>Alfresco Software Limited</organization>
+			<organizationUrl>http://www.alfresco.com</organizationUrl>
+		</developer>
+		<developer>
+			<id>uzi</id>
+			<email>uzi@alfresco.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>Alfresco Software Limited</organization>
+			<organizationUrl>http://www.alfresco.com</organizationUrl>
+		</developer>
+		<developer>
+			<id>yqu</id>
+			<email>yong.qu@alfresco.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>Alfresco Software Limited</organization>
+			<organizationUrl>http://www.alfresco.com</organizationUrl>
+		</developer>
+		<developer>
+          <id>mindthegab</id>
+          <email>gabriele.columbro@alfresco.com</email>
+          <roles>
+            <role>Maven Little Helper</role>
+          </roles>
+          <organization>Alfresco Software Limited</organization>
+          <organizationUrl>http://www.alfresco.com</organizationUrl>
+        </developer>
+	</developers>
+	<build>
+		<extensions>
+			<extension>
+				<groupId>org.springframework.build.aws</groupId>
+				<artifactId>org.springframework.build.aws.maven</artifactId>
+				<version>2.0.0.RELEASE</version>
+			</extension>
+		</extensions>
+		<pluginManagement>
+			<plugins>
+	            <plugin>
+	                <groupId>org.apache.maven.plugins</groupId>
+	                <artifactId>maven-deploy-plugin</artifactId>
+	                <version>2.4</version>
+	                <dependencies>
+	                	<dependency>
+				            <groupId>org.codehaus.plexus</groupId>
+				            <artifactId>plexus-utils</artifactId>
+				            <version>1.5.15</version>
+	                	</dependency>
+	                </dependencies>
+	            </plugin>
+	    	</plugins>
+		</pluginManagement>
+		<plugins>
+		<!-- Dashboard -->
+		 <plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>dashboard-maven-plugin</artifactId>
+		  <version>${maven.dashboard.version}</version>
+		  <configuration>
+		    <dialect>${org.hibernate.dialect}</dialect>
+		    <driverClass>
+		      ${org.hibernate.connection.driverclass}
+		    </driverClass>
+		    <connectionUrl>
+		      ${org.hibernate.connection.connectionurl}
+		    </connectionUrl>
+		    <username>${org.hibernate.connection.username}</username>
+		    <password>${org.hibernate.connection.password}</password>
+		    <keepVersionAsDiscriminantCriteria>
+		      false
+		    </keepVersionAsDiscriminantCriteria>
+		
+		  </configuration>
+		  <dependencies>
+		    <dependency>
+		      <!-- HSQLDB Jdbc Driver -->
+		      <groupId>hsqldb</groupId>
+		      <artifactId>hsqldb</artifactId>
+		      <version>1.8.0.7</version>
+		    </dependency>
+		
+		    <!-- to override commons-logging in Hibernate library dependency -->
+		    <dependency>
+		      <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+		      <version>1.1</version>
+		    </dependency>
+		  </dependencies>
+		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.1</version>
+			</plugin>		
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4</version>
+				<configuration>
+					<includeEmptyDirs>true</includeEmptyDirs>
+					<!-- <encoding>UTF-8</encoding> -->					
+				</configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.3</version>
+				<configuration>
+					<!-- <skipTests>true</skipTests> -->
+				</configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
+            </plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1-beta-1</version>
+				<configuration>
+					<attachClasses>true</attachClasses>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+                    <archive>
+                        <manifestEntries>
+                            <SCM-Revision>${buildNumber}</SCM-Revision>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Help to manage Maven license files -->			
+			<plugin>
+				<inherited>false</inherited>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.5.0</version>
+				<configuration>
+				   <header>src/etc/license.txt</header>
+				   <aggregate>true</aggregate>
+				   <properties>
+				       <name>${project.name}</name>
+				       <year>${project.inceptionYear}</year>
+				   </properties>
+				   <includes>
+				       <include>**/*.java</include>
+				   </includes>
+				   <failIfMissing>false</failIfMissing>
+				</configuration>
+				<executions>
+				   <execution>
+				       <goals>
+				           <goal>check</goal>
+				       </goals>
+				   </execution>
+				</executions>
+			</plugin>			
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<executions>
+				  <execution>
+				    <phase>validate</phase>        
+				    <goals>
+				      <goal>create</goal>
+				    </goals>
+				  </execution>
+				</executions>
+				<configuration>
+				  <doCheck>false</doCheck>
+				  <doUpdate>true</doUpdate>
+				  <!-- This value will be used for buildNumber when revision cannot be retrieved from SCM (e.g. new untested/uncommitted code) -->
+				  <revisionOnScmFailure>1</revisionOnScmFailure>
+				</configuration>
+			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+			
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-4</version>
+				<configuration>
+					<descriptors>
+						<descriptor>distribution/src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+            </plugin>
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.4</version>
+                <dependencies>
+					<dependency>
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-utils</artifactId>
+						<version>1.5.1</version>
+						<type>jar</type>
+					</dependency>                
+                </dependencies>
+            </plugin>
+            -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-release-plugin</artifactId>
+              <version>2.0-beta-9</version>
+              <configuration>
+                <dryRun>${maven.release.dryRun}</dryRun>
+                <preparationGoals>clean install</preparationGoals>
+                <goals>${maven.release.goals}</goals>
+                <tagBase>${maven.release.scm.tags}</tagBase>
+                <autoVersionSubmodules>${maven.release.multimodule}</autoVersionSubmodules>
+                <arguments>${maven.release.arguments}</arguments>
+                <username>${surf.scm.username}</username>
+                <password>${surf.scm.password}</password>
+              </configuration>
+            </plugin>
+
+            <!-- IDE -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>false</downloadJavadocs>
+                    <!-- WTP is not required
+                    <wtpversion>2.0</wtpversion> -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <dependenciesAsLibraries>true</dependenciesAsLibraries>
+                </configuration>
+            </plugin>
+
+            <!-- Site -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${plugin.site.version}</version>
+                <configuration>
+                  <stagingRepositoryId>springsurf.org</stagingRepositoryId>
+                  <stagingSiteURL>scpexe://www.springsurf.org/var/www/staging/${project.version}</stagingSiteURL>
+                </configuration>
+            </plugin>
+
+            <!-- DocBook (with thanks to Spring Batch's config!) -->
+			<plugin>
+				<groupId>com.agilejava.docbkx</groupId>
+				<artifactId>docbkx-maven-plugin</artifactId>
+				<version>2.0.9</version>
+				<executions>
+					<execution>
+						<id>single-page</id>
+						<goals>
+							<goal>generate-html</goal>
+						</goals>
+						<configuration>
+							<htmlCustomization>${project.parent.basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+							<postProcess>
+								<move todir="${basedir}/target/site/reference/html-single">
+									<fileset dir="${basedir}/target/docbkx/html">
+										<include name="index.html" />
+									</fileset>
+								</move>
+								<copy todir="${basedir}/target/site/reference/html-single">
+									<fileset dir="${project.parent.basedir}/src/docbkx/resources">
+										<include name="**/*.css" />
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
+									</fileset>
+								</copy>
+								<copy todir="${basedir}/target/site/reference/html-single">
+									<fileset dir="${basedir}/src/site/docbook/reference">
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
+										<include name="code/**/*" />
+									</fileset>
+								</copy>
+								<!--
+								<copy todir="${basedir}/target/site/reference/html-single/code">
+									<fileset dir="${basedir}/src/site/docbook/reference/code">
+										<include name="**/*" />
+									</fileset>
+								</copy>
+								-->
+							</postProcess>
+						</configuration>
+						<phase>site</phase>
+					</execution>
+					<execution>
+						<id>single-pdf</id>
+						<goals>
+							<goal>generate-pdf</goal>
+						</goals>
+						<configuration>
+							<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
+							<admonGraphicsPath>../../src/docbkx/resources/images/</admonGraphicsPath>
+							<postProcess>
+								<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/${project.artifactId}.pdf" failonerror="false" />
+							</postProcess>
+						</configuration>
+						<phase>site</phase>
+					</execution>
+					<execution>
+						<id>multi-page</id>
+						<goals>
+							<goal>generate-html</goal>
+						</goals>
+						<configuration>
+							<chunkedOutput>true</chunkedOutput>
+							<htmlCustomization>${project.parent.basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+							<postProcess>
+								<move todir="${basedir}/target/site/reference">
+									<fileset dir="${basedir}/target/docbkx">
+										<include name="**/*.html" />
+									</fileset>
+								</move>
+								<copy todir="${basedir}/target/site/reference/html">
+									<fileset dir="${project.parent.basedir}/src/docbkx/resources">
+										<include name="**/*.css" />
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
+									</fileset>
+								</copy>
+								<copy todir="${basedir}/target/site/reference/html">
+									<fileset dir="${basedir}/src/site/docbook/reference">
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
+										<include name="code/**/*" />
+									</fileset>
+								</copy>
+								<!--
+								<copy todir="${basedir}/target/site/reference/html/code">
+									<fileset dir="${basedir}/src/site/docbook/reference/code">
+										<include name="**/*" />
+									</fileset>
+								</copy>
+								-->
+							</postProcess>
+						</configuration>
+						<phase>site</phase>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.docbook</groupId>
+						<artifactId>docbook-xml</artifactId>
+						<version>4.4</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.xmlgraphics</groupId>
+						<artifactId>fop</artifactId>
+						<version>0.93</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<includes>index.xml</includes>
+					<chunkedOutput>false</chunkedOutput>
+					<draftWatermarkImage />
+					<htmlStylesheet>css/html.css</htmlStylesheet>
+					<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
+					<foCustomization>${project.parent.basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
+					<xincludeSupported>true</xincludeSupported>
+					<entities>
+						<entity>
+							<name>version</name>
+							<value>${project.version}</value>
+						</entity>
+					</entities>
+				</configuration>
+			</plugin>
+			<!--
+			<plugin>
+			    <groupId>com.vineetmanohar</groupId>
+				<artifactId>maven-twitter-plugin</artifactId>
+				<version>0.1</version>
+				<executions>
+				    <execution>
+				       <goals>
+				           <goal>tweet</goal>
+					   </goals>
+				       <id>tweet-deploy</id>
+				       <inherited>false</inherited>
+					   <configuration>
+					   	   <twitterStatus>Spring Surf Modules ${project.version} deployed. Check http://www.springsurf.org for documentation.</twitterStatus>
+                       </configuration>
+                       <phase>deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
+			-->
+		</plugins>
+	</build>
+	<reporting>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-report-plugin</artifactId>
+          <version>2.4.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jxr-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>2.3</version>
+          <configuration>
+          	<targetJdk>${maven.compiler.source}</targetJdk>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>taglist-maven-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.6.1</version>
+        </plugin>
+        <plugin>
+          <groupId>com.googlecode.maven-overview-plugin</groupId>
+          <artifactId>maven-overview-plugin</artifactId>
+          <version>RELEASE</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>cobertura-maven-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>dashboard-maven-plugin</artifactId>
+          <version>${maven.dashboard.version}</version>
+        </plugin>
+        <!--
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>2.3</version>
+          <configuration>
+            <xmlOutput>true</xmlOutput>
+            <effort>Max</effort>
+          </configuration>
+        </plugin>
+        -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>jdepend-maven-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-changelog-plugin</artifactId>
+          <reportSets>
+            <reportSet>
+              <id>dual-report</id>
+                <configuration>
+                <type>range</type>
+                <range>30</range>
+              </configuration>
+              <reports>
+                <report>changelog</report>
+                <report>file-activity</report>
+              </reports>
+            </reportSet>
+          </reportSets>
+          <inherited>false</inherited>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-changes-plugin</artifactId>
+          <version>2.3</version>
+          <reportSets>
+            <reportSet>
+              <reports>
+                <report>jira-report</report>
+              </reports>
+            </reportSet>
+          </reportSets>
+          <configuration>
+            <statusIds>Closed,Resolved</statusIds>
+            <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Fix Version</columnNames>
+            <sortColumnNames>Type,Key DESC</sortColumnNames>
+            <!-- This generates notes for release 1.0.0-M2 using the Jira versionId 1136 -->
+            <fixVersionIds>11367</fixVersionIds>
+            <template>custom-announcement.vm</template>
+	          <templateDirectory>announcements</templateDirectory>
+	          <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+	          <mailSender>
+                <name>Spring Surf Release Notification</name>
+                <email>noreply@springsurf.org</email>
+              </mailSender>
+	          <smtpHost>${smtp.server}</smtpHost>
+	          <smtpPort implementation="java.lang.Integer">${smtp.port}</smtpPort>
+	          <toAddresses>
+	            <toAddress implementation="java.lang.String">gabriele.columbro@alfresco.com</toAddress>
+	            <toAddress implementation="java.lang.String">uzi@alfresco.com</toAddress>  
+	            <toAddress implementation="java.lang.String">yong.qu@alfresco.com</toAddress>  
+	          </toAddresses>
+	          <username>${smtp.username}</username>
+	          <password>${smtp.password}</password>
+	          <sslMode>${smtp.sslMode}</sslMode>
+	          <urlDownload>http://maven.springframework.org/milestone</urlDownload>
+	          <generateJiraAnnouncement>true</generateJiraAnnouncement>
+	        </configuration>
+	        <inherited>false</inherited>
+        </plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-project-info-reports-plugin</artifactId>
+			<configuration>
+				<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+			</configuration>
+		</plugin>        
+      </plugins>
+   </reporting>
+
+	<!-- Common test dependencies for Spring Surf -->
+	<dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
+        </dependency>  	
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Servlet API 2.5 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		
+	</dependencies>
+	 
+	<properties>
+		
+		<!-- Surf Properties -->
+		<surf.version.major>1</surf.version.major>
+		<surf.version.minor>0</surf.version.minor>
+		<surf.version.revision>0</surf.version.revision>
+		<surf.version.label>Milestone 3</surf.version.label>
+		<surf.edition>-</surf.edition>
+		<surf.schema>1000</surf.schema>
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<plugin.site.version>2.0.1</plugin.site.version>
+		<svn.url.base>https://src.springframework.org/svn/se-surf</svn.url.base>
+
+		<!-- Spring version dependencies -->
+		<spring.version>3.0.0.RELEASE</spring.version>
+		<roo.version>1.0.2.RELEASE</roo.version>
+		
+		<!-- maven-release-plugin configuration -->
+		<maven.release.dryRun>false</maven.release.dryRun>
+		<maven.release.goals>deploy site-deploy changes:announcement-generate changes:announcement-mail</maven.release.goals>
+		<maven.release.scm.tags>${svn.url.base}/tags</maven.release.scm.tags>
+		<maven.release.multimodule>true</maven.release.multimodule>
+		<!-- Add here custom JVM/Maven argument appended to the forked mvn release command line execution -->
+		<maven.release.arguments>-Psite</maven.release.arguments>
+		<maven.dashboard.version>RELEASE</maven.dashboard.version>
+		<!-- maven-compiler-plugin configuration -->
+		<maven.compiler.source>1.5</maven.compiler.source>
+		<maven.compiler.target>1.5</maven.compiler.target>
+	</properties>
+	
+	<profiles>
+		
+		<!-- Specific settings for Maven 2.2.1 (used for site and site deploy) -->
+		<profile>
+			<id>site</id>			
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<plugin.site.version>2.1</plugin.site.version>
+			</properties>
+		</profile>		
+	</profiles>
+
+</project>

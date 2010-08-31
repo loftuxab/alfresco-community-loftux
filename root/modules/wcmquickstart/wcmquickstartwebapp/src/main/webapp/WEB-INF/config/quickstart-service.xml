@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+      
+    <!-- Object factories -->
+
+    <bean id="sectionFactory" class="org.alfresco.wcm.client.impl.SectionFactoryCmisImpl">
+       <property name="sectionsRefreshAfter" value="60"/>
+       <property name="assetFactory" ref="assetFactory"/>
+	   <property name="dictionaryService" ref="dictionaryService"/>       
+    </bean>
+    
+    <bean id="collectionFactory" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.CollectionFactoryWebserviceImpl">
+       <property name="extensionName" value="collectionFactory"/>    
+       <property name="assetFactory" ref="assetFactory"/>
+       <property name="sectionFactory" ref="sectionFactory"/>
+       <property name="connectorService" ref="connector.service"/> 
+    </bean>
+    
+    <bean id="assetFactory" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.AssetFactoryCmisImpl">
+       <property name="extensionName" value="assetFactory"/>    
+       <property name="collectionFactory" ref="collectionFactory"/>
+       <property name="sectionFactory" ref="sectionFactory"/>
+    </bean>
+
+    <!-- Service for fetching site data. Implements a cache. -->    
+    <bean id="webSiteService" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.WebSiteServiceImpl">
+       <property name="extensionName" value="webSiteService"/>
+       <property name="webSiteCacheRefreshAfter" value="300"/>
+       <property name="urlUtils" ref="urlUtils"/>       
+       <property name="sectionFactory" ref="sectionFactory"/>
+       <property name="assetFactory" ref="assetFactory"/>
+       <property name="connectorService" ref="connector.service"/> 
+       <property name="logoFilename" value="logo.%"/>
+    </bean>
+    
+    <!--  Dictionary service -->
+    <bean id="dictionaryService" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.DictionaryServiceImpl">
+       <property name="extensionName" value="dictionaryService"/>
+    </bean>    
+</beans>

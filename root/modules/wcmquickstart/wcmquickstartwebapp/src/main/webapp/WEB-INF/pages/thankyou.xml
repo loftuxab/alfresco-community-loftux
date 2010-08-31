@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page> 
+   <id>thankyou.html</id>
+   <title>title.thankyou</title>
+   <template-instance>two-block</template-instance>
+   <authentication>none</authentication>
+   <components>
+      <component>
+         <region-id>left1</region-id>
+         <url>/contact/thankyou</url>
+      </component>       
+      <component>
+         <region-id>right1</region-id>
+         <url>/content/narrow</url>
+         <properties>
+  	     	<asset>/contact.html</asset>
+    	 </properties>         
+      </component>       
+   </components>
+</page>
