@@ -5,6 +5,7 @@
 <urlrewrite default-match-type="wildcard">
 
 	<!-- Spring Surf -->
+	<!-- Not required by quickstart
 	<rule>
 		<from>/proxy**</from>
 		<to>/service/proxy/$1</to>
@@ -17,6 +18,7 @@
 		<from>/service/**</from>
 		<to>/service/$1</to>
 	</rule>	
+	-->
 	<rule match-type="regex">
 	    <from>/(css|js|img|images|swf)/.*</from>
 	    <set name="static">true</set>
