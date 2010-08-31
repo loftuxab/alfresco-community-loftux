@@ -59,7 +59,7 @@
    <script type="text/javascript">//<![CDATA[
    new ${jsType}().setOptions(
    {
-      nodeRef: new Alfresco.util.NodeRef("${url.args.nodeRef}"),
+      nodeRef: new Alfresco.util.NodeRef("${url.args.nodeRef?js_string}"),
       siteId: "${page.url.templateArgs.site!""}",
       rootNode: new Alfresco.util.NodeRef("${rootNode}")
    });

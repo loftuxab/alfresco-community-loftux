@@ -1,4 +1,4 @@
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
 Alfresco.util.addMessages(${messages}, "Alfresco.module.PropertyPicker");
 <#if transientContentProperties??>

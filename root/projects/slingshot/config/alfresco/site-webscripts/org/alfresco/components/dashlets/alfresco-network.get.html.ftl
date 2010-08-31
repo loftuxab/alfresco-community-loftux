@@ -1,6 +1,8 @@
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
+   new Alfresco.widget.DashletResizer("${el}", "${instance.object.id}");
 //]]></script>
+
 <div class="dashlet">
    <div class="title">${msg("header.network")}</div>
    <div class="body scrollablePanel" <#if args.height??>style="height: ${args.height}px;"</#if>>
@@ -12,6 +14,7 @@
       </div>
    </div>
 </div>
+
 <script type="text/javascript">//<![CDATA[
-   Alfresco.util.relToTarget("${args.htmlid}");
+   Alfresco.util.relToTarget("${el}");
 //]]></script>

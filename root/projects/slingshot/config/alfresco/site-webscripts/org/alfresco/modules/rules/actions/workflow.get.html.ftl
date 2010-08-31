@@ -1,4 +1,4 @@
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?html>
 <div id="${el}-dialog" class="workflow">
    <div id="${el}-title" class="hd">&nbsp;</div>
    <div class="bd">

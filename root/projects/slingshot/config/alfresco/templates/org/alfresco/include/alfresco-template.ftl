@@ -4,7 +4,7 @@
 <#assign DEBUG=(common.globalConfig("client-debug", "false") = "true")>
 <#assign AUTOLOGGING=(common.globalConfig("client-debug-autologging", "false") = "true")>
 <#-- allow theme to be specified in url args - helps debugging themes -->
-<#assign theme = (page.url.args.theme)!theme />
+<#assign theme = (page.url.args.theme!theme)?html />
 <#-- Portlet container detection -->
 <#assign PORTLET=(context.attributes.portletHost!false)>
 

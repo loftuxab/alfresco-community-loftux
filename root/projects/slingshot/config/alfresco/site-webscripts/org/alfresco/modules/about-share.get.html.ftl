@@ -1,6 +1,7 @@
-<div id="${args.htmlid}-dialog" class="about-share">
+<#assign el=args.htmlid?html>
+<div id="${el}-dialog" class="about-share">
    <div class="bd">
-      <div id="${args.htmlid}-logo" class="logo">
+      <div id="${el}-logo" class="logo">
          <div class="about">
             <#assign split=serverVersion?index_of(" ")>
             <div class="header">Alfresco ${serverEdition?html} v${serverVersion?substring(0, split)?html}</div>

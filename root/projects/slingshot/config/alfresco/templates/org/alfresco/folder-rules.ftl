@@ -37,7 +37,7 @@
    <script type="text/javascript">//<![CDATA[
    new Alfresco.FolderRules().setOptions(
    {
-      nodeRef: new Alfresco.util.NodeRef("${url.args.nodeRef}"),
+      nodeRef: new Alfresco.util.NodeRef("${url.args.nodeRef?js_string}"),
       siteId: "${page.url.templateArgs.site!""}",
       folder:
       {

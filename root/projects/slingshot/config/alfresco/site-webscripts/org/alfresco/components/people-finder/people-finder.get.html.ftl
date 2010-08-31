@@ -1,30 +1,31 @@
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.PeopleFinder("${args.htmlid}").setOptions(
+   new Alfresco.PeopleFinder("${el}").setOptions(
    {
-      siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>",
-      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
-      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')},
-      setFocus: ${args.setFocus!'false'},
-      addButtonSuffix: "${args.addButtonSuffix!''}",
-      dataWebScript: "${(args.dataWebScript!'api/people')?replace("[", "{")?replace("]", "}")}",
+      siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${(args.site!"")?js_string}</#if>",
+      minSearchTermLength: ${(args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length'))?js_string},
+      maxSearchResults: ${(args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results'))?js_string},
+      setFocus: ${(args.setFocus!'false')?js_string},
+      addButtonSuffix: "${(args.addButtonSuffix!'')?js_string}",
+      dataWebScript: "${(args.dataWebScript!'api/people')?replace("[", "{")?replace("]", "}")?js_string}",
       viewMode: ${args.viewMode!"Alfresco.PeopleFinder.VIEW_MODE_DEFAULT"}
    }).setMessages(
       ${messages}
    );
 //]]></script>
 
-<div id="${args.htmlid}-body" class="people-finder list">
+<div id="${el}-body" class="people-finder list">
    
-   <div class="title"><label for="${args.htmlid}-search-text">${msg("title")}</label></div>
+   <div class="title"><label for="${el}-search-text">${msg("title")}</label></div>
    
    <div class="finder-wrapper">
       <div class="search-bar theme-bg-color-3">
-         <div class="search-text"><input type="text" id="${args.htmlid}-search-text" name="-" value="" maxlength="256" tabindex="0"/></div>
+         <div class="search-text"><input type="text" id="${el}-search-text" name="-" value="" maxlength="256" tabindex="0"/></div>
          <div class="search-button">
-            <span id="${args.htmlid}-search-button" class="yui-button yui-push-button"><span class="first-child"><button>${msg("button.search")}</button></span></span>
+            <span id="${el}-search-button" class="yui-button yui-push-button"><span class="first-child"><button>${msg("button.search")}</button></span></span>
          </div>
       </div>
       
-      <div id="${args.htmlid}-results" class="results"></div>
+      <div id="${el}-results" class="results"></div>
    </div>
 </div>

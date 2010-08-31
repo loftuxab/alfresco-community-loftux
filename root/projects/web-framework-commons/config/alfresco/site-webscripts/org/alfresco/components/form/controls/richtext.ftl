@@ -32,6 +32,6 @@
       <textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" columns="${columns}" tabindex="0"
                 <#if field.description??>title="${field.description}"</#if>
                 <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
-                <#if field.disabled && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true")>disabled="true"</#if>>${field.value}</textarea>
+                <#if field.disabled && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true")>disabled="true"</#if>>${field.value?html}</textarea>
    </#if>
 </div>

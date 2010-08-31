@@ -1,4 +1,4 @@
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?html>
 <div id="${el}-rulesContainer" class="rules">
    <h3>${msg("header.rule-picker")}</h3>
    <div id="${el}-rulePicker" class="rule-picker"></div>

@@ -1,4 +1,4 @@
-<#assign controlId = args.htmlid + "-cntrl">
+<#assign controlId = args.htmlid?html + "-cntrl">
 <#assign pickerId = controlId + "-picker">
 
 <div id="${pickerId}" class="picker document-picker">

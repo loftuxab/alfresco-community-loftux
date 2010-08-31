@@ -1,14 +1,14 @@
 <#macro renderFormsRuntime formId>
    <script type="text/javascript">//<![CDATA[
-      new Alfresco.FormUI("${formId}", "${args.htmlid}").setOptions(
+      new Alfresco.FormUI("${formId}", "${args.htmlid?js_string}").setOptions(
       {
          mode: "${form.mode}",
          <#if form.mode == "view">
          arguments:
          {
-            itemKind: "${form.arguments.itemKind!""}",
-            itemId: "${form.arguments.itemId!""}",
-            formId: "${form.arguments.formId!""}"
+            itemKind: "${(form.arguments.itemKind!"")?js_string}",
+            itemId: "${(form.arguments.itemId!"")?js_string}",
+            formId: "${(form.arguments.formId!"")?js_string}"
          }
          <#else>
          enctype: "${form.enctype}",
@@ -16,7 +16,7 @@
          [
             <#list form.constraints as constraint>
             {
-               fieldId : "${args.htmlid}_${constraint.fieldId}", 
+               fieldId : "${args.htmlid?js_string}_${constraint.fieldId}", 
                handler : ${constraint.validationHandler}, 
                params : ${constraint.params}, 
                event : "${constraint.event}",
@@ -37,23 +37,23 @@
       <#if form.showCaption?? && form.showCaption>
          <div id="${formId}-caption" class="caption"><span class="mandatory-indicator">*</span>${msg("form.required.fields")}</div>
       </#if>
-         
+      
       <#if form.mode != "view">
-         <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl}">
+         <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl?html}">
       </#if>
       
       <#if form.mode == "create" && form.destination?? && form.destination?length &gt; 0>
-         <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination}" />
+         <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination?html}" />
       </#if>
       
       <#if form.mode != "view" && form.redirect?? && form.redirect?length &gt; 0>
-         <input id="${formId}-redirect" name="alf_redirect" type="hidden" value="${form.redirect}" />
+         <input id="${formId}-redirect" name="alf_redirect" type="hidden" value="${form.redirect?html}" />
       </#if>
       
       <div id="${formId}-fields" class="form-fields">
          <#nested>
       </div>
-         
+      
       <#if form.mode != "view">
          <@renderFormButtons formId=formId />
          </form>
@@ -77,7 +77,7 @@
 
 <#macro renderField field>
    <#if field.control?? && field.control.template??>
-      <#assign fieldHtmlId=args.htmlid + "_" + field.id >
+      <#assign fieldHtmlId=args.htmlid?js_string + "_" + field.id >
       <#include "${field.control.template}" />
    </#if>
 </#macro>

@@ -2,7 +2,7 @@
    <div class="hd">${msg("title.browseDocfolder")}</div>
    <div class="bd">
       <div class="tree-div">
-         <h2 id="twister">${args.site}</h2>
+         <h2 id="twister">${args.site?html}</h2>
          <div id="treeview" />
       </div>
    </div>

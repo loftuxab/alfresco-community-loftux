@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.CreateContentMgr("${args.htmlid}").setOptions(
+   new Alfresco.CreateContentMgr("${args.htmlid?js_string}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(

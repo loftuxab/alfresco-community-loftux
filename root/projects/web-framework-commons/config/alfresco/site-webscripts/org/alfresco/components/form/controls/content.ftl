@@ -19,8 +19,8 @@
          currentValue: "${field.value?js_string}",
          mandatory: ${field.mandatory?string},
          formMode: "${form.mode}",
-         nodeRef: "${context.properties.nodeRef!""}",
-         mimeType: "${context.properties.mimeType!""}",
+         nodeRef: "${(context.properties.nodeRef!"")?js_string}",
+         mimeType: "${(context.properties.mimeType!"")?js_string}",
          <#if field.control.params.plainMimeTypes??>plainMimeTypes: "${field.control.params.plainMimeTypes}",</#if>
          <#if field.control.params.richMimeTypes??>richMimeTypes: "${field.control.params.richMimeTypes}",</#if>
          <#if field.control.params.imageMimeTypes??>imageMimeTypes: "${field.control.params.imageMimeTypes}",</#if>

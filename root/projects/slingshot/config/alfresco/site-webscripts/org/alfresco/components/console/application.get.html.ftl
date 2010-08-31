@@ -3,11 +3,11 @@
 <![endif]-->
 <input id="yui-history-field" type="hidden" />
 
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.ConsoleApplication("${args.htmlid}").setMessages(${messages});
+   new Alfresco.ConsoleApplication("${el}").setMessages(${messages});
 //]]></script>
 
-<#assign el=args.htmlid>
 <div id="${el}-body" class="application">
    
    <!-- Options panel -->

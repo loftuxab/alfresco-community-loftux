@@ -9,5 +9,5 @@
    </ul>
 </div>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.component.BaseFilter("Alfresco.DataListFilter", "${args.htmlid}").setFilterIds([${filterIds}]);
+   new Alfresco.component.BaseFilter("Alfresco.DataListFilter", "${args.htmlid?js_string}").setFilterIds([${filterIds}]);
 //]]></script>

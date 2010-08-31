@@ -27,6 +27,8 @@ import org.alfresco.service.cmr.repository.StoreRef;
 /**
  * Path Object Reference
  * 
+ * Note: This path is relative to the CMIS root path 
+ * 
  * @author davidc
  */
 public class ObjectPathReference extends AbstractObjectReference
@@ -44,9 +46,7 @@ public class ObjectPathReference extends AbstractObjectReference
     public ObjectPathReference(CMISServices cmisServices, CMISRepositoryReference repo, String path)
     {
         super(cmisServices, repo);
-        this.path = path.startsWith("/") ? path : "/" + path;
-        this.path = (cmisServices.getDefaultRootPath().equals("/") || this.path.startsWith(cmisServices.getDefaultRootPath())) ?
-                this.path : cmisServices.getDefaultRootPath() + this.path;
+        this.path = cmisServices.getDefaultRootPath() + path;
         String[] splitPath = this.path.split("/");
         String[] pathSegments = new String[splitPath.length -1];
         System.arraycopy(splitPath, 1, pathSegments, 0, splitPath.length -1);

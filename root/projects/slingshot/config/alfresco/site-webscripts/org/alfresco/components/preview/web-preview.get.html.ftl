@@ -1,6 +1,7 @@
+<#assign el=args.htmlid?html>
 <#if (node?exists)>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.WebPreview("${args.htmlid}").setOptions(
+new Alfresco.WebPreview("${el}").setOptions(
 {
    nodeRef: "${node.nodeRef}",
    name: "${node.name?js_string}",
@@ -17,14 +18,14 @@ new Alfresco.WebPreview("${args.htmlid}").setOptions(
    <div class="hd">
       <div class="title">
          <h4>
-            <img id="${args.htmlid}-title-img" src="${url.context}/components/images/generic-file-32.png" alt="File" />
-            <span id="${args.htmlid}-title-span"></span>            
+            <img id="${el}-title-img" src="${url.context}/components/images/generic-file-32.png" alt="File" />
+            <span id="${el}-title-span"></span>
          </h4>
       </div>
    </div>
    <div class="bd">
-      <div id="${args.htmlid}-shadow-swf-div" class="preview-swf">
-         <div id="${args.htmlid}-swfPlayerMessage-div"><#if (node?exists)>${msg("label.preparingPreviewer")}</#if></div>
+      <div id="${el}-shadow-swf-div" class="preview-swf">
+         <div id="${el}-swfPlayerMessage-div"><#if (node?exists)>${msg("label.preparingPreviewer")}</#if></div>
       </div>
    </div>
 </div>

@@ -3,16 +3,16 @@
 <![endif]-->
 <input id="yui-history-field" type="hidden" />
 
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.ConsoleGroups("${args.htmlid}").setOptions({
-      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
-      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}
+   new Alfresco.ConsoleGroups("${el}").setOptions({
+      minSearchTermLength: ${(args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length'))?js_string},
+      maxSearchResults: ${(args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results'))?js_string}
    }).setMessages(
       ${messages}
    );
 //]]></script>
 
-<#assign el=args.htmlid>
 <div id="${el}-body" class="groups">
 
    <!-- Search panel -->
