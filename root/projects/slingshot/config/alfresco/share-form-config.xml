@@ -305,7 +305,22 @@
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
                <show id="mimetype" />
+               <show id="cm:modified" />
+               <show id="cm:modifier" />
             </field-visibility>
+            <appearance>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/mimetype.ftl" />
+               </field>
+               <field id="cm:modifier">
+                  <control>
+                     <control-param name="forceEditable">true</control-param>
+                  </control>
+               </field>
+               <field id="cm:modified">
+                  <control template="/org/alfresco/components/form/controls/daterange.ftl" />
+               </field>
+            </appearance>
          </form>
       </forms>
    </config>

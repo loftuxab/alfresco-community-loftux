@@ -55,7 +55,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "calendar"], this.onComponentsLoaded, this);
       
       // Initialise prototype properties
       this.widgets = {};
@@ -226,7 +226,7 @@
          // render the calendar control
          this.widgets.calendar.render();
 
-         // Iw value was set in visible fields, make sure they are validated and put in the hidden field as well 
+         // If value was set in visible fields, make sure they are validated and put in the hidden field as well 
          if (this.options.currentValue !== "")
          {
             this._handleFieldChange(null);
