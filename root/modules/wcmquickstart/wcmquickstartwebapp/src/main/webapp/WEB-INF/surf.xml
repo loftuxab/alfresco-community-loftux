@@ -16,6 +16,8 @@
 			</autowire>
 			
 			<defaults>
+			
+			    <region-chrome>vanilla</region-chrome>
 
 				<!-- Set up our sample login and logout pages -->
 				<page-type>

@@ -23,14 +23,22 @@
     <!-- Make Surf I18NUtil managed messages available to javascript. This bean can be accessed
          from html using <script type="text/javascript" src="${url.context}/messages.js?locale=${locale}"></script>
     -->
-    <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.wcm.client.webscript.MessagesWebScript" />
+    <!-- <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.wcm.client.webscript.MessagesWebScript" />
+	-->
 
+    <!-- Webscript for RSS -->
+    <bean id="webscript.rss.rss.get" parent="webscript" class="org.alfresco.wcm.client.webscript.RssWebScript">
+        <property name="collectionFactory" ref="collectionFactory" />
+        <property name="urlUtils" ref="urlUtils"/>
+    </bean>
+    
     <!-- Class for converting between CMIS ids and url safe representations of the id -->
     <bean id="cmisIdEncoder" class="org.alfresco.wcm.client.util.impl.AlfrescoCmisIdEncoderImpl"/>
     
     <!-- Url Utils -->
     <bean id="urlUtils" class="org.alfresco.wcm.client.util.impl.UrlUtilsImpl">
         <property name="cmisIdEncoder" ref="cmisIdEncoder"/>
+ 		<property name="websiteDomain" value="%{website.domain}"/>        
     </bean>
     
     <!-- Beans that provide Freemarker directives-->
@@ -60,6 +68,7 @@
                 <entry key="endTemplate" value-ref="endTemplateDirective"/>
             </map>         
         </property>
+		<property name="urlUtils" ref="urlUtils"/>           
 	</bean>  
 
     <!-- Intercept any controller and add application-wide data to the request. -->
@@ -83,16 +92,15 @@
     <!-- Comment form controller -->   
     <bean id="commentFormController" class="org.alfresco.wcm.client.controller.CommentFormController"/>
            
-    <!-- Comment form controller -->   
-    <bean id="rssController" class="org.alfresco.wcm.client.controller.RssController"/>
-
     <!-- Resolve views by using the template selected within the repository for a page -->
     <bean id="dynamicPageViewResolver" class="org.alfresco.wcm.client.viewresolver.DynamicPageViewResolver" parent="abstractWebFrameworkViewResolver"/>
 
+	<!-- 
     <bean id="staticPageViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/"/>
         <property name="suffix" value=".ftl"/>
     </bean>
+    -->
 
     <!-- Use an editorially configured error page if available, otherwise use a static one -->
 	<bean id="exceptionResolver" class="org.alfresco.wcm.client.exceptionresolver.RepositoryExceptionResolver">
@@ -120,7 +128,7 @@
         <property name="interceptors">
             <list>
                 <!-- SURF: required interceptors -->
-                <!-- 
+                <!-- These ones are not needed by WCM quickstart
                 <ref bean="requestContextInterceptor"/>
                 <ref bean="themeInterceptor"/>
                 <ref bean="previewContextInterceptor"/> 

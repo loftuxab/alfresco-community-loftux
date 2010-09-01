@@ -34,7 +34,7 @@ public interface CmisSessionPool
 	Session getGuestSession() throws Exception;
 	
 	/** 
-	 * Get a session for a logged-in user.
+	 * Get a session authenticated against the repository.
 	 * @param username repository username
 	 * @param password repository password 
 	 */

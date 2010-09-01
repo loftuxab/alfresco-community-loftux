@@ -18,7 +18,11 @@
  */
 package org.alfresco.wcm.client.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,7 +43,7 @@ import org.springframework.web.servlet.view.RedirectView;
  */
 public class GenericTemplateAssetController extends UrlViewController
 {
-	private Set<String> staticPages;
+	private List<Pattern> staticPages;
 	
 	@Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)	
@@ -64,7 +68,7 @@ public class GenericTemplateAssetController extends UrlViewController
 		// repository to get a template name from the url.
 		RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
 		Asset asset = (Asset) requestContext.getValue("asset");		
-		if (asset == null && ! staticPages.contains(path)) 
+		if (asset == null && ! isStatic(path)) 
 		{
 			response.setStatus(HttpStatus.NOT_FOUND.value());
 			throw new PageNotFoundException();
@@ -83,9 +87,23 @@ public class GenericTemplateAssetController extends UrlViewController
 		return super.handleRequestInternal(request, response);
 	}
 	
+	private boolean isStatic(String path)
+	{
+        for (Pattern staticPage : staticPages)
+        {
+            Matcher matcher = staticPage.matcher(path);
+            if (matcher.matches()) return true;
+        }
+        return false;
+	}
+	
 	public void setStaticPages(Set<String> staticPages)
 	{
-		this.staticPages = staticPages;
+		this.staticPages = new ArrayList<Pattern>();		
+        for (String staticPage : staticPages)
+        {
+            this.staticPages.add(Pattern.compile(staticPage));
+        }
 	}
 
 }

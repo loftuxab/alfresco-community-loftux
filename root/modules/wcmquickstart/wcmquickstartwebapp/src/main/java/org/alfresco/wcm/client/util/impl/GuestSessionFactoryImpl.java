@@ -76,7 +76,6 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory
 		Session session = (Session)obj;
 		session.cancel();
 		session.clear();
-		//TODO close also needed?!
 	}
 
 	/**
