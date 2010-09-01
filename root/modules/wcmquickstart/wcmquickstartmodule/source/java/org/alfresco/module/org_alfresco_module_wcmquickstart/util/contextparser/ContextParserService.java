@@ -18,7 +18,9 @@
  */
 package org.alfresco.module.org_alfresco_module_wcmquickstart.util.contextparser;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +35,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 public class ContextParserService
 {
 	/** Pattern matcher */
-	private static final Pattern MATCH_PATTERN = Pattern.compile("\\$\\{(\\w+)\\}"); 
+	private static final Pattern MATCH_PATTERN = Pattern.compile("\\$\\{(.+)\\}"); 
 	
 	/** Context parser map */
 	private Map<String, ContextParser> contextParsers = new TreeMap<String, ContextParser>();
@@ -56,6 +58,7 @@ public class ContextParserService
 	public String parse(NodeRef context, String value)
 	{		
 		String result = value;	
+		Collection<ContextParser> parsers = contextParsers.values();
 		
 		// Get a Matcher based on the target string. 
 		Matcher matcher = MATCH_PATTERN.matcher(value); 
@@ -63,15 +66,18 @@ public class ContextParserService
 		// Find all the matches. 
 		while (matcher.find() == true) 
 		{ 
-			String contextParserName = matcher.group(1);
-			ContextParser qp = contextParsers.get(contextParserName.trim());
-			if (qp != null)
+			String invocation = matcher.group(1).trim();
+			for (ContextParser parser : parsers)
 			{
-				String temp = qp.execute(context);
-				if (temp != null)
-				{
-					result = result.replace(matcher.group(), temp);
-				}
+			    if (parser.canHandle(invocation))
+			    {
+	                String temp = parser.execute(context, invocation);
+	                if (temp != null)
+	                {
+	                    result = result.replace(matcher.group(), temp);
+	                }
+	                break;
+			    }
 			}
 		}	
 		
