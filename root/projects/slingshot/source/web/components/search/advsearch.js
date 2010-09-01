@@ -153,8 +153,7 @@
          });
          
          // render initial form template
-         // TODO: from previous query!
-         this.renderFormTemplate(defaultForm);
+         this.renderFormTemplate(defaultForm, true);
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -170,11 +169,13 @@
        * 
        * @method renderFormTemplate
        * @param form {Object} Form descriptor to render template for
+       * @param repopulate {boolean} If true, repopulate form instance based on supplied data
        */
-      renderFormTemplate: function ADVSearch_renderFormTemplate(form)
+      renderFormTemplate: function ADVSearch_renderFormTemplate(form, repopulate)
       {
          // update current form state
          this.currentForm = form;
+         this.currentForm.repopulate = repopulate;
          
          var containerDiv = Dom.get(this.id + "-forms");
          
@@ -247,6 +248,41 @@
       },
       
       /**
+       * Repopulate currently displayed Form fields based on saved query data
+       *
+       * @method repopulateCurrentForm
+       */
+      repopulateCurrentForm: function ADVSearch_repopulateCurrentForm()
+      {
+         if (this.options.savedQuery.length !== 0)
+         {
+            var savedQuery = YAHOO.lang.JSON.parse(this.options.savedQuery);
+            var elForm = Dom.get(this.currentForm.runtime.formId);
+            
+            for (var i = 0, j = elForm.elements.length; i < j; i++)
+            {
+               var element = elForm.elements[i];
+               var name = element.name;
+               if (name != undefined && name !== "-")
+               {
+                  var savedValue = savedQuery[name];
+                  if (savedValue !== undefined)
+                  {
+                     if (element.type === "checkbox" || element.type === "radio")
+                     {
+                        element.checked = (savedValue === "true");
+                     }
+                     else
+                     {
+                        element.value = savedValue;
+                     }
+                  }
+               }
+            }
+         }
+      },
+      
+      /**
        * Event handler that gets fired when user clicks the Search button.
        *
        * @method onSearchClick
@@ -280,6 +316,13 @@
       {
          // extract the current form runtime - so we can reference it later
          this.currentForm.runtime = args[1].runtime;
+         
+         // Repopulate current form from url query data?
+         if (this.currentForm.repopulate)
+         {
+            this.currentForm.repopulate = false;
+            this.repopulateCurrentForm();
+         }
       }
    });
 })();
