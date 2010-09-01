@@ -105,6 +105,7 @@
                               <li><a onclick="FDK.runUnitTest('textarea-parameters');">textarea.ftl</a></li>
                               <li><a onclick="FDK.runUnitTest('textfield-parameters');">textfield.ftl</a></li>
                               <li><a onclick="FDK.runUnitTest('styleClass-parameters');">styleClass</a></li>
+                              <li><a onclick="FDK.runUnitTest('style-parameters');">style</a></li>
                            </ul>
                         </div>
                      </div>
