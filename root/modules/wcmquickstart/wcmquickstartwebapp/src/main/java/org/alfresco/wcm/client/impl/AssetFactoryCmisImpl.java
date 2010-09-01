@@ -51,9 +51,8 @@ import org.apache.chemistry.opencmis.commons.enums.RelationshipDirection;
 import org.apache.chemistry.opencmis.commons.spi.RelationshipService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.extensions.webscripts.processor.BaseProcessorExtension;
 
-public class AssetFactoryCmisImpl extends BaseProcessorExtension implements AssetFactory
+public class AssetFactoryCmisImpl implements AssetFactory
 {
     private final static Log log = LogFactory.getLog(AssetFactoryCmisImpl.class);
     

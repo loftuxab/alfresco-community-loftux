@@ -40,9 +40,8 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.extensions.webscripts.processor.BaseProcessorExtension;
 
-public class CollectionFactoryCmisImpl extends BaseProcessorExtension implements CollectionFactory
+public class CollectionFactoryCmisImpl implements CollectionFactory
 {	
 	private final static Log log = LogFactory.getLog(CollectionFactoryCmisImpl.class);
 	

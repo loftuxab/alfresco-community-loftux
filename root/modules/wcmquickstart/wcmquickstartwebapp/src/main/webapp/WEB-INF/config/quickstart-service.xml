@@ -16,22 +16,19 @@
 	   <property name="dictionaryService" ref="dictionaryService"/>       
     </bean>
     
-    <bean id="collectionFactory" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.CollectionFactoryWebserviceImpl">
-       <property name="extensionName" value="collectionFactory"/>    
+    <bean id="collectionFactory" class="org.alfresco.wcm.client.impl.CollectionFactoryWebserviceImpl">
        <property name="assetFactory" ref="assetFactory"/>
        <property name="sectionFactory" ref="sectionFactory"/>
        <property name="connectorService" ref="connector.service"/> 
     </bean>
     
-    <bean id="assetFactory" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.AssetFactoryCmisImpl">
-       <property name="extensionName" value="assetFactory"/>    
+    <bean id="assetFactory" class="org.alfresco.wcm.client.impl.AssetFactoryCmisImpl">
        <property name="collectionFactory" ref="collectionFactory"/>
        <property name="sectionFactory" ref="sectionFactory"/>
     </bean>
 
     <!-- Service for fetching site data. Implements a cache. -->    
-    <bean id="webSiteService" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.WebSiteServiceImpl">
-       <property name="extensionName" value="webSiteService"/>
+    <bean id="webSiteService" class="org.alfresco.wcm.client.impl.WebSiteServiceImpl">
        <property name="webSiteCacheRefreshAfter" value="300"/>
        <property name="urlUtils" ref="urlUtils"/>       
        <property name="sectionFactory" ref="sectionFactory"/>
@@ -41,7 +38,13 @@
     </bean>
     
     <!--  Dictionary service -->
-    <bean id="dictionaryService" parent="baseScriptExtension" class="org.alfresco.wcm.client.impl.DictionaryServiceImpl">
-       <property name="extensionName" value="dictionaryService"/>
-    </bean>    
+    <bean id="dictionaryService" class="org.alfresco.wcm.client.impl.DictionaryServiceImpl"/>
+    
+    <!-- Services which make the factories available to webscripts -->
+        
+    <bean id="collectionService" parent="baseScriptExtension" class="org.alfresco.wcm.client.service.CollectionService">
+       <property name="extensionName" value="collectionService"/>    
+       <property name="collectionFactory" ref="collectionFactory"/>
+    </bean>     
+
 </beans>

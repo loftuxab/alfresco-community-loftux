@@ -1,4 +1,4 @@
-model.articles = collectionFactory.getCollection(context.properties.section.id, args.collection);
+model.articles = collectionService.getCollection(context.properties.section.id, args.collection);
 
 
 
