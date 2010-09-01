@@ -21,26 +21,22 @@ package org.alfresco.wcm.client.impl;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.alfresco.wcm.client.Asset;
+import org.alfresco.wcm.client.AssetCollection;
 import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.CollectionFactory;
-import org.alfresco.wcm.client.AssetCollection;
 import org.alfresco.wcm.client.Query;
 import org.alfresco.wcm.client.ResourceNotFoundException;
 import org.alfresco.wcm.client.Section;
 import org.alfresco.wcm.client.SectionFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.extensions.surf.exception.ConnectorServiceException;
-import org.springframework.extensions.webscripts.connector.Connector;
-import org.springframework.extensions.webscripts.connector.ConnectorService;
-import org.springframework.extensions.webscripts.connector.Response;
 
 /**
  * Get collection using a call to a web service. This is done to avoid having to perform
@@ -56,7 +52,7 @@ public class CollectionFactoryWebserviceImpl implements CollectionFactory
 	
     private SectionFactory sectionFactory;
 	private AssetFactory assetFactory;
-	private ConnectorService connectorService;
+	private WebScriptCaller webscriptCaller;
     
     /**
 	 * Create a ResourceCollection from JSON
@@ -122,39 +118,26 @@ public class CollectionFactoryWebserviceImpl implements CollectionFactory
 				
 		try 
 		{
-			// Query the named collection under the collections folder
-			Connector connector = connectorService.getConnector("alfresco-qs");
-			
-			String uri = "/api/assetcollections/"+URLEncoder.encode(collectionName,"UTF-8")+"?sectionid="+URLEncoder.encode(section.getId(),"UTF-8");
-			log.debug("About to call: "+uri);
-			Response response = connector.call(uri);
-			if (response == null) throw new ResourceNotFoundException("No response for "+uri);
-			String jsonString = response.getText();
-			JSONObject data;
-			try {
-				JSONObject jsonObject = new JSONObject(jsonString);					
-				data = (JSONObject)jsonObject.get("data");
-			
-			}
-			catch (JSONException e) {
-				log.warn("Collection "+collectionName+" not found for section "+section.getPath());
-				return null;
-			}
+		    String scriptUri = "assetcollections/"+URLEncoder.encode(collectionName,"UTF-8");
+            WebscriptParam[] params = new WebscriptParam[] {
+                    new WebscriptParam("sectionid", section.getId())
+            };
+            JSONObject jsonObject = webscriptCaller.getJsonObject(scriptUri, Arrays.asList(params));
+            JSONObject data;
+            if (jsonObject != null)
+            {
+                data = (JSONObject)jsonObject.get("data");
+            }
+            else
+            {
+                throw new ResourceNotFoundException("No response for " + scriptUri);
+            }
 			
 			AssetCollectionImpl collection = buildCollection(data);	
 			
 			// Get the list of ids of assets in the collection
 			List<String> assetIds = buildRelatedAssetList(data);
 			
-			//TODO Remove dummy data code.....
-			/*if (maxResults != -1) {
-				List<String> list = new ArrayList<String>();
-				list.addAll(assetIds);
-				for (int i = 0; i < 7; i++) {
-					assetIds.addAll(list);
-				}
-			}*/
-
 			Query query = new Query();
 			query.setSectionId(sectionId);
 			query.setMaxResults(maxResults);
@@ -176,10 +159,6 @@ public class CollectionFactoryWebserviceImpl implements CollectionFactory
 			}
 			return collection;
 		}
-		catch (ConnectorServiceException e) 
-		{
-			throw new RuntimeException("Connection to alfresco endpoint failed", e);
-		}
 		catch (JSONException e) 
 		{
 			throw new RuntimeException("Parsing getCollection ws JSON response failed", e);
@@ -198,10 +177,10 @@ public class CollectionFactoryWebserviceImpl implements CollectionFactory
     public void setAssetFactory(AssetFactory assetFactory)
     {
         this.assetFactory = assetFactory;
-    }    
-    
-    public void setConnectorService(ConnectorService connectorService) 
-    {
-    	this.connectorService = connectorService;
     }
+
+    public void setWebscriptCaller(WebScriptCaller webscriptCaller)
+    {
+        this.webscriptCaller = webscriptCaller;
+    }    
 }

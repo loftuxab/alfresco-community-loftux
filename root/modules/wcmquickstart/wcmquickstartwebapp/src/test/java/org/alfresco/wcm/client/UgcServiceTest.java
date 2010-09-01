@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.wcm.client.impl.AssetFactoryCmisImpl;
 import org.alfresco.wcm.client.impl.SectionFactoryCmisImpl;
+import org.alfresco.wcm.client.impl.WebScriptCaller;
 import org.alfresco.wcm.client.impl.WebSiteServiceImpl;
 import org.alfresco.wcm.client.util.CmisSessionHelper;
 import org.alfresco.wcm.client.util.CmisSessionPool;
@@ -19,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.extensions.webscripts.connector.ConnectorService;
 
 public class UgcServiceTest extends TestCase 
 {
@@ -39,7 +39,6 @@ public class UgcServiceTest extends TestCase
 	    super.setUp();
 	    
         ApplicationContext testCtx = new ClassPathXmlApplicationContext("test-context.xml");        
-        ConnectorService connectorService = (ConnectorService)testCtx.getBean("connector.service");
         
         // Create a CMIS session
 	    GuestSessionFactoryImpl guestSessionFactory = new GuestSessionFactoryImpl("http://localhost:8080/alfresco/service/cmis","admin","admin");	
@@ -54,7 +53,7 @@ public class UgcServiceTest extends TestCase
         webSiteService = new WebSiteServiceImpl();
         webSiteService.setSectionFactory(sectionFactory);
         webSiteService.setAssetFactory(assetFactory);
-        webSiteService.setConnectorService(connectorService);
+        webSiteService.setWebscriptCaller((WebScriptCaller)testCtx.getBean("webscriptCaller"));
     }
 
 	@Override

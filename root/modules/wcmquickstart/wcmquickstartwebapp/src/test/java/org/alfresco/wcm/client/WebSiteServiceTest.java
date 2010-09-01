@@ -9,6 +9,7 @@ import org.alfresco.wcm.client.impl.AssetFactoryCmisImpl;
 import org.alfresco.wcm.client.impl.AssetImpl;
 import org.alfresco.wcm.client.impl.DictionaryServiceImpl;
 import org.alfresco.wcm.client.impl.SectionFactoryCmisImpl;
+import org.alfresco.wcm.client.impl.WebScriptCaller;
 import org.alfresco.wcm.client.impl.WebSiteServiceImpl;
 import org.alfresco.wcm.client.util.CmisSessionHelper;
 import org.alfresco.wcm.client.util.CmisSessionPool;
@@ -21,7 +22,6 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.extensions.webscripts.connector.ConnectorService;
 
 public class WebSiteServiceTest extends TestCase 
 {
@@ -31,7 +31,6 @@ public class WebSiteServiceTest extends TestCase
 	private Session session;
 	private SectionFactoryCmisImpl sectionFactory;
 	private AssetFactoryCmisImpl assetFactory;
-	private ConnectorService connectorService;
     private ApplicationContext ctx;
     private UrlUtils urlUtils;	
 	
@@ -60,7 +59,6 @@ public class WebSiteServiceTest extends TestCase
 		assetFactory.setSectionFactory(sectionFactory);
 		
         ctx = new ClassPathXmlApplicationContext("test-context.xml");      		
-		connectorService = (ConnectorService)ctx.getBean("connector.service");
 		urlUtils = new UrlUtilsImpl();
     }
 
@@ -76,7 +74,7 @@ public class WebSiteServiceTest extends TestCase
 		WebSiteServiceImpl webSiteService = new WebSiteServiceImpl();
 		webSiteService.setSectionFactory(sectionFactory);
 		webSiteService.setAssetFactory(assetFactory);
-		webSiteService.setConnectorService(connectorService);
+        webSiteService.setWebscriptCaller((WebScriptCaller)ctx.getBean("webscriptCaller"));
 		webSiteService.setUrlUtils(urlUtils);
 		
 		Collection<WebSite> webSites = webSiteService.getWebSites();
@@ -122,7 +120,7 @@ public class WebSiteServiceTest extends TestCase
 		WebSiteServiceImpl webSiteService = new WebSiteServiceImpl();
 		webSiteService.setSectionFactory(sectionFactory);
 		webSiteService.setAssetFactory(assetFactory);
-        webSiteService.setConnectorService(connectorService);
+        webSiteService.setWebscriptCaller((WebScriptCaller)ctx.getBean("webscriptCaller"));
         webSiteService.setUrlUtils(urlUtils);		
 		
 		final WebSite site = webSiteService.getWebSite("localhost", port);
@@ -134,7 +132,7 @@ public class WebSiteServiceTest extends TestCase
 		WebSiteServiceImpl webSiteService = new WebSiteServiceImpl();
 		webSiteService.setSectionFactory(sectionFactory);
 		webSiteService.setAssetFactory(assetFactory);
-        webSiteService.setConnectorService(connectorService);
+        webSiteService.setWebscriptCaller((WebScriptCaller)ctx.getBean("webscriptCaller"));
         webSiteService.setUrlUtils(urlUtils);		
 		
 		WebSite site = webSiteService.getWebSite("localhost", port);

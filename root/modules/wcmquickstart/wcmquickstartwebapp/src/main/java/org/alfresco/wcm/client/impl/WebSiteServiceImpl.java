@@ -19,7 +19,7 @@
 package org.alfresco.wcm.client.impl;
 
 import java.math.BigInteger;
-import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +38,6 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
-import org.springframework.extensions.webscripts.connector.Connector;
-import org.springframework.extensions.webscripts.connector.ConnectorService;
-import org.springframework.extensions.webscripts.connector.Response;
-import org.springframework.extensions.webscripts.connector.ResponseStatus;
 
 /**
  * Web site service implementation
@@ -66,9 +62,9 @@ public class WebSiteServiceImpl implements WebSiteService
     private int webSiteCacheRefreshAfter = 60;
     private int webSiteSectionCacheRefreshAfter = 60;
 
-    private ConnectorService connectorService;
     private SectionFactory sectionFactory;
     private AssetFactory assetFactory;
+    private WebScriptCaller webscriptCaller;
 
     private String logoFilename;
 	private UrlUtils urlUtils;
@@ -174,31 +170,18 @@ public class WebSiteServiceImpl implements WebSiteService
         String rootSectionId = websiteid;
         try
         {
-            // Query the named collection under the collections folder
-            Connector connector = connectorService.getConnector("alfresco-qs");
-
-            String uri = "/api/websiteinfo?websiteid=" + URLEncoder.encode(websiteid, "UTF-8");
-            if (log.isDebugEnabled())
+            WebscriptParam[] params = new WebscriptParam[] {
+                    new WebscriptParam("websiteid", websiteid)
+            };
+            JSONObject jsonObject = webscriptCaller.getJsonObject("websiteinfo", Arrays.asList(params));
+            if (jsonObject != null)
             {
-                log.debug("About to call... " + uri);
-            }
-            Response response = connector.call(uri);
-            if ((response != null) && (response.getStatus().getCode() == ResponseStatus.STATUS_OK))
-            {
-                String jsonString = response.getText();
-                JSONObject jsonObject = new JSONObject(jsonString);
                 JSONObject data = (JSONObject) jsonObject.get("data");
                 feedbackFolderId = data.getString("feedbackfolderid");
                 rootSectionId = data.getString("rootsectionid");
-            } else
-            {
-                if (log.isWarnEnabled())
-                {
-                    log.warn("Received unexpected response when requesting feedback folder for site "
-                            + websiteid + ": " + response);
-                }
             }
-        } catch (Exception ex)
+        } 
+        catch (Exception ex)
         {
             log.error("Error while attempting to retrieve feedback folder for website " + websiteid, ex);
         }
@@ -243,13 +226,12 @@ public class WebSiteServiceImpl implements WebSiteService
         this.assetFactory = assetFactory;
     }
 
-    public void setConnectorService(ConnectorService connectorService)
+	public void setWebscriptCaller(WebScriptCaller webscriptCaller)
     {
-        this.connectorService = connectorService;
+        this.webscriptCaller = webscriptCaller;
     }
 
-    	
-	public void setUrlUtils(UrlUtils urlUtils) {
+    public void setUrlUtils(UrlUtils urlUtils) {
 		this.urlUtils = urlUtils;
 	}    
 
