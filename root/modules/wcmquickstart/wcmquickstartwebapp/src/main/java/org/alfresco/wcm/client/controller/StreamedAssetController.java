@@ -52,8 +52,7 @@ public class StreamedAssetController extends AbstractController
 {
 	private static final long EXPIRES = 300000L; // 5 mins in ms
 	
-    private static final SimpleDateFormat httpDateFormat = new SimpleDateFormat(
-            "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+    private static ThreadLocal<SimpleDateFormat> httpDateFormat = new ThreadLocal<SimpleDateFormat>() {};  	     
 
     private UrlUtils urlUtils;
     private AssetFactory assetFactory;
@@ -155,16 +154,31 @@ public class StreamedAssetController extends AbstractController
         return new ModelAndView(new StreamedAssetView(stream, mimeType));
     }
 
-    public synchronized static String getHttpDate(Date date)
+    public String getHttpDate(Date date)
     {
-        return httpDateFormat.format(date);
+        return dateFormatter().format(date);
     }
 
-    public synchronized static Date getDateFromHttpDate(String date) throws ParseException
+    public Date getDateFromHttpDate(String date) throws ParseException
     {
-        return httpDateFormat.parse(date);
+        return dateFormatter().parse(date);
     }
-
+    
+    /**
+     * Get a date formatter for the thread as SimpleDateFormat is not thread-safe
+     * @return
+     */
+    public SimpleDateFormat dateFormatter() 
+    {
+    	SimpleDateFormat formatter = httpDateFormat.get();
+    	if (formatter == null)
+    	{
+    		formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+    		httpDateFormat.set(formatter);
+    	}
+    	return formatter;
+    }
+ 
     public void setUrlUtils(UrlUtils urlUtils)
     {
         this.urlUtils = urlUtils;

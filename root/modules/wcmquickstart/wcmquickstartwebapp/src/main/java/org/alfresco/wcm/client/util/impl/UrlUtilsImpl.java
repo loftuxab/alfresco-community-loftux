@@ -35,6 +35,7 @@ import org.alfresco.wcm.client.util.UrlUtils;
 public class UrlUtilsImpl implements UrlUtils 
 {
 	private CmisIdEncoder cmisIdEncoder;
+    private String websiteDomain;
 
 	/**
 	 * @see org.alfresco.wcm.client.util.UrlUtils#getUrl(Asset)
@@ -131,7 +132,22 @@ public class UrlUtilsImpl implements UrlUtils
 		return objectId;
     }
 	
-	public void setCmisIdEncoder(CmisIdEncoder cmisIdEncoder) {
+	public void setCmisIdEncoder(CmisIdEncoder cmisIdEncoder) 
+	{
 		this.cmisIdEncoder = cmisIdEncoder;
 	}
+	
+	public void setWebsiteDomain(String domain) 
+	{
+	    this.websiteDomain = domain;
+	}
+
+    /**
+     * @see org.alfresco.wcm.client.util.UrlUtils#getWebsiteDomain()
+     */
+    @Override
+    public String getWebsiteDomain()
+    {
+        return websiteDomain;
+    }
 }

@@ -19,24 +19,20 @@
 package org.alfresco.wcm.client.util.impl;
 
 import org.alfresco.wcm.client.util.CmisSessionPool;
-import org.alfresco.wcm.client.util.UserSessionPool;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.commons.pool.ObjectPool;
 
 /**
- * Facade for the two types of CMIS collection pool
+ * Facade for CMIS collection pool implementations
  * @author Chris Lack
  */
 public class CmisSessionPoolImpl implements CmisSessionPool 
 {
 	private ObjectPool guestSessionPool;
-	private UserSessionPool userSessionPool;
 
-	public CmisSessionPoolImpl(ObjectPool guestSessionPool,
-			                   UserSessionPool userSessionPool)
+	public CmisSessionPoolImpl(ObjectPool guestSessionPool)
 	{
 		this.guestSessionPool = guestSessionPool;
-		this.userSessionPool = userSessionPool;
 	}
 	
 	/**
@@ -45,12 +41,7 @@ public class CmisSessionPoolImpl implements CmisSessionPool
 	@Override
 	public synchronized void closeSession(Session session) throws Exception
 	{
-		if (userSessionPool != null && userSessionPool.isUserSession(session)) {
-			userSessionPool.closeSession(session);
-		}
-		else {
-			guestSessionPool.returnObject(session);
-		}
+		guestSessionPool.returnObject(session);
 	}
 
 	/**
@@ -68,7 +59,7 @@ public class CmisSessionPoolImpl implements CmisSessionPool
 	@Override
 	public synchronized Session getSession(String username, String password)
 	{
-		return userSessionPool.getSession(username, password);		
+		throw new UnsupportedOperationException("Repository authenticated sessions not yet supported by this class");
 	}
 	
 	

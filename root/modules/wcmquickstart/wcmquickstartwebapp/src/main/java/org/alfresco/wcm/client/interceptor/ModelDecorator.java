@@ -21,6 +21,8 @@ package org.alfresco.wcm.client.interceptor;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.alfresco.wcm.client.util.UrlUtils;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,6 +37,7 @@ import freemarker.template.TemplateDirectiveModel;
 public class ModelDecorator
 {
 	private Map<String, TemplateDirectiveModel> freemarkerDirectives;
+    private UrlUtils urlUtils;
 
     public void populate(HttpServletRequest request, ModelAndView modelAndView)
     {		 
@@ -58,13 +61,22 @@ public class ModelDecorator
 		    			new org.springframework.web.servlet.support.RequestContext(request, model));
 		    
 		    // Put the pre-filtered/modified URI into the model
-		    model.put("uri", requestContext.getAttribute("javax.servlet.forward.request_uri"));		    
+		    model.put("uri", requestContext.getAttribute("javax.servlet.forward.request_uri"));	
+		    
+		    model.put("websiteDomain", urlUtils.getWebsiteDomain());
 	    }
     }
 
-    public void setFreemarkerDirectives(Map<String,TemplateDirectiveModel> directives) {
+    public void setFreemarkerDirectives(Map<String,TemplateDirectiveModel> directives) 
+    {
 		this.freemarkerDirectives = directives;
 	}
+    
+    
+    public void setUrlUtils(UrlUtils urlUtils)
+    {
+        this.urlUtils = urlUtils;
+    }      
 }
 
 

@@ -40,7 +40,8 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 /**
- * CommentFormController processes a user generated feedback submission. 
+ * CommentFormController processes a user generated feedback submission such as a comment
+ * on a blog or a contact form post.
  * @author Chris Lack
  */
 @Controller

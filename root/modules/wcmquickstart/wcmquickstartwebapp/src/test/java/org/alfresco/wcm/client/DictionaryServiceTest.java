@@ -50,7 +50,7 @@ public class DictionaryServiceTest extends TestCase
 	    // Create a CMIS session
 	    GuestSessionFactoryImpl guestSessionFactory = new GuestSessionFactoryImpl("http://localhost:8080/alfresco/service/cmis","admin","admin");	
 	    GenericObjectPool guestSessionPool = new GenericObjectPool(guestSessionFactory, 5, GenericObjectPool.WHEN_EXHAUSTED_GROW, 30, 5);	    
-	    sessionPool = new CmisSessionPoolImpl(guestSessionPool, null);
+	    sessionPool = new CmisSessionPoolImpl(guestSessionPool);
 	    session = sessionPool.getGuestSession();
 		CmisSessionHelper.setSession(session);
 		

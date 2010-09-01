@@ -3,7 +3,7 @@
         <div class="interior-header">
             <h2>${articles.title}</h2>
             <#if articles.description??><p class="intheader-paragraph">${articles.description}</p></#if>
-            <span class="ih-rss"> <a href="<@makeurl section=section/>rss/"><img src="${url.context}/img/rss_16.png" width="16" height="16" alt="" /></a><a href="<@makeurl section=section/>rss/">${msg('list.wide2.rss')}</a></span> 
+            <span class="ih-rss"> <a href="<@makeurl section=section/>rss.xml"><img src="${url.context}/img/rss_16.png" width="16" height="16" alt="" /></a><a href="<@makeurl section=section/>rss.xml">${msg('list.wide2.rss')}</a></span> 
         </div>
     </#if>
     

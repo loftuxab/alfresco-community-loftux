@@ -68,4 +68,11 @@ public interface UrlUtils
 	 * @return
 	 */
 	String decodeResourceName(String resourceName);	
+	
+	/**
+	 * Get the website domain. This can be different to the value obtained from the
+	 * HttpServletRequest object where another server sits in-front of the app server.
+	 * @return domain
+	 */
+	String getWebsiteDomain();	
 }
