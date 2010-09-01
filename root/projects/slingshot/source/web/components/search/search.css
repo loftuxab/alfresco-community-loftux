@@ -218,3 +218,8 @@
    background-repeat: no-repeat;
    border-width: 0px;
 }
+
+.search .form-container .mandatory-indicator
+{
+   display: none;
+}

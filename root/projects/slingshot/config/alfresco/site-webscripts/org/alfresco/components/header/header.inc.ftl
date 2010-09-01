@@ -104,7 +104,7 @@
    <a class="avatar" ${attrHref} tabindex="0"><img src="${avatar}" alt="avatar" /></a>
    <span class="user-status">
       <textarea id="${id}-statusText" tabindex="0">${userStatus?html}</textarea>
-      <div id="${id}-statusTime" class="user-status-time" title="${userStatusTime?html}"></div>
+      <div id="${id}-statusTime" class="user-status-time" title="${(userStatusTime!"")?html}"></div>
       <div class="flat-button">
          <span id="${id}-submitStatus" class="yui-button yui-push-button">
             <span class="first-child">
