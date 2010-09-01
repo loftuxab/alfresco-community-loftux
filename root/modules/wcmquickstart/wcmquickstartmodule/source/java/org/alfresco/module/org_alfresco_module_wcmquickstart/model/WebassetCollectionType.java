@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_wcmquickstart.util.WebassetCollectionHelper;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.contextparser.ContextParser;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.contextparser.ContextParserService;
 import org.alfresco.repo.node.NodeServicePolicies;
@@ -59,18 +60,12 @@ public class WebassetCollectionType implements WebSiteModel,
 	/** Node service */
 	private NodeService nodeService;
 	
-	/** Search service */
-	private SearchService searchService;
-	
 	/** On create association behaviour */
 	private JavaBehaviour onCreateAssociation;
-	
-	/** Context parser service */
-	private ContextParserService contextParserService;
-	
-	/** Search store */
-	private String searchStore = "workspace://SpacesStore";
 		
+	/** Collection helper */
+	private WebassetCollectionHelper collectionHelper;
+	
 	/**
 	 * Set the policy component
 	 * 
@@ -92,33 +87,14 @@ public class WebassetCollectionType implements WebSiteModel,
 	}
 	
 	/**
-	 * Set the search service
+	 * Set the web asset collection helper
 	 * 
-	 * @param searchService	search service
+	 * @param collectionHelper	web asset collection helper
 	 */
-	public void setSearchService(SearchService searchService)
+	public void setCollectionHelper(WebassetCollectionHelper collectionHelper) 
 	{
-		this.searchService = searchService;
+		this.collectionHelper = collectionHelper;
 	}
-	
-	/**
-	 * Set the search store, must be a valid store reference string
-	 * 
-	 * @param searchStore	search store
-	 */
-	public void setSearchStore(String searchStore) 
-	{
-		this.searchStore = searchStore;
-	}
-	
-	/**
-	 * 
-	 * @param contextParserService
-	 */
-	public void setContextParserService(ContextParserService contextParserService)
-    {
-	    this.contextParserService = contextParserService;
-    }
 	
 	/**
 	 * Init method.  Binds model behaviours to policies.
@@ -148,25 +124,33 @@ public class WebassetCollectionType implements WebSiteModel,
 	@Override
 	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) 
 	{
-		String queryBefore = makeNull((String)before.get(PROP_QUERY));
-		String queryAfter = makeNull((String)after.get(PROP_QUERY));
-		
-		if ((queryBefore == null && queryAfter != null) ||
-			(queryBefore != null && queryAfter != null && queryBefore.equals(queryAfter) == false))
+		onCreateAssociation.disable();
+		try
 		{
-			// Refresh the collection
-			refreshCollection(nodeRef);
+			String queryBefore = makeNull((String)before.get(PROP_QUERY));
+			String queryAfter = makeNull((String)after.get(PROP_QUERY));
 			
-			// Set the dynamic flag
-			nodeService.setProperty(nodeRef, PROP_IS_DYNAMIC, true);
+			if ((queryBefore == null && queryAfter != null) ||
+				(queryBefore != null && queryAfter != null && queryBefore.equals(queryAfter) == false))
+			{
+				// Refresh the collection
+				collectionHelper.refreshCollection(nodeRef);
+				
+				// Set the dynamic flag
+				nodeService.setProperty(nodeRef, PROP_IS_DYNAMIC, true);
+			}
+			else if (queryBefore != null && queryAfter == null)
+			{
+				// Clear the contents of the collection as we are resetting the query
+				collectionHelper.clearCollection(nodeRef);
+				
+				// Set the dynamic flag
+				nodeService.setProperty(nodeRef, PROP_IS_DYNAMIC, false);
+			}
 		}
-		else if (queryBefore != null && queryAfter == null)
+		finally
 		{
-			// Clear the contents of the collection as we are resetting the query
-			clearCollection(nodeRef);
-			
-			// Set the dynamic flag
-			nodeService.setProperty(nodeRef, PROP_IS_DYNAMIC, false);
+			onCreateAssociation.enable();
 		}
 	}
 	
@@ -184,110 +168,7 @@ public class WebassetCollectionType implements WebSiteModel,
 		}
 		return result;
 	}
-	
-	/**
-	 * Clear collection
-	 * 
-	 * @param collection	collection node reference
-	 */
-	private void clearCollection(NodeRef collection)
-	{
-		List<AssociationRef> assocs = nodeService.getTargetAssocs(collection, ASSOC_WEBASSETS);
-		for (AssociationRef assoc : assocs) 
-		{
-			nodeService.removeAssociation(collection, assoc.getTargetRef(), ASSOC_WEBASSETS);
-		}		
-	}
-	
-	/**
-	 * Refresh collection, clears all current members of the collection.
-	 * 
-	 * @param collection	collection node reference
-	 */
-	private void refreshCollection(NodeRef collection)
-	{
-		onCreateAssociation.disable();
-		try
-		{
-			// Get the query language and max query size
-			String queryLanguage = (String)nodeService.getProperty(collection, PROP_QUERY_LANGUAGE);
-			int maxQuerySize = ((Integer)nodeService.getProperty(collection, PROP_QUERY_RESULTS_MAX_SIZE)).intValue();
-			String query = (String)nodeService.getProperty(collection, PROP_QUERY);
-			
-			if (query != null && query.trim().length() != 0)
-			{			
-				// Clear the contents of the content collection
-				clearCollection(collection);			
-				
-				// Parse the query string
-				query = contextParserService.parse(collection, query);
-				
-				// Build the query parameters
-				SearchParameters searchParameters = new SearchParameters();
-				searchParameters.addStore(new StoreRef(searchStore));
-				searchParameters.setLanguage(queryLanguage);
-				searchParameters.setMaxItems(maxQuerySize);
-				searchParameters.setQuery(query);
-				
-				try
-				{				
-					// Execute the query
-					ResultSet resultSet = searchService.query(searchParameters);
-			
-					// Iterate over the results of the query
-					for (NodeRef result : resultSet.getNodeRefs()) 
-					{
-						// Only ass associations to webassets
-						if (nodeService.hasAspect(result, ASPECT_WEBASSET) == true)
-						{
-							nodeService.createAssociation(collection, result, ASSOC_WEBASSETS);
-						}
-					}
-				}
-				catch (AlfrescoRuntimeException e)
-				{
-					// Rethrow
-					throw new AlfrescoRuntimeException("Invalid collection query.  Please check query for syntax errors.", e);
-				}
-			}
-		}
-		finally
-		{
-			onCreateAssociation.enable();
-		}
-	}
 
-//	/**
-//	 * Parse the collection query
-//	 * @param collection
-//	 * @param query
-//	 * @return
-//	 */
-//	private String parseQueryString(NodeRef collection, String query)
-//	{
-//		
-//		String result = query;	
-//		
-//		// Compile the regex. 
-//		// Create the 'target' string we wish to interrogate. 
-//		// Get a Matcher based on the target string. 
-//		Matcher matcher = queryPattern.matcher(query); 
-//
-//		// Find all the matches. 
-//		while (matcher.find()) 
-//		{ 
-//			String queryParserName = matcher.group(1);
-//			QueryParser qp = queryParsers.get(queryParserName.trim());
-//			if (qp != null)
-//			{
-//				String value = qp.execute(collection);
-//				result = result.replace(matcher.group(), value);
-//			}
-//		}	
-//		
-//		return result;
-//	}
-	
 	/**
 	 * @see org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy#onCreateChildAssociation(org.alfresco.service.cmr.repository.ChildAssociationRef, boolean)
 	 */

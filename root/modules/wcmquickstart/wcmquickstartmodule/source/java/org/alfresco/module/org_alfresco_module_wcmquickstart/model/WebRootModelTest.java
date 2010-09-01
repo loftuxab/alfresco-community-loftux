@@ -21,6 +21,8 @@ package org.alfresco.module.org_alfresco_module_wcmquickstart.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -268,6 +270,7 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 		userTransaction.begin();
 
 		assertTrue((Boolean)nodeService.getProperty(myCollection, PROP_IS_DYNAMIC));
+		checkRefreshAfterNow(myCollection);
 		
 		List<AssociationRef> assocs = nodeService.getTargetAssocs(myCollection, ASSOC_WEBASSETS);
 		assertNotNull(assocs);
@@ -282,6 +285,7 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 		userTransaction.begin();
 		
 		assertTrue((Boolean)nodeService.getProperty(myCollection, PROP_IS_DYNAMIC));
+		checkRefreshAfterNow(myCollection);
 		
 		assocs = nodeService.getTargetAssocs(myCollection, ASSOC_WEBASSETS);
 		assertNotNull(assocs);
@@ -313,6 +317,7 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 		assertNotNull(assocs);
 		assertEquals(3, assocs.size());
 		assertTrue((Boolean)nodeService.getProperty(myCollection, PROP_IS_DYNAMIC));
+		checkRefreshAfterNow(myCollection);
 		
 		// Test the ${siteid}
 		query = "select d.*, w.* " +
@@ -329,8 +334,19 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 		assertNotNull(assocs);
 		assertEquals(3, assocs.size());
 		assertTrue((Boolean)nodeService.getProperty(myCollection, PROP_IS_DYNAMIC));
+		checkRefreshAfterNow(myCollection);
 		
 		userTransaction.commit();
+	}
+	
+	private void checkRefreshAfterNow(NodeRef collection)
+	{
+		Calendar now = Calendar.getInstance();
+		Date refreshAt = (Date)nodeService.getProperty(collection, PROP_REFRESH_AT);
+		assertNotNull(refreshAt);
+		Calendar temp = Calendar.getInstance();
+		temp.setTime(refreshAt);
+		assertTrue(now.before(temp));
 	}
 	
 	public void testPDFWebassets() throws Exception

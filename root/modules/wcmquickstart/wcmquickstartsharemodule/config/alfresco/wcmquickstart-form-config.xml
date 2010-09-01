@@ -103,6 +103,7 @@
                <show id="ws:queryLanguage" />
                <show id="ws:query" />
                <show id="ws:queryResultsMaxSize" />
+               <show id="ws:minsToQueryRefresh" />
                <show id="ws:webassets" />
             </field-visibility>
             <appearance>

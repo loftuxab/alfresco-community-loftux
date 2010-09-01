@@ -68,6 +68,8 @@ public interface WebSiteModel
 	public static final QName PROP_QUERY_LANGUAGE = QName.createQName(NAMESPACE, "queryLanguage");
 	public static final QName PROP_QUERY_RESULTS_MAX_SIZE = QName.createQName(NAMESPACE, "queryResultsMaxSize");
 	public static final QName PROP_IS_DYNAMIC = QName.createQName(NAMESPACE, "isDynamic");
+	public static final QName PROP_MINS_TO_QUERY_REFRESH = QName.createQName(NAMESPACE, "minsToQueryRefresh");
+	public static final QName PROP_REFRESH_AT = QName.createQName(NAMESPACE, "refreshAt");
 	public static final QName ASSOC_WEBASSETS = QName.createQName(NAMESPACE, "webassets");
 	
 	// ws:indexPage type

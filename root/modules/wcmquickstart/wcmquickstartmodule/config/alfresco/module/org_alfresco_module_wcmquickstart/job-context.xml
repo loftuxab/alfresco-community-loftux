@@ -72,6 +72,29 @@
             <value>0 0/2 * * * ?</value>
         </property>
     </bean>
+    
+     <bean id="org_alfresco_module_wcmquickstart_dynamicQueryRefreshProcess" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+              <property name="targetObject">
+                <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.DynamicCollectionProcessor">
+                    <property name="searchService" ref="searchService" />
+                    <property name="transactionService" ref="TransactionService" />
+                    <property name="nodeService" ref="nodeService" />
+                    <property name="collectionHelper" ref="org_alfresco_module_wcmquickstart_collectionHelper" />
+                </bean>
+              </property>
+              <property name="targetMethod" value="run"/>
+            </bean>
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+            <!-- The default is to check every 2 minutes. May well want to reduce the frequency on a production box. -->
+            <value>0 0/2 * * * ?</value>
+        </property>
+    </bean>
 
               
 </beans>
