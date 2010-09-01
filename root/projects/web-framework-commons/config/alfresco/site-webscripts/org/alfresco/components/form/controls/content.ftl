@@ -19,7 +19,13 @@
          currentValue: "${field.value?js_string}",
          mandatory: ${field.mandatory?string},
          formMode: "${form.mode}",
-         nodeRef: "${(context.properties.nodeRef!"")?js_string}",
+         <#if context.properties.nodeRef??>
+         nodeRef: "${context.properties.nodeRef?js_string}",
+         <#elseif form.mode == "edit" && args.itemId??>
+         nodeRef: "${args.itemId?js_string}",
+         <#else>
+         nodeRef: "",
+         </#if>
          mimeType: "${(context.properties.mimeType!"")?js_string}",
          <#if field.control.params.plainMimeTypes??>plainMimeTypes: "${field.control.params.plainMimeTypes}",</#if>
          <#if field.control.params.richMimeTypes??>richMimeTypes: "${field.control.params.richMimeTypes}",</#if>
