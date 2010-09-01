@@ -81,8 +81,9 @@
        */
       onReady: function DateRange_onReady()
       {
-         var fromDate = new Date(0);
          var toDate = new Date();
+         var fromDate = new Date();
+         fromDate.setMonth(toDate.getMonth() - 1);
          
          // construct the pickers
          var page = (fromDate.getMonth() + 1) + "/" + fromDate.getFullYear();
