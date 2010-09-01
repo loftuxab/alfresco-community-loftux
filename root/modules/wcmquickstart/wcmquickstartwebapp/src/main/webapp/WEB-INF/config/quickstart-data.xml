@@ -10,7 +10,7 @@
                 
     <!-- CMIS Session factory for anonymous visitors to the website -->
 	<bean id="guestSessionFactory" class="org.alfresco.wcm.client.util.impl.GuestSessionFactoryImpl">	
-		<constructor-arg value="%{quickstart.repo.url}"/>
+		<constructor-arg value="%{quickstart.repo.cmisurl}"/>
 		<constructor-arg value="%{quickstart.repo.user}"/>
 		<constructor-arg value="%{quickstart.repo.password}"/>
 	</bean>

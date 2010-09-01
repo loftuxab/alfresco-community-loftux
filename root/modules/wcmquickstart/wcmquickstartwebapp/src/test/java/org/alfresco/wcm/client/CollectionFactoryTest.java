@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 import org.alfresco.wcm.client.impl.AssetFactoryCmisImpl;
 import org.alfresco.wcm.client.impl.CollectionFactoryWebserviceImpl;
 import org.alfresco.wcm.client.impl.SectionFactoryCmisImpl;
+import org.alfresco.wcm.client.impl.WebScriptCaller;
 import org.alfresco.wcm.client.impl.WebSiteServiceImpl;
 import org.alfresco.wcm.client.util.CmisSessionHelper;
 import org.alfresco.wcm.client.util.CmisSessionPool;
@@ -16,7 +17,6 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.extensions.webscripts.connector.ConnectorService;
 
 public class CollectionFactoryTest extends TestCase 
 {
@@ -55,17 +55,15 @@ public class CollectionFactoryTest extends TestCase
 		
 		AssetFactoryCmisImpl assetFactory = new AssetFactoryCmisImpl();
 		
-		ConnectorService connectorService = (ConnectorService)ctx.getBean("connector.service");
-		
 		CollectionFactoryWebserviceImpl collectionFactory = new CollectionFactoryWebserviceImpl();
 		collectionFactory.setSectionFactory(sectionFactory);
 		collectionFactory.setAssetFactory(assetFactory);
-		collectionFactory.setConnectorService(connectorService);
+        collectionFactory.setWebscriptCaller((WebScriptCaller)ctx.getBean("webscriptCaller"));
 		
 		WebSiteServiceImpl webSiteService = new WebSiteServiceImpl();
 		webSiteService.setSectionFactory(sectionFactory);
 		webSiteService.setAssetFactory(assetFactory);
-		webSiteService.setConnectorService(connectorService);
+        webSiteService.setWebscriptCaller((WebScriptCaller)ctx.getBean("webscriptCaller"));
 		webSiteService.setLogoFilename("logo.%");
 
 		WebSite site = webSiteService.getWebSite("localhost", port);
