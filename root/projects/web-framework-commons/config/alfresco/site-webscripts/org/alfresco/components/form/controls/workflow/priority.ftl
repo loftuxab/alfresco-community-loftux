@@ -13,8 +13,9 @@
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
       <select id="${fieldHtmlId}" name="${field.name}" tabindex="0" size="1"
-            <#if field.description?exists>title="${field.description}"</#if>
-            <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
+            <#if field.description??>title="${field.description}"</#if>
+            <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
+            <#if field.control.params.style??>style="${field.control.params.style}"</#if>
             <#if field.disabled>disabled="true"</#if>>
             <option value="1"<#if field.value?string == "1"> selected="selected"</#if>>${msg("priority.high")}</option>
             <option value="2"<#if field.value?string == "2"> selected="selected"</#if>>${msg("priority.medium")}</option>

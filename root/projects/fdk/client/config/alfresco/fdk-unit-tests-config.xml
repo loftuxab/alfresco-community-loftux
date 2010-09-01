@@ -538,6 +538,49 @@
             </appearance>
          </form>
          
+         <form id="style-parameters">
+            <field-visibility>
+               <show id="fdk:text" />
+               <show id="fdk:textMultiple" />
+               <show id="fdk:int" />
+               <show id="fdk:boolean" />
+               <show id="mimetype" />
+               <show id="encoding" />
+            </field-visibility>
+            <appearance>
+               <field id="fdk:text">
+                  <control>
+                     <control-param name="style">border: 2px solid red; width: 600px</control-param>
+                  </control>
+               </field>
+               <field id="fdk:textMultiple">
+                  <control>
+                     <control-param name="style">border: 2px solid red; width: 600px</control-param>
+                  </control>
+               </field>
+               <field id="fdk:int">
+                  <control>
+                     <control-param name="style">border: 2px solid red; width: 600px</control-param>
+                  </control>
+               </field>
+               <field id="fdk:boolean">
+                  <control>
+                     <control-param name="style">float: right; margin-right: 90%</control-param>
+                  </control>
+               </field>
+               <field id="mimetype">
+                  <control template="/org/alfresco/components/form/controls/mimetype.ftl">
+                     <control-param name="style">border: 2px solid red; width: 600px</control-param>
+                  </control>
+               </field>
+               <field id="encoding">
+                  <control template="/org/alfresco/components/form/controls/encoding.ftl">
+                     <control-param name="style">border: 2px solid red; width: 600px</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+         
          <form id="field-names">
             <field-visibility>
                <show id="mimetype" />

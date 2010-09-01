@@ -21,6 +21,7 @@
       <input id="${fieldHtmlId}" name="${field.name}" tabindex="0"
              <#if field.control.params.password??>type="password"<#else>type="text"</#if>
              <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
+             <#if field.control.params.style??>style="${field.control.params.style}"</#if>
              <#if field.value?is_number>value="${field.value?c}"<#else>value="${field.value?html}"</#if>
              <#if field.description??>title="${field.description}"</#if>
              <#if field.control.params.maxLength??>maxlength="${field.control.params.maxLength}"</#if> 
