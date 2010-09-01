@@ -155,7 +155,8 @@ public class MarkContentTag extends AbstractTemplateTag
                      this.formId, this.nestedMarker);
                 markedContent.add(content);
 
-                out.write("<span class=\"alfresco-content-marker\" id=\"");
+                // Hide initially, in case we need to log in or user does not want to log in
+                out.write("<span class=\"alfresco-content-marker\" style=\"opacity: 0.4\" id=\"");
                 out.write(editMarkerId);
                 out.write("\">");
 

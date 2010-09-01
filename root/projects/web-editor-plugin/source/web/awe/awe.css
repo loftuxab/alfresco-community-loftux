@@ -63,20 +63,34 @@ a.alfresco-content-delete
     margin: 0 5px 0 0
 }
 
+/*
 span.alfresco-content-marker hide
 {
     display: hidden;
 }
+*/
 
 #awe--show-hide-edit-markers,
 #awe--show-hide-edit-markers span.first-child,
 #awe--quickedit,
-#awe--quickedit span.first-child
+#awe--quickedit span.first-child,
+#awe--quickcreate,
+#awe--quickcreate span.first-child,
+#awe--quickdelete,
+#awe--quickdelete span.first-child
 {
    background: none;
    border: 0;
 }
 
+/*
+#awe--quickedit .disabled,
+#awe--quickcreate .disabled,
+#awe--quickdelete .disabled
+{
+   opacity: 0.4;
+}
+*/
 .js-disabled-form h2
 {
    font-size: 146.5%;
@@ -145,25 +159,25 @@ span.alfresco-content-marker hide
    color: #146997;
    text-decoration: none;
 }
-#awe--loggedout,
-#awe--loggedout span.first-child 
+#awe--loginToggle,
+#awe--loginToggle span.first-child 
 {
    background:none;
    border:0;
 }
-#wef-ribbon #awe--loggedout button
+#wef-ribbon #awe--loginToggle button
 {
    font-weight:bold;
    font-size:85%;
    color:#333;
 }
 
-#wef-ribbon #awe--loggedout.yui-button-disabled button
+#wef-ribbon #awe--loginToggle.yui-button-disabled button
 {
    color:#999;
 }
 
-#wef-ribbon #awe--loggedout button
+#wef-ribbon #awe--loginToggle button
 {
    background: transparent url(./images/logout.png) no-repeat 11px 50%;
 }
