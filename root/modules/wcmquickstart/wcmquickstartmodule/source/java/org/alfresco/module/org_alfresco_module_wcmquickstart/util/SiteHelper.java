@@ -1,6 +1,5 @@
 package org.alfresco.module.org_alfresco_module_wcmquickstart.util;
 
-import java.awt.font.TextMeasurer;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -9,6 +8,7 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebSiteModel;
 import org.alfresco.repo.site.SiteModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.site.SiteInfo;
@@ -34,6 +34,8 @@ public class SiteHelper implements WebSiteModel
     
     /** Node service */
     private NodeService nodeService;
+    
+    private DictionaryService dictionaryService;
     
     /**
      * Given a webasset, return the full URL calculated from the containing web site.
@@ -178,17 +180,22 @@ public class SiteHelper implements WebSiteModel
         this.nodeService = nodeService;
     }
 
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+
     /**
      * Find the nearest parent in the primary child association hierarchy that
-     * matches the given content type.
+     * is of the specified content type (or a sub-type of that type).
      * @param noderef		node reference
      * @param parentType	parent node type
      * @return NodeRef		nearest parent node reference, null otherwise
      */
     private NodeRef findNearestParent(NodeRef noderef, QName parentType)
     {
-        NodeRef parentNode = noderef;
-        while (parentNode != null && !nodeService.getType(parentNode).equals(parentType))
+        NodeRef parentNode = nodeService.getPrimaryParent(noderef).getParentRef();
+        while (parentNode != null && !dictionaryService.isSubClass(nodeService.getType(parentNode), parentType))
         {
             parentNode = nodeService.getPrimaryParent(parentNode).getParentRef();
         }

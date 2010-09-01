@@ -104,4 +104,14 @@ public abstract class ContextParser implements WebSiteModel
 	 * @return String	parsed string value
 	 */
 	public abstract String execute(NodeRef context);
+	
+	public boolean canHandle(String invocation)
+	{
+	    return (invocation != null && invocation.equals(name));
+	}
+	
+	public String execute(NodeRef context, String invocation)
+	{
+	    return execute(context);
+	}
 }
