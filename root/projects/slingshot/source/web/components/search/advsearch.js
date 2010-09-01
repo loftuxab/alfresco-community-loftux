@@ -297,11 +297,10 @@
          // add DD type to form data structure
          formData.datatype = this.currentForm.type;
          
-         // TODO: add site to search page url
-         
          // build and execute url for search page
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "search?t={terms}&q={query}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "{site}search?t={terms}&q={query}",
          {
+            site: (this.options.siteId.length !== 0 ? ("site/" + this.options.siteId + "/") : ""),
             terms: encodeURIComponent(Dom.get(this.id + "-search-text").value),
             query: encodeURIComponent(YAHOO.lang.JSON.stringify(formData))
          });
