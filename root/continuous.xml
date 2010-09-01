@@ -731,12 +731,12 @@
 
       <!-- Main Installer -->
        <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win.txt" failifexecutionfails="false">
-         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win}" "alfresco_svn_rootdir=${basedir}" "binaries_folder=${dir.name.binaries}"'/>
+         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows"'/>
       </exec>
       
       <!-- Main 64-bit Installer -->
        <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win64.txt" failifexecutionfails="false">
-         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win64}" "alfresco_svn_rootdir=${basedir}" "binaries_folder=${dir.name.binaries}"'/>
+         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows-x64"'/>
       </exec>
       
       <!-- Deployment Installer -->
@@ -751,7 +751,7 @@
 
       <!-- Main Installer -->
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-osx.txt" failifexecutionfails="false">
-         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.osx}" "alfresco_svn_rootdir=${basedir}" "binaries_folder=${dir.name.binaries}"'/>
+         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.osx}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-osx-x86"'/>
       </exec>
       <tar destfile="${dir.continuous.dist}/${file.name.dist.installer.osx}.tar.gz"
            longfile="gnu"
@@ -782,12 +782,12 @@
    
       <!-- Main Installer -->
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux.txt" failifexecutionfails="false">
-         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux}" "alfresco_svn_rootdir=${basedir}" "binaries_folder=${dir.name.binaries}"'/>
+         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux"'/>
       </exec>          
       
       <!-- Main 64-bit Installer -->
       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux64.txt" failifexecutionfails="false">
-         <arg line='build project.xml linux-x64 --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux64}" "alfresco_svn_rootdir=${basedir}" "binaries_folder=${dir.name.binaries}"'/>
+         <arg line='build project.xml linux-x64 --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux-x64"'/>
       </exec>          
 
       <!-- Deployment Installer -->
