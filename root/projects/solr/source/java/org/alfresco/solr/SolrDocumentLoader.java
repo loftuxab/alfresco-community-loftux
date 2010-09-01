@@ -75,9 +75,11 @@ public class SolrDocumentLoader
         {
             Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
             docs.add(createContainerDocument(i));
+            docs.add(createContainerPathDocument(i));
             for(int j = 0; j < LEAVES; j++)
             {
                 docs.add(createLeafDocument(i, j));
+                docs.add(createLeafPathDocument(i, j));
             }
             solr.add(docs);
         }
@@ -128,6 +130,15 @@ public class SolrDocumentLoader
         doc.addField("@{http://www.alfresco.org/model/content/1.0}creator", "Andy");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modified", "2010-07-21T10:52:00.000Z");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modifier", "Andy");
+        return doc;
+    }
+    
+    public static SolrInputDocument createLeafPathDocument(int i, int j)
+    {
+        SolrInputDocument doc = new SolrInputDocument();
+        doc.addField("ID", "ID-L-"+i+"-"+j+"-Path"); 
+        doc.addField("TX", "TX-1"); 
+        doc.addField("DBID", getDbId());
         QName first = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "folder_"+i);
         QName second = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "leaf_"+j);
         doc.addField("PATH", "/" + ISO9075.getXPathName(first)+"/" + ISO9075.getXPathName(second));
@@ -159,10 +170,21 @@ public class SolrDocumentLoader
         doc.addField("@{http://www.alfresco.org/model/content/1.0}creator", "Andy");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modified", "2010-07-21T10:52:00.000Z");
         doc.addField("@{http://www.alfresco.org/model/content/1.0}modifier", "Andy");
+        return doc;
+    }
+    
+    public static SolrInputDocument createContainerPathDocument(int i)
+    {
+        SolrInputDocument doc = new SolrInputDocument();
+       
+        doc.addField("ID", "ID-F-"+i+"-Path"); 
+        doc.addField("TX", "TX-1"); 
+        doc.addField("DBID", "0");
         QName first = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "folder_"+i);
         doc.addField("PATH", "/" + ISO9075.getXPathName(first));
         return doc;
     }
+    
     
     public static SolrInputDocument createRootDocument()
     {

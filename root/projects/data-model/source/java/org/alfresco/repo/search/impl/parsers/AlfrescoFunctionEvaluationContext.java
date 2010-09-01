@@ -84,6 +84,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_FTSSTATUS);
         EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_ASSOCTYPEQNAME);
         EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_PRIMARYASSOCTYPEQNAME);
+        EXPOSED_FIELDS.add(LuceneQueryParser.FIELD_DBID);
     }
 
     /**
