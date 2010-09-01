@@ -27,14 +27,13 @@ import org.alfresco.wcm.client.util.CmisSessionHelper;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.Tree;
-import org.springframework.extensions.webscripts.processor.BaseProcessorExtension;
 
 /**
  * Dictionary service implementation
  * 
  * @author Roy Wetherall
  */
-public class DictionaryServiceImpl extends BaseProcessorExtension implements DictionaryService
+public class DictionaryServiceImpl implements DictionaryService
 {
 	/** CMIS type delimiter */
 	private static final String TYPE_DELIMITER = ":";

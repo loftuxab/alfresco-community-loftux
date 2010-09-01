@@ -42,7 +42,6 @@ import org.springframework.extensions.webscripts.connector.Connector;
 import org.springframework.extensions.webscripts.connector.ConnectorService;
 import org.springframework.extensions.webscripts.connector.Response;
 import org.springframework.extensions.webscripts.connector.ResponseStatus;
-import org.springframework.extensions.webscripts.processor.BaseProcessorExtension;
 
 /**
  * Web site service implementation
@@ -50,7 +49,7 @@ import org.springframework.extensions.webscripts.processor.BaseProcessorExtensio
  * @author Roy Wetherall
  * @author Brian Remmington
  */
-public class WebSiteServiceImpl extends BaseProcessorExtension implements WebSiteService
+public class WebSiteServiceImpl implements WebSiteService
 {
     private static final Log log = LogFactory.getLog(WebSiteServiceImpl.class);
     /** Query for all web roots */

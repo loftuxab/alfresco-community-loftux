@@ -1,7 +1,7 @@
 var resultsToSkip = url.args.resultsToSkip == null ? 0 : url.args.resultsToSkip;
 var maxResults = 10;
 
-var articles = collectionFactory.getCollection(context.properties.section.id, args.collection, resultsToSkip, maxResults);
+var articles = collectionService.getCollection(context.properties.section.id, args.collection, resultsToSkip, maxResults);
 
 model.articles = articles;
 model.pageNumber = articles.query.resultsToSkip / articles.query.maxResults + 1;

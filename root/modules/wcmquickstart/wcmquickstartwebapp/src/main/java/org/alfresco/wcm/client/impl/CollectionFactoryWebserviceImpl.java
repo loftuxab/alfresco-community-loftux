@@ -41,7 +41,6 @@ import org.springframework.extensions.surf.exception.ConnectorServiceException;
 import org.springframework.extensions.webscripts.connector.Connector;
 import org.springframework.extensions.webscripts.connector.ConnectorService;
 import org.springframework.extensions.webscripts.connector.Response;
-import org.springframework.extensions.webscripts.processor.BaseProcessorExtension;
 
 /**
  * Get collection using a call to a web service. This is done to avoid having to perform
@@ -51,7 +50,7 @@ import org.springframework.extensions.webscripts.processor.BaseProcessorExtensio
  * joins are used.
  * @author Chris Lack
  */
-public class CollectionFactoryWebserviceImpl extends BaseProcessorExtension implements CollectionFactory
+public class CollectionFactoryWebserviceImpl implements CollectionFactory
 {	
 	private final static Log log = LogFactory.getLog(CollectionFactoryWebserviceImpl.class);
 	
