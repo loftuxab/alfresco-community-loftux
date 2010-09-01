@@ -9,31 +9,6 @@
         <!-- AlfrescoDM build settings -->
         <!-- NOTE: licenses directory should also include the licenses provided by BitRock -->
 
-        <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-linux" >
-            <ruleList>
-                <compareText text="${platform_name}"  logic="equals" value="linux" />
-            </ruleList>
-        </setInstallerVariable>
-        <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-linux-x64" > 
-            <ruleList> 
-                <compareText text="${platform_name}"  logic="equals" value="linux-x64" /> 
-            </ruleList> 
-        </setInstallerVariable> 
-        <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-windows" >
-            <ruleList>
-                <compareText text="${platform_name}"  logic="equals" value="windows" />
-            </ruleList>
-        </setInstallerVariable>
-        <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-windows-x64" > 
-            <ruleList> 
-		<compareText text="${project.installerFilename}" logic="contains" value="win-x64"/> 
-            </ruleList> 
-        </setInstallerVariable> 
-        <setInstallerVariable name="binaries_folder" value="${alfresco_svn_rootdir.unix}/../../ALF-BINARIES/bitrock/binaries-osx-x86" >
-            <ruleList>
-                <compareText text="${platform_name}"  logic="equals" value="osx" />
-            </ruleList>
-        </setInstallerVariable>
         <setInstallerVariable name="alfresco_extensions_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/tomcat/shared/classes/alfresco" />
         <setInstallerVariable name="alfresco_endorsed_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/tomcat/endorsed" />
         <setInstallerVariable name="alfresco_war_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/web-server/webapps" />
@@ -70,15 +45,15 @@
         <setInstallerVariable name="alfresco_mmt_source_file" value="${alfresco_svn_rootdir.unix}/build/assemble/commands/bin/alfresco-mmt.jar" />
 
 
-        <setInstallerVariable name="alfresco_amps_source_directory" value="${alfresco_svn_rootdir.unix}/build/dist" />
-        <setInstallerVariable name="alfresco_sharepoint_source_file" value="${alfresco_amps_source_directory}/vti-module.amp" />
+        <setInstallerVariable name="alfresco_amps_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/amps" />
+        <setInstallerVariable name="alfresco_sharepoint_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-spp-${project.version}.amp" />
         <setInstallerVariable name="alfresco_sharepoint_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescosharepoint" />
 
 
-        <setInstallerVariable name="alfresco_quickr_source_file" value="${alfresco_amps_source_directory}/alfresco-quickr.amp" />
+        <setInstallerVariable name="alfresco_quickr_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-quickr-${project.version}.amp" />
         <setInstallerVariable name="alfresco_quickr_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescoquickr" />
-        <setInstallerVariable name="alfresco_rm_source_file" value="${alfresco_amps_source_directory}/alfresco-dod5015.amp" />
-        <setInstallerVariable name="alfresco_rm_share_source_file" value="${alfresco_amps_source_directory}/alfresco-dod5015-share.amp" />
+        <setInstallerVariable name="alfresco_rm_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-dod5015-${project.version}.amp" />
+        <setInstallerVariable name="alfresco_rm_share_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-dod5015-share-${project.version}.amp" />
         <!-- END ALFRESCO BUILD SYSTEM-->
         </actionList>
         <ruleList>

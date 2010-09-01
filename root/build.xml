@@ -313,8 +313,22 @@
            depends="package-spp-extension,
                     package-dod5015-extension,
                     package-dod5015-share-extension, 
+                    package-wcmquickstart-extension,
+                    package-wcmquickstart-share-extension, 
                     package-quickr-extension" >
                     <!-- package-rm-extension, -->
+
+	  <!-- Copy AMPs to assembly area for installer -->
+      <copy todir="${dir.continuous.assemble}/amps">
+         <fileset dir="${dir.module.dod5015.dist}"              includes="${file.name.amp.dod5015}" />
+         <fileset dir="${dir.module.dod5015.share.dist}"        includes="${file.name.amp.dod5015.share}" />
+         <fileset dir="${dir.module.spp.dist}"           includes="${file.name.amp.spp}" />
+         <fileset dir="${dir.module.quickr.dist}"               includes="${file.name.amp.quickr}" />
+         <fileset dir="${dir.module.wcmquickstart.dist}"              includes="${file.name.amp.wcmquickstart}" />
+         <fileset dir="${dir.module.wcmquickstart-share.dist}"        includes="${file.name.amp.wcmquickstart-share}" />
+      </copy>
+
+      <!-- Zip bundles of AMPs -->
       <zip destfile="${dir.continuous.dist}/${file.name.dist.dod5015}.zip">
          <fileset dir="${dir.module.dod5015.dist}"              includes="${file.name.amp.dod5015}" />
          <fileset dir="${dir.module.dod5015.share.dist}"        includes="${file.name.amp.dod5015.share}" />
@@ -328,6 +342,7 @@
          <fileset dir="${dir.module.quickr.dist}"               includes="${file.name.amp.quickr}" />
          <fileset file="${dir.module.quickr}/README_quickr.txt" />
       </zip>
+      
    </target>
 
 
