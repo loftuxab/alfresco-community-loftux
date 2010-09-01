@@ -45,34 +45,6 @@
             </div>
          </div>
       </div>
-      <!--
-      <table>
-         <tr>
-            <td><span>${msg("form.control.date-range.from")}:</td>
-            <td>
-               <#-- from date -->
-               <input id="${controlId}-date-from" name="-" type="text" class="date-entry" <#if field.description??>title="${field.description}"</#if> tabindex="0" />
-               <a id="${controlId}-icon-from"><img src="${url.context}/components/form/images/calendar.png" class="datepicker-icon"/></a>
-               <div id="${controlId}-from" class="datepicker"></div>
-               
-               <div class="format-info">
-                  <span class="date-format">${msg("form.control.date-picker.display.date.format")}</span>
-               </div>
-            </td>
-            <td><span>${msg("form.control.date-range.to")}:</td>
-            <td>
-               <#-- to date -->
-               <input id="${controlId}-date-to" name="-" type="text" class="date-entry" <#if field.description??>title="${field.description}"</#if> tabindex="0" />
-               <a id="${controlId}-icon-to"><img src="${url.context}/components/form/images/calendar.png" class="datepicker-icon"/></a>
-               <div id="${controlId}-to" class="datepicker"></div>
-               
-               <div class="format-info">
-                  <span class="date-format">${msg("form.control.date-picker.display.date.format")}</span>
-               </div>
-            </td>
-         </tr>
-      </table>
-      -->
    </div>
    
 </div>
