@@ -32,6 +32,7 @@ public interface WebSite extends Serializable
 	/** Property constants */
 	static final String PROP_HOSTNAME = "ws:hostName";
 	static final String PROP_HOSTPORT = "ws:hostPort";
+	static final String PROP_CONTEXT = "ws:webAppContext";
 	
 	/**
 	 * Gets the host name
@@ -98,6 +99,19 @@ public interface WebSite extends Serializable
      * @return 
      */
 	UgcService getUgcService();
+
+	/** 
+	 * Get a section by path
+	 * @param path
+	 * @return
+	 */
+	Section getSectionByPath(String path);
+
+	/**
+	 * Get website context
+	 * @return
+	 */
+	String getContext();
 
 
 }

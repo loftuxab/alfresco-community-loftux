@@ -27,6 +27,7 @@ import java.util.List;
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.CollectionFactory;
 import org.alfresco.wcm.client.Section;
+import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.impl.AssetCollectionImpl;
 import org.alfresco.wcm.client.util.UrlUtils;
 import org.apache.commons.logging.Log;
@@ -72,7 +73,8 @@ public class RssWebScript extends AbstractWebScript
             
             // Get the section placed in the request context by ApplicationDataInterceptor
             RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
-            Section section = (Section) requestContext.getValue("section");      
+            Section section = (Section)requestContext.getValue("section");    
+            WebSite webSite = (WebSite)requestContext.getValue("webSite");
             
             // Get the collection property from the page definition
             String collectionName = requestContext.getPage().getProperty("collection");
@@ -86,7 +88,7 @@ public class RssWebScript extends AbstractWebScript
             feed.setFeedType(FEED_TYPE);
 
             feed.setTitle(section.getTitle());
-            feed.setLink(urlUtils.getWebsiteDomain()+urlUtils.getUrl(section));
+            feed.setLink(urlUtils.getWebsiteDomain(webSite)+urlUtils.getUrl(section));
             feed.setDescription(section.getDescription());
 
             List<SyndEntry> entries = new ArrayList<SyndEntry>();
@@ -94,8 +96,8 @@ public class RssWebScript extends AbstractWebScript
             {
                 SyndEntry entry = new SyndEntryImpl();
                 entry.setTitle(asset.getTitle());
-                entry.setLink(urlUtils.getWebsiteDomain()+urlUtils.getUrl(asset));
-                entry.setUri(urlUtils.getWebsiteDomain()+urlUtils.getShortUrl(asset));
+                entry.setLink(urlUtils.getWebsiteDomain(webSite)+urlUtils.getUrl(asset));
+                entry.setUri(urlUtils.getWebsiteDomain(webSite)+urlUtils.getShortUrl(asset));
                 entry.setPublishedDate((Date)asset.getProperties().get(Asset.PROPERTY_PUBLISHED_TIME));
                 SyndContent description = new SyndContentImpl();
                 description.setType("text/html");

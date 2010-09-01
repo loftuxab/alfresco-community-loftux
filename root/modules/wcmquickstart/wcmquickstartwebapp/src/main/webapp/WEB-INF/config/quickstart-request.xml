@@ -37,8 +37,7 @@
     
     <!-- Url Utils -->
     <bean id="urlUtils" class="org.alfresco.wcm.client.util.impl.UrlUtilsImpl">
-        <property name="cmisIdEncoder" ref="cmisIdEncoder"/>
- 		<property name="websiteDomain" value="%{website.domain}"/>        
+        <property name="cmisIdEncoder" ref="cmisIdEncoder"/>     
     </bean>
     
     <!-- Beans that provide Freemarker directives-->
@@ -68,7 +67,7 @@
                 <entry key="endTemplate" value-ref="endTemplateDirective"/>
             </map>         
         </property>
-		<property name="urlUtils" ref="urlUtils"/>           
+        <property name="editorialSite" value="%{editorial.site}"/>              
 	</bean>  
 
     <!-- Intercept any controller and add application-wide data to the request. -->
@@ -91,6 +90,9 @@
     
     <!-- Comment form controller -->   
     <bean id="commentFormController" class="org.alfresco.wcm.client.controller.CommentFormController"/>
+
+    <!--  RSS feed controller -->
+    <bean id="rssController" class="org.alfresco.wcm.client.controller.RssController"/>
            
     <!-- Resolve views by using the template selected within the repository for a page -->
     <bean id="dynamicPageViewResolver" class="org.alfresco.wcm.client.viewresolver.DynamicPageViewResolver" parent="abstractWebFrameworkViewResolver"/>
