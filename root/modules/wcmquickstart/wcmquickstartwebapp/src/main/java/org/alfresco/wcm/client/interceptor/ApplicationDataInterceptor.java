@@ -70,9 +70,13 @@ public class ApplicationDataInterceptor extends HandlerInterceptorAdapter
 		} 
 		else
 		{
-			// If asset not found then store the root section for use by the 404
-			// page.
-			section = webSite.getRootSection();
+			// If asset not found then try just the section
+			section = webSite.getSectionByPath(path);			
+			if (section == null)
+			{
+				// Else store the root section for use by the 404 page.
+				section = webSite.getRootSection();
+			}
 		}
 		requestContext.setValue("section", section);
 

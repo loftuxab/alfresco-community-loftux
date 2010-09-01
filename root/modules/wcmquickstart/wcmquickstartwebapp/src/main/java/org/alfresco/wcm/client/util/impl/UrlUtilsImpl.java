@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
 
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.Section;
+import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.util.CmisIdEncoder;
 import org.alfresco.wcm.client.util.UrlUtils;
 
@@ -35,7 +36,6 @@ import org.alfresco.wcm.client.util.UrlUtils;
 public class UrlUtilsImpl implements UrlUtils 
 {
 	private CmisIdEncoder cmisIdEncoder;
-    private String websiteDomain;
 
 	/**
 	 * @see org.alfresco.wcm.client.util.UrlUtils#getUrl(Asset)
@@ -136,18 +136,13 @@ public class UrlUtilsImpl implements UrlUtils
 	{
 		this.cmisIdEncoder = cmisIdEncoder;
 	}
-	
-	public void setWebsiteDomain(String domain) 
-	{
-	    this.websiteDomain = domain;
-	}
 
     /**
-     * @see org.alfresco.wcm.client.util.UrlUtils#getWebsiteDomain()
+     * @see org.alfresco.wcm.client.util.UrlUtils#getWebsiteDomain(WebSite)
      */
     @Override
-    public String getWebsiteDomain()
+    public String getWebsiteDomain(WebSite webSite)
     {
-        return websiteDomain;
+        return "http://"+webSite.getHostName()+(webSite.getHostPort() == 80 ? "" : ":"+webSite.getHostPort()+"/"+webSite.getContext());
     }
 }

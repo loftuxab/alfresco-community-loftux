@@ -22,7 +22,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.wcm.client.util.UrlUtils;
+import org.alfresco.wcm.client.directive.TemplateConstants;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,7 +37,7 @@ import freemarker.template.TemplateDirectiveModel;
 public class ModelDecorator
 {
 	private Map<String, TemplateDirectiveModel> freemarkerDirectives;
-    private UrlUtils urlUtils;
+	private boolean editorialSite;
 
     public void populate(HttpServletRequest request, ModelAndView modelAndView)
     {		 
@@ -63,7 +63,12 @@ public class ModelDecorator
 		    // Put the pre-filtered/modified URI into the model
 		    model.put("uri", requestContext.getAttribute("javax.servlet.forward.request_uri"));	
 		    
-		    model.put("websiteDomain", urlUtils.getWebsiteDomain());
+		    // Flag that the site is the editorial version so that editorial-only features can
+		    // be enabled
+		    model.put("editorialSite", editorialSite);
+		    
+		    // Enable the web editor if this is the editorial site.
+		    request.setAttribute(TemplateConstants.REQUEST_ATTR_KEY_WEF_ENABLED, editorialSite);
 	    }
     }
 
@@ -73,9 +78,9 @@ public class ModelDecorator
 	}
     
     
-    public void setUrlUtils(UrlUtils urlUtils)
+    public void setEditorialSite(boolean editorialFeaturesEnabled)
     {
-        this.urlUtils = urlUtils;
+        this.editorialSite = editorialFeaturesEnabled;
     }      
 }
 

@@ -42,6 +42,9 @@ public class WebSiteImpl implements WebSite
 	/** Host name */
 	private String hostName;
 	
+	/** Context **/
+	private String context;
+	
 	/** Host port */
 	private int hostPort;
 	
@@ -91,6 +94,20 @@ public class WebSiteImpl implements WebSite
 	public int getHostPort()
 	{
 		return hostPort;
+	}
+	
+	/**
+	 * @see org.alfresco.wcm.client.WebSite#getContext()
+	 */
+	@Override	
+	public String getContext()
+	{
+		return context;
+	}
+	
+	public void setContext(String context) 
+	{
+		this.context = context;
 	}
 	
 	public String getId()
@@ -151,6 +168,19 @@ public class WebSiteImpl implements WebSite
 		
 		return asset;
 	}
+	
+	/**
+	 * @throws Exception 
+	 * @see org.alfresco.wcm.client.WebSite#getSectionByPath(java.lang.String)
+	 */
+	@Override
+	public Section getSectionByPath(String path)
+	{
+		Path segmentedPath = new PathImpl(path); 
+		String[] sectionPath = segmentedPath.getPathSegments();
+		
+		return sectionFactory.getSectionFromPathSegments(rootSectionId, sectionPath);
+	}	
 	
 	public void setSectionFactory(SectionFactory sectionFactory) 
 	{

@@ -49,7 +49,7 @@ public class WebSiteServiceImpl implements WebSiteService
 {
     private static final Log log = LogFactory.getLog(WebSiteServiceImpl.class);
     /** Query for all web roots */
-    private static final String QUERY_WEB_ROOTS = "select f.cmis:objectId, w.ws:hostName, w.ws:hostPort, t.cm:title, t.cm:description "
+    private static final String QUERY_WEB_ROOTS = "select f.cmis:objectId, w.ws:hostName, w.ws:hostPort, t.cm:title, t.cm:description, w.ws:webAppContext "
             + "from cmis:folder as f "
             + "join ws:website as w on w.cmis:objectId = f.cmis:objectId "
             + "join cm:titled as t on t.cmis:objectId = f.cmis:objectId";
@@ -137,6 +137,7 @@ public class WebSiteServiceImpl implements WebSiteService
                 String key = hostName + ":" + hostPort.toString();
                 String title = result.getPropertyValueById(Asset.PROPERTY_TITLE);
                 String description = result.getPropertyValueById(Asset.PROPERTY_DESCRIPTION);
+                String context = result.getPropertyValueById(WebSite.PROP_CONTEXT);
 
                 WebsiteInfo siteInfo = getWebsiteInfo(id);
 
@@ -145,6 +146,7 @@ public class WebSiteServiceImpl implements WebSiteService
                 webSite.setRootSectionId(siteInfo.rootSectionId);
                 webSite.setTitle(title);
                 webSite.setDescription(description);
+                webSite.setContext(context);
                 webSite.setSectionFactory(sectionFactory);
                 UgcServiceCmisImpl ugcService = new UgcServiceCmisImpl(session
                         .createObjectId(siteInfo.feedbackFolderId));

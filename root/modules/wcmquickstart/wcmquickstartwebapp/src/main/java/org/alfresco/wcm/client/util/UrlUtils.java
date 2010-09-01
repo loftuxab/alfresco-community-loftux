@@ -20,6 +20,7 @@ package org.alfresco.wcm.client.util;
 
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.Section;
+import org.alfresco.wcm.client.WebSite;
 
 /**
  * Url utility methods
@@ -70,9 +71,8 @@ public interface UrlUtils
 	String decodeResourceName(String resourceName);	
 	
 	/**
-	 * Get the website domain. This can be different to the value obtained from the
-	 * HttpServletRequest object where another server sits in-front of the app server.
+	 * Get the website domain as a string. 
 	 * @return domain
 	 */
-	String getWebsiteDomain();	
+	String getWebsiteDomain(WebSite website);	
 }
