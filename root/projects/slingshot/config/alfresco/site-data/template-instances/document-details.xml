@@ -141,6 +141,21 @@
       </component>
       <!-- document-versions: normal & repository -->
       <component>
+         <region-id>document-workflows</region-id>
+         <url>/components/document-details/document-workflows</url>
+         <properties>
+            <nodeRef>{nodeRef}</nodeRef>
+         </properties>
+      </component>
+      <component>
+         <region-id>repo-document-workflows</region-id>
+         <url>/components/document-details/document-workflows</url>
+         <properties>
+            <nodeRef>{nodeRef}</nodeRef>
+         </properties>
+      </component>
+      <!-- document-versions: normal & repository -->
+      <component>
          <region-id>document-versions</region-id>
          <url>/components/document-details/document-versions</url>
          <properties>

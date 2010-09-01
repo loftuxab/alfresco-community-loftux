@@ -39,6 +39,7 @@
                <@region id=doclibType + "document-metadata-header" scope="template" protected=true />
                <@region id=doclibType + "document-metadata" scope="template" protected=true />
                <@region id=doclibType + "document-info" scope="template" protected=true />
+               <@region id=doclibType + "document-workflows" scope="template" protected=true />
                <@region id=doclibType + "document-versions" scope="template" protected=true />
             </div>
             <div class="yui-u">
