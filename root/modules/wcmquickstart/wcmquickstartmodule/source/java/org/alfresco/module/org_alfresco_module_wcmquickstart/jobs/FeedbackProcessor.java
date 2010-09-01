@@ -103,20 +103,29 @@ public class FeedbackProcessor
                                         //If the asset is in a Share site (which it probably is) then place the summary node in a
                                         //specific container named "feedbackSummaries"...
                                         NodeRef summaryParent = siteHelper.getWebSiteContainer(relatedAsset, FEEDBACK_SUMMARIES_CONTAINER_NAME);
-                                        
-                                        String name = "FeedbackSummary_" + relatedAsset.getId();
-                                        HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
-                                        props.put(ContentModel.PROP_NAME, name);
-                                        props.put(WebSiteModel.PROP_AVERAGE_RATING, 0.0);
-                                        props.put(WebSiteModel.PROP_PROCESSED_RATINGS, 0);
-                                        props.put(WebSiteModel.PROP_COMMENT_COUNT, 0);
-                                        props.put(WebSiteModel.PROP_SUMMARISED_ASSET, relatedAsset);
-                                        summaryNode = nodeService.createNode(summaryParent, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), 
-                                                WebSiteModel.TYPE_VISITOR_FEEDBACK_SUMMARY, props).getChildRef();
-                                        nodeService.createAssociation(summaryNode, relatedAsset, WebSiteModel.ASSOC_SUMMARISED_ASSET);
-                                        if (log.isDebugEnabled())
+                                        if (summaryParent != null)
                                         {
-                                            log.debug("Created a new feedback summary node for asset " + relatedAsset);
+	                                        String name = "FeedbackSummary_" + relatedAsset.getId();
+	                                        HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
+	                                        props.put(ContentModel.PROP_NAME, name);
+	                                        props.put(WebSiteModel.PROP_AVERAGE_RATING, 0.0);
+	                                        props.put(WebSiteModel.PROP_PROCESSED_RATINGS, 0);
+	                                        props.put(WebSiteModel.PROP_COMMENT_COUNT, 0);
+	                                        props.put(WebSiteModel.PROP_SUMMARISED_ASSET, relatedAsset);
+	                                        summaryNode = nodeService.createNode(summaryParent, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), 
+	                                                WebSiteModel.TYPE_VISITOR_FEEDBACK_SUMMARY, props).getChildRef();
+	                                        nodeService.createAssociation(summaryNode, relatedAsset, WebSiteModel.ASSOC_SUMMARISED_ASSET);
+	                                        if (log.isDebugEnabled())
+	                                        {
+	                                            log.debug("Created a new feedback summary node for asset " + relatedAsset);
+	                                        }
+                                        }
+                                        else
+                                        {
+                                        	if (log.isDebugEnabled() == true)
+                                        	{
+                                        		log.debug("Unable to create feedback summary node for asset " + relatedAsset + " because parent container could not be found.");
+                                        	}
                                         }
                                     }
                                     else

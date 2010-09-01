@@ -141,7 +141,7 @@ public class SiteHelper implements WebSiteModel
             {
                 websiteId = siteInfo.getNodeRef();
             }
-            NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), "websiteTemp_" + websiteId.getId());
+            NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), websiteId.getId());
             if (containerParent == null)
             {
                 containerParent = siteService.createContainer(siteInfo.getShortName(), websiteId.getId(), null, null);

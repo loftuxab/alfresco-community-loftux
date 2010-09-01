@@ -170,6 +170,15 @@
                     <mandatory>true</mandatory>
                     <default>5</default>
                 </property>
+                <property name="ws:minsToQueryRefresh">
+                	<title>Minutes To Query Refresh</title>
+                	<type>d:int</type>
+                	<default>30</default>                	
+                </property>
+                <property name="ws:refreshAt">
+                	<title>Refresh At</title>
+                	<type>d:date</type>                	
+                </property>
                 <property name="ws:isDynamic">
                     <title>Is Dynamic</title>
                     <type>d:boolean</type>

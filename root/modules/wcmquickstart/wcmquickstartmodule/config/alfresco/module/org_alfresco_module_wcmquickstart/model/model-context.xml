@@ -42,9 +42,7 @@
           init-method="init">
     	<property name="policyComponent" ref="policyComponent" />
     	<property name="nodeService" ref="nodeService" />
-    	<property name="searchService" ref="searchService" />
-    	<property name="contextParserService" ref="wcmquickstartmodule_contextParserService"/>
-    	<property name="searchStore" value="${wcmqs.searchstore}" />
+    	<property name="collectionHelper" ref="org_alfresco_module_wcmquickstart_collectionHelper" />
     </bean>
               
     <bean id="wcmquickstartmodule_webassetAspect"
