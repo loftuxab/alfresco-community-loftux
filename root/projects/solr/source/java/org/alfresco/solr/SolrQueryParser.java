@@ -50,7 +50,7 @@ public class SolrQueryParser extends LuceneQueryParser
         reader.parse(queryText);
         SolrPathQuery pathQuery = handler.getQuery();
         pathQuery.setRepeats(withRepeats);
-        return pathQuery;
+        return new SolrCachingPathQuery(pathQuery);
     }
     
     protected Query createQNameQuery(String queryText) throws SAXPathException

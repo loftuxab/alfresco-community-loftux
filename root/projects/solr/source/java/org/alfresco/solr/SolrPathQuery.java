@@ -126,6 +126,20 @@ public class SolrPathQuery extends Query
         return new Term(getPathField(), ";");
     }
 
+    ArrayList<Term> getTerms()
+    {
+        ArrayList<Term> answer = new ArrayList<Term>(pathStructuredFieldPositions.size());
+        for (StructuredFieldPosition sfp : pathStructuredFieldPositions)
+        {
+            if (sfp.getTermText() != null)
+            {
+                Term term = new Term(pathField, sfp.getTermText());
+                answer.add(term);
+            }
+        }
+        return answer;
+    }
+    
     /*
      * @see org.apache.lucene.search.Query#createWeight(org.apache.lucene.search.Searcher)
      */
@@ -265,19 +279,7 @@ public class SolrPathQuery extends Query
             return queryWeight * queryWeight; // square it
         }
 
-        private ArrayList<Term> getTerms()
-        {
-            ArrayList<Term> answer = new ArrayList<Term>(pathStructuredFieldPositions.size());
-            for (StructuredFieldPosition sfp : pathStructuredFieldPositions)
-            {
-                if (sfp.getTermText() != null)
-                {
-                    Term term = new Term(pathField, sfp.getTermText());
-                    answer.add(term);
-                }
-            }
-            return answer;
-        }
+      
 
         /*
          * (non-Javadoc)
