@@ -45,5 +45,10 @@
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>	
-
+    
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/500page.html</location>
+    </error-page>
+    
 </web-app>

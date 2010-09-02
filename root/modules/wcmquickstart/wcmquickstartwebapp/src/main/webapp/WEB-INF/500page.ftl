@@ -47,7 +47,6 @@
         </div>    
     </div>
 
-<!--
     <#if editorialSite!'false' == "true">
         <script type="text/javascript">
         var _errorhidden = true;
@@ -107,12 +106,6 @@
             ${msg('error.friendly')}
         </div>
     </#if>
-  -->
-    <div class="error">
-        <h2>Error</h2>
-        <br/>
-        <p>Sorry, the seems to be a problem. Please try again later.</p>
-    </div>
      
     <div id="footer">
         <div class="copyright"><a href="http://www.alfresco.com">Alfresco.com</a></div>

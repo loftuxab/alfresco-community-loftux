@@ -25,8 +25,9 @@ public class EditorialException extends RuntimeException
 	private String messageCode;
 	private String assetName;
 
-	public EditorialException(String messageCode, String assetName)
+	public EditorialException(String message, String messageCode, String assetName)
     {
+		super(message);
 	    this.messageCode = messageCode;
 	    this.assetName = assetName;
     }
