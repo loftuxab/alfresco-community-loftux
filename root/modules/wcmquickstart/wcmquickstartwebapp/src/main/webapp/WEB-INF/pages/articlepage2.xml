@@ -16,6 +16,9 @@
       <component>
          <region-id>left3</region-id>
          <url>/comments/write</url>
+         <properties>
+            <successAsset>comment-thankyou.html</successAsset>
+         </properties>                  
       </component>       
       <component>
          <region-id>right1</region-id>

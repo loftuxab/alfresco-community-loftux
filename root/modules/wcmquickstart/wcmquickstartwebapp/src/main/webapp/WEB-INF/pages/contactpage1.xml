@@ -5,20 +5,19 @@
    <title>title.contact</title>
    <template-instance>two-block</template-instance>
    <authentication>none</authentication>
-   <components>   
+   <components>     
       <component>
          <region-id>left1</region-id>
-         <url>/content/current</url>
-      </component>       
-      <component>
-         <region-id>left2</region-id>
          <url>/contact/form</url>
+         <properties>
+            <successAsset>thankyou.html</successAsset>
+         </properties>         
       </component>       
       <component>
          <region-id>right1</region-id>
          <url>/content/named</url>
          <properties>
-  	     	<asset>/location.html</asset>
+  	     	<asset>location.html</asset>
     	 </properties>         
       </component>       
    </components>

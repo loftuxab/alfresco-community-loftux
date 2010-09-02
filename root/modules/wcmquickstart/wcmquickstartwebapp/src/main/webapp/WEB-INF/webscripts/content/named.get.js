@@ -1,1 +1,1 @@
-model.componentAsset = webSite.getAssetByPath(args.asset);
+model.componentAsset = webSite.getAssetByPath(section.path+args.asset);
