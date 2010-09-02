@@ -29,21 +29,28 @@ import org.alfresco.wcm.client.interceptor.ModelDecorator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.WebFrameworkServiceRegistry;
 import org.springframework.extensions.surf.mvc.PageView;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
+import org.springframework.extensions.surf.types.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 /**
  * This class attempts to find an error page for a http status code within the 
- * repository when an exception occurs. If not found it reverts to the behaviour of the 
+ * repository when an exception occurs in a controller. eg 404page.html
+ * If one is not found then it looks for a specific surf page. eg 404page
+ * If still not found then it reverts to the behaviour of the 
  * SimpleMappingExceptionResolver and so uses a default catch-all error page.
  * @author Chris Lack
  */
 public class RepositoryExceptionResolver extends SimpleMappingExceptionResolver
 {
     private static Log log = LogFactory.getLog(RepositoryExceptionResolver.class);
+    
+    /** The web framework service registry. */
+    private WebFrameworkServiceRegistry webFrameworkServiceRegistry;    
 
     private AssetFactory assetFactory;	
 	private String errorPageSuffix;
@@ -76,17 +83,32 @@ public class RepositoryExceptionResolver extends SimpleMappingExceptionResolver
 				// Determine the error page asset name and fetch it from the repository
 				String errorPage = statusCode+errorPageSuffix+".html";		
 		        Asset errorAsset = assetFactory.getSectionAsset(webSite.getRootSection().getId(), errorPage, true);
-		        
-		        // If there is an editorially configured error page then use it
+	
+		        String template = null;
 		        if (errorAsset != null)
 		        {
-		        	
+		        	// A generic Surf error page will be used with the repository asset html inserted within it.
+		        	template = "errorpage";
+		        }
+		        else
+		        {
+		        	// If no asset exists in the repository for the status code then look for a specific Surf page.
+		        	String pageName = statusCode+errorPageSuffix;
+		        	if (lookupPage(pageName) != null)
+		        	{
+		        		template = pageName;		        	
+		        	}
+		        }
+		        
+		        // If there is an editorially configured error page or a specific Surf one then use it
+		        if (template != null)
+		        {		        	
 					// Apply HTTP status code for error views.
 					// Only apply it if we're processing a top-level request.
 					applyStatusCodeIfPossible(request, response, statusCode);
 					
 			        PageView view = new PageView(requestContext.getServiceRegistry());
-			        view.setUrl("errorpage");
+			        view.setUrl(template);
 			        			        
 		    		ModelAndView mv = new ModelAndView();
 			        mv.setView(view);
@@ -94,7 +116,13 @@ public class RepositoryExceptionResolver extends SimpleMappingExceptionResolver
 				    // Store website, section and asset on spring model too for use in page meta data
 			        // When exceptions are encountered a new model is created by Spring so any data loaded 
 			        // by the the controller interceptors is lost.  
-			        modelDecorator.populate(request, mv);
+			        try {
+			        	modelDecorator.populate(request, mv);
+			        }
+			        catch (Exception e) 
+			        {
+			        	// ignore any errors on trying to populate the model
+			        }
 			        
 			        // Store error details on model
 	    			mv.addObject("exception", ex);		        	
@@ -104,9 +132,20 @@ public class RepositoryExceptionResolver extends SimpleMappingExceptionResolver
 			}
 		}
 		
-		// If we couldn't determine an editorially configured error page then use a static one
+		// If we couldn't determine an editorially configured error page or a specific Surf one
+		// then use a static page
     	return super.doResolveException(request, response, handler, ex);
     }
+	
+    /**
+     * Retrieves the page object with the given page id from Surf.
+     * @param pageId
+     * @return Page object or null if not found
+     */
+    private Page lookupPage(String pageId)
+    {
+        return webFrameworkServiceRegistry.getModelObjectService().getPage(pageId);
+    }	
 
 	public void setErrorPageSuffix(String errorPageSuffix) 
 	{
@@ -117,10 +156,15 @@ public class RepositoryExceptionResolver extends SimpleMappingExceptionResolver
     {
         this.assetFactory = assetFactory;
     }	
-    
-	
+    	
 	public void setModelDecorator(ModelDecorator modelDecorator) 
 	{
 		this.modelDecorator = modelDecorator;
 	}    
+	
+    public void setServiceRegistry(WebFrameworkServiceRegistry webFrameworkServiceRegistry)
+    {
+        this.webFrameworkServiceRegistry = webFrameworkServiceRegistry;
+    }
+    	
 }
