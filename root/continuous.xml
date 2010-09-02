@@ -702,13 +702,6 @@
    <!-- ** Installer targets ** -->
    <!-- *********************** -->
 
-   <target name="distribute-installers"
-           depends="continuous-init, set-build-number,
-                    set-bitrock-builder,
-                    distribute-bitrock-installer-osx,
-                    distribute-bitrock-installer-win,
-                    distribute-bitrock-installer-linux" />
-
    <!-- Try and pick appropriate exe - assumes mac=OSX and unix=Linux -->
    <target name="set-bitrock-builder">
       <condition property="platformExe" value="${file.name.bitrock.exe.win}">
@@ -726,75 +719,78 @@
    </target>
 
 
-   <!-- Windows Installers -->
-   <target name="distribute-bitrock-installer-win" depends="continuous-init, set-bitrock-builder">
+   <!-- Build installers in parallel -->
+   <target name="distribute-installers"
+           depends="continuous-init, set-build-number, set-bitrock-builder" >
+      <parallel>
 
-      <!-- Main Installer -->
-       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win.txt" failifexecutionfails="false">
-         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows"'/>
-      </exec>
+         <!-- Windows Installers -->
+
+         <!-- Main Installer -->
+         <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win.txt" failifexecutionfails="false">
+            <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows"'/>
+         </exec>
       
       <!-- Main 64-bit Installer -->
-       <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win64.txt" failifexecutionfails="false">
-         <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows-x64"'/>
-      </exec>
+         <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win64.txt" failifexecutionfails="false">
+            <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows-x64"'/>
+         </exec>
       
       <!-- Deployment Installer -->
-       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-win.txt" failifexecutionfails="false">
-         <arg line='build deployment.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.win}"'/>
-      </exec>
-   </target>
+         <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-win.txt" failifexecutionfails="false">
+            <arg line='build deployment.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.win}"'/>
+         </exec>
 
+         <!-- OS X Installers -->
 
-   <!-- OS X Installers -->
-   <target name="distribute-bitrock-installer-osx" depends="continuous-init, set-bitrock-builder">
+         <!-- Main Installer -->
+         <!-- Sequence installer then tarball -->
+	     <sequential>
+            <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-osx.txt" failifexecutionfails="false">
+               <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.osx}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-osx-x86"'/>
+            </exec>
+            <tar destfile="${dir.continuous.dist}/${file.name.dist.installer.osx}.tar.gz"
+                 longfile="gnu"
+                 compression="gzip">
+               <tarfileset dir="${dir.continuous.dist}/${file.name.dist.installer.osx}"
+                           prefix="${file.name.dist.installer.osx}" mode="755"/>
+            </tar>
+            <delete quiet="yes" dir="${dir.continuous.dist}/${file.name.dist.installer.osx}" />
+         </sequential>
 
-      <!-- Main Installer -->
-      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-osx.txt" failifexecutionfails="false">
-         <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.osx}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-osx-x86"'/>
-      </exec>
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.installer.osx}.tar.gz"
-           longfile="gnu"
-           compression="gzip">
-         <tarfileset dir="${dir.continuous.dist}/${file.name.dist.installer.osx}"
-                     prefix="${file.name.dist.installer.osx}" mode="755"/>
-      </tar>
-      <delete quiet="yes"
-              dir="${dir.continuous.dist}/${file.name.dist.installer.osx}" />
+         <!-- Deployment Installer -->
+         <!-- Sequence installer then tarball -->
+         <sequential>
+            <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-osx.txt" failifexecutionfails="false">
+               <arg line='build deployment.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.osx}"'/>
+            </exec>
+            <tar destfile="${dir.continuous.dist}/${file.name.dist.deployment.osx}.tar.gz"
+                 longfile="gnu"
+                 compression="gzip">
+               <tarfileset dir="${dir.continuous.dist}/${file.name.dist.deployment.osx}"
+                           prefix="${file.name.dist.deployment.osx}" mode="755"/>
+            </tar>
+            <delete quiet="yes" dir="${dir.continuous.dist}/${file.name.dist.deployment.osx}" />
+         </sequential>
 
-      <!-- Deployment Installer -->
-       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-osx.txt" failifexecutionfails="false">
-         <arg line='build deployment.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.osx}"'/>
-      </exec>
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.deployment.osx}.tar.gz"
-           longfile="gnu"
-           compression="gzip">
-         <tarfileset dir="${dir.continuous.dist}/${file.name.dist.deployment.osx}"
-                     prefix="${file.name.dist.deployment.osx}" mode="755"/>
-      </tar>
-      <delete quiet="yes"
-              dir="${dir.continuous.dist}/${file.name.dist.deployment.osx}" />
-   </target>
-
-
-   <!-- Linux Installers -->
-   <target name="distribute-bitrock-installer-linux" depends="continuous-init, set-bitrock-builder">
+         <!-- Linux Installers -->
    
-      <!-- Main Installer -->
-      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux.txt" failifexecutionfails="false">
-         <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux"'/>
-      </exec>          
+         <!-- Main Installer -->
+         <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux.txt" failifexecutionfails="false">
+            <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux"'/>
+         </exec>          
       
-      <!-- Main 64-bit Installer -->
-      <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux64.txt" failifexecutionfails="false">
-         <arg line='build project.xml linux-x64 --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux-x64"'/>
-      </exec>          
+         <!-- Main 64-bit Installer -->
+         <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux64.txt" failifexecutionfails="false">
+            <arg line='build project.xml linux-x64 --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux-x64"'/>
+         </exec>          
 
-      <!-- Deployment Installer -->
-       <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-linux.txt" failifexecutionfails="false">
-         <arg line='build deployment.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.linux}"'/>
-      </exec>
+         <!-- Deployment Installer -->
+         <exec dir="${dir.installer.deploy}" executable="${platformExe}" output="build/error-deploy-linux.txt" failifexecutionfails="false">
+            <arg line='build deployment.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline} Deployment" project.installerFilename="${file.name.dist.deployment.linux}"'/>
+         </exec>
 
+      </parallel>
    </target>
 
 
