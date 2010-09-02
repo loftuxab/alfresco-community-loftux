@@ -1,12 +1,6 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/components/workflow/workflow.lib.js">
-var workflowDefinitions = getWorkflowTypes(),
+var workflowDefinitions = getWorkflowDefinitions(),
    filters = [];
-filters.push(
-{
-   id: "workflowType",
-   data: "",
-   label: "link.any"
-});
 if (workflowDefinitions)
 {
    for (var i = 0, il = workflowDefinitions.length; i < il; i++)
@@ -14,7 +8,7 @@ if (workflowDefinitions)
       filters.push(
       {
          id: "workflowType",
-         data: "definitionId=" + workflowDefinitions[i].id,
+         data: workflowDefinitions[i].id,
          label: workflowDefinitions[i].title
       });
    }

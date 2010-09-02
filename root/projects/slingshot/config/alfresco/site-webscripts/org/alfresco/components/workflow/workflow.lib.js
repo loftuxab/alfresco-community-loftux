@@ -1,39 +1,39 @@
-function getWorkflowTypes()
+function getHiddenTaskTypes()
 {
-   var connector = remote.connect("alfresco"),
-      result = connector.get("/api/workflow-definitions"),
-      filteredWorkflows;
-   if (result.status == 200)
+   var hiddenTaskTypes = [],
+      hiddenTasks = config.scoped["Workflow"]["hidden-tasks"].childrenMap["task"];
+   if (hiddenTasks)
    {
-      var workflows = eval('(' + result + ')').data,
-         hiddenWorkflows = config.scoped["Workflow"]["hidden-workflows"].childrenMap["workflow"],
-         hiddenWorkflowName;
-      filteredWorkflows = []
-      for (var i = 0, il = workflows.length; i < il; i++)
+      for (var hi = 0, hil = hiddenTasks.size(); hi < hil; hi++)
       {
-         try
-         {
-            // TODO: Remove this filtering and add the hidden tasks to the url instead
-            if (hiddenWorkflows)
-            {
-               for (var hi = 0, hil = hiddenWorkflows.size(); hi < hil; hi++)
-               {
-                  hiddenWorkflowName = hiddenWorkflows.get(hi).attributes["name"];
-                  if (workflows[i].name == hiddenWorkflowName)
-                  {
-                     break;
-                  }
-               }
-               if (hi == hil)
-               {
-                  filteredWorkflows.push(workflows[i]);
-               }
-            }
-         }
-         catch (e)
-         {
-         }
+         hiddenTaskTypes.push(hiddenTasks.get(hi).attributes["type"]);
       }
    }
-   return filteredWorkflows;
+   return hiddenTaskTypes;
+}
+
+function getHiddenWorkflowNames()
+{
+   var hiddenWorkflowNames = [],
+      hiddenWorkflows = config.scoped["Workflow"]["hidden-workflows"].childrenMap["workflow"];
+   if (hiddenWorkflows)
+   {
+      for (var hi = 0, hil = hiddenWorkflows.size(); hi < hil; hi++)
+      {
+         hiddenWorkflowNames.push(hiddenWorkflows.get(hi).attributes["name"]);
+      }
+   }
+   return hiddenWorkflowNames;
+}
+
+function getWorkflowDefinitions()
+{
+   var hiddenWorkflowNames = getHiddenWorkflowNames(),
+      connector = remote.connect("alfresco"),
+      result = connector.get("/api/workflow-definitions?exclude=" + hiddenWorkflowNames.join(","));
+   if (result.status == 200)
+   {
+      return eval('(' + result + ')').data;         
+   }
+   return [];
 }

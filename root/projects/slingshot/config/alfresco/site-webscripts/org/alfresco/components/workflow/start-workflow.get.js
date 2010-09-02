@@ -1,2 +1,2 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/components/workflow/workflow.lib.js">
-model.workflowDefinitions = getWorkflowTypes();
+model.workflowDefinitions = getWorkflowDefinitions();

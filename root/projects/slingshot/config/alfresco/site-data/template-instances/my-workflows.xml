@@ -2,12 +2,18 @@
 <template-instance>
    <template-type>org/alfresco/my-workflows</template-type>
    <components>
-      <!-- title: normal, portlet, repository & portlet+repository -->
       <component>
          <region-id>task-title</region-id>
          <url>/components/title/simple-title</url>
          <properties>
             <title>title.myWorkflows</title>
+         </properties>
+      </component>
+      <component>
+         <region-id>all-filter</region-id>
+         <url>/components/workflow/filter/all</url>
+         <properties>
+            <mode>workflows</mode>
          </properties>
       </component>
       <component>
@@ -30,11 +36,9 @@
          <region-id>toolbar</region-id>
          <url>/components/workflow/workflow-list-toolbar</url>
       </component>
-      <!--
       <component>
          <region-id>list</region-id>
-         <url>/components/workflow/task-list</url>
+         <url>/components/workflow/workflow-list</url>
       </component>
-      -->
    </components>
 </template-instance>
