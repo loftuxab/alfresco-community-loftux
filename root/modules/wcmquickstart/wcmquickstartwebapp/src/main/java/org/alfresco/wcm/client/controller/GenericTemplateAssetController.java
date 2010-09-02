@@ -74,16 +74,6 @@ public class GenericTemplateAssetController extends UrlViewController
 			throw new PageNotFoundException();
 		}
 		
-		// If section URL does not end with / then redirect to one with / to avoid duplicate URLs
-		if (asset != null && asset.getName().equals("index.html") && ! path.endsWith("/"))
-		{
-			String uri = context + path + "/";
-			RedirectView redirect = new RedirectView(uri,false,false);
-			redirect.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
-			return new ModelAndView(redirect);			
-			
-		}
-		
 		return super.handleRequestInternal(request, response);
 	}
 	
