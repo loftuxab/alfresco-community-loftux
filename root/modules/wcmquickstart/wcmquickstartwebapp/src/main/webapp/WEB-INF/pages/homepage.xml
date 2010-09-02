@@ -35,7 +35,7 @@
       </component>       
       <component>
          <region-id>bottom-right</region-id>
-         <url>/content/narrow</url>
+         <url>/content/named</url>
          <properties>
             <asset>/feature.html</asset>
          </properties>         

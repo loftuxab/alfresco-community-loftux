@@ -1,22 +1,11 @@
 <#import "../spring.ftl" as spring />
 
-<div class="interior-header">
-    <h2>${msg('contact.form.title')}</h2>
-    <p class="intheader-paragraph">
-        ${msg('contact.form.intro')}
-    </p>
-</div>
-
 <div class="interior-content">
-    <p>
-        ${msg('contact.form.text')}
-    </p>
-
     <@spring.bind "feedback.*" />
     <form id="post-comment" action="" method="post">
         <fieldset class="blog-comment-fieldset">
             <input type="hidden" name="feedbackType" value="Contact Request"/>          
-            <input type="hidden" name="successPage" value="${url.context}/thankyou.html"/>          
+            <input type="hidden" name="successPage" value="${url.context}/contact/thankyou.html"/>          
             <h3>${msg('comments.write.title')}</h3>
             <#if spring.status.error>
                 <div class="contact-error"><p>${msg('comments.write.errors')}</p></div>

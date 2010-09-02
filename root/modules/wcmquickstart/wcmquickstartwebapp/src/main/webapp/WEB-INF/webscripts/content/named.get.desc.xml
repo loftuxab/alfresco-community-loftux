@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Named Asset</shortname>
+  <description>Show content from named asset</description>
+  <url>/content/named</url>
+</webscript>
