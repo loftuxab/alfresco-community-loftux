@@ -145,23 +145,20 @@ public class SiteHelper implements WebSiteModel
                 websiteId = siteInfo.getNodeRef();
             }
  
-            if (siteService.getSite(websiteId.getId()) != null)
-            {            
-                NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), websiteId.getId());
-                if (containerParent == null)
-                {
-                    containerParent = siteService.createContainer(siteInfo.getShortName(), websiteId.getId(), null, null);
-                }
-                container = nodeService.getChildByName(containerParent, ContentModel.ASSOC_CONTAINS, 
-                        containerName);
-                if (container == null)
-                {
-                    HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
-                    props.put(ContentModel.PROP_NAME, containerName);
-                    container = nodeService.createNode(containerParent, ContentModel.ASSOC_CONTAINS, 
-                            QName.createQName(WebSiteModel.NAMESPACE, containerName), 
-                            ContentModel.TYPE_FOLDER, props).getChildRef();
-                }
+            NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), websiteId.getId());
+            if (containerParent == null)
+            {
+                containerParent = siteService.createContainer(siteInfo.getShortName(), websiteId.getId(), null, null);
+            }
+            container = nodeService.getChildByName(containerParent, ContentModel.ASSOC_CONTAINS, 
+                    containerName);
+            if (container == null)
+            {
+                HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
+                props.put(ContentModel.PROP_NAME, containerName);
+                container = nodeService.createNode(containerParent, ContentModel.ASSOC_CONTAINS, 
+                        QName.createQName(WebSiteModel.NAMESPACE, containerName), 
+                        ContentModel.TYPE_FOLDER, props).getChildRef();
             }
         }
         return container;
