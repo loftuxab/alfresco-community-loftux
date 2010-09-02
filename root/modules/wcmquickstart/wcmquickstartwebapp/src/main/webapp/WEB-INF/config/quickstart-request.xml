@@ -96,24 +96,18 @@
            
     <!-- Resolve views by using the template selected within the repository for a page -->
     <bean id="dynamicPageViewResolver" class="org.alfresco.wcm.client.viewresolver.DynamicPageViewResolver" parent="abstractWebFrameworkViewResolver"/>
-
-	<!-- 
+     
     <bean id="staticPageViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/"/>
         <property name="suffix" value=".ftl"/>
     </bean>
-    -->
 
     <!-- Use an editorially configured error page if available, otherwise use a static one -->
 	<bean id="exceptionResolver" class="org.alfresco.wcm.client.exceptionresolver.RepositoryExceptionResolver">
+        <property name="serviceRegistry" ref="webframework.service.registry"/>
         <property name="modelDecorator" ref="modelDecorator"/>
         <property name="assetFactory" ref="assetFactory"/>
         <property name="errorPageSuffix" value="page"/>
-        <property name="exceptionMappings">
-            <map>
-                <entry key="org.alfresco.wcm.client.exception.PageNotFoundException" value="404page"/>
-           </map>
-        </property>        
         <property name="defaultErrorView" value="500page"/>
 	</bean>
 	
