@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -94,47 +95,67 @@ public class AssetFactoryCmisImpl implements AssetFactory
             + COMMON_ASSET_FROM_CLAUSE + "WHERE IN_TREE(d, ''{0}'') AND ANY wa.ws:tags IN (''{1}'') "
             + "ORDER BY SEARCH_SCORE ASC";
     
+    private final String modifiedTimeByAssetId = "SELECT d.cmis:lastModificationDate " +
+    		"FROM cmis:document AS d WHERE d.cmis:objectId = ''{0}''";
+    
+    private final String modifiedTimesByAssetIds = "SELECT d.cmis:objectId, d.cmis:lastModificationDate " +
+    		"FROM cmis:document AS d WHERE d.cmis:objectId IN ({0})";
+    
     @Override
-    public Asset getAssetById(String id)
+    public Asset getAssetById(String id, boolean deferredLoad)
     {
         Asset asset = null;
-        ItemIterable<QueryResult> results = runQuery(
-                MessageFormat.format(assetByIdQueryPattern, id));
-        Iterator<QueryResult> iterator = results.iterator();
-        if (iterator.hasNext())
+        if (deferredLoad)
         {
-            QueryResult result = iterator.next();
-            asset = buildAsset(result);
+            asset = new DeferredLoadingAssetImpl(id, this);
+        }
+        else
+        {
+            ItemIterable<QueryResult> results = runQuery(
+                    MessageFormat.format(assetByIdQueryPattern, id));
+            Iterator<QueryResult> iterator = results.iterator();
+            if (iterator.hasNext())
+            {
+                QueryResult result = iterator.next();
+                asset = buildAsset(result);
+            }
         }
         return asset;
     }
 
     @Override
-    public List<Asset> getAssetsById(Collection<String> ids)
+    public List<Asset> getAssetsById(Collection<String> ids, boolean deferredLoad)
     {
-        List<Asset> assets = new ArrayList<Asset>(ids.size());
-        boolean first = true;
-        StringBuilder builder = new StringBuilder();
-        for (String id : ids)
+        List<Asset> assets;
+        if (deferredLoad)
         {
-            if (!first)
-            {
-                builder.append(',');
-            }
-            builder.append('\'');
-            builder.append(id);
-            builder.append('\'');
-            first = false;
+            assets = new DeferredLoadingAssetListImpl(ids, this);
         }
-        ItemIterable<QueryResult> results = runQuery(MessageFormat.format(assetsByIdQueryPattern,
-                builder.toString()));
-        Iterator<QueryResult> iterator = results.iterator();
-        while (iterator.hasNext())
+        else
         {
-            QueryResult result = iterator.next();
-            assets.add(buildAsset(result));
+            assets = new ArrayList<Asset>(ids.size());
+            String idList = buildIdList(ids);
+            ItemIterable<QueryResult> results = runQuery(MessageFormat.format(assetsByIdQueryPattern, idList));
+            Iterator<QueryResult> iterator = results.iterator();
+            while (iterator.hasNext())
+            {
+                QueryResult result = iterator.next();
+                assets.add(buildAsset(result));
+            }
         }
         return assets;
+    }
+
+    @Override
+    public Asset getAssetById(String id)
+    {
+        return getAssetById(id, true);
+    }
+
+    @Override
+    public List<Asset> getAssetsById(Collection<String> ids)
+    {
+        return getAssetsById(ids, true);
     }
 
     @Override
@@ -220,26 +241,80 @@ public class AssetFactoryCmisImpl implements AssetFactory
                 PropertyData<?> targetIdData = props.get(PropertyIds.TARGET_ID);
                 PropertyData<?> assocTypeData = props.get(PropertyIds.OBJECT_TYPE_ID);
                 
-                if (targetIdData == null || assocTypeData == null)
+                if (targetIdData != null && assocTypeData != null)
                 {
-                    continue;
+                    //The association type will have a prefix of "R:". Strip this off.
+                    String assocType = assocTypeData.getFirstValue().toString();
+                    if (assocType.startsWith("R:"))
+                    {
+                        assocType = assocType.substring(2);
+                    }
+                    List<String> currentTargets = result.get(assocType);
+                    if (currentTargets == null)
+                    {
+                        currentTargets = new ArrayList<String>();
+                        result.put(assocType, currentTargets);
+                    }
+                    currentTargets.add(targetIdData.getFirstValue().toString());
                 }
-                //The association type will have a prefix of "R:". Strip this off.
-                String assocType = assocTypeData.getFirstValue().toString();
-                if (assocType.startsWith("R:"))
-                {
-                    assocType = assocType.substring(2);
-                }
-                List<String> currentTargets = result.get(assocType);
-                if (currentTargets == null)
-                {
-                    currentTargets = new ArrayList<String>();
-                    result.put(assocType, currentTargets);
-                }
-                currentTargets.add(targetIdData.getFirstValue().toString());
             }
         }
         return result;
+    }
+
+    @Override
+    public Date getModifiedTimeOfAsset(String assetId)
+    {
+        Date modifiedTime = null;
+        String cmisQuery = MessageFormat.format(modifiedTimeByAssetId, assetId);
+        ItemIterable<QueryResult> results = runQuery(cmisQuery);
+        Iterator<QueryResult> iterator = results.iterator();
+        if (iterator.hasNext())
+        {
+            QueryResult result = iterator.next();
+            modifiedTime = SqlUtils.getDateProperty(result, Resource.PROPERTY_MODIFIED_TIME);
+        }
+        return modifiedTime;
+    }
+    
+    @Override
+    public Map<String,Date> getModifiedTimesOfAssets(Collection<String> assetIds)
+    {
+        Map<String, Date> map = new TreeMap<String, Date>();
+        
+        String idList = buildIdList(assetIds);
+        String cmisQuery = MessageFormat.format(modifiedTimesByAssetIds, idList);
+        ItemIterable<QueryResult> results = runQuery(cmisQuery);
+        Iterator<QueryResult> iterator = results.iterator();
+
+        Date modifiedTime;
+        String id;
+        while (iterator.hasNext())
+        {
+            QueryResult result = iterator.next();
+            modifiedTime = SqlUtils.getDateProperty(result, Resource.PROPERTY_MODIFIED_TIME);
+            id = (String) result.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue();
+            map.put(id, modifiedTime);
+        }
+        return map;
+    }
+
+    private String buildIdList(Collection<String> assetIds)
+    {
+        boolean first = true;
+        StringBuilder builder = new StringBuilder();
+        for (String id : assetIds)
+        {
+            if (!first)
+            {
+                builder.append(',');
+            }
+            builder.append('\'');
+            builder.append(id);
+            builder.append('\'');
+            first = false;
+        }
+        return builder.toString();
     }
     
     @Override
@@ -303,12 +378,21 @@ public class AssetFactoryCmisImpl implements AssetFactory
 
     private ItemIterable<QueryResult> runQuery(String query)
     {
+        long start = 0L;
         if (log.isDebugEnabled())
         {
             log.debug("About to run CMIS query: " + query);
+            start = System.currentTimeMillis();
         }
         Session session = CmisSessionHelper.getSession();
-        return session.query(query, false);
+        ItemIterable<QueryResult> results = session.query(query, false);
+        
+        if (log.isDebugEnabled())
+        {
+            long end = System.currentTimeMillis();
+            log.debug("CMIS query took " + (end-start) + "ms to return.");
+        }
+        return results;
     }
     
     public void setSectionFactory(SectionFactory sectionFactory)

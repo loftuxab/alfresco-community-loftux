@@ -19,6 +19,7 @@
 package org.alfresco.wcm.client;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +27,13 @@ public interface AssetFactory
 {
     Asset getAssetById(String id);
     List<Asset> getAssetsById(Collection<String> ids);
+    Asset getAssetById(String id, boolean deferredLoad);
+    List<Asset> getAssetsById(Collection<String> ids, boolean deferredLoad);
     Asset getSectionAsset(String sectionId, String assetName);
 	Asset getSectionAsset(String sectionId, String assetName, boolean wildcardsAllowedInName);
     SearchResults findByQuery(Query query);
     Map<String, List<String>> getSourceRelationships(String assetId);
-    public Map<String, Rendition> getRenditions(String assetId);
+    Map<String, Rendition> getRenditions(String assetId);
+    Date getModifiedTimeOfAsset(String assetId);
+    Map<String, Date> getModifiedTimesOfAssets(Collection<String> assetIds);
 }
