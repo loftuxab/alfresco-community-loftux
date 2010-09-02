@@ -149,7 +149,7 @@ public class WebSiteImpl implements WebSite
 		Section section = sectionFactory.getSectionFromPathSegments(rootSectionId, sectionPath);
 		if (section != null)
 		{
-			if (resourceName != null)
+			if (resourceName != null && resourceName.length() > 0)
 			{
 				String decodedResourceName = urlUtils.decodeResourceName(resourceName); //TODO Having UrlUtils depedency here is not nice.
 				asset = section.getAsset(decodedResourceName);
