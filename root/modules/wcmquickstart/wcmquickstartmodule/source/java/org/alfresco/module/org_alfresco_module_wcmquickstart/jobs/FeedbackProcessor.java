@@ -169,45 +169,42 @@ public class FeedbackProcessor
                             SummaryInfo summaryInfo = entry.getValue();
                             NodeRef summaryNode = summaryInfo.summaryNode;
                             
-                            if (summaryNode != null)
+                            Map<QName,Serializable> props = nodeService.getProperties(summaryNode);
+                            
+                            //Get the current values from the summary node
+                            Integer commentCountObj = (Integer)nodeService.getProperty(summaryNode, WebSiteModel.PROP_COMMENT_COUNT);
+                            Integer processedRatingsObj = (Integer)nodeService.getProperty(summaryNode, WebSiteModel.PROP_PROCESSED_RATINGS);
+                            Float averageRatingObj = (Float)nodeService.getProperty(summaryNode, WebSiteModel.PROP_AVERAGE_RATING);
+                            
+                            int commentCount = commentCountObj == null ? 0 : commentCountObj.intValue();
+                            int processedRatings = processedRatingsObj == null ? 0 : processedRatingsObj.intValue();
+                            float averageRating = averageRatingObj == null ? 0 : averageRatingObj.floatValue();
+                            
+                            if (log.isDebugEnabled())
                             {
-                                Map<QName,Serializable> props = nodeService.getProperties(summaryNode);
-                                
-                                //Get the current values from the summary node
-                                Integer commentCountObj = (Integer)nodeService.getProperty(summaryNode, WebSiteModel.PROP_COMMENT_COUNT);
-                                Integer processedRatingsObj = (Integer)nodeService.getProperty(summaryNode, WebSiteModel.PROP_PROCESSED_RATINGS);
-                                Float averageRatingObj = (Float)nodeService.getProperty(summaryNode, WebSiteModel.PROP_AVERAGE_RATING);
-                                
-                                int commentCount = commentCountObj == null ? 0 : commentCountObj.intValue();
-                                int processedRatings = processedRatingsObj == null ? 0 : processedRatingsObj.intValue();
-                                float averageRating = averageRatingObj == null ? 0 : averageRatingObj.floatValue();
-                                
-                                if (log.isDebugEnabled())
-                                {
-                                    log.debug("About to update feedback summary for asset " + entry.getKey() + ". Current values are: " +
-                                            "commentCount = " + commentCount + "; processedRatings = " + processedRatings + "; averageRating = " + averageRating);
-                                }
-                                
-                                //Update the values with the information gathered in the SummaryInfo object...
-                                commentCount += summaryInfo.commentCount;
-                                float totalRatingSoFar = averageRating * processedRatings;
-                                if (summaryInfo.ratingCount > 0)
-                                {
-                                    processedRatings += summaryInfo.ratingCount;
-                                    totalRatingSoFar += summaryInfo.totalRating;
-                                    averageRating = totalRatingSoFar / processedRatings;
-                                }
-                                if (log.isDebugEnabled())
-                                {
-                                    log.debug("About to update feedback summary for asset " + entry.getKey() + ". New values are: " +
-                                            "commentCount = " + commentCount + "; processedRatings = " + processedRatings + "; averageRating = " + averageRating);
-                                }
-                                props.put(WebSiteModel.PROP_COMMENT_COUNT, commentCount);
-                                props.put(WebSiteModel.PROP_PROCESSED_RATINGS, processedRatings);
-                                props.put(WebSiteModel.PROP_AVERAGE_RATING, averageRating);
-                                // ... and write the new values back to the repo.
-                                nodeService.setProperties(summaryNode, props);
+                                log.debug("About to update feedback summary for asset " + entry.getKey() + ". Current values are: " +
+                                        "commentCount = " + commentCount + "; processedRatings = " + processedRatings + "; averageRating = " + averageRating);
                             }
+                            
+                            //Update the values with the information gathered in the SummaryInfo object...
+                            commentCount += summaryInfo.commentCount;
+                            float totalRatingSoFar = averageRating * processedRatings;
+                            if (summaryInfo.ratingCount > 0)
+                            {
+                                processedRatings += summaryInfo.ratingCount;
+                                totalRatingSoFar += summaryInfo.totalRating;
+                                averageRating = totalRatingSoFar / processedRatings;
+                            }
+                            if (log.isDebugEnabled())
+                            {
+                                log.debug("About to update feedback summary for asset " + entry.getKey() + ". New values are: " +
+                                        "commentCount = " + commentCount + "; processedRatings = " + processedRatings + "; averageRating = " + averageRating);
+                            }
+                            props.put(WebSiteModel.PROP_COMMENT_COUNT, commentCount);
+                            props.put(WebSiteModel.PROP_PROCESSED_RATINGS, processedRatings);
+                            props.put(WebSiteModel.PROP_AVERAGE_RATING, averageRating);
+                            // ... and write the new values back to the repo.
+                            nodeService.setProperties(summaryNode, props);
                         }
                         return null;
                     }   
