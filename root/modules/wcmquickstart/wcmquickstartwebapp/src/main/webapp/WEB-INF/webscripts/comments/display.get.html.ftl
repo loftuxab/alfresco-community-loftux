@@ -13,7 +13,7 @@
                     <h4>${comment.visitorName!'Anonymous'}</h4>
                 </#if>
                 <span class="newslist-date"><#if comment.postTime??>${comment.postTime?string(msg('date.format'))}</#if></span>
-                <#if comment.commentFlagged>
+                <#if comment.commentFlagged || (context.properties['report']!'') = comment.id>
                     <span class="comments-text">${msg('comments.display.censored')}</span>
                 <#else>
                     <span class="comments-text">${comment.comment!'nothing to say'}</span>

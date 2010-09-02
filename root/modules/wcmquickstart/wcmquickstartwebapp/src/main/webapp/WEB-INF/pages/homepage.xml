@@ -37,7 +37,7 @@
          <region-id>bottom-right</region-id>
          <url>/content/named</url>
          <properties>
-            <asset>/feature.html</asset>
+            <asset>feature.html</asset>
          </properties>         
       </component>       
    </components>

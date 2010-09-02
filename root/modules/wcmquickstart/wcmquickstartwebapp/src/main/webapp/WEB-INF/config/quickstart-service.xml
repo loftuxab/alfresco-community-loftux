@@ -40,8 +40,6 @@
     <!--  Dictionary service -->
     <bean id="dictionaryService" class="org.alfresco.wcm.client.impl.DictionaryServiceImpl"/>
     
-    <!-- Services which make the factories available to webscripts -->
-        
 	<bean id="webscriptCaller" class="org.alfresco.wcm.client.impl.WebScriptCallerImpl" init-method="init">
 		<property name="baseUrl" value="%{quickstart.repo.baseWebscriptUrl}" />
 		<property name="credentials">
@@ -52,9 +50,10 @@
 		</property>
 	</bean>
     
+    <!-- Services which make the factories available to webscripts -->
+        
     <bean id="collectionService" parent="baseScriptExtension" class="org.alfresco.wcm.client.service.CollectionService">
        <property name="extensionName" value="collectionService"/>    
        <property name="collectionFactory" ref="collectionFactory"/>
     </bean>     
-
 </beans>
