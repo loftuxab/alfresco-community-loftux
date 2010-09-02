@@ -44,15 +44,9 @@ public class PathImpl implements Path
 		if (index != -1)
 		{
 			String resource = cleanUri.substring(index+1);
-			if (resource.contains(".") == true)
-			{
-				path = cleanUri.substring(0, index);
-				this.resourceName = resource;
-			}
-			else
-			{
-				path = cleanUri;
-			}
+			if (resource.length() == 0) resource = null;
+			path = cleanUri.substring(0, index);
+			this.resourceName = resource;
 		}
 		else
 		{
