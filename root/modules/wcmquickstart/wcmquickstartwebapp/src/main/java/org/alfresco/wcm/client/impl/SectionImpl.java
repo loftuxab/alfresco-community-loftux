@@ -184,7 +184,16 @@ public class SectionImpl extends ResourceBaseImpl implements Section
 	@Override
 	public Asset getAsset(String resourceName) 
 	{
-	    return getAssetFactory().getSectionAsset(getId(), resourceName);
+	    Asset asset;
+	    if (resourceName == null || resourceName.length() == 0)
+	    {
+	        asset = getIndexPage();
+	    }
+	    else
+	    {
+	        asset = getAssetFactory().getSectionAsset(getId(), resourceName);
+	    }
+	    return asset;
 	}
 	
 	/**

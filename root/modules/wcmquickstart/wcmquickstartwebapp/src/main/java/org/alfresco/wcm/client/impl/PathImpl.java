@@ -23,6 +23,7 @@ import org.alfresco.wcm.client.Path;
 /** 
  * Path splits a uri into a resource name and array of path segments.
  * @author Chris Lack
+ * @author Brian Remmington
  */
 public class PathImpl implements Path
 {
@@ -31,29 +32,20 @@ public class PathImpl implements Path
 	
 	public PathImpl(String uri) 
 	{
-		if (uri == null) 
-		{
-			this.pathSegments = new String[]{};
-			return;
-		}
-		
-		String cleanUri = uri.trim();
-		String path = null;
+        pathSegments = new String[0];
+        resourceName = "";
 
-		int index = cleanUri.lastIndexOf("/");
-		if (index != -1)
+        if (uri != null) 
 		{
-			String resource = cleanUri.substring(index+1);
-			if (resource.length() == 0) resource = null;
-			path = cleanUri.substring(0, index);
-			this.resourceName = resource;
+            uri = uri.trim();
+		    String[] splitPath = uri.split("/", -1);
+		    if (splitPath.length > 0)
+		    {
+		        resourceName = splitPath[splitPath.length - 1];
+		        pathSegments = new String[splitPath.length - 1];
+		        System.arraycopy(splitPath, 0, pathSegments, 0, pathSegments.length);
+		    }
 		}
-		else
-		{
-			path = cleanUri;
-		}
-		
-		this.pathSegments = path.split("/");
 	}
 	
 	/**
