@@ -63,14 +63,17 @@ public class DynamicPageViewResolver extends AbstractWebFrameworkViewResolver
         String template = requestContext.getParameter("view");
         if (template == null) {
         	// else ask the asset what it's template should be
-		    template = asset.getTemplate();
+		    template = asset.getTemplate();		   
+		    
 		    if (template == null)
-		        throw new EditorialException("template.none", asset.getName());
+		        throw new EditorialException("No template page for "+asset.getContainingSection().getPath()+asset.getName(), 
+		        		                     "template.none",asset.getContainingSection().getPath()+asset.getName()+asset.getName());
         }
         
         Page page = lookupPage(template);
         if (page == null)
-            throw new EditorialException("template.missing", asset.getName());
+            throw new EditorialException("Invalid template page \""+template+"\" specified for "+asset.getContainingSection().getPath()+asset.getName(), 
+                    "template.none",asset.getContainingSection().getPath()+asset.getName()+asset.getName());
 
         view = new PageView(getServiceRegistry());
         view.setUrl(template);

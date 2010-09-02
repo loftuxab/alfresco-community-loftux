@@ -96,13 +96,14 @@
            
     <!-- Resolve views by using the template selected within the repository for a page -->
     <bean id="dynamicPageViewResolver" class="org.alfresco.wcm.client.viewresolver.DynamicPageViewResolver" parent="abstractWebFrameworkViewResolver"/>
-     
+    
+    <!-- View resolver for the 500page -->
     <bean id="staticPageViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/"/>
-        <property name="suffix" value=".ftl"/>
+        <property name="suffix" value=".html"/>
     </bean>
-
-    <!-- Use an editorially configured error page if available, otherwise use a static one -->
+    
+    <!-- Use an editorially configured error page if available, otherwise use a static one -->    
 	<bean id="exceptionResolver" class="org.alfresco.wcm.client.exceptionresolver.RepositoryExceptionResolver">
         <property name="serviceRegistry" ref="webframework.service.registry"/>
         <property name="modelDecorator" ref="modelDecorator"/>
