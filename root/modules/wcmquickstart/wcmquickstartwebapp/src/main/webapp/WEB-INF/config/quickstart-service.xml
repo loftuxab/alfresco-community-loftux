@@ -15,16 +15,35 @@
        <property name="assetFactory" ref="assetFactory"/>
 	   <property name="dictionaryService" ref="dictionaryService"/>       
     </bean>
-    
+
     <bean id="collectionFactory" class="org.alfresco.wcm.client.impl.CollectionFactoryWebserviceImpl">
-       <property name="assetFactory" ref="assetFactory"/>
-       <property name="sectionFactory" ref="sectionFactory"/>
-       <property name="webscriptCaller" ref="webscriptCaller"/> 
+        <property name="assetFactory" ref="assetFactory" />
+        <property name="sectionFactory" ref="sectionFactory" />
+        <property name="webscriptCaller" ref="webscriptCaller" />
     </bean>
-    
-    <bean id="assetFactory" class="org.alfresco.wcm.client.impl.AssetFactoryCmisImpl">
-       <property name="collectionFactory" ref="collectionFactory"/>
-       <property name="sectionFactory" ref="sectionFactory"/>
+
+
+    <bean id="assetFactory" class="org.alfresco.wcm.client.impl.CachingAssetFactoryImpl">
+        <property name="delegate">
+            <bean class="org.alfresco.wcm.client.impl.AssetFactoryCmisImpl">
+                <property name="collectionFactory" ref="collectionFactory" />
+                <property name="sectionFactory" ref="sectionFactory" />
+            </bean>
+        </property>
+        <property name="cache">
+            <bean class="org.alfresco.wcm.client.impl.cache.EhCacheAdapter">
+                <property name="cache">
+                    <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+                        <property name="cacheManager">
+                            <ref bean="ehCacheManager" />
+                        </property>
+                        <property name="cacheName">
+                            <value>assetCache</value>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
     </bean>
 
     <!-- Service for fetching site data. Implements a cache. -->    
@@ -55,5 +74,8 @@
     <bean id="collectionService" parent="baseScriptExtension" class="org.alfresco.wcm.client.service.CollectionService">
        <property name="extensionName" value="collectionService"/>    
        <property name="collectionFactory" ref="collectionFactory"/>
-    </bean>     
+    </bean>  
+       
+   <bean name="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+   
 </beans>
