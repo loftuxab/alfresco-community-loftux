@@ -15,7 +15,7 @@
         <@streamasset asset=asset/>
     </div>
         
-    <h3>${msg('tags')}</h3>
+    <h3 class="tag-list">${msg('tags')}</h3>
     <#if asset.tags?size == 0>
         <p>${msg('tags.none')}</p>
     <#else>
