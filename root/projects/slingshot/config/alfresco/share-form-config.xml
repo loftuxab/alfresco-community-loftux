@@ -59,6 +59,27 @@
                <show id="cm:addressees" />
                <show id="cm:sentdate" />
                <show id="cm:subjectline" />
+               
+               <!-- cm:geographic aspect -->
+               <show id="cm:latitude" />
+               <show id="cm:longitude" />
+               
+               <!-- exif:exif aspect -->
+               <show id="exif:dateTimeOriginal" />
+               <show id="exif:pixelXDimension" />
+               <show id="exif:pixelYDimension" />
+               <show id="exif:exposureTime" />
+               <show id="exif:fNumber" />
+               <show id="exif:flash" />
+               <show id="exif:focalLength" />
+               <show id="exif:isoSpeedRatings" />
+               <show id="exif:manufacturer" />
+               <show id="exif:model" />
+               <show id="exif:software" />
+               <show id="exif:orientation" />
+               <show id="exif:xResolution" />
+               <show id="exif:yResolution" />
+               <show id="exif:resolutionUnit" />
             </field-visibility>
             <appearance>
                <field id="cm:title">
