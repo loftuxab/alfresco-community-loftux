@@ -921,6 +921,7 @@ blockquote {
 }
 .contact-success {
 	float:left;
+	margin-bottom: 20px;
 }
 .contact-error p, .contact-success p {
 	padding:0 10px 0 10px;

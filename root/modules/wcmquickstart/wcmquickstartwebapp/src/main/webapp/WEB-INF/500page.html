@@ -33,7 +33,7 @@
         <div class="link-menu">
             <ul>                
                 <!--<li><a href="#">Accessibility</a></li>-->
-                <li><a href="/wcmqs/contact.html">Contact</a></li>
+                <li><a href="/wcmqs/contact/contact.html">Contact</a></li>
             </ul>
         </div>
     </div>

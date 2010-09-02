@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page> 
-   <id>thankyou.html</id>
-   <title>title.thankyou</title>
+   <id>contactpage1</id>
+   <description>contact us page with form</description>    
+   <title>title.contact</title>
    <template-instance>two-block</template-instance>
    <authentication>none</authentication>
-   <components>
+   <components>   
       <component>
          <region-id>left1</region-id>
-         <url>/contact/thankyou</url>
+         <url>/content/current</url>
+      </component>       
+      <component>
+         <region-id>left2</region-id>
+         <url>/contact/form</url>
       </component>       
       <component>
          <region-id>right1</region-id>
-         <url>/content/narrow</url>
+         <url>/content/named</url>
          <properties>
-  	     	<asset>/contact.html</asset>
+  	     	<asset>/location.html</asset>
     	 </properties>         
       </component>       
    </components>

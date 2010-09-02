@@ -89,7 +89,7 @@
     </bean>
     
     <!-- Comment form controller -->   
-    <bean id="commentFormController" class="org.alfresco.wcm.client.controller.CommentFormController"/>
+    <!-- <bean id="commentFormController" class="org.alfresco.wcm.client.controller.CommentFormController"/> -->
 
     <!--  RSS feed controller -->
     <bean id="rssController" class="org.alfresco.wcm.client.controller.RssController"/>

@@ -1,0 +1,1 @@
+model.componentAsset = webSite.getAssetByPath(args.asset);
