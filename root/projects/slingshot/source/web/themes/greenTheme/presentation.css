@@ -33,6 +33,11 @@ h2
    font-size: 123.1%;
 }
 
+h2.thin
+{
+   font-weight: normal;
+}
+
 h1 .light,
 h1 .lighter,
 h2 .light,

@@ -28,14 +28,15 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths,
-      $siteURL = Alfresco.util.siteURL;
+         $combine = Alfresco.util.combinePaths,
+         $siteURL = Alfresco.util.siteURL;
 
    /**
     * Alfresco.action.WorkflowActions implementation
@@ -55,7 +56,7 @@
       cancelWorkflow: function WA_cancelWorkflow(workflowId, workflowTitle)
       {
          var me = this,
-            wid = workflowId;
+               wid = workflowId;
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: this.msg("workflow.cancel.title"),
@@ -147,7 +148,123 @@
                scope: this
             }
          });
-      }
+      },
 
-   };
-})();
+      /**
+       * Takes a filter and looks for its url parameter representation
+       *
+       * @method createFilterURLParameters
+       * @param filter {object} The filter to create url parameters for
+       * @param filterParameters {Array} List of configured filter parameters that shall create url parameters
+       * @return URL parameters created from the instructions in filterParameters based on data from the filter OR null no instructions were found
+       * @override
+       */
+      createFilterURLParameters: function DateFilter_createFilterURLParameters(filter, filterParameters)
+      {
+         if (YAHOO.lang.isString(filter.filterData))
+         {
+            var filterParameter,
+               result = null;
+            for (var fpi = 0, fpil = filterParameters.length; fpi < fpil; fpi++)
+            {
+               filterParameter = filterParameters[fpi];
+               if ((filter.filterId == filterParameter.id || filterParameter.id == "*") &&
+                     (filter.filterData == filterParameter.data || filterParameter.data == "*"))
+               {
+                  return this.substituteParameters(filterParameter.parameters, {
+                     id: filter.filterId,
+                     data: filter.filterData
+                  });
+               }
+            }
+         }
+         return null;
+      },
+
+      /**
+       * Takes a template and performs substituion against "Obj" and according to date instructions as described below.
+       *
+       * Assumes the template data may contain date instructions where the instructions are placed inside curly brackets:
+       * "param={attr}" - the name of an attribute in "obj"
+       * "param={0dt}" - the current date time in iso8601 format
+       * "param={1d}" - the current date (time set to end of day) and rolled l days forward
+       * "param={-2d}" - the current date (time set to end of day) and rolled 2 days backward
+
+       * @param template The template containing attributes from obj and dates to resolve
+       * @param obj Contains runtime values
+       */
+      substituteParameters: function (template, obj)
+      {
+         var unresolvedTokens = template.match(/{[^}]+}/g);
+         if (unresolvedTokens)
+         {
+            var resolvedTokens = {},
+                  name, value, date;
+            for (var i = 0, il = unresolvedTokens.length; i < il; i++)
+            {
+               name = unresolvedTokens[i].substring(1, unresolvedTokens[i].length - 1);
+               value = name;
+               date = new Date();
+               if (/^[\-\+]?\d+(d|dt)$/.test(value))
+               {
+                  if (/^[\-\+]?\d+(d)$/.test(value))
+                  {
+                     // Only date (and not datetime) that was requested
+                     date.setHours(11);
+                     date.setMinutes(59);
+                     date.setSeconds(59);
+                     date.setMilliseconds(999);
+                  }
+                  date.setDate(date.getDate() + parseInt(value));
+                  value = date;
+               }
+               else
+               {
+                  value = obj[name];
+               }
+               resolvedTokens[name] = Alfresco.util.isDate(value) ? Alfresco.util.toISO8601(value) :  value;
+            }
+            return YAHOO.lang.substitute(template, resolvedTokens);
+         }
+         return template;
+      },
+
+      /**
+       * @method createAction
+       * @param label
+       * @param css
+       * @param action
+       * @param oRecord
+       */
+      createAction: function WA_createAction(elCell, label, css, action, oRecord)
+      {
+         var div = document.createElement("div");
+         Dom.addClass(div, css);
+         div.onmouseover = function()
+         {
+            Dom.addClass(this, css + "-over");
+         };
+         div.onmouseout = function()
+         {
+            Dom.removeClass(this, css + "-over");
+
+         };
+         var a = document.createElement("a");
+         if (YAHOO.lang.isFunction(action))
+         {
+            Event.addListener(a, "click", action, oRecord, this);
+            a.setAttribute("href", "#");
+         }
+         else
+         {
+            a.setAttribute("href", action);
+         }
+         var span = document.createElement("span");
+         Dom.addClass(span, "theme-color-1");
+         span.appendChild(document.createTextNode(label));
+         a.appendChild(span);
+         div.appendChild(a);
+         elCell.appendChild(div);
+      }
+   }          
+})();  

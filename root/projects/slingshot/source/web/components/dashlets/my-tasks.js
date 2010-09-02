@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 /**
  * Dashboard MyTasks component.
- * 
+ *
  * @namespace Alfresco.dashlet
  * @class Alfresco.dashlet.MyTasks
  */
@@ -29,7 +29,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+         Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -38,18 +38,31 @@
 
    /**
     * Dashboard MyTasks constructor.
-    * 
+    *
     * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.dashlet.MyTasks} The new component instance
     * @constructor
     */
    Alfresco.dashlet.MyTasks = function MyTasks_constructor(htmlId)
    {
-      Alfresco.dashlet.MyTasks.superclass.constructor.call(this, "Alfresco.dashlet.MyTasks", htmlId, ["button", "container", "datasource", "datatable", "animation"]);
+      Alfresco.dashlet.MyTasks.superclass.constructor.call(this, "Alfresco.dashlet.MyTasks", htmlId, ["button", "container", "datasource", "datatable", "paginator", "history", "animation"]);
       return this;
    };
 
-   YAHOO.extend(Alfresco.dashlet.MyTasks, Alfresco.component.Base,
+   /**
+    * Extend from Alfresco.component.Base
+    */
+   YAHOO.extend(Alfresco.dashlet.MyTasks, Alfresco.component.Base);
+
+   /**
+    * Augment prototype with Common Workflow actions to reuse createFilterURLParameters
+    */
+   YAHOO.lang.augmentProto(Alfresco.dashlet.MyTasks, Alfresco.action.WorkflowActions);
+
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.dashlet.MyTasks.prototype,
    {
 
       /**
@@ -67,7 +80,24 @@
           * @type object
           * @default []
           */
-         hiddenTaskTypes: []
+         hiddenTaskTypes: [],
+
+         /**
+          * Maximum number of tasks to display in the dashlet.
+          *
+          * @property maxItems
+          * @type int
+          * @default 50
+          */
+         maxItems: 50,
+
+         /**
+          * The filters to display in the filter menu.
+          *
+          * @property filters
+          * @type Array
+          */
+         filters: []
       },
 
       /**
@@ -76,69 +106,105 @@
        */
       onReady: function MyTasks_onReady()
       {
-         var me = this;
-         
-         // DataSource definition
-         var properties = ["bpm_priority", "bpm_status", "bpm_dueDate", "bpm_description"];
-         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + 
-               "api/task-instances?authority=" + encodeURIComponent(Alfresco.constants.USERNAME) +
-               "&properties=" + properties.join(","),
+         // Prepare webscript url to task instances
+         var webscript = YAHOO.lang.substitute("api/task-instances?authority={authority}&properties={properties}&exclude={exclude}",
          {
-            responseType: YAHOO.util.DataSource.TYPE_JSON,
-            responseSchema:
+            authority: encodeURIComponent(Alfresco.constants.USERNAME),
+            properties: ["bpm_priority", "bpm_status", "bpm_dueDate", "bpm_description"].join(","),
+            exclude: this.options.hiddenTaskTypes.join(",")
+         });
+
+         /**
+          * Create datatable with a simple pagination that only displays number of results.
+          * The pagination is handled in the "base" data source url and can't be changed in the dashlet
+          */
+         this.widgets.alfrescoDataTable = new Alfresco.util.DataTable(
+         {
+            dataSource:
             {
-               resultsList: "data",
-               fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable"]
+               url: Alfresco.constants.PROXY_URI + webscript,
+               config:
+               {
+                  fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable"]
+               },
+               initialParameters: this.options.filters.length > 0 ? this.options.filters[0].value : ""
+            },
+            dataTable:
+            {
+               container: this.id + "-tasks",
+               columnDefinitions:
+               [
+                  { key: "isPooled", sortable: false, formatter: this.proxy(this.renderCellIcons), width: 20 },
+                  { key: "title", sortable: false, formatter: this.proxy(this.renderCellTaskInfo) },
+                  { key: "name", sortable: false, formatter: this.proxy(this.renderCellActions), width: 40 }
+               ],
+               config:
+               {
+                  MSG_EMPTY: this.msg("message.noTasks")
+               }
+            },
+            paginator:
+            {
+               config:
+               {
+                  containers: [this.id + "-paginator"],
+                  template: this.msg("pagination.template"),
+                  pageReportTemplate: this.msg("pagination.template.page-report"),
+                  rowsPerPage: this.options.maxItems
+               }
             }
          });
 
-         // TODO: Remove this filtering and add the hidden tasks to the url instead
-         this.widgets.dataSource.doBeforeParseData = function SiteFinder_doBeforeParseData(oRequest , oFullResponse)
+         // Create filter menu
+         this.widgets.filterMenuButton = Alfresco.util.createYUIButton(this, "filters", this.onFilterSelected,
          {
-            // Make sure only allowed tasks are visible by skipping the ones configured to be hidden
-            if (oFullResponse)
-            {
-               var allTasks = oFullResponse.data || [],
-                     allowedTasks = [];
-               for (var i = 0, il = allTasks.length; i < il; i++)
-               {
-                  if (!Alfresco.util.arrayContains(me.options.hiddenTaskTypes, allTasks[i].type))
-                  {
-                     allowedTasks.push(allTasks[i]);
-                  }
-               }
-               return {
-                  data: allowedTasks
-               };
-            }
-            return oFullResponse;
-         };
+            type: "menu",
+            menu: this.options.filters,
+            lazyloadmenu: false
+         });
+         if (this.options.filters.length > 0)
+         {
+            this.widgets.filterMenuButton.set("label", this.options.filters[0].text);
+         }
+         Dom.removeClass(this.id + "-filters", "hide");
+      },
 
-         /**
-          * Priority & pooled icons custom datacell formatter
-          */
-         var renderCellIcons = function MyTasks_onReady_renderCellIcons(elCell, oRecord, oColumn, oData)
-         {
-            Dom.setStyle(elCell, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            var priority = oRecord.getData("properties")["bpm_priority"],
+      /**
+       * Reloads the list with the new filter and updates the filter menu button's label
+       *
+       * @param event
+       * @param args
+       */
+      onFilterSelected: function(event, args)
+      {
+         this.widgets.filterMenuButton.set("label", args[1].cfg.getProperty("text"));
+         var parameters = this.substituteParameters(args[1].value, {});
+         this.widgets.alfrescoDataTable.loadDataTable(parameters);
+      },
+
+      /**
+       * Priority & pooled icons custom datacell formatter
+       */
+      renderCellIcons: function MyTasks_onReady_renderCellIcons(elCell, oRecord, oColumn, oData)
+      {
+         var priority = oRecord.getData("properties")["bpm_priority"],
                priorityMap = { "1": "high", "2": "medium", "3": "low" },
                priorityKey = priorityMap[priority + ""],
                pooledTask = oRecord.getData("isPooled");
-            var desc = '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/priority-' + priorityKey + '-16.png" title="' + me.msg("label.priority", me.msg("priority." + priorityKey)) + '"/>';
-            if (pooledTask)
-            {
-               desc += '<br/><img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/pooled-task-16.png" title="' + me.msg("label.pooledTask") + '"/>';
-            }
-            elCell.innerHTML = desc;
-         };
-                  
-         /**
-          * Task info custom datacell formatter
-          */
-         var renderCellTaskInfo = function MyTasks_onReady_renderCellTaskInfo(elCell, oRecord, oColumn, oData)
+         var desc = '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/priority-' + priorityKey + '-16.png" title="' + this.msg("label.priority", this.msg("priority." + priorityKey)) + '"/>';
+         if (pooledTask)
          {
-            var taskId = oRecord.getData("id"),
+            desc += '<br/><img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/pooled-task-16.png" title="' + this.msg("label.pooledTask") + '"/>';
+         }
+         elCell.innerHTML = desc;
+      },
+
+      /**
+       * Task info custom datacell formatter
+       */
+      renderCellTaskInfo: function MyTasks_onReady_renderCellTaskInfo(elCell, oRecord, oColumn, oData)
+      {
+         var taskId = oRecord.getData("id"),
                title = oRecord.getData("properties")["bpm_description"],
                dueDateStr = oRecord.getData("properties")["bpm_dueDate"],
                dueDate = dueDateStr ? Alfresco.util.fromISO8601(dueDateStr) : null,
@@ -146,66 +212,31 @@
                type = oRecord.getData("title"),
                status = oRecord.getData("properties")["bpm_status"],
                assignee = oRecord.getData("owner");
-            var titleDesc = '<h4><a href="task-details?taskId=' + taskId + '" class="theme-color-1" title="' + me.msg("link.viewTask") + '">' + title + '</a></h4>',
+         var titleDesc = '<h4><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + title + '</a></h4>',
                dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '">' + Alfresco.util.formatDate(dueDate, "mediumDate") + '</span></h4>' : "",
-               statusDesc = '<div>' + me.msg("label.taskSummary", type, status) + '</div>',
+               statusDesc = '<div>' + this.msg("label.taskSummary", type, status) + '</div>',
                unassignedDesc = '';
-            if (!assignee || !assignee.userName)
-            {
-               unassignedDesc = '<span class="theme-bg-color-5 theme-color-5 unassigned-task">' + me.msg("label.unassignedTask") + '</span>';
-            }
-            elCell.innerHTML = titleDesc + dateDesc + statusDesc + unassignedDesc;
-         };
-         
-         /**
-          * Actions custom datacell formatter
-          */
-         var renderCellActions = function MyTasks_onReady_renderCellActions(elCell, oRecord, oColumn, oData)
+         if (!assignee || !assignee.userName)
          {
-            Dom.setStyle(elCell, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            var task = oRecord.getData();
-            if (task.isEditable)
-            {
-               elCell.innerHTML = '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + me.msg("link.editTask") + '">&nbsp;</a>';
-            }
-         };
-
-         // DataTable column definitions
-         var columnDefinitions =
-         [
-            { key: "isPooled", sortable: false, formatter: renderCellIcons, width: 20 },
-            { key: "title", sortable: false, formatter: renderCellTaskInfo },
-            { key: "name", sortable: false, formatter: renderCellActions, width: 20}
-         ];
-
-         // DataTable definition
-         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-tasks", columnDefinitions, this.widgets.dataSource,
-         {
-            MSG_EMPTY: this.msg("label.noTasks")
-         });
-
-         // Enable row highlighting
-         this.widgets.dataTable.subscribe("rowMouseoverEvent", this.widgets.dataTable.onEventHighlightRow);
-         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);
+            unassignedDesc = '<span class="theme-bg-color-5 theme-color-5 unassigned-task">' + this.msg("label.unassignedTask") + '</span>';
+         }
+         elCell.innerHTML = titleDesc + dateDesc + statusDesc + unassignedDesc;
       },
 
       /**
-       * Fired by YUI when parent element is available for scripting
-       * @method reloadTasks
+       * Actions custom datacell formatter
        */
-      reloadTasks: function MyTasks_reloadTasks()
+      renderCellActions:function MyTasks_onReady_renderCellActions(elCell, oRecord, oColumn, oData)
       {
-         var successHandler = function MyTasks_reloadTasks_successHandler(sRequest, oResponse, oPayload)
+         var task = oRecord.getData();
+         var actions = "";
+         if (task.isEditable)
          {
-            this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-         };
-
-         this.widgets.dataSource.sendRequest("",
-         {
-            success: successHandler,
-            scope: this
-         });
+            actions += '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + this.msg("link.editTask") + '">&nbsp;</a>';
+         }
+         actions += '<a href="task-details?taskId=' + task.id + '" class="view-task" title="' + this.msg("link.viewTask") + '">&nbsp;</a>';
+         elCell.innerHTML = actions;
       }
+
    });
 })();

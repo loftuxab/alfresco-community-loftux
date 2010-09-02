@@ -1,11 +1,13 @@
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/components/workflow/workflow.lib.js">
+model.hiddenTaskTypes = getHiddenTaskTypes();
 
-var hiddenTaskTypes = [],
-   hiddenTasks = config.scoped["Workflow"]["hidden-tasks"].childrenMap["task"];
-if (hiddenTasks)
+var myConfig = new XML(config.script),
+   filters = [];
+for each(var xmlFilter in myConfig..filter)
 {
-   for (var hi = 0, hil = hiddenTasks.size(); hi < hil; hi++)
-   {
-      hiddenTaskTypes.push(hiddenTasks.get(hi).attributes["type"]);
-   }
+   filters.push({
+      label: xmlFilter.@label.toString(),
+      parameters: xmlFilter.@parameters.toString()
+   });
 }
-model.hiddenTaskTypes = hiddenTaskTypes;
+model.filters = filters;

@@ -2,12 +2,18 @@
 <template-instance>
    <template-type>org/alfresco/my-tasks</template-type>
    <components>
-      <!-- title: normal, portlet, repository & portlet+repository -->
       <component>
          <region-id>task-title</region-id>
          <url>/components/title/simple-title</url>
          <properties>
             <title>title.myTasks</title>
+         </properties>
+      </component>
+      <component>
+         <region-id>all-filter</region-id>
+         <url>/components/workflow/filter/all</url>
+         <properties>
+            <mode>tasks</mode>
          </properties>
       </component>
       <component>
@@ -21,10 +27,6 @@
       <component>
          <region-id>assignee-filter</region-id>
          <url>/components/workflow/filter/assignee</url>
-      </component>
-      <component>
-         <region-id>workflow-type-filter</region-id>
-         <url>/components/workflow/filter/workflow-type</url>
       </component>
       <component>
          <region-id>toolbar</region-id>

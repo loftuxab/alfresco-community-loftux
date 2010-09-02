@@ -20,10 +20,10 @@
             </div>
          </div>
          <div class="yui-b" id="alf-filters">
+            <@region id="all-filter" scope="template" protected=true />
             <@region id="due-filter" scope="template" protected=true />
             <@region id="priority-filter" scope="template" protected=true />
             <@region id="assignee-filter" scope="template" protected=true />
-            <@region id="workflow-type-filter" scope="template" protected=true />
          </div>
       </div>
    </div>

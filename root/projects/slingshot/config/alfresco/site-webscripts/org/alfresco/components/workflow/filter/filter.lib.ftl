@@ -1,6 +1,6 @@
 <#macro template header jsClass="Alfresco.component.BaseFilter" filterName="">
    <#local filterIds = "">
-   <div class="filter doclib-filter">
+   <div class="filter">
       <h2>${header}</h2>
       <ul class="filterLink">
       <#list filters as filter>
@@ -13,4 +13,14 @@
    <script type="text/javascript">//<![CDATA[
       new ${jsClass}("${filterName!jsClass}", "${args.htmlid?js_string}").setFilterIds([${filterIds}]);
    //]]></script>
+</#macro>
+
+<#macro jsonParameterFilter filterParameters>
+[<#list filterParameters as filterParameter>
+   {
+      id: "${filterParameter.id?js_string}",
+      "data": "${filterParameter.data?js_string}",
+      "parameters": "${filterParameter.parameters?js_string}"
+   }<#if filterParameter_has_next>,</#if>
+</#list>]
 </#macro>

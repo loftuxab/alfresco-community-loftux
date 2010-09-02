@@ -709,6 +709,24 @@ Alfresco.util.fromExplodedJSONDate = function(date)
 };
 
 /**
+ * Helps a callback getting invoked with the specified scope.
+ *
+ * @method Alfresco.util.proxy
+ * @param scope The scope to apply on method when it is invoked
+ * @param method The method that needs a specific scope when invoked
+ * @return {function}
+ * @static
+ */
+Alfresco.util.proxy = function(method, scope)
+{
+   var proxy = function()
+   {
+      return method.apply(scope, arguments);
+   };
+   return proxy;
+};
+
+/**
  * Convert an object literal into a JavaScript native Date object into an JSON date exploded.
  * NOTE: Passed-in date will have month as zero-based.
  *
@@ -4836,7 +4854,20 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       msg: function Base_msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
+      },
+
+      /**
+       * Asserts a method always is called with this component's scope
+       *
+       * @method msg
+       * @param method {function} The messageId to retrieve
+       * @return {string} The custom message
+       */
+      proxy: function Base_proxy(method)
+      {
+         return Alfresco.util.proxy(method, this);
       }
+
    };
 })();
 
@@ -4971,7 +5002,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
                {
                   filterOwner: me.name,
                   filterId: filterId,
-                  filterData: me.resolveFilterData(filterData)
+                  filterData: filterData
                });
 
                // If a function has been provided which corresponds to the filter Id, then call it
@@ -4985,17 +5016,6 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 
             return true;
          });
-      },
-
-      /**
-       * Override this method to resolve unresolved data from the clicked filter.
-       *
-       * @method resolveFilterData
-       * @param filterData {object} The data to send out in the event that could contain unresolved data
-       */
-      resolveFilterData: function BaseFilter_resolveFilterData(filterData)
-      {
-         return filterData;
       },
 
       /**
@@ -5114,73 +5134,6 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          }
       }
    });
-})();
-
-
-/**
- * DateFilter.
- *
- * @namespace Alfresco.component
- * @class Alfresco.component.DateFilter
- */
-(function()
-{
-
-   Alfresco.component.DateFilter = function(name, id, components)
-   {
-      Alfresco.component.DateFilter.superclass.constructor.apply(this, arguments);
-      return this;
-   };
-
-   YAHOO.extend(Alfresco.component.DateFilter, Alfresco.component.BaseFilter,
-   {
-
-      /**
-       * Assumes the filter data may contain date instructions where the instructions are placed inside curly brackets:
-       * "param={now}" - the current date time in iso8601 format
-       * "param={1}" - the current date (time set to end of day) and rolled l days forward
-       * "param={-2}" - the current date (time set to end of day) and rolled 2 days backward
-       *
-       * @method resolveFilterData
-       * @param filterData {object} The data to send out in the event that could contain unresolved data
-       * @override
-       */
-      resolveFilterData: function DateFilter_resolveFilterData(filterData)
-      {
-         if (YAHOO.lang.isString(filterData))
-         {
-            var unresolvedTokens = filterData.match(/{[^}]+}/g);
-            if (unresolvedTokens)
-            {
-               var resolvedTokens = {},
-                     name, value, date;
-               for (var i = 0, il = unresolvedTokens.length; i < il; i++)
-               {
-                  name = unresolvedTokens[i].substring(1, unresolvedTokens[i].length - 1);
-                  value = name;
-                  date = new Date();
-                  if (value == "now")
-                  {
-                     value = date;
-                  }
-                  else if (/^[\-\+]?\d+$/.test(value))
-                  {
-                     date.setHours(11);
-                     date.setMinutes(59);
-                     date.setSeconds(59);
-                     date.setMilliseconds(999);
-                     date.setDate(date.getDate() + parseInt(value));
-                     value = date;
-                  }
-                  resolvedTokens[name] = Alfresco.util.isDate(value) ? Alfresco.util.toISO8601(value) :  value;
-               }
-               filterData = YAHOO.lang.substitute(filterData, resolvedTokens);
-            }
-         }
-         return filterData;
-      }
-   });
-
 })();
 
 /**
@@ -5373,4 +5326,397 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          }
       }
    });
+})();
+
+/**
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
+ *
+ * This file is part of Alfresco
+ *
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ *
+ * @namespace Alfresco
+ * @cssClass Alfresco.util.DataTable
+ */
+(function()
+{
+
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
+
+   Alfresco.util.DataTable = function(c)
+   {
+      // Check mandatory config attributes
+      if (!c.dataSource ||
+            !YAHOO.lang.isString(c.dataSource.url) ||
+            !c.dataTable.container ||
+            !YAHOO.lang.isArray(c.dataTable.columnDefinitions))
+      {
+         throw new Error("Mandatory config parameter is missing or of wrong type!");
+      }
+
+      // Merge default data source config
+      c.dataSource.pagingResolver = c.dataSource.pagingResolver || this.defaultPagingResolver;
+      c.dataSource.config.responseType = c.dataSource.config.responseType || YAHOO.util.DataSource.TYPE_JSON;
+      c.dataSource.config.responseSchema = c.dataSource.config.responseSchema || {};
+      c.dataSource.config.responseSchema.resultsList = c.dataSource.config.responseSchema.resultsList || "data";
+      c.dataSource.config.responseSchema.fields = c.dataSource.config.responseSchema.fields || null;
+      c.dataSource.config.responseSchema.metaFields = YAHOO.lang.merge(
+      {
+         paginationRecordOffset: "paging.skipCount",
+         paginationRowsPerPage:"paging.maxItems",
+         totalRecords: "paging.totalItems"
+      }, c.dataSource.config.responseSchema.metaFields || {});
+
+      // Merge default data table config
+      c.dataTable.config = YAHOO.lang.merge(
+      {
+         dynamicData : true,
+         initialLoad : false,
+         MSG_EMPTY: Alfresco.util.message("message.datatable.empty"),
+         MSG_ERROR: Alfresco.util.message("message.datatable.error"),
+         MSG_LOADING: Alfresco.util.message("message.datatable.loading")
+      }, c.dataTable.config || {});
+
+      // Merge default paginator config
+      if (c.paginator)
+      {
+         c.paginator.config = YAHOO.lang.merge(
+         {
+            rowsPerPage: 10,
+            recordOffset: 0,
+            template: Alfresco.util.message("pagination.template"),
+            pageReportTemplate: Alfresco.util.message("pagination.template.page-report"),
+            previousPageLinkLabel: Alfresco.util.message("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel: Alfresco.util.message("pagination.nextPageLinkLabel")
+         }, c.paginator.config || {});
+         if (!c.paginator.config.containers)
+         {
+            throw new Error("Mandatory paginator config parameter is missing!");
+         }
+      }
+      this.config = c;
+
+      // Instance variables
+      this.currentFilter = null;
+      this.formatters = {};
+      this.widgets = {};
+
+
+      this.init();
+
+      // Return instance
+      return this;
+   };
+
+   Alfresco.util.DataTable.prototype =
+   {
+
+      init: function DT_init()
+      {
+         // Reference to self used by inline functions
+         var me = this;
+         var History = YAHOO.util.History;
+
+         // Create DataSource
+         this.widgets.dataSource = new YAHOO.util.DataSource(this.config.dataSource.url, this.config.dataSource.config);
+
+         // Create Paginator
+         if (this.config.paginator.config)
+         {
+            this.widgets.paginator = new YAHOO.widget.Paginator(this.config.paginator.config);
+            this.config.dataTable.config.paginator = this.widgets.paginator; 
+         }
+
+         // Help formatters setting their width automatically (if a width has been provided)
+         var columnDefinitions = this.config.dataTable.columnDefinitions;
+         for (var i = 0, il = columnDefinitions.length; i <il; i++) {
+            if (YAHOO.lang.isFunction(columnDefinitions[i].formatter)) {
+               // Save original formatter
+               this.formatters[i] = columnDefinitions[i].formatter;
+               columnDefinitions[i].formatter = function(el, oRecord, oColumn, oData)
+               {
+                  // Apply widths on each cell so it actually works as given in the column definitions
+                  if (oColumn.width) {
+                     YAHOO.util.Dom.setStyle(el, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
+                     YAHOO.util.Dom.setStyle(el.parentNode, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
+                  }
+                  me.formatters[oColumn.getIndex()].call(this, el, oRecord, oColumn, oData);
+               };
+            }
+         }
+
+         // Create data table and show loading message while page is being rendered
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.config.dataTable.container, columnDefinitions, this.widgets.dataSource, this.config.dataTable.config);
+         this.widgets.dataTable.showTableMessage(this.config.dataTable.config.MSG_LOADING, YAHOO.widget.DataTable.CLASS_LOADING);
+
+
+         // Enable row highlighting
+         this.widgets.dataTable.subscribe("rowMouseoverEvent", this.widgets.dataTable.onEventHighlightRow);
+         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);         
+
+         var navigateWithHistory = function ()
+         {
+            var multiState = {},
+               pagingState = me.getPagingState(),
+               filterState = me.getFilterState();
+            if (pagingState)
+            {
+               multiState["paging"] = pagingState;
+            }
+            if (filterState)
+            {
+               multiState["filter"] = filterState;
+            }
+            History.multiNavigate(multiState);
+         };
+
+         var handlePagination = function(paginatorState)
+         {
+            var sortedBy = this.get("sortedBy") || {},
+               dir = sortedBy.dir ? sortedBy.dir.substring(7) : null;
+            me.setPaging(paginatorState.recordOffset, paginatorState.rowsPerPage, sortedBy.key, dir);
+            navigateWithHistory();
+         };
+
+         // First we must unhook the built-in mechanism and then we hook up our custom function
+         if (this.widgets.paginator)
+         {
+            this.widgets.paginator.unsubscribe("changeRequest", this.widgets.dataTable.onPaginatorChangeRequest);
+            this.widgets.paginator.subscribe("changeRequest", handlePagination, this.widgets.dataTable, true);
+         }
+
+         // Update payload data on the fly for tight integration with latest values from server
+         this.widgets.dataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
+            var meta = oResponse.meta || {};
+            oPayload.totalRecords = YAHOO.lang.isNumber(meta.totalRecords) ? meta.totalRecords : oPayload.totalRecords;
+            oPayload.pagination = {
+               rowsPerPage: YAHOO.lang.isNumber(meta.paginationRowsPerPage) ? meta.paginationRowsPerPage : me.config.paginator.config.rowsPerPage,
+               recordOffset: YAHOO.lang.isNumber(meta.paginationRecordOffset) ? meta.paginationRecordOffset : me.config.paginator.config.recordOffset
+            };
+            if (meta.sortKey)
+            {
+               oPayload.sortedBy = {
+                  key: meta.sortKey || null,
+                  dir: (meta.sortDir) ? "yui-dt-" + meta.sortDir : "yui-dt-asc" // Convert from server value to DataTable format
+               };
+            }
+            return true;
+         };
+
+         var onNewHistoryPagingState = function (pagingState)
+         {
+            me.loadDataTableFromHistory();
+         };
+
+         var onNewHistoryFilterState = function (filterState)
+         {
+            me.loadDataTableFromHistory();
+         };
+
+         YAHOO.Bubbling.on("changeFilter", function TL_onChangeFilter(layer, args)
+         {
+            var obj = args[1];
+            if (obj)
+            {
+               me.setFilter(obj);
+               me.setPaging();
+               navigateWithHistory();
+            }
+         }, this);
+
+         // Register the module with states taken either form url or default values if they don't exist
+         this.setPaging();
+         this.setFilter();
+         History.register("paging", History.getBookmarkedState("paging") || this.getPagingState(), onNewHistoryPagingState);
+         History.register("filter", History.getBookmarkedState("filter") || this.getFilterState(), onNewHistoryFilterState);
+
+         var onHistoryManagerReady = function()
+         {
+            // Current state after BHM is initialized is the source of truth for what state to render
+            me.setPagingState(History.getCurrentState("paging"));
+            me.setFilterState(History.getCurrentState("filter"));
+            me.loadDataTableFromHistory(true);
+         };
+
+         // Initialize the Browser History Manager.
+         History.onReady(onHistoryManagerReady, {}, this);
+         try
+         {
+            // Create the html elements needed for history management
+            var historyMarkup = '';
+            if (YAHOO.env.ua.ie > 0 && !Dom.get("yui-history-iframe")) {
+              historyMarkup += '<iframe id="yui-history-iframe" src="' + Alfresco.constants.URL_CONTEXT + '/yui/history/assets/blank.html" style="display: none;"></iframe>';
+            }
+            if (!Dom.get("yui-history-field")) {
+               historyMarkup +='<input id="yui-history-field" type="hidden" />';
+            }
+            if (historyMarkup.length > 0)
+            {
+               var historyManagementEl = document.createElement("div");
+               historyManagementEl.innerHTML = historyMarkup;
+               document.body.appendChild(historyManagementEl);
+            }
+            History.initialize("yui-history-field", "yui-history-iframe");
+         }
+         catch(e)
+         {
+            Alfresco.logger.error(this.name + ": Couldn't initialize HistoryManager.", e);
+            onHistoryManagerReady();
+         }
+      },
+
+      loadDataTableFromHistory: function (firstLoad)
+      {
+         if (this.pagingChanged || this.filterChanged)
+         {
+            this.pagingChanged = false;
+            this.filterChanged = false;
+            this.loadDataTable();
+         }
+         else if (firstLoad)
+         {
+            if (this.widgets.paginator)
+            {
+               // Set default values for paginatoin since they weren't provided in the url
+               this.currentSkipCount = this.currentSkipCount || this.config.paginator.config.recordOffset;
+               this.currentMaxItems = this.currentMaxItems || this.config.paginator.config.rowsPerPage;
+            }
+            if(this.config.dataSource.initialFilter)
+            {
+               YAHOO.Bubbling.fire("changeFilter", this.config.dataSource.initialFilter);
+            }
+            else if (YAHOO.lang.isString(this.config.dataSource.initialParameters))
+            {
+               this.loadDataTable(this.config.dataSource.initialParameters);
+            }
+         }
+      },
+
+      loadDataTable: function (parameters)
+      {
+         var me = this,
+            baseParameters = this.createUrlParameters(),
+            delimiter = (this.config.dataSource.url + baseParameters).indexOf("?") > -1 ? "&" : "?";
+         this.widgets.dataSource.sendRequest(baseParameters + (parameters ? delimiter + parameters : ""),
+         {
+            success : function (oRequest, oResponse, oPayload)
+            {
+               // Will end up making the doBeforeLoadData being called
+               me.widgets.dataTable.onDataReturnSetRows(oRequest, oResponse, oPayload);
+               if (me.currentFilter)
+               {
+                  YAHOO.Bubbling.fire("filterChanged", me.currentFilter);
+               }
+            },
+            failure : this.widgets.dataTable.onDataReturnSetRows,
+            scope : this.widgets.dataTable,
+            argument : {}
+         });
+      },
+
+      defaultPagingResolver: function(currentSkipCount, currentMaxItems)
+      {
+         return "skipCount=" + currentSkipCount + "&" + "maxItems=" + currentMaxItems;
+      },
+
+      // Returns a request string for consumption by the DataSource
+      createUrlParameters: function()
+      {
+         if (this.widgets.paginator)
+         {
+            var pagingParams = null;
+            if ((this.currentSkipCount || this.currentMaxItems || this.currentSortKey || this.currentDir) && YAHOO.lang.isFunction(this.config.dataSource.pagingResolver))
+            {
+               pagingParams = this.config.dataSource.pagingResolver(this.currentSkipCount, this.currentMaxItems, this.currentSortKey, this.currentDir);
+            }
+         }            
+         var filterParams = null;
+         if (this.currentFilter && YAHOO.lang.isFunction(this.config.dataSource.filterResolver))
+         {
+            filterParams = this.config.dataSource.filterResolver(this.currentFilter);
+         }
+         var delimiters = ["?", "&"];
+         if (this.config.dataSource.url.indexOf("?") > -1)
+         {
+            delimiters = ["&", "&"];
+         }
+         return (pagingParams ? delimiters.shift() + pagingParams : "") + (filterParams ? delimiters.shift() + filterParams : "");
+      },
+
+      setPaging: function (skipCount, maxItems, sortKey, dir)
+      {
+         skipCount = skipCount || this.config.paginator.config.recordOffset;
+         maxItems = maxItems || this.config.paginator.config.rowsPerPage;
+         sortKey = sortKey || "id";
+         dir = dir || "asc";
+         this.pagingChanged = (skipCount != this.currentSkipCount || maxItems != this.currentMaxItems); // TODO check sorting params as well
+         this.currentSkipCount = skipCount;
+         this.currentMaxItems = maxItems;
+         this.currentSortKey = sortKey;
+         this.currentDir = dir;
+      },
+
+      getPagingState: function ()
+      {
+         return this.currentSkipCount + "|" + this.currentMaxItems; // TODO for sorting: + "|" + this.currentSortKey + "|" + this.currentDir;
+      },
+
+      setPagingState: function (pagingState)
+      {
+         var paging = pagingState ? pagingState.split("|") : [];
+         this.setPaging(
+               paging.length > 0 ? parseInt(paging[0]) : null,
+               paging.length > 1 ? parseInt(paging[1]) : null,
+               paging.length > 2 ? paging[2] : null,
+               paging.length > 3 ? paging[3] : null);
+      },
+
+      setFilter: function (filter)
+      {
+         var changed = (!filter && this.currentFilter) || (filter && !this.currentFilter);
+         if (!changed && filter)
+         {
+            changed = filter.filterId != this.currentFilter.filterId || filter.filterData != this.currentFilter.filterData;
+         }
+         this.filterChanged = changed;
+         this.currentFilter = filter;
+         return changed;
+      },
+
+      getFilterState: function ()
+      {
+         return this.currentFilter ? (this.currentFilter.filterId + "|" + (this.currentFilter.filterData || "")) : "";
+      },
+
+      setFilterState: function (filterState)
+      {
+         var filter = null,
+            filterTokens = (filterState && filterState.indexOf("|") > -1) ? filterState.split("|") : null;
+         if (filterTokens)
+         {
+            filter = {
+               filterId: filterTokens[0],
+               filterData: filterTokens.slice(1).join("|") // Make sure ':' characters in the data value remains
+            }
+         }
+         this.setFilter(filter);
+      }
+
+   };
+
 })();

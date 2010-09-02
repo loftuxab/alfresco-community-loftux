@@ -1,3 +1,34 @@
+/* Toolbars */
+
+.my-tasks .hide
+{
+   visibility: hidden;
+}
+
+.my-tasks .toolbar div.actions,
+.my-tasks .toolbar div.links
+{
+   float: right;
+}
+
+.my-tasks .toolbar div.actions
+{
+   min-height: 2em; line-height: 2em;
+}
+
+.my-tasks .toolbar .yui-pg-container,
+.my-tasks .toolbar .yui-pg-container .yui-pg-current
+{
+   margin: 0 0 0 0.3em;
+   padding: 0;
+}
+
+/* Body */
+
+.my-tasks .body
+{
+   clear: both;
+}
 
 .my-tasks .scrollableList 
 {
@@ -74,21 +105,31 @@
    background: url(../images/warning-16.png) no-repeat; 
 }
 
+.my-tasks a.view-task,
 .my-tasks a.edit-task
 {
-   background: url(../images/edit-16.png) no-repeat center;
    cursor: pointer;
-   padding: 1em;
+   padding: 1em 0.75em;
    visibility: hidden;
 }
 
-.my-tasks a.edit-task:active,
-.my-tasks a.edit-task:hover
+.my-tasks a.view-task
+{
+   background: url(../images/task-16.png) no-repeat center;
+}
+
+.my-tasks a.edit-task
+{
+   background: url(../images/edit-16.png) no-repeat center;
+}
+
+.my-tasks .yui-dt-col-name a:active,
+.my-tasks .yui-dt-col-name a:hover
 {
    text-decoration: none;
 }
 
-.my-tasks .yui-dt-highlighted a.edit-task
+.my-tasks .yui-dt-highlighted a
 {
    visibility: visible;
 }

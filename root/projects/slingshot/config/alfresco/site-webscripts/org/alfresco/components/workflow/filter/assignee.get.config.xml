@@ -1,5 +1,6 @@
-<filters>
-   <filter id="assignee" data="" label="link.any" />
-   <filter id="assignee" data="pooledTasks=false" label="link.me"/>
-   <filter id="assignee" data="pooledTasks=true" label="link.unassigned" />
-</filters>
+<config>
+   <filters>
+      <filter id="assignee" data="me" label="link.me"/>
+      <filter id="assignee" data="unassigned" label="link.unassigned" />
+   </filters>
+</config>

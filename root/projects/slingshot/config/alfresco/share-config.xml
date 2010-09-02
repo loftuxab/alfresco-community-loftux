@@ -25,13 +25,13 @@
          <app-items>
             <!-- defaults: icon="{id}.png" label="header.{id}.label" description="header.{id}.description" -->
             <item type="link" id="my-dashboard">{userdashboardpage}</item>
-            <item type="link" id="my-tasks" condition="false">/user/user-tasks</item>
             <item type="js" id="sites">Alfresco.module.Sites</item>
             <item type="link" id="people">/people-finder</item>
             <item type="link" id="repository">/repository</item>
             <item type="container" id="more">
                <container-group id="my">
-                  <item type="link" id="my-workflows" condition="false">/user/user-workflows</item>
+                  <item type="link" id="my-tasks">/my-tasks</item>
+                  <item type="link" id="my-workflows">/my-workflows</item>
                   <item type="link" id="my-content">/user/user-content</item>
                   <item type="link" id="my-sites">/user/user-sites</item>
                   <item type="link" id="my-profile">{userprofilepage}</item>

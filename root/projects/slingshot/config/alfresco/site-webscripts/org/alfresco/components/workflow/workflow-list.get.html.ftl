@@ -1,8 +1,8 @@
 <#import "workflow.lib.ftl" as workflow/>
 <#import "filter/filter.lib.ftl" as filter/>
 <#assign el=args.htmlid?js_string>
-<div id="${el}-body" class="task-list">
-   <div class="yui-g task-list-bar flat-button">
+<div id="${el}-body" class="workflow-list">
+   <div class="yui-g workflow-list-bar flat-button">
       <div class="yui-u first">
          <h2 id="${el}-filterTitle" class="thin">
             &nbsp;
@@ -12,13 +12,14 @@
          <div id="${el}-paginator" class="paginator">&nbsp;</div>
       </div>
    </div>
-   <div id="${el}-tasks" class="tasks"></div>
+   <div id="${el}-workflows" class="workflows"></div>
 </div>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.component.TaskList("${el}").setOptions(
+   new Alfresco.component.WorkflowList("${el}").setOptions(
    {
       filterParameters: <@filter.jsonParameterFilter filterParameters />,
-      hiddenTaskTypes: <@workflow.jsonHiddenTaskTypes hiddenTaskTypes/>
+      hiddenWorkflowNames: <@workflow.jsonHiddenTaskTypes hiddenWorkflowNames/>,
+      workflowDefinitions: <@workflow.jsonWorkflowDefinitions workflowDefinitions/>
    }).setMessages(
       ${messages}
    );

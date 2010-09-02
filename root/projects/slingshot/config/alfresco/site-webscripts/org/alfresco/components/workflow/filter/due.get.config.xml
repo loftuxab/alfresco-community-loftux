@@ -1,9 +1,9 @@
-<filters>
-   <!-- The number/instruction in '{}' will be resolved by Alfresco.component.DateFilter -->
-   <filter id="due" data="" label="link.any" />
-   <filter id="due" data="dueAfter={-1}&amp;dueBefore={0}" label="link.today"/>
-   <filter id="due" data="dueAfter={0}&amp;dueBefore={1}" label="link.tomorrow" />
-   <filter id="due" data="dueAfter={0}&amp;dueBefore={8}" label="link.next7days" />
-   <filter id="due" data="dueBefore={now}" label="link.overdue" />
-   <filter id="due" data="dueBefore=null" label="link.noDate" />
-</filters>
+<config>
+   <filters>
+      <filter id="due" data="today" label="link.today"/>
+      <filter id="due" data="tomorrow" label="link.tomorrow" />
+      <filter id="due" data="next7Days" label="link.next7Days" />
+      <filter id="due" data="overdue" label="link.overdue" />
+      <filter id="due" data="noDate" label="link.noDate" />
+   </filters>
+</config>
