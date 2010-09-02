@@ -127,49 +127,49 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 		m_sessions     = new FTPSessionList();
 		m_dataSessions = new FTPDataSessionTable();
 
-    //  Find the FTP server configuration
+		//  Find the FTP server configuration
     
-    m_configSection = (FTPConfigSection) config.getConfigSection( FTPConfigSection.SectionName);
-    if ( m_configSection != null) {
+		m_configSection = (FTPConfigSection) config.getConfigSection( FTPConfigSection.SectionName);
+		if ( m_configSection != null) {
       
-  		//	Check if there is a data port range, initialize the data port id
-  		
-  		m_dataPortId = getFTPConfiguration().getFTPDataPortLow();
-  		
-  		//	Enable debug
-  		
-  		if ( getFTPConfiguration().getFTPDebug() != 0)
-  			setDebug(true);
-  			
-  		//	Create the root path, if configured
-  		
-  		if ( getFTPConfiguration().hasFTPRootPath()) {
-  
-  			try {			
-  
-  				//	Create the root path
-  				
-  				m_rootPath = new FTPPath(getFTPConfiguration().getFTPRootPath());
-  			}
-  			catch (InvalidPathException ex) {
-  				Debug.println(ex);
-  			}
-  		}
+	  		//	Check if there is a data port range, initialize the data port id
+	  		
+	  		m_dataPortId = getFTPConfiguration().getFTPDataPortLow();
+	  		
+	  		//	Enable debug
+	  		
+	  		if ( getFTPConfiguration().getFTPDebug() != 0)
+	  			setDebug(true);
+	  			
+	  		//	Create the root path, if configured
+	  		
+	  		if ( getFTPConfiguration().hasFTPRootPath()) {
+	  
+	  			try {			
+	  
+	  				//	Create the root path
+	  				
+	  				m_rootPath = new FTPPath(getFTPConfiguration().getFTPRootPath());
+	  			}
+	  			catch (InvalidPathException ex) {
+	  				Debug.println(ex);
+	  			}
+	  		}
       
-      // Set the FTP SITE interface
-      
-      setSiteInterface( getFTPConfiguration().getFTPSiteInterface());
-    }
-    else
-      setEnabled( false);
+	  		// Set the FTP SITE interface
+	      
+	  		setSiteInterface( getFTPConfiguration().getFTPSiteInterface());
+		}
+		else
+			setEnabled( false);
     
-    // Create the UTF-8 string normalizer, if the normalizer cannot be initialized then swicth off UTF-8 support
-    
-    try {
-      m_normalizer = new UTF8Normalizer();
-    }
-    catch ( Exception ex) {
-    }
+	    // Create the UTF-8 string normalizer, if the normalizer cannot be initialized then swicth off UTF-8 support
+	    
+	    try {
+	      m_normalizer = new UTF8Normalizer();
+	    }
+	    catch ( Exception ex) {
+	    }
 	}
 	
 	/**
@@ -572,6 +572,11 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 			
 			if ( Debug.EnableInfo && hasDebug() && getFTPConfiguration().hasFTPDataPortRange())
 			  Debug.println("[FTP] Data ports restricted to range " + getFTPConfiguration().getFTPDataPortLow() + " - " + getFTPConfiguration().getFTPDataPortHigh());
+			
+			// Check if FTPS support is enabled/required
+			
+			if ( Debug.EnableInfo && hasDebug() && getFTPConfiguration().isFTPSEnabled())
+				Debug.println("[FTP] FTPS support enabled (" + (getFTPConfiguration().requireSecureSession() ? "required" : "optional") + ")");
 			
 			//	Indicate that the server is active
 			

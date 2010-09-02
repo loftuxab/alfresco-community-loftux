@@ -63,7 +63,8 @@ public class FTPConfigSection extends ConfigSection {
   
   private FTPAuthenticator m_ftpAuthenticator;
   
-  /** Is the authenticator instance owned by this object? **/
+  // Is the authenticator instance owned by this object
+  
   private boolean m_localFtpAuthenticator;
   
   //  FTP server debug flags
@@ -81,6 +82,19 @@ public class FTPConfigSection extends ConfigSection {
   // IPv6 enabled
   
   private boolean m_ipv6;
+  
+  // FTPS configuration
+  //
+  // Path to the keystore/truststore files
+  
+  private String m_keyStorePath;
+  private String m_trustStorePath;
+  
+  private char[] m_passphrase;
+  
+  // Only allow FTPS/encrypted session logons
+  
+  private boolean m_requireSecureSess;
   
   /**
    * Class constructor
@@ -237,6 +251,53 @@ public class FTPConfigSection extends ConfigSection {
    */
   public final boolean isIPv6Enabled() {
 	  return m_ipv6;
+  }
+  
+  /**
+   * Check if FTPS support is enabled
+   * 
+   * @return boolean
+   */
+  public final boolean isFTPSEnabled() {
+	  if ( getKeyStorePath() != null && getTrustStorePath() != null && getPassphrase() != null)
+		  return true;
+	  return false;
+  }
+  
+  /**
+   * Return the key store path
+   * 
+   * @return String
+   */
+  public final String getKeyStorePath() {
+	  return m_keyStorePath;
+  }
+  
+  /**
+   * Return the trust store path
+   * 
+   * @return String
+   */
+  public final String getTrustStorePath() {
+	  return m_trustStorePath;
+  }
+  
+  /**
+   * Return the passphrase for the key store/trust store
+   * 
+   * @return char[]
+   */
+  public final char[] getPassphrase() {
+	  return m_passphrase;
+  }
+  
+  /**
+   * Detemrine if only secure sessions will be allowed to logon
+   * 
+   * @return boolean
+   */
+  public final boolean requireSecureSession() {
+	  return m_requireSecureSess;
   }
   
   /**
@@ -534,6 +595,94 @@ public class FTPConfigSection extends ConfigSection {
     //  Return the change status
     
     return sts;
+  }
+  
+  /**
+   * Set the key store path
+   * 
+   * @param path String
+   * @return int
+   */
+  public final int setKeyStorePath(String path)
+	  throws InvalidConfigurationException {
+
+	  //  Inform listeners, validate the configuration change
+	    
+	  int sts = fireConfigurationChange(ConfigId.FTPKeyStore, path);
+
+	  //  Set the key store path
+
+	  m_keyStorePath = path;
+	      
+	  //  Return the change status
+	    
+	  return sts;
+  }
+  
+  /**
+   * Set the trust store path
+   * 
+   * @param path String
+   * @return int
+   */
+  public final int setTrustStorePath(String path)
+  	throws InvalidConfigurationException {
+
+	  //  Inform listeners, validate the configuration change
+	    
+	  int sts = fireConfigurationChange(ConfigId.FTPTrustStore, path);
+	
+	  //  Set the trust store path
+	
+	  m_trustStorePath = path;
+	      
+	  //  Return the change status
+	    
+	  return sts;
+  }
+  
+  /**
+   * Set the key/trust store passphrase
+   * 
+   * @param passphrase String
+   * @return int
+   */
+  public final int setPassphrase(String passphrase)
+  	throws InvalidConfigurationException {
+
+	  //  Inform listeners, validate the configuration change
+	    
+	  int sts = fireConfigurationChange(ConfigId.FTPPassphrase, passphrase);
+	
+	  //  Set the key/trust store passphrase
+	
+	  m_passphrase = passphrase.toCharArray();
+	      
+	  //  Return the change status
+	    
+	  return sts;
+  }
+  
+  /**
+   * Set the require secure session flag
+   * 
+   * @param reqSecureSess boolean
+   * @return int
+   */
+  public final int setRequireSecureSession(boolean reqSecureSess)
+  	throws InvalidConfigurationException {
+
+	  //  Inform listeners, validate the configuration change
+	    
+	  int sts = fireConfigurationChange(ConfigId.FTPRequireSecure, new Boolean( reqSecureSess));
+	
+	  //  Set the require secure session flag
+	
+	  m_requireSecureSess = reqSecureSess;
+	      
+	  //  Return the change status
+	    
+	  return sts;
   }
   
   /**
