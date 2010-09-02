@@ -6,21 +6,6 @@
     <selected>1</selected>
     <show>1</show>
 
-    <parameterList>
-        <booleanParameter name="alfrescorm_confirmation" default="no" displayStyle="checkbox-left">
-            <title>Records Management</title>
-            <explanation>Records Management is a separately licensed component of Alfresco. Please ensure you understand the terms of this license before installing this component.</explanation>
-            <description>Include Records Management</description>
-            <postShowPageActionList>
-                <setInstallerVariable name="next_page" value="alfrescorm_confirmation">
-                    <ruleList>
-                        <isFalse value="${alfrescorm_confirmation}" />
-                    </ruleList>
-                </setInstallerVariable>
-            </postShowPageActionList>
-        </booleanParameter>
-    </parameterList>
-  
     <folderList>
         <folder>
             <description>Program Files</description>
