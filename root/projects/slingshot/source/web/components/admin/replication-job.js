@@ -321,7 +321,7 @@
          this.form.addValidation(this.id + "-prop_name", Alfresco.forms.validation.nodeName, null, "keyup");
          this.form.addValidation(this.id + "-prop_name", Alfresco.forms.validation.length,
          {
-            max: 256,
+            max: 255,
             crop: true
          }, "keyup");
 
