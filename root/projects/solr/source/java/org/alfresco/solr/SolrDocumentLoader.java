@@ -41,8 +41,6 @@ import org.apache.solr.common.SolrInputDocument;
  */
 public class SolrDocumentLoader
 {
-
-    public static int count = 0;
     
     public static void main(String[] args) throws SolrServerException, IOException
     {
@@ -55,10 +53,12 @@ public class SolrDocumentLoader
         solr.commit(true, true);
         solr.optimize(true, true);
         
-        SolrInputDocument root = createRootDocument();
+        int dbid = 0;
+        
+        SolrInputDocument root = createRootDocument(dbid);
         solr.add(root);
         
-        SolrInputDocument rootPath = createRootPathDocument();
+        SolrInputDocument rootPath = createRootPathDocument(dbid++);
         solr.add(rootPath);
         
         solr.commit(true, true);
@@ -74,12 +74,12 @@ public class SolrDocumentLoader
         for(int i = 0; i < FOLDERS; i++)
         {
             Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
-            docs.add(createContainerDocument(i));
-            docs.add(createContainerPathDocument(i));
+            docs.add(createContainerDocument(dbid, i));
+            docs.add(createContainerPathDocument(dbid++, i));
             for(int j = 0; j < LEAVES; j++)
             {
-                docs.add(createLeafDocument(i, j));
-                docs.add(createLeafPathDocument(i, j));
+                docs.add(createLeafDocument(dbid, i, j));
+                docs.add(createLeafPathDocument(dbid++, i, j));
             }
             solr.add(docs);
         }
@@ -100,12 +100,7 @@ public class SolrDocumentLoader
         System.out.println("Done "+ (FOLDERS*(LEAVES+1) + 2));
     }
     
-    public static int getDbId()
-    {
-        return ++count;
-    }
-    
-    public static SolrInputDocument createLeafDocument(int i, int j)
+    public static SolrInputDocument createLeafDocument(int dbid, int i, int j)
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("ISCATEGORY","F");
@@ -120,7 +115,7 @@ public class SolrDocumentLoader
         doc.addField("TX", "TX-1"); 
         doc.addField("ISROOT", "F"); 
         doc.addField("ISNODE", "T"); 
-        doc.addField("DBID", getDbId());
+        doc.addField("DBID", dbid);
         doc.addField("TYPE", "{http://www.alfresco.org/model/content/1.0}folder");
         doc.addField("ASPECT", "{http://www.alfresco.org/model/content/1.0}auditable");
         doc.addField("@{http://www.alfresco.org/model/system/1.0}locale", "en");
@@ -133,19 +128,19 @@ public class SolrDocumentLoader
         return doc;
     }
     
-    public static SolrInputDocument createLeafPathDocument(int i, int j)
+    public static SolrInputDocument createLeafPathDocument(int dbid, int i, int j)
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("ID", "ID-L-"+i+"-"+j+"-Path"); 
         doc.addField("TX", "TX-1"); 
-        doc.addField("DBID", getDbId());
+        doc.addField("DBID", ""+dbid);
         QName first = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "folder_"+i);
         QName second = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "leaf_"+j);
         doc.addField("PATH", "/" + ISO9075.getXPathName(first)+"/" + ISO9075.getXPathName(second));
         return doc;
     }
     
-    public static SolrInputDocument createContainerDocument(int i)
+    public static SolrInputDocument createContainerDocument(int dbid, int i)
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("ISCATEGORY","F");
@@ -160,7 +155,7 @@ public class SolrDocumentLoader
         doc.addField("TX", "TX-1"); 
         doc.addField("ISROOT", "T"); 
         doc.addField("ISNODE", "T"); 
-        doc.addField("DBID", "0");
+        doc.addField("DBID", ""+dbid);
         doc.addField("TYPE", "{http://www.alfresco.org/model/content/1.0}folder");
         doc.addField("ASPECT", "{http://www.alfresco.org/model/content/1.0}auditable");
         doc.addField("@{http://www.alfresco.org/model/system/1.0}locale", "en");
@@ -173,20 +168,20 @@ public class SolrDocumentLoader
         return doc;
     }
     
-    public static SolrInputDocument createContainerPathDocument(int i)
+    public static SolrInputDocument createContainerPathDocument(int dbid, int i)
     {
         SolrInputDocument doc = new SolrInputDocument();
        
         doc.addField("ID", "ID-F-"+i+"-Path"); 
         doc.addField("TX", "TX-1"); 
-        doc.addField("DBID", "0");
+        doc.addField("DBID", ""+dbid);
         QName first = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "folder_"+i);
         doc.addField("PATH", "/" + ISO9075.getXPathName(first));
         return doc;
     }
     
     
-    public static SolrInputDocument createRootDocument()
+    public static SolrInputDocument createRootDocument(int dbid)
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("ISCATEGORY","F");
@@ -195,18 +190,17 @@ public class SolrDocumentLoader
         doc.addField("TX", "TX-1"); 
         doc.addField("ISROOT", "T"); 
         doc.addField("ISNODE", "T"); 
-        doc.addField("DBID", "0");
-        doc.addField("PATH", "/");
+        doc.addField("DBID", ""+dbid);
         return doc;
     }
     
-    public static SolrInputDocument createRootPathDocument()
+    public static SolrInputDocument createRootPathDocument(int dbid)
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("PATH", "/");
         doc.addField("ID", "Root-Path"); 
         doc.addField("TX", "TX-1"); 
-        doc.addField("DBID", "0"); 
+        doc.addField("DBID", ""+dbid); 
         return doc;
     }
     

@@ -21,6 +21,7 @@ package org.alfresco.solr;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import org.alfresco.repo.search.impl.lucene.analysis.NumericEncoder;
 import org.apache.lucene.document.Document;
@@ -37,11 +38,11 @@ import org.apache.solr.search.SolrIndexSearcher;
  */
 public class AlfrescoSolrEventListener implements SolrEventListener
 {
-    private static String ALFRESCO_CACHE = "alfrescoCache";
+    public static String ALFRESCO_CACHE = "alfrescoCache";
 
-    private static String KEY_ORDERED_BY_DBID = "ordered_by_dbid";
+    public static String KEY_ORDERED_BY_DBID = "ordered_by_dbid";
 
-    private static String KEY_INDEXED_BY_DOC_ID = "indexed_by_doc_id";
+    public static String KEY_INDEXED_BY_DOC_ID = "indexed_by_doc_id";
 
     private NamedList args;
 
@@ -67,11 +68,10 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         System.out.println("Max "+reader.maxDoc());
         System.out.println("Docs "+reader.numDocs());
         System.out.println("Deleted "+reader.numDeletedDocs());
-        newSearcher.cacheInsert(ALFRESCO_CACHE, KEY_ORDERED_BY_DBID, new CacheEntry[0]);
         newSearcher.cacheInsert(ALFRESCO_CACHE, KEY_INDEXED_BY_DOC_ID, new CacheEntry[0]);
         int max = reader.maxDoc();
         CacheEntry[] indexedByDocId = new CacheEntry[max];
-        CacheEntry[] orderedByDbid = new CacheEntry[reader.numDocs()];
+        HashMap<Long, CacheEntry> unmatchedByDBID = new HashMap<Long, CacheEntry>(10000);
         try
         {
             for (int i = 0; i < max; i++)
@@ -100,22 +100,17 @@ public class AlfrescoSolrEventListener implements SolrEventListener
                         isLeaf = string.equals("T");
                     }
                  
-                    CacheEntry entry = new CacheEntry(dbid);
-
-                    // find by dbid
-
-                    int position = Arrays.binarySearch(orderedByDbid, entry, entry);
-                    if (position < 0)
+                    CacheEntry entry = unmatchedByDBID.get(dbid);
+                    if(entry == null)
                     {
-                        int insertPosition = -position - 1;
-                        System.arraycopy(orderedByDbid, insertPosition, orderedByDbid, insertPosition + 1, orderedByDbid.length - insertPosition - 1);
-                        orderedByDbid[insertPosition] = entry;
-
+                        entry = new CacheEntry(dbid);
+                        unmatchedByDBID.put(dbid, entry);
                     }
                     else
                     {
-                        entry = orderedByDbid[position];
+                        unmatchedByDBID.remove(dbid);
                     }
+
 
                     if (isLeaf)
                     {
@@ -134,7 +129,6 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         {
 
         }
-        newSearcher.cacheInsert(ALFRESCO_CACHE, KEY_ORDERED_BY_DBID, orderedByDbid);
         newSearcher.cacheInsert(ALFRESCO_CACHE, KEY_INDEXED_BY_DOC_ID, indexedByDocId);
 
     }
