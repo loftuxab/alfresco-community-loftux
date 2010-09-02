@@ -77,7 +77,7 @@ public class SiteHelper implements WebSiteModel
         SiteInfo siteInfo = null;
         
         NodeRef parentNode = findNearestParent(noderef, SiteModel.TYPE_SITE);
-        if (parentNode != null)
+        if (parentNode != null && nodeService.exists(parentNode) == true)
         {
             // If we get here then parentNode identifies a Share site.
             siteInfo = siteService.getSite(parentNode);
@@ -137,26 +137,31 @@ public class SiteHelper implements WebSiteModel
         NodeRef container = null;
         SiteInfo siteInfo = getRelevantShareSite(noderef);
         NodeRef websiteId = getRelevantWebSite(noderef);
-        if (siteInfo != null)
+        if (siteInfo != null && 
+            nodeService.exists(siteInfo.getNodeRef()) == true)
         {
             if (websiteId == null)
             {
                 websiteId = siteInfo.getNodeRef();
             }
-            NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), websiteId.getId());
-            if (containerParent == null)
-            {
-                containerParent = siteService.createContainer(siteInfo.getShortName(), websiteId.getId(), null, null);
-            }
-            container = nodeService.getChildByName(containerParent, ContentModel.ASSOC_CONTAINS, 
-                    containerName);
-            if (container == null)
-            {
-                HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
-                props.put(ContentModel.PROP_NAME, containerName);
-                container = nodeService.createNode(containerParent, ContentModel.ASSOC_CONTAINS, 
-                        QName.createQName(WebSiteModel.NAMESPACE, containerName), 
-                        ContentModel.TYPE_FOLDER, props).getChildRef();
+ 
+            if (siteService.getSite(websiteId.getId()) != null)
+            {            
+                NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), websiteId.getId());
+                if (containerParent == null)
+                {
+                    containerParent = siteService.createContainer(siteInfo.getShortName(), websiteId.getId(), null, null);
+                }
+                container = nodeService.getChildByName(containerParent, ContentModel.ASSOC_CONTAINS, 
+                        containerName);
+                if (container == null)
+                {
+                    HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
+                    props.put(ContentModel.PROP_NAME, containerName);
+                    container = nodeService.createNode(containerParent, ContentModel.ASSOC_CONTAINS, 
+                            QName.createQName(WebSiteModel.NAMESPACE, containerName), 
+                            ContentModel.TYPE_FOLDER, props).getChildRef();
+                }
             }
         }
         return container;
@@ -195,7 +200,9 @@ public class SiteHelper implements WebSiteModel
     private NodeRef findNearestParent(NodeRef noderef, QName parentType)
     {
         NodeRef parentNode = nodeService.getPrimaryParent(noderef).getParentRef();
-        while (parentNode != null && !dictionaryService.isSubClass(nodeService.getType(parentNode), parentType))
+        while (parentNode != null && 
+               nodeService.exists(parentNode) == true &&
+               dictionaryService.isSubClass(nodeService.getType(parentNode), parentType) == false)
         {
             parentNode = nodeService.getPrimaryParent(parentNode).getParentRef();
         }
