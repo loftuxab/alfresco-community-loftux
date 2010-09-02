@@ -71,32 +71,36 @@ public class FTPCommand {
 	public final static int XCup		= 40;
 	public final static int XCwd		= 41;
   
-  public final static int MLst    = 42;
-  public final static int MLsd    = 43;
+	public final static int MLst        = 42;
+	public final static int MLsd        = 43;
 
-  public final static int EPrt    = 44;
-  public final static int EPsv    = 45;
+	public final static int EPrt        = 44;
+	public final static int EPsv        = 45;
   
-  public final static int Auth    = 46;
+	public final static int Auth        = 46;
+	public final static int Pbsz        = 47;
+	public final static int Prot        = 48;
+	public final static int Ccc         = 49;
   
-	public final static int MaxId		= 46;
+	public final static int MaxId		= 49;
 	
 	public final static int InvalidCmd	= -1;
 	
 	//	Command name strings
 	
-	private static final String[] _cmds = {	"USER",				"PASS",				"ACCT",				"CWD",
-																					"CDUP",				"SMNT",				"REIN",				"QUIT",
-																					"PORT",				"PASV",				"TYPE",				"STRU",
-																					"MODE",				"RETR",				"STOR",				"STOU",
-																					"APPE",				"ALLO",				"REST",				"RNFR",
-																					"RNTO",				"ABOR",				"DELE",				"RMD",
-																					"MKD",				"PWD",				"LIST",				"NLST",
-																					"SITE",				"SYST",				"STAT",				"HELP",
-																					"NOOP",				"MDTM",				"SIZE",				"OPTS",
-																					"FEAT",				"XPWD",				"XMKD",				"XRMD",
-																					"XCUP",				"XCWD",    "MLST",    "MLSD",
-																					"EPRT",       "EPSV",    "AUTH"
+	private static final String[] _cmds = {	"USER",	"PASS",	"ACCT",	"CWD",
+											"CDUP",	"SMNT",	"REIN",	"QUIT",
+											"PORT",	"PASV",	"TYPE",	"STRU",
+											"MODE",	"RETR",	"STOR",	"STOU",
+											"APPE",	"ALLO",	"REST",	"RNFR",
+											"RNTO",	"ABOR",	"DELE",	"RMD",
+											"MKD",	"PWD",	"LIST",	"NLST",
+											"SITE",	"SYST",	"STAT",	"HELP",
+											"NOOP",	"MDTM",	"SIZE",	"OPTS",
+											"FEAT",	"XPWD",	"XMKD",	"XRMD",
+											"XCUP",	"XCWD", "MLST", "MLSD",
+											"EPRT", "EPSV", "AUTH", "PBSZ",
+											"PROT", "CCC"
 	};
 	
 	/**

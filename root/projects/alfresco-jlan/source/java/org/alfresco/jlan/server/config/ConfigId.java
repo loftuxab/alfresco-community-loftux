@@ -96,6 +96,10 @@ public class ConfigId {
 	public static final int FTPSiteInterface 	= GroupFTP + 10;
 	public static final int FTPAuthenticator 	= GroupFTP + 11;
 	public static final int FTPIPv6Enable 		= GroupFTP + 12;
+	public static final int FTPKeyStore 		= GroupFTP + 13;
+	public static final int FTPTrustStore 		= GroupFTP + 14;
+	public static final int FTPPassphrase 		= GroupFTP + 15;
+	public static final int FTPRequireSecure	= GroupFTP + 16;
 
 	// NFS server variables
 

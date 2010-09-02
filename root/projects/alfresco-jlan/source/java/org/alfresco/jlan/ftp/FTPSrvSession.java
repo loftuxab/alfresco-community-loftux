@@ -19,6 +19,7 @@
 
 package org.alfresco.jlan.ftp;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +32,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,6 +47,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.Vector;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.server.SrvSession;
@@ -91,6 +107,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	public static final int DBG_TIMING 		= 0x00000400; // Time packet processing
 	public static final int DBG_DATAPORT 	= 0x00000800; // Data port
 	public static final int DBG_DIRECTORY 	= 0x00001000; // Directory commands
+	public static final int DBG_SSL			= 0x00002000; // Secure sessions
 
 	// Enabled features
 
@@ -98,6 +115,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	public static final boolean FeatureMDTM = true;
 	public static final boolean FeatureSIZE = true;
 	public static final boolean FeatureMLST = true;
+	public static final boolean FeatureAUTH = true;
 
 	// Root directory and FTP directory seperator
 
@@ -156,6 +174,12 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	protected static final String TypeIPv4 = "1";
 	protected static final String TypeIPv6 = "2";
 	
+	// Valid protection levels for PROT command
+	
+	protected static final String ProtLevels = "CSEP";
+	
+	protected static final String ProtLevelClear = "C";
+	
 	// Session socket
 
 	private Socket m_sock;
@@ -210,6 +234,19 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 	private TreeConnectionHash m_connections;
 
+	// SSL/TLS testing
+	
+	private SSLContext m_sslContext;
+	private SSLEngine m_sslEngine;
+	
+	private ByteBuffer m_sslIn;
+	private ByteBuffer m_sslOut;
+	
+	// Protected buffer size and protection level
+	
+	private int m_pbSize = -1;
+	private String m_protLevel;
+	
 	/**
 	 * Class constructor
 	 * 
@@ -658,10 +695,63 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Output the FTP response
 
 		if ( m_out != null) {
-			m_out.write(outbuf.toString());
-			m_out.flush();
+		    
+		    // Check if the response should be encrypted
+		    
+		    if ( m_sslEngine != null) {
+		    
+		        // Encrypt the response
+		        
+		        sendEncryptedFTPResponse( outbuf.toString());
+		    }
+		    else {
+
+		        // Plaintext connection
+		        
+		        m_out.write(outbuf.toString());
+		        m_out.flush();
+		    }
 		}
 	}
+
+    /**
+     * Send an unencrypted FTP command response
+     * 
+     * @param stsCode int
+     * @param msg String
+     * @exception IOException
+     */
+    public final void sendUnencryptedFTPResponse(int stsCode, String msg)
+        throws IOException {
+
+        // Build the output record
+
+        StringBuffer outbuf = new StringBuffer(10 + (msg != null ? msg.length() : 0));
+        outbuf.append(stsCode);
+        outbuf.append(" ");
+
+        if ( msg != null)
+            outbuf.append(msg);
+
+        // DEBUG
+
+        if ( Debug.EnableInfo && hasDebug(DBG_TXDATA))
+            debugPrintln("Tx msg=" + outbuf.toString());
+
+        if ( Debug.EnableError && hasDebug(DBG_ERROR) && stsCode >= 500)
+            debugPrintln("Error status=" + stsCode + ", msg=" + msg);
+
+        // Add the CR/LF
+
+        outbuf.append(CRLF);
+
+        // Output the FTP response
+
+        if ( m_out != null) {
+            m_out.write(outbuf.toString());
+            m_out.flush();
+        }
+    }
 
 	/**
 	 * Send an FTP command response
@@ -672,7 +762,9 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	public final void sendFTPResponse(StringBuffer msg)
 		throws IOException {
 
-		// DEBUG
+	    sendFTPResponse( msg.toString());
+/**
+	    // DEBUG
 
 		if ( Debug.EnableInfo && hasDebug(DBG_TXDATA))
 			debugPrintln("Tx msg=" + msg.toString());
@@ -684,6 +776,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 			m_out.write(CRLF);
 			m_out.flush();
 		}
+**/
 	}
 
 	/**
@@ -703,12 +796,82 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Output the FTP response
 
 		if ( m_out != null) {
-			m_out.write(msg);
-			m_out.write(CRLF);
-			m_out.flush();
+
+		    // Check if the response should be encrypted
+            
+            if ( m_sslEngine != null) {
+            
+                // Encrypt the response
+                
+                StringBuilder str = new StringBuilder( msg.length() + CRLF.length());
+                str.append( msg);
+                str.append( CRLF);
+                
+                sendEncryptedFTPResponse( str.toString());
+            }
+            else {
+                
+                // Plaintext connection
+                
+            
+                m_out.write(msg);
+                m_out.write(CRLF);
+                m_out.flush();
+            }
 		}
 	}
 
+	/**
+	 * Send an encrypted FTP response
+	 * 
+	 * @param msg String
+	 * @exception IOException
+	 */
+	protected final void sendEncryptedFTPResponse( String msg)
+	    throws IOException {
+	    
+        // DEBUG
+
+        if ( Debug.EnableInfo && hasDebug(DBG_TXDATA))
+            debugPrintln("Tx msg=" + msg);
+
+        // Output the FTP response
+
+        if ( m_out != null) {
+
+            // Check if the response should be encrypted
+            
+            if ( m_sslEngine != null) {
+            
+                // Encrypt the response
+                
+                byte[] respByts = msg.getBytes();
+                ByteBuffer inByts = ByteBuffer.wrap( respByts, 0, respByts.length);
+
+                m_sslOut.position( 0);
+                m_sslOut.limit( m_sslOut.capacity());
+                
+                // Decrypt the received data
+                
+                SSLEngineResult sslRes = m_sslEngine.wrap( inByts, m_sslOut);
+                
+                if ( m_sslEngine.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK) {
+
+                    Runnable task;
+                    while ((task = m_sslEngine.getDelegatedTask()) != null) {
+                        task.run();
+                    }
+                }
+                
+                // Output the encrypted response
+
+                m_sslOut.flip();
+                m_sock.getOutputStream().write( m_sslOut.array(), 0, m_sslOut.remaining());
+                m_sock.getOutputStream().flush();
+            }
+        }
+	}
+	
 	/**
 	 * Process a user command
 	 * 
@@ -730,6 +893,13 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 			return;
 		}
 
+		// Check if secure session logons are required
+		
+		if ( getFTPServer().getFTPConfiguration().isFTPSEnabled() && getFTPServer().getFTPConfiguration().requireSecureSession() == true && isSecureSession() == false) {
+			sendFTPResponse(530, "Only secure logons are allowed, use FTPS");
+			return;
+		}
+		
 		// Check for an anonymous login
 
 		if ( getFTPServer().allowAnonymous() == true && req.getArgument().equalsIgnoreCase(getFTPServer().getAnonymousAccount())) {
@@ -3202,6 +3372,9 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 			sendFTPResponse(" MLSD");
 		}
 
+		if ( FeatureAUTH)
+		    sendFTPResponse(" AUTH TLS");
+		
 		sendFTPResponse(211, "END");
 	}
 
@@ -3397,11 +3570,162 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	protected final void procAuth(FTPRequest req)
 		throws IOException {
 
-		// return a success status
+		// Check if SSL/TLS sessions are enabled
+		
+		if ( getFTPServer().getFTPConfiguration().isFTPSEnabled() == false) {
+			sendFTPResponse( 534, "SSL/TLS sessions not available");
+			return;
+		}
+		
+		// Switch the control session into SSL/TLS mode
+        
+        try {
 
-		sendFTPResponse(234, "SSL/TLS testing");
+            // Check for SSL or TLS type
+            
+            if ( req.hasArgument()) {
+                
+                String engineTyp = req.getArgument().toUpperCase();
+                if ( engineTyp.equals( "SSL") || engineTyp.equals( "TLS")) {
+                    
+                    // Initialize the SSL engine
+                    
+                    setupSSLEngine( engineTyp);
+                    
+                    // Send a response to indicate the socket is ready to switch to SSL/TLS mode
+                    
+                    sendUnencryptedFTPResponse(234, "Switching to " + engineTyp + " secure session");
+                }
+            }
+            else {
+                
+                // Type not specified
+                
+                sendFTPResponse( 421, "Failed to negotiate SSL/TLS, type not specified");
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            
+            m_sslEngine = null;
+            sendFTPResponse( 421, "Failed to negotiate SSL/TLS");
+        }
 	}
 
+    /**
+     * Process a protected buffer size command.
+     * 
+     * @param req FTPRequest
+     * @exception IOException
+     */
+    protected final void procProtectedBufferSize(FTPRequest req)
+        throws IOException {
+        
+        // Check if the control session is using SSL/TLS
+        
+        if ( m_sslEngine == null) {
+            sendFTPResponse( 503, "Not using secure connection");
+            return;
+        }
+        
+        // Convert the buffer size argument
+        
+        String arg = req.getArgument();
+        if ( arg == null || arg.length() == 0) {
+            sendFTPResponse( 501, "Empty buffer size argument");
+            return;
+        }
+        
+        // Parse the buffer size argument
+        
+        try {
+            m_pbSize = Integer.parseInt( arg);
+        }
+        catch ( NumberFormatException ex) {
+            sendFTPResponse( 501, "Invalid buffer size argument");
+            return;
+        }
+        
+        // Return a success status
+        
+        sendFTPResponse( 200, "Buffer size ok");
+    }
+    
+    /**
+     * Process a data channel protection level command.
+     * 
+     * @param req FTPRequest
+     * @exception IOException
+     */
+    protected final void procDataChannelProtection(FTPRequest req)
+        throws IOException {
+        
+        // Check that the protected buffer size has been negotiated
+        
+        if ( m_pbSize == -1) {
+            sendFTPResponse( 503, "Protected buffer size not negotiated");
+            return;
+        }
+        
+        // Validate the protection level
+        
+        String arg = req.getArgument().toUpperCase();
+        
+        if ( arg == null || ProtLevels.indexOf( arg) == -1) {
+            sendFTPResponse( 504, "Invalid protection level, " + arg);
+            return;
+        }
+        
+        // Only accept the 'clear' protection level
+        
+        if ( arg.equals( ProtLevelClear)) {
+        	
+        	// Accept the clear protection level, data connections sent in clear text
+        	
+        	sendFTPResponse( 200, "Protection level accepted");
+        }
+        else {
+        	
+	        // Reject the protection level for now, we do not support protected data connections
+	        
+	        sendFTPResponse( 534, "Protected data connections not supported");
+        }
+    }
+    
+    /**
+     * Process a clear command channel command
+     * 
+     * @param req FTPRequest
+     * @exception IOException
+     */
+    protected final void procClearCommandChannel( FTPRequest ftpReq)
+    	throws IOException {
+
+        // Check if the control session is using SSL/TLS
+        
+        if ( m_sslEngine == null) {
+            sendFTPResponse( 533, "Not using secure connection");
+            return;
+        }
+
+        // Send the response over the protected session
+        
+        sendFTPResponse( 200, "Secure connection closed");
+        
+    	// Close the SSL engine
+    	
+        m_sslEngine.closeOutbound();
+    	getSSLCommand( m_inbuf, 0);
+
+        // Release resources used by the secure connection
+        
+        m_sslEngine  = null;
+        m_sslContext = null;
+        
+        m_sslIn  = null;
+        m_sslOut = null;
+    }
+    
 	/**
 	 * Process an extended port command
 	 * 
@@ -3924,35 +4248,45 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		}
 		else {
 
-			// Wait for an incoming request
-
-			int rdlen = m_in.read(m_inbuf);
-
-			// Check if there is no more data, the other side has dropped the connection
-
-			if ( rdlen == -1) {
-				closeSession();
-				return null;
-			}
-
-			// Trim the trailing <CR><LF>
-
-			if ( rdlen > 0) {
-				while (rdlen > 0 && m_inbuf[rdlen - 1] == '\r' || m_inbuf[rdlen - 1] == '\n')
-					rdlen--;
-			}
-
-			// Get the command string, create the new request
-
-			String cmd = null;
-
-			if ( isUTF8Enabled()) {
-				cmd = m_normalizer.normalize(new String(m_inbuf, 0, rdlen, "UTF8"));
-			}
-			else
-				cmd = new String(m_inbuf, 0, rdlen);
-
-			nextReq = new FTPRequest(cmd);
+		    // Loop until a valid request is received, or the connection is closed
+		    
+		    while ( nextReq == null) {
+		        
+    			// Wait for an incoming request
+    
+    			int rdlen = m_in.read(m_inbuf);
+    
+    			// Check if there is no more data, the other side has dropped the connection
+    
+    			if ( rdlen == -1) {
+    				closeSession();
+    				return null;
+    			}
+    
+    			// If there is an SSL engine associated with this session then decrypt the received data
+    			
+    			if ( m_sslEngine != null)
+    			    rdlen = getSSLCommand( m_inbuf, rdlen);
+    			
+    			// Trim the trailing <CR><LF>
+    
+    			if ( rdlen > 0) {
+    				while (rdlen > 0 && m_inbuf[rdlen - 1] == '\r' || m_inbuf[rdlen - 1] == '\n')
+    					rdlen--;
+    
+        			// Get the command string, create the new request
+        
+        			String cmd = null;
+        
+        			if ( isUTF8Enabled()) {
+        				cmd = m_normalizer.normalize(new String(m_inbuf, 0, rdlen, "UTF8"));
+        			}
+        			else
+        				cmd = new String(m_inbuf, 0, rdlen);
+        
+        			nextReq = new FTPRequest(cmd);
+    			}
+		    }
 		}
 
 		// Return the request
@@ -3960,6 +4294,255 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		return nextReq;
 	}
 
+	/**
+	 * Get the next command data on an SSL/TLS encrypted connection
+	 *
+	 * @param buf byte[]
+	 * @param len int
+	 * @return int
+	 * @exception SocketException
+	 * @exception IOException
+	 */
+	protected final int getSSLCommand( byte[] buf, int len)
+	    throws SocketException, IOException {
+
+	    
+	    m_sslIn.limit( m_sslIn.capacity());
+	    m_sslIn.position( len);
+	    m_sslIn.flip();
+        
+	    m_sslOut.clear();
+	    
+        // Get the SSL engine status
+        
+        SSLEngineResult sslRes = m_sslEngine.unwrap( m_sslIn, m_sslOut);
+        
+        // DEBUG
+        
+		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+			debugPrintln("SSL unwrap() len=" + len + ", returned " + sslRes.bytesProduced() + " bytes, res=" + sslRes);
+        
+        int unwrapLen = sslRes.bytesProduced();
+        boolean loopDone = false;
+        Runnable task = null;
+        
+        while ( loopDone == false && m_sslEngine.getHandshakeStatus() != HandshakeStatus.NOT_HANDSHAKING &&
+        		sslRes.getStatus() != SSLEngineResult.Status.CLOSED) {
+            
+            switch ( m_sslEngine.getHandshakeStatus()) {
+                case NEED_TASK:
+
+                	// DEBUG
+                    
+            		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+            			debugPrintln("SSL engine status=NEED_TASK");
+
+            		// Run the SSL engine task in the current thread
+            		
+                    while ((task = m_sslEngine.getDelegatedTask()) != null) {
+                        task.run();
+                    }
+                    break;
+                case NEED_WRAP:
+
+                	// DEBUG
+                    
+            		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+            			debugPrintln("SSL engine status=NEED_WRAP");
+
+                    m_sslIn.limit( m_sslIn.capacity());
+                    m_sslIn.flip();
+                    
+                    m_sslOut.clear();
+                    
+                    while ( m_sslEngine.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
+                        sslRes = m_sslEngine.wrap( m_sslIn, m_sslOut);
+                        
+                        // DEBUG
+                        
+                		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+                			debugPrintln("  wrap() returned " + sslRes.bytesProduced() + " bytes, res=" + sslRes);
+                    }
+
+                    // Send the output to the client
+                    
+                    m_sslOut.flip();
+                    
+                    if ( m_sslOut.remaining() > 0) {
+
+                    	// DEBUG
+                        
+                		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+                			debugPrintln("  Send data to client = " + m_sslOut.remaining());
+                		
+                		// Send the encrypted data to the client
+                		
+                        m_sock.getOutputStream().write( m_sslOut.array(), 0, m_sslOut.remaining());
+                        m_sock.getOutputStream().flush();
+                    }
+                    break;
+                case NEED_UNWRAP:
+
+                	// DEBUG
+                    
+            		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+            			debugPrintln("SSL engine status=NEED_UNWRAP");
+
+                    // Read more data from the socket
+                    
+                    int rdlen = m_in.read(m_inbuf);
+	                    
+                    // Check if there is no more data, the other side has dropped the connection
+        
+                    if ( rdlen == -1) {
+                    	
+                        // DEBUG
+                        
+                        if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+                        	debugPrintln("  Socket read returned -1, closing session");
+
+                        // Close the FTP session
+                        
+                        closeSession();
+                        return 0;
+                    }
+                    
+                    m_sslIn.limit( m_sslIn.capacity());
+                    m_sslIn.position( rdlen);
+                    m_sslIn.flip();
+
+                    while ( m_sslEngine.getHandshakeStatus() == HandshakeStatus.NEED_UNWRAP && m_sslIn.remaining() > 0) {
+                        m_sslOut.limit( m_sslOut.capacity());
+                        sslRes = m_sslEngine.unwrap( m_sslIn, m_sslOut);
+                        
+                        // DEBUG
+                        
+                        if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+                        	debugPrintln("  unwrap() len=" + rdlen + ",returned " + sslRes.bytesProduced() + " bytes, res=" + sslRes);
+
+                        // Run the SSL engine task in the current thread
+                		
+                        if ( m_sslEngine.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
+	                        while ((task = m_sslEngine.getDelegatedTask()) != null) {
+	                            task.run();
+
+	                            // DEBUG
+	                            
+	                            if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+	                            	debugPrintln("  task during unwrap");
+	                        }
+                        }                        
+                    }
+
+                    m_sslOut.flip();
+                    if ( m_sslOut.remaining() > 0) {
+                        if ( m_sslEngine.getHandshakeStatus() == HandshakeStatus.NOT_HANDSHAKING) {
+                            unwrapLen = m_sslOut.remaining();
+                            loopDone = true;
+                        }
+                        else {
+
+                        	// DEBUG
+                            
+                    		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+                    			debugPrintln("  Send data to client = " + m_sslOut.remaining());
+                    		
+                    		// Send the encrypted data to the client
+                    		
+                            m_sock.getOutputStream().write( m_sslOut.array(), 0, m_sslOut.remaining());
+                            m_sock.getOutputStream().flush();
+                        }
+                    }
+                    break;
+                case NOT_HANDSHAKING:
+
+                	// DEBUG
+                    
+            		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+            			debugPrintln("SSL engine status=NOT_HANDSHAKING");
+                    loopDone = true;
+                    break;
+                case FINISHED:
+
+                	// DEBUG
+                    
+            		if ( Debug.EnableDbg && hasDebug(DBG_SSL))
+            			debugPrintln("SSL engine status=FINISHED");
+                    loopDone = true;
+                    break;
+            }
+        }
+
+        // Move decrypted data to the input buffer
+        
+        if ( unwrapLen > 0)
+            System.arraycopy( m_sslOut.array(), 0, m_inbuf, 0, unwrapLen);
+        
+        // Return the decrypted data length
+        
+        return unwrapLen;
+	}
+	
+	/**
+	 * Initialize the SSL engine when SSL mode is enabled on the command socket
+	 * 
+	 * @param engineTyp String
+	 * @exception IOException
+	 * @exception NoSuchAlgorithmException
+	 * @exception CertificateException
+	 * @exception KeyStoreException
+	 * @exception UnrecoverableKeyException
+	 * @exception KeyManagementException
+	 */
+	protected final void setupSSLEngine( String engineTyp)
+	    throws IOException, NoSuchAlgorithmException, CertificateException,
+	        KeyStoreException, UnrecoverableKeyException, KeyManagementException {
+	    
+		// Get the FTP configuration
+		
+		FTPConfigSection ftpConfig = getFTPServer().getFTPConfiguration();
+		
+	    // Load the key store and trust store
+	    
+        KeyStore keyStore   = KeyStore.getInstance("JKS");
+        KeyStore trustStore = KeyStore.getInstance("JKS");
+
+        char[] passphrase = ftpConfig.getPassphrase();
+
+        keyStore.load(new FileInputStream( ftpConfig.getKeyStorePath()), passphrase);
+        trustStore.load(new FileInputStream( ftpConfig.getTrustStorePath()), passphrase);
+
+        KeyManagerFactory keyFactory = KeyManagerFactory.getInstance("SunX509");
+        keyFactory.init(keyStore, passphrase);
+
+        TrustManagerFactory trustFactory = TrustManagerFactory.getInstance("SunX509");
+        trustFactory.init( trustStore);
+
+        m_sslContext = SSLContext.getInstance( engineTyp);
+
+        m_sslContext.init( keyFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);
+        
+        m_sslEngine = m_sslContext.createSSLEngine();
+        m_sslEngine.setUseClientMode( false);
+        m_sslEngine.setWantClientAuth( true);
+        
+        SSLSession sslSess = m_sslEngine.getSession();
+        m_sslOut = ByteBuffer.allocate( sslSess.getApplicationBufferSize() + 50);
+        
+        if ( m_inbuf.length < sslSess.getApplicationBufferSize())
+            m_inbuf = new byte[sslSess.getApplicationBufferSize()];
+        m_sslIn = ByteBuffer.wrap( m_inbuf);
+	}
+	
+	/**
+	 * Check if the session is in SSL/TLS mode
+	 * 
+	 * @return boolean
+	 */
+	protected final boolean isSecureSession() {
+		return m_sslEngine != null ? true : false;
+	}
+	
 	/**
 	 * Generate a machine listing string for the specified file/folder information
 	 * 
@@ -4112,7 +4695,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 			m_in = m_sock.getInputStream();
 			m_out = new OutputStreamWriter(m_sock.getOutputStream());
 
-			m_inbuf = new byte[512];
+			m_inbuf = new byte[1024];
 
 			// Return the initial response
 
@@ -4384,6 +4967,24 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 						procAuth(ftpReq);
 						break;
 
+					// Protected buffer size
+						
+					case FTPCommand.Pbsz:
+					    procProtectedBufferSize( ftpReq);
+					    break;
+					    
+					// Data channel protection level
+					    
+					case FTPCommand.Prot:
+					    procDataChannelProtection( ftpReq);
+					    break;
+					    
+					// Clear command channel
+					    
+					case FTPCommand.Ccc:
+						procClearCommandChannel( ftpReq);
+						break;
+						
 					// Unknown/unimplemented command
 
 					default:
