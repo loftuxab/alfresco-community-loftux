@@ -952,6 +952,7 @@ blockquote {
 .article-body {
     clear: both; 
     float: left;
+    width: 620px;
 }
 
 /* facebook-like */
