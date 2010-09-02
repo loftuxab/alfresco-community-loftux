@@ -67,7 +67,7 @@ public interface SearchService
      *            the query string - which may include parameters
      * @return Returns the query results
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = {"store", "language", "query"})
+    @Auditable(parameters = {"store", "language", "query"})
     public ResultSet query(StoreRef store, String language, String query);
 
     /**
@@ -84,7 +84,7 @@ public interface SearchService
      *            the value.
      * @return Returns the query results
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = {"store", "language", "query", "queryParameterDefinitions"})
+    @Auditable(parameters = {"store", "language", "query", "queryParameterDefinitions"})
     public ResultSet query(StoreRef store, String language, String query,
             QueryParameterDefinition[] queryParameterDefintions);
 
@@ -100,14 +100,14 @@ public interface SearchService
      *            parameterisation for the canned query
      * @return Returns the query results
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = {"store", "queryId", "queryParameters"})
+    @Auditable(parameters = {"store", "queryId", "queryParameters"})
     public ResultSet query(StoreRef store, QName queryId, QueryParameter[] queryParameters);
 
     /**
      * Search using the given SearchParameters
      */
 
-    @Auditable(key = Auditable.Key.ARG_0, parameters = {"searchParameters"})
+    @Auditable(parameters = {"searchParameters"})
     public ResultSet query(SearchParameters searchParameters);
 
     /**
@@ -127,7 +127,7 @@ public interface SearchService
      * @return a list of all the child assoc relationships to the selected nodes
      */
     @Auditable(
-            key = Auditable.Key.ARG_0,
+            
             parameters = {"contextNodeRef", "xpath", "parameters", "namespacePrefixResolver", "followAllParentLinks"},
             recordable = {true,             true,    true,         false,                     true})
     public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters,
@@ -153,7 +153,7 @@ public interface SearchService
      * @return a list of all the child assoc relationships to the selected nodes
      */
     @Auditable(
-            key = Auditable.Key.ARG_0,
+            
             parameters = {"contextNodeRef", "xpath", "parameters", "namespacePrefixResolver", "followAllParentLinks", "language"},
             recordable = {true,             true,    true,         false,                     true,                   true})
     public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters,
@@ -177,7 +177,7 @@ public interface SearchService
      * @return a list of property values
      */
     @Auditable(
-            key = Auditable.Key.ARG_0,
+            
             parameters = {"contextNodeRef", "xpath", "parameters", "namespacePrefixResolver", "followAllParentLinks"},
             recordable = {true,             true,    true,         false,                     true})
     public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath,
@@ -203,7 +203,7 @@ public interface SearchService
      * @return a list of property values
      */
     @Auditable(
-            key = Auditable.Key.ARG_0,
+            
             parameters = {"contextNodeRef", "xpath", "parameters", "namespacePrefixResolver", "followAllParentLinks", "language"},
             recordable = {true,             true,     true,        false,                     true,                   true})
     public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath,
@@ -222,7 +222,7 @@ public interface SearchService
      *            a Google-like pattern to search for in the property value
      * @return Returns true if the pattern could be found - uses the default OR operator
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = {"nodeRef", "propertyQName", "googleLikePattern"})
+    @Auditable(parameters = {"nodeRef", "propertyQName", "googleLikePattern"})
     public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern)
             throws InvalidNodeRefException;
     
@@ -238,7 +238,7 @@ public interface SearchService
      *            a Google-like pattern to search for in the property value
      * @return Returns true if the pattern could be found
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = {"nodeRef", "propertyQName", "googleLikePattern", "defaultOperator"})
+    @Auditable(parameters = {"nodeRef", "propertyQName", "googleLikePattern", "defaultOperator"})
     public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern, SearchParameters.Operator defaultOperator)
             throws InvalidNodeRefException;
 
@@ -256,7 +256,7 @@ public interface SearchService
      *            include full text search matches in the like test
      * @return Returns true if the pattern could be found
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = {"nodeRef", "propertyQName", "sqlLikePattern", "includeFTS"})
+    @Auditable(parameters = {"nodeRef", "propertyQName", "sqlLikePattern", "includeFTS"})
     public boolean like(NodeRef nodeRef, QName propertyQName, String sqlLikePattern, boolean includeFTS)
             throws InvalidNodeRefException;
 }

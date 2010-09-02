@@ -193,7 +193,7 @@ public interface PermissionService
      *            the reference to the node
      * @return the set of allowed permissions
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef" })
+    @Auditable(parameters = { "nodeRef" })
     public Set<AccessPermission> getPermissions(NodeRef nodeRef);
 
     /**
@@ -203,7 +203,7 @@ public interface PermissionService
      *            the reference to the node
      * @return the set of allowed permissions
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef" })
+    @Auditable(parameters = { "nodeRef" })
     public Set<AccessPermission> getAllSetPermissions(NodeRef nodeRef);
 
     /**
@@ -212,7 +212,7 @@ public interface PermissionService
      * @param nodeRef
      * @return
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef" })
+    @Auditable(parameters = { "nodeRef" })
     public Set<String> getSettablePermissions(NodeRef nodeRef);
 
     /**
@@ -232,7 +232,7 @@ public interface PermissionService
      * @param permission
      * @return - access status
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef", "permission" })
+    @Auditable(parameters = { "nodeRef", "permission" })
     public AccessStatus hasPermission(NodeRef nodeRef, String permission);
 
     /**
@@ -246,7 +246,7 @@ public interface PermissionService
      *            the reference to the node
      * @return access status
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef" })
+    @Auditable(parameters = { "nodeRef" })
     public AccessStatus hasReadPermission(NodeRef nodeRef);
 
     /**
@@ -264,7 +264,7 @@ public interface PermissionService
      *
      * @param nodeRef
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef" })
+    @Auditable(parameters = { "nodeRef" })
     public void deletePermissions(NodeRef nodeRef);
 
     /**
@@ -274,7 +274,7 @@ public interface PermissionService
      * @param authority
      *            (if null then this will match all authorities)
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef", "authority" })
+    @Auditable(parameters = { "nodeRef", "authority" })
     public void clearPermission(NodeRef nodeRef, String authority);
 
     /**
@@ -293,7 +293,7 @@ public interface PermissionService
      * @param permission
      *            the entry permission (if null then this will match all permissions)
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef", "authority", "permission" })
+    @Auditable(parameters = { "nodeRef", "authority", "permission" })
     public void deletePermission(NodeRef nodeRef, String authority, String permission);
 
     /**
@@ -304,7 +304,7 @@ public interface PermissionService
      * @param permission
      * @param allow
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef", "authority", "permission", "allow" })
+    @Auditable(parameters = { "nodeRef", "authority", "permission", "allow" })
     public void setPermission(NodeRef nodeRef, String authority, String permission, boolean allow);
 
     /**
@@ -313,7 +313,7 @@ public interface PermissionService
      * @param nodeRef
      * @param inheritParentPermissions
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef", "inheritParentPermissions" })
+    @Auditable(parameters = { "nodeRef", "inheritParentPermissions" })
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
 
     /**
@@ -322,7 +322,7 @@ public interface PermissionService
      * @param nodeRef
      * @return inheritParentPermissions
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "nodeRef" })
+    @Auditable(parameters = { "nodeRef" })
     public boolean getInheritParentPermissions(NodeRef nodeRef);
 
    
@@ -334,7 +334,7 @@ public interface PermissionService
      * @param permission
      * @param allow
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "storeRef", "authority", "permission", "allow" })
+    @Auditable(parameters = { "storeRef", "authority", "permission", "allow" })
     public void setPermission(StoreRef storeRef, String authority, String permission, boolean allow);
     
     /**
@@ -343,7 +343,7 @@ public interface PermissionService
      * @param authority
      * @param permission
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "storeRef", "authority", "permission" })
+    @Auditable(parameters = { "storeRef", "authority", "permission" })
     public void deletePermission(StoreRef storeRef, String authority, String permission);
     
     /**
@@ -352,7 +352,7 @@ public interface PermissionService
      * @param storeRef
      * @param authority
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "storeRef", "authority" })
+    @Auditable(parameters = { "storeRef", "authority" })
     public void clearPermission(StoreRef storeRef, String authority);
     
     /**
@@ -360,7 +360,7 @@ public interface PermissionService
      * 
      * @param storeRef
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "storeRef" })
+    @Auditable(parameters = { "storeRef" })
     public void deletePermissions(StoreRef storeRef);
     
     
@@ -371,7 +371,7 @@ public interface PermissionService
      *            the reference to the store
      * @return the set of allowed permissions
      */
-    @Auditable(key = Auditable.Key.ARG_0, parameters = { "storeRef" })
+    @Auditable(parameters = { "storeRef" })
     public Set<AccessPermission> getAllSetPermissions(StoreRef storeRef);
     
     public Set<String> getAuthorisations();
