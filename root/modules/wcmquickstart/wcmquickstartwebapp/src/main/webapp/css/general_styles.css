@@ -12,6 +12,7 @@ blockquote {
 #body-wrapper {
 	margin:20px auto;
 	width:960px;
+	position: relative;
 }
 #logo {
 	position:relative;
@@ -236,6 +237,7 @@ blockquote {
 .ln-list li h6 {
 	float:left;
 	margin:0 10px 0 0;
+	width: 291px;
 }
 .ln-list li p {
 	float:left;
@@ -244,7 +246,7 @@ blockquote {
 .ln-date {
 	float:left;
 	margin:0 0 0 0;
-	width: 100%;
+    width: 100%;
 }
 #left p {
 	margin:10px 0 10px 0;
@@ -813,7 +815,7 @@ blockquote {
 .address-box h3 {
 	float:left;
 	margin:2px 0 0 0;
-	width:291px;
+	width: 100%;
 }
 .address-box .map-img {
 	margin:10px 0 0 1px;
@@ -952,7 +954,7 @@ blockquote {
 .article-body {
     clear: both; 
     float: left;
-    width: 620px;
+    width: 100%;
 }
 
 /* facebook-like */
@@ -963,9 +965,13 @@ blockquote {
 }
 
 /* article tag list */
-ul.tag-list {
+h3.tag-list {
 	clear: left;
-    float: left;
+	width: 100%
+}
+ul.tag-list {
+	float: left;
+	width: 100%;
 }
 
 ul.tag-list li {
@@ -995,24 +1001,30 @@ ul.tag-list li {
     float:left;
     margin:0 12px 0 0;
 }
+.publications-list-detail {
+    width: 820px;
+    float: left;
+}
+.publications-list-detail h3 {
+    width: 100%;
+    float:left;
+}
 .publications-list-detail .newslist-date {
-    clear: left;
+    width: 100%;
+    float: left;
 }
 .publications-list-detail p {
     float:left;
     margin:6px 0 0 0;
     padding:0;
+    width: 100%;
 }
-.publications-list-detail h3 {
-	clear: left;
-    float:left;
-}
-.publications-list-detail {
-	width: 820px;
+.publications-list-detail ul.tag-list {
 	float: left;
+    width: 100%;
 }
 .publications-list-detail p.tag-list {
-	clear: left;
+	float: left;
 }
 
 /* comments */
@@ -1024,15 +1036,18 @@ ul.tag-list li {
 	border: 6px solid #EFEFEF;
 	margin: 2px 0 10px 0;
 	padding: 5px;
-	width: 640;
+	width: 610px;
 }
 .comments-text {
-	clear: both;
 	float: left;
-	margin-bottom: 2px;
+	/*margin-bottom: 2px;*/
+	width: 100%;
+}
+*:first-child+html .comments-text  { /* this applies only to ie7 */
+    padding-bottom:1px;
 }
 .comments-report {
-    float:right;
+    float: right;
 }
 
 /* error page */
