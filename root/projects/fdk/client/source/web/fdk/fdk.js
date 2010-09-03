@@ -71,6 +71,5 @@ FDK.formConsoleContentReady = function FDK_formConsoleContentReady(layer, args)
 FDK.cancelUnitTest = function FDK_cancelUnitTest(type, args)
 {
    // go back to unit tests page
-   //history.go(-1);
-   window.location.href = "fdk-unit-tests";
+   window.location.href = "fdk-unit-tests?nodeRef=" + YAHOO.util.Dom.get("itemId").value;
 }
