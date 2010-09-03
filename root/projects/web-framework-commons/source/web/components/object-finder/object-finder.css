@@ -1,7 +1,8 @@
 .object-finder-list
 {
    display: block;
-   max-height: 20em;
+   min-height: 2em;
+   max-height: 17.4em;
    overflow-x: hidden;
    overflow-y: scroll;
    margin-bottom: 0.5em;

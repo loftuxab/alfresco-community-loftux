@@ -187,12 +187,13 @@
          showLinkToTarget: false,
          
          /**
-          * Template to use for link to target nodes, must
+          * Template string or function to use for link to target nodes, must
           * be supplied when showLinkToTarget property is
           * set to true
           *
-          * @property targetLinkTemplate
-          * @type string
+          * @property targetLinkTemplate If of type string it will be used as a template, if of type function an
+          * item object will be passed as argument and link is expected to be returned by the function
+          * @type (string|function)
           */
          targetLinkTemplate: null,
          
@@ -853,7 +854,7 @@
             }
             else
             {
-               var item;
+               var item, link;
                if (this.options.displayMode == "list")
                {
                   var l = this.widgets.currentValuesDataTable.getRecordSet().getLength();
@@ -876,8 +877,17 @@
                   {
                      if (this.options.displayMode == "items")
                      {
+                        link = null;
+                        if (YAHOO.lang.isFunction(this.options.targetLinkTemplate))
+                        {
+                           link = this.options.targetLinkTemplate.call(this, oRecord.getData());
+                        }
+                        else if (YAHOO.lang.isString(this.options.targetLinkTemplate))
+                        {
+                           link = YAHOO.lang.substitute(this.options.targetLinkTemplate, oRecord.getData());
+                        }
                         displayValue += this.options.objectRenderer.renderItem(item, 16,
-                              "<div>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
+                              "<div>{icon} <a href='" + link + "'>{name}</a></div>");
                      }
                      else if (this.options.displayMode == "list")
                      {
@@ -1217,18 +1227,26 @@
          return function ObjectFinder_fnRenderCellListItemActions(elCell, oRecord, oColumn, oData)
          {
             var item = oRecord.getData(),
+               description =  item.description ? $html(item.description) : scope.msg("label.none"),
                modifiedOn = item.modified ? Alfresco.util.formatDate(Alfresco.util.fromISO8601(item.modified)) : null,
-               template = '<h3 class="name">{name}</h3>';
-
-            if (item.description)
+               title = $html(item.name);
+            if (scope.options.showLinkToTarget && scope.options.targetLinkTemplate !== null)
             {
-               template += '<div class="description">{description}</div>';
+               var link;
+               if (YAHOO.lang.isFunction(scope.options.targetLinkTemplate))
+               {
+                  link = scope.options.targetLinkTemplate.call(scope, oRecord.getData());
+               }
+               else if (YAHOO.lang.isString(scope.options.targetLinkTemplate))
+               {
+                  link = YAHOO.lang.substitute(scope.options.targetLinkTemplate, oRecord.getData());
+               }
+               title = '<a href="' + link + '">' + $html(item.name) + '</a>';
             }
-            if (modifiedOn)
-            {
-               template += '<div class="viewmode-label">' + scope.msg("form.control.object-picker.modified-on") + ': ' + modifiedOn + '</div>';
-            }
-            elCell.innerHTML = scope.options.objectRenderer.renderItem(item, 0, template);
+            var template = '<h3 class="name">' + title + '</h3>';
+            template += '<div class="description">' + scope.msg("form.control.object-picker.description") + ': ' + description + '</div>';
+            template += '<div class="viewmode-label">' + scope.msg("form.control.object-picker.modified-on") + ': ' + (modifiedOn ? modifiedOn : scope.msg("label.none")) + '</div>';
+            elCell.innerHTML = template;
          };
       },
 
@@ -1493,8 +1511,7 @@
             return updatedResponse;
          };
 
-         var me = this,
-            fields = ["type", "hasChildren", "name", "description", "displayPath", "nodeRef"];
+         var me = this;
 
          if (this.options.disabled === false)
          {
@@ -1502,7 +1519,6 @@
             // Setup a DataSource for the selected items list
             this.widgets.dataSource = new YAHOO.util.DataSource([]);
             this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-            this.widgets.dataSource.responseSchema = { fields: fields };
             this.widgets.dataSource.doBeforeParseData = doBeforeParseDataFunction;
 
             // Picker DataTable definition
@@ -1553,13 +1569,12 @@
             // Setup a DataSource for the selected items list
             var ds = new YAHOO.util.DataSource([]);
             ds.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-            ds.responseSchema = { fields: fields };
             ds.doBeforeParseData = doBeforeParseDataFunction;
 
             // Current values DataTable definition
             var currentValuesColumnDefinitions =
             [
-               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellGenericIcon()},
+               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellGenericIcon() },
                { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellListItemName() },
                { key: "action", label: "Actions", sortable: false, formatter: this.fnRenderCellListItemActions(), width: "5em" }
             ];
@@ -2338,7 +2353,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["type", "hasChildren", "name", "description", "displayPath", "nodeRef", "selectable"],
+             fields: null, 
              metaFields: { parent: "parent" }
          };
 
