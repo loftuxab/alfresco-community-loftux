@@ -70,12 +70,12 @@
       <div id="bd">
          <div class="form-console">
             <h2>Form Console</h2>
-            <#if url.args.mode?exists>
+            <#if url.args.mode??>
                <#assign mode="${url.args.mode}">
             <#else>
                <#assign mode="edit">
             </#if>
-            <#if url.args.submitType?exists>
+            <#if url.args.submitType??>
                <#assign submitType="${url.args.submitType}">
             <#else>
                <#assign submitType="multipart">
@@ -84,17 +84,17 @@
                <fieldset>
                   <legend>Item Details</legend>
                   <label for="itemKind">Kind:</label>
-                  <input id="itemKind" type="text" name="itemKind" value="<#if url.args.itemKind?exists>${url.args.itemKind}<#else>node</#if>" size="5" />
+                  <input id="itemKind" type="text" name="itemKind" value="<#if url.args.itemKind??>${url.args.itemKind}<#else>node</#if>" size="5" />
                   <label for="itemId">Id:</label>
-                  <input id="itemId" type="text" name="itemId" value="<#if url.args.itemId?exists>${url.args.itemId}</#if>" size="70" />
+                  <input id="itemId" type="text" name="itemId" value="<#if url.args.itemId??>${url.args.itemId}</#if>" size="70" />
                   <br/>
                   <label for="destination">Destination:</label>
-                  <input id="destination" type="text" name="destination" value="<#if url.args.destination?exists>${url.args.destination}</#if>" size="77" />
+                  <input id="destination" type="text" name="destination" value="<#if url.args.destination??>${url.args.destination}</#if>" size="77" />
                </fieldset>
                <fieldset>
                   <legend>Form Details</legend>
                   <label for="formId">Id:</label>
-                  <input id="formId" name="formId" value="<#if url.args.formId?exists>${url.args.formId}</#if>" />
+                  <input id="formId" name="formId" value="<#if url.args.formId??>${url.args.formId}</#if>" />
                   <label class="inline-label">Mode:</label>
                   <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
                   <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
@@ -105,7 +105,7 @@
                   <input id="submitType-url" type="radio" name="submitType" value="urlencoded"<#if submitType == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
                   <br/>
                   <label for="redirect">Redirect:</label>
-                  <input id="redirect" type="text" name="redirect" value="<#if url.args.redirect?exists>${url.args.redirect}</#if>" size="80" />
+                  <input id="redirect" type="text" name="redirect" value="<#if url.args.redirect??>${url.args.redirect}</#if>" size="80" />
                </fieldset>
                <input type="submit" value="Show Form" class="button" />
                <input type="button" value="Clear" class="button"

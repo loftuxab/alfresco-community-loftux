@@ -26,7 +26,7 @@
                the test you want to run.</p>
             </div>
             <div class="item">
-               <input type="text" id="noderef" name="noderef" />
+               <input type="text" id="noderef" name="noderef" <#if url.args.nodeRef??>value="${url.args.nodeRef}"</#if> />
             </div>
             <div class="tests">
                <div class="yui-g">
