@@ -70,6 +70,12 @@ public interface NamespaceService extends NamespacePrefixResolver
     /** Application Model Prefix */
     static final String APP_MODEL_PREFIX = "app";
 
+    /** EXIF Model URI */
+    static final String EXIF_MODEL_1_0_URI = "http://www.alfresco.org/model/exif/1.0";
+
+    /** EXIF Model Prefix */
+    static final String EXIF_MODEL_PREFIX = "exif";
+
     /** Business Process Model URI */
     static final String BPM_MODEL_1_0_URI = "http://www.alfresco.org/model/bpm/1.0";
 
