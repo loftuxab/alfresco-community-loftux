@@ -4688,7 +4688,9 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
         
         //  Check if the file/directory exists
 
-        if ( disk.fileExists(sess, tree, filePath) == FileStatus.FileExists) {
+        int fsts = disk.fileExists(sess, tree, filePath);
+        
+        if ( fsts == FileStatus.FileExists || fsts == FileStatus.DirectoryExists) {
 
             //  Get file information for the path
 
@@ -4703,7 +4705,10 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
                 // Allocate and build the file handle
                 
                 fHandle = new byte[NFS.FileHandleSize];
-                NFSHandle.packFileHandle( shareId, dirId, fileId, fHandle);
+                if ( finfo.isDirectory())
+                    NFSHandle.packDirectoryHandle( shareId, dirId, fHandle);
+                else
+                    NFSHandle.packFileHandle( shareId, dirId, fileId, fHandle);
             }
         }
     }
