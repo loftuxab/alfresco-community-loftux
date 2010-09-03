@@ -677,14 +677,27 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
         	
         	// Check whether we are overwriting something that is outside our 
         	// control
-            if(exists && fileSystemReceiverService.isErrorOnOverwrite() )
+            if(fileSystemReceiverService.isErrorOnOverwrite() )
             {
-                if (metaDataTarget.lookupMetadataFile(f.getParent(), f.getName()) == null)
+                if(exists)
                 {
-                    /**
-                     * File exists but is not in metadata
-                     */
-                    throw new DeploymentException("file already exists, path:" + f.getAbsolutePath());
+                    // file does exist
+                    if (metaDataTarget.lookupMetadataFile(f.getParent(), f.getName()) == null)
+                    {
+                        /**
+                         * File exists but is not in metadata
+                         */
+                        throw new DeploymentException("file already exists, path:" + f.getAbsolutePath());
+                    }
+                }
+                else
+                {
+                    // file does not exist
+                    if(!create)
+                    {
+                        // And this should be an update
+                        throw new DeploymentException("file to update does not exist, path:" + f.getAbsolutePath()); 
+                    }
                 }
             }
     	       
