@@ -57,8 +57,6 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory, Runnable
 	 * @param repo CMIS repository URL
 	 * @param user CMIS user
 	 * @param password CMIS password
-	 * @param repositoryPollInterval Optional. If > 0 a thread polls for the repository, otherwise the constructor
-	 *                               will just issue an exception if the repository is not available. 
 	 */
 	public GuestSessionFactoryImpl(String repo, String user, String password)
 	{
