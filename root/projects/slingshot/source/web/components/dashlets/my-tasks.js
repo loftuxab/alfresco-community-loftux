@@ -205,22 +205,30 @@
       renderCellTaskInfo: function MyTasks_onReady_renderCellTaskInfo(elCell, oRecord, oColumn, oData)
       {
          var taskId = oRecord.getData("id"),
-               title = oRecord.getData("properties")["bpm_description"],
+               message = oRecord.getData("properties")["bpm_description"],
                dueDateStr = oRecord.getData("properties")["bpm_dueDate"],
                dueDate = dueDateStr ? Alfresco.util.fromISO8601(dueDateStr) : null,
                today = new Date(),
                type = oRecord.getData("title"),
                status = oRecord.getData("properties")["bpm_status"],
                assignee = oRecord.getData("owner");
-         var titleDesc = '<h4><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + title + '</a></h4>',
-               dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '">' + Alfresco.util.formatDate(dueDate, "mediumDate") + '</span></h4>' : "",
+            
+         // if message is the same as the task type show the <no message> label
+         if (message == type)
+         {
+            message = this.msg("workflow.no_message");
+         }
+               
+         var messageDesc = '<h4><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h4>',
+               dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '" title="' + 
+                          this.msg("label.dueOn", Alfresco.util.formatDate(dueDate, "longDate")) + '">' + Alfresco.util.formatDate(dueDate, "longDate") + '</span></h4>' : "",
                statusDesc = '<div>' + this.msg("label.taskSummary", type, status) + '</div>',
                unassignedDesc = '';
          if (!assignee || !assignee.userName)
          {
             unassignedDesc = '<span class="theme-bg-color-5 theme-color-5 unassigned-task">' + this.msg("label.unassignedTask") + '</span>';
          }
-         elCell.innerHTML = titleDesc + dateDesc + statusDesc + unassignedDesc;
+         elCell.innerHTML = messageDesc + dateDesc + statusDesc + unassignedDesc;
       },
 
       /**
