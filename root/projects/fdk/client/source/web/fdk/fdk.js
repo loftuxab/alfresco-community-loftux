@@ -37,7 +37,15 @@ FDK.runUnitTest = function FDK_runUnitTest(formId)
    }
    else
    {
-      window.location.href = "form-console?itemKind=node&itemId=" + nodeRef + "&formId=" + formId + "&redirect=" + window.location.href;
+      var url = "form-console?itemKind=node&itemId=" + nodeRef + "&formId=" + formId + "&redirect=";
+      
+      var redirectUrl = window.location.href;
+      if (redirectUrl.indexOf("?nodeRef=") == -1)
+      {
+         redirectUrl = redirectUrl + "?nodeRef=" + nodeRef;
+      }
+      
+      window.location.href = url + encodeURIComponent(redirectUrl);
    }
 }
 
