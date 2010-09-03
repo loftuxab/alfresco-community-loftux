@@ -8,7 +8,9 @@ var email = context.properties['visitorEmail'];
 var website = context.properties['visitorWebsite'];
 var subject = context.properties['feedbackSubject'];
 var comment = context.properties['feedbackComment'];
+var formId = context.properties['formId'];
 
+// Validate the form
 if (name == null || name.length == 0)
 {
 	failed = true;
@@ -36,6 +38,8 @@ if (comment == null || comment.length == 0)
 	errors["comment"] = "comments.write.null.feedback.comment";
 }
 
+model.formId = formId;
+
 if (failed)
 {
 	model.errors = errors;
@@ -47,17 +51,22 @@ if (failed)
 }
 else 
 {
-	var assetId;
-	if (asset != null)
-	{
-		assetId = asset.id;
+	// Check that the form id has not already been submitted, ie prevent re-post via browser refresh.
+	if (webSite.ugcService.validateFormId(formId))
+	{	
+		// Post the feedback
+		var assetId;
+		if (asset != null)
+		{
+			assetId = asset.id;
+		}
+		else
+		{
+			assetId = webSite.id;
+		}
+		webSite.ugcService.postFeedback(assetId, name, email, website, type, subject, comment, 0);
 	}
-	else
-	{
-		assetId = webSite.id;
-	}
-	webSite.ugcService.postFeedback(assetId, name, email, website, type, subject, comment, 0);
-	
+	// Get the thankyou asset from the repository to render
 	model.successAsset = webSite.getAssetByPath(section.path+args.successAsset);
 }
 
