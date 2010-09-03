@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.exception.PageNotFoundException;
+import org.alfresco.wcm.client.util.HeaderHelper;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.mvc.UrlViewController;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
@@ -72,6 +73,11 @@ public class GenericTemplateAssetController extends UrlViewController
 			response.setStatus(HttpStatus.NOT_FOUND.value());
 			throw new PageNotFoundException();
 		}
+		
+        // Set headers
+    	boolean render = HeaderHelper.setHeaders(asset, request, response);
+    	// If browser has an up-to-date copy of the asset then exit
+        if ( ! render) return null;		
 		
 		return super.handleRequestInternal(request, response);
 	}

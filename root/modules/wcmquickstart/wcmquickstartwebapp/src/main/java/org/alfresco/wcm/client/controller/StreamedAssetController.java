@@ -19,10 +19,7 @@
 package org.alfresco.wcm.client.controller;
 
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,8 +29,8 @@ import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.ContentStream;
 import org.alfresco.wcm.client.Rendition;
-import org.alfresco.wcm.client.Resource;
 import org.alfresco.wcm.client.impl.ContentStreamCmisRenditionImpl;
+import org.alfresco.wcm.client.util.HeaderHelper;
 import org.alfresco.wcm.client.util.UrlUtils;
 import org.alfresco.wcm.client.view.StreamedAssetView;
 import org.springframework.http.HttpStatus;
@@ -50,10 +47,6 @@ import org.springframework.web.servlet.view.RedirectView;
  */
 public class StreamedAssetController extends AbstractController
 {
-	private static final long EXPIRES = 300000L; // 5 mins in ms
-	
-    private static ThreadLocal<SimpleDateFormat> httpDateFormat = new ThreadLocal<SimpleDateFormat>() {};  	     
-
     private UrlUtils urlUtils;
     private AssetFactory assetFactory;
 
@@ -85,37 +78,9 @@ public class StreamedAssetController extends AbstractController
         }
 
         // Set headers
-        Date modifiedDate = ((Date) asset.getProperty(Resource.PROPERTY_MODIFIED_TIME));
-        long modifiedTime = modifiedDate.getTime();
-        modifiedTime = (modifiedTime / 1000) * 1000; // remove ms
-        response.addDateHeader("Last-Modified", modifiedTime);
-        response.addDateHeader("Expires", new Date().getTime() + EXPIRES); 
-        String etag = Long.toHexString(modifiedTime);
-        response.addHeader("ETag", etag);
-        
-        // Check if the asset has been changed since the last request
-        String requestIfNoneMatch = request.getHeader("If-None-Match");
-        if (requestIfNoneMatch != null)
-        {
-            if (etag.equals(requestIfNoneMatch))
-            {
-                response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-                return null;
-            }
-        } 
-        else
-        {
-            String requestIfModifiedSince = request.getHeader("If-Modified-Since");
-            if (requestIfModifiedSince != null)
-            {
-                Date requestDate = getDateFromHttpDate(requestIfModifiedSince);
-                if (requestDate.getTime() >= modifiedTime)
-                {
-                    response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-                    return null;
-                }
-            }
-        }
+    	boolean render = HeaderHelper.setHeaders(asset, request, response);
+    	// If browser has an up-to-date copy of the asset then exit
+        if ( ! render) return null;
         
         InputStream stream = null;
         String mimeType = null;
@@ -152,31 +117,6 @@ public class StreamedAssetController extends AbstractController
         
         // Return a StreamedAssetView to render the stream
         return new ModelAndView(new StreamedAssetView(stream, mimeType));
-    }
-
-    public String getHttpDate(Date date)
-    {
-        return dateFormatter().format(date);
-    }
-
-    public Date getDateFromHttpDate(String date) throws ParseException
-    {
-        return dateFormatter().parse(date);
-    }
-    
-    /**
-     * Get a date formatter for the thread as SimpleDateFormat is not thread-safe
-     * @return
-     */
-    public SimpleDateFormat dateFormatter() 
-    {
-    	SimpleDateFormat formatter = httpDateFormat.get();
-    	if (formatter == null)
-    	{
-    		formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-    		httpDateFormat.set(formatter);
-    	}
-    	return formatter;
     }
  
     public void setUrlUtils(UrlUtils urlUtils)
