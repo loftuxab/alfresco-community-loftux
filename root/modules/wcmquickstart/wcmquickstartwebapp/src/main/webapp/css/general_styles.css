@@ -908,8 +908,9 @@ blockquote {
 }
 .portfolio-wrapper li {
 	float:left;
-	margin:16px 0 10px 30px;
-	width:215px;
+	margin:16px 0 0px 30px;
+	width:215px;	
+	min-height: 270px;
 }
 .portfolio-wrapper li h4 {
 	float:left;
