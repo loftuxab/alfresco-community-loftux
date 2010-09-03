@@ -107,8 +107,6 @@
                <field id="exif:xResolution" set="exif" />
                <field id="exif:yResolution" set="exif" />
                <field id="exif:resolutionUnit" set="exif" />
-               <field id="cm:latitude" set="exif" />
-               <field id="cm:longitude" set="exif" />
             </appearance>
          </form>
       </forms>
