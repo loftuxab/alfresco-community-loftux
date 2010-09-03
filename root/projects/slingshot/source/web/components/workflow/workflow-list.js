@@ -235,7 +235,12 @@
       renderCellWorkflowInfo: function WL_renderCellWorkflowInfo(elCell, oRecord, oColumn, oData)
       {
          var workflow = oRecord.getData();
-         var title = '<h3><a href="workflow-details?workflowId=' + workflow.id + '&myWorkflowsLinkBack=true" class="theme-color-1" title="' + this.msg("link.viewWorkflow") + '">' + $html(workflow.message) + '</a></h3>',
+         var message = workflow.message;
+         if (message === null)
+         {
+            message = this.msg("workflow.no_message");
+         }
+         var title = '<h3><a href="workflow-details?workflowId=' + workflow.id + '&myWorkflowsLinkBack=true" class="theme-color-1" title="' + this.msg("link.viewWorkflow") + '">' + $html(message) + '</a></h3>',
             description = '<div>' + $html(workflow.title) + '</div>';
          elCell.innerHTML = title + description;
       },
