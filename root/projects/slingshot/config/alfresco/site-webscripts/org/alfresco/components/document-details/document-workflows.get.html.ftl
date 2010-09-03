@@ -19,7 +19,7 @@
                <div class="icon"><img src="${url.context}/components/documentlibrary/images/workflow-indicator-16.png" /></div>
                <div class="details">
                   <div class="message">
-                     <a href="${url.context}/page/workflow-details?workflowId=${workflow.id}">${workflow.message}</a>
+                     <a href="${url.context}/page/workflow-details?workflowId=${workflow.id}"><#if workflow.message??>${workflow.message}<#else>${msg("workflow.no_message")?html}</#if></a>
                   </div>
                   <div class="title">${workflow.title}</div>
                </div>

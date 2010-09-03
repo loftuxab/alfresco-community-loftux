@@ -187,7 +187,13 @@
 
             Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
-            Dom.get(this.id + "-message").innerHTML = $html(recentTask.properties.bpm_description);
+            
+            var message = this.workflow.message;
+            if (message === null)
+            {
+               message = this.msg("workflow.no_message");
+            }
+            Dom.get(this.id + "-message").innerHTML = $html(message);
             
             Dom.get(this.id + "-recentTaskOwnersComment").innerHTML = $html(recentTask.properties.bpm_comment || this.msg("label.noComment"));
 
@@ -204,8 +210,8 @@
             var dueDate = Alfresco.util.fromISO8601(this.workflow.dueDate);
             if (dueDate)
             {
-               Dom.get(this.id + "-dueSummary").innerHTML = this.msg("label.dueOn", Alfresco.util.formatDate(dueDate));
-               Dom.get(this.id + "-due").innerHTML = Alfresco.util.formatDate(dueDate);
+               Dom.get(this.id + "-dueSummary").innerHTML = this.msg("label.dueOn", Alfresco.util.formatDate(dueDate, "defaultDateOnly"));
+               Dom.get(this.id + "-due").innerHTML = Alfresco.util.formatDate(dueDate, "defaultDateOnly");
             }
             else
             {
@@ -323,7 +329,7 @@
          var renderCellDueDate = function WorkflowHistory_onReady_renderCellDueDate(elCell, oRecord, oColumn, oData)
          {
             var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties").bpm_dueDate);
-            elCell.innerHTML = Alfresco.util.formatDate(completionDate);
+            elCell.innerHTML = Alfresco.util.formatDate(completionDate, "defaultDateOnly");
          };
 
          /**
@@ -369,7 +375,7 @@
          // DataTable column definitions for current tasks
          var currentTasksColumnDefinitions =
          [
-            { key: "type", label: this.msg("column.type"), formatter: renderCellType },
+            { key: "name", label: this.msg("column.type"), formatter: renderCellType },
             { key: "owner", label: this.msg("column.assignedTo"), formatter: renderCellOwner },
             { key: "id", label: this.msg("column.dueDate"), formatter: renderCellDueDate },
             { key: "state", label: this.msg("column.status"), formatter: renderCellStatus },
@@ -391,7 +397,7 @@
          // DataTable column definitions workflow history
          var historyColumnDefinitions =
          [
-            { key: "type", label: this.msg("column.type"), formatter: renderCellType },
+            { key: "name", label: this.msg("column.type"), formatter: renderCellType },
             { key: "owner", label: this.msg("column.userGroup"), formatter: renderCellOwner },
             { key: "id", label: this.msg("column.dateCompleted"), formatter: renderCellDateCompleted },
             { key: "state", label: this.msg("column.outcome"), formatter: renderCellOutcome },
@@ -407,7 +413,7 @@
          workflowHistoryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
          workflowHistoryDS.responseSchema =
          {
-            fields: [ "title", "type", "owner", "id", "state", "properties", "outcome"]
+            fields: [ "title", "name", "owner", "id", "state", "properties", "outcome"]
          };
          this.widgets.dataTable = new YAHOO.widget.DataTable(historyTasksEl, historyColumnDefinitions, workflowHistoryDS,
          {
