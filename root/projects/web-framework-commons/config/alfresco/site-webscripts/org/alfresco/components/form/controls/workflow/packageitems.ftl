@@ -2,23 +2,19 @@
 
 <#macro setPackageItemOptions field>
 
-   <#-- Remove all items action -->
-
-   <#-- Remove item action -->
+   <#local documentLinkResolver>function(item){ return Alfresco.constants.URL_PAGECONTEXT + (item.site ? "site/" + item.site + "/": "") + "document-details?nodeRef=" + item.nodeRef; }</#local>
    <#local allowAddAction = false>
    <#local allowRemoveAllAction = false>
    <#local allowRemoveAction = false>
    <#local actions = []>
 
-   <#-- Add item action -->
    <#if form.data['prop_bpm_packageActionGroup']?? && form.data['prop_bpm_packageActionGroup']?is_string && form.data['prop_bpm_packageActionGroup']?length &gt; 0>
       <#local allowAddAction = true>
    </#if>
 
    <#if form.data['prop_bpm_packageItemActionGroup']?? && form.data['prop_bpm_packageItemActionGroup']?is_string && form.data['prop_bpm_packageItemActionGroup']?length &gt; 0>
       <#local packageItemActionGroup = form.data['prop_bpm_packageItemActionGroup']>
-      <#local viewMoreActionsLink>function(item){ return Alfresco.constants.URL_PAGECONTEXT + (item.site ? "site/" + item.site + "/": "") + "document-details?nodeRef=" + item.nodeRef; }</#local>
-      <#local viewMoreAction = { "name": "view_more_actions", "label": "form.control.object-picker.workflow.view_more_actions", "link": viewMoreActionsLink }>
+      <#local viewMoreAction = { "name": "view_more_actions", "label": "form.control.object-picker.workflow.view_more_actions", "link": documentLinkResolver }>
       <#if packageItemActionGroup == "read_package_item_actions" || packageItemActionGroup == "edit_package_item_actions">
          <#local actions = actions + [viewMoreAction]>
       <#elseif packageItemActionGroup == "remove_package_item_actions" || packageItemActionGroup == "start_package_item_actions" || packageItemActionGroup == "edit_and_remove_package_item_actions">
@@ -42,6 +38,8 @@
       var picker = Alfresco.util.ComponentManager.get("${controlId}");
       picker.setOptions(
       {
+         showLinkToTarget: true,
+         targetLinkTemplate: ${documentLinkResolver},         
          <#if form.mode == "create" && form.destination?? && form.destination?length &gt; 0>
          startLocation: "${form.destination?js_string}",
          </#if>

@@ -284,16 +284,20 @@
                            text: this.msg("message." + action + ".success")
                         });
 
-                        if (data.owner && data.owner.userName == Alfresco.constants.USERNAME)
+                        YAHOO.lang.later(3000, this, function(data)
                         {
-                           // Let the user keep working on the task since he claimed it
-                           document.location.reload();
-                        }
-                        else
-                        {
-                           // Take the user to the most suitable place  
-                           this._navigateForward();
-                        }
+                           if (data.owner && data.owner.userName == Alfresco.constants.USERNAME)
+                           {
+                              // Let the user keep working on the task since he claimed it
+                              document.location.reload();
+                           }
+                           else
+                           {
+                              // Take the user to the most suitable place
+                              this._navigateForward();
+                           }
+                        }, data);
+
                      }
                   },
                   obj: action,
