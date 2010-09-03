@@ -87,6 +87,26 @@
          //Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'loggedOutClick', this.onLogoutClick, this, true);
          Bubbling.on(this.config.name + WebEditor.SEPARATOR + 'loginToggleClick', this.onLoginToggleClick, this, true);
 
+         // Hover States
+         var els = [], 
+         suffix = "-over",
+         ext = ".png";
+         
+         els.push(Dom.getElementsByClassName("alfresco-content-delete")); 
+         els.push(Dom.getElementsByClassName("alfresco-content-new"));
+         els.push(Dom.getElementsByClassName("alfresco-content-edit"));
+         
+         Event.addListener(els, "mouseover", function()
+         {
+            var el = Dom.getChildren(this)[0];
+            Dom.setAttribute(el, "src", Dom.getAttribute(el, "src").replace(ext, suffix+ext))
+         });
+         Event.addListener(els, "mouseout", function()
+         {
+            var el = Dom.getChildren(this)[0];
+            Dom.setAttribute(el, "src", Dom.getAttribute(el, "src").replace(suffix+ext, ext));
+         });
+
          this.initAttributes(this.config);
          this.initEditor();
 
@@ -350,7 +370,6 @@
          {
             // remove existing toolbar buttons, if necessary
             this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'quickcreate');
-            this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'quickdelete');
             this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'quickedit');
             this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers');
 
@@ -375,15 +394,6 @@
                   menu: this.renderEditableContentMenu(editables)
                },
                {
-                  type: 'menu',
-                  label: '<img src="' + contextPath + '/res/awe/images/quick-delete.png" alt="'+ this.getMessage('awe.toolbar-quick-delete-icon-label') +'" />',
-                  title: this.getMessage('awe.toolbar-quick-delete-icon-label'),
-                  value: this.config.name + WebEditor.SEPARATOR + 'quickdelete',
-                  id: this.config.name + WebEditor.SEPARATOR + 'quickdelete',
-                  icon: true,
-                  menu: this.renderDeleteContentMenu(editables)
-               },
-               {
                   type: 'push',
                   label: '<img src="' + contextPath + '/res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('awe.toolbar-toggle-markers-icon-label') +'" />',
                   title: this.getMessage('awe.toolbar-toggle-markers-icon-label'),
@@ -393,7 +403,6 @@
                }
             ]);
             tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
-            tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickdelete').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
          }
 
          // set up toolbar as a managed attribute so it can be exposed to other plugins
@@ -740,10 +749,6 @@
          var quickCreate = WebEditor.module.Ribbon.getToolbar(
             'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root').getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickcreate');
          quickCreate.set('disabled', !enabled);
-
-         var quickDelete = WebEditor.module.Ribbon.getToolbar(
-            'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root').getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickdelete');
-         quickDelete.set('disabled', !enabled);
 
          var quickEdit = WebEditor.module.Ribbon.getToolbar(
             'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root').getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit');

@@ -165,6 +165,12 @@ span.alfresco-content-marker hide
    background:none;
    border:0;
 }
+
+#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon, 
+#wef-ribbon-container.wef-ribbon-orientation-top #wef-ribbon_c {
+   height:6.7em;
+}
+
 #wef-ribbon #awe--loginToggle button
 {
    font-weight:bold;
