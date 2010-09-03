@@ -51,7 +51,28 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory, Runnable
 	private Map<String,String> parameters;
 	private volatile Thread waitForRepository;
 	private Exception lastException;
+
+	/**
+	 * Create a CMIS session factory.
+	 * @param repo CMIS repository URL
+	 * @param user CMIS user
+	 * @param password CMIS password
+	 * @param repositoryPollInterval Optional. If > 0 a thread polls for the repository, otherwise the constructor
+	 *                               will just issue an exception if the repository is not available. 
+	 */
+	public GuestSessionFactoryImpl(String repo, String user, String password)
+	{
+		this(repo, user, password, -1);
+	}
 	
+	/**
+	 * Create a CMIS session factory.
+	 * @param repo CMIS repository URL
+	 * @param user CMIS user
+	 * @param password CMIS password
+	 * @param repositoryPollInterval Optional. If > 0 a thread polls for the repository, otherwise the constructor
+	 *                               will just issue an exception if the repository is not available. 
+	 */
 	public GuestSessionFactoryImpl(String repo, String user, String password, int repositoryPollInterval)
 	{
 		this.repositoryPollInterval = repositoryPollInterval;
@@ -68,19 +89,32 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory, Runnable
 		parameters.put(SessionParameter.ATOMPUB_URL, repo);
 		parameters.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
 
-		// Start thread which gets repository object
-		this.waitForRepository = new Thread(this);
-		waitForRepository.start();
+		if (repositoryPollInterval > 0)
+		{
+			// Start thread which gets repository object
+			this.waitForRepository = new Thread(this);
+			waitForRepository.start();
+		}
+		else
+		{
+			// If no poll interval then just check in the current thread and throw exception if not available
+			getRepository();
+		}
 	}
 
+	private void getRepository()
+	{
+		List<Repository> repositories = sessionFactory.getRepositories(parameters);
+		this.repository = repositories.get(0);		
+	}
+	
 	@Override
 	public void run() {
 		Thread thisThread = Thread.currentThread();
 	    while (waitForRepository == thisThread) {
             // See if the repository can be reached
 	    	try {
-				List<Repository> repositories = sessionFactory.getRepositories(parameters);
-				this.repository = repositories.get(0);
+	    		getRepository();
 				log.info("Repository available");
 				break;
 	    	}
