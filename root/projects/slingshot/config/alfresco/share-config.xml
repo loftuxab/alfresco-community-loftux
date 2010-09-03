@@ -333,20 +333,19 @@
 
    <!-- Workflow config section -->
    <config evaluator="string-compare" condition="Workflow">
-      <!--
-         A list of workflow definitions that NOT shall be displayed in Share
-      -->
+      <!-- A list of workflow definitions that are NOT displayed in Share -->
       <hidden-workflows>
-         <workflow name="jbpm$wcmwf:changerequest"/>
+         <!-- Hide all WCM related workflows -->
+         <workflow name="jbpm$wcmwf:*"/>
          <workflow name="jbpm$wf:articleapproval"/>
          <workflow name="jbpm$inwf:invitation-nominated"/>
          <workflow name="jbpm$imwf:invitation-moderated"/>
-         <workflow name="jbpm$wcmwf:submit"/>
-         <workflow name="jbpm$wcmwf:submitdirect"/>
       </hidden-workflows>
 
+      <!-- A list of workflow tasks that are NOT displayed in Share  -->
       <hidden-tasks>
-         <task type="wcmwf:reviewTask"/>
+         <!-- Hide all WCM related tasks -->
+         <task type="wcmwf:*"/>
       </hidden-tasks>
    </config>
 
