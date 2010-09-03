@@ -564,11 +564,14 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
 	            	}
 	            }
 	            
+	            boolean isFile = f.isFile();
+	            
 	            DeployedFile file = new DeployedFile(FileType.DELETED, 
 	                                                 null,
 	                                                 path,
 	                                                 null,
-	                                                 false);
+	                                                 false,
+	                                                 isFile);
 	            deployment.add(file);
 	        }
 	        catch (IOException e)
@@ -639,7 +642,8 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
 	                                             null,
 	                                             path,
 	                                             guid,
-	                                             !exists);
+	                                             !exists,
+	                                             false);
 	        try
 	        {
 	            deployment.add(file);
@@ -688,7 +692,8 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
                                              preLocation,
                                              path,
                                              guid,
-                                             !exists);
+                                             !exists,
+                                             true);
         	deployment.add(file);
         	return out;
         }
@@ -712,6 +717,7 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
                      null,
                      path,
                      guid,
+                     false,
                      false);
 	         deployment.add(file);
 	     }

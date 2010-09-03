@@ -527,26 +527,33 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 			final String localStoreName = getLocalStoreName(deployment.getAuthoringStoreName());
 			final String fpath = path;
 
-			RetryingTransactionCallback<Integer> deleteCB = new RetryingTransactionCallback<Integer>()
+			RetryingTransactionCallback<AVMNodeDescriptor> deleteCB = new RetryingTransactionCallback<AVMNodeDescriptor>()
 			{
-				public Integer execute() throws Throwable
+				public AVMNodeDescriptor execute() throws Throwable
 				{
 					String dst = localStoreName + ":" + getLocalPath(fpath);
 					
 					/**
 					 * Remove the file or directory
 					 */
+					AVMNodeDescriptor desc = fAVMService.lookup(-1, dst);
 					fAVMService.removeNode(dst);
 					logger.debug("Delete file" + dst);
-					return null;
+					return desc;
 				}
 			};
 
 
 			RetryingTransactionHelper trn = trxService.getRetryingTransactionHelper();
-			trn.doInTransaction(deleteCB);
+			AVMNodeDescriptor deleted = trn.doInTransaction(deleteCB);
 
 
+			boolean isFile = false;
+			if(deleted != null)
+			{
+			    isFile = deleted.isFile();
+			}
+			
 			/**
 			 * Update the deployment record
 			 */
@@ -554,7 +561,8 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 					null,
 					path,
 					null,
-					false);
+					false,
+					isFile);
 			deployment.add(file);
 		}
 		catch (IOException e)
@@ -701,7 +709,8 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 					null,
 					path,
 					guid,
-					true);
+					true,
+					false);
 
 			deployment.add(file);
 		}
@@ -846,7 +855,8 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
                                              tempFile.getAbsolutePath(),
                                              getLocalPath(path),
                                              guid,
-                                             newFile);
+                                             newFile,
+                                             true);
        		deployment.add(file);
         	
         	return out;
@@ -942,7 +952,8 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 					null,
 					path,
 					guid,
-					false);
+					false,
+					true);
 			deployment.add(file);
 			logger.debug("end upate directory" + dst);
 

@@ -45,11 +45,12 @@ public class DMDeployedFile extends DeployedFile
             String path,
             String guid, 
             boolean create,
+            boolean file,
             NodeRef destNodeRef,
             String encoding,
             String mimeType)
     {
-        super(type, preLocation, path, guid, create);
+        super(type, preLocation, path, guid, create, file);
         this.destNodeRef = destNodeRef;
         this.encoding = encoding;
         this.mimeType = mimeType;    
@@ -60,9 +61,10 @@ public class DMDeployedFile extends DeployedFile
             String preLocation, 
             String path,
             String guid, 
-            boolean create)
+            boolean create,
+            boolean file)
     {
-        super(type, preLocation, path, guid, create);
+        super(type, preLocation, path, guid, create, file);
         // TODO Auto-generated constructor stub
     }
 
