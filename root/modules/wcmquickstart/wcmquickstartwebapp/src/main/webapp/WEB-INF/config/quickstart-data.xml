@@ -13,7 +13,8 @@
 		<constructor-arg value="%{quickstart.repo.cmisurl}"/>
 		<constructor-arg value="%{quickstart.repo.user}"/>
 		<constructor-arg value="%{quickstart.repo.password}"/>
-	</bean>
+        <constructor-arg value="10000"/> <!-- Poll for repository every 10s -->
+    </bean>
 
     <!-- Pool of anonymous CMIS sessions -->
 	<bean id="guestSessionPool" class="org.apache.commons.pool.impl.GenericObjectPool">

@@ -19,10 +19,15 @@
 package org.alfresco.wcm.client.exception;
 
 /**
- * This exception indicates that an asset, template etc has not been found for the requested URL
+ * This exception indicates that the repository is not currently available.
  * @author Chris Lack
  */
-public class PageNotFoundException extends RuntimeException
+public class RepositoryUnavailableException extends RuntimeException
 {
-    private static final long serialVersionUID = 126826782878L;
+    private static final long serialVersionUID = 3686782878L;
+
+    public RepositoryUnavailableException(Throwable t)
+    {
+    	super(t);
+    }
 }

@@ -28,23 +28,37 @@ import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisConnectionException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.alfresco.wcm.client.exception.RepositoryUnavailableException;
 
 /**
  * GuestSessionFactoryImpl implements a PoolableObjectFactory for use with
  * an apache commons GenericObjectPool. The class creates and destroys 
- * CMIS sessions.
+ * CMIS sessions. It uses a thread which periodically tries to reach the
+ * repository. This allows for the repository not being available at 
+ * application start-up without re-trying on every request.
  * @author Chris Lack
  */
-public class GuestSessionFactoryImpl implements PoolableObjectFactory 
+public class GuestSessionFactoryImpl implements PoolableObjectFactory, Runnable 
 {	
+	private final static Log log = LogFactory.getLog(GuestSessionFactoryImpl.class);
+	private int repositoryPollInterval;	
 	private Repository repository;
+	private SessionFactory sessionFactory;
+	private Map<String,String> parameters;
+	private volatile Thread waitForRepository;
+	private Exception lastException;
 	
-	public GuestSessionFactoryImpl(String repo, String user, String password)
+	public GuestSessionFactoryImpl(String repo, String user, String password, int repositoryPollInterval)
 	{
+		this.repositoryPollInterval = repositoryPollInterval;
+		
 		// Create session factory
-		SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
-		Map<String, String> parameters = new HashMap<String, String>();
+		this.sessionFactory = SessionFactoryImpl.newInstance();
+		this.parameters = new HashMap<String, String>();
 		
 		// user credentials
 		parameters.put(SessionParameter.USER, user);
@@ -54,8 +68,39 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory
 		parameters.put(SessionParameter.ATOMPUB_URL, repo);
 		parameters.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
 
-		List<Repository> repositories = sessionFactory.getRepositories(parameters);
-		this.repository = repositories.get(0);		
+		// Start thread which gets repository object
+		this.waitForRepository = new Thread(this);
+		waitForRepository.start();
+	}
+
+	@Override
+	public void run() {
+		Thread thisThread = Thread.currentThread();
+	    while (waitForRepository == thisThread) {
+            // See if the repository can be reached
+	    	try {
+				List<Repository> repositories = sessionFactory.getRepositories(parameters);
+				this.repository = repositories.get(0);
+				log.info("Repository available");
+				break;
+	    	}
+	    	catch (CmisConnectionException e) {
+	    		lastException = e;
+				log.error("Repository not available: "+e.getMessage());
+	    	}
+			
+	    	// Wait a bit
+            try {
+                Thread.sleep(repositoryPollInterval);
+            } 
+            catch (InterruptedException e) {}	      
+	    }
+	    waitForRepository = null;
+	}	
+	
+	public void stop()
+	{
+		waitForRepository = null;
 	}
 	
 	/**
@@ -84,6 +129,7 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory
 	@Override
 	public Object makeObject() throws Exception
 	{
+		if (repository == null) throw new RepositoryUnavailableException(lastException);
 		return repository.createSession();
 	}
 
@@ -106,4 +152,5 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory
 	{
 		return true;
 	}
+
 }

@@ -25,6 +25,7 @@ import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.exception.PageNotFoundException;
+import org.alfresco.wcm.client.exception.RepositoryUnavailableException;
 import org.alfresco.wcm.client.interceptor.ModelDecorator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +61,10 @@ public class RepositoryExceptionResolver extends SimpleMappingExceptionResolver
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
     {
 	    // Log the exception
-	    log.error(ex, ex);
+	    if ( ! (ex instanceof RepositoryUnavailableException)) // Don't bother to log these for every request. It will be logged by GuestSessionFactoryImpl. 
+	    {
+	    	log.error(ex, ex);
+	    }
 	    
 		// Determine the http status code from the exception
 		Integer statusCode;
