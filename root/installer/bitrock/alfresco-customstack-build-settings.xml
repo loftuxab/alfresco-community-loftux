@@ -45,6 +45,7 @@
         <setInstallerVariable name="alfresco_mmt_source_file" value="${alfresco_svn_rootdir.unix}/build/assemble/commands/bin/alfresco-mmt.jar" />
 
 
+        <setInstallerVariable name="alfresco_commands_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/commands" />
         <setInstallerVariable name="alfresco_amps_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/amps" />
         <setInstallerVariable name="alfresco_sharepoint_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-spp-${project.version}.amp" />
         <setInstallerVariable name="alfresco_sharepoint_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescosharepoint" />
@@ -54,6 +55,8 @@
         <setInstallerVariable name="alfresco_quickr_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescoquickr" />
         <setInstallerVariable name="alfresco_rm_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-dod5015-${project.version}.amp" />
         <setInstallerVariable name="alfresco_rm_share_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-dod5015-share-${project.version}.amp" />
+        <setInstallerVariable name="alfresco_wcmqs_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-wcmqs-${project.version}.amp" />
+        <setInstallerVariable name="alfresco_wcmqs_share_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-wcmqs-share-${project.version}.amp" />
         <!-- END ALFRESCO BUILD SYSTEM-->
         </actionList>
         <ruleList>
