@@ -42,6 +42,8 @@ public class DeployedFile implements Serializable
     
     private boolean fCreate;
     
+    private boolean fFile;
+    
     /**
      * 
      * @param type
@@ -54,13 +56,15 @@ public class DeployedFile implements Serializable
                         String preLocation,
                         String path,
                         String guid,
-                        boolean create)
+                        boolean create,
+                        boolean file)
     {
         fType = type;
         fPreLocation = preLocation;
         fPath = path;
         fGUID = guid;
         fCreate = create;
+        fFile = file;
     }
 
     /**
@@ -91,6 +95,16 @@ public class DeployedFile implements Serializable
     public boolean isCreate()
     {
         return fCreate;
+    }
+    
+    /**
+     * Is this a file or directory ?
+     * 
+     * @return true this is a file, false this is a directory
+     */
+    public boolean isFile()
+    {
+        return fFile;
     }
 
     

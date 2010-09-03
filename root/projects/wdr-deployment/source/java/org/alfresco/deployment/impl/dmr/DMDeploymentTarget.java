@@ -468,9 +468,9 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 	    
 		try
 		{
-			RetryingTransactionCallback<NodeRef> deleteCB = new RetryingTransactionCallback<NodeRef>()
+			RetryingTransactionCallback<FileInfo> deleteCB = new RetryingTransactionCallback<FileInfo>()
 			{
-				public NodeRef execute() throws Throwable
+				public FileInfo execute() throws Throwable
 				{
 			        List<String> pathElements = toFolderPath(destPath);
 					
@@ -478,12 +478,14 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 					 * Remove the file or directory
 					 */
 				    FileInfo context = fileFolderService.resolveNamePath(deployment.getRootNode().getNodeRef(), pathElements);
-					logger.debug("Delete file" + destPath);
-					return context.getNodeRef();
+					logger.debug("Delete path:" + destPath);
+					return context;
 				}
 			};
 
-			NodeRef toDelete = tran.doInTransaction(deleteCB);
+			FileInfo context = tran.doInTransaction(deleteCB);
+			NodeRef toDelete = context.getNodeRef();
+			boolean isFile = !context.isFolder();
 
 			/**
 			 * Update the deployment record
@@ -492,7 +494,9 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 					null,
 					destPath,
 					null,
-					false);
+					false,
+					isFile);
+			
 			file.setDestNodeRef(toDelete);
 			deployment.add(file);
 		}
@@ -654,7 +658,8 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 					null,
 					destPath,
 					guid,
-					true);
+					true,
+					false);
 
 			deployment.add(file);
 		}
@@ -789,6 +794,7 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
                                              destPath,
                                              guid,
                                              ret.isNew,
+                                             true,
                                              destNode,
                                              encoding,
                                              mimeType);
@@ -865,7 +871,8 @@ public class DMDeploymentTarget implements Serializable, DeploymentTarget
 	                null,
 	                destPath,
 	                guid,
-	                false);
+	                false,
+	                true);
 	        deployment.add(file);
 
 	        logger.debug("end update directory");
