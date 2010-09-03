@@ -7,6 +7,7 @@ import org.alfresco.wcm.client.impl.DictionaryServiceImpl;
 import org.alfresco.wcm.client.impl.SectionFactoryCmisImpl;
 import org.alfresco.wcm.client.impl.WebScriptCaller;
 import org.alfresco.wcm.client.impl.WebSiteServiceImpl;
+import org.alfresco.wcm.client.impl.cache.SimpleCache;
 import org.alfresco.wcm.client.util.CmisSessionHelper;
 import org.alfresco.wcm.client.util.CmisSessionPool;
 import org.alfresco.wcm.client.util.UrlUtils;
@@ -70,6 +71,7 @@ public class SectionFactoryTest extends TestCase
 		webSiteService.setSectionFactory(sectionFactory);
 		webSiteService.setAssetFactory(assetFactory);
         webSiteService.setWebscriptCaller((WebScriptCaller)ctx.getBean("webscriptCaller"));
+        webSiteService.setFormIdCache((SimpleCache<String, String>)ctx.getBean("formIdCache"));
         webSiteService.setUrlUtils(urlUtils);
         
 		WebSite site = webSiteService.getWebSite("localhost", port);

@@ -30,5 +30,30 @@
       </constructor-arg>
    </bean>
 
+    <bean id="formIdCache" class="org.alfresco.wcm.client.impl.cache.EhCacheAdapter">
+        <property name="cache">
+            <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+                <property name="cacheManager">
+                    <ref bean="ehCacheManager" />
+                </property>
+                <property name="cacheName">
+                    <value>formIdCache</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean name="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+
+    <bean id="webscriptCaller" class="org.alfresco.wcm.client.impl.WebScriptCallerImpl" init-method="init">
+        <property name="baseUrl" value="http://localhost:8080/alfresco/service/api/" />
+        <property name="credentials">
+            <bean class="org.apache.commons.httpclient.UsernamePasswordCredentials">
+                <constructor-arg value="admin"/>
+                <constructor-arg value="admin"/>
+            </bean>
+        </property>
+    </bean>
+    
     
 </beans>

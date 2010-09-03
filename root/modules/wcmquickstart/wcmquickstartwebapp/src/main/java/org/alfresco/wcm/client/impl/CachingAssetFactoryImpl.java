@@ -31,15 +31,19 @@ import org.alfresco.wcm.client.Query;
 import org.alfresco.wcm.client.Rendition;
 import org.alfresco.wcm.client.SearchResults;
 import org.alfresco.wcm.client.impl.cache.SimpleCache;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
+/**
+ * A proxying implementation of the {@link AssetFactory} interface that caches loaded assets
+ * @author Brian
+ *
+ */
 public class CachingAssetFactoryImpl implements AssetFactory
 {
-    private static final Log log = LogFactory.getLog(CachingAssetFactoryImpl.class);
+//    private static final Log log = LogFactory.getLog(CachingAssetFactoryImpl.class);
     
     private AssetFactory delegate;
     private SimpleCache<String, CacheEntry> newCache;
+    private long minimumCacheMilliseconds = 30000L;
 
     public void setDelegate(AssetFactory delegate)
     {
@@ -50,6 +54,11 @@ public class CachingAssetFactoryImpl implements AssetFactory
     {
         this.newCache = newCache;
     }
+    
+    public void setMinimumCacheSeconds(int seconds)
+    {
+        minimumCacheMilliseconds = seconds * 1000L;
+    }
 
     public SearchResults findByQuery(Query query)
     {
@@ -58,35 +67,38 @@ public class CachingAssetFactoryImpl implements AssetFactory
 
     public Asset getAssetById(String id, boolean deferredLoad)
     {
-        long time = System.currentTimeMillis() - 30000L;
+        long now = System.currentTimeMillis();
+        long refreshCutoffTime = now - minimumCacheMilliseconds;
         CacheEntry cacheEntry = newCache.get(id);
         Asset asset = null;
         if (cacheEntry != null)
         {
+            //We have found the asset in the cache. How long has it been there? If it has been there 
+            //longer than the minimum cache time then we'll check its modified time in the repo
+            //to ensure it hasn't become out of date
             asset = cacheEntry.asset;
-            if (cacheEntry.cacheTime < time)
+            if (cacheEntry.cacheTime < refreshCutoffTime)
             {
                 Date currentModifiedTime = delegate.getModifiedTimeOfAsset(id);
                 Date cachedModifiedTime = (Date)asset.getProperty(Asset.PROPERTY_MODIFIED_TIME);
                 if (currentModifiedTime.after(cachedModifiedTime))
                 {
+                    //This asset has been updated in the repo, so flush this asset from the cache and
+                    //forget we ever found it there...
                     newCache.remove(id);
                     asset = null;
                 }
                 else
                 {
-                    long oldTime = cacheEntry.cacheTime;
-                    cacheEntry.refresh();
-                    long newTime = newCache.get(id).cacheTime;
-                    if (newTime == oldTime)
-                    {
-                        log.error("!!!!!!!!!! Cache time not updated !!!!!!!!!!!");
-                    }
+                    //The asset has not been modified in the repo since we cached it, so we don't 
+                    //have to check it again until the minimum cache time has expired again...
+                    cacheEntry.cacheTime = now;
                 }
             }
         }
         if (asset == null)
         {
+            //We have not found the asset in the cache. Load it using our delegated factory and cache the result
             asset = delegate.getAssetById(id, deferredLoad);
             newCache.put(id, new CacheEntry(asset));
         }
@@ -104,18 +116,26 @@ public class CachingAssetFactoryImpl implements AssetFactory
         Map<String,Asset> assetsToCheck = new TreeMap<String, Asset>();
         Map<String, Asset> foundAssets = new TreeMap<String, Asset>();
         
-        long time = System.currentTimeMillis() - 30000L;
+        long now = System.currentTimeMillis();
+        long refreshCutoffTime = now - minimumCacheMilliseconds;
+
         for (String id : ids)
         {
+            //For each id that we've been given, see if we have the corresponding
+            //asset in our cache.
             CacheEntry cacheEntry = newCache.get(id);
             if (cacheEntry != null)
             {
-                if (cacheEntry.cacheTime < time)
+                //If we find it, work out whether its necessary to check its modified time in the repo.
+                //This is the case if we last checked it longer ago than the "minimumCacheMilliseconds"
+                if (cacheEntry.cacheTime < refreshCutoffTime)
                 {
+                    //Yes, we need to check this one. Record it in our collection of assets to check
                     assetsToCheck.put(id, cacheEntry.asset);
                 }
                 else
                 {
+                    //No, our cached copy hasn't reached its minimum age yet
                     foundAssets.put(id, cacheEntry.asset);
                 }
             }
@@ -128,6 +148,7 @@ public class CachingAssetFactoryImpl implements AssetFactory
         //Check the modified time of those assets found in the cache
         if (!assetsToCheck.isEmpty())
         {
+            //Get the modified times from the repo for the assets we need to check
             Map<String,Date> currentModifiedTimes = delegate.getModifiedTimesOfAssets(assetsToCheck.keySet());
             for (Map.Entry<String,Date> currentAssetModifiedTime : currentModifiedTimes.entrySet())
             {
@@ -137,22 +158,21 @@ public class CachingAssetFactoryImpl implements AssetFactory
                 Date cachedModifiedTime = (Date)cachedAsset.getProperty(Asset.PROPERTY_MODIFIED_TIME);
                 if (currentModifiedTime.after(cachedModifiedTime))
                 {
+                    //This one has been modified since we cached it. Remove it from our cache and add it
+                    //to our list of assets to load
                     newCache.remove(assetId);
                     idsToLoad.add(assetId);
                 }
                 else
                 {
+                    //This one hasn't been modified since we cached it, so we can use the cached one.
                     foundAssets.put(assetId, cachedAsset);
                     CacheEntry cachedEntry = newCache.get(assetId);
                     if (cachedEntry != null)
                     {
-                        long oldTime = cachedEntry.cacheTime;
-                        cachedEntry.refresh();
-                        long newTime = newCache.get(assetId).cacheTime;
-                        if (newTime == oldTime)
-                        {
-                            log.error("!!!!!!!!!! Cache time not updated !!!!!!!!!!!");
-                        }
+                        //Reset the cache time on the cached asset - we don't need to check it again until
+                        //the minimum cache time expires on it again
+                        cachedEntry.cacheTime = now;
                     }
                 }
             }
@@ -169,7 +189,7 @@ public class CachingAssetFactoryImpl implements AssetFactory
             }
         }
         
-        //Try to retain the correct order where possible...
+        //Try to retain the correct order as given to us in the originally supplied collection of ids...
         List<Asset> finalResults = new ArrayList<Asset>(foundAssets.size());
         for (String id : ids)
         {
@@ -226,11 +246,6 @@ public class CachingAssetFactoryImpl implements AssetFactory
         public CacheEntry(Asset asset)
         {
             this.asset = asset;
-            refresh();
-        }
-        
-        public void refresh()
-        {
             this.cacheTime = System.currentTimeMillis();
         }
     }
