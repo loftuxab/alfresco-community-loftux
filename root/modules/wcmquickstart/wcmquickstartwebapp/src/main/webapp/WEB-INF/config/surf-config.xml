@@ -46,7 +46,6 @@
     	        <property name="staticPages">
     	           <set>
                        <value>\/messages\.js</value>
-                       <value>\/thankyou\.html</value>
     	           </set>
     	        </property>
     	    </bean>     		
