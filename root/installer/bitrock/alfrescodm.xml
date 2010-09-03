@@ -229,19 +229,8 @@
                 </actionGroup>
 	    </actionList>
             <distributionFileList>
-                <distributionFile origin="${alfresco_on_install_settings_per_platform_directory}/commands/*" allowWildcards="1" />
+                <distributionFile origin="${alfresco_commands_source_directory}/*" allowWildcards="1" />
             </distributionFileList>
-        </folder>
-        <folder>
-            <name>mmt</name>
-            <description>alfrescommt</description>
-            <destination>${alfresco_commands_directory}/bin</destination>
-            <distributionFileList>
-                <distributionDirectory origin="${alfresco_mmt_source_file}" />
-            </distributionFileList>
-            <shouldPackRuleList>
-                <fileTest path="${alfresco_on_install_settings_per_platform_directory}/commands/bin/alfresco-mmt.jar" condition="not_exists" />
-            </shouldPackRuleList>
         </folder>
     </folderList>
     <postInstallationActionList>
