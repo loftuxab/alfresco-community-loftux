@@ -60,10 +60,6 @@
                <show id="cm:sentdate" />
                <show id="cm:subjectline" />
                
-               <!-- cm:geographic aspect -->
-               <show id="cm:latitude" />
-               <show id="cm:longitude" />
-               
                <!-- exif:exif aspect -->
                <show id="exif:dateTimeOriginal" />
                <show id="exif:pixelXDimension" />
@@ -80,6 +76,10 @@
                <show id="exif:xResolution" />
                <show id="exif:yResolution" />
                <show id="exif:resolutionUnit" />
+               
+               <!-- cm:geographic aspect -->
+               <show id="cm:latitude" />
+               <show id="cm:longitude" />
             </field-visibility>
             <appearance>
                <field id="cm:title">
