@@ -27,11 +27,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.UgcService;
 import org.alfresco.wcm.client.VisitorFeedback;
 import org.alfresco.wcm.client.VisitorFeedbackPage;
+import org.alfresco.wcm.client.impl.cache.SimpleCache;
 import org.alfresco.wcm.client.util.CmisSessionHelper;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
@@ -71,13 +73,18 @@ public class UgcServiceCmisImpl implements UgcService
             + COMMON_ASSET_FROM_CLAUSE + "WHERE f.ws:relevantAssetRef = ''{0}''";
 
     private AssetFactory assetFactory;
-
+    private SimpleCache<String, String> formIdCache;
     private ObjectId feedbackFolderId;
 
     public UgcServiceCmisImpl(ObjectId feedbackFolderId)
     {
         super();
         this.feedbackFolderId = feedbackFolderId;
+    }
+
+    public void setFormIdCache(SimpleCache<String, String> formIdCache)
+    {
+        this.formIdCache = formIdCache;
     }
 
     @Override
@@ -162,6 +169,26 @@ public class UgcServiceCmisImpl implements UgcService
         return postFeedback(feedback);
     }
 
+    @Override
+    public String getFormId()
+    {
+        String id = UUID.randomUUID().toString();
+        formIdCache.put(id, id);
+        return id;
+    }
+
+    @Override
+    public boolean validateFormId(String formId)
+    {
+        boolean isValid = false;
+        if (formIdCache.contains(formId))
+        {
+            isValid = true;
+            formIdCache.remove(formId);
+        }
+        return isValid;
+    }
+
     private VisitorFeedbackImpl buildFeedbackObject(String assetId, String visitorName,
             String visitorEmailAddress, String visitorWebsite, String type, String subject, String comment,
             boolean commentFlagged, Integer rating)
@@ -198,7 +225,7 @@ public class UgcServiceCmisImpl implements UgcService
         return feedback;
     }
 
-    ItemIterable<QueryResult> runQuery(String query)
+    private ItemIterable<QueryResult> runQuery(String query)
     {
         if (log.isDebugEnabled())
         {

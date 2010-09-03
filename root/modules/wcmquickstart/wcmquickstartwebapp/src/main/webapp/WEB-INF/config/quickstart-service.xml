@@ -48,12 +48,26 @@
 
     <!-- Service for fetching site data. Implements a cache. -->    
     <bean id="webSiteService" class="org.alfresco.wcm.client.impl.WebSiteServiceImpl">
-       <property name="webSiteCacheRefreshAfter" value="300"/>
-       <property name="urlUtils" ref="urlUtils"/>       
-       <property name="sectionFactory" ref="sectionFactory"/>
-       <property name="assetFactory" ref="assetFactory"/>
-       <property name="webscriptCaller" ref="webscriptCaller"/> 
-       <property name="logoFilename" value="logo.%"/>
+        <property name="webSiteCacheRefreshAfter" value="300" />
+        <property name="urlUtils" ref="urlUtils" />
+        <property name="sectionFactory" ref="sectionFactory" />
+        <property name="assetFactory" ref="assetFactory" />
+        <property name="webscriptCaller" ref="webscriptCaller" />
+        <property name="logoFilename" value="logo.%" />
+        <property name="formIdCache">
+            <bean class="org.alfresco.wcm.client.impl.cache.EhCacheAdapter">
+                <property name="cache">
+                    <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+                        <property name="cacheManager">
+                            <ref bean="ehCacheManager" />
+                        </property>
+                        <property name="cacheName">
+                            <value>formIdCache</value>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
     </bean>
     
     <!--  Dictionary service -->

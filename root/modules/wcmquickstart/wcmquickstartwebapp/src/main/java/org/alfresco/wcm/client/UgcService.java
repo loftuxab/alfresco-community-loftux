@@ -36,4 +36,8 @@ public interface UgcService
     VisitorFeedbackPage getFeedbackPage(String assetId, int itemsToFetch, long itemsToSkip);
 
 	void reportFeedback(String feedbackId);
+	
+	String getFormId();
+	
+	boolean validateFormId(String formId);
 }

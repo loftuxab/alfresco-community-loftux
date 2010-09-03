@@ -29,6 +29,7 @@ import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.SectionFactory;
 import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.WebSiteService;
+import org.alfresco.wcm.client.impl.cache.SimpleCache;
 import org.alfresco.wcm.client.util.CmisSessionHelper;
 import org.alfresco.wcm.client.util.UrlUtils;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
@@ -65,6 +66,7 @@ public class WebSiteServiceImpl implements WebSiteService
     private SectionFactory sectionFactory;
     private AssetFactory assetFactory;
     private WebScriptCaller webscriptCaller;
+    private SimpleCache<String, String> formIdCache;
 
     private String logoFilename;
 	private UrlUtils urlUtils;
@@ -150,7 +152,9 @@ public class WebSiteServiceImpl implements WebSiteService
                 webSite.setSectionFactory(sectionFactory);
                 UgcServiceCmisImpl ugcService = new UgcServiceCmisImpl(session
                         .createObjectId(siteInfo.feedbackFolderId));
+                ugcService.setFormIdCache(formIdCache);
                 webSite.setUgcService(ugcService);
+                
                 newCache.put(key, webSite);
 
                 // Find the logo asset id
@@ -236,6 +240,11 @@ public class WebSiteServiceImpl implements WebSiteService
     public void setUrlUtils(UrlUtils urlUtils) {
 		this.urlUtils = urlUtils;
 	}    
+
+    public void setFormIdCache(SimpleCache<String, String> formIdCache)
+    {
+        this.formIdCache = formIdCache;
+    }
 
     public final static class WebsiteInfo
     {
