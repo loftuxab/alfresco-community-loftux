@@ -2,12 +2,6 @@
 
    <!-- Share override config to add FDK types and aspects -->
    <config evaluator="string-compare" condition="DocumentLibrary">
-      <aspects>
-         <visible>
-            <aspect name="fdk:exif" />
-         </visible>
-      </aspects>
-      
       <types>
          <type name="cm:content">
             <subtype name="fdk:gadget" />
@@ -86,20 +80,10 @@
    <config evaluator="node-type" condition="cm:content">
       <forms>
          <form>
-            <field-visibility>
-               <!-- exif aspect data, if applied -->
-               <show id="fdk:manufacturer" />
-               <show id="fdk:software" />
-               <show id="fdk:originalDateTime" />
-               <show id="fdk:compression" />
-               <show id="fdk:xResolution" />
-               <show id="fdk:yResolution" />
-               <show id="fdk:resolutionUnit" />
-               <show id="fdk:flash" />
-            </field-visibility>
             <appearance>
                <set id="dublin-core" appearance="" template="/fdk/templates/custom-set-dublincore.ftl" />
                <set id="exif" appearance="" label-id="fdk.tab.label.exif" template="/fdk/templates/custom-set-exif.ftl" />
+               
                <field id="cm:publisher" set="dublin-core" />
                <field id="cm:contributor" set="dublin-core" />
                <field id="cm:type" set="dublin-core" />
@@ -108,14 +92,23 @@
                <field id="cm:coverage" set="dublin-core" />
                <field id="cm:rights" set="dublin-core" />
                <field id="cm:subject" set="dublin-core" />
-               <field id="fdk:manufacturer" set="exif" />
-               <field id="fdk:software" set="exif" />
-               <field id="fdk:originalDateTime" set="exif" />
-               <field id="fdk:compression" set="exif" />
-               <field id="fdk:xResolution" set="exif" />
-               <field id="fdk:yResolution" set="exif" />
-               <field id="fdk:resolutionUnit" set="exif" />
-               <field id="fdk:flash" set="exif" />
+               <field id="exif:dateTimeOriginal" set="exif" />
+               <field id="exif:pixelXDimension" set="exif" />
+               <field id="exif:pixelYDimension" set="exif" />
+               <field id="exif:exposureTime" set="exif" />
+               <field id="exif:fNumber" set="exif" />
+               <field id="exif:flash" set="exif" />
+               <field id="exif:focalLength" set="exif" />
+               <field id="exif:isoSpeedRatings" set="exif" />
+               <field id="exif:manufacturer" set="exif" />
+               <field id="exif:model" set="exif" />
+               <field id="exif:software" set="exif" />
+               <field id="exif:orientation" set="exif" />
+               <field id="exif:xResolution" set="exif" />
+               <field id="exif:yResolution" set="exif" />
+               <field id="exif:resolutionUnit" set="exif" />
+               <field id="cm:latitude" set="exif" />
+               <field id="cm:longitude" set="exif" />
             </appearance>
          </form>
       </forms>
@@ -144,20 +137,21 @@
                <show id="fdk:pressRelease" />
                <show id="fdk:images" />
                
-               <!-- exif aspect data, if applied -->
-               <show id="fdk:manufacturer" />
-               <show id="fdk:software" />
-               <show id="fdk:originalDateTime" />
-               <show id="fdk:compression" />
-               <show id="fdk:xResolution" />
-               <show id="fdk:yResolution" />
-               <show id="fdk:resolutionUnit" />
-               <show id="fdk:flash" />
+               <!-- cm:dublincore aspect -->
+               <show id="cm:publisher"/>
+               <show id="cm:contributor"/>
+               <show id="cm:type"/>
+               <show id="cm:identifier"/>
+               <show id="cm:dcsource"/>
+               <show id="cm:coverage"/>
+               <show id="cm:rights"/>
+               <show id="cm:subject"/>
             </field-visibility>
             <appearance>
                <set id="" label-id="fdk.tab.label.details" />
                <set id="press" label-id="fdk.tab.label.press" />
-               <set id="exif" label-id="fdk.tab.label.exif" />
+               <set id="dublin-core" label-id="fdk.tab.label.dublincore" />
+
                <field id="cm:description">
                   <control template="/org/alfresco/components/form/controls/richtext.ftl" />
                </field>
@@ -181,14 +175,14 @@
                      <control-param name="startLocation">{doclib}</control-param>
                   </control>
                </field>
-               <field id="fdk:manufacturer" set="exif" />
-               <field id="fdk:software" set="exif" />
-               <field id="fdk:originalDateTime" set="exif" />
-               <field id="fdk:compression" set="exif" />
-               <field id="fdk:xResolution" set="exif" />
-               <field id="fdk:yResolution" set="exif" />
-               <field id="fdk:resolutionUnit" set="exif" />
-               <field id="fdk:flash" set="exif" />
+               <field id="cm:publisher" set="dublin-core" />
+               <field id="cm:contributor" set="dublin-core" />
+               <field id="cm:type" set="dublin-core" />
+               <field id="cm:identifier" set="dublin-core" />
+               <field id="cm:dcsource" set="dublin-core" />
+               <field id="cm:coverage" set="dublin-core" />
+               <field id="cm:rights" set="dublin-core" />
+               <field id="cm:subject" set="dublin-core" />
             </appearance>
          </form>
          

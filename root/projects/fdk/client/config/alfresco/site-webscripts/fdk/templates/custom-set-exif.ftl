@@ -1,4 +1,4 @@
-<#if form.fields["prop_fdk_manufacturer"]??>
+<#if form.fields["prop_exif_flash"]??>
    <#if form.mode == "view">
       <#list set.children as item>
          <#if item.kind != "set">

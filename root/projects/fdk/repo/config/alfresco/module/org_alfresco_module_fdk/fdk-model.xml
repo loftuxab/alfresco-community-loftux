@@ -427,6 +427,10 @@
       </type>
    </types>
    
+   <!-- DEPRECATED -->
+   <!-- The fdk:exif aspect has been replaced with the built-in exif:exif aspect -->
+   <!-- It remains here for backwards compatibility -->
+   
    <aspects>
       <aspect name="fdk:exif">
          <properties>
