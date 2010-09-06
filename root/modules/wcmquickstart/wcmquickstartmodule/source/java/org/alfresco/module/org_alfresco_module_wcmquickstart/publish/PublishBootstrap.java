@@ -88,7 +88,7 @@ public class PublishBootstrap implements ApplicationContextAware,
 			        catch (TransferException e) 
 			        {
 			            transferService.createAndSaveTransferTarget(transferTargetName, transferTargetName, transferTargetName, 
-			                    "https", "internal", 443, null, "notused", "notused".toCharArray());
+			                    "https", "internal", 443, "", "notused", "notused".toCharArray());
 			        }
 			        return transferTargetName;
                 }
