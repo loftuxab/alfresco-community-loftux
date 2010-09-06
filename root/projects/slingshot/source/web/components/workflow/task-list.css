@@ -161,7 +161,28 @@
    text-align: center;
 }
 
-.task-list .tasks .unassigned-task
+
+.task-list .tasks .yui-dt-col-title .yui-dt-liner div
+{
+   float: left;
+   margin-top: 0.5em;
+   min-width: 15em;
+}
+
+.task-list .tasks .yui-dt-col-title .yui-dt-liner div.type
+{
+   clear: both;
+   margin-bottom: 0.5em;
+}
+
+.task-list .tasks .yui-dt-col-title .yui-dt-liner div.unassigned
+{
+   clear: both;
+   margin-top: 0;
+   margin-bottom: 0.5em;
+}
+
+.task-list .tasks .yui-dt-col-title .yui-dt-liner div.unassigned .unassigned-task
 {
    padding: 0.15em 0.4em;
    text-transform: uppercase;

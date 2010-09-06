@@ -134,9 +134,9 @@
                container: this.id + "-tasks",
                columnDefinitions:
                [
-                  { key: "isPooled", sortable: false, formatter: this.proxy(this.renderCellIcons), width: 20 },
-                  { key: "title", sortable: false, formatter: this.proxy(this.renderCellTaskInfo) },
-                  { key: "name", sortable: false, formatter: this.proxy(this.renderCellActions), width: 40 }
+                  { key: "isPooled", sortable: false, formatter: this.bind(this.renderCellIcons), width: 20 },
+                  { key: "title", sortable: false, formatter: this.bind(this.renderCellTaskInfo) },
+                  { key: "name", sortable: false, formatter: this.bind(this.renderCellActions), width: 40 }
                ],
                config:
                {

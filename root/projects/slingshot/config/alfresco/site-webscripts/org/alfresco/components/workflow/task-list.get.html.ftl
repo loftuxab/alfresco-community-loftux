@@ -18,7 +18,8 @@
    new Alfresco.component.TaskList("${el}").setOptions(
    {
       filterParameters: <@filter.jsonParameterFilter filterParameters />,
-      hiddenTaskTypes: <@workflow.jsonHiddenTaskTypes hiddenTaskTypes/>
+      hiddenTaskTypes: <@workflow.jsonHiddenTaskTypes hiddenTaskTypes/>,
+      maxItems: ${args.maxItems!"50"}
    }).setMessages(
       ${messages}
    );

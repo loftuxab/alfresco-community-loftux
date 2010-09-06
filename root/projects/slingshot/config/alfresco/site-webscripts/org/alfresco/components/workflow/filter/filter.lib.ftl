@@ -5,7 +5,7 @@
       <ul class="filterLink">
       <#list filters as filter>
          <#local filterIds>${filterIds}"${filter.id}"<#if filter_has_next>,</#if></#local>
-         <li><span class="${filter.id}"><a class="filter-link" rel="${filter.data?html}" href="#">${msg(filter.label)}</a></span></li>
+         <li><span class="${filter.id}"><a class="filter-link" rel="${filter.data?js_string}" href="#">${msg(filter.label?html)}</a></span></li>
       </#list>
       </ul>
    </div>

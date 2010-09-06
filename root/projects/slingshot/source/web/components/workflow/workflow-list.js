@@ -105,7 +105,16 @@
           * @type Array
           * @default []
           */
-         workflowDefinitions: []
+         workflowDefinitions: [],
+
+         /**
+          * Number of workflows to display at the same time
+          *
+          * @property maxItems
+          * @type int
+          * @default 50
+          */
+         maxItems: 50
       },
 
       /**
@@ -125,9 +134,9 @@
                container: this.id + "-workflows",
                columnDefinitions:
                [
-                  { key: "id", sortable: false, formatter: this.proxy(this.renderCellIcons), width: 40 },
-                  { key: "title", sortable: false, formatter: this.proxy(this.renderCellWorkflowInfo) },
-                  { key: "name", sortable: false, formatter: this.proxy(this.renderCellActions), width: 200 }
+                  { key: "id", sortable: false, formatter: this.bind(this.renderCellIcons), width: 40 },
+                  { key: "title", sortable: false, formatter: this.bind(this.renderCellWorkflowInfo) },
+                  { key: "name", sortable: false, formatter: this.bind(this.renderCellActions), width: 200 }
                ],
                config:
                {
@@ -141,11 +150,11 @@
                {
                   fields: ["id", "name", "title", "message"]
                },
-               initialFilter:
+               defaultFilter:
                {
                   filterId: "all"
                },
-               filterResolver: this.proxy(function(filter)
+               filterResolver: this.bind(function(filter)
                {
                   // Reuse method from WorkflowActions
                   return this.createFilterURLParameters(filter, this.options.filterParameters);
@@ -155,7 +164,8 @@
             {
                config:
                {
-                  containers: [this.id + "-paginator"]
+                  containers: [this.id + "-paginator"],
+                  rowsPerPage: this.options.maxItems
                }
             }
          });
@@ -235,14 +245,18 @@
       renderCellWorkflowInfo: function WL_renderCellWorkflowInfo(elCell, oRecord, oColumn, oData)
       {
          var workflow = oRecord.getData();
-         var message = workflow.message;
+         var message = workflow.message,
+            dueDate = workflow.dueDate ? Alfresco.util.fromISO8601(workflow.dueDate) : null,
+            startedDate = workflow.startDate ? Alfresco.util.fromISO8601(workflow.startDate) : null;
          if (message === null)
          {
             message = this.msg("workflow.no_message");
          }
-         var title = '<h3><a href="workflow-details?workflowId=' + workflow.id + '&myWorkflowsLinkBack=true" class="theme-color-1" title="' + this.msg("link.viewWorkflow") + '">' + $html(message) + '</a></h3>',
-            description = '<div>' + $html(workflow.title) + '</div>';
-         elCell.innerHTML = title + description;
+         var info = '<h3><a href="workflow-details?workflowId=' + workflow.id + '&myWorkflowsLinkBack=true" class="theme-color-1" title="' + this.msg("link.viewWorkflow") + '">' + $html(message) + '</a></h3>';
+         info += '<div class="due"><label>' + this.msg("label.due") + ':</label><span>' + (dueDate ? Alfresco.util.formatDate(dueDate, "longDate") : this.msg("label.none")) + '</span></div>';
+         info += '<div class=started"><label>' + this.msg("label.started") + ':</label><span>' + (startedDate ? Alfresco.util.formatDate(startedDate, "longDate") : this.msg("label.none")) + '</span></div>';
+         info += '<div class="type"><label>' + this.msg("label.type") + '</label><span>' + $html(workflow.title) + '</span></div>';
+         elCell.innerHTML = info;
       },
 
       /**
