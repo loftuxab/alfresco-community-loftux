@@ -19,7 +19,8 @@
    {
       filterParameters: <@filter.jsonParameterFilter filterParameters />,
       hiddenWorkflowNames: <@workflow.jsonHiddenTaskTypes hiddenWorkflowNames/>,
-      workflowDefinitions: <@workflow.jsonWorkflowDefinitions workflowDefinitions/>
+      workflowDefinitions: <@workflow.jsonWorkflowDefinitions workflowDefinitions/>,
+      maxItems: ${args.maxItems!"50"}
    }).setMessages(
       ${messages}
    );

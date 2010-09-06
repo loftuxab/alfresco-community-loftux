@@ -71,6 +71,13 @@ hr
    background-color: #E4E4E4;
 }
 
+label,
+.share-form .viewmode-label
+{
+   color: #606060;
+   margin-right: 0.4em;
+}
+
 .label
 {
    font-weight: bold;

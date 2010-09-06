@@ -161,6 +161,18 @@
    text-align: center;
 }
 
+.workflow-list .workflows .yui-dt-col-title .yui-dt-liner div
+{
+   float: left;
+   margin-top: 0.5em;
+   min-width: 15em;
+}
+
+.workflow-list .workflows .yui-dt-col-title .yui-dt-liner div.type
+{
+   clear: both;
+   margin-bottom: 0.5em;
+}
 
 .workflow-list .workflow-cancel-link,
 .workflow-list .workflow-view-link

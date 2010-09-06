@@ -60,7 +60,7 @@
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: this.msg("workflow.cancel.title"),
-            text: this.msg("workflow.cancel.label", $html(workflowTitle)),
+            text: this.msg("workflow.cancel.label", workflowTitle),
             noEscape: true,
             buttons: [
                {

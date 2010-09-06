@@ -17,7 +17,7 @@
       <select id="${el}-workflowDefinitions" tabindex="0">
          <option>${msg("option.selectWorkflow")}</option>
          <#list workflowDefinitions as workflowDefinition>
-         <option value="${workflowDefinition.name}">${workflowDefinition.title?html}</option>
+         <option value="${workflowDefinition.name?js_string}">${workflowDefinition.title?html}</option>
          </#list>
       </select>
    </div>

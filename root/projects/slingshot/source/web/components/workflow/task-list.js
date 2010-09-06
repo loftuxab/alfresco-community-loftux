@@ -95,7 +95,16 @@
           * @type Array
           * @default []
           */
-         filterParameters: []
+         filterParameters: [],
+
+         /**
+          * Number of tasks to display at the same time
+          *
+          * @property maxItems
+          * @type int
+          * @default 50
+          */
+         maxItems: 50
       },
 
       /**
@@ -116,9 +125,9 @@
                container: this.id + "-tasks",
                columnDefinitions:
                [
-                  { key: "id", sortable: false, formatter: this.proxy(this.renderCellIcons), width: 40 },
-                  { key: "title", sortable: false, formatter: this.proxy(this.renderCellTaskInfo) },
-                  { key: "name", sortable: false, formatter: this.proxy(this.renderCellActions), width: 200 }
+                  { key: "id", sortable: false, formatter: this.bind(this.renderCellIcons), width: 40 },
+                  { key: "title", sortable: false, formatter: this.bind(this.renderCellTaskInfo) },
+                  { key: "name", sortable: false, formatter: this.bind(this.renderCellActions), width: 200 }
                ],
                config:
                {
@@ -132,11 +141,11 @@
                {
                   fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable", "workflowInstance"]
                },
-               initialFilter:
+               defaultFilter:
                {
                   filterId: "all" 
                },
-               filterResolver: this.proxy(function(filter)
+               filterResolver: this.bind(function(filter)
                {
                   // Reuse method form WorkflowActions
                   return this.createFilterURLParameters(filter, this.options.filterParameters);
@@ -147,7 +156,7 @@
                config:
                {
                   containers: [this.id + "-paginator"],
-                  rowsPerPage: 50
+                  rowsPerPage: this.options.maxItems
                }
             }
          });
@@ -205,12 +214,11 @@
       renderCellTaskInfo: function TL_renderCellTaskInfo(elCell, oRecord, oColumn, oData)
       {
          var taskId = oRecord.getData("id"),
-               message = oRecord.getData("properties")["bpm_description"],
+               message = $html(oRecord.getData("properties")["bpm_description"]),
                dueDateStr = oRecord.getData("properties")["bpm_dueDate"],
                dueDate = dueDateStr ? Alfresco.util.fromISO8601(dueDateStr) : null,
-               today = new Date(),
-               type = oRecord.getData("title"),
-               status = oRecord.getData("properties")["bpm_status"],
+               type = $html(oRecord.getData("title")),
+               status = $html(oRecord.getData("properties")["bpm_status"]),
                assignee = oRecord.getData("owner");
                
          // if message is the same as the task type show the <no message> label
@@ -219,15 +227,15 @@
             message = this.msg("workflow.no_message");
          }
                
-         var messageDesc = '<h3><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h3>',
-               dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '">' + Alfresco.util.formatDate(dueDate, "longDate") + '</span></h4>' : "",
-               statusDesc = '<div>' + this.msg("label.taskSummary", type, status) + '</div>',
-               unassignedDesc = '';
+         var info = '<h3><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h3>';
+         info += '<div class="due"><label>' + this.msg("label.due") + ':</label><span>' + (dueDate ? Alfresco.util.formatDate(dueDate, "longDate") : this.msg("label.none")) + '</span></div>';
+         info += '<div class="status"><label>' + this.msg("label.status") + ':</label><span>' + status + '</span></div>';
+         info += '<div class="type"><label>' + this.msg("label.type", type) + ':</label><span>' + type + '</span></div>';
          if (!assignee || !assignee.userName)
          {
-            unassignedDesc = '<span class="theme-bg-color-5 theme-color-5 unassigned-task">' + this.msg("label.unassignedTask") + '</span>';
+            info += '<div class="unassigned"><span class="theme-bg-color-5 theme-color-5 unassigned-task">' + this.msg("label.unassignedTask") + '</span></div>';
          }
-         elCell.innerHTML = messageDesc + dateDesc + statusDesc + unassignedDesc;
+         elCell.innerHTML = info;
       },
 
       /**
