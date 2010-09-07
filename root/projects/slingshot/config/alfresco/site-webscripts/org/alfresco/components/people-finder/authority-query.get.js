@@ -1,3 +1,9 @@
+var MAPPING_TYPE =
+{
+   API: 0,
+   STATIC: 1
+};
+
 var mapUser = function(data)
 {
    return (
@@ -31,15 +37,16 @@ var mapGroup = function(data)
    });
 };
 
-var getApiMappings = function()
+var getMappings = function()
 {
-   var apiMappings = [],
+   var mappings = [],
       authorityType = args.authorityType === null ? "all" : String(args.authorityType).toLowerCase();
    
    if (authorityType === "all" || authorityType == "user")
    {
-      apiMappings.push(
+      mappings.push(
       {
+         type: MAPPING_TYPE.API,
          url: "/api/people?filter=" + encodeURIComponent(args.filter),
          rootObject: "people",
          fn: mapUser
@@ -54,33 +61,58 @@ var getApiMappings = function()
          url += "&zone=" + encodeURIComponent(args.zone === null ? "APP.DEFAULT" : args.zone);
       }
       
-      apiMappings.push(
+      mappings.push(
       {
+         type: MAPPING_TYPE.API,
          url: url,
          rootObject: "data",
          fn: mapGroup
       });
+
+      mappings.push(
+      {
+         type: MAPPING_TYPE.STATIC,
+         data: [
+            {
+               shortName: "EVERYONE",
+               fullName: "GROUP_EVERYONE",
+               displayName: msg.get("group.everyone"),
+               description: "GROUP_EVERYONE"
+            }
+         ],
+         fn: mapGroup
+      });
    }
-   return apiMappings;
+   return mappings;
 };
 
 function main()
 {
-   var apiMappings = getApiMappings(),
+   var mappings = getMappings(),
       connector = remote.connect("alfresco"),
       authorities = [],
-      api, result, data;
+      mapping, result, data, i, ii, j, jj;
    
-   for (var i = 0; i < apiMappings.length; i++)
+   for (i = 0, ii = mappings.length; i < ii; i++)
    {
-      api = apiMappings[i];
-      result = connector.get(api.url);
-      if (result.status == 200)
+      mapping = mappings[i];
+      if (mapping.type == MAPPING_TYPE.API)
       {
-         data = eval('(' + result + ')');
-         for (var j = 0; j < data[api.rootObject].length; j++)
+         result = connector.get(mapping.url);
+         if (result.status == 200)
          {
-            authorities.push(api.fn.call(this, data[api.rootObject][j]));
+            data = eval('(' + result + ')');
+            for (j = 0, jj = data[mapping.rootObject].length; j < jj; j++)
+            {
+               authorities.push(mapping.fn.call(this, data[mapping.rootObject][j]));
+            }
+         }
+      }
+      else if (mapping.type == MAPPING_TYPE.STATIC)
+      {
+         for (j = 0, jj = mapping.data.length; j < jj; j++)
+         {
+            authorities.push(mapping.fn.call(this, mapping.data[j]));
          }
       }
    }
