@@ -3,14 +3,14 @@
    display: inline;
    float: left;
    text-align: right;
-   width: 8em;
+   width: 11em;
    margin-right: 1em;
    margin-top: 0.4em;
 }
 
 .form-container .exif .date-format
 {
-   margin-left: 13.2em;
+   margin-left: 17.2em;
 }
 
 .form-container .exif .help-text

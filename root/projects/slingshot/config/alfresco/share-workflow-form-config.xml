@@ -217,7 +217,7 @@
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.set.task.info" />
-               <set id="info" appearance="" template="/org/alfresco/components/form/3-column-set.ftl" />
+               <set id="info" appearance="whitespace" template="/org/alfresco/components/form/3-column-set.ftl" />
                <set id="progress" appearance="title" label-id="workflow.set.task.progress" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                <set id="response" appearance="title" label-id="workflow.set.response" />
@@ -259,7 +259,7 @@
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.set.task.info" />
-               <set id="info" appearance="" template="/org/alfresco/components/form/3-column-set.ftl" />
+               <set id="info" appearance="whitespace" template="/org/alfresco/components/form/3-column-set.ftl" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                <set id="response" appearance="title" label-id="workflow.set.response" />
                
@@ -300,7 +300,7 @@
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.set.task.info" />
-               <set id="info" appearance="" template="/org/alfresco/components/form/3-column-set.ftl" />
+               <set id="info" appearance="whitespace" template="/org/alfresco/components/form/3-column-set.ftl" />
                <set id="progress" appearance="title" label-id="workflow.set.task.progress" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                <set id="response" appearance="title" label-id="workflow.set.response" />
@@ -342,7 +342,7 @@
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.set.task.info" />
-               <set id="info" appearance="" template="/org/alfresco/components/form/3-column-set.ftl" />
+               <set id="info" appearance="whitespace" template="/org/alfresco/components/form/3-column-set.ftl" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                <set id="response" appearance="title" label-id="workflow.set.response" />
                
@@ -382,7 +382,7 @@
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.set.task.info" />
-               <set id="info" appearance="" template="/org/alfresco/components/form/3-column-set.ftl" />
+               <set id="info" appearance="whitespace" template="/org/alfresco/components/form/3-column-set.ftl" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                <set id="response" appearance="title" label-id="workflow.set.response" />
                
