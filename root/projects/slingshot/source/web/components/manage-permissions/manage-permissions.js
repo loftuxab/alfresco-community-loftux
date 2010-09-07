@@ -264,7 +264,7 @@
             // Set the correct options for our use
             this.modules.authorityFinder.setOptions(
             {
-               dataWebScript: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/authority-query?zone=all",
+               dataWebScript: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/authority-query",
                viewMode: Alfresco.AuthorityFinder.VIEW_MODE_COMPACT,
                singleSelectMode: true,
                minSearchTermLength: 3
@@ -322,8 +322,8 @@
             isInherited: data.isInherited,
             canReadInherited: data.canReadInherited,
             inherited: data.inherited,
-            original: data.direct,
-            current: data.direct
+            original: Alfresco.util.deepCopy(data.direct),
+            current: Alfresco.util.deepCopy(data.direct)
          };
          
          // Does the user have permissions to read the parent node's permissions?
