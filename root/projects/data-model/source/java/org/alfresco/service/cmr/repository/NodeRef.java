@@ -216,15 +216,24 @@ public final class NodeRef implements EntityRef, Serializable
      */
     public static class Status
     {
+        private final NodeRef nodeRef;
         private final String changeTxnId;
         private final Long dbTxnId;
         private final boolean deleted;
         
-        public Status(String changeTxnId, Long dbTxnId, boolean deleted)
+        public Status(NodeRef nodeRef, String changeTxnId, Long dbTxnId, boolean deleted)
         {
+            this.nodeRef = nodeRef;
             this.changeTxnId = changeTxnId;
             this.dbTxnId = dbTxnId;
             this.deleted = deleted;
+        }
+        /**
+         * @return Returns the NodeRef that to which this status applies
+         */
+        public NodeRef getNodeRef()
+        {
+            return nodeRef;
         }
         /**
          * @return Returns the ID of the last transaction to change the node
@@ -255,12 +264,9 @@ public final class NodeRef implements EntityRef, Serializable
             StringBuilder sb = new StringBuilder(50);
             
             sb.append("Status[")
-              .append("changeTxnId=")
-              .append(changeTxnId)
-              .append(", dbTxnId=")
-              .append(dbTxnId)
-              .append(", deleted=")
-              .append(deleted)
+              .append("changeTxnId=").append(changeTxnId)
+              .append(", dbTxnId=").append(dbTxnId)
+              .append(", deleted=").append(deleted)
               .append("]");
             
             return sb.toString();
