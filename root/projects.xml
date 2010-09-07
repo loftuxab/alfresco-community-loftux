@@ -2585,7 +2585,7 @@
 	<target name="build-wcmquickstartwebapp-war"
 	        depends="init">		
 		<artifact:mvn pom="${dir.wcmquickstart.webapp}/pom.xml"
-		              mavenHome="${home.maven}">
+		              mavenHome="${home.maven}" fork="true">
 			<arg value="install"/>
 			<arg value="-DskipTests=true"/>
 		</artifact:mvn>		

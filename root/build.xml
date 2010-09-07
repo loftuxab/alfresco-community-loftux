@@ -297,11 +297,9 @@
                     package-fb-doclib-extension,
                     package-googlegadgets,
                     package-truncatemalformedxml-extension" >
-                    <!-- package-rm-extension, -->
-      <copy todir="${dir.continuous.dist}">
+       <copy todir="${dir.continuous.dist}">
          <fileset dir="${dir.module.php.dist}"                  includes="${file.name.amp.php}" />
          <fileset dir="${dir.module.mediawiki.dist}"            includes="${file.name.amp.mediawiki}" />
-<!--         <fileset dir="${dir.module.rm.dist}"                   includes="${file.name.amp.rm}" /> -->
          <fileset dir="${dir.module.truncatemalformedxml.dist}" includes="${file.name.amp.truncatemalformedxml}" />
          <fileset dir="${dir.module.fb.doclib.dist}"            includes="${file.name.amp.fb.doclib}" />
          <fileset dir="${dir.module.gg.dist}"                   includes="${file.name.zip.gg}" />
@@ -315,8 +313,8 @@
                     package-dod5015-share-extension, 
                     package-wcmquickstart-extension,
                     package-wcmquickstart-share-extension, 
+                    build-wcmquickstartwebapp-war,
                     package-quickr-extension" >
-                    <!-- package-rm-extension, -->
 
 	  <!-- Copy AMPs to assembly area for installer -->
       <copy todir="${dir.continuous.assemble}/amps">
@@ -327,6 +325,8 @@
          <fileset dir="${dir.module.wcmquickstart.dist}"              includes="${file.name.amp.wcmquickstart}" />
          <fileset dir="${dir.module.wcmquickstart-share.dist}"        includes="${file.name.amp.wcmquickstart-share}" />
       </copy>
+      
+      <copy todir="${dir.continuous.assemble}" file="${dir.wcmquickstart.webapp}/target/${file.name.wcmquickstart-war}" />
 
       <!-- Zip bundles of AMPs -->
       <zip destfile="${dir.continuous.dist}/${file.name.dist.dod5015}.zip">

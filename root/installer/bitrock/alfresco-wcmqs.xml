@@ -1,0 +1,50 @@
+<component>
+    <name>alfrescowcmqs</name>
+    <description>WCM Quick Start</description>
+    <detailedDescription>Include Web Content Management Quick Start.</detailedDescription>
+    <canBeEdited>1</canBeEdited>
+    <selected>1</selected>
+    <show>1</show>
+
+    <parameterList>
+    </parameterList>
+  
+    <folderList>
+        <folder>
+            <description>Program Files</description>
+            <destination>${alfresco_amps_directory}</destination>
+            <name>wcmqs</name>
+            <platforms>all</platforms>
+            <distributionFileList>
+              <distributionFile origin="${alfresco_wcmqs_source_file}" allowWildcards="1" />
+            </distributionFileList>
+            <actionList>
+                <setInstallerVariable name="alfresco_apply_amps" value="1" />
+            </actionList>
+        </folder>
+        <folder>
+            <description>Program Files</description>
+            <destination>${alfresco_amps_share_directory}</destination>
+            <name>wcmqsshare</name>
+            <platforms>all</platforms>
+            <distributionFileList>
+              <distributionFile origin="${alfresco_wcmqs_share_source_file}" allowWildcards="1" />
+            </distributionFileList>
+            <actionList>
+                <setInstallerVariable name="alfresco_apply_amps_share" value="1" />
+            </actionList>
+        </folder>
+        <folder>
+            <description>War files</description>
+            <name>warfiles</name>
+            <destination>${installdiralfresco}</destination>
+            <distributionFileList>
+                <distributionFile origin="${alfresco_wcmqs_war_source_file}" allowWildcards="1" />
+                <distributionFile origin="${alfresco_awe_war_source_file}" allowWildcards="1" />
+            </distributionFileList>
+        </folder>
+    </folderList>
+</component>
+
+
+
