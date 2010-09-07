@@ -1657,7 +1657,7 @@
            depends="init">
 
       <echo>Merging selected Slingshot Javascript files...</echo>
-      <concat destfile="${dir.project.slingshot.assemble}/js/yui-common.js">
+      <concat destfile="${dir.project.slingshot.assemble}/js/yui-common.js" force="no">
          <fileset file="${dir.project.slingshot.assemble}/yui/utilities/utilities.js" />
          <fileset file="${dir.project.slingshot.assemble}/yui/button/button-min.js" />
          <fileset file="${dir.project.slingshot.assemble}/yui/container/container-min.js" />
@@ -1667,7 +1667,7 @@
          <fileset file="${dir.project.slingshot.src.web}/yui/yui-patch.js" />
       </concat>
 
-      <concat destfile="${dir.project.slingshot.assemble}/js/documentlibrary-actions.js">
+      <concat destfile="${dir.project.slingshot.assemble}/js/documentlibrary-actions.js" force="no">
          <fileset file="${dir.project.slingshot.src.web}/components/documentlibrary/actions.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/global-folder.js" />
@@ -1677,7 +1677,7 @@
          <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/aspects.js" />
       </concat>
 
-      <concat destfile="${dir.project.slingshot.assemble}/js/datalist-actions.js">
+      <concat destfile="${dir.project.slingshot.assemble}/js/datalist-actions.js" force="no">
          <fileset file="${dir.project.slingshot.src.web}/components/data-lists/actions.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
       </concat>
