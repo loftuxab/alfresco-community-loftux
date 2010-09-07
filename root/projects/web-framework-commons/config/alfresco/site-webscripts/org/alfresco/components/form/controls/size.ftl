@@ -21,6 +21,6 @@
 <script type="text/javascript">//<![CDATA[
 YAHOO.util.Event.onContentReady("${fieldHtmlId}", function ()
 {
-   YAHOO.util.Dom.get("${fieldHtmlId}").innerHTML = Alfresco.util.formatFileSize(${size?c});
+   YAHOO.util.Dom.get("${fieldHtmlId}").innerHTML = <#if size?is_number>Alfresco.util.formatFileSize(${size?c})<#else>"${msg("form.control.novalue")}"</#if>;
 }, this);
 //]]></script>
