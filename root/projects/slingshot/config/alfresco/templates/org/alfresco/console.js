@@ -18,9 +18,10 @@ if (family != null)
    // be output by the component template for each tool required
    for (var i = 0; i < tools.length; i++)
    {
-      var tool = tools[i];
-      var id = tool.id;
-      var scriptName = id.substring(id.lastIndexOf('/') + 1, id.lastIndexOf('.'));
+      var tool = tools[i],
+         id = tool.id,
+         scriptName = id.substring(id.lastIndexOf('/') + 1, id.lastIndexOf('.')),
+         toolUrl = (new String(tool.getURIs()[0])).toString();
       
       // handle the case when no tool selection in the URL - select the first
       if (currentToolId.length == 0)
@@ -36,7 +37,7 @@ if (family != null)
       toolInfo[i] =
       {
          id: scriptName,
-         url: new String(tool.getURIs()[0]),
+         url: toolUrl,
          label: labelId,
          description: descId,
          selected: (currentToolId == scriptName)
@@ -50,8 +51,12 @@ if (family != null)
             // first ever visit to the page - there is no component binding yet
             component = sitedata.newComponent("page", "tool", family);
          }
-         component.properties.url = toolInfo[i].url.toString();
-         component.save();
+
+         if (component.properties.url != toolUrl)
+         {
+            component.properties.url = toolUrl;
+            component.save();
+         }
       }
    }
 }
