@@ -30,7 +30,9 @@
       <property name="order" value="0" />
       
       <property name="defaultHandler">
-         <bean class="org.springframework.extensions.surf.mvc.UrlViewController" />
+         <bean class="org.springframework.extensions.surf.mvc.UrlViewController">
+            <property name="urlPathHelper" ref="urlPathHelper" />
+         </bean>
       </property>
    </bean>
 
