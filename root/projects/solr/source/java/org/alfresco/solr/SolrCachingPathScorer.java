@@ -99,16 +99,16 @@ public class SolrCachingPathScorer extends Scorer
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean skipTo(int position) throws IOException
+    public boolean skipTo(int target) throws IOException
     {
-        while(position > doc())
+        while(next())
         {
-            if(!next())
+            if(doc() >= target)
             {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     @Override

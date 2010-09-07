@@ -216,7 +216,7 @@ public class SolrContainerScorer extends Scorer
 
     private boolean check(int start, int end) throws IOException
     {
-        int offset = checkTail(start, end, 0, 0);
+        int offset = checkTail(start, end, 0, 0, true);
         // Last match may fail
         if (offset == -1)
         {
@@ -232,15 +232,31 @@ public class SolrContainerScorer extends Scorer
      * For // type pattern matches we need to test patterns of variable greedyness.
      *
      * 
-     * @param start
-     * @param end
-     * @param currentPosition
-     * @param currentOffset
+     * @param start - first term position
+     * @param end - end term position marker
+     * @param currentPosition - current path match index
+     * @param currentOffset - current path position starting at zero (position being considered is start+offset)  
      * @return
      * @throws IOException
      */
-    private int checkTail(int start, int end, int currentPosition, int currentOffset) throws IOException
+    private int checkTail(int start, int end, int currentPosition, int currentOffset, boolean checkLastMatch) throws IOException
     {
+        // pre check last can match some combintaion or we are done
+        if(checkLastMatch)
+        {
+            if(end-start > 1)
+            {
+                StructuredFieldPosition last = getLastPositionNotSelfCheck();
+                if(last != null)
+                {
+                    if(last.matches(start, end, end-start-2) == -1)
+                    {
+                        return -1;
+                    }
+                }
+            }
+        }
+        
         int offset = currentOffset;
         for (int i = currentPosition, l = positions.length; i < l; i++)
         {
@@ -251,9 +267,10 @@ public class SolrContainerScorer extends Scorer
             }
             if (positions[i].isDescendant())
             {
-                for (int j = offset; j < end; j++)
+                // go up in twos as there are two parts to a QName
+                for (int j = offset; j < (end - start); j+=2)
                 {
-                    int newOffset = checkTail(start, end, i + 1, j);
+                    int newOffset = checkTail(start, end, i + 1, j, false);
                     if (newOffset != -1)
                     {
                         return newOffset;
@@ -273,6 +290,19 @@ public class SolrContainerScorer extends Scorer
         }
     }
 
+    private StructuredFieldPosition getLastPositionNotSelfCheck()
+    {
+        for(int i = positions.length-1; i >= 0; i--)
+        {
+            if(positions[i].linkSelf())
+            {
+                continue;
+            }
+            return positions[i];
+        }
+        return null;
+    }
+    
     /*
      * Move to the next position to consider for a match test
      */
