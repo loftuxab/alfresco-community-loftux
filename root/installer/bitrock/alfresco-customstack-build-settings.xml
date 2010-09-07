@@ -57,6 +57,8 @@
         <setInstallerVariable name="alfresco_rm_share_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-dod5015-share-${project.version}.amp" />
         <setInstallerVariable name="alfresco_wcmqs_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-wcmqs-${project.version}.amp" />
         <setInstallerVariable name="alfresco_wcmqs_share_source_file" value="${alfresco_amps_source_directory}/${alfresco_edition}-wcmqs-share-${project.version}.amp" />
+        <setInstallerVariable name="alfresco_wcmqs_war_source_file" value="${alfresco_svn_rootdir.unix}/build/assemble/wcmqs.war" />
+        <setInstallerVariable name="alfresco_awe_war_source_file" value="${alfresco_svn_rootdir.unix}/build/assemble/awe.war" />
         <!-- END ALFRESCO BUILD SYSTEM-->
         </actionList>
         <ruleList>

@@ -1493,6 +1493,7 @@
                      includes="spring-webeditor-*.jar" />
          <zipfileset file="${file.jar.webeditor.yui}" />
       </zip>
+      <copy todir="${dir.continuous.assemble}" file="${dir.project.webeditor.dist}/${file.name.war.webeditor}" />
    </target>
    
    <!-- ***************** -->

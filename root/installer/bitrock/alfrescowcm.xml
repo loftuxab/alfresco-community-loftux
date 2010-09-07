@@ -1,7 +1,7 @@
 <component>
     <name>alfrescowcm</name>
-    <description>Alfresco WCM</description>
-    <detailedDescription>Alfresco Web Content Management for managing web site content.</detailedDescription>
+    <description>Web Project Management (AVM)</description>
+    <detailedDescription>Alfresco AVM Web Project Management for managing web site content.</detailedDescription>
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>1</show>
