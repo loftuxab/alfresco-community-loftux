@@ -91,8 +91,8 @@
             <ref bean="schedulerFactory" />
         </property>
         <property name="cronExpression">
-            <!-- The default is to check every 2 minutes. May well want to reduce the frequency on a production box. -->
-            <value>0 0/2 * * * ?</value>
+            <!-- The default is to check every minute. May well want to reduce the frequency on a production box. -->
+            <value>0 0/1 * * * ?</value>
         </property>
     </bean>
 
