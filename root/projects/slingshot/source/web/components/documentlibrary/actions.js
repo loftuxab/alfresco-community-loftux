@@ -771,10 +771,10 @@
          var nodeRef = asset.nodeRef,
             type = asset.type,
             repoId = asset.location.repositoryId,
-            url = this.options.replicationUrlMapping[repoId],
+            urlMapping = this.options.replicationUrlMapping,
             siteUrl;
          
-         if (!repoId || !url)
+         if (!repoId || !urlMapping || !urlMapping[repoId])
          {
             return "#";
          }
@@ -784,7 +784,7 @@
          // Strip off this webapp's context as the mapped one might be different
          siteUrl = siteUrl.substring(Alfresco.constants.URL_CONTEXT.length);
          
-         return $combine(url, "/", siteUrl);
+         return $combine(urlMapping[repoId], "/", siteUrl);
       }
    };
 })();

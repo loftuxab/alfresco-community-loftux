@@ -175,12 +175,10 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
 	            else
 	            {
 	            	// Make sure we cast the created doc lib to the correct type
-	                
-//	                BJR:20100901:This is causing problems at the moment due to issues with changes on HEAD.
-//	            	if (WebSiteModel.TYPE_WEBSITE_CONTAINER.equals(nodeService.getType(docLib)) == false)
-//	            	{
-//	            		nodeService.setType(docLib, WebSiteModel.TYPE_WEBSITE_CONTAINER);
-//	            	}
+	            	if (WebSiteModel.TYPE_WEBSITE_CONTAINER.equals(nodeService.getType(docLib)) == false)
+	            	{
+	            		nodeService.setType(docLib, WebSiteModel.TYPE_WEBSITE_CONTAINER);
+	            	}
 	            }
 	        	
 		        // Log
