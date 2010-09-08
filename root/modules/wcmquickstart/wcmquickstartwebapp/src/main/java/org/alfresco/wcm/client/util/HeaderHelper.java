@@ -28,16 +28,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.wcm.client.Asset;
-import org.alfresco.wcm.client.Resource;
 
 public abstract class HeaderHelper 
 {
-	private static final long EXPIRES = 300000L; // 5 mins in ms
-	
-    private static ThreadLocal<SimpleDateFormat> httpDateFormat = new ThreadLocal<SimpleDateFormat>() {};  	     
+    private ThreadLocal<SimpleDateFormat> httpDateFormat = new ThreadLocal<SimpleDateFormat>() 
+    {
+        @Override
+        protected SimpleDateFormat initialValue()
+        {
+            return new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        }
+    };  	     
 
     /**
-     * Set date headers on the response for an asset and return true if it should be rendered
+     * This base implementation simply returns true to indicate that the request should be re-rendered.
+     * Override in a subclass as necessary
      * @param asset
      * @param request
      * @param response
@@ -45,55 +50,17 @@ public abstract class HeaderHelper
      * @throws IOException 
      * @throws ParseException 
      */
-	public static boolean setHeaders(Asset asset, HttpServletRequest request, HttpServletResponse response) 
+	public boolean setHeaders(Asset asset, HttpServletRequest request, HttpServletResponse response) 
 	{
-		try {
-	        // Set headers
-	        Date modifiedDate = ((Date) asset.getProperty(Resource.PROPERTY_MODIFIED_TIME));
-	        long modifiedTime = modifiedDate.getTime();
-	        modifiedTime = (modifiedTime / 1000) * 1000; // remove ms
-	        response.addDateHeader("Last-Modified", modifiedTime);
-	        response.addDateHeader("Expires", new Date().getTime() + EXPIRES); 
-	        String etag = Long.toHexString(modifiedTime);
-	        response.addHeader("ETag", etag);
-	        
-	        // Check if the asset has been changed since the last request
-	        String requestIfNoneMatch = request.getHeader("If-None-Match");
-	        if (requestIfNoneMatch != null)
-	        {
-	            if (etag.equals(requestIfNoneMatch))
-	            {
-	                response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-	                return false;
-	            }
-	        } 
-	        else
-	        {
-	            String requestIfModifiedSince = request.getHeader("If-Modified-Since");
-	            if (requestIfModifiedSince != null)
-	            {
-	                Date requestDate = getDateFromHttpDate(requestIfModifiedSince);
-	                if (requestDate.getTime() >= modifiedTime)
-	                {
-	                    response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-	                    return false;
-	                }
-	            }
-	        }
-	        return true;
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+	    return true;
 	}
 	
-    public static String getHttpDate(Date date)
+    public final String getHttpDate(Date date)
     {
         return dateFormatter().format(date);
     }
 
-    public static Date getDateFromHttpDate(String date) throws ParseException
+    public final Date getDateFromHttpDate(String date) throws ParseException
     {
         return dateFormatter().parse(date);
     }
@@ -102,14 +69,8 @@ public abstract class HeaderHelper
      * Get a date formatter for the thread as SimpleDateFormat is not thread-safe
      * @return
      */
-    public static SimpleDateFormat dateFormatter() 
+    public final SimpleDateFormat dateFormatter() 
     {
-    	SimpleDateFormat formatter = httpDateFormat.get();
-    	if (formatter == null)
-    	{
-    		formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-    		httpDateFormat.set(formatter);
-    	}
-    	return formatter;
+    	return httpDateFormat.get();
     }	
 }

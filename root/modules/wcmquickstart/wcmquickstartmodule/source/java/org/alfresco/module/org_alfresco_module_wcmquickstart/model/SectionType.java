@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.contextparser.ContextParserService;
@@ -46,6 +47,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.lang.ArrayUtils;
@@ -56,6 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * ws:section type behaviours.
  * 
  * @author Roy Wetherall
+ * @author Brian Remmington
  */
 public class SectionType extends TransactionListenerAdapter implements WebSiteModel
 {
@@ -95,6 +98,7 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     private RenditionService renditionService;
     
     private ContextParserService contextParserService;
+    private NamespaceService namespaceService;
     
     /** Mimetype map */
     private MimetypeMap mimetypeMap;;
@@ -104,6 +108,8 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
 
     /** The section's collection folder name */
     private String sectionCollectionsFolderName = "collections";
+    
+    private Set<String> typesToIgnore = new TreeSet<String>();
 
     /**
      * Set the policy component
@@ -178,6 +184,11 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
 	    this.renditionService = renditionService;
     }
     
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
+    }
+
     /**
      * Set the mimetype map
      * @param mimetypeMap	mimetype map
@@ -215,6 +226,18 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     public void setContextParserService(ContextParserService contextParserService)
     {
 	    this.contextParserService = contextParserService;
+    }
+
+    /**
+     * When a new content node is added into a section, behaviours configured by this class 
+     * normally cause it to be specialised to either an article or an image.
+     * If you have types for which you don't want this to happen, supply their names as prefixed qualified
+     * names ("ws:indexPage", for instance) to this method.
+     * @param typesToIgnore
+     */
+    public void setTypesToIgnore(Set<String> typesToIgnore)
+    {
+        this.typesToIgnore = typesToIgnore;
     }
 
     /**
@@ -261,6 +284,11 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      */
     public void onCreateChildAssociationEveryEvent(ChildAssociationRef childAssoc, boolean isNewNode)
     {
+        if (log.isDebugEnabled())
+        {
+            log.debug("onCreateChildAssociationEveryEvent: parent == " + childAssoc.getParentRef() + 
+                    "; child == " + childAssoc.getChildRef() + "; newNode == " + isNewNode);
+        }
         NodeRef childNode = childAssoc.getChildRef();
         QName childNodeType = nodeService.getType(childNode);
         if (ContentModel.TYPE_FOLDER.equals(childNodeType))
@@ -309,6 +337,11 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      */
     private void recordAffectedChild(ChildAssociationRef childAssoc)
     {
+        if (log.isDebugEnabled())
+        {
+            log.debug("Recording affected child of section " + 
+                    childAssoc.getParentRef() + ":  " + childAssoc.getChildRef());
+        }
         NodeRef nodeRef = childAssoc.getChildRef();
         @SuppressWarnings("unchecked")
         Set<NodeRef> affectedNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport
@@ -332,11 +365,15 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                 .getResource(AFFECTED_WEB_ASSETS);
         if (affectedNodeRefs != null && affectedNodeRefs.remove(childNode))
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug("Processing commit of section child:  " + childNode);
+            }
             if (nodeService.exists(childNode))
             {
                 QName childNodeType = nodeService.getType(childNode);
-                if (dictionaryService.isSubClass(childNodeType, ContentModel.TYPE_CONTENT) == true
-                        && TYPE_VISITOR_FEEDBACK.equals(childNodeType) == false)
+                if (dictionaryService.isSubClass(childNodeType, ContentModel.TYPE_CONTENT)
+                        && !typesToIgnore.contains(childNodeType.toPrefixString(namespaceService)))
                 {
                     // Check to see if this is an image
                     ContentReader reader = contentService.getReader(childNode, ContentModel.PROP_CONTENT);
@@ -374,40 +411,47 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                             	}
               
                             }
-
-                        	// Apply the web asset aspect
-                            nodeService.addAspect(childNode, ASPECT_WEBASSET, null);
                         }
                     }
+                    // Apply the web asset aspect
+                    nodeService.addAspect(childNode, ASPECT_WEBASSET, null);
                 }
 
-                List<ChildAssociationRef> parentAssocs = nodeService
-                        .getParentAssocs(childNode, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
-                ArrayList<NodeRef> parentSections = new ArrayList<NodeRef>(
-                        parentAssocs.size());
-                for (ChildAssociationRef assoc : parentAssocs)
+                if (nodeService.hasAspect(childNode, ASPECT_WEBASSET))
                 {
-                    NodeRef parentNode = assoc.getParentRef();
-                    if (dictionaryService.isSubClass(nodeService
-                            .getType(parentNode), WebSiteModel.TYPE_SECTION))
+                    List<ChildAssociationRef> parentAssocs = nodeService
+                            .getParentAssocs(childNode, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+                    ArrayList<NodeRef> parentSections = new ArrayList<NodeRef>(
+                            parentAssocs.size());
+                    for (ChildAssociationRef assoc : parentAssocs)
                     {
-                        parentSections.add(parentNode);
+                        NodeRef parentNode = assoc.getParentRef();
+                        if (dictionaryService.isSubClass(nodeService
+                                .getType(parentNode), WebSiteModel.TYPE_SECTION))
+                        {
+                            parentSections.add(parentNode);
+                        }
                     }
-                }
-                
-                try
-                {
-                    behaviourFilter.disableBehaviour(childNode, ASPECT_WEBASSET);
-                    behaviourFilter.disableBehaviour(childNode,
-                            ContentModel.ASPECT_AUDITABLE);
-                    nodeService.setProperty(childNode, PROP_PARENT_SECTIONS,
-                            parentSections);
-                } 
-                finally
-                {
-                    behaviourFilter.enableBehaviour(childNode,
-                            ContentModel.ASPECT_AUDITABLE);
-                    behaviourFilter.enableBehaviour(childNode, ASPECT_WEBASSET);
+                    
+                    try
+                    {
+                        behaviourFilter.disableBehaviour(childNode, ASPECT_WEBASSET);
+                        behaviourFilter.disableBehaviour(childNode,
+                                ContentModel.ASPECT_AUDITABLE);
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Section child is a web asset (" + childNode + 
+                                    "). Setting parent section ids:  " + parentSections);
+                        }
+                        nodeService.setProperty(childNode, PROP_PARENT_SECTIONS,
+                                parentSections);
+                    } 
+                    finally
+                    {
+                        behaviourFilter.enableBehaviour(childNode,
+                                ContentModel.ASPECT_AUDITABLE);
+                        behaviourFilter.enableBehaviour(childNode, ASPECT_WEBASSET);
+                    }
                 }
             }
         }
@@ -436,6 +480,7 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
         writer.setMimetype(MimetypeMap.MIMETYPE_HTML);
         writer.putContent("");
         nodeService.addAspect(indexPage.getNodeRef(), ASPECT_WEBASSET, null);
+        recordAffectedChild(nodeService.getPrimaryParent(indexPage.getNodeRef()));
 
         // Create the collections folder node
         fileFolderService.create(section, sectionCollectionsFolderName, TYPE_WEBASSET_COLLECTION_FOLDER);

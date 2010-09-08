@@ -160,10 +160,10 @@ public class WebAssetAspect implements WebSiteModel,
             Map<QName, Serializable> before,
             Map<QName, Serializable> after)
     {
-        //If the "published" flag is changing to true, then set the published time to "now".
-        Boolean afterPublished = (Boolean)after.get(PROP_PUBLISHED);
-        Boolean beforePublished = (Boolean)before.get(PROP_PUBLISHED);
-        if (afterPublished != null && !afterPublished.equals(beforePublished) && afterPublished)
+        //If the "available" flag is changing to true, then set the published time to "now".
+        Boolean afterAvailable = (Boolean)after.get(PROP_AVAILABLE);
+        Boolean beforeAvailable = (Boolean)before.get(PROP_AVAILABLE);
+        if (afterAvailable != null && !afterAvailable.equals(beforeAvailable) && afterAvailable)
         {
             behaviourFilter.disableBehaviour(nodeRef, ASPECT_WEBASSET);
             try
@@ -214,6 +214,7 @@ public class WebAssetAspect implements WebSiteModel,
 	@Override
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
+	    nodeService.setProperty(nodeRef, PROP_AVAILABLE, Boolean.TRUE);
 		renditionHelper.createRenditions(nodeRef);
     }
 }
