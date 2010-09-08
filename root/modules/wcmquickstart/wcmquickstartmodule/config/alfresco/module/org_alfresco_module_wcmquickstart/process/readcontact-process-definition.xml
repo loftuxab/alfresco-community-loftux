@@ -6,7 +6,7 @@
 
     <start-state name="start">
         <task name="wswf:submitReadContactTask" swimlane="initiator" />
-        <transition name="" to="readContact" />
+        <transition name="" to="handleContactRequest" />
     </start-state>
 
     <swimlane name="reader">
@@ -15,14 +15,9 @@
         </assignment>    
     </swimlane>
 
-    <task-node name="readContact">
-        <task name="wswf:readContact" swimlane="reader"/>
-        <transition name="read" to="deltWith" />
-    </task-node>
-    
-    <task-node name="deltWith">
-        <task name="wswf:deltWithTask" swimlane="initiator" />
-        <transition name="" to="end" />
+    <task-node name="handleContactRequest">
+        <task name="wswf:handleContactRequest" swimlane="reader"/>
+        <transition name="dealtWith" to="end" />
     </task-node>
 
     <end-state name="end" />

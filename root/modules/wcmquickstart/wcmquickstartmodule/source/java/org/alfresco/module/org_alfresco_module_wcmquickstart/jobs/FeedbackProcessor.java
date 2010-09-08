@@ -18,27 +18,21 @@
  */
 package org.alfresco.module.org_alfresco_module_wcmquickstart.jobs;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
-import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.feedback.FeedbackProcessorHandler;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebSiteModel;
-import org.alfresco.module.org_alfresco_module_wcmquickstart.util.SiteHelper;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,19 +42,37 @@ import org.apache.commons.logging.LogFactory;
  * information for each asset (total comment count and average rating).
  * 
  * @author Brian
- * 
  */
 public class FeedbackProcessor
 {
-    private static final String FEEDBACK_SUMMARIES_CONTAINER_NAME = "feedbackSummaries";
-
+    /** Logger */
     private static final Log log = LogFactory.getLog(FeedbackProcessor.class);
 
+    /** Retrying transaction helper */
     private RetryingTransactionHelper txHelper;
+    
+    /** Search service */
     private SearchService searchService;
+    
+    /** Node service */
     private NodeService nodeService;
-    private SiteHelper siteHelper;
+    
+    /** Map of feedback processors */
+    private Map<String, FeedbackProcessorHandler> handlers = new TreeMap<String, FeedbackProcessorHandler>();
 
+    /**
+     * Register a feedback processor handler
+     * @param handler   feedback processor handler
+     */
+    public void registerHandler(FeedbackProcessorHandler handler)
+    {
+        handlers.put(handler.getFeedbackType(), handler);
+    }
+    
+    /**
+     * Run job.  Find all feedback node references that require processing and delegate to appropriate
+     * handlers.
+     */
     public void run()
     {
         AuthenticationUtil.runAs(new RunAsWork<Object>()
@@ -72,9 +84,7 @@ public class FeedbackProcessor
                 {
                     @Override
                     public Object execute() throws Throwable
-                    {
-                        HashMap<NodeRef,SummaryInfo> nodeSummaryMap = new HashMap<NodeRef, SummaryInfo>(89);
-
+                    {                   
                         //Find all visitor feedback nodes that have not yet been processed
                         ResultSet rs = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, 
                                 SearchService.LANGUAGE_LUCENE, "@ws\\:ratingProcessed:\"false\"");
@@ -84,128 +94,57 @@ public class FeedbackProcessor
                             log.debug("Running feedback processor across " + rs.length() + " feedback nodes");
                         }
                         for (ResultSetRow row : rs)
-                        {
-                            //Get the asset to which this feedback relates
-                            NodeRef relatedAsset = (NodeRef)row.getValue(WebSiteModel.PROP_RELEVANT_ASSET); 
-                            if (relatedAsset != null)
+                        {                 
+                            // Get the feedback node and feedback type
+                            NodeRef feedback = row.getNodeRef();
+                            String feedbackType = (String)nodeService.getProperty(feedback, WebSiteModel.PROP_FEEDBACK_TYPE);
+                            
+                            if (feedbackType != null)
                             {
-                                //and check whether it has a feedback summary node associated with it
-                                SummaryInfo info = nodeSummaryMap.get(relatedAsset);
-                                if (info == null &&
-                                	nodeService.exists(relatedAsset) == true)
+                                // Get the feedback processor handler
+                                FeedbackProcessorHandler handler = handlers.get(feedbackType);
+                                if (handler != null)
                                 {
-                                    //We haven't come across this asset previously in this run, so we need to look for a summary node for it
-                                    List<AssociationRef> assocs = nodeService.getSourceAssocs(relatedAsset, WebSiteModel.ASSOC_SUMMARISED_ASSET);
-                                    NodeRef summaryNode = null;
-                                    if (assocs.isEmpty())
+                                    // Process the feedback
+                                    if (log.isDebugEnabled() == true)
                                     {
-                                        //There is no summary node currently. Create one.
-                                        //If the asset is in a Share site (which it probably is) then place the summary node in a
-                                        //specific container named "feedbackSummaries"...
-                                        NodeRef summaryParent = siteHelper.getWebSiteContainer(relatedAsset, FEEDBACK_SUMMARIES_CONTAINER_NAME);
-                                        if (summaryParent != null)
-                                        {
-	                                        String name = "FeedbackSummary_" + relatedAsset.getId();
-	                                        HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
-	                                        props.put(ContentModel.PROP_NAME, name);
-	                                        props.put(WebSiteModel.PROP_AVERAGE_RATING, 0.0);
-	                                        props.put(WebSiteModel.PROP_PROCESSED_RATINGS, 0);
-	                                        props.put(WebSiteModel.PROP_COMMENT_COUNT, 0);
-	                                        props.put(WebSiteModel.PROP_SUMMARISED_ASSET, relatedAsset);
-	                                        summaryNode = nodeService.createNode(summaryParent, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), 
-	                                                WebSiteModel.TYPE_VISITOR_FEEDBACK_SUMMARY, props).getChildRef();
-	                                        nodeService.createAssociation(summaryNode, relatedAsset, WebSiteModel.ASSOC_SUMMARISED_ASSET);
-	                                        if (log.isDebugEnabled())
-	                                        {
-	                                            log.debug("Created a new feedback summary node for asset " + relatedAsset);
-	                                        }
-                                        }
-                                        else
-                                        {
-                                        	if (log.isDebugEnabled() == true)
-                                        	{
-                                        		log.debug("Unable to create feedback summary node for asset " + relatedAsset + " because parent container could not be found.");
-                                        	}
-                                        }
+                                        log.debug("Processing feedback node " + feedback.toString() + " of feedback type " + feedbackType);                                        
                                     }
-                                    else
+                                    handler.processFeedback(feedback);
+                                    
+                                    //Set the "ratingProcessed" flag to true on this feedback node so we don't process it again
+                                    nodeService.setProperty(feedback, WebSiteModel.PROP_RATING_PROCESSED, Boolean.TRUE);
+                                }
+                                else
+                                {
+                                    // Record that a feedback processor could not be found
+                                    if (log.isDebugEnabled() == true)
                                     {
-                                        //There is an existing summary node to use
-                                        summaryNode = assocs.get(0).getSourceRef();
-                                        if (log.isDebugEnabled())
-                                        {
-                                            log.debug("Found an existing feedback summary node for asset " + relatedAsset);
-                                        }
+                                        log.debug("Feedback processor handler can not be found for feedback type " + feedbackType + " on feedback node " + feedback.toString());
                                     }
-                                    //Create and record a SummaryInfo object in which to gather data for this asset
-                                    info = new SummaryInfo(summaryNode);
-                                    nodeSummaryMap.put(relatedAsset, info);
-                                }
-                                if (row.getValue(WebSiteModel.PROP_COMMENT) != null)
-                                {
-                                    info.commentCount++;
-                                }
-                                Integer rating = (Integer)row.getValue(WebSiteModel.PROP_RATING);
-                                if (rating != null)
-                                {
-                                    info.totalRating += rating;
-                                    info.ratingCount++;
                                 }
                             }
                             else
                             {
-                                if (log.isInfoEnabled())
+                                // Record that no feedback type has been set for this feedback
+                                if (log.isDebugEnabled() == true)
                                 {
-                                    log.info("Skipping a piece of feedback that is related to no asset: " + row.getNodeRef());
+                                    log.debug("Feedback type not specified for feedback node " + feedback.toString());
                                 }
                             }
-                            //Set the "ratingProcessed" flag to true on this feedback node so we don't process it again
-                            nodeService.setProperty(row.getNodeRef(), WebSiteModel.PROP_RATING_PROCESSED, Boolean.TRUE);
+                                
                         }
                         
-                        //Now we can work through the records that we've recorded in memory and update the necessary summary nodes
-                        for (Map.Entry<NodeRef, SummaryInfo> entry : nodeSummaryMap.entrySet())
+                        // Execute feedback processor callbacks
+                        for (FeedbackProcessorHandler handler : handlers.values())
                         {
-                            SummaryInfo summaryInfo = entry.getValue();
-                            NodeRef summaryNode = summaryInfo.summaryNode;
-                            
-                            Map<QName,Serializable> props = nodeService.getProperties(summaryNode);
-                            
-                            //Get the current values from the summary node
-                            Integer commentCountObj = (Integer)nodeService.getProperty(summaryNode, WebSiteModel.PROP_COMMENT_COUNT);
-                            Integer processedRatingsObj = (Integer)nodeService.getProperty(summaryNode, WebSiteModel.PROP_PROCESSED_RATINGS);
-                            Float averageRatingObj = (Float)nodeService.getProperty(summaryNode, WebSiteModel.PROP_AVERAGE_RATING);
-                            
-                            int commentCount = commentCountObj == null ? 0 : commentCountObj.intValue();
-                            int processedRatings = processedRatingsObj == null ? 0 : processedRatingsObj.intValue();
-                            float averageRating = averageRatingObj == null ? 0 : averageRatingObj.floatValue();
-                            
-                            if (log.isDebugEnabled())
+                            if (log.isDebugEnabled() == true)
                             {
-                                log.debug("About to update feedback summary for asset " + entry.getKey() + ". Current values are: " +
-                                        "commentCount = " + commentCount + "; processedRatings = " + processedRatings + "; averageRating = " + averageRating);
+                                log.debug("Executing feedback handler callback for feedback type " + handler.getFeedbackType());
                             }
-                            
-                            //Update the values with the information gathered in the SummaryInfo object...
-                            commentCount += summaryInfo.commentCount;
-                            float totalRatingSoFar = averageRating * processedRatings;
-                            if (summaryInfo.ratingCount > 0)
-                            {
-                                processedRatings += summaryInfo.ratingCount;
-                                totalRatingSoFar += summaryInfo.totalRating;
-                                averageRating = totalRatingSoFar / processedRatings;
-                            }
-                            if (log.isDebugEnabled())
-                            {
-                                log.debug("About to update feedback summary for asset " + entry.getKey() + ". New values are: " +
-                                        "commentCount = " + commentCount + "; processedRatings = " + processedRatings + "; averageRating = " + averageRating);
-                            }
-                            props.put(WebSiteModel.PROP_COMMENT_COUNT, commentCount);
-                            props.put(WebSiteModel.PROP_PROCESSED_RATINGS, processedRatings);
-                            props.put(WebSiteModel.PROP_AVERAGE_RATING, averageRating);
-                            // ... and write the new values back to the repo.
-                            nodeService.setProperties(summaryNode, props);
+                            handler.processorCallback();
                         }
+                        
                         return null;
                     }   
                 });
@@ -213,38 +152,31 @@ public class FeedbackProcessor
             }
         }, AuthenticationUtil.SYSTEM_USER_NAME);
     }
-    
 
-    private static class SummaryInfo
-    {
-        public int commentCount = 0;
-        public int totalRating = 0;
-        public int ratingCount = 0;
-        public final NodeRef summaryNode;
-        
-        public SummaryInfo(NodeRef summaryNode)
-        {
-            this.summaryNode = summaryNode;
-        }
-    }
-
+    /**
+     * Sets the transaction helper
+     * @param txHelper  transaction helper
+     */
     public void setTxHelper(RetryingTransactionHelper txHelper)
     {
         this.txHelper = txHelper;
     }
 
+    /**
+     * Sets the search service
+     * @param searchService search service
+     */
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
     }
 
+    /**
+     * Sets the node service
+     * @param nodeService   node service
+     */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
-    }
-
-    public void setSiteHelper(SiteHelper siteHelper)
-    {
-        this.siteHelper = siteHelper;
     }
 }

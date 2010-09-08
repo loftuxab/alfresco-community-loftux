@@ -6,14 +6,7 @@
     <bean id="org_alfresco_module_wcmquickstart_processReceivedFeedbackTrigger" class="org.alfresco.util.CronTriggerBean">
         <property name="jobDetail">
 			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-			  <property name="targetObject">
-			  	<bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.FeedbackProcessor">
-			  		<property name="nodeService" ref="nodeService" />
-			  		<property name="searchService" ref="searchService" />
-			  		<property name="txHelper" ref="retryingTransactionHelper" />
-                    <property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper" />
-			  	</bean>
-			  </property>
+			  <property name="targetObject" ref="feedbackProcessor"/>
 			  <property name="targetMethod" value="run"/>
 			</bean>
         </property>
@@ -24,6 +17,29 @@
         	<!-- The default is to check every 30 seconds. May well want to reduce the frequency on a production box. -->
             <value>0/30 * * * * ?</value>
         </property>
+    </bean>
+    
+  	<bean id="feedbackProcessor" class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.FeedbackProcessor">
+  		<property name="nodeService" ref="nodeService" />
+  		<property name="searchService" ref="searchService" />
+  		<property name="txHelper" ref="retryingTransactionHelper" />
+  	</bean>
+    
+    <bean id="feedbackProcessorHandler" abstract="true" init-method="init">
+    	<property name="nodeService" ref="nodeService"/>
+    	<property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper" />
+    	<property name="feedbackProcessor" ref="feedbackProcessor" />
+    </bean> 
+    
+    <bean id="commentFeedbackProcessorHandler" parent="feedbackProcessorHandler" class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.feedback.CommentFeedbackProcessorHandler">
+   		<property name="feedbackType" value="Comment"/>
+    </bean>
+    
+    <bean id="contactFeedbackProcessorHandler" parent="feedbackProcessorHandler" class="org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.feedback.ContactFeedbackProcessorHandler">   	
+        <property name="actionService" ref="actionService" />        
+        <property name="personService" ref="personService" />
+        <property name="contextParserService" ref="wcmquickstartmodule_contextParserService"/>
+   		<property name="feedbackType" value="Contact Request"/>
     </bean>
 
     <bean id="org_alfresco_module_wcmquickstart_processAssetAvailabilityTrigger" class="org.alfresco.util.CronTriggerBean">
