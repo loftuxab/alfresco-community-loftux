@@ -74,7 +74,7 @@
 	<actionGroup>
 	    <actionList>
 		<runProgram>
-		    <progressText>Stoping MySQL...</progressText>
+		    <progressText>Stopping MySQL...</progressText>
 		    <program>${installdir}/${ctlscript_unix}</program>
 		    <programArguments>stop mysql</programArguments>
 		    <ruleList>
@@ -82,7 +82,7 @@
                     </ruleList>
                 </runProgram>
 		<runProgram>
-		    <progressText>Stoping MySQL...</progressText>
+		    <progressText>Stopping MySQL...</progressText>
 		    <program>${mysql_root_directory.dos}\scripts\servicerun.bat</program>
 		    <programArguments>STOP</programArguments>
 		    <ruleList>
