@@ -328,8 +328,16 @@
           */
          var renderCellDueDate = function WorkflowHistory_onReady_renderCellDueDate(elCell, oRecord, oColumn, oData)
          {
-            var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties").bpm_dueDate);
-            elCell.innerHTML = Alfresco.util.formatDate(completionDate, "defaultDateOnly");
+            var dueISODate = oRecord.getData("properties").bpm_dueDate;
+            if (dueISODate !== null)
+            {
+               var dueDate = Alfresco.util.fromISO8601(dueISODate);
+               elCell.innerHTML = Alfresco.util.formatDate(dueDate, "defaultDateOnly");
+            }
+            else
+            {
+               elCell.innerHTML = me.msg("label.none");
+            }
          };
 
          /**

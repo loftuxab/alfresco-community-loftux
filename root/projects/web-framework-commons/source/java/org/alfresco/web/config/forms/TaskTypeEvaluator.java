@@ -77,8 +77,9 @@ public class TaskTypeEvaluator extends ServiceBasedEvaluator
                 try
                 {
                     // get the task instance details
+                    String type = null;
                     String jsonResponseString = callService("/api/task-instances/" + taskId);
-    
+                    
                     // determine whether the condition matches
                     if (jsonResponseString != null)
                     {
@@ -94,16 +95,23 @@ public class TaskTypeEvaluator extends ServiceBasedEvaluator
                                     JSONObject typeObj = defObj.getJSONObject(JSON_TYPE);
                                     if (typeObj.has(JSON_NAME))
                                     {
-                                        String type = dataObj.getString(JSON_NAME);
+                                        type = dataObj.getString(JSON_NAME);
                                         result = (condition.equals(type));
                                     }
                                 }
                             }
                         }
+                        
+                        // log warning if the type wasn't found
+                        if (type == null && getLogger().isWarnEnabled())
+                        {
+                            getLogger().warn("Failed to find task type for '" + taskId + "' in JSON response from task instances service");
+                        }
+                                    
                     }
                     else if (getLogger().isWarnEnabled())
                     {
-                        getLogger().warn("Task instances service response appears to be null!");
+                        getLogger().warn("Task instances service response appears to be null for '" + taskId + "'");
                     }
                 }
                 catch (NotAuthenticatedException ne)
@@ -122,7 +130,7 @@ public class TaskTypeEvaluator extends ServiceBasedEvaluator
                 {
                     if (getLogger().isWarnEnabled())
                     {
-                        getLogger().warn("Failed to find task type in JSON response from task instances service.", je);
+                        getLogger().warn("Failed to find task type for '" + taskId + "' in JSON response from task instances service.", je);
                     }
                 }
             }
