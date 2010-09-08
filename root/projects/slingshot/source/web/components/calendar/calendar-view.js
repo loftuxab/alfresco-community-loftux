@@ -336,6 +336,11 @@
          for (var i = 0; i < data.length; i++) 
          {
             var ev = data[i];
+            
+            // Escape User Input Strings to avoid XSS
+            ev.title = Alfresco.util.encodeHTML(ev.title);
+            ev.where = Alfresco.util.encodeHTML(ev.where);
+            
             if (ev.site == site) 
             {
                siteEvents.push(ev);
