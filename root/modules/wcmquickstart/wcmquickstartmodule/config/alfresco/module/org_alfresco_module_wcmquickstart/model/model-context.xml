@@ -26,6 +26,13 @@
         <property name="renditionService" ref="renditionService"/>
     	<property name="sectionIndexPageName" value="${wcmqs.indexpage}" />
     	<property name="sectionCollectionsFolderName" value="${wcmqs.collectionsfolder}"/>
+        <property name="namespaceService" ref="namespaceService" />
+        <property name="typesToIgnore">
+            <set>
+                <value>ws:visitorFeedback</value>
+                <value>ws:indexPage</value>
+            </set>
+        </property>
     </bean>
     
     <bean id="wcmquickstartmodule_webassetCollectionFolderType" 

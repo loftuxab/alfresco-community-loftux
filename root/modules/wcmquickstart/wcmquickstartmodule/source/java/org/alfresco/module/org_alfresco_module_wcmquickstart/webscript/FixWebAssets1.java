@@ -60,7 +60,7 @@ public class FixWebAssets1 extends DeclarativeWebScript implements WebSiteModel
 	    for (ResultSetRow row : rs)
 	    {
 	        Map<QName,Serializable> props = nodeService.getProperties(row.getNodeRef());
-            props.put(PROP_PUBLISHED, Boolean.TRUE);
+            props.put(PROP_AVAILABLE, Boolean.TRUE);
             props.put(PROP_AVAILABLE_FROM_DATE, now);
             props.put(PROP_PUBLISHED_TIME, now);
             nodeService.setProperties(row.getNodeRef(), props);

@@ -73,7 +73,7 @@ public class AvailabilityProcessor
                             }
                             for (ResultSetRow row : rs)
                             {
-                                nodeService.setProperty(row.getNodeRef(), WebSiteModel.PROP_PUBLISHED, Boolean.TRUE);
+                                nodeService.setProperty(row.getNodeRef(), WebSiteModel.PROP_AVAILABLE, Boolean.TRUE);
                             }
 
                             //Find all web assets that are due to expire today
@@ -86,7 +86,7 @@ public class AvailabilityProcessor
                             }
                             for (ResultSetRow row : rs)
                             {
-                                nodeService.setProperty(row.getNodeRef(), WebSiteModel.PROP_PUBLISHED, Boolean.FALSE);
+                                nodeService.setProperty(row.getNodeRef(), WebSiteModel.PROP_AVAILABLE, Boolean.FALSE);
                             }
                         }
                         finally

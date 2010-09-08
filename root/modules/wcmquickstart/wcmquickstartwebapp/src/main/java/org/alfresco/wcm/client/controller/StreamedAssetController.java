@@ -49,6 +49,7 @@ public class StreamedAssetController extends AbstractController
 {
     private UrlUtils urlUtils;
     private AssetFactory assetFactory;
+    private HeaderHelper headerHelper;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
@@ -78,7 +79,7 @@ public class StreamedAssetController extends AbstractController
         }
 
         // Set headers
-    	boolean render = HeaderHelper.setHeaders(asset, request, response);
+    	boolean render = headerHelper.setHeaders(asset, request, response);
     	// If browser has an up-to-date copy of the asset then exit
         if ( ! render) return null;
         
@@ -127,6 +128,11 @@ public class StreamedAssetController extends AbstractController
     public void setAssetFactory(AssetFactory assetFactory)
     {
         this.assetFactory = assetFactory;
+    }
+
+    public void setHeaderHelper(HeaderHelper headerHelper)
+    {
+        this.headerHelper = headerHelper;
     }
 
 }

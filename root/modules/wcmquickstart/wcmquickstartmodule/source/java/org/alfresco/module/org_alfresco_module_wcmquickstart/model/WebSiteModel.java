@@ -86,7 +86,8 @@ public interface WebSiteModel
     public static final QName PROP_AVAILABLE_FROM_DATE = QName.createQName(NAMESPACE, "availableFromDate");
     public static final QName PROP_AVAILABLE_TO_DATE = QName.createQName(NAMESPACE, "availableToDate");
     public static final QName PROP_PUBLISHED_TIME = QName.createQName(NAMESPACE, "publishedTime");
-    public static final QName PROP_PUBLISHED = QName.createQName(NAMESPACE, "published");
+//    public static final QName PROP_PUBLISHED = QName.createQName(NAMESPACE, "available");
+    public static final QName PROP_AVAILABLE = QName.createQName(NAMESPACE, "available");
     public static final QName PROP_TAGS = QName.createQName(NAMESPACE, "tags");
     
     //ws:visitorFeedback type

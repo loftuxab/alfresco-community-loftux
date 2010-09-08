@@ -67,7 +67,7 @@
                 <entry key="endTemplate" value-ref="endTemplateDirective"/>
             </map>         
         </property>
-        <property name="editorialSite" value="%{editorial.site}"/>              
+        <property name="editorialSite" value="%{quickstart.enableEditorial}"/>              
 	</bean>  
 
     <!-- Intercept any controller and add application-wide data to the request. -->
@@ -80,6 +80,7 @@
     <bean id="assetController" class="org.alfresco.wcm.client.controller.StreamedAssetController">
         <property name="urlUtils" ref="urlUtils"/>
         <property name="assetFactory" ref="assetFactory"/>
+        <property name="headerHelper" ref="cacheControlHeaderHelper" />
     </bean>
 
     <!-- Search form controller -->    
@@ -172,4 +173,7 @@
         <property name="maxUploadSize" value="10000000"/>
     </bean>
 
+    <bean id="cacheControlHeaderHelper" class="org.alfresco.wcm.client.util.impl.SimpleCacheControlHeaderHelper" >
+        <property name="defaultExpiry" value="%{quickstart.http.cache.defaultExpiry}"></property>
+    </bean>
 </beans>
