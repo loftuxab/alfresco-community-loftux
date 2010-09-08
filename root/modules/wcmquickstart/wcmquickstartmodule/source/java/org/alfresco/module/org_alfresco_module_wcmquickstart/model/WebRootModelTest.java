@@ -48,9 +48,6 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.cmr.workflow.WorkflowService;
-import org.alfresco.service.cmr.workflow.WorkflowTask;
-import org.alfresco.service.cmr.workflow.WorkflowTaskState;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
@@ -73,7 +70,7 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 	private MutableAuthenticationService authenticationService;
 	private PersonService personService;
 	private PermissionService permissionService;
-	private WorkflowService workflowService;
+	//private WorkflowService workflowService;
 	
 	NodeRef companyHome;
 	String testUserName;
@@ -91,7 +88,7 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 		authenticationService = (MutableAuthenticationService)appContext.getBean("authenticationService");
 		personService = (PersonService)appContext.getBean("personService");
 		permissionService = (PermissionService)appContext.getBean("permissionService");
-		workflowService = (WorkflowService)appContext.getBean("WorkflowService");
+		//workflowService = (WorkflowService)appContext.getBean("WorkflowService");
 		
 		// Set authentication		
 		authenticationComponent.setCurrentUser("admin");		
@@ -601,20 +598,20 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
         assertEquals(article1, nodeService.getProperty(feedback2, PROP_RELEVANT_ASSET));
         assertFalse(nodeService.getTargetAssocs(feedback2, ASSOC_RELEVANT_ASSET).isEmpty());
         
-        // Does the user have a pending task
-        List<WorkflowTask> tasks = workflowService.getAssignedTasks(testUserName, WorkflowTaskState.IN_PROGRESS);
-        assertNotNull(tasks);
-        assertEquals(1, tasks.size());
-        WorkflowTask task = tasks.get(0);
-        
-        // Does the workflow package contain the feedback object
-        List<NodeRef> taskPackageContents = workflowService.getPackageContents(task.id);
-        assertNotNull(taskPackageContents);
-        assertEquals(1, taskPackageContents.size());
-        assertEquals(feedback2, taskPackageContents.get(0));
-        
-        // End the task
-        workflowService.endTask(task.id, null);
+//        // Does the user have a pending task
+//        List<WorkflowTask> tasks = workflowService.getAssignedTasks(testUserName, WorkflowTaskState.IN_PROGRESS);
+//        assertNotNull(tasks);
+//        assertEquals(1, tasks.size());
+//        WorkflowTask task = tasks.get(0);
+//        
+//        // Does the workflow package contain the feedback object
+//        List<NodeRef> taskPackageContents = workflowService.getPackageContents(task.id);
+//        assertNotNull(taskPackageContents);
+//        assertEquals(1, taskPackageContents.size());
+//        assertEquals(feedback2, taskPackageContents.get(0));
+//        
+//        // End the task
+//        workflowService.endTask(task.id, null);
         
         //test what happens when the article is deleted (should cause the feedback to be deleted too)
         nodeService.deleteNode(article1);

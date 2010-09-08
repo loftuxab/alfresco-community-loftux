@@ -117,7 +117,7 @@ public class SiteHelper implements WebSiteModel
     }
     
     /**
-     * Gets the secetion that the node resides within
+     * Gets the section that the node resides within
      * @param nodeRef	node reference
      * @return NodeRef	section node reference, null otherwise
      */
@@ -130,7 +130,7 @@ public class SiteHelper implements WebSiteModel
      * Gets the named site container that a given node reference resides within
      * @param noderef			node reference
      * @param containerName		container name
-     * @return NodeRef			continer node reference, null otherwise
+     * @return NodeRef			container node reference, null otherwise
      */
     public NodeRef getWebSiteContainer(NodeRef noderef, String containerName)
     {
@@ -145,20 +145,23 @@ public class SiteHelper implements WebSiteModel
                 websiteId = siteInfo.getNodeRef();
             }
  
-            NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), websiteId.getId());
-            if (containerParent == null)
-            {
-                containerParent = siteService.createContainer(siteInfo.getShortName(), websiteId.getId(), null, null);
-            }
-            container = nodeService.getChildByName(containerParent, ContentModel.ASSOC_CONTAINS, 
-                    containerName);
-            if (container == null)
-            {
-                HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
-                props.put(ContentModel.PROP_NAME, containerName);
-                container = nodeService.createNode(containerParent, ContentModel.ASSOC_CONTAINS, 
-                        QName.createQName(WebSiteModel.NAMESPACE, containerName), 
-                        ContentModel.TYPE_FOLDER, props).getChildRef();
+            if (siteService.getSite(siteInfo.getShortName()) != null)
+            {            
+                NodeRef containerParent = siteService.getContainer(siteInfo.getShortName(), websiteId.getId());
+                if (containerParent == null)
+                {
+                    containerParent = siteService.createContainer(siteInfo.getShortName(), websiteId.getId(), null, null);
+                }
+                container = nodeService.getChildByName(containerParent, ContentModel.ASSOC_CONTAINS, 
+                        containerName);
+                if (container == null)
+                {
+                    HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
+                    props.put(ContentModel.PROP_NAME, containerName);
+                    container = nodeService.createNode(containerParent, ContentModel.ASSOC_CONTAINS, 
+                            QName.createQName(WebSiteModel.NAMESPACE, containerName), 
+                            ContentModel.TYPE_FOLDER, props).getChildRef();
+                }
             }
         }
         return container;

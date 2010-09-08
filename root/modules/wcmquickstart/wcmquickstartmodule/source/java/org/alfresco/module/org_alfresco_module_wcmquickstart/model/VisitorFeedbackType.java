@@ -23,26 +23,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
-import org.alfresco.module.org_alfresco_module_wcmquickstart.util.SiteHelper;
-import org.alfresco.module.org_alfresco_module_wcmquickstart.util.contextparser.ContextParserService;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
-import org.alfresco.repo.workflow.StartWorkflowActionExecuter;
-import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * ws:visitorFeedback type behaviours.
@@ -51,6 +45,9 @@ import org.alfresco.service.namespace.QName;
  */
 public class VisitorFeedbackType implements WebSiteModel
 {
+    /** Logger */
+    private final static Log log = LogFactory.getLog(VisitorFeedbackType.class);
+    
     private final static String AFFECTED_VISITOR_FEEDBACK = "AffectedVisitorFeedback";
     
     /** Feedback types */
@@ -65,18 +62,6 @@ public class VisitorFeedbackType implements WebSiteModel
 	
 	/** Node service */
 	private NodeService nodeService;
-	
-	/** Action service */
-	private ActionService actionService;
-	
-	/** Person service */
-	private PersonService personService;
-	
-	/** Site helper */
-	private SiteHelper siteHelper;
-	
-	/** Context parser service */
-	private ContextParserService contextParserService;
 	
 	/**
 	 * Set the policy component
@@ -107,62 +92,30 @@ public class VisitorFeedbackType implements WebSiteModel
         this.behaviourFilter = behaviourFilter;
     }
 	
-	/**
-	 * Set the action service
-	 * @param actionService	action service
-	 */
-	public void setActionService(ActionService actionService)
-    {
-	    this.actionService = actionService;
-    }
-	
-	/**
-	 * Set the person service
-	 * @param personService
-	 */
-	public void setPersonService(PersonService personService)
-    {
-	    this.personService = personService;
-    }
-
-	/**
-	 * Sets the site helper
-	 * @param siteHelper	site helper
-	 */
-	public void setSiteHelper(SiteHelper siteHelper)
-    {
-	    this.siteHelper = siteHelper;
-    }
-	
-	/**
-	 * Set the context parser service
-	 * @param contextParserService	context parser service
-	 */
-	public void setContextParserService(ContextParserService contextParserService)
-    {
-	    this.contextParserService = contextParserService;
-    }
-	
     /**
 	 * Init method.  Binds model behaviours to policies.
 	 */
 	public void init()
 	{
-        policyComponent.bindClassBehaviour(NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME, 
+        policyComponent.bindClassBehaviour(
+                NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME, 
                 WebSiteModel.TYPE_VISITOR_FEEDBACK,
                 new JavaBehaviour(this, "onUpdatePropertiesEveryEvent", NotificationFrequency.EVERY_EVENT));
         
-        policyComponent.bindClassBehaviour(NodeServicePolicies.OnCreateNodePolicy.QNAME,
-                WebSiteModel.TYPE_VISITOR_FEEDBACK, new JavaBehaviour(this, "onCreateNodeEveryEvent", 
-                        NotificationFrequency.EVERY_EVENT));
+        policyComponent.bindClassBehaviour(
+                NodeServicePolicies.OnCreateNodePolicy.QNAME,
+                WebSiteModel.TYPE_VISITOR_FEEDBACK, 
+                new JavaBehaviour(this, "onCreateNodeEveryEvent", NotificationFrequency.EVERY_EVENT));
 
-        policyComponent.bindClassBehaviour(NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME, 
+        policyComponent.bindClassBehaviour(
+                NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME, 
                 WebSiteModel.TYPE_VISITOR_FEEDBACK,
                 new JavaBehaviour(this, "onUpdatePropertiesOnCommit", NotificationFrequency.TRANSACTION_COMMIT));
         
-        policyComponent.bindClassBehaviour(NodeServicePolicies.OnCreateNodePolicy.QNAME,
-                WebSiteModel.TYPE_VISITOR_FEEDBACK, new JavaBehaviour(this, "onCreateNodeOnCommit", 
-                        NotificationFrequency.TRANSACTION_COMMIT));
+        policyComponent.bindClassBehaviour(
+                NodeServicePolicies.OnCreateNodePolicy.QNAME,
+                WebSiteModel.TYPE_VISITOR_FEEDBACK, 
+                new JavaBehaviour(this, "onCreateNodeOnCommit", NotificationFrequency.TRANSACTION_COMMIT));
 	}
 
 	/**
@@ -171,6 +124,10 @@ public class VisitorFeedbackType implements WebSiteModel
 	 */
     public void onCreateNodeEveryEvent(ChildAssociationRef childAssocRef)
     {
+        if (log.isDebugEnabled() == true)
+        {
+            log.debug("onCreateNode (every event) - recording node " + childAssocRef.getChildRef().toString());
+        }
         recordNode(childAssocRef.getChildRef());
     }
     
@@ -185,6 +142,10 @@ public class VisitorFeedbackType implements WebSiteModel
             Map<QName, Serializable> before,
             Map<QName, Serializable> after)
     {
+        if (log.isDebugEnabled() == true)
+        {
+            log.debug("onUpdateProperties (every event) - recording node " + nodeRef.toString());
+        }
         recordNode(nodeRef);
     }
     
@@ -194,52 +155,35 @@ public class VisitorFeedbackType implements WebSiteModel
      */
     public void onCreateNodeOnCommit(ChildAssociationRef childAssocRef)
     {
+        if (log.isDebugEnabled() == true)
+        {
+            log.debug("onCreateNode (on commit) - process commit " + childAssocRef.getChildRef().toString());
+        }
         processCommit(childAssocRef.getChildRef());        
     }
-    
+        
     /**
-     * Get the feeback configuration for the relevant web site
-     * @param feedback				feedback node reference
-     * @return Map<String, String>  feedback configuration
+     * onUpdateProperties behaviour (on commit)
+     * @param nodeRef   node reference
+     * @param before    before property values
+     * @param after     after property valuesS
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, String> getFeedbackConfiguration(NodeRef feedback)
-    {
-    	Map<String, String> result = new TreeMap<String, String>();
-        
-    	NodeRef relevantArticle = (NodeRef)nodeService.getProperty(feedback, PROP_RELEVANT_ASSET);
-        if (relevantArticle != null)
-        {
-        	NodeRef website = siteHelper.getRelevantWebSite(relevantArticle);
-        	if (website != null)
-        	{
-        		List<String> feedbackConfig = (List<String>)nodeService.getProperty(website, PROP_FEEDBACK_CONFIG);
-        		if (feedbackConfig != null)
-        		{
-	        		for (String configValue : feedbackConfig)
-	                {
-		                String[] configValues = configValue.split("=");
-		                if (configValues.length == 2)
-		                {
-		                	result.put(configValues[0], 
-		                			   contextParserService.parse(website, configValues[1]));
-		                }
-	                }
-        		}
-        	}
-        }
-        
-        return result;
-    }
-        
     public void onUpdatePropertiesOnCommit(
             NodeRef nodeRef,
             Map<QName, Serializable> before,
             Map<QName, Serializable> after)
     {
+        if (log.isDebugEnabled() == true)
+        {
+            log.debug("onUpdateProperties (on commit) - process commit " + nodeRef.toString());
+        }       
         processCommit(nodeRef);
     }
 
+    /**
+     * Record the node to be processed later
+     * @param nodeRef   node reference
+     */
     private void recordNode(NodeRef nodeRef)
     {
         @SuppressWarnings("unchecked")
@@ -253,6 +197,10 @@ public class VisitorFeedbackType implements WebSiteModel
         affectedNodeRefs.add(nodeRef);
     }
 
+    /**
+     * Process node reference commit
+     * @param nodeRef   node reference
+     */
     private void processCommit(NodeRef nodeRef)
     {
         @SuppressWarnings("unchecked")
@@ -286,36 +234,6 @@ public class VisitorFeedbackType implements WebSiteModel
                 {
                     nodeService.setProperty(nodeRef, PROP_RATING_PROCESSED, Boolean.FALSE);
                 }
-                
-
-                // Start workflow for contact us feedback
-            	String feedbackType = (String)nodeService.getProperty(nodeRef, PROP_FEEDBACK_TYPE);
-            	if (feedbackType != null &&
-            	    CONTACT_REQUEST_TYPE.equals(feedbackType) == true)
-            	{
-            		// Create the action
-            		Action action = actionService.createAction(StartWorkflowActionExecuter.NAME);
-                    action.setParameterValue(StartWorkflowActionExecuter.PARAM_WORKFLOW_NAME, PROCESS_READ_CONTACT);
-                    
-                    // Get feedback configuration
-                    Map<String, String> feedbackConfig = getFeedbackConfiguration(nodeRef);
-                    String workflowUser = null;
-                    if (feedbackConfig != null)
-                    {
-                    	feedbackConfig.get(CONTACT_REQUEST_TYPE);
-                    }
-                    if (workflowUser == null)
-                    {
-                    	workflowUser = AuthenticationUtil.getAdminUserName();
-                    }
-                    
-                    // Get the assignee
-                    NodeRef workflowPerson = personService.getPerson(workflowUser);
-                    action.setParameterValue("bpm:assignee", workflowPerson);
-                    
-                    // Start the workflow
-                    actionService.executeAction(action, nodeRef);
-            	}
             }
             finally
             {
