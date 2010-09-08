@@ -58,7 +58,7 @@
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.docfolder")}:</div>
-      <div class="yui-u docfolder-label" id="${el}-docfolder">${result.docfolder}</div>
+      <div class="yui-u docfolder-label" id="${el}-docfolder">${result.docfolder?html}</div>
    </div>
    <br />
    <div class="bdft">

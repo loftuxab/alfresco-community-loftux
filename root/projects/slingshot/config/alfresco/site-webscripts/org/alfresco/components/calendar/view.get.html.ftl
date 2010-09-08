@@ -1,19 +1,19 @@
-
+<#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.CalendarView('${args.htmlid}Container').setOptions(
+   new Alfresco.CalendarView('${args.htmlid?js_string}Container').setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
       //view type
-      view : '${viewArgs.viewType}',
-      id : '${args.htmlid}View',
+      view : '${viewArgs.viewType?html}',
+      id : '${el}View',
       /*
       * The start date of the week/month if week or month
       * a Date object or a ISO string
       **/
-      startDate : Alfresco.util.fromISO8601('${viewArgs.view.startDate}'),
-      endDate : Alfresco.util.fromISO8601('${viewArgs.view.endDate}'),
-      titleDate : Alfresco.util.fromISO8601('${viewArgs.view.titleDate}'),
-      permitToCreateEvents : '${viewArgs.permitToCreateEvents}'
+      startDate : Alfresco.util.fromISO8601('${viewArgs.view.startDate?html}'),
+      endDate : Alfresco.util.fromISO8601('${viewArgs.view.endDate?html}'),
+      titleDate : Alfresco.util.fromISO8601('${viewArgs.view.titleDate?html}'),
+      permitToCreateEvents : '${viewArgs.permitToCreateEvents?html}'
    }).setMessages(
       ${messages}
    );
@@ -21,8 +21,8 @@
 
 <#if (viewArgs.viewType=='month')>    
 <h2 id="calTitle"></h2>
-<div id="${args.htmlid}Container" class="calendar vcalendar monthview">
-    <table id="${args.htmlid}View" cellspacing="0" cellpadding="0">
+<div id="${el}Container" class="calendar vcalendar monthview">
+    <table id="${el}View" cellspacing="0" cellpadding="0">
         <thead>
             <tr>
                 <#assign days_in_week = msg("days.medium")?split(",") >
@@ -55,13 +55,13 @@
                                 <#if (event.allday) >                              
                                     <div class="vevent allday theme-bg-color-1">
                                         <div>
-                                             <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}?date=${viewArgs.view.dates[id].id}" class="summary theme-color-1">${event.summary}</a>
-                                             <p class="description">${event.description}</p>
+                                             <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}?date=${viewArgs.view.dates[id].id}" class="summary theme-color-1">${event.summary?html}</a>
+                                             <p class="description">${event.description?html}</p>
                                              <p class="dates"> <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                              - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
-                                             <span class="location">${event.location}</span>
+                                             <span class="location">${event.location?html}</span>
                                              <span class="duration" title="${event.duration}">1h</span>
-                                             <span class="category" >${event.tags}</span> 
+                                             <span class="category" >${event.tags?html}</span> 
                                         </div>
                                     </div>
                                     <#assign numAllDayEvents = numAllDayEvents + 1>
@@ -78,13 +78,13 @@
                                          </#if>
 
                                          <li class="vevent ${class}">
-                                               <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}?date=${viewArgs.view.dates[id].id}" class="summary theme-color-1">${event.summary}</a>
-                                               <p class="description">${event.description}</p>
+                                               <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}?date=${viewArgs.view.dates[id].id}" class="summary theme-color-1">${event.summary?html}</a>
+                                               <p class="description">${event.description?html}</p>
                                                <p class="dates"><span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                                - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
-                                               <span class="location">${event.location}</span>
+                                               <span class="location">${event.location?html}</span>
                                                <span class="duration" title="${event.duration}">${event.duration}</span>
-                                               <span class="category" >${event.tags}</span>
+                                               <span class="category" >${event.tags?html}</span>
                                              </li>
                                          <#assign numEvents=numEvents + 1>    
                                  </#if>
@@ -110,8 +110,8 @@
 <#elseif (viewArgs.viewType=='week')>
 <!-- week view -->
 <h2 id="calTitle"></h2>
-<div id="${args.htmlid}Container" class="calendar vcalendar weekview">
-    <table id="${args.htmlid}View" cellspacing="0" cellpadding="0">
+<div id="${el}Container" class="calendar vcalendar weekview">
+    <table id="${el}View" cellspacing="0" cellpadding="0">
         <thead>
             <tr>
                 <th scope="col">${msg("label.hours")}</th>
@@ -177,8 +177,8 @@
 <#elseif (viewArgs.viewType=='day')>
 <!-- day view -->
 <h2 id="calTitle"></h2>
-<div id="${args.htmlid}Container" class="calendar vcalendar dayview">
-    <table id="${args.htmlid}View" cellspacing="0" cellpadding="0">
+<div id="${el}Container" class="calendar vcalendar dayview">
+    <table id="${el}View" cellspacing="0" cellpadding="0">
         <tbody>
             <tr class="alldayRow">
                 <th scope="row"><h2>${msg("label.all-day")}</h2></th>
@@ -220,8 +220,8 @@
 
 <!-- agenda -->
 <h2 id="calTitle"></h2>
-<div id="${args.htmlid}Container" class="alf-calendar agendaview">
-    <div id="${args.htmlid}View">
+<div id="${el}Container" class="alf-calendar agendaview">
+    <div id="${el}View">
     </div>
 </div>
 </#if>

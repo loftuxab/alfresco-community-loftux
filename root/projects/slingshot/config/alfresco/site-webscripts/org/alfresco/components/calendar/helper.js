@@ -277,7 +277,7 @@ var CalendarScriptHelper = (function()
       
       getView: function()
       {
-         return getPageUrlParam('view', 'month').toLowerCase();
+         return escape(getPageUrlParam('view', 'month').toLowerCase());
       },
       
       /**
