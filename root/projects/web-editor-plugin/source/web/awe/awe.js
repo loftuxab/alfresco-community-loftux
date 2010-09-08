@@ -929,7 +929,7 @@
       
       onHelp: function AWE_onHelp()
       {
-         window.open('http://www.alfresco.com/help/33/enterprise/webeditor/','wefhelp');
+         window.open('http://www.alfresco.com/help/34/community/webeditor/','wefhelp');
       },
 
       onQuickEditMouseOver: function AWE_onQuickEditMouseOver(e, args)
