@@ -1,17 +1,17 @@
-Alfresco Community Edition 3.3
-===============================
+Alfresco Community 3.4
+======================
 
 For information on what is included in this release, refer to:
-http://wiki.alfresco.com/wiki/Alfresco_Community_Edition_3.3
+http://wiki.alfresco.com/wiki/Alfresco_Community_3.4
 
 For Release Notes, refer to:
-http://wiki.alfresco.com/wiki/Alfresco_Community_Edition_3.3_Release_Notes
+http://wiki.alfresco.com/wiki/Alfresco_Community_3.4_Release_Notes
 
 For Installation instructions, refer to:
-Installing and Configuring Alfresco Community Edition 3.3 in:
+Installing and Configuring Alfresco Community 3.4 in:
 
 share.alfresco.com
-Document Library > Documents > Documentation > Community Edition 3.3
+Document Library > Documents > Documentation > Community 3.4
 
 For support, refer to:
 http://forums.alfresco.com
