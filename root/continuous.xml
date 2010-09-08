@@ -640,7 +640,7 @@
          <fileset dir="${dir.project.jlan}/jni" />
       </copy>
       <copy todir="${dir.continuous.assemble.commands}">
-         <fileset dir="${dir.project.installer}/bin" />
+         <fileset dir="${dir.installer.bitrock}/bitrock/alfresco/commands/bin" />
       </copy>
       
    </target>
