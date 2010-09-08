@@ -12,9 +12,9 @@
    })();
    //]]></script>
    
-   <label for="${controlId}-date">${field.label?html}:</label>
+   <label for="${controlId}">${field.label?html}:</label>
    
-   <input id="${fieldHtmlId}" type="hidden" name="${field.name}-daterange" value="" />
+   <input id="${fieldHtmlId}" type="hidden" name="${field.name}-date-range" value="" />
    
    <div id="${controlId}" style="width:16em">
       <div class="yui-gc">
