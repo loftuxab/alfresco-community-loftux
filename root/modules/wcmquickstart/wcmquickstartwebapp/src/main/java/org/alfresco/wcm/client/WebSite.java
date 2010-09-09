@@ -20,6 +20,7 @@ package org.alfresco.wcm.client;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -32,7 +33,10 @@ public interface WebSite extends Serializable
 	/** Property constants */
 	static final String PROP_HOSTNAME = "ws:hostName";
 	static final String PROP_HOSTPORT = "ws:hostPort";
-	static final String PROP_CONTEXT = "ws:webAppContext";
+    static final String PROP_CONTEXT = "ws:webAppContext";
+    static final String PROP_SITE_CONFIG = "ws:siteConfig";
+    
+    static final String CONFIG_IS_EDITORIAL = "isEditorial";
 	
 	/**
 	 * Gets the host name
@@ -113,5 +117,7 @@ public interface WebSite extends Serializable
 	 */
 	String getContext();
 
+    Map<String, String> getConfig();
 
+    boolean isEditorialSite();
 }

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.directive.TemplateConstants;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
@@ -37,7 +38,6 @@ import freemarker.template.TemplateDirectiveModel;
 public class ModelDecorator
 {
 	private Map<String, TemplateDirectiveModel> freemarkerDirectives;
-	private boolean editorialSite;
 
     public void populate(HttpServletRequest request, ModelAndView modelAndView)
     {		 
@@ -50,8 +50,9 @@ public class ModelDecorator
 		    model.putAll(freemarkerDirectives);
 		    
 		    // Store website, section and asset on spring model too for use in page meta data
-			RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();	    
-		    model.put("webSite", requestContext.getValue("webSite"));
+			RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();	
+			WebSite website = (WebSite)requestContext.getValue("webSite");
+		    model.put("webSite", website);
 		    model.put("section", requestContext.getValue("section"));
 		    model.put("asset", requestContext.getValue("asset"));
 		    
@@ -65,10 +66,10 @@ public class ModelDecorator
 		    
 		    // Flag that the site is the editorial version so that editorial-only features can
 		    // be enabled
-		    model.put("editorialSite", editorialSite);
+		    model.put("editorialSite", website.isEditorialSite());
 		    
 		    // Enable the web editor if this is the editorial site.
-		    request.setAttribute(TemplateConstants.REQUEST_ATTR_KEY_WEF_ENABLED, editorialSite);
+		    request.setAttribute(TemplateConstants.REQUEST_ATTR_KEY_WEF_ENABLED, website.isEditorialSite());
 	    }
     }
 
@@ -76,12 +77,6 @@ public class ModelDecorator
     {
 		this.freemarkerDirectives = directives;
 	}
-    
-    
-    public void setEditorialSite(boolean editorialFeaturesEnabled)
-    {
-        this.editorialSite = editorialFeaturesEnabled;
-    }      
 }
 
 

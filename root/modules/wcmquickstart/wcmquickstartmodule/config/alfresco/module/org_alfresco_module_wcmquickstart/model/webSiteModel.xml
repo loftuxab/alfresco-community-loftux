@@ -55,7 +55,7 @@
                     <multiple>true</multiple>
                 </property>
                 <property name="ws:excludeFromNavigation">
-                    <title>Exclude from navigation?</title>
+                    <title>Exclude from navigation</title>
                     <type>d:boolean</type>
                     <default>false</default>
                 </property>
@@ -108,6 +108,11 @@
                 <property name="ws:feedbackConfig">
                     <title>Feedback Config</title>
                     <type>d:text</type>                    
+                    <multiple>true</multiple>
+                </property>
+                <property name="ws:siteConfig">
+                    <title>Site Configuration</title>
+                    <type>d:text</type>
                     <multiple>true</multiple>
                 </property>
             </properties>
@@ -421,7 +426,7 @@
                     <type>d:date</type>
                 </property>
                 <property name="ws:available">
-                    <title>Is available now?</title>
+                    <title>Is available now</title>
                     <type>d:boolean</type>
                     <mandatory>true</mandatory>
                     <default>true</default>

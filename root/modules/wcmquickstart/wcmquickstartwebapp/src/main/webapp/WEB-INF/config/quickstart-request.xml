@@ -67,7 +67,6 @@
                 <entry key="endTemplate" value-ref="endTemplateDirective"/>
             </map>         
         </property>
-        <property name="editorialSite" value="%{quickstart.enableEditorial}"/>              
 	</bean>  
 
     <!-- Intercept any controller and add application-wide data to the request. -->

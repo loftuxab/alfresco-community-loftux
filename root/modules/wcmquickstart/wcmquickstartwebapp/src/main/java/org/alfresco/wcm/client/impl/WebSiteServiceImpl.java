@@ -22,10 +22,13 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.AssetFactory;
+import org.alfresco.wcm.client.Section;
 import org.alfresco.wcm.client.SectionFactory;
 import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.WebSiteService;
@@ -49,8 +52,8 @@ import org.json.JSONObject;
 public class WebSiteServiceImpl implements WebSiteService
 {
     private static final Log log = LogFactory.getLog(WebSiteServiceImpl.class);
-    /** Query for all web roots */
-    private static final String QUERY_WEB_ROOTS = "select f.cmis:objectId, w.ws:hostName, w.ws:hostPort, t.cm:title, t.cm:description, w.ws:webAppContext "
+    /** Query for all web sites */
+    private static final String QUERY_WEB_ROOTS = "select f.cmis:objectId, w.ws:hostName, w.ws:hostPort, t.cm:title, t.cm:description, w.ws:webAppContext, w.ws:siteConfig "
             + "from cmis:folder as f "
             + "join ws:website as w on w.cmis:objectId = f.cmis:objectId "
             + "join cm:titled as t on t.cmis:objectId = f.cmis:objectId";
@@ -140,6 +143,8 @@ public class WebSiteServiceImpl implements WebSiteService
                 String title = result.getPropertyValueById(Asset.PROPERTY_TITLE);
                 String description = result.getPropertyValueById(Asset.PROPERTY_DESCRIPTION);
                 String context = result.getPropertyValueById(WebSite.PROP_CONTEXT);
+                List<String> configList = result.getPropertyMultivalueById(WebSite.PROP_SITE_CONFIG);
+                Map<String,String> configProperties = parseSiteConfig(configList);
 
                 WebsiteInfo siteInfo = getWebsiteInfo(id);
 
@@ -150,6 +155,7 @@ public class WebSiteServiceImpl implements WebSiteService
                 webSite.setDescription(description);
                 webSite.setContext(context);
                 webSite.setSectionFactory(sectionFactory);
+                webSite.setConfig(configProperties);
                 UgcServiceCmisImpl ugcService = new UgcServiceCmisImpl(session
                         .createObjectId(siteInfo.feedbackFolderId));
                 ugcService.setFormIdCache(formIdCache);
@@ -168,6 +174,24 @@ public class WebSiteServiceImpl implements WebSiteService
             webSiteCache = newCache;
         }
         return webSiteCache;
+    }
+
+    private Map<String, String> parseSiteConfig(List<String> configList)
+    {
+        Map<String, String> result = new TreeMap<String, String>();
+        if (configList != null)
+        {
+            for (String configValue : configList) 
+            {
+                //Make sure we cater for empty values when parsing the name/value pairs
+                String[] split = configValue.split("=", -1);
+                if (split.length == 2)
+                {
+                    result.put(split[0], split[1]);
+                }
+            }
+        }
+        return result;
     }
 
     private WebsiteInfo getWebsiteInfo(String websiteid)
