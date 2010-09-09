@@ -37,6 +37,13 @@ import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
 public class DynamicPageViewResolver extends AbstractWebFrameworkViewResolver
 {
+    public DynamicPageViewResolver()
+    {
+        //The default caching provided by the AbstractCachingViewResolver class from which this 
+        //class is derived
+        setCache(false);
+    }
+    
     /**
      * @see org.springframework.web.servlet.view.UrlBasedViewResolver#canHandle(java.lang.String,
      *      java.util.Locale)
