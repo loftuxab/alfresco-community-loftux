@@ -19,6 +19,7 @@
 package org.alfresco.wcm.client.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.Path;
@@ -62,6 +63,10 @@ public class WebSiteImpl implements WebSite
 	private transient UrlUtils urlUtils;
 
     private String rootSectionId;
+
+    private Map<String, String> configMap;
+
+    private Boolean editorial;
 
 	/**
 	 * Constructor 
@@ -237,5 +242,27 @@ public class WebSiteImpl implements WebSite
     public void setRootSectionId(String rootSectionId)
     {
         this.rootSectionId = rootSectionId;
+    }
+
+    public void setConfig(Map<String, String> configProperties)
+    {
+        configMap = configProperties;
+    }
+    
+    @Override
+    public Map<String,String> getConfig()
+    {
+        return configMap;
+    }
+
+    @Override
+    public boolean isEditorialSite()
+    {
+        if (editorial == null)
+        {
+            //Attempt to read from the config. Defaults to false.
+            editorial = Boolean.parseBoolean(configMap.get(CONFIG_IS_EDITORIAL));
+        }
+        return editorial;
     }
 }

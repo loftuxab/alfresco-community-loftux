@@ -63,6 +63,7 @@
                <show id="ws:hostName"/>
                <show id="ws:hostPort"/>
                <show id="ws:webAppContext"/>
+               <show id="ws:siteConfig"/>
                <show id="ws:publishTarget"/>
             </field-visibility>
             <appearance>
