@@ -105,12 +105,17 @@ public class FeedbackProcessor
                                 FeedbackProcessorHandler handler = handlers.get(feedbackType);
                                 if (handler != null)
                                 {
+                                    /// TODO wrap into sub transaction
+                                    
                                     // Process the feedback
                                     if (log.isDebugEnabled() == true)
                                     {
                                         log.debug("Processing feedback node " + feedback.toString() + " of feedback type " + feedbackType);                                        
                                     }
                                     handler.processFeedback(feedback);
+                                    
+                                    // END
+                                    // TODO Log exception                                    
                                     
                                     //Set the "ratingProcessed" flag to true on this feedback node so we don't process it again
                                     nodeService.setProperty(feedback, WebSiteModel.PROP_RATING_PROCESSED, Boolean.TRUE);
@@ -131,8 +136,7 @@ public class FeedbackProcessor
                                 {
                                     log.debug("Feedback type not specified for feedback node " + feedback.toString());
                                 }
-                            }
-                                
+                            }                                
                         }
                         
                         // Execute feedback processor callbacks
