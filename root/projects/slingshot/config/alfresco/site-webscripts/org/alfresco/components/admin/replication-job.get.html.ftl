@@ -35,46 +35,56 @@
       <form id="${id}-form" method="post" action="${action}">
          <div id="${id}-form-fields" class="form-fields">
 
-            <div class="set-title">${msg("label.set.general")}</div>
-            <div class="form-field">
-               <label for="${id}-prop_name">${msg("label.name")}:<span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></label>
-               <input type="text" id="${id}-prop_name" name="name" tabindex="0" title="${msg("label.name")}" value="${(jobDetail.name!"")?html}" />
-            </div>
-            <div class="form-field">
-               <label for="${id}-prop_description">${msg("label.description")}:</label>
-               <textarea id="${id}-prop_description" name="description" rows="2" cols="60" tabindex="0" title="${msg("label.description")}">${(jobDetail.description!"")?html}</textarea>
-            </div>
-
-            <div class="set-title">${msg("label.set.payload")}</div>
-            <div id="${id}-payloadContainer"></div>
-
-            <div class="set-title">${msg("label.set.transfer-target")}</div>
-            <div id="${id}-transferTargetContainer"></div>
-
-            <div class="set-title">${msg("label.set.schedule")}</div>
-            <div class="form-field">
-               <input id="${id}-scheduleEnabled" type="checkbox" tabindex="0" name="-" title="${msg("label.schedule-job")}" <#if jobDetail.schedule??>checked="checked"</#if>>
-               <label for="${id}-scheduleEnabled" class="checkbox">${msg("label.schedule-job")}</label>
-            </div>
-            <div id="${id}-scheduleContainer" class="hidden">
-               <div id="${id}-scheduleStartContainer"></div>
+            <div class="set">
+               <div class="set-title">${msg("label.set.general")}</div>
                <div class="form-field">
-                  <label for="${id}-prop_intervalCount">${msg("label.repeat")}:<span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></label>
-                  <input type="text" id="${id}-prop_intervalCount" name="schedule.intervalCount" tabindex="0" title="${msg("label.repeat-count")}" class="number" value="${((jobDetail.schedule.intervalCount)!"")?html}" />
-                  <select id="${id}-prop_intervalPeriod" name="schedule.intervalPeriod" tabindex="0" title="${msg("label.repeat-period")}">
-                     <option value="-">${msg("option.none")}</option>
-                  <#list intervalPeriods?keys as ip>
-                     <option value="${ip?html}"<#if ip == (jobDetail.schedule.intervalPeriod)!""> selected="selected"</#if>>${(intervalPeriods[ip])?html}</option>
-                  </#list>
-                  </select>
+                  <label for="${id}-prop_name">${msg("label.name")}:<span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></label>
+                  <input type="text" id="${id}-prop_name" name="name" tabindex="0" title="${msg("label.name")}" value="${(jobDetail.name!"")?html}" />
+               </div>
+               <div class="form-field">
+                  <label for="${id}-prop_description">${msg("label.description")}:</label>
+                  <textarea id="${id}-prop_description" name="description" rows="2" cols="60" tabindex="0" title="${msg("label.description")}">${(jobDetail.description!"")?html}</textarea>
                </div>
             </div>
-
-            <div class="set-title">${msg("label.set.other")}</div>
-            <div class="form-field">
-               <input id="${id}-prop_enabled" type="hidden" name="enabled" value="${(jobDetail.enabled!false)?string}">
-               <input id="${id}-prop_enabled-entry" type="checkbox" tabindex="0" name="-" title="${msg("label.enabled")}" <#if jobDetail.enabled!false>checked="checked"</#if> onchange="javascript:YUIDom.get('${id}-prop_enabled').value=this.checked;">
-               <label for="${id}-prop_enabled-entry" class="checkbox">${msg("label.enabled")}</label>
+            
+            <div class="set">
+               <div class="set-title">${msg("label.set.payload")}</div>
+               <div id="${id}-payloadContainer"></div>
+            </div>
+            
+            <div class="set">
+               <div class="set-title">${msg("label.set.transfer-target")}</div>
+               <div id="${id}-transferTargetContainer"></div>
+            </div>
+            
+            <div class="set">
+               <div class="set-title">${msg("label.set.schedule")}</div>
+               <div class="form-field">
+                  <input id="${id}-scheduleEnabled" type="checkbox" tabindex="0" name="-" title="${msg("label.schedule-job")}" <#if jobDetail.schedule??>checked="checked"</#if>>
+                  <label for="${id}-scheduleEnabled" class="checkbox">${msg("label.schedule-job")}</label>
+               </div>
+               <div id="${id}-scheduleContainer" class="hidden">
+                  <div id="${id}-scheduleStartContainer"></div>
+                  <div class="form-field">
+                     <label for="${id}-prop_intervalCount">${msg("label.repeat")}:<span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></label>
+                     <input type="text" id="${id}-prop_intervalCount" name="schedule.intervalCount" tabindex="0" title="${msg("label.repeat-count")}" class="number" value="${((jobDetail.schedule.intervalCount)!"")?html}" />
+                     <select id="${id}-prop_intervalPeriod" name="schedule.intervalPeriod" tabindex="0" title="${msg("label.repeat-period")}">
+                        <option value="-">${msg("option.none")}</option>
+                     <#list intervalPeriods?keys as ip>
+                        <option value="${ip?html}"<#if ip == (jobDetail.schedule.intervalPeriod)!""> selected="selected"</#if>>${(intervalPeriods[ip])?html}</option>
+                     </#list>
+                     </select>
+                  </div>
+               </div>
+            </div>
+            
+            <div class="set">
+               <div class="set-title">${msg("label.set.other")}</div>
+               <div class="form-field">
+                  <input id="${id}-prop_enabled" type="hidden" name="enabled" value="${(jobDetail.enabled!false)?string}">
+                  <input id="${id}-prop_enabled-entry" type="checkbox" tabindex="0" name="-" title="${msg("label.enabled")}" <#if jobDetail.enabled!false>checked="checked"</#if> onchange="javascript:YUIDom.get('${id}-prop_enabled').value=this.checked;">
+                  <label for="${id}-prop_enabled-entry" class="checkbox">${msg("label.enabled")}</label>
+               </div>
             </div>
          </div>
 

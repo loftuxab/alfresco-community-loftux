@@ -83,6 +83,7 @@
 </#macro>
 
 <#macro renderSet set>
+   <div class="set">
    <#if set.appearance??>
       <#if set.appearance == "fieldset">
          <fieldset><legend>${set.label}</legend>
@@ -121,6 +122,7 @@
          </div>
       </#if>
    </#if>
+   </div>
 </#macro>
 
 <#macro renderFieldHelp field>
