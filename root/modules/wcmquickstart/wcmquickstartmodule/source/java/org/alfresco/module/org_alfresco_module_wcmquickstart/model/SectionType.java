@@ -398,18 +398,10 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                             	RenditionDefinition def = renditionService.loadRenditionDefinition(QName.createQName(NAMESPACE, "pdfWebasset"));
                             	if (def != null)
                             	{
-                            		// Parse the path template in the context of the current node
-            						String pathTemplate = (String)def.getParameterValue(RenditionService.PARAM_DESTINATION_PATH_TEMPLATE);
-            						if (pathTemplate != null)
-            						{
-            							pathTemplate = contextParserService.parse(childNode, pathTemplate);
-            							def.setParameterValue(RenditionService.PARAM_DESTINATION_PATH_TEMPLATE, pathTemplate);
-            						}
-                            		
             						// Create rendition
-            						childNode = renditionService.render(childNode, def).getChildRef();;
+                        	        RenditionDefinition clone = cloneRenditionDefinition(def, childNode);
+            						childNode = renditionService.render(childNode, clone).getChildRef();        						
                             	}
-              
                             }
                         }
                     }
@@ -456,6 +448,24 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
             }
         }
     }    
+    
+    public RenditionDefinition cloneRenditionDefinition(RenditionDefinition source, NodeRef context)
+    {
+        RenditionDefinition clone = renditionService.createRenditionDefinition(
+                                                        source.getRenditionName(), 
+                                                        source.getActionDefinitionName());
+        clone.setExecuteAsynchronously(source.getExecuteAsychronously());
+        clone.setParameterValues(source.getParameterValues());
+        
+        String pathTemplate = (String)source.getParameterValue(RenditionService.PARAM_DESTINATION_PATH_TEMPLATE);
+        if (pathTemplate != null)
+        {
+            String resolvedPath = contextParserService.parse(context, pathTemplate);
+            clone.setParameterValue(RenditionService.PARAM_DESTINATION_PATH_TEMPLATE, resolvedPath);
+        }
+        
+        return clone;
+    }
     
     /**
      * On create node behaviour 
