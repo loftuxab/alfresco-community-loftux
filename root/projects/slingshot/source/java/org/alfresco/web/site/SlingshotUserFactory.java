@@ -77,8 +77,8 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
             Map<String, Boolean> immutability) throws JSONException
     {
         AlfrescoUser user = new SlingshotUser(properties.getString(CM_USERNAME), capabilities, immutability);
-        user.setProperty(PROP_USERSTATUS, properties.getString(CM_USERSTATUS));
-        user.setProperty(PROP_USERSTATUSTIME, properties.getString(CM_USERSTATUSTIME));
+        user.setProperty(PROP_USERSTATUS, properties.has(CM_USERSTATUS) ? properties.getString(CM_USERSTATUS) : null);
+        user.setProperty(PROP_USERSTATUSTIME, properties.has(CM_USERSTATUSTIME) ? properties.getString(CM_USERSTATUSTIME) : null);
         return user;
     }
 
