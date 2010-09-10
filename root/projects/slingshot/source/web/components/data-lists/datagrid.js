@@ -1022,15 +1022,15 @@
        */
       onEventHighlightRow: function DataGrid_onEventHighlightRow(oArgs)
       {
-         // Call through to get the row highlighted by YUI
-         this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
-
          // elActions is the element id of the active table cell where we'll inject the actions
          var elActions = Dom.get(this.id + "-actions-" + oArgs.target.id);
 
          // Inject the correct action elements into the actionsId element
-         if (elActions.firstChild === null)
+         if (elActions && elActions.firstChild === null)
          {
+            // Call through to get the row highlighted by YUI
+            this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
+
             // Clone the actionSet template node from the DOM
             var record = this.widgets.dataTable.getRecord(oArgs.target.id),
                clone = Dom.get(this.id + "-actionSet").cloneNode(true);
