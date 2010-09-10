@@ -1,6 +1,6 @@
 .document-workflows
 {
-	padding: 0em 1em 0em 0em;
+   padding: 0em 1em 0em 0em;
 }
 
 .document-workflows .heading
@@ -30,6 +30,12 @@
    padding: 0.5em 0.5em 1em;
    margin-bottom: 0.5em;
    border-bottom: 1px dashed #ddd;
+}
+
+.document-workflows .workflow-last
+{
+   border-bottom: medium none;
+   margin-bottom: 0;
 }
 
 .document-workflows .workflow .details
