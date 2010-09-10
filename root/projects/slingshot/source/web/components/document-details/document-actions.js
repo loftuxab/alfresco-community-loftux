@@ -194,7 +194,8 @@
             inlineEditUrl: fnPageURL("inline-edit?nodeRef=" + nodeRef),
             managePermissionsUrl: fnPageURL("manage-permissions?nodeRef=" + nodeRef),
             workingCopyUrl: fnPageURL("document-details?nodeRef=" + (custom.workingCopyNode || nodeRef)),
-            originalUrl: fnPageURL("document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef))
+            originalUrl: fnPageURL("document-details?nodeRef=" + (custom.workingCopyOriginal || nodeRef)),
+            sourceRepositoryUrl: this.viewInSourceRepositoryURL(recordData) + "\" target=\"_blank"
          });
       },
        
