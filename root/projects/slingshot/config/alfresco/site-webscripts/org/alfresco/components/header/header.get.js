@@ -87,24 +87,18 @@ function getHeader(siteId)
  */
 function getUserStatus()
 {
-   var statusDefault = msg.get("status.default"),
-      userStatus = statusDefault,
-      userStatusTime = null;
+   var userStatus = msg.get("status.default"),
+      userStatusTime = "";
    
-   // TODO: Replace with user.* calls when ALF-4209 resolved
-   var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name));
-   if (result.status == 200 && result != "{}")
+   if (user.properties["userStatus"] != null)
    {
-      var response = eval('(' + result + ')'),
-         userStatus = response.userStatus || statusDefault,
-         userStatusTime = response.userStatusTime || "";
-      
-      if (userStatusTime !== null)
-      {
-         userStatusTime = userStatusTime.iso8601;
-      }
+      userStatus = user.properties["userStatus"];
    }
-
+   if (user.properties["userStatusTime"] != null)
+   {
+      userStatusTime = user.properties["userStatusTime"];
+   }
+   
    model.userStatus = userStatus;
    model.userStatusTime = userStatusTime;
 }
