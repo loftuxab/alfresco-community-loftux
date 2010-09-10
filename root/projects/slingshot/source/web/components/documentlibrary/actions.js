@@ -269,6 +269,22 @@
       },
 
       /**
+       * Delete link.
+       *
+       * @method onActionDeleteLink
+       * @param asset {object} Object literal representing the filelink or folderlink to be actioned
+       */
+      onActionDeleteLink: function dlA_onActionDeleteLink(asset)
+      {
+         if (asset.custom && asset.custom.linkNodeRef)
+         {
+            var linkAsset = Alfresco.util.deepCopy(asset);
+            linkAsset.nodeRef = asset.custom.linkNodeRef;
+            this.onActionDelete(linkAsset);
+         }
+      },
+
+      /**
        * Edit Offline.
        * NOTE: Placeholder only, clients MUST implement their own editOffline action
        *
