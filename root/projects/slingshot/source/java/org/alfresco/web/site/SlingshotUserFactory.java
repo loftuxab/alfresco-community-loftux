@@ -50,6 +50,12 @@ import org.springframework.extensions.webscripts.json.JSONWriter;
  */
 public class SlingshotUserFactory extends AlfrescoUserFactory
 {
+    // Alfresco 3.4 user status properties
+    public static final String CM_USERSTATUS = "{http://www.alfresco.org/model/content/1.0}userStatus";
+    public static final String CM_USERSTATUSTIME = "{http://www.alfresco.org/model/content/1.0}userStatusTime";
+    public static final String PROP_USERSTATUS = "userStatus";
+    public static final String PROP_USERSTATUSTIME = "userStatusTime";  
+    
     /**
      * @see org.alfresco.web.site.UserFactory#authenticate(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
      */
@@ -70,7 +76,10 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
     protected AlfrescoUser constructUser(JSONObject properties, Map<String, Boolean> capabilities,
             Map<String, Boolean> immutability) throws JSONException
     {
-        return new SlingshotUser(properties.getString(CM_USERNAME), capabilities, immutability);
+        AlfrescoUser user = new SlingshotUser(properties.getString(CM_USERNAME), capabilities, immutability);
+        user.setProperty(PROP_USERSTATUS, properties.getString(CM_USERSTATUS));
+        user.setProperty(PROP_USERSTATUSTIME, properties.getString(CM_USERSTATUSTIME));
+        return user;
     }
 
     /**

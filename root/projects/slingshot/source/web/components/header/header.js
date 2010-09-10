@@ -408,7 +408,7 @@
       {
          Alfresco.util.Ajax.jsonPost(
          {
-            url: Alfresco.constants.PROXY_URI + "/slingshot/profile/userstatus",
+            url: Alfresco.constants.URL_SERVICECONTEXT + "/components/profile/userstatus",
             dataObj:
             {
                status: this.getStatusText()
