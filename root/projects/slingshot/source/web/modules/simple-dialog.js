@@ -395,7 +395,7 @@
          {
             fn: function(id, keyEvent)
             {
-               this._hideDialog();
+               this.dialog.hide();
             },
             scope: this,
             correctScope: true
@@ -416,7 +416,7 @@
        */
       hide: function AmSD_hide()
       {
-         this._hideDialog();
+         this.dialog.hide();
       },
 
 
@@ -428,14 +428,18 @@
        */
       _hideDialog: function AmSD__hideDialog()
       {
+         // Unhook close button
+         this.dialog.hideEvent.unsubscribe(this.onHideEvent, null, this);
+
          if (this.widgets.escapeListener)
          {
             this.widgets.escapeListener.disable();
          }
          var form = Dom.get(this.id + "-form");
+
          // Undo Firefox caret issue
          Alfresco.util.undoCaretFix(form);
-         this.dialog.hide();
+
          if (this.options.destroyOnHide)
          {
             YAHOO.Bubbling.fire("formContainerDestroyed");
@@ -448,6 +452,19 @@
                delete this.form;
             }
          }
+      },
+      
+      /**
+       * Event handler for container "hide" event.
+       * Defer until the dialog itself has processed the hide event so we can safely destroy it later.
+       *
+       * @method onHideEvent
+       * @param e {object} Event type
+       * @param obj {object} Object passed back from subscribe method
+       */
+      onHideEvent: function AmSD_onHideEvent(e, obj)
+      {
+         YAHOO.lang.later(0, this, this._hideDialog);
       },
       
       /**
@@ -474,6 +491,9 @@
          {
             width: this.options.width
          });
+
+         // Hook close button
+         this.dialog.hideEvent.subscribe(this.onHideEvent, null, this);
 
          // Are we controlling a Forms Service-supplied form?
          if (Dom.get(this.id + "-form-submit"))
@@ -571,7 +591,7 @@
        */
       onCancel: function AmSD_onCancel(e, p_obj)
       {
-         this._hideDialog();
+         this.dialog.hide();
       },
 
       /**
@@ -582,7 +602,7 @@
        */
       onSuccess: function AmSD_onSuccess(response)
       {
-         this._hideDialog();
+         this.dialog.hide();
 
          if (!response)
          {
