@@ -10,7 +10,7 @@ function main()
    var conn = remote.connect("alfresco");
    var result = conn.post(
       "/slingshot/profile/userstatus",
-      jsonUtils.toJSONString({status: json.get("status")}),
+      jsonUtils.toJSONString( {status: json.get("status")} ),
       "application/json");
    if (result.status == 200 && result.response != "{}")
    {
@@ -25,16 +25,6 @@ function main()
    {
       status.code = result.status;
    }
-}
-
-function pad(s, len)
-{
-    var result = s;
-    for (var i=0; i<(len - s.length); i++)
-    {
-        result = "0" + result;
-    }
-    return result;
 }
 
 main();

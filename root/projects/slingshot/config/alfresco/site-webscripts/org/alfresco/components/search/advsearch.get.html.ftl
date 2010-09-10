@@ -31,7 +31,7 @@
             </span>
          </span>
          <#-- menu list of available forms -->
-         <div id="${el}-selected-form-list" class="yuimenu">
+         <div id="${el}-selected-form-list" class="yuimenu" style="visibility:hidden">
             <div class="bd">
                <ul>
                   <#list searchForms as f>
@@ -45,8 +45,9 @@
          </div>
       </div>
       
+      <#-- search button -->
       <div class="yui-u align-right">
-         <span id="${el}-search-button" class="yui-button yui-push-button search-icon">
+         <span id="${el}-search-button-1" class="yui-button yui-push-button search-icon">
             <span class="first-child">
                <button type="button">${msg('button.search')}</button>
             </span>
@@ -61,7 +62,18 @@
    </div>
    
    <#-- container for forms retrieved via ajax -->
-   <div id="${el}-forms" class="forms-container form-fields">
+   <div id="${el}-forms" class="forms-container form-fields"></div>
+   
+   <div class="yui-gc form-row">
+      <div class="yui-u first"></div>
+      <#-- search button -->
+      <div class="yui-u align-right">
+         <span id="${el}-search-button-2" class="yui-button yui-push-button search-icon">
+            <span class="first-child">
+               <button type="button">${msg('button.search')}</button>
+            </span>
+         </span>
+      </div>
    </div>
    
 </div>

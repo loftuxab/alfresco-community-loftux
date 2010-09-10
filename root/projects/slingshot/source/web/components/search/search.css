@@ -3,6 +3,11 @@
 	margin: 0 -10px;
 }
 
+.search .align-right
+{
+   text-align: right;
+}
+
 .search .search-sites
 {
    margin-bottom: -0.75em;
@@ -27,7 +32,7 @@
 
 .search .search-box .terms
 {
-   width: 32em;
+   width: 42em;
 }
 
 .search .search-icon span.first-child
@@ -159,6 +164,7 @@
 .search .form-row
 {
    margin: 1.5em 0 1.5em 1.5em;
+   width: 830px;
 }
 
 .search .form-row span.lookfor
@@ -219,7 +225,15 @@
    border-width: 0px;
 }
 
+/* hide mandatory indicators - make no sense for a search */
 .search .form-container .mandatory-indicator
 {
    display: none;
+}
+
+/* collapse form-buttons div as it is not used */
+.search .form-container .form-buttons
+{
+   margin: 0;
+   padding: 0;
 }

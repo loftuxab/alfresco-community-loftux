@@ -16,8 +16,8 @@
    
    <input id="${fieldHtmlId}" type="hidden" name="${field.name}-range" value="" />
    
-   <div id="${controlId}" style="width:16em">
-      <div class="yui-gc">
+   <div id="${controlId}" style="width:24em">
+      <div class="yui-g">
          <div class="yui-u first">
             <span>${msg("form.control.range.min")}:</span>
             <#-- min value -->
