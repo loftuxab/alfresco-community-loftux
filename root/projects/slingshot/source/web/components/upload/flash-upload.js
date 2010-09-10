@@ -380,6 +380,9 @@
          // Create the panel
          this.panel = Alfresco.util.createYUIPanel(this.id + "-dialog");
 
+         // Hook close button
+         this.panel.hideEvent.subscribe(this.onCancelOkButtonClick, null, this);
+
          /**
           * Mac Gecko bugfix for javascript losing connection to the flash uploader movie.
           * To avoid a mac gecko bug where scrollbars are displayed even if the "scrolled"
@@ -464,7 +467,10 @@
             correctScope: true
          });
          
-         Dom.addClass(this.id + "-flashuploader-div", "hidden");
+         YAHOO.lang.later(this, 2000, function()
+         {
+            Dom.addClass(this.id + "-flashuploader-div", "hidden");
+         });
       },
 
       /**
@@ -648,10 +654,6 @@
             uniqueFileToken;
          for (var i in event.fileList)
          {
-            if (this.dataTable.get("renderLoopSize") === 0)
-            {
-               this.dataTable.set("renderLoopSize", 1);
-            }
             data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
             uniqueFileToken = this._getUniqueFileToken(data);
             if (!this.addedFiles[uniqueFileToken])
@@ -968,6 +970,9 @@
             }
          }
 
+         // Remove all files and references for this upload "session"
+         this._clear();
+
          // Hide the panel
          this.panel.hide();
 
@@ -976,9 +981,6 @@
                   
          // Disable the Esc key listener
          this.widgets.escapeListener.disable();
-
-         // Remove all files and references for this upload "session"
-         this._clear();
 
          // Inform the user if any files were uploaded before the rest was cancelled
          if (message)
@@ -1362,7 +1364,7 @@
             scrollable: true,            
             height: "100px", // must be set to something so it can be changed afterwards, when the showconfig options decides if its a sinlge or multi upload
             width: "620px",
-            renderLoopSize: 0, // value > 0 results in an error in IE & Safari from YIU2.6.0
+            renderLoopSize: 1,
             MSG_EMPTY: this.msg("label.noFiles")
          });
          this.dataTable.subscribe("postRenderEvent", this.onPostRenderEvent, this, true);
