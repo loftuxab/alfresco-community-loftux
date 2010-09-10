@@ -296,9 +296,10 @@
          <form>
             <field-visibility>
                <show id="message" />
-               <show id="bpm:taskId" />
+               <show id="taskOwner" />
                <show id="bpm:priority" />
                <show id="bpm:dueDate" />
+               <show id="bpm:taskId" />
                <show id="bpm:status" />
                <show id="packageItems" />
                <show id="bpm:comment" />
@@ -314,6 +315,7 @@
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
+               <field id="taskOwner" set="info" />
                <field id="bpm:taskId" set="info">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -339,9 +341,10 @@
          <form>
             <field-visibility>
                <show id="message" />
-               <show id="bpm:taskId" />
+               <show id="taskOwner" />
                <show id="bpm:priority" />
                <show id="bpm:dueDate" />
+               <show id="bpm:taskId" />
                <show id="packageItems" />
                <show id="bpm:comment" />
                <show id="transitions" />
@@ -355,6 +358,7 @@
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
+               <field id="taskOwner" set="info" />
                <field id="bpm:taskId" set="info">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -379,9 +383,10 @@
          <form>
             <field-visibility>
                <show id="message" />
-               <show id="bpm:taskId" />
+               <show id="taskOwner" />
                <show id="bpm:priority" />
                <show id="bpm:dueDate" />
+               <show id="bpm:taskId" />
                <show id="bpm:status" />
                <show id="packageItems" />
                <show id="bpm:comment" />
@@ -397,6 +402,7 @@
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
+               <field id="taskOwner" set="info" />
                <field id="bpm:taskId" set="info">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -422,9 +428,10 @@
          <form>
             <field-visibility>
                <show id="message" />
-               <show id="bpm:taskId" />
+               <show id="taskOwner" />
                <show id="bpm:priority" />
                <show id="bpm:dueDate" />
+               <show id="bpm:taskId" />
                <show id="packageItems" />
                <show id="bpm:comment" />
                <show id="transitions" />
@@ -438,6 +445,7 @@
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
+               <field id="taskOwner" set="info" />
                <field id="bpm:taskId" set="info">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -462,9 +470,10 @@
          <form>
             <field-visibility>
                <show id="message" />
-               <show id="bpm:taskId" />
+               <show id="taskOwner" />
                <show id="bpm:priority" />
                <show id="bpm:dueDate" />
+               <show id="bpm:taskId" />
                <show id="packageItems" />
                <show id="bpm:comment" />
                <show id="transitions" />
@@ -478,6 +487,7 @@
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
+               <field id="taskOwner" set="info" />
                <field id="bpm:taskId" set="info">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -502,9 +512,10 @@
          <form>
             <field-visibility>
                <show id="message" />
-               <show id="bpm:taskId" />
+               <show id="taskOwner" />
                <show id="bpm:priority" />
                <show id="bpm:dueDate" />
+               <show id="bpm:taskId" />
                <show id="wf:reviewerCount" />
                <show id="wf:approveCount" />
                <show id="wf:requiredPercent" />
@@ -524,6 +535,7 @@
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
+               <field id="taskOwner" set="info" />
                <field id="bpm:taskId" set="info">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -560,9 +572,10 @@
          <form>
             <field-visibility>
                <show id="message" />
-               <show id="bpm:taskId" />
+               <show id="taskOwner" />
                <show id="bpm:priority" />
                <show id="bpm:dueDate" />
+               <show id="bpm:taskId" />
                <show id="wf:reviewerCount" />
                <show id="wf:approveCount" />
                <show id="wf:requiredPercent" />
@@ -582,6 +595,7 @@
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
+               <field id="taskOwner" set="info" />
                <field id="bpm:taskId" set="info">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
