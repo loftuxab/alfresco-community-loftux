@@ -925,7 +925,7 @@ Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
  */
 Alfresco.util.encodeURIPath = function(text)
 {
-   return encodeURI(text).replace(/#/g, "%23").replace(/&/g, "%26").replace(/\=/g, "%3D");
+   return encodeURIComponent(text).replace(/%2F/g, "/");
 };
 
 /**
@@ -1200,6 +1200,33 @@ Alfresco.util.disableYUIButton = function(p_button)
          p_button.removeStateCSSClasses("hover");
          p_button.removeStateCSSClasses("active");
          p_button.removeStateCSSClasses("focus");
+      }
+   }
+};
+
+/**
+ * Wrapper to (re)enable a YUI Button, including link buttons.
+ * Link buttons aren't disabled by YUI; see http://developer.yahoo.com/yui/button/#apiref
+ *
+ * @method Alfresco.util.enableYUIButton
+ * @param p_button {YAHOO.widget.Button} Button instance
+ * @static
+ */
+Alfresco.util.enableYUIButton = function(p_button)
+{
+   if (p_button.set && p_button.get)
+   {
+      p_button.set("disabled", false);
+      if (p_button.get("type") == "link")
+      {
+         /**
+          * Note the non-optimal use of a "private" variable, which is why it's tested before use.
+          */
+         if (p_button._button && p_button._button.removeAttribute)
+         {
+            p_button._button.removeAttribute("onclick");
+         }
+         p_button.removeStateCSSClasses("disabled");
       }
    }
 };
@@ -4062,6 +4089,14 @@ if (typeof log4javascript != "undefined")
             }
          }
       }, true);
+   }
+}
+else if (YAHOO.lang.isObject(window.console))
+{
+   Alfresco.logger = window.console;
+   Alfresco.logger.isDebugEnabled = function()
+   {
+      return true;
    }
 }
 else
