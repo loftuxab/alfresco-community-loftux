@@ -697,7 +697,6 @@
 
    </target>
 
-      
    <!-- *********************** -->
    <!-- ** Installer targets ** -->
    <!-- *********************** -->
@@ -845,6 +844,28 @@
 
    </target>
 
+
+   <!-- ************************ -->
+   <!-- ** Quick Start Bundle ** -->
+   <!-- ************************ -->
+
+   <target name="distribute-wcmqs-extension">
+
+      <tar destfile="${dir.continuous.assemble}/temp.tar" 
+           longfile="gnu">
+         <tarfileset dir="${dir.module.wcmquickstart.dist}" includes="${file.name.amp.wcmquickstart}" />
+         <tarfileset dir="${dir.module.wcmquickstart-share.dist}" includes="${file.name.amp.wcmquickstart-share}" />
+         <tarfileset dir="${dir.module.wcmquickstart.dist}" includes="${file.name.amp.wcmquickstart}" />
+         <tarfileset dir="${dir.module.wcmquickstart}" includes="README_wcmqs.txt" />
+         <tarfileset dir="${dir.continuous.assemble}" includes="${file.name.war.webeditor}, ${file.name.wcmquickstart-war}" />
+      </tar>
+	  <zip destfile="${dir.continuous.dist}/${file.name.dist.wcmqs}.zip">
+        <tarfileset src="${dir.continuous.assemble}/temp.tar"/>
+      </zip>
+      <delete quiet="yes" file="${dir.continuous.assemble}/temp.tar" />
+
+   </target>
+      
    <!-- *************************** -->
    <!-- ** Office Add-in targets ** -->
    <!-- *************************** -->
