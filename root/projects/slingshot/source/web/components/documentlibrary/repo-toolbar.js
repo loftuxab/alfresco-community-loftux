@@ -154,6 +154,7 @@
             params += "&format=rss";
             
             this.widgets.rssFeed.set("href", Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/documentlibrary/feed/" + params);
+            Alfresco.util.enableYUIButton(this.widgets.rssFeed);
          }
       }
    }, true);

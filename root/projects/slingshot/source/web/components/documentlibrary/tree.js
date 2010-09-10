@@ -350,15 +350,22 @@
       {
          var node = args.node;
          
-         this._updateSelectedNode(node);
-         
-         // Fire the change filter event
-         YAHOO.Bubbling.fire("changeFilter",
+         if (this.isFilterOwner && node == this.selectedNode)
          {
-            filterOwner: this.name,
-            filterId: "path",
-            filterData: node.data.path
-         });
+            YAHOO.Bubbling.fire("metadataRefresh");
+         }
+         else
+         {
+            this._updateSelectedNode(node);
+
+            // Fire the change filter event
+            YAHOO.Bubbling.fire("changeFilter",
+            {
+               filterOwner: this.name,
+               filterId: "path",
+               filterData: node.data.path
+            });
+         }
 
          Event.stopEvent(args.event);
          // Prevent the tree node from expanding (TODO: user preference?)
