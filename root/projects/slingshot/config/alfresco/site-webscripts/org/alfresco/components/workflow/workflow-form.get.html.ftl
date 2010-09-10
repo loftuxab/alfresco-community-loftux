@@ -62,75 +62,77 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
 
    <#-- Will be inserted above "More Info" in the form after its been loaded through ajax -->
    <div id="${el}-general-form-section">
-      <div class="set-title">${msg("header.generalInfo")}</div>
-      <div class="form-field">
-         <div class="viewmode-field">
-            <span class="viewmode-label">${msg("label.title")}:</span>
-            <span class="viewmode-value" id="${el}-title"></span>
+      <div class="set">
+         <div class="set-title">${msg("header.generalInfo")}</div>
+         <div class="form-field">
+            <div class="viewmode-field">
+               <span class="viewmode-label">${msg("label.title")}:</span>
+               <span class="viewmode-value" id="${el}-title"></span>
+            </div>
          </div>
-      </div>
-      <div class="form-field">
-         <div class="viewmode-field">
-            <span class="viewmode-label">${msg("label.description")}:</span>
-            <span class="viewmode-value" id="${el}-description"></span>
+         <div class="form-field">
+            <div class="viewmode-field">
+               <span class="viewmode-label">${msg("label.description")}:</span>
+               <span class="viewmode-value" id="${el}-description"></span>
+            </div>
          </div>
-      </div>
-      <div class="yui-gb">
-         <div class="yui-u first">
-            <div class="form-field">
-               <div class="viewmode-field">
-                  <span class="viewmode-label">${msg("label.startedBy")}:</span>
-                  <span class="viewmode-value" id="${el}-startedBy"></span>
+         <div class="yui-gb">
+            <div class="yui-u first">
+               <div class="form-field">
+                  <div class="viewmode-field">
+                     <span class="viewmode-label">${msg("label.startedBy")}:</span>
+                     <span class="viewmode-value" id="${el}-startedBy"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="yui-u">
+               <div class="form-field">
+                  <div class="viewmode-field">
+                     <span class="viewmode-label">${msg("label.due")}:</span>
+                     <span class="viewmode-value" id="${el}-due"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="yui-u">
+               <div class="form-field">
+                  <div class="viewmode-field">
+                     <span class="viewmode-label">${msg("label.completed")}:</span>
+                     <span class="viewmode-value" id="${el}-completed"></span>
+                  </div>
                </div>
             </div>
          </div>
-         <div class="yui-u">
-            <div class="form-field">
-               <div class="viewmode-field">
-                  <span class="viewmode-label">${msg("label.due")}:</span>
-                  <span class="viewmode-value" id="${el}-due"></span>
+         <div class="yui-gb">
+            <div class="yui-u first">
+               <div class="form-field">
+                  <div class="viewmode-field">
+                     <span class="viewmode-label">${msg("label.started")}:</span>
+                     <span class="viewmode-value" id="${el}-started"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="yui-u">
+               <div class="form-field">
+                  <div class="viewmode-field">
+                     <span class="viewmode-label">${msg("label.priority")}:</span>
+                     <span class="viewmode-value" id="${el}-priority"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="yui-u">
+               <div class="form-field">
+                  <div class="viewmode-field">
+                     <span class="viewmode-label">${msg("label.status")}:</span>
+                     <span class="viewmode-value" id="${el}-status"></span>
+                  </div>
                </div>
             </div>
          </div>
-         <div class="yui-u">
-            <div class="form-field">
-               <div class="viewmode-field">
-                  <span class="viewmode-label">${msg("label.completed")}:</span>
-                  <span class="viewmode-value" id="${el}-completed"></span>
-               </div>
+         <div class="form-field">
+            <div class="viewmode-field">
+               <span class="viewmode-label">${msg("label.message")}:</span>
+               <span class="viewmode-value" id="${el}-message"></span>
             </div>
-         </div>
-      </div>
-      <div class="yui-gb">
-         <div class="yui-u first">
-            <div class="form-field">
-               <div class="viewmode-field">
-                  <span class="viewmode-label">${msg("label.started")}:</span>
-                  <span class="viewmode-value" id="${el}-started"></span>
-               </div>
-            </div>
-         </div>
-         <div class="yui-u">
-            <div class="form-field">
-               <div class="viewmode-field">
-                  <span class="viewmode-label">${msg("label.priority")}:</span>
-                  <span class="viewmode-value" id="${el}-priority"></span>
-               </div>
-            </div>
-         </div>
-         <div class="yui-u">
-            <div class="form-field">
-               <div class="viewmode-field">
-                  <span class="viewmode-label">${msg("label.status")}:</span>
-                  <span class="viewmode-value" id="${el}-status"></span>
-               </div>
-            </div>
-         </div>
-      </div>
-      <div class="form-field">
-         <div class="viewmode-field">
-            <span class="viewmode-label">${msg("label.message")}:</span>
-            <span class="viewmode-value" id="${el}-message"></span>
          </div>
       </div>
    </div>

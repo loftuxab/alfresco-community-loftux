@@ -1,7 +1,13 @@
+.workflow-form h3
+{
+   font-size: 116%;
+   font-weight: normal;
+}
+
 .workflow-form .summary
 {
    padding: 1em;
-   margin-bottom: 1em;
+   margin-bottom: 1.5em;
    margin-top: 0.5em;
 }
 
@@ -76,16 +82,20 @@
    padding: 0.5em;
 }
 
+.workflow-form .workflow-history
+{
+   margin-bottom: 2em;
+}
+   
 .workflow-form .workflow-history h3
 {
-   margin-top: 2em;
+   margin-top: 1.5em;
    margin-bottom: 0.5em;
 }
 
 .workflow-form .current-tasks h3
 {
    margin-bottom: 0.5em;
-   margin-top: 2em;
 }
 
 .workflow-form .workflow-history table,

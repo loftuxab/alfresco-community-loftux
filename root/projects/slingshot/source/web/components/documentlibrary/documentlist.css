@@ -164,7 +164,7 @@
 .form-container .form-fields
 {
    border-bottom: medium none;
-   padding: 1em;
+   padding: 1em 1em 0em 1em;
 }
 
 /* Details Form */

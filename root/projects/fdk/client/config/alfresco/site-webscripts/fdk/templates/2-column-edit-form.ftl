@@ -16,6 +16,7 @@
 
 
 <#macro renderSetWithColumns set>
+   <div class="set">
    <#if set.appearance?exists>
       <#if set.appearance == "fieldset">
          <fieldset><legend>${set.label}</legend>
@@ -57,4 +58,5 @@
          </div>
       </#if>
    </#if>
+   </div>
 </#macro>

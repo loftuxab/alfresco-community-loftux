@@ -5,11 +5,11 @@
    border: 1px solid #aaaaaa;
    padding: 1.2em 0 0.5em 1.5em;
    margin-bottom: 1em;
-   margin-top: 2em;
 }
 
 .form-container legend
 {
+   font-size: 116%;
    color: #333333;
    padding: 0 0.4em;
 }
@@ -254,10 +254,14 @@
 
 /* Set appearance classes */
 
+.set
+{
+   padding-bottom: 0.5em;
+}
+
 .set-panel
 {
    margin-bottom: 0.6em;
-   padding-top: 1em;
 }
 
 .set-panel-heading
@@ -276,7 +280,6 @@
 .set-bordered-panel
 {
    margin-bottom: 0.8em;
-   padding-top: 1em;
 }
 
 .set-bordered-panel-heading
@@ -294,11 +297,9 @@
 
 .set-title
 {
-   font-size: 106%;
-   font-weight: bold;
+   font-size: 116%;
    border-bottom: 1px solid #eeeeee;
    padding-bottom: 0.1em;
-   padding-top: 1em;
    margin-bottom: 0.6em;
    margin-top: 0.2em;
 }

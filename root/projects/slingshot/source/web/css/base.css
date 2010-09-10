@@ -259,7 +259,7 @@ span.navigation-separator-alt
 
 .share-form .form-container .form-fields
 {
-   padding: 1em !important;
+   padding: 1em 1em 0 !important;
    width: 800px;
 }
 
