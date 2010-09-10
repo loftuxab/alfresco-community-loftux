@@ -15,7 +15,7 @@
       <#if workflows?size &gt; 0>
          <div class="workflows">
          <#list workflows as workflow>
-            <div class="workflow">
+            <div class="workflow <#if !workflow_has_next>workflow-last</#if>">
                <div class="icon"><img src="${url.context}/components/documentlibrary/images/workflow-indicator-16.png" /></div>
                <div class="details">
                   <div class="message">
