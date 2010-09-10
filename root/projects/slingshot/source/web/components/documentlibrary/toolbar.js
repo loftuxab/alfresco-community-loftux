@@ -59,10 +59,12 @@
       // Initialise prototype properties
       this.selectedFiles = [];
       this.currentFilter = {};
+      this.dynamicControls = [];
 
       // Decoupled event listeners
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      YAHOO.Bubbling.on("deactivateDynamicControls", this.onDeactivateDynamicControls, this);
       YAHOO.Bubbling.on("selectedFilesChanged", this.onSelectedFilesChanged, this);
       YAHOO.Bubbling.on("userAccess", this.onUserAccess, this);
       YAHOO.Bubbling.on("doclistMetadata", this.onDoclistMetadata, this);
@@ -188,6 +190,14 @@
       folderDetailsUrl: null,
 
       /**
+       * Dynamic controls that take part in the deactivateDynamicControls event
+       * 
+       * @property dynamicControls
+       * @type array
+       */
+      dynamicControls: null,
+
+      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -204,6 +214,7 @@
             disabled: true,
             value: "create"
          });
+         this.dynamicControls.push(this.widgets.createContent);
 
          // New Folder button: user needs "create" access
          this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewFolder,
@@ -211,6 +222,7 @@
             disabled: true,
             value: "create"
          });
+         this.dynamicControls.push(this.widgets.newFolder);
          
          // File Upload button: user needs  "create" access
          this.widgets.fileUpload = Alfresco.util.createYUIButton(this, "fileUpload-button", this.onFileUpload,
@@ -218,6 +230,7 @@
             disabled: true,
             value: "create"
          });
+         this.dynamicControls.push(this.widgets.fileUpload);
 
          // Selected Items menu button
          this.widgets.selectedItems = Alfresco.util.createYUIButton(this, "selectedItems-button", this.onSelectedItems,
@@ -227,6 +240,7 @@
             lazyloadmenu: false,
             disabled: true
          });
+         this.dynamicControls.push(this.widgets.selectedItems);
 
          // Customize button
          this.widgets.customize = Alfresco.util.createYUIButton(this, "customize-button", this.onCustomize);
@@ -241,12 +255,14 @@
          {
             type: "link"
          });
+         this.dynamicControls.push(this.widgets.rssFeed);
 
          // Folder Up Navigation button
          this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp,
          {
             disabled: true
          });
+         this.dynamicControls.push(this.widgets.folderUp);
 
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions(this.options.workingMode);
@@ -664,7 +680,7 @@
        */
       onCustomize: function DLTB_onCustomize(e, p_obj)
       {
-         
+         Alfresco.logger.warn("DLTB_onCustomize: Not implemented");
       },
 
       /**
@@ -785,6 +801,26 @@
             if (this.widgets.hasOwnProperty(index))
             {
                fnDisable(this.widgets[index]);
+            }
+         }
+      },
+
+      /**
+       * Deactivate Dynamic Controls event handler.
+       * Only deactivates those controls whose enabled state is evaluated on each update.
+       *
+       * @method onDeactivateDynamicControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateDynamicControls: function DLTB_onDeactivateDynamicControls(layer, args)
+      {
+         var index, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.dynamicControls)
+         {
+            if (this.dynamicControls.hasOwnProperty(index))
+            {
+               fnDisable(this.dynamicControls[index]);
             }
          }
       },
@@ -1189,6 +1225,7 @@
             params += "&format=rss";
             
             this.widgets.rssFeed.set("href", Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/documentlibrary/feed/" + params);
+            Alfresco.util.enableYUIButton(this.widgets.rssFeed);
          }
       }
    }, true);

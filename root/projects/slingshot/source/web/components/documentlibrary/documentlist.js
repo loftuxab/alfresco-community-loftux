@@ -77,12 +77,15 @@
       this.afterDocListUpdate = [];
       this.doclistMetadata = {};
       this.previewTooltips = [];
+      this.dynamicControls = [];
       
       /**
        * Decoupled event listeners
        */
       // Specific event handlers
+      YAHOO.Bubbling.on("activateDynamicControls", this.onActivateDynamicControls, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      YAHOO.Bubbling.on("deactivateDynamicControls", this.onDeactivateDynamicControls, this);
       YAHOO.Bubbling.on("metadataRefresh", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("fileRenamed", this.onFileRenamed, this);
       YAHOO.Bubbling.on("changeFilter", this.onChangeFilter, this);
@@ -493,6 +496,14 @@
       doclistMetadata: null,
 
       /**
+       * Dynamic controls that take part in the deactivateDynamicControls event
+       * 
+       * @property dynamicControls
+       * @type array
+       */
+      dynamicControls: null,
+
+      /**
        * Fired by YUI when parent element is available for scripting.
        * Initial History Manager event registration
        *
@@ -511,6 +522,7 @@
          if (this.widgets.showFolders !== null)
          {
             this.widgets.showFolders.set("label", this.msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
+            this.dynamicControls.push(this.widgets.showFolders);
          }
 
          // Detailed/Simple List button
@@ -521,6 +533,7 @@
             this.widgets.simpleDetailed.on("checkedButtonChange", this.onSimpleDetailed, this.widgets.simpleDetailed, this);
             Dom.addClass(this.id + "-simpleView", "simple-view");
             Dom.addClass(this.id + "-detailedView", "detailed-view");
+            this.dynamicControls.push(this.widgets.simpleDetailed);
          }
 
          // File Select menu button
@@ -529,6 +542,10 @@
             type: "menu", 
             menu: "fileSelect-menu"
          });
+         if (this.widgets.fileSelect !== null)
+         {
+            this.dynamicControls.push(this.widgets.fileSelect);
+         }
 
          // Preferences service
          this.services.preferences = new Alfresco.service.Preferences();
@@ -1323,7 +1340,7 @@
             Alfresco.logger.debug("DataTable renderEvent");
             
             // IE6 fix for long filename rendering issue
-            if (YAHOO.env.ua.ie < 7)
+            if (0 < YAHOO.env.ua.ie && YAHOO.env.ua.ie < 7)
             {
                var ie6fix = this.widgets.dataTable.getTableEl().parentNode;
                ie6fix.className = ie6fix.className;
@@ -1361,16 +1378,7 @@
             // Register preview tooltips
             this.widgets.previewTooltip.cfg.setProperty("context", this.previewTooltips);
             
-            // YUI Bug #2286608
-            // http://yuilibrary.com/projects/yui2/ticket/2286608
-            if (this.widgets.dataTable.getRecordSet().getLength() === 0)
-            {
-               this.widgets.dataTable.set("renderLoopSize", 0);
-            }
-            else
-            {
-               this.widgets.dataTable.set("renderLoopSize", this.options.usePagination ? 16 : Alfresco.util.RENDERLOOPSIZE);
-            }
+            this.widgets.dataTable.set("renderLoopSize", this.options.usePagination ? 16 : Alfresco.util.RENDERLOOPSIZE);
             
          }, this, true);
          
@@ -2336,6 +2344,46 @@
       },
       
       /**
+       * Deactivate Dynamic Controls event handler
+       * Only deactivates specifically defined controls.
+       *
+       * @method onDeactivateDynamicControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateDynamicControls: function DL_onDeactivateDynamicControls(layer, args)
+      {
+         var index, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.dynamicControls)
+         {
+            if (this.dynamicControls.hasOwnProperty(index))
+            {
+               fnDisable(this.dynamicControls[index]);
+            }
+         }
+      },
+      
+      /**
+       * Activate Dynamic Controls event handler
+       * (Re-)Activates controls taking part in dynamic deactivation
+       *
+       * @method onActivateDynamicControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onActivateDynamicControls: function DL_onActivateDynamicControls(layer, args)
+      {
+         var index, fnEnable = Alfresco.util.enableYUIButton;
+         for (index in this.dynamicControls)
+         {
+            if (this.dynamicControls.hasOwnProperty(index))
+            {
+               fnEnable(this.dynamicControls[index]);
+            }
+         }
+      },
+      
+      /**
        * Favourite document event handler
        *
        * @method onFavouriteDocument
@@ -2512,6 +2560,7 @@
             // Updating the Doclist may change the file selection
             var fnAfterUpdate = function DL__uDL_sH_fnAfterUpdate()
             {
+               YAHOO.Bubbling.fire("activateDynamicControls");
                YAHOO.Bubbling.fire("selectedFilesChanged");
             };
             this.afterDocListUpdate.push(fnAfterUpdate);
@@ -2544,17 +2593,38 @@
             {
                try
                {
-                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  this.widgets.dataTable.set("MSG_ERROR", response.message);
-                  this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                   if (oResponse.status == 404)
                   {
-                     // Site or container not found - deactivate controls
+                     // Folder not found (via the HTTP "404 Not Found" response) - deactivate dynamic controls only
+                     YAHOO.Bubbling.fire("deactivateDynamicControls");
+                  }
+                  else
+                  {
+                     // Site or container not found (e.g. via the HTTP "410 Gone" response) or more serious - deactivate all controls
                      YAHOO.Bubbling.fire("deactivateAllControls");
                   }
+
+                  var fnAfterFailedUpdate = function DL__uDL_failureHandler_fnAfterUpdate(responseMsg)
+                  {
+                     return function DL__uDL_failureHandler_afterUpdate()
+                     {
+                        this.widgets.paginator.setState(
+                        {
+                           totalRecords: 0
+                        });
+                        this.widgets.paginator.render();
+                        this.widgets.dataTable.set("MSG_ERROR", responseMsg);
+                        this.widgets.dataTable.showTableMessage(responseMsg, YAHOO.widget.DataTable.CLASS_ERROR);
+                     };
+                  };
+
+                  this.afterDocListUpdate.push(fnAfterFailedUpdate(YAHOO.lang.JSON.parse(oResponse.responseText).message));
+                  this.widgets.dataTable.initializeTable();
+                  this.widgets.dataTable.render();
                }
                catch(e)
                {
+                  Alfresco.logger.error(e);
                   this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
