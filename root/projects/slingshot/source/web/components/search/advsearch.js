@@ -131,7 +131,8 @@
          }
          
          // search YUI button and menus
-         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
+         this.widgets.searchButton1 = Alfresco.util.createYUIButton(this, "search-button-1", this.onSearchClick);
+         this.widgets.searchButton2 = Alfresco.util.createYUIButton(this, "search-button-2", this.onSearchClick);
          this.widgets.formButton = new YAHOO.widget.Button(this.id + "-selected-form-button",
          {
             type: "menu",
