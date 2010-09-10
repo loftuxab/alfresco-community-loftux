@@ -373,7 +373,7 @@
 
             if (jobs.length === 0)
             {
-               jobsContainer.innerHTML = this.msg("label.no-jobs");
+               jobsContainer.innerHTML = '<div class="no-jobs">' + this.msg("label.no-jobs") + '</div>';
             }
             else
             {

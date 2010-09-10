@@ -62,6 +62,12 @@
 
 /* Job List */
 
+.replication .jobs-list .no-jobs
+{
+   font-style: italic;
+   padding: 1em 0;
+}
+
 .replication .jobs-list ul li
 {
    background-position: 2px 50%;
@@ -130,7 +136,7 @@
 .replication .job-detail .message
 {
    font-style: italic;
-   padding: 1em;
+   padding: 1em 0;
 }
 
 .replication .job-detail h2,
