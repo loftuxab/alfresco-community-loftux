@@ -15,10 +15,10 @@
       </actionSet>
 
       <actionSet id="transferredFolder">
-         <action type="simple-link" id="onActionViewSourceRepository" permission="view-source-repository,~portlet" href="{sourceRepositoryUrl}" label="actions.folder.view-source-repository" />
          <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
          <action type="simple-link" id="onActionRules" permission="edit" href="{folderRulesUrl}" label="actions.folder.rules" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />
+         <action type="simple-link" id="onActionViewSourceRepository" permission="view-source-repository,~portlet" href="{sourceRepositoryUrl}" label="actions.folder.view-source-repository" />
          <action type="simple-link" id="onActionExplorerView" permission="repository,~portlet" href="{explorerViewUrl}" label="actions.folder.explorer-view" />
       </actionSet>
    </actionSets>

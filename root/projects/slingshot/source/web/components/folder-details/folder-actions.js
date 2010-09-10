@@ -137,7 +137,8 @@
        */
       getActionUrls: function FolderActions_getActionUrls()
       {
-         var nodeRef = this.assetData.nodeRef,
+         var recordData = this.assetData,
+            nodeRef = recordData.nodeRef,
             nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
             fnPageURL = Alfresco.util.bind(function(page)
             {
@@ -149,7 +150,8 @@
             editMetadataUrl: fnPageURL("edit-metadata?nodeRef=" + nodeRef),
             folderRulesUrl: fnPageURL("folder-rules?nodeRef=" + nodeRef),
             managePermissionsUrl: fnPageURL("manage-permissions?nodeRef=" + nodeRef),
-            explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank"
+            explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank",
+            sourceRepositoryUrl: this.viewInSourceRepositoryURL(recordData) + "\" target=\"_blank"
          });
       },
        
@@ -184,7 +186,7 @@
             var userAccess = assetData.permissions.userAccess,
                actionLabels = assetData.actionLabels || {},
                actions = YAHOO.util.Selector.query("div", actionsContainer),
-               action, actionPermissions, i, ii, j, jj, actionAllowed, aTag, spanTag;
+               action, actionPermissions, aP, i, ii, j, jj, actionAllowed, aTag, spanTag;
 
             // Inject special-case permissions
             if (this.options.repositoryUrl)
@@ -204,12 +206,15 @@
                {
                   spanTag.innerHTML = $html(actionLabels[action.className]);
                }
+
                if (aTag.rel !== "")
                {
                   actionPermissions = aTag.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
                   {
-                     if (!userAccess[actionPermissions[j]])
+                     aP = actionPermissions[j];
+                     // Support "negative" permissions
+                     if ((aP.charAt(0) == "~") ? !!userAccess[aP.substring(1)] : !userAccess[aP])
                      {
                         actionAllowed = false;
                         break;
