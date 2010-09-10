@@ -115,7 +115,8 @@
                     distribute-webserviceclient,
                     distribute-extensions-office2003,
                     distribute-deployment,
-                    distribute-webeditor" />
+                    distribute-webeditor,
+                    distribute-wcmqs-extension" />
 
    <target name="set-build-number"
            depends="continuous-init, set-build-devbox-number, set-revision-number">
