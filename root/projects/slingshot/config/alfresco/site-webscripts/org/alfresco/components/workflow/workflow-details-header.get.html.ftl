@@ -1,6 +1,9 @@
 <#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.WorkflowDetailsHeader("${el}").setMessages(
+new Alfresco.WorkflowDetailsHeader("${el}").setOptions(
+{
+   taskId: <#if page.url.args.taskId??>"${page.url.args.taskId?js_string}"<#else>null</#if>
+}).setMessages(
    ${messages}
 );
 //]]></script>

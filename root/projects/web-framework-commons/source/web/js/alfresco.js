@@ -5458,6 +5458,8 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 
       // Merge default data source config
       c.dataSource.pagingResolver = c.dataSource.pagingResolver || this._defaultPagingResolver;
+      c.dataSource.defaultFilter = c.dataSource.defaultFilter || {};
+      c.dataSource.config.connXhrMode = c.dataSource.config.connXhrMode || "cancelStaleRequests";
       c.dataSource.config.responseType = c.dataSource.config.responseType || YAHOO.util.DataSource.TYPE_JSON;
       c.dataSource.config.responseSchema = c.dataSource.config.responseSchema || {};
       c.dataSource.config.responseSchema.resultsList = c.dataSource.config.responseSchema.resultsList || "data";
@@ -5499,7 +5501,6 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       this.config = c;
 
       // Instance variables
-      this.currentFilter = {};
       this.formatters = {};
       this.widgets = {};
 
@@ -5512,13 +5513,68 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 
    Alfresco.util.DataTable.prototype =
    {
+      /**
+       * The config passed in to the constructor
+       *
+       * @param parameters
+       * @type Object
+       */
       config: null,
+
+      /**
+       * Name space to save all yui widgets in
+       *
+       * @param widgets
+       * @type Object
+       */
       widgets: null,
+
+      /**
+       * Place to save all data table formatters so we can call them later
+       *
+       * @param formatters
+       * @type Object
+       */
       formatters: null,
+
+      /**
+       * The current filter
+       *
+       * @param currentFilter
+       * @type Object
+       */
       currentFilter: {},
+
+      /**
+       * The current number of items to skip
+       *
+       * @param currentSkipCount
+       * @type int
+       */
       currentSkipCount: null,
+
+      /**
+       * The current number of maximum values to display
+       *
+       * @param currentMaxItems
+       * @type int
+       */
       currentMaxItems: null,
+
+      /**
+       * The current sort column/key
+       *
+       * @param currentSortKey
+       * @type String
+       */
       currentSortKey: null,
+
+      /**
+       * The current sort direction
+       *
+       * @param currentDir
+       * @type String
+       */
       currentDir: null,
 
       /**
@@ -5531,8 +5587,10 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       {
          var me = this,
             baseParameters = this.createUrlParameters(),
-            delimiter = (this.config.dataSource.url + baseParameters).indexOf("?") > -1 ? "&" : "?";
-         this.widgets.dataSource.sendRequest(baseParameters + (parameters ? delimiter + parameters : ""),
+            delimiter = (this.config.dataSource.url + baseParameters).indexOf("?") > -1 ? "&" : "?",
+            url = baseParameters + (parameters ? delimiter + parameters : "");
+         Alfresco.logger.debug(url);
+         this.widgets.dataSource.sendRequest(url,
          {
             success : function (oRequest, oResponse, oPayload)
             {
@@ -5543,7 +5601,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
                {
                   filter = me.config.dataSource.defaultFilter;
                }
-               if (filter)
+               if (filter && filter.filterId)
                {
                   YAHOO.Bubbling.fire("filterChanged", filter);
                }
@@ -5599,8 +5657,8 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       _init: function DT__init()
       {
          // Reference to self used by inline functions
-         var me = this;
-         var History = YAHOO.util.History;
+         var me = this,
+            History = YAHOO.util.History;
 
          // Create DataSource
          this.widgets.dataSource = new YAHOO.util.DataSource(this.config.dataSource.url, this.config.dataSource.config);
@@ -5623,7 +5681,8 @@ Alfresco.util.RENDERLOOPSIZE = 25;
                columnDefinitions[i].formatter = function(el, oRecord, oColumn, oData)
                {
                   // Apply widths on each cell so it actually works as given in the column definitions
-                  if (oColumn.width) {
+                  if (oColumn.width)
+                  {
                      YAHOO.util.Dom.setStyle(el, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
                      YAHOO.util.Dom.setStyle(el.parentNode, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
                   }
@@ -5638,35 +5697,21 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 
          // Enable row highlighting (and making it possible to display hidden column content such as actions usin css)
          this.widgets.dataTable.subscribe("rowMouseoverEvent", this.widgets.dataTable.onEventHighlightRow);
-         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);         
-
-
-         var navigateWithHistory = function (multiState)
-         {
-            History.multiNavigate(multiState);
-         };
+         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);
 
          var handlePagination = function(paginatorStateObj)
          {
             /*
             var sortedBy = this.get("sortedBy") || {},
                dir = sortedBy.dir ? sortedBy.dir.substring(7) : null;
-            me.setPaging(paginatorState.recordOffset, paginatorState.rowsPerPage, sortedBy.key, dir);
-            navigateWithHistory();
             */
             var pagingState = me.getPagingState(paginatorStateObj.recordOffset, paginatorStateObj.rowsPerPage);
             if (pagingState)
             {
-               var multiState =
+               History.multiNavigate(
                {
                   "paging": pagingState
-               };
-               var filterState = me.getFilterState(me.currentFilter);
-               if (filterState)
-               {
-                  multiState.filter = filterState;
-               }
-               navigateWithHistory(multiState);
+               });
             }
          };
 
@@ -5678,7 +5723,8 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          }
 
          // Update payload data on the fly for tight integration with latest values from server
-         this.widgets.dataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
+         this.widgets.dataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload)
+         {
             var meta = oResponse.meta || {};
             oPayload.totalRecords = YAHOO.lang.isNumber(meta.totalRecords) ? meta.totalRecords : oPayload.totalRecords;
             oPayload.pagination = {
@@ -5699,48 +5745,72 @@ Alfresco.util.RENDERLOOPSIZE = 25;
 
          var onNewHistoryPagingState = function (pagingState)
          {
-            me.setPagingState(pagingState);
-            me._loadDataTableFromHistory();
+            me.setPagingState(pagingState);            
+            if (History.getBookmarkedState("filter") == null || History.getBookmarkedState("filter") == History.getCurrentState("filter"))
+            {
+               me.loadDataTable();
+            }
          };
 
          var onNewHistoryFilterState = function (filterState)
          {
             me.setFilterState(filterState);
-            me._loadDataTableFromHistory();
+            me.loadDataTable();
          };
 
          /**
           * When a filter has changed we save the filter and add it to the browser history state.
-          * When the new state has been added the _loadDataTableFromHistory will be called that will reload the datatable
-          * which when the respons successfuly comes back will fire the "filterChanged" event to make it possible for
+          * When the new state has been added the _loadDataTableFromHistory will be called that will reload the data table
+          * which when the response successfully comes back will fire the "filterChanged" event to make it possible for
           * the filter ui to update itself.
           */
-         YAHOO.Bubbling.on("changeFilter", function TL_onChangeFilter(layer, args)
+         YAHOO.Bubbling.on("changeFilter", function DT_onChangeFilter(layer, args)
          {
             var filterState = args[1] ? me.getFilterState(args[1]) : null;
             if (filterState)
             {
-               // Reset pagination since we have changed filter
-               me.setPaging();
-               navigateWithHistory({
-                  "filter": filterState,
-                  "paging": me.getPagingState(this.currentSkipCount, this.currentMaxItems) // TODO Add sorting when implemented
+               History.multiNavigate(
+               {
+                  "paging": "|",
+                  "filter": filterState
                });
             }
          }, this);
 
          // Register the module with states taken either from the url (or from the default values if not present)
-         this.setPaging();
-         this.setFilter();
-         History.register("paging", History.getBookmarkedState("paging") || this.getPagingState(), onNewHistoryPagingState);
-         History.register("filter", History.getBookmarkedState("filter") || this.getFilterState(), onNewHistoryFilterState);
+         var pc = this.config.paginator.config;
+         History.register("paging", History.getBookmarkedState("paging") || this.getPagingState(pc.recordOffset, pc.rowsPerPage), onNewHistoryPagingState);
+         History.register("filter", History.getBookmarkedState("filter") || this.getFilterState(this.config.dataSource.defaultFilter), onNewHistoryFilterState);
 
          var onHistoryManagerReady = function()
          {
             // Current state after BHM is initialized is the source of truth for what state to render
             me.setPagingState(History.getCurrentState("paging"));
             me.setFilterState(History.getCurrentState("filter"));
-            me._loadDataTableFromHistory(true);
+
+            // There was no specific filter arguments in the url from a previous visit on the page
+            if (me.widgets.paginator)
+            {
+               // Set default values for pagination since they weren't provided in the url
+               me.currentSkipCount = me.currentSkipCount || me.config.paginator.config.recordOffset;
+               me.currentMaxItems = me.currentMaxItems || me.config.paginator.config.rowsPerPage;
+               // todo set sorting default attributes if not present
+            }
+            if (me.currentFilter.filterId)
+            {
+               me.loadDataTable();
+            }
+            else if (this.config.dataSource.defaultFilter)
+            {
+               // Since there was no filter in the url we set the configured default as start filter
+               me.currentFilter = this.config.dataSource.defaultFilter;
+               me.loadDataTable();
+            }
+            else if (YAHOO.lang.isString(me.config.dataSource.initialParameters))
+            {
+               // Since there is no filter in url or set as default we use the configured default url parameters
+               me.loadDataTable(me.config.dataSource.initialParameters);
+            }
          };
 
          // Initialize the Browser History Manager.
@@ -5771,43 +5841,6 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       },
 
       /**
-       * Called on page load or after the browser history state has changed and will if needed load the datatable
-       *
-       * @method _loadDataTableFromHistory
-       * @param firstLoad Tells method if it is the first time the datatable is about to be loaded
-       */
-      _loadDataTableFromHistory: function DT__loadDataTableFromHistory(firstLoad)
-      {
-         if (this.pagingChanged || this.filterChanged)
-         {
-            this.pagingChanged = false;
-            this.filterChanged = false;
-            this.loadDataTable();
-         }
-         else if (firstLoad)
-         {
-            // There was no specific filter arguments in the url from a previous visit on the page
-            if (this.widgets.paginator)
-            {
-               // Set default values for pagination since they weren't provided in the url
-               this.currentSkipCount = this.currentSkipCount || this.config.paginator.config.recordOffset;
-               this.currentMaxItems = this.currentMaxItems || this.config.paginator.config.rowsPerPage;               
-            }
-            if(this.config.dataSource.defaultFilter)
-            {
-               // Since there is no paginator we set the configured default as start filter
-               this.setFilter(this.config.dataSource.defaultFilter);
-               this.loadDataTable();
-            }
-            else if (YAHOO.lang.isString(this.config.dataSource.initialParameters))
-            {
-               // Since there is no paginator or defaultFilter we use the configured default url parameters
-               this.loadDataTable(this.config.dataSource.initialParameters);
-            }
-         }
-      },
-
-      /**
        * The default function to create url pagination parameters using "skipCount" and "maxItems".
        * If these parameters doesn't mathc th url of the REST call override this method by passing in a
        * similar function to the "dataSource.pagingResolver" config element to the YAHOO.util.DataTAble constructor.
@@ -5828,27 +5861,6 @@ Alfresco.util.RENDERLOOPSIZE = 25;
        */
 
       /**
-       * Saves the paging values (and uses the default values if they are undefined) and marks it as changed if new values was provided.
-       *
-       * @param skipCount {int}
-       * @param maxItems {int}
-       * @param sortKey {String}
-       * @param dir {String}
-       */
-      setPaging: function DT_setPaging(skipCount, maxItems, sortKey, dir)
-      {
-         skipCount = skipCount || this.config.paginator.config.recordOffset;
-         maxItems = maxItems || this.config.paginator.config.rowsPerPage;
-         sortKey = sortKey || "id";
-         dir = dir || "asc";
-         this.pagingChanged = (skipCount != this.currentSkipCount || maxItems != this.currentMaxItems); // TODO check sorting params as well
-         this.currentSkipCount = skipCount;
-         this.currentMaxItems = maxItems;
-         this.currentSortKey = sortKey;
-         this.currentDir = dir;
-      },
-
-      /**
        * Returns the current paging values encoded as a browser history bookmark state string.
        *
        * @method getPagingState
@@ -5867,25 +5879,11 @@ Alfresco.util.RENDERLOOPSIZE = 25;
        */
       setPagingState: function DT_setPagingState(pagingState)
       {
-         var paging = pagingState ? pagingState.split("|") : [];
-         this.setPaging(
-               paging.length > 0 ? parseInt(paging[0]) : null,
-               paging.length > 1 ? parseInt(paging[1]) : null,
-               paging.length > 2 ? paging[2] : null,
-               paging.length > 3 ? paging[3] : null);
-      },
-
-      /**
-       * Saves the filter (and uses the default values if they are undefined) and sets filter as changed if new filter values was provided.
-       *
-       * @method setFilter
-       * @param filter {Object}
-       */
-      setFilter: function DT_setFilter(filter)
-      {
-         filter = filter || {};
-         this.filterChanged = filter.filterId != this.currentFilter.filterId || filter.filterData != this.currentFilter.filterData;
-         this.currentFilter = filter;         
+         // Check against, "|"-index of "0" and not "-1" since "-1" means filterId is empty
+         var paging = (pagingState && pagingState.indexOf("|") > 0) ? pagingState.split("|") : [];
+         this.currentSkipCount = paging.length > 0 ? parseInt(paging[0]) : this.config.paginator.config.recordOffset;
+         this.currentMaxItems = paging.length > 1 ? parseInt(paging[1]) : this.config.paginator.config.rowsPerPage;
+         // todo for sorting variables
       },
 
       /**
@@ -5911,7 +5909,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       setFilterState: function DT_setFilterState(filterState)
       {
          var filter = {};
-         if (filterState.indexOf("|") > -1)
+         if (filterState.indexOf("|") > 0)
          {
             var filterTokens = filterState.split("|");
             filter.filterId = filterTokens[0];
@@ -5921,7 +5919,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          {
             filter.filterId = filterState.length > 0 ? filterState : undefined;
          }
-         this.setFilter(filter);
+         this.currentFilter = filter || {};
       }
 
    };

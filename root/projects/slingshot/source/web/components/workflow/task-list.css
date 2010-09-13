@@ -4,7 +4,6 @@
 }
 
 /* task-list bar */
-
 .task-list .task-list-bar
 {
    background-color: #f8f8f8;
@@ -30,7 +29,6 @@
    top: -4px;
    vertical-align: bottom;
 }
-
 /* task-list bar Buttons and Paginator */
 
 .task-list .task-list-bar .thin,
@@ -81,19 +79,6 @@
 .task-list tr.yui-dt-odd
 {
    background-color: #ffffff;
-}
-
-.task-list tr.yui-dt-odd td.yui-dt-last .yui-dt-liner,
-.task-list tr.yui-dt-even td.yui-dt-last .yui-dt-liner
-{
-   visibility: hidden;
-}
-
-.task-list tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last .yui-dt-liner,
-.task-list tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last .yui-dt-liner
-{
-   border-left: 1px solid #c5e6e9;
-   visibility: visible;
 }
 
 .task-list .tasks.yui-dt .yui-dt-data td
@@ -235,4 +220,15 @@
    background-color: #FFF;
    border: 1px solid #2B6EB5;
    cursor: pointer;   
+}
+
+.task-list .tasks table tbody tr .yui-dt-col-name .yui-dt-liner
+{
+   visibility: hidden;
+}
+
+.task-list .tasks table tbody tr.yui-dt-highlighted td.yui-dt-col-name div.yui-dt-liner
+{
+   visibility: visible;
+   border-left: 1px solid #c5e6e9;
 }

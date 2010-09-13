@@ -58,6 +58,24 @@
    {
 
       /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * The taskId for the task related to the workflow, if any.
+          *
+          * @property taskId
+          * @type String
+          * @default null
+          */
+         taskId: null
+      },
+      
+      /**
        * Event handler called when the "onWorkflowDetailedData" event is received
        *
        * @method: onWorkflowDetailedData
@@ -65,7 +83,35 @@
       onWorkflowDetailedData: function TDH_onWorkflowDetailedData(layer, args)
       {
          // Display workflow description
-         Selector.query("h1 span", this.id, true).innerHTML = $html(args[1].title);
+         var workflow = args[1],
+            title = null;
+         if (this.options.taskId)
+         {
+            // There was a specific task related to the task in the url, lets use its message
+            var task, message, type;
+            for (var i = 0, il = workflow.tasks.length; i < il; i++)
+            {
+               task = workflow.tasks[i];
+               if (task.id == this.options.taskId)
+               {
+                  message = task.properties.bpm_description;
+                  type = task.title;
+               }
+            }
+            if (message && message != type)
+            {
+               title = $html(message);
+            }
+            else
+            {
+               title = this.msg("label.noMessage", $html(type));
+            }
+         }
+         else
+         {
+            title = this.msg("label.noMessageAndNoTask");
+         }
+         Selector.query("h1 span", this.id, true).innerHTML = title;
       }
 
    });
