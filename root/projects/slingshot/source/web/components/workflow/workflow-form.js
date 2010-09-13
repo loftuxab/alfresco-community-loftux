@@ -184,6 +184,7 @@
 
             // Set values in the "Summary" & "General" form sections
             Dom.get(this.id + "-recentTaskTitle").innerHTML = $html(recentTask.title || "");
+            Dom.get(this.id + "-recentTaskTitle").setAttribute("href", "task-details?taskId=" + encodeURIComponent(recentTask.id));
 
             Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
@@ -298,7 +299,7 @@
           */
          var renderCellType = function WorkflowHistory_onReady_renderCellType(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = '<a href="task-details?taskId=' + oRecord.getData("id") + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
+            elCell.innerHTML = '<a href="task-details?taskId=' + encodeURIComponent(oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
          };
 
          /**
@@ -372,7 +373,7 @@
             var task = oRecord.getData();
             if (task.isEditable)
             {
-               elCell.innerHTML = '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + me.msg("link.title.task-edit") + '">' + me.msg("actions.edit") + '</a>';
+               elCell.innerHTML = '<a href="task-edit?taskId=' + encodeURIComponent(task.id) + '" class="edit-task" title="' + me.msg("link.title.task-edit") + '">' + me.msg("actions.edit") + '</a>';
             }
          };
 
