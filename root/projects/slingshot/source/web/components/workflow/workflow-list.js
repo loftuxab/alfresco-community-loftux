@@ -186,7 +186,7 @@
             var workflowTitle;
             for (var i = 0, il = this.options.workflowDefinitions.length; i < il; i++)
             {
-               if (this.options.workflowDefinitions[i].id == filter.filterData)
+               if (this.options.workflowDefinitions[i].name == filter.filterData)
                {
                   Dom.get(this.id + "-filterTitle").innerHTML = $html(this.msg("filter." + filter.filterId, this.options.workflowDefinitions[i].title));
                }
