@@ -21,7 +21,7 @@ package org.alfresco.module.org_alfresco_module_wcmquickstart.publish;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebSiteModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.transfer.TransferException;
-import org.alfresco.service.cmr.transfer.TransferService;
+import org.alfresco.service.cmr.transfer.TransferService2;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -39,14 +39,14 @@ public class PublishBootstrap implements ApplicationContextAware,
 {
 	private Lifecycle lifecycle = new Lifecycle();
 	private PublishService publishService;
-	private TransferService transferService;
+	private TransferService2 transferService;
 	
 	public void setPublishService(PublishService publishService)
     {
         this.publishService = publishService;
     }
 
-    public void setTransferService(TransferService transferService)
+    public void setTransferService(TransferService2 transferService)
     {
         this.transferService = transferService;
     }

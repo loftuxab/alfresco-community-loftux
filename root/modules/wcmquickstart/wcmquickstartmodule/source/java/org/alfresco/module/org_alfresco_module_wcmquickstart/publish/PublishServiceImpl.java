@@ -38,7 +38,7 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.transfer.NodeCrawler;
 import org.alfresco.service.cmr.transfer.NodeCrawlerFactory;
 import org.alfresco.service.cmr.transfer.TransferDefinition;
-import org.alfresco.service.cmr.transfer.TransferService;
+import org.alfresco.service.cmr.transfer.TransferService2;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.GUID;
@@ -52,7 +52,7 @@ public class PublishServiceImpl implements PublishService
     
     private SiteHelper siteHelper;
     private NodeService nodeService;
-    private TransferService transferService;
+    private TransferService2 transferService;
     private TransferPathMapper pathMapper;
     private NodeCrawlerFactory nodeCrawlerFactory;
     private String transferTargetName = "Internal Target";
@@ -67,7 +67,7 @@ public class PublishServiceImpl implements PublishService
         this.nodeService = nodeService;
     }
 
-    public void setTransferService(TransferService transferService)
+    public void setTransferService(TransferService2 transferService)
     {
         this.transferService = transferService;
     }

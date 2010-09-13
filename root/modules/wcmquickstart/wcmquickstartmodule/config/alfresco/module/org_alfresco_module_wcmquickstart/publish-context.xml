@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
 <beans>
-    <bean id="org_alfresco_module_wcmquickstart_transferService" class="org.alfresco.repo.transfer.TransferServiceImpl"
+    <bean id="org_alfresco_module_wcmquickstart_transferService" class="org.alfresco.repo.transfer.TransferServiceImpl2"
         init-method="init">
         <property name="actionService">
             <ref bean="ActionService" />
