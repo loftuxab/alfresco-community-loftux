@@ -11,8 +11,8 @@ new Alfresco.WorkflowDetailsHeader("${el}").setOptions(
    <#if page.url.args.taskId??>
    <div class="links">
       <a href="task-details?taskId=${page.url.args.taskId?js_string}">${msg("label.taskDetails")}</a>
-      &nbsp;|&nbsp;
-      <span>${msg("label.workflowDetails")}</span>
+      <span class="separator">|</span>
+      <span class="theme-color-2">${msg("label.workflowDetails")}</span>
    </div>
    </#if>
    <h1>${msg("header")}: <span></span></h1>
