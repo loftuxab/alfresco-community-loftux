@@ -8,7 +8,7 @@ if (workflowDefinitions)
       filters.push(
       {
          id: "workflowType",
-         data: workflowDefinitions[i].id,
+         data: workflowDefinitions[i].name,
          label: workflowDefinitions[i].title
       });
    }

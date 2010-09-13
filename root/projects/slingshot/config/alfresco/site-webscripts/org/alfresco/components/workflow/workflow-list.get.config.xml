@@ -22,6 +22,6 @@
       <filter id="started"       data="last14Days"   parameters="startedAfter={-14d}"/>
       <filter id="started"       data="last28Days"   parameters="startedAfter={-28d}"/>
       <filter id="priority"      data="*"            parameters="priority={data}"/>
-      <filter id="workflowType"  data="*"            parameters="definitionId={data}"/>
+      <filter id="workflowType"  data="*"            parameters="definitionName={data}"/>
    </filters-parameters>
 </config>
