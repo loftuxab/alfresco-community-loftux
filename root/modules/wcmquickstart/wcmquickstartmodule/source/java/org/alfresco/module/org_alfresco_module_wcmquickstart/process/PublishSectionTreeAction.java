@@ -18,6 +18,7 @@
  */
 package org.alfresco.module.org_alfresco_module_wcmquickstart.process;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -101,8 +102,8 @@ public class PublishSectionTreeAction extends ActionExecuterAbstractBase
             {
                 log.debug("Supplied node is a workflow package: " + actionedUponNodeRef);
             }
-            List<ChildAssociationRef> childAssocs = null;
-            childAssocs = nodeService.getChildAssocs(actionedUponNodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+            List<ChildAssociationRef> childAssocs = new ArrayList<ChildAssociationRef>();
+            childAssocs.addAll(nodeService.getChildAssocs(actionedUponNodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL));
             if (TYPE_BPM_PACKAGE.equals(nodeService.getType(actionedUponNodeRef)))
             {
                 childAssocs.addAll(nodeService.getChildAssocs(actionedUponNodeRef, ASSOC_BPM_PACKAGE_CONTAINS, RegexQNamePattern.MATCH_ALL));
