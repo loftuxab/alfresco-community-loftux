@@ -299,7 +299,15 @@
           */
          var renderCellType = function WorkflowHistory_onReady_renderCellType(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = '<a href="task-details?taskId=' + encodeURIComponent(oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
+            var task = oRecord.getData();
+            if (task.isEditable)
+            {
+               elCell.innerHTML = '<a href="task-edit?taskId=' + encodeURIComponent(oRecord.getData("id")) + '" title="' + me.msg("link.title.task-edit") + '">' + $html(oRecord.getData("title")) + '</a>';
+            }
+            else
+            {
+               elCell.innerHTML = '<a href="task-details?taskId=' + encodeURIComponent(oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
+            }
          };
 
          /**
@@ -398,7 +406,7 @@
          {
             fields: [ "title", "type", "owner", "id", "state", "isPooled", "isEditable", "properties"]
          };
-         this.widgets.dataTable = new YAHOO.widget.DataTable(currentTasksTasksEl, currentTasksColumnDefinitions, currentTasksDS,
+         this.widgets.currentTasksDataTable = new YAHOO.widget.DataTable(currentTasksTasksEl, currentTasksColumnDefinitions, currentTasksDS,
          {
             MSG_EMPTY: this.msg("label.noTasks")
          });
@@ -424,7 +432,7 @@
          {
             fields: [ "title", "name", "owner", "id", "state", "properties", "outcome"]
          };
-         this.widgets.dataTable = new YAHOO.widget.DataTable(historyTasksEl, historyColumnDefinitions, workflowHistoryDS,
+         this.widgets.historyTasksDataTable = new YAHOO.widget.DataTable(historyTasksEl, historyColumnDefinitions, workflowHistoryDS,
          {
             MSG_EMPTY: this.msg("label.noTasks")
          });
