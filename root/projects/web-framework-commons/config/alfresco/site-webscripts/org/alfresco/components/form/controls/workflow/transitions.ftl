@@ -11,7 +11,7 @@
 })();
 //]]></script>
 
-<div class="form-field" id="${fieldHtmlId}">
+<div class="form-field suggested-actions" id="${fieldHtmlId}">
    <div id="${fieldHtmlId}-buttons">
    </div>
 </div>

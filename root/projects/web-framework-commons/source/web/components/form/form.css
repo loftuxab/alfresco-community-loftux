@@ -81,6 +81,12 @@
    border-bottom: 1px dashed #c2c2c2;
 }
 
+.form-container .form-fields .suggested-actions .yui-button .first-child
+{
+   background: url(images/suggested-action-16.png) no-repeat scroll 12px 4px transparent;
+   padding-left: 22px;
+}
+
 .form-container .form-buttons
 {
    padding-top: 1em;
