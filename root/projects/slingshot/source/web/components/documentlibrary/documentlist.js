@@ -375,7 +375,15 @@
           * @property vtiServer
           * @type object
           */
-         vtiServer: {}
+         vtiServer: {},
+         
+         /**
+          * Replication URL Mapping details
+          *
+          * @property replicationUrlMapping
+          * @type object
+          */
+         replicationUrlMapping: {}
       },
 
       /**

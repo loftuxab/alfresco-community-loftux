@@ -1,6 +1,6 @@
 <#import "../import/alfresco-common.ftl" as common />
 
-<#-- Global flags retrieved from web-framework-config-application -->
+<#-- Global flags retrieved from share-config (or share-config-custom) -->
 <#assign DEBUG=(common.globalConfig("client-debug", "false") = "true")>
 <#assign AUTOLOGGING=(common.globalConfig("client-debug-autologging", "false") = "true")>
 <#-- allow theme to be specified in url args - helps debugging themes -->
