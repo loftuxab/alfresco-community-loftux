@@ -2579,6 +2579,46 @@
    </target>
    
    <!-- *********************************** -->
+   <!-- ** WCM Quick Start Client API       ** -->
+   <!-- *********************************** -->
+   
+   <target name="incremental-wcmquickstart-clientapi" 
+           depends="package-wcmquickstart-clientapi" />
+      
+   <target name="build-wcmquickstart-clientapi" 
+           depends="clean-wcmquickstart-clientapi, 
+                    incremental-wcmquickstart-clientapi" />
+   
+   <target name="clean-wcmquickstart-clientapi" 
+           depends="init">
+      <clean projectdir="${dir.project.wcmquickstart-clientapi}" />
+   </target>
+
+   <target name="compile-wcmquickstart-clientapi" 
+           depends="init">
+      <compile-java projectdir="${dir.project.wcmquickstart-clientapi}" />
+   </target>
+   
+   <target name="package-wcmquickstart-clientapi"
+           depends="compile-wcmquickstart-clientapi">
+      <mkdir dir="${dir.project.wcmquickstart-clientapi.dist}" />
+      <jar jarfile="${dir.project.wcmquickstart-clientapi.dist}/${file.name.jar.wcmquickstart-clientapi}" 
+           basedir="${dir.project.wcmquickstart-clientapi.classes}" />
+   </target>
+   
+   <target name="test-wcmquickstart-clientapi" 
+           depends="compile-wcmquickstart-clientapi">
+      <run-tests projectdir="${dir.project.wcmquickstart-clientapi}" />
+   </target>
+   
+   <target name="generate-javadocs-wcmquickstart-clientapi" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco WCM Quick Start Client API ${version.number}" 
+                         windowtitle="Alfresco WCM Quick Start Client API" 
+                         projectdir="${dir.project.wcmquickstart-clientapi}"/>
+   </target>
+   
+   <!-- *********************************** -->
    <!-- ** WCM Quick Start Web App       ** -->
    <!-- *********************************** -->
     
