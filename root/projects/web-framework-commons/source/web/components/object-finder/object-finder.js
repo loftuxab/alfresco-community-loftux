@@ -1140,8 +1140,14 @@
           */
          return function ObjectFinder_renderCellGenericIcon(elCell, oRecord, oColumn, oData)
          {
+            Alfresco.logger.debug("ObjectFinder_renderCellGenericIcon(" + elCell + ", " + oRecord + ", " + oColumn.width + ", " + oData + ")");
             var iconSize = scope.options.compactMode ? 16 : 32;
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            if (oColumn.width)
+            {
+               Alfresco.logger.debug("ObjectFinder_renderCellGenericIcon setting width!");
+               Dom.setStyle(elCell, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
+               Dom.setStyle(elCell.parentNode, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
+            }
             elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
          };
       },
@@ -1199,7 +1205,7 @@
           * @param oData {object|string}
           */
          return function ObjectFinder_renderCellRemove(elCell, oRecord, oColumn, oData)
-         {  
+         {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             elCell.innerHTML = '<a href="#" class="remove-item remove-' + scope.eventGroup + '" title="' + scope.msg("form.control.object-picker.remove-item") + '" tabindex="0"><span class="removeIcon">&nbsp;</span></a>';
          };
@@ -1218,13 +1224,13 @@
          /**
           * Action item custom datacell formatter
           *
-          * @method fnRenderCellListItemActions
+          * @method fnRenderCellListItemName
           * @param elCell {object}
           * @param oRecord {object}
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         return function ObjectFinder_fnRenderCellListItemActions(elCell, oRecord, oColumn, oData)
+         return function ObjectFinder_fnRenderCellListItemName(elCell, oRecord, oColumn, oData)
          {
             var item = oRecord.getData(),
                description =  item.description ? $html(item.description) : scope.msg("label.none"),
@@ -1271,9 +1277,12 @@
           */
          return function ObjectFinder_fnRenderCellListItemActions(elCell, oRecord, oColumn, oData)
          {
-            Dom.setStyle(elCell, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
+            if (oColumn.width)
+            {
+               Dom.setStyle(elCell, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
+               Dom.setStyle(elCell.parentNode, "width", oColumn.width + (YAHOO.lang.isNumber(oColumn.width) ? "px" : ""));
+            }
+            
             // While waiting for the package item actions, only render the actions (remove) in non editable mode
             if (scope.options.disabled === false) 
             {
@@ -1574,9 +1583,9 @@
             // Current values DataTable definition
             var currentValuesColumnDefinitions =
             [
-               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellGenericIcon() },
+               { key: "nodeRef", label: "Icon", sortable: false, formatter: this.fnRenderCellGenericIcon(), width: 50 },
                { key: "name", label: "Item", sortable: false, formatter: this.fnRenderCellListItemName() },
-               { key: "action", label: "Actions", sortable: false, formatter: this.fnRenderCellListItemActions(), width: "5em" }
+               { key: "action", label: "Actions", sortable: false, formatter: this.fnRenderCellListItemActions(), width: 200 }
             ];
 
             // Make sure the currentValues container is a div rather than a span to make sure it may become a datatable
@@ -1614,7 +1623,7 @@
                   if (record)
                   {
                      var data = record.getData(),
-                        name = args[1].anchor.getAttribute("class").split(" ")[0];
+                        name = YAHOO.util.Dom.getAttribute(args[1].target, "class").split(" ")[0];
                      for (var i = 0, il = me.options.listItemActions.length; i < il; i++)
                      {
                         if (me.options.listItemActions[i].name == name)

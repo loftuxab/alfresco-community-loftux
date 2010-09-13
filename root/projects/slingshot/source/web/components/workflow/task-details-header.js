@@ -65,13 +65,20 @@
          // Set workflow details url and display link
          var task = args[1],
             taskId = task.id,
-            taskName = task.properties["bpm_description"],
+            message = task.properties["bpm_description"],
             workflowId = task.workflowInstance.id,
             workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + workflowId + "&taskId=" + taskId);
-         
+         if (message && message != task.title)
+         {
+            message = $html(message);
+         }
+         else
+         {
+            message = this.msg("label.noMessage", $html(task.title));
+         }
          Selector.query(".links a", this.id, true).setAttribute("href", workflowDetailsUrl);
          Dom.removeClass(Selector.query(".links", this.id, true), "hidden");
-         Selector.query("h1 span", this.id, true).innerHTML = $html(taskName);
+         Selector.query("h1 span", this.id, true).innerHTML = message;
       }
    });
 })();

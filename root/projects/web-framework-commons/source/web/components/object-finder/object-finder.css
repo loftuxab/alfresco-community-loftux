@@ -11,7 +11,7 @@
 .current-values.object-finder-list table
 {
    width: 100%;
-   table-layout: fixed;
+  /* table-layout: fixed; */
    border: none;
 }
 
@@ -25,11 +25,12 @@
    border-right-style: none;
 }
 
+/*
 .current-values.object-finder-list table td.yui-dt-col-nodeRef
 {
    width: 54px;
 }
-
+*/
 .current-values.object-finder-list table td.yui-dt-col-nodeRef .yui-dt-liner div
 {
    text-align: center;
@@ -44,12 +45,12 @@
 {
 
 }
-
+/*
 .current-values.object-finder-list table td.yui-dt-col-action
 {
    width: 30%;
 }
-
+  */
 .current-values.object-finder-list table td.yui-dt-col-name .yui-dt-liner div
 {
    padding-left: 0;
@@ -72,12 +73,6 @@
 .current-values.object-finder-list div
 {
    padding: 0.5em;
-}
-
-.current-values.object-finder-list img
-{
-   position: relative;
-   top: 3px;
 }
 
 .object-finder .inlineable div
