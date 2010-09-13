@@ -87,8 +87,10 @@
        */
       onReady: function StartWorkflow_onReady()
       {
+         // Listen for workflow choices
          this.widgets.workflowSelectEl = Dom.get(this.id + "-workflowDefinitions");
          Event.addListener(this.widgets.workflowSelectEl, "change", this.onWorkflowSelectChange, null, this);
+
          return Alfresco.StartWorkflow.superclass.onReady.call(this);
       },
 
@@ -155,6 +157,29 @@
       {
          var formEl = Dom.get(this.id + "-workflowFormContainer");
          formEl.innerHTML = response.serverResponse.responseText;
+      },
+
+      /**
+       * Decides to which page we shall navigate after form submission or cancellation
+       *
+       * @method navigateForward
+       * @override
+       */
+      navigateForward: function FormManager_navigateForward()
+      {
+         // Did the user come from
+         if (document.referrer.match(/document-details([?]|$)/))
+         {
+            /**
+             * We can't use history.go(-1) since it won't refresh the page which means
+             * the user wouldn't see the new workflow in the workflow list
+             */
+            document.location.href = document.referrer;
+         }
+         else
+         {
+            Alfresco.StartWorkflow.superclass.navigateForward.call(this);
+         }
       }
 
    });
