@@ -101,7 +101,15 @@
           * @type string
           * @default "documentLibrary"
           */
-         containerId: "documentLibrary"
+         containerId: "documentLibrary",
+
+         /**
+          * Replication URL Mapping details
+          *
+          * @property replicationUrlMapping
+          * @type object
+          */
+         replicationUrlMapping: {}
       },
       
       /**
