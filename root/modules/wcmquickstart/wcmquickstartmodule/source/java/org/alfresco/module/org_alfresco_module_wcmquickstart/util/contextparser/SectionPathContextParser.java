@@ -78,7 +78,7 @@ public class SectionPathContextParser extends ContextParser
 		    } 
 		    else if ("..".equals(segment))
 		    {
-		        currentNode = siteHelper.getRelevantSection(currentNode);
+		        currentNode = siteHelper.getRelevantSection(currentNode, false);
 		    }
 		    else
 		    {

@@ -118,12 +118,25 @@ public class SiteHelper implements WebSiteModel
     
     /**
      * Gets the section that the node resides within
-     * @param nodeRef	node reference
-     * @return NodeRef	section node reference, null otherwise
+     * @param nodeRef   node reference
+     * @return NodeRef  section node reference, null otherwise
      */
     public NodeRef getRelevantSection(NodeRef nodeRef)
     {
-    	return findNearestParent(nodeRef, WebSiteModel.TYPE_SECTION);
+        return getRelevantSection(nodeRef, true);
+    }
+    
+    /**
+     * Gets the section that the node resides within
+     * @param nodeRef   node reference
+     * @param allowSelf true if the supplied noderef is included in the "relevant section" test. That is to say that
+     * if this flag is true and the supplied node ref identifies a Section then this method will return the 
+     * supplied node ref.
+     * @return NodeRef  section node reference, null otherwise
+     */
+    public NodeRef getRelevantSection(NodeRef nodeRef, boolean allowSelf)
+    {
+        return findNearestParent(nodeRef, WebSiteModel.TYPE_SECTION, allowSelf);
     }
     
     /**
@@ -193,13 +206,26 @@ public class SiteHelper implements WebSiteModel
     /**
      * Find the nearest parent in the primary child association hierarchy that
      * is of the specified content type (or a sub-type of that type).
+     * @param noderef       node reference
+     * @param parentType    parent node type
+     * @return NodeRef      nearest parent node reference, null otherwise
+     */
+    private NodeRef findNearestParent(NodeRef noderef, QName parentType)
+    {
+        return findNearestParent(noderef, parentType, true);
+    }
+
+    /**
+     * Find the nearest parent in the primary child association hierarchy that
+     * is of the specified content type (or a sub-type of that type).
      * @param noderef		node reference
      * @param parentType	parent node type
      * @return NodeRef		nearest parent node reference, null otherwise
      */
-    private NodeRef findNearestParent(NodeRef noderef, QName parentType)
+    private NodeRef findNearestParent(NodeRef noderef, QName parentType, boolean allowSelf)
     {
-        NodeRef parentNode = nodeService.getPrimaryParent(noderef).getParentRef();
+        NodeRef parentNode;
+        parentNode = allowSelf ? noderef : nodeService.getPrimaryParent(noderef).getParentRef();
         while (parentNode != null && 
                nodeService.exists(parentNode) == true &&
                dictionaryService.isSubClass(nodeService.getType(parentNode), parentType) == false)

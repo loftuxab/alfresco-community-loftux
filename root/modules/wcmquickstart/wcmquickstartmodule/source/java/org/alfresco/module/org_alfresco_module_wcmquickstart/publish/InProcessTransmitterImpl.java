@@ -21,12 +21,12 @@ package org.alfresco.module.org_alfresco_module_wcmquickstart.publish;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
 
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
-import org.alfresco.repo.transfer.DeltaList;
 import org.alfresco.repo.transfer.Transfer;
 import org.alfresco.repo.transfer.TransferCommons;
 import org.alfresco.repo.transfer.TransferTransmitter;
@@ -138,10 +138,17 @@ public class InProcessTransmitterImpl implements TransferTransmitter
             String transferId = transfer.getTransferId();
             FileInputStream fs = new FileInputStream(manifest);
             receiver.saveSnapshot(transferId, fs);
+            receiver.generateRequsite(transferId, results);
+            results.close();
         } 
         catch (FileNotFoundException error)
         {
             throw new TransferException("Failed to find snapshot file: " + manifest.getPath(), error);
+        }
+        catch (IOException e)
+        {
+            throw new TransferException("Failed to either read snapshot file or write requisite file: " + 
+                    manifest.getPath(), e);
         }
     }
 
