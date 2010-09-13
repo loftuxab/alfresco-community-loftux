@@ -28,7 +28,6 @@ function getTwisterPrefs()
 
 /**
  * Site Title
- * @return siteId
  */
 function getSiteTitle()
 {
@@ -53,8 +52,6 @@ function getSiteTitle()
    model.siteTitle = siteTitle;
    // Save the site title for downstream components - saves remote calls for Site Profile
    context.setValue("site-title", siteTitle);
-   
-   return siteId;
 }
 
 /**
@@ -71,7 +68,7 @@ function getThemeOverride()
 /**
  * Customizable Header
  */
-function getHeader(siteId)
+function getHeader()
 {
    // Array of tokenised values for use in i18n messages
    model.labelTokens = [ user.name || "", user.firstName || "", user.lastName || "", user.fullName || ""];
@@ -106,9 +103,9 @@ function getUserStatus()
 function main()
 {
    getTwisterPrefs();
-   var siteId = getSiteTitle();
+   getSiteTitle();
    getThemeOverride();
-   getHeader(siteId);
+   getHeader();
    getUserStatus();
 }
 

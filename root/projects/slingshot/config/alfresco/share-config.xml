@@ -46,7 +46,7 @@
             </item>
          </app-items>
          <user-items>
-            <item type="container" id="user" icon="">
+            <item type="container" id="user" icon="" description="">
                <container-group id="usermenu" label="">
                   <item type="user" id="status">{userprofilepage}</item>
                   <item type="link" id="my-profile">{userprofilepage}</item>

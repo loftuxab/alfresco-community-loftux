@@ -33,6 +33,13 @@ body .header span.app-items span.yui-menu-button
    top: 2px;
 }
 
+body .header .user-items span.yui-button,
+body .header .search-box span.yui-button
+{
+   background: none;
+   border-width: 0px;
+}
+
 body .header .user-items div.search-box input
 {
    border-width: 0px;
