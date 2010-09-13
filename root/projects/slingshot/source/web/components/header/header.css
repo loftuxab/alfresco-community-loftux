@@ -129,7 +129,8 @@
    top: -5px;
 }
 
-.header .user-items span.yui-button
+.header .user-items > span.yui-button,
+.header .search-box > span.yui-button
 {
    background: none;
    border-width: 0px;

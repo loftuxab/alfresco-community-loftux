@@ -105,7 +105,7 @@
    <span class="user-status">
       <textarea id="${id}-statusText" tabindex="0">${userStatus?html}</textarea>
       <div id="${id}-statusTime" class="user-status-time" title="${userStatusTime?html}"></div>
-      <div class="flat-button">
+      <div>
          <span id="${id}-submitStatus" class="yui-button yui-push-button">
             <span class="first-child">
                <button type="button" tabindex="0" title="${msg("header.submit-status.description")}"><span>${msg("header.submit-status.label")}</span></button>
