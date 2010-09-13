@@ -26,6 +26,11 @@ function getHiddenWorkflowNames()
    return hiddenWorkflowNames;
 }
 
+function sortByTitle(workflow1, workflow2)
+{
+   return (workflow1.title > workflow2.title) ? 1 : (workflow1.title < workflow2.title) ? -1 : 0;
+}
+
 function getWorkflowDefinitions()
 {
    var hiddenWorkflowNames = getHiddenWorkflowNames(),
@@ -33,7 +38,9 @@ function getWorkflowDefinitions()
       result = connector.get("/api/workflow-definitions?exclude=" + hiddenWorkflowNames.join(","));
    if (result.status == 200)
    {
-      return eval('(' + result + ')').data;         
+      var workflows = eval('(' + result + ')').data;
+      workflows.sort(sortByTitle);
+      return workflows;
    }
    return [];
 }
