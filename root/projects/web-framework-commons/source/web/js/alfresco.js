@@ -5285,7 +5285,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
        */
       onMetadataUpdateSuccess: function FormManager_onMetadataUpdateSuccess(response)
       {
-         this._navigateForward();
+         this.navigateForward();
       },
 
       /**
@@ -5312,22 +5312,21 @@ Alfresco.util.RENDERLOOPSIZE = 25;
        */
       onCancelButtonClick: function FormManager_onCancel(type, args)
       {
-         this._navigateForward();
+         this.navigateForward();
       },
 
       /**
-       * Displays the corresponding details page for the current node
+       * Decides to which page we shall navigate after form submission or cancellation
        *
-       * @method _navigateForward
-       * @private
+       * @method navigateForward
        */
-      _navigateForward: function FormManager__navigateForward()
+      navigateForward: function FormManager_navigateForward()
       {
          // If user came from a "list" page?
          if (document.referrer.match(/documentlibrary([?]|$)/) ||
                document.referrer.match(/repository([?]|$)/) ||
                document.referrer.match(/my-workflows([?]|$)/) ||
-               document.referrer.match(/my-tasks([?]|$)/)) 
+               document.referrer.match(/my-tasks([?]|$)/))
          {
             // Yes, then go back to the referrer page
             history.go(-1);
