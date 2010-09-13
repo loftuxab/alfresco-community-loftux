@@ -6,8 +6,8 @@ new Alfresco.TaskDetailsHeader("${el}").setMessages(
 //]]></script>
 <div id="${el}-body" class="form-manager task-details-header">
    <div class="links hidden">
-      <span>${msg("label.taskDetails")}</span>
-      &nbsp;|&nbsp;
+      <span class="theme-color-2">${msg("label.taskDetails")}</span>
+      <span class="separator">|</span>
       <a href="">${msg("label.workflowDetails")}</a>
    </div>
    <h1>${msg("header")}: <span></span></h1>
