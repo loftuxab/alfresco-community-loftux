@@ -32,10 +32,9 @@ The WCM Quick Start uses an HTML Site Template the includes the following third-
 	7)  The font used for logo and headers is called Liberation Sans and can be downloaded from here: http://www.dafont.com/Liberation-Sans.Font.  
 		License: Public domain / GNU GPL - GNU General Public License v.2 with exceptions (http://fedorahosted.org/liberation-fonts/broser/source/license.txt). 
 
-	8) 	Cufon plugin for text replacement can be found here:http://cufon.shoqolate.com/generate/.  License: MIT license stated within the javascript source files.
-		See http://github.com/sorccu/cufon/blob/master/LICENSE.txt for further details.
-
-	9) 	jQuery: http://jquery.org/license  License: Dual license - MIT License or the GNU General Public License (GPL) Version 2.
+	8) 	jQuery: http://jquery.org/license  License: Dual license - MIT License or the GNU General Public License (GPL) Version 2.
+	
+	9)  SWFObject - Used for the flash preview component is provided under the MIT license.  See http://code.google.com/p/swfobject/.
 	
 	
 Website Images
