@@ -326,7 +326,7 @@
          <fileset dir="${dir.module.wcmquickstart-share.dist}"        includes="${file.name.amp.wcmquickstart-share}" />
       </copy>
       
-      <copy todir="${dir.continuous.assemble}" file="${dir.wcmquickstart.webapp}/target/${file.name.wcmquickstart-war}" />
+      <copy todir="${dir.continuous.assemble}" file="${dir.project.wcmquickstart-webapp}/target/${file.name.war.wcmquickstart-webapp}" />
 
       <!-- Zip bundles of AMPs -->
       <zip destfile="${dir.continuous.dist}/${file.name.dist.dod5015}.zip">
