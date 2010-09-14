@@ -1,4 +1,0 @@
-// Spring Roo 1.0.2.RELEASE [rev 638] log opened at 2010-06-21 14:20:09
-project --topLevelPackage org.alfresco.wcm.quickstart
-surf install
-deploy --server "SpringSource tc Server v6.0"
