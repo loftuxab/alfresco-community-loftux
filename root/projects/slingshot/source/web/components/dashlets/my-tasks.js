@@ -219,10 +219,10 @@
             message = this.msg("workflow.no_message");
          }
                
-         var messageDesc = '<h4><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h4>',
+         var messageDesc = '<h4><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("title.editTask") + '">' + message + '</a></h4>',
                dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '" title="' + 
-                          this.msg("label.dueOn", Alfresco.util.formatDate(dueDate, "longDate")) + '">' + Alfresco.util.formatDate(dueDate, "longDate") + '</span></h4>' : "",
-               statusDesc = '<div>' + this.msg("label.taskSummary", type, status) + '</div>',
+                          this.msg("title.dueOn", Alfresco.util.formatDate(dueDate, "longDate")) + '">' + Alfresco.util.formatDate(dueDate, "longDate") + '</span></h4>' : "",
+               statusDesc = '<div title="' + this.msg("title.taskSummary", type, status) + '">' + this.msg("label.taskSummary", type, status) + '</div>',
                unassignedDesc = '';
          if (!assignee || !assignee.userName)
          {
@@ -240,9 +240,9 @@
          var actions = "";
          if (task.isEditable)
          {
-            actions += '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + this.msg("link.editTask") + '">&nbsp;</a>';
+            actions += '<a href="task-edit?taskId=' + task.id + '" class="edit-task" title="' + this.msg("title.editTask") + '">&nbsp;</a>';
          }
-         actions += '<a href="task-details?taskId=' + task.id + '" class="view-task" title="' + this.msg("link.viewTask") + '">&nbsp;</a>';
+         actions += '<a href="task-details?taskId=' + task.id + '" class="view-task" title="' + this.msg("title.viewTask") + '">&nbsp;</a>';
          elCell.innerHTML = actions;
       }
 
