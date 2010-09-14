@@ -34,6 +34,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.transfer.TransferDefinition;
 import org.alfresco.service.descriptor.Descriptor;
 import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -83,12 +84,12 @@ public class WebPublishingManifestNodeFactory implements TransferManifestNodeFac
         this.descriptorService = descriptorService;
     }
 
-    public TransferManifestNode createTransferManifestNode(NodeRef nodeRef)
+    public TransferManifestNode createTransferManifestNode(NodeRef nodeRef, TransferDefinition definition)
     {
         TransferManifestNode newNode = preProcess(nodeRef);
         if (newNode == null)
         {
-            newNode = realFactory.createTransferManifestNode(nodeRef);
+            newNode = realFactory.createTransferManifestNode(nodeRef, definition);
         }
 
         long start = 0L;
