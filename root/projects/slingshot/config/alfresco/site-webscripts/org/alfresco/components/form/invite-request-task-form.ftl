@@ -15,14 +15,7 @@
          <div class="yui-u first">
             <div class="invite-task-title">
                <img src="${url.context}/components/images/site-24.png" />
-               <span>${msg("workflow.task.invite.title", form.data["prop_inwf_resourceTitle"])?html}</span>
-            </div>
-            <div class="invite-task-subtitle">
-               ${msg("workflow.task.invite.subtitle", form.data["prop_inwf_resourceTitle"])?html}
-            </div>
-            <div class="invite-task-role">
-               <#assign roleLabel = msg("role." + form.data["prop_inwf_inviteeRole"]) />
-               ${msg("workflow.task.invite.role", roleLabel)?html}
+               <span>${msg("workflow.task.request.invite.title", form.data["prop_imwf_inviteeUserName"], form.data["prop_imwf_resourceName"])?html}</span>
             </div>
          </div>
          <div class="yui-u">
@@ -44,3 +37,5 @@
       </form>
    </#if>
 </div>
+
+

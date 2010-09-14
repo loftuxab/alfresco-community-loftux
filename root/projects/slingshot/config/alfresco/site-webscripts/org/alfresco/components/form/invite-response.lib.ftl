@@ -19,7 +19,7 @@
             </div>
             <div class="yui-u">
                <div class="invite-task-priority">
-                  <img src="${url.context}/components/images/priority-${form.data["prop_bpm_priority"]?c}-16.png" />
+                  <img src="${url.context}/components/images/${getPriorityIcon()}" />
                </div>
             </div>
          </div>
@@ -51,3 +51,9 @@
    //]]></script>
 </#if>
 </#macro>
+
+<#function getPriorityIcon>
+   <#assign priority=form.data["prop_bpm_priority"]?string />
+   <#assign priorityMap={"1": "low", "2": "medium", "3": "high"} />
+   <#return "priority-" + priorityMap[priority] + "-16.png">
+</#function>
