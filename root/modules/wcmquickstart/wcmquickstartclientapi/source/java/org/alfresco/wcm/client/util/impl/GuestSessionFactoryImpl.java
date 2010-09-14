@@ -87,15 +87,17 @@ public class GuestSessionFactoryImpl implements PoolableObjectFactory, Runnable
 		parameters.put(SessionParameter.ATOMPUB_URL, repo);
 		parameters.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
 
-		// Try and get the repository for the first time
-		getRepository();
-		
-		if (repositoryPollInterval > 0)
-		{
-			// Start thread which gets repository object
-			this.waitForRepository = new Thread(this);
-			waitForRepository.start();
-		}
+        if (repositoryPollInterval > 0)
+        {
+            // Start thread which gets repository object
+            this.waitForRepository = new Thread(this);
+            waitForRepository.start();
+        }
+        else
+        {
+            // If no poll interval then just check in the current thread and throw exception if not available
+            getRepository();
+        }
 	}
 
 	private void getRepository()

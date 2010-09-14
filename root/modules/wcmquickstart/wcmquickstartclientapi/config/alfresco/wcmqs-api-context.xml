@@ -16,7 +16,7 @@
 		<constructor-arg value="%{wcmqs.api.alfresco.cmis}"/>
 		<constructor-arg value="%{wcmqs.api.user}"/>
 		<constructor-arg value="%{wcmqs.api.password}"/>
-        <constructor-arg value="10000"/> <!-- Poll for repository every 10s -->
+        <constructor-arg value="2000"/> <!-- Poll for repository every 2s -->
     </bean>
 
     <!-- Pool of anonymous CMIS sessions -->
