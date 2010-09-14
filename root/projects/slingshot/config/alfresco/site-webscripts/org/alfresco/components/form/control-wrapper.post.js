@@ -95,19 +95,19 @@ function main()
          break;
 
       case "category":
-         if (control.params.compactMode == null)
+         if (field.control.params.compactMode == null)
          {
-            control.params.compactMode = true;
+            field.control.params.compactMode = true;
          }
          break;
 
       case "tag":
-         control.template = "controls/category.ftl";
-         if (control.params.hasOwnProperty.compactMode == null)
+         field.control.template = "controls/category.ftl";
+         if (field.control.params.compactMode == null)
          {
-            control.params.compactMode = true;
+            field.control.params.compactMode = true;
          }
-         control.params.params = "aspect=cm:taggable";
+         field.control.params.params = "aspect=cm:taggable";
          break;
    }
 
