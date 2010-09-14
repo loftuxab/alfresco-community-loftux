@@ -285,7 +285,21 @@
          </form>
       </forms>
    </config>
-   
+
+   <config evaluator="task-type" condition="imwf:moderatedInvitationSubmitTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="imwf:inviteeUserName" />
+               <show id="imwf:resourceName" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.set.workflow.more_info" 
+                    template="/org/alfresco/components/form/2-column-set.ftl" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
    
    <!-- *********************** -->
    <!-- Task Form Configuration -->
@@ -681,6 +695,29 @@
                <show id="bpm:priority" />
                <show id="transitions" />
             </field-visibility>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="task-type" condition="imwf:moderatedInvitationReviewTask">
+      <forms>
+         <form>
+            <view-form template="/org/alfresco/components/form/invite-request-task-form.ftl" />
+            <edit-form template="/org/alfresco/components/form/invite-request-task-form.ftl" />
+            <field-visibility>
+               <show id="imwf:inviteeUserName" />
+               <show id="imwf:resourceName" />
+               <show id="bpm:priority" />
+               <show id="bpm:comment" />
+               <show id="transitions" />
+            </field-visibility>
+            <appearance>
+               <set id="response" appearance="title" label-id="workflow.set.response" />
+               <field id="bpm:comment" label-id="workflow.field.comment" set="response">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="transitions" set="response" />
+            </appearance>
          </form>
       </forms>
    </config>

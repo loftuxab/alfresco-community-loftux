@@ -634,6 +634,7 @@ div.dashlet div.hdr
 .invite-task-title
 {
    font-size: 108%;
+   margin-bottom: 1em;
 }
 
 .invite-task-title img
@@ -644,7 +645,6 @@ div.dashlet div.hdr
 
 .invite-task-subtitle
 {
-   margin-top: 1em;
    margin-left: 34px;
 }
 
