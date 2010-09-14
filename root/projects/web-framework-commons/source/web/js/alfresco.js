@@ -3017,7 +3017,19 @@ Alfresco.util.FilterManager = function()
  */
 Alfresco.util.Ajax = function()
 {
+   // Since we mix FORM & JSON request we must make sure our Content-type headers aren't overriden
+   YAHOO.util.Connect.setDefaultPostHeader(false);
+   YAHOO.util.Connect.setDefaultXhrHeader(false);
+   
    return {
+
+      /**
+       * Constant for contentType of type standard XHR form request
+       *
+       * @property FORM
+       * @type string
+       */
+      FORM: "application/x-www-form-urlencoded",
 
       /**
        * Constant for contentType of type json
@@ -3166,8 +3178,11 @@ Alfresco.util.Ajax = function()
          // If a contentType is provided set it in the header
          if (c.requestContentType)
          {
-            YAHOO.util.Connect.setDefaultPostHeader(c.requestContentType);
             YAHOO.util.Connect.initHeader("Content-Type", c.requestContentType);
+         }
+         else
+         {
+            YAHOO.util.Connect.initHeader("Content-Type", this.FORM)
          }
 
          // Encode dataObj depending on request method and contentType.
