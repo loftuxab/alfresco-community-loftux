@@ -23,7 +23,8 @@
    </#if>
    <#if field.control.params.startLocation??>
       startLocation: "${field.control.params.startLocation}",
-      <#if args.itemId??>currentItem: "${args.itemId?js_string}",</#if>
+      <#if form.mode == "edit" && args.itemId??>currentItem: "${args.itemId?js_string}",</#if>
+      <#if form.mode == "create" && form.destination?? && form.destination?length &gt; 0>currentItem: "${form.destination?js_string}",</#if>
    </#if>
       currentValue: "${field.value}",
       <#if field.control.params.valueType??>valueType: "${field.control.params.valueType}",</#if>

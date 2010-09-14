@@ -44,6 +44,13 @@
                <show id="fdk:type" />
                <show id="fdk:images" />
             </field-visibility>
+            <appearance>
+               <field id="fdk:images">
+                  <control>
+                     <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
+            </appearance>
          </form>
       </forms>
    </config>
