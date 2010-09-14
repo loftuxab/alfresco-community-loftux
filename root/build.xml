@@ -67,6 +67,7 @@
          <fileset dir="${dir.modules}">
             <include name="**/${dir.name.lib}/*.jar" />
             <exclude name="wcmquickstart/wcmquickstartwebapp/**" />
+            <exclude name="wcmquickstart/wcmquickstartwebsite/${dir.name.build}/**" />
          </fileset>
          <fileset dir="${dir.modules}">
             <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
