@@ -18,13 +18,11 @@
 	         <constraint type="NUMERIC" validation-handler="Alfresco.forms.validation.numericMatch"
 	                     message="Test Message override" message-id="regex_error" />
 	      </constraint-handlers>
-          <!-- Override the values of some dependencies -->
-          <dependencies>
-              <css src="/css/path/1/override" />
-              <css src="/css/path/2" />
-              <js src="/js/path/1" />
-              <js src="/js/path/2/override" />
-          </dependencies>
+         <!-- Add more dependencies -->
+         <dependencies>
+            <css src="/css/path/3" />
+            <js src="/js/path/3" />
+         </dependencies>
       </forms>
    </config>
    

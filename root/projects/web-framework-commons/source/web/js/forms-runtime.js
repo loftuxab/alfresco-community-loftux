@@ -451,9 +451,15 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          if (field == null)
          {
             if (Alfresco.logger.isDebugEnabled())
-            {
                Alfresco.logger.debug("Ignoring validation for field with id of '" + fieldId + "' as it could not be located.");
-            }
+            
+            return;
+         }
+         
+         if (validationHandler === undefined || validationHandler === null)
+         {
+            if (Alfresco.logger.isDebugEnabled())
+               Alfresco.logger.debug("Ignoring validation for field with id of '" + fieldId + "' as a validationHandler was not provided.");
             
             return;
          }

@@ -92,8 +92,8 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
         
         // We want the dependencies as arrays as these are more JS-friendly than
         // Lists, but I'll compare the expected values as Lists.
-        String[] expectedCssDependencies = new String[]{"/css/path/1/override", "/css/path/2"};
-        String[] expectedJsDependencies = new String[]{"/js/path/1", "/js/path/2/override"};
+        String[] expectedCssDependencies = new String[]{"/css/path/1", "/css/path/2", "/css/path/3"};
+        String[] expectedJsDependencies = new String[]{"/js/path/1", "/js/path/2", "/js/path/3"};
 
         assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(depsCE.getCss()));
         assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(depsCE.getJs()));
