@@ -16,11 +16,10 @@
                     <li>
                         <a href="<@makeurl asset=article force='long'/>${linkParam!''}"><img src="<@makeurl asset=article rendition='mediumPublicationThumbnail'/>" alt="${asset.title!''}" class="img-border" /></a>
                         <h3><a href="<@makeurl asset=article force='long'/>${linkParam!''}">${article.title!'no title'}</a></h3>
-                        <p><@truncate value=article.description chars=100/></p>
+                        <#if article.description??><p><@truncate value=article.description chars=100/></p></#if>
                     </li>
                 </#list>
             </ul>
         </#if>
     </div>
-</#if>    
-
+</#if>
