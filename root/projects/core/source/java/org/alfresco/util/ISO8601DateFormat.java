@@ -150,12 +150,13 @@ public class ISO8601DateFormat
                 throw new IndexOutOfBoundsException("Expected : character but found " + isoDate.charAt(offset));
             }
             int seconds = Integer.parseInt(isoDate.substring(offset += 1 , offset += 2));
-            if (isoDate.charAt(offset) != '.')
+            int milliseconds = 0;
+            if (isoDate.charAt(offset) == '.')
             {
-                throw new IndexOutOfBoundsException("Expected . character but found " + isoDate.charAt(offset));
+                // ALF-3803 bug fix, milliseconds are optional
+                milliseconds = Integer.parseInt(isoDate.substring(offset += 1, offset += 3));
             }
-            int milliseconds = Integer.parseInt(isoDate.substring(offset += 1, offset += 3));
-
+            
             // extract timezone
             String timezoneId;
             char timezoneIndicator = isoDate.charAt(offset);
