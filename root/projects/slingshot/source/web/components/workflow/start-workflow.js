@@ -44,9 +44,13 @@
 
       // Re-register with our own name
       this.name = "Alfresco.StartWorkflow";
+      this.selectedItems = "";
+      this.destination = "";
+      this.workflowTypes = [];
       Alfresco.util.ComponentManager.reregister(this);
 
       YAHOO.Bubbling.on("objectFinderReady", this.onObjectFinderReady, this);
+      YAHOO.Bubbling.on("formContentReady", this.onFormContentReady, this);
 
       return this;
    };
@@ -76,7 +80,20 @@
           * @property destination
           * @type string
           */
-         destination: ""
+         destination: "",
+
+         /**
+          * The workflow types that can be started
+          *
+          * @property workflowDefinitions
+          * @type Array of
+          *    {
+          *       name: {String} The workflow name (unique)
+          *       title: {String} The title of the workflow
+          *       description {String} The description of the workflow
+          *    }
+          */
+         workflowDefinitions: []
       },
 
       /**
@@ -88,8 +105,14 @@
       onReady: function StartWorkflow_onReady()
       {
          // Listen for workflow choices
-         this.widgets.workflowSelectEl = Dom.get(this.id + "-workflowDefinitions");
-         Event.addListener(this.widgets.workflowSelectEl, "change", this.onWorkflowSelectChange, null, this);
+         this.widgets.workflowDefinitionMenuButton = new YAHOO.widget.Button(this.id + "-workflow-definition-button",
+         {
+            type: "menu",
+            menu: this.id + "-workflow-definition-menu"
+         });
+         this.widgets.workflowDefinitionMenuButton.set("label", this.msg("label.selectWorkflowDefinition"));
+         this.widgets.workflowDefinitionMenuButton.set("title", this.msg("title.selectWorkflowDefinition"));
+         this.widgets.workflowDefinitionMenuButton.getMenu().subscribe("click", this.onWorkflowSelectChange, null, this);
 
          return Alfresco.StartWorkflow.superclass.onReady.call(this);
       },
@@ -115,10 +138,17 @@
        *
        * @method onWorkflowSelectChange
        */
-      onWorkflowSelectChange: function StartWorkflow_onWorkflowSelectChange()
+      onWorkflowSelectChange: function StartWorkflow_onWorkflowSelectChange(p_sType, p_aArgs)
       {
-         var i = this.widgets.workflowSelectEl.selectedIndex;
-         if (i >= 0) {
+         var i = p_aArgs[1].index;
+         if (i >= 0)
+         {
+            // Update label of workflow menu button
+            var workflowDefinition = this.options.workflowDefinitions[i];
+            this.widgets.workflowDefinitionMenuButton.set("label", workflowDefinition.title);
+            this.widgets.workflowDefinitionMenuButton.set("title", workflowDefinition.description);
+
+            // Load the form for the specific workflow
             Alfresco.util.Ajax.request(
             {
                url: Alfresco.constants.URL_SERVICECONTEXT + "components/form",
@@ -126,7 +156,7 @@
                {
                   htmlid: this.id + "-startWorkflowForm-" + Alfresco.util.generateDomId(),
                   itemKind: "workflow",
-                  itemId: this.widgets.workflowSelectEl.options[i].value,
+                  itemId: workflowDefinition.name,
                   mode: "create",
                   submitType: "json",
                   showCaption: true,
@@ -156,7 +186,17 @@
       onWorkflowFormLoaded: function StartWorkflow_onWorkflowFormLoaded(response)
       {
          var formEl = Dom.get(this.id + "-workflowFormContainer");
+         Dom.addClass(formEl, "hidden");
          formEl.innerHTML = response.serverResponse.responseText;
+      },
+
+      /**
+       * Event handler called when the "formContentReady" event is received
+       */
+      onFormContentReady: function FormManager_onFormContentReady(layer, args)
+      {
+         var formEl = Dom.get(this.id + "-workflowFormContainer");
+         Dom.removeClass(formEl, "hidden");                  
       },
 
       /**
