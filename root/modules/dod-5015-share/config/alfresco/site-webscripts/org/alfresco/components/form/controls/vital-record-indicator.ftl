@@ -5,7 +5,7 @@
    <#if form.mode == "view">
       <div class="viewmode-field">
          <span class="viewmode-label">${field.label?html}:</span>
-         <span class="viewmode-value"><#if isTrue>Yes<#else>No</#if></span>
+         <span class="viewmode-value"><#if isTrue>${msg("form.control.checkbox.yes")}<#else>${msg("form.control.checkbox.no")}</#if></span>
       </div>
    <#else>
       <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="<#if isTrue>true<#else>false</#if>" />
