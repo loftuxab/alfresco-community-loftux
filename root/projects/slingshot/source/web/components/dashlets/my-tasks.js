@@ -136,7 +136,7 @@
                [
                   { key: "isPooled", sortable: false, formatter: this.bind(this.renderCellIcons), width: 20 },
                   { key: "title", sortable: false, formatter: this.bind(this.renderCellTaskInfo) },
-                  { key: "name", sortable: false, formatter: this.bind(this.renderCellActions), width: 40 }
+                  { key: "name", sortable: false, formatter: this.bind(this.renderCellActions), width: 45 }
                ],
                config:
                {
