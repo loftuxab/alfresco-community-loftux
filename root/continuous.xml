@@ -858,7 +858,7 @@
          <tarfileset dir="${dir.module.wcmquickstart-share.dist}" includes="${file.name.amp.wcmquickstart-share}" />
          <tarfileset dir="${dir.module.wcmquickstart.dist}" includes="${file.name.amp.wcmquickstart}" />
          <tarfileset dir="${dir.module.wcmquickstart}" includes="README_wcmqs.txt" />
-         <tarfileset dir="${dir.continuous.assemble}" includes="${file.name.war.webeditor}, ${file.name.wcmquickstart-war}" />
+         <tarfileset dir="${dir.continuous.assemble}" includes="${file.name.war.webeditor}, ${file.name.war.wcmquickstart-webapp}" />
       </tar>
 	  <zip destfile="${dir.continuous.dist}/${file.name.dist.wcmqs}.zip">
         <tarfileset src="${dir.continuous.assemble}/temp.tar"/>
