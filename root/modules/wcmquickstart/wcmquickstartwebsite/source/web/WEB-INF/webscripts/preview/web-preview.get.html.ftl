@@ -1,14 +1,7 @@
 <div class="interior-content">
     <h2>${asset.title!'no title'}</h2>
     <div class="blog-list-misc">
-        <#if asset.properties['cmis:lastModificationDate']??><span>${asset.properties['cmis:lastModificationDate']?string(msg('date.format'))}</span>&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;</#if>
-        <span>${asset.properties['ws:derivedCommentCount']!0}
-                <#if (asset.properties['ws:derivedCommentCount']!0) == 1>
-                  comment
-                <#else>
-                  comments
-                </#if>
-        </span>
+        <#if asset.properties['cmis:lastModificationDate']??><span>${asset.properties['cmis:lastModificationDate']?string(msg('date.format'))}</span></#if>
     </div>
  
     <#if asset.mimeType?starts_with("image/")>
@@ -40,4 +33,3 @@
         </ul>
     </#if>  
 </div>
-        
