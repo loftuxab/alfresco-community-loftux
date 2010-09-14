@@ -6,7 +6,7 @@
 	 <!-- Create a property placeholder configurer so that properties can be substituted from a .properties file.
          Note that the prefix must be altered from the default to avoid wrongly substituting a property value
          in Spring Surf which contains ${. -->
-    <bean id="quickstartPropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="clientApiConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:alfresco/wcmqs-api.properties"/>
         <property name="placeholderPrefix" value="%{"/>
     </bean>	

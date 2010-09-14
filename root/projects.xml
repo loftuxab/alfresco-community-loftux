@@ -2603,7 +2603,8 @@
            depends="compile-wcmquickstart-clientapi">
       <mkdir dir="${dir.project.wcmquickstart-clientapi.dist}" />
       <jar jarfile="${dir.project.wcmquickstart-clientapi.dist}/${file.name.jar.wcmquickstart-clientapi}" 
-           basedir="${dir.project.wcmquickstart-clientapi.classes}" />
+           basedir="${dir.project.wcmquickstart-clientapi.classes}"
+           excludes="alfresco/**" />
    </target>
    
    <target name="test-wcmquickstart-clientapi" 
@@ -2618,18 +2619,108 @@
                          projectdir="${dir.project.wcmquickstart-clientapi}"/>
    </target>
    
-   <!-- *********************************** -->
-   <!-- ** WCM Quick Start Web App       ** -->
-   <!-- *********************************** -->
-    
+    <!-- *********************************** -->
+    <!-- ** WCM Quick Start Web App       ** -->
+    <!-- *********************************** -->
+   
+    <target name="incremental-wcmquickstart-webapp" 
+           depends="package-wcmquickstart-webapp" />
+      
+    <target name="build-wcmquickstart-webapp" 
+           depends="clean-wcmquickstart-webapp, 
+                    incremental-wcmquickstart-webapp" />
+   
+    <target name="clean-wcmquickstart-webapp" 
+           depends="init">
+      <clean projectdir="${dir.project.wcmquickstart-webapp}" />
+    </target>
+
+    <target name="compile-wcmquickstart-webapp" 
+           depends="package-webeditor-taglib-jar">
+      <compile-java projectdir="${dir.project.wcmquickstart-webapp}" />
+    </target>
+   
+    <target name="package-wcmquickstart-webapp"
+           depends="compile-wcmquickstart-webapp">
+      <mkdir dir="${dir.project.wcmquickstart-webapp.dist}" />
+      <jar jarfile="${dir.project.wcmquickstart-webapp.dist}/${file.name.jar.wcmquickstart-webapp}" 
+           basedir="${dir.project.wcmquickstart-webapp.classes}" />
+    </target>
+	
+	<target name="assemble-wcmquickstart-webapp" 
+           depends="package-wcmquickstart-clientapi, package-wcmquickstart-webapp, package-webeditor-jar, package-webeditor-taglib-jar">
+		<mkdir dir="${dir.project.wcmquickstart-webapp.assemble}" />
+      
+		<copy todir="${dir.project.wcmquickstart-webapp.assemble}">
+			<fileset dir="${dir.project.wcmquickstart-webapp.src.web}" excludes="WEB-INF/web.xml"/>
+		</copy>
+      
+		<copy todir="${dir.project.wcmquickstart-webapp.assemble}/WEB-INF/classes">
+			<fileset dir="${dir.project.wcmquickstart-webapp.config}" excludes="**/web-extension/**" />
+		</copy>
+		
+		<copy todir="${dir.project.wcmquickstart-webapp.assemble}/WEB-INF/classes">
+			<fileset dir="${dir.project.wcmquickstart-clientapi.config}" excludes="**/web-extension/**" />
+		</copy>
+      
+		<!-- add all JAR to WEB-INF/lib -->
+		<copy todir="${dir.project.wcmquickstart-webapp.assemble}/WEB-INF/lib">
+        
+			<!-- 3rd Party Libs -->
+			<fileset dir="${dir.project.3rdparty.lib}" 
+				includes="${includes.wcmquickstart-webapp.libs.3rdparty}" />
+			<fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                includes="${includes.wcmquickstart-webapp.libs.spring-surf}" />
+			<fileset dir="${dir.project.3rdparty.lib}/commons" 
+                includes="${includes.wcmquickstart-webapp.libs.commons}" />
+			<fileset dir="${dir.project.3rdparty.lib}/optional"
+                includes="${includes.wcmquickstart-webapp.libs.optional}"/>		 
+			<fileset dir="${dir.project.3rdparty.lib}/abdera"
+				includes="${includes.wcmquickstart-webapp.libs.abdera}"/>
+
+			<!-- Web Client API Libs -->
+			<fileset dir="${dir.project.wcmquickstart-clientapi.lib}" />
+			<fileset dir="${dir.project.wcmquickstart-clientapi.dist}" 
+                includes="${file.name.jar.wcmquickstart-clientapi}" />		
+				  
+			<!-- Web App Libs -->
+			<fileset dir="${dir.project.wcmquickstart-webapp.lib}" />
+			<fileset dir="${dir.project.wcmquickstart-webapp.dist}" 
+                includes="${file.name.jar.wcmquickstart-webapp}" />
+				
+			<!-- AWE Libs -->
+			<fileset dir="${dir.project.webeditor.dist}"
+					 includes="${file.name.jar.webeditor}"/>
+			<fileset dir="${dir.project.webeditor.dist}"
+					 includes="${file.name.jar.webeditor.taglib}"/>
+			
+		</copy>
+      
+    </target>  
+   
+    <target name="package-wcmquickstart-webapp-war" 
+            depends="assemble-wcmquickstart-webapp">
+		<war warfile="${dir.project.wcmquickstart-webapp.dist}/${file.name.war.wcmquickstart-webapp}" 
+             webxml="${dir.project.wcmquickstart-webapp.src.webinf}/web.xml">
+			<fileset dir="${dir.project.wcmquickstart-webapp.assemble}" />
+        </war>
+    </target>
+    	
 	<target name="build-wcmquickstartwebapp-war"
-	        depends="init">		
-		<artifact:mvn pom="${dir.wcmquickstart.webapp}/pom.xml"
-		              mavenHome="${home.maven}" fork="true">
-			<arg value="install"/>
-			<arg value="-DskipTests=true"/>
-		</artifact:mvn>		
+	        depends="package-wcmquickstart-webapp-war">	
+		<copy todir="${dir.project.wcmquickstart-webapp}/target" 
+              file="${dir.project.wcmquickstart-webapp.dist}/${file.name.war.wcmquickstart-webapp}" />		
 	</target>
+	
+	<target name="deploy-wcmquickstartwebapp-tomcat" depends="package-wcmquickstart-webapp-war" 
+            description="Deploys the WCM Quick Start Web App WAR to the application Tomcat server">
+		<delete file="${dir.deploy.tomcat.application}/${file.name.war.wcmquickstart-webapp}" />
+		<delete dir="${dir.deploy.tomcat.application.wcmquickstart}" 
+                includeEmptyDirs="true" quiet="yes" />
+		<copy todir="${dir.deploy.tomcat.application}" 
+              file="${dir.project.wcmquickstart-webapp.dist}/${file.name.war.wcmquickstart-webapp}" />
+   </target>
+	
 	
    <!-- ******************************************************************* -->
    <!-- Note: avmCompare and truncateMalformedXml have a nearly identical   -->
