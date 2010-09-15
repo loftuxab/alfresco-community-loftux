@@ -86,8 +86,8 @@
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowDueDate" />
                <show id="bpm:workflowPriority" />
-               <show id="wf:requiredApprovePercent" />
                <show id="bpm:groupAssignee" />
+               <show id="wf:requiredApprovePercent" />
                <show id="packageItems" />
             </field-visibility>
             <appearance>
@@ -105,8 +105,8 @@
                <field id="bpm:workflowPriority" label-id="workflow.field.priority" set="info">
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
-               <field id="wf:requiredApprovePercent" set="info" />
-               <field id="bpm:groupAssignee" label-id="workflow.field.reviewer" set="assignee" />
+               <field id="bpm:groupAssignee" label-id="workflow.field.review_group" set="assignee" />
+               <field id="wf:requiredApprovePercent" set="assignee" />
                <field id="packageItems" set="items" />
             </appearance>
          </form>
@@ -120,14 +120,14 @@
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowDueDate" />
                <show id="bpm:workflowPriority" />
-               <show id="wf:requiredApprovePercent" />
                <show id="bpm:assignees" />
+               <show id="wf:requiredApprovePercent" />
                <show id="packageItems" />
             </field-visibility>
             <appearance>
                <set id="" appearance="title" label-id="workflow.set.general" />
                <set id="info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl" />
-               <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
+               <set id="assignee" appearance="title" label-id="workflow.set.assignees" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                
                <field id="bpm:workflowDescription" label-id="workflow.field.message">
@@ -139,7 +139,7 @@
                <field id="bpm:workflowPriority" label-id="workflow.field.priority" set="info">
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
-               <field id="wf:requiredApprovePercent" set="info" />
+               <field id="wf:requiredApprovePercent" set="assignee" />
                <field id="bpm:assignees" label-id="workflow.field.reviewers" set="assignee" />
                <field id="packageItems" set="items" />
             </appearance>
@@ -154,8 +154,8 @@
                <show id="bpm:workflowDescription" />
                <show id="bpm:workflowDueDate" />
                <show id="bpm:workflowPriority" />
-               <show id="wf:requiredApprovePercent" />
                <show id="bpm:groupAssignee" />
+               <show id="wf:requiredApprovePercent" />
                <show id="packageItems" />
             </field-visibility>
             <appearance>
@@ -173,8 +173,8 @@
                <field id="bpm:workflowPriority" label-id="workflow.field.priority" set="info">
                   <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
                </field>
-               <field id="wf:requiredApprovePercent" set="info" />
-               <field id="bpm:groupAssignee" label-id="workflow.field.reviewers" set="assignee" />
+               <field id="wf:requiredApprovePercent" set="assignee" />
+               <field id="bpm:groupAssignee" label-id="workflow.field.review_group" set="assignee" />
                <field id="packageItems" set="items" />
             </appearance>
          </form>
@@ -303,7 +303,7 @@
                <set id="" appearance="title" label-id="workflow.set.workflow.more_info" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                
-               <field id="bpm:groupAssignee" label-id="workflow.field.assigned_to_group" />
+               <field id="bpm:groupAssignee" label-id="workflow.field.review_group" />
                <field id="wf:requiredApprovePercent" />
                <field id="packageItems" set="items" />
             </appearance>
