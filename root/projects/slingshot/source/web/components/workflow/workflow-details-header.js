@@ -20,8 +20,8 @@
 /**
  * WorkflowDetailsHeader component.
  *
- * @namespace Alfresco
- * @class Alfresco.WorkflowDetailsHeader
+ * @namespace Alfresco.component
+ * @class Alfresco.component.WorkflowDetailsHeader
  */
 (function()
 {
@@ -41,12 +41,12 @@
     * WorkflowDetailsHeader constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.WorkflowDetailsHeader} The new WorkflowDetailsHeader instance
+    * @return {Alfresco.component.WorkflowDetailsHeader} The new WorkflowDetailsHeader instance
     * @constructor
     */
-   Alfresco.WorkflowDetailsHeader = function WorkflowDetailsHeader_constructor(htmlId)
+   Alfresco.component.WorkflowDetailsHeader = function WorkflowDetailsHeader_constructor(htmlId)
    {
-      Alfresco.WorkflowDetailsHeader.superclass.constructor.call(this, "Alfresco.WorkflowDetailsHeader", htmlId, ["button", "container", "datasource", "datatable"]);
+      Alfresco.component.WorkflowDetailsHeader.superclass.constructor.call(this, "Alfresco.component.WorkflowDetailsHeader", htmlId, ["button", "container", "datasource", "datatable"]);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("workflowDetailedData", this.onWorkflowDetailedData, this);
@@ -54,7 +54,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.WorkflowDetailsHeader, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.component.WorkflowDetailsHeader, Alfresco.component.Base,
    {
 
       /**

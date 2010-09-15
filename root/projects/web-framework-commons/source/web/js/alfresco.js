@@ -5176,12 +5176,12 @@ Alfresco.util.RENDERLOOPSIZE = 25;
  * Set options to customise:
  *  - the label of the submit button
  *  - the failure message if form submission failed
- *  - the page that the user shall visit if not coming from the document library
+ *  - the page that the user shall visit after the form was submitted or cancelled
  *
  * ...or override it's onFormContentReady method to perform additional customisation.
  *
- * @namespace Alfresco
- * @class Alfresco.FormManager
+ * @namespace Alfresco.component
+ * @class Alfresco.component.FormManager
  */
 (function()
 {
@@ -5194,12 +5194,12 @@ Alfresco.util.RENDERLOOPSIZE = 25;
     * FormManager constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.FormManager} The new FormManager instance
+    * @return {Alfresco.component.FormManager} The new FormManager instance
     * @constructor
     */
-   Alfresco.FormManager = function FormManager_constructor(htmlId, components)
+   Alfresco.component.FormManager = function FormManager_constructor(htmlId, components)
    {
-      Alfresco.FormManager.superclass.constructor.call(this, "Alfresco.FormManager", htmlId, components);
+      Alfresco.component.FormManager.superclass.constructor.call(this, "Alfresco.component.FormManager", htmlId, components);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("formContentReady", this.onFormContentReady, this);
@@ -5208,7 +5208,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       return this;
    };
 
-   YAHOO.extend(Alfresco.FormManager, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.component.FormManager, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -5235,13 +5235,31 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          submitButtonMessageKey: "button.save",
 
          /**
-          * The url to forward to if user didn't come from a list page:
-          * the document library, my-workflows or my-tasks
+          * The url to always take the user to if the form was submitted even if another url was visited just before
+          * the form.
           *
-          * @property forwardUrl
+          * @property submitUrl
           * @type string
           */
-         forwardUrl: null
+         submitUrl: null,
+
+         /**
+          * The url to always take the user to if the form was cancelled even if another url was visited just before
+          * the form.
+          *
+          * @property cancelUrl
+          * @type string
+          */
+         cancelUrl: null,
+
+         /**
+          * The url to dispatch the user to if no submit or cancel url was provided and the page visited just before
+          * the form couldn't be resolved.
+          *
+          * @property defaultUrl
+          * @type string
+          */
+         defaultUrl: null
       },
 
       /**
@@ -5281,35 +5299,35 @@ Alfresco.util.RENDERLOOPSIZE = 25;
          {
             successCallback:
             {
-               fn: this.onMetadataUpdateSuccess,
+               fn: this.onFormSubmitSuccess,
                scope: this
             },
             failureCallback:
             {
-               fn: this.onMetadataUpdateFailure,
+               fn: this.onFormSubmitFailure,
                scope: this
             }
          });
       },
 
       /**
-       * Handler called when the metadata was updated successfully
+       * Handler called when the form was submitted successfully
        *
-       * @method onMetadataUpdateSuccess
+       * @method onFormSubmitSuccess
        * @param response The response from the submission
        */
-      onMetadataUpdateSuccess: function FormManager_onMetadataUpdateSuccess(response)
+      onFormSubmitSuccess: function FormManager_onFormSubmitSuccess(response)
       {
-         this.navigateForward();
+         this.navigateForward(true);
       },
 
       /**
-       * Handler called when the metadata update operation failed
+       * Handler called when the form submitoperation failed
        *
        * @method onMetadataUpdateFailure
        * @param response The response from the submission
        */
-      onMetadataUpdateFailure: function FormManager_onMetadataUpdateFailure(response)
+      onFormSubmitFailure: function FormManager_onFormSubmitFailure(response)
       {
          Alfresco.util.PopupManager.displayPrompt(
          {
@@ -5327,33 +5345,104 @@ Alfresco.util.RENDERLOOPSIZE = 25;
        */
       onCancelButtonClick: function FormManager_onCancel(type, args)
       {
-         this.navigateForward();
+         this.navigateForward(false);
+      },
+
+      /**
+       * Override this method to and return true for urls that matches pages on your site that is considered to be
+       * pages that use ajax states (places a "#" to add runtime values to the browser location bar).
+       * The browser will do a history.go(-1) for these pages so that the these pages gets a chance of loading the state
+       * the page had before this form was visited.
+       *
+       * @method pageUsesAjaxState
+       * @param url
+       * @return {boolean} True if the url is recognised as a page that uses ajax states (adds values after "#" on the url)
+       */
+      pageUsesAjaxState: function FormManager_pageUsesAjaxState(url)
+      {
+         return false;
+      },
+
+      /**
+       * Override this method to make the user visit this url if no preferred urls was given for a form and
+       * there was no page visited before the user came to the form page.
+       *
+       * @method getSiteDefaultUrl
+       * @return {string} The url to make the user visit if no other alternatives have been found
+       */
+      getSiteDefaultUrl: function FormManager_getSiteDefaultUrl()
+      {
+         return null;
       },
 
       /**
        * Decides to which page we shall navigate after form submission or cancellation
        *
        * @method navigateForward
+       * @param submitted {boolean} True if the form was submitted successfully
        */
-      navigateForward: function FormManager_navigateForward()
+      navigateForward: function FormManager_navigateForward(submitted)
       {
-         // If user came from a "list" page?
-         if (document.referrer.match(/documentlibrary([?]|$)/) ||
-               document.referrer.match(/repository([?]|$)/) ||
-               document.referrer.match(/my-workflows([?]|$)/) ||
-               document.referrer.match(/my-tasks([?]|$)/))
+         if(submitted && this.options.submitUrl)
          {
-            // Yes, then go back to the referrer page
+            /**
+             * The form was submitted and this form wants the user to always be taken to a specific page after this
+             * form has been submitted.
+             */
+            document.location.href = this.options.submitUrl;
+         }
+         else if(!submitted && this.options.cancelUrl)
+         {
+            /**
+             * The form was cancelled and this form wants the user to always be taken to a specific page after this
+             * form has been cancelled.
+             */
+            document.location.href = this.options.cancelUrl;
+         }
+         else if (document.referrer)
+         {
+            // No specific urls have been provided to navigate to, lets look at the previous page url if present
+            if (this.pageUsesAjaxState(document.referrer))
+            {
+               /**
+                * The previous page is considered to be a page that uses ajax states (appends "#" on the url)
+                * Since everything after the "#" isn't included in the value of document.referrer we must use
+                * history.go(-1) so the page can restore to its previous ajax state.
+                */
+               history.go(-1);
+            }
+            else
+            {
+               /**
+                * The page is not considered be a page that uses ajax states, which means we have the complete url in
+                * the value of document.referrer, therefore we navigate to it since that increases the chance of the
+                * data being refreshed on the page if it the data is displayed in the html code
+                * rather than coming from a http request.
+                */
+               document.location.href = document.referrer;
+            }
+         }
+         else if (history.length > 1)
+         {
+            /**
+             * The document.referrer wasn't available, either because there was no previous page (because the user
+             * navigated directly to the page) or because the referrer header has been blocked.
+             * So instead we'll use the browser history, unfortunately with increased chance of displaying stale data
+             * since the page most likely won't be refreshed.
+             */
             history.go(-1);
          }
-         else if (this.options.forwardUrl != null)
+         else if (this.options.defaultUrl)
          {
-            // No, the go forward to the appropriate page for the node, i.e. a details page or a list page if it exists
-            window.location.href = this.options.forwardUrl;
+            /**
+             * Now we know that there was no previous page, lets use the default url that was provided for this form
+             */
+            document.location.href = this.options.defaultUrl;
          }
-         else {
-            // User didn't come from a list page but no page was suggested to where to go from here, fallback to the previous page
-            history.go(-1);
+         else
+         {
+            // What a sad form, fallback to use the sites default url if provided, otherwise assume the context will work
+            document.location.href = this.getSiteDefaultUrl() || Alfresco.constants.URL_CONTEXT;
          }
       }
    });

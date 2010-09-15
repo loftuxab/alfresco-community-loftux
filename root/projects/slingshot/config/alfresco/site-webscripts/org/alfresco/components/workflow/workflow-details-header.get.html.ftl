@@ -1,7 +1,7 @@
 <#include "../../include/alfresco-macros.lib.ftl" />
 <#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.WorkflowDetailsHeader("${el}").setOptions(
+new Alfresco.component.WorkflowDetailsHeader("${el}").setOptions(
 {
    taskId: <#if page.url.args.taskId??>"${page.url.args.taskId?js_string}"<#else>null</#if>
 }).setMessages(

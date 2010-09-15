@@ -1,9 +1,9 @@
 <#include "../../include/alfresco-macros.lib.ftl" />
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.FormManager("${args.htmlid}").setOptions(
+   new Alfresco.component.ShareFormManager("${args.htmlid}").setOptions(
    {
       failureMessage: "edit-metadata-mgr.update.failed",
-      forwardUrl: "${siteURL((nodeType!"document") + "-details?nodeRef=" + (nodeRef!page.url.args.nodeRef)?js_string)}"
+      defaultUrl: "${siteURL((nodeType!"document") + "-details?nodeRef=" + (nodeRef!page.url.args.nodeRef)?js_string)}"
    }).setMessages(
       ${messages}
    );

@@ -20,8 +20,8 @@
 /**
  * StartWorkflow component.
  *
- * @namespace Alfresco
- * @class Alfresco.StartWorkflow
+ * @namespace Alfresco.component
+ * @class Alfresco.component.StartWorkflow
  */
 (function()
 {
@@ -35,19 +35,22 @@
     * StartWorkflow constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.StartWorkflow} The new StartWorkflow instance
+    * @return {Alfresco.component.StartWorkflow} The new StartWorkflow instance
     * @constructor
     */
-   Alfresco.StartWorkflow = function StartWorkflow_constructor(htmlId)
+   Alfresco.component.StartWorkflow = function StartWorkflow_constructor(htmlId)
    {
-      Alfresco.StartWorkflow.superclass.constructor.call(this, htmlId, ["button"]);
+      Alfresco.component.StartWorkflow.superclass.constructor.call(this, htmlId, ["button"]);
 
       // Re-register with our own name
-      this.name = "Alfresco.StartWorkflow";
+      this.name = "Alfresco.component.StartWorkflow";
+      Alfresco.util.ComponentManager.reregister(this);
+
+      // Instance variables
+      this.options = YAHOO.lang.merge(this.options, Alfresco.component.StartWorkflow.superclass.options);
       this.selectedItems = "";
       this.destination = "";
       this.workflowTypes = [];
-      Alfresco.util.ComponentManager.reregister(this);
 
       YAHOO.Bubbling.on("objectFinderReady", this.onObjectFinderReady, this);
       YAHOO.Bubbling.on("formContentReady", this.onFormContentReady, this);
@@ -55,7 +58,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.StartWorkflow, Alfresco.FormManager,
+   YAHOO.extend(Alfresco.component.StartWorkflow, Alfresco.component.ShareFormManager,
    {
 
       /**
@@ -114,7 +117,7 @@
          this.widgets.workflowDefinitionMenuButton.set("title", this.msg("title.selectWorkflowDefinition"));
          this.widgets.workflowDefinitionMenuButton.getMenu().subscribe("click", this.onWorkflowSelectChange, null, this);
 
-         return Alfresco.StartWorkflow.superclass.onReady.call(this);
+         return Alfresco.component.StartWorkflow.superclass.onReady.call(this);
       },
 
       /**
@@ -195,32 +198,9 @@
        */
       onFormContentReady: function FormManager_onFormContentReady(layer, args)
       {
-         Alfresco.StartWorkflow.superclass.onFormContentReady.call(this, layer, args);
+         Alfresco.component.StartWorkflow.superclass.onFormContentReady.call(this, layer, args);
          var formEl = Dom.get(this.id + "-workflowFormContainer");
          Dom.removeClass(formEl, "hidden");                  
-      },
-
-      /**
-       * Decides to which page we shall navigate after form submission or cancellation
-       *
-       * @method navigateForward
-       * @override
-       */
-      navigateForward: function FormManager_navigateForward()
-      {
-         // Did the user come from
-         if (document.referrer.match(/document-details([?]|$)/))
-         {
-            /**
-             * We can't use history.go(-1) since it won't refresh the page which means
-             * the user wouldn't see the new workflow in the workflow list
-             */
-            document.location.href = document.referrer;
-         }
-         else
-         {
-            Alfresco.StartWorkflow.superclass.navigateForward.call(this);
-         }
       }
 
    });

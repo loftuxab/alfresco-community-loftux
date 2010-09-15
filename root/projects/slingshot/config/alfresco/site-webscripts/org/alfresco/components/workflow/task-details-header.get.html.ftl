@@ -1,6 +1,6 @@
 <#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.TaskDetailsHeader("${el}").setOptions(
+new Alfresco.component.TaskDetailsHeader("${el}").setOptions(
 {
    <#if page.url.args.referrer??>referrer: "${page.url.args.referrer?js_string}"</#if>
 }).setMessages(
