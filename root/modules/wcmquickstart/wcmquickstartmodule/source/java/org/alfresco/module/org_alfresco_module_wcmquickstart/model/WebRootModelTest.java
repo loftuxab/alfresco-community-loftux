@@ -322,6 +322,7 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 				"where in_tree(d, '${siteid}')";
 		nodeService.setProperty(myCollection, PROP_QUERY_LANGUAGE, SearchService.LANGUAGE_CMIS_ALFRESCO);
 		nodeService.setProperty(myCollection, PROP_QUERY, query);
+		nodeService.setProperty(myCollection, PROP_QUERY_RESULTS_MAX_SIZE, 2);
 		
 		userTransaction.commit();
 		userTransaction = transactionService.getUserTransaction();
@@ -329,7 +330,7 @@ public class WebRootModelTest extends TestCase implements WebSiteModel
 		
 		assocs = nodeService.getTargetAssocs(myCollection, ASSOC_WEBASSETS);
 		assertNotNull(assocs);
-		assertEquals(3, assocs.size());
+		assertEquals(2, assocs.size());
 		assertTrue((Boolean)nodeService.getProperty(myCollection, PROP_IS_DYNAMIC));
 		checkRefreshAfterNow(myCollection);
 		
