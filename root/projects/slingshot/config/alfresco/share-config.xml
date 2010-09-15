@@ -266,7 +266,6 @@
          </type>
 
          <type name="cm:folder">
-            <subtype name="trx:transferTarget" />
          </type>
       </types>
 
