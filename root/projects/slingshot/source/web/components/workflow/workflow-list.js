@@ -252,7 +252,7 @@
          {
             message = this.msg("workflow.no_message");
          }
-         var info = '<h3><a href="workflow-details?workflowId=' + workflow.id + '&referrer=workflows&myWorkflowsLinkBack=true" class="theme-color-1" title="' + this.msg("link.viewWorkflow") + '">' + $html(message) + '</a></h3>';
+         var info = '<h3><a href="' + $siteURL('workflow-details?workflowId=' + workflow.id + '&referrer=workflows&myWorkflowsLinkBack=true') + '" class="theme-color-1" title="' + this.msg("link.viewWorkflow") + '">' + $html(message) + '</a></h3>';
          info += '<div class="due"><label>' + this.msg("label.due") + ':</label><span>' + (dueDate ? Alfresco.util.formatDate(dueDate, "longDate") : this.msg("label.none")) + '</span></div>';
          info += '<div class=started"><label>' + this.msg("label.started") + ':</label><span>' + (startedDate ? Alfresco.util.formatDate(startedDate, "longDate") : this.msg("label.none")) + '</span></div>';
          info += '<div class="type"><label>' + this.msg("label.type") + '</label><span>' + $html(workflow.title) + '</span></div>';

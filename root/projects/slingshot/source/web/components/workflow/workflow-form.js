@@ -162,7 +162,7 @@
          {
             url += "&referrer=" + encodeURIComponent(this.options.referrer);
          }
-         return url;
+         return $siteURL(url);
       },
 
       /**
