@@ -257,6 +257,7 @@
                   itemKind: "task",
                   itemId: this.workflow.startTaskInstanceId,
                   mode: "view",
+                  formId: "workflow-details",
                   formUI: false
                },
                successCallback:
