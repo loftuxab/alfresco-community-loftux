@@ -20,8 +20,8 @@
 /**
  * TaskDetailsHeader component.
  *
- * @namespace Alfresco
- * @class Alfresco.TaskDetailsHeader
+ * @namespace Alfresco.component
+ * @class Alfresco.component.TaskDetailsHeader
  */
 (function()
 {
@@ -40,12 +40,12 @@
     * TaskDetailsHeader constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.TaskDetailsHeader} The new TaskDetailsHeader instance
+    * @return {Alfresco.component.TaskDetailsHeader} The new TaskDetailsHeader instance
     * @constructor
     */
-   Alfresco.TaskDetailsHeader = function TDH_constructor(htmlId)
+   Alfresco.component.TaskDetailsHeader = function TDH_constructor(htmlId)
    {
-      Alfresco.TaskDetailsHeader.superclass.constructor.call(this, "Alfresco.TaskDetailsHeader", htmlId, ["button"]);
+      Alfresco.component.TaskDetailsHeader.superclass.constructor.call(this, "Alfresco.component.TaskDetailsHeader", htmlId, ["button"]);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("taskDetailedData", this.onTaskDetailsData, this);
@@ -53,7 +53,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.TaskDetailsHeader, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.component.TaskDetailsHeader, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options

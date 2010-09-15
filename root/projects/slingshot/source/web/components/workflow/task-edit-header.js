@@ -20,8 +20,8 @@
 /**
  * TaskEditHeader component.
  *
- * @namespace Alfresco
- * @class Alfresco.TaskEditHeader
+ * @namespace Alfresco.component
+ * @class Alfresco.component.TaskEditHeader
  */
 (function()
 {
@@ -42,15 +42,18 @@
     * TaskEditHeader constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.TaskEditHeader} The new TaskEditHeader instance
+    * @return {Alfresco.component.TaskEditHeader} The new TaskEditHeader instance
     * @constructor
     */
-   Alfresco.TaskEditHeader = function TaskEditHeader_constructor(htmlId)
+   Alfresco.component.TaskEditHeader = function TaskEditHeader_constructor(htmlId)
    {
-      Alfresco.TaskEditHeader.superclass.constructor.call(this, htmlId, ["button"]);
+      Alfresco.component.TaskEditHeader.superclass.constructor.call(this, htmlId, ["button"]);
 
       // Re-register with our own name
-      this.name = "Alfresco.TaskEditHeader";
+      this.name = "Alfresco.component.TaskEditHeader";
+
+      // Instance variables
+      this.options = YAHOO.lang.merge(this.options, Alfresco.component.TaskEditHeader.superclass.options);
       Alfresco.util.ComponentManager.reregister(this);
       this.isRunning = false;
       this.taskId = null;
@@ -61,7 +64,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.TaskEditHeader, Alfresco.FormManager,
+   YAHOO.extend(Alfresco.component.TaskEditHeader, Alfresco.component.ShareFormManager,
    {
 
       /**
@@ -294,7 +297,7 @@
                            else
                            {
                               // Take the user to the most suitable place
-                              this._navigateForward();
+                              this.navigateForward(true);
                            }
                         }, data);
 

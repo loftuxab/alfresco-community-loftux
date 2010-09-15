@@ -1,9 +1,10 @@
+<#include "../../include/alfresco-macros.lib.ftl" />
 <#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.TaskEditHeader("${el}").setOptions(
+new Alfresco.component.TaskEditHeader("${el}").setOptions(
 {
    submitButtonMessageKey: "button.saveandclose",
-   forwardUrl: Alfresco.util.uriTemplate("userdashboardpage", { userid: Alfresco.constants.USERNAME }),
+   defaultUrl: "${siteURL("my-tasks")}"
 }).setMessages(
    ${messages}
 );

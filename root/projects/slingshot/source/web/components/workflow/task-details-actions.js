@@ -20,8 +20,8 @@
 /**
  * TaskDetailsActions component.
  *
- * @namespace Alfresco
- * @class Alfresco.TaskDetailsActions
+ * @namespace Alfresco.component
+ * @class Alfresco.component.TaskDetailsActions
  */
 (function()
 {
@@ -35,12 +35,12 @@
     * TaskDetailsActions constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.TaskDetailsActions} The new TaskDetailsActions instance
+    * @return {Alfresco.component.TaskDetailsActions} The new TaskDetailsActions instance
     * @constructor
     */
-   Alfresco.TaskDetailsActions = function TDA_constructor(htmlId)
+   Alfresco.component.TaskDetailsActions = function TDA_constructor(htmlId)
    {
-      Alfresco.TaskDetailsActions.superclass.constructor.call(this, "Alfresco.TaskDetailsActions", htmlId, ["button"]);
+      Alfresco.component.TaskDetailsActions.superclass.constructor.call(this, "Alfresco.component.TaskDetailsActions", htmlId, ["button"]);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("taskDetailedData", this.onTaskDetailsData, this);
@@ -48,8 +48,25 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.TaskDetailsActions, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.component.TaskDetailsActions, Alfresco.component.Base,
    {
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Add referrer to the url if present
+          *
+          * @property referrer
+          * @type String
+          */
+         referrer: null
+      },
+
       /**
        * Event handler called when the "taskDetailedData" event is received
        *
@@ -57,12 +74,17 @@
        */
       onTaskDetailsData: function TDA_onTaskDetailsData(layer, args)
       {
-         var task = args[1];
+         var task = args[1],
+               url = "task-edit?taskId=" + task.id;
+         if (this.options.referrer)
+         {
+            url += "&referrer=" + this.options.referrer;
+         }
          if (task.isEditable)
          {
             Alfresco.util.createYUIButton(this, "edit", function TDA_onMetadataRefresh_onEditClick()
             {
-               window.location.href = Alfresco.util.siteURL("task-edit?taskId=" + task.id);
+               window.location.href = Alfresco.util.siteURL(url);
             });
             Dom.removeClass(Selector.query(".actions", this.id), "hidden");
          }

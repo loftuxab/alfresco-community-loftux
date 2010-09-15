@@ -32,8 +32,8 @@
  * 4. However we shall also display info from the workflow itsel, so once the form is loaded and inserted in to the Dom,
  *    the additional sections "Summary", "General", "Current Tasks" & "Workflow History" are inserted inside the form.
  *
- * @namespace Alfresco
- * @class Alfresco.WorkflowForm
+ * @namespace Alfresco.component
+ * @class Alfresco.component.WorkflowForm
  */
 (function()
 {
@@ -55,13 +55,13 @@
     * WorkflowForm constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.WorkflowForm} The new WorkflowForm instance
+    * @return {Alfresco.component.WorkflowForm} The new WorkflowForm instance
     * @constructor
     */
-   Alfresco.WorkflowForm = function WorkflowForm_constructor(htmlId)
+   Alfresco.component.WorkflowForm = function WorkflowForm_constructor(htmlId)
    {
 
-      Alfresco.WorkflowForm.superclass.constructor.call(this, "Alfresco.WorkflowForm", htmlId, ["button", "container", "datasource", "datatable"]);
+      Alfresco.component.WorkflowForm.superclass.constructor.call(this, "Alfresco.component.WorkflowForm", htmlId, ["button", "container", "datasource", "datatable"]);
       this.isReady = false;
       this.workflow = null;
       this.currentTasks = [];
@@ -73,7 +73,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.WorkflowForm, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.component.WorkflowForm, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options

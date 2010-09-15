@@ -1,9 +1,10 @@
+<#include "../../include/alfresco-macros.lib.ftl" />
 <#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.StartWorkflow("${el}").setOptions({
+   new Alfresco.component.StartWorkflow("${el}").setOptions({
       failureMessage: "message.failure",
       submitButtonMessageKey: "button.startWorkflow",
-      forwardUrl: Alfresco.util.uriTemplate("userdashboardpage", { userid: Alfresco.constants.USERNAME }),
+      defaultUrl: "${siteURL("my-tasks")}",
       selectedItems: "${(page.url.args.selectedItems!"")?js_string}",
       destination: "${(page.url.args.destination!"")?js_string}",
       workflowDefinitions:

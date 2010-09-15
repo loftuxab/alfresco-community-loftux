@@ -22,8 +22,8 @@
  *
  * Displays a cancel workflow button
  *
- * @namespace Alfresco
- * @class Alfresco.WorkflowDetailsActions
+ * @namespace Alfresco.component
+ * @class Alfresco.component.WorkflowDetailsActions
  */
 (function()
 {
@@ -38,15 +38,15 @@
     * WorkflowDetailsActions constructor.
     *
     * @param htmlId {String} The HTML id of the parent element
-    * @return {Alfresco.WorkflowDetailsActions} The new Toolbar instance
+    * @return {Alfresco.component.WorkflowDetailsActions} The new Toolbar instance
     * @constructor
     */
-   Alfresco.WorkflowDetailsActions = function(htmlId)
+   Alfresco.component.WorkflowDetailsActions = function(htmlId)
    {
-      Alfresco.WorkflowDetailsActions.superclass.constructor.call(this, htmlId, ["button"]);
+      Alfresco.component.WorkflowDetailsActions.superclass.constructor.call(this, htmlId, ["button"]);
 
       // Re-register with our own name
-      this.name = "Alfresco.WorkflowDetailsActions";
+      this.name = "Alfresco.component.WorkflowDetailsActions";
       Alfresco.util.ComponentManager.reregister(this);
 
       // Decoupled event listeners
@@ -60,17 +60,17 @@
    /**
     * Extend from Alfresco.component.Base to reuse functionality to decide where to navigate after cancel
     */
-   YAHOO.extend(Alfresco.WorkflowDetailsActions, Alfresco.FormManager);
+   YAHOO.extend(Alfresco.component.WorkflowDetailsActions, Alfresco.component.ShareFormManager);
 
    /**
     * Augment prototype with Common Workflow actions to reuse cancel workflow
     */
-   YAHOO.lang.augmentProto(Alfresco.WorkflowDetailsActions, Alfresco.action.WorkflowActions);
+   YAHOO.lang.augmentProto(Alfresco.component.WorkflowDetailsActions, Alfresco.action.WorkflowActions);
 
    /**
     * Augment prototype with main class implementation, ensuring overwrite is enabled
     */
-   YAHOO.lang.augmentObject(Alfresco.WorkflowDetailsActions.prototype,
+   YAHOO.lang.augmentObject(Alfresco.component.WorkflowDetailsActions.prototype,
    {
 
       /**
@@ -116,8 +116,8 @@
        * @param args {array} Event parameters (depends on event type)
        */
       onWorkflowCancelled: function WorkflowDetailsActions_onWorkflowCancelled(layer, args)
-      {         
-         this._navigateForward();
+      {
+         this.navigateForward(true);
       }
 
    }, true);
