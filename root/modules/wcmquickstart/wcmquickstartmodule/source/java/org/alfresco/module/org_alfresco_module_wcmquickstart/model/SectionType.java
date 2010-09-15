@@ -70,7 +70,14 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     {
     	MimetypeMap.MIMETYPE_WORD,
     	MimetypeMap.MIMETYPE_EXCEL,
-    	MimetypeMap.MIMETYPE_PPT
+    	MimetypeMap.MIMETYPE_PPT,
+    	MimetypeMap.MIMETYPE_OPENXML_WORDPROCESSING,
+    	MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET,
+    	MimetypeMap.MIMETYPE_OPENXML_PRESENTATION,
+    	MimetypeMap.MIMETYPE_OPENDOCUMENT_TEXT,
+    	MimetypeMap.MIMETYPE_OPENDOCUMENT_SPREADSHEET,
+    	MimetypeMap.MIMETYPE_OPENDOCUMENT_PRESENTATION
+    	
     };
 
     /** Log */
