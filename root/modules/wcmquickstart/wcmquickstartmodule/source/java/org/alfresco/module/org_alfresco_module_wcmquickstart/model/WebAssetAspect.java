@@ -21,6 +21,7 @@ package org.alfresco.module.org_alfresco_module_wcmquickstart.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_wcmquickstart.publish.PublishService;
@@ -36,9 +37,11 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * ws:webasset aspect behaviours.
@@ -48,7 +51,8 @@ import org.alfresco.service.namespace.QName;
 public class WebAssetAspect implements WebSiteModel, 
 									   CopyServicePolicies.OnCopyNodePolicy,
 									   ContentServicePolicies.OnContentUpdatePolicy,
-									   NodeServicePolicies.OnAddAspectPolicy
+									   NodeServicePolicies.OnAddAspectPolicy,
+									   NodeServicePolicies.BeforeDeleteNodePolicy
 {
 	/** Policy component */
     private PolicyComponent policyComponent;
@@ -128,16 +132,7 @@ public class WebAssetAspect implements WebSiteModel,
         policyComponent.bindClassBehaviour(NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME, ASPECT_WEBASSET,
                 new JavaBehaviour(this, "onUpdatePropertiesEachEvent", NotificationFrequency.EVERY_EVENT));
         policyComponent.bindClassBehaviour(NodeServicePolicies.BeforeDeleteNodePolicy.QNAME, ASPECT_WEBASSET,
-                new JavaBehaviour(this, "beforeDeleteNodeEachEvent", NotificationFrequency.EVERY_EVENT));
-    }
-
-    /**
-     * Before delete, fired on each event
-     * @param nodeRef	node reference of deleted node
-     */
-    public void beforeDeleteNodeEachEvent(NodeRef nodeRef)
-    {
-        publishService.enqueueRemovedNodes(nodeRef);
+                new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.FIRST_EVENT));
     }
     
     /**
@@ -216,5 +211,31 @@ public class WebAssetAspect implements WebSiteModel,
     {
 	    nodeService.setProperty(nodeRef, PROP_AVAILABLE, Boolean.TRUE);
 		renditionHelper.createRenditions(nodeRef);
+    }
+
+	/**
+	 * @see org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy#beforeDeleteNode(org.alfresco.service.cmr.repository.NodeRef)
+	 */
+    @Override
+    public void beforeDeleteNode(NodeRef nodeRef)
+    {
+        // Enqueue nodes
+        publishService.enqueueRemovedNodes(nodeRef);
+        
+        // Remove all referencing and referenced associations
+        removeAll(nodeService.getSourceAssocs(nodeRef, RegexQNamePattern.MATCH_ALL));
+        removeAll(nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL));        
+    }
+    
+    /**
+     * Remove all the associations in the list
+     * @param assocs    list of associations
+     */
+    private void removeAll(List<AssociationRef> assocs)
+    {
+        for (AssociationRef assoc : assocs)
+        {
+            nodeService.removeAssociation(assoc.getSourceRef(), assoc.getTargetRef(), assoc.getTypeQName());
+        }
     }
 }
