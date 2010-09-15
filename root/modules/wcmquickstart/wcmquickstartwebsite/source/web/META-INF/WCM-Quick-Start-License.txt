@@ -39,9 +39,17 @@ The WCM Quick Start uses an HTML Site Template the includes the following third-
 	
 Website Images
 --------------
-All royalty free photos used within the WCM Quick Start have been provided via http://www.sxc.hu and as such are subject to the license specified at http://www.sxc.hu/txt/license.html.  Express permission has been granted from each of the respective photographers for their image(s) to be included as part of the WCM Quick Start.
+The images used within the Quick Start website(s) have been provided by two different sources (BigStock and Stock.XCHNG) and as such are subject to two different license agreements.
 
-If you desire to reproduce or distribute the photos separately from the WCM Quick Start, you must consult the license terms set forth at http://www.sxc.hu/txt/license.html.
+BigStock Images
+---------------
+Website images provided by BigStock (http://www.bigstockphoto.com) are done so subject to the licensing terms and conditions stated by their BSP-112U license.
+
+If you desire to reproduce or distribute the photos separately from the WCM Quick Start, you must consult the image usage agreement and license terms set forth at http://www.bigstockphoto.com/usage.html and http://www.bigstockphoto.com/licensing/detail/?code=BSP-112U.
+
+Stock.XCHNG Images
+------------------
+All royalty free photos provided via http://www.sxc.hu are done so subject to the license specified at http://www.sxc.hu/txt/license.html.  Express permission has been granted from each of the respective photographers for their image(s) to be included as part of the WCM Quick Start.
 
 *  Stock photo: The Other One! - http://www.sxc.hu/photo/395364 - Neil Gould (http://www.sxc.hu/profile/ngould)
 *  Stock photo: Wall Street - http://www.sxc.hu/photo/976300 - Robert Linder (http://www.sxc.hu/profile/linder6580)
