@@ -100,7 +100,7 @@
             }
             if (message && message != type)
             {
-               title = $html(message);
+               title = this.msg("label.message", $html(message), $html(type));
             }
             else
             {
