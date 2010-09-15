@@ -84,15 +84,16 @@
       {
          // Display workflow description
          var workflow = args[1],
-            title = null;
-         if (this.options.taskId)
+            title = null,
+            taskId = this.options.taskId || workflow.startTaskInstanceId;
+         if (taskId)
          {
             // There was a specific task related to the task in the url, lets use its message
             var task, message, type;
             for (var i = 0, il = workflow.tasks.length; i < il; i++)
             {
                task = workflow.tasks[i];
-               if (task.id == this.options.taskId)
+               if (task.id == taskId)
                {
                   message = task.properties.bpm_description;
                   type = task.title;
