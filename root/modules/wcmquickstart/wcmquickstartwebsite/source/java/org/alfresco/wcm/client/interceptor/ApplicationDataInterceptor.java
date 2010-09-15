@@ -37,72 +37,71 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  */
 public class ApplicationDataInterceptor extends HandlerInterceptorAdapter
 {
-	private WebSiteService webSiteService;
-	private ModelDecorator modelDecorator;
+    private WebSiteService webSiteService;
+    private ModelDecorator modelDecorator;
 
-	/**
-	 * @see org.springframework.web.servlet.handler.HandlerInterceptorAdapter#preHandle(HttpServletRequest,
-	 *      HttpServletResponse, Object)
-	 */
-	@Override
-	public boolean preHandle(HttpServletRequest request,
-	        HttpServletResponse response, Object handler) throws Exception
-	{
-		RequestContext requestContext = ThreadLocalRequestContext
-		        .getRequestContext();
+    /**
+     * @see org.springframework.web.servlet.handler.HandlerInterceptorAdapter#preHandle(HttpServletRequest,
+     *      HttpServletResponse, Object)
+     */
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
+    {
+        RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
 
-		// Get the website object and store it in the surf request context
-		String serverName = request.getServerName();
-		int serverPort = request.getServerPort();
-		WebSite webSite = webSiteService.getWebSite(serverName, serverPort);
-		requestContext.setValue("webSite", webSite);
+        // Get the website object and store it in the surf request context
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+        WebSite webSite = webSiteService.getWebSite(serverName, serverPort);
+        WebSiteService.setThreadWebSite(webSite);
+        requestContext.setValue("webSite", webSite);
 
-		// Get the current asset and section and store them in the surf request
-		// context
-		String path = request.getPathInfo();
-		Asset asset = webSite.getAssetByPath(path);
-		requestContext.setValue("asset", asset);
+        // Get the current asset and section and store them in the surf request
+        // context
+        String path = request.getPathInfo();
+        Asset asset = webSite.getAssetByPath(path);
+        requestContext.setValue("asset", asset);
 
-		Section section;
-		if (asset != null)
-		{
-			section = asset.getContainingSection();
-		} 
-		else
-		{
-			// If asset not found then try just the section
-			section = webSite.getSectionByPath(path);			
-			if (section == null)
-			{
-				// Else store the root section for use by the 404 page.
-				section = webSite.getRootSection();
-			}
-		}
-		requestContext.setValue("section", section);
+        Section section;
+        if (asset != null)
+        {
+            section = asset.getContainingSection();
+        }
+        else
+        {
+            // If asset not found then try just the section
+            section = webSite.getSectionByPath(path);
+            if (section == null)
+            {
+                // Else store the root section for use by the 404 page.
+                section = webSite.getRootSection();
+            }
+        }
+        requestContext.setValue("section", section);
 
-		return super.preHandle(request, response, handler);
-	}
-	
-	/**
-	 * @see org.springframework.web.servlet.handler.HandlerInterceptorAdapter#postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView)
-	 */
-	@Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception
-    {		 
-	    super.postHandle(request, response, handler, modelAndView);
-
-	    modelDecorator.populate(request, modelAndView);
+        return super.preHandle(request, response, handler);
     }
 
-	public void setWebSiteService(WebSiteService webSiteService)
-	{
-		this.webSiteService = webSiteService;
-	}
-	
-	public void setModelDecorator(ModelDecorator modelDecorator) 
-	{
-		this.modelDecorator = modelDecorator;
-	}
+    /**
+     * @see org.springframework.web.servlet.handler.HandlerInterceptorAdapter#postHandle(HttpServletRequest,
+     *      HttpServletResponse, Object, ModelAndView)
+     */
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+            ModelAndView modelAndView) throws Exception
+    {
+        super.postHandle(request, response, handler, modelAndView);
+
+        modelDecorator.populate(request, modelAndView);
+    }
+
+    public void setWebSiteService(WebSiteService webSiteService)
+    {
+        this.webSiteService = webSiteService;
+    }
+
+    public void setModelDecorator(ModelDecorator modelDecorator)
+    {
+        this.modelDecorator = modelDecorator;
+    }
 }
-
-

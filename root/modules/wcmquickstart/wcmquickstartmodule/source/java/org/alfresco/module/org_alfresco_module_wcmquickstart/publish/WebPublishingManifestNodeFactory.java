@@ -20,10 +20,12 @@ package org.alfresco.module.org_alfresco_module_wcmquickstart.publish;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebSiteModel;
 import org.alfresco.repo.transfer.manifest.TransferManifestDeletedNode;
 import org.alfresco.repo.transfer.manifest.TransferManifestNode;
 import org.alfresco.repo.transfer.manifest.TransferManifestNodeFactory;
@@ -86,6 +88,7 @@ public class WebPublishingManifestNodeFactory implements TransferManifestNodeFac
 
     public TransferManifestNode createTransferManifestNode(NodeRef nodeRef, TransferDefinition definition)
     {
+        Date now = new Date();
         TransferManifestNode newNode = preProcess(nodeRef);
         if (newNode == null)
         {
@@ -136,6 +139,11 @@ public class WebPublishingManifestNodeFactory implements TransferManifestNodeFac
             if (props.containsKey(ContentModel.PROP_NODE_UUID))
             {
                 props.put(ContentModel.PROP_NODE_UUID, mappedNodeRef.getId());
+            }
+            //Set the published time if this is a web asset
+            if (props.containsKey(WebSiteModel.PROP_PUBLISHED_TIME))
+            {
+                props.put(WebSiteModel.PROP_PUBLISHED_TIME, now);
             }
             
             //Re-process noderef properties
