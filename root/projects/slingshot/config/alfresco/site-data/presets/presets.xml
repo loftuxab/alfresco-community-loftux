@@ -91,7 +91,7 @@
             <scope>page</scope>
             <region-id>component-1-2</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/alfresco-network</url>
+            <url>/components/dashlets/my-tasks</url>
          </component>
          <component>
             <scope>page</scope>
@@ -130,7 +130,7 @@
             <scope>page</scope>
             <region-id>component-3-3</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/my-tasks</url>
+            <url>/components/dashlets/alfresco-network</url>
          </component>
       </components>
       <pages>
