@@ -2,21 +2,103 @@
 <template-instance>
    <template-type>org/alfresco/task-details</template-type>
    <components>
+
+      <!-- Title -->
+
       <component>
          <region-id>title</region-id>
+         <url>/components/title/collaboration-title</url>
+      </component>
+      <component>
+         <region-id>portlet-title</region-id>
+         <url>/components/title/portlet-collaboration-title</url>
+      </component>
+
+      <component>
+         <region-id>repo-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.repository</title>
+            <subtitle>title.browser</subtitle>
+         </properties>
+      </component>
+      <component>
+         <region-id>portlet-repo-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.repository</title>
+            <subtitle>title.browser</subtitle>
+         </properties>
+      </component>
+
+      <component>
+         <region-id>tasks-title</region-id>
          <url>/components/title/simple-title</url>
          <properties>
             <title>title.myTasks</title>
          </properties>
       </component>
       <component>
-         <region-id>toolbar</region-id>
+         <region-id>portlet-tasks-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myTasks</title>
+         </properties>
+      </component>
+
+      <component>
+         <region-id>workflows-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myWorkflows</title>
+         </properties>
+      </component>
+      <component>
+         <region-id>portlet-workflows-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myWorkflows</title>
+         </properties>
+      </component>
+
+
+      <!-- Navigation -->
+
+      <component>
+         <region-id>navigation</region-id>
+         <url>/components/navigation/collaboration-navigation</url>
+      </component>
+      <component>
+         <region-id>portlet-navigation</region-id>
+         <url>/components/navigation/collaboration-navigation</url>
+      </component>
+
+      <component>
+         <region-id>tasks-navigation</region-id>
          <url>/components/workflow/task-toolbar</url>
       </component>
+      <component>
+         <region-id>portlet-tasks-navigation</region-id>
+         <url>/components/workflow/task-toolbar</url>
+      </component>
+
+      <component>
+         <region-id>workflows-navigation</region-id>
+         <url>/components/workflow/workflow-toolbar</url>
+      </component>
+      <component>
+         <region-id>portlet-workflows-navigation</region-id>
+         <url>/components/workflow/workflow-toolbar</url>
+      </component>
+
+
+      <!-- Header, form, actions & data loader -->
+
       <component>
          <region-id>task-header</region-id>
          <url>/components/workflow/task-details-header</url>
       </component>
+
       <component>
          <region-id>task-form</region-id>
          <url>/components/form</url>
@@ -27,10 +109,12 @@
             <formUI>true</formUI>
          </properties>
       </component>
+
       <component>
          <region-id>task-actions</region-id>
          <url>/components/workflow/task-details-actions</url>
       </component>
+      
       <component>
          <region-id>data-loader</region-id>
          <url>/components/data/data-loader</url>
@@ -40,5 +124,6 @@
             <eventData>data</eventData>
          </properties>
       </component>
+
    </components>
 </template-instance>

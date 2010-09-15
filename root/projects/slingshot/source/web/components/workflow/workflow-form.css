@@ -104,10 +104,19 @@
    width: 100%;
 }
 
-.workflow-form .current-tasks table a.edit-task
+.workflow-form .current-tasks table a.edit-task,
+.workflow-form .current-tasks table a.view-task
 {
-   background: url("../images/edit-16.png") no-repeat scroll left center transparent;
    cursor: pointer;
    padding: 1em 1em 1em 2em;
 }
 
+.workflow-form .current-tasks table a.edit-task
+{
+   background: url("../images/edit-16.png") no-repeat scroll left center transparent;
+}
+
+.workflow-form .current-tasks table a.view-task
+{
+   background: url("../images/workflow-16.png") no-repeat scroll left center transparent;
+}

@@ -56,6 +56,23 @@
    YAHOO.extend(Alfresco.TaskDetailsHeader, Alfresco.component.Base,
    {
       /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Add referrer to the url if present
+          *
+          * @property referrer
+          * @type String
+          */
+         referrer: null
+      },
+
+      /**
        * Event handler called when the "taskDetailedData" event is received
        *
        * @method: onTaskDetailsData
@@ -68,6 +85,10 @@
             message = task.properties["bpm_description"],
             workflowId = task.workflowInstance.id,
             workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + workflowId + "&taskId=" + taskId);
+         if (this.options.referrer)
+         {
+            workflowDetailsUrl += "&referrer=" + this.options.referrer;
+         }
          if (message && message != task.title)
          {
             message = this.msg("label.message", $html(message), $html(task.title));

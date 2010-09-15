@@ -18,10 +18,10 @@
  */
 
 /**
- * WorkflowListToolbar component.
+ * TaskListToolbar component.
  *
  * @namespace Alfresco
- * @class Alfresco.component.WorkflowListToolbar
+ * @class Alfresco.component.TaskListToolbar
  */
 (function()
 {
@@ -32,19 +32,19 @@
       Selector = YAHOO.util.Selector;
 
    /**
-    * WorkflowListToolbar constructor.
+    * TaskListToolbar constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.component.WorkflowListToolbar} The new WorkflowListToolbar instance
+    * @return {Alfresco.component.TaskListToolbar} The new TaskListToolbar instance
     * @constructor
     */
-   Alfresco.component.WorkflowListToolbar = function TDH_constructor(htmlId)
+   Alfresco.component.TaskListToolbar = function TDH_constructor(htmlId)
    {
-      Alfresco.component.WorkflowListToolbar.superclass.constructor.call(this, "Alfresco.component.WorkflowListToolbar", htmlId, ["button"]);
+      Alfresco.component.TaskListToolbar.superclass.constructor.call(this, "Alfresco.component.TaskListToolbar", htmlId, ["button"]);
       return this;
    };
 
-   YAHOO.extend(Alfresco.component.WorkflowListToolbar, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.component.TaskListToolbar, Alfresco.component.Base,
    {
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -67,7 +67,7 @@
        */
       onStartWorkflowButtonClick: function WLT_onNewFolder(e, p_obj)
       {
-         document.location.href = Alfresco.util.siteURL("start-workflow?referrer=workflows&myWorkflowsLinkBack=true");
+         document.location.href = Alfresco.util.siteURL("start-workflow?referrer=tasks&myTasksLinkBack=true");
       }
 
    });

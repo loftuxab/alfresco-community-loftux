@@ -1,6 +1,9 @@
 <#assign el=args.htmlid?js_string>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
+new Alfresco.WorkflowForm("${el}").setOptions(
+{
+   <#if page.url.args.referrer??>referrer: "${page.url.args.referrer?js_string}"</#if>
+}).setMessages(${messages});
 //]]></script>
 <div id="${el}-body" class="workflow-form">
 </div>
@@ -9,7 +12,6 @@ new Alfresco.WorkflowForm("${el}").setOptions({}).setMessages(${messages});
  The workflow details page form is actually a form display of the workflow's start task and data form the workflow itself.
  The approach taken to display all this information is described in the Alfresco.WorkflowForm javascript class.
 -->
-
    <#-- Will be inserted in the top of the form after its been loaded through ajax -->
    <div id="${el}-summary-form-section">
       <h3>${msg("header.workflowSummary")}</h3>

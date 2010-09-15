@@ -75,6 +75,22 @@
 
    YAHOO.extend(Alfresco.WorkflowForm, Alfresco.component.Base,
    {
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Add referrer to the url if present
+          *
+          * @property referrer
+          * @type String
+          */
+         referrer: null
+      },
 
       /**
        * Flag set after component is instantiated.
@@ -132,6 +148,23 @@
          this._loadWorkflowForm();
       },
 
+
+      /**
+       * Returns a task url
+       *
+       * @method _getTaskUrl
+       * @private
+       */
+      _getTaskUrl: function WF___getReferrer(page, taskId)
+      {
+         var url = page + "?taskId=" +encodeURIComponent(taskId);
+         if (this.options.referrer)
+         {
+            url += "&referrer=" + encodeURIComponent(this.options.referrer);
+         }
+         return url;
+      },
+
       /**
        * @method _displayWorkflowForm
        * @private
@@ -184,7 +217,7 @@
 
             // Set values in the "Summary" & "General" form sections
             Dom.get(this.id + "-recentTaskTitle").innerHTML = $html(recentTask.title || "");
-            Dom.get(this.id + "-recentTaskTitle").setAttribute("href", "task-details?taskId=" + encodeURIComponent(recentTask.id));
+            Dom.get(this.id + "-recentTaskTitle").setAttribute("href", this._getTaskUrl("task-details", recentTask.id));
 
             Dom.get(this.id + "-title").innerHTML = $html(this.workflow.title);
             Dom.get(this.id + "-description").innerHTML = $html(this.workflow.description);
@@ -303,11 +336,11 @@
             var task = oRecord.getData();
             if (task.isEditable)
             {
-               elCell.innerHTML = '<a href="task-edit?taskId=' + encodeURIComponent(oRecord.getData("id")) + '" title="' + me.msg("link.title.task-edit") + '">' + $html(oRecord.getData("title")) + '</a>';
+               elCell.innerHTML = '<a href="' + me._getTaskUrl("task-edit", oRecord.getData("id")) + '" title="' + me.msg("link.title.task-edit") + '">' + $html(oRecord.getData("title")) + '</a>';
             }
             else
             {
-               elCell.innerHTML = '<a href="task-details?taskId=' + encodeURIComponent(oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
+               elCell.innerHTML = '<a href="' + me._getTaskUrl("task-details", oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
             }
          };
 
@@ -382,7 +415,7 @@
             var task = oRecord.getData();
             if (task.isEditable)
             {
-               elCell.innerHTML = '<a href="task-edit?taskId=' + encodeURIComponent(task.id) + '" class="edit-task" title="' + me.msg("link.title.task-edit") + '">' + me.msg("actions.edit") + '</a>';
+               elCell.innerHTML = '<a href="' + me._getTaskUrl("task-edit", task.id) + '" class="edit-task" title="' + me.msg("link.title.task-edit") + '">' + me.msg("actions.edit") + '</a>';
             }
          };
 
