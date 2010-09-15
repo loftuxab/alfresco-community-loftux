@@ -28,7 +28,6 @@ import java.util.TreeMap;
 
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.AssetFactory;
-import org.alfresco.wcm.client.Section;
 import org.alfresco.wcm.client.SectionFactory;
 import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.WebSiteService;
@@ -49,7 +48,7 @@ import org.json.JSONObject;
  * @author Roy Wetherall
  * @author Brian Remmington
  */
-public class WebSiteServiceImpl implements WebSiteService
+public class WebSiteServiceImpl extends WebSiteService
 {
     private static final Log log = LogFactory.getLog(WebSiteServiceImpl.class);
     /** Query for all web sites */

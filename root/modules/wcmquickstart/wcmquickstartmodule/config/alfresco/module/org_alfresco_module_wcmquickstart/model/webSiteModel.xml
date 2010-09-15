@@ -40,7 +40,7 @@
             <parent>cm:folder</parent>
             <properties>
                 <property name="ws:sectionConfig">
-                    <title>Section Config</title>
+                    <title>Template Mapping</title>
                     <type>d:text</type>
                     <multiple>true</multiple>
                 </property>

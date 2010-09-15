@@ -56,12 +56,12 @@ import org.apache.commons.logging.LogFactory;
 public class AssetFactoryCmisImpl implements AssetFactory
 {
     private final static Log log = LogFactory.getLog(AssetFactoryCmisImpl.class);
-    
+
     private SectionFactory sectionFactory;
     private CollectionFactory collectionFactory;
 
     private final static String COMMON_ASSET_SELECT_CLAUSE = "SELECT d.cmis:objectId, d.cmis:objectTypeId, d.cmis:name, d.cmis:contentStreamLength, "
-            + "d.cmis:contentStreamMimeType, d.cmis:lastModificationDate, t.cm:title, t.cm:description, wa.ws:parentSections, wa.ws:publishedTime, " 
+            + "d.cmis:contentStreamMimeType, d.cmis:lastModificationDate, t.cm:title, t.cm:description, wa.ws:parentSections, wa.ws:publishedTime, "
             + "wa.ws:derivedCommentCount, wa.ws:derivedAverageRating, wa.ws:tags, a.cm:author ";
 
     private final static String COMMON_ASSET_FROM_CLAUSE = "FROM cmis:document AS d "
@@ -75,32 +75,31 @@ public class AssetFactoryCmisImpl implements AssetFactory
     private final String assetsByIdQueryPattern = COMMON_ASSET_SELECT_CLAUSE + COMMON_ASSET_FROM_CLAUSE
             + "WHERE d.cmis:objectId IN ({0})";
 
-    private final String assetBySectionAndNameQueryPattern = COMMON_ASSET_SELECT_CLAUSE
-            + COMMON_ASSET_FROM_CLAUSE
+    private final String assetBySectionAndNameQueryPattern = COMMON_ASSET_SELECT_CLAUSE + COMMON_ASSET_FROM_CLAUSE
             + "WHERE ANY wa.ws:parentSections IN (''{0}'') AND d.cmis:name = ''{1}''";
 
-	private final String assetBySectionAndNameWildcardQueryPattern = COMMON_ASSET_SELECT_CLAUSE 
-			+ COMMON_ASSET_FROM_CLAUSE
-		    + "WHERE ANY wa.ws:parentSections IN (''{0}'') AND d.cmis:name like ''{1}''";    
+    private final String assetBySectionAndNameWildcardQueryPattern = COMMON_ASSET_SELECT_CLAUSE
+            + COMMON_ASSET_FROM_CLAUSE + "WHERE ANY wa.ws:parentSections IN (''{0}'') AND d.cmis:name like ''{1}''";
 
     private final String assetBySectionQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() "
-            + COMMON_ASSET_FROM_CLAUSE + "WHERE IN_TREE(d, ''{0}'') "
-            + "ORDER BY SEARCH_SCORE ASC";
+            + COMMON_ASSET_FROM_CLAUSE + "WHERE IN_TREE(d, ''{0}'') ";
 
-    private final String assetByFtsQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() "
-            + COMMON_ASSET_FROM_CLAUSE + "WHERE IN_TREE(d, ''{0}'') AND CONTAINS(d, ''{1}'') "
-            + "ORDER BY SEARCH_SCORE ASC";
+    private final String assetByFtsQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() " + COMMON_ASSET_FROM_CLAUSE
+            + "WHERE IN_TREE(d, ''{0}'') AND CONTAINS(d, ''{1}'') ";
 
-    private final String assetByTagQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() "
-            + COMMON_ASSET_FROM_CLAUSE + "WHERE IN_TREE(d, ''{0}'') AND ANY wa.ws:tags IN (''{1}'') "
-            + "ORDER BY SEARCH_SCORE ASC";
+    private final String assetByTagQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() " + COMMON_ASSET_FROM_CLAUSE
+            + "WHERE IN_TREE(d, ''{0}'') AND ANY wa.ws:tags IN (''{1}'') ";
+
+    private final String searchOrderClause = " ORDER BY SEARCH_SCORE ASC";
+
+//    private final String availabilityConstraint = " AND wa.ws:available = true ";
     
-    private final String modifiedTimeByAssetId = "SELECT d.cmis:lastModificationDate " +
-    		"FROM cmis:document AS d WHERE d.cmis:objectId = ''{0}''";
-    
-    private final String modifiedTimesByAssetIds = "SELECT d.cmis:objectId, d.cmis:lastModificationDate " +
-    		"FROM cmis:document AS d WHERE d.cmis:objectId IN ({0})";
-    
+    private final String modifiedTimeByAssetId = "SELECT d.cmis:lastModificationDate "
+            + "FROM cmis:document AS d WHERE d.cmis:objectId = ''{0}''";
+
+    private final String modifiedTimesByAssetIds = "SELECT d.cmis:objectId, d.cmis:lastModificationDate "
+            + "FROM cmis:document AS d WHERE d.cmis:objectId IN ({0})";
+
     @Override
     public Asset getAssetById(String id, boolean deferredLoad)
     {
@@ -111,8 +110,7 @@ public class AssetFactoryCmisImpl implements AssetFactory
         }
         else
         {
-            ItemIterable<QueryResult> results = runQuery(
-                    MessageFormat.format(assetByIdQueryPattern, id));
+            ItemIterable<QueryResult> results = runQuery(MessageFormat.format(assetByIdQueryPattern, id));
             Iterator<QueryResult> iterator = results.iterator();
             if (iterator.hasNext())
             {
@@ -161,15 +159,15 @@ public class AssetFactoryCmisImpl implements AssetFactory
     @Override
     public Asset getSectionAsset(String sectionId, String resourceName)
     {
-    	return getSectionAsset(sectionId, resourceName, false);
+        return getSectionAsset(sectionId, resourceName, false);
     }
 
     @Override
     public Asset getSectionAsset(String sectionId, String resourceName, boolean wildcardsAllowedInName)
     {
         Asset asset = null;
-        ItemIterable<QueryResult> results = runQuery(MessageFormat.format(
-                (wildcardsAllowedInName ? assetBySectionAndNameWildcardQueryPattern
+        ItemIterable<QueryResult> results = runQuery(MessageFormat
+                .format((wildcardsAllowedInName ? assetBySectionAndNameWildcardQueryPattern
                         : assetBySectionAndNameQueryPattern), sectionId, resourceName));
         Iterator<QueryResult> iterator = results.iterator();
         if (iterator.hasNext())
@@ -182,9 +180,10 @@ public class AssetFactoryCmisImpl implements AssetFactory
 
     @Override
     public SearchResults findByQuery(Query query)
-    {   
-        //We search either by phrase or by tag but not by both. Choose the appropriate CMIS query, falling back to constraining by
-        //section only
+    {
+        // We search either by phrase or by tag but not by both. Choose the
+        // appropriate CMIS query, falling back to constraining by
+        // section only
         String cmisQuery = null;
         if (query.getPhrase() != null)
         {
@@ -193,13 +192,13 @@ public class AssetFactoryCmisImpl implements AssetFactory
         else if (query.getTag() != null)
         {
             cmisQuery = MessageFormat.format(assetByTagQueryPattern, query.getSectionId(), query.getTag());
-        } 
+        }
         else
         {
             cmisQuery = MessageFormat.format(assetBySectionQueryPattern, query.getSectionId());
         }
-        
-        ItemIterable<QueryResult> results = runQuery(cmisQuery);
+
+        ItemIterable<QueryResult> results = runQuery(cmisQuery, searchOrderClause);
         ItemIterable<QueryResult> page = results.skipTo(query.getResultsToSkip()).getPage(query.getMaxResults());
         List<SearchResult> foundAssets = new ArrayList<SearchResult>((int) page.getPageNumItems());
         for (QueryResult queryResult : page)
@@ -217,20 +216,20 @@ public class AssetFactoryCmisImpl implements AssetFactory
     @Override
     public Map<String, List<String>> getSourceRelationships(String assetId)
     {
-        Map<String,List<String>> result = new TreeMap<String, List<String>>();
-        
+        Map<String, List<String>> result = new TreeMap<String, List<String>>();
+
         Session session = CmisSessionHelper.getSession();
         if (log.isDebugEnabled())
         {
             log.debug("About to run call CMIS relationship service for: " + assetId);
-        }        
+        }
         final RelationshipService relationshipService = session.getBinding().getRelationshipService();
         final OperationContext ctxt = session.getDefaultContext();
 
         // fetch the relationships
-        ObjectList relList = relationshipService.getObjectRelationships(session.getRepositoryInfo().getId(),
-                assetId, true, RelationshipDirection.SOURCE, null, ctxt.getFilterString(), ctxt
-                        .isIncludeAllowableActions(), null, null, null);
+        ObjectList relList = relationshipService.getObjectRelationships(session.getRepositoryInfo().getId(), assetId,
+                true, RelationshipDirection.SOURCE, null, ctxt.getFilterString(), ctxt.isIncludeAllowableActions(),
+                null, null, null);
 
         // convert relationship objects
         if (relList.getObjects() != null)
@@ -240,10 +239,11 @@ public class AssetFactoryCmisImpl implements AssetFactory
                 Map<String, PropertyData<?>> props = rod.getProperties().getProperties();
                 PropertyData<?> targetIdData = props.get(PropertyIds.TARGET_ID);
                 PropertyData<?> assocTypeData = props.get(PropertyIds.OBJECT_TYPE_ID);
-                
+
                 if (targetIdData != null && assocTypeData != null)
                 {
-                    //The association type will have a prefix of "R:". Strip this off.
+                    // The association type will have a prefix of "R:". Strip
+                    // this off.
                     String assocType = assocTypeData.getFirstValue().toString();
                     if (assocType.startsWith("R:"))
                     {
@@ -276,12 +276,12 @@ public class AssetFactoryCmisImpl implements AssetFactory
         }
         return modifiedTime;
     }
-    
+
     @Override
-    public Map<String,Date> getModifiedTimesOfAssets(Collection<String> assetIds)
+    public Map<String, Date> getModifiedTimesOfAssets(Collection<String> assetIds)
     {
         Map<String, Date> map = new TreeMap<String, Date>();
-        
+
         String idList = buildIdList(assetIds);
         String cmisQuery = MessageFormat.format(modifiedTimesByAssetIds, idList);
         ItemIterable<QueryResult> results = runQuery(cmisQuery);
@@ -316,11 +316,11 @@ public class AssetFactoryCmisImpl implements AssetFactory
         }
         return builder.toString();
     }
-    
+
     @Override
     public Map<String, org.alfresco.wcm.client.Rendition> getRenditions(String assetId)
     {
-        Map<String,org.alfresco.wcm.client.Rendition> renditionMap = new TreeMap<String, org.alfresco.wcm.client.Rendition>();
+        Map<String, org.alfresco.wcm.client.Rendition> renditionMap = new TreeMap<String, org.alfresco.wcm.client.Rendition>();
         if (assetId == null || assetId.length() == 0)
         {
             throw new IllegalArgumentException("assetId = " + assetId);
@@ -341,30 +341,28 @@ public class AssetFactoryCmisImpl implements AssetFactory
         AssetImpl asset = new AssetImpl();
         Map<String, Serializable> properties = new TreeMap<String, Serializable>();
 
-        properties.put(PropertyIds.OBJECT_ID, (String) result.getPropertyById(PropertyIds.OBJECT_ID)
+        properties.put(PropertyIds.OBJECT_ID, (String) result.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue());
+        properties.put(PropertyIds.OBJECT_TYPE_ID, (Serializable) result.getPropertyById(PropertyIds.OBJECT_TYPE_ID)
                 .getFirstValue());
-        properties.put(PropertyIds.OBJECT_TYPE_ID, (Serializable) result.getPropertyById(
-                PropertyIds.OBJECT_TYPE_ID).getFirstValue());
-        properties.put(PropertyIds.NAME, (Serializable) result.getPropertyById(PropertyIds.NAME)
-                .getFirstValue());
+        properties.put(PropertyIds.NAME, (Serializable) result.getPropertyById(PropertyIds.NAME).getFirstValue());
         properties.put(PropertyIds.CONTENT_STREAM_LENGTH, (Serializable) result.getPropertyById(
                 PropertyIds.CONTENT_STREAM_LENGTH).getFirstValue());
         properties.put(PropertyIds.CONTENT_STREAM_MIME_TYPE, (Serializable) result.getPropertyById(
                 PropertyIds.CONTENT_STREAM_MIME_TYPE).getFirstValue());
-        properties.put(Resource.PROPERTY_TITLE, (Serializable) result
-                .getPropertyById(Resource.PROPERTY_TITLE).getFirstValue());
-        properties.put(Resource.PROPERTY_MODIFIED_TIME, SqlUtils.getDateProperty(result, Resource.PROPERTY_MODIFIED_TIME));
+        properties.put(Resource.PROPERTY_TITLE, (Serializable) result.getPropertyById(Resource.PROPERTY_TITLE)
+                .getFirstValue());
+        properties.put(Resource.PROPERTY_MODIFIED_TIME, SqlUtils.getDateProperty(result,
+                Resource.PROPERTY_MODIFIED_TIME));
         properties.put(Resource.PROPERTY_DESCRIPTION, (Serializable) result.getPropertyById(
                 Resource.PROPERTY_DESCRIPTION).getFirstValue());
         properties.put(Asset.PROPERTY_AVERAGE_RATING, (Serializable) result.getPropertyById(
                 Asset.PROPERTY_AVERAGE_RATING).getFirstValue());
-        properties.put(Asset.PROPERTY_COMMENT_COUNT, (Serializable) result.getPropertyById(
-                Asset.PROPERTY_COMMENT_COUNT).getFirstValue());
-        properties.put(Asset.PROPERTY_TAGS, (Serializable) result.getPropertyMultivalueById(
-                Asset.PROPERTY_TAGS));
+        properties.put(Asset.PROPERTY_COMMENT_COUNT, (Serializable) result
+                .getPropertyById(Asset.PROPERTY_COMMENT_COUNT).getFirstValue());
+        properties.put(Asset.PROPERTY_TAGS, (Serializable) result.getPropertyMultivalueById(Asset.PROPERTY_TAGS));
         properties.put(Asset.PROPERTY_PUBLISHED_TIME, SqlUtils.getDateProperty(result, Asset.PROPERTY_PUBLISHED_TIME));
-        properties.put(Asset.PROPERTY_AUTHOR, (Serializable) result.getPropertyById(
-                Asset.PROPERTY_AUTHOR).getFirstValue());
+        properties.put(Asset.PROPERTY_AUTHOR, (Serializable) result.getPropertyById(Asset.PROPERTY_AUTHOR)
+                .getFirstValue());
 
         List<String> parentSectionIds = result.getPropertyMultivalueById(Asset.PROPERTY_PARENT_SECTIONS);
 
@@ -378,6 +376,31 @@ public class AssetFactoryCmisImpl implements AssetFactory
 
     private ItemIterable<QueryResult> runQuery(String query)
     {
+        return runQuery(query, null, false);
+    }
+    
+    private ItemIterable<QueryResult> runQuery(String query, String orderByClause)
+    {
+        return runQuery(query, orderByClause, false);
+    }
+    
+    private ItemIterable<QueryResult> runQuery(String query, String orderByClause, boolean forceUnavailableAssets)
+    {
+//      Lack of time and complexities surrounding dynamic content collections leads
+//      to this availability check not being implemented in this version of the quick start.
+//        WebSite currentWebSite = WebSiteService.getThreadWebSite();
+//        
+//
+//        if (!forceUnavailableAssets && (currentWebSite == null || !currentWebSite.isEditorialSite()))
+//        {
+//            //We want to constrain the query by whether the asset is available
+//            query += availabilityConstraint;
+//        }
+        if (orderByClause != null)
+        {
+            query += orderByClause;
+        }
+        
         long start = 0L;
         if (log.isDebugEnabled())
         {
@@ -394,7 +417,7 @@ public class AssetFactoryCmisImpl implements AssetFactory
         }
         return results;
     }
-    
+
     public void setSectionFactory(SectionFactory sectionFactory)
     {
         this.sectionFactory = sectionFactory;

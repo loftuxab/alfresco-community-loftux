@@ -24,22 +24,50 @@ import java.util.Collection;
  * Web Site Service Interface
  * 
  * @author Roy Wetherall
+ * @author Brian Remmington
  */
-public interface WebSiteService 
+public abstract class WebSiteService
 {
-	/**
-	 * Gets all the web sites hosted on the repository
-	 * 
-	 * @return	Collection<WebSite>		web sites
-	 */
-	Collection<WebSite> getWebSites();
-	
-	/**
-	 * Gets the web site that relates to the host name and port.
-	 * 
-	 * @param hostName	host name
-	 * @param hostPort  port number
-	 * @return WebSite	web site, null if non found
-	 */
-	WebSite getWebSite(String hostName, int hostPort);	
+    private static ThreadLocal<WebSite> currentWebsite = new ThreadLocal<WebSite>();
+
+    /**
+     * Gets all the web sites hosted on the repository
+     * 
+     * @return Collection<WebSite> web sites
+     */
+    public abstract Collection<WebSite> getWebSites();
+
+    /**
+     * Gets the web site that relates to the host name and port.
+     * 
+     * @param hostName
+     *            host name
+     * @param hostPort
+     *            port number
+     * @return WebSite web site, null if non found
+     */
+    public abstract WebSite getWebSite(String hostName, int hostPort);
+
+    /**
+     * Set the supplied website in a thread-local container to make it available
+     * for all activity that subsequently takes place on the current thread
+     * 
+     * @param website
+     */
+    public static void setThreadWebSite(WebSite website)
+    {
+        currentWebsite.set(website);
+    }
+
+    /**
+     * Retrieve the WebSite object that has most recently been set on the
+     * current thread via a call to {@link #setThreadWebSite(WebSite)}.
+     * 
+     * @return The WebSite object most recently set on this thread or null if no
+     *         object has been set.
+     */
+    public static WebSite getThreadWebSite()
+    {
+        return currentWebsite.get();
+    }
 }
