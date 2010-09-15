@@ -70,7 +70,7 @@
             workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + workflowId + "&taskId=" + taskId);
          if (message && message != task.title)
          {
-            message = $html(message);
+            message = this.msg("label.message", $html(message), $html(task.title));
          }
          else
          {
