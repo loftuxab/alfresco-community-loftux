@@ -2,7 +2,9 @@
 <template-instance>
    <template-type>org/alfresco/start-workflow</template-type>
    <components>
-      <!-- title: normal, portlet, repository & portlet+repository -->
+
+      <!-- Title -->
+
       <component>
          <region-id>title</region-id>
          <url>/components/title/collaboration-title</url>
@@ -11,6 +13,7 @@
          <region-id>portlet-title</region-id>
          <url>/components/title/portlet-collaboration-title</url>
       </component>
+
       <component>
          <region-id>repo-title</region-id>
          <url>/components/title/simple-title</url>
@@ -27,13 +30,74 @@
             <subtitle>title.browser</subtitle>
          </properties>
       </component>
+
+      <component>
+         <region-id>tasks-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myTasks</title>
+         </properties>
+      </component>
+      <component>
+         <region-id>portlet-tasks-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myTasks</title>
+         </properties>
+      </component>
+
+      <component>
+         <region-id>workflows-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myWorkflows</title>
+         </properties>
+      </component>
+      <component>
+         <region-id>portlet-workflows-title</region-id>
+         <url>/components/title/simple-title</url>
+         <properties>
+            <title>title.myWorkflows</title>
+         </properties>
+      </component>
+
+
+      <!-- Navigation -->
+
       <component>
          <region-id>navigation</region-id>
          <url>/components/navigation/collaboration-navigation</url>
       </component>
       <component>
+         <region-id>portlet-navigation</region-id>
+         <url>/components/navigation/collaboration-navigation</url>
+      </component>
+
+      <component>
+         <region-id>tasks-navigation</region-id>
+         <url>/components/workflow/task-toolbar</url>
+      </component>
+      <component>
+         <region-id>portlet-tasks-navigation</region-id>
+         <url>/components/workflow/task-toolbar</url>
+      </component>
+
+      <component>
+         <region-id>workflows-navigation</region-id>
+         <url>/components/workflow/workflow-toolbar</url>
+      </component>
+      <component>
+         <region-id>portlet-workflows-navigation</region-id>
+         <url>/components/workflow/workflow-toolbar</url>
+      </component>
+
+      
+      <!-- Start workflow form -->
+
+      <component>
          <region-id>start-workflow</region-id>
          <url>/components/workflow/start</url>
       </component>
    </components>
+
 </template-instance>

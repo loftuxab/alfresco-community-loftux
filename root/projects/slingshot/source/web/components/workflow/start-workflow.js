@@ -195,6 +195,7 @@
        */
       onFormContentReady: function FormManager_onFormContentReady(layer, args)
       {
+         Alfresco.StartWorkflow.superclass.onFormContentReady.call(this, layer, args);
          var formEl = Dom.get(this.id + "-workflowFormContainer");
          Dom.removeClass(formEl, "hidden");                  
       },

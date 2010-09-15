@@ -3,14 +3,9 @@
 
 <@templateBody>
    <div id="alf-hd">
-      <@region id="header" scope="global" protected=true/>
-      <#if page.url.args.taskId??>
-      <@region id="task-title" scope="template" protected=true />
-      <@region id="task-toolbar" scope="template" protected=true/>
-      <#else>
-      <@region id="workflow-title" scope="template" protected=true />
-      <@region id="workflow-toolbar" scope="template" protected=true/>
-      </#if>
+      <@region id=appType + "header" scope="global" protected=true />
+      <@region id=appType + referrer + "title" scope="template" protected=true />
+      <@region id=appType + referrer + "navigation" scope="template" protected=true />
    </div>
    <div id="bd">
       <div class="share-form">

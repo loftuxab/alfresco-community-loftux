@@ -227,7 +227,7 @@
             message = this.msg("workflow.no_message");
          }
                
-         var info = '<h3><a href="task-edit?taskId=' + taskId + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h3>';
+         var info = '<h3><a href="task-edit?taskId=' + taskId + '&referrer=tasks&myTasksLinkBack=true" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h3>';
          info += '<div class="due"><label>' + this.msg("label.due") + ':</label><span>' + (dueDate ? Alfresco.util.formatDate(dueDate, "longDate") : this.msg("label.none")) + '</span></div>';
          info += '<div class="status"><label>' + this.msg("label.status") + ':</label><span>' + status + '</span></div>';
          info += '<div class="type"><label>' + this.msg("label.type", type) + ':</label><span>' + type + '</span></div>';
@@ -250,9 +250,9 @@
       renderCellActions: function TL_renderCellActions(elCell, oRecord, oColumn, oData)
       {
          // Create actions using WorkflowAction
-         this.createAction(elCell, this.msg("link.editTask"), "task-edit-link", $siteURL('task-edit?taskId=' + oRecord.getData('id')));
-         this.createAction(elCell, this.msg("link.viewTask"), "task-view-link", $siteURL('task-details?taskId=' + oRecord.getData('id') + '&myTasksLinkBack=true'));
-         this.createAction(elCell, this.msg("link.viewWorkflow"), "workflow-view-link", $siteURL('workflow-details?workflowId=' + oRecord.getData('workflowInstance').id + '&' + 'taskId=' + oRecord.getData('id') + '&myTasksLinkBack=true'));
+         this.createAction(elCell, this.msg("link.editTask"), "task-edit-link", $siteURL('task-edit?taskId=' + oRecord.getData('id') + '&referrer=tasks&myTasksLinkBack=true'));
+         this.createAction(elCell, this.msg("link.viewTask"), "task-view-link", $siteURL('task-details?taskId=' + oRecord.getData('id') + '&referrer=tasks&myTasksLinkBack=true'));
+         this.createAction(elCell, this.msg("link.viewWorkflow"), "workflow-view-link", $siteURL('workflow-details?workflowId=' + oRecord.getData('workflowInstance').id + '&' + 'taskId=' + oRecord.getData('id') + '&referrer=tasks&myTasksLinkBack=true'));
       }
 
    }, true);

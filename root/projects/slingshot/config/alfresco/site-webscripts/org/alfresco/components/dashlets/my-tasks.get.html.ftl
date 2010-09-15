@@ -21,7 +21,7 @@
    <div class="title">${msg("header")}</div>
    <div class="toolbar">
       <div class="actions">
-         <a href="${page.url.context}/page/start-workflow" class="theme-color-1">${msg("link.startWorkflow")}</a>
+         <a href="${page.url.context}/page/start-workflow?referrer=tasks" class="theme-color-1">${msg("link.startWorkflow")}</a>
       </div>
       <div>
          <button id="${el}-filters" class="hide"></button>&nbsp;

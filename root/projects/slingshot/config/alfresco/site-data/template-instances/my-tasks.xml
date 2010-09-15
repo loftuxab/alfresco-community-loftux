@@ -30,7 +30,7 @@
       </component>
       <component>
          <region-id>toolbar</region-id>
-         <url>/components/workflow/workflow-list-toolbar</url>
+         <url>/components/workflow/task-list-toolbar</url>
       </component>
       <component>
          <region-id>list</region-id>

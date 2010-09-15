@@ -10,7 +10,8 @@ new Alfresco.WorkflowDetailsHeader("${el}").setOptions(
 <div id="${el}-body" class="form-manager workflow-details-header">
    <#if page.url.args.taskId??>
    <div class="links">
-      <a href="task-details?taskId=${page.url.args.taskId?js_string}">${msg("label.taskDetails")}</a>
+      <#assign referrer><#if page.url.args.referrer??>&referrer=${page.url.args.referrer?js_string}</#if></#assign>
+      <a href="task-details?taskId=${page.url.args.taskId?js_string}${referrer}">${msg("label.taskDetails")}</a>
       <span class="separator">|</span>
       <span class="theme-color-2">${msg("label.workflowDetails")}</span>
    </div>
