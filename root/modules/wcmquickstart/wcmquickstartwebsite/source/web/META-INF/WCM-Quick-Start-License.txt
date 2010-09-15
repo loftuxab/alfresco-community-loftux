@@ -47,6 +47,10 @@ Website images provided by BigStock (http://www.bigstockphoto.com) are done so s
 
 If you desire to reproduce or distribute the photos separately from the WCM Quick Start, you must consult the image usage agreement and license terms set forth at http://www.bigstockphoto.com/usage.html and http://www.bigstockphoto.com/licensing/detail/?code=BSP-112U.
 
+* Engine - http://www.bigstockphoto.com/image-1077401/stock-photo-engine
+* Stock Market - http://www.bigstockphoto.com/image-5451969/stock-photo-stock-market
+* Credit Card - http://www.bigstockphoto.com/image-280412/stock-photo-golden-credit-card
+
 Stock.XCHNG Images
 ------------------
 All royalty free photos provided via http://www.sxc.hu are done so subject to the license specified at http://www.sxc.hu/txt/license.html.  Express permission has been granted from each of the respective photographers for their image(s) to be included as part of the WCM Quick Start.
@@ -54,6 +58,6 @@ All royalty free photos provided via http://www.sxc.hu are done so subject to th
 *  Stock photo: The Other One! - http://www.sxc.hu/photo/395364 - Neil Gould (http://www.sxc.hu/profile/ngould)
 *  Stock photo: Wall Street - http://www.sxc.hu/photo/976300 - Robert Linder (http://www.sxc.hu/profile/linder6580)
 *  Stock illustration: mortgage and money 2 - http://www.sxc.hu/photo/963935 - Svilen Milev (http://www.sxc.hu/profile/svilen001)
-*  Stock photo: Brussels Airport - http://www.sxc.hu/photo/1138046 - Juliane Brandt (http://www.sxc.hu/profile/Julie0815)
-*  Stock photo: piggy bank - http://www.sxc.hu/photo/1187283 - (http://www.sxc.hu/profile/RAWKU5)
 *  Stock illustration: finance symbols 3 - http://www.sxc.hu/photo/1272919 - Svilen Milev (http://www.sxc.hu/profile/svilen001)
+*  Stock photo: Timetable at the airport... 2 - http://www.sxc.hu/photo/722363 - David Ritter (http://rgbstock.com/ - http://www.rgbstock.com/gallery/dlritter)
+*  Stock photo: money - http://www.sxc.hu/photo/1211947 - Viktor Hujer (http://www.sxc.hu/profile/v_hujer)
