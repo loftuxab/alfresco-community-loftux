@@ -121,13 +121,23 @@ public class WebassetCollectionHelper implements WebSiteModel
 				ResultSet resultSet = searchService.query(searchParameters);
 		
 				// Iterate over the results of the query
+				int resultCount = 0;
 				for (NodeRef result : resultSet.getNodeRefs()) 
 				{
-					// Only ass associations to webassets
-					if (nodeService.hasAspect(result, ASPECT_WEBASSET) == true)
-					{
-						nodeService.createAssociation(collection, result, ASSOC_WEBASSETS);
-					}
+				    if (maxQuerySize < 1 || 
+				        resultCount < maxQuerySize)
+				    {
+    					// Only ass associations to webassets
+    					if (nodeService.hasAspect(result, ASPECT_WEBASSET) == true)
+    					{
+    						nodeService.createAssociation(collection, result, ASSOC_WEBASSETS);
+    					}
+    					resultCount++;
+				    }
+				    else
+				    {
+				        break;
+				    }
 				}
 				
 				// Set the refreshAt property
