@@ -84,7 +84,7 @@
             taskId = task.id,
             message = task.properties["bpm_description"],
             workflowId = task.workflowInstance.id,
-            workflowDetailsUrl = Alfresco.util.siteURL("workflow-details?workflowId=" + workflowId + "&taskId=" + taskId);
+            workflowDetailsUrl = "workflow-details?workflowId=" + workflowId + "&taskId=" + taskId;
          if (this.options.referrer)
          {
             workflowDetailsUrl += "&referrer=" + this.options.referrer;
@@ -97,7 +97,7 @@
          {
             message = this.msg("label.noMessage", $html(task.title));
          }
-         Selector.query(".links a", this.id, true).setAttribute("href", workflowDetailsUrl);
+         Selector.query(".links a", this.id, true).setAttribute("href", Alfresco.util.siteURL(workflowDetailsUrl));
          Dom.removeClass(Selector.query(".links", this.id, true), "hidden");
          Selector.query("h1 span", this.id, true).innerHTML = message;
       }

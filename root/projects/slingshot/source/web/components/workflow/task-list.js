@@ -35,7 +35,7 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-         $siteURL = Alfresco.util.siteURL;
+      $siteURL = Alfresco.util.siteURL;
 
    /**
     * DocumentList constructor.
@@ -227,7 +227,7 @@
             message = this.msg("workflow.no_message");
          }
                
-         var info = '<h3><a href="task-edit?taskId=' + taskId + '&referrer=tasks&myTasksLinkBack=true" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h3>';
+         var info = '<h3><a href="' + $siteURL('task-edit?taskId=' + taskId + '&referrer=tasks&myTasksLinkBack=true') + '" class="theme-color-1" title="' + this.msg("link.editTask") + '">' + message + '</a></h3>';
          info += '<div class="due"><label>' + this.msg("label.due") + ':</label><span>' + (dueDate ? Alfresco.util.formatDate(dueDate, "longDate") : this.msg("label.none")) + '</span></div>';
          info += '<div class="status"><label>' + this.msg("label.status") + ':</label><span>' + status + '</span></div>';
          info += '<div class="type"><label>' + this.msg("label.type", type) + ':</label><span>' + type + '</span></div>';

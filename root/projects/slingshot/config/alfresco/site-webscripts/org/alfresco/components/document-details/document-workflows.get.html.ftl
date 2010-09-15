@@ -1,3 +1,4 @@
+<#include "../../include/alfresco-macros.lib.ftl" />
 <div id="${args.htmlid}-body" class="document-workflows">
 
    <div class="info-section">
@@ -19,7 +20,7 @@
                <div class="icon"><img src="${url.context}/components/documentlibrary/images/workflow-indicator-16.png" /></div>
                <div class="details">
                   <div class="message">
-                     <a href="workflow-details?workflowId=${workflow.id}"><#if workflow.message??>${workflow.message}<#else>${msg("workflow.no_message")?html}</#if></a>
+                     <a href="${siteURL("workflow-details?workflowId=" + workflow.id?js_string)}"><#if workflow.message??>${workflow.message}<#else>${msg("workflow.no_message")?html}</#if></a>
                   </div>
                   <div class="title">${workflow.title}</div>
                </div>
