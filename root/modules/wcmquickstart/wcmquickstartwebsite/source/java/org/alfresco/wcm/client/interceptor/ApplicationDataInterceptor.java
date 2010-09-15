@@ -25,6 +25,9 @@ import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.Section;
 import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.WebSiteService;
+import org.alfresco.wcm.client.exception.PageNotFoundException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,6 +40,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  */
 public class ApplicationDataInterceptor extends HandlerInterceptorAdapter
 {
+    private static final Log log = LogFactory.getLog(ApplicationDataInterceptor.class);
+    
     private WebSiteService webSiteService;
     private ModelDecorator modelDecorator;
 
@@ -53,6 +58,14 @@ public class ApplicationDataInterceptor extends HandlerInterceptorAdapter
         String serverName = request.getServerName();
         int serverPort = request.getServerPort();
         WebSite webSite = webSiteService.getWebSite(serverName, serverPort);
+        
+        if (webSite == null)
+        {
+            log.warn("Received request for which no configured website can be found: " + 
+                    serverName + ":" + serverPort);
+            throw new PageNotFoundException();
+        }
+            
         WebSiteService.setThreadWebSite(webSite);
         requestContext.setValue("webSite", webSite);
 

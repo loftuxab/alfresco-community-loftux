@@ -112,12 +112,23 @@ public interface WebSite extends Serializable
 	Section getSectionByPath(String path);
 
 	/**
-	 * Get website context
+	 * Get context of the webapp used to deliver this site.
+	 * The context, together with the host name and host port, is used to
+	 * generate absolute URLs for assets in this site when necessary
 	 * @return
 	 */
 	String getContext();
 
+	/**
+	 * Obtain the map of configuration properties set on this website.
+	 * @return
+	 */
     Map<String, String> getConfig();
 
+    /**
+     * Returns true if this website has been marked as an editorial site. May
+     * be used by templates to enable editorial features on the website.
+     * @return
+     */
     boolean isEditorialSite();
 }

@@ -5,8 +5,8 @@
       <actionSet id="document">               
          <action type="action-link" id="onPreviewWebasset" permission="" label="actions.wcmqs.preview-webasset" />
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
-         <action type="simple-link" id="onActionView" href="{viewUrl}" label="actions.document.view" />
          <action type="action-link" id="onActionDetails" permission="edit" label="actions.document.edit-metadata" />
+         <action type="simple-link" id="onActionView" href="{viewUrl}" label="actions.document.view" />
          <action type="action-link" id="onActionSimpleApprove" permission="simple-approve" label="actions.document.simple-approve" />
          <action type="action-link" id="onActionSimpleReject" permission="simple-reject" label="actions.document.simple-reject" />
          <action type="action-link" id="onActionLocate" permission="~filter-path" label="actions.document.locate" />

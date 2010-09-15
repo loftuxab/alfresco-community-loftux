@@ -46,15 +46,18 @@ public interface Section extends Resource
     Section getSection(String sectionName);
     
     /**
-     * Get configuration map for the section
-     * @return	Map<String, String>		configuration map
+     * Get the template mappings for this section
+     * @return	Map<String, String>		the template mappings. Key/value pairs where
+     * the key is the name of the content type and the value is the name of the template
+     * to use when rendering content of that type.
      */
-    Map<String, String> getConfigMap();
+    Map<String, String> getTemplateMappings();
 	
     /**
-	 * Gets an asset from name
-	 * @param String asset name			
-	 * @return Asset asset object 		
+	 * Gets the asset with the given name in this section.
+	 * @param String the name of the required asset. If null or empty then the 
+	 * section's index page is returned			
+	 * @return Asset the named asset if it exists or null otherwise 		
 	 */
 	Asset getAsset(String name);
 	
@@ -66,11 +69,6 @@ public interface Section extends Resource
 	 */
 	String getTemplate(String type);
 	
-	/** 
-	 * Get the id of the collection folder for the section.
-	 * @return String the collection of collections node id
-	 */
-	//String getCollectionFolderId();
 		
 	/** 
 	 * Gets the path of the section
@@ -127,5 +125,9 @@ public interface Section extends Resource
      */
     SearchResults searchByTag(String tag, int maxResults, int resultsToSkip);
     
+    /**
+     * A factory method for returning an empty search query object.
+     * @return
+     */
     Query createQuery();
 }

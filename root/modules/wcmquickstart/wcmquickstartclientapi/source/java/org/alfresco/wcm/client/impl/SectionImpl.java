@@ -106,9 +106,9 @@ public class SectionImpl extends ResourceBaseImpl implements Section
     }
 	
 	/**
-	 * @see org.alfresco.wcm.client.Section#getConfigMap()
+	 * @see org.alfresco.wcm.client.Section#getTemplateMappings()
 	 */
-	public Map<String, String> getConfigMap()
+	public Map<String, String> getTemplateMappings()
 	{
 		return configMap;
 	}
@@ -280,7 +280,7 @@ public class SectionImpl extends ResourceBaseImpl implements Section
 		String template = null;
 		
 		// See if there is a template match on this section
-		template = findTemplate(section.getConfigMap(), type);				
+		template = findTemplate(section.getTemplateMappings(), type);				
 		
 		// If no template found check parent
 		Section parent = section.getContainingSection();
