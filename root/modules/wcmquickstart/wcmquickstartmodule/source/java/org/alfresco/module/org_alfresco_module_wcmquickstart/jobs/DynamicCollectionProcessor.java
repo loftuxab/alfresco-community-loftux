@@ -129,26 +129,26 @@ public class DynamicCollectionProcessor implements WebSiteModel
                         for (NodeRef collection : rs.getNodeRefs())
                         {
                             Date refreshAtDate = (Date)nodeService.getProperty(collection, PROP_REFRESH_AT);
+                            Calendar refreshAt = Calendar.getInstance();
                             if (refreshAtDate != null)
                             {
                                 // Convert the date to calendar
-                                Calendar refreshAt = Calendar.getInstance();
                                 refreshAt.setTime(refreshAtDate);
+                            }
                                 
-                                if (now.after(refreshAt) == true)
+                            if ((refreshAtDate == null) || now.after(refreshAt))
+                            {
+                                if (log.isDebugEnabled() == true)
                                 {
-                                    if (log.isDebugEnabled() == true)
+                                    String collectionName = (String)nodeService.getProperty(collection, ContentModel.PROP_NAME);
+                                    if (collectionName != null)
                                     {
-                                        String collectionName = (String)nodeService.getProperty(collection, ContentModel.PROP_NAME);
-                                        if (collectionName != null)
-                                        {
-                                            log.debug("Refreshing dynamic collection " + collectionName);
-                                        }
-                                    }                                    
-                                    
-                                    // Refresh the collection
-                                    collectionHelper.refreshCollection(collection);
-                                }
+                                        log.debug("Refreshing dynamic collection " + collectionName);
+                                    }
+                                }                                    
+                                
+                                // Refresh the collection
+                                collectionHelper.refreshCollection(collection);
                             }
                         }
                         return null;
