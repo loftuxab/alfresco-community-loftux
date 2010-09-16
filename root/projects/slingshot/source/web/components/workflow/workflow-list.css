@@ -83,37 +83,43 @@
    background-color: #ffffff;
 }
 
-.workflow-list tr.yui-dt-odd td.yui-dt-last .yui-dt-liner,
-.workflow-list tr.yui-dt-even td.yui-dt-last .yui-dt-liner
+.workflow-list .workflows td.yui-dt-last .yui-dt-liner
 {
    visibility: hidden;
 }
 
-.workflow-list tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last .yui-dt-liner,
-.workflow-list tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last .yui-dt-liner
+.workflow-list .workflows tr:hover td.yui-dt-last .yui-dt-liner
 {
    border-left: 1px solid #c5e6e9;
    visibility: visible;
 }
 
-.workflow-list .workflows.yui-dt .yui-dt-data td
+/*
+.workflow-list .workflows tr.yui-dt-highlighted td.yui-dt-last .yui-dt-liner
+{
+   border-left: 1px solid #c5e6e9;
+   visibility: visible;
+}
+*/
+
+.workflow-list .workflows .yui-dt-data td
 {
    border-bottom: 1px dashed #d9d9d9;
    border-right: medium none;
    vertical-align: top;
 }
 
-.workflow-list .workflows.yui-dt .yui-dt-data .yui-dt-last td
+.workflow-list .workflows .yui-dt-data .yui-dt-last td
 {
    border-bottom: medium none;
 }
 
-.workflow-list .workflows.yui-dt tr.yui-dt-first td
+.workflow-list .workflows tr.yui-dt-first td
 {
    border-top: medium none;
 }
 
-.workflow-list .workflows.yui-dt td.yui-dt-last
+.workflow-list .workflows td.yui-dt-last
 {
    border-left: 1px solid #fff;
    vertical-align: middle;
@@ -124,8 +130,8 @@
    padding: 4px;
 }
 
-.workflow-list .workflows.yui-dt tr.yui-dt-first td.yui-dt-empty,
-.workflow-list .workflows.yui-dt tr.yui-dt-first td.yui-dt-loading
+.workflow-list .workflows tr.yui-dt-first td.yui-dt-empty,
+.workflow-list .workflows tr.yui-dt-first td.yui-dt-loading
 {
    border-right: medium none;
    padding: 0.5em 1em;
