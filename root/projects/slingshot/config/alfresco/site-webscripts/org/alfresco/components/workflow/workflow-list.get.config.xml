@@ -16,7 +16,7 @@
       <filter id="due"           data="today"        parameters="dueAfter={-1d}&amp;dueBefore={0d}"/>
       <filter id="due"           data="tomorrow"     parameters="dueAfter={0d}&amp;dueBefore={1d}"/>
       <filter id="due"           data="next7Days"    parameters="dueAfter={0d}&amp;dueBefore={8d}"/>
-      <filter id="due"           data="overdue"      parameters="dueBefore={0dt}"/>
+      <filter id="due"           data="overdue"      parameters="dueBefore={-1d}"/>
       <filter id="due"           data="noDate"       parameters="dueBefore=null"/>
       <filter id="started"       data="last7Days"    parameters="startedAfter={-7d}"/>
       <filter id="started"       data="last14Days"   parameters="startedAfter={-14d}"/>

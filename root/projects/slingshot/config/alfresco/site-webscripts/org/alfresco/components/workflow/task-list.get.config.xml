@@ -17,7 +17,7 @@
       <filter id="due"           data="today"        parameters="dueAfter={-1d}&amp;dueBefore={0d}"/>
       <filter id="due"           data="tomorrow"     parameters="dueAfter={0d}&amp;dueBefore={1d}"/>
       <filter id="due"           data="next7Days"    parameters="dueAfter={0d}&amp;dueBefore={8d}"/>
-      <filter id="due"           data="overdue"      parameters="dueBefore={0dt}"/>
+      <filter id="due"           data="overdue"      parameters="dueBefore={-1d}"/>
       <filter id="due"           data="noDate"       parameters="dueBefore="/>
       <filter id="priority"      data="*"            parameters="priority={data}"/>
       <filter id="assignee"      data="me"           parameters="pooledTasks=false"/>
