@@ -17,7 +17,7 @@
    
    <!-- Import Slingshot -->
    <import resource="classpath*:alfresco/slingshot-application-context.xml" />
-   <import resource="classpath*:alfresco/web-extension/custom-slingshot-application-context.xml" />
+   <import resource="classpath*:alfresco/web-extension/*-context.xml" />
    
    <!-- SURF: support for Surf application config -->
    <import resource="classpath*:org/springframework/extensions/surf/application/*-context.xml" />
