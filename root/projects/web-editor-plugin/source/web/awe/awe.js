@@ -55,7 +55,7 @@
          YAHOO.Bubbling.unsubscribe = function(layer, handler)
          {
             this.bubble[layer].unsubscribe(handler);
-         }
+         };
 
          // handle events
          // edit content icon event
@@ -99,7 +99,7 @@
          Event.addListener(els, "mouseover", function()
          {
             var el = Dom.getChildren(this)[0];
-            Dom.setAttribute(el, "src", Dom.getAttribute(el, "src").replace(ext, suffix+ext))
+            Dom.setAttribute(el, "src", Dom.getAttribute(el, "src").replace(ext, suffix+ext));
          });
          Event.addListener(els, "mouseout", function()
          {
@@ -200,7 +200,7 @@
       confirmDeleteNode: function AWE_App_confirmDeleteNode(editable)
       {
          var title = Alfresco.util.message.call(this, 'title.confirm.delete');
-         var msg = Alfresco.util.message.call(this, 'message.confirm.delete', '', editable.title);
+         var msg = Alfresco.util.message.call(this, 'message.confirm.delete', '', editable.title.replace("Edit ",""));
 	     var me = this;
          var configDialog = Alfresco.util.PopupManager.displayPrompt(
          {
@@ -465,10 +465,10 @@
          var menuConfig = [];
          for (var i = 0; i < editables.length; i++) 
          {
-            var editable = editables[i].config;
+            var editable = editables[i].config, modifiedTitle = editable.title.replace("Edit ","");
             menuConfig.push(
             {
-	           text: Alfresco.util.message.call(this, 'message.edit', '', editable.title),
+	           text: Alfresco.util.message.call(this, 'message.edit', '', modifiedTitle),
                value: editable
             });
          }
@@ -481,10 +481,10 @@
          var menuConfig = [];
          for (var i = 0; i < editables.length; i++) 
          {
-            var editable = editables[i].config;
+            var editable = editables[i].config, modifiedTitle = editable.title.replace("Edit ","");
             menuConfig.push(
             {
-               text: Alfresco.util.message.call(this, 'message.delete', '', editable.title),
+               text: Alfresco.util.message.call(this, 'message.delete', '', modifiedTitle),
                value: editable
             });
          }
@@ -937,15 +937,17 @@
          if (args.length>0)
          {
             var targetContentEl = (args[1].value.nested) ? Dom.get(args[1].value.id).parentNode : Dom.get(args[1].value.id),
-                targetContentElRegion = Dom.getRegion(targetContentEl), 
+                targetContentElRegion = Dom.getRegion(targetContentEl),
+                defaultColor = this.getMessage('awe.bgColor'),
+                hoverColor =  this.getMessage('awe.highlightColor'),
                 fadeIn = function fade(el)
                 {
                    var anim = new YAHOO.util.ColorAnim(el,
                    {
                       backgroundColor: 
                       {
-                         from: '#ffffff',
-                         to: '#FFFF99',
+                         from: defaultColor,
+                         to: hoverColor,
                          duration: '0.5'
                       }
                    });
@@ -964,8 +966,8 @@
                    {
                       backgroundColor: 
                       {
-                         from: '#FFFF99',
-                         to: '#ffffff',
+                         from: hoverColor,
+                         to: defaultColor,
                          duration: '0.5'
                       }
                    });
