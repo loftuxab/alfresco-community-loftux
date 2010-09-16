@@ -61,6 +61,13 @@
         <property name="publishService" ref="org_alfresco_module_wcmquickstart_publishingService" />
         <property name="renditionHelper" ref="wcmquickstartmodule_renditionHelper"/>
     </bean>
+    
+    <bean id="wcmquickstartmodule_imageType"
+          class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.ImageType"
+          init-method="init">
+    	<property name="nodeService" ref="nodeService" />
+    	<property name="policyComponent" ref="policyComponent" />
+    </bean>
               
     <bean id="wcmquickstartmodule_tagscopeAspect"
           class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.TagScopeAspect"
