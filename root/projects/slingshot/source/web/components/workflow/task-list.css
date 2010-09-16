@@ -222,12 +222,12 @@
    cursor: pointer;   
 }
 
-.task-list .tasks table tbody tr .yui-dt-col-name .yui-dt-liner
+.task-list .tasks td.yui-dt-last .yui-dt-liner
 {
    visibility: hidden;
 }
 
-.task-list .tasks table tbody tr.yui-dt-highlighted td.yui-dt-col-name div.yui-dt-liner
+.task-list .tasks tr:hover td.yui-dt-last .yui-dt-liner
 {
    visibility: visible;
    border-left: 1px solid #c5e6e9;

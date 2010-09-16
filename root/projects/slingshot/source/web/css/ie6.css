@@ -664,3 +664,11 @@ table .yui-dt-empty
 {
    visibility: visible;
 }
+
+/* Lists */
+
+.task-list .tasks td.yui-dt-last .yui-dt-liner,
+.workflow-list .workflows td.yui-dt-last .yui-dt-liner
+{
+   visibility: visible;
+}
