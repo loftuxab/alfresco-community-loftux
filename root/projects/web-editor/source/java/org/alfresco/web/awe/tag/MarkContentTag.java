@@ -20,9 +20,7 @@
 package org.alfresco.web.awe.tag;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -147,7 +145,7 @@ public class MarkContentTag extends AbstractTemplateTag
                 String markerIdPrefix = (String) this.pageContext.getRequest().getAttribute(
                      AlfrescoTagUtil.KEY_MARKER_ID_PREFIX);
 
-                String redirectUrl = calculateRedirectUrl();
+                String redirectUrl = AlfrescoTagUtil.calculateRedirectUrl((HttpServletRequest) pageContext.getRequest());
                 String editMarkerId = markerIdPrefix + "-" + (markedContent.size() + 1);
 
                 // create marked content object and store
@@ -155,109 +153,7 @@ public class MarkContentTag extends AbstractTemplateTag
                      this.formId, this.nestedMarker);
                 markedContent.add(content);
 
-                // Hide initially, in case we need to log in or user does not want to log in
-                out.write("<span class=\"alfresco-content-marker\" style=\"opacity: 0.4\" id=\"");
-                out.write(editMarkerId);
-                out.write("\">");
-
-                // render edit link for content
-                out.write("<a class=\"alfresco-content-edit\" href=\"");
-                out.write(urlPrefix);
-                out.write("/page/metadata?nodeRef=");
-                out.write(this.contentId);
-                out.write("&js=off");
-                if(this.contentTitle != null)
-                {
-                    out.write("&title=");
-                    out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
-                }
-
-                if (redirectUrl != null)
-                {
-                    out.write("&redirect=");
-                    out.write(calculateRedirectUrl());
-                }
-
-                if (this.formId != null)
-                {
-                    out.write("&formId=");
-                    out.write(this.formId);
-                }
-
-                out.write("\"><img src=\"");
-                out.write(urlPrefix);
-                out.write("/res/awe/images/edit.png\" alt=\"");
-                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
-                out.write("\" title=\"");
-                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
-                out.write("\"border=\"0\" /></a>");
-
-                // render create link for content
-                out.write("<a class=\"alfresco-content-new\" href=\"");
-                out.write(urlPrefix);
-                out.write("/page/metadata?nodeRef=");
-                out.write(this.contentId);
-                out.write("&js=off");
-                if(this.contentTitle != null)
-                {
-                    out.write("&title=");
-                    out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
-                }
-
-                if (redirectUrl != null)
-                {
-                    out.write("&redirect=");
-                    out.write(calculateRedirectUrl());
-                }
-
-                if (this.formId != null)
-                {
-                    out.write("&formId=");
-                    out.write(this.formId);
-                }
-
-                out.write("\"><img src=\"");
-                out.write(urlPrefix);
-                out.write("/res/awe/images/new.png\" alt=\"");
-                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
-                out.write("\" title=\"");
-                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
-                out.write("\"border=\"0\" /></a>");
-                
-                // render delete link for content
-                out.write("<a class=\"alfresco-content-delete\" href=\"");
-                out.write(urlPrefix);
-                // TODO
-                out.write("/page/metadata?nodeRef=");
-                out.write(this.contentId);
-                out.write("&js=off");
-                if(this.contentTitle != null)
-                {
-                    out.write("&title=");
-                    out.write(URLEncoder.encode(this.contentTitle, "UTF-8"));
-                }
-
-                if (redirectUrl != null)
-                {
-                    out.write("&redirect=");
-                    out.write(calculateRedirectUrl());
-                }
-
-                if (this.formId != null)
-                {
-                    out.write("&formId=");
-                    out.write(this.formId);
-                }
-
-                out.write("\"><img src=\"");
-                out.write(urlPrefix);
-                out.write("/res/awe/images/delete.png\" alt=\"");
-                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
-                out.write("\" title=\"");
-                out.write(encode(this.contentTitle == null ? "" : this.contentTitle));
-                out.write("\"border=\"0\" /></a>");
-                
-                out.write("</span>\n");
+                AlfrescoTagUtil.writeMarkContentHtml(out, urlPrefix, redirectUrl, content);
 
                 if (logger.isDebugEnabled())
                 {
@@ -285,35 +181,4 @@ public class MarkContentTag extends AbstractTemplateTag
         super.release();
     }
 
-    /**
-     * Calculates the redirect url for form submission, this will
-     * be the current request URL.
-     * 
-     * @return The redirect URL
-     */
-    private String calculateRedirectUrl()
-    {
-        // NOTE: This may become configurable in the future, for now
-        //       this just returns the current page's URI
-
-        String redirectUrl = null;
-        HttpServletRequest request = (HttpServletRequest) this.pageContext.getRequest();
-        try
-        {
-            StringBuffer url = request.getRequestURL();
-            String queryString = request.getQueryString();
-            if (queryString != null)
-            {
-                url.append("?").append(queryString);
-            }
-
-            redirectUrl = URLEncoder.encode(url.toString(), "UTF-8");
-        }
-        catch (UnsupportedEncodingException uee)
-        {
-            // just return null
-        }
-
-        return redirectUrl;
-    }
 }

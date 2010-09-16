@@ -100,43 +100,14 @@ public class WebEditorMarkContentDirective extends AbstractTemplateDirective
                 List<MarkedContent> markedContent = AlfrescoTagUtil.getMarkedContent(request);
                 String markerIdPrefix = (String) request.getAttribute(AlfrescoTagUtil.KEY_MARKER_ID_PREFIX);
                 String markerId = markerIdPrefix + "-" + (markedContent.size() + 1);
+                String redirectUrl = calculateRedirectUrl(request);
 
                 // create marked content object and store
                 MarkedContent content = new MarkedContent(markerId, contentId, contentTitle, formId, nestedMarker);
                 markedContent.add(content);
 
-                // render edit link for content
-                out.write("<span class=\"alfresco-content-marker\" id=\"");
-                out.write(markerId);
-                out.write("\"><a href=\"");
-                out.write(urlPrefix);
-                out.write("/page/metadata?nodeRef=");
-                out.write(contentId);
-                //out.write("workspace://SpacesStore/d7aa3119-5ca9-4fb0-9f4d-b8b4febc4b7b"); //contentId);
-                out.write("&js=off");
-                out.write("&title=");
-                out.write(URLEncoder.encode(contentTitle, "UTF-8"));
+                AlfrescoTagUtil.writeMarkContentHtml(out, urlPrefix, redirectUrl, content);
 
-                String redirectUrl = calculateRedirectUrl(request);
-                if (redirectUrl != null)
-                {
-                    out.write("&redirect=");
-                    out.write(redirectUrl);
-                }
-
-                if (formId != null)
-                {
-                    out.write("&formId=");
-                    out.write(formId);
-                }
-
-                out.write("\"><img src=\"");
-                out.write(urlPrefix);
-                out.write("/res/awe/images/edit.png\" alt=\"");
-                out.write(encode(contentTitle));
-                out.write("\" title=\"");
-                out.write(encode(contentTitle));
-                out.write("\"border=\"0\" /></a></span>\n");
 
                 if (logger.isDebugEnabled())
                     logger.debug("Completed markContent rendering for: " + content);
@@ -161,15 +132,16 @@ public class WebEditorMarkContentDirective extends AbstractTemplateDirective
      */
     private String calculateRedirectUrl(HttpServletRequest request)
     {
-        // NOTE: This may become configurable in the future, for now
-        //       this just returns the current page's URI
-
         String redirectUrl = null;
         try
         {
         	// Build the redirect URL up bit by bit to avoid getting /service/ included.
         	String fullUrl = request.getRequestURL().toString();
-        	int firstSep = fullUrl.indexOf("/", 7);
+        	if (logger.isDebugEnabled())
+        	{
+        	    logger.debug("Calculating redirect URL. Request URL is " + fullUrl);
+        	}
+        	int firstSep = fullUrl.indexOf("/", fullUrl.indexOf("://")+3);
             StringBuffer url = new StringBuffer();
             url.append(fullUrl.substring(0, firstSep));
             url.append(request.getContextPath());
@@ -181,6 +153,10 @@ public class WebEditorMarkContentDirective extends AbstractTemplateDirective
             }
 
             redirectUrl = URLEncoder.encode(url.toString(), "UTF-8");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Calculated redirect URL: " + redirectUrl);
+            }
         }
         catch (UnsupportedEncodingException uee)
         {
