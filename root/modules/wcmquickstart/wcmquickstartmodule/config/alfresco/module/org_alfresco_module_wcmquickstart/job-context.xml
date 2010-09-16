@@ -62,8 +62,7 @@
         </property>
         <property name="cronExpression">
             <!-- Normally check at midnight each day. -->
-            <value>0/30 * * * * ?</value>
-<!--             <value>0 0 0 * * ?</value>  -->
+            <value>0 0 0 * * ?</value>
         </property>
     </bean>
 
@@ -84,8 +83,8 @@
             <ref bean="schedulerFactory" />
         </property>
         <property name="cronExpression">
-            <!-- The default is to check every 2 minutes. May well want to reduce the frequency on a production box. -->
-            <value>0 0/2 * * * ?</value>
+            <!-- The default is to check every minute. -->
+            <value>0 0/1 * * * ?</value>
         </property>
     </bean>
     

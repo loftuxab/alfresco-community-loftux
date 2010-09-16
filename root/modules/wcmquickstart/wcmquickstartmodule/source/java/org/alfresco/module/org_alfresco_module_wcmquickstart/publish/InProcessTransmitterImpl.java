@@ -18,6 +18,7 @@
  */
 package org.alfresco.module.org_alfresco_module_wcmquickstart.publish;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,6 +38,8 @@ import org.alfresco.service.cmr.transfer.TransferProgress;
 import org.alfresco.service.cmr.transfer.TransferReceiver;
 import org.alfresco.service.cmr.transfer.TransferTarget;
 import org.alfresco.service.transaction.TransactionService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class delegates transfer service to the transfer receiver without using
@@ -49,6 +52,7 @@ import org.alfresco.service.transaction.TransactionService;
  */
 public class InProcessTransmitterImpl implements TransferTransmitter
 {
+    private static final Log log = LogFactory.getLog(InProcessTransmitterImpl.class);
     private TransferReceiver receiver;
     private ContentService contentService;
     private TransactionService transactionService;
@@ -140,15 +144,15 @@ public class InProcessTransmitterImpl implements TransferTransmitter
             receiver.saveSnapshot(transferId, fs);
             receiver.generateRequsite(transferId, results);
             results.close();
-        } 
+        }
         catch (FileNotFoundException error)
         {
             throw new TransferException("Failed to find snapshot file: " + manifest.getPath(), error);
         }
         catch (IOException e)
         {
-            throw new TransferException("Failed to either read snapshot file or write requisite file: " + 
-                    manifest.getPath(), e);
+            throw new TransferException("Failed to either read snapshot file or write requisite file: "
+                    + manifest.getPath(), e);
         }
     }
 
@@ -163,6 +167,34 @@ public class InProcessTransmitterImpl implements TransferTransmitter
         return receiver.getStatus(transferId);
     }
 
+    @Override
+    public void getTransferReport(Transfer transfer, OutputStream results)
+    {
+        String transferId = transfer.getTransferId();
+
+        InputStream is = receiver.getTransferReport(transferId);
+
+        try
+        {
+            BufferedInputStream br = new BufferedInputStream(is);
+            byte[] buffer = new byte[1000];
+            int i = br.read(buffer);
+            while (i >= 0)
+            {
+                results.write(buffer, 0, i);
+                i = br.read(buffer);
+            }
+            results.flush();
+            results.close();
+            br.close();
+        }
+        catch (IOException ie)
+        {
+            log.warn("Failed to write transfer report.", ie);
+            return;
+        }
+    }
+
     public void setReceiver(TransferReceiver receiver)
     {
         this.receiver = receiver;
@@ -172,11 +204,5 @@ public class InProcessTransmitterImpl implements TransferTransmitter
     {
         return contentService;
     }
-
-	@Override
-	public void getTransferReport(Transfer transfer, OutputStream results) 
-	{
-		
-	}
 
 }
