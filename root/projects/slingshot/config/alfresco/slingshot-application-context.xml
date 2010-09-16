@@ -141,5 +141,6 @@
    
    <!--  I18N resources and messages Web Script -->
    <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" />
+   <bean id="webscript.org.springframework.extensions.messages.post" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" />
    
 </beans>
