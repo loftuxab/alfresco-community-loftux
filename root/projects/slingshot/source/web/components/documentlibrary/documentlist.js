@@ -1375,6 +1375,15 @@
                   fileName: this.options.highlightFile
                });
             }
+            else
+            {
+               // Scroll up (only) to the top of the documents
+               var yPos = Dom.getY(this.id + "-documents");
+               if (window.scrollY > yPos)
+               {
+                  window.scrollTo(0, yPos);
+               }
+            }
 
             // Deferred functions specified?
             for (var i = 0, j = this.afterDocListUpdate.length; i < j; i++)

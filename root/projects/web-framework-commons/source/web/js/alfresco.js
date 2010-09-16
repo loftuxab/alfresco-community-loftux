@@ -2260,6 +2260,53 @@ Alfresco.util.YUILoaderHelper = function()
     */
    var initialLoaderComplete = false;
    
+   /**
+    * Create YUILoader
+    * @function createYUILoader
+    * @private
+    */
+   var createYUILoader = function YUILoaderHelper_createYUILoader()
+   {
+      if (yuiLoader === null)
+      {
+         yuiLoader = new YAHOO.util.YUILoader(
+         {
+            base: Alfresco.constants.URL_CONTEXT + "yui/",
+            filter: Alfresco.constants.DEBUG ? "DEBUG" : "",
+            loadOptional: false,
+            skin: {},
+            onSuccess: Alfresco.util.YUILoaderHelper.onLoaderComplete,
+            onFailure: function(event)
+            {
+               alert("load failed:" + event);
+            },
+            scope: this
+         });
+         // Add Alfresco YUI components to YUI loader
+
+         // SWFPlayer
+         yuiLoader.addModule(
+         {
+            name: "swfplayer",
+            type: "js",
+            path: "swfplayer/swfplayer.js", //can use a path instead, extending base path
+            varName: "SWFPlayer",
+            requires: ['uploader'] // The FlashAdapter class is located in uploader.js
+         });
+
+         // ColumnBrowser - js
+         yuiLoader.addModule(
+         {
+            name: "columnbrowser",
+            type: "js",
+            path: "columnbrowser/columnbrowser.js", //can use a path instead, extending base path
+            varName: "ColumnBrowser",
+            requires: ['json', 'carousel'],
+            skinnable: true
+         });
+      }
+   };
+   
    return (
    {
       /**
@@ -2271,46 +2318,7 @@ Alfresco.util.YUILoaderHelper = function()
        */
       require: function YLH_require(p_aComponents, p_oCallback, p_oScope)
       {
-         if (yuiLoader === null)
-         {
-            yuiLoader = new YAHOO.util.YUILoader(
-            {
-               base: Alfresco.constants.URL_CONTEXT + "yui/",
-               filter: Alfresco.constants.DEBUG ? "DEBUG" : "",
-               loadOptional: false,
-               skin: {},
-               onSuccess: Alfresco.util.YUILoaderHelper.onLoaderComplete,
-               onFailure: function(event)
-               {
-                  alert("load failed:" + event);
-               },
-               scope: this
-            });
-            // Add Alfresco YUI components to YUI loader
-
-            // SWFPlayer
-            yuiLoader.addModule(
-            {
-               name: "swfplayer",
-               type: "js",
-               path: "swfplayer/swfplayer.js", //can use a path instead, extending base path
-               varName: "SWFPlayer",
-               requires: ['uploader'] // The FlashAdapter class is located in uploader.js
-            });
-
-            // ColumnBrowser - js
-            yuiLoader.addModule(
-            {
-               name: "columnbrowser",
-               type: "js",
-               path: "columnbrowser/columnbrowser.js", //can use a path instead, extending base path
-               varName: "ColumnBrowser",
-               requires: ['json', 'carousel'],
-               skinnable: true
-            });
-
-         }
-         
+         createYUILoader();
          if (p_aComponents.length > 0)
          {
             /* Have all the YUI components the caller requires been registered? */
@@ -2354,6 +2362,7 @@ Alfresco.util.YUILoaderHelper = function()
        */
       loadComponents: function YLH_loadComponents(p_pageLoad)
       {
+         createYUILoader();
          if (initialLoaderComplete || p_pageLoad === true)
          {
             if (yuiLoader !== null)

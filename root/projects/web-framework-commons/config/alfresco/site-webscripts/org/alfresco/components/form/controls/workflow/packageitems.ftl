@@ -2,7 +2,7 @@
 
 <#macro setPackageItemOptions field>
 
-   <#local documentLinkResolver>function(item){ return Alfresco.constants.URL_PAGECONTEXT + (item.site ? "site/" + item.site + "/": "") + "document-details?nodeRef=" + item.nodeRef; }</#local>
+   <#local documentLinkResolver>function(item){ return Alfresco.util.siteURL("document-details?nodeRef=" + item.nodeRef, { site: item.site }); }</#local>
    <#local allowAddAction = false>
    <#local allowRemoveAllAction = false>
    <#local allowRemoveAction = false>
@@ -47,17 +47,16 @@
          displayMode: "${field.control.params.displayMode!"list"}",
          listItemActions: [
          <#list actions as action>
-            {
-               name: "${action.name}",
-               <#if action.link??>
-               link: ${action.link},
-               <#elseif action.event>
-               event: "${action.event}", 
-               </#if>
-               label: "${action.label}"
-            }<#if action_has_next>,</#if>
-         </#list>
-         ],
+         {
+            name: "${action.name}",
+            <#if action.link??>
+            link: ${action.link},
+            <#elseif action.event>
+            event: "${action.event}", 
+            </#if>
+            label: "${action.label}"
+         }<#if action_has_next>,</#if>
+         </#list>],
          allowRemoveAction: ${allowRemoveAction?string},
          allowRemoveAllAction: ${allowRemoveAllAction?string},
          allowSelectAction: ${allowAddAction?string},

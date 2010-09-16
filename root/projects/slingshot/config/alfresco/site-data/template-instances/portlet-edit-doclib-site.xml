@@ -4,7 +4,7 @@
    <components>
       <component>
          <region-id>portlet-component</region-id>
-         <url>/components/my-documentlibraries/my-doclibs</url>
+         <url>/components/portlet/edit-doclib-site</url>
       </component>
    </components>
 </template-instance>

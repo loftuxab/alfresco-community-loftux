@@ -3,7 +3,7 @@
    If the current page is within a Site context, that context is used for the generated link.
    The function understands that &amp; needs to be unescaped when in portlet mode.
 -->
-<#function siteURL relativeURL siteId=page.url.templateArgs.site!"">
+<#function siteURL relativeURL=page.url.uri?substring(page.url.context?length) siteId=page.url.templateArgs.site!"">
    <#assign portlet = context.attributes.portletHost!false>
    <#assign portlet_url = (context.attributes.portletUrl!"")>
    <#assign site_url = relativeURL>
@@ -13,7 +13,8 @@
    </#if>
 
    <#if site_url?starts_with("/")><#assign site_url = site_url?substring(1)></#if>
-   <#assign site_url = ("/page/" + site_url)>
+   <#if !site_url?starts_with("page/")><#assign site_url = ("page/" + site_url)></#if>
+   <#assign site_url = "/" + site_url>
 
    <#if portlet>
       <#assign site_url = portlet_url?replace("%24%24scriptUrl%24%24", site_url?replace("&amp;", "&")?url)>

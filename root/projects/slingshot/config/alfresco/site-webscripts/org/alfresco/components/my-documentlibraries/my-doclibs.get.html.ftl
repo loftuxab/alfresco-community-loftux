@@ -12,7 +12,7 @@
       </div>
 </#macro>
 
-<#assign el=args.htmlid>
+<#assign el=args.htmlid?html>
 <div id="${el}-body" class="my-doclibs">
 
    <div class="header-bar"><h2>${msg("label.header-my")}</h2></div>
@@ -26,7 +26,7 @@
    </ul>
 <#else>
    <p>${msg("label.no-site-memberships")}</p>
-</#if>         
+</#if>
 
 <#if (otherSites?size > 0)>
    <p>&nbsp;</p>
@@ -38,5 +38,5 @@
       </li>
    </#list>
    </ul>
-</#if>         
+</#if>
 </div>

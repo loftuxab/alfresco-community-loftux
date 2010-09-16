@@ -3,15 +3,15 @@
     "http://www.liferay.com/dtd/liferay-portlet-app_5_2_0.dtd">
 <liferay-portlet-app>
    <portlet>
-      <portlet-name>CMISFolder</portlet-name>
+      <portlet-name>ShareMyDocLibs</portlet-name>
       <user-principal-strategy>screenName</user-principal-strategy>
    </portlet>
    <portlet>
-      <portlet-name>ShareDocLib</portlet-name>
+      <portlet-name>ShareSiteDocLib</portlet-name>
       <user-principal-strategy>screenName</user-principal-strategy>
    </portlet>
    <portlet>
-      <portlet-name>ShareRepoDocLib</portlet-name>
+      <portlet-name>ShareRepoBrowser</portlet-name>
       <user-principal-strategy>screenName</user-principal-strategy>
    </portlet>
 </liferay-portlet-app>

@@ -3,8 +3,8 @@
 
 <display>
    <category name="Alfresco">
-      <portlet id="CMISFolder" />
-      <portlet id="ShareDocLib" />
-      <portlet id="ShareRepoDocLib" />
+      <portlet id="ShareMyDocLibs" />
+      <portlet id="ShareSiteDocLib" />
+      <portlet id="ShareRepoBrowser" />
    </category>
 </display>
