@@ -1534,6 +1534,16 @@
             file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" />
       <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" 
                token="${page.url.context}/" value="${page.url.context}/res/" />
+
+      <copy todir="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form" overwrite="yes"
+            file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/form.lib.ftl" />
+      <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/form.lib.ftl" 
+               token="${url.context}/" value="${url.context}/res/" />
+
+      <copy todir="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/controls" overwrite="yes"
+            file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/controls/date.ftl" />
+      <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/controls/date.ftl" 
+               token="${url.context}/" value="${url.context}/res/" />
    </target>
    
    <target name="minimize-forms-client-javascript" depends="init">
