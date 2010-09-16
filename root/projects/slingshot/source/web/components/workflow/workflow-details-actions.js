@@ -104,7 +104,10 @@
        */
       onWorkflowFormReady: function WDA_onWorkflowFormReady(layer, args)
       {
-         Dom.removeClass(Selector.query(".actions", this.id), "hidden");
+         if (this.workflow.initiator.userName == Alfresco.constants.USERNAME)
+         {
+            Dom.removeClass(Selector.query(".actions", this.id), "hidden");
+         }
       },
 
       /**
