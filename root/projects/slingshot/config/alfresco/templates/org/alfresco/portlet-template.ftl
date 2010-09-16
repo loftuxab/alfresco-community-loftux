@@ -4,7 +4,7 @@
 <@templateBody>
    <div id="alf-hd"></div>
    <div id="bd">
-      <@region id="my-doclibs" scope="template" />
+      <@region id="portlet-component" scope="template" />
    </div>
 </@>
 

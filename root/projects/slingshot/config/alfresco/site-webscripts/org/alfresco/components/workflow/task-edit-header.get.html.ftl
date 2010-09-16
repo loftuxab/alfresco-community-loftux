@@ -28,7 +28,7 @@ new Alfresco.component.TaskEditHeader("${el}").setOptions(
    <!-- People Finder Dialog -->
    <div style="display: none;">
       <div id="${el}-reassignPanel" class="task-edit-header reassign-panel">
-         <div class="hd">${msg("panel.reassign.header")}</span></div>
+         <div class="hd">${msg("panel.reassign.header")}</div>
          <div class="bd">
             <div style="margin: auto 10px;">
                <div id="${el}-peopleFinder"></div>

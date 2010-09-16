@@ -19,6 +19,11 @@
 package org.alfresco.web.portlet;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -26,6 +31,7 @@ import javax.portlet.Portlet;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletSecurityException;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -45,17 +51,26 @@ import org.springframework.extensions.surf.util.URLEncoder;
  * @author davidc
  * @author dward
  * @author kevinr
+ * @author mikeh
  */
 public class ProxyPortlet implements Portlet
 {
     private static Log logger = LogFactory.getLog(ProxyPortlet.class);
     
+    private static final String EDIT_URL     = "editScriptUrl";
     private static final String SCRIPT_URL   = "scriptUrl";
     private static final String PORTLET_URL  = "portletUrl";
     private static final String PORTLET_HOST = "portletHost";
+    private static final String MODE_PARAM_NAME = "mode";
+    private static final String MODE_PARAM_VALUE_EDIT = "edit";
+    private static final String MODE_PARAM_VALUE_VIEW = "view";
+    private static final String UPDATED_PARAM_NAME = "updated";
+    private static final String PREF_PARAM_NAME_PREFIX = "pref_";
+    private static final String DEFAULT_VALUE = "[DEFAULT]";
     
     // Portlet initialisation
     protected PortletConfig config;
+    protected String editScriptUrl;
     protected String initScriptUrl;
 
 
@@ -66,6 +81,7 @@ public class ProxyPortlet implements Portlet
     public void init(PortletConfig config) throws PortletException
     {
         this.config = config;
+        this.editScriptUrl = config.getInitParameter(EDIT_URL);
         this.initScriptUrl = config.getInitParameter(SCRIPT_URL);
     }
 
@@ -76,11 +92,7 @@ public class ProxyPortlet implements Portlet
     public void processAction(ActionRequest req, ActionResponse res)
         throws PortletException, PortletSecurityException, IOException
     {
-        String scriptUrl = req.getParameter(SCRIPT_URL);
-        if (scriptUrl != null)
-        {
-            res.setRenderParameter(SCRIPT_URL, scriptUrl);
-        }
+        res.setRenderParameters(req.getParameterMap());
     }
 
     /*
@@ -95,6 +107,10 @@ public class ProxyPortlet implements Portlet
         {
             doView(req, res);
         }
+        else if (PortletMode.EDIT.equals(portletMode))
+        {
+            doEdit(req, res);
+        }
     }
 
     /*
@@ -106,7 +122,7 @@ public class ProxyPortlet implements Portlet
     }
 
     /**
-     * Render Surf view
+     * Render Surf view (portlet view mode)
      * 
      * @param req
      * @param res
@@ -120,13 +136,51 @@ public class ProxyPortlet implements Portlet
         //
         // Establish View URL
         //
-        
         String scriptUrl = req.getParameter(SCRIPT_URL);
         if (scriptUrl == null)
         {
             // retrieve initial scriptUrl as configured by Portlet
             scriptUrl = this.initScriptUrl;
-            if (scriptUrl == null)
+            if (scriptUrl != null)
+            {
+                // contains replaceable tokens?
+                if (scriptUrl.indexOf("{") > -1)
+                {
+                    PortletPreferences prefs = req.getPreferences();
+                    Map<String, String[]> prefsMap = prefs.getMap();
+                    // search / replace each available preference occurrence in the string
+                    Pattern p = Pattern.compile("\\{(\\w+)\\}");
+                    Matcher m = p.matcher(scriptUrl);
+                    boolean result = m.find();
+                    if (result)
+                    {
+                        StringBuffer sb = new StringBuffer();
+                        do
+                        {
+                            m.appendReplacement(sb, prefsMap.containsKey(m.group(1)) ? prefsMap.get(m.group(1))[0] : DEFAULT_VALUE);
+                            result = m.find();
+                        } while (result);
+                        m.appendTail(sb);
+                        scriptUrl = sb.toString();
+                    }
+
+                    // still have non-replaced tokens?
+                    if (scriptUrl.indexOf(DEFAULT_VALUE) > -1)
+                    {
+                        // redirect to the edit page in "view" mode
+                        if (this.editScriptUrl != null)
+                        {
+                            scriptUrl = this.editScriptUrl;
+                            req.setAttribute(MODE_PARAM_NAME, MODE_PARAM_VALUE_VIEW);
+                        }
+                        else
+                        {
+                            throw new PortletException("Required preferences missing and 'editScriptUrl' parameter has not been specified.");
+                        }
+                    }
+                }
+            }
+            else
             {
                 // If the path parameter has not been provided, forward to the user specific dashboard page
                 String userId = req.getRemoteUser();
@@ -141,6 +195,85 @@ public class ProxyPortlet implements Portlet
             }
         }
         
+        renderRequest(req, res, scriptUrl);
+    }
+
+    /**
+     * Render Surf view (portlet edit mode)
+     * 
+     * @param req
+     * @param res
+     * @throws PortletException
+     * @throws PortletSecurityException
+     * @throws IOException
+     */
+    @SuppressWarnings("unchecked")
+    protected void doEdit(RenderRequest req, RenderResponse res)
+        throws PortletException, PortletSecurityException, IOException
+    {
+        //
+        // Establish Edit URL
+        //
+        String scriptUrl = req.getParameter(SCRIPT_URL);
+        if (scriptUrl == null)
+        {
+            // retrieve initial scriptUrl as configured by Portlet
+            scriptUrl = this.editScriptUrl;
+            if (scriptUrl == null)
+            {
+                throw new PortletException("Initial 'editScriptUrl' parameter has not been specified.");
+            }
+        }
+        
+        //
+        // Store updated preferences if any found
+        //
+        boolean foundPref = false;
+        PortletPreferences prefs = req.getPreferences();
+        Map<String, String[]> prefsMap = prefs.getMap();
+        Enumeration<String> names = req.getParameterNames();
+        while (names.hasMoreElements())
+        {
+           String name = (String)names.nextElement();
+           String value = req.getParameter(name);
+           if (prefsMap.containsKey(name) && value != null)
+           {
+               prefs.setValue(name, value);
+               foundPref = true;
+           }
+        }
+        if (foundPref)
+        {
+            prefs.store();
+            req.setAttribute(UPDATED_PARAM_NAME, true);
+            // Must re-query the prefs map
+            prefsMap = prefs.getMap();
+        }
+        // Add prefs to request attributes, names prefixed with "pref_"
+        Iterator it = prefsMap.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry pairs = (Map.Entry)it.next();
+            req.setAttribute(PREF_PARAM_NAME_PREFIX + pairs.getKey(), pairs.getValue());
+        }
+        
+        req.setAttribute(MODE_PARAM_NAME, MODE_PARAM_VALUE_EDIT);
+        renderRequest(req, res, scriptUrl);
+    }
+        
+    /**
+     * Render Surf request
+     * 
+     * @param req
+     * @param res
+     * @param scriptUrl
+     * @throws PortletException
+     * @throws PortletSecurityException
+     * @throws IOException
+     */
+    protected void renderRequest(RenderRequest req, RenderResponse res, String scriptUrl)
+        throws PortletException, PortletSecurityException, IOException
+    {
         if (logger.isDebugEnabled())
             logger.debug("Processing portal render request " + req.getScheme() + "://" + req.getServerName() + ":"
                     + req.getServerPort() + "/" + req.getContextPath() + " (scriptUrl=" + scriptUrl + ")");

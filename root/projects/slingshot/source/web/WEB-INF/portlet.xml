@@ -3,29 +3,8 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd">
    <portlet>
-      <description>CMIS Folder Browser</description>
-      <portlet-name>CMISFolder</portlet-name>
-      <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
-
-      <init-param>
-         <name>scriptUrl</name>
-         <value>/service/sample/cmis/repo</value>
-      </init-param>
-
-      <supports>
-         <mime-type>text/html</mime-type>
-         <portlet-mode>VIEW</portlet-mode>
-      </supports>
-
-      <portlet-info>
-         <title>CMIS Folder Browser</title>
-         <short-title>CMIS Folder</short-title>
-      </portlet-info>
-   </portlet>
-
-   <portlet>
-      <description>Share Document Libraries</description>
-      <portlet-name>ShareDocLib</portlet-name>
+      <description>Alfresco Share: My Document Libraries</description>
+      <portlet-name>ShareMyDocLibs</portlet-name>
       <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
 
       <init-param>
@@ -39,14 +18,48 @@
       </supports>
 
       <portlet-info>
-         <title>My Document Libraries</title>
-         <short-title>Share DocLib</short-title>
+         <title>Share: My Document Libraries</title>
+         <short-title>My Document Libraries</short-title>
       </portlet-info>
    </portlet>
 
    <portlet>
-      <description>Share Repository Library</description>
-      <portlet-name>ShareRepoDocLib</portlet-name>
+      <description>Alfresco Share: Site Document Library</description>
+      <portlet-name>ShareSiteDocLib</portlet-name>
+      <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
+
+      <init-param>
+         <name>scriptUrl</name>
+         <value>/page/site/{siteId}/documentlibrary</value>
+      </init-param>
+
+      <init-param>
+         <name>editScriptUrl</name>
+         <value>/page/portlet-edit-doclib-site</value>
+      </init-param>
+
+      <supports>
+         <mime-type>text/html</mime-type>
+         <portlet-mode>VIEW</portlet-mode>
+         <portlet-mode>EDIT</portlet-mode>
+      </supports>
+
+      <portlet-info>
+         <title>Share: Site Document Library</title>
+         <short-title>Site DocLib</short-title>
+      </portlet-info>
+
+      <portlet-preferences>
+         <preference>
+            <name>siteId</name>
+            <value>[DEFAULT]</value>
+         </preference>    
+      </portlet-preferences>
+   </portlet>
+
+   <portlet>
+      <description>Alfresco Share: Repository Browser</description>
+      <portlet-name>ShareRepoBrowser</portlet-name>
       <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
 
       <init-param>
@@ -60,8 +73,8 @@
       </supports>
 
       <portlet-info>
-         <title>Repository Library</title>
-         <short-title>Share Repo DocLib</short-title>
+         <title>Share: Repository Browser</title>
+         <short-title>Repository Browser</short-title>
       </portlet-info>
    </portlet>
 

@@ -1,10 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
    <template-type>org/alfresco/start-workflow</template-type>
+   <properties>
+      <pageFamily>documentlibrary</pageFamily>
+   </properties>
    <components>
-
-      <!-- Title -->
-
+      <!-- title: normal, portlet, repo, tasks & workflow -->
       <component>
          <region-id>title</region-id>
          <url>/components/title/collaboration-title</url>
@@ -61,15 +62,9 @@
          </properties>
       </component>
 
-
-      <!-- Navigation -->
-
+      <!-- navigation: normal, tasks & workflow -->
       <component>
          <region-id>navigation</region-id>
-         <url>/components/navigation/collaboration-navigation</url>
-      </component>
-      <component>
-         <region-id>portlet-navigation</region-id>
          <url>/components/navigation/collaboration-navigation</url>
       </component>
 
@@ -91,9 +86,7 @@
          <url>/components/workflow/workflow-toolbar</url>
       </component>
 
-      
-      <!-- Start workflow form -->
-
+      <!-- start workflow form -->
       <component>
          <region-id>start-workflow</region-id>
          <url>/components/workflow/start</url>
