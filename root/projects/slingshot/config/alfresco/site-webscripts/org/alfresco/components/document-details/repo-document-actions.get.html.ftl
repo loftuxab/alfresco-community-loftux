@@ -2,7 +2,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DocumentActions("${el}").setOptions(
    {
-      workingMode: Alfresco.doclib.MODE_REPOSITORY
+      workingMode: Alfresco.doclib.MODE_REPOSITORY,
+      replicationUrlMapping: ${replicationUrlMappingJSON!"{}"}
    }).setMessages(
       ${messages}
    );
