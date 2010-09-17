@@ -21,6 +21,7 @@ package org.alfresco.module.vti.web.scripts;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.alfresco.repo.admin.SysAdminParams;
 import org.springframework.extensions.surf.util.StringBuilderWriter;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptException;
@@ -36,13 +37,25 @@ import org.springframework.extensions.webscripts.json.JSONWriter;
  */
 public class VtiServerWebScript extends AbstractWebScript
 {
-	private int vtiServerPort = 0;
-	
+    private int vtiServerPort = 0;
+    private String vtiServerHost = "${localname}";
+    private SysAdminParams sysAdminParams;
+
     public void setPort(int vtiServerPort)
     {
         this.vtiServerPort = vtiServerPort;
     }
-	
+
+    public void setHost(String vtiServerHost)
+    {
+        this.vtiServerHost = vtiServerHost;
+    }
+    
+    public void setSysAdminParams(SysAdminParams sysAdminParams)
+    {
+        this.sysAdminParams = sysAdminParams;
+    }
+
     /**
      * Execute the webscript and return the cached JavaScript response
      */
@@ -54,6 +67,7 @@ public class VtiServerWebScript extends AbstractWebScript
         {
             out.startObject();
             out.writeValue("port", this.vtiServerPort);
+            out.writeValue("host", this.sysAdminParams.subsituteHost(vtiServerHost));
             out.endObject();
         }
         catch (IOException jsonErr)

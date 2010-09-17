@@ -16,27 +16,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 /**
  * Document Library Actions module
- * 
+ *
  * @namespace Alfresco.doclib
  * @class Alfresco.doclib.Actions
  */
 (function()
 {
    /**
-    * YUI Library aliases
-    */
-   var Dom = YAHOO.util.Dom;
-
-   /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
       $combine = Alfresco.util.combinePaths,
       $siteURL = Alfresco.util.siteURL;
-   
+
    /**
     * Alfresco.doclib.Actions implementation
     */
@@ -53,7 +48,7 @@
       onActionDetails: function dlA_onActionDetails(asset)
       {
          var scope = this;
-         
+
          // Intercept before dialog show
          var doBeforeDialogShow = function dlA_onActionDetails_doBeforeDialogShow(p_form, p_dialog)
          {
@@ -65,7 +60,7 @@
             );
 
             // Edit metadata link button
-            this.widgets.editMetadata = Alfresco.util.createYUIButton(p_dialog, "editMetadata", null, 
+            this.widgets.editMetadata = Alfresco.util.createYUIButton(p_dialog, "editMetadata", null,
             {
                type: "link",
                label: scope.msg("edit-details.label.edit-metadata"),
@@ -187,7 +182,7 @@
       onActionDelete: function dlA_onActionDelete(asset)
       {
          var me = this;
-         
+
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: this.msg("message.confirm.delete.title"),
@@ -226,7 +221,7 @@
             filePath = $combine(path, fileName),
             displayName = asset.displayName,
             nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
-         
+
          this.modules.actions.genericAction(
          {
             success:
@@ -297,15 +292,114 @@
       },
 
       /**
+       * Valid online edit mimetypes, mapped to application ProgID.
+       * Currently allowed are Microsoft Office 2003 and 2007 mimetypes for Excel, PowerPoint and Word only
+       *
+       * @property onlineEditMimetypes
+       * @type object
+       */
+      onlineEditMimetypes:
+      {
+         "application/vnd.ms-excel": "Excel.Sheet",
+         "application/vnd.ms-powerpoint": "PowerPoint.Slide",
+         "application/msword": "Word.Document",
+         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Excel.Sheet",
+         "application/vnd.openxmlformats-officedocument.presentationml.presentation": "PowerPoint.Slide",
+         "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word.Document"
+      },
+
+      /**
        * Edit Online.
-       * NOTE: Placeholder only, clients MUST implement their own editOffline action
        *
        * @method onActionEditOnline
-       * @param asset {object} Object literal representing the file or folder to be actioned
+       * @param asset {object} Object literal representing file or folder to be actioned
        */
       onActionEditOnline: function dlA_onActionEditOnline(asset)
       {
-         Alfresco.logger.error("onActionEditOnline", "Abstract implementation not overridden");
+         if (this._launchOnlineEditor(asset))
+         {
+            YAHOO.Bubbling.fire("metadataRefresh");
+         }
+      },
+
+      /**
+       * Opens the appropriate Microsoft Office application for online editing.
+       * Supports: Microsoft Office 2003, 2007 & 2010.
+       *
+       * @method Alfresco.util.sharePointOpenDocument
+       * @param asset {object} Object literal representing file or folder to be actioned
+       * @return {boolean} True if the action was completed successfully, false otherwise.
+       */
+      _launchOnlineEditor: function dlA__launchOnlineEditor(asset)
+      {
+         var controlProgID = "SharePoint.OpenDocuments",
+            mimetype = asset.mimetype,
+            appProgID = null,
+            activeXControl = null,
+            extensionMap =
+            {
+               xls: "application/vnd.ms-excel",
+               ppt: "application/vnd.ms-powerpoint",
+               doc: "application/msword",
+               xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+               pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+               docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            };
+
+         // Try to resolve the asset to an application ProgID; by mimetype first, then file extension.
+         if (this.onlineEditMimetypes.hasOwnProperty(mimetype))
+         {
+            appProgID = this.onlineEditMimetypes[mimetype];
+         }
+         else
+         {
+            var extn = Alfresco.util.getFileExtension(asset.location.file);
+            if (extn !== null)
+            {
+               extn = extn.toLowerCase();
+               if (extensionMap.hasOwnProperty(extn))
+               {
+                  mimetype = extensionMap[extn];
+                  if (this.onlineEditMimetypes.hasOwnProperty(mimetype))
+                  {
+                     appProgID = this.onlineEditMimetypes[mimetype];
+                  }
+               }
+            }
+         }
+
+         if (appProgID !== null)
+         {
+            // Try each version of the SharePoint control in turn, newest first
+            try
+            {
+               activeXControl = new ActiveXObject(controlProgID + ".3");
+               return activeXControl.EditDocument3(window, asset.onlineEditUrl, true, appProgID);
+            }
+            catch(e)
+            {
+               try
+               {
+                  activeXControl = new ActiveXObject(controlProgID + ".2");
+                  return activeXControl.EditDocument2(window, asset.onlineEditUrl, appProgID);
+               }
+               catch(e)
+               {
+                  try
+                  {
+                     activeXControl = new ActiveXObject(controlProgID + ".1");
+                     return activeXControl.EditDocument(asset.onlineEditUrl, appProgID);
+                  }
+                  catch(e)
+                  {
+                     // Do nothing
+                  }
+               }
+            }
+         }
+
+         // No success in launching application via ActiveX control; launch the WebDAV URL anyway
+         return window.open(asset.onlineEditUrl, "_blank");
       },
 
       /**
@@ -462,12 +556,12 @@
             // Only add a filtering extension if filename contains a name and a suffix
             extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
          }
-         
+
          if (asset.custom && asset.custom.workingCopyVersion)
          {
             version = asset.custom.workingCopyVersion;
          }
-         
+
          var singleUpdateConfig =
          {
             updateNodeRef: nodeRef.toString(),
@@ -568,7 +662,7 @@
             }
          });
       },
-      
+
       /**
        * Copy single document or folder.
        *
@@ -610,7 +704,7 @@
          {
             throw new Error("'" + mode + "' is not a valid Copy/Move to mode.");
          }
-         
+
          if (!this.modules.copyMoveTo)
          {
             this.modules.copyMoveTo = new Alfresco.module.DoclibCopyMoveTo(this.id + "-copyMoveTo");
@@ -659,7 +753,7 @@
          }
          else
          {
-            nodeRefs = asset.nodeRef;                          
+            nodeRefs = asset.nodeRef;
             destination = asset.location.parent.nodeRef;
          }
          var postBody = { "selectedItems" : nodeRefs};
@@ -775,7 +869,7 @@
          });
          this.modules.changeType.show();
       },
-      
+
       /**
        * View in source Repository URL helper
        *
@@ -789,17 +883,17 @@
             repoId = asset.location.repositoryId,
             urlMapping = this.options.replicationUrlMapping,
             siteUrl;
-         
+
          if (!repoId || !urlMapping || !urlMapping[repoId])
          {
             return "#";
          }
-         
+
          // Generate a URL to the relevant details page
          siteUrl = Alfresco.util.siteURL(type + "-details?nodeRef=" + nodeRef);
          // Strip off this webapp's context as the mapped one might be different
          siteUrl = siteUrl.substring(Alfresco.constants.URL_CONTEXT.length);
-         
+
          return $combine(urlMapping[repoId], "/", siteUrl);
       }
    };
