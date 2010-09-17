@@ -3,7 +3,8 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${template.properties.container!"documentLibrary"}",
-      vtiServer: ${vtiServer}
+      vtiServer: ${vtiServer},
+      replicationUrlMapping: ${replicationUrlMappingJSON!"{}"}
    }).setMessages(
       ${messages}
    );

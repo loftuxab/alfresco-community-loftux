@@ -1,11 +1,3 @@
-<import resource="classpath:/alfresco/site-webscripts/org/alfresco/components/document-details/document-actions.get.js">
+<import resource="classpath:/alfresco/site-webscripts/org/alfresco/components/documentlibrary/include/documentlist.lib.js">
 
-// Repository Url
-var repositoryUrl = null,
-   repositoryConfig = config.scoped["DocumentLibrary"]["repository-url"];
-if (repositoryConfig !== null)
-{
-   repositoryUrl = repositoryConfig.value;
-}
-
-model.repositoryUrl = repositoryUrl;
+doclibCommon();

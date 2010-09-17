@@ -2,7 +2,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RepositoryFolderActions("${el}").setOptions(
    {
-      <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}"</#if>
+      <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}",</#if>
+      replicationUrlMapping: ${replicationUrlMappingJSON!"{}"}
    }).setMessages(
       ${messages}
    );

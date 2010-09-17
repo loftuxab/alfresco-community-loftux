@@ -2,7 +2,8 @@
    new Alfresco.RecordsFolderActions("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${template.properties.container!"documentLibrary"}"
+      containerId: "${template.properties.container!"documentLibrary"}",
+      replicationUrlMapping: ${replicationUrlMappingJSON!"{}"}
    }).setMessages(
       ${messages}
    );

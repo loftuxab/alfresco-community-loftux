@@ -5,7 +5,7 @@
    <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/folder-details.js"></@script>   
-   <#if doclibType != ""><@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script></#if>
+   <#if doclibType = "dod5015"><@script type="text/javascript" src="${page.url.context}/templates/folder-details/dod5015-folder-details.js"></@script></#if>
    <@templateHtmlEditorAssets />
 </@>
 

@@ -5,7 +5,7 @@
    <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/document-details/document-details.js"></@script>
-   <#if doclibType != ""><@script type="text/javascript" src="${page.url.context}/templates/document-details/${doclibType}document-details.js"></@script></#if>
+   <#if doclibType = "dod5015"><@script type="text/javascript" src="${page.url.context}/templates/document-details/dod5015-document-details.js"></@script></#if>
    <@templateHtmlEditorAssets />
 </@>
 
@@ -22,12 +22,12 @@
 
       <div class="yui-g">
          <div class="yui-g first">
-            <#if (config.scoped['DocumentDetails']['document-details'].getChildValue('display-web-preview') == "true")>
+         <#if (config.scoped['DocumentDetails']['document-details'].getChildValue('display-web-preview') == "true")>
             <@region id=doclibType + "web-preview" scope="template" protected=true />
-            </#if>
-            <#if doclibType?starts_with("dod5015")>
+         </#if>
+         <#if doclibType?starts_with("dod5015")>
             <@region id=doclibType + "events" scope="template" protected=true />
-            <#else>
+         <#else>
             <div class="document-details-comments">
                <@region id=doclibType + "comments" scope="template" protected=true />
                <@region id=doclibType + "createcomment" scope="template" protected=true />
