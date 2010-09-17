@@ -62,7 +62,7 @@ public class DynamicPageViewResolver extends AbstractWebFrameworkViewResolver
      */
     protected AbstractUrlBasedView buildView(String viewName) throws Exception
     {
-        AbstractUrlBasedView view = null;
+        PageView view = null;
         RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
         Asset asset = (Asset) requestContext.getValue("asset");
 
@@ -84,6 +84,7 @@ public class DynamicPageViewResolver extends AbstractWebFrameworkViewResolver
 
         view = new PageView(getServiceRegistry());
         view.setUrl(template);
+        view.setPage(page);
         return view;
     }
 }
