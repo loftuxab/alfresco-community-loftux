@@ -494,7 +494,11 @@
                     clean-truncatemalformedxml,
                     clean-dod5015,
                     clean-dod5015-share,
-                    clean-quickr" />
+                    clean-quickr,
+                    clean-wcmquickstart,
+                    clean-wcmquickstart-share,
+                    clean-wcmquickstart-clientapi,
+                    clean-wcmquickstart-webapp" />
    
    <target name ="clean-tomcat-deployments" 
            description="Cleans all Tomcat server deployments"

@@ -16,6 +16,7 @@
         <property name="nodeService" ref="NodeService"/>
         <property name="renditionService" ref="RenditionService" />
         <property name="dictionaryService" ref="DictionaryService" />
+        <property name="transactionService" ref="TransactionService" />
         <property name="definitions">
             <list>
                            
