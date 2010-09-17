@@ -19,7 +19,7 @@
             </div>
             <div class="separator">&nbsp;</div>
          </div>         
-         <div class="hideable toolbar-hidden DocListTree">
+         <div class="hideable toolbar-hidden DocListTree hidden">
             <div class="new-article"><button id="${args.htmlid}-newArticle-button" name="newArticle">${msg("button.new-article")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>         
