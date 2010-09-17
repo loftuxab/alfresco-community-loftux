@@ -6,6 +6,9 @@ function toRepoType(contentType)
       case "dod5015":
          type = "dod:filePlan";
          break;
+      case "wcmqs":
+         type = "ws:websiteContainer";
+         break;
    }
    return type;
 }
@@ -18,6 +21,9 @@ function fromRepoType(repoType)
       case "dod:filePlan":
          type = "dod5015";
          break;
+      case "ws:websiteContainer":
+         type = "wcmqs";
+         break;   
    }
    return type;
 }
