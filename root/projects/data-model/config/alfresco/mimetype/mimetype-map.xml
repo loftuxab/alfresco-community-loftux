@@ -262,11 +262,6 @@
             <extension>pps</extension>
             <extension>pot</extension>
          </mimetype>
-         <mimetype mimetype="application/vnd.powerpoint" display="Microsoft PowerPoint">
-            <extension>ppt</extension>
-            <extension>pps</extension>
-            <extension>pot</extension>
-         </mimetype>
          <mimetype mimetype="image/x-cmu-raster" display="Raster Image">
             <extension>ras</extension>
          </mimetype>
@@ -348,9 +343,6 @@
             <extension display="Excel Spreadsheet" default="true">xls</extension>
             <extension display="Excel Template">xlt</extension>
             <extension display="Excel Macro">xlm</extension>
-         </mimetype>
-         <mimetype mimetype="application/vnd.excel" display="Microsoft Excel">
-            <extension>xls</extension>
          </mimetype>
          <mimetype mimetype="image/x-xpixmap" display="XPixmap Image">
             <extension>xpm</extension>
