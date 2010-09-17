@@ -601,6 +601,25 @@ Alfresco.util.getFileIcon.types =
 };
 
 /**
+ * Returns the extension from file url or path
+ * 
+ * @method Alfresco.util.getFileExtension
+ * @param filePath {string} File path from which to extract file extension
+ * @return {string|null} File extension or null
+ * @static
+ */
+Alfresco.util.getFileExtension = function(filePath)
+{
+   var match = (new String(filePath)).match(/^.*\.([^\.]*)$/);
+   if (YAHOO.lang.isArray(match) && YAHOO.lang.isString(match[1]))
+   {
+      return match[1];
+   }
+   
+   return null;
+};
+
+/**
  * Formats a Freemarker datetime into more UI-friendly format
  *
  * @method Alfresco.util.formatDate

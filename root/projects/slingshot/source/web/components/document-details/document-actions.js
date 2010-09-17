@@ -118,23 +118,6 @@
          },
 
          /**
-          * Valid online edit mimetypes
-          * Currently allowed are Microsoft Office 2003 and 2007 mimetypes for Excel, PowerPoint and Word only
-          *
-          * @property onlineEditMimetypes
-          * @type object
-          */
-         onlineEditMimetypes:
-         {
-            "application/vnd.ms-excel": true,
-            "application/vnd.ms-powerpoint": true,
-            "application/msword": true,
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": true,
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation": true,
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": true 
-         },
-         
-         /**
           * SharePoint (Vti) Server Details
           *
           * @property vtiServer
@@ -253,15 +236,15 @@
 
             /*
              * Configure the Online Edit URL and permission if correct conditions are met
-             * Browser == MSIE; vtiServer port retrieved; vti module installed; mimetype matches whitelist
+             * Browser == MSIE; vtiServer details retrieved; vti module installed; mimetype matches whitelist
              */
             if (YAHOO.env.ua.ie > 0 &&
                this.options.vtiServer && typeof this.options.vtiServer.port == "number" &&
                this.doclistMetadata.onlineEditing &&
-               assetData.mimetype in this.options.onlineEditMimetypes)
+               assetData.mimetype in this.onlineEditMimetypes)
             {
                var loc = assetData.location;
-               assetData.onlineEditUrl = window.location.protocol.replace(/https/i, "http") + "//" + window.location.hostname + ":" + this.options.vtiServer.port + "/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file);
+               assetData.onlineEditUrl = window.location.protocol.replace(/https/i, "http") + "//" + this.options.vtiServer.host + ":" + this.options.vtiServer.port + "/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file);
                userAccess["online-edit"] = true;
             }
             
@@ -546,19 +529,6 @@
          this.onNewVersionUploadComplete.call(this, complete);
          this.assetData.nodeRef = complete.successful[0].nodeRef;
          window.location = this.getActionUrls().documentDetailsUrl;
-      },
-
-      /**
-       * Edit Online.
-       *
-       * @method onActionEditOnline
-       * @param asset {object} Object literal representing file or folder to be actioned
-       */
-      onActionEditOnline: function DocumentActions_onActionEditOnline(asset)
-      {
-         window.open(asset.onlineEditUrl, "_blank");
-         // Really, we'd need to refresh after the document has been opened, but we don't know when/if this occurs
-         YAHOO.Bubbling.fire("metadataRefresh");
       },
 
       /**
