@@ -112,8 +112,9 @@ public class RepositoryExceptionResolver extends SimpleMappingExceptionResolver
 					applyStatusCodeIfPossible(request, response, statusCode);
 					
 			        PageView view = new PageView(requestContext.getServiceRegistry());
+			        view.setPage(lookupPage(template));
 			        view.setUrl(template);
-			        			        
+			        
 		    		ModelAndView mv = new ModelAndView();
 			        mv.setView(view);
 				    
