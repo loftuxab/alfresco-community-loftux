@@ -69,6 +69,7 @@ public class WebPublishingManifestNodeFactory implements TransferManifestNodeFac
     private TransferManifestNodeFactory realFactory;
     private NodeService nodeService;
     private DescriptorService descriptorService;
+    private NodeRefMapper nodeRefMapper;
 
 
     public void setDelegate(TransferManifestNodeFactory realFactory)
@@ -84,6 +85,11 @@ public class WebPublishingManifestNodeFactory implements TransferManifestNodeFac
     public void setDescriptorService(DescriptorService descriptorService)
     {
         this.descriptorService = descriptorService;
+    }
+
+    public void setNodeRefMapper(NodeRefMapper nodeRefMapper)
+    {
+        this.nodeRefMapper = nodeRefMapper;
     }
 
     public TransferManifestNode createTransferManifestNode(NodeRef nodeRef, TransferDefinition definition)
@@ -256,28 +262,7 @@ public class WebPublishingManifestNodeFactory implements TransferManifestNodeFac
      */
     public NodeRef getMappedNodeRef(NodeRef node)
     {
-        /**
-         * Map the node ref by replacing the 36th digit with a new letter greater than 'F'. 
-         * The existing UUID could have 0-9 1-F in the 36th digit
-         */
-        StringBuilder nodeId = new StringBuilder(node.getId());
-        if (nodeId.length() == 36)
-        {
-            int ch = nodeId.charAt(35);
-            if (ch > 'f')
-            {
-                nodeId.setCharAt(35, (char)(ch+1));
-            }
-            else
-            {
-                nodeId.setCharAt(35, 'g');
-            }
-        }
-        else
-        {
-            nodeId.append('g');
-        }
-       return new NodeRef(node.getStoreRef(), nodeId.toString());
+       return nodeRefMapper.mapSourceNodeRef(node);
     }
 
     /**
