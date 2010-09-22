@@ -51,7 +51,11 @@
         <property name="delegate" ref="transferManifestNodeFactory" />
         <property name="descriptorService" ref="DescriptorService" />
         <property name="nodeService" ref="NodeService" />
+        <property name="nodeRefMapper" ref="org_alfresco_module_wcmquickstart_nodeRefMapper" />
     </bean>
+
+    <bean id="org_alfresco_module_wcmquickstart_nodeRefMapper" 
+        class="org.alfresco.module.org_alfresco_module_wcmquickstart.publish.NodeRefMapper" />
 
     <bean id="org_alfresco_module_wcmquickstart_publishingService"
         class="org.alfresco.module.org_alfresco_module_wcmquickstart.publish.PublishServiceImpl">
