@@ -132,7 +132,7 @@
       <attribute name="projectdir" />
       <sequential>
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
-         <junit showoutput="yes" printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="yes" dir="@{projectdir}" jvm="${java.home}/bin/java">
+         <junit showoutput="yes" printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="yes" dir="@{projectdir}" jvm="${env.JAVA_HOME}/bin/java">
             <jvmarg value="-server"/>
             <jvmarg value="-XX:MaxPermSize=128M"/>
             <jvmarg value="-Dcom.sun.management.jmxremote"/>
@@ -154,7 +154,7 @@
       <attribute name="projectdir" />
       <sequential>
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
-         <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="@{projectdir}" jvm="${java.home}/bin/java">
+         <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="@{projectdir}" jvm="${env.JAVA_HOME}/bin/java">
             <jvmarg value="-server"/>
             <jvmarg value="-XX:MaxPermSize=256M"/>
             <jvmarg value="-Dcom.sun.management.jmxremote"/>
@@ -200,7 +200,7 @@
       <attribute name="ampfile" />
       <attribute name="warfile" />
       <sequential>
-         <java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool" jvm="${java.home}/bin/java">
+         <java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool" jvm="${env.JAVA_HOME}/bin/java">
             <classpath refid="classpath.compile"/>
             <arg line="install @{ampfile} @{warfile} -force -verbose -nobackup"/>
          </java>
@@ -319,7 +319,7 @@
       <sequential>
          <echo>Starting Alfresco Tomcat:  ${tomcat.home}</echo>
          <java jar="${tomcat.home}/bin/bootstrap.jar" 
-               fork="true" jvm="${java.home}/bin/java">
+               fork="true" jvm="${env.JAVA_HOME}/bin/java">
             <jvmarg value="-Dcatalina.home=${tomcat.home}"/>
             <jvmarg value="-Dcatalina.base=${tomcat.home}"/>
             <jvmarg value="-server"/>
@@ -336,7 +336,7 @@
            <antcall  target="wait-for-alfresco"/>
            <echo>Starting Virtual Tomcat:  ${virtual.tomcat.home}</echo>
            <java jar="${virtual.tomcat.home}/bin/bootstrap.jar" 
-                 fork="true" jvm="${java.home}/bin/java">
+                 fork="true" jvm="${env.JAVA_HOME}/bin/java">
                <jvmarg value="-Dcatalina.home=${virtual.tomcat.home}"/>
                <jvmarg value="-Dcatalina.base=${virtual.tomcat.home}"/>
                <jvmarg value="-server"/>
