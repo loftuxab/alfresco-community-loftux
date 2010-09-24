@@ -117,7 +117,7 @@ public class StreamedAssetController extends AbstractController
         }
         
         // Return a StreamedAssetView to render the stream
-        return new ModelAndView(new StreamedAssetView(stream, mimeType));
+        return new ModelAndView(new StreamedAssetView(objectId, stream, mimeType));
     }
  
     public void setUrlUtils(UrlUtils urlUtils)

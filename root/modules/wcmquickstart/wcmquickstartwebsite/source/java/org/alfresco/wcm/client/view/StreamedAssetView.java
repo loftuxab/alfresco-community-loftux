@@ -29,68 +29,82 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.web.servlet.view.AbstractView;
+import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
 /**
  * Stream an asset for the view
+ * 
  * @author Chris Lack
- *
+ * 
  */
-public class StreamedAssetView extends AbstractView
+public class StreamedAssetView extends AbstractUrlBasedView
 {
-	private static final Log log = LogFactory.getLog(StreamedAssetView.class.getName());
+    private static final Log log = LogFactory.getLog(StreamedAssetView.class.getName());
+    private ThreadLocal<byte[]> streamBuffer = new ThreadLocal<byte[]>() {
 
-	private InputStream stream;
+        @Override
+        protected byte[] initialValue()
+        {
+            return new byte[10240];
+        }
+    };
 
-	/**
-	 * Construct the view with the image details
-	 * @param stream the stream of data which represents the image
-	 * @param mimeType the mime type of the image
-	 */
-	public StreamedAssetView(InputStream stream, String mimeType)
-	{
-	    this.stream = stream;
-	    setContentType(mimeType);
-	}
+    private InputStream stream;
 
-	/**
-	 * @see org.springframework.web.servlet.view.AbstractView#renderMergedOutputModel(java.util.Map, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	@Override
-    protected void renderMergedOutputModel(Map<String, Object> model,
-            							   HttpServletRequest request, HttpServletResponse response) throws Exception
-	{
-	    ServletOutputStream out = null;
-	
-	    if (stream == null)
-	    {
-	        log.debug("Asset contents are not available!");
-	        return;
-	    }
-	
-	    try
-	    {
-	    	// Write the InputStream to the servlet OutputStream
-	        out = response.getOutputStream();
-	        BufferedOutputStream bufOut = new BufferedOutputStream(out);
-	        response.setContentType(getContentType());
-	        byte[] buf = new byte[2048];
-	        int count;
+    /**
+     * Construct the view with the image details
+     * 
+     * @param stream
+     *            the stream of data which represents the image
+     * @param mimeType
+     *            the mime type of the image
+     */
+    public StreamedAssetView(String url, InputStream stream, String mimeType)
+    {
+        super(url);
+        this.stream = stream;
+        setContentType(mimeType);
+    }
+
+    /**
+     * @see org.springframework.web.servlet.view.AbstractView#renderMergedOutputModel(java.util.Map,
+     *      javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
+            HttpServletResponse response) throws Exception
+    {
+        ServletOutputStream out = null;
+
+        if (stream == null)
+        {
+            log.debug("Asset contents are not available!");
+            return;
+        }
+
+        try
+        {
+            // Write the InputStream to the servlet OutputStream
+            out = response.getOutputStream();
+            BufferedOutputStream bufOut = new BufferedOutputStream(out);
+            response.setContentType(getContentType());
+            byte[] buf = streamBuffer.get();
+            int count;
             while ((count = stream.read(buf)) != -1)
             {
-            	bufOut.write(buf, 0, count);
+                bufOut.write(buf, 0, count);
             }
             bufOut.flush();
-	    }
-	    catch (IOException ex)
-	    {
-	        log.error("Unable to stream asset data!", ex);
-	    }
-	    finally
-	    {
-	        if (out != null) out = null;
-	    }
-	}
+        }
+        catch (IOException ex)
+        {
+            log.error("Unable to stream asset data!", ex);
+        }
+        finally
+        {
+            if (out != null)
+                out = null;
+        }
+    }
 }
-
-
