@@ -60,7 +60,9 @@ function main()
    model.searchTerm = (page.url.args["t"] != null) ? page.url.args["t"] : "";
    model.searchTag = (page.url.args["tag"] != null) ? page.url.args["tag"] : "";
    model.searchSort = (page.url.args["s"] != null) ? page.url.args["s"] : "";
-   model.searchAll = (page.url.args["a"] == "true");
+   model.searchRepo = (page.url.args["r"] == "true");
+   model.searchAllSites = (page.url.args["a"] == "true" || siteId.length == 0);
+   
    // Advanced search forms based json query
    model.searchQuery = (page.url.args["q"] != null) ? page.url.args["q"] : "";
 }

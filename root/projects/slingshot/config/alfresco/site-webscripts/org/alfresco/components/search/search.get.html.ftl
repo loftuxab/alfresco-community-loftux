@@ -5,7 +5,8 @@
       siteId: "${siteId}",
       initialSearchTerm: "${searchTerm?js_string}",
       initialSearchTag: "${searchTag?js_string}",
-      initialSearchAll: ${searchAll?string},
+      initialSearchAllSites: ${searchAllSites?string},
+      initialSearchRepository: ${searchRepo?string},
       initialSort: "${searchSort?js_string}",
       searchQuery: "${searchQuery?js_string}",
       minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
@@ -16,10 +17,11 @@
 //]]></script>
 
 <div id="${el}-body" class="search">
-   <#if siteId?length != 0>
+   <#if searchQuery?length == 0>
    <div class="search-sites">
-      <a id="${el}-site-link" href="#"><#if !searchAll><b></#if>${msg('message.singlesite', siteTitle)}<#if !searchAll></b></#if></a> |
-      <a id="${el}-all-sites-link" href="#"><#if searchAll><b></#if>${msg('message.allsites')}<#if searchAll></b></#if></a>
+      <#if siteId?length != 0><a id="${el}-site-link" href="#" <#if !searchAllSites && !searchRepo>class="bold"</#if>>${msg('message.singlesite', siteTitle)}</a> |</#if>
+      <a id="${el}-all-sites-link" href="#" <#if searchAllSites && !searchRepo>class="bold"</#if>>${msg('message.allsites')}</a> |
+      <a id="${el}-repo-link" href="#" <#if searchRepo>class="bold"</#if>>${msg('message.repository')}</a>
    </div>
    </#if>
    <div class="search-box">

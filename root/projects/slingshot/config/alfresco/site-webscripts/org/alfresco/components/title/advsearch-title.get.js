@@ -35,6 +35,7 @@ function main()
                   "&tag=" + (args["stag"] != null ? encodeURIComponent(args["stag"]) : "") +
                   "&s=" + (args["ss"] != null ? encodeURIComponent(args["ss"]) : "") +
                   "&a=" + (args["sa"] != null ? encodeURIComponent(args["sa"]) : "") +
+                  "&r=" + (args["sr"] != null ? encodeURIComponent(args["sr"]) : "") +
                   "&q=" + (args["sq"] != null ? encodeURIComponent(args["sq"]) : "");
       model.backlink = query;
    }
