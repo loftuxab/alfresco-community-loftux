@@ -107,12 +107,20 @@
          
          /**
           * States whether all sites should be searched.
-          * This field only has an effect if siteId != ""
           * 
-          * @property initialSearchAll
+          * @property initialSearchAllSites
           * @type boolean
           */
-         initialSearchAll: true,
+         initialSearchAllSites: true,
+         
+         /**
+          * States whether repository should be searched.
+          * This is in preference to current or all sites.
+          * 
+          * @property initialSearchRepository
+          * @type boolean
+          */
+         initialSearchRepository: false,
          
          /**
           * Sort property to use for the initial search.
@@ -154,7 +162,12 @@
       /**
        * Whether the search was over all sites or just the current one
        */
-      searchAll: true,
+      searchAllSites: true,
+      
+      /**
+       * Whether the search is over the entire repository - in preference to site or all sites
+       */
+      searchRepository: false,
       
       /**
        * Search sort used for the last search.
@@ -194,9 +207,8 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["nodeRef", "type", "name", "displayName", "description",
-                      "modifiedOn", "modifiedByUser", "modifiedBy", "size",
-                      "title", "browseUrl", "site", "tags"]
+             fields: ["nodeRef", "type", "name", "displayName", "title", "description", "container",
+                      "modifiedOn", "modifiedByUser", "modifiedBy", "size", "site", "tags", "path"]
          };
          
          // YUI Paginator definition
@@ -240,7 +252,8 @@
             searchTerm: this.options.initialSearchTerm,
             searchTag: this.options.initialSearchTag,
             searchSort: this.options.initialSort,
-            searchAll: this.options.initialSearchAll
+            searchAllSites: this.options.initialSearchAllSites,
+            searchRepository: this.options.initialSearchRepository
          });
          
          // toggle site scope links
@@ -248,6 +261,8 @@
          Event.addListener(toggleLink, "click", this.onSiteSearch, this, true);
          toggleLink = Dom.get(this.id + "-all-sites-link");
          Event.addListener(toggleLink, "click", this.onAllSiteSearch, this, true);
+         toggleLink = Dom.get(this.id + "-repo-link");
+         Event.addListener(toggleLink, "click", this.onRepositorySearch, this, true);
          
          // search YUI button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
@@ -371,7 +386,7 @@
             // Render the cell
             var name = oRecord.getData("displayName");
             var htmlName = $html(name);
-            var html = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
+            var html = '<span><a href="' + url + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
             if (dataType === "document")
             {
                var viewUrl = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/content/" + oRecord.getData("nodeRef").replace(":/", "") + "/" + oRecord.getData("name");
@@ -386,7 +401,7 @@
          };
 
          /**
-          * Description/detail custom datacell formatter
+          * Description/detail custom cell formatter
           *
           * @method renderCellDescription
           * @param elCell {object}
@@ -399,21 +414,29 @@
             // apply styles
             Dom.setStyle(elCell.parentNode, "line-height", "1.5em");
             
-            // we currently render all results the same way
+            // site and repository items render with different information available
             var site = oRecord.getData("site");
             var url = me._getBrowseUrlForRecord(oRecord);
             
-            // title/link to details page
-            var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '" class="theme-color-1">' + $html(oRecord.getData("displayName")) + '</a></h3>';
+            // displayname and link to details page
+            var displayName = oRecord.getData("displayName");
+            var desc = '<h3 class="itemname"><a href="' + url + '" class="theme-color-1">' + $html(displayName) + '</a>';
+            // add title (if any) to displayname area
+            var title = oRecord.getData("title");
+            if (title && title !== displayName)
+            {
+               desc += '<span class="title">(' + $html(title) + ')</span>';
+            }
+            desc += '</h3>';
             
             // description (if any)
             var txt = oRecord.getData("description");
-            if (txt !== undefined && txt !== "")
+            if (txt)
             {
-               desc += '<div class="details">' + $html(txt) + '</div>';
+               desc += '<div class="details meta">' + $html(txt) + '</div>';
             }
             
-            // type information
+            // detailed information, includes site etc. type specific
             desc += '<div class="details">';
             var type = oRecord.getData("type");
             switch (type)
@@ -434,18 +457,46 @@
             }
             
             // link to the site and other meta-data details
-            desc += ' ' + me.msg("message.insite");
-            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + $html(site.shortName) + '/dashboard">' + $html(site.title) + '</a>';
+            if (site)
+            {
+               desc += ' ' + me.msg("message.insite");
+               desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + $html(site.shortName) + '/dashboard">' + $html(site.title) + '</a>';
+            }
             if (oRecord.getData("size") !== -1)
             {
                desc += ' ' + me.msg("message.ofsize");
-               desc += ' ' + Alfresco.util.formatFileSize(oRecord.getData("size"));
+               desc += ' <span class="meta">' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
             }
-            desc += ' ' + me.msg("message.modifiedby");
-            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedBy")) + '</a> ';
-            desc += me.msg("message.modifiedon");
-            desc += ' ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"));
+            if (oRecord.getData("modifiedBy"))
+            {
+               desc += ' ' + me.msg("message.modifiedby");
+               desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedBy")) + '</a>';
+            }
+            desc += ' ' + me.msg("message.modifiedon") + ' <span class="meta">' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
             desc += '</div>';
+            
+            // folder path (if any)
+            if (type === "document" || type === "folder")
+            {
+               var path = oRecord.getData("path");
+               if (site)
+               {
+                  if (path === null || path === undefined)
+                  {
+                     path = "";
+                  }
+                  desc += '<div class="details">' + me.msg("message.infolderpath") +
+                          ': <a href="' + me._getBrowseUrlForFolderPath(path, site) + '">' + $html('/' + path) + '</a></div>';
+               }
+               else
+               {
+                  if (path)
+                  {
+                     desc += '<div class="details">' + me.msg("message.infolderpath") +
+                          ': <a href="' + me._getBrowseUrlForFolderPath(path) + '">' + $html(path) + '</a></div>';
+                  }
+               }
+            }
             
             // tags (if any)
             var tags = oRecord.getData("tags");
@@ -540,21 +591,113 @@
       },
 
       /**
-       * Constructs the browse url for a given record.
+       * Constructs the completed browse url for a record.
+       * @param record {string} the record
        */
-      _getBrowseUrlForRecord: function (oRecord)
+      _getBrowseUrlForRecord: function Search__getBrowseUrlForRecord(record)
       {
-         var url = "#";
-         if (oRecord.getData("browseUrl") !== undefined)
+         var url = null;
+         
+         var name = record.getData("name"),
+             type = record.getData("type"),
+             site = record.getData("site"),
+             path = record.getData("path");
+         
+         switch (type)
+         {
+            case "document":
+            {
+               url = "document-details?nodeRef=" + record.getData("nodeRef");
+               break;
+            }
+            
+            case "folder":
+            {
+               if (path !== null)
+               {
+                  if (site)
+                  {
+                     url = "documentlibrary?path=" + encodeURIComponent(this._buildSpaceNamePath(path.split("/"), name));
+                  }
+                  else
+                  {
+                     url = "repository?path=" + encodeURIComponent(this._buildSpaceNamePath(path.split("/").slice(2), name));
+                  }
+               }
+               break;
+            }
+            
+            case "blogpost":
+            {
+               url = "blog-postview?container=" + record.getData("container") + "&postId=" + name;
+               break;
+            }
+            
+            case "forumpost":
+            {
+               url = "discussions-topicview?container=" + record.getData("container") + "&topicId=" + name;
+               break;
+            }
+            
+            case "calendarevent":
+            {
+               url = record.getData("container"); // this is "calendar"
+               break;
+            }
+            
+            case "wikipage":
+            {
+               url = "wiki-page?title=" + name;
+               break;
+            }
+            
+            case "link":
+            {
+               url = "links-view?linkId=" + name;
+               break;
+            }
+         }
+         
+         if (url !== null)
          {
             // browse urls always go to a page. We assume that the url contains the page name and all
-            // parameters. What we have to add is the absolute path and the site param
-            // PENDING: could we somehow make use of Alfresco.constants.URI_TEMPLATES and pass
-            //          the pageid and param list separately?
-            var site = oRecord.getData("site");
-            url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/" + oRecord.getData("browseUrl");
+            // parameters. Add the absolute path and the optional site param
+            if (site)
+            {
+               url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/" + url;
+            }
+            else
+            {
+               url = Alfresco.constants.URL_PAGECONTEXT + url;
+            }
+         }
+         
+         return (url !== null ? url : '#');
+      },
+      
+      /**
+       * Constructs the folder url for a record.
+       * @param path {string} folder path
+       *        For a site relative item this can be empty (root of doclib) or any path - without a leading slash
+       *        For a repository item, this can never be empty - but will contain leading slash and Company Home root
+       */
+      _getBrowseUrlForFolderPath: function Search__getBrowseUrlForFolderPath(path, site)
+      {
+         var url = null;
+         if (site)
+         {
+            url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/documentlibrary?path=" + encodeURIComponent('/' + path);
+         }
+         else
+         {
+            url = Alfresco.constants.URL_PAGECONTEXT + "repository?path=" + encodeURIComponent('/' + path.split('/').slice(2).join('/'));
          }
          return url;
+      },
+      
+      _buildSpaceNamePath: function Search__buildSpaceNamePath(pathParts, name)
+      {
+         return (pathParts.length !== 0 ? ("/" + pathParts.join("/")) : "") + "/" + name;
       },
 
       /**
@@ -594,10 +737,15 @@
          {
             searchTag = args.searchTag;
          }
-         var searchAll = this.searchAll;
-         if (args.searchAll !== undefined)
+         var searchAllSites = this.searchAllSites;
+         if (args.searchAllSites !== undefined)
          {
-            searchAll = args.searchAll;
+            searchAllSites = args.searchAllSites;
+         }
+         var searchRepository = this.searchRepository;
+         if (args.searchRepository !== undefined)
+         {
+            searchRepository = args.searchRepository;
          }
          var searchSort = this.searchSort;
          if (args.searchSort !== undefined)
@@ -610,22 +758,33 @@
             searchQuery = args.searchQuery;
          }
          
-         // redirect to the search page
+         // redirect back to the search page - with appropriate site context
          var url = Alfresco.constants.URL_CONTEXT + "page";
          if (this.options.siteId.length !== 0)
          {
             url += "/site/" + this.options.siteId;
          }
+         
+         // add search data webscript arguments
          url += "/search?t=" + encodeURIComponent(searchTerm);
-         if (searchTag.length !== 0)
-         {
-            url += "&tag=" + encodeURIComponent(searchTag);
-         }
          if (searchSort.length !== 0)
          {
             url += "&s=" + searchSort;
          }
-         url += "&a=" + searchAll + "&q=" + searchQuery;
+         if (searchQuery.length !== 0)
+         {
+            // if we have a query (already encoded), then apply it
+            // other options such as tag, terms, all sites, repo etc. are trumped
+            url += "&q=" + searchQuery;
+         }
+         else
+         {
+            if (searchTag.length !== 0)
+            {
+               url += "&tag=" + encodeURIComponent(searchTag);
+            }
+            url += "&a=" + searchAllSites + "&r=" + searchRepository;
+         }
          window.location = url;
       },
 
@@ -656,10 +815,15 @@
             {
                searchTag = obj.searchTag;
             }
-            var searchAll = this.searchAll;
-            if (obj.searchAll !== undefined)
+            var searchAllSites = this.searchAllSites;
+            if (obj.searchAllSites !== undefined)
             {
-               searchAll = obj.searchAll;
+               searchAllSites = obj.searchAllSites;
+            }
+            var searchRepository = this.searchRepository;
+            if (obj.searchRepository !== undefined)
+            {
+               searchRepository = obj.searchRepository;
             }
             var searchSort = this.searchSort;
             if (obj.searchSort !== undefined)
@@ -670,7 +834,8 @@
             {
                searchTerm: searchTerm,
                searchTag: searchTag,
-               searchAll: searchAll,
+               searchAllSites: searchAllSites,
+               searchRepository: searchRepository,
                searchSort: searchSort
             });
          }
@@ -694,7 +859,7 @@
       },
       
       /**
-       * Click event for site specific search link
+       * Click event for Current Site search link
        * 
        * @method onSiteSearch
        */
@@ -702,12 +867,13 @@
       {
          this.refreshSearch(
          {
-            searchAll: false
+            searchAllSites: false,
+            searchRepository: false
          });
       },
       
       /**
-       * Click event for all sites search link
+       * Click event for All Sites search link
        * 
        * @method onAllSiteSearch
        */
@@ -715,7 +881,21 @@
       {
          this.refreshSearch(
          {
-            searchAll: true
+            searchAllSites: true,
+            searchRepository: false
+         });
+      },
+      
+      /**
+       * Click event for Repository search link
+       * 
+       * @method onRepositorySearch
+       */
+      onRepositorySearch: function Search_onRepositorySearch(e, args)
+      {
+         this.refreshSearch(
+         {
+            searchRepository: true
          });
       },
 
@@ -742,12 +922,15 @@
        */
       _performSearch: function Search__performSearch(args)
       {
-         var searchTerm = YAHOO.lang.trim(args.searchTerm);
-         var searchTag = YAHOO.lang.trim(args.searchTag);
-         var searchAll = args.searchAll;
-         var searchSort = args.searchSort;
+         var searchTerm = YAHOO.lang.trim(args.searchTerm),
+             searchTag = YAHOO.lang.trim(args.searchTag),
+             searchAllSites = args.searchAllSites,
+             searchRepository = args.searchRepository,
+             searchSort = args.searchSort;
+         
          if (this.options.searchQuery.length === 0 &&
-             searchTag.length === 0 && searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
+             searchTag.length === 0 &&
+             searchTerm.replace(/\*/g, "").length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -769,7 +952,8 @@
             // update current state on success
             this.searchTerm = searchTerm;
             this.searchTag = searchTag;
-            this.searchAll = searchAll;
+            this.searchAllSites = searchAllSites;
+            this.searchRepository = searchRepository;
             this.searchSort = searchSort;
             
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
@@ -805,7 +989,7 @@
             }
          }
          
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm, searchTag, searchSort),
+         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchRepository, searchAllSites, searchTerm, searchTag, searchSort),
          {
             success: successHandler,
             failure: failureHandler,
@@ -841,12 +1025,13 @@
        *
        * @method _buildSearchParams
        */
-      _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm, searchTag, searchSort)
+      _buildSearchParams: function Search__buildSearchParams(searchRepository, searchAllSites, searchTerm, searchTag, searchSort)
       {
-         var site = searchAll ? "" : this.options.siteId;
-         var params = YAHOO.lang.substitute("site={site}&term={term}&tag={tag}&maxResults={maxResults}&sort={sort}&query={query}",
+         var site = searchAllSites ? "" : this.options.siteId;
+         var params = YAHOO.lang.substitute("site={site}&term={term}&tag={tag}&maxResults={maxResults}&sort={sort}&query={query}&repo={repo}",
          {
             site: encodeURIComponent(site),
+            repo: (searchRepository || this.options.searchQuery.length !== 0).toString(), // always search entire repo with advanced query
             term: encodeURIComponent(searchTerm),
             tag: encodeURIComponent(searchTag),
             sort: encodeURIComponent(searchSort),

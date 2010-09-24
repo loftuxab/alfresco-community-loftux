@@ -314,7 +314,13 @@
          else
          {
             // Redirect to the search page
-            window.location = $siteURL("search?t=" + encodeURIComponent(searchText));
+            var url = "search?t=" + encodeURIComponent(searchText);
+            // Append repository search argument if within repo browser page
+            if (window.location.href.match("/repository$") == "/repository")
+            {
+               url += "&r=true";
+            }
+            window.location = $siteURL(url);
          }
       },
       
