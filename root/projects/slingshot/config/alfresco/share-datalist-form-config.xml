@@ -57,6 +57,11 @@
                <field id="dl:todoNotes">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="dl:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
 
@@ -93,6 +98,11 @@
             <appearance>
                <field id="dl:todoNotes">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="dl:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
                </field>
             </appearance>
          </form>
@@ -131,6 +141,11 @@
                <field id="dl:taskComments">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -166,6 +181,11 @@
                </field>
                <field id="dl:taskComments">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
                </field>
             </appearance>
          </form>
@@ -310,6 +330,11 @@
                <field id="dl:issueComments">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -345,6 +370,11 @@
                <field id="dl:issueComments">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -376,6 +406,11 @@
                </field>
                <field id="dl:eventNote">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
                </field>
             </appearance>
          </form>
@@ -409,6 +444,11 @@
                <field id="dl:eventNote">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -438,6 +478,11 @@
             <appearance>
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
                </field>
             </appearance>
          </form>
@@ -469,6 +514,11 @@
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -496,6 +546,11 @@
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -522,6 +577,11 @@
             <appearance>
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
                </field>
             </appearance>
          </form>
@@ -551,6 +611,11 @@
                <field id="dl:eventAgendaNotes">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
                </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -578,6 +643,11 @@
             <appearance>
                <field id="dl:eventAgendaNotes">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                    <control-param name="startLocation">{doclib}</control-param>
+                  </control>
                </field>
             </appearance>
          </form>
