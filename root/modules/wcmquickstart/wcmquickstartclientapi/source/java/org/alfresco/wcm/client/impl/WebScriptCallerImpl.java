@@ -19,6 +19,7 @@
 package org.alfresco.wcm.client.impl;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class WebScriptCallerImpl implements WebScriptCaller
 {
@@ -124,8 +126,8 @@ public class WebScriptCallerImpl implements WebScriptCaller
             httpClient.executeMethod(getMethod);
             if (getMethod.getStatusCode() == 200)
             {
-                responseText = getMethod.getResponseBodyAsString();
-                jsonObject = new JSONObject(responseText);
+                jsonObject = new JSONObject(new JSONTokener(
+                        new InputStreamReader(getMethod.getResponseBodyAsStream(), "UTF-8")));
             }
             else
             {
