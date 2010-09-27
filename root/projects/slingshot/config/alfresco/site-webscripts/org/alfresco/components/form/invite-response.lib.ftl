@@ -54,6 +54,6 @@
 
 <#function getPriorityIcon>
    <#assign priority=form.data["prop_bpm_priority"]?string />
-   <#assign priorityMap={"1": "low", "2": "medium", "3": "high"} />
+   <#assign priorityMap={"1": "high", "2": "medium", "3": "low"} />
    <#return "priority-" + priorityMap[priority] + "-16.png">
 </#function>
