@@ -231,14 +231,17 @@
          if (this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT)
          {
             Dom.addClass(this.id + "-body", "compact");
+            Dom.removeClass(this.id + "-results", "hidden");
          }
          else if (this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_FULLPAGE)
          {
             Dom.setStyle(this.id + "-results", "height", "auto");
+            Dom.removeClass(this.id + "-help", "hidden");
          }
          else
          {
             Dom.setStyle(this.id + "-results", "height", "300px");
+            Dom.removeClass(this.id + "-help", "hidden");
          }
          
          // Search button
@@ -488,7 +491,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
+            renderLoopSize: Alfresco.util.RENDERLOOPSIZE,
             initialLoad: false,
             MSG_EMPTY: this.msg("message.instructions")
          });
@@ -697,6 +700,14 @@
 
             var successHandler = function PeopleFinder__pS_successHandler(sRequest, oResponse, oPayload)
             {
+               if (this.options.viewMode != Alfresco.PeopleFinder.VIEW_MODE_COMPACT)
+               {
+                  if (Dom.hasClass(this.id + "-results", "hidden"))
+                  {
+                     Dom.removeClass(this.id + "-results", "hidden");
+                     Dom.addClass(this.id + "-help", "hidden");
+                  }
+               }
                this._enableSearchUI();
                this._setDefaultDataTableErrors(this.widgets.dataTable);
                this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
