@@ -91,7 +91,7 @@
                     </ruleList>
                 </throwError>
                 <throwError>
-                    <text>Installation directory path too long. The maximum number of characters allowed is ${base_installdir_max_characters}.</text>
+                    <text>Installation directory path is too long. The maximum number of characters allowed is ${base_installdir_max_characters}.</text>
                     <ruleList>
                         <platformTest type="windows" />
                         <compareTextLength text="${installdir}" logic="greater" length="${base_installdir_max_characters}" />

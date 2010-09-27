@@ -650,7 +650,7 @@
          <fileset dir="${dir.project.jlan}/jni" />
       </copy>
       <copy todir="${dir.continuous.assemble.commands}">
-         <fileset dir="${dir.installer.bitrock}/bitrock/alfresco/commands/bin" />
+         <fileset dir="${dir.installer.bitrock}/bitrock/alfresco/commands" />
       </copy>
       
    </target>
@@ -820,11 +820,11 @@
                      includes="README.txt" />
          <tarfileset dir="${dir.continuous.assemble.tomcat}"
                      prefix="web-server" />
-         <tarfileset dir="${dir.continuous.assemble}/commands/bin"
+         <tarfileset dir="${dir.continuous.assemble}/commands"
                      prefix="bin" 
                      excludes="**/*.dll,**/*.bat"
                      mode="755"/>
-         <tarfileset dir="${dir.continuous.assemble}/commands/bin"
+         <tarfileset dir="${dir.continuous.assemble}/commands"
                      prefix="bin" 
                      includes="**/*.dll,**/*.bat"/>
       </tar>

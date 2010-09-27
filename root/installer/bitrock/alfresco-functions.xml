@@ -116,6 +116,10 @@
                             <value>${alfresco_admin_password_md4}</value>
                         </substitution>
                         <substitution>
+                            <pattern>@@BITROCK_ALFRESCO_PLAIN_ADMIN_PASSWORD@@</pattern>
+                            <value>${alfresco_admin_password}</value>
+                        </substitution>
+                        <substitution>
                             <pattern>@@BITROCK_FTP_PORT@@</pattern>
                             <value>${alfresco_ftp_port}</value>
                         </substitution>
@@ -142,6 +146,10 @@
                         <substitution>
                             <pattern>@@BITROCK_TOMCAT_DIRNAME@@</pattern>
                             <value>${tomcat_dirname}</value>
+                        </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_TOMCAT_ROOTDIR@@</pattern>
+                            <value>${tomcat_server_home}</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_JAVA_HOME_UNIX@@</pattern>

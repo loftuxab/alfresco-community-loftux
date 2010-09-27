@@ -14,6 +14,8 @@
         <setInstallerVariable name="project.readmeFile" value="${build_project_directory}/README.txt" />
         <setInstallerVariable name="alfresco_on_install_settings_directory" value="bitrock" />
         <setInstallerVariable name="alfresco_on_install_settings_per_platform_directory" value="bitrock/alfresco" />
+        <setInstallerVariable name="alfresco_commands_source_directory" value="bitrock/alfresco/commands" />
+
 
         <setInstallerVariable name="alfrescowcm_source_directory" value="alfrescowcm" />
         <setInstallerVariable name="alfrescowcm_on_install_settings_directory" value="bitrock/alfrescowcm" />
@@ -24,10 +26,16 @@
         <setInstallerVariable name="alfresco_sharepoint_source_file" value="vti-module.amp" />
         <setInstallerVariable name="alfresco_sharepoint_on_install_settings_directory" value="bitrock/alfrescosharepoint" />
         <!-- Records Management and Quickr AMPs -->
-        <setInstallerVariable name="alfresco_quickr_source_file" value="alfresco-quickr.amp" />
+        <setInstallerVariable name="alfresco_quickr_source_file" value="alfresco-community-quickr-3.4.a.amp" />
         <setInstallerVariable name="alfresco_quickr_on_install_settings_directory" value="bitrock/alfrescoquickr" />
-        <setInstallerVariable name="alfresco_rm_source_file" value="alfresco-dod5015.amp" />
-        <setInstallerVariable name="alfresco_rm_share_source_file" value="alfresco-dod5015-share.amp" />
+        <setInstallerVariable name="alfresco_rm_source_file" value="alfresco-community-dod5015-3.4.a.amp" />
+        <setInstallerVariable name="alfresco_rm_share_source_file" value="alfresco-community-dod5015-share-3.4.a.amp" />
+
+        <setInstallerVariable name="alfresco_wcmqs_source_file" value="alfresco-community-wcmqs-3.4.a.amp" />
+        <setInstallerVariable name="alfresco_wcmqs_share_source_file" value="alfresco-community-wcmqs-share-3.4.a.amp" />
+        <setInstallerVariable name="alfresco_wcmqs_war_source_file" value="wcmqs.war" />
+        <setInstallerVariable name="alfresco_awe_war_source_file" value="awe.war" />
+
 
         <!-- BINARIES -->
         <setInstallerVariable name="binaries_folder" value="${build_project_directory}" />

@@ -1,7 +1,7 @@
 <component>
     <name>openofficecomponent</name>
     <description>OpenOffice</description>
-    <detailedDescription>OpenOffice.org is a multiplatform and multilingual office suite and an open-source project.</detailedDescription>
+    <detailedDescription>OpenOffice.org is a multiplatform, open-source office software suite for word processing, spreadsheets, presentations, graphics, and databases required for document transformations.</detailedDescription>
     <selected>1</selected>
     <show>1</show>
     <componentSelectionValidationActionList/>
@@ -11,14 +11,14 @@
 	<booleanParameter name="openoffice_show_ports" value="0" ask="0" />
         <directoryParameter>
             <ask>0</ask>
-            <description>OpenOffice installation directory</description>
+            <description>OpenOffice Installation Directory</description>
             <name>openoffice_directory</name>
             <cliOptionName>openoffice_directory</cliOptionName>
         </directoryParameter>
         <directoryParameter>
             <ask>0</ask>
             <default/>
-            <description>Xvfb installation directory</description>
+            <description>Xvfb Installation Directory</description>
             <name>openoffice_xvfb_directory</name>
             <value>${installdir}/Xvfb</value>
             <cliOptionName>openoffice_xvfb_directory</cliOptionName>
@@ -27,7 +27,7 @@
             <name>openoffice_port</name>
             <title>OpenOffice Server Port</title>
             <description>OpenOffice Server port</description>
-            <explanation>Please enter the port that the Openoffice Server will listen to by default.</explanation>
+            <explanation>Please enter the port that the Openoffice server will listen to by default.</explanation>
             <value>8100</value>
             <default>8100</default>
             <allowEmptyValue>1</allowEmptyValue>

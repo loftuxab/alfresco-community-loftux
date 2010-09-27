@@ -1,7 +1,7 @@
 <component>
     <name>alfrescosharepoint</name>
     <description>SharePoint</description>
-    <detailedDescription>SharePoint protocol support.</detailedDescription>
+    <detailedDescription>SharePoint Protocol support.</detailedDescription>
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>1</show>
@@ -22,7 +22,7 @@
             </ruleList>
             <validationActionList>
                 <throwError>
-                    <text>Unable to bind to the given port number. Please select another port for the SharePoint protocol.</text>
+                    <text>Unable to bind to the given port number. Please select another port for the SharePoint Protocol.</text>
                     <ruleList>
                         <portTest port="${alfresco_sharepoint_port}" condition="cannot_bind"/>
                     </ruleList>

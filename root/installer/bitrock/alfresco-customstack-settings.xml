@@ -44,7 +44,7 @@
     <parameterList>
 	<choiceParameter>
 	    <name>alfrescocustomstack_installation_type</name>
-	    <title>Installation type</title>
+	    <title>Installation Type</title>
 	    <default>easy</default>
 	    <explanation></explanation>
 	    <displayType>radiobuttons</displayType>
@@ -87,7 +87,7 @@
 	    <insertBefore>readytoinstall</insertBefore>
 	    <optionList>
 		<option text="Manual - Configure servers to start services manually" value="demand" />
-		<option text="Auto - Configure servers to start automatically during the boot" value="auto" />
+		<option text="Auto - Configure servers to start automatically" value="auto" />
 	    </optionList>
 	    <validationActionList>
 		<setInstallerVariable name="component(tomcatservice).parameter(tomcatservice_startup).value" value="${alfrescocustomstack_services_startup}" />

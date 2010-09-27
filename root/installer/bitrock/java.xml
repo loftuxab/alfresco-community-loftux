@@ -10,7 +10,7 @@ Copyrighted by BitRock
 -->
 <component>
     <name>java</name>
-    <description>java</description>
+    <description>Java</description>
     <canBeEdited>0</canBeEdited>
     <detailedDescription/>
     <selected>1</selected>
@@ -199,7 +199,7 @@ Copyrighted by BitRock
             <ask>0</ask>
             <title>JDK configuration</title>
             <explanation>We have not been able to find a suitable JDK installation in your system. ${product_fullname} requires JDK 1.5 or later.</explanation>
-            <description>JDK installation directory:</description>
+            <description>JDK Installation Directory:</description>
             <validationActionList>
                 <throwError>
                     <text>The directory you selected does not seem to be a valid JDK directory. Please try again.</text>
