@@ -69,6 +69,14 @@
    margin: 0 0 1em 0;
 }
 
+.form-container .debug
+{
+   border: 1px solid #ccc;
+   background-color: #efefef;
+   padding: 0.5em;
+   margin-bottom: 0.5em;
+}
+
 .form-container .missing-options
 {
    font-style: italic;
