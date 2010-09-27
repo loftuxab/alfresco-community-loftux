@@ -616,6 +616,9 @@
                      mode="755" />
          <tarfileset dir="${dir.project.installer}"
                      includes="wcm-bootstrap-context.xml" />
+         <tarfileset dir="${dir.project.installer}/wcm-commands"
+                     prefix="bin" 
+                     mode="755"/>
          <tarfileset dir="${dir.project.webclient.xforms.examples}"
                      prefix="wcm-examples"
                      excludes="unit-tests/**" />
@@ -820,13 +823,13 @@
                      includes="README.txt" />
          <tarfileset dir="${dir.continuous.assemble.tomcat}"
                      prefix="web-server" />
-         <tarfileset dir="${dir.continuous.assemble}/commands"
+         <tarfileset dir="${dir.project.installer}/war-commands"
                      prefix="bin" 
-                     excludes="**/*.dll,**/*.bat"
                      mode="755"/>
+         <!-- Only DLLs and JARs from assemble area -->
          <tarfileset dir="${dir.continuous.assemble}/commands"
                      prefix="bin" 
-                     includes="**/*.dll,**/*.bat"/>
+                     includes="**/*.dll,**/*.jar"/>
       </tar>
 	  <zip destfile="${dir.continuous.dist}/${file.name.dist.war}.zip">
         <tarfileset src="${dir.continuous.assemble}/temp.tar"/>
