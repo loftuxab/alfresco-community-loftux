@@ -381,6 +381,14 @@
                case "link":
                   imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/link.png';
                   break;
+               
+               case "datalist":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/datalist.png';
+                  break;
+               
+               case "datalistitem":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/datalistitem.png';
+                  break;
             }
             
             // Render the cell
@@ -447,10 +455,12 @@
                case "forumpost":
                case "calendarevent":
                case "wikipage":
+               case "datalist":
+               case "datalistitem":
                case "link":
                   desc += me.msg("label." + type);
                   break;
-
+               
                default:
                   desc += me.msg("label.unknown");
                   break;
@@ -654,6 +664,13 @@
             case "link":
             {
                url = "links-view?linkId=" + name;
+               break;
+            }
+            
+            case "datalist":
+            case "datalistitem":
+            {
+               url = "data-lists?list=" + name;
                break;
             }
          }
