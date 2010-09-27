@@ -524,10 +524,10 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 			if ( ftpPath.isRootPath()) {
 
-				// Path specifies the share name
+				// Path specifies the share name and possibly a subdirectory
 
 				try {
-					ftpPath.setSharePath(path, null);
+					ftpPath.setFTPPath(FTP_SEPERATOR + path);
 				}
 				catch (InvalidPathException ex) {
 					return null;

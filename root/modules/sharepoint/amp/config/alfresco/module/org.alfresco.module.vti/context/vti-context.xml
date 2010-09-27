@@ -11,10 +11,7 @@
         </property>
     </bean>
 
-    <bean id="vtiProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="ignoreUnresolvablePlaceholders">
-            <value>true</value>
-        </property>
+    <bean id="vtiProperties" parent="common-placeholder-configurer">
         <property name="locations">
             <list>
                 <value>classpath:alfresco/module/org.alfresco.module.vti/context/vti.properties</value>

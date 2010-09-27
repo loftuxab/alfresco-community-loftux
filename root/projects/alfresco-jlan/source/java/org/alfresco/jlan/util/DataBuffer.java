@@ -223,7 +223,10 @@ public class DataBuffer {
 	 * @return String
 	 */
 	public final String getString(boolean uni) {
-		return getString(255, uni);
+	    int maxLen = getAvailableLength();
+	    if ( uni)
+	        maxLen = maxLen / 2;
+		return getString( maxLen, uni);
 	}
 
 	/**

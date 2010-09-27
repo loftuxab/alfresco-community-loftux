@@ -24,35 +24,31 @@
 package org.alfresco.catalina.host;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.management.ObjectName;
+
+import org.alfresco.filter.CacheControlFilter;
+import org.alfresco.filter.CacheControlFilterInfoBean;
 import org.alfresco.jndi.AVMFileDirContext;
-import org.alfresco.mbeans.VirtServerInfoMBean;
+import org.alfresco.jndi.JndiInfoBean;
 import org.alfresco.mbeans.VirtServerRegistrationThread;
 import org.alfresco.mbeans.VirtWebappRegistryMBean;
+import org.alfresco.repo.remote.ClientTicketHolder;
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.remote.AVMRemote;
-import org.apache.catalina.Container;
-import org.apache.catalina.Context;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardPipeline;
-import org.apache.catalina.Host;
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.catalina.Valve;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.modeler.Registry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.alfresco.repo.security.authentication.AuthenticationException;
-import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.repo.remote.ClientTicketHolder;
-import org.alfresco.jndi.JndiInfoBean;
-import org.alfresco.filter.CacheControlFilter;
-import org.alfresco.filter.CacheControlFilterInfoBean;
 
 /**
 *  This class implements a Catalina virtual Host;  it can be 
@@ -135,7 +131,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     static FileSystemXmlApplicationContext Context_ = null;
 
 
-    private static org.apache.commons.logging.Log log=
+    private static org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog( AVMHost.class );
 
     static String AVMFileDirMountPoint_;
@@ -175,6 +171,8 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 		NOT_AVAILABLE,
 		AVAILABLE,
 	}
+	
+	private AVMHostConfig deployer_ = null;
 
 
     public AVMHost()
@@ -191,6 +189,18 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     public void setReverseProxyBinding(String binding) 
     { 
         reverse_proxy_binding_ = binding;
+    }
+    
+    private boolean lazyDeployExperimentalOnly_ = false;
+    
+    public void setLazyDeployExperimentalOnly(boolean lazyDeployExperimentalOnly)
+    { 
+        lazyDeployExperimentalOnly_ = lazyDeployExperimentalOnly;
+    }
+    
+    public boolean getLazyDeployExperimentalOnly()
+    {
+        return lazyDeployExperimentalOnly_;
     }
 
     public String getResourceBindingClassName()
@@ -211,6 +221,11 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     public AVMResourceBinding getResourceBinding()
     {
         return resource_binding_;
+    }
+    
+    public AVMHostConfig getAVMHostConfig()
+    {
+        return deployer_;
     }
 
 
@@ -463,9 +478,12 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                     sleepBeforeRetryingConnection();
                 }
             }
-
-            log.debug("Succeeded connecting to authentication service");
-
+            
+            if (log.isDebugEnabled())
+            {
+                log.debug("Succeeded connecting to authentication service");
+            }
+            
             // Initialize RPC to talk to AVM 
             AVMFileDirContext.InitAVMRemote(Service_);
 
@@ -569,7 +587,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             // Tell the AVMHostContext what appBase was given within 
             // the server.xml file.
              
-            AVMHostConfig deployer = new AVMHostConfig( super.getAppBase() );
+            deployer_ = new AVMHostConfig( super.getAppBase() );
 
             if ( reverse_proxy_binding_ == null )
             {
@@ -606,7 +624,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             VirtWebappRegistryMBean  virtWebappRegistry = 
                 (VirtWebappRegistryMBean)  Context_.getBean("virtWebappRegistry");
 
-            virtWebappRegistry.setDeployer( deployer );
+            virtWebappRegistry.setDeployer( deployer_ );
 
 
             // Give AVM server the info it needs to perform callbacks
@@ -620,7 +638,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             registrationThread_.start();
 
 
-            addLifecycleListener(deployer);                
+            addLifecycleListener(deployer_);                
 
             // TODO:  Determine whether to deal with registration.
             //        In the superclass, the code was as listed

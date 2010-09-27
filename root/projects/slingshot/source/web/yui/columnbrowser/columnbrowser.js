@@ -693,7 +693,7 @@ YAHOO.namespace('extension');
             }
          };
 
-         this._addColumn(errorColumn, serverResponse.argument.url);
+         this._addColumn(errorColumn, serverResponse.argument.url, true);
       },
 
       /**
@@ -701,15 +701,18 @@ YAHOO.namespace('extension');
        *
        * @param columnInfo
        * @param url The url from where the columInfo was requested
+       * @param handlingFailure {boolean} True if the function is attempting to add a failure message.
        * @protected
        */
-      _addColumn: function(columnInfo, url) {
+      _addColumn: function(columnInfo, url, handlingFailure) {
          var paneContent;
          try {
             // Create the column from the columnInfo object
             paneContent = this._createColumnEl(columnInfo);
          } catch (e) {
-            this._handleFailure({ argument: { errorMessage: 'Malformed column data' } });
+            if (!handlingFailure) {
+               this._handleFailure({ argument: { errorMessage: 'Malformed column data' } });
+            }
             return;
          }
 

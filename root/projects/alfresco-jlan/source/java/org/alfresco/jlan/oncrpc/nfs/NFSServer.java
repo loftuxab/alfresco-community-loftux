@@ -2922,13 +2922,21 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
 				//	Remove the original path from the cache
 
-				if ( finfo != null && finfo.getFileId() != -1)
+				if ( finfo != null && finfo.getFileId() != -1) {
 				  details.getFileIdCache().deletePath(finfo.getFileId());
+				  
+				  // Add an entry with the original file id mapped to the new path
+				  //
+				  // The file id from the file information for the new path may not be the same
+				  // but the client will still be using the original handle to access the file.
+
+				  details.getFileIdCache().addPath(finfo.getFileId(), newPath);
+				}
 
 				//	Get the file id for the new file/directory
 
 				finfo = disk.getFileInformation(sess, conn, newPath);
-				if (finfo != null)
+				if (finfo != null) 
 					details.getFileIdCache().addPath(finfo.getFileId(), newPath);
 
 				//	Check if there are any file/directory change notify requests active
@@ -4715,7 +4723,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
     catch (Exception ex) {
     }
     
-    // Check if hte file handle is valid
+    // Check if the file handle is valid
     
     if ( fHandle == null)
         throw new BadHandleException();

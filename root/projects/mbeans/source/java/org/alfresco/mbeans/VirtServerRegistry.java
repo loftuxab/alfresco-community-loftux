@@ -366,8 +366,8 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
             }
             catch (Exception e)
             {
-                if ( log.isWarnEnabled() )
-                    log.warn("Could not connect to virtualization server: " + 
+                if ( log.isErrorEnabled() )
+                    log.error("Could not connect to virtualization server: " + 
                               getVirtServerJmxUrl() );
 
                 return result;
@@ -417,8 +417,10 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
                               boolean isRecursive
                             )
     {
+        long start = System.currentTimeMillis();
+        
         if  ( ! verifyJmxRmiConnection() ) { return false; }
-
+        
         try
         {
             Boolean result = 
@@ -455,6 +457,13 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
             closeJmxRmiConnection();
 
             return false;
+        }
+        finally
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug("jmxRmiWebappNotification: "+action+"["+version+", "+pathToWebapp+","+isRecursive+" in "+(System.currentTimeMillis()-start)+" ms");
+            }
         }
     }
     

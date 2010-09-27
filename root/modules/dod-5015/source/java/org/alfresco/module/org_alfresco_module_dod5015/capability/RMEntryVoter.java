@@ -1121,6 +1121,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             MethodInvocation mi = (MethodInvocation) object;
             logger.debug("Method: " + mi.getMethod().toString());
         }
+        // The system user can do anything
         if (AuthenticationUtil.isRunAsUserTheSystemUser())
         {
             if (logger.isDebugEnabled())
@@ -1132,6 +1133,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
 
+        // No RM definitions so we do not vote
         if (supportedDefinitions.size() == 0)
         {
             return AccessDecisionVoter.ACCESS_ABSTAIN;
@@ -1142,24 +1144,34 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         Method method = invocation.getMethod();
         Class[] params = method.getParameterTypes();
 
+        // If there are only capability (RM_CAP) and policy (RM) entries non must deny 
+        // If any abstain we deny
+        // All present must vote to allow unless an explicit direction comes first (e.g. RM_ALLOW)
+       
         for (ConfigAttributeDefintion cad : supportedDefinitions)
         {
-            if (cad.typeString.equals(RM_ABSTAIN))
-            {
-                return AccessDecisionVoter.ACCESS_ABSTAIN;
-            }
-            else if (cad.typeString.equals(RM_DENY))
+            // Whatever is found first takes precedence
+            if (cad.typeString.equals(RM_DENY))
             {
                 return AccessDecisionVoter.ACCESS_DENIED;
+            }
+            else if (cad.typeString.equals(RM_ABSTAIN))
+            {
+                return AccessDecisionVoter.ACCESS_ABSTAIN;
             }
             else if (cad.typeString.equals(RM_ALLOW))
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
+            // RM_QUERY is a special case - the entry is allowed and filtering sorts out the results
+            // It is distinguished from RM_ALLOW so query may have additional behaviour in the future
             else if (cad.typeString.equals(RM_QUERY))
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
+            // Ignore config that references method arguments that do not exist
+            // Arguably we should deny here but that requires a full impact analysis
+            // These entries effectively abstain
             else if (((cad.parameters.get(0) != null) && (cad.parameters.get(0) >= invocation.getArguments().length))
                     || ((cad.parameters.get(1) != null) && (cad.parameters.get(1) >= invocation.getArguments().length)))
             {
@@ -1167,19 +1179,55 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             }
             else if (cad.typeString.equals(RM_CAP))
             {
-                if (checkCapability(invocation, params, cad) == AccessDecisionVoter.ACCESS_DENIED)
+                switch(checkCapability(invocation, params, cad))
                 {
+                case  AccessDecisionVoter.ACCESS_DENIED:
                     return AccessDecisionVoter.ACCESS_DENIED;
+                case AccessDecisionVoter.ACCESS_ABSTAIN:
+                    if(logger.isDebugEnabled())
+                    {
+                        if(logger.isTraceEnabled())
+                        {
+                            logger.trace("Capability " + cad.required + " abstained for " + invocation.getMethod(), new IllegalStateException());
+                        }
+                        else
+                        {
+                            logger.debug("Capability " + cad.required + " abstained for " + invocation.getMethod());
+                        }
+                    }
+                    // abstain denies
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                case AccessDecisionVoter.ACCESS_GRANTED:
+                    break;
                 }
             }
             else if (cad.typeString.equals(RM))
             {
-                if (checkPolicy(invocation, params, cad) == AccessDecisionVoter.ACCESS_DENIED)
+                switch(checkPolicy(invocation, params, cad))
                 {
+                case  AccessDecisionVoter.ACCESS_DENIED:
                     return AccessDecisionVoter.ACCESS_DENIED;
+                case AccessDecisionVoter.ACCESS_ABSTAIN:
+                    if(logger.isDebugEnabled())
+                    {
+                        if(logger.isTraceEnabled())
+                        {
+                            logger.trace("Policy " + cad.policyName + " abstained for " + invocation.getMethod(), new IllegalStateException());
+                        }
+                        else
+                        {
+                            logger.debug("Policy " + cad.policyName + " abstained for " + invocation.getMethod());
+                        }
+                    }
+                    // abstain denies
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                case AccessDecisionVoter.ACCESS_GRANTED:
+                    break;
                 }
             }
         }
+        
+        // all voted to allow
 
         return AccessDecisionVoter.ACCESS_GRANTED;
 

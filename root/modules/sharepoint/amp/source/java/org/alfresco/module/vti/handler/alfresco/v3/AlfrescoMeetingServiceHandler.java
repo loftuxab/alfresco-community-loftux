@@ -145,7 +145,7 @@ public class AlfrescoMeetingServiceHandler implements MeetingServiceHandler
             public Object execute()
             {
                 ChildAssociationRef childAssociationRef = nodeService.createNode(finalcalendarContainer, ContentModel.ASSOC_CONTAINS, QName.createQName(
-                        NamespaceService.CONTENT_MODEL_PREFIX, (String) props.get(ContentModel.PROP_NAME)), TYPE_EVENT, props);
+                        NamespaceService.CONTENT_MODEL_1_0_URI, (String) props.get(ContentModel.PROP_NAME)), TYPE_EVENT, props);
 
                 if (meeting.getReccurenceRule() != null)
                 {

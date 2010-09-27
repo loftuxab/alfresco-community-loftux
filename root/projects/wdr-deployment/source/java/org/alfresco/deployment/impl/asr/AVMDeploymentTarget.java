@@ -822,8 +822,8 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
     					}
     				}
     				
-    				// Remove Obsolete Aspects
-    				for(QName aspect : fAVMService.getAspects(-1, dst))
+    				// Remove Obsolete Aspects (avoiding concurrent modification exception)
+    				for(QName aspect : new LinkedList<QName>(fAVMService.getAspects(-1, dst)))
     				{
     					if(!aspectList.contains(aspect))
     					{
