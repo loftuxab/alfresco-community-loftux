@@ -2,7 +2,7 @@
 <#import "header.inc.ftl" as header>
 <#assign siteActive = page.url.templateArgs.site??>
 <#assign id = args.htmlid>
-<#assign jsid = id?replace("-", "$")>
+<#assign jsid = id?replace("-", "_")>
 <#assign logo=msg("header.logo")><#if logo="header.logo"><#assign logo="app-logo.png"></#if>
 <#if !user.isGuest>
 <script type="text/javascript">//<![CDATA[
@@ -18,7 +18,7 @@
          userid: "${user.name?js_string}"
       }
    }).setMessages(${messages});
-   Alfresco.util.createTwister.collapsed = "${collapsedTwisters?js_string}"
+   Alfresco.util.createTwister.collapsed = "${collapsedTwisters?js_string}";
 //]]></script>
 <div class="header">
    <span class="header-left">
