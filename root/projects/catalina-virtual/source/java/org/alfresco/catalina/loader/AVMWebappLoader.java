@@ -48,19 +48,14 @@
 
 package org.alfresco.catalina.loader;
 
-import org.alfresco.jndi.AVMFileDirContext;
-import org.alfresco.service.cmr.avm.LayeringDescriptor;
-import org.alfresco.service.cmr.remote.AVMRemote;
-
-import org.apache.catalina.loader.Constants;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilePermission;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -69,26 +64,31 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
-import java.util.jar.JarFile;
 import java.util.Map;
+import java.util.jar.JarFile;
+
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.naming.Binding;
-import javax.naming.directory.DirContext;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
+
+import org.alfresco.jndi.AVMFileDirContext;
+import org.alfresco.service.cmr.avm.LayeringDescriptor;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.loader.Constants;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
 import org.apache.commons.modeler.Registry;
@@ -454,10 +454,10 @@ public class AVMWebappLoader
     public void addRepository(String repository) 
     {
         // jcox TODO:   don't add if not in your own repository.
-        System.out.println("AVMWebappLoader.addRepository:  " + repository);
-
         if (log.isDebugEnabled())
+        {
             log.debug(sm.getString("webappLoader.addRepository", repository));
+        }
 
         for (int i = 0; i < repositories.length; i++) {
             if (repository.equals(repositories[i]))
@@ -1050,18 +1050,27 @@ public class AVMWebappLoader
             String absoluteClassesPath =
                 servletContext.getRealPath(classesPath);
 
-            System.out.println("AVMWebappLoader absoluteClassesPath:  " + absoluteClassesPath);
+            if (log.isDebugEnabled())
+            {
+                log.debug("AVMWebappLoader absoluteClassesPath:  " + absoluteClassesPath);
+            }
 
 
             if (absoluteClassesPath != null) 
             {
-                System.out.println("AVMWebappLoader absoluteClassesPath not null, so no need to make copy");
-
+                if (log.isDebugEnabled())
+                {
+                    log.debug("AVMWebappLoader absoluteClassesPath not null, so no need to make copy");
+                }
+                
                 classRepository = new File(absoluteClassesPath);
             } 
             else 
             {
-                System.out.println("AVMWebappLoader absoluteClassesPath null, so need to make copy");
+                if (log.isDebugEnabled())
+                {
+                    log.debug("AVMWebappLoader absoluteClassesPath null, so need to make copy");
+                }
 
                 classRepository = new File(workDir, classesPath);
                 classRepository.mkdirs();
@@ -1078,8 +1087,10 @@ public class AVMWebappLoader
             }
 
             if(log.isDebugEnabled())
+            {
                 log.debug(sm.getString("webappLoader.classDeploy", classesPath,
                              classRepository.getAbsolutePath()));
+            }
 
 
             // Adding the repository to the class loader

@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.EnumSet;
 
+import javax.servlet.ServletOutputStream;
+
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.dic.GetOption;
 import org.alfresco.module.vti.metadata.model.Document;
 import org.alfresco.module.vti.web.VtiEncodingUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -87,15 +90,17 @@ public class GetDocumentMethod extends AbstractMethod
 
         response.endVtiAnswer();
 
-        // 4K buffer
-        byte[] bytearray = new byte[4096];
         InputStream is = document.getInputStream();
-        int bytesread = 0;
-        while ((bytesread = is.read(bytearray)) != -1)
+        ServletOutputStream os = response.getOutputStream();
+        try
         {
-            response.getOutputStream().write(bytearray, 0, bytesread);
+            IOUtils.copy(is, os);
         }
-        is.close();
+        finally
+        {
+            try { is.close(); } catch (Exception e) {}
+            try { os.close(); } catch (Exception e) {}
+        }
 
         if (logger.isDebugEnabled())
         {

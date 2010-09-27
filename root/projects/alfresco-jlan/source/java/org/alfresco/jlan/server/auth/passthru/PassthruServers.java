@@ -379,10 +379,11 @@ public class PassthruServers
         
         // Open a new authentication session to the server
         
-        PCShare authShare = new PCShare(passthruServer.getAddress().getHostAddress(), "IPC$", "", "");
         AuthenticateSession authSess = null;
         
         while ( authSess == null && passthruServer != null && hasOnlineServers()) {
+
+            PCShare authShare = new PCShare(passthruServer.getAddress().getHostAddress(), "IPC$", "", "");
 
             try
             {

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -42,6 +43,10 @@ public class DispositionScheduleImpl implements DispositionSchedule,
     
     private List<DispositionActionDefinition> actions;
     private Map<String, DispositionActionDefinition> actionsById;
+    
+    //If name is not the same as node-uuid, then action will be stored here too
+    //Fix for ALF-2588
+    private Map<String, DispositionActionDefinition> actionsByName;
     
     public DispositionScheduleImpl(RecordsManagementServiceRegistry services, NodeService nodeService,  NodeRef nodeRef)
     {
@@ -96,8 +101,13 @@ public class DispositionScheduleImpl implements DispositionSchedule,
         {
             getDispositionActionsImpl();
         }
-        
-        return this.actionsById.get(id);
+
+        DispositionActionDefinition actionDef = this.actionsById.get(id);
+        if (actionDef == null)
+        {
+            actionDef = this.actionsByName.get(id);
+        }
+        return actionDef;
     }
 
     public List<DispositionActionDefinition> getDispositionActionDefinitions()
@@ -118,6 +128,7 @@ public class DispositionScheduleImpl implements DispositionSchedule,
                                                       RegexQNamePattern.MATCH_ALL);
         this.actions = new ArrayList<DispositionActionDefinition>(assocs.size());
         this.actionsById = new HashMap<String, DispositionActionDefinition>(assocs.size()); 
+        this.actionsByName = new HashMap<String, DispositionActionDefinition>(assocs.size()); 
         int index = 0;
         for (ChildAssociationRef assoc : assocs)
         {            
@@ -125,6 +136,13 @@ public class DispositionScheduleImpl implements DispositionSchedule,
             actions.add(da);
             actionsById.put(da.getId(), da);
             index++;
+            
+            String actionNodeName = (String) nodeService.getProperty(assoc.getChildRef(), ContentModel.PROP_NAME);
+            if (!actionNodeName.equals(da.getId()))
+            {
+                //It was imported and now has new ID. Old ID may present in old files.
+                actionsByName.put(actionNodeName, da);
+            }
         }
     }
     

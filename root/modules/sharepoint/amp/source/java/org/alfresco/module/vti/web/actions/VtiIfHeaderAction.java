@@ -46,6 +46,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -191,16 +192,15 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
 
         InputStream is = contentReader.getContentInputStream();
         OutputStream os = resp.getOutputStream();
-        int len = 0;
-        byte[] buf = new byte[4096];
-
-        while ((len = is.read(buf)) != -1)
+        try
         {
-            os.write(buf, 0, len);
+            IOUtils.copy(is, os);
         }
-
-        is.close();
-        os.close();
+        finally
+        {
+            try { is.close(); } catch (Exception e) {}
+            try { os.close(); } catch (Exception e) {}
+        }
     }
 
     /**

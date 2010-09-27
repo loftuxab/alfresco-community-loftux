@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Simple in-memory namespace DAO
  */
-public class NamespaceDAOImpl implements NamespaceDAO, DictionaryListener
+public class NamespaceDAOImpl implements NamespaceDAO
 {
     private static final Log logger = LogFactory.getLog(NamespaceDAOImpl.class);
     
@@ -74,19 +74,8 @@ public class NamespaceDAOImpl implements NamespaceDAO, DictionaryListener
     public void registerDictionary(DictionaryDAO dictionaryDAO)
     {
         this.dictionaryDAO = dictionaryDAO;
-        this.dictionaryDAO.register(this);
     }
     
-    
-    public void afterDictionaryDestroy()
-    {
-     // TODO Auto-generated method stub
-    }
-    
-    public void onDictionaryInit()
-    {
-        // TODO Auto-generated method stub
-    }
     
     /**
      * Complete the initialisation

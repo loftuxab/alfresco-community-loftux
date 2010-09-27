@@ -60,7 +60,7 @@ public class VirtServerRegistrationThread extends Thread
 		AVAILABLE,
 	}
 	
-    private static org.apache.commons.logging.Log log=
+    private static org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog( VirtServerRegistrationThread.class );
 
     ApplicationContext springContext_;
@@ -201,7 +201,10 @@ public class VirtServerRegistrationThread extends Thread
 
             url_ = new JMXServiceURL( avm_jmx_url );
             
-            System.out.println("MER url_ is " + avm_jmx_url);
+            if (log.isInfoEnabled())
+            {
+                log.info("Remote Alfresco JMX Server url_ is " + avm_jmx_url);
+            }
 
             env_ = new HashMap<String,Object>();
 
@@ -275,7 +278,11 @@ public class VirtServerRegistrationThread extends Thread
             if (conn_ == null  ) 
             { 
                 conn_ = JMXConnectorFactory.connect(url_, env_); 
-                log.info("Connected to remote Alfresco JMX Server");
+                
+                if (log.isInfoEnabled())
+                {
+                    log.info("Connected to remote Alfresco JMX Server");
+                }
             }
 
             MBeanServerConnection mbsc = conn_.getMBeanServerConnection();

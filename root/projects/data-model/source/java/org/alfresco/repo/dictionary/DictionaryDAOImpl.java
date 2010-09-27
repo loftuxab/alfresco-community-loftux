@@ -253,6 +253,9 @@ public class DictionaryDAOImpl implements DictionaryDAO
             dictionaryListener.afterDictionaryInit();
         }
         
+        // called last
+        namespaceDAO.afterDictionaryInit();
+        
         return dictionaryRegistry;
     }
     

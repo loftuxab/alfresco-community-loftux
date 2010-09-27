@@ -32,7 +32,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-
+import javax.net.ssl.SSLSocketFactory;
 import org.alfresco.webservice.content.Content;
 import org.springframework.util.FileCopyUtils;
 
@@ -182,7 +182,25 @@ public class ContentUtils
     @SuppressWarnings("deprecation")
     public static String putContent(File file, String host, int port, String mimetype, String encoding)
     {
-        return putContent(file, host, port, WebServiceFactory.getEndpointWebapp(), mimetype, encoding);
+        boolean isSSL = WebServiceFactory.getEndpointAddress().toLowerCase().startsWith("https:");
+        return putContent(file, host, port, WebServiceFactory.getEndpointWebapp(), mimetype, encoding, isSSL);
+    }
+    
+    /**
+     * Streams content into the repository using nonSSL connection.  Once done a content details string is returned and this can be used to update 
+     * a content property in a CML statement.
+     * 
+     * @param file  the file to stream into the repository
+     * @param host  the host name of the destination repository
+     * @param port  the port name of the destination repository
+     * @param webAppName        the name of the target web application (default 'alfresco')
+     * @param mimetype the mimetype of the file, ignored if null
+     * @param encoding the encoding of the file, ignored if null
+     * @return      the content data that can be used to set the content property in a CML statement  
+     */
+    public static String putContent(File file, String host, int port, String webAppName, String mimetype, String encoding)
+    {      
+        return putContent(file, host, port, webAppName, mimetype, encoding, false);
     }
     
     /**
@@ -195,10 +213,11 @@ public class ContentUtils
      * @param webAppName        the name of the target web application (default 'alfresco')
      * @param mimetype the mimetype of the file, ignored if null
      * @param encoding the encoding of the file, ignored if null
+     * @param isSSL true if HTTPS protocol is used
      * @return      the content data that can be used to set the content property in a CML statement  
      */
     @SuppressWarnings("deprecation")
-    public static String putContent(File file, String host, int port, String webAppName, String mimetype, String encoding)
+    public static String putContent(File file, String host, int port, String webAppName, String mimetype, String encoding, boolean isSSL)
     {      
         String result = null;
         
@@ -226,7 +245,15 @@ public class ContentUtils
                           "\n";
             
             // Open sockets and streams
-            Socket socket = new Socket(host, port);
+            Socket socket = null;
+            if (isSSL)
+            {
+                socket = SSLSocketFactory.getDefault().createSocket(host, port);
+            }
+            else
+            {
+                socket = new Socket(host, port);
+            }
             DataOutputStream os = new DataOutputStream(socket.getOutputStream());
             DataInputStream is = new DataInputStream(socket.getInputStream());
               

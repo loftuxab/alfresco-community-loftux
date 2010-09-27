@@ -19,6 +19,8 @@
 
 package org.alfresco.module.vti.web.ws;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,7 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.vti.handler.MeetingServiceHandler;
 import org.alfresco.module.vti.metadata.model.MeetingBean;
 import org.apache.commons.logging.Log;
@@ -54,8 +58,8 @@ public class AddMeetingFromICalEndpoint extends AbstractEndpoint
 
     private static final String DATE_FROMAT = "yyyyMMddkkmmss";
 
-    // private static final long SHIFT = 3600000;
-
+    private static final String ALL_DAY_DATE_FROMAT = "yyyyMMdd";
+    
     private static Log logger = LogFactory.getLog(AddMeetingFromICalEndpoint.class);
 
     private static long DAY = 24 * 60 * 60 * 1000;
@@ -178,17 +182,80 @@ public class AddMeetingFromICalEndpoint extends AbstractEndpoint
      */
     private Date parseDate(String stringDate)
     {
+        DateFormat dateFormat;
+        
+        if (stringDate.indexOf("T") == -1)
+        {
+            dateFormat = new SimpleDateFormat(ALL_DAY_DATE_FROMAT);
+        }
+        else
+        {
+            dateFormat = new SimpleDateFormat(DATE_FROMAT);
+        }
+        
+        TimeZone timeZone = getTimeZone(stringDate);
+        dateFormat.setTimeZone(timeZone);
+
+        stringDate = prepareDate(stringDate);
+
         Date date = null;
         try
         {
-            String preparedDate = stringDate.replace("T", "").replace("Z", "");
-            date = new SimpleDateFormat(DATE_FROMAT).parse(preparedDate);
-            // date = new Date(date.getTime() + TimeZone.getDefault().getRawOffset() + SHIFT);
+            date = dateFormat.parse(stringDate);
         }
-        catch (Exception e)
+        catch (ParseException e)
         {
+            throw new AlfrescoRuntimeException("Date '" + stringDate + "' + cannot be parsed", e);
         }
+
         return date;
+    }
+
+    /**
+     * Retrieve TimeZone from specific iCal format
+     * 
+     * @param stringDate iCal date value
+     */
+    private TimeZone getTimeZone(String stringDate)
+    {
+        TimeZone timeZone = null;
+        if (stringDate.startsWith("TZID"))
+        {
+            String timeZoneId = stringDate.substring(5, stringDate.indexOf(":"));
+            timeZone = TimeZone.getTimeZone(timeZoneId);
+        }
+        else if (stringDate.endsWith("Z"))
+        {
+            timeZone = TimeZone.getTimeZone("GMT");
+        }
+        else
+        {
+            timeZone = TimeZone.getDefault();
+        }
+        return timeZone;
+    }
+
+    /**
+     * Prepare iCal date to parsing, remove all unparsable parts
+     * 
+     * @param stringDate iCal date value
+     */
+    private String prepareDate(String stringDate)
+    {
+        String preparedDate = stringDate;
+        if (preparedDate.contains(":"))
+        {
+            preparedDate = preparedDate.substring(stringDate.indexOf(":") + 1);
+        }
+        if (preparedDate.contains("T"))
+        {
+            preparedDate = preparedDate.replace("T", "");
+        }
+        if (preparedDate.contains("Z"))
+        {
+            preparedDate = preparedDate.replace("Z", "");
+        }
+        return preparedDate;
     }
 
     /**

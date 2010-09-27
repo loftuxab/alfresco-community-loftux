@@ -23,41 +23,30 @@
 
 package org.alfresco.catalina.valve;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.StringTokenizer;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+
 import javax.servlet.ServletException;
+
+import org.alfresco.catalina.context.AVMStandardContext;
 import org.alfresco.catalina.host.AVMHost;
+import org.alfresco.catalina.host.AVMHostConfig;
 import org.alfresco.catalina.host.AVMHostMatch;
 import org.alfresco.catalina.host.AVMResourceBinding;
-import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
+import org.alfresco.config.JNDIConstants;
+import org.alfresco.filter.CacheControlFilter;
 import org.apache.catalina.Container;
-import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.alfresco.filter.CacheControlFilter;
 
 
 /**
@@ -112,6 +101,9 @@ import org.alfresco.filter.CacheControlFilter;
 */
 public class AVMUrlValve extends ValveBase implements Lifecycle
 {
+    protected static org.apache.commons.logging.Log log =
+        org.apache.commons.logging.LogFactory.getLog( AVMUrlValve.class );
+    
     static Pattern first_seg_pattern_ =  Pattern.compile( "^/([^/]*)" );
 
     /**
@@ -608,8 +600,42 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
                                                          store_name,
                                                          ""
                                                        );
-
-
+        
+        if (avm_host.getLazyDeployExperimentalOnly())
+        {
+            boolean isStoreDeployed = false; // note: only checks AVM store here (not webapps)
+            Container children[] = avm_host.findChildren();
+            for (int i = 0; i < children.length; i++) 
+            {
+                if (children[i] instanceof AVMStandardContext)
+                {
+                    AVMStandardContext sc = (AVMStandardContext)children[i];
+                    String ctxName = sc.getName();
+                    if (ctxName.startsWith(uri_prefix))
+                    {
+                        isStoreDeployed = true;
+                    }
+                }
+            }
+            
+            if (! isStoreDeployed)
+            {
+                // try to deploy here and now ...
+                String storePath = store_name+":"+JNDIConstants.DIR_DEFAULT_WWW_APPBASE;
+                
+                if (log.isDebugEnabled())
+                {
+                    log.debug("invoke: lazily deploy "+version+", "+storePath+" (lazy deploy is enabled)");
+                }
+                
+                AVMHostConfig avm_host_config = avm_host.getAVMHostConfig();
+                if (avm_host_config != null)
+                {
+                    avm_host_config.updateAllVirtualWebapps(version, storePath, true);
+                }
+            }
+        }
+        
         // In the URI:  /moo/cow/egg.html, the first_segment is
         // captured as: "moo" by the pattern's regex.
 
