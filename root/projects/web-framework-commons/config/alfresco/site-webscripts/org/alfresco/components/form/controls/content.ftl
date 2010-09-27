@@ -15,7 +15,7 @@
    {
       new Alfresco.ContentControl("${fieldHtmlId}").setOptions(
       {
-         <#if field.disabled>disabled: true,</#if>
+         <#if form.mode == "view" || (field.disabled && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true"))>disabled: true,</#if>
          currentValue: "${field.value?js_string}",
          mandatory: ${field.mandatory?string},
          formMode: "${form.mode}",
