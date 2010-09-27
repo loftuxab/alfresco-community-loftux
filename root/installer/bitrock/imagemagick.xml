@@ -15,7 +15,7 @@ System variables provided by this component:
 -->
 <component>
     <name>imagemagick</name>
-    <description>IMAGEMAGICK Component</description>
+    <description>ImageMagick Component</description>
     <canBeEdited>0</canBeEdited>
     <show>0</show>
     <selected>1</selected>
@@ -23,13 +23,13 @@ System variables provided by this component:
     <parameterList>
         <directoryParameter>
             <ask>0</ask>
-            <description>IMAGEMAGICK installation directory</description>
+            <description>ImageMagick Installation Directory</description>
             <name>imagemagick_root_directory</name>
             <cliOptionName>imagemagick_root_directory</cliOptionName>
         </directoryParameter>
         <stringParameter>
             <ask>0</ask>
-            <description>IMAGEMAGICK version</description>
+            <description>ImageMagick Version</description>
             <name>imagemagick_version</name>
             <value>6.5.1</value>
             <default>6.5.1</default>

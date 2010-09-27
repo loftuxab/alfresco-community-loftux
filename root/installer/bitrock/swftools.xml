@@ -8,7 +8,7 @@
     <parameterList>
         <directoryParameter>
             <ask>0</ask>
-            <description>SWFTOOLS installation directory</description>
+            <description>SWFTOOLS Installation Directory</description>
             <name>swftools_root_directory</name>
             <cliOptionName>swftools_root_directory</cliOptionName>
         </directoryParameter>

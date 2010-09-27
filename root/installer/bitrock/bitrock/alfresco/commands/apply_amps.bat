@@ -24,7 +24,7 @@ pause
 :nowait1
 "%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" install "%ALF_HOME%amps" "%CATALINA_HOME%\webapps\alfresco.war" -directory "%2"
 "%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" list "%CATALINA_HOME%\webapps\alfresco.war"
-"%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" install "%ALF_HOME%amps-share" "%CATALINA_HOME%\webapps\share.war" -directory "%2"
+"%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" install "%ALF_HOME%amps_share" "%CATALINA_HOME%\webapps\share.war" -directory "%2"
 "%JAVA_HOME%\bin\java" -jar "%ALF_HOME%bin\alfresco-mmt.jar" list "%CATALINA_HOME%\webapps\share.war"
 echo .
 echo About to clean out tomcat/webapps/alfresco directory and temporary files...

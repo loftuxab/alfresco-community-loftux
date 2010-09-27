@@ -27,7 +27,7 @@
             <name>virtualtomcatconf</name>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionFile origin="${alfrescowcm_on_install_settings_per_platform_directory}/conf/*" allowWildcards="1" />
+                <distributionFile origin="${alfrescowcm_on_install_settings_directory}/conf/*" allowWildcards="1" />
             </distributionFileList>
             <actionList>
                  <alfrescoConfigure alfrescoFiles="*/alfresco-virtserver.properties" />
@@ -35,17 +35,17 @@
         </folder>
         <folder>
             <description>Program Files</description>
-            <destination>${alfrescowcm_virtualtomcat_location}</destination>
+            <destination>${alfresco_commands_directory}</destination>
             <name>virtualtomcatscript</name>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionFile origin="${alfrescowcm_on_install_settings_per_platform_directory}/commands/*" allowWildcards="1"/>
+                <distributionFile origin="${alfrescowcm_on_install_settings_directory}/commands/*" allowWildcards="1"/>
             </distributionFileList>
             <actionList>
                 <alfrescoConfigure alfrescoFiles="*.sh;*.bat" />
                 <actionGroup>
                     <actionList>
-                        <deleteFile path="${alfrescowcm_on_install_settings_per_platform_directory}/commands/*.sh" />
+                        <deleteFile path="${alfresco_commands_directory}/*.sh" />
                     </actionList>
                     <ruleList>
                         <platformTest type="windows" />
@@ -53,7 +53,7 @@
                 </actionGroup>
                 <actionGroup>
                     <actionList>
-                        <deleteFile path="${alfrescowcm_on_install_settings_per_platform_directory}/commands/*.bat" />
+                        <deleteFile path="${alfresco_commands_directory}/*.bat" />
                     </actionList>
                     <ruleList>
                         <platformTest type="unix" />

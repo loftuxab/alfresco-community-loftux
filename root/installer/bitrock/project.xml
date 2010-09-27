@@ -3,7 +3,7 @@
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <fullName>Alfresco Community Edition Stack</fullName>
     <shortName>alfresco</shortName>
-    <version>3.3G-20100415-1</version>
+    <version>3.4.a-1</version>
     <installerFilename>${product_shortname}-community-${product_version}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <licenseFile></licenseFile>
     <readmeFile>${alfresco_readme_file}</readmeFile>
@@ -17,6 +17,13 @@
     <allowComponentSelection>1</allowComponentSelection>
     <leftImage>images/alfresco_left.png</leftImage>
 
+    <platformOptionsList>
+        <platformOptions>
+            <platform>osx</platform>
+            <height>393</height>
+        </platformOptions>
+    </platformOptionsList>
+
     <componentList>
         <include file="alfresco-customstack-build-settings.xml" />
         <include file="alfresco-build-settings.xml" />
@@ -24,6 +31,7 @@
 
         <include file="alfresco-linux-building-on-windows-patch.xml" />
         <include file="alfresco-osx-building-on-windows-patch.xml" />
+        <include file="alfresco-linux-x64-building-on-windows-patch.xml" />
         <include file="alfresco-apply-amps.xml" />
 
         <include file="base-java-settings.xml"/>
@@ -49,10 +57,9 @@
         <!-- AMP extensions -->
         <include file="alfresco-sharepoint.xml" />
         <include file="alfresco-records-management.xml" />
-         <include file="alfresco-wcmqs.xml" />
-        <include file="alfrescowcm.xml" />
-       <include file="alfresco-quickr.xml" />
-
+	<include file="alfresco-wcmqs.xml" />
+	<include file="alfrescowcm.xml" />
+        <include file="alfresco-quickr.xml" />
 	<include file="base-unix-service.xml" />
 
 	<include file="openoffice.xml"/>
@@ -127,7 +134,7 @@
 	    </ruleList>
 	</actionGroup>-->
 	<actionGroup>
-	    <progressText>Launch ${product_fullname} Share now?</progressText>
+	    <progressText>Launch ${product_fullname} Share</progressText>
 	    <actionList>
 		<showProgressDialog title="Starting servers ..." >
 		    <actionList>
@@ -176,7 +183,7 @@
 	    </ruleList>
 	</actionGroup>
 	<showInfo>
-            <text>You have chosen Apache Tomcat existing installation. To use new applications installed you have to restart Apache Tomcat.</text>
+            <text>You have chosen Apache Tomcat as the existing installation. To use new installed applications you must restart Apache Tomcat.</text>
             <ruleList>
                 <compareText text="${application_server_installation_type}" logic="equals" value="existing" />
 	    </ruleList>

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Start or stop Alfresco server
 # Set the following to where Tomcat is installed
-. scripts/setenv.sh
+. @@BITROCK_INSTALLDIR@@/scripts/setenv.sh
 APPSERVER=@@BITROCK_INSTALLDIR@@/virtual-tomcat
 # Set any default JVM values
 #

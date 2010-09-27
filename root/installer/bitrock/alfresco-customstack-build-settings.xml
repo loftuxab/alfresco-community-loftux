@@ -30,16 +30,6 @@
 
         <setInstallerVariable name="alfrescowcm_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble" />
         <setInstallerVariable name="alfrescowcm_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescowcm" />
-        <setInstallerVariable name="alfrescowcm_on_install_settings_per_platform_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescowcm/linux" >
-            <ruleList>
-                <compareText text="${plaform_name}"  logic="does_not_equal" value="windows" />
-            </ruleList>
-        </setInstallerVariable>
-        <setInstallerVariable name="alfresco_on_install_per_plaform_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescowcm/windows" >
-            <ruleList>
-                <compareText text="${plaform_name}"  logic="equals" value="windows" />
-            </ruleList>
-        </setInstallerVariable>
 
 
         <setInstallerVariable name="alfresco_mmt_source_file" value="${alfresco_svn_rootdir.unix}/build/assemble/commands/bin/alfresco-mmt.jar" />

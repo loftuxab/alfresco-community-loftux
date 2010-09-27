@@ -6,7 +6,7 @@
         <choiceParameter>
             <name>alfrescomysqlquestion_bundled</name>
             <title>Database Installation</title>
-            <explanation>Please select which database configuration you wish to use. If you select an existing database you should configure the Alfresco application before the installation.</explanation>
+            <explanation>Please select which database configuration you wish to use. If you select an existing database you should configure the Alfresco application before running the Alfresco server.</explanation>
             <cliOptionShow>0</cliOptionShow>
             <description/>
             <displayType>radiobuttons</displayType>
@@ -68,7 +68,7 @@
 		<passwordParameter>
 		    <name>jdbc_password</name>
 		    <description>Password</description>
-		    <descriptionRetype>Re-enter</descriptionRetype>
+		    <descriptionRetype>Verify</descriptionRetype>
 		    <default></default>
 		</passwordParameter>
 	    </parameterList>

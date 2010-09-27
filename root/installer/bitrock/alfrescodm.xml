@@ -1,7 +1,7 @@
 <component>
     <name>alfresco</name>
     <description>Alfresco</description>
-    <detailedDescription>Alfresco is an Enterprise Content Management (ECM) system featuring Document Management, Collaboration Management and Image Management.</detailedDescription>
+    <detailedDescription>Alfresco Enterprise Content Management (ECM) system featuring Document Management, Collaboration Management and Image Management.</detailedDescription>
     <canBeEdited>0</canBeEdited>
     <selected>1</selected>
     <show>1</show>
@@ -15,7 +15,7 @@
     <parameterList>
         
         <directoryParameter name="alfresco_base_application_directory" value="${installdir}" ask="0" />
-        <directoryParameter name="alfresco_commands_directory" value="${installdir}" ask="0" description="use to configure the destination of the content in commands folder" />
+        <directoryParameter name="alfresco_commands_directory" value="${installdir}/bin" ask="0" description="Use to configure the destination of the content in commands folder" />
         <directoryParameter name="alfresco_library_directory" value="${tomcat_server_directory}/lib" ask="0" />
         <directoryParameter name="alfresco_shared_directory" value="${tomcat_server_directory}/shared/classes" ask="0" />
         <stringParameter name="alfresco_database_name" value="alfresco" ask="0" />
@@ -102,7 +102,7 @@
     </readyToInstallActionList>
     <folderList>
         <folder>
-            <description>War files</description>
+            <description>War Files</description>
             <name>warfiles</name>
             <destination>${installdiralfresco}</destination>
             <distributionFileList>
@@ -210,7 +210,6 @@
                 <actionGroup>
                     <actionList>
                         <deleteFile path="${alfresco_commands_directory}/*.sh" />
-                        <deleteFile path="${alfresco_commands_directory}/bin/*.sh" />
                     </actionList>
                     <ruleList>
                         <platformTest type="windows" />
@@ -219,9 +218,8 @@
                 <actionGroup>
                     <actionList>
                         <deleteFile path="${alfresco_commands_directory}/*.bat" />
-                        <deleteFile path="${alfresco_commands_directory}/bin/*.bat" />
-                        <deleteFile path="${alfresco_commands_directory}/bin/*.dll" />
-                        <deleteFile path="${alfresco_commands_directory}/bin/*.exe" />
+                        <deleteFile path="${alfresco_commands_directory}/*.dll" />
+                        <deleteFile path="${alfresco_commands_directory}/*.exe" />
                     </actionList>
                     <ruleList>
                         <platformTest type="unix" />
