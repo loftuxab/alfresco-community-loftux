@@ -74,12 +74,21 @@
                     generate-checksums" />
 
    <target name="continuous-without-tests" 
-           description="Performs a full clean and creates all distribution files"
+           description="Performs a full clean and creates all distribution files but does not run any tests"
            depends="clean-continuous, 
                     clean, 
                     -reset-database, 
                     distribute,
                     generate-checksums" />
+   
+   <target name="continuous-without-distribute" 
+           description="Performs a full clean and runs all tests but does not generate any distribution files"
+           depends="clean-continuous, 
+                    clean, 
+                    -reset-database,
+                    set-build-number,
+                    init-test,
+                    test" />
 
    <target name="distribute" 
            description="Creates the distribution files for all platforms"
