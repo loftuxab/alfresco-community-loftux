@@ -100,32 +100,25 @@
    color: #656565;
 }
 
-.people-finder .help
+.people-finder .help span
 {
-   padding: 0.5em;
-}
-
-.people-finder .help .info
-{
+   display: block;
    padding: 0.5em;
 }
 
 .people-finder .help .title
 {
    font-size: 116%;
-   padding: 0.5em;
 }
 
 .people-finder .help .subtitle
 {
    font-weight: bold;
-   padding: 0.5em;
 }
 
 .people-finder .help .example
 {
    font-style: italic;
-   padding: 0.5em;
 }
 
 /* Compact Mode */
