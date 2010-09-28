@@ -73,6 +73,7 @@
             <mandatory-aspects>
                 <aspect>ws:ordered</aspect>
                 <aspect>cm:tagscope</aspect>
+                <aspect>cm:titled</aspect>
             </mandatory-aspects>
         </type>
         
@@ -130,6 +131,9 @@
                     </target>
                 </association>
             </associations>
+            <mandatory-aspects>
+                <aspect>cm:titled</aspect>
+            </mandatory-aspects>
         </type>
 
         <type name="ws:webroot">
@@ -205,6 +209,9 @@
                     </target>
                 </association>
             </associations>
+            <mandatory-aspects>
+                <aspect>cm:titled</aspect>
+            </mandatory-aspects>
         </type>
 
         <type name="ws:indexPage">
