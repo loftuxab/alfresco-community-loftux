@@ -315,8 +315,9 @@
          {
             // Redirect to the search page
             var url = "search?t=" + encodeURIComponent(searchText);
-            // Append repository search argument if within repo browser page
-            if (window.location.href.match("/repository$") == "/repository")
+            // Append repository search argument if within repo browser page or previous repository search
+            if (window.location.pathname.match("/repository$") == "/repository" ||
+                (window.location.pathname.match("/search$") == "/search" && window.location.search.indexOf("r=true") != -1))
             {
                url += "&r=true";
             }
