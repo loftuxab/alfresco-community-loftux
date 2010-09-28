@@ -91,11 +91,13 @@
          this.widgets.calendarFrom = new YAHOO.widget.Calendar(this.id + "-from", this.id + "-from", { title:this.msg("form.control.date-picker.choose"), close:true });
          this.widgets.calendarFrom.cfg.setProperty("pagedate", page);
          this.widgets.calendarFrom.cfg.setProperty("selected", selected);
+         Alfresco.util.calI18nParams(this.widgets.calendarFrom);
          page = (toDate.getMonth() + 1) + "/" + toDate.getFullYear();
          selected = (toDate.getMonth() + 1) + "/" + toDate.getDate() + "/" + toDate.getFullYear();   
          this.widgets.calendarTo = new YAHOO.widget.Calendar(this.id + "-to", this.id + "-to", { title:this.msg("form.control.date-picker.choose"), close:true });
          this.widgets.calendarTo.cfg.setProperty("pagedate", page);
          this.widgets.calendarTo.cfg.setProperty("selected", selected);
+         Alfresco.util.calI18nParams(this.widgets.calendarTo);
          
          // setup events
          this.widgets.calendarFrom.selectEvent.subscribe(this._handlePickerChangeFrom, this, true);

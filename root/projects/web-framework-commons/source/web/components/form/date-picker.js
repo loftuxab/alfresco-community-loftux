@@ -195,7 +195,8 @@
          this.widgets.calendar = new YAHOO.widget.Calendar(this.id, this.id, { title:this._msg("form.control.date-picker.choose"), close:true });
          this.widgets.calendar.cfg.setProperty("pagedate", page);
          this.widgets.calendar.cfg.setProperty("selected", selected);
-         
+         Alfresco.util.calI18nParams(this.widgets.calendar);
+
          // setup events
          this.widgets.calendar.selectEvent.subscribe(this._handlePickerChange, this, true);
          Event.addListener(this.id + "-date", "keyup", this._handleFieldChange, this, true);
