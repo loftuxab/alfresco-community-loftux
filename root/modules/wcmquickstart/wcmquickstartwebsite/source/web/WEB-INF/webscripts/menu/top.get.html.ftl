@@ -2,7 +2,7 @@
     <ul>
 		<#list sections as section>
             <#if ! section.excludeFromNav>
-    			<li><a href="${url.context}${section.path}"><#if section.title?length != 0>${section.title}<#else>${section.name}</#if></a>
+    			<li><a href="${url.context}${section.path}">${section.title!section.name}</a>
     				<@outputMenu sections=section.sections/>	
     			</li>
     		</#if>	
@@ -15,7 +15,7 @@
 		<li><a href="${url.context}/" accesskey="1">${msg('nav.home')}</a></li>
 		<#list webSite.sections as section>
 		    <#if ! section.excludeFromNav>
-    			<li><a href="${url.context}${section.path}" accesskey="${section_index+2}"><#if section.title?length != 0>${section.title}<#else>${section.name}</#if></a>
+    			<li><a href="${url.context}${section.path}" accesskey="${section_index+2}">${section.title!section.name}</a>
     				<@outputMenu sections=section.sections/>	
     			</li>
     		</#if>	
