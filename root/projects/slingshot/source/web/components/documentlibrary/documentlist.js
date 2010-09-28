@@ -2139,7 +2139,7 @@
                }
             }
          });
-
+      },
 
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
