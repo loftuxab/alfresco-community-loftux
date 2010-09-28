@@ -1,4 +1,5 @@
 <#assign el=args.htmlid>
+<#assign searchconfig=config.scoped['Search']['search']>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.Search("${el}").setOptions(
    {
@@ -9,19 +10,19 @@
       initialSearchRepository: ${searchRepo?string},
       initialSort: "${searchSort?js_string}",
       searchQuery: "${searchQuery?js_string}",
-      minSearchTermLength: ${args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length')},
-      maxSearchResults: ${args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results')}
+      minSearchTermLength: ${args.minSearchTermLength!searchconfig.getChildValue('min-search-term-length')},
+      maxSearchResults: ${args.maxSearchResults!searchconfig.getChildValue('max-search-results')}
    }).setMessages(
       ${messages}
    );
 //]]></script>
 
 <div id="${el}-body" class="search">
-   <#if searchQuery?length == 0>
+   <#if searchQuery?length == 0 && searchconfig.getChildValue('repository-search') != "always">
    <div class="search-sites">
       <#if siteId?length != 0><a id="${el}-site-link" href="#" <#if !searchAllSites && !searchRepo>class="bold"</#if>>${msg('message.singlesite', siteTitle)}</a> |</#if>
-      <a id="${el}-all-sites-link" href="#" <#if searchAllSites && !searchRepo>class="bold"</#if>>${msg('message.allsites')}</a> |
-      <a id="${el}-repo-link" href="#" <#if searchRepo>class="bold"</#if>>${msg('message.repository')}</a>
+      <a id="${el}-all-sites-link" href="#" <#if searchAllSites && !searchRepo>class="bold"</#if>>${msg('message.allsites')}</a>
+      <span <#if searchconfig.getChildValue('repository-search') == "none">class="hidden"</#if>>| <a id="${el}-repo-link" href="#" <#if searchRepo>class="bold"</#if>>${msg('message.repository')}</a></span>
    </div>
    </#if>
    <div class="search-box">
