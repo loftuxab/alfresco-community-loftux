@@ -116,28 +116,7 @@
           // If for some reason the data fails to load, the calendar will still display.
          this.calendar = new YAHOO.widget.Calendar("calendar");
          // Set localised properties
-         this.calendar.cfg.setProperty("MONTHS_SHORT", this._msg("months.short").split(","));
-         this.calendar.cfg.setProperty("MONTHS_LONG", this._msg("months.long").split(","));
-         this.calendar.cfg.setProperty("WEEKDAYS_1CHAR", this._msg("days.initial").split(","));
-         this.calendar.cfg.setProperty("WEEKDAYS_SHORT", this._msg("days.short").split(","));
-         this.calendar.cfg.setProperty("WEEKDAYS_MEDIUM", this._msg("days.medium").split(","));
-         this.calendar.cfg.setProperty("WEEKDAYS_LONG", this._msg("days.long").split(","));
-         var monthPos = this._msg("calendar.widget_config.my_label_month_position");
-         if (monthPos.length !== 0)
-         {
-            this.calendar.cfg.setProperty("MY_LABEL_MONTH_POSITION", parseInt(monthPos));
-         }
-         var monthSuffix = this._msg("calendar.widget_config.my_label_month_suffix");
-         if (monthSuffix.length !== 0)
-         {
-            this.calendar.cfg.setProperty("MY_LABEL_MONTH_SUFFIX", monthSuffix);
-         }
-         var yearPos = this._msg("calendar.widget_config.my_label_year_position");
-         if (yearPos.length !== 0)
-         {
-            this.calendar.cfg.setProperty("MY_LABEL_YEAR_POSITION", parseInt(yearPos));
-         }
-         this.calendar.cfg.setProperty("MY_LABEL_YEAR_SUFFIX", this._msg("calendar.widget_config.my_label_year_suffix"));
+         Alfresco.util.calI18nParams(this.calendar);
          this.calendar.render();
          this.calendar.selectEvent.subscribe(this.onDateSelected, this, true);
          

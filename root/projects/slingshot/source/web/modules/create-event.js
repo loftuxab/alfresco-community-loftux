@@ -418,6 +418,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          oCalendarMenu.align();
 
          var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
+         Alfresco.util.calI18nParams(oCalendar);
          oCalendar.render();
 
          oCalendar.changePageEvent.subscribe(function () {

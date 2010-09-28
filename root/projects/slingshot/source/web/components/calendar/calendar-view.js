@@ -1791,28 +1791,7 @@ Alfresco.util.DialogManager = (function()
          {
             pagedate: pagedate
          });
-         o.oCalendar.cfg.setProperty("MONTHS_SHORT", Alfresco.util.message("months.short").split(","));
-         o.oCalendar.cfg.setProperty("MONTHS_LONG", Alfresco.util.message("months.long").split(","));
-         o.oCalendar.cfg.setProperty("WEEKDAYS_1CHAR", Alfresco.util.message("days.initial").split(","));
-         o.oCalendar.cfg.setProperty("WEEKDAYS_SHORT", Alfresco.util.message("days.short").split(","));
-         o.oCalendar.cfg.setProperty("WEEKDAYS_MEDIUM", Alfresco.util.message("days.medium").split(","));
-         o.oCalendar.cfg.setProperty("WEEKDAYS_LONG", Alfresco.util.message("days.long").split(","));
-         var monthPos = Alfresco.util.message("calendar.widget_config.my_label_month_position");
-         if (monthPos.length !== 0)
-         {
-            o.oCalendar.cfg.setProperty("MY_LABEL_MONTH_POSITION", parseInt(monthPos));
-         }
-         var monthSuffix = Alfresco.util.message("calendar.widget_config.my_label_month_suffix");
-         if (monthSuffix.length !== 0)
-         {
-            o.oCalendar.cfg.setProperty("MY_LABEL_MONTH_SUFFIX", monthSuffix);
-         }
-         var yearPos = Alfresco.util.message("calendar.widget_config.my_label_year_position");
-         if (yearPos.length !== 0)
-         {
-            o.oCalendar.cfg.setProperty("MY_LABEL_YEAR_POSITION", parseInt(yearPos));
-         }
-         o.oCalendar.cfg.setProperty("MY_LABEL_YEAR_SUFFIX", Alfresco.util.message("calendar.widget_config.my_label_year_suffix"));
+         Alfresco.util.calI18nParams(o.oCalendar);
          o.oCalendar.render();
          o.oCalendar.selectEvent.subscribe(function(type, args)
          {
