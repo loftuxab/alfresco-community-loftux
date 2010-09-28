@@ -181,6 +181,39 @@
       </forms>
    </config>
    
+   <!-- Review and Approve Workflow Definition -->
+   <config evaluator="string-compare" condition="jbpm$wfl:lifecycleapproval">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:workflowDescription" />
+               <show id="bpm:workflowDueDate" />
+               <show id="bpm:workflowPriority" />
+               <show id="bpm:assignee" />
+               <show id="packageItems" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.set.general" />
+               <set id="info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl" />
+               <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
+               <set id="items" appearance="title" label-id="workflow.set.items" />
+               
+               <field id="bpm:workflowDescription" label-id="workflow.field.message">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl">
+                     <control-param name="style">width: 95%</control-param>
+                  </control>
+               </field>
+               <field id="bpm:workflowDueDate" label-id="workflow.field.due" set="info" />
+               <field id="bpm:workflowPriority" label-id="workflow.field.priority" set="info">
+                  <control template="/org/alfresco/components/form/controls/workflow/priority.ftl" />
+               </field>
+               <field id="bpm:assignee" label-id="workflow.field.reviewer" set="assignee" />
+               <field id="packageItems" set="items" />
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
    <!-- ***************************** -->
    <!-- Start Task Form Configuration -->
    <!-- ***************************** -->
