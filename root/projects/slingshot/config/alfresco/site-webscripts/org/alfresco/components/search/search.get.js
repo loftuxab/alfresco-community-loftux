@@ -54,13 +54,15 @@ function main()
    }
    
    // Prepare the model
+   var repoconfig = config.scoped['Search']['search'].getChildValue('repository-search');
    model.siteId = siteId;
    model.siteTitle = (siteTitle != null ? siteTitle : "");
    model.sortFields = sortFields;
    model.searchTerm = (page.url.args["t"] != null) ? page.url.args["t"] : "";
    model.searchTag = (page.url.args["tag"] != null) ? page.url.args["tag"] : "";
    model.searchSort = (page.url.args["s"] != null) ? page.url.args["s"] : "";
-   model.searchRepo = (page.url.args["r"] == "true");
+   // config override can force repository search on/off
+   model.searchRepo = ((page.url.args["r"] == "true") || repoconfig == "always") && repoconfig != "none";
    model.searchAllSites = (page.url.args["a"] == "true" || siteId.length == 0);
    
    // Advanced search forms based json query
