@@ -322,3 +322,7 @@
 {
    padding: 0.4em;
 }
+
+.yui-calendar div.calheader a.calnav:hover {
+   color:#000000;
+}
