@@ -1,5 +1,5 @@
 <div class="interior-content">
-    <h2>${asset.title!'no title'}</h2>
+    <h2>${asset.title!asset.name}</h2>
     <div class="blog-misc">
         <#if asset.properties['ws:publishedTime']??><span>${asset.properties['ws:publishedTime']?string(msg('date.format'))}</span>&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;</#if>
         <#if asset.properties['cm:author']??><span>${asset.properties['cm:author']}</span>&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;</#if>
@@ -12,7 +12,7 @@
         </a></span>
     </div>
         
-    <@markContent id=asset.id title="${msg('webeditor.edit')} \"${asset.title}\"" nestedMarker="true" />    
+    <@markContent id=asset.id nestedMarker="true" />    
     
     <div class="article-body">
         <@streamasset asset=asset/>

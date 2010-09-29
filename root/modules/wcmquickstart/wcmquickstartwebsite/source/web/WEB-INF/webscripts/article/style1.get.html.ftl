@@ -1,14 +1,14 @@
 <div class="interior-content">
-    <h2>${asset.title!'no title'}</h2>
+    <h2>${asset.title!asset.name}</h2>
     <span class="ih-date">From <a href="<@makeurl section=asset.containingSection/>">${asset.containingSection.title}</a><#if asset.properties['ws:publishedTime']??> - ${asset.properties['ws:publishedTime']?string(msg('date.format'))}</#if></span>
     
-    <@markContent id=asset.id title="${msg('webeditor.edit')} \"${asset.title}\"" nestedMarker="true" />    
+    <@markContent id=asset.id  nestedMarker="true" />    
     
     <div class="article-body">
         <#if asset.relatedAssets['ws:primaryImage']??>             
             <#assign image=asset.relatedAssets['ws:primaryImage'][0]>             
             <a rel="lightbox" title="detail image" href="<@makeurl asset=image rendition='largeNewsThumbnail'/>">
-                <img src="<@makeurl asset=image rendition='mediumNewsThumbnail'/>" alt="${image.title!asset.title}" class="img-border left-img" />
+                <img src="<@makeurl asset=image rendition='mediumNewsThumbnail'/>" alt="${image.title!image.name}" class="img-border left-img" />
             </a>
         </#if>
                

@@ -30,6 +30,8 @@ import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.Query;
 import org.alfresco.wcm.client.Rendition;
 import org.alfresco.wcm.client.SearchResults;
+import org.alfresco.wcm.client.WebSite;
+import org.alfresco.wcm.client.WebSiteService;
 import org.alfresco.wcm.client.impl.cache.SimpleCache;
 
 /**
@@ -68,7 +70,7 @@ public class CachingAssetFactoryImpl implements AssetFactory
     public Asset getAssetById(String id, boolean deferredLoad)
     {
         long now = System.currentTimeMillis();
-        long refreshCutoffTime = now - minimumCacheMilliseconds;
+        long refreshCutoffTime = now - getMinimumCacheMilliseconds();
         CacheEntry cacheEntry = newCache.get(id);
         Asset asset = null;
         if (cacheEntry != null)
@@ -117,7 +119,7 @@ public class CachingAssetFactoryImpl implements AssetFactory
         Map<String, Asset> foundAssets = new TreeMap<String, Asset>();
         
         long now = System.currentTimeMillis();
-        long refreshCutoffTime = now - minimumCacheMilliseconds;
+        long refreshCutoffTime = now - getMinimumCacheMilliseconds();
 
         for (String id : ids)
         {
@@ -248,5 +250,16 @@ public class CachingAssetFactoryImpl implements AssetFactory
             this.asset = asset;
             this.cacheTime = System.currentTimeMillis();
         }
+    }
+    
+    private long getMinimumCacheMilliseconds()
+    {
+        long result = 0L;
+        WebSite currentSite = WebSiteService.getThreadWebSite();
+        if (currentSite == null || !currentSite.isEditorialSite())
+        {
+            result = minimumCacheMilliseconds;
+        }
+        return result;
     }
 }

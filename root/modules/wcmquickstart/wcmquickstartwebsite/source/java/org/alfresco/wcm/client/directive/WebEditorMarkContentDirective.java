@@ -73,14 +73,14 @@ public class WebEditorMarkContentDirective extends AbstractTemplateDirective
 		SimpleScalar formIdParam = (SimpleScalar)params.get("formId");
 		SimpleScalar nestedMarkerParam = (SimpleScalar)params.get("nestedMarker");
 
-		if (idParam == null || titleParam == null) 
+		if (idParam == null) 
 		{
-			throw new TemplateModelException("id and title parameters are mandatory for markContent directive");
+			throw new TemplateModelException("id parameter is mandatory for markContent directive");
 		}
 
 		String contentId = idParam.getAsString();
 		//String safeId = URLEncoder.encode(contentId, "UTF-8");
-		String contentTitle = titleParam.getAsString();
+		String contentTitle = (titleParam == null) ? null : titleParam.getAsString();
 		String formId = null;
 		boolean nestedMarker = false;
 		if (formIdParam != null) formId = formIdParam.getAsString();

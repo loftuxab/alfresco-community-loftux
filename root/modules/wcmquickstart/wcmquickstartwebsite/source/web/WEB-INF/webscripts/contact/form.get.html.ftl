@@ -14,25 +14,25 @@
             </#if> 
             <ul>
                 <li>
-                    <input type="text" name="visitorName" class="bc-input" value="${visitorName!''}"/>          
+                    <input type="text" name="visitorName" class="bc-input" value="${visitorName!''}" max-length="70"/>          
                     <label for="bc-name">${msg('comments.write.name')}</label> *
                     <#if errors?? && errors['visitorName']??>
                         <span class="contact-error-value">${msg(errors['visitorName'])}</span>
                     </#if>                
                 </li>
                 <li>
-                    <input type="text" name="visitorEmail" class="bc-input" value="${visitorEmail!''}"/>                      
+                    <input type="text" name="visitorEmail" class="bc-input" value="${visitorEmail!''}" max-length="200"/>                      
                     <label for="bc-email">${msg('comments.write.email')}</label> *
                     <#if errors?? && errors['visitorEmail']??>
                         <span class="contact-error-value">${msg(errors['visitorEmail'])}</span>
                     </#if>                  
                 </li>     
                 <li>
-                    <input type="text" name="visitorWebsite" class="bc-input" value="${visitorWebsite!''}"/>                      
+                    <input type="text" name="visitorWebsite" class="bc-input" value="${visitorWebsite!''}" max-length="100"/>                      
                     <label for="bc-website">${msg('comments.write.website')}</label>
                 </li>
                 <li>
-                    <input type="text" name="feedbackSubject" class="bc-input" value="${feedbackSubject!''}"/>                      
+                    <input type="text" name="feedbackSubject" class="bc-input" value="${feedbackSubject!''}" max-length="200"/>                      
                     <label for="bc-website">${msg('comments.write.subject')}</label>
                 </li>            
                 <li>

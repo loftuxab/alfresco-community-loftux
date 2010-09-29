@@ -48,27 +48,25 @@ import org.alfresco.service.namespace.RegexQNamePattern;
  * 
  * @author Brian
  */
-public class WebAssetAspect implements WebSiteModel, 
-									   CopyServicePolicies.OnCopyNodePolicy,
-									   ContentServicePolicies.OnContentUpdatePolicy,
-									   NodeServicePolicies.OnAddAspectPolicy,
-									   NodeServicePolicies.BeforeDeleteNodePolicy
+public class WebAssetAspect implements WebSiteModel, CopyServicePolicies.OnCopyNodePolicy,
+        ContentServicePolicies.OnContentUpdatePolicy, NodeServicePolicies.OnAddAspectPolicy,
+        NodeServicePolicies.BeforeDeleteNodePolicy
 {
-	/** Policy component */
+    /** Policy component */
     private PolicyComponent policyComponent;
-    
+
     /** Node service */
     private NodeService nodeService;
-    
+
     /** Behaviour filter */
     private BehaviourFilter behaviourFilter;
-    
+
     /** Publish service */
     private PublishService publishService;
-    
+
     /** Rendition helper */
     private RenditionHelper renditionHelper;
-    
+
     /**
      * Set the policy component
      * 
@@ -82,25 +80,31 @@ public class WebAssetAspect implements WebSiteModel,
 
     /**
      * Set the node service
-     * @param nodeService	node service
+     * 
+     * @param nodeService
+     *            node service
      */
     public void setNodeService(NodeService nodeService)
     {
-	    this.nodeService = nodeService;
+        this.nodeService = nodeService;
     }
-    
+
     /**
      * Set rendition helper
-     * @param renditionHelper	rendition helper
+     * 
+     * @param renditionHelper
+     *            rendition helper
      */
     public void setRenditionHelper(RenditionHelper renditionHelper)
     {
-	    this.renditionHelper = renditionHelper;
+        this.renditionHelper = renditionHelper;
     }
-    
+
     /**
      * Set the behaviour filter
-     * @param behaviourFilter	behaviour filter
+     * 
+     * @param behaviourFilter
+     *            behaviour filter
      */
     public void setBehaviourFilter(BehaviourFilter behaviourFilter)
     {
@@ -109,34 +113,35 @@ public class WebAssetAspect implements WebSiteModel,
 
     /**
      * Set the publish service
-     * @param publishService	publish service
+     * 
+     * @param publishService
+     *            publish service
      */
     public void setPublishService(PublishService publishService)
     {
         this.publishService = publishService;
     }
-    
+
     /**
      * Init method. Binds model behaviours to policies.
      */
     public void init()
     {
-        policyComponent.bindClassBehaviour(OnCopyNodePolicy.QNAME, ASPECT_WEBASSET, new JavaBehaviour(
-                this, "getCopyCallback"));
-        policyComponent.bindClassBehaviour(ContentServicePolicies.OnContentUpdatePolicy.QNAME, 
-        								   ASPECT_WEBASSET, 
-        								   new JavaBehaviour(this, "onContentUpdate", NotificationFrequency.TRANSACTION_COMMIT));
-        policyComponent.bindClassBehaviour(NodeServicePolicies.OnAddAspectPolicy.QNAME, 
-        								   ASPECT_WEBASSET, 
-        								   new JavaBehaviour(this, "onAddAspect", NotificationFrequency.TRANSACTION_COMMIT));
+        policyComponent.bindClassBehaviour(OnCopyNodePolicy.QNAME, ASPECT_WEBASSET, new JavaBehaviour(this,
+                "getCopyCallback"));
+        policyComponent.bindClassBehaviour(ContentServicePolicies.OnContentUpdatePolicy.QNAME, ASPECT_WEBASSET,
+                new JavaBehaviour(this, "onContentUpdate", NotificationFrequency.TRANSACTION_COMMIT));
+        policyComponent.bindClassBehaviour(NodeServicePolicies.OnAddAspectPolicy.QNAME, ASPECT_WEBASSET,
+                new JavaBehaviour(this, "onAddAspect", NotificationFrequency.TRANSACTION_COMMIT));
         policyComponent.bindClassBehaviour(NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME, ASPECT_WEBASSET,
                 new JavaBehaviour(this, "onUpdatePropertiesEachEvent", NotificationFrequency.EVERY_EVENT));
         policyComponent.bindClassBehaviour(NodeServicePolicies.BeforeDeleteNodePolicy.QNAME, ASPECT_WEBASSET,
                 new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.FIRST_EVENT));
     }
-    
+
     /**
-     * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#getCopyCallback(org.alfresco.service.namespace.QName, org.alfresco.repo.copy.CopyDetails)
+     * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#getCopyCallback(org.alfresco.service.namespace.QName,
+     *      org.alfresco.repo.copy.CopyDetails)
      */
     @Override
     public CopyBehaviourCallback getCopyCallback(QName classRef, CopyDetails copyDetails)
@@ -150,14 +155,13 @@ public class WebAssetAspect implements WebSiteModel,
      * @param before
      * @param after
      */
-    public void onUpdatePropertiesEachEvent(
-            NodeRef nodeRef,
-            Map<QName, Serializable> before,
+    public void onUpdatePropertiesEachEvent(NodeRef nodeRef, Map<QName, Serializable> before,
             Map<QName, Serializable> after)
     {
-        //If the "available" flag is changing to true, then set the published time to "now".
-        Boolean afterAvailable = (Boolean)after.get(PROP_AVAILABLE);
-        Boolean beforeAvailable = (Boolean)before.get(PROP_AVAILABLE);
+        // If the "available" flag is changing to true, then set the published
+        // time to "now".
+        Boolean afterAvailable = (Boolean) after.get(PROP_AVAILABLE);
+        Boolean beforeAvailable = (Boolean) before.get(PROP_AVAILABLE);
         if (afterAvailable != null && !afterAvailable.equals(beforeAvailable) && afterAvailable)
         {
             behaviourFilter.disableBehaviour(nodeRef, ASPECT_WEBASSET);
@@ -171,7 +175,7 @@ public class WebAssetAspect implements WebSiteModel,
             }
         }
     }
-        
+
     /**
      * WebAsset aspect copy behaviour callback class
      */
@@ -184,52 +188,58 @@ public class WebAssetAspect implements WebSiteModel,
                 Map<QName, Serializable> properties)
         {
             Map<QName, Serializable> propertiesToCopy = new HashMap<QName, Serializable>(properties);
-            //We don't want to copy across the original node's record of the website sections it's in.
-            //This property will be calculated afresh on the copy
+            // We don't want to copy across the original node's record of the
+            // website sections it's in.
+            // This property will be calculated afresh on the copy
             propertiesToCopy.remove(PROP_PARENT_SECTIONS);
             return propertiesToCopy;
         }
     }
 
     /**
-     * @see org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy#onContentUpdate(org.alfresco.service.cmr.repository.NodeRef, boolean)
+     * @see org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy#onContentUpdate(org.alfresco.service.cmr.repository.NodeRef,
+     *      boolean)
      */
-	@Override
+    @Override
     public void onContentUpdate(NodeRef nodeRef, boolean newContent)
     {
-		if (newContent == true)
-		{					
-			renditionHelper.createRenditions(nodeRef);
-		}
+        if (newContent == true)
+        {
+            renditionHelper.createRenditions(nodeRef);
+        }
     }
 
-	/**
-	 * @see org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy#onAddAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
-	 */
-	@Override
+    /**
+     * @see org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy#onAddAspect(org.alfresco.service.cmr.repository.NodeRef,
+     *      org.alfresco.service.namespace.QName)
+     */
+    @Override
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-	    nodeService.setProperty(nodeRef, PROP_AVAILABLE, Boolean.TRUE);
-		renditionHelper.createRenditions(nodeRef);
+        nodeService.setProperty(nodeRef, PROP_AVAILABLE, Boolean.TRUE);
+        nodeService.setProperty(nodeRef, PROP_PUBLISHED_TIME, new Date());
+        renditionHelper.createRenditions(nodeRef);
     }
 
-	/**
-	 * @see org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy#beforeDeleteNode(org.alfresco.service.cmr.repository.NodeRef)
-	 */
+    /**
+     * @see org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy#beforeDeleteNode(org.alfresco.service.cmr.repository.NodeRef)
+     */
     @Override
     public void beforeDeleteNode(NodeRef nodeRef)
     {
         // Enqueue nodes
         publishService.enqueueRemovedNodes(nodeRef);
-        
+
         // Remove all referencing and referenced associations
         removeAll(nodeService.getSourceAssocs(nodeRef, RegexQNamePattern.MATCH_ALL));
-        removeAll(nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL));        
+        removeAll(nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL));
     }
-    
+
     /**
      * Remove all the associations in the list
-     * @param assocs    list of associations
+     * 
+     * @param assocs
+     *            list of associations
      */
     private void removeAll(List<AssociationRef> assocs)
     {
