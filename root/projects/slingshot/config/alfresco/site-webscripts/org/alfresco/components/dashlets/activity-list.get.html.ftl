@@ -15,7 +15,7 @@
       <#assign siteLink="<a href=\"${activity.sitePage}\" class=\"theme-color-1\">${(siteTitles[activity.siteId]!activity.siteId)?html}</a>">
       <#if dateCompare(lastDate?date, activity.date.fullDate?date) == 1>
          <#assign lastDate = activity.date.fullDate lastHour = activity.date.hour>
-<div class="new-day <#if activity_index = 0>first-item</#if>"><div class="ruler"></div><span>${lastHour?string("00")}:00, ${lastDate?date?string.medium}</span></div>
+<div class="new-day <#if activity_index = 0>first-item</#if>"><div class="ruler"></div><span>${lastHour?string("00")}:00, ${lastDate?string(msg("date-format.mediumDateFTL"))}</span></div>
       <#elseif lastHour != activity.date.hour>
          <#assign lastHour = activity.date.hour>
 <div class="new-hour"><div class="ruler"></div><span>${lastHour?string("00")}:00</span></div>
