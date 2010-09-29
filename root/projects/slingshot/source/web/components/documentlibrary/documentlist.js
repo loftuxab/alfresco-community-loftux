@@ -879,7 +879,7 @@
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn, "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn, scope.msg("date-format.longDate")) + '</span>';
                   desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
@@ -954,7 +954,7 @@
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn, "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + scope.msg("details.modified.on") + '</em> ' + $date(record.modifiedOn, scope.msg("date-format.longDate")) + '</span>';
                   desc += '<span class="item-simple"><em>' + scope.msg("details.by") + '</em> ' + $userProfile(record.modifiedByUser, record.modifiedBy) + '</span></div>';
                }
                else
