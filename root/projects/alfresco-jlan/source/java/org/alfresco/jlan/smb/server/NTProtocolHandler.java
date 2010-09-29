@@ -2369,6 +2369,16 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 				if ( FileAction.createNotExists(openFunc)) {
 
+					// Check if the session has write access to the filesystem
+
+					if ( conn.hasWriteAccess() == false) {
+
+						// User does not have the required access rights
+
+						m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTAccessDenied, SMBStatus.DOSAccessDenied, SMBStatus.ErrDos);
+						return;
+					}
+
 					// Create a new file
 
 					netFile = disk.createFile(m_sess, conn, params);
