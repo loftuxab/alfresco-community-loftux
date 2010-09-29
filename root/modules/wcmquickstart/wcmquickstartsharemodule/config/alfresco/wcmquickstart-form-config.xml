@@ -107,7 +107,6 @@
                <show id="ws:minsToQueryRefresh" />
                <show id="ws:webassets" />
             </field-visibility>
-			<edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
             <appearance>
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />

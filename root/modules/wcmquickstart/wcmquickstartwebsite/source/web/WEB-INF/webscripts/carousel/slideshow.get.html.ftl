@@ -6,11 +6,11 @@
                 <li <#if article_index == 1>class="active"</#if>>                     
                     <#if article.relatedAssets['ws:primaryImage']??>             
                         <#assign image=article.relatedAssets['ws:primaryImage'][0]>             
-                        <a href="<@makeurl asset=article/>"><img src="<@makeurl asset=image rendition='featuredNewsThumbnail'/>" alt="${image.title!}" class="slide-1-img" /></a>
+                        <a href="<@makeurl asset=article/>"><img src="<@makeurl asset=image rendition='featuredNewsThumbnail'/>" alt="${image.title!image.name}" class="slide-1-img" /></a>
                     </#if>
                     <div class="slide-1-desc">
-                      <h1>${article.title!'no title'}</h1>
-                      <p>${article.description!'no preview'}</p>
+                      <h1>${article.title!article.name}</h1>
+                      <p>${article.description!''}</p>
                       <div class="slideshow-rm"><a href="<@makeurl asset=article/>">${msg('read.more')}</a></div>
                     </div>
                 </li>

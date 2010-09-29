@@ -51,9 +51,6 @@
 
 	<config evaluator="aspect-name" condition="ws:webasset">
 		<property-sheet>
-			<show-property name="ws:availableFromDate" />
-            <show-property name="ws:availableToDate" />
-			<show-property name="ws:published" />
             <show-property name="ws:publishedTime" read-only="true" />
 			<show-property name="ws:derivedCommentCount" read-only="true" />
 			<show-property name="ws:derivedAverageRating" read-only="true" />
