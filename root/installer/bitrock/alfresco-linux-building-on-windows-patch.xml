@@ -913,6 +913,7 @@
                               <fileTest path="${installdir}/java/jre/lib/desktop/mime/packages/x-java-archive.xml" condition="exists" />
                            </ruleList>
                         </changePermissions>
+                        <dos2unix files="${installdir}/java/jre/lib/i386/jvm.cfg" abortOnError="0" showMessageOnError="0" />
                         <changePermissions permissions="00755" files="${installdir}/java/jre/lib/i386/libioser12.so" >
                            <ruleList>
                               <fileTest path="${installdir}/java/jre/lib/i386/libioser12.so" condition="exists" />
