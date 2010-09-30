@@ -72,6 +72,14 @@
          siteId: "",
          
          /**
+          * Current site title
+          * 
+          * @property siteTitle
+          * @type string
+          */
+         siteTitle: "",
+         
+         /**
           * Maximum number of results displayed.
           * 
           * @property maxSearchResults
@@ -1031,6 +1039,20 @@
          else
          {
             text = this.msg("search.info.resultinfo", resultsCount);
+         }
+         
+         // apply the context
+         if (this.searchRepository)
+         {
+            text += ' ' + this.msg("search.info.foundinrepository");
+         }
+         else if (this.searchAllSites)
+         {
+            text += ' ' + this.msg("search.info.foundinallsite");
+         }
+         else
+         {
+            text += ' ' + this.msg("search.info.foundinsite", $html(this.options.siteTitle));
          }
          
          // set the text
