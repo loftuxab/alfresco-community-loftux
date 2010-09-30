@@ -1,5 +1,6 @@
 <#macro dateFormat date>${date?string("EEE d MMM yyyy HH:mm:ss")}</#macro>
 <#macro formatContent content date type index>
+   <#if content.browseUrl??>
    <li<#if (index == 0)> class="first"</#if>>
       <a href="${url.context}/page/site/${content.site.shortName}/${content.browseUrl}" class="thmb"><img src="${url.context}/components/images/generic-file-32.png" /></a>
       <p>
@@ -7,6 +8,7 @@
          ${content.description?html}
          <span>${msg("label." + type)} <@dateFormat date /></span></p>
    </li>
+   </#if>
 </#macro>
 
 <#assign el=args.htmlid>
