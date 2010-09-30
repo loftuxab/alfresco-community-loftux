@@ -178,7 +178,7 @@
 
             // Set the forms action url
             var formEl = Dom.get(this.id + "-htmlupload-form");
-            if (this.showConfig.importURL === null)
+            if (!this.showConfig.importURL)
             {
                // The .html suffix is required - it is not possible to do a multipart post using an ajax call.
                // So it has to be a FORM submit, to make it feel like an ajax call a a hidden iframe is used.
