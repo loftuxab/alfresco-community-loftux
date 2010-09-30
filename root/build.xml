@@ -1235,7 +1235,7 @@
             classname="org.alfresco.util.Convert" 
             dir="." >
          <classpath refid="classpath.unit.test" />
-         <arg line="--dry-run --svn-status --encoding=UTF-8 --line-ending=WINDOWS --match=(.classpath|.java|.xml|.xsd|.jsp|.properties|.txt|.sql)$ --ignore=(.svn|classes) ${dir}"/>
+         <arg line="--dry-run --svn-status --encoding=UTF-8 --line-ending=WINDOWS --match=(.classpath|.java|.xml|.xsd|.jsp|.properties|.txt|.sql|.sample)$ --ignore=(.svn|classes) ${dir}"/>
       </java> 
    </target> 
 
@@ -1246,7 +1246,7 @@
             classname="org.alfresco.util.Convert" 
             dir="." >
          <classpath refid="classpath.unit.test" />
-         <arg line="--no-backup --svn-status --encoding=UTF-8 --line-ending=WINDOWS --match=(.classpath|.java|.xml|.xsd|.jsp|.properties|.txt|.sql)$ --ignore=(.svn|classes) ${dir}"/>
+         <arg line="--no-backup --svn-status --encoding=UTF-8 --line-ending=WINDOWS --match=(.classpath|.java|.xml|.xsd|.jsp|.properties|.txt|.sql|.sample)$ --ignore=(.svn|classes) ${dir}"/>
       </java> 
    </target> 
 
