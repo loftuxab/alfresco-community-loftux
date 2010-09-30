@@ -29,19 +29,37 @@ if (result.status == 200)
       var store = (type === 'created') ? model.addedContent : model.modifiedContent,
          contents = data[type].items,
          dateType = type + 'On',
-         content;
+         item;
       
       for (var i = 0, len = contents.length; i < len; i++)
       {
-         content = contents[i];
+         item = contents[i];
          if (store.length < maxItems)
          {
             // convert createdOn and modifiedOn fields to date
-            if (content[dateType])
+            if (item[dateType])
             {
-               content[dateType] = new Date(content[dateType]);
+               item[dateType] = new Date(item[dateType]);
             }
-            store.push(content);
+            if (!item.browseUrl)
+            {
+               switch (item.type)
+               {
+                  case "document":
+                     item.browseUrl = "document-details?nodeRef=" + item.nodeRef;
+                     break;
+                  case "blogpost":
+                     item.browseUrl = "blog-postview?container=" + item.container + "&postId=" + item.name;
+                     break;
+                  case "wikipage":
+                     item.browseUrl = "wiki-page?title=" + item.name;
+                     break;
+                  case "forumpost":
+                     item.browseUrl = "discussions-topicview?container=" + item.container + "&topicId=" + item.name;
+                     break;
+               }
+            }
+            store.push(item);
          }
       }
       
