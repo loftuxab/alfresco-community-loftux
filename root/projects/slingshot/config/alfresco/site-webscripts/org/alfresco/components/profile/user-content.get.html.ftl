@@ -1,4 +1,4 @@
-<#macro dateFormat date>${date?string("EEE d MMM yyyy HH:mm:ss")}</#macro>
+<#macro dateFormat date>${date?string(msg("date-format.defaultFTL"))}</#macro>
 <#macro formatContent content date type index>
    <#if content.browseUrl??>
    <li<#if (index == 0)> class="first"</#if>>
