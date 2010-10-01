@@ -41,7 +41,7 @@
       </component>
       <component>
          <region-id>create-content</region-id>
-         <url>/components/form?mimeType={mimeType}&amp;destination={destination}</url>
+         <url>/components/form?mimeType={mimeType}&amp;destination={destination}&amp;formId={formId}</url>
          <properties>
             <itemKind>type</itemKind>
             <itemId>cm:content</itemId>
