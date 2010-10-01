@@ -241,7 +241,7 @@
          else
          {
             Dom.setStyle(this.id + "-results", "height", "300px");
-            Dom.removeClass(this.id + "-help", "hidden");
+            Dom.removeClass(this.id + "-results", "hidden");
          }
          
          // Search button
