@@ -1,8 +1,8 @@
 <#assign siteActive = args.siteId??>
 <#assign id = args.htmlid>
-<#assign jsid = id?replace("-", "$")>
+<#assign id_js = id?js_string>
 <script type="text/javascript">//<![CDATA[
-   var ${jsid} = Alfresco.util.ComponentManager.get("${args.htmlid}").setOptions(
+   Alfresco.util.ComponentManager.get("${id_js}").setOptions(
    {
       siteTitle: "${siteTitle?js_string}",
       favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>}
@@ -24,7 +24,7 @@
       <#assign addFavDisplay><#if (siteActive && !currentSiteIsFav)>block<#else>none</#if></#assign>
       <ul id="${id}-addFavourite" class="add-favourite-menuitem separator" style="display: ${addFavDisplay}">
          <li style="display: ${addFavDisplay}">
-            <span><a href="#" onclick="${jsid}.addAsFavourite(); return false;">${msg("label.add-favourite", siteTitle?html)}</a></span>
+            <span><a href="#" onclick='Alfresco.util.ComponentManager.get("${id_js}").addAsFavourite(); return false;'>${msg("label.add-favourite", siteTitle?html)}</a></span>
          </li>
       </ul>
       <ul class="site-finder-menuitem<#if !user.isGuest> separator</#if>">
@@ -34,7 +34,7 @@
       </ul>
       <ul class="create-site-menuitem">
          <li>
-            <span><a href="#" onclick="${jsid}.showCreateSite(); return false;">${msg("label.create-site")}</a></span>
+            <span><a href="#" onclick='Alfresco.util.ComponentManager.get("${id_js}").showCreateSite(); return false;'>${msg("label.create-site")}</a></span>
          </li>
       </ul>
    </div>
