@@ -67,6 +67,11 @@
 
 /* Application Items */
 
+.header .app-items
+{
+   display: inline-block;
+}
+
 .header .app-items span.yui-button
 {
    background: none;

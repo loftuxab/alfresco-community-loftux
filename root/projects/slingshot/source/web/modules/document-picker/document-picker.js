@@ -902,12 +902,11 @@
       {
          var me = this;
          // Setup a DataSource for the selected items list
-         this.widgets.dataSource = new YAHOO.util.DataSource([]); 
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
-         this.widgets.dataSource.responseSchema =
-         { 
-            fields: ["type", "hasChildren", "name", "description", "displayPath", "hasChildren", "nodeRef"]
-         };
+         this.widgets.dataSource = new YAHOO.util.DataSource([],
+         {
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
+         });
+
          /**
           * Icon datacell formatter
           *
@@ -1377,14 +1376,15 @@
 
          // DataSource definition  
          var pickerChildrenUrl = Alfresco.constants.PROXY_URI + "api/forms/picker/" + this.options.itemFamily + "/";
-         this.widgets.dataSource = new YAHOO.util.DataSource(pickerChildrenUrl);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(pickerChildrenUrl,
          {
-             resultsList: "items",
-             fields: ["type", "hasChildren", "name", "description", "displayPath", "hasChildren", "nodeRef", "selectable"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
+            {
+                resultsList: "items"
+            }
+         });
 
          this.widgets.dataSource.doBeforeParseData = function ObjectRenderer_doBeforeParseData(oRequest, oFullResponse)
          {

@@ -110,14 +110,15 @@
          {
             // DataSource definition
             var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints";
-            this.widgets.listDataSource = new YAHOO.util.DataSource(uriSearchResults);
-            this.widgets.listDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            this.widgets.listDataSource.connXhrMode = "queueRequests";
-            this.widgets.listDataSource.responseSchema =
+            this.widgets.listDataSource = new YAHOO.util.DataSource(uriSearchResults,
             {
-                resultsList: "data",
-                fields: ["constraintName", "constraintTitle"]
-            };
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               connXhrMode: "queueRequests",
+               responseSchema:
+               {
+                   resultsList: "data"
+               }
+            });
             this.widgets.listDataSource.doBeforeParseData = function RecordsListOfValues_doBeforeParseData(oRequest , oFullResponse)
             {
                if (oFullResponse && oFullResponse.data)
@@ -688,14 +689,15 @@
          {
             // DataSource definition
             var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints";
-            this.widgets.valuesDataSource = new YAHOO.util.DataSource(uriSearchResults);
-            this.widgets.valuesDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            this.widgets.valuesDataSource.connXhrMode = "queueRequests";
-            this.widgets.valuesDataSource.responseSchema =
+            this.widgets.valuesDataSource = new YAHOO.util.DataSource(uriSearchResults,
             {
-                resultsList: "data.values",
-                fields: ["valueName", "valueTitle"]
-            };
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               connXhrMode: "queueRequests",
+               responseSchema:
+               {
+                   resultsList: "data.values"
+               }
+            });
             this.widgets.valuesDataSource.doBeforeParseData = function RecordsListOfValues_doBeforeParseData(oRequest , oFullResponse)
             {
                if (oFullResponse && oFullResponse.data && oFullResponse.data.values)
@@ -1110,14 +1112,15 @@
          {
             // DataSource definition
             var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints";
-            this.widgets.accessDataSource = new YAHOO.util.DataSource(uriSearchResults);
-            this.widgets.accessDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            this.widgets.accessDataSource.connXhrMode = "queueRequests";
-            this.widgets.accessDataSource.responseSchema =
+            this.widgets.accessDataSource = new YAHOO.util.DataSource(uriSearchResults,
             {
-                resultsList: "data.value.authorities",
-                fields: ["authorityName", "authorityTitle"]
-            };
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               connXhrMode: "queueRequests",
+               responseSchema:
+               {
+                   resultsList: "data.value.authorities"
+               }
+            });
             this.widgets.accessDataSource.doBeforeParseData = function RecordsListOfAccess_doBeforeParseData(oRequest , oFullResponse)
             {
                if (oFullResponse && oFullResponse.data && oFullResponse.data.value.authorities)

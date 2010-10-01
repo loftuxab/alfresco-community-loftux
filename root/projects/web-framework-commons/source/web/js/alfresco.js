@@ -5633,6 +5633,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
       // Merge default data source config
       c.dataSource.pagingResolver = c.dataSource.pagingResolver || this._defaultPagingResolver;
       c.dataSource.defaultFilter = c.dataSource.defaultFilter || {};
+      c.dataSource.config = c.dataSource.config || {};
       c.dataSource.config.connXhrMode = c.dataSource.config.connXhrMode || "cancelStaleRequests";
       c.dataSource.config.responseType = c.dataSource.config.responseType || YAHOO.util.DataSource.TYPE_JSON;
       c.dataSource.config.responseSchema = c.dataSource.config.responseSchema || {};

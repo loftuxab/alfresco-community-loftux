@@ -1345,12 +1345,10 @@
          ];
 
          // The data tables underlying data source.
-         var myDataSource = new YAHOO.util.DataSource([]);
-         myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-         myDataSource.responseSchema =
+         var myDataSource = new YAHOO.util.DataSource([],
          {
-            fields: ["id", "name", "created", "modified", "type", "size", "progress"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
+         });
 
          /**
           * Create the data table.

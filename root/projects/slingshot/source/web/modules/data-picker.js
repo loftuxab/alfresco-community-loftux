@@ -325,8 +325,10 @@
       _setupList: function PP__setupList(tabObj, tabRootEl)
       {
          // The data tables underlying data source.
-         var dataSource = new YAHOO.util.DataSource([]);
-         dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+         var dataSource = new YAHOO.util.DataSource([],
+         {
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
+         });
 
          // Get the data tables column labels
          for (var i = 0, il = this.options.dataTableColumnDefinitions.length, def; i < il; i++)

@@ -821,12 +821,7 @@
        */
       _setupDataSource: function DataGrid__setupDataSource()
       {
-         var listNodeRef = new Alfresco.util.NodeRef(this.datalistMeta.nodeRef),
-            fields =
-            [
-               "nodeRef", "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "tags",
-               "actionSet", "permissions", "custom", "actionLabels", "itemData"
-            ];
+         var listNodeRef = new Alfresco.util.NodeRef(this.datalistMeta.nodeRef);
          
          for (var i = 0, ii = this.datalistColumns.length; i < ii; i++)
          {
@@ -840,20 +835,21 @@
          }
          
          // DataSource definition
-         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "slingshot/datalists/data/node/" + listNodeRef.uri);
-         this.widgets.dataSource.connMethodPost = true;
-         this.widgets.dataSource.connMgr.setDefaultPostHeader(Alfresco.util.Ajax.JSON);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "slingshot/datalists/data/node/" + listNodeRef.uri,
          {
-            resultsList: "items",
-            fields: fields,
-            metaFields:
+            connMethodPost: true,
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            responseSchema:
             {
-               paginationRecordOffset: "startIndex",
-               totalRecords: "totalRecords"
+               resultsList: "items",
+               metaFields:
+               {
+                  paginationRecordOffset: "startIndex",
+                  totalRecords: "totalRecords"
+               }
             }
-         };
+         });
+         this.widgets.dataSource.connMgr.setDefaultPostHeader(Alfresco.util.Ajax.JSON);
 
          // Intercept data returned from data webscript to extract custom metadata
          this.widgets.dataSource.doBeforeCallback = function DataGrid_doBeforeCallback(oRequest, oFullResponse, oParsedResponse)

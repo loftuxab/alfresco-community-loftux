@@ -163,13 +163,14 @@
 
          // DataSource definition  
          var inviteeSearchUrl = Alfresco.constants.PROXY_URI + "api/invites?";
-         this.widgets.dataSource = new YAHOO.util.DataSource(inviteeSearchUrl);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(inviteeSearchUrl,
          {
-             resultsList: "invites",
-             fields: ["inviteId", "invitee", "invitationStatus", "role", "sentInviteDate"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            responseSchema:
+            {
+                resultsList: "invites"
+            }
+         });
 
          this.widgets.dataSource.doBeforeParseData = function SentInvites_doBeforeParseData(oRequest, oFullResponse)
          {

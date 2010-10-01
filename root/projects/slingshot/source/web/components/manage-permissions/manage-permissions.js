@@ -683,28 +683,18 @@
       _setupDataSources: function Permissions__setupDataSources()
       {
          // DataSource definition - Inherited
-         this.widgets.dsInherited = new YAHOO.util.DataSource(this.generateData);
-         this.widgets.dsInherited.responseType = YAHOO.util.DataSource.TYPE_JSFUNCTION;
-         this.widgets.dsInherited.scope = this;
-         this.widgets.dsInherited.responseSchema =
+         this.widgets.dsInherited = new YAHOO.util.DataSource(this.generateData,
          {
-            fields:
-            [
-               "index", "authority", "displayName", "role"
-            ]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSFUNCTION,
+            scope: this
+         });
 
          // DataSource definition - Direct
-         this.widgets.dsDirect = new YAHOO.util.DataSource(this.generateData);
-         this.widgets.dsDirect.responseType = YAHOO.util.DataSource.TYPE_JSFUNCTION;
-         this.widgets.dsDirect.scope = this;
-         this.widgets.dsDirect.responseSchema =
+         this.widgets.dsDirect = new YAHOO.util.DataSource(this.generateData,
          {
-            fields:
-            [
-               "index", "authority", "displayName", "role"
-            ]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSFUNCTION,
+            scope: this
+         });
       },
       
       /**

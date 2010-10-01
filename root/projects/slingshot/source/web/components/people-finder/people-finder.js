@@ -250,14 +250,15 @@
          // DataSource definition  
          var peopleSearchUrl = Alfresco.constants.PROXY_URI + YAHOO.lang.substitute(this.options.dataWebScript, this.options);
          peopleSearchUrl += (peopleSearchUrl.indexOf("?") < 0) ? "?" : "&";
-         this.widgets.dataSource = new YAHOO.util.DataSource(peopleSearchUrl);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(peopleSearchUrl,
          {
-             resultsList: "people",
-             fields: ["userName", "avatar", "firstName", "lastName", "organization", "jobtitle", "email", "userStatus", "userStatusTime"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
+            {
+                resultsList: "people"
+            }
+         });
 
          this.widgets.dataSource.doBeforeParseData = function PeopleFinder_doBeforeParseData(oRequest, oFullResponse)
          {

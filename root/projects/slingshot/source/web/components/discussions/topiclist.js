@@ -289,7 +289,7 @@
                   args[1].stop = true;
                }
             }
-      		 
+
             return true;
          }
          YAHOO.Bubbling.addDefaultAction("topic-action-link-span", fnActionHandlerSpan);
@@ -303,24 +303,21 @@
             site: this.options.siteId,
             container: this.options.containerId
          });
-         this.widgets.dataSource = new YAHOO.util.DataSource(uriDiscussionsTopicList);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(uriDiscussionsTopicList,
          {
-            resultsList: "items",
-            fields:
-            [ "name", "totalReplyCount", "lastReplyOn", "lastReplyBy", "tags", "url", "repliesUrl",
-              "nodeRef", "title", "createdOn", "modifiedOn", "isUpdated", "updatedOn",
-              "author", "content", "replyCount", "permissions"
-            ],
-            metaFields:
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
             {
-               recordOffset: "startIndex",
-               totalRecords: "total",
-               forumPermissions: "forumPermissions"
+               resultsList: "items",
+               metaFields:
+               {
+                  recordOffset: "startIndex",
+                  totalRecords: "total",
+                  forumPermissions: "forumPermissions"
+               }
             }
-         };
+         });
          
          var generateTopicActions = function(me, data, tagName)
          {

@@ -254,14 +254,15 @@
          searchUrl += (searchUrl.indexOf("?") < 0) ? "?" : "&";
          searchUrl += "authorityType=" + this.options.authorityType + "&";
          searchUrl += "maxResults=" + this.options.maxSearchResults + "&";
-         this.widgets.dataSource = new YAHOO.util.DataSource(searchUrl);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(searchUrl,
          {
-             resultsList: "authorities",
-             fields: ["authorityType", "shortName", "fullName", "displayName", "metadata", "calc_iconUrl"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
+            {
+                resultsList: "authorities"
+            }
+         });
 
          this.widgets.dataSource.doBeforeParseData = function AuthorityFinder_doBeforeParseData(oRequest, oFullResponse)
          {

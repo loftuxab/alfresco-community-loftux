@@ -316,25 +316,21 @@
             site: this.options.siteId,
             container: this.options.containerId
          });
-         this.widgets.dataSource = new YAHOO.util.DataSource(uriBlogPostList);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(uriBlogPostList,
          {
-            resultsList: "items",
-            fields:
-            [
-                "url", "commentsUrl",  "nodeRef", "name", "title", "content", "author", "createdOn", "modifiedOn",
-                "permissions", "commentCount", "tags", "isDraft", "releasedOn", "isUpdated", "updatedOn", "publishedOn",
-                "updatedOn", "postId", "postLink", "outOfDate", "isPublished"
-            ],
-            metaFields:
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
             {
-               recordOffset: "startIndex",
-               totalRecords: "total",
-               metadata: "metadata"
+               resultsList: "items",
+               metaFields:
+               {
+                  recordOffset: "startIndex",
+                  totalRecords: "total",
+                  metadata: "metadata"
+               }
             }
-         };
+         });
          
          /**
           * Blog post element. We only have a list and not an acutal table, there is therefore

@@ -209,15 +209,15 @@
          
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI_RELATIVE + "slingshot/search?";
-         this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults,
          {
-             resultsList: "items",
-             fields: ["nodeRef", "type", "name", "displayName", "title", "description", "container",
-                      "modifiedOn", "modifiedByUser", "modifiedBy", "size", "site", "tags", "path"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
+            {
+                resultsList: "items"
+            }
+         });
          
          // YUI Paginator definition
          var handlePagination = function Search_handlePagination(state, me)

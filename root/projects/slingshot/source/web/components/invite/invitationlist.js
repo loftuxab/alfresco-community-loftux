@@ -126,12 +126,10 @@
          });
          
          // setup the datasource
-         this.widgets.dataSource = new YAHOO.util.DataSource([]); 
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
-         this.widgets.dataSource.responseSchema =
-         { 
-            fields: ["id", "firstName", "lastName", "email"]
-         };
+         this.widgets.dataSource = new YAHOO.util.DataSource([],
+         {
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
+         });
          
          // setup of the datatable
          this._setupDataTable();

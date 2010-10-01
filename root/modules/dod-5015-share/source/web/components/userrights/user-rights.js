@@ -71,12 +71,10 @@ Alfresco.RM = Alfresco.RM || {};
          this.widgets['roles'] = Dom.get('userrightsRoles');
          this.widgets['groups'] = Dom.get('userrightsGroups');         
          
-         var DS = this.widgets['datasource'] = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + 'api/rma/admin/userrightsreport');
-         DS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-         DS.responseSchema =
+         var DS = this.widgets['datasource'] = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + 'api/rma/admin/userrightsreport',
          {
-            fields: ["name", "userName", "roles", "groups"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
+         });
          
          DS.doBeforeCallback = function doBeforeCallback(oRequest, oFullResponse, oParsedResponse, oCallback)
          {

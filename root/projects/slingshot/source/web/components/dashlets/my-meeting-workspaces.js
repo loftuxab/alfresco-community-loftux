@@ -112,11 +112,7 @@
          // DataSource definition
          this.widgets.dataSource = new YAHOO.util.DataSource(this.options.sites,
          {
-            responseType: YAHOO.util.DataSource.TYPE_JSARRAY,
-            responseSchema:
-            {
-               fields: ["shortName", "title", "description", "isFavourite", "isIMAPFavourite", "isSiteManager"]
-            }
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
          });
 
          /**

@@ -101,21 +101,19 @@
             parent.widgets.newuserButton = Alfresco.util.createYUIButton(parent, "newuser-button", parent.onNewUserClick);
             
             // DataTable and DataSource setup
-            parent.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/people");
-            parent.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            parent.widgets.dataSource.responseSchema =
+            parent.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/people",
             {
-               resultsList: "people",
-               fields:
-               [
-                  "avatar", "userName", "enabled", "firstName", "lastName", "jobtitle", "email", "quota", "sizeCurrent"
-               ],
-               metaFields:
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               responseSchema:
                {
-                  recordOffset: "startIndex",
-                  totalRecords: "totalRecords"
+                  resultsList: "people",
+                  metaFields:
+                  {
+                     recordOffset: "startIndex",
+                     totalRecords: "totalRecords"
+                  }
                }
-            };
+            });
             
             var me = this;
             
