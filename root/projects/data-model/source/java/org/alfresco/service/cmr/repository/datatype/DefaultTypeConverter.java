@@ -782,7 +782,7 @@ public class DefaultTypeConverter
         {
             public String convert(ContentData source)
             {
-                return source.toString();
+                return source.getInfoUrl();
             }
         });
                 
