@@ -434,12 +434,10 @@
          ];
 
          // Create current tasks data table filled with current tasks
-         var currentTasksDS = new YAHOO.util.DataSource(this.currentTasks);
-         currentTasksDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-         currentTasksDS.responseSchema =
+         var currentTasksDS = new YAHOO.util.DataSource(this.currentTasks,
          {
-            fields: [ "title", "type", "owner", "id", "state", "isPooled", "isEditable", "properties"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
+         });
          this.widgets.currentTasksDataTable = new YAHOO.widget.DataTable(currentTasksTasksEl, currentTasksColumnDefinitions, currentTasksDS,
          {
             MSG_EMPTY: this.msg("label.noTasks")
@@ -460,12 +458,10 @@
             historyTasksEl = Selector.query("div", historyContainerEl, true);
 
          // Create workflow history data table filled with history tasks
-         var workflowHistoryDS = new YAHOO.util.DataSource(this.historyTasks);
-         workflowHistoryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-         workflowHistoryDS.responseSchema =
+         var workflowHistoryDS = new YAHOO.util.DataSource(this.historyTasks,
          {
-            fields: [ "title", "name", "owner", "id", "state", "properties", "outcome"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
+         });
          this.widgets.historyTasksDataTable = new YAHOO.widget.DataTable(historyTasksEl, historyColumnDefinitions, workflowHistoryDS,
          {
             MSG_EMPTY: this.msg("label.noTasks")

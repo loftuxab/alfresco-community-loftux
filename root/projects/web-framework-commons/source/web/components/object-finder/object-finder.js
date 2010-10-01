@@ -1526,9 +1526,11 @@
          {
 
             // Setup a DataSource for the selected items list
-            this.widgets.dataSource = new YAHOO.util.DataSource([]);
-            this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-            this.widgets.dataSource.doBeforeParseData = doBeforeParseDataFunction;
+            this.widgets.dataSource = new YAHOO.util.DataSource([],
+            {
+               responseType: YAHOO.util.DataSource.TYPE_JSARRAY,
+               doBeforeParseData: doBeforeParseDataFunction
+            });
 
             // Picker DataTable definition
             var columnDefinitions =
@@ -1576,9 +1578,11 @@
          if (this.options.displayMode == "list")
          {
             // Setup a DataSource for the selected items list
-            var ds = new YAHOO.util.DataSource([]);
-            ds.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-            ds.doBeforeParseData = doBeforeParseDataFunction;
+            var ds = new YAHOO.util.DataSource([],
+            {
+               responseType: YAHOO.util.DataSource.TYPE_JSARRAY,
+               doBeforeParseData: doBeforeParseDataFunction
+            });
 
             // Current values DataTable definition
             var currentValuesColumnDefinitions =
@@ -2356,15 +2360,19 @@
 
          // DataSource definition  
          var pickerChildrenUrl = Alfresco.constants.PROXY_URI + "api/forms/picker/" + this.options.itemFamily;
-         this.widgets.dataSource = new YAHOO.util.DataSource(pickerChildrenUrl);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(pickerChildrenUrl,
          {
-             resultsList: "items",
-             fields: null, 
-             metaFields: { parent: "parent" }
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
+            {
+               resultsList: "items",
+               metaFields:
+               {
+                  parent: "parent"
+               }
+            }
+         });
 
          this.widgets.dataSource.doBeforeParseData = function ObjectRenderer_doBeforeParseData(oRequest, oFullResponse)
          {

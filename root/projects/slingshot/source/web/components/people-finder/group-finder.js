@@ -238,14 +238,15 @@
          var groupSearchUrl = Alfresco.constants.PROXY_URI + YAHOO.lang.substitute(this.options.dataWebScript, this.options);
          groupSearchUrl += (groupSearchUrl.indexOf("?") < 0) ? "?" : "&";
          groupSearchUrl += "zone=APP.DEFAULT&";
-         this.widgets.dataSource = new YAHOO.util.DataSource(groupSearchUrl);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(groupSearchUrl,
          {
-             resultsList: "data",
-             fields: ["shortName", "fullName", "displayName", "userCount", "groupCount"]
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
+            {
+                resultsList: "data"
+            }
+         });
 
          this.widgets.dataSource.doBeforeParseData = function GroupFinder_doBeforeParseData(oRequest, oFullResponse)
          {

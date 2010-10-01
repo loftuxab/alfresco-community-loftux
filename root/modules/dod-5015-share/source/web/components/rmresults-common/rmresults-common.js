@@ -239,11 +239,6 @@
          // Initial image background css
          Dom.setStyle(this.id + "-options-toggle", "url(" + Alfresco.constants.URL_CONTEXT + "components/images/expanded.png)");
          
-         // DataSource definition
-         var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch/" + this.options.siteId + "?";
-         this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
          // add the well known 'cm', 'rma' and 'dod' namespace fields
          var fields =
          [
@@ -270,11 +265,19 @@
          {
             fields.push("properties.rmc_" + this.options.customFields[i].id);
          }
-         this.widgets.dataSource.responseSchema =
+
+         // DataSource definition
+         var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch/" + this.options.siteId + "?";
+         this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults,
          {
-             resultsList: "items",
-             fields: fields
-         };
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: "queueRequests",
+            responseSchema:
+            {
+                resultsList: "items",
+                fields: fields
+            }
+         });
          
          // setup of the datatable.
          this._setupDataTable();

@@ -110,14 +110,15 @@
          {
             // DataSource definition
             var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/rmevents";
-            this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
-            this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            this.widgets.dataSource.connXhrMode = "queueRequests";
-            this.widgets.dataSource.responseSchema =
+            this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults,
             {
-                resultsList: "data",
-                fields: ["eventName", "eventDisplayLabel", "eventType"]
-            };
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               connXhrMode: "queueRequests",
+               responseSchema:
+               {
+                   resultsList: "data"
+               }
+            });
             this.widgets.dataSource.doBeforeParseData = function RecordsEvents_doBeforeParseData(oRequest , oFullResponse)
             {
                if (oFullResponse && oFullResponse.data)

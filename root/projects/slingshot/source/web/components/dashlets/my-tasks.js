@@ -123,10 +123,6 @@
             dataSource:
             {
                url: Alfresco.constants.PROXY_URI + webscript,
-               config:
-               {
-                  fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable"]
-               },
                initialParameters: this.options.filters.length > 0 ? this.options.filters[0].value : ""
             },
             dataTable:

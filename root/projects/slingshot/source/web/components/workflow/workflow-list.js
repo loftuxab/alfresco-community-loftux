@@ -146,10 +146,6 @@
             dataSource:
             {
                url: url,
-               config:
-               {
-                  fields: ["id", "name", "title", "message"]
-               },
                defaultFilter:
                {
                   filterId: "all"

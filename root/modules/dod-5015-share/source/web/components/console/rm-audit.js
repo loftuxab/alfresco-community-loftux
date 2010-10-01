@@ -238,18 +238,21 @@
             this.widgets.toCalendar.render();             
 
             //Sets up datatable and datasource.
-            var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri);
-         
-            DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            DS.responseSchema = {
-               resultsList:'data.entries',
-               fields: ["timestamp","fullName","userRole","event","nodeName","nodeRef","path"],
-               metaFields: {
-                  "enabled": "data.enabled",
-                  "stopDate": "data.stopped",
-                  "startDate": "data.started"
+            var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri,
+            {
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               responseSchema:
+               {
+                  resultsList:'data.entries',
+                  metaFields:
+                  {
+                     "enabled": "data.enabled",
+                     "stopDate": "data.stopped",
+                     "startDate": "data.started"
+                  }
                }
-            };
+            });
+         
             DS.doBeforeCallback = function ( oRequest , oFullResponse , oParsedResponse , oCallback )
             {
                me.options.results = oFullResponse.data.entries;

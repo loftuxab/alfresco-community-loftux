@@ -1184,24 +1184,19 @@
          var me = this;
          
          // DataSource definition
-         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/");
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/",
          {
-            resultsList: "items",
-            fields:
-            [
-               "nodeRef", "nodeType", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "title", "description",
-               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "lockedBy", "lockedByUser",
-               "version", "size", "contentUrl", "actionSet", "tags", "categories", "activeWorkflows", "isFavourite", "location", "permissions", "custom",
-               "actionLabels", "onlineEditUrl"
-            ],
-            metaFields:
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            responseSchema:
             {
-               paginationRecordOffset: "startIndex",
-               totalRecords: "totalRecords"
+               resultsList: "items",
+               metaFields:
+               {
+                  paginationRecordOffset: "startIndex",
+                  totalRecords: "totalRecords"
+               }
             }
-         };
+         });
 
          // Intercept data returned from data webscript to extract custom metadata
          this.widgets.dataSource.doBeforeCallback = function DL_doBeforeCallback(oRequest, oFullResponse, oParsedResponse)

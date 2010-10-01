@@ -218,20 +218,21 @@
             container: this.options.containerId
          });
 
-         this.widgets.dataSource = new YAHOO.util.DataSource(uriResults);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = 'queueRequests';
-         this.widgets.dataSource.responseSchema =
+         this.widgets.dataSource = new YAHOO.util.DataSource(uriResults,
          {
-            resultsList: 'items',
-            fields: ['name', 'title', 'description', 'url', 'tags', 'internal', 'createdOn', 'author', 'permissions'],
-            metaFields:
+            responseType: YAHOO.util.DataSource.TYPE_JSON,
+            connXhrMode: 'queueRequests',
+            responseSchema:
             {
-               recordOffset: 'startIndex',
-               totalRecords: 'total',
-               metadata: 'metadata'
+               resultsList: 'items',
+               metaFields:
+               {
+                  recordOffset: 'startIndex',
+                  totalRecords: 'total',
+                  metadata: 'metadata'
+               }
             }
-         };
+         });
 
          return this;
       },

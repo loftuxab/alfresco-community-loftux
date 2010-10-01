@@ -148,21 +148,19 @@
             browse.on("click", this.onBrowseClick, browse, this);
 
             // DataTable and DataSource setup
-            this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?zone=APP.DEFAULT&");
-            this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            this.widgets.dataSource.responseSchema =
+            this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?zone=APP.DEFAULT&",
             {
-               resultsList: "data",
-               fields:
-               [
-                  "shortName", "displayName"
-               ],
-               metaFields:
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               responseSchema:
                {
-                  recordOffset: "startIndex",
-                  totalRecords: "totalRecords"
+                  resultsList: "data",
+                  metaFields:
+                  {
+                     recordOffset: "startIndex",
+                     totalRecords: "totalRecords"
+                  }
                }
-            };
+            });
 
             // Work to be performed after data has been queried but before display by the DataTable
             this.widgets.dataSource.doBeforeParseData = function ConsoleGroups_SearchPanel_doBeforeParseData(oRequest, oFullResponse)

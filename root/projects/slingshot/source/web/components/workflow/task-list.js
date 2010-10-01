@@ -137,10 +137,6 @@
             dataSource:
             {
                url: url,
-               config:
-               {
-                  fields: ["id", "name", "state", "isPooled", "title", "owner", "properties", "isEditable", "workflowInstance"]
-               },
                defaultFilter:
                {
                   filterId: "all" 

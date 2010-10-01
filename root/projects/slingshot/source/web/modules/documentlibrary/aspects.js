@@ -390,11 +390,7 @@
          // DataSource
          this.widgets.dataSourceLeft = new YAHOO.util.DataSource([],
          {
-            responseType: YAHOO.util.DataSource.TYPE_JSARRAY,
-            responseSchema:
-            { 
-               fields: ["id", "icon", "name"]
-            }
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
          }); 
 
          // DataTable
@@ -435,11 +431,7 @@
           */
          this.widgets.dataSourceRight = new YAHOO.util.DataSource([],
          {
-            responseType: YAHOO.util.DataSource.TYPE_JSARRAY,
-            responseSchema:
-            { 
-               fields: ["id", "icon", "name"]
-            }
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY
          }); 
          var columnDefinitionsRight =
          [

@@ -109,14 +109,15 @@
          {
             // DataSource definition
             var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/customreferencedefinitions";
-            this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
-            this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            this.widgets.dataSource.connXhrMode = "queueRequests";
-            this.widgets.dataSource.responseSchema =
+            this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults,
             {
-                resultsList: "data.customReferences",
-                fields: ["refId", "referenceType", "source", "target", "label", "title"]
-            };
+               responseType: YAHOO.util.DataSource.TYPE_JSON,
+               connXhrMode: "queueRequests",
+               responseSchema:
+               {
+                   resultsList: "data.customReferences"
+               }
+            });
 
             this.widgets.dataSource.doBeforeParseData = function RecordsReferences_doBeforeParseData(oRequest , oFullResponse)
             {

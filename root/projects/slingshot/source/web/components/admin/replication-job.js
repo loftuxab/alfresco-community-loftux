@@ -174,7 +174,7 @@
          
          this.widgets.scheduleCheckbox = Dom.get(this.id + "-scheduleEnabled");
          this.widgets.scheduleContainer = Dom.get(this.id + "-scheduleContainer");
-         Event.addListener(this.widgets.scheduleCheckbox, "change", this.onScheduleChange, this, true);
+         Event.addListener(this.widgets.scheduleCheckbox, "click", this.onScheduleChange, this, true);
       },
       
       /**
