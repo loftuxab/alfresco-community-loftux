@@ -49,9 +49,8 @@
             <span class="first-child"><button></button></span>
          </span>
          <select id="${el}-sort-menu" class="yuimenu hidden">
-            <option value="">${msg("search.sort.relevance")}</option>
             <#list sortFields as sort>
-            <option value="${sort.type}">${sort.label}</option>
+            <option value="${sort.type!""}">${sort.label}</option>
             </#list>
          </select>
       </div>

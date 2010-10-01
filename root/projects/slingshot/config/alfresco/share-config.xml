@@ -148,6 +148,7 @@
             labelId = I18N message id of label text to display
       -->
       <sorting>
+         <sort labelId="search.sort.relevance"></sort>
          <sort labelId="label.name">cm:name</sort>
          <sort labelId="label.title">cm:title</sort>
          <sort labelId="label.description">cm:description</sort>
