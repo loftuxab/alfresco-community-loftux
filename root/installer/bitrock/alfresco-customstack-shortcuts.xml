@@ -70,28 +70,6 @@
             </startMenuShortcutList>
         </startMenuFolder>
         <startMenuFolder>
-            <name>${product_fullname} Console Mode</name>
-            <platforms>windows</platforms>
-            <startMenuShortcutList>
-                <startMenuShortcut>
-                    <comment>Start Alfresco Server - Console Mode</comment>
-                    <name>Start Alfresco Server - Console Mode</name>
-                    <windowsExec>${installdir}/alf_start.bat</windowsExec>
-                    <!--windowsExecArgs>start</windowsExecArgs-->
-                    <windowsIcon>${installdir}/alfresco.ico</windowsIcon>
-                    <windowsPath>${installdir}/</windowsPath>
-                </startMenuShortcut>
-                <startMenuShortcut>
-                    <comment>Stop Alfresco Server - Console Mode</comment>
-                    <name>Stop Alfresco Server - Console Mode</name>
-                    <windowsExec>${installdir}/alf_stop.bat</windowsExec>
-                    <!--windowsExecArgs>stop</windowsExecArgs-->
-                    <windowsIcon>${installdir}/alfresco.ico</windowsIcon>
-                    <windowsPath>${installdir}/</windowsPath>
-                </startMenuShortcut>
-            </startMenuShortcutList>
-        </startMenuFolder>
-        <startMenuFolder>
             <name>${product_fullname} Virtual Server</name>
             <platforms>windows</platforms>
             <startMenuShortcutList>
