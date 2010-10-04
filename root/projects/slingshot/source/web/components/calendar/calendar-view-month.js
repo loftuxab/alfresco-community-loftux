@@ -245,7 +245,7 @@
             var numDays = ~ ~ (1 * (durationObj.D));
             if (durationObj.W && durationObj.W >= 1) 
             {
-               numDays += (~ ~ (1 * (7 * durationObj.W))) + 1;
+               numDays += (~ ~ (1 * (7 * durationObj.W)));
             }
             if (numDays > 1) 
             {
@@ -519,10 +519,6 @@
             var dtEndDate = fromISO8601(data.to + 'T' + data.end);
             data.duration = Alfresco.CalendarHelper.getDuration(dtStartDate, dtEndDate);
             var days = data.duration.match(/([0-9]+)D/);
-            if (days && days[1]) 
-            {
-               data.duration = data.duration.replace(/([0-9]+)D/, ++days[1] + 'D');
-            }
             
             //tagname  
             data.el = 'li';

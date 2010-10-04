@@ -97,7 +97,7 @@
             var id = Event.generateId(vEventEl);
             vEventEl.id = id;
             //all day
-            if (ev.start === ev.end) 
+            if (ev.isAllDay) 
             {
                this.renderAllDayEvents(vEventEl, ev);
             }
@@ -237,7 +237,7 @@
       renderMultipleDayTimedEvents: function CalendarWeekView_renderMultipleDayTimedEvents(eventEl)
       {
          this.deleteMultipleDayTimedEvents(eventEl); // remove any existing elements repeated from this event.
-			// Detect if the eventEl should be repeated
+         // Detect if the eventEl should be repeated
          var dtstart = Dom.getElementsByClassName("dtstart", "span", eventEl)[0].getAttribute("title");
          var dtend = Dom.getElementsByClassName("dtend", "span", eventEl)[0].getAttribute("title");
          if (!Alfresco.CalendarHelper.isSameDay(dtstart, dtend)) 
@@ -249,27 +249,27 @@
             var eventDayStartEl = document.getElementById(eventDayEl.id.split("T")[0] + "T00:00");
             var nextDayEl = Dom.getNextSibling(eventDayStartEl);
             var nextDayDate = fromISO8601(nextDayEl.id.substring(4));
-				var nextDayCount = 0;
-				
+            var nextDayCount = 0;
+            
             while (nextDayEl !== null) 
             
-				{
+            {
                nextDayDate = fromISO8601(nextDayEl.id.substring(4));
                var repeatEl = null; // reset on each iteration.
-					// repeat cell if needed
-					if (nextDayDate < fromISO8601(dtend))
+               // repeat cell if needed
+               if (nextDayDate < fromISO8601(dtend)) 
                {
                   var insertPoint = Dom.getFirstChild(Dom.getFirstChild(nextDayEl));
-					   repeatEl = document.createElement("div");
-						repeatEl.innerHTML = eventEl.innerHTML;
-						var multipleString = eventEl.id + "-multiple";
-						repeatEl.id = multipleString + "-" + ++nextDayCount;
-						repeatEl.className = eventEl.className + " " + multipleString;
-						
+                  repeatEl = document.createElement("div");
+                  repeatEl.innerHTML = eventEl.innerHTML;
+                  var multipleString = eventEl.id + "-multiple";
+                  repeatEl.id = multipleString + "-" + ++nextDayCount;
+                  repeatEl.className = eventEl.className + " " + multipleString;
+                  
                   // insert element
-						YAHOO.util.Dom.setStyle(insertPoint, 'position', 'relative');
-						insertPoint.appendChild(repeatEl);
-					   //this._adjustHeightByHour(repeatEl);
+                  YAHOO.util.Dom.setStyle(insertPoint, 'position', 'relative');
+                  insertPoint.appendChild(repeatEl);
+                  //this._adjustHeightByHour(repeatEl);
                }
                nextDayEl = Dom.getNextSibling(nextDayEl);
             }
@@ -279,28 +279,27 @@
          }
       },
       
-		/**
-		 * @method deleteMultipleDayTimedEvents
-		 * 
-		 * Removes events related to eventEl
-		 * 
-		 * @param eventEl {Element} The original event element 
-		 */
-		
-		deleteMultipleDayTimedEvents: function CalendarWeekView_deleteMultipleDayTimedEvents(eventEl) 
-		{
-			// find all events related to eventEl
-			var className = eventEl.id+"-multiple";
-			var repeatedElements = Dom.getElementsByClassName(className);
-			
-			// remove them all from the DOM
-			for (var i = 0; i < repeatedElements.length; i++)
-			{
-				repeatedElements[i].parentNode.removeChild(repeatedElements[i]);
-			}
-			
-		},
-		
+      /**
+       * @method deleteMultipleDayTimedEvents
+       *
+       * Removes events related to eventEl
+       *
+       * @param eventEl {Element} The original event element
+       */
+      deleteMultipleDayTimedEvents: function CalendarWeekView_deleteMultipleDayTimedEvents(eventEl)
+      {
+         // find all events related to eventEl
+         var className = eventEl.id + "-multiple";
+         var repeatedElements = Dom.getElementsByClassName(className);
+         
+         // remove them all from the DOM
+         for (var i = 0; i < repeatedElements.length; i++) 
+         {
+            repeatedElements[i].parentNode.removeChild(repeatedElements[i]);
+         }
+         
+      },
+      
       /** 
        *  fix table cell border bleedthrough in IE
        *
@@ -402,6 +401,9 @@
             targetEl = Dom.get('cal-' + (toISO8601(this.options.startDate)).split('T')[0]);
          }
          
+         targetEl.appendChild(eventEl);
+         Dom.addClass(eventEl, 'allday');
+         
          // add view for events that span multiple days.
          this.renderMultipleDay(eventEl, data);
          
@@ -469,8 +471,8 @@
                var continuedTo = document.createElement("span");
                continuedTo.innerHTML = "&gt;";
                continuedTo.className = "continuedTo theme-color-1";
-               
-               for (var i = 1, len = numDays; i < numDays; i++) 
+               var flag = true;
+               for (var i = 0, len = numDays; i < numDays; i++) 
                {
                   var date = YAHOO.widget.DateMath.add(startDate, YAHOO.widget.DateMath.DAY, i);
                   var dateCell = Dom.get('cal-' + Alfresco.util.toISO8601(date).split('T')[0]);
@@ -489,7 +491,7 @@
                   if (targetCell) // only generate output if there is a place to put it. 
                   {
                      var ulEl = targetCell.getElementsByTagName('ul');
-                     var elId = eventEl.id + '-multiple' + (i + 1);
+                     var elId = eventEl.id + '-multiple' + i;
                      
                      if (isAllDayEvent) 
                      {
@@ -498,20 +500,21 @@
                         multipleAllDayEl.className = 'allday multipleAllDay theme-bg-color-1 ' + eventEl.id + '-multiple';
                         multipleAllDayEl.id = elId;
                         
-                        // Display the title on the first cell.
-                        if (i === 1) 
-                        {
-                           multipleAllDayEl.innerHTML = eventEl.innerHTML
-                        }
-                        
-                        
                         if (ulEl.length > 0) 
                         {
                            targetCell.insertBefore(multipleAllDayEl, ulEl[0]);
                         }
                         else 
                         {
-                           targetCell.appendChild(multipleAllDayEl);
+                           if (document.getElementById("yuievtautoid-0") && flag) 
+                           {
+                              flag = false;
+                           }
+                           else 
+                           {
+                              targetCell.appendChild(multipleAllDayEl);
+                              Dom.addClass(multipleAllDayEl, 'allday');
+                           }
                         }
                      }
                   }
@@ -624,16 +627,16 @@
          if (!Dom.hasClass(eventEl, 'allday')) 
          {
             this._adjustHeightByHour(eventEl);
-				// find all events related to eventEl
-	         var className = eventEl.id+"-multiple";
-	         var repeatedElements = Dom.getElementsByClassName(className);
-	         
-	         // adjust their height
-	         for (var i = 0; i < repeatedElements.length; i++)
-	         {
-	             this._adjustHeightByHour(repeatedElements[i]);
-	         }
-         }        
+            // find all events related to eventEl
+            var className = eventEl.id + "-multiple";
+            var repeatedElements = Dom.getElementsByClassName(className);
+            
+            // adjust their height
+            for (var i = 0; i < repeatedElements.length; i++) 
+            {
+               this._adjustHeightByHour(repeatedElements[i]);
+            }
+         }
          YAHOO.Bubbling.fire("eventEditedAfter");
          
       },
@@ -711,15 +714,15 @@
                if (!Dom.hasClass(vEventEl, 'allday')) 
                {
                   this._adjustHeightByHour(vEventEl);
-						// find all events related to eventEl
-		            var className = vEventEl.id+"-multiple";
-		            var repeatedElements = Dom.getElementsByClassName(className);
-		            
-		            // adjust their height
-		            for (var i = 0; i < repeatedElements.length; i++)
-		            {
-		                this._adjustHeightByHour(repeatedElements[i]);
-		            }
+                  // find all events related to eventEl
+                  var className = vEventEl.id + "-multiple";
+                  var repeatedElements = Dom.getElementsByClassName(className);
+                  
+                  // adjust their height
+                  for (var i = 0; i < repeatedElements.length; i++) 
+                  {
+                     this._adjustHeightByHour(repeatedElements[i]);
+                  }
                }
                this.renderMultipleDayTimedEvents(vEventEl);
                this.renderMultipleEvents();
@@ -745,18 +748,18 @@
          //if allday remove multiday els too
          if (Dom.hasClass(evt, 'allday')) 
          {
-           // this.removeMultipleAllDayEvents(evt);
+            // this.removeMultipleAllDayEvents(evt);
          }
          this.events[id].deleteEvent();
          
          Event.purgeElement(this.events[id].getEl(), true);
          delete this.events[id];
-			this.deleteMultipleDayTimedEvents(evt);
+         this.deleteMultipleDayTimedEvents(evt);
          this.renderMultipleEvents();
          this.deleteMultipleDayTimedEvents(evt);
-		   YAHOO.Bubbling.fire("eventDeletedAfter");
+         YAHOO.Bubbling.fire("eventDeletedAfter");
       },
-		
+      
       /**
        * Handler for when an event is moved(dragged). Updates DOM with new event data
        *
