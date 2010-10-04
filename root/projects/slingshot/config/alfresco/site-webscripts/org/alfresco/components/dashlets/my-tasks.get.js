@@ -11,3 +11,5 @@ for each(var xmlFilter in myConfig..filter)
    });
 }
 model.filters = filters;
+
+model.maxItems = getMaxItems();

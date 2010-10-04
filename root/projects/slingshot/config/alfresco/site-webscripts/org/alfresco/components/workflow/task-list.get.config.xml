@@ -1,4 +1,5 @@
 <config>
+   <max-items>50</max-items>
    <filters-parameters>
       <!--
          Turns the filters form the filter's config files into url parameters by matching the filter id and data against

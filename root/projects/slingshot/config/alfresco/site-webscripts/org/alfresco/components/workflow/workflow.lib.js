@@ -44,3 +44,14 @@ function getWorkflowDefinitions()
    }
    return [];
 }
+
+function getMaxItems()
+{
+   var myConfig = new XML(config.script),
+      maxItems = myConfig["max-items"];
+   if (maxItems)
+   {
+      maxItems = myConfig["max-items"].toString();
+   }
+   return maxItems && maxItems.length > 0 ? maxItems : null;
+}

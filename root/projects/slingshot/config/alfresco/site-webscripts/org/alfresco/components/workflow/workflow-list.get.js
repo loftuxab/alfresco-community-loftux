@@ -3,5 +3,5 @@
 model.workflowDefinitions = getWorkflowDefinitions();
 model.hiddenWorkflowNames = getHiddenWorkflowNames();
 model.filterParameters = getFilterParameters();
-
+model.maxItems = getMaxItems();
 
