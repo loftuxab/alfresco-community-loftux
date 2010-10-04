@@ -104,19 +104,20 @@
    width: 100%;
 }
 
-.workflow-form .current-tasks table a.edit-task,
-.workflow-form .current-tasks table a.view-task
+.workflow-form .current-tasks table a.task-edit,
+.workflow-form .current-tasks table a.task-details
 {
    cursor: pointer;
-   padding: 1em 1em 1em 2em;
+   padding: 1em;
+   text-decoration: none;
 }
 
-.workflow-form .current-tasks table a.edit-task
+.workflow-form .current-tasks table a.task-edit
 {
    background: url("../images/edit-16.png") no-repeat scroll left center transparent;
 }
 
-.workflow-form .current-tasks table a.view-task
+.workflow-form .current-tasks table a.task-details
 {
-   background: url("../images/workflow-16.png") no-repeat scroll left center transparent;
+   background: url("../images/task-16.png") no-repeat scroll left center transparent;
 }

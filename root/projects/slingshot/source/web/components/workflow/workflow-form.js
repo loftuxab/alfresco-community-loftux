@@ -326,99 +326,6 @@
          formFieldsEl.insertBefore(generalSummaryEl, Dom.getFirstChild(formFieldsEl));
          formFieldsEl.insertBefore(workflowSummaryEl, generalSummaryEl);
 
-         var me = this;
-
-         /**
-          * Render task type as link
-          */
-         var renderCellType = function WorkflowHistory_onReady_renderCellType(elCell, oRecord, oColumn, oData)
-         {
-            var task = oRecord.getData();
-            if (task.isEditable)
-            {
-               elCell.innerHTML = '<a href="' + me._getTaskUrl("task-edit", oRecord.getData("id")) + '" title="' + me.msg("link.title.task-edit") + '">' + $html(oRecord.getData("title")) + '</a>';
-            }
-            else
-            {
-               elCell.innerHTML = '<a href="' + me._getTaskUrl("task-details", oRecord.getData("id")) + '" title="' + me.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
-            }
-         };
-
-         /**
-          * Render task owner as link
-          */
-         var renderCellOwner = function WorkflowHistory_onReady_renderCellOwner(elCell, oRecord, oColumn, oData)
-         {
-            var owner = oRecord.getData("owner");
-            if (owner != null && owner.userName)
-            {
-               var displayName = $html(me.msg("field.owner", owner.firstName, owner.lastName));
-               elCell.innerHTML = $userProfileLink(owner.userName, displayName, null, !owner.firstName);
-            }
-         };
-
-         /**
-          * Render task completed date
-          */
-         var renderCellDateCompleted = function WorkflowHistory_onReady_renderCellDateCompleted(elCell, oRecord, oColumn, oData)
-         {
-            var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties").bpm_completionDate);
-            elCell.innerHTML = Alfresco.util.formatDate(completionDate);
-         };
-
-         /**
-          * Render task due date
-          */
-         var renderCellDueDate = function WorkflowHistory_onReady_renderCellDueDate(elCell, oRecord, oColumn, oData)
-         {
-            var dueISODate = oRecord.getData("properties").bpm_dueDate;
-            if (dueISODate !== null)
-            {
-               var dueDate = Alfresco.util.fromISO8601(dueISODate);
-               elCell.innerHTML = Alfresco.util.formatDate(dueDate, "defaultDateOnly");
-            }
-            else
-            {
-               elCell.innerHTML = me.msg("label.none");
-            }
-         };
-
-         /**
-          * Render task status
-          */
-         var renderCellStatus = function WorkflowHistory_onReady_renderCellStatus(elCell, oRecord, oColumn, oData)
-         {
-            elCell.innerHTML = $html(oRecord.getData("properties").bpm_status);
-         };
-
-         /**
-          * Render task outcome
-          */
-         var renderCellOutcome = function WorkflowHistory_onReady_renderCellOutcome(elCell, oRecord, oColumn, oData)
-         {
-            elCell.innerHTML = $html(oRecord.getData("outcome"));
-         };
-
-         /**
-          *  Render task comment
-          */
-         var renderCellComment = function WorkflowHistory_onReady_renderCellComment(elCell, oRecord, oColumn, oData)
-         {
-            elCell.innerHTML = $html(oRecord.getData("properties").bpm_comment);
-         };
-
-         /**
-          * Render actions available for current tasks 
-          */
-         var renderCellCurrentTasksActions = function WorkflowHistory_onReady_renderCellCurrentTasksActions(elCell, oRecord, oColumn, oData)
-         {
-            var task = oRecord.getData();
-            if (task.isEditable)
-            {
-               elCell.innerHTML = '<a href="' + me._getTaskUrl("task-edit", task.id) + '" class="edit-task" title="' + me.msg("link.title.task-edit") + '">' + me.msg("actions.edit") + '</a>';
-            }
-         };
-
          // Create header and data table elements
          var currentTasksContainerEl = Dom.get(this.id + "-currentTasks-form-section"),
             currentTasksTasksEl = Selector.query("div", currentTasksContainerEl, true);
@@ -426,11 +333,11 @@
          // DataTable column definitions for current tasks
          var currentTasksColumnDefinitions =
          [
-            { key: "name", label: this.msg("column.type"), formatter: renderCellType },
-            { key: "owner", label: this.msg("column.assignedTo"), formatter: renderCellOwner },
-            { key: "id", label: this.msg("column.dueDate"), formatter: renderCellDueDate },
-            { key: "state", label: this.msg("column.status"), formatter: renderCellStatus },
-            { key: "properties", label: this.msg("column.actions"), formatter: renderCellCurrentTasksActions }
+            { key: "name", label: this.msg("column.type"), formatter: this.bind(this.renderCellType) },
+            { key: "owner", label: this.msg("column.assignedTo"), formatter: this.bind(this.renderCellOwner) },
+            { key: "id", label: this.msg("column.dueDate"), formatter: this.bind(this.renderCellDueDate) },
+            { key: "state", label: this.msg("column.status"), formatter: this.bind(this.renderCellStatus) },
+            { key: "properties", label: this.msg("column.actions"), formatter: this.bind(this.renderCellCurrentTasksActions) }
          ];
 
          // Create current tasks data table filled with current tasks
@@ -446,11 +353,11 @@
          // DataTable column definitions workflow history
          var historyColumnDefinitions =
          [
-            { key: "name", label: this.msg("column.type"), formatter: renderCellType },
-            { key: "owner", label: this.msg("column.userGroup"), formatter: renderCellOwner },
-            { key: "id", label: this.msg("column.dateCompleted"), formatter: renderCellDateCompleted },
-            { key: "state", label: this.msg("column.outcome"), formatter: renderCellOutcome },
-            { key: "properties", label: this.msg("column.comment"), formatter: renderCellComment }
+            { key: "name", label: this.msg("column.type"), formatter: this.bind(this.renderCellType) },
+            { key: "owner", label: this.msg("column.userGroup"), formatter: this.bind(this.renderCellOwner) },
+            { key: "id", label: this.msg("column.dateCompleted"), formatter: this.bind(this.renderCellDateCompleted) },
+            { key: "state", label: this.msg("column.outcome"), formatter: this.bind(this.renderCellOutcome) },
+            { key: "properties", label: this.msg("column.comment"), formatter: this.bind(this.renderCellComment) }
          ];
 
          // Create header and data table elements
@@ -473,6 +380,146 @@
 
          // Fire event so other components knows the form finally has been loaded
          YAHOO.Bubbling.fire("workflowFormReady", this);         
+      },
+
+      /**
+       * Render task type as link
+       *
+       * @method renderCellType
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellType: function WorkflowForm_renderCellType(elCell, oRecord, oColumn, oData)
+      {
+         var task = oRecord.getData();
+         if (task.isEditable)
+         {
+            elCell.innerHTML = '<a href="' + this._getTaskUrl("task-edit", oRecord.getData("id")) + '" title="' + this.msg("link.title.task-edit") + '">' + $html(oRecord.getData("title")) + '</a>';
+         }
+         else
+         {
+            elCell.innerHTML = '<a href="' + this._getTaskUrl("task-details", oRecord.getData("id")) + '" title="' + this.msg("link.title.task-details") + '">' + $html(oRecord.getData("title")) + '</a>';
+         }
+      },
+
+      /**
+       * Render task owner as link
+       *
+       * @method renderCellOwner
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellOwner: function WorkflowForm_renderCellOwner(elCell, oRecord, oColumn, oData)
+      {
+         var owner = oRecord.getData("owner");
+         if (owner != null && owner.userName)
+         {
+            var displayName = $html(this.msg("field.owner", owner.firstName, owner.lastName));
+            elCell.innerHTML = $userProfileLink(owner.userName, displayName, null, !owner.firstName);
+         }
+      },
+
+      /**
+       * Render task completed date
+       *
+       * @method TL_renderCellSelected
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellDateCompleted: function WorkflowForm_renderCellDateCompleted(elCell, oRecord, oColumn, oData)
+      {
+         var completionDate = Alfresco.util.fromISO8601(oRecord.getData("properties").bpm_completionDate);
+         elCell.innerHTML = Alfresco.util.formatDate(completionDate);
+      },
+
+      /**
+       * Render task due date
+       *
+       * @method renderCellDueDate
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellDueDate: function WorkflowForm_renderCellDueDate(elCell, oRecord, oColumn, oData)
+      {
+         var dueISODate = oRecord.getData("properties").bpm_dueDate;
+         if (dueISODate !== null)
+         {
+            var dueDate = Alfresco.util.fromISO8601(dueISODate);
+            elCell.innerHTML = Alfresco.util.formatDate(dueDate, "defaultDateOnly");
+         }
+         else
+         {
+            elCell.innerHTML = this.msg("label.none");
+         }
+      },
+
+      /**
+       * Render task status
+       *
+       * @method TL_renderCellSelected
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellStatus: function WorkflowForm_renderCellStatus(elCell, oRecord, oColumn, oData)
+      {
+         elCell.innerHTML = $html(oRecord.getData("properties").bpm_status);
+      },
+
+      /**
+       * Render task outcome
+       *
+       * @method renderCellOutcome
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellOutcome: function WorkflowForm_renderCellOutcome(elCell, oRecord, oColumn, oData)
+      {
+         elCell.innerHTML = $html(oRecord.getData("outcome"));
+      },
+
+      /**
+       *  Render task comment
+       *
+       * @method renderCellComment
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellComment: function WorkflowForm_renderCellComment(elCell, oRecord, oColumn, oData)
+      {
+         elCell.innerHTML = $html(oRecord.getData("properties").bpm_comment);
+      },
+
+      /**
+       * Render actions available for current tasks
+       *
+       * @method renderCellCurrentTasksActions
+       * @param elCell {object}
+       * @param oRecord {object}
+       * @param oColumn {object}
+       * @param oData {object|string}
+       */
+      renderCellCurrentTasksActions: function WorkflowForm_renderCellCurrentTasksActions(elCell, oRecord, oColumn, oData)
+      {
+         var task = oRecord.getData();
+         elCell.innerHTML += '<a href="' + this._getTaskUrl("task-details", task.id) + '" class="task-details" title="' + this.msg("link.title.task-details") + '">&nbsp;</a>';
+         if (task.isEditable)
+         {
+            elCell.innerHTML += '<a href="' + this._getTaskUrl("task-edit", task.id) + '" class="task-edit" title="' + this.msg("link.title.task-edit") + '">&nbsp;</a>';
+         }
       }
 
    });
