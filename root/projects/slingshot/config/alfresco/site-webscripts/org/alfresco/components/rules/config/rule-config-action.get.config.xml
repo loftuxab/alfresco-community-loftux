@@ -4,20 +4,11 @@
 
    <config-definitions webscript="/api/actiondefinitions">
       <!--
-         Action Definitions that we don't want displayed in the menu
+         Public Action Definitions that we don't want displayed in the menu
       -->
       <remove>
          <action name="copy-to-web-project"/>
-         <action name="transfer-this-tree"/>                                              
-         <action name="transfer- this-node"/>
          <action name="blog-post"/>
-         <action name="create-transfer-target"/>
-         <action name="transfer-tree-with-cancel"/>
-         <action name="reformat"/>
-         <action name="imageRenderingEngine"/>
-         <action name="freemarkerRenderingEngine"/>
-         <action name="xsltRenderingEngine"/>
-         <action name="compositeRenderingEngine"/>
       </remove>
    </config-definitions>
 

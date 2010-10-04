@@ -702,7 +702,7 @@
                   {
                      id: ruleConfigDef.name,
                      type: this.options.ruleConfigType,
-                     label: ruleConfigDef.displayLabel,
+                     label: ruleConfigDef.displayLabel || ruleConfigDef.name,
                      descriptor: ruleConfigDef
                   });
                }
