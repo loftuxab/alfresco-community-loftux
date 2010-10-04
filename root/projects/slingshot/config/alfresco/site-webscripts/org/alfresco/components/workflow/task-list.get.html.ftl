@@ -19,7 +19,7 @@
    {
       filterParameters: <@filter.jsonParameterFilter filterParameters />,
       hiddenTaskTypes: <@workflow.jsonHiddenTaskTypes hiddenTaskTypes/>,
-      maxItems: ${args.maxItems!"50"}
+      maxItems: ${maxItems!"50"}
    }).setMessages(
       ${messages}
    );

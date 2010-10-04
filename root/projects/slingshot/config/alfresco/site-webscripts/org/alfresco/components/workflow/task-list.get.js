@@ -2,5 +2,5 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/components/workflow/filter/filter.lib.js">
 model.hiddenTaskTypes = getHiddenTaskTypes();
 model.filterParameters = getFilterParameters();
-
+model.maxItems = getMaxItems();
 

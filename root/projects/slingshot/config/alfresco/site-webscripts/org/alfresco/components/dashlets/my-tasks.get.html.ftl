@@ -3,7 +3,7 @@
    new Alfresco.dashlet.MyTasks("${el}").setOptions(
    {
       hiddenTaskTypes: [<#list hiddenTaskTypes as type>"${type}"<#if type_has_next>, </#if></#list>],
-      maxItems: ${args.maxItems!"50"},
+      maxItems: ${maxItems!"50"},
       filters:
       [<#list filters as filter>
          {
