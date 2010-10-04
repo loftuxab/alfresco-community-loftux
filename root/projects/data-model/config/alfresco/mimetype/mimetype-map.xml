@@ -307,6 +307,9 @@
          <mimetype mimetype="video/x-flv" display="Flash Video">
             <extension>flv</extension>
          </mimetype>
+         <mimetype mimetype="application/x-fla" display="Flash Source">
+            <extension>fla</extension>
+         </mimetype>
          <mimetype mimetype="application/x-tar" display="Tarball">
             <extension>tar</extension>
          </mimetype>

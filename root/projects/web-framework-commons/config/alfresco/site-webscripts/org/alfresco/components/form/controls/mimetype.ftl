@@ -99,6 +99,8 @@
          <@mimetypeOption mt="text/sgml" />
          <@mimetypeOption mt="application/x-sh" />
          <@mimetypeOption mt="application/x-shockwave-flash" />
+         <@mimetypeOption mt="video/x-flv" />
+         <@mimetypeOption mt="application/x-fla" />
          <@mimetypeOption mt="application/vnd.stardivision.chart" />
          <@mimetypeOption mt="application/vnd.stardivision.calc" />
          <@mimetypeOption mt="application/vnd.stardivision.draw" />
@@ -286,6 +288,10 @@
       <#return "Shell Script">
    <#elseif mt=="application/x-shockwave-flash">
       <#return "Shockwave Flash">
+   <#elseif mt=="video/x-flv">
+      <#return "Flash Video">
+   <#elseif mt=="application/x-fla">
+      <#return "Flash Source">
    <#elseif mt=="application/vnd.stardivision.chart">
       <#return "StarChart 5.x">
    <#elseif mt=="application/vnd.stardivision.calc">

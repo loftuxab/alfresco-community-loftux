@@ -65,7 +65,14 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_PPT = "application/vnd.ms-powerpoint";
     public static final String MIMETYPE_APP_DWG = "application/dwg";
     public static final String MIMETYPE_IMG_DWG = "image/vnd.dwg";
+    
+    // Flash
     public static final String MIMETYPE_FLASH = "application/x-shockwave-flash";
+    public static final String MIMETYPE_VIDEO_FLV = "video/x-flv";
+    public static final String MIMETYPE_APPLICATION_FLA = "application/x-fla";
+
+    public static final String MIMETYPE_VIDEO_MPG = "video/mpeg";
+
     public static final String MIMETYPE_IMAGE_GIF = "image/gif";
     public static final String MIMETYPE_IMAGE_JPEG = "image/jpeg";
     public static final String MIMETYPE_IMAGE_RGB = "image/x-rgb";
