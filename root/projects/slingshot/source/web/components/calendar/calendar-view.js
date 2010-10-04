@@ -332,6 +332,8 @@
          var siteEvents = [];
          var events = [];
          var comparisonFn = null;
+         var viewStartDate = this.options.startDate;
+         var viewEndDate = this.options.endDate;		 
          var site = this.options.siteId;
          for (var i = 0; i < data.length; i++) 
          {
@@ -350,17 +352,15 @@
          // TODO: These take no account of timezone. E.g. day view of 6th June. server time = GMT+1000, event time = 06 JUN 2010 05:00GMT+1000, date returned from server is 05 JUN 2010 19:00GMT+0000. 05 JUN != 06 JUN.
          comparisonFn = function()
          {
-            var viewStartDate = this.options.startDate;
-            var viewEndDate = this.options.endDate;
             
             return function(eventDate, endDate)
             {
                // Event can: Start before and finish after display dates
-               var eventSurroundsView = (eventDate < viewStartDate && viewEndDate < endDate);
+               var eventSurroundsView = (eventDate <= viewStartDate && viewEndDate <= endDate);
                // or: start during
-               var startDuring = (eventDate > viewStartDate && eventDate < viewEndDate);
+               var startDuring = (eventDate >= viewStartDate && eventDate < viewEndDate);
                // or: finish during
-               var endDuring = (endDate > viewStartDate && endDate < viewEndDate);
+               var endDuring = (endDate >= viewStartDate && endDate < viewEndDate);
                return (eventSurroundsView || startDuring || endDuring);
             };
          }.apply(this);
@@ -384,7 +384,7 @@
                datum.hidden = '';
                datum.allday = '';
                datum.isMultiDay = (datum.from.split("T")[0] !== datum.to.split("T")[0]);
-               datum.isAllDay = (datum.isMultiDay && ev.start === "00:00" && ev.end === "00:00");
+               datum.isAllDay = (ev.start === "00:00" && ev.end === "00:00");
                datum.el = 'div';
                datum.duration = Alfresco.CalendarHelper.getDuration(fromISO8601(datum.from), fromISO8601(datum.to));
                var days = datum.duration.match(/([0-9]+)D/);

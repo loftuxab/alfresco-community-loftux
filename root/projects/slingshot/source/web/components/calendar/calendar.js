@@ -114,7 +114,7 @@
       
           // Separate the (initial) rendering of the calendar from the data loading.
           // If for some reason the data fails to load, the calendar will still display.
-         this.calendar = new YAHOO.widget.Calendar("calendar");
+         this.calendar = new YAHOO.widget.Calendar("calendar", { navigator:true });
          // Set localised properties
          Alfresco.util.calI18nParams(this.calendar);
          this.calendar.render();
