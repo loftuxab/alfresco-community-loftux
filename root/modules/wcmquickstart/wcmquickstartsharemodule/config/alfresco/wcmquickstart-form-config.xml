@@ -1,18 +1,42 @@
 <alfresco-config>
-    
-    <config evaluator="node-type" condition="ws:section">
+
+   <config evaluator="node-type" condition="ws:section">
       <forms>
          <form>
             <field-visibility>
                <show id="cm:name" />
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
-               <show id="ws:excludeFromNavigation"/>
-               <show id="ws:sectionConfig"/>
-               <show id="ws:inheritRenditionConfig"/>
-               <show id="ws:renditionConfig"/>
-               <show id="ws:orderIndex" force="true" />               
+               <show id="ws:excludeFromNavigation" />
+               <show id="ws:sectionConfig" />
+               <show id="ws:inheritRenditionConfig" />
+               <show id="ws:renditionConfig" />
+               <show id="ws:orderIndex" force="true" />
             </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="ws:sectionConfig">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="ws:renditionConfig">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+            </appearance>
+         </form>
+         <form id="doclib-simple-metadata">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="ws:excludeFromNavigation" />
+               <show id="ws:sectionConfig" />
+               <show id="ws:inheritRenditionConfig" />
+               <show id="ws:renditionConfig" />
+               <show id="ws:orderIndex" force="true" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
             <appearance>
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
@@ -27,7 +51,7 @@
          </form>
       </forms>
    </config>
-   
+
    <config evaluator="node-type" condition="ws:webroot">
       <forms>
          <form>
@@ -35,9 +59,30 @@
                <show id="cm:name" />
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
-               <show id="ws:sectionConfig"/>
-               <show id="ws:renditionConfig"/>
+               <show id="ws:sectionConfig" />
+               <show id="ws:renditionConfig" />
             </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="ws:sectionConfig">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="ws:renditionConfig">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+            </appearance>
+         </form>
+         <form id="doclib-simple-metadata">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="ws:sectionConfig" />
+               <show id="ws:renditionConfig" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
             <appearance>
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
@@ -52,7 +97,7 @@
          </form>
       </forms>
    </config>
-    
+
    <config evaluator="node-type" condition="ws:website">
       <forms>
          <form>
@@ -60,12 +105,36 @@
                <show id="cm:name" />
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
-               <show id="ws:hostName"/>
-               <show id="ws:hostPort"/>
-               <show id="ws:webAppContext"/>
-               <show id="ws:siteConfig"/>
-               <show id="ws:publishTarget"/>
+               <show id="ws:hostName" />
+               <show id="ws:hostPort" />
+               <show id="ws:webAppContext" />
+               <show id="ws:siteConfig" />
+               <show id="ws:publishTarget" />
             </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="ws:sectionConfig">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="ws:renditionConfig">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+            </appearance>
+         </form>
+         <form id="doclib-simple-metadata">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="ws:hostName" />
+               <show id="ws:hostPort" />
+               <show id="ws:webAppContext" />
+               <show id="ws:siteConfig" />
+               <show id="ws:publishTarget" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
             <appearance>
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
@@ -80,21 +149,21 @@
          </form>
       </forms>
    </config>
-    
-    <config evaluator="node-type" condition="ws:webassetCollectionFolder">
+
+   <config evaluator="node-type" condition="ws:webassetCollectionFolder">
       <forms>
          <form>
             <field-visibility>
                <show id="cm:name" />
             </field-visibility>
-	        <appearance>
-	           <field id="cm:name" read-only="true"/>
-	        </appearance>
-         </form>         
+            <appearance>
+               <field id="cm:name" read-only="true" />
+            </appearance>
+         </form>
       </forms>
    </config>
-    
-    <config evaluator="node-type" condition="ws:webassetCollection">
+
+   <config evaluator="node-type" condition="ws:webassetCollection">
       <forms>
          <form>
             <field-visibility>
@@ -113,8 +182,26 @@
                </field>
             </appearance>
          </form>
+         <form id="doclib-simple-metadata">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="ws:queryLanguage" />
+               <show id="ws:query" />
+               <show id="ws:queryResultsMaxSize" />
+               <show id="ws:minsToQueryRefresh" />
+               <show id="ws:webassets" />
+            </field-visibility>
+            <edit-form template="../documentlibrary/forms/doclib-simple-metadata.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+            </appearance>
+         </form>
       </forms>
-   </config>    
+   </config>
 
    <config evaluator="node-type" condition="ws:indexPage">
       <forms>
@@ -131,48 +218,48 @@
                <show id="cm:created" for-mode="view" />
                <show id="cm:modifier" for-mode="view" />
                <show id="cm:modified" for-mode="view" />
-               
+
                <!-- tags and categories -->
                <show id="cm:taggable" for-mode="edit" force="true" />
                <show id="cm:categories" />
-               
+
                <!-- ws:webasset aspect -->
                <show id="ws:derivedCommentCount" for-mode="view" />
                <show id="ws:derivedAverageRating" for-mode="view" />
                <show id="ws:publishedTime" for-mode="view" />
 
                <!-- cm:dublincore aspect -->
-               <show id="cm:publisher"/>
-               <show id="cm:contributor"/>
-               <show id="cm:type"/>
-               <show id="cm:identifier"/>
-               <show id="cm:dcsource"/>
-               <show id="cm:coverage"/>
-               <show id="cm:rights"/>
-               <show id="cm:subject"/>
-               
+               <show id="cm:publisher" />
+               <show id="cm:contributor" />
+               <show id="cm:type" />
+               <show id="cm:identifier" />
+               <show id="cm:dcsource" />
+               <show id="cm:coverage" />
+               <show id="cm:rights" />
+               <show id="cm:subject" />
+
                <!-- cm:complianceable aspect -->
                <show id="cm:removeAfter" />
-               
+
                <!-- cm:effectivity aspect -->
-               <show id="cm:from"/>
-               <show id="cm:to"/>
-               
+               <show id="cm:from" />
+               <show id="cm:to" />
+
                <!--  cm:summarizable aspect -->
                <show id="cm:summary" />
-               
+
                <!-- cm:translatable aspect -->
                <show id="cm:translations" />
-               
+
                <!-- cm:localizable aspect -->
                <show id="cm:locale" />
-               
+
                <!-- cm:ownable aspect -->
                <show id="cm:owner" />
-               
+
                <!-- cm:attachable aspect -->
                <show id="cm:attachments" />
-               
+
                <!-- cm:emailed aspect -->
                <show id="cm:originator" />
                <show id="cm:addressee" />
@@ -252,7 +339,7 @@
                </field>
             </appearance>
          </form>
-         
+
          <!-- Document Library Inline Edit form -->
          <form id="doclib-inline-edit">
             <field-visibility>
@@ -274,9 +361,9 @@
             </appearance>
          </form>
       </forms>
-   </config> 
-   
-    <config evaluator="node-type" condition="ws:article">
+   </config>
+
+   <config evaluator="node-type" condition="ws:article">
       <forms>
          <!-- Default form configuration for the cm:content type -->
          <form>
@@ -291,59 +378,59 @@
                <show id="cm:created" for-mode="view" />
                <show id="cm:modifier" for-mode="view" />
                <show id="cm:modified" for-mode="view" />
-               
+
                <!-- tags and categories -->
                <show id="cm:taggable" for-mode="edit" force="true" />
                <show id="cm:categories" />
-               
+
                <!-- ws:webasset aspect -->
                <show id="ws:derivedCommentCount" for-mode="view" />
                <show id="ws:derivedAverageRating" for-mode="view" />
                <show id="ws:publishedTime" for-mode="view" />
 
                <!-- cm:dublincore aspect -->
-               <show id="cm:publisher"/>
-               <show id="cm:contributor"/>
-               <show id="cm:type"/>
-               <show id="cm:identifier"/>
-               <show id="cm:dcsource"/>
-               <show id="cm:coverage"/>
-               <show id="cm:rights"/>
-               <show id="cm:subject"/>
-               
+               <show id="cm:publisher" />
+               <show id="cm:contributor" />
+               <show id="cm:type" />
+               <show id="cm:identifier" />
+               <show id="cm:dcsource" />
+               <show id="cm:coverage" />
+               <show id="cm:rights" />
+               <show id="cm:subject" />
+
                <!-- cm:complianceable aspect -->
                <show id="cm:removeAfter" />
-               
+
                <!-- cm:effectivity aspect -->
-               <show id="cm:from"/>
-               <show id="cm:to"/>
-               
+               <show id="cm:from" />
+               <show id="cm:to" />
+
                <!--  cm:summarizable aspect -->
                <show id="cm:summary" />
-               
+
                <!-- cm:translatable aspect -->
                <show id="cm:translations" />
-               
+
                <!-- cm:localizable aspect -->
                <show id="cm:locale" />
-               
+
                <!-- cm:ownable aspect -->
                <show id="cm:owner" />
-               
+
                <!-- cm:attachable aspect -->
                <show id="cm:attachments" />
-               
+
                <!-- cm:emailed aspect -->
                <show id="cm:originator" />
                <show id="cm:addressee" />
                <show id="cm:addressees" />
                <show id="cm:sentdate" />
                <show id="cm:subjectline" />
-               
+
                <show id="ws:primaryImage" />
                <show id="ws:secondaryImage" />
                <show id="ws:relatedArticles" />
-               
+
             </field-visibility>
             <appearance>
                <field id="cm:title">
@@ -416,7 +503,7 @@
                </field>
             </appearance>
          </form>
-         
+
          <!-- Document Library Inline Edit form -->
          <form id="doclib-inline-edit">
             <field-visibility>
@@ -438,21 +525,21 @@
             </appearance>
          </form>
       </forms>
-   </config> 
+   </config>
 
    <config evaluator="model-type" condition="ws:visitorFeedback">
       <forms>
          <form>
             <field-visibility>
-                <show id="ws:visitorEmail" />
-                <show id="ws:commentFlagged" />
-                <show id="ws:feedbackType" />
-                <show id="ws:feedbackSubject" />
-                <show id="ws:feedbackComment" />
-                <show id="ws:rating" />
-                <show id="ws:relevantAssetAssoc" />
-                <show id="ws:visitorName" />
-                <show id="ws:visitorWebsite" />
+               <show id="ws:visitorEmail" />
+               <show id="ws:commentFlagged" />
+               <show id="ws:feedbackType" />
+               <show id="ws:feedbackSubject" />
+               <show id="ws:feedbackComment" />
+               <show id="ws:rating" />
+               <show id="ws:relevantAssetAssoc" />
+               <show id="ws:visitorName" />
+               <show id="ws:visitorWebsite" />
             </field-visibility>
             <create-form template="../data-lists/forms/dataitem.ftl" />
             <appearance>
@@ -464,8 +551,8 @@
          </form>
       </forms>
    </config>
-   
-    <config evaluator="node-type" condition="ws:image">
+
+   <config evaluator="node-type" condition="ws:image">
       <forms>
          <!-- Default form configuration for the cm:content type -->
          <form>
@@ -480,55 +567,55 @@
                <show id="cm:created" for-mode="view" />
                <show id="cm:modifier" for-mode="view" />
                <show id="cm:modified" for-mode="view" />
-               
+
                <!-- tags and categories -->
                <show id="cm:taggable" for-mode="edit" force="true" />
                <show id="cm:categories" />
-               
+
                <!-- ws:webasset aspect -->
                <show id="ws:derivedCommentCount" for-mode="view" />
                <show id="ws:derivedAverageRating" for-mode="view" />
                <show id="ws:publishedTime" for-mode="view" />
 
                <!-- cm:dublincore aspect -->
-               <show id="cm:publisher"/>
-               <show id="cm:contributor"/>
-               <show id="cm:type"/>
-               <show id="cm:identifier"/>
-               <show id="cm:dcsource"/>
-               <show id="cm:coverage"/>
-               <show id="cm:rights"/>
-               <show id="cm:subject"/>
-               
+               <show id="cm:publisher" />
+               <show id="cm:contributor" />
+               <show id="cm:type" />
+               <show id="cm:identifier" />
+               <show id="cm:dcsource" />
+               <show id="cm:coverage" />
+               <show id="cm:rights" />
+               <show id="cm:subject" />
+
                <!-- cm:complianceable aspect -->
                <show id="cm:removeAfter" />
-               
+
                <!-- cm:effectivity aspect -->
-               <show id="cm:from"/>
-               <show id="cm:to"/>
-               
+               <show id="cm:from" />
+               <show id="cm:to" />
+
                <!--  cm:summarizable aspect -->
                <show id="cm:summary" />
-               
+
                <!-- cm:translatable aspect -->
                <show id="cm:translations" />
-               
+
                <!-- cm:localizable aspect -->
                <show id="cm:locale" />
-               
+
                <!-- cm:ownable aspect -->
                <show id="cm:owner" />
-               
+
                <!-- cm:attachable aspect -->
                <show id="cm:attachments" />
-               
+
                <!-- cm:emailed aspect -->
                <show id="cm:originator" />
                <show id="cm:addressee" />
                <show id="cm:addressees" />
                <show id="cm:sentdate" />
                <show id="cm:subjectline" />
-               
+
             </field-visibility>
             <appearance>
                <field id="cm:title">
@@ -601,7 +688,7 @@
                </field>
             </appearance>
          </form>
-         
+
          <!-- Document Library Inline Edit form -->
          <form id="doclib-inline-edit">
             <field-visibility>
@@ -623,21 +710,21 @@
             </appearance>
          </form>
       </forms>
-   </config> 
+   </config>
 
    <config evaluator="node-type" condition="ws:visitorFeedback">
       <forms>
          <form>
             <field-visibility>
-                <show id="ws:visitorEmail" />
-                <show id="ws:commentFlagged" />
-                <show id="ws:feedbackType" />
-                <show id="ws:feedbackSubject" />
-                <show id="ws:feedbackComment" />
-                <show id="ws:rating" />
-                <show id="ws:relevantAssetAssoc" />
-                <show id="ws:visitorName" />
-                <show id="ws:visitorWebsite" />
+               <show id="ws:visitorEmail" />
+               <show id="ws:commentFlagged" />
+               <show id="ws:feedbackType" />
+               <show id="ws:feedbackSubject" />
+               <show id="ws:feedbackComment" />
+               <show id="ws:rating" />
+               <show id="ws:relevantAssetAssoc" />
+               <show id="ws:visitorName" />
+               <show id="ws:visitorWebsite" />
             </field-visibility>
             <edit-form template="../data-lists/forms/dataitem.ftl" />
             <appearance>
@@ -666,7 +753,7 @@
                <set id="info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl" />
                <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
-               
+
                <field id="bpm:workflowDescription" label-id="workflow.field.message">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl">
                      <control-param name="style">width: 95%</control-param>
@@ -699,7 +786,7 @@
                <set id="info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl" />
                <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
-               
+
                <field id="bpm:workflowDescription" label-id="workflow.field.message">
                   <control template="/org/alfresco/components/form/controls/textarea.ftl">
                      <control-param name="style">width: 95%</control-param>
@@ -727,14 +814,13 @@
                <set id="assignee" appearance="title" label-id="workflow.set.assignee" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
 
-               <field id="bpm:assignee" label-id="workflow.field.reviewer"
-                  set="assignee" />
+               <field id="bpm:assignee" label-id="workflow.field.reviewer" set="assignee" />
                <field id="packageItems" set="items" />
             </appearance>
          </form>
       </forms>
    </config>
-   
+
    <config evaluator="task-type" condition="wswf:reviewTask">
       <forms>
          <form>
@@ -779,7 +865,7 @@
          </form>
       </forms>
    </config>
-   
+
    <config evaluator="task-type" condition="wswf:approvedTask">
       <forms>
          <form>
@@ -798,7 +884,7 @@
                <set id="info" appearance="" template="/org/alfresco/components/form/3-column-set.ftl" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                <set id="response" appearance="title" label-id="workflow.set.response" />
-               
+
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -821,7 +907,7 @@
          </form>
       </forms>
    </config>
-   
+
    <config evaluator="task-type" condition="wswf:rejectedTask">
       <forms>
          <form>
@@ -840,7 +926,7 @@
                <set id="info" appearance="" template="/org/alfresco/components/form/3-column-set.ftl" />
                <set id="items" appearance="title" label-id="workflow.set.items" />
                <set id="response" appearance="title" label-id="workflow.set.response" />
-               
+
                <field id="message">
                   <control template="/org/alfresco/components/form/controls/info.ftl" />
                </field>
@@ -863,5 +949,5 @@
          </form>
       </forms>
    </config>
-   
+
 </alfresco-config>
