@@ -85,6 +85,7 @@
          <@mimetypeOption mt="text/plain" />
          <@mimetypeOption mt="image/png" />
          <@mimetypeOption mt="image/x-portable-bitmap" />
+         <@mimetypeOption mt="application/eps" />
          <@mimetypeOption mt="application/postscript" />
          <@mimetypeOption mt="video/quicktime" />
          <@mimetypeOption mt="video/x-rad-screenplay" />
@@ -263,6 +264,8 @@
       <#return "Portable Bitmap">
    <#elseif mt=="application/postscript">
       <#return "Postscript">
+   <#elseif mt=="application/eps">
+      <#return "EPS Type PostScript">
    <#elseif mt=="video/quicktime">
       <#return "Quicktime Video">
    <#elseif mt=="video/x-rad-screenplay">
