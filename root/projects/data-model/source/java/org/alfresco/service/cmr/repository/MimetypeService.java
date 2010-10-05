@@ -21,7 +21,6 @@ package org.alfresco.service.cmr.repository;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.encoding.ContentCharsetFinder;
 import org.alfresco.service.NotAuditable;
 import org.alfresco.service.PublicService;
@@ -112,6 +111,17 @@ public interface MimetypeService
      */
     @NotAuditable
     public String guessMimetype(String filename);
+    
+    /**
+     * Use detection heuristics to check if the mime type of the document really 
+     *  matches what it claims to be.
+     * This is typically used when a transformation or metadata extractions fails, 
+     *  and you want to know if someone has renamed a file and consequently it has 
+     *  the wrong mime type. 
+     * @return Null if the mime type seems ok, otherwise the mime type it probably is
+     */
+    @NotAuditable
+    public String getMimetypeIfNotMatches(ContentReader reader);
 
     /**
      * Provides the system default charset finder.

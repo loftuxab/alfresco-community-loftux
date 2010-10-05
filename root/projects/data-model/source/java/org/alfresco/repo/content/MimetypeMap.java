@@ -28,10 +28,14 @@ import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.encoding.ContentCharsetFinder;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.util.PropertyCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.springframework.extensions.config.Config;
 import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.ConfigLookupContext;
@@ -141,6 +145,7 @@ public class MimetypeMap implements MimetypeService
     
     private ConfigService configService;
     private ContentCharsetFinder contentCharsetFinder;
+    private TikaConfig tikaConfig;
     
     private List<String> mimetypes;
     private Map<String, String> extensionsByMimetype;
@@ -358,7 +363,64 @@ public class MimetypeMap implements MimetypeService
     {
         return textMimetypes.contains(mimetype);
     }
+    
+    /**
+     * Use Apache Tika to check if the mime type of the document really matches
+     *  what it claims to be.
+     * This is typically used when a transformation or metadata extractions fails, 
+     *  and you want to know if someone has renamed a file and consequently it has 
+     *  the wrong mime type. 
+     * @return Null if the mime type seems ok, otherwise the mime type it probably is
+     */
+    public String getMimetypeIfNotMatches(ContentReader reader)
+    {
+       if(tikaConfig == null)
+       {
+          try {
+             tikaConfig = TikaConfig.getDefaultConfig();
+          } catch(Exception e) {
+             logger.warn("Error creating Tika detector", e);
+             return null;
+          }
+       }
+       
+       Metadata metadata = new Metadata();
+       MediaType type;
+       try {
+          type = tikaConfig.getMimeRepository().detect(
+                reader.getContentInputStream(), metadata
+          );
+          logger.debug(reader + " detected by Tika as being " + type.toString());
+       } catch(Exception e) {
+          logger.warn("Error identifying content type of problem document", e);
+          return null;
+       }
+       
+       // Is it a good match?
+       if(type.toString().equals(reader.getMimetype())) 
+       {
+          return null;
+       }
+       
+       // Is it close?
+       MediaType claimed = MediaType.parse(reader.getMimetype());
+       if(tikaConfig.getMediaTypeRegistry().isSpecializationOf(claimed, type) ||
+          tikaConfig.getMediaTypeRegistry().isSpecializationOf(type, claimed))
+       {
+          // Probably close enough
+          return null;
+       }
+       
+       // If we get here, then most likely the type is wrong
+       return type.toString();
+    }
 
+/* // Coming soon! See  ALF-5082
+    public String guessMimetype(ContentReader)
+    {  
+    }
+*/
+    
     /**
      * @see #MIMETYPE_BINARY
      */
