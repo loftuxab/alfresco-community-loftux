@@ -20,6 +20,8 @@ package org.alfresco.wcm.client;
 
 import java.io.Serializable;
 
+import org.alfresco.wcm.client.util.QuerySanitizer;
+
 public class Query implements Serializable
 {
     private static final long serialVersionUID = -6767417568016378846L;
@@ -46,7 +48,7 @@ public class Query implements Serializable
     
     public void setPhrase(String phrase)
     {
-        this.phrase = phrase;
+        this.phrase = QuerySanitizer.sanitize(phrase).trim();
     }
     
     public String getPhrase()
@@ -94,6 +96,6 @@ public class Query implements Serializable
 
     public void setTag(String tag)
     {
-        this.tag = tag;
+        this.tag = QuerySanitizer.sanitize(tag).trim();
     }
 }

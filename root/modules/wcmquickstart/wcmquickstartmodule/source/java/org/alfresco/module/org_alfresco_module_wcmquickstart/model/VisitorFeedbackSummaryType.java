@@ -21,7 +21,6 @@ package org.alfresco.module.org_alfresco_module_wcmquickstart.model;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
@@ -92,9 +91,7 @@ public class VisitorFeedbackSummaryType implements WebSiteModel
         NodeRef summarisedAsset = (NodeRef)after.get(PROP_SUMMARISED_ASSET);
         if (summarisedAsset != null && nodeService.exists(summarisedAsset))
         {
-            //We are going to copy the comment count and average rating onto the asset itself, 
-            //but we don't want this to affect the asset's modified time or modifier...
-            behaviourFilter.disableBehaviour(summarisedAsset, ContentModel.ASPECT_AUDITABLE);
+            //We are going to copy the comment count and average rating onto the asset itself 
             behaviourFilter.disableBehaviour(summarisedAsset, WebSiteModel.ASPECT_WEBASSET);
             try
             {
@@ -121,7 +118,6 @@ public class VisitorFeedbackSummaryType implements WebSiteModel
             finally
             {
                 behaviourFilter.enableBehaviour(summarisedAsset, WebSiteModel.ASPECT_WEBASSET);
-                behaviourFilter.enableBehaviour(summarisedAsset, ContentModel.ASPECT_AUDITABLE);
             }
         }
     }

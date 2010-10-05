@@ -196,16 +196,21 @@ public class UgcServiceCmisImpl implements UgcService
         VisitorFeedbackImpl feedback = (VisitorFeedbackImpl) createFeedback();
         feedback.setAssetId(assetId);
         feedback.setFeedbackType(type);
-        feedback.setSubject(subject);
-        feedback.setComment(comment);
-        feedback.setVisitorEmail(visitorEmailAddress);
-        feedback.setVisitorName(visitorName);
-        feedback.setVisitorWebsite(visitorWebsite);
+        feedback.setSubject(sanitizeText(subject));
+        feedback.setComment(sanitizeText(comment));
+        feedback.setVisitorEmail(sanitizeText(visitorEmailAddress));
+        feedback.setVisitorName(sanitizeText(visitorName));
+        feedback.setVisitorWebsite(sanitizeText(visitorWebsite));
         feedback.setCommentFlagged(commentFlagged);
         feedback.setRating(rating);
         return feedback;
     }
-
+    
+    protected String sanitizeText(String text)
+    {
+        return text == null ? null : text.replaceAll("[<>]", "");
+    }
+    
     private VisitorFeedbackImpl buildFeedbackObject(QueryResult queryResult)
     {
         BigInteger rating = (BigInteger) queryResult.getPropertyValueById(PROP_RATING);

@@ -18,7 +18,6 @@
  */
 package org.alfresco.module.org_alfresco_module_wcmquickstart.webscript;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +28,9 @@ import org.alfresco.module.org_alfresco_module_wcmquickstart.util.SiteHelper;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.site.SiteInfo;
-import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.webscripts.Cache;
@@ -53,37 +48,14 @@ public class WebsiteInfoGet extends DeclarativeWebScript implements WebSiteModel
 {
     private static final Log log = LogFactory.getLog(WebsiteInfoGet.class);
 
-    private static final String DATALIST_NAMESPACE_URI = "http://www.alfresco.org/model/datalist/1.0";
-    private static final QName TYPE_DATA_LIST = QName.createQName(DATALIST_NAMESPACE_URI, "dataList");
-    private static final QName PROP_DATA_LIST_ITEM_TYPE = QName.createQName(DATALIST_NAMESPACE_URI, "dataListItemType");
-        
     private static final String PARAM_WEBSITE_ID = "websiteid";
-    private static final String DATA_LISTS_FOLDER_NAME = "dataLists";
 
     private NodeService nodeService;
-    private SiteService siteService;
-    private SearchService searchService;
-    private NamespaceService namespaceService;
     private SiteHelper siteHelper;
 
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
-    }
-
-    public void setSiteService(SiteService siteService)
-    {
-        this.siteService = siteService;
-    }
-
-    public void setSearchService(SearchService searchService)
-    {
-        this.searchService = searchService;
-    }
-
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
     }
 
     public void setSiteHelper(SiteHelper siteHelper)
@@ -151,71 +123,8 @@ public class WebsiteInfoGet extends DeclarativeWebScript implements WebSiteModel
         } 
         else
         {
-            if (log.isDebugEnabled())
-            {
-                log.debug("Found the corresponding Share site for the specified website: " + siteInfo.getShortName());
-            }
-            NodeRef dataListsFolder = siteService.getContainer(siteInfo.getShortName(),
-                    DATA_LISTS_FOLDER_NAME);
-            if (dataListsFolder == null)
-            {
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Failed to find data lists container for site " + siteInfo.getShortName() + 
-                            ". Attempting to create it.");
-                }
-                dataListsFolder = siteService.createContainer(siteInfo.getShortName(),
-                        DATA_LISTS_FOLDER_NAME, null, null);
-            }
-            String websiteTitle = (String) nodeService.getProperty(websiteNode, ContentModel.PROP_TITLE);
-            if (websiteTitle == null) 
-            {
-                websiteTitle = (String) nodeService.getProperty(websiteNode, ContentModel.PROP_NAME);
-            }
-            String listTitle = "Visitor Feedback (" + websiteTitle + ")";
-            
-            NodeRef visitorFeedbackList = null;
-            
-            //Try to find a data list with the appropriate name...
-            if (log.isDebugEnabled())
-            {
-                log.debug("Searching for data list with title: " + listTitle);
-            }
-            String query = "+PARENT:\"" + dataListsFolder + "\" +@cm\\:title:\"" + listTitle + "\"";
-            if(log.isDebugEnabled())
-            {
-                log.debug("Running query: " + query);
-            }
-            ResultSet rs = searchService.query(websiteNode.getStoreRef(), SearchService.LANGUAGE_LUCENE, query);
-            if (rs.length() == 0)
-            {
-                //We haven't been able to find the data list. Create it...
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Failed to find required data list. Creating...");
-                }
-                HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
-                String name = GUID.generate();
-                props.put(ContentModel.PROP_NAME, name);
-                props.put(ContentModel.PROP_TITLE, listTitle);
-                props.put(PROP_DATA_LIST_ITEM_TYPE, TYPE_VISITOR_FEEDBACK.toPrefixString(namespaceService));
-                visitorFeedbackList = nodeService.createNode(dataListsFolder, ContentModel.ASSOC_CONTAINS, 
-                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), TYPE_DATA_LIST, props).getChildRef();
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Created data list with properties " + props + " as node " + visitorFeedbackList);
-                }
-            }
-            else
-            {
-                //We have found the appropriate data list
-                visitorFeedbackList = rs.getNodeRef(0);
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Found the appropriate data list: " + visitorFeedbackList);
-                }
-            }
-            feedbackFolderId = visitorFeedbackList.toString();
+            feedbackFolderId = siteHelper.getFeedbackList((String)nodeService.getProperty(websiteNode, ContentModel.PROP_NAME), 
+                    siteInfo.getShortName(), true).toString();
         }
 
         // Put the collection data in the model and pass to the view
@@ -224,5 +133,4 @@ public class WebsiteInfoGet extends DeclarativeWebScript implements WebSiteModel
         model.put("feedbackFolderId", feedbackFolderId);
         return model;
     }
-
 }

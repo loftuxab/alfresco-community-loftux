@@ -12,7 +12,7 @@
         <#else>
     	  	<#list articles.assets as article>  	
                 <div class="blog-entry">
-    	            <h2><a href="<@makeurl asset=article/>">${article.title!'no title'}</a></h2>
+    	            <h2><a href="<@makeurl asset=article/>">${article.title!article.name}</a></h2>
                     <div class="blog-list-misc">
         	            <#if article.properties['ws:publishedTime']??><span>${article.properties['ws:publishedTime']?string(msg('date.format'))}</span>&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;</#if>
                         <#if article.properties['cm:author']??><span>${article.properties['cm:author']}</span>&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;</#if>
