@@ -154,6 +154,12 @@
          });
          this.widgets.panel.setHeader(this.options.title);
          this.widgets.panel.render(Dom.get(this.id));
+         
+         // subscribe to the close (cross) icon close event
+         this.widgets.panel.hideEvent.subscribe(function()
+         {
+            this.hide();
+         }, this, true);
 
          YAHOO.Bubbling.on('beforeFormRuntimeInit', function(e, args) 
          {
