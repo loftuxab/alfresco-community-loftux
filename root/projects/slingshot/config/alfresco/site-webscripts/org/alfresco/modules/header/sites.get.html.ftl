@@ -1,4 +1,4 @@
-<#assign siteActive = args.siteId??>
+<#assign siteActive = args.siteId?? && (siteTitle?length > 0)>
 <#assign id = args.htmlid>
 <#assign id_js = id?js_string>
 <script type="text/javascript">//<![CDATA[

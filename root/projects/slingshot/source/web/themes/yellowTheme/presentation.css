@@ -618,12 +618,14 @@ body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem-selected
    background-color: #f6931c;
 }
 
-body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
+body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
+body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a
 {
    color: #333333; 
 }
 
-body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
+body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel,
+body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel a
 {
    color: #FFF;
 }

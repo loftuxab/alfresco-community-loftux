@@ -654,12 +654,14 @@ body.yui-skin-gdocs .yuimenu .bd ul li.yuimenuitem-selected
    background-color: #6688EE;
 }
 
-body.yui-skin-gdocs .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
+body.yui-skin-gdocs .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
+body.yui-skin-gdocs .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a
 {
    color: #0600cc;
 }
 
-body.yui-skin-gdocs .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
+body.yui-skin-gdocs .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel,
+body.yui-skin-gdocs .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel a
 {
    color: #FFF;
 }
