@@ -189,7 +189,7 @@
                /**
                 * Documents and Links
                 */
-               docDetailsUrl = scope.getActionUrls(oRecord).documentDetailsUrl;
+               docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
 
                // Locked / Working Copy handling
                if (record.lockedByUser && record.lockedByUser !== "")

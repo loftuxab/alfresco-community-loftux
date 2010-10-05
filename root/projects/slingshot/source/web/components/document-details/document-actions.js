@@ -163,12 +163,12 @@
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
+       * @param recordData {object} Object literal representing the node
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function DocumentActions_getActionUrls()
+      getActionUrls: function DocumentActions_getActionUrls(recordData)
       {
-         var recordData = this.assetData,
-            nodeRef = recordData.nodeRef,
+         var nodeRef = recordData.nodeRef,
             custom = recordData.custom || {},
             fnPageURL = Alfresco.util.bind(function(page)
             {
@@ -213,7 +213,7 @@
             displayName = assetData.displayName;
 
          // Token replacement
-         clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls());
+         clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls(this.assetData));
 
          // Replace existing actions and assign correct class for icon rendering
          actionsContainer.innerHTML = clone.innerHTML;
@@ -394,7 +394,7 @@
                   fn: function DocumentActions_oAEO_success(data)
                   {
                      this.assetData.nodeRef = data.json.results[0].nodeRef;
-                     window.location = this.getActionUrls().documentDetailsUrl + "#editOffline";
+                     window.location = this.getActionUrls(this.assetData).documentDetailsUrl + "#editOffline";
                   },
                   scope: this
                }
@@ -436,7 +436,7 @@
                   fn: function DocumentActions_oACE_success(data)
                   {
                      this.assetData.nodeRef = data.json.results[0].nodeRef;
-                     window.location = this.getActionUrls().documentDetailsUrl + "#editCancelled";
+                     window.location = this.getActionUrls(this.assetData).documentDetailsUrl + "#editCancelled";
                   },
                   scope: this
                }
@@ -528,7 +528,7 @@
          // Call the normal callback to post the activity data
          this.onNewVersionUploadComplete.call(this, complete);
          this.assetData.nodeRef = complete.successful[0].nodeRef;
-         window.location = this.getActionUrls().documentDetailsUrl;
+         window.location = this.getActionUrls(this.assetData).documentDetailsUrl;
       },
 
       /**
@@ -559,7 +559,7 @@
                   fn: function DocumentActions_oAEO_success(data)
                   {
                      this.assetData.nodeRef = data.json.results[0].nodeRef;
-                     window.location = this.getActionUrls().documentDetailsUrl + "#checkoutToGoogleDocs";
+                     window.location = this.getActionUrls(this.assetData).documentDetailsUrl + "#checkoutToGoogleDocs";
                   },
                   scope: this
                }
@@ -619,7 +619,7 @@
                   fn: function DocumentActions_oACE_success(data)
                   {
                      this.assetData.nodeRef = data.json.results[0].nodeRef;
-                     window.location = this.getActionUrls().documentDetailsUrl + "#checkinFromGoogleDocs";
+                     window.location = this.getActionUrls(this.assetData).documentDetailsUrl + "#checkinFromGoogleDocs";
                   },
                   scope: this
                }

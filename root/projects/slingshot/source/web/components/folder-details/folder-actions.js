@@ -141,12 +141,12 @@
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
+       * @param recordData {object} Object literal representing the node
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function FolderActions_getActionUrls()
+      getActionUrls: function FolderActions_getActionUrls(recordData)
       {
-         var recordData = this.assetData,
-            nodeRef = recordData.nodeRef,
+         var nodeRef = recordData.nodeRef,
             nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
             fnPageURL = Alfresco.util.bind(function(page)
             {
@@ -182,7 +182,7 @@
             clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
 
          // Token replacement
-         clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls());
+         clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls(this.assetData));
 
          // Replace existing actions and assign correct class for icon rendering
          actionsContainer.innerHTML = clone.innerHTML;

@@ -613,7 +613,7 @@
                /**
                 * Detailed View
                 */
-                oColumn.width = 180;
+                oColumn.width = 200;
             }
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -777,13 +777,12 @@
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
-       * @param record {object} A data source element describing the item in the list
+       * @param recordData {object} Object literal representing the node
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function DL_getActionUrls(record)
+      getActionUrls: function DL_getActionUrls(recordData)
       {
          var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/",
-            recordData = record.getData(),
             nodeRef = recordData.nodeRef,
             filePlan = this.doclistMetadata.filePlan.replace(":/", "");
 

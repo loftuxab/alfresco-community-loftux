@@ -797,7 +797,7 @@
                else
                {
                   var id = scope.id + '-preview-' + oRecord.getId();
-                  docDetailsUrl = scope.getActionUrls(oRecord).documentDetailsUrl;
+                  docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
                   elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
 
                   // Preview tooltip
@@ -819,7 +819,7 @@
                }
                else
                {
-                  docDetailsUrl = scope.getActionUrls(oRecord).documentDetailsUrl;
+                  docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
                   elCell.innerHTML = '<span class="thumbnail">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.DocumentList.generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
                }
             }
@@ -913,7 +913,7 @@
                /**
                 * Documents and Links
                 */
-               docDetailsUrl = scope.getActionUrls(oRecord).documentDetailsUrl;
+               docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
 
                // Locked / Working Copy handling
                if (record.lockedByUser && record.lockedByUser !== "")
@@ -1618,7 +1618,7 @@
             var clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
             
             // Token replacement
-            clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls(record));
+            clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls(record.getData()));
 
             // Generate an id
             clone.id = elActions.id + "_a";
@@ -1718,13 +1718,12 @@
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
-       * @param record {object} A data source element describing the item in the list
+       * @param recordData {object} Object literal representing the node
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function DL_getActionUrls(record)
+      getActionUrls: function DL_getActionUrls(recordData)
       {
-         var recordData = record.getData(),
-            nodeRef = recordData.nodeRef,
+         var nodeRef = recordData.nodeRef,
             nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
             contentUrl = recordData.contentUrl,
             custom = recordData.custom,
