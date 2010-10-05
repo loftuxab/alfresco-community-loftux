@@ -123,7 +123,7 @@ public final class Debug {
 	 * @param ex Exception
 	 */
 	public static final void println(Exception ex) {
-		println(ex, Error);
+		m_debug.debugPrintln(ex, Error);
 	}
 	
 	/**
@@ -133,18 +133,7 @@ public final class Debug {
 	 * @param level int
 	 */
 	public static final void println(Exception ex, int level) {			
-
-		//	Write the exception stack trace records to an in-memory stream
-				
-		StringWriter strWrt = new StringWriter();
-		ex.printStackTrace(new PrintWriter(strWrt, true));
-				
-		//	Split the resulting string into seperate records and output to the debug device
-				
-		StringTokenizer strTok = new StringTokenizer(strWrt.toString(), LineSeperator);
-				
-		while ( strTok.hasMoreTokens())
-			m_debug.debugPrintln(strTok.nextToken(), level);
+		m_debug.debugPrintln( ex, level);
 	}
 
 	/**
@@ -153,7 +142,7 @@ public final class Debug {
 	 * @param ex Throwable
 	 */
 	public static final void println(Throwable ex) {
-		println(ex, Error);
+		m_debug.debugPrintln(ex, Error);
 	}
 	
 	/**

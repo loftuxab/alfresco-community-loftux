@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.springframework.extensions.config.ConfigElement;
 
 /**
@@ -115,13 +116,14 @@ public class LogFileDebug extends DebugInterfaceBase {
 	 * Initialize the debug interface using the specified parameters.
 	 *
 	 * @param params ConfigElement
+	 * @param config ServerConfiguration
 	 */
-	public void initialize(ConfigElement params)
+	public void initialize(ConfigElement params, ServerConfiguration config)
 		throws Exception {
 
 		// Call the base class
 		
-		super.initialize( params);
+		super.initialize( params, config);
 		
 		//	Get the output file name and append flag settings
 
