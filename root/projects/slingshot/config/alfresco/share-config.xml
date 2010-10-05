@@ -95,13 +95,6 @@
       </pages>
    </config>
 
-   <config evaluator="string-compare" condition="HelpPages">
-      <help-pages>
-         <share-help>http://www.alfresco.com/help/34/community/sharehelp/</share-help>
-         <share-tutorial>http://www.alfresco.com/help/34/community/sharetutorial/</share-tutorial>
-      </help-pages>
-   </config>
-   
    <config evaluator="string-compare" condition="Users">
       <users>
          <!-- minimum length for username and password -->
