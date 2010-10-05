@@ -57,12 +57,12 @@
        *
        * @method getActionUrls
        * @override
+       * @param recordData {object} Object literal representing the node
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function RecordsDocumentActions_getActionUrls()
+      getActionUrls: function RecordsDocumentActions_getActionUrls(recordData)
       {
          var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/",
-            recordData = this.assetData,
             nodeRef = new Alfresco.util.NodeRef(recordData.nodeRef),
             filePlan = this.doclistMetadata.filePlan.replace(":/", "");
 
