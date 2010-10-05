@@ -108,7 +108,7 @@ public class DebugConfigSection extends ConfigSection {
           //  Initialize the debug output class
         
           DebugInterface dbg = (DebugInterface) obj;
-          dbg.initialize(params);
+          dbg.initialize(params, getServerConfiguration());
         
           //  Inform listeners of the configuration change
           
@@ -154,5 +154,18 @@ public class DebugConfigSection extends ConfigSection {
     //  Return the change status
     
     return sts;
+  }
+  
+  /**
+   * Close the configuration section, perform any cleanup
+   */
+  public void closeConfig() {
+	  
+	  // Close the debug interface
+	  
+	  if ( m_debugDev != null) {
+		  m_debugDev.close();
+		  m_debugDev = null;
+	  }
   }
 }

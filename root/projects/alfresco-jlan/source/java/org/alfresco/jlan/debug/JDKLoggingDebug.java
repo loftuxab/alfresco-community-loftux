@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.springframework.extensions.config.ConfigElement;
 
 /**
@@ -100,6 +101,46 @@ public class JDKLoggingDebug extends DebugInterfaceBase {
 	}
   }
 
+	/**
+	 * Output an exception
+	 * 
+	 * @param ex Throwable
+	 * @param level int
+	 */
+	public void debugPrintln( Throwable ex, int level) {
+		
+		// Check if the logging level is enabled
+		  
+		if ( level <= getLogLevel()) {
+
+			// Convert the logging level to a JDK logging level
+			
+			Level logLevel = Level.OFF;
+			
+			switch ( level) {
+				case Debug.Debug:
+				  logLevel = Level.FINEST;
+				  break;
+				case Debug.Info:
+				  logLevel = Level.INFO;
+				  break;
+				case Debug.Warn:
+				  logLevel = Level.WARNING;
+				  break;
+				case Debug.Fatal:
+				  logLevel = Level.SEVERE;
+				  break;
+				case Debug.Error:
+				  logLevel = Level.FINEST;
+				  break;
+			  }
+
+			// Output the exception
+			
+			  Logger.global.log(logLevel, "", ex);
+		}
+	}
+	
   /**
    * Output to the logger at the appropriate log level
    * 
@@ -134,8 +175,9 @@ public class JDKLoggingDebug extends DebugInterfaceBase {
    * Initialize the debug interface using the specified parameters.
    *
    * @param params ConfigElement
+   * @param config ServerConfiguration
    */
-  public void initialize( ConfigElement params) {
+  public void initialize( ConfigElement params, ServerConfiguration config) {
 
     //  Get the logging properities file name
 

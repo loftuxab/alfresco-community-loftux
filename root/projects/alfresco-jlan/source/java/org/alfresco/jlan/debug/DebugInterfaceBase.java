@@ -19,6 +19,11 @@
 
 package org.alfresco.jlan.debug;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.StringTokenizer;
+
+import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.springframework.extensions.config.ConfigElement;
 
 /**
@@ -27,6 +32,10 @@ import org.springframework.extensions.config.ConfigElement;
  * @author gkspencer
  */
 public abstract class DebugInterfaceBase implements DebugInterface {
+
+	//	Line seperator used for exception stack traces
+	
+	private static final String LineSeperator	= System.getProperty("line.separator");
 
 	// Log output level
 	
@@ -77,6 +86,27 @@ public abstract class DebugInterfaceBase implements DebugInterface {
 	public abstract void debugPrintln(String str, int level);
 
 	/**
+	 * Output an exception
+	 * 
+	 * @param ex Throwable
+	 * @param level int
+	 */
+	public void debugPrintln( Throwable ex, int level) {
+		
+		//	Write the exception stack trace records to an in-memory stream
+		
+		StringWriter strWrt = new StringWriter();
+		ex.printStackTrace(new PrintWriter(strWrt, true));
+				
+		//	Split the resulting string into seperate records and output to the debug device
+				
+		StringTokenizer strTok = new StringTokenizer(strWrt.toString(), LineSeperator);
+				
+		while ( strTok.hasMoreTokens())
+			debugPrintln(strTok.nextToken(), level);
+	}
+	
+	/**
 	 * Return the debug interface logging level
 	 * 
 	 * @return int
@@ -98,8 +128,9 @@ public abstract class DebugInterfaceBase implements DebugInterface {
 	 * Initialize the debug interface using the specified parameters.
 	 *
 	 * @param params ConfigElement
+	 * @param config ServerConfiguration
 	 */
-	public void initialize(ConfigElement params)
+	public void initialize(ConfigElement params, ServerConfiguration config)
 		throws Exception {
 		
 		// Check for a logging level

@@ -19,6 +19,7 @@
 
 package org.alfresco.jlan.debug;
 
+import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.springframework.extensions.config.ConfigElement;
 
 /**
@@ -31,7 +32,7 @@ public interface DebugInterface {
 	/**
 	 * Close the debug output.
 	 */
-	void close();
+	public void close();
 
 	/**
 	 * Output a debug string.
@@ -63,12 +64,21 @@ public interface DebugInterface {
 	public void debugPrintln(String str, int level);
 
 	/**
+	 * Output an exception
+	 * 
+	 * @param ex Throwable
+	 * @param level int
+	 */
+	public void debugPrintln( Throwable ex, int level);
+	
+	/**
 	 * Initialize the debug interface using the specified named parameters.
 	 *
 	 * @param params ConfigElement
+	 * @param config ServerConfiguration
 	 * @exception Exception
 	 */
-	public void initialize(ConfigElement params)
+	public void initialize(ConfigElement params, ServerConfiguration config)
 		throws Exception;
 	
 	/**
