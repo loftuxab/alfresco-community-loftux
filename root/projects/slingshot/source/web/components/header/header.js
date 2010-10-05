@@ -130,6 +130,7 @@
        */
       onReady: function Header_onReady()
       {
+         Dom.removeClass(this.id + "-appItems", "hidden");
          this.replaceUriTokens();
          this.configureSearch();
          this.configureMyStatus();
