@@ -20,9 +20,9 @@
         <ul class="newslist-wrapper">
             <#list results.results as result>
                 <li> 
-                  <h4><a href="<@makeurl asset=result force='short'/>">${result.title!'no title'}</a></h4>
+                  <h4><a href="<@makeurl asset=result force='short'/>">${result.title!result.name}</a></h4>
                   <span class="newslist-date"><#if result.properties['ws:publishedTime']??>${result.properties['ws:publishedTime']?string(msg('date.format'))}</#if></span>
-                  <p>${result.description!'no preview'}</p>
+                  <p>${result.description!''}</p>
                 </li>
             </#list>
         </ul>

@@ -28,8 +28,8 @@ import org.alfresco.wcm.client.SearchResults;
 public class SearchResultsImpl implements SearchResults
 {
     private List<SearchResult> results = Collections.emptyList();
-    private Query query;
-    private long totalSize;
+    private Query query = null;
+    private long totalSize = 0L;
     
     @Override
     public Query getQuery()

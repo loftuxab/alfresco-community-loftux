@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.SectionFactory;
+import org.alfresco.wcm.client.UgcService;
 import org.alfresco.wcm.client.WebSite;
 import org.alfresco.wcm.client.WebSiteService;
 import org.alfresco.wcm.client.impl.cache.SimpleCache;
@@ -102,7 +103,21 @@ public class WebSiteServiceImpl extends WebSiteService
      */
     public WebSite getWebSite(String hostName, int hostPort)
     {
-        return getWebSiteCache().get(hostName + ":" + hostPort);
+        String key = hostName + ":" + hostPort;
+        WebSite website = getWebSiteCache().get(key);
+        if (website == null)
+        {
+            //It would be fairly unusual for us to have received a request for a specific host and port that
+            //doesn't map to a website in the repo. Could it be that our cache is out of date?
+            //We'll refresh the cache once now just to check.
+            refreshWebsiteCache();
+            website = getWebSiteCache().get(key);
+        }
+        if (website == null)
+        {
+            log.warn("Received a request for unrecognised host+port: " + key);
+        }
+        return website;
     }
 
     /**
@@ -122,57 +137,67 @@ public class WebSiteServiceImpl extends WebSiteService
     {
         if (webSiteCache == null || webSiteCacheExpired() == true)
         {
-            Map<String, WebSite> newCache = new HashMap<String, WebSite>(5);
-
-            Session session = CmisSessionHelper.getSession();
-
-            // Execute query
-            if (log.isDebugEnabled())
-            {
-                log.debug("About to run CMIS query: " + QUERY_WEB_ROOTS);
-            }            
-            ItemIterable<QueryResult> results = session.query(QUERY_WEB_ROOTS, false);
-            for (QueryResult result : results)
-            {
-                // Get the details of the returned object
-                String id = result.getPropertyValueById(PropertyIds.OBJECT_ID);
-                String hostName = result.getPropertyValueById(WebSite.PROP_HOSTNAME);
-                BigInteger hostPort = result.getPropertyValueById(WebSite.PROP_HOSTPORT);
-                String key = hostName + ":" + hostPort.toString();
-                String title = result.getPropertyValueById(Asset.PROPERTY_TITLE);
-                String description = result.getPropertyValueById(Asset.PROPERTY_DESCRIPTION);
-                String context = result.getPropertyValueById(WebSite.PROP_CONTEXT);
-                List<String> configList = result.getPropertyMultivalueById(WebSite.PROP_SITE_CONFIG);
-                Map<String,String> configProperties = parseSiteConfig(configList);
-
-                WebsiteInfo siteInfo = getWebsiteInfo(id);
-
-                WebSiteImpl webSite = new WebSiteImpl(id, hostName, hostPort.intValue(),
-                        webSiteSectionCacheRefreshAfter);
-                webSite.setRootSectionId(siteInfo.rootSectionId);
-                webSite.setTitle(title);
-                webSite.setDescription(description);
-                webSite.setContext(context);
-                webSite.setSectionFactory(sectionFactory);
-                webSite.setConfig(configProperties);
-                UgcServiceCmisImpl ugcService = new UgcServiceCmisImpl(session
-                        .createObjectId(siteInfo.feedbackFolderId));
-                ugcService.setFormIdCache(formIdCache);
-                webSite.setUgcService(ugcService);
-                
-                newCache.put(key, webSite);
-
-                // Find the logo asset id
-                Asset logo = assetFactory.getSectionAsset(siteInfo.rootSectionId, logoFilename, true);
-                webSite.setLogo(logo);
-                
-                webSite.setUrlUtils(urlUtils);
-            }
-
-            webSiteCacheRefeshedAt = System.currentTimeMillis();
-            webSiteCache = newCache;
+            refreshWebsiteCache();
         }
         return webSiteCache;
+    }
+
+    private void refreshWebsiteCache()
+    {
+        Map<String, WebSite> newCache = new HashMap<String, WebSite>(5);
+
+        Session session = CmisSessionHelper.getSession();
+
+        // Execute query
+        if (log.isDebugEnabled())
+        {
+            log.debug("About to run CMIS query: " + QUERY_WEB_ROOTS);
+        }            
+        ItemIterable<QueryResult> results = session.query(QUERY_WEB_ROOTS, false);
+        for (QueryResult result : results)
+        {
+            // Get the details of the returned object
+            String id = result.getPropertyValueById(PropertyIds.OBJECT_ID);
+            String hostName = result.getPropertyValueById(WebSite.PROP_HOSTNAME);
+            BigInteger hostPort = result.getPropertyValueById(WebSite.PROP_HOSTPORT);
+            String key = hostName + ":" + hostPort.toString();
+            String title = result.getPropertyValueById(Asset.PROPERTY_TITLE);
+            String description = result.getPropertyValueById(Asset.PROPERTY_DESCRIPTION);
+            String context = result.getPropertyValueById(WebSite.PROP_CONTEXT);
+            List<String> configList = result.getPropertyMultivalueById(WebSite.PROP_SITE_CONFIG);
+            Map<String,String> configProperties = parseSiteConfig(configList);
+
+            WebsiteInfo siteInfo = getWebsiteInfo(id);
+
+            WebSiteImpl webSite = new WebSiteImpl(id, hostName, hostPort.intValue(),
+                    webSiteSectionCacheRefreshAfter);
+            webSite.setRootSectionId(siteInfo.rootSectionId);
+            webSite.setTitle(title);
+            webSite.setDescription(description);
+            webSite.setContext(context);
+            webSite.setSectionFactory(sectionFactory);
+            webSite.setConfig(configProperties);
+            webSite.setUgcService(createUgcService(session, siteInfo));
+            
+            newCache.put(key, webSite);
+
+            // Find the logo asset id
+            Asset logo = assetFactory.getSectionAsset(siteInfo.rootSectionId, logoFilename, true);
+            webSite.setLogo(logo);
+            
+            webSite.setUrlUtils(urlUtils);
+        }
+
+        webSiteCacheRefeshedAt = System.currentTimeMillis();
+        webSiteCache = newCache;
+    }
+
+    protected UgcService createUgcService(Session session, WebsiteInfo siteInfo)
+    {
+        UgcServiceCmisImpl ugcService = new UgcServiceCmisImpl(session
+                .createObjectId(siteInfo.feedbackFolderId));
+        ugcService.setFormIdCache(formIdCache);
+        return ugcService;
     }
 
     private Map<String, String> parseSiteConfig(List<String> configList)

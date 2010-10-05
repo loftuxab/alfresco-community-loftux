@@ -4,23 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.TestCase;
-
-import org.alfresco.wcm.client.impl.AssetFactoryCmisImpl;
-import org.alfresco.wcm.client.impl.SectionFactoryCmisImpl;
-import org.alfresco.wcm.client.impl.WebScriptCaller;
-import org.alfresco.wcm.client.impl.WebSiteServiceImpl;
-import org.alfresco.wcm.client.impl.cache.SimpleCache;
-import org.alfresco.wcm.client.util.CmisSessionHelper;
-import org.alfresco.wcm.client.util.CmisSessionPool;
-import org.alfresco.wcm.client.util.impl.CmisSessionPoolImpl;
-import org.alfresco.wcm.client.util.impl.GuestSessionFactoryImpl;
-import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class UgcServiceTest extends BaseTest 
 {

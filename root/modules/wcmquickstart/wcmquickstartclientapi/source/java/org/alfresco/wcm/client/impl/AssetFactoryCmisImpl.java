@@ -185,31 +185,36 @@ public class AssetFactoryCmisImpl implements AssetFactory
         // appropriate CMIS query, falling back to constraining by
         // section only
         String cmisQuery = null;
-        if (query.getPhrase() != null)
+        if ((query.getPhrase() != null) && (query.getPhrase().length() > 0))
         {
             cmisQuery = MessageFormat.format(assetByFtsQueryPattern, query.getSectionId(), query.getPhrase());
         }
-        else if (query.getTag() != null)
+        else if ((query.getTag() != null) && (query.getTag().length() > 0))
         {
             cmisQuery = MessageFormat.format(assetByTagQueryPattern, query.getSectionId(), query.getTag());
         }
-        else
+        else if (query.getSectionId() != null)
         {
             cmisQuery = MessageFormat.format(assetBySectionQueryPattern, query.getSectionId());
         }
 
-        ItemIterable<QueryResult> results = runQuery(cmisQuery, searchOrderClause);
-        ItemIterable<QueryResult> page = results.skipTo(query.getResultsToSkip()).getPage(query.getMaxResults());
-        List<SearchResult> foundAssets = new ArrayList<SearchResult>((int) page.getPageNumItems());
-        for (QueryResult queryResult : page)
-        {
-            foundAssets.add(new SearchResultAssetImpl(buildAsset(queryResult), ((BigDecimal) queryResult
-                    .getPropertyValueByQueryName("SEARCH_SCORE")).scaleByPowerOfTen(2).intValue()));
-        }
         SearchResultsImpl searchResults = new SearchResultsImpl();
-        searchResults.setResults(foundAssets);
         searchResults.setQuery(new Query(query));
-        searchResults.setTotalSize(results.getTotalNumItems());
+
+        if (cmisQuery != null)
+        {
+            ItemIterable<QueryResult> results = runQuery(cmisQuery, searchOrderClause);
+            ItemIterable<QueryResult> page = results.skipTo(query.getResultsToSkip()).getPage(query.getMaxResults());
+            List<SearchResult> foundAssets = new ArrayList<SearchResult>((int) page.getPageNumItems());
+            for (QueryResult queryResult : page)
+            {
+                foundAssets.add(new SearchResultAssetImpl(buildAsset(queryResult), ((BigDecimal) queryResult
+                        .getPropertyValueByQueryName("SEARCH_SCORE")).scaleByPowerOfTen(2).intValue()));
+            }
+            searchResults.setResults(foundAssets);
+            searchResults.setTotalSize(results.getTotalNumItems());
+        }
+        
         return searchResults;
     }
 

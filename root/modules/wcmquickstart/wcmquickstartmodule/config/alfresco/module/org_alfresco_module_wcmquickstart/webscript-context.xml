@@ -14,9 +14,6 @@
           class="org.alfresco.module.org_alfresco_module_wcmquickstart.webscript.WebsiteInfoGet" 
           parent="webscript">
        <property name="nodeService" ref="NodeService"/>       
-       <property name="searchService" ref="SearchService"/>
-       <property name="siteService" ref="SiteService"/>
-       <property name="namespaceService" ref="NamespaceService"/>
        <property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper" />
     </bean>
               

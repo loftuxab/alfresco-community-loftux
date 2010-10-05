@@ -26,6 +26,8 @@
         class="org.alfresco.module.org_alfresco_module_wcmquickstart.util.SiteHelper">
         <property name="nodeService" ref="NodeService" />
         <property name="siteService" ref="SiteService" />
+        <property name="searchService" ref="SearchService" />
+        <property name="namespaceService" ref="NamespaceService" />
         <property name="dictionaryService" ref="DictionaryService" />
     </bean>
 
