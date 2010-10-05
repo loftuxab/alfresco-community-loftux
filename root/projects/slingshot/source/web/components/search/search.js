@@ -659,7 +659,7 @@
             
             case "calendarevent":
             {
-               url = record.getData("container"); // this is "calendar"
+               url = record.getData("container") + "?date=" + Alfresco.util.formatDate(record.getData("modifiedOn"), "yyyy-mm-dd");
                break;
             }
             
