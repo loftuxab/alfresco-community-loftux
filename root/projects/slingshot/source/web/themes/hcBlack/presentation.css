@@ -657,12 +657,14 @@ body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected
    background-color: #000;
 }
 
-body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
+body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
+body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a
 {
    color: #000;
 }
 
-body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
+body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel,
+body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel a
 {
    color: #FFF;
 }
@@ -730,7 +732,7 @@ body.yui-skin-hcBlack .over,
 
 .site-members .search-controls
 {
-   background-color: #F5F5F5;
+   background-color: #FFF;
 }
 
 body.yui-skin-hcBlack .my-sites a.favourite-site.enabled,

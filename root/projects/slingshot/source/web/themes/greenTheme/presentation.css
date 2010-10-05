@@ -634,12 +634,14 @@ body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected
    background-color: #008f22;
 }
 
-body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
+body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
+body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a
 {
-   color: #00AE42;
+   color: #000;
 }
 
-body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
+body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel,
+body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel a
 {
    color: #FFF;
 }
@@ -915,7 +917,7 @@ div.theme-bg-color-2
 .theme-bg-color-3,
 div.theme-bg-color-3
 {
-   background-color: #DDEDE6;
+   background-color: #F5F5F5;
 }
 
 .theme-bg-color-4,

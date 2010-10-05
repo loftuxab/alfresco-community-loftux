@@ -12,7 +12,9 @@
 
 <div id="${args.htmlid}-sentinvites" class="sent-invites">
 
-   <div class="title">${msg("sentinvites.title")}</div>
+   <div class="title">
+      <label for="${args.htmlid}-search-text">${msg("sentinvites.title")}</label>
+   </div>
 
    <div id="${args.htmlid}-wrapper" class="sent-invites-wrapper">
       <div class="search-bar theme-bg-color-3">
