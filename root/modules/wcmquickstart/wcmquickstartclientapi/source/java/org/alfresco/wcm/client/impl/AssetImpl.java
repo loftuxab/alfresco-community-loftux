@@ -118,7 +118,10 @@ public class AssetImpl extends ResourceBaseImpl implements Asset
     public void setParentSectionIds(Collection<String> sectionIds)
     {
         this.parentSectionIds  = new ArrayList<String>(sectionIds);
-        setPrimarySectionId(parentSectionIds.get(0));
+        if (sectionIds.size() > 0)
+        {
+            setPrimarySectionId(parentSectionIds.get(0));
+        }
     }
     
     /**

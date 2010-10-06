@@ -177,12 +177,12 @@
                     <title>Maximum Size</title>
                     <type>d:int</type>
                     <mandatory>true</mandatory>
-                    <default>5</default>
+                    <!-- default>5</default-->
                 </property>
                 <property name="ws:minsToQueryRefresh">
                 	<title>Minutes To Query Refresh</title>
                 	<type>d:int</type>
-                	<default>30</default>                	
+                	<!-- default>30</default-->                	
                 </property>
                 <property name="ws:refreshAt">
                 	<title>Refresh At</title>

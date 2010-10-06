@@ -38,7 +38,7 @@ public class QuerySanitizer
      */
     protected String sanitizeImpl(String text)
     {
-        return text == null ? null : text.replaceAll("[\"'%?*()$^<>/{}\\[\\]#~@.,|\\\\+!:;]", " ");
+        return text == null ? null : text.replaceAll("[\"'%?*()$^<>/{}\\[\\]#~@.,|\\\\+!:;&`¬=]", " ");
     }
     
     /**
