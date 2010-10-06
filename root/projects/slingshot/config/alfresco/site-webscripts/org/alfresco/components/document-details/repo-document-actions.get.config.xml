@@ -9,6 +9,7 @@
          <action type="action-link" id="onActionUploadNewVersion" permission="edit" label="actions.document.upload-new-version" />
          <action type="simple-link" id="onActionInlineEdit" permission="edit,inline-edit" href="{inlineEditUrl}" label="actions.document.inline-edit" />
          <action type="action-link" id="onActionEditOffline" permission="edit" label="actions.document.edit-offline" />
+         <action type="action-link" id="onActionCheckoutToGoogleDocs" permission="edit,googledocs-edit" label="actions.document.checkout-google" />
          <action type="action-link" id="onActionSimpleApprove" permission="simple-approve" label="actions.document.simple-approve" />
          <action type="action-link" id="onActionSimpleReject" permission="simple-reject" label="actions.document.simple-reject" />
          <action type="action-link" id="onActionCopyTo" label="actions.document.copy-to" />
