@@ -103,7 +103,9 @@
     <bean id="rssController" class="org.alfresco.wcm.client.controller.RssController"/>
            
     <!-- Resolve views by using the template selected within the repository for a page -->
-    <bean id="dynamicPageViewResolver" class="org.alfresco.wcm.client.viewresolver.DynamicPageViewResolver" parent="abstractWebFrameworkViewResolver"/>
+    <bean id="dynamicPageViewResolver" class="org.alfresco.wcm.client.viewresolver.DynamicPageViewResolver" parent="abstractWebFrameworkViewResolver">
+        <property name="order" value="1"/>
+    </bean>
     
     <!-- View resolver for the 500page -->
     <bean id="staticPageViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
