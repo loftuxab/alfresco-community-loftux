@@ -370,7 +370,10 @@ public class AssetFactoryCmisImpl implements AssetFactory
                 .getFirstValue());
 
         List<String> parentSectionIds = result.getPropertyMultivalueById(Asset.PROPERTY_PARENT_SECTIONS);
-
+        if (parentSectionIds == null || parentSectionIds.isEmpty())
+        {
+            log.warn("Retrieved an asset that has no parent sections: " + properties.get(PropertyIds.OBJECT_ID));
+        }
         asset.setProperties(properties);
         asset.setParentSectionIds(parentSectionIds);
         asset.setSectionFactory(sectionFactory);

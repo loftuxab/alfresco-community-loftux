@@ -31,12 +31,39 @@
       <property name="sectionIndexPageName" value="${wcmqs.indexpage}" />
       <property name="sectionCollectionsFolderName" value="${wcmqs.collectionsfolder}" />
       <property name="namespaceService" ref="namespaceService" />
-      <property name="typesToIgnore">
+      <property name="typesToIgnore" ref="wcmquickstartmodule_sectionTypesToIgnore" />
+      <property name="assetCollectionDefinitions" ref="wcmquickstartmodule_sectionAssetCollections" />
+   </bean>
+   
+   <bean id="wcmquickstartmodule_sectionTypesToIgnore" class="java.util.TreeSet">
+      <constructor-arg>
          <set>
             <value>ws:visitorFeedback</value>
             <value>ws:indexPage</value>
          </set>
-      </property>
+       </constructor-arg>
+   </bean>
+   
+   <bean id="wcmquickstartmodule_sectionAssetCollections" class="java.util.ArrayList" >
+      <constructor-arg>
+         <list>
+            <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.AssetCollectionDefinition">
+                <property name="name" value="latest.articles" />
+                <property name="title" value="Latest Articles" />
+                <property name="maxResults" value="3" />
+                <property name="query"><value>SELECT d.* FROM cmis:document AS d JOIN ws:webasset AS wa ON d.cmis:objectId = wa.cmis:objectId WHERE d.cmis:objectTypeId='D:ws:article' AND in_tree(d, '%{section:.}') ORDER BY wa.ws:publishedTime DESC</value></property>
+            </bean>
+            <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.AssetCollectionDefinition">
+                <property name="name" value="all.articles" />
+                <property name="title" value="Articles" />
+                <property name="query"><value>SELECT d.* FROM cmis:document AS d JOIN ws:webasset AS wa ON d.cmis:objectId = wa.cmis:objectId WHERE d.cmis:objectTypeId='D:ws:article' AND in_tree(d, '%{section:.}') ORDER BY wa.ws:publishedTime DESC</value></property>
+            </bean>
+            <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.AssetCollectionDefinition">
+                <property name="name" value="featured.articles" />
+                <property name="title" value="Featured Articles" />
+            </bean>
+         </list>
+      </constructor-arg>
    </bean>
 
    <bean id="wcmquickstartmodule_webassetCollectionFolderType" class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebassetCollectionFolderType"
