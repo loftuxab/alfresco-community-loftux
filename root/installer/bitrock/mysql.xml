@@ -326,6 +326,7 @@ System variables provided by this component:
                     </preShowPageActionList>
                     <ruleEvaluationLogic>or</ruleEvaluationLogic>
                     <ruleList>
+                        <compareText logic="equals" value="1" text="${mysql_server_port_show}"/>
                         <ruleGroup>
                             <ruleList>
                                 <compareText text="${component(mysql).parameter(mysql_global_port_checking).value}" logic="equals" value="1"/>
@@ -334,15 +335,14 @@ System variables provided by this component:
                         </ruleGroup>
                         <compareText text="${mysql_installation_type}" logic="equals" value="existing"/>
                         <portTest condition="cannot_bind" port="${mysql_port}"/>
-                        <compareText logic="equals" value="1" text="${mysql_server_port_show}"/>
                     </ruleList>
                 </stringParameter>
             </parameterList>
             <ruleEvaluationLogic>or</ruleEvaluationLogic>
             <ruleList>
+                <compareText logic="equals" value="1" text="${mysql_server_port_show}"/>
                 <compareText text="${mysql_installation_type}" logic="equals" value="existing"/>
                 <portTest condition="cannot_bind" port="${mysql_port}"/>
-                <compareText logic="equals" value="1" text="${mysql_server_port_show}"/>
             </ruleList>
         </parameterGroup>
 
