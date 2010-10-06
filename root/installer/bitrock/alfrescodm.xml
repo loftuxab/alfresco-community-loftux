@@ -210,6 +210,11 @@
                 <actionGroup>
                     <actionList>
                         <deleteFile path="${alfresco_commands_directory}/*.sh" />
+                        <copyFile>
+                           <origin>${alfresco_commands_directory}/*.dll</origin>
+                           <destination>${tomcat_server_directory}/bin</destination>
+                        </copyFile>
+                        <deleteFile path="${alfresco_commands_directory}/*.dll" />
                     </actionList>
                     <ruleList>
                         <platformTest type="windows" />
