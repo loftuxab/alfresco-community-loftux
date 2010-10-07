@@ -863,6 +863,7 @@
                      this.widgets.currentValuesDataTable.deleteRows(0, l);
                   }
                }
+               
                for (var key in items)
                {
                   item = items[key];
@@ -880,11 +881,11 @@
                         link = null;
                         if (YAHOO.lang.isFunction(this.options.targetLinkTemplate))
                         {
-                           link = this.options.targetLinkTemplate.call(this, oRecord.getData());
+                           link = this.options.targetLinkTemplate.call(this, item);
                         }
                         else if (YAHOO.lang.isString(this.options.targetLinkTemplate))
                         {
-                           link = YAHOO.lang.substitute(this.options.targetLinkTemplate, oRecord.getData());
+                           link = YAHOO.lang.substitute(this.options.targetLinkTemplate, item);
                         }
                         displayValue += this.options.objectRenderer.renderItem(item, 16,
                               "<div>{icon} <a href='" + link + "'>{name}</a></div>");
