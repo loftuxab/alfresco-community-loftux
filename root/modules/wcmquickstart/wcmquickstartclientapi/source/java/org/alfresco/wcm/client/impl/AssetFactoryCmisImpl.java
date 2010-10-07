@@ -81,9 +81,6 @@ public class AssetFactoryCmisImpl implements AssetFactory
     private final String assetBySectionAndNameWildcardQueryPattern = COMMON_ASSET_SELECT_CLAUSE
             + COMMON_ASSET_FROM_CLAUSE + "WHERE ANY wa.ws:parentSections IN (''{0}'') AND d.cmis:name like ''{1}''";
 
-    private final String assetBySectionQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() "
-            + COMMON_ASSET_FROM_CLAUSE + "WHERE IN_TREE(d, ''{0}'') ";
-
     private final String assetByFtsQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() " + COMMON_ASSET_FROM_CLAUSE
             + "WHERE IN_TREE(d, ''{0}'') AND CONTAINS(d, ''{1}'') ";
 
@@ -192,10 +189,6 @@ public class AssetFactoryCmisImpl implements AssetFactory
         else if ((query.getTag() != null) && (query.getTag().length() > 0))
         {
             cmisQuery = MessageFormat.format(assetByTagQueryPattern, query.getSectionId(), query.getTag());
-        }
-        else if (query.getSectionId() != null)
-        {
-            cmisQuery = MessageFormat.format(assetBySectionQueryPattern, query.getSectionId());
         }
 
         SearchResultsImpl searchResults = new SearchResultsImpl();
