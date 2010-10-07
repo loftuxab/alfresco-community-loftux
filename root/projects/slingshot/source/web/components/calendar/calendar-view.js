@@ -157,7 +157,7 @@
                // create button on mouseover of day cells
                this.addButton = Alfresco.CalendarHelper.renderTemplate('createEventButton', 
                {
-                  addEventUrl: Alfresco.constants.URL_CONTEXT + 'components/calendar/images/add-event-16-2.png',
+                  addEventUrl: Alfresco.constants.URL_RESCONTEXT + 'components/calendar/images/add-event-16-2.png',
                   addEvent: this.msg('label.add-event')
                });
                // highlight current date

@@ -65,7 +65,7 @@
    {
       Alfresco.FlashUpload.superclass.constructor.call(this, "Alfresco.FlashUpload", htmlId, ["button", "container", "datatable", "datasource", "cookie", "uploader"]);
 
-      this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf?dt=" + (new Date()).getTime();
+      this.swf = Alfresco.constants.URL_RESCONTEXT + "yui/uploader/assets/uploader.swf?dt=" + (new Date()).getTime();
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
       
       this.fileStore = {};
@@ -446,7 +446,7 @@
          this.widgets.cancelOkButton = Alfresco.util.createYUIButton(this, "cancelOk-button", this.onCancelOkButtonClick);
 
          // Create and save a reference to the uploader so we can call it later
-         this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div", Alfresco.constants.URL_CONTEXT + "themes/" + Alfresco.constants.THEME + "/images/upload-button-sprite.png", true);
+         this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div", Alfresco.constants.URL_RESCONTEXT + "themes/" + Alfresco.constants.THEME + "/images/upload-button-sprite.png", true);
          this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
          this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
          this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);

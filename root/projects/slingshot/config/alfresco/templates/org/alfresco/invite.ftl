@@ -1,6 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/invite/invite.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/templates/invite/invite.css" />
 </@>
 
 <@templateBody>

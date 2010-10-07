@@ -360,7 +360,7 @@
             {
                ec.onclick = function Links_onEditLink()
                {
-                  window.location = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit?linkId={linkId}",
+                  window.location = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links-linkedit?linkId={linkId}",
                   {
                      site: me.options.siteId,
                      linkId: oRecord.getData('name')
@@ -565,7 +565,7 @@
       */
       generateLinksViewUrl: function Links_generateLinksViewUrl(site, container, linkId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}&listViewLinkBack=true",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links-view?linkId={linkId}&listViewLinkBack=true",
          {
             site: site,
             container: container,
@@ -879,7 +879,7 @@
        */
       showCreateLinkDlg: function Links_showCreateLinkDlg()
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links-linkedit",
          {
             site: this.options.siteId
          });

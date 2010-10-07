@@ -17,7 +17,7 @@
          <div class="workflows">
          <#list workflows as workflow>
             <div class="workflow <#if !workflow_has_next>workflow-last</#if>">
-               <div class="icon"><img src="${url.context}/components/documentlibrary/images/workflow-indicator-16.png" /></div>
+               <div class="icon"><img src="${url.context}/res/components/documentlibrary/images/workflow-indicator-16.png" /></div>
                <div class="details">
                   <div class="message">
                      <a href="${siteURL("workflow-details?workflowId=" + workflow.id?js_string)}"><#if workflow.message??>${workflow.message}<#else>${msg("workflow.no_message")?html}</#if></a>

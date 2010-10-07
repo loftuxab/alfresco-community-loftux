@@ -604,7 +604,7 @@
       onEditBlogPost: function BlogPostList_onEditBlogPost(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postedit?container={container}&postId={postId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postedit?container={container}&postId={postId}",
          {
             site: this.options.siteId,
             container: this.options.containerId,

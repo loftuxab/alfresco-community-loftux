@@ -225,7 +225,7 @@
          var priority = oRecord.getData("priority"),
             priorityMap = { "1": "high", "2": "medium", "3": "low" },
             priorityKey = priorityMap[priority + ""],
-            desc = '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/priority-' + priorityKey + '-16.png" title="' + this.msg("label.priority", this.msg("priority." + priorityKey)) + '"/>';
+            desc = '<img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/priority-' + priorityKey + '-16.png" title="' + this.msg("label.priority", this.msg("priority." + priorityKey)) + '"/>';
          elCell.innerHTML = desc;
       },
 

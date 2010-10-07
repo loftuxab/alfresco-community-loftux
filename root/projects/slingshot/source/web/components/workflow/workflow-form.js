@@ -234,7 +234,7 @@
             var taskOwner = recentTask.owner || {},
                taskOwnerAvatar = taskOwner.avatar,
                taskOwnerLink = Alfresco.util.userProfileLink(taskOwner.userName, taskOwner.firstName + " " + taskOwner.lastName, null, !taskOwner.firstName);
-            Dom.get(this.id + "-recentTaskOwnersAvatar").setAttribute("src", taskOwnerAvatar ? Alfresco.constants.PROXY_URI + taskOwnerAvatar  + "?c=force" : Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png");
+            Dom.get(this.id + "-recentTaskOwnersAvatar").setAttribute("src", taskOwnerAvatar ? Alfresco.constants.PROXY_URI + taskOwnerAvatar  + "?c=force" : Alfresco.constants.URL_RESCONTEXT + "components/images/no-user-photo-64.png");
             Dom.get(this.id + "-recentTaskOwnersCommentLink").innerHTML = this.msg("label.recentTaskOwnersCommentLink", taskOwnerLink);
 
             var initiator = this.workflow.initiator || {};

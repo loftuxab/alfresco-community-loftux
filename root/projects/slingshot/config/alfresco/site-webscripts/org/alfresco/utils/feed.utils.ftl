@@ -12,7 +12,7 @@
    </h4>
    <p>${item.description}</p>
 <#if item.attachment??>
-   <div><img src="${url.context}/images/filetypes32/${item.attachment.type}.gif"/><a href="${item.attachment.url}">${item.attachment.name}</a></div>
+   <div><img src="${url.context}/res/images/filetypes32/${item.attachment.type}.gif"/><a href="${item.attachment.url}">${item.attachment.name}</a></div>
 </#if>
    <br />
 </div>

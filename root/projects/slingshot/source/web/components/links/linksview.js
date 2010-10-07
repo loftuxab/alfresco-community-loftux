@@ -285,7 +285,7 @@
       */
       generateLinksViewUrl: function LinksView_generateLinksViewUrl(site, container, linkId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links-view?linkId={linkId}",
          {
             site: site,
             linkId: linkId
@@ -307,7 +307,7 @@
          var obj = args[1];
          if (obj && (obj.tagName !== null))
          {
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links?filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links?filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
             {
                site: this.options.siteId,
                filterId: "tag",
@@ -372,7 +372,7 @@
             this._releaseBusy();
 
             // load the link list page
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links",
             {
                site: this.options.siteId
             });
@@ -418,7 +418,7 @@
        */
       onEditLink: function LinksView_onEditNode(linkId)
       {  
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit?linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links-linkedit?linkId={linkId}",
          {
             site: this.options.siteId,
             linkId: linkId

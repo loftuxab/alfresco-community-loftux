@@ -1,10 +1,10 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/alfresco-resizer.js"></@script>
    <script type="text/javascript">//<![CDATA[
       new Alfresco.widget.Resizer("Links");
    //]]></script>
-   <@script type="text/javascript" src="${page.url.context}/components/links/linksdiscuss-common.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/res/components/links/linksdiscuss-common.js"></@script>
 </@>
 
 <@templateBody>

@@ -5,7 +5,7 @@
    <#if form.mode == "view">
       <div class="viewmode-field">
          <#if field.mandatory && field.value == "">
-            <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
+            <span class="incomplete-warning"><img src="${url.context}/res/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
          <#if field.control.params.activateLinks?? && field.control.params.activateLinks == "true">

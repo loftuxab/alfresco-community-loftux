@@ -58,7 +58,7 @@
                </span>
                <span class="insertDate">${msg("label.insertdate")}:</span>
                <div id="${el}-date" class="datepicker"></div>
-               <a id="${el}-date-icon"><img src="${url.context}/components/form/images/calendar.png" class="datepicker-icon"/></a>
+               <a id="${el}-date-icon"><img src="${url.context}/res/components/form/images/calendar.png" class="datepicker-icon"/></a>
             </div>
             <div class="query">
                <!-- Query terms text input -->

@@ -1,7 +1,7 @@
 <#include "include/alfresco-template.ftl" />
 <#import "import/alfresco-layout.ftl" as layout />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/dashboard/customise-dashboard.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/templates/dashboard/customise-dashboard.css" />
 </@>
 
 <@templateBody>

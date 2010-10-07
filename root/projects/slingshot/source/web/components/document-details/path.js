@@ -250,7 +250,7 @@
          {
             Dom.get(this.id + "-iconType").innerHTML = YAHOO.lang.substitute('<img src="{iconContext}{icon}-48.png" width="48" height="48" /><span class="type">{type}</span>',
             {
-               iconContext: Alfresco.constants.URL_CONTEXT + "components/documentlibrary/images/",
+               iconContext: Alfresco.constants.URL_RESCONTEXT + "components/documentlibrary/images/",
                icon: folderData.type,
                type: this.msg("type." + folderData.type)
             });

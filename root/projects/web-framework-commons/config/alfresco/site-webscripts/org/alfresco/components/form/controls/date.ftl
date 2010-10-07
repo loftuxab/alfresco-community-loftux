@@ -12,7 +12,7 @@
    <#if form.mode == "view">
       <div class="viewmode-field">
          <#if field.mandatory && field.value == "">
-            <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
+            <span class="incomplete-warning"><img src="${url.context}/res/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
          <span class="viewmode-value"><#if field.value != "">${xmldate(field.value)?string(viewFormat)}</#if></span>
@@ -48,7 +48,7 @@
          <input id="${controlId}-date" name="-" type="text" class="date-entry" <#if field.description??>title="${field.description}"</#if> <#if disabled>disabled="true"<#else>tabindex="0"</#if> />
       
          <#if disabled == false>
-            <a id="${controlId}-icon"><img src="${url.context}/components/form/images/calendar.png" class="datepicker-icon"/></a>
+            <a id="${controlId}-icon"><img src="${url.context}/res/components/form/images/calendar.png" class="datepicker-icon"/></a>
          </#if>
       
          <div id="${controlId}" class="datepicker"></div>

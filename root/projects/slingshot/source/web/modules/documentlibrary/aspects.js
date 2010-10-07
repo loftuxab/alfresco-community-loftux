@@ -547,7 +547,7 @@
                record =
                {
                   id: current,
-                  icon: Alfresco.constants.URL_CONTEXT + "components/images/aspect-16.png",
+                  icon: Alfresco.constants.URL_RESCONTEXT + "components/images/aspect-16.png",
                   name: this.i18n(current),
                   canAdd: current in addableObj,
                   canRemove: current in removeableObj
@@ -568,7 +568,7 @@
                   this.widgets.dataTableLeft.addRow(
                   {
                      id: addable,
-                     icon: Alfresco.constants.URL_CONTEXT + "components/images/aspect-16.png",
+                     icon: Alfresco.constants.URL_RESCONTEXT + "components/images/aspect-16.png",
                      name: this.i18n(addable),
                      canAdd: true,
                      canRemove: true

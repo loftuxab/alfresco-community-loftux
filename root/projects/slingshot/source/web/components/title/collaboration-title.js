@@ -185,7 +185,7 @@
                         Alfresco.module.getEditSiteInstance().show({shortName: this.options.site});
                         break;
                      case "customiseSite":
-                        window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.site + "/customise-site";;
+                        window.location =  Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.site + "/customise-site";;
                         break;
                      case "leaveSite":
                         var me = this;

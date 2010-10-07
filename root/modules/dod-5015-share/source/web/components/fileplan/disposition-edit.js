@@ -1091,7 +1091,7 @@
          this.widgets.doneButton.set("disabled", true);
 
          // Send the user to this page again without saving changes
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/record-category-details?nodeRef=" + this.options.nodeRef;
+         document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/record-category-details?nodeRef=" + this.options.nodeRef;
       }
    });
 })();

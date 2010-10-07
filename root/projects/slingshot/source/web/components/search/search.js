@@ -355,7 +355,7 @@
             Dom.addClass(elCell, "thumbnail-cell");
             
             var url = me._getBrowseUrlForRecord(oRecord);
-            var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/generic-result.png';
+            var imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/generic-result.png';
             
             // use the preview image for a document type
             var dataType = oRecord.getData("type");
@@ -367,35 +367,35 @@
                   break;
                
                case "folder":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/folder.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/folder.png';
                   break;
                
                case "blogpost":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/blog-post.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/blog-post.png';
                   break;
                
                case "forumpost":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/topic-post.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/topic-post.png';
                   break;
                
                case "calendarevent":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/calendar-event.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/calendar-event.png';
                   break;
                
                case "wikipage":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/wiki-page.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/wiki-page.png';
                   break;
                   
                case "link":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/link.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/link.png';
                   break;
                
                case "datalist":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/datalist.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/datalist.png';
                   break;
                
                case "datalistitem":
-                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/datalistitem.png';
+                  imageUrl = Alfresco.constants.URL_RESCONTEXT + 'components/search/images/datalistitem.png';
                   break;
             }
             
@@ -408,9 +408,9 @@
                var viewUrl = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/content/" + oRecord.getData("nodeRef").replace(":/", "") + "/" + oRecord.getData("name");
                html = '<div class="action-overlay">' + 
                       '<a href="' + encodeURI(viewUrl) + '" target="_blank"><img title="' + $html(me.msg("label.viewinbrowser")) +
-                      '" src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/view-in-browser-16.png" width="16" height="16"/></a>' +
+                      '" src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/view-in-browser-16.png" width="16" height="16"/></a>' +
                       '<a href="' + encodeURI(viewUrl + "?a=true") + '" style="padding-left:4px" target="_blank"><img title="' + $html(me.msg("label.download")) +
-                      '" src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/download-16.png" width="16" height="16"/></a>' + 
+                      '" src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/download-16.png" width="16" height="16"/></a>' + 
                       '</div>' + html;
             }
             elCell.innerHTML = html;
@@ -784,14 +784,14 @@
          }
          
          // redirect back to the search page - with appropriate site context
-         var url = Alfresco.constants.URL_CONTEXT + "page";
+         var url = Alfresco.constants.URL_PAGECONTEXT;
          if (this.options.siteId.length !== 0)
          {
-            url += "/site/" + this.options.siteId;
+            url += "site/" + this.options.siteId + "/";
          }
          
          // add search data webscript arguments
-         url += "/search?t=" + encodeURIComponent(searchTerm);
+         url += "search?t=" + encodeURIComponent(searchTerm);
          if (searchSort.length !== 0)
          {
             url += "&s=" + searchSort;

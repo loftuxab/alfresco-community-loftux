@@ -9,7 +9,7 @@
             <#if user.properties.avatar??>
                <img  class="photoimg" src="${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" alt="" />
             <#else>
-               <img class="photoimg" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
+               <img class="photoimg" src="${url.context}/res/components/images/no-user-photo-64.png" alt="" />
             </#if>
          </div>
 <#escape x as x?html>

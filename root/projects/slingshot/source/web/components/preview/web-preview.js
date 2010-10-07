@@ -228,7 +228,7 @@
 
          // Set title and icon         
          this.widgets.titleText.innerHTML = this.options.name;
-         this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.options.icon.substring(1);
+         this.widgets.titleImg.src = Alfresco.constants.URL_RESCONTEXT + this.options.icon.substring(1);
 
          // Parameter nodeRef is mandatory
          if (this.options.nodeRef === undefined)
@@ -274,7 +274,7 @@
 
                // Create flash web preview by using swfobject
                var swfId = "WebPreviewer_" + this.id;
-               var so = new YAHOO.deconcept.SWFObject(Alfresco.constants.URL_CONTEXT + "components/preview/WebPreviewer.swf",
+               var so = new YAHOO.deconcept.SWFObject(Alfresco.constants.URL_RESCONTEXT + "components/preview/WebPreviewer.swf",
                      swfId, "100%", "100%", "9.0.45");
                so.addVariable("fileName", this.options.name);
                so.addVariable("paging", previewCtx.paging);

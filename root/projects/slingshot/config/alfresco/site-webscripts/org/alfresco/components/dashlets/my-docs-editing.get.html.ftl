@@ -15,7 +15,7 @@
    <div class="detail-list-item <#if doc_index = 0>first-item</#if>">
       <div>
          <div class="icon">
-            <img src="${url.context}${icon}" alt="${doc.displayName?html}" />
+            <img src="${url.context}/res/${icon}" alt="${doc.displayName?html}" />
          </div>
          <div class="details">
             <h4><a href="${url.context}/page/site/${doc.site.shortName}/${doc.browseUrl}" class="theme-color-1">${doc.displayName?html}</a></h4>
@@ -47,7 +47,7 @@
       <div class="detail-list-item <#if doc_index = 0>first-item</#if>">
          <div>
             <div class="icon">
-               <img src="${url.context}/components/images/generic-file-32.png" alt="${doc.displayName?html}" />
+               <img src="${url.context}/res/components/images/generic-file-32.png" alt="${doc.displayName?html}" />
             </div>
             <div class="details">
                <h4><@doclibUrl doc /></h4>
@@ -71,7 +71,7 @@
          <h3>${msg('text.blogposts')}</h3>
       </div>
       <#if content.blogPosts.items?size != 0>
-         <@renderItems content.blogPosts '/components/images/blogpost-32.png' />
+         <@renderItems content.blogPosts 'components/images/blogpost-32.png' />
       <#else>
          <@renderNoItems />
       </#if>
@@ -79,7 +79,7 @@
          <h3>${msg('text.wikipages')}</h3>
       </div>
       <#if content.wikiPages.items?size != 0>
-         <@renderItems content.wikiPages '/components/images/wikipage-32.png' />
+         <@renderItems content.wikiPages 'components/images/wikipage-32.png' />
       <#else>
          <@renderNoItems />
       </#if>
@@ -87,7 +87,7 @@
          <h3>${msg('text.forumposts')}</h3>
       </div>
       <#if content.forumPosts.items?size != 0>
-         <@renderItems content.forumPosts '/components/images/topicpost-32.png' />
+         <@renderItems content.forumPosts 'components/images/topicpost-32.png' />
       <#else>
          <@renderNoItems />
       </#if>

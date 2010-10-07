@@ -1,12 +1,12 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/alfresco-resizer.js"></@script>
    <script type="text/javascript">//<![CDATA[
       new Alfresco.widget.Resizer("Blog-PostList");
    //]]></script>
    <!-- General Blog Assets -->
-   <@script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></@script>
-   <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/res/components/blog/blogdiscussions-common.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/res/components/blog/blog-common.js"></@script>
    <@templateHtmlEditorAssets />
 </@>
 

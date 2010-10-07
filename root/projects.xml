@@ -1528,22 +1528,6 @@
       <!-- copy the forms client context file -->
       <copy todir="${dir.project.webframeworkcommons.assemble}/org/springframework/extensions/surf" 
             file="${dir.project.webframeworkcommons.src}/plugin/forms-client-context.xml" />
-      
-      <!-- force overwrite copy of form.get.head.ftl so replace works correctly -->
-      <copy todir="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form" overwrite="yes"
-            file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" />
-      <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" 
-               token="${page.url.context}/" value="${page.url.context}/res/" />
-
-      <copy todir="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form" overwrite="yes"
-            file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/form.lib.ftl" />
-      <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/form.lib.ftl" 
-               token="${url.context}/" value="${url.context}/res/" />
-
-      <copy todir="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/controls" overwrite="yes"
-            file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/controls/date.ftl" />
-      <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/controls/date.ftl" 
-               token="${url.context}/" value="${url.context}/res/" />
    </target>
    
    <target name="minimize-forms-client-javascript" depends="init">
@@ -2543,6 +2527,12 @@
    <!-- ******************************** -->
    <!-- ** WCM Quick Share Start Project ** -->
    <!-- ******************************** -->
+
+   <target name="incremental-wcmquickstart-share" 
+           depends="package-wcmquickstart-share" />
+
+   <target name="build-wcmquickstart-share" 
+           depends="clean-wcmquickstart-share, incremental-wcmquickstart-share" />
 
    <target name="clean-wcmquickstart-share" 
            depends="init">

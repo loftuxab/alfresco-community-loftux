@@ -1592,7 +1592,7 @@
             var datePickerIconEl = document.createElement("a");
             Alfresco.util.setDomId(datePickerIconEl, datePickerId + "-icon");
             var datePickerImgEl = document.createElement("img");
-            datePickerImgEl.setAttribute("src", Alfresco.constants.URL_CONTEXT + "components/form/images/calendar.png");
+            datePickerImgEl.setAttribute("src", Alfresco.constants.URL_RESCONTEXT + "components/form/images/calendar.png");
             Dom.addClass(datePickerImgEl, "datepicker-icon");
             datePickerIconEl.appendChild(datePickerImgEl);
 

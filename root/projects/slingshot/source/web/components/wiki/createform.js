@@ -246,7 +246,7 @@
          }
       
          // Redirect to the page that has just been created
-         window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=" + encodeURIComponent(name);
+         window.location =  Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/wiki-page?title=" + encodeURIComponent(name);
       },
 
       /**

@@ -95,10 +95,10 @@
             }
             default:
             {
-               return Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(item.name, item.type, size); 
+               return Alfresco.constants.URL_RESCONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(item.name, item.type, size); 
             }
          }
-         return Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + type + '-'+size+'.png';
+         return Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/' + type + '-'+size+'.png';
       }
    }      
    });

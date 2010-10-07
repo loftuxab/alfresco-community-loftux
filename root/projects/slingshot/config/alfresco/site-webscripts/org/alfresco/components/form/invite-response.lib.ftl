@@ -13,13 +13,13 @@
          <div class="yui-gc">
             <div class="yui-u first">
                <div class="invite-task-title">
-                  <img src="${url.context}/components/images/site-24.png" />
+                  <img src="${url.context}/res/components/images/site-24.png" />
                   <span>${msg("workflow.task.invite." + outcome, form.data["prop_inwf_inviteeFirstName"], form.data["prop_inwf_inviteeLastName"], form.data["prop_inwf_resourceTitle"])?html}</span>
                </div>
             </div>
             <div class="yui-u">
                <div class="invite-task-priority">
-                  <img src="${url.context}/components/images/${getPriorityIcon()}" />
+                  <img src="${url.context}/res/components/images/${getPriorityIcon()}" />
                </div>
             </div>
          </div>

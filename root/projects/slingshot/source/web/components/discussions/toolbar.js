@@ -142,7 +142,7 @@
        */
       onNewTopicClick: function DToolbar_onNewTopicClick(e)
       {         
-         window.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/discussions-createtopic";
+         window.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/discussions-createtopic";
       },
 
       /**

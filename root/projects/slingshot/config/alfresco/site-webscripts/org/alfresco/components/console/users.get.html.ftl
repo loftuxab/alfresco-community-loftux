@@ -1,5 +1,5 @@
 <!--[if IE]>
-<iframe id="yui-history-iframe" src="${url.context}/yui/history/assets/blank.html"></iframe> 
+<iframe id="yui-history-iframe" src="${url.context}/res/yui/history/assets/blank.html"></iframe> 
 <![endif]-->
 <input id="yui-history-field" type="hidden" />
 
@@ -82,7 +82,7 @@
          <div class="header-bar">${msg("label.about")}</div>
          <div class="photo-row">
             <div class="photo">
-               <img class="view-photoimg" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
+               <img class="view-photoimg" src="${url.context}/res/components/images/no-user-photo-64.png" alt="" />
             </div>
             <div id="${el}-view-name" class="name-label"></div>
             <div id="${el}-view-jobtitle" class="field-label"></div>
@@ -352,7 +352,7 @@
          <div class="header-bar">${msg("label.photo")}</div>
          <div class="update-photo-row">
             <div class="photo">
-               <img id="${el}-update-photoimg" class="update-photoimg left" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
+               <img id="${el}-update-photoimg" class="update-photoimg left" src="${url.context}/res/components/images/no-user-photo-64.png" alt="" />
                <div class="updateuser-clearphoto-button">
                   <span class="yui-button yui-push-button" id="${el}-updateuser-clearphoto-button">
                      <span class="first-child"><button>${msg("button.usedefault")}</button></span>

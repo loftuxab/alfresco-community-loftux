@@ -154,7 +154,7 @@
          this.widgets.editPropertiesButton.set("disabled", true);
 
          // Send the user to the edit proprties page
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/edit-metadata?nodeRef=" + this.options.dipositionScheduleNodeRef;
+         document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + this.options.dipositionScheduleNodeRef;
       },
 
       /**
@@ -170,7 +170,7 @@
          this.widgets.editScheduleButton.set("disabled", true);
 
          // Send the user to the edit schedule page
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/disposition-edit?nodeRef=" + this.options.nodeRef;
+         document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/disposition-edit?nodeRef=" + this.options.nodeRef;
       },
 
       /**

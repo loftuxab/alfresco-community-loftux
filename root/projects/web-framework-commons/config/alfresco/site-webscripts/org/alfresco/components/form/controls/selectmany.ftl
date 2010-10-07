@@ -5,7 +5,7 @@
    <#if form.mode == "view">
       <div class="viewmode-field">
          <#if field.mandatory && !(field.value?is_number) && field.value?string == "">
-            <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
+            <span class="incomplete-warning"><img src="${url.context}/res/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
          <span class="viewmode-value">${field.value?html}</span>
