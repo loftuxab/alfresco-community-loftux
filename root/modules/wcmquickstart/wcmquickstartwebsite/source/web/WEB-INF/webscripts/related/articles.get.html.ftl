@@ -4,7 +4,7 @@
         <ul class="services-box-list">
             <#list asset.relatedAssets['ws:relatedArticles'] as related>      
                 <li>
-                    <a href="<@makeurl asset=related/>">${related.title!'no title'}</a>
+                    <a href="<@makeurl asset=related/>"><#if related.title?? && related.title?length gt 0>${related.title}<#else>${related.name}</#if></a>
                 </li>
             </#list>
         </ul>
