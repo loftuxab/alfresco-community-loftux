@@ -4,12 +4,9 @@
 <beans>
    
    <!-- Override WebScript Messages - add slingshot application messages -->
-   <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
+   <bean id="dod5015.custom.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
          <list>
-            <value>webscripts.messages.webscripts</value>
-            <value>alfresco.messages.common</value>
-            <value>alfresco.messages.slingshot</value>
             <value>alfresco.messages.dod5015</value>
          </list>
       </property>
