@@ -364,7 +364,7 @@
 
             var userName = oRecord.getData("userName"),
                userUrl = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile",
-               avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+               avatarUrl = Alfresco.constants.URL_RESCONTEXT + "components/images/no-user-photo-64.png";
             
             if (oRecord.getData("avatar") !== undefined)
             {

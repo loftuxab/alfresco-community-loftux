@@ -301,7 +301,7 @@
                fn: function()
                {
                   // Send the user to the newly configured dashboard
-                  document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + siteId + "/dashboard";
+                  document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + siteId + "/dashboard";
                },
                scope: this
             },
@@ -341,7 +341,7 @@
       onCancelButtonClick: function CP_onCancelButtonClick(event)
       {
          // Take the user back to the sites dashboard
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/dashboard";
+         document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/dashboard";
       },
 
       /**

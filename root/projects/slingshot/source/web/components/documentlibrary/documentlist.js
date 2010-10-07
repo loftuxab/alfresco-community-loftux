@@ -736,7 +736,7 @@
                      i18n = i18nMeta;
                   }
                   tip = Alfresco.util.message(i18n, scope.name, meta.split("|")); // Note: deliberate bypass of scope.msg() function
-                  desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + status + '-indicator-16.png" title="' + tip + '" alt="' + status + '" /></div>';
+                  desc += '<div class="status"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/' + status + '-indicator-16.png" title="' + tip + '" alt="' + status + '" /></div>';
                }
             }
 
@@ -745,7 +745,7 @@
             if (status && status !== "")
             {
                tip = scope.msg("tip.active-workflow", status.split(",").length);
-               desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/workflow-indicator-16.png" title="' + tip + '" alt="' + tip + '" /></div>';
+               desc += '<div class="status"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/workflow-indicator-16.png" title="' + tip + '" alt="' + tip + '" /></div>';
             }
 
             elCell.innerHTML = desc;
@@ -792,13 +792,13 @@
 
                if (type == "folder")
                {
-                  elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
+                  elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
                }
                else
                {
                   var id = scope.id + '-preview-' + oRecord.getId();
                   docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
-                  elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
+                  elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
 
                   // Preview tooltip
                   scope.previewTooltips.push(id);
@@ -815,7 +815,7 @@
 
                if (type == "folder")
                {
-                  elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
+                  elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
                }
                else
                {
@@ -1356,8 +1356,10 @@
             else
             {
                // Scroll up (only) to the top of the documents
-               var yPos = Dom.getY(this.id + "-documents");
-               if (window.scrollY > yPos)
+               var yPos = Dom.getY(this.id + "-documents"),
+                  yScroll = YAHOO.env.ua.ie > 0 ? ((document.compatMode && document.compatMode != "BackCompat") ? document.documentElement : document.body).scrollTop : window.scrollY;
+               
+               if (yScroll > yPos)
                {
                   window.scrollTo(0, yPos);
                }

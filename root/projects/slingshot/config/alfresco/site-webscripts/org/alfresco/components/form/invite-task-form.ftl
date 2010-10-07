@@ -14,7 +14,7 @@
       <div class="yui-gc">
          <div class="yui-u first">
             <div class="invite-task-title">
-               <img src="${url.context}/components/images/site-24.png" />
+               <img src="${url.context}/res/components/images/site-24.png" />
                <span>${msg("workflow.task.invite.title", form.data["prop_inwf_resourceTitle"])?html}</span>
             </div>
             <div class="invite-task-subtitle">
@@ -27,7 +27,7 @@
          </div>
          <div class="yui-u">
             <div class="invite-task-priority">
-               <img src="${url.context}/components/images/${inviteLib.getPriorityIcon()}" />
+               <img src="${url.context}/res/components/images/${inviteLib.getPriorityIcon()}" />
             </div>
          </div>
       </div>

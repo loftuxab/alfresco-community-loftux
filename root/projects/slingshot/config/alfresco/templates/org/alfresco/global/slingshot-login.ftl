@@ -1,7 +1,7 @@
 <#include "../include/alfresco-template.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/login/login.css" />
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/login.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/templates/login/login.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/themes/${theme}/login.css" />
 </@>
 <@templateBody>
    <div id="alflogin" class="login-panel">

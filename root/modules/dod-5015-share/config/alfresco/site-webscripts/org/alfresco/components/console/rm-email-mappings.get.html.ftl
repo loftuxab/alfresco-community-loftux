@@ -26,7 +26,7 @@
       <div>
          <span>${msg('label.map')}</span>
          <input type="text" name="emailProperty-text" value="" id="emailProperty-text" />
-         <button id="emailProperty-but" name="emailProperty-but" class="thin-button"><img src="${page.url.context}/components/images/expanded.png" title="${msg('label.select-email')}"/></button>
+         <button id="emailProperty-but" name="emailProperty-but" class="thin-button"><img src="${page.url.context}/res/components/images/expanded.png" title="${msg('label.select-email')}"/></button>
          <div id="email-menu-container"></div>
          <span>${msg('label.to')}</span>
          <button id="${htmlid}-rmproperty-button" name="rmproperty" class="thin-button">${msg("message.select")}</button>

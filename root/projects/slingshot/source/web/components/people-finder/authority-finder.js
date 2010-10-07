@@ -358,7 +358,7 @@
             
             var authType = oRecord.getData("authorityType"),
                metadata = oRecord.getData("metadata") || {},
-               avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/" + (authType == "USER" ? "no-user-photo-64.png" : "group-64.png");
+               avatarUrl = Alfresco.constants.URL_RESCONTEXT + "components/images/" + (authType == "USER" ? "no-user-photo-64.png" : "group-64.png");
 
             if (metadata.avatar && metadata.avatar.length !== 0)
             {

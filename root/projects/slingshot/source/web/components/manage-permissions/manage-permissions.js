@@ -471,7 +471,7 @@
 
             var authority = oRecord.getData("authority"),
                isGroup = authority.name.indexOf("GROUP_") === 0,
-               iconUrl = Alfresco.constants.URL_CONTEXT + "components/images/" + (isGroup ? "group" : "no-user-photo") + "-64.png";
+               iconUrl = Alfresco.constants.URL_RESCONTEXT + "components/images/" + (isGroup ? "group" : "no-user-photo") + "-64.png";
 
             if (authority.avatar && authority.avatar.length !== 0)
             {

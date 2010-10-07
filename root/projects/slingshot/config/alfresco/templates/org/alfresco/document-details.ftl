@@ -1,11 +1,11 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/components/blog/postview.css" />
-   <@script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></@script>
-   <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
-   <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
-   <@script type="text/javascript" src="${page.url.context}/templates/document-details/document-details.js"></@script>
-   <#if doclibType?starts_with("dod5015")><@script type="text/javascript" src="${page.url.context}/templates/document-details/dod5015-document-details.js"></@script></#if>
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/components/blog/postview.css" />
+   <@script type="text/javascript" src="${page.url.context}/res/components/blog/blogdiscussions-common.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/res/components/blog/blog-common.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/modules/documentlibrary/doclib-actions.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/res/templates/document-details/document-details.js"></@script>
+   <#if doclibType?starts_with("dod5015")><@script type="text/javascript" src="${page.url.context}/res/templates/document-details/dod5015-document-details.js"></@script></#if>
    <@templateHtmlEditorAssets />
 </@>
 

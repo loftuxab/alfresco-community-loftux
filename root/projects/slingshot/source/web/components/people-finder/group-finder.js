@@ -337,7 +337,7 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            elCell.innerHTML = '<img class="avatar" src="' + Alfresco.constants.URL_CONTEXT + 'components/images/group-64.png" alt="avatar" />';
+            elCell.innerHTML = '<img class="avatar" src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/group-64.png" alt="avatar" />';
          };
 
          /**

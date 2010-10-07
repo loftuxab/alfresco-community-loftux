@@ -348,7 +348,7 @@
 
             // Render the icon
             elCell.innerHTML = '<a href="' + url + '"><img src="' + 
-               Alfresco.constants.URL_CONTEXT + 'components/site-finder/images/site-64.png' + 
+               Alfresco.constants.URL_RESCONTEXT + 'components/site-finder/images/site-64.png' + 
                '" alt="' + siteName + '" title="' + siteName + '" /></a>';
          };
 

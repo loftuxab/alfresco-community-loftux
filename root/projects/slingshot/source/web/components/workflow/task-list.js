@@ -190,10 +190,10 @@
                priorityMap = { "1": "high", "2": "medium", "3": "low" },
                priorityKey = priorityMap[priority + ""],
                pooledTask = oRecord.getData("isPooled");
-         var desc = '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/priority-' + priorityKey + '-16.png" title="' + this.msg("label.priority", this.msg("priority." + priorityKey)) + '"/>';
+         var desc = '<img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/priority-' + priorityKey + '-16.png" title="' + this.msg("label.priority", this.msg("priority." + priorityKey)) + '"/>';
          if (pooledTask)
          {
-            desc += '<br/><img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/pooled-task-16.png" title="' + this.msg("label.pooledTask") + '"/>';
+            desc += '<br/><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/pooled-task-16.png" title="' + this.msg("label.pooledTask") + '"/>';
          }
          elCell.innerHTML = desc;
       },

@@ -2,7 +2,7 @@
    <#include "./rm-console-access.ftl">
 <#else>
 <!--[if IE]>
-<iframe id="yui-history-iframe" src="${url.context}/yui/history/assets/blank.html"></iframe> 
+<iframe id="yui-history-iframe" src="${url.context}/res/yui/history/assets/blank.html"></iframe> 
 <![endif]-->
 <input id="yui-history-field" type="hidden" />
 

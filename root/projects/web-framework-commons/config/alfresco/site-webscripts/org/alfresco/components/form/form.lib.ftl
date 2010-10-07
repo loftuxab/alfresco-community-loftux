@@ -128,7 +128,7 @@
 <#macro renderFieldHelp field>
    <#if field.help?? && field.help?length &gt; 0>
       <span class="help-icon">
-         <img src="${url.context}/components/form/images/help.png" title="${msg("form.field.help")}" 
+         <img src="${url.context}/res/components/form/images/help.png" title="${msg("form.field.help")}" 
               onclick="javascript:Alfresco.util.toggleHelpText('${fieldHtmlId}-help');" />
       </span>
       <div class="help-text" id="${fieldHtmlId}-help">${field.help?html}</div>

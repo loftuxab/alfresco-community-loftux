@@ -287,7 +287,7 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png",
+            var avatarUrl = Alfresco.constants.URL_RESCONTEXT + "components/images/no-user-photo-64.png",
                invitee = oRecord.getData("invitee");
             if (invitee.avatar !== undefined)
             {

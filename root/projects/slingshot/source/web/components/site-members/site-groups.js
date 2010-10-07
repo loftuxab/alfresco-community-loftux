@@ -363,7 +363,7 @@
          var renderCellIcon = function SiteGroups_renderCellIcon(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            elCell.innerHTML = '<img src="' + Alfresco.constants.URL_CONTEXT + "components/images/group-64.png" + '" alt="group" />';
+            elCell.innerHTML = '<img src="' + Alfresco.constants.URL_RESCONTEXT + "components/images/group-64.png" + '" alt="group" />';
          };
 
          /**

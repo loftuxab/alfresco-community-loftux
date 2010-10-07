@@ -91,7 +91,7 @@
          </div>
          <div id="${el}-center-div" class="fileupload-center-div">
             <span class="fileupload-progressSuccess-span">&nbsp;</span>
-            <img src="${url.context}/components/images/generic-file-32.png" class="fileupload-docImage-img" alt="file" />
+            <img src="${url.context}/res/components/images/generic-file-32.png" class="fileupload-docImage-img" alt="file" />
             <span class="fileupload-progressInfo-span"></span>
          </div>
          <div id="${el}-right-div" class="fileupload-right-div">

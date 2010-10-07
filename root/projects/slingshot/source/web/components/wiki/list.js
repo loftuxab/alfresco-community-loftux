@@ -78,7 +78,7 @@
 
          // Make sure the parser is using the current site
          this.$parser = new Alfresco.WikiParser();
-         this.$parser.URL = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=";
+         this.$parser.URL = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/wiki-page?title=";
 
          return this;
       },

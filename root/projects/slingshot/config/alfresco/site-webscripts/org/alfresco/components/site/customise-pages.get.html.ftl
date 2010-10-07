@@ -32,12 +32,12 @@
             <li id="${args.htmlid}-currentPage-li-${page.pageId}" <#if (!page.used)>style="display: none;"</#if>>
                <div class="pageTitle"><h4>${page.title}</h4></div>
                <div class="pageIcon">
-                  <img src="${url.context}/components/images/page-42.png" alt="page icon" />
+                  <img src="${url.context}/res/components/images/page-42.png" alt="page icon" />
                </div>
                <div class="pageActions">
-                  <img src="${url.context}/components/images/info-16.png" title="${page.description}" alt="${page.description}" />
+                  <img src="${url.context}/res/components/images/info-16.png" title="${page.description}" alt="${page.description}" />
                   <a id="${args.htmlid}-remove-link-${page.pageId}" href="#">
-                     <img src="${url.context}/components/images/remove-icon-16.png" title="${msg("button.remove")}" alt="${msg("button.remove")}"/>
+                     <img src="${url.context}/res/components/images/remove-icon-16.png" title="${msg("button.remove")}" alt="${msg("button.remove")}"/>
                   </a>
                </div>
             </li>
@@ -67,7 +67,7 @@
             <#list pages as page>
                <li id="${args.htmlid}-page-li-${page.pageId}" <#if (page.used)>style="display: none;"</#if>>
                <div class="pageIcon">
-                  <img src="${url.context}/components/images/page-42.png"/>
+                  <img src="${url.context}/res/components/images/page-42.png"/>
                </div>
                <div class="pageActions">
                   <input id="${args.htmlid}-select-button-${page.pageId}" type="button" value="${msg("button.select")}"/>

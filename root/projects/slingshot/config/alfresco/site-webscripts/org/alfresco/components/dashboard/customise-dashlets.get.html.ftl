@@ -32,7 +32,7 @@
          templateId: "${currentLayout.templateId}",
          noOfColumns: ${currentLayout.noOfColumns},
          description: "${currentLayout.description}",
-         icon: "${url.context}/components/dashboard/images/${currentLayout.templateId}.png"         
+         icon: "${url.context}/res/components/dashboard/images/${currentLayout.templateId}.png"         
       },
       dashboardUrl: "${dashboardUrl}",
       dashboardId: "${dashboardId}"
@@ -64,7 +64,7 @@
          <#list availableDashlets as dashlet>
             <li class="availableDashlet">
                <input type="hidden" name="dashleturl" value="${dashlet.url}"/>
-               <a href="#"><img class="dnd-draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
+               <a href="#"><img class="dnd-draggable" src="${url.context}/res/yui/assets/skins/default/transparent.gif" alt="" /></a>
                <span >${dashlet.shortName}</span>
                <div class="dnd-draggable" title="${dashlet.description}"></div>
             </li>
@@ -87,7 +87,7 @@
                <li class="usedDashlet">
                   <input type="hidden" name="dashleturl" value="${dashlet.url}"/>
                   <input type="hidden" name="originalregionid" value="${dashlet.originalRegionId}"/>
-                  <a href="#"><img class="dnd-draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
+                  <a href="#"><img class="dnd-draggable" src="${url.context}/res/yui/assets/skins/default/transparent.gif" alt="" /></a>
                   <span>${dashlet.shortName}</span>
                   <div class="dnd-draggable" title="${dashlet.description}"></div>
                </li>

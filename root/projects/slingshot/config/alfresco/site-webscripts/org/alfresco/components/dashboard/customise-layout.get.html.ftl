@@ -8,7 +8,7 @@
          templateId: "${currentLayout.templateId}",
          noOfColumns: ${currentLayout.noOfColumns},
          description: "${currentLayout.description}",
-         icon: "${url.context}/components/dashboard/images/${currentLayout.templateId}.png"
+         icon: "${url.context}/res/components/dashboard/images/${currentLayout.templateId}.png"
       },
       layouts:
       {
@@ -18,7 +18,7 @@
             templateId: "${layout.templateId}",
             noOfColumns: ${layout.noOfColumns},
             description: "${layout.description}",
-            icon: "${url.context}/components/dashboard/images/${layout.templateId}.png"
+            icon: "${url.context}/res/components/dashboard/images/${layout.templateId}.png"
          }<#if (layout_has_next)>,</#if>
 </#list>
       }
@@ -37,7 +37,7 @@
 
       <div>
          <br />
-         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon" src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png" alt="${msg("img.currentLayout")}" />
+         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon" src="${url.context}/res/components/dashboard/images/${currentLayout.templateId}.png" alt="${msg("img.currentLayout")}" />
          <div id="${args.htmlid}-changeButtonWrapper-div" class="buttons">
             <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}" />
          </div>
@@ -59,7 +59,7 @@
                <div class="layoutDescription">${layout.description}</div>
                <div class="layoutBox">
                   <span>
-                     <img id="${args.htmlid}-select-img-${layout.templateId}" class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.templateId}.png" alt="${layout.templateId}" />
+                     <img id="${args.htmlid}-select-img-${layout.templateId}" class="layoutIcon" src="${url.context}/res/components/dashboard/images/${layout.templateId}.png" alt="${layout.templateId}" />
                      <input id="${args.htmlid}-select-button-${layout.templateId}" type="button" value="${msg("button.select")}" />
                   </span>
                </div>

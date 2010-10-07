@@ -198,7 +198,7 @@ Alfresco.RM = Alfresco.RM || {};
          {
             // We only need one
             var selectedItem = selectedItems[0],
-               docUrl = Alfresco.constants.URL_CONTEXT + 'page/site/rm/document-details?nodeRef=' + selectedItem.nodeRef,
+               docUrl = Alfresco.constants.URL_PAGECONTEXT + 'site/rm/document-details?nodeRef=' + selectedItem.nodeRef,
                docLibPath = selectedItem.displayPath.split('documentLibrary')[1];
             selectedEl.innerHTML = '<a href="'+ docUrl+ '" title="' + $html(selectedItem.description) + '">'+ $html(docLibPath + '/' + selectedItem.name) +'</a>';
             Dom.addClass(selectedEl,'active');

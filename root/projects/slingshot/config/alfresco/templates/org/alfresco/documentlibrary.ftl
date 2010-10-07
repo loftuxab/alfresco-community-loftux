@@ -2,11 +2,11 @@
 <#include "include/documentlibrary.inc.ftl" />
 <@templateHeader>
    <@documentLibraryJS />
-   <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/alfresco-resizer.js"></@script>
    <script type="text/javascript">//<![CDATA[
       new Alfresco.widget.Resizer("DocumentLibrary");
    //]]></script>
-   <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/modules/documentlibrary/doclib-actions.js"></@script>
 </@>
 
 <@templateBody>

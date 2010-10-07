@@ -1,6 +1,6 @@
 <#include "../../include/alfresco-macros.lib.ftl" />
 <#macro siteHTML site>
-      <div class="icon"><a href="${siteURL("documentlibrary", site.shortName)}"><img src="${url.context}/components/documentlibrary/images/folder-32.png" /></a></div>
+      <div class="icon"><a href="${siteURL("documentlibrary", site.shortName)}"><img src="${url.context}/res/components/documentlibrary/images/folder-32.png" /></a></div>
       <div class="details">
          <h4><a href="${siteURL("documentlibrary", site.shortName)}" class="theme-color-1">${(site.title!site.shortName)?html}</a></h4>
          <div>${(site.description!"")?html}</div>

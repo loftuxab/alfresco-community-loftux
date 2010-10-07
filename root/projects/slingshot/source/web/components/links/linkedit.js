@@ -366,7 +366,7 @@
        */
       _loadLinkViewPage: function LinkEdit__loadLinkViewPage(linkId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/links-view?linkId={linkId}",
          {
             site: this.options.siteId,
             linkId: linkId

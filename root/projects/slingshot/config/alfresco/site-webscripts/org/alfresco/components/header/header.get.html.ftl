@@ -23,7 +23,7 @@
 <div class="header">
    <span class="header-left">
       <span class="logo">
-         <a href="#" onclick="${jsid}.showAboutShare(); return false;"><img src="${url.context}/themes/${theme}/images/${logo}" alt="Alfresco Share" /></a>
+         <a href="#" onclick="${jsid}.showAboutShare(); return false;"><img src="${url.context}/res/themes/${theme}/images/${logo}" alt="Alfresco Share" /></a>
       </span>
       <span class="logo-spacer">&nbsp;</span>
       <span id="${id}-appItems" class="app-items hidden"><@header.renderItems config.global.header.appItems id "app" /></span>
@@ -36,7 +36,7 @@
       <@header.renderItems config.global.header.userItems id "user" />
       <div class="search-box">
          <span id="${id}-search_more" class="yui-button yui-menu-button">
-            <span class="first-child" style="background-image: url(${url.context}/components/images/header/search-menu.png)">
+            <span class="first-child" style="background-image: url(${url.context}/res/components/images/header/search-menu.png)">
                <button type="button" title="${msg("header.search.description")}" tabindex="0"></button>
             </span>
          </span>
@@ -45,7 +45,7 @@
       <div id="${id}-searchmenu_more" class="yuimenu yui-overlay yui-overlay-hidden">
          <div class="bd">
             <ul class="first-of-type">
-               <li><span style="background-image: url(${url.context}/components/images/header/advanced-search.png)"><a title="${msg("header.advanced-search.description")}" href="${siteURL("advsearch")}">${msg("header.advanced-search.label")}</a></span></li>
+               <li><span style="background-image: url(${url.context}/res/components/images/header/advanced-search.png)"><a title="${msg("header.advanced-search.description")}" href="${siteURL("advsearch")}">${msg("header.advanced-search.label")}</a></span></li>
             </ul>
          </div>
       </div>
@@ -58,7 +58,7 @@
 <div class="header">
    <span class="header-left">
       <span class="logo">
-         <a href="#" onclick="${jsid}.showAboutShare(); return false;"><img src="${url.context}/themes/${theme}/images/${logo}" alt="Alfresco Share" /></a>
+         <a href="#" onclick="${jsid}.showAboutShare(); return false;"><img src="${url.context}/res/themes/${theme}/images/${logo}" alt="Alfresco Share" /></a>
       </span>
       <span class="logo-spacer">&nbsp;</span>
    </span>

@@ -369,7 +369,7 @@
        */
       onEditTopic: function DiscussionsTopic_onEditTopic()
       {
-         window.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/discussions-createtopic?container=" + this.options.containerId + "&topicId=" + this.options.topicId;
+         window.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/discussions-createtopic?container=" + this.options.containerId + "&topicId=" + this.options.topicId;
          //this._loadEditForm();
       },
      
@@ -417,7 +417,7 @@
          // ajax request success handler
          var onDeleted = function onDeleted(response)
          {
-            var listUrl = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topiclist?container={container}",
+            var listUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/discussions-topiclist?container={container}",
             {
                site: this.options.siteId,
                container: this.options.containerId
@@ -470,7 +470,7 @@
          if (obj && (obj.tagName !== null))
          {
             // construct the topic list url with initial active tag filter
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topiclist" +
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/discussions-topiclist" +
                     "?container={container}&filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
             {
                site: this.options.siteId,

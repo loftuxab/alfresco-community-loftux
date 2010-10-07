@@ -56,57 +56,57 @@
 </#if>
 
 <!-- Shortcut Icons -->
-   <link rel="shortcut icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" /> 
-   <link rel="icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" />
+   <link rel="shortcut icon" href="${url.context}/res/favicon.ico" type="image/vnd.microsoft.icon" /> 
+   <link rel="icon" href="${url.context}/res/favicon.ico" type="image/vnd.microsoft.icon" />
 
 <!-- Site-wide YUI Assets -->
-   <@link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/yui/reset-fonts-grids/reset-fonts-grids.css" />
    <#if theme = 'default'>
-      <@link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/default/skin.css" />
+      <@link rel="stylesheet" type="text/css" href="${url.context}/res/yui/assets/skins/default/skin.css" />
    <#else>
-      <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/yui/assets/skin.css" />   
+      <@link rel="stylesheet" type="text/css" href="${url.context}/res/themes/${theme}/yui/assets/skin.css" />   
    </#if>
 <#-- Selected components preloaded here for better UI experience. -->
 <#if DEBUG>
-   <script type="text/javascript" src="${url.context}/js/log4javascript.v1.4.1.js"></script>
+   <script type="text/javascript" src="${url.context}/res/js/log4javascript.v1.4.1.js"></script>
 <!-- Common YUI components: DEBUG -->
-   <script type="text/javascript" src="${url.context}/yui/yahoo/yahoo-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/event/event-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/dom/dom-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/dragdrop/dragdrop-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/animation/animation-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/logger/logger-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/connection/connection-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/element/element-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/get/get-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/yuiloader/yuiloader-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/button/button-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/container/container-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/menu/menu-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/json/json-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/selector/selector-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/yahoo/yahoo-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/event/event-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/dom/dom-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/dragdrop/dragdrop-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/animation/animation-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/logger/logger-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/connection/connection-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/element/element-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/get/get-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/yuiloader/yuiloader-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/button/button-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/container/container-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/menu/menu-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/json/json-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/selector/selector-debug.js"></script>
 <!-- YUI Patches -->
-   <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
+   <script type="text/javascript" src="${url.context}/res/yui/yui-patch.js"></script>
    <script type="text/javascript">//<![CDATA[
       YAHOO.util.Event.throwErrors = true;
    //]]></script>
 <#else>
 <!-- Common YUI components: RELEASE concatenated -->
-   <script type="text/javascript" src="${url.context}/js/yui-common.js"></script>
+   <script type="text/javascript" src="${url.context}/res/js/yui-common.js"></script>
 </#if>
 
 <!-- Site-wide Common Assets -->
-   <@link rel="stylesheet" type="text/css" href="${url.context}/css/base.css" />
-   <@link rel="stylesheet" type="text/css" href="${url.context}/css/yui-layout.css" />   
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
-   <@script type="text/javascript" src="${url.context}/js/bubbling.v2.1.js"></@script>
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/css/base.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/css/yui-layout.css" />   
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/themes/${theme}/presentation.css" />
+   <@script type="text/javascript" src="${url.context}/res/js/bubbling.v2.1.js"></@script>
    <script type="text/javascript">//<![CDATA[
       YAHOO.Bubbling.unsubscribe = function(layer, handler)
       {
          this.bubble[layer].unsubscribe(handler);
       }
    //]]></script>
-   <@script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/flash/AC_OETags.js"></@script>
    <#-- NOTE: Do not attempt to load -min.js version of messages.js -->
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
    <script type="text/javascript">//<![CDATA[
@@ -118,6 +118,7 @@
       Alfresco.constants.PROXY_FEED_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco-feed/";
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
+      Alfresco.constants.URL_RESCONTEXT = "${url.context}/res/";
       Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
       Alfresco.constants.URL_FEEDSERVICECONTEXT = "${url.context}/feedservice/";
@@ -130,8 +131,8 @@
       document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${url.context}";
    </#if>
    //]]></script>
-   <@script type="text/javascript" src="${url.context}/js/alfresco.js"></@script>
-   <@script type="text/javascript" src="${url.context}/js/forms-runtime.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/alfresco.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/forms-runtime.js"></@script>
    <@common.uriTemplates />
    <@common.helpPages />
    <@common.htmlEditor htmlEditor="tinyMCE"/>
@@ -154,9 +155,9 @@
 ${head}
 
 <!-- MSIE CSS fix overrides -->
-   <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie6.css" /><![endif]-->
-   <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie7.css" /><![endif]-->
-   <!--[if IE 8]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie8.css" /><![endif]-->
+   <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/res/css/ie6.css" /><![endif]-->
+   <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/res/css/ie7.css" /><![endif]-->
+   <!--[if IE 8]><link rel="stylesheet" type="text/css" href="${url.context}/res/css/ie8.css" /><![endif]-->
 <#if !PORTLET>
 </head>
 </#if>
@@ -170,9 +171,9 @@ ${head}
 <#macro templateHtmlEditorAssets>
 <!-- HTML Editor Assets -->
    <#-- NOTE: Do not attempt to load -min.js version of tiny_mce/tiny_mce.js -->
-   <script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce/tiny_mce.js"></script>
-   <@script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce.js"></@script>
-   <@script type="text/javascript" src="${page.url.context}/modules/editors/yui_editor.js"></@script>
+   <script type="text/javascript" src="${page.url.context}/res/modules/editors/tiny_mce/tiny_mce.js"></script>
+   <@script type="text/javascript" src="${page.url.context}/res/modules/editors/tiny_mce.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/res/modules/editors/yui_editor.js"></@script>
 </#macro>
 
 

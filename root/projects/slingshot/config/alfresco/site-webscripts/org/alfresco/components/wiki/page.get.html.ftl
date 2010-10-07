@@ -213,7 +213,7 @@
                <div class="tags">
                <#if result.tags?? && result.tags?size &gt; 0>
                   <#list result.tags as tag>
-                     <div class="tag"><img src="${page.url.context}/components/images/tag-16.png" /> ${tag}</img></div>                    
+                     <div class="tag"><img src="${page.url.context}/res/components/images/tag-16.png" /> ${tag}</img></div>                    
                   </#list>
                <#else>
                   ${msg("label.none")}

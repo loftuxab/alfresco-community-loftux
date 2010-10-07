@@ -330,7 +330,7 @@
        */
       onNewPageClick: function WikiToolbar_onNewPageClick(e)
       {
-         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-create";
+         var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/wiki-create";
          if (!this.options.showBackLink)
          {
             url += "?listViewLinkBack=true";
@@ -400,7 +400,7 @@
       onPageDeleted: function WikiToolbar_onPageDeleted(e)
       {
          // Redirect to the wiki landing page
-         var landingPage = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki";
+         var landingPage = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/wiki";
          if (window.location.pathname == landingPage)
          {
             window.location.reload(true);
@@ -469,7 +469,7 @@
             if (!YAHOO.lang.isUndefined(response.name))
             {
                // Change the location bar
-               window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=" + encodeURIComponent(response.name);
+               window.location = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/wiki-page?title=" + encodeURIComponent(response.name);
             } 
             else
             {

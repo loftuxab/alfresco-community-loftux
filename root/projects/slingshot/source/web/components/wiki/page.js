@@ -583,7 +583,7 @@
        */
       _getAbsolutePath: function WikiPage__getAbsolutePath()
       {
-         return Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=";   
+         return Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/wiki-page?title=";   
       },
       
       /*

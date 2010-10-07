@@ -85,7 +85,7 @@ Alfresco.util.people.generateUserAvatarImg = function generateUserAvatarImg(pers
    }
    else
    {
-      avatarUrl = Alfresco.constants.URL_CONTEXT + 'components/images/no-user-photo-64.png';
+      avatarUrl = Alfresco.constants.URL_RESCONTEXT + 'components/images/no-user-photo-64.png';
    }
    return '<img src="' + avatarUrl + '" alt="' + person.username + '-avatar-image" />';
 };

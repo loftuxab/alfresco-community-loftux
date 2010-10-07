@@ -35,8 +35,8 @@
 //
 
 // If you would like to use a custom loading image or close button reference them in the next two lines.
-var loadingImage = Alfresco.constants.URL_CONTEXT + 'components/images/lightbox/loading.gif';
-var closeButton = Alfresco.constants.URL_CONTEXT + 'components/images/lightbox/close.gif';
+var loadingImage = Alfresco.constants.URL_RESCONTEXT + 'components/images/lightbox/loading.gif';
+var closeButton = Alfresco.constants.URL_RESCONTEXT + 'components/images/lightbox/close.gif';
 
 
 

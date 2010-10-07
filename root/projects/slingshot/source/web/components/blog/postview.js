@@ -345,7 +345,7 @@
          var obj = args[1];
          if (obj && (obj.tagName !== null))
          {
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}&filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postlist?container={container}&filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
             {
                site: this.options.siteId,
                container: this.options.containerId,
@@ -363,7 +363,7 @@
        */
       onEditBlogPost: function BlogPostView_onEditNode(postId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postedit?container={container}&postId={postId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postedit?container={container}&postId={postId}",
          {
             site: this.options.siteId,
             container: this.options.containerId,
@@ -426,7 +426,7 @@
             this._releaseBusy();
             
             // load the blog post list page
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postlist?container={container}",
             {
                site: this.options.siteId,
                container: this.options.containerId

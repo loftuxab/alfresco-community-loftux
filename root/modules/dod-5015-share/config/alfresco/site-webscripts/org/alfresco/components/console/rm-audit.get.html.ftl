@@ -54,12 +54,12 @@
                   <div class="bd">
                      <input type="text" name="${htmlid}-audit-fromDate" value="" id="${htmlid}-audit-fromDate" />
                      <a id="${htmlid}-audit-fromDate-icon" class="datepicker-icon">
-                        <img class="datepicker-icon" src="${url.context}/components/form/images/calendar.png" />
+                        <img class="datepicker-icon" src="${url.context}/res/components/form/images/calendar.png" />
                      </a>
                      <div id="${htmlid}-audit-fromDate-cal" class="datepicker"></div>
                      <label for="${htmlid}-audit-toDate">${msg('label.header-to')}:</label><input type="text"  name="${htmlid}-audit-toDate" value="" id="${htmlid}-audit-toDate" />
                      <a id="${htmlid}-audit-toDate-icon" class="datepicker-icon">
-                        <img class="datepicker-icon" src="${url.context}/components/form/images/calendar.png" />
+                        <img class="datepicker-icon" src="${url.context}/res/components/form/images/calendar.png" />
                      </a>
                      <div id="${htmlid}-audit-toDate-cal" class="datepicker"></div>
                   </div>
@@ -103,7 +103,7 @@
                   </div>
                   <div class="bd">
                      <label for="audit-specifyfilter">${msg("label.show-log-for")}</label> 
-                     <div id="${htmlid}-audit-personFilter" class="personFilter"><span>${msg("label.all-users")}</span><a id="${htmlid}-personFilterRemove" class="personFilterRemove"><img src="${page.url.context}/components/images/remove-icon-16.png"  alt="${msg('label.remove-filter')}"/></a></div>
+                     <div id="${htmlid}-audit-personFilter" class="personFilter"><span>${msg("label.all-users")}</span><a id="${htmlid}-personFilterRemove" class="personFilterRemove"><img src="${page.url.context}/res/components/images/remove-icon-16.png"  alt="${msg('label.remove-filter')}"/></a></div>
                      <button id="${htmlid}-audit-specifyfilter" name="audit-specifyfilter" class="audit-specifyfilter">${msg("label.button-specify")}</button>
                      <div id="${htmlid}-audit-peoplefinder" class="audit-peoplefinder"></div>
                   </div>

@@ -2329,7 +2329,7 @@ Alfresco.util.YUILoaderHelper = function()
       {
          yuiLoader = new YAHOO.util.YUILoader(
          {
-            base: Alfresco.constants.URL_CONTEXT + "yui/",
+            base: Alfresco.constants.URL_RESCONTEXT + "yui/",
             filter: Alfresco.constants.DEBUG ? "DEBUG" : "",
             loadOptional: false,
             skin: {},
@@ -5995,7 +5995,7 @@ Alfresco.util.RENDERLOOPSIZE = 25;
             // Create the html elements needed for history management
             var historyMarkup = '';
             if (YAHOO.env.ua.ie > 0 && !Dom.get("yui-history-iframe")) {
-              historyMarkup += '<iframe id="yui-history-iframe" src="' + Alfresco.constants.URL_CONTEXT + '/yui/history/assets/blank.html" style="display: none;"></iframe>';
+              historyMarkup += '<iframe id="yui-history-iframe" src="' + Alfresco.constants.URL_RESCONTEXT + 'yui/history/assets/blank.html" style="display: none;"></iframe>';
             }
             if (!Dom.get("yui-history-field")) {
                historyMarkup +='<input id="yui-history-field" type="hidden" />';

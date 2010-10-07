@@ -29,7 +29,7 @@
 <#-- Attributes -->
 <#assign itemId = id + "-${prefix}_" + item.generatedId>
 <#assign itemMenuId = id + "-${prefix}menu_" + item.generatedId>
-<#assign attrStyle><#if (item.icon?length > 0)>style="background-image: url(${url.context}/components/images/header/${item.icon});"</#if></#assign>
+<#assign attrStyle><#if (item.icon?length > 0)>style="background-image: url(${url.context}/res/components/images/header/${item.icon});"</#if></#assign>
 <#assign attrTitle><#if (item.description?length > 0)>title="${msg(item.description)}"</#if></#assign>
 <#assign attrHref = "href=\"#\"">
    <#if (item.value?starts_with("http"))><#assign attrHref>href="${item.value}"</#assign>
@@ -86,7 +86,7 @@
 <#-- Condition check -->
 <#if (item.condition?length > 0)><#if !(item.condition?eval)><#return></#if></#if>
 <#-- Attributes -->
-<#assign attrStyle><#if (item.icon?length > 0)>style="background-image: url(${url.context}/components/images/header/${item.icon});"</#if></#assign>
+<#assign attrStyle><#if (item.icon?length > 0)>style="background-image: url(${url.context}/res/components/images/header/${item.icon});"</#if></#assign>
 <#assign attrTitle><#if (item.description?length > 0)>title="${msg(item.description)}"</#if></#assign>
 <#assign attrHref = "href=\"#\"">
    <#if (item.type != "js")>
@@ -99,7 +99,7 @@
    <#if user.properties.avatar??>
       <#assign avatar>${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force</#assign>
    <#else>
-      <#assign avatar>${url.context}/components/images/no-user-photo-64.png</#assign>
+      <#assign avatar>${url.context}/res/components/images/no-user-photo-64.png</#assign>
    </#if>
    <a class="avatar" ${attrHref} tabindex="0"><img src="${avatar}" alt="avatar" /></a>
    <span class="user-status">

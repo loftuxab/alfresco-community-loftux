@@ -266,7 +266,7 @@
          if (response.json !== undefined && response.json.success)
          {
             // The site has been successfully created, redirect the user to it.
-            document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + response.config.dataObj.shortName + "/dashboard";
+            document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + response.config.dataObj.shortName + "/dashboard";
          }
          else
          {

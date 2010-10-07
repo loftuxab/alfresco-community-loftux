@@ -8,7 +8,7 @@
    <#if eventList?size &gt; 0>
       <#list eventList as event>
       <div class="detail-list-item <#if event_index = 0>first-item<#elseif !event_has_next>last-item</#if>">
-         <div class="icon"><img src="${url.context}/components/calendar/images/calendar-16.png" alt="event" /></div>
+         <div class="icon"><img src="${url.context}/res/components/calendar/images/calendar-16.png" alt="event" /></div>
          <div class="details2">
             <h4><a href="${url.context}/${event.url}" class="theme-color-1">${event.title?html}</a></h4>
             <div>${event.when?string(msg("date-format.mediumDateFTL"))} (${event.start} - ${event.end})</div>

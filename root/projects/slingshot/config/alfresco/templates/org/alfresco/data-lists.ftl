@@ -54,11 +54,11 @@
       }
    })();
    //]]></script>
-   <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/js/alfresco-resizer.js"></@script>
    <script type="text/javascript">//<![CDATA[
       new Alfresco.widget.Resizer("DataLists");
    //]]></script>
-   <@script type="text/javascript" src="${url.context}/modules/data-lists/datalist-actions.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/modules/data-lists/datalist-actions.js"></@script>
 </@>
 
 <@templateBody>

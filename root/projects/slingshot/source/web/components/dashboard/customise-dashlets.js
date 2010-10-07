@@ -309,7 +309,7 @@
                fn: function()
                {
                   // Send the user to the newly configured dashboard
-                  document.location.href = Alfresco.constants.URL_CONTEXT + "page/" + dashboardUrl;
+                  document.location.href = Alfresco.constants.URL_PAGECONTEXT + "" + dashboardUrl;
                },
                scope: this
             },
@@ -353,7 +353,7 @@
          this.widgets.cancelButton.set("disabled", true);
          
          // Send the user to this page again without saveing changes
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/" + this.options.dashboardUrl;
+         document.location.href = Alfresco.constants.URL_PAGECONTEXT + "" + this.options.dashboardUrl;
       }
 
    });

@@ -162,7 +162,7 @@
        */
       onNewBlogClick: function BlogToolbar_onNewBlogClick(e)
       {         
-         window.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postedit";
+         window.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/blog-postedit";
       },
 
       /**

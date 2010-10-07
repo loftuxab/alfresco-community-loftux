@@ -2,7 +2,7 @@
 <#macro formatContent content date type index>
    <#if content.browseUrl??>
    <li<#if (index == 0)> class="first"</#if>>
-      <a href="${url.context}/page/site/${content.site.shortName}/${content.browseUrl}" class="thmb"><img src="${url.context}/components/images/generic-file-32.png" /></a>
+      <a href="${url.context}/page/site/${content.site.shortName}/${content.browseUrl}" class="thmb"><img src="${url.context}/res/components/images/generic-file-32.png" /></a>
       <p>
          <a href="${url.context}/page/site/${content.site.shortName}/${content.browseUrl}" class="theme-color-1">${content.displayName?html!""}</a>
          ${content.description?html}

@@ -315,7 +315,7 @@
                Dom.setStyle(elCell.parentNode, "border-right", "1px solid #D7D7D7");
                
                // apply the avatar image as a background
-               var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+               var avatarUrl = Alfresco.constants.URL_RESCONTEXT + "components/images/no-user-photo-64.png";
                if (oRecord.getData("avatar") !== undefined)
                {
                   avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
@@ -326,8 +326,7 @@
                
                // overlay the account enabled/disabled indicator image
                var enabled = (oRecord.getData("enabled") ? 'enabled' : 'disabled');
-               elCell.innerHTML = '<img class="indicator" alt="' + parent._msg("label." + enabled) + '" src="' + Alfresco.constants.URL_CONTEXT +
-                     'components/images/account_' + enabled + '.gif" alt="" />';
+               elCell.innerHTML = '<img class="indicator" alt="' + parent._msg("label." + enabled) + '" src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/account_' + enabled + '.gif" alt="" />';
             };
             
             /**
@@ -529,7 +528,7 @@
                {
                   photos[i].src = person.avatar ?
                         Alfresco.constants.PROXY_URI + person.avatar + "?c=force" :
-                        Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+                        Alfresco.constants.URL_RESCONTEXT + "components/images/no-user-photo-64.png";
                }
                
                // About section fields
@@ -1079,7 +1078,7 @@
                {
                   photos[i].src = person.avatar ?
                         Alfresco.constants.PROXY_URI + person.avatar + "?c=force" :
-                        Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+                        Alfresco.constants.URL_RESCONTEXT + "components/images/no-user-photo-64.png";
                }
                
                // About section fields
@@ -1576,7 +1575,7 @@
        */
       onUpdateUserClearPhotoClick: function ConsoleUsers_onUpdateUserClearPhotoClick(e, args)
       {
-         Dom.get(this.id + "-update-photoimg").src = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+         Dom.get(this.id + "-update-photoimg").src = Alfresco.constants.URL_RESCONTEXT + "components/images/no-user-photo-64.png";
          this._getCurrentPanel().setPhotoReset();
       },
       
