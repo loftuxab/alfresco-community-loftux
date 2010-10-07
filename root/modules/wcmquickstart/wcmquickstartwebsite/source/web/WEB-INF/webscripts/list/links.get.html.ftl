@@ -11,7 +11,7 @@
             <ul class="services-box-list">
                 <#list articles.assets as article>      
                     <li>
-                        <a href="<@makeurl asset=article/>">${article.title!'no title'}</a>
+                        <a href="<@makeurl asset=article/>"><#if article.title?? && article.title?length gt 0>${article.title}<#else>${article.name}</#if></a> 
                     </li>
                 </#list>
             </ul>
