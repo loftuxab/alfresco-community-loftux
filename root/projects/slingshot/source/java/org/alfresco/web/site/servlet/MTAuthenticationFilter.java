@@ -44,6 +44,7 @@ public class MTAuthenticationFilter implements Filter
     /** Thread local holder of the HttpServletRequest */
     private static ThreadLocal<HttpServletRequest> requestHolder = new ThreadLocal<HttpServletRequest>();
     
+    private static final String ACCEPT_LANGUAGE_HEADER = "Accept-Language";
     
     /* (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
@@ -61,6 +62,12 @@ public class MTAuthenticationFilter implements Filter
         if (req instanceof HttpServletRequest)
         {
             requestHolder.set((HttpServletRequest)req);
+
+            if (((HttpServletRequest) req).getHeader(ACCEPT_LANGUAGE_HEADER) == null)
+            {
+                req = new SlingshotServletRequestWrapper((HttpServletRequest) req);
+                ((SlingshotServletRequestWrapper) req).addHeader(ACCEPT_LANGUAGE_HEADER, "en_US");
+            }
         }
         try
         {
