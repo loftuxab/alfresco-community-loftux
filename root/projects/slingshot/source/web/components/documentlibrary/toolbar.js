@@ -458,7 +458,8 @@
                activityData =
                {
                   fileCount: success,
-                  path: this.currentPath
+                  path: this.currentPath,
+                  parentNodeRef : this.modules.docList.doclistMetadata.parent.nodeRef
                };
                this.modules.actions.postActivity(this.options.siteId, "files-added", "documentlibrary", activityData);
             }
@@ -612,7 +613,8 @@
                      activityData =
                      {
                         fileCount: successCount,
-                        path: this.currentPath
+                        path: this.currentPath,
+                        parentNodeRef : this.modules.docList.doclistMetadata.parent.nodeRef
                      };
                      this.modules.actions.postActivity(this.options.siteId, "files-deleted", "documentlibrary", activityData);
                   }
