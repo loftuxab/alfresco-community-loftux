@@ -234,7 +234,8 @@
                   activityData:
                   {
                      fileName: fileName,
-                     path: path
+                     path: path,
+                     nodeRef: nodeRef.toString()
                   }
                },
                event:
@@ -619,7 +620,8 @@
                activityData =
                {
                   fileCount: success,
-                  path: this.currentPath
+                  path: this.currentPath,
+                  parentNodeRef : this.modules.docList.doclistMetadata.parent.nodeRef
                };
                this.modules.actions.postActivity(this.options.siteId, "files-updated", "documentlibrary", activityData);
             }
