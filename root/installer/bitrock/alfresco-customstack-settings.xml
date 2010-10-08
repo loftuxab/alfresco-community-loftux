@@ -100,5 +100,8 @@
 	    </ruleList>
 	</choiceParameter>
     </parameterList>
+    <postInstallationActionList>
+        <alfrescoConfigure alfrescoFiles="${tomcat_server_directory}/bin/service.bat;${tomcat_server_directory}/scripts/ctl.sh" />
+    </postInstallationActionList>
 </component>
 
