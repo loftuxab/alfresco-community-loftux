@@ -224,13 +224,13 @@ public class WebPublishingManifestNodeFactory implements TransferManifestNodeFac
 
         /*
          * The default implementation works around an issue (ALF-4333) that appears in the transfer service
-         * on versions 3.3c, 3.3.0, and 3.3.1.
+         * on versions 3.3c, 3.3.0, 3.3.1, 3.3.2, and 3.3.3.
          */
         Descriptor descriptor = descriptorService.getServerDescriptor();
         if ("3".equals(descriptor.getVersionMajor()) && "3".equals(descriptor.getVersionMinor()))
         {
-            //Are we a version lower than 3.3.2?
-            if ("2".compareTo(descriptor.getVersionRevision()) > 0)
+            //Are we a version lower than 3.3.4?
+            if ("4".compareTo(descriptor.getVersionRevision()) > 0)
             {
                 //Yes. Apply the workaround...
                 NodeRef.Status status = nodeService.getNodeStatus(nodeRef);
