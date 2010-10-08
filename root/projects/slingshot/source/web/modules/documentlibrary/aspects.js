@@ -67,19 +67,6 @@
       selectedValues: null,
 
       /**
-       * Fired by YUI when parent element is available for scripting.
-       * Component initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
-       * @override
-       */
-      onReady: function DA_onReady()
-      {
-         this.widgets.ok = Alfresco.util.createYUIButton(this, "ok", this.onOK);
-         this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
-      },
-
-      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -187,6 +174,10 @@
          
          this._createAspectsControls();
          this._requestAspectData();
+
+         // Enable buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
       },
       
       /**
@@ -201,7 +192,7 @@
          // Success callback function
          var fnSuccess = function DA_dBAR_success(p_data)
          {
-            this._hideDialog();
+            this.hide();
 
             // Did the operation succeed?
             Alfresco.util.PopupManager.displayMessage(
@@ -219,7 +210,7 @@
          // Failure callback function
          var fnFailure = function DA_dBAR_failure(p_data)
          {
-            this._hideDialog();
+            this.hide();
 
             Alfresco.util.PopupManager.displayMessage(
             {
