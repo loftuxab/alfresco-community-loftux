@@ -2507,7 +2507,7 @@
             }
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("create-new-item-" + this.eventGroup, fnCreateNewItemHandler);
+         YAHOO.Bubbling.addDefaultAction("create-new-item-" + this.eventGroup, fnCreateNewItemHandler, true);
 
          // Hook navigation action click events
          var fnNavigationHandler = function ObjectRenderer__createControls_fnNavigationHandler(layer, args)
