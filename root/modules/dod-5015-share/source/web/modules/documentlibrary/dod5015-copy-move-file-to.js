@@ -52,23 +52,28 @@
        */
       setOptions: function RMCMFT_setOptions(obj)
       {
-         var dataWebScripts =
+         var myOptions =
          {
-            copy: "copy-to",
-            move: "move-to",
-            file: "add-child"
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/copy-move-file-to"
          };
-         
-         if (obj.mode && typeof dataWebScripts[obj.mode] == "undefined")
+
+         if (typeof obj.mode !== "undefined")
          {
-            throw new Error("Alfresco.module.RecordsCopyMoveFileTo: Invalid mode '" + obj.mode + "'");
+            var dataWebScripts =
+            {
+               copy: "copy-to",
+               move: "move-to",
+               file: "add-child"
+            };
+
+            if (typeof dataWebScripts[obj.mode] == "undefined")
+            {
+               throw new Error("Alfresco.module.RecordsCopyMoveFileTo: Invalid mode '" + obj.mode + "'");
+            }
+            myOptions.dataWebScript = dataWebScripts[obj.mode];
          }
          
-         return Alfresco.module.RecordsCopyMoveFileTo.superclass.setOptions.call(this, YAHOO.lang.merge(
-         {
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/copy-move-file-to",
-            dataWebScript: dataWebScripts[obj.mode]
-         }, obj));
+         return Alfresco.module.RecordsCopyMoveFileTo.superclass.setOptions.call(this, YAHOO.lang.merge(myOptions, obj));
       },
 
       /**
