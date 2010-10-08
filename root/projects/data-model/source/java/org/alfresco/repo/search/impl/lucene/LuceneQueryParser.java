@@ -675,7 +675,6 @@ public class LuceneQueryParser extends QueryParser
                         }
                     }
                 }
-                        
             }
         }
         else
@@ -715,7 +714,6 @@ public class LuceneQueryParser extends QueryParser
                         }
                     }
                 }
-                        
             }
         }
         else
@@ -734,14 +732,57 @@ public class LuceneQueryParser extends QueryParser
     
     private ClassDefinition matchClassDefinition(String string)
     {
-        TypeDefinition match = matchTypeDefinition(string);
-        if(match != null)
+        QName search = QName.createQName(expandQName(string));
+        ClassDefinition classDefinition = dictionaryService.getClass(QName.createQName(expandQName(string)));
+        QName match = null;
+        if(classDefinition == null)
         {
-            return match;
+            for(QName definition : dictionaryService.getAllTypes())
+            {
+                if(definition.getNamespaceURI().equalsIgnoreCase(search.getNamespaceURI()))
+                {
+                    if(definition.getLocalName().equalsIgnoreCase(search.getLocalName()))
+                    {
+                        if(match == null)
+                        {
+                            match = definition;
+                        }
+                        else
+                        {
+                            throw new LuceneQueryParserException("Ambiguous data datype "+string);
+                        }
+                    }
+                }
+            }
+            for(QName definition : dictionaryService.getAllAspects())
+            {
+                if(definition.getNamespaceURI().equalsIgnoreCase(search.getNamespaceURI()))
+                {
+                    if(definition.getLocalName().equalsIgnoreCase(search.getLocalName()))
+                    {
+                        if(match == null)
+                        {
+                            match = definition;
+                        }
+                        else
+                        {
+                            throw new LuceneQueryParserException("Ambiguous data datype "+string);
+                        }
+                    }
+                }
+            }
         }
         else
         {
-            return matchAspectDefinition(string);
+            return classDefinition;
+        }
+        if(match == null)
+        {
+            return null;
+        }
+        else
+        {
+            return dictionaryService.getClass(match);
         }
     }
     
