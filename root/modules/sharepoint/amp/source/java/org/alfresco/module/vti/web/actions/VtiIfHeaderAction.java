@@ -34,13 +34,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.web.VtiAction;
 import org.alfresco.module.vti.web.fp.PropfindMethod;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -73,21 +73,11 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
 
     private AuthenticationService authenticationService;
 
-    private ContentService contentService;
+    private VtiPathHelper pathHelper;
 
     static
     {
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-
-    /**
-     * <p>ContentService setter.</p>
-     *
-     * @param contentService {@link ContentService}.    
-     */
-    public void setContentService(ContentService contentService)
-    {
-        this.contentService = contentService;
     }
 
     /**
@@ -128,6 +118,17 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
     public void setAuthenticationService(AuthenticationService authenticationService)
     {
         this.authenticationService = authenticationService;
+    }
+    
+    
+    /**
+     * <p>VtiPathHelper setter.</p>
+     * 
+     * @param pathHelper {@link VtiPathHelper}.
+     */
+    public void setPathHelper(VtiPathHelper pathHelper)
+    {
+        this.pathHelper = pathHelper;
     }
 
     /**
@@ -216,41 +217,37 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
         {
             return;
         }
+        String path  = req.getPathInfo();
+        String alfrescoContext = pathHelper.getAlfrescoContext();
+        // remove the servlet path from the path
+        if (alfrescoContext != null && alfrescoContext.length() > 0 && path.startsWith(alfrescoContext))
+        {
+            // Strip the servlet path from the relative path
+            path = path.substring(alfrescoContext.length());
+        }
         
-        String if_header_value = req.getHeader("If");
-        String guid = null;
-
-        if (if_header_value != null && if_header_value.length() > 0)
-        {
-            int begin = if_header_value.indexOf(":");
-            int end = if_header_value.indexOf("@");
-            if (begin != -1 && end != -1)
-            {
-                guid = if_header_value.substring(begin + 1, end);
-            }
-        }
-
-        if (guid == null)
-        {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-
-        NodeRef nodeRef = new NodeRef("workspace", "SpacesStore", guid.toLowerCase());
+        
+        NodeRef nodeRef = pathHelper.resolvePathFileInfo(path).getNodeRef();
         NodeRef workingCopyNodeRef = checkOutCheckInService.getWorkingCopy(nodeRef);
-
-        // original document writer
-        ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
-
+        
+        ContentWriter writer = null;
+        
         if (workingCopyNodeRef != null)
         {
             String workingCopyOwner = nodeService.getProperty(workingCopyNodeRef, ContentModel.PROP_WORKING_COPY_OWNER).toString();
             if (workingCopyOwner.equals(authenticationService.getCurrentUserName()))
             {
                 // working copy writer
-                writer = contentService.getWriter(workingCopyNodeRef, ContentModel.PROP_CONTENT, true);
+                writer = fileFolderService.getWriter(workingCopyNodeRef);
             }
         }
+        else
+        {
+            // original document writer
+            writer = fileFolderService.getWriter(nodeRef);  
+
+        }
+        
         // updates changes on the server
         try
         {
@@ -276,8 +273,8 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
             }
         }
         Date lastModified = (Date) props.get(ContentModel.PROP_MODIFIED);
-        resp.setHeader("Repl-uid", "rid{" + guid + "}");
-        resp.setHeader("ResourceTag", "rt:" + guid + "@" + PropfindMethod.convertDateToVersion(lastModified));
+        resp.setHeader("Repl-uid", "rid{" + nodeRef.getId() + "}");
+        resp.setHeader("ResourceTag", "rt:" + nodeRef.getId() + "@" + PropfindMethod.convertDateToVersion(lastModified));
         resp.setContentType(writer.getMimetype());
 
         resp.getOutputStream().close();

@@ -236,6 +236,19 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler
             {
                 NodeRef resourceNodeRef = resourceFileInfo.getNodeRef();
                 ContentData contentData = (ContentData) getNodeService().getProperty(resourceNodeRef, ContentModel.PROP_CONTENT);
+                
+                NodeRef workingCopyNodeRef = getCheckOutCheckInService().getWorkingCopy(resourceNodeRef);
+                if (workingCopyNodeRef != null)
+                {
+                    String workingCopyOwner = getNodeService().getProperty(workingCopyNodeRef, ContentModel.PROP_WORKING_COPY_OWNER).toString();
+                    if (workingCopyOwner.equals(getAuthenticationService().getCurrentUserName()))
+                    {
+                        // allow to see changes in document after it was checked out (only for checked out owner)
+                        contentData = (ContentData) getNodeService().getProperty(workingCopyNodeRef, ContentModel.PROP_CONTENT);
+                        resourceNodeRef = workingCopyNodeRef;
+                    }
+                }
+                
                 response.setContentType(contentData.getMimetype());
                 ContentReader reader = getFileFolderService().getReader(resourceNodeRef);
                 try
