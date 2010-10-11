@@ -6,8 +6,8 @@ Quick Start Module
 ------------------
 The Alfresco Web Quick Start is licensed under the Apache License, Version 2.0 with the following exceptions that are licensed separately by their respective parties
 
-  * Website Images - embedded within the source .ACP file - see "Website Images" section below.
   * Website Templates - See "Site Template" section below.
+  * Website Images - embedded within the source .ACP file - see "Website Images" section below.
   
 Source code for the Web Quick Start is available via the SVN repository detailed here - http://wiki.alfresco.com/wiki/Download_Community_Edition.
 
@@ -17,7 +17,7 @@ The Web Quick Start uses an HTML Site Template licensed by Envato (http://envato
 
 Site Template Components
 ------------------------
-The Web Quick Start uses an HTML Site Template the includes the following third-party files and components:
+The Web Quick Start uses an HTML Site Template that includes the following third-party files and components:
 
 	1) 	Reset CSS - Reset.css by Eric Meyer: http://meyerweb.com/eric/tools/css/reset/.  See website or file header for licensing terms and conditions.
 
