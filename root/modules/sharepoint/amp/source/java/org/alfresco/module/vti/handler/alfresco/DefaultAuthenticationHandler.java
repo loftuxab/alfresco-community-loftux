@@ -35,8 +35,6 @@ import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.security.PersonService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Default implementation of web authentication. Delegates to a authentication handler in the core alfresco
@@ -48,8 +46,6 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler
 {
     private final static String USER_SESSION_ATTRIBUTE = "_vtiAuthTicket";
 
-    private static Log logger = LogFactory.getLog(DefaultAuthenticationHandler.class);
-        
     private MethodHandler vtiHandler;
     private UserGroupServiceHandler vtiUserGroupServiceHandler;
     private PersonService personService;
@@ -64,7 +60,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler
 
         String targetUri = uri.startsWith(alfrescoContext) ? uri.substring(alfrescoContext.length()) : uri;
 
-        if (targetUri.equals("") || targetUri.startsWith("/_vti_inf.html") || targetUri.startsWith("/_vti_bin/") || targetUri.startsWith("/resources/"))
+        if (targetUri.equals("/") || targetUri.equals("") || targetUri.startsWith("/_vti_inf.html") || targetUri.startsWith("/_vti_bin/") || targetUri.startsWith("/resources/"))
             return true;
 
         String dwsName = null;

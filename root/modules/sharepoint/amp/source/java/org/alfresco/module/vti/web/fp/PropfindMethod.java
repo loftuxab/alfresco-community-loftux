@@ -297,7 +297,10 @@ public class PropfindMethod extends PropFindMethod
 
                 // Move the next level of nodes to the current node list
                 nodeInfos.clear();
-                nodeInfos.addAll(nextNodeInfos);
+                if (nextNodeInfos != null)
+                {
+                    nodeInfos.addAll(nextNodeInfos);
+                }
             }
         }
 
@@ -305,6 +308,7 @@ public class PropfindMethod extends PropFindMethod
         xml.endElement(WebDAV.DAV_NS, WebDAV.XML_MULTI_STATUS, WebDAV.XML_NS_MULTI_STATUS);
 
         // Send remaining data
+        xml.flush();
     }
 
     /**

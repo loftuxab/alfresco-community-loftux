@@ -37,7 +37,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.MeetingServiceHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiExceptionUtils;
-import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.model.MeetingBean;
 import org.alfresco.module.vti.metadata.model.MeetingsInformation;
 import org.alfresco.module.vti.metadata.model.MwsStatus;
@@ -94,8 +93,6 @@ public class AlfrescoMeetingServiceHandler implements MeetingServiceHandler
     protected PersonService personService;
 
     protected ShareUtils shareUtils;
-
-	private VtiPathHelper pathHelper;
 
     private static final QName TYPE_EVENT = QName.createQName("http://www.alfresco.org/model/calendar", "calendarEvent");
     private static final QName PROP_WHAT_EVENT = QName.createQName("http://www.alfresco.org/model/calendar", "whatEvent");
@@ -587,9 +584,5 @@ public class AlfrescoMeetingServiceHandler implements MeetingServiceHandler
     {
         this.fileFolderService = fileFolderService;
     }
-
-    public void setPathHelper(VtiPathHelper pathHelper)
-    {
-        this.pathHelper = pathHelper;
-    }
+    
 }

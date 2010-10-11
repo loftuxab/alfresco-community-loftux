@@ -54,7 +54,7 @@ public class VtiInfAction implements VtiAction
         {
             OutputStream outputStream = response.getOutputStream();
             outputStream.write("<!-- FrontPage Configuration Information\n".getBytes());
-            outputStream.write(" FPVersion=\"6.0.2.9999\"\n".getBytes());
+            outputStream.write(" FPVersion=\"14.00.0.000\"\n".getBytes());
             outputStream.write("FPShtmlScriptUrl=\"_vti_bin/shtml.dll/_vti_rpc\"\n".getBytes());
             outputStream.write("FPAuthorScriptUrl=\"_vti_bin/_vti_aut/author.dll\"\n".getBytes());
             outputStream.write("FPAdminScriptUrl=\"_vti_bin/_vti_adm/admin.dll\"\n".getBytes());

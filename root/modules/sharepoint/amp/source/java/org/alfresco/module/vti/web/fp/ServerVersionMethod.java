@@ -30,11 +30,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ServerVersionMethod extends AbstractMethod
 {
-    private static final int major = 6;
+    private static final int major = 14;
     private static final int minor = 0;
-    private static final int phase = 2;
-    private static final int increment = 8117;    
-
+    private static final int phase = 0;
+    private static final int increment = 4730;    
+    
     public static final String version = major + "." + minor + "." + phase + "." + increment;
     
     private static Log logger = LogFactory.getLog(ServerVersionMethod.class);

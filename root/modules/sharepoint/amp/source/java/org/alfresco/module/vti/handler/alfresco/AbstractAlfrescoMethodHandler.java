@@ -1082,7 +1082,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
                 docMetaInfo.setFilesize(String.valueOf(workingCopyFileInfo.getContentData().getSize()));
 
                 docMetaInfo.setSourcecontrolcheckedoutby((String) workingCopyProps.get(ContentModel.PROP_WORKING_COPY_OWNER));
-                docMetaInfo.setSourcecontroltimecheckedout(VtiUtils.formatDate((Date) workingCopyProps.get(ContentModel.PROP_CREATED)));
+                docMetaInfo.setSourcecontroltimecheckedout(modifiedDate);
             }
             else
             {

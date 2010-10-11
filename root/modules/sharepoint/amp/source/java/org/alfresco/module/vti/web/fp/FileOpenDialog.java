@@ -78,11 +78,7 @@ public class FileOpenDialog extends AbstractMethod
         }
         String location = request.getNotEncodedParameter("location");
         String site = getSiteUrl(request);
-        if (site.equals(""))
-        {
-            response.setStatus(HttpServletResponse.SC_GONE);
-            return;
-        }
+        
         List<String> fileDialogFilterValue = Arrays.asList(request.getParameter("FileDialogFilterValue").split(";"));
         String rootFolder = request.getParameter("RootFolder", "");
         VtiSortField sortField = request.getParameter("SortField", VtiSortField.TYPE);

@@ -67,6 +67,15 @@
         <property name="personService" ref="PersonService"/>
         <property name="fileFolderService" ref="FileFolderService" />
     </bean>
+    
+    <bean id="checkOutCheckInServiceHandler" class="org.alfresco.module.vti.handler.alfresco.v3.AlfrescoCheckOutCheckInServiceHandler">
+        <property name="pathHelper" ref="vtiPathHelper"/>
+        <property name="checkOutCheckInService" ref="CheckoutCheckinService"/>
+        <property name="lockService" ref="LockService" />
+        <property name="transactionService" ref="transactionService" />
+        <property name="nodeService" ref="NodeService"/>
+        <property name="authenticationService" ref="AuthenticationService" />
+    </bean>    
 
     <bean id="vtiHandlerTarget" class="org.alfresco.module.vti.handler.alfresco.v3.AlfrescoMethodHandler">
         <property name="nodeService" ref="NodeService" />

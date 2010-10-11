@@ -42,9 +42,6 @@
     <bean id="vtiFilter" class="org.alfresco.module.vti.web.VtiFilter">
         <property name="authenticationHandler" ref="vtiAuthenticationHandler"/>
         <property name="vtiHandler" ref="vtiHandler"/>
-        <property name="sysAdminParams">
-            <ref bean="sysAdminParams" />
-        </property>
         <property name="alfrescoContext">
             <value>${vti.alfresco.deployment.context}</value>
         </property>
@@ -88,6 +85,36 @@
                 <bean class="org.alfresco.module.vti.web.VtiRequestDispatcher$ActionMapping">
                     <property name="customRules">
                         <map>
+                            <entry key="Request-method">
+                                <value>LOCK</value>
+                            </entry>
+                        </map>
+                    </property>
+                    <property name="action" ref="vtiLockAction"/>
+                </bean>
+                <bean class="org.alfresco.module.vti.web.VtiRequestDispatcher$ActionMapping">
+                    <property name="customRules">
+                        <map>
+                            <entry key="Request-method">
+                                <value>PROPPATCH</value>
+                            </entry>
+                        </map>
+                    </property>
+                    <property name="action" ref="vtiPropPatchAction"/>
+                </bean>
+                <bean class="org.alfresco.module.vti.web.VtiRequestDispatcher$ActionMapping">
+                    <property name="customRules">
+                        <map>
+                            <entry key="Request-method">
+                                <value>UNLOCK</value>
+                            </entry>
+                        </map>
+                    </property>
+                    <property name="action" ref="vtiUnlockAction"/>
+                </bean>
+                <bean class="org.alfresco.module.vti.web.VtiRequestDispatcher$ActionMapping">
+                    <property name="customRules">
+                        <map>
                             <entry key="Request-method"><value>(GET)|(PUT)</value></entry>
                             <entry key="If"><value>^.+$</value></entry>
                         </map>
@@ -116,9 +143,6 @@
         </constructor-arg>
         <property name="sysAdminParams">
            <ref bean="sysAdminParams" />
-        </property>
-        <property name="context">
-            <value>${vti.alfresco.deployment.context}</value>
         </property>
     </bean>
 
@@ -163,12 +187,31 @@
         <property name="authenticationService" ref="AuthenticationService" />
     </bean>
 
+    <bean id="vtiLockAction" class="org.alfresco.module.vti.web.actions.VtiLockAction">
+        <property name="pathHelper" ref="vtiPathHelper"/>
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+        <property name="authenticationService" ref="AuthenticationService"/>
+    </bean>
+
+    <bean id="vtiPropPatchAction" class="org.alfresco.module.vti.web.actions.VtiPropPatchAction">
+        <property name="pathHelper" ref="vtiPathHelper"/>
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+        <property name="authenticationService" ref="AuthenticationService"/>
+    </bean>
+
+    <bean id="vtiUnlockAction" class="org.alfresco.module.vti.web.actions.VtiUnlockAction">
+        <property name="pathHelper" ref="vtiPathHelper"/>
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+        <property name="authenticationService" ref="AuthenticationService"/>
+    </bean>
+
+
     <bean id="vtiIfHeaderAction" class="org.alfresco.module.vti.web.actions.VtiIfHeaderAction">
         <property name="nodeService" ref="NodeService" />
         <property name="fileFolderService" ref="FileFolderService" />
         <property name="checkOutCheckInService" ref="CheckoutCheckinService" />
         <property name="authenticationService" ref="AuthenticationService" />
-        <property name="contentService" ref="ContentService" />
+        <property name="pathHelper" ref="vtiPathHelper"/>
     </bean>
 
     <bean id="vtiBrowserAction" class="org.alfresco.module.vti.web.actions.VtiBrowserAction">
@@ -178,29 +221,84 @@
     <bean id="vtiSoapAction" class="org.alfresco.module.vti.web.actions.VtiSoapAction">
         <property name="endpointsMapping">
             <map>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/WebUrlFromPageUrl"> <ref bean="webUrlFromPageUrlEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/GetDwsMetaData"> <ref bean="getDwsMetaDataEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/GetVersions"> <ref bean="getVersionsEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/RestoreVersion"> <ref bean="restoreVersionEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/DeleteVersion"> <ref bean="deleteVersionEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/GetDwsData"> <ref bean="getDwsDataEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/CreateDws"> <ref bean="createDwsEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/DeleteAllVersions"> <ref bean="deleteAllVersionsEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/directory/GetUserLoginFromEmail"> <ref bean="getUserLoginFromEmailEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/directory/AddUserCollectionToRole"> <ref bean="addUserCollectionToRoleEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/CreateFolder"> <ref bean="createFolderEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/DeleteFolder"> <ref bean="deleteFolderEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/DeleteDws"> <ref bean="deleteDwsEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RenameDws"> <ref bean="renameDwsEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RemoveDwsUser"> <ref bean="removeDwsUserEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/UpdateDwsData"> <ref bean="updateDwsDataEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/GetMeetingWorkspaces"> <ref bean="getMeetingWorkspacesEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/GetMeetingsInformation"> <ref bean="getMeetingsInformationEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/CreateWorkspace"> <ref bean="createWorkspaceEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/AddMeetingFromICal"> <ref bean="addMeetingFromICalEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/UpdateMeetingFromICal"> <ref bean="updateMeetingFromICalEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/RemoveMeeting"> <ref bean="removeMeetingEndpoint"/> </entry>
-                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/DeleteWorkspace"> <ref bean="deleteWorkspaceEndpoint"/> </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/WebUrlFromPageUrl">
+                    <ref bean="webUrlFromPageUrlEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/GetDwsMetaData">
+                    <ref bean="getDwsMetaDataEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/CheckOutFile">
+                    <ref bean="checkOutFile"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/CheckInFile">
+                    <ref bean="checkInFile"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/UndoCheckOut">
+                    <ref bean="undoCheckOutFile"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/GetVersions">
+                    <ref bean="getVersionsEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/RestoreVersion">
+                    <ref bean="restoreVersionEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/DeleteVersion">
+                    <ref bean="deleteVersionEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/GetDwsData">
+                    <ref bean="getDwsDataEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/CreateDws">
+                    <ref bean="createDwsEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/DeleteAllVersions">
+                    <ref bean="deleteAllVersionsEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/directory/GetUserLoginFromEmail">
+                    <ref bean="getUserLoginFromEmailEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/directory/AddUserCollectionToRole">
+                    <ref bean="addUserCollectionToRoleEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/CreateFolder">
+                    <ref bean="createFolderEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/DeleteFolder">
+                    <ref bean="deleteFolderEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/DeleteDws">
+                    <ref bean="deleteDwsEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RenameDws">
+                    <ref bean="renameDwsEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RemoveDwsUser">
+                    <ref bean="removeDwsUserEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/dws/UpdateDwsData">
+                    <ref bean="updateDwsDataEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/GetMeetingWorkspaces">
+                    <ref bean="getMeetingWorkspacesEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/GetMeetingsInformation">
+                    <ref bean="getMeetingsInformationEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/CreateWorkspace">
+                    <ref bean="createWorkspaceEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/AddMeetingFromICal">
+                    <ref bean="addMeetingFromICalEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/UpdateMeetingFromICal">
+                    <ref bean="updateMeetingFromICalEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/RemoveMeeting">
+                    <ref bean="removeMeetingEndpoint"/>
+                </entry>
+                <entry key="http://schemas.microsoft.com/sharepoint/soap/meetings/DeleteWorkspace">
+                    <ref bean="deleteWorkspaceEndpoint"/>
+                </entry>
             </map>
         </property>
     </bean>
@@ -267,6 +365,36 @@
         <constructor-arg ref="vtiHandler" />
         <property name="name">
             <value>WebUrlFromPageUrl</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+    </bean>
+
+    <bean id="checkOutFile" class="org.alfresco.module.vti.web.ws.CheckOutFileEndpoint">
+        <constructor-arg ref="checkOutCheckInServiceHandler"/>
+        <property name="name">
+            <value>CheckOutFile</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+    </bean>
+
+    <bean id="checkInFile" class="org.alfresco.module.vti.web.ws.CheckInFileEndpoint">
+        <constructor-arg ref="checkOutCheckInServiceHandler"/>
+        <property name="name">
+            <value>CheckInFile</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+    </bean>
+
+    <bean id="undoCheckOutFile" class="org.alfresco.module.vti.web.ws.UndoCheckOutFileEndpoint">
+        <constructor-arg ref="checkOutCheckInServiceHandler"/>
+        <property name="name">
+            <value>UndoCheckOut</value>
         </property>
         <property name="namespace">
             <value>http://schemas.microsoft.com/sharepoint/soap/</value>

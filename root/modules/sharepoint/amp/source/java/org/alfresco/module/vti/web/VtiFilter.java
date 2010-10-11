@@ -38,10 +38,8 @@ import org.alfresco.module.vti.handler.MethodHandler;
 import org.alfresco.module.vti.handler.SiteMemberMappingException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.repo.SessionUser;
-import org.alfresco.repo.admin.SysAdminParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mortbay.jetty.HttpHeaders;
 import org.springframework.extensions.surf.util.URLDecoder;
 
 /**
@@ -62,10 +60,13 @@ public class VtiFilter implements Filter
     public static final String METHOD_PUT = "PUT";
     public static final String METHOD_TRACE = "TRACE";
     public static final String METHOD_PROPFIND = "PROPFIND";
+    public static final String METHOD_LOCK = "LOCK";
+    public static final String METHOD_UNLOCK = "UNLOCK";
+    
+    public static final String AUTHENTICATE_HEADER = "WWW-Authenticate";
 
     private AuthenticationHandler authenticationHandler;
     private MethodHandler vtiHandler;
-    private SysAdminParams sysAdminParams;
 
     private String alfrescoContext;
     private ServletContext context;
@@ -107,10 +108,7 @@ public class VtiFilter implements Filter
         }
 
         String httpMethod = httpRequest.getMethod();
-        String agentHeader = httpRequest.getHeader(HttpHeaders.USER_AGENT); 
-        if (agentHeader != null && agentHeader.startsWith("Microsoft-WebDAV-MiniRedir/6")
-                && (METHOD_PROPFIND.equals(httpMethod) || METHOD_OPTIONS.equals(httpMethod))
-                && ("/".equals(uri) || alfrescoContext.equals(uri)))
+        if ((METHOD_OPTIONS.equals(httpMethod)) && ("/".equals(uri) || alfrescoContext.equals(uri)))
         {
             writeResponseForMiniRedir(httpResponse);
             return;
@@ -153,6 +151,12 @@ public class VtiFilter implements Filter
 
         if (user == null)
         {
+            if (!httpResponse.containsHeader(AUTHENTICATE_HEADER))
+            {
+                httpResponse.setHeader(AUTHENTICATE_HEADER, "BASIC realm=\"Alfresco Server\"");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResponse.getOutputStream().close();
+            }
             return;
         }
         else
@@ -217,11 +221,14 @@ public class VtiFilter implements Filter
             }
             httpResponse.setHeader("MS-Author-Via", "MS-FP/4.0,DAV");
             httpResponse.setHeader("MicrosoftOfficeWebServer", "5.0_Collab");
-            httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
+            httpResponse.setHeader("MicrosoftSharePointTeamServices", "14.00.0.000");
             httpResponse.setHeader("DAV", "1,2");
             httpResponse.setHeader("Accept-Ranges", "none");
             httpResponse.setHeader("Cache-Control", "no-cache");
             httpResponse.setHeader("Allow", "GET, POST, OPTIONS, HEAD, MKCOL, PUT, PROPFIND, PROPPATCH, DELETE, MOVE, COPY, GETLIB, LOCK, UNLOCK");
+            
+            httpResponse.setHeader("DocumentManagementServer", "Properties Schema;Source Control;Version History;");
+
         }
         else if (METHOD_HEAD.equals(httpMethod) || METHOD_GET.equals(httpMethod) || METHOD_PUT.equals(httpMethod))
         {
@@ -230,7 +237,7 @@ public class VtiFilter implements Filter
                 logger.debug("Return VTI answer for HEAD request");
             }
             httpResponse.setHeader("Public-Extension", "http://schemas.microsoft.com/repl-2");
-            httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
+            httpResponse.setHeader("MicrosoftSharePointTeamServices", "14.00.0.000");
             if (METHOD_GET.equals(httpMethod))
             {
                 if (httpRequest.getRequestURI().startsWith(getAlfrescoContext() + "/resources"))
@@ -248,19 +255,19 @@ public class VtiFilter implements Filter
             }
             httpResponse.setContentType("text/html");
         }
-        else if (METHOD_PROPFIND.equals(httpMethod))
+        else if (METHOD_PROPFIND.equals(httpMethod) || METHOD_LOCK.equals(httpMethod) || METHOD_UNLOCK.equals(httpMethod))
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Return VTI answer for PROPFIND request");
+                logger.debug("Return VTI answer for " + httpMethod + " request");
             }
             httpResponse.setHeader("Public-Extension", "http://schemas.microsoft.com/repl-2");
-            httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
+            httpResponse.setHeader("MicrosoftSharePointTeamServices", "14.00.0.000");
             httpResponse.setHeader("Cache-Control", "no-cache");
         }
         else if (METHOD_POST.equals(httpMethod))
         {
-            httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
+            httpResponse.setHeader("MicrosoftSharePointTeamServices", "14.00.0.000");
             httpResponse.setHeader("Cache-Control", "no-cache");
             httpResponse.setHeader("Connection", "close");
             httpResponse.setContentType("application/x-vermeer-rpc");
@@ -271,21 +278,12 @@ public class VtiFilter implements Filter
     {
         httpResponse.setHeader("MS-Author-Via", "MS-FP/4.0,DAV");
         httpResponse.setHeader("MicrosoftOfficeWebServer", "5.0_Collab");
-        httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
+        httpResponse.setHeader("MicrosoftSharePointTeamServices", "14.00.0.000");
         httpResponse.setHeader("DAV", "1,2");
         httpResponse.setHeader("Accept-Ranges", "none");
         httpResponse.setHeader("Cache-Control", "no-cache");
         httpResponse.setHeader("Allow", "GET, POST, OPTIONS, HEAD, MKCOL, PUT, PROPFIND, PROPPATCH, DELETE, MOVE, COPY, GETLIB, LOCK, UNLOCK");
 
-        OutputStream outputStream = httpResponse.getOutputStream();
-        outputStream.write("<!-- FrontPage Configuration Information\n".getBytes());
-        outputStream.write(" FPVersion=\"6.0.2.9999\"\n".getBytes());
-        outputStream.write("FPShtmlScriptUrl=\"_vti_bin/shtml.dll/_vti_rpc\"\n".getBytes());
-        outputStream.write("FPAuthorScriptUrl=\"_vti_bin/_vti_aut/author.dll\"\n".getBytes());
-        outputStream.write("FPAdminScriptUrl=\"_vti_bin/_vti_adm/admin.dll\"\n".getBytes());
-        outputStream.write("TPScriptUrl=\"_vti_bin/owssvr.dll\"\n".getBytes());
-        outputStream.write("-->".getBytes());
-        outputStream.close();
     }
 
     private boolean validSiteUri(HttpServletRequest request)
@@ -320,11 +318,6 @@ public class VtiFilter implements Filter
             return false;
         }
     }    
-
-    public void setSysAdminParams(SysAdminParams sysAdminParams)
-    {
-        this.sysAdminParams = sysAdminParams;
-    }
 
     public MethodHandler getVtiHandler()
     {
