@@ -81,15 +81,17 @@ public class AssetFactoryCmisImpl implements AssetFactory
             + COMMON_ASSET_FROM_CLAUSE + "WHERE ANY wa.ws:parentSections IN (''{0}'') AND d.cmis:name like ''{1}''";
 
     private final String assetByFtsQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() " + COMMON_ASSET_FROM_CLAUSE
-            + "WHERE IN_TREE(d, ''{0}'') AND CONTAINS(d, ''{1}'') ";
+            + "WHERE IN_TREE(d, ''{0}'') AND (CONTAINS(d, ''{1}'') OR ANY wa.ws:tags IN ('''*'{1}'*''') "
+            + "OR t.cm:title like ''%{1}%'' OR t.cm:description like ''%{1}%'' ) ";
 
     private final String assetByTagQueryPattern = COMMON_ASSET_SELECT_CLAUSE + ", SCORE() " + COMMON_ASSET_FROM_CLAUSE
             + "WHERE IN_TREE(d, ''{0}'') AND ANY wa.ws:tags IN (''{1}'') ";
 
     private final String searchOrderClause = " ORDER BY SEARCH_SCORE ASC";
 
-//    private final String availabilityConstraint = " AND wa.ws:available = true ";
-    
+    // private final String availabilityConstraint =
+    // " AND wa.ws:available = true ";
+
     private final String modifiedTimeByAssetId = "SELECT d.cmis:lastModificationDate "
             + "FROM cmis:document AS d WHERE d.cmis:objectId = ''{0}''";
 
@@ -206,7 +208,7 @@ public class AssetFactoryCmisImpl implements AssetFactory
             searchResults.setResults(foundAssets);
             searchResults.setTotalSize(results.getTotalNumItems());
         }
-        
+
         return searchResults;
     }
 
@@ -378,29 +380,32 @@ public class AssetFactoryCmisImpl implements AssetFactory
     {
         return runQuery(query, null, false);
     }
-    
+
     private ItemIterable<QueryResult> runQuery(String query, String orderByClause)
     {
         return runQuery(query, orderByClause, false);
     }
-    
+
     private ItemIterable<QueryResult> runQuery(String query, String orderByClause, boolean forceUnavailableAssets)
     {
-//      Lack of time and complexities surrounding dynamic content collections leads
-//      to this availability check not being implemented in this version of the quick start.
-//        WebSite currentWebSite = WebSiteService.getThreadWebSite();
-//        
-//
-//        if (!forceUnavailableAssets && (currentWebSite == null || !currentWebSite.isEditorialSite()))
-//        {
-//            //We want to constrain the query by whether the asset is available
-//            query += availabilityConstraint;
-//        }
+        // Lack of time and complexities surrounding dynamic content collections
+        // leads
+        // to this availability check not being implemented in this version of
+        // the quick start.
+        // WebSite currentWebSite = WebSiteService.getThreadWebSite();
+        //        
+        //
+        // if (!forceUnavailableAssets && (currentWebSite == null ||
+        // !currentWebSite.isEditorialSite()))
+        // {
+        // //We want to constrain the query by whether the asset is available
+        // query += availabilityConstraint;
+        // }
         if (orderByClause != null)
         {
             query += orderByClause;
         }
-        
+
         long start = 0L;
         if (log.isDebugEnabled())
         {
@@ -409,11 +414,11 @@ public class AssetFactoryCmisImpl implements AssetFactory
         }
         Session session = CmisSessionHelper.getSession();
         ItemIterable<QueryResult> results = session.query(query, false);
-        
+
         if (log.isDebugEnabled())
         {
             long end = System.currentTimeMillis();
-            log.debug("CMIS query took " + (end-start) + "ms to return.");
+            log.debug("CMIS query took " + (end - start) + "ms to return.");
         }
         return results;
     }

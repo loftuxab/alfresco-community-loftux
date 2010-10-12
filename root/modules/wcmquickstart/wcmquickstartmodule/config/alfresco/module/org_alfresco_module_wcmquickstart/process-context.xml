@@ -35,12 +35,12 @@
         </property>
     </bean>
 
-    <bean id="wcmqs_publish" parent="action-executer" class="org.alfresco.module.org_alfresco_module_wcmquickstart.process.WebPublishAction">
+    <bean id="webqs_publish" parent="action-executer" class="org.alfresco.module.org_alfresco_module_wcmquickstart.process.WebPublishAction">
         <property name="nodeService" ref="NodeService" />
         <property name="publishService" ref="org_alfresco_module_wcmquickstart_publishingService" />
     </bean>
 
-    <bean id="wcmqs_publishTree" parent="action-executer" 
+    <bean id="webqs_publishTree" parent="action-executer" 
             class="org.alfresco.module.org_alfresco_module_wcmquickstart.process.PublishSectionTreeAction">
         <property name="nodeService" ref="NodeService" />
         <property name="dictionaryService" ref="DictionaryService" />

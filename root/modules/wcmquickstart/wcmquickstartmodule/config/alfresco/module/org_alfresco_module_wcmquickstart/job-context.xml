@@ -15,7 +15,7 @@
         </property>
         <property name="cronExpression">
         	<!-- The default is to check every 30 seconds. May well want to reduce the frequency on a production box. -->
-            <value>0/30 * * * * ?</value>
+            <value>${wcmqs.feedbackProcessor.schedule}</value>
         </property>
     </bean>
     
@@ -84,7 +84,7 @@
         </property>
         <property name="cronExpression">
             <!-- The default is to check every minute. -->
-            <value>0 0/1 * * * ?</value>
+            <value>${wcmqs.publishQueueProcessor.schedule}</value>
         </property>
     </bean>
     
@@ -107,7 +107,7 @@
         </property>
         <property name="cronExpression">
             <!-- The default is to check every minute. May well want to reduce the frequency on a production box. -->
-            <value>0 0/1 * * * ?</value>
+            <value>${wcmqs.dynamicCollectionProcessor.schedule}</value>
         </property>
     </bean>
 
