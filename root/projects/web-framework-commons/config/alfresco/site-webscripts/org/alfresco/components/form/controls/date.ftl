@@ -15,7 +15,7 @@
             <span class="incomplete-warning"><img src="${url.context}/res/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
-         <span class="viewmode-value"><#if field.value != "">${xmldate(field.value)?string(viewFormat)}</#if></span>
+         <span class="viewmode-value"><#if field.value == "">${msg("form.control.novalue")}<#else>${xmldate(field.value)?string(viewFormat)}</#if></span>
       </div>
    <#else>
       <#if jsDisabled>

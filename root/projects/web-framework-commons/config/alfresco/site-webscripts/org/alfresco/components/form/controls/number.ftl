@@ -5,7 +5,7 @@
             <span class="incomplete-warning"><img src="${url.context}/res/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
-         <span class="viewmode-value"><#if field.value?is_number>${field.value?c}<#else>${field.value?html}</#if></span>
+         <span class="viewmode-value"><#if field.value?is_number>${field.value?c}<#elseif field.value == "">${msg("form.control.novalue")}<#else>${field.value?html}</#if></span>
       </div>
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>

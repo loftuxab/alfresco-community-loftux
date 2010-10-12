@@ -8,7 +8,7 @@
    </#if>
 <#else>
    <#if field.value == "">
-      <#assign displayValue="" />
+      <#assign displayValue=msg("form.control.novalue") />
    <#else>   
       <#if field.dataType == "date">
          <#assign displayValue=field.value?datetime("yyyy-MM-dd'T'HH:mm:ss")?string(msg("form.control.date-picker.view.date.format")) />
