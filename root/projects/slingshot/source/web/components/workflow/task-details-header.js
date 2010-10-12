@@ -64,12 +64,20 @@
       options:
       {
          /**
-          * Add referrer to the url if present
+          * Adds referrer to the url if present
           *
           * @property referrer
           * @type String
           */
-         referrer: null
+         referrer: null,
+
+         /**
+          * Adds nodeRef to the url if present
+          *
+          * @property nodeRef
+          * @type String
+          */
+         nodeRef: null
       },
 
       /**
@@ -87,7 +95,11 @@
             workflowDetailsUrl = "workflow-details?workflowId=" + workflowId + "&taskId=" + taskId;
          if (this.options.referrer)
          {
-            workflowDetailsUrl += "&referrer=" + this.options.referrer;
+            workflowDetailsUrl += "&referrer=" + encodeURIComponent(this.options.referrer);
+         }
+         else if (this.options.nodeRef)
+         {
+            workflowDetailsUrl += "&nodeRef=" + encodeURIComponent(this.options.nodeRef);
          }
          if (message && message != task.title)
          {

@@ -86,30 +86,14 @@
          <url>/components/workflow/workflow-toolbar</url>
       </component>
 
-      <!-- workflow header: form, actions & data loader -->
+      <!-- document path -->
       <component>
-         <region-id>workflow-details-header</region-id>
-         <url>/components/workflow/workflow-details-header</url>
+         <region-id>path</region-id>
+         <url>/components/document-details/path</url>
       </component>
-
       <component>
-         <region-id>workflow-form</region-id>
-         <url>/components/workflow/workflow-form</url>
-      </component>
-
-      <component>
-         <region-id>workflow-details-actions</region-id>
-         <url>/components/workflow/workflow-details-actions</url>
-      </component>
-      
-      <component>
-         <region-id>data-loader</region-id>
-         <url>/components/data/data-loader</url>
-         <properties>
-            <url>api/workflow-instances/{workflowId}?includeTasks=true</url>
-            <eventName>workflowDetailedData</eventName>
-            <eventData>data</eventData>
-         </properties>
+         <region-id>repo-path</region-id>
+         <url>/components/document-details/repo/path</url>
       </component>
 
    </components>

@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
-   <template-type>org/alfresco/task-details</template-type>
+   <template-type>org/alfresco/workflow-details</template-type>
    <properties>
       <pageFamily>documentlibrary</pageFamily>
    </properties>
    <components>
-      <!-- title: normal, portlet, repo, tasks & workflow -->
+      <!-- title: normal, portlet, repo, task & workflow -->
       <component>
          <region-id>title</region-id>
          <url>/components/title/collaboration-title</url>
@@ -84,37 +84,6 @@
       <component>
          <region-id>portlet-workflows-navigation</region-id>
          <url>/components/workflow/workflow-toolbar</url>
-      </component>
-
-      <component>
-         <region-id>task-header</region-id>
-         <url>/components/workflow/task-details-header</url>
-      </component>
-
-      <component>
-         <region-id>task-form</region-id>
-         <url>/components/form</url>
-         <properties>
-            <itemKind>task</itemKind>
-            <itemId>{taskId}</itemId>
-            <mode>view</mode>
-            <formUI>true</formUI>
-         </properties>
-      </component>
-
-      <component>
-         <region-id>task-actions</region-id>
-         <url>/components/workflow/task-details-actions</url>
-      </component>
-      
-      <component>
-         <region-id>data-loader</region-id>
-         <url>/components/data/data-loader</url>
-         <properties>
-            <url>api/task-instances/{taskId}?detailed=true</url>
-            <eventName>taskDetailedData</eventName>
-            <eventData>data</eventData>
-         </properties>
       </component>
 
    </components>

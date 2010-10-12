@@ -12,7 +12,8 @@ new Alfresco.component.WorkflowDetailsHeader("${el}").setOptions(
    <#if page.url.args.taskId??>
    <div class="links">
       <#assign referrer><#if page.url.args.referrer??>&referrer=${page.url.args.referrer?js_string}</#if></#assign>
-      <a href="${siteURL("task-details?taskId=" + page.url.args.taskId?js_string + referrer)}">${msg("label.taskDetails")}</a>
+      <#assign nodeRef><#if page.url.args.nodeRef??>&nodeRef=${page.url.args.nodeRef?js_string}</#if></#assign>
+      <a href="${siteURL("task-details?taskId=" + page.url.args.taskId?js_string + referrer + nodeRef)}">${msg("label.taskDetails")}</a>
       <span class="separator">|</span>
       <span class="theme-color-2">${msg("label.workflowDetails")}</span>
    </div>

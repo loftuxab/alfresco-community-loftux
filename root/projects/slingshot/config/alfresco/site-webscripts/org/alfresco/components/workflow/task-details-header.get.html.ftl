@@ -2,7 +2,8 @@
 <script type="text/javascript">//<![CDATA[
 new Alfresco.component.TaskDetailsHeader("${el}").setOptions(
 {
-   <#if page.url.args.referrer??>referrer: "${page.url.args.referrer?js_string}"</#if>
+   referrer: <#if page.url.args.referrer??>"${page.url.args.referrer?js_string}"<#else>null</#if>,
+   nodeRef: <#if page.url.args.nodeRef??>"${page.url.args.nodeRef?js_string}"<#else>null</#if>
 }).setMessages(
    ${messages}
 );
