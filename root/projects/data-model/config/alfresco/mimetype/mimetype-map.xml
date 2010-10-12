@@ -45,7 +45,6 @@
 
          <mimetype mimetype="text/plain" text="true" display="Plain Text">
             <extension display="Plain Text" default="true">txt</extension>
-            <extension display="Comma Separated Values">csv</extension>
             <extension display="Java Source">java</extension>
             <extension display="Java Server Page">jsp</extension>
             <extension display="SQL">sql</extension>
@@ -55,6 +54,9 @@
             <extension display="Windows Batch Script">bat</extension>
             <extension display="Unix Shell Script">sh</extension>
             <extension display="Log">log</extension>S
+         </mimetype>
+         <mimetype mimetype="text/csv" text="true" display="Comma Separated Values (CSV)">
+            <extension default="true">csv</extension>
          </mimetype>
          <mimetype mimetype="text/html" text="true" display="HTML">
             <!-- first extension will be default unless otherwise specified -->

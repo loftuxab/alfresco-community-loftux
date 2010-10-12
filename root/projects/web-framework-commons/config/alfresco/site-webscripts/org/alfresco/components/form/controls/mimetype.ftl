@@ -38,6 +38,7 @@
          <@mimetypeOption mt="image/x-portable-graymap" />
          <@mimetypeOption mt="application/x-gzip" />
          <@mimetypeOption mt="application/x-gtar" />
+         <@mimetypeOption mt="text/csv" />
          <@mimetypeOption mt="text/html" />
          <@mimetypeOption mt="application/vnd.oasis.opendocument.text-web" />
          <@mimetypeOption mt="text/calendar" />
@@ -138,6 +139,8 @@
       <#return "JPEG Image">
    <#elseif mt=="image/gif">
       <#return "GIF Image">
+   <#elseif mt=="text/csv">
+      <#return "Comma Separated Values (CSV)">
    <#elseif mt=="text/html">
       <#return "HTML">
    <#elseif mt=="text/xml">
