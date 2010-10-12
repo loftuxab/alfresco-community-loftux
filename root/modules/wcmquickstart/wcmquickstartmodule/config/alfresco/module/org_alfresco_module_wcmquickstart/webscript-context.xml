@@ -38,7 +38,14 @@
         <property name="siteService" ref="SiteService"/>     
         <property name="nodeService" ref="NodeService"/>
         <property name="fileFolderService" ref="FileFolderService"/>
-        <property name="importFileLocation" value="${wcmqs.importFileLocation}"/>
+        <property name="importFileLocations">
+       		<map>
+       			<entry key="financial" value="${wcmqs.importFileLocation}"/>
+       			<entry key="media" value="${wcmqs.importFileLocation.media}"/>
+       			<entry key="government" value="${wcmqs.importFileLocation.government}"/>
+       		</map>
+        </property>
+        
     </bean>
     
      <bean id="webscript.org.alfresco.module.wcmquickstart.updatewebsiterenditions.get" 

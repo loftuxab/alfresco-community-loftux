@@ -21,6 +21,15 @@
             </list>
         </property>
     </bean>
+    
+    <!--  Bootstrap property files -->
+    <bean id="org_alfresco_module_wcmquickstart_propertyBootstrap" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.module.org_alfresco_module_wcmquickstart.message.wcmqs</value>
+            </list>
+        </property>
+    </bean>
 
     <bean id="org_alfresco_module_wcmquickstart_siteHelper"
         class="org.alfresco.module.org_alfresco_module_wcmquickstart.util.SiteHelper">
