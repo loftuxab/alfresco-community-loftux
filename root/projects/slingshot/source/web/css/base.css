@@ -28,6 +28,12 @@ html, body
    height: 50px;
 }
 
+.login-panel .login-portlet
+{
+   padding: 132px 56px 64px 0px;
+   text-align: center;
+}
+
 /* Site-wide Styles */
 
 #alfresco-yuiloader
@@ -71,6 +77,11 @@ hr
    border: 0;
    width: 100%;
    clear: both;
+}
+
+.yui-button button
+{
+   background-image: none;
 }
 
 .yui-button.inline-button span button

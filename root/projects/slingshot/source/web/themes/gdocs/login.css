@@ -1,6 +1,5 @@
 body
 {
-   background-color: #fff;
    text-align: left;
 }
 
@@ -9,6 +8,11 @@ input
    border: 1px solid #C5D6E2;
    padding: 2px;
    font-weight: normal;
+}
+
+.alfresco-share .sticky-wrapper
+{
+   background-color: #fff;
 }
 
 .yui-panel-container.shadow .underlay
@@ -46,6 +50,7 @@ input
    font-weight: normal;
    color: #959a9b;
 }
+
 .login-logo
 {
    position: absolute;

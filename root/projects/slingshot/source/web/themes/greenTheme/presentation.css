@@ -78,6 +78,11 @@ label,
    margin-right: 0.4em;
 }
 
+.alfresco-share .sticky-wrapper
+{
+   background-color: #fff;
+}
+
 .label
 {
    font-weight: bold;
@@ -374,8 +379,8 @@ span.navigation-separator-alt
 .share-toolbar .separator,
 .toolbar .separator
 {
+   border: medium none;
    border-right: 1px dotted #3a6c38;
-   border-top: medium none;
 }
 
 .share-toolbar .backLink
