@@ -156,10 +156,11 @@
          this.widgets.panel.render(Dom.get(this.id));
          
          // subscribe to the close (cross) icon close event
-         this.widgets.panel.hideEvent.subscribe(function()
+         var fnHideEventHandler = function AweFormPanel_fnHideEventHandler()
          {
             this.hide();
-         }, this, true);
+         }
+         this.widgets.panel.hideEvent.subscribe(fnHideEventHandler, this, true);
 
          YAHOO.Bubbling.on('beforeFormRuntimeInit', function(e, args) 
          {
@@ -171,6 +172,8 @@
             {
                fn: function()
                {
+                  // Unhook close button
+                  this.widgets.panel.hideEvent.unsubscribe(fnHideEventHandler, null, this);
                   this.widgets.panel.hide();
                   this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                   {
