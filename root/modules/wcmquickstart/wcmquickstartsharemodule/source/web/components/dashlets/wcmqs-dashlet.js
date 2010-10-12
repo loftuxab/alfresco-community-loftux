@@ -83,11 +83,14 @@
                displayTime: 0
             });
             
+            // Get the import id that's been selected
+            var importid = Dom.get(this.id + "-load-data-options").value;
+            
             // call repo-tier to perform test data import
             Alfresco.util.Ajax.request(
             {
                method: Alfresco.util.Ajax.GET,
-               url: Alfresco.constants.PROXY_URI + "api/loadwebsitedata?site=" + this.options.siteId,
+               url: Alfresco.constants.PROXY_URI + "api/loadwebsitedata?site=" + this.options.siteId + "&importid=" + importid,
                successCallback:
                {
                   fn: function()

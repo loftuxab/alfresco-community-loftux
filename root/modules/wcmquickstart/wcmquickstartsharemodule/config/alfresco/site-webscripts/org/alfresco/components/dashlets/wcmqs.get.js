@@ -5,6 +5,22 @@ function main()
    var res = conn.get("/api/loadwebsitedata?site=" + page.url.templateArgs.site + "&preview=true");
    var jsonData = eval("(" + res + ")");   
    model.dataloaded = !jsonData.success;
+   if (model.dataloaded == false)
+   {
+	   var keys = new Array();
+	   var labels = new Array();
+	   var count = 0;
+	   for (var key in jsonData.importids)
+	   {
+		   var label = jsonData.importids[key];
+		   keys[count] = key;
+		   labels[count] = label;
+		   count ++;
+	   }   
+	   
+	   model.importids = keys;
+	   model.importidlabels = labels;		   
+   }
 }
 
 main();

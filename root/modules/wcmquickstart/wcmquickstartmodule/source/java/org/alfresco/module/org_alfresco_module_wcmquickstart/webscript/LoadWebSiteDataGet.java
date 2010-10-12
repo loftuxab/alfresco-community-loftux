@@ -60,6 +60,10 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
     /** Arguments */
     private static final String ARG_SITE_NAME = "site";
     private static final String ARG_PREVIEW = "preview";
+    private static final String ARG_IMPORT_ID = "importid";
+    
+    /** Default */
+    private static final String DEFAULT_IMPORT_ID = "financial";
     
     /** Importer service */
     private ImporterService importerService;
@@ -72,10 +76,10 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
     
     /** File folder service */
     private FileFolderService fileFolderService;
-
-    /** Location of the import file that we want to load */
-    private String importFileLocation = "alfresco/module/org_alfresco_module_wcmquickstart/bootstrap/wcmquickstart.acp";
     
+    /** Map of import ACPs */
+    private Map<String, String> importFileLocations;
+
     /**
      * Set the importer service
      * @param importerService	importer service
@@ -113,12 +117,12 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
     }
     
     /**
-     * Set the import file location
-     * @param importFileLocation	import file location
+     * Set the map of available import ACPs
+     * @param importACPs    map of import ACPs
      */
-    public void setImportFileLocation(String importFileLocation)
+    public void setImportFileLocations(Map<String, String> importFileLocations)
     {
-	    this.importFileLocation = importFileLocation;
+        this.importFileLocations = importFileLocations;
     }
     
     /**
@@ -146,6 +150,13 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
         	preview = Boolean.parseBoolean(value); 
         }
         
+        // Determine the import id
+        String importId = DEFAULT_IMPORT_ID;
+        if (req.getParameter(ARG_IMPORT_ID) != null)
+        {
+            importId = req.getParameter(ARG_IMPORT_ID);
+        }
+        
         // Get the site from the site name
         SiteInfo site = siteService.getSite(siteName);
         if (site == null)
@@ -154,11 +165,11 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
         }
             
         // Get the dod lib container
-        NodeRef docLib = siteService.getContainer(siteName, COMPONENT_DOCUMENT_LIBRARY);        
+        NodeRef docLib = siteService.getContainer(siteName, COMPONENT_DOCUMENT_LIBRARY);
         
         // Check to see if the data has already been loaded
         boolean success = true;
-        if (docLib == null || isDataLoaded(docLib) == true)
+        if (docLib != null && isDataLoaded(docLib) == true)
         {
         	success = false;
         }
@@ -166,6 +177,13 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
         {
 	        if (preview == false)
 	        {       
+	            // Get the import location
+	            String importFileLocation = importFileLocations.get(importId);
+	            if (importFileLocation == null)
+	            {
+	                throw new WebScriptException(Status.STATUS_BAD_REQUEST, "The import file location for import id " + importId + " could not be found.");
+	            }
+	            
 	        	// If we don't have a doc lib create one
 	        	if (docLib == null)
 	            {
@@ -230,6 +248,12 @@ public class LoadWebSiteDataGet extends DeclarativeWebScript
         // Put the success string into the model    
         Map<String, Object> model = new HashMap<String, Object>(1, 1.0f);
     	model.put("success", success);
+    	model.put("preview", preview);
+    	if (success == true && preview == true)
+    	{
+    	    // Put a list of the available import id's into the model
+    	    model.put("importids", importFileLocations.keySet());
+    	}
     	
         return model;
     }

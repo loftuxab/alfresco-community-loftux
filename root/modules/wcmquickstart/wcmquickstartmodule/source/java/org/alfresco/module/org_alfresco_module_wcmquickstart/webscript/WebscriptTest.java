@@ -162,13 +162,17 @@ public final class WebscriptTest extends BaseWebScriptTest implements WebSiteMod
 	
 	public void testGetImportWebSiteData() throws Exception
 	{
-		String url = MessageFormat.format(GET_LOADWEBSITEDATA, new Object[]{siteName});
-		sendRequest(new GetRequest(url), 200);
-	
-		// Start transaction
-		UserTransaction userTransaction = transactionService.getUserTransaction();
-		userTransaction.begin();
+        // Start transaction
+        UserTransaction userTransaction = transactionService.getUserTransaction();
+        userTransaction.begin();
+        
+	    String url = MessageFormat.format(GET_LOADWEBSITEDATA, new Object[]{siteName});
+        Response resp = sendRequest(new GetRequest(url + "&preview=true"), 200);	    
+        System.out.println(resp.getContentAsString());
 		
+        resp = sendRequest(new GetRequest(url), 200);
+        System.out.println(resp.getContentAsString());
+	
 		NodeRef nodeRef = siteService.getContainer(siteName, "documentLibrary");
 		assertNotNull(nodeRef);
 		
