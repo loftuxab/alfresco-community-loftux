@@ -64,7 +64,15 @@
           * @property referrer
           * @type String
           */
-         referrer: null
+         referrer: null,
+
+         /**
+          * Adds nodeRef to the url if present
+          *
+          * @property nodeRef
+          * @type String
+          */
+         nodeRef: null
       },
 
       /**
@@ -79,6 +87,10 @@
          if (this.options.referrer)
          {
             url += "&referrer=" + this.options.referrer;
+         }
+         else if (this.options.nodeRef)
+         {
+            url += "&nodeRef=" + encodeURIComponent(this.options.nodeRef);
          }
          if (task.isEditable)
          {

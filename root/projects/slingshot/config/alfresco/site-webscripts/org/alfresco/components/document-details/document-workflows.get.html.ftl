@@ -20,9 +20,9 @@
                <div class="icon"><img src="${url.context}/res/components/documentlibrary/images/workflow-indicator-16.png" /></div>
                <div class="details">
                   <div class="message">
-                     <a href="${siteURL("workflow-details?workflowId=" + workflow.id?js_string)}"><#if workflow.message??>${workflow.message}<#else>${msg("workflow.no_message")?html}</#if></a>
+                     <a href="${siteURL("workflow-details?workflowId=" + workflow.id?js_string + "&nodeRef=" + (args.nodeRef!"")?js_string)}"><#if workflow.message?? && workflow.message?length &gt; 0>${workflow.message?html}<#else>${msg("workflow.no_message")?html}</#if></a>
                   </div>
-                  <div class="title">${workflow.title}</div>
+                  <div class="title">${workflow.title?html}</div>
                </div>
             </div>
          </#list>
