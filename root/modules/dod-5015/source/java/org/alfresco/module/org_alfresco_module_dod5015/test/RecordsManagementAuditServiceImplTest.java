@@ -70,6 +70,13 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     protected void setUp() throws Exception 
     {
         testStartTime = new Date();
+        
+        // We require that records management auditing is enabled
+        // This gets done by the AMP, but as we're not running from 
+        //  and AMP, we need to do it ourselves!
+        System.setProperty("audit.dod5015.enabled", "true");
+        
+        // Now we can fetch the context
         ctx = ApplicationContextHelper.getApplicationContext();
 
         this.serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
