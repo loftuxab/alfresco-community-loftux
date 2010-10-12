@@ -37,8 +37,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is designed to be run periodically. It finds any visitor feedback
- * that has not been processed yet, and incorporates it into the summary
- * information for each asset (total comment count and average rating).
+ * that has not been processed yet and, for each item it finds, invokes the feedback handler that has been
+ * registered for that type of feedback.
  * 
  * @author Brian
  */

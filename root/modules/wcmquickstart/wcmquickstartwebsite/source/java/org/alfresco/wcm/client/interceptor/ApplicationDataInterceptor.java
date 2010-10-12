@@ -67,6 +67,7 @@ public class ApplicationDataInterceptor extends HandlerInterceptorAdapter
             
         WebSiteService.setThreadWebSite(webSite);
         requestContext.setValue("webSite", webSite);
+        requestContext.setValue("website", webSite);
 
         // Get the current asset and section and store them in the surf request
         // context

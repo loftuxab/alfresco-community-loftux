@@ -12,14 +12,9 @@
         <property name="dictionaryService" ref="dictionaryService" />
     </bean>
 
-    <bean id="wcmquickstartmodule_renditionBootstrap" class="org.alfresco.module.org_alfresco_module_wcmquickstart.rendition.RenditionBootstrap">
-        <property name="nodeService" ref="NodeService"/>
-        <property name="renditionService" ref="RenditionService" />
-        <property name="dictionaryService" ref="DictionaryService" />
-        <property name="transactionService" ref="TransactionService" />
-        <property name="definitions">
+    <bean id="wqsmodule_renditionDefinitions" class="java.util.ArrayList">
+        <constructor-arg>
             <list>
-                           
                 <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.rendition.BootstrapCompositeRenditionDefinition">
                     <property name="name" value="smallThumbnail"/>
                     <property name="renderingEngineName" value="compositeRenderingEngine"/>
@@ -54,26 +49,26 @@
                     <property name="renderingEngineName" value="compositeRenderingEngine"/>
                     <property name="definitions">
                         <list>                            
-			                <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.rendition.BootstrapRenditionDefinition">
-			                    <property name="renderingEngineName" value="reformat"/>
-			                    <property name="parameters">
-			                        <map>
-			                            <entry key="mime-type" value="image/jpeg"/>          
-			                            <entry key="runAs" value="System"/>   
-			                        </map>
-			                    </property>
-			                </bean>
-			                <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.rendition.BootstrapRenditionDefinition">
-			                    <property name="renderingEngineName" value="imageRenderingEngine"/>
-			                    <property name="parameters">
-			                        <map>
-			                            <entry key="xsize" value="110"/>                            
-			                            <entry key="ysize" value="145"/>                                                        
-			                            <entry key="maintainAspectRatio" value="false"/>
-			                            <entry key="runAs" value="System"/>
-			                        </map>
-			                    </property>
-			                </bean>
+                            <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.rendition.BootstrapRenditionDefinition">
+                                <property name="renderingEngineName" value="reformat"/>
+                                <property name="parameters">
+                                    <map>
+                                        <entry key="mime-type" value="image/jpeg"/>          
+                                        <entry key="runAs" value="System"/>   
+                                    </map>
+                                </property>
+                            </bean>
+                            <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.rendition.BootstrapRenditionDefinition">
+                                <property name="renderingEngineName" value="imageRenderingEngine"/>
+                                <property name="parameters">
+                                    <map>
+                                        <entry key="xsize" value="110"/>                            
+                                        <entry key="ysize" value="145"/>                                                        
+                                        <entry key="maintainAspectRatio" value="false"/>
+                                        <entry key="runAs" value="System"/>
+                                    </map>
+                                </property>
+                            </bean>
                         </list>                    
                     </property>
                 </bean>
@@ -225,7 +220,15 @@
                 </bean>
                 
             </list>
-        </property>
+        </constructor-arg>
+    </bean> 
+
+    <bean id="wcmquickstartmodule_renditionBootstrap" class="org.alfresco.module.org_alfresco_module_wcmquickstart.rendition.RenditionBootstrap">
+        <property name="nodeService" ref="NodeService"/>
+        <property name="renditionService" ref="RenditionService" />
+        <property name="dictionaryService" ref="DictionaryService" />
+        <property name="transactionService" ref="TransactionService" />
+        <property name="definitions" ref="wqsmodule_renditionDefinitions" />
     </bean>
                 
 

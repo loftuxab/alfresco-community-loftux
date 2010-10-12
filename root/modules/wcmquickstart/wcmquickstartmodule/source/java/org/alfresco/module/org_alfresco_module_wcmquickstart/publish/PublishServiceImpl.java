@@ -54,6 +54,7 @@ public class PublishServiceImpl implements PublishService
     private TransferService2 transferService;
     private TransferPathMapper pathMapper;
     private NodeCrawlerFactory nodeCrawlerFactory;
+    private NodeCrawlerConfigurer crawlerConfigurer;
     private String transferTargetName = "Internal Target";
 
     public void setSiteHelper(SiteHelper siteHelper)
@@ -84,6 +85,11 @@ public class PublishServiceImpl implements PublishService
     public void setNodeCrawlerFactory(NodeCrawlerFactory nodeCrawlerFactory)
     {
         this.nodeCrawlerFactory = nodeCrawlerFactory;
+    }
+
+    public void setCrawlerConfigurer(NodeCrawlerConfigurer crawlerConfigurer)
+    {
+        this.crawlerConfigurer = crawlerConfigurer;
     }
 
     public void enqueuePublishedNodes(final NodeRef... nodes)
@@ -201,19 +207,12 @@ public class PublishServiceImpl implements PublishService
     
     /**
      * Set up the supplied node crawler to find other nodes that should be published too.
-     * Override this if necessary.
+     * Override this if necessary, or (preferably) inject a different configurer
      * @param crawler
      */
     protected void configureNodeCrawler(NodeCrawler crawler)
     {
-        crawler.setNodeFilters(new ExistingNodeFilter(),
-                new CheckedOutNodeFilter());
-        crawler.setNodeFinders(
-                new IndexPageSectionFinder(),
-                new CriticalSectionInfoFinder(),
-                new WebAssetCollectionPublishingFinder(),
-                new ArticleImageFinder(),
-                new RenditionsFinder());
+        crawlerConfigurer.configure(crawler);
     }
 
     public String getTransferTargetName()

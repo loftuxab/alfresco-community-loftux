@@ -64,7 +64,11 @@
         <property name="transferService" ref="org_alfresco_module_wcmquickstart_transferService" />
         <property name="pathMapper" ref="org_alfresco_module_wcmquickstart_transferManifestNodeFactory" />
         <property name="nodeCrawlerFactory" ref="NodeCrawlerFactory" />
+        <property name="crawlerConfigurer" ref="wqsmodule_publishingCrawlerConfigurer" />
     </bean>
+    
+    <bean id="wqsmodule_publishingCrawlerConfigurer" 
+            class="org.alfresco.module.org_alfresco_module_wcmquickstart.publish.WqsNodeCrawlerConfigurerImpl" />
 
     <bean 
         class="org.alfresco.module.org_alfresco_module_wcmquickstart.publish.PublishBootstrap">
