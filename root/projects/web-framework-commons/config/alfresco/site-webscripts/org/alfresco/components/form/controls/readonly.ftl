@@ -2,7 +2,7 @@
    <#if form.mode == "view">
       <div class="viewmode-field">
          <span class="viewmode-label">${field.label?html}:</span>
-         <span class="viewmode-value">${field.value?html}</span>
+         <span class="viewmode-value"><#if field.value == "">${msg("form.control.novalue")}<#else>${field.value?html}</#if></span>
       </div>
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:</label>

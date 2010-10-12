@@ -324,7 +324,7 @@
          allowSelectAction: true,
 
          /**
-          * The action for the select button that trigegrs the object finder dialog
+          * The action for the select button that triggers the object finder dialog
           *
           * @property selectActionLabel
           * @type string
@@ -1384,6 +1384,12 @@
          }
          else
          {
+            // if disabled show the (None) message
+            if (this.options.disabled && this.options.displayMode == "items")
+            {
+               Dom.get(this.id + "-currentValueDisplay").innerHTML = this.msg("form.control.novalue");
+            }
+            
             this._enableActions();
          }
       },

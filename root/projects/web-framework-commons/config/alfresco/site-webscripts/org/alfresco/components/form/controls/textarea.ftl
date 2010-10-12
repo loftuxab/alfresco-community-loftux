@@ -13,7 +13,7 @@
          <#else>
             <#assign fieldValue=field.value?html>
          </#if>
-         <span class="viewmode-value">${fieldValue}</span>
+         <span class="viewmode-value"><#if fieldValue == "">${msg("form.control.novalue")}<#else>${fieldValue}</#if></span>
       </div>
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
