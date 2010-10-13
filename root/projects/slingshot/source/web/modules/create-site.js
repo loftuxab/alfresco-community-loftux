@@ -265,8 +265,12 @@
       {
          if (response.json !== undefined && response.json.success)
          {
-            // The site has been successfully created, redirect the user to it.
-            document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + response.config.dataObj.shortName + "/dashboard";
+            // The site has been successfully created - add it to the user's favourites and navigate to it
+            var preferencesService = new Alfresco.service.Preferences(),
+               shortName = response.config.dataObj.shortName;
+            
+            preferencesService.set(Alfresco.service.Preferences.FAVOURITE_SITES + "." + shortName, true);
+            document.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard";
          }
          else
          {

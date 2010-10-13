@@ -26,6 +26,12 @@
    padding: 4px 15px;
 }
 
+.header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a
+{
+   display: block;
+   text-decoration: none;
+}
+
 /* Menu: Selected state */
 
 .header .yuimenu .bd ul li.yuimenuitem-selected
@@ -89,6 +95,7 @@
 .header .app-items span.yui-button span.first-child button
 {
    padding: 18px 4px 0;
+   text-decoration: none;
 }
 
 .header .app-items span.yui-button span.first-child button
