@@ -25,17 +25,19 @@
       <property name="dictionaryService" ref="dictionaryService" />
       <property name="fileFolderService" ref="fileFolderService" />
       <property name="contentService" ref="contentService" />
+      <property name="transactionService" ref="transactionService" />
       <property name="mimetypeMap" ref="mimetypeService" />
       <property name="contextParserService" ref="wcmquickstartmodule_contextParserService" />
       <property name="renditionService" ref="renditionService" />
       <property name="sectionIndexPageName" value="${wcmqs.indexpage}" />
       <property name="sectionCollectionsFolderName" value="${wcmqs.collectionsfolder}" />
       <property name="namespaceService" ref="namespaceService" />
-      <property name="typesToIgnore" ref="wcmquickstartmodule_sectionTypesToIgnore" />
-      <property name="assetCollectionDefinitions" ref="wcmquickstartmodule_sectionAssetCollections" />
+      <property name="typesToIgnore" ref="wqsmodule_sectionTypesToIgnore" />
+      <property name="assetCollectionDefinitions" ref="wqsmodule_sectionAssetCollections" />
+      <property name="sectionHierarchyProcessor" ref="wqsmodule_sectionHierarchyProcessor" />
    </bean>
    
-   <bean id="wcmquickstartmodule_sectionTypesToIgnore" class="java.util.TreeSet">
+   <bean id="wqsmodule_sectionTypesToIgnore" class="java.util.TreeSet">
       <constructor-arg>
          <set>
             <value>ws:visitorFeedback</value>
@@ -44,7 +46,7 @@
        </constructor-arg>
    </bean>
    
-   <bean id="wcmquickstartmodule_sectionAssetCollections" class="java.util.ArrayList" >
+   <bean id="wqsmodule_sectionAssetCollections" class="java.util.ArrayList" >
       <constructor-arg>
          <list>
             <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.AssetCollectionDefinition">
@@ -64,6 +66,15 @@
             </bean>
          </list>
       </constructor-arg>
+   </bean>
+   
+   <bean id="wqsmodule_sectionHierarchyProcessor"
+        class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.SectionHierarchyProcessor">
+      <property name="behaviourFilter" ref="policyBehaviourFilter" />
+      <property name="nodeService" ref="nodeService" />
+      <property name="dictionaryService" ref="dictionaryService" />
+      <property name="searchService" ref="SearchService" />
+      <property name="transactionService" ref="TransactionService" />
    </bean>
 
    <bean id="wcmquickstartmodule_webassetCollectionFolderType" class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebassetCollectionFolderType"

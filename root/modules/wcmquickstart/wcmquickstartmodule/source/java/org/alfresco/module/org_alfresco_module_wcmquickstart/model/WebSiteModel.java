@@ -79,6 +79,10 @@ public interface WebSiteModel
     public static final QName ASPECT_WEBASSET = QName.createQName(NAMESPACE, "webasset");
     public static final QName PROP_PARENT_SECTIONS = QName.createQName(NAMESPACE, "parentSections");
 
+    // ws:hasancestors aspect
+    public static final QName ASPECT_HAS_ANCESTORS = QName.createQName(NAMESPACE, "hasancestors");
+    public static final QName PROP_ANCESTOR_SECTIONS = QName.createQName(NAMESPACE, "ancestorSections");
+
     // ws:imageFolder type
     public static final QName TYPE_IMAGE = QName.createQName(NAMESPACE, "image");
     public static final QName PROP_DERIVED_COMMENT_COUNT = QName.createQName(NAMESPACE, "derivedCommentCount");

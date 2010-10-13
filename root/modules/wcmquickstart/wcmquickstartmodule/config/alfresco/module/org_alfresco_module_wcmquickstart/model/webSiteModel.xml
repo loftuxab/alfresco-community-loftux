@@ -464,6 +464,22 @@
             </properties>
         </aspect>
 
+        <aspect name="ws:hasancestors">
+            <title>Has Ancestors</title>
+            <properties>
+                <property name="ws:ancestorSections">
+                    <title>Ancestor sections</title>
+                    <type>d:noderef</type>
+                    <multiple>true</multiple>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>false</tokenised>
+                    </index>
+                </property>
+            </properties>
+        </aspect>
+
     </aspects>
 
 </model>
