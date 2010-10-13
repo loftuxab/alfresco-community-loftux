@@ -17,11 +17,13 @@
  */
 package org.alfresco.wcm.client.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.httpclient.Credentials;
@@ -30,6 +32,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -38,7 +41,7 @@ import org.json.JSONTokener;
 
 public class WebScriptCallerImpl implements WebScriptCaller
 {
-    private static Log log = LogFactory.getLog(WebScriptCallerImpl.class);
+    static Log log = LogFactory.getLog(WebScriptCallerImpl.class);
 
     private static ThreadLocal<byte[]> localBuffer = new ThreadLocal<byte[]>()
     {
@@ -50,7 +53,7 @@ public class WebScriptCallerImpl implements WebScriptCaller
     };
 
     private String baseUrl;
-    private HttpClient httpClient;
+    HttpClient httpClient;
     private AuthScope authScope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
     private Credentials credentials;
 
@@ -107,17 +110,7 @@ public class WebScriptCallerImpl implements WebScriptCaller
     {
         JSONObject jsonObject = null;
 
-        GetMethod getMethod = new GetMethod(this.baseUrl + servicePath);
-
-        if (params != null)
-        {
-            List<NameValuePair> args = new ArrayList<NameValuePair>();
-            for (WebscriptParam param : params)
-            {
-                args.add(new NameValuePair(param.getName(), param.getValue()));
-            }
-            getMethod.setQueryString(args.toArray(new NameValuePair[args.size()]));
-        }
+        GetMethod getMethod = getGETMethod(servicePath, params);
 
         String responseText = null;
         try
@@ -130,18 +123,7 @@ public class WebScriptCallerImpl implements WebScriptCaller
             }
             else
             {
-                // Must read the response, even though we don't use it
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Received non-OK response when invoking GET method on path " + getMethod.getPath() + 
-                            ". Response was:\n" + getMethod.getResponseBodyAsString());
-                }
-                else
-                {
-                    byte[] buf = localBuffer.get();
-                    InputStream responseStream = getMethod.getResponseBodyAsStream();
-                    while (responseStream.read(buf) != -1);
-                }
+                discardResponse(getMethod);
             }
         }
         catch (RuntimeException ex)
@@ -162,6 +144,96 @@ public class WebScriptCallerImpl implements WebScriptCaller
             getMethod.releaseConnection();
         }
         return jsonObject;
+    }
+    
+    public void get(String servicePath, WebscriptResponseHandler handler, List<WebscriptParam> params)
+    {
+        GetMethod getMethod = getGETMethod(servicePath, params);
+        try
+        {
+            httpClient.executeMethod(getMethod);
+            if (getMethod.getStatusCode() == 200)
+            {
+                handler.handleResponse(getMethod.getResponseBodyAsStream());
+            }
+            else
+            {
+                // Must read the response, even though we don't use it
+                discardResponse(getMethod);
+            }
+        }
+        catch (RuntimeException ex)
+        {
+            log.error("Rethrowing runtime exception.", ex);
+            throw ex;
+        }
+        catch (Exception ex)
+        {
+            log.error("Failed to make request to Alfresco web script", ex);
+        }
+        finally
+        {
+            getMethod.releaseConnection();
+        }
+    }
+
+    void discardResponse(GetMethod getMethod) throws IOException
+    {
+        if (log.isDebugEnabled())
+        {
+            log.debug("Received non-OK response when invoking GET method on path " + getMethod.getPath() + 
+                    ". Response was:\n" + getMethod.getResponseBodyAsString());
+        }
+        else
+        {
+            byte[] buf = localBuffer.get();
+            InputStream responseStream = getMethod.getResponseBodyAsStream();
+            while (responseStream.read(buf) != -1);
+        }
+    }
+
+    GetMethod getGETMethod(String servicePath, List<WebscriptParam> params)
+    {
+        GetMethod getMethod = new GetMethod(this.baseUrl + servicePath);
+
+        if (params != null)
+        {
+            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            for (WebscriptParam param : params)
+            {
+                args.add(new NameValuePair(param.getName(), param.getValue()));
+            }
+            getMethod.setQueryString(args.toArray(new NameValuePair[args.size()]));
+        }
+        return getMethod;
+    }
+
+    PostMethod getPOSTMethod(String servicePath, List<WebscriptParam> params)
+    {
+        PostMethod postMethod = new PostMethod(this.baseUrl + servicePath);
+
+        if (params != null)
+        {
+            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            for (WebscriptParam param : params)
+            {
+                args.add(new NameValuePair(param.getName(), param.getValue()));
+            }
+            postMethod.addParameters(args.toArray(new NameValuePair[args.size()]));
+        }
+        return postMethod;
+    }
+
+    @Override
+    public JSONObject getJsonObject(String servicePath, WebscriptParam... params)
+    {
+        return getJsonObject(servicePath, Arrays.asList(params));
+    }
+
+    @Override
+    public void get(String servicePath, WebscriptResponseHandler handler, WebscriptParam... params)
+    {
+        get(servicePath, handler, Arrays.asList(params));
     }
 
 }

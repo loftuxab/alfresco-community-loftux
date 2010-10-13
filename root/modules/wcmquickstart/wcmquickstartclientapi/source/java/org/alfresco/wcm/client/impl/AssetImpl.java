@@ -185,7 +185,7 @@ public class AssetImpl extends ResourceBaseImpl implements Asset
 		
 		// Only "text" assets have templates associated with them
 	    String mimeType = getMimeType();
-	    if (mimeType.startsWith("text") == true)
+	    if ((mimeType != null) && mimeType.startsWith("text"))
 	    {
 	    	Section section = getContainingSection();
 	    	template = section.getTemplate(getType());

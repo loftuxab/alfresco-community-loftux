@@ -19,6 +19,7 @@ package org.alfresco.module.org_alfresco_module_wcmquickstart.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +37,10 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.TransactionListenerAdapter;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -53,6 +57,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,9 +92,11 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     private DictionaryService dictionaryService;
     private FileFolderService fileFolderService;
     private RenditionService renditionService;
+    private TransactionService transactionService;
     private ContextParserService contextParserService;
     private NamespaceService namespaceService;
-    private MimetypeMap mimetypeMap;;
+    private MimetypeMap mimetypeMap;
+    private SectionHierarchyProcessor sectionHierarchyProcessor;
 
     /** The section index page name */
     private String sectionIndexPageName = "index.html";
@@ -136,6 +143,11 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+
+    public void setTransactionService(TransactionService transactionService)
+    {
+        this.transactionService = transactionService;
     }
 
     /**
@@ -229,6 +241,11 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     public void setContextParserService(ContextParserService contextParserService)
     {
         this.contextParserService = contextParserService;
+    }
+
+    public void setSectionHierarchyProcessor(SectionHierarchyProcessor sectionHierarchyProcessor)
+    {
+        this.sectionHierarchyProcessor = sectionHierarchyProcessor;
     }
 
     /**
@@ -372,10 +389,12 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      * 
      * @param childNode
      */
+    @SuppressWarnings("unchecked")
     private void processCommit(NodeRef childNode)
     {
         @SuppressWarnings("unchecked")
         Set<NodeRef> affectedNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(AFFECTED_WEB_ASSETS);
+        Set<NodeRef> affectedSections = new HashSet<NodeRef>();
         if (affectedNodeRefs != null && affectedNodeRefs.remove(childNode))
         {
             if (log.isDebugEnabled())
@@ -423,17 +442,32 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                     nodeService.addAspect(childNode, ASPECT_WEBASSET, null);
                 }
 
-                if (nodeService.hasAspect(childNode, ASPECT_WEBASSET))
+                boolean childIsWebAsset = nodeService.hasAspect(childNode, ASPECT_WEBASSET);
+                boolean childIsSection = dictionaryService.isSubClass(nodeService.getType(childNode),
+                        WebSiteModel.TYPE_SECTION);
+
+                if (childIsSection)
+                {
+                    affectedSections.add(childNode);
+                }
+                if (childIsWebAsset)
                 {
                     List<ChildAssociationRef> parentAssocs = nodeService.getParentAssocs(childNode,
                             ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
                     ArrayList<NodeRef> parentSections = new ArrayList<NodeRef>(parentAssocs.size());
+                    Set<NodeRef> ancestorSections = new HashSet<NodeRef>();
                     for (ChildAssociationRef assoc : parentAssocs)
                     {
                         NodeRef parentNode = assoc.getParentRef();
                         if (dictionaryService.isSubClass(nodeService.getType(parentNode), WebSiteModel.TYPE_SECTION))
                         {
                             parentSections.add(parentNode);
+                            Collection<NodeRef> ancestors = (Collection<NodeRef>) nodeService.getProperty(parentNode,
+                                    PROP_ANCESTOR_SECTIONS);
+                            if (ancestors != null)
+                            {
+                                ancestorSections.addAll(ancestors);
+                            }
                         }
                     }
 
@@ -441,12 +475,18 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                     {
                         behaviourFilter.disableBehaviour(childNode, ASPECT_WEBASSET);
                         behaviourFilter.disableBehaviour(childNode, ContentModel.ASPECT_AUDITABLE);
-                        if (log.isDebugEnabled())
+                        if (childIsWebAsset)
                         {
-                            log.debug("Section child is a web asset (" + childNode + "). Setting parent section ids:  "
-                                    + parentSections);
+                            ancestorSections.addAll(parentSections);
+                            if (log.isDebugEnabled())
+                            {
+                                log.debug("Section child is a web asset (" + childNode
+                                        + "). Setting parent section ids:  " + parentSections);
+                            }
+                            nodeService.setProperty(childNode, PROP_PARENT_SECTIONS, parentSections);
+                            nodeService.setProperty(childNode, PROP_ANCESTOR_SECTIONS, new ArrayList<NodeRef>(
+                                    ancestorSections));
                         }
-                        nodeService.setProperty(childNode, PROP_PARENT_SECTIONS, parentSections);
                     }
                     finally
                     {
@@ -455,6 +495,10 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                     }
                 }
             }
+        }
+        if (!affectedSections.isEmpty())
+        {
+            AlfrescoTransactionSupport.bindListener(new SectionCommitTransactionListener(affectedSections));
         }
     }
 
@@ -484,6 +528,7 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
         processCreateNode(childAssocRef.getChildRef());
+        recordAffectedChild(childAssocRef);
     }
 
     /**
@@ -504,10 +549,10 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
         recordAffectedChild(nodeService.getPrimaryParent(indexPage.getNodeRef()));
 
         // Create the collections folder node
-        FileInfo collectionFolder = fileFolderService.create(section, 
-                sectionCollectionsFolderName, TYPE_WEBASSET_COLLECTION_FOLDER);
-        
-        //and create any configured collections within that folder...
+        FileInfo collectionFolder = fileFolderService.create(section, sectionCollectionsFolderName,
+                TYPE_WEBASSET_COLLECTION_FOLDER);
+
+        // and create any configured collections within that folder...
         for (AssetCollectionDefinition collectionDef : collectionDefinitions)
         {
             Map<QName, Serializable> props = new HashMap<QName, Serializable>();
@@ -520,10 +565,10 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                 props.put(WebSiteModel.PROP_QUERY_RESULTS_MAX_SIZE, collectionDef.getMaxResults());
                 props.put(WebSiteModel.PROP_MINS_TO_QUERY_REFRESH, collectionDef.getQueryIntervalMinutes());
             }
-            nodeService.createNode(collectionFolder.getNodeRef(), ContentModel.ASSOC_CONTAINS, 
-                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, collectionDef.getName()), 
+            nodeService.createNode(collectionFolder.getNodeRef(), ContentModel.ASSOC_CONTAINS, QName.createQName(
+                    NamespaceService.CONTENT_MODEL_1_0_URI, collectionDef.getName()),
                     WebSiteModel.TYPE_WEBASSET_COLLECTION, props);
-            
+
         }
     }
 
@@ -558,6 +603,45 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     private boolean isOfficeMimetype(String mimetype)
     {
         return ArrayUtils.contains(OFFICE_MIMETYPES, mimetype);
+    }
+
+    private class SectionCommitTransactionListener extends TransactionListenerAdapter
+    {
+        private Set<NodeRef> sectionsToProcess = null;
+
+        public SectionCommitTransactionListener(Set<NodeRef> affectedSections)
+        {
+            this.sectionsToProcess = affectedSections;
+        }
+
+        @Override
+        public void afterCommit()
+        {
+            // For each section that has had its ancestors changed we need to
+            // adjust any webassets directly
+            // below it and any sections directly below it. We then need to
+            // process all the affected subsections
+            // in the same way
+            final RetryingTransactionHelper.RetryingTransactionCallback<Object> work = 
+                new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+            {
+                public Object execute() throws Throwable
+                {
+                    sectionHierarchyProcessor.process(sectionsToProcess);
+                    return null;
+                }
+            };
+
+            AuthenticationUtil.runAs(new RunAsWork<Object>()
+            {
+                @Override
+                public Object doWork() throws Exception
+                {
+                    transactionService.getRetryingTransactionHelper().doInTransaction(work, false, true);
+                    return null;
+                }
+            }, AuthenticationUtil.SYSTEM_USER_NAME);
+        }
     }
 
 }

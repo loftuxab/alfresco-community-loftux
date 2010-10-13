@@ -8,8 +8,16 @@
       contains ${.
    -->
    <bean id="clientApiConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-      <property name="location" value="classpath:alfresco/wcmqs-api.properties" />
-      <property name="placeholderPrefix" value="%{" />
+        <property name="ignoreUnresolvablePlaceholders">
+            <value>true</value>
+        </property>
+        <property name="locations">
+            <list>
+                <value>classpath:alfresco/wcmqs-api.properties</value>
+                <value>classpath*:alfresco/extension/wqsapi-custom.properties</value>
+            </list>
+        </property>
+        <property name="placeholderPrefix" value="%{" />
    </bean>
 
    <!-- CMIS Session factory for anonymous visitors to the website -->
@@ -58,12 +66,7 @@
 
    <!--  Asset factory -->
    <bean id="assetFactory" class="org.alfresco.wcm.client.impl.CachingAssetFactoryImpl">
-      <property name="delegate">
-         <bean class="org.alfresco.wcm.client.impl.AssetFactoryCmisImpl">
-            <property name="collectionFactory" ref="collectionFactory" />
-            <property name="sectionFactory" ref="sectionFactory" />
-         </bean>
-      </property>
+      <property name="delegate" ref="%{wcmqs.api.assetFactoryType}AssetFactory" />
       <property name="cache">
          <bean class="org.alfresco.wcm.client.impl.cache.EhCacheAdapter">
             <property name="cache">
@@ -79,6 +82,19 @@
          </bean>
       </property>
    </bean>
+
+   <bean id="cmisAssetFactory" class="org.alfresco.wcm.client.impl.AssetFactoryCmisImpl">
+      <property name="collectionFactory" ref="collectionFactory" />
+      <property name="sectionFactory" ref="sectionFactory" />
+   </bean>
+
+   <bean id="webscriptAssetFactory" class="org.alfresco.wcm.client.impl.AssetFactoryWebscriptImpl" lazy-init="true">
+      <property name="collectionFactory" ref="collectionFactory" />
+      <property name="sectionFactory" ref="sectionFactory" />
+      <property name="supportingAssetFactory" ref="cmisAssetFactory" />
+      <property name="webscriptCaller" ref="webscriptCaller" />
+   </bean>
+
 
    <!-- Service for fetching site data. Implements a cache. -->
    <bean id="webSiteService" class="org.alfresco.wcm.client.impl.WebSiteServiceImpl">
