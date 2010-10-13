@@ -588,6 +588,21 @@ public class AlfrescoAtomBasedFeedServiceImpl implements AtomBasedFeedService
     }
 
     /**
+     * Download draft.
+     * 
+     * @param libraryId id of library .
+     * @param draftId id of draft.
+     * @return Response {@link Response}.
+     */
+    public Response downloadDraft(String libraryId, String draftId, HttpHeaders headers)
+    {
+        NodeRef documentNodeRef = new NodeRef(pathHelper.getLibraryStoreRef(), draftId);
+        documentNodeRef = pathHelper.getDocumentForWork(documentNodeRef);
+
+        return downloadDocument(libraryId, documentNodeRef.getId(), headers, false);
+    }
+
+    /**
      * Download document version.
      * 
      * @param libraryId id of library .
