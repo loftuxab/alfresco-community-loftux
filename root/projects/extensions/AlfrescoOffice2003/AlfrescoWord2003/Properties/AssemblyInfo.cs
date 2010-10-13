@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("AlfrescoWord2003")]
 [assembly: AssemblyDescription("Alfresco Add-In for Microsoft Word 2003")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyConfiguration("Community")]
 [assembly: AssemblyCompany("Alfresco")]
 [assembly: AssemblyProduct("Alfresco Word 2003 Add-In")]
 [assembly: AssemblyCopyright("Copyright © Alfresco 2007-2010")]
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("3.3.*")]
-[assembly: AssemblyFileVersion("3.3.0.0")]
+[assembly: AssemblyVersion("3.4.*")]
+[assembly: AssemblyFileVersion("3.4.0.0")]

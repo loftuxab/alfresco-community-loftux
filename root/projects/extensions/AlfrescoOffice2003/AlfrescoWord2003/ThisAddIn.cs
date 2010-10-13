@@ -18,7 +18,9 @@
  */
 using System;
 using System.Drawing;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Tools.Applications.Runtime;
 using Word = Microsoft.Office.Interop.Word;
@@ -39,6 +41,7 @@ namespace AlfrescoWord2003
 
       private AlfrescoPane m_AlfrescoPane;
       private string m_DefaultTemplate = "wcservice/office/";
+      private string m_helpUrl = null;
       private Office.CommandBar m_CommandBar;
       private Office.CommandBarButton m_AlfrescoButton;
       private Office.CommandBarButton m_HelpButton;
@@ -207,7 +210,25 @@ namespace AlfrescoWord2003
       /// <param name="CancelDefault"></param>
       void m_HelpButton_Click(Microsoft.Office.Core.CommandBarButton Ctrl, ref bool CancelDefault)
       {
-         System.Diagnostics.Process.Start(Properties.Resources.HelpURL);
+         if (m_helpUrl == null)
+         {
+            StringBuilder helpUrl = new StringBuilder(Properties.Resources.HelpURL);
+            Assembly asm = Assembly.GetExecutingAssembly();
+            Version version = asm.GetName().Version;
+            string edition = "community";
+            object[] attr = asm.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+            if (attr.Length > 0)
+            {
+               AssemblyConfigurationAttribute aca = (AssemblyConfigurationAttribute)attr[0];
+               edition = aca.Configuration;
+            }
+            helpUrl.Replace("{major}", version.Major.ToString());
+            helpUrl.Replace("{minor}", version.Minor.ToString());
+            helpUrl.Replace("{edition}", edition.ToLowerInvariant());
+
+            m_helpUrl = helpUrl.ToString();
+         }
+         System.Diagnostics.Process.Start(m_helpUrl);
       }
 
       /// <summary>
