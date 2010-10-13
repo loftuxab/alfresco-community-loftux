@@ -140,6 +140,14 @@ public interface AtomBasedFeedService
     boolean lock);
 
     @GET
+    @Path("/library/{libraryId}/draft/{draftId}/media")
+    public Response downloadDraft(@PathParam("libraryId")
+    String libraryId, @PathParam("draftId")
+    String draftId, @Context
+    HttpHeaders headers);
+
+
+    @GET
     @Path("/library/{libraryId}/document/{documentId}/version/{versionId}/media")
     public Response downloadDocumentVersion(@PathParam("libraryId")
     String libraryId, @PathParam("documentId")

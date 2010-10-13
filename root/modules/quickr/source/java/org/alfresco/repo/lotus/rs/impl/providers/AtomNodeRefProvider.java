@@ -93,6 +93,11 @@ public class AtomNodeRefProvider implements MessageBodyWriter<NodeRef>
         Date lastModified = (Date) props.get(ContentModel.PROP_MODIFIED);
 
         String fileName = (String) props.get(ContentModel.PROP_NAME);
+        if (nodeService.hasAspect(nodeRef, ContentModel.ASPECT_WORKING_COPY))
+        {
+            NodeRef originalNode = ((NodeRef) nodeService.getProperty(nodeRef, ContentModel.PROP_COPY_REFERENCE));
+            fileName = (String) nodeService.getProperty(originalNode, ContentModel.PROP_NAME);
+        }
 
         String documentLanguage = content.getLocale().toString().replace('_', '-');
 
