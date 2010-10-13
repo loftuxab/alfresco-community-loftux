@@ -20,16 +20,16 @@
             <css src="/yui/tabview/assets/skins/sam/tabview.css" />
             <css src="/yui/autocomplete/assets/skins/sam/autocomplete.css" />
             <css src="/yui/container/assets/skins/sam/container.css" />
-            <css src="/res/fdk/accordion/accordion.css" />
-            <css src="/res/fdk/exif-accordion.css" />
-            <css src="/res/fdk/progress-bar.css" />
+            <css src="/fdk/accordion/accordion.css" />
+            <css src="/fdk/exif-accordion.css" />
+            <css src="/fdk/progress-bar.css" />
             
             <js src="/yui/tabview/tabview-min.js" />
             <js src="/yui/animation/animation-min.js" />
             <js src="/yui/datasource/datasource-min.js" />
             <js src="/yui/autocomplete/autocomplete-min.js" />
             <js src="/yui/slider/slider-min.js" />
-            <js src="/res/fdk/accordion/accordion-min.js" />
+            <js src="/fdk/accordion/accordion-min.js" />
          </dependencies>
       </forms>
    </config>

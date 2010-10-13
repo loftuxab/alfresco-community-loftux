@@ -54,9 +54,13 @@
          Alfresco.constants.URL_CONTEXT = "${url.context}/";
          Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
          Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
+         Alfresco.constants.URL_RESCONTEXT = "${url.context}/res/";
          Alfresco.constants.USERNAME = "admin";
          Alfresco.constants.HTML_EDITOR = "tinyMCE";
          Alfresco.constants.URI_TEMPLATES = {};
+         
+         // make any YUI errors visible
+         YAHOO.util.Event.throwErrors = true;
          
          // register event handler callback
          YAHOO.Bubbling.on("formContentReady", FDK.formConsoleContentReady, null);
