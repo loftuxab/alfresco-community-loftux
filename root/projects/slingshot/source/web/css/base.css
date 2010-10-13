@@ -89,6 +89,29 @@ hr
    min-height: 1.8em;
 }
 
+/* Enables a link to be vertically-aligned to a YUI button */
+.yui-button-align
+{
+   border-color: transparent;
+   border-style: solid;
+   border-width: 1px 0;
+   display: inline-block;
+   vertical-align: text-bottom;
+}
+.yui-button-align .first-child
+{
+   border-color: transparent;
+   border-style: solid;
+   border-width: 0 1px;
+}
+.yui-button-align button,
+.yui-button-align a
+{
+   font-size: 93%;
+   line-height: 2;
+   min-height: 2em;
+}
+
 .yui-t1
 {
    width: auto;

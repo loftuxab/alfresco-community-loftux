@@ -14,29 +14,29 @@ function main()
 {
    var sites = [],
       imapServerEnabled = false;
-   
+
    // Call the repo for sites the user is a member of
    var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/sites");
    if (result.status == 200)
    {
       var site, favourites = {}, imapFavourites = {}, managers,
          i, ii, j, jj;
-      
+
       // Create javascript objects from the server response
       sites = eval('(' + result + ')');
-      
+
       if (sites.length > 0)
       {
          // Check for IMAP server status
          result = remote.call("/imap/servstatus");
          imapServerEnabled = (result.status == 200 && result == "enabled");
-         
+
          // Call the repo for the user's favourite sites
          result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_SITES);
          if (result.status == 200 && result != "{}")
          {
             var prefs = eval('(' + result + ')');
-            
+
             // Populate the favourites object literal for easy look-up later
             favourites = eval('try{(prefs.' + PREF_FAVOURITE_SITES + ')}catch(e){}');
             if (typeof favourites != "object")
@@ -51,11 +51,11 @@ function main()
                imapFavourites = {};
             }
          }
-         
+
          for (i = 0, ii = sites.length; i < ii; i++)
          {
             site = sites[i];
-            
+
             // Is current user a Site Manager for this site?
             site.isSiteManager = false;
             if (site.siteManagers)
@@ -70,10 +70,10 @@ function main()
                   }
                }
             }
-            
+
             // Is this site a user favourite?
             site.isFavourite = !!(favourites[site.shortName]);
-            
+
             // Is this site a user imap favourite?
             site.isIMAPFavourite = !!(imapFavourites[site.shortName]);
          }
