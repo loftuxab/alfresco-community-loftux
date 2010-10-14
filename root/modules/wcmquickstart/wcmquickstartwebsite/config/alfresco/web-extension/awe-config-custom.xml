@@ -61,10 +61,6 @@
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
                <show id="cm:content" force="true" />
-               <show id="cm:taggable" force="true" />
-               <show id="ws:primaryImage" force="true" />
-               <show id="ws:secondaryImage" force="true" />
-               <show id="ws:relatedArticles" force="true" />
             </field-visibility>
             <appearance>
                <field id="cm:title">
@@ -102,29 +98,6 @@
                         theme_advanced_buttons3: "",
                         theme_advanced_resizing: true
                      </control-param>
-                  </control>
-               </field>
-               <field id="cm:taggable">
-                  <control>
-                     <control-param name="compactMode">true</control-param>
-                     <control-param name="params">aspect=cm:taggable</control-param>
-                     <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
-                     <control-param name="createNewItemIcon">tag</control-param>
-                  </control>
-               </field>
-               <field id="ws:primaryImage">
-                  <control>
-                     <control-param name="startLocation">{doclib}</control-param>
-                  </control>
-               </field>
-               <field id="ws:secondaryImage">
-                  <control>
-                     <control-param name="startLocation">{doclib}</control-param>
-                  </control>
-               </field>
-               <field id="ws:relatedArticles">
-                  <control>
-                     <control-param name="startLocation">{doclib}</control-param>
                   </control>
                </field>
             </appearance>
@@ -193,10 +166,6 @@
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
                <show id="cm:content" force="true" />
-               <show id="cm:taggable" force="true" />
-               <show id="ws:primaryImage" force="true" />
-               <show id="ws:secondaryImage" force="true" />
-               <show id="ws:relatedArticles" force="true" />
             </field-visibility>
             <appearance>
                <field id="cm:title">
@@ -234,29 +203,6 @@
                         theme_advanced_buttons3: "",
                         theme_advanced_resizing: true
                          </control-param>
-                  </control>
-               </field>
-               <field id="cm:taggable">
-                  <control>
-                     <control-param name="compactMode">true</control-param>
-                     <control-param name="params">aspect=cm:taggable</control-param>
-                     <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
-                     <control-param name="createNewItemIcon">tag</control-param>
-                  </control>
-               </field>
-               <field id="ws:primaryImage">
-                  <control>
-                     <control-param name="startLocation">{doclib}</control-param>
-                  </control>
-               </field>
-               <field id="ws:secondaryImage">
-                  <control>
-                     <control-param name="startLocation">{doclib}</control-param>
-                  </control>
-               </field>
-               <field id="ws:relatedArticles">
-                  <control>
-                     <control-param name="startLocation">{doclib}</control-param>
                   </control>
                </field>
             </appearance>
