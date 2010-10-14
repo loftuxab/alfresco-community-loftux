@@ -13,6 +13,12 @@
    padding-left: 1em;
 }
 
+/* YUI Carousel 2.8.1 fails to calculate size on this element if its not set using px */
+.yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column
+{
+   height: 370px;
+}
+
 .yui-columnbrowser .yui-columnbrowser-column .yui-columnbrowser-column-body {
     height: 25em;
 }
