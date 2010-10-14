@@ -1647,7 +1647,7 @@
          var me = this;
          var fnGetter = function(id)
          {
-            return Dom.get(me.id + id).value;
+            return YAHOO.lang.trim(Dom.get(me.id + id).value);
          };
          
          // verify password against second field
