@@ -1151,7 +1151,10 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
  * 
  * @method number
  * @param field {object} The element representing the field the validation is for
- * @param args {object} Not used
+ * @param args {object} Optional object containing a "repeating" flag
+ *        {
+ *           repeating: true
+ *        }
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
@@ -1163,7 +1166,34 @@ Alfresco.forms.validation.number = function number(field, args, event, form, sil
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a number");
    
-   var valid = (isNaN(field.value) == false);
+   var repeating = false;
+   
+   // determine if field has repeating values
+   if (args !== null && args.repeating)
+   {
+      repeating = true;
+   }
+   
+   var valid = true;
+   if (repeating)
+   {
+      // as it's repeating there could be multiple comma separated values
+      var values = field.value.split(",");
+      for (var i = 0; i < values.length; i++)
+      {
+         valid = (isNaN(values[i]) == false);
+         
+         if (!valid)
+         {
+            // stop as soon as we find an invalid value
+            break;
+         }
+      }
+   }
+   else
+   {
+      valid = (isNaN(field.value) == false);
+   }
    
    if (!valid && !silent && form)
    {

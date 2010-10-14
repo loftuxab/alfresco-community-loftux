@@ -1687,6 +1687,13 @@ public class FormUIGet extends DeclarativeWebScript
             
             if (constraint != null)
             {
+                // if the field is repeating add a flag to indicate this
+                // so the client side validation handler can take the appropriate action
+                if (field.isRepeating())
+                {
+                    constraint.getJSONParams().put("repeating", true);
+                }
+                
                 // add the constraint to the context
                 context.getConstraints().add(constraint);
             }
@@ -1926,6 +1933,9 @@ public class FormUIGet extends DeclarativeWebScript
             if (maxLength != -1)
             {
                 field.getControl().getParams().put("maxLength", Integer.toString(maxLength));
+                
+                // set the crop argument to true so that textareas also restrict characters 
+                constraint.getJSONParams().put("crop", true);
             }
         }
         else if (CONSTRAINT_REGEX.equals(constraint.getId()))
