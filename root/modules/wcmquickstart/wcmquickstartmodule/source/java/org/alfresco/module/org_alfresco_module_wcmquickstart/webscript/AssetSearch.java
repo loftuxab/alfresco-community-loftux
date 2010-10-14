@@ -178,6 +178,8 @@ public class AssetSearch extends AbstractWebScript
             int index = skip;
             int count = 0;
             
+            res.setContentEncoding("UTF-8");
+            res.setContentType("text/xml");
             Writer writer = res.getWriter();
             AssetSerializer assetSerializer = assetSerializerFactory.getAssetSerializer();
             assetSerializer.start(writer);

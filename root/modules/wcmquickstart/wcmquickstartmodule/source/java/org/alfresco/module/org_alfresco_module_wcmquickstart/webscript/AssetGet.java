@@ -112,6 +112,9 @@ public class AssetGet extends AbstractWebScript
             }
 
             boolean onlyModifiedTime = (req.getParameter(PARAM_MODIFIED_TIME_ONLY) != null);
+            
+            res.setContentEncoding("UTF-8");
+            res.setContentType("text/xml");
             Writer writer = res.getWriter();
             AssetSerializer assetSerializer = assetSerializerFactory.getAssetSerializer();
             assetSerializer.start(writer);

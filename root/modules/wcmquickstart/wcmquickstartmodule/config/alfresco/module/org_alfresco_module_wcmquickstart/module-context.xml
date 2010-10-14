@@ -47,4 +47,6 @@
     	<property name="contextParserService" ref="wcmquickstartmodule_contextParserService"/>
     	<property name="searchStore" value="${wcmqs.searchstore}" />
     </bean>
+
+    <import resource="classpath*:alfresco/extension/webquickstart-custom-context.xml" />
 </beans>

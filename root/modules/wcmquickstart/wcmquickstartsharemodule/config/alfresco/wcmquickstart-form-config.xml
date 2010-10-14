@@ -465,6 +465,21 @@
                <field id="cm:addressees" read-only="true" />
                <field id="cm:sentdate" read-only="true" />
                <field id="cm:subjectline" read-only="true" />
+               <field id="ws:primaryImage" >
+                    <control>
+                        <control-param name="startLocation">{doclib}</control-param>
+                    </control>
+               </field>
+               <field id="ws:secondaryImage" >
+                    <control>
+                        <control-param name="startLocation">{doclib}</control-param>
+                    </control>
+               </field>
+               <field id="ws:relatedArticles" >
+                    <control>
+                        <control-param name="startLocation">{doclib}</control-param>
+                    </control>
+               </field>
             </appearance>
          </form>
 

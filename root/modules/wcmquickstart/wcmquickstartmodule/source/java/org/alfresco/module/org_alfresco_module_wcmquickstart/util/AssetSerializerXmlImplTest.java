@@ -76,7 +76,7 @@ public class AssetSerializerXmlImplTest extends TestCase
         props.put(QName.createQName("uri", "doubleProperty"), new Double(132.4352e12));
         props.put(QName.createQName("uri", "noderefProperty"), 
                 new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, GUID.generate()));
-        props.put(QName.createQName("uri", "textProperty"), "The cat sat on the mat");
+        props.put(QName.createQName("uri", "textProperty"), "The радиатор <sat> on the mat: first on one side; the on the other... – ");
         ArrayList<String> textList = new ArrayList<String>();
         textList.add("One");
         textList.add("Two");

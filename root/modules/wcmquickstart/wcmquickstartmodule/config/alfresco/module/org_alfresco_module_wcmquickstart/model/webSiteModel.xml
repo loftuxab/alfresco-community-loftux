@@ -98,7 +98,7 @@
                     <title>Host Port</title>
                     <type>d:int</type>
                     <mandatory>true</mandatory>
-                    <default>8082</default>
+                    <default>8080</default>
                 </property>
                 <property name="ws:webAppContext">
                     <title>Web App Context</title>
