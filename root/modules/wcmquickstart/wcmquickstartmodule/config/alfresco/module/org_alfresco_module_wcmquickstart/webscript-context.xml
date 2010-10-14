@@ -60,14 +60,17 @@
         <property name="siteService" ref="SiteService"/>     
         <property name="nodeService" ref="NodeService"/>
         <property name="fileFolderService" ref="FileFolderService"/>
-        <property name="importFileLocations">
-       		<map>
-       			<entry key="financial" value="${wcmqs.importFileLocation}"/>
-       			<entry key="media" value="${wcmqs.importFileLocation.media}"/>
-       			<entry key="government" value="${wcmqs.importFileLocation.government}"/>
-       		</map>
-        </property>
-        
+        <property name="importFileLocations" ref="wqsmodule_siteImportFileLocations" />
+    </bean>
+    
+    <bean id="wqsmodule_siteImportFileLocations" class="java.util.TreeMap">
+        <constructor-arg>
+            <map>
+                <entry key="financial" value="${wcmqs.importFileLocation.finance}"/>
+                <entry key="media" value="${wcmqs.importFileLocation.media}"/>
+                <entry key="government" value="${wcmqs.importFileLocation.government}"/>
+            </map>
+        </constructor-arg>
     </bean>
     
      <bean id="webscript.org.alfresco.module.wcmquickstart.updatewebsiterenditions.get" 
