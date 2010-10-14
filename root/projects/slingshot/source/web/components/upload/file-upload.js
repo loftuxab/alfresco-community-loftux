@@ -86,7 +86,25 @@
           * @type boolean
           * @default true
           */
-         adobeFlashEnabled: true
+         adobeFlashEnabled: true,
+
+         /**
+          * Class name of Flash Uploader
+          *
+          * @property flashUploader
+          * @type string
+          * @default "Alfresco.FlashUpload"
+          */
+         flashUploader: "Alfresco.FlashUpload",
+
+         /**
+          * Class name of HTML Uploader
+          *
+          * @property flashUploader
+          * @type string
+          * @default "Alfresco.HtmlUpload"
+          */
+         htmlUploader: "Alfresco.HtmlUpload"
       },
       
       /**
@@ -194,7 +212,7 @@
             this.hasRequiredFlashPlayer = this.options.adobeFlashEnabled && !Alfresco.util.getVar("noflash") && Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
 
             // Create the appropriate uploader component
-            var uploadType = this.hasRequiredFlashPlayer ? "Alfresco.FlashUpload" : "Alfresco.HtmlUpload",
+            var uploadType = this.hasRequiredFlashPlayer ? this.options.flashUploader : this.options.htmlUploader,
                uploadInstance = Alfresco.util.ComponentManager.findFirst(uploadType);
 
             if (uploadInstance)
