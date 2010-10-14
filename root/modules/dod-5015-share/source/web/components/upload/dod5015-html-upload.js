@@ -71,7 +71,6 @@
 
    YAHOO.extend(Alfresco.RecordsHtmlUpload, Alfresco.HtmlUpload,
    {
-
       /**
        * Shows uploader in single import mode.
        *
@@ -129,34 +128,6 @@
       },
 
       /**
-       * Show can be called multiple times and will display the uploader dialog
-       * in different ways depending on the config parameter.
-       *
-       * @method show
-       * @param config {object} describes how the upload dialog should be displayed
-       * The config object is in the form of:
-       * {
-       *    siteId: {string},        // site to upload file(s) to
-       *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
-       *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
-       *    updateNodeRef: {string}, // nodeRef to the document that should be updated
-       *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
-       *    mode: {int},             // MODE_SINGLE_UPLOAD or MODE_SINGLE_UPDATE
-       *    filter: {array},         // limits what kind of files the user can select in the OS file selector
-       *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: false         // If true and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to overwrite a versionable file with the existing name
-       *                             // If false and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to append a number to the versionable filename to avoid
-       *                             // an overwrite and a new version
-       * }
-       */
-      show: function RecordsHtmlUpload_show(config)
-      {
-         Alfresco.RecordsHtmlUpload.superclass.show.call(this, config);
-      },
-
-      /**
        * Adjust the gui according to the config passed into the show method.
        *
        * @method _applyConfig
@@ -200,12 +171,17 @@
          {
             // Display the record type form & flash tips
             Dom.removeClass(this.widgets.recordTypeSection, "hidden");
-            Dom.removeClass(this.widgets.singleUploadTip, "hidden");            
+            Dom.addClass(this.widgets.singleUploadTip, "hidden");            
+            // Only show the "Install Flash" message if Flash is enabled via config
+            if (this.showConfig.adobeFlashEnabled)
+            {
+               // Show the help label for single uploads
+               Dom.removeClass(this.widgets.singleUploadTip, "hidden");
+            }
 
             // Set the file input name to match the upload webscripts
             this.widgets.filedata.setAttribute("name", "filedata");
          }
       }
-
    });
 })();

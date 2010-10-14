@@ -1191,7 +1191,6 @@
          if (fileUpload)
          {
             fileUpload.hasRequiredFlashPlayer = false;
-            fileUpload.onComponentsLoaded();
          }
          return fileUpload;
       },

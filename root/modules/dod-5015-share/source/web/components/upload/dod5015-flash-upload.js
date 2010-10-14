@@ -43,7 +43,6 @@
  */
 (function()
 {
-
    /**
     * YUI Library aliases
     */
@@ -75,7 +74,6 @@
 
    YAHOO.extend(Alfresco.RecordsFlashUpload, Alfresco.FlashUpload,
    {
-
       /**
        * Shows uploader in single import mode.
        *
@@ -142,11 +140,9 @@
          if (fileUpload)
          {
             fileUpload.hasRequiredFlashPlayer = false;
-            fileUpload.onComponentsLoaded();
          }
          return fileUpload;
       },
-
 
       /**
        * Adjust the gui according to the config passed into the show method.
