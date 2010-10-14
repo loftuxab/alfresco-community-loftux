@@ -602,6 +602,7 @@
                         activityData =
                         {
                            fileName: data.json.results[i].id,
+                           nodeRef: data.json.results[i].nodeRef,
                            path: this.currentPath
                         };
                         this.modules.actions.postActivity(this.options.siteId, "file-deleted", "documentlibrary", activityData);
