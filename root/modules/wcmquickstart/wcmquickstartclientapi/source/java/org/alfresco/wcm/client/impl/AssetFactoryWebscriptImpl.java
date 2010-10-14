@@ -43,7 +43,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     private SectionFactory sectionFactory;
     private CollectionFactory collectionFactory;
     private AssetFactory supportingAssetFactory;
-    
+
     public void setWebscriptCaller(WebScriptCaller webscriptCaller)
     {
         this.webscriptCaller = webscriptCaller;
@@ -71,29 +71,35 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
         results.setQuery(query);
         if (query != null && query.getSectionId() != null)
         {
-            List<WebscriptParam> params = new ArrayList<WebscriptParam>();
-            params.add(new WebscriptParam("sectionid", query.getSectionId()));
-            if (query.getTag() != null)
+            String phrase = query.getPhrase();
+            String tag = query.getTag();
+            //Return no results unless either phrase or tag has been specified
+            if ((phrase != null && phrase.length() > 0) || (tag != null && tag.length() > 0))
             {
-                params.add(new WebscriptParam("tag", query.getTag()));
+                List<WebscriptParam> params = new ArrayList<WebscriptParam>();
+                params.add(new WebscriptParam("sectionid", query.getSectionId()));
+                if (query.getTag() != null)
+                {
+                    params.add(new WebscriptParam("tag", query.getTag()));
+                }
+                if (query.getPhrase() != null)
+                {
+                    params.add(new WebscriptParam("phrase", query.getPhrase()));
+                }
+                params.add(new WebscriptParam("skip", Integer.toString(query.getResultsToSkip())));
+                params.add(new WebscriptParam("max", Integer.toString(query.getMaxResults())));
+                Map<String, Serializable> headerProps = new TreeMap<String, Serializable>();
+                LinkedList<TreeMap<String, Serializable>> assets = searchAssetsInRepo(params, headerProps);
+
+                Long totalResults = (Long) headerProps.get("totalResults");
+                results.setTotalSize(totalResults == null ? assets.size() : totalResults);
+                List<SearchResult> resultList = new ArrayList<SearchResult>(assets.size());
+                for (TreeMap<String, Serializable> assetData : assets)
+                {
+                    resultList.add(buildSearchResult(assetData));
+                }
+                results.setResults(resultList);
             }
-            if (query.getPhrase() != null)
-            {
-                params.add(new WebscriptParam("phrase", query.getPhrase()));
-            }
-            params.add(new WebscriptParam("skip", Integer.toString(query.getResultsToSkip())));
-            params.add(new WebscriptParam("max", Integer.toString(query.getMaxResults())));
-            Map<String,Serializable> headerProps = new TreeMap<String, Serializable>();
-            LinkedList<TreeMap<String, Serializable>> assets = searchAssetsInRepo(params, headerProps);
-            
-            Long totalResults = (Long)headerProps.get("totalResults");
-            results.setTotalSize(totalResults == null ? assets.size() : totalResults);
-            List<SearchResult> resultList = new ArrayList<SearchResult>(assets.size());
-            for (TreeMap<String, Serializable> assetData : assets)
-            {
-                resultList.add(buildSearchResult(assetData));
-            }
-            results.setResults(resultList);
         }
         return results;
     }
@@ -108,7 +114,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     public Asset getAssetById(String id, boolean deferredLoad)
     {
         Asset asset = null;
-        WebscriptParam[] params = new WebscriptParam[] {new WebscriptParam("noderef", id)};
+        WebscriptParam[] params = new WebscriptParam[] { new WebscriptParam("noderef", id) };
         LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(params);
         if (!assetList.isEmpty())
         {
@@ -144,13 +150,13 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     public Date getModifiedTimeOfAsset(String assetId)
     {
         Date result = null;
-        WebscriptParam[] params = new WebscriptParam[] {new WebscriptParam("noderef", assetId),
-                new WebscriptParam("modifiedTimeOnly", "true")};
+        WebscriptParam[] params = new WebscriptParam[] { new WebscriptParam("noderef", assetId),
+                new WebscriptParam("modifiedTimeOnly", "true") };
         LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(params);
         if (!assetList.isEmpty())
         {
             TreeMap<String, Serializable> assetData = assetList.get(0);
-            result = (Date)assetData.get("cm:modified");
+            result = (Date) assetData.get("cm:modified");
         }
         return result;
     }
@@ -158,7 +164,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     @Override
     public Map<String, Date> getModifiedTimesOfAssets(Collection<String> assetIds)
     {
-        Map<String,Date> result = new TreeMap<String, Date>();
+        Map<String, Date> result = new TreeMap<String, Date>();
         List<WebscriptParam> params = new ArrayList<WebscriptParam>(assetIds.size());
         for (String id : assetIds)
         {
@@ -166,9 +172,9 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
         }
         params.add(new WebscriptParam("modifiedTimeOnly", "true"));
         LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(params);
-        for (TreeMap<String, Serializable>asset : assetList)
+        for (TreeMap<String, Serializable> asset : assetList)
         {
-            result.put((String)asset.get("id"), (Date)asset.get("cm:modified"));
+            result.put((String) asset.get("id"), (Date) asset.get("cm:modified"));
         }
         return result;
     }
@@ -215,7 +221,8 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
         return getAssetsFromRepo(params, null);
     }
 
-    private LinkedList<TreeMap<String, Serializable>> getAssetsFromRepo(List<WebscriptParam> params, Map<String,Serializable> header)
+    private LinkedList<TreeMap<String, Serializable>> getAssetsFromRepo(List<WebscriptParam> params,
+            Map<String, Serializable> header)
     {
         AssetDeserializerXmlImpl deserializer = new AssetDeserializerXmlImpl();
         webscriptCaller.get("webasset", deserializer, params);
@@ -227,7 +234,8 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
         return assetList;
     }
 
-    private LinkedList<TreeMap<String, Serializable>> searchAssetsInRepo(List<WebscriptParam> params, Map<String,Serializable> header)
+    private LinkedList<TreeMap<String, Serializable>> searchAssetsInRepo(List<WebscriptParam> params,
+            Map<String, Serializable> header)
     {
         AssetDeserializerXmlImpl deserializer = new AssetDeserializerXmlImpl();
         webscriptCaller.get("webassetsearch", deserializer, params);
@@ -255,7 +263,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     private SearchResult buildSearchResult(TreeMap<String, Serializable> props)
     {
         Asset asset = buildAsset(props);
-        Long score = (Long)asset.getProperty("searchScore");
+        Long score = (Long) asset.getProperty("searchScore");
         if (score == null)
         {
             score = 0L;
@@ -270,7 +278,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
         props.put(PropertyIds.OBJECT_TYPE_ID, props.get("type"));
         props.put(PropertyIds.NAME, props.get("cm:name"));
         props.put(PropertyIds.LAST_MODIFICATION_DATE, props.get("cm:modified"));
-        ContentInfo contentInfo = (ContentInfo)props.get("cm:content");
+        ContentInfo contentInfo = (ContentInfo) props.get("cm:content");
         if (contentInfo != null)
         {
             props.put(PropertyIds.CONTENT_STREAM_LENGTH, contentInfo.getSize());
