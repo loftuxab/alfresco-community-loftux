@@ -1042,7 +1042,7 @@
          }
          
          // apply the context
-         if (this.searchRepository)
+         if (this.searchRepository || this.options.searchQuery.length !== 0)
          {
             text += ' ' + this.msg("search.info.foundinrepository");
          }

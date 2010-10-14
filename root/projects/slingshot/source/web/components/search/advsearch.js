@@ -156,6 +156,18 @@
          // render initial form template
          this.renderFormTemplate(defaultForm, true);
          
+         // register the "enter" event on the search text field
+         var queryInput = Dom.get(this.id + "-search-text");
+         this.widgets.enterListener = new YAHOO.util.KeyListener(queryInput, 
+         {
+            keys: YAHOO.util.KeyListener.KEY.ENTER
+         }, 
+         {
+            fn: me._searchEnterHandler,
+            scope: this,
+            correctScope: true
+         }, "keydown").enable();
+         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -312,7 +324,7 @@
       /**
        * Event handler called when the "beforeFormRuntimeInit" event is received
        */
-      onBeforeFormRuntimeInit: function CreateContentMgr_onBeforeFormRuntimeInit(layer, args)
+      onBeforeFormRuntimeInit: function ADVSearch_onBeforeFormRuntimeInit(layer, args)
       {
          // extract the current form runtime - so we can reference it later
          this.currentForm.runtime = args[1].runtime;
@@ -323,6 +335,16 @@
             this.currentForm.repopulate = false;
             this.repopulateCurrentForm();
          }
+      },
+      
+      /**
+       * Search text box ENTER key event handler
+       * 
+       * @method _searchEnterHandler
+       */
+      _searchEnterHandler: function ADVSearch__searchEnterHandler(e, args)
+      {
+         this.onSearchClick(e, args);
       }
    });
 })();
