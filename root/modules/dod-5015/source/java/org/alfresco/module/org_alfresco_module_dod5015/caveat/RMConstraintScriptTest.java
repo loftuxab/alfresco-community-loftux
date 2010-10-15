@@ -44,7 +44,8 @@ public class RMConstraintScriptTest extends BaseWebScriptTest
     private RMCaveatConfigService caveatConfigService;
     private PersonService personService;
     
-    protected final static String RM_LIST = "rmc:smList";
+    protected final static String RM_LIST          = "rmc:smListTest";
+    protected final static String RM_LIST_URI_ELEM = "rmc_smListTest";
     
     private static final String URL_RM_CONSTRAINTS = "/api/rma/rmconstraints";
   
@@ -75,7 +76,10 @@ public class RMConstraintScriptTest extends BaseWebScriptTest
         /**
          * Delete the list to remove any junk then recreate it.
          */
-        caveatConfigService.deleteRMConstraint(RM_LIST);
+        if (caveatConfigService.getRMConstraint(RM_LIST) != null)
+        {
+            caveatConfigService.deleteRMConstraint(RM_LIST);
+        }
         caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         
@@ -96,7 +100,7 @@ public class RMConstraintScriptTest extends BaseWebScriptTest
          * Positive test Get the constraint 
          */
         {
-            String url = URL_RM_CONSTRAINTS + "/" + "rmc_smList";
+            String url = URL_RM_CONSTRAINTS + "/" + RM_LIST_URI_ELEM;
             Response response = sendRequest(new GetRequest(url), Status.STATUS_OK);
             JSONObject top = new JSONObject(response.getContentAsString());
             

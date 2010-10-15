@@ -412,10 +412,10 @@ public class M2Model
         M2Constraint constraint = getConstraint(name);
         if (constraint != null)
         {
-            constraints.remove(name);
+            constraints.remove(constraint);
         }
     }
-
+    
     // Do not delete: referenced by m2binding.xml
     @SuppressWarnings("unused")
     private static List createList()
