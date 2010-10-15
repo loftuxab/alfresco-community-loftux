@@ -104,6 +104,8 @@ public interface WebSiteModel
     public static final QName PROP_COMMENT = QName.createQName(NAMESPACE, "feedbackComment");
     public static final QName PROP_RATING = QName.createQName(NAMESPACE, "rating");
     public static final QName PROP_FEEDBACK_TYPE = QName.createQName(NAMESPACE, "feedbackType");
+    public static final QName PROP_VISITOR_NAME = QName.createQName(NAMESPACE, "visitorName");
+    public static final QName PROP_VISITOR_EMAIL = QName.createQName(NAMESPACE, "visitorEmail");
 
     // ws:visitorFeedbackSummary type
     public static final QName TYPE_VISITOR_FEEDBACK_SUMMARY = QName.createQName(NAMESPACE, "visitorFeedbackSummary");
