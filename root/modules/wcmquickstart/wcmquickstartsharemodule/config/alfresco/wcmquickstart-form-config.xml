@@ -180,6 +180,11 @@
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
+               <field id="ws:webassets" >
+                    <control>
+                        <control-param name="startLocation">{doclib}</control-param>
+                    </control>
+               </field>
             </appearance>
          </form>
          <form id="doclib-simple-metadata">
@@ -197,6 +202,11 @@
             <appearance>
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="ws:webassets" >
+                    <control>
+                        <control-param name="startLocation">{doclib}</control-param>
+                    </control>
                </field>
             </appearance>
          </form>

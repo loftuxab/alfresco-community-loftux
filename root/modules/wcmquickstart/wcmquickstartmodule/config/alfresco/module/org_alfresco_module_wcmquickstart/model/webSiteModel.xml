@@ -203,7 +203,7 @@
                         <many>true</many>
                     </source>
                     <target>
-                        <class>cm:content</class>
+                        <class>ws:webasset</class>
                         <mandatory>false</mandatory>
                         <many>true</many>
                     </target>
