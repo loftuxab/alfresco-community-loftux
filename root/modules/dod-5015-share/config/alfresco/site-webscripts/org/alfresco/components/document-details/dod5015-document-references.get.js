@@ -69,12 +69,14 @@ function getDocReferences()
             if (type == 'from')
             {
                refField = 'childRef';
-               labelField = 'source';               
+               //labelField = 'source';
+               labelField = 'target';
             }
             else
             {
                refField = 'parentRef';  
-               labelField = 'target';               
+               //labelField = 'target';
+               labelField = 'source';
             }
          }
          else
