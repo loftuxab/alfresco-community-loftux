@@ -15,7 +15,7 @@
                     <li class="entry">
                         <a href="<@makeurl asset=article force='long'/>${linkParam!''}"><img src="<@makeurl asset=article rendition='mediumPublicationThumbnail'/>" alt="${article.title!''}" class="img-border"/></a>                        
                         <div class="publications-list-detail">
-                            <h3><a href="<@makeurl asset=article force='long'/>${linkParam!''}">${article.title!'no title'}</a></h3>
+                            <h3><a href="<@makeurl asset=article force='long'/>${linkParam!''}">${article.title!article.name}</a></h3>
                             <span class="newslist-date">
                                 <#if article.properties['cmis:lastModificationDate']??>${article.properties['cmis:lastModificationDate']?string(msg('date.format'))}</#if>
                                 <#if article.properties['cm:author']??> by ${article.properties['cm:author']}</#if>
