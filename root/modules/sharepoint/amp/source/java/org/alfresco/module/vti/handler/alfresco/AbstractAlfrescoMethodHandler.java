@@ -54,6 +54,7 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessStatus;
@@ -87,6 +88,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
     private LockService lockService;
     private ContentService contentService;
     private TransactionService transactionService;
+    private MimetypeService mimetypeService;
 
     private VtiDocumentHepler documentHelper;
     private VtiPathHelper pathHelper;
@@ -179,6 +181,16 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
     public void setVersionService(VersionService versionService)
     {
         this.versionService = versionService;
+    }
+
+    public void setMimetypeService(MimetypeService mimetypeService)
+    {
+        this.mimetypeService = mimetypeService;
+    }
+
+    public MimetypeService getMimetypeService()
+    {
+        return mimetypeService;
     }
 
     /**
@@ -906,6 +918,8 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
             getNodeService().setProperty(curDocumentNodeRef, ContentModel.PROP_AUTHOR, getAuthenticationService().getCurrentUserName());
 
             ContentWriter writer = getContentService().getWriter(curDocumentNodeRef, ContentModel.PROP_CONTENT, true);
+            String mimetype = getMimetypeService().guessMimetype(documentName);
+            writer.setMimetype(mimetype);
             writer.putContent(document.getInputStream());
 
             tx.commit();

@@ -87,6 +87,7 @@
         <property name="lockService" ref="LockService" />
         <property name="contentService" ref="ContentService" />
         <property name="transactionService" ref="transactionService" />
+        <property name="mimetypeService" ref="MimetypeService" />
         <property name="siteService" ref="SiteService" />
         <property name="authenticationComponent" ref="AuthenticationComponent" />
         <property name="documentHelper" ref="vtiDocumentHelper" />
