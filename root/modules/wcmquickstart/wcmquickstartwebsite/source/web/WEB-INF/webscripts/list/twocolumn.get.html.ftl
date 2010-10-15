@@ -6,16 +6,16 @@
     	  	<#list articles.assets as article>  
     	  	    <#if article_index == 0>
     	  	        <div class="featured-news">
-                        <h2><a href="<@makeurl asset=article/>">${article.title!'no title'}</a></h2>
+                        <h2><a href="<@makeurl asset=article/>">${article.title!article.name}</a></h2>
                         <span class="newslist-date">From <a href="<@makeurl section=article.containingSection/>">${article.containingSection.title}</a><#if article.properties['ws:publishedTime']??> - ${article.properties['ws:publishedTime']?string(msg('date.format'))}</#if></span>
                         <div class="featured-news-body">
                             <#if article.relatedAssets['ws:primaryImage']??>             
                                 <#assign image=article.relatedAssets['ws:primaryImage'][0]>             
                                 <a title="Link to news article" href="<@makeurl asset=article/>">
-                                    <img src="<@makeurl asset=image rendition='mediumNewsThumbnail'/>" alt="${image.title!article.title}" class="left-img" />
+                                    <img src="<@makeurl asset=image rendition='mediumNewsThumbnail'/>" alt="${image.title!article.title!article.name}" class="left-img" />
                                 </a>
                             </#if>
-                            <p>${article.description!'no preview'}</p>
+                            <p>${article.description!''}</p>
                         </div>
                     </div>		  	    
                     <ul class="services-wrapper">
@@ -28,7 +28,7 @@
     		        <li class="${liClass}">    		            
                         <div class="service-txt">
                             <span class="newslist-date">From <a href="<@makeurl section=article.containingSection/>">${article.containingSection.title}</a><#if article.properties['ws:publishedTime']??> - ${article.properties['ws:publishedTime']?string(msg('date.format'))}</#if></span>
-        		            <h3><a href="<@makeurl asset=article/>">${article.title!'no title'}</a></h3>
+        		            <h3><a href="<@makeurl asset=article/>">${article.title!article.name}</a></h3>
         		            <p>${article.description!'no preview'}</p>        		            
         		        </div>
     		        </li>

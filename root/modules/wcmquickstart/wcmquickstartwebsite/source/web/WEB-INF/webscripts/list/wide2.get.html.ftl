@@ -16,11 +16,11 @@
     		        <li>
                         <#if article.relatedAssets['ws:primaryImage']??>             
                             <#assign image=article.relatedAssets['ws:primaryImage'][0]>             
-                            <a href="<@makeurl asset=article/>"><img src="<@makeurl asset=image rendition='smallThumbnail'/>" alt="${image.title!article.title}" class="news-img" /></a>
+                            <a href="<@makeurl asset=article/>"><img src="<@makeurl asset=image rendition='smallThumbnail'/>" alt="${image.title!article.title!article.name}" class="news-img" /></a>
                         </#if>
-    		            <h4><a href="<@makeurl asset=article/>">${article.title!'no title'}</a></h4>
+    		            <h4><a href="<@makeurl asset=article/>">${article.title!article.name}</a></h4>
     		            <span class="newslist-date"><#if article.properties['ws:publishedTime']??>${article.properties['ws:publishedTime']?string(msg('date.format'))}</#if></span>
-    		            <p>${article.description!'no preview'}</p>
+    		            <p>${article.description!''}</p>
     		        </li>
     		    </#list>
     		</ul>

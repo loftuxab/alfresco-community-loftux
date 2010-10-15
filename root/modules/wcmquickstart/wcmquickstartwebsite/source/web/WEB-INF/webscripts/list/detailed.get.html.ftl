@@ -24,7 +24,7 @@
                                                                                 </#if>
                         </a></span>
                     </div>
-    	            <p>${article.description!'no preview'}</p>
+    	            <p>${article.description!''}</p>
                     <div class="body-rm"><a href="<@makeurl asset=article/>">${msg('read.more')}</a></div>
         		</div>
             </#list>

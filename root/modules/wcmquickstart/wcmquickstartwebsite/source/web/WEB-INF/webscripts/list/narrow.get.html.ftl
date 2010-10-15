@@ -10,7 +10,7 @@
     		<ul class="ln-list">
     		  	<#list articles.assets as article>
     		        <li>
-    		          <h6><a href="<@makeurl asset=article/>">${article.title!'no title'}</a></h6>
+    		          <h6><a href="<@makeurl asset=article/>">${article.title!article.name}</a></h6>
     		          <p><@truncate value=article.description chars=100/></p>
     		          <div class="ln-date"><#if article.properties['ws:publishedTime']??>${article.properties['ws:publishedTime']?string(msg('date.format'))}</#if></div>
     		        </li>
