@@ -100,6 +100,27 @@
             parent.widgets.searchButton = Alfresco.util.createYUIButton(parent, "search-button", parent.onSearchClick);
             parent.widgets.newuserButton = Alfresco.util.createYUIButton(parent, "newuser-button", parent.onNewUserClick);
             
+            var newuserSuccess = function(res)
+            {
+               if (!res.json.data.creationAllowed)
+               {
+                  parent.widgets.newuserButton.set("disabled", true);
+               }
+            };
+            
+            // make an ajax call to get authentication mutability - "creationAllowed" will be returned as true
+            // in the response if the administrator is able to create new users on the alfresco server 
+            Alfresco.util.Ajax.jsonGet(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/authentication",
+               successCallback:
+               {
+                  fn: newuserSuccess,
+                  scope: this
+               },
+               failureMessage: parent._msg("message.authenticationdetails-failure", $html(parent.group))
+            });
+            
             // DataTable and DataSource setup
             parent.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/people",
             {
