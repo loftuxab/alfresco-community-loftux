@@ -159,7 +159,15 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          */
         logger.debug("test remove entire list rmc:smList");
         caveatConfigService.deleteRMConstraint(RM_LIST);
-        caveatConfigService.deleteRMConstraint(RM_LIST);
+        try 
+        {
+            caveatConfigService.deleteRMConstraint(RM_LIST);
+            fail("unknown constraint should have thrown an exception");
+        }
+        catch (Exception e)
+        {
+            // expect to go here
+        }
         
         
         /**
@@ -281,7 +289,6 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          * Add a group to the list
          */
         caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "Engineering", values);
-        caveatConfigService.deleteRMConstraint(RM_LIST);
         
         /**
          * Add to a list that does not exist
@@ -428,7 +435,15 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          */
         logger.debug("test remove entire list rmc:smList");
         caveatConfigService.deleteRMConstraint(RM_LIST);
-        caveatConfigService.deleteRMConstraint(RM_LIST);
+        try 
+        {
+            caveatConfigService.deleteRMConstraint(RM_LIST);
+            fail("unknown constraint should have thrown an exception");
+        }
+        catch (Exception e)
+        {
+            // expect to go here
+        }
         
         
         /**
