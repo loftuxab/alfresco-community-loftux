@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.alfresco.module.org_alfresco_module_wcmquickstart.model.VisitorFeedbackType;
+import org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebSiteModel;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.contextparser.ContextParserService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.workflow.StartWorkflowActionExecuter;
@@ -31,6 +32,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PersonService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 /**
  * Comment feedback processor handler.
@@ -81,7 +83,6 @@ public class ContactFeedbackProcessorHandler extends FeedbackProcessorHandlerBas
     /**
      * @see org.alfresco.module.org_alfresco_module_wcmquickstart.jobs.feedback.FeedbackProcessorHandler#processFeedback(org.alfresco.service.cmr.repository.NodeRef)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void processFeedback(NodeRef feedback)
     {
@@ -94,16 +95,32 @@ public class ContactFeedbackProcessorHandler extends FeedbackProcessorHandlerBas
         String workflowUser = null;
         if (feedbackConfig != null)
         {
-            feedbackConfig.get(VisitorFeedbackType.CONTACT_REQUEST_TYPE);
+            workflowUser = feedbackConfig.get(VisitorFeedbackType.CONTACT_REQUEST_TYPE);
         }
         if (workflowUser == null)
         {
             workflowUser = AuthenticationUtil.getAdminUserName();
         }
+        String visitorName = (String)nodeService.getProperty(feedback, WebSiteModel.PROP_VISITOR_NAME);
+        String visitorEmail = (String)nodeService.getProperty(feedback, WebSiteModel.PROP_VISITOR_EMAIL);
+        
+        if (visitorName == null)
+        {
+            if (visitorEmail == null)
+            {
+                visitorName = I18NUtil.getMessage("wcmqs.contactRequest.unknownPerson");
+            }
+            else
+            {
+                int indexOfAt = visitorEmail.indexOf('@');
+                visitorName = indexOfAt == -1 ? visitorEmail : visitorEmail.substring(0, indexOfAt);
+            }
+        }
         
         // Get the assignee
         NodeRef workflowPerson = personService.getPerson(workflowUser);
         action.setParameterValue("bpm:assignee", workflowPerson);
+        action.setParameterValue("bpm:workflowDescription", I18NUtil.getMessage("wcmqs.contactRequest.workflowDescription", visitorName));
         
         if (log.isDebugEnabled() == true)
         {
