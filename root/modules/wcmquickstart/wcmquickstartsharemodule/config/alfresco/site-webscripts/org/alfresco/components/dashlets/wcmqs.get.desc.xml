@@ -1,6 +1,6 @@
 <webscript>
-   <shortname>WCM Quick Start</shortname>
-   <description>WCM Quick Start Site dashlet.</description>
+   <shortname>Web Quick Start</shortname>
+   <description>Web Quick Start Site dashlet.</description>
    <family>site-dashlet</family>
    <url>/components/dashlets/wcmqs</url>
 </webscript>

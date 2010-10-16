@@ -16,6 +16,7 @@
        <property name="nodeService" ref="NodeService"/>
        <property name="searchService" ref="SearchService"/>
        <property name="assetSerializerFactory" ref="wqsmodule_assetSerializerFactory" />
+       <property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper" />
     </bean>
     
     <bean id="webscript.org.alfresco.module.wcmquickstart.assetsearch.get" 
@@ -25,6 +26,7 @@
        <property name="searchService" ref="SearchService"/>
        <property name="assetSerializerFactory" ref="wqsmodule_assetSerializerFactory" />
        <property name="sectionHierarchyProcessor" ref="wqsmodule_sectionHierarchyProcessor" />
+       <property name="siteHelper" ref="org_alfresco_module_wcmquickstart_siteHelper" />
     </bean>
     
     <bean id="wqsmodule_assetSerializerFactory" 

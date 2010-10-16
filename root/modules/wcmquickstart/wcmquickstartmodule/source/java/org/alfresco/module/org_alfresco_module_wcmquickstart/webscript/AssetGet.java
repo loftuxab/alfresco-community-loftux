@@ -23,15 +23,18 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.AssetSerializer;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.AssetSerializerFactory;
+import org.alfresco.module.org_alfresco_module_wcmquickstart.util.SiteHelper;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.springframework.extensions.webscripts.AbstractWebScript;
@@ -46,12 +49,14 @@ public class AssetGet extends AbstractWebScript
 {
     private static final String PARAM_NODEREF = "noderef";
     private static final String PARAM_MODIFIED_TIME_ONLY = "modifiedTimeOnly";
+    private static final String PARAM_SITE_ID = "siteid";
     private static final String PARAM_SECTION_ID = "sectionid";
     private static final String PARAM_NODE_NAME = "nodename";
 
     private NodeService nodeService;
     private SearchService searchService;
     private AssetSerializerFactory assetSerializerFactory;
+    private SiteHelper siteHelper;
 
     public void setAssetSerializerFactory(AssetSerializerFactory assetSerializerFactory)
     {
@@ -66,6 +71,11 @@ public class AssetGet extends AbstractWebScript
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
+    }
+
+    public void setSiteHelper(SiteHelper siteHelper)
+    {
+        this.siteHelper = siteHelper;
     }
 
     @Override
@@ -84,9 +94,29 @@ public class AssetGet extends AbstractWebScript
                     throw new WebScriptException(
                             "Either noderef or sectionid and nodename are required parameters");
                 }
+                
+                NodeRef siteId = null;
+                String siteIdText = req.getParameter(PARAM_SITE_ID);
+                if (siteIdText == null)
+                {
+                    siteId = siteHelper.getRelevantWebSite(new NodeRef(sectionIdText));
+                }
+                else
+                {
+                    siteId = new NodeRef(siteIdText);
+                }
+
                 String query = "+@ws\\:parentSections:\"" + sectionIdText + "\" +@cm\\:name:\"" + nodeName + "\"";
-                ResultSet rs = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, 
-                        SearchService.LANGUAGE_LUCENE, query);
+                SearchParameters searchParameters = new SearchParameters();
+                searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+                searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+                searchParameters.setQuery(query);
+                List<Locale> locales = siteHelper.getWebSiteLocales(siteId);
+                for (Locale locale : locales)
+                {
+                    searchParameters.addLocale(locale);
+                }
+                ResultSet rs = searchService.query(searchParameters);
                 if (rs.length() > 0)
                 {
                     foundNodes.add(rs.getNodeRef(0));

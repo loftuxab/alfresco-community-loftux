@@ -116,6 +116,11 @@
                     <type>d:text</type>
                     <multiple>true</multiple>
                 </property>
+                <property name="ws:siteLocales">
+                    <title>Site Locales</title>
+                    <type>d:locale</type>
+                    <multiple>true</multiple>
+                </property>
             </properties>
             <associations>
                 <association name="ws:publishTarget">

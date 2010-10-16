@@ -30,11 +30,14 @@ import java.util.TreeMap;
 import org.alfresco.wcm.client.Asset;
 import org.alfresco.wcm.client.AssetFactory;
 import org.alfresco.wcm.client.CollectionFactory;
+import org.alfresco.wcm.client.DictionaryService;
 import org.alfresco.wcm.client.Query;
 import org.alfresco.wcm.client.Rendition;
 import org.alfresco.wcm.client.SearchResult;
 import org.alfresco.wcm.client.SearchResults;
 import org.alfresco.wcm.client.SectionFactory;
+import org.alfresco.wcm.client.WebSite;
+import org.alfresco.wcm.client.WebSiteService;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 
 public class AssetFactoryWebscriptImpl implements AssetFactory
@@ -43,6 +46,24 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     private SectionFactory sectionFactory;
     private CollectionFactory collectionFactory;
     private AssetFactory supportingAssetFactory;
+    
+    private ThreadLocal<List<WebscriptParam>> localParamList = new ThreadLocal<List<WebscriptParam>>() 
+    {
+        @Override
+        protected List<WebscriptParam> initialValue()
+        {
+            return new ArrayList<WebscriptParam>();
+        }
+
+        @Override
+        public List<WebscriptParam> get()
+        {
+            List<WebscriptParam> list = super.get();
+            list.clear();
+            return list;
+        }
+        
+    };
 
     public void setWebscriptCaller(WebScriptCaller webscriptCaller)
     {
@@ -76,8 +97,13 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
             //Return no results unless either phrase or tag has been specified
             if ((phrase != null && phrase.length() > 0) || (tag != null && tag.length() > 0))
             {
-                List<WebscriptParam> params = new ArrayList<WebscriptParam>();
+                List<WebscriptParam> params = localParamList.get();
                 params.add(new WebscriptParam("sectionid", query.getSectionId()));
+                WebSite currentSite = WebSiteService.getThreadWebSite(); 
+                if (currentSite != null)
+                {
+                    params.add(new WebscriptParam("siteid", currentSite.getId()));
+                }
                 if (query.getTag() != null)
                 {
                     params.add(new WebscriptParam("tag", query.getTag()));
@@ -114,8 +140,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     public Asset getAssetById(String id, boolean deferredLoad)
     {
         Asset asset = null;
-        WebscriptParam[] params = new WebscriptParam[] { new WebscriptParam("noderef", id) };
-        LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(params);
+        LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(new WebscriptParam("noderef", id));
         if (!assetList.isEmpty())
         {
             asset = buildAsset(assetList.get(0));
@@ -133,7 +158,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     public List<Asset> getAssetsById(Collection<String> ids, boolean deferredLoad)
     {
         List<Asset> results = new ArrayList<Asset>(ids.size());
-        List<WebscriptParam> params = new ArrayList<WebscriptParam>(ids.size());
+        List<WebscriptParam> params = localParamList.get();
         for (String id : ids)
         {
             params.add(new WebscriptParam("noderef", id));
@@ -150,9 +175,10 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     public Date getModifiedTimeOfAsset(String assetId)
     {
         Date result = null;
-        WebscriptParam[] params = new WebscriptParam[] { new WebscriptParam("noderef", assetId),
-                new WebscriptParam("modifiedTimeOnly", "true") };
-        LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(params);
+        List<WebscriptParam> paramList = localParamList.get();
+        paramList.add(new WebscriptParam("noderef", assetId));
+        paramList.add(new WebscriptParam("modifiedTimeOnly", "true"));
+        LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(paramList);
         if (!assetList.isEmpty())
         {
             TreeMap<String, Serializable> assetData = assetList.get(0);
@@ -165,7 +191,7 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     public Map<String, Date> getModifiedTimesOfAssets(Collection<String> assetIds)
     {
         Map<String, Date> result = new TreeMap<String, Date>();
-        List<WebscriptParam> params = new ArrayList<WebscriptParam>(assetIds.size());
+        List<WebscriptParam> params = localParamList.get();
         for (String id : assetIds)
         {
             params.add(new WebscriptParam("noderef", id));
@@ -195,9 +221,15 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     public Asset getSectionAsset(String sectionId, String assetName, boolean wildcardsAllowedInName)
     {
         Asset asset = null;
-        WebscriptParam[] params = new WebscriptParam[] { new WebscriptParam("sectionid", sectionId),
-                new WebscriptParam("nodename", assetName) };
-        LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(params);
+        List<WebscriptParam> paramList = localParamList.get();
+        WebSite currentSite = WebSiteService.getThreadWebSite(); 
+        if (currentSite != null)
+        {
+            paramList.add(new WebscriptParam("siteid", currentSite.getId()));
+        }
+        paramList.add(new WebscriptParam("sectionid", sectionId));
+        paramList.add(new WebscriptParam("nodename", assetName));
+        LinkedList<TreeMap<String, Serializable>> assetList = getAssetsFromRepo(paramList);
         if (!assetList.isEmpty())
         {
             asset = buildAsset(assetList.get(0));
@@ -275,7 +307,19 @@ public class AssetFactoryWebscriptImpl implements AssetFactory
     private void mimicCmisProperties(TreeMap<String, Serializable> props)
     {
         props.put(PropertyIds.OBJECT_ID, props.get("id"));
-        props.put(PropertyIds.OBJECT_TYPE_ID, props.get("type"));
+        
+        //Translate the root types to their CMIS equivalent...
+        String typeName = (String)props.get("type");
+        if ("cm:content".equals(typeName))
+        {
+            typeName = DictionaryService.TYPE_CMIS_DOCUMENT;
+        }
+        else if ("cm:folder".equals(typeName))
+        {
+            typeName = DictionaryService.TYPE_CMIS_FOLDER;
+        }
+        props.put(PropertyIds.OBJECT_TYPE_ID, typeName);
+
         props.put(PropertyIds.NAME, props.get("cm:name"));
         props.put(PropertyIds.LAST_MODIFICATION_DATE, props.get("cm:modified"));
         ContentInfo contentInfo = (ContentInfo) props.get("cm:content");
