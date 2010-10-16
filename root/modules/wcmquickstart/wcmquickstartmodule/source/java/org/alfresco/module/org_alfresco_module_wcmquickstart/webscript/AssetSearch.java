@@ -21,19 +21,21 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import org.alfresco.module.org_alfresco_module_wcmquickstart.model.SectionHierarchyProcessor;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.model.WebSiteModel;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.AssetSerializer;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.AssetSerializerFactory;
+import org.alfresco.module.org_alfresco_module_wcmquickstart.util.SiteHelper;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -44,32 +46,13 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 /**
- * Asset GET implementation
+ * AssetSearch GET implementation
  */
 public class AssetSearch extends AbstractWebScript
 {
     private static Log log = LogFactory.getLog(AssetSearch.class);
     
-    private static Set<Character> CHARS_TO_ESCAPE = new HashSet<Character>(89);
-    static {
-        CHARS_TO_ESCAPE.add('!');
-        CHARS_TO_ESCAPE.add('*');
-        CHARS_TO_ESCAPE.add('?');
-        CHARS_TO_ESCAPE.add('(');
-        CHARS_TO_ESCAPE.add(')');
-        CHARS_TO_ESCAPE.add('[');
-        CHARS_TO_ESCAPE.add(']');
-        CHARS_TO_ESCAPE.add('^');
-        CHARS_TO_ESCAPE.add('"');
-        CHARS_TO_ESCAPE.add('~');
-        CHARS_TO_ESCAPE.add(':');
-        CHARS_TO_ESCAPE.add('+');
-        CHARS_TO_ESCAPE.add('-');
-        CHARS_TO_ESCAPE.add('\\');
-        CHARS_TO_ESCAPE.add('{');
-        CHARS_TO_ESCAPE.add('}');
-    }
-
+    private static final String PARAM_SITE_ID = "siteid";
     private static final String PARAM_SECTION_ID = "sectionid";
     private static final String PARAM_PHRASE = "phrase";
     private static final String PARAM_TAG = "tag";
@@ -80,6 +63,7 @@ public class AssetSearch extends AbstractWebScript
     private SearchService searchService;
     private AssetSerializerFactory assetSerializerFactory;
     private SectionHierarchyProcessor sectionHierarchyProcessor;
+    private SiteHelper siteHelper;
 
     public void setAssetSerializerFactory(AssetSerializerFactory assetSerializerFactory)
     {
@@ -99,6 +83,11 @@ public class AssetSearch extends AbstractWebScript
     public void setSectionHierarchyProcessor(SectionHierarchyProcessor sectionHierarchyProcessor)
     {
         this.sectionHierarchyProcessor = sectionHierarchyProcessor;
+    }
+
+    public void setSiteHelper(SiteHelper siteHelper)
+    {
+        this.siteHelper = siteHelper;
     }
 
     @Override
@@ -124,6 +113,17 @@ public class AssetSearch extends AbstractWebScript
                 throw new WebScriptException("\"sectionid\" is a required parameter");
             }
             
+            NodeRef siteId = null;
+            String siteIdText = req.getParameter(PARAM_SITE_ID);
+            if (siteIdText == null)
+            {
+                siteId = siteHelper.getRelevantWebSite(new NodeRef(sectionId));
+            }
+            else
+            {
+                siteId = new NodeRef(siteIdText);
+            }
+
             queryBuilder.append("+@ws\\:ancestorSections:\"");
             queryBuilder.append(sectionId);
             queryBuilder.append("\" ");
@@ -159,8 +159,18 @@ public class AssetSearch extends AbstractWebScript
                 queryBuilder.append("\" ");
             }
             
-            long start = 0L;
             String query = queryBuilder.toString();
+            SearchParameters searchParameters = new SearchParameters();
+            searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+            searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+            searchParameters.setQuery(query);
+            List<Locale> locales = siteHelper.getWebSiteLocales(siteId);
+            for (Locale locale : locales)
+            {
+                searchParameters.addLocale(locale);
+            }
+
+            long start = 0L;
             if (log.isDebugEnabled())
             {
                 log.debug("About to run query: " + query);

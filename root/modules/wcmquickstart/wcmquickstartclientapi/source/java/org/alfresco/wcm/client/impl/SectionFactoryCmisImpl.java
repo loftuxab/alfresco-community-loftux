@@ -177,7 +177,18 @@ public class SectionFactoryCmisImpl implements SectionFactory
             String[] split = configValue.split("=");
             if (split.length == 2)
             {
-                result.put(split[0], split[1]);
+                String name = split[0];
+                String value = split[1];
+                result.put(name, value);
+                //We cater for either "cmis:document" or "cm:content" interchangeably...
+                if ("cmis:document".equals(name))
+                {
+                    result.put("cm:content", value);
+                }
+                else if ("cm:content".equals(name))
+                {
+                    result.put("cmis:document", value);
+                }
             }
             else
             {

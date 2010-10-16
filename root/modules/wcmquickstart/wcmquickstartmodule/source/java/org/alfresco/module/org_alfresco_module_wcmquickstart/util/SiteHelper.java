@@ -1,8 +1,29 @@
+/*
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
+ *
+ * This file is part of the Alfresco Web Quick Start module.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.alfresco.module.org_alfresco_module_wcmquickstart.util;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
@@ -46,6 +67,14 @@ public class SiteHelper implements WebSiteModel
     private DictionaryService dictionaryService;
     private SearchService searchService;
     private NamespaceService namespaceService;
+
+    private Map<NodeRef,List<Locale>> websiteLocales = new HashMap<NodeRef, List<Locale>>();
+    private List<Locale> defaultWebsiteLocales = new ArrayList<Locale>();
+    
+    public void setDefaultWebsiteLocales(List<Locale> defaultWebsiteLocales)
+    {
+        this.defaultWebsiteLocales = defaultWebsiteLocales;
+    }
 
     /**
      * Given a webasset, return the full URL calculated from the containing web
@@ -163,6 +192,40 @@ public class SiteHelper implements WebSiteModel
     public NodeRef getRelevantSection(NodeRef nodeRef, boolean allowSelf)
     {
         return findNearestParent(nodeRef, WebSiteModel.TYPE_SECTION, allowSelf);
+    }
+    
+    public List<Locale> getWebSiteLocales(NodeRef website)
+    {
+        List<Locale> locales = Collections.emptyList();
+        if (website != null && nodeService.exists(website) && 
+                dictionaryService.isSubClass(TYPE_WEB_SITE, nodeService.getType(website)))
+        {
+            locales = websiteLocales.get(website);
+            if (locales == null)
+            {
+                locales = loadWebSiteLocales(website);
+            }
+        }
+        return locales;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private List<Locale> loadWebSiteLocales(NodeRef website)
+    {
+        List<Locale> locales = (List<Locale>) nodeService.getProperty(website, PROP_SITE_LOCALES);
+        if (locales == null)
+        {
+            locales = defaultWebsiteLocales;
+        }
+        //Protect against multiple concurrent writes
+        synchronized(websiteLocales)
+        {
+            Map<NodeRef,List<Locale>> newLocaleMap = new HashMap<NodeRef, List<Locale>>(websiteLocales);
+            newLocaleMap.put(website, locales);
+            //Atomic replacement of old map with new one.
+            websiteLocales = newLocaleMap;
+        }
+        return locales;
     }
 
     /**
