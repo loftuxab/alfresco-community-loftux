@@ -771,4 +771,119 @@ public interface NodeService
             NodeRef destinationParentNodeRef,
             QName assocTypeQName,
             QName assocQName);
+    
+    /**
+     * General node-find parameters.   There may be some combinations of parameters that are not
+     * valid; look at the specific setter methods to get more information.
+     * 
+     * @author Derek Hulley
+     * @since 3.4.0b
+     */
+    public class FindNodeParameters
+    {
+        private Long minNodeId;
+        private Long maxNodeId;
+        private List<QName> nodeTypes;
+        private List<QName> nodeAspects;
+        private boolean sortAscending;
+        private int limit;
+        
+        /**
+         * Defaults:<br/>
+         * <b>minNodeId:</b> null<br/>
+         * <b>maxNodeId:</b> null<br/>
+         * <b>nodeTypes:</b> null<br/>
+         * <b>nodeAspects:</b> null<br/>
+         * <b>sortAscending:</b> true<br/>
+         * <b>limit:</b> 10000<br/>
+         */
+        public FindNodeParameters()
+        {
+            limit = 10000;
+            sortAscending = true;
+        }
+        
+        public Long getMinNodeId()
+        {
+            return minNodeId;
+        }
+        /**
+         * The lowest node ID (inclusive) to return
+         * 
+         * @param minNodeId             the minimum node ID or <tt>null</tt> to ignore
+         */
+        public void setMinNodeId(Long minNodeId)
+        {
+            this.minNodeId = minNodeId;
+        }
+        public Long getMaxNodeId()
+        {
+            return maxNodeId;
+        }
+        /**
+         * The largest node ID (exclusive) to return
+         * 
+         * @param maxNodeId             the maximum node ID or <tt>null</tt> to ignore
+         */
+        public void setMaxNodeId(Long maxNodeId)
+        {
+            this.maxNodeId = maxNodeId;
+        }
+        public List<QName> getNodeTypes()
+        {
+            return nodeTypes;
+        }
+        /**
+         * Set the node types to find.  Subtypes will be included automatically.
+         * 
+         * @param nodeTypes             the node types or <tt>null</tt> to ignore
+         */
+        public void setNodeTypes(List<QName> nodeTypes)
+        {
+            this.nodeTypes = nodeTypes;
+        }
+        public List<QName> getNodeAspects()
+        {
+            return nodeAspects;
+        }
+        /**
+         * Set the node aspects to find.  Subtypes will be included automatically.
+         * 
+         * @param nodeAspects           the node aspects or <tt>null</tt> to ignore
+         */
+        public void setNodeAspects(List<QName> nodeAspects)
+        {
+            this.nodeAspects = nodeAspects;
+        }
+        public boolean isSortAscending()
+        {
+            return sortAscending;
+        }
+        /**
+         * Set the node-ID sort order.
+         * 
+         * @param sortAscending         <tt>true</tt> to retrieve the nodes in ascending ID order
+         */
+        public void setSortAscending(boolean sortAscending)
+        {
+            this.sortAscending = sortAscending;
+        }
+        public int getLimit()
+        {
+            return limit;
+        }
+        /**
+         * Set the number of results to return.  If this too large, then results will be trimmed
+         * by wrapping classes or might cause excessive resource usage; limit the results and
+         * requery using the ID-bases limiters.
+         * 
+         * @param limit                 the maximum number of results to return
+         */
+        public void setLimit(int limit)
+        {
+            this.limit = limit;
+        }
+    }
+    
+    public List<NodeRef> findNodes(FindNodeParameters params);
 }
