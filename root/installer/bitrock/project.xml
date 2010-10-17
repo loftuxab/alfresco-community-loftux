@@ -183,7 +183,7 @@
 	    </ruleList>
 	</actionGroup>
 	<showInfo>
-            <text>You have chosen Apache Tomcat as the existing installation. To use new installed applications you must restart Apache Tomcat.</text>
+            <text>You have chosen Tomcat as the existing installation. To use new installed applications you must restart Tomcat.</text>
             <ruleList>
                 <compareText text="${application_server_installation_type}" logic="equals" value="existing" />
 	    </ruleList>
@@ -226,6 +226,9 @@
 	    <abortOnError>0</abortOnError>
 	    <actionList>
 		<deleteFile>
+		    <path>${installdir}/tomcat/bin/setenv.sh</path>
+		</deleteFile>
+		<deleteFile>
 		    <path>${installdir}/tomcat</path>
 		</deleteFile>
 	    </actionList>
@@ -242,6 +245,7 @@
 		<deleteFile>
 		    <path>${installdir}/mysql/data</path>
 		</deleteFile>
+        <deleteFile path="${installdir}/mysql" />
 	    </actionList>
 	    <ruleList>
 		<compareText text="${deleteConfirm}" logic="equals" value="yes" />
@@ -249,4 +253,13 @@
 	    </ruleList>
 	</actionGroup>
     </preUninstallationActionList>
+    <postUninstallationActionList>
+        <deleteFile path="${installdir}/tomcat" />
+        <deleteFile path="${installdir}/mysql" />
+        <deleteFile path="${installdir}" >
+            <ruleList>
+                <fileTest path="${installdir}" condition="is_empty"/>
+            </ruleList>
+        </deleteFile>
+    </postUninstallationActionList>
 </project>

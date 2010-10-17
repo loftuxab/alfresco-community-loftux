@@ -141,7 +141,7 @@ TODO LIST
                     </ruleList>
                 </throwError>
                 <showInfo>
-                    <text>Couldn't check Apache Tomcat Version.
+                    <text>Couldn't check Tomcat Version.
 Tomcat 5.5 is recommended.</text>
                     <ruleEvaluationLogic>and</ruleEvaluationLogic>
                     <ruleList>
@@ -159,7 +159,7 @@ Tomcat 5.5 is recommended.</text>
                                 <fileContentTest>
                                     <path>${tomcat_server_directory}/webapps/ROOT/RELEASE-NOTES.txt</path>
                                     <logic>does_not_contain</logic>
-                                    <text>Apache Tomcat Version 5.5</text>
+                                    <text>Tomcat Version 5.5</text>
                                 </fileContentTest>
                             </ruleList>
                         </ruleGroup>
@@ -416,11 +416,20 @@ Tomcat 5.5 is recommended.</text>
             </distributionFileList>
             <actionList>
                 <substitute>
-                    <files>*/scripts/ctl.sh;*/scripts/servicerun.bat;*/scripts/serviceinstall.bat</files>
+                    <files>*/scripts/ctl.sh</files>
                     <substitutionList>
                         <substitution>
                             <pattern>@@BITROCK_TOMCAT_ROOTDIR@@</pattern>
                             <value>${application_server_directory}</value>
+                        </substitution>
+                    </substitutionList>
+                </substitute>
+                <substitute>
+                    <files>*/scripts/servicerun.bat;*/scripts/serviceinstall.bat</files>
+                    <substitutionList>
+                        <substitution>
+                            <pattern>@@BITROCK_TOMCAT_ROOTDIR@@</pattern>
+                            <value>${application_server_directory.dos}</value>
                         </substitution>
                     </substitutionList>
                 </substitute>

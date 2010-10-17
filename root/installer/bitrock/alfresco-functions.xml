@@ -66,6 +66,10 @@
                                 <platformTest type="osx"/>
                             </ruleList>
                         </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_OO_PORT@@</pattern>
+                            <value>${openoffice_port}</value>
+                        </substitution>
 			<substitution>
                             <pattern>{img.root}/bin/convert</pattern>
                             <value>{img.root}/convert</value>

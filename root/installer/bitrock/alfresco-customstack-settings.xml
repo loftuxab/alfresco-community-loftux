@@ -9,14 +9,26 @@
         <setInstallerVariable name="component(mysql).show" value="1" />
         <setInstallerVariable name="component(mysql).selected" value="1" />
         <setInstallerVariable name="component(mysql).canBeEdited" value="0" />
+	<setInstallerVariable name="component(mysql).parameter(mysql_credentials).parameter(mysql_root_password).description" value="MySQL Server root Password" />
 	<setInstallerVariable name="component(mysql).parameter(mysql_credentials).parameter(mysql_root_password).explanation" value="Please enter your database password" />
+	<setInstallerVariable name="component(mysql).parameter(mysql_credentials).parameter(mysql_root_password).descriptionRetype" value="Verify password" />
+	<setInstallerVariable name="component(mysql).parameter(mysql_data).parameter(mysql_database_password).descriptionRetype" value="Verify password" />
+        <setInstallerVariable name="component(mysql).parameter(mysql_information).parameter(mysql_port).description" value="MySQL Server Port" />
         <setInstallerVariable name="component(java).show" value="1" />
         <setInstallerVariable name="component(java).selected" value="1" />
         <setInstallerVariable name="component(java).canBeEdited" value="0" />
 	<setInstallerVariable name="component(java).detailedDescription" value="Java Component required to run the Alfresco server." />
+        <setInstallerVariable name="component(java).parameter(java_home_directory).description" value="JDK Installation Directory:" />
+        <setInstallerVariable name="component(openofficecomponent).parameter(openoffice_directory).description" value="OpenOffice Installation Directory" />
+        <!--setInstallerVariable name="component(openofficecomponent).parameter(openoffice_xvfb_directory).description" value="Xvfb Installation Directory" /-->
+        <setInstallerVariable name="component(swftools).parameter(swftools_root_directory).description" value="SWFTOOLS Installation Directory" />
+        <setInstallerVariable name="component(tomcat).parameter(tomcat_server_directory).description" value="Tomcat Directory:" />
+        <setInstallerVariable name="component(tomcat).parameter(tomcat_ports).parameter(tomcat_server_domain).description" value="Web Server Domain:" />
+        
     </preBuildActionList>
     <initializationActionList>
 	<setInstallerVariable name="component(openofficecomponent).parameter(openofficeservice_notstart).value" value="1" />
+	<setInstallerVariable name="component(openofficecomponent).parameter(openoffice_installed_as_service).value" value="0" />
 	<setInstallerVariable name="component(tomcatservice).parameter(tomcatservice_notstart).value" value="1" />
 
         <setInstallerVariable name="component(mysql).parameter(mysql_data).parameter(mysql_database_username).value" value="alfresco"/>

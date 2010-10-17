@@ -80,11 +80,11 @@
             </distributionFileList>
         </folder>
     </folderList>
-    <postUninstallationActionList>
+    <preUninstallationActionList>
         <deleteFile path="${installdir}/virtual-tomcat/logs" />
         <deleteFile path="${installdir}/virtual-tomcat/work" />
         <deleteFile path="${installdir}/virtual-tomcat" />
         <deleteFile path="${installdir}/wcm" />
         <deleteFile path="${installdir}/www" />
-    </postUninstallationActionList>
+    </preUninstallationActionList>
 </component>

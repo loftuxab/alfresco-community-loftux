@@ -15,6 +15,7 @@
             <name>openoffice_directory</name>
             <cliOptionName>openoffice_directory</cliOptionName>
         </directoryParameter>
+        <!--
         <directoryParameter>
             <ask>0</ask>
             <default/>
@@ -23,6 +24,7 @@
             <value>${installdir}/Xvfb</value>
             <cliOptionName>openoffice_xvfb_directory</cliOptionName>
         </directoryParameter>
+        -->
         <stringParameter>
             <name>openoffice_port</name>
             <title>OpenOffice Server Port</title>
@@ -61,12 +63,14 @@
 	    <value>0</value>
 	    <cliOptionShow>0</cliOptionShow>
 	</booleanParameter>
+    <booleanParameter name="openoffice_installed_as_service" ask="0" default="1" />
     </parameterList>
     <readyToInstallActionList>
         <setInstallerVariable name="openoffice_execute_abort_action_list" value="1"/>
         <setInstallerVariable name="openoffice_directory" value="${installdir}/openoffice"/>
     </readyToInstallActionList>
     <folderList>
+        <!--
         <folder>
             <description>Xvfb</description>
             <destination>${installdir}</destination>
@@ -80,6 +84,7 @@
                 <compareText logic="does_not_equal" text="${platform_name}" value="windows"/>
             </ruleList>
         </folder>
+        -->
         <folder>
             <description>OpenOffice</description>
             <destination>${installdir}</destination>
@@ -144,10 +149,12 @@
                             <pattern>@@BITROCK_OO_PORT@@</pattern>
                             <value>${openoffice_port}</value>
                         </substitution>
+                        <!--
                         <substitution>
                             <pattern>@@BITROCK_XVFB_ROOTDIR@@</pattern>
                             <value>${openoffice_xvfb_directory}</value>
                         </substitution>
+                        -->
                     </substitutionList>
                 </substitute>
                 <changePermissions>
@@ -162,6 +169,15 @@
 			<isFalse value="${openofficeservice_notstart}" />			
 		    </ruleList>
                 </runProgram>
+                <actionGroup>
+                    <actionList>
+                        <renameFile origin="${openoffice_directory}/scripts/ctl.sh" destination="${openoffice_directory}/scripts/openoffice_ctl.sh"/>
+                        <addFilesToUninstaller files="${openoffice_directory}/scripts/openoffice_ctl.sh" />
+                    </actionList>
+                    <ruleList>
+                         <isFalse value="${openoffice_installed_as_service}" />
+                    </ruleList>
+                </actionGroup>
             </actionList>
             <ruleList>
                 <compareText logic="does_not_equal" text="${platform_name}" value="windows"/>
@@ -212,6 +228,7 @@
 		    </actionList>
 		    <ruleList>
 			<isFalse value="${openofficeservice_notstart}" />
+            <isTrue value="${openoffice_installed_as_service}" />
 		    </ruleList>
 		</actionGroup>
 		<actionGroup>
@@ -224,6 +241,7 @@
 		    </actionList>
 		    <ruleList>
 			<isTrue value="${openofficeservice_notstart}" />
+            <isTrue value="${openoffice_installed_as_service}" />
 		    </ruleList>
 		</actionGroup>
 		<runProgram>
@@ -234,6 +252,17 @@
 			<compareText text="${openofficeservice_startup}" logic="does_not_equal" value="auto" />
 		    </ruleList>
 		</runProgram>
+        <actionGroup>
+            <actionList>
+               <renameFile origin="${openoffice_directory}/scripts/servicerun.bat" destination="${openoffice_directory}/scripts/openoffice_servicerun.bat"/>
+               <addFilesToUninstaller files="${openoffice_directory}/scripts/openoffice_servicerun.bat" />
+               <renameFile origin="${openoffice_directory}/scripts/serviceinstall.bat" destination="${openoffice_directory}/scripts/openoffice_serviceinstall.bat"/>
+               <addFilesToUninstaller files="${openoffice_directory}/scripts/openoffice_serviceinstall.bat" />
+            </actionList>
+            <ruleList>
+                <isFalse value="${openoffice_installed_as_service}" />
+            </ruleList>
+           </actionGroup>
 	    </actionList>
             <ruleList>
                 <compareText logic="equals" text="${platform_name}" value="windows"/>
