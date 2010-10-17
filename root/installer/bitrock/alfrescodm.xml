@@ -176,6 +176,10 @@
                                     <pattern>@@BITROCK_MYSQL_PORT@@</pattern>
                                     <value>3306</value>
                                 </substitution>
+                                <substitution>
+                                    <pattern>@@BITROCK_OO_PORT@@</pattern>
+                                    <value>${openoffice_port}</value>
+                                </substitution>
                             </substitutionList>
                         </substitute>
                     </actionList>
@@ -191,7 +195,7 @@
         </folder>
         <folder>
             <name>licenses</name>
-            <description>alfrescolicenses</description>
+            <description>Alfresco Licenses</description>
             <destination>${alfresco_base_application_directory}</destination>
             <distributionFileList>
                 <distributionDirectory origin="${alfresco_licenses_directory}" />

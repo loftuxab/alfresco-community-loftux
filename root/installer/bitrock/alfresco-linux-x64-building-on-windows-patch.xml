@@ -3877,11 +3877,6 @@
                            <ruleList>
                               <fileTest path="${installdir}/openoffice/scripts/ctl.sh" condition="exists" />
                            </ruleList>
-                        </changePermissions>
-                        <changePermissions permissions="00755" files="${installdir}/Xvfb/bin/Xvfb" >
-                           <ruleList>
-                              <fileTest path="${installdir}/Xvfb/bin/Xvfb" condition="exists" />
-                           </ruleList>
                         </changePermissions> 
         <changePermissions permissions="0755" files="${installdir}/*.sh" />
         <changePermissions permissions="0755" files="${installdir}/*/*.sh" />

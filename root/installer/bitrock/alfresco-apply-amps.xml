@@ -23,6 +23,14 @@
                 <addFilesToUninstaller files="${alfresco_amps_share_directory}" />
             </actionList>
         </folder>
+        <folder>
+            <description>mmtjar</description>
+            <name>mmtjar</name>
+            <destination>${alfresco_commands_directory}</destination>
+            <distributionFileList>
+              <distributionFile origin="${alfresco_mmt_source_files}/*.jar" allowWildcards="1" />
+            </distributionFileList>
+        </folder>
     </folderList>
     <postInstallationActionList>
         <showProgressDialog progressText="Alfresco Module Packages" >

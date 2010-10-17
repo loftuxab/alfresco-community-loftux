@@ -1,3 +1,3 @@
 #!/bin/sh
 
-. @@BITROCK_INSTALLDIR@@/virtual_alf.sh start
+. @@BITROCK_INSTALLDIR@@/bin/virtual_alf.sh start
