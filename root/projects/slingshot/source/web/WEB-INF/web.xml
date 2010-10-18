@@ -61,6 +61,11 @@
    </filter-mapping>
    
    <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/proxy/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
       <filter-name>UrlRewriteFilter</filter-name>
       <url-pattern>/proxy/*</url-pattern>
    </filter-mapping>

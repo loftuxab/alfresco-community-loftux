@@ -72,15 +72,7 @@
           * @property repositoryUrl
           * @type string
           */
-         repositoryUrl: null,
-
-         /**
-          * External authentication being used for login
-          * 
-          * @property externalAuth
-          * @type boolean
-          */
-         externalAuth: false
+         repositoryUrl: null
       },
 
       /**
@@ -113,7 +105,7 @@
          if (parseInt(docData.size, 10) > 0)
          {
             // Download and View links
-            var contentUrl = (this.options.externalAuth ? Alfresco.constants.PROXY_URI : Alfresco.constants.PROXY_FEED_URI) + docData.contentUrl;
+            var contentUrl = Alfresco.constants.PROXY_URI + docData.contentUrl;
             this.populateLinkUI(
             {
                name: "download",
