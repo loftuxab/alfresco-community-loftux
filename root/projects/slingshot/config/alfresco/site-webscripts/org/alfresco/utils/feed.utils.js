@@ -4,6 +4,7 @@
  * in any RSS feed.
  */
 const DISPLAY_ITEMS = 999;
+
 /**
  * Takes a URL of an RSS feed and returns an rss object
  * with title and an array of items in the feed.
@@ -12,7 +13,7 @@ const DISPLAY_ITEMS = 999;
  */
 function getRSSFeed(uri, limit)
 {
-   var re = /^http:\/\//;
+   var re = /^(http|https):\/\//;
    if (!re.test(uri))
    {
       uri = "http://" + uri;
@@ -51,7 +52,6 @@ function getRSSFeed(uri, limit)
             error: "bad_data"
          };
       }
-
    }
    else
    {
