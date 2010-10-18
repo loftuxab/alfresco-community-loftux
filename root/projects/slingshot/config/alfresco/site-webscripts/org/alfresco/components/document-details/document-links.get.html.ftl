@@ -2,8 +2,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DocumentLinks("${el}").setOptions(
    {
-      <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}",</#if>
-      externalAuth: ${externalAuth?string("true", "false")}
+      <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}"</#if>
    }).setMessages(${messages});
 //]]></script>
 
