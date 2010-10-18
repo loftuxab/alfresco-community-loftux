@@ -24,6 +24,8 @@ package org.alfresco.mbeans;
 
 // server side
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -83,8 +85,16 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
 
         try 
         {
-            // throws exception when there's no password file to be found. 
-            passwordProps.load( new FileInputStream( passwordFile_ ) );
+            // throws exception when there's no password file to be found.
+            InputStream is = new FileInputStream(passwordFile_);
+            try
+            {
+                passwordProps.load(is);
+            }
+            finally
+            {
+                if (is != null) { try { is.close(); } catch (IOException e) {} }
+            }
 
             // Given that we've got a valid password file, it's fair to assume 
             // WCM is enabled.  Therefore, initialize the server connector.
