@@ -3,7 +3,7 @@
 var c = sitedata.getComponent(url.templateArgs.componentId);
 
 var uri = String(json.get("url"));
-var re = /^http:\/\//;
+var re = /^(http|https):\/\//;
 if (!re.test(uri))
 {
    uri = "http://" + uri;
@@ -41,7 +41,7 @@ var limit = String(json.get("limit"));
 if (limit === "all")
 {
    c.properties["limit"] = null; // reset
-   model.limit = 999;
+   model.limit = 100;
 }
 else
 {

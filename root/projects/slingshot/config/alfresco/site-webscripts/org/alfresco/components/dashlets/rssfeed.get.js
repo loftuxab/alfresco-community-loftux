@@ -14,13 +14,13 @@ function main ()
    }
 
    var connector = remote.connect("http");
-   var re = /^http:\/\//;
+   var re = /^(http|https):\/\//;
    if (!re.test(uri))
    {
       uri = "http://" + uri;
    }
    model.uri = uri;
-   model.limit = args.limit || 999;
+   model.limit = args.limit || 100;
    model.target = args.target || "_self";
 
    var feed = getRSSFeed(uri);
@@ -35,7 +35,6 @@ function main ()
       model.title = feed.title;
       model.items = feed.items;
    }
-
 
    var userIsSiteManager = true;
    //Check whether we are within the context of a site
