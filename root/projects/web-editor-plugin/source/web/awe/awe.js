@@ -113,6 +113,11 @@
          return this;
       },
       
+      isLoggedIn: function AWE_isLoggedIn()
+      {
+         return this.get('loggedInStatus');
+      },
+      
       initEditor: function AWE_App_initEditor()
       {
          this.getNodeInfo();
@@ -199,6 +204,11 @@
       
       confirmDeleteNode: function AWE_App_confirmDeleteNode(editable)
       {
+         if(this.isLoggedIn() === false)
+         {
+            return;
+         }
+
          var title = Alfresco.util.message.call(this, 'title.confirm.delete');
          var msg = Alfresco.util.message.call(this, 'message.confirm.delete', '', editable.title.replace("Edit ",""));
 	     var me = this;
@@ -262,7 +272,6 @@
                {
                   this.onNodesLoaded(args);
 
-                  // need to re-render to pick up new menu items
                   this.render();
                   this.showControls();
                },
@@ -327,6 +336,12 @@
          }
       },
 
+      /*
+       * Renders the editor. Note that this needs to deal with being called more than once
+       * e.g. for logouts and logins. Hence, the checks for existence of elements in the
+       * DOM and creation of these elements if they don't exist.
+       *
+       */
       render: function AWE_render()
       {
          // innerHTML causes issues with rendering so use DOM
@@ -366,69 +381,81 @@
          }
 
          var editables = this.get('editables');
-         if(editables != null && editables.length > 0)
+         if(editables == null)
          {
-            // remove existing toolbar buttons, if necessary
-            this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'quickcreate');
-            this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'quickedit');
-            this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers');
-
-            tb.addButtons(
-            [
-               {
-                  type: 'menu',
-                  label: '<img src="' + contextPath + '/res/awe/images/quick-new.png" alt="'+ this.getMessage('awe.toolbar-quick-new-icon-label') +'" />',
-                  title: this.getMessage('awe.toolbar-quick-new-icon-label'),
-                  value: this.config.name + WebEditor.SEPARATOR + 'quickcreate',
-                  id: this.config.name + WebEditor.SEPARATOR + 'quickcreate',
-                  icon: true,
-                  menu: this.renderCreateContentMenu(editables)
-               },
-               {
-                  type: 'menu',
-                  label: '<img src="' + contextPath + '/res/awe/images/quick-edit.png" alt="'+ this.getMessage('awe.toolbar-quick-edit-icon-label') +'" />',
-                  title: this.getMessage('awe.toolbar-quick-edit-icon-label'),
-                  value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
-                  id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
-                  icon: true,
-                  menu: this.renderEditableContentMenu(editables)
-               },
-               {
-                  type: 'push',
-                  label: '<img src="' + contextPath + '/res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('awe.toolbar-toggle-markers-icon-label') +'" />',
-                  title: this.getMessage('awe.toolbar-toggle-markers-icon-label'),
-                  value: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
-                  id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
-                  icon: true
-               }
-            ]);
-            tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
+            editables = [];
          }
 
+         // need to remove existing menus and re-create because there doesn't seem to be a way
+         // of updating existing menus with new menu items
+
+         // remove existing toolbar buttons, if necessary
+         this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'quickcreate');
+         this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'quickedit');
+         this.removeButton(tb, this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers');
+
+         var loggedIn = this.isLoggedIn();
+
+         tb.addButtons(
+         [
+            {
+               type: 'menu',
+               label: '<img src="' + contextPath + '/res/awe/images/quick-new.png" alt="'+ this.getMessage('awe.toolbar-quick-new-icon-label') +'" />',
+               title: this.getMessage('awe.toolbar-quick-new-icon-label'),
+               value: this.config.name + WebEditor.SEPARATOR + 'quickcreate',
+               id: this.config.name + WebEditor.SEPARATOR + 'quickcreate',
+               icon: true,
+               disabled: !loggedIn,
+               menu: this.renderCreateContentMenu(editables)
+            },
+            {
+               type: 'menu',
+               label: '<img src="' + contextPath + '/res/awe/images/quick-edit.png" alt="'+ this.getMessage('awe.toolbar-quick-edit-icon-label') +'" />',
+               title: this.getMessage('awe.toolbar-quick-edit-icon-label'),
+               value: this.config.name + WebEditor.SEPARATOR + 'quickedit',
+               id: this.config.name + WebEditor.SEPARATOR + 'quickedit',
+               icon: true,
+               disabled: !loggedIn,
+               menu: this.renderEditableContentMenu(editables)
+            },
+            {
+               type: 'push',
+               label: '<img src="' + contextPath + '/res/awe/images/toggle-edit-off.png" alt="'+ this.getMessage('awe.toolbar-toggle-markers-icon-label') +'" />',
+               title: this.getMessage('awe.toolbar-toggle-markers-icon-label'),
+               value: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
+               disabled: !loggedIn,
+               id: this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers',
+               icon: true
+            }
+         ]);
+
+         tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit').getMenu().subscribe('mouseover', this.onQuickEditMouseOver, this, true);
+
          // set up toolbar as a managed attribute so it can be exposed to other plugins
-         this.setAttributeConfig('toolbar',
+         if(this.setAttributeConfig('toolbar') == null)
          {
-            value: tb
-         });
+            this.setAttributeConfig('toolbar',
+            {
+               value: tb
+            });
+         }
 
          tb = WebEditor.module.Ribbon.getToolbar(WebEditor.ui.Ribbon.SECONDARY_TOOLBAR);
-         // assume this exists, it is created by WEF
+         // assume tb exists, it is created by WEF
          if(tb.getButtonById(this.config.name + WebEditor.SEPARATOR + 'loginToggle') == null)
          {
             tb.addButtons(
             [ 
                {
                   type: 'push',
-                  label: this.getMessage('awe.toolbar-logout-label'),
-                  title: this.getMessage('awe.toolbar-logout-label'),
+                  label: loggedIn ? this.getMessage('awe.toolbar-logout-label') : this.getMessage('awe.toolbar-login-label'),
+                  title: loggedIn ? this.getMessage('awe.toolbar-logout-label') : this.getMessage('awe.toolbar-login-label'),
                   value: 'loginToggle',
                   id: this.config.name + WebEditor.SEPARATOR + 'loginToggle',
                   icon: true
                }
             ]);
          }
-
-         this.refresh(['loggedInStatus']);
       },
 
       renderCreateContentMenu: function AWE_renderCreateContentMenu(editables)
@@ -510,7 +537,6 @@
                destroyPanelOnHide: false
             });
          }
-         //this.widgets.loginModule.hideEvent.subscribe(hideControls);
          this.widgets.loginModule.show(o);
       },
 
@@ -527,6 +553,11 @@
        */
       loadEditForm : function AWE_loadEditForm(o)
       {
+         if(this.isLoggedIn() === false)
+         {
+            return;
+         }
+         
          // formId is optional so use appropriate substitute string
          var formUri = null;
          if (o.formId)
@@ -564,6 +595,11 @@
        */
       loadCreateForm : function AWE_loadCreateForm(o)
       {
+         if(this.isLoggedIn() === false)
+         {
+            return;
+         }
+
          // formId is optional so use appropriate substitute string
          var formUri = null;
          if (o.formId)
@@ -588,7 +624,7 @@
             redirectUrl: o.redirectUrl
          }).show();
       },
-      
+
       /**
        * Registers editable content on page. Adds click events to load form.
        *
@@ -753,6 +789,10 @@
          var quickEdit = WebEditor.module.Ribbon.getToolbar(
             'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root').getButtonById(this.config.name + WebEditor.SEPARATOR + 'quickedit');
          quickEdit.set('disabled', !enabled);
+
+         var showHideEditMarkers = WebEditor.module.Ribbon.getToolbar(
+            'WEF-'+WebEditor.ui.Ribbon.PRIMARY_TOOLBAR+'-root').getButtonById(this.config.name + WebEditor.SEPARATOR + 'show-hide-edit-markers');
+         showHideEditMarkers.set('disabled', !enabled);
       },
       
       loginCancelled: function AWE_loginCancelled()
@@ -802,26 +842,17 @@
 
       onQuickCreateClick: function AWE_onQuickCreateClick(e, args)
       {
-         if(this.get('loggedInStatus') === true)
-         {
-            this.loadCreateForm(args[1]);
-         }
+        this.loadCreateForm(args[1]);
       },
       
       onQuickEditClick: function AWE_onQuickEditClick(e, args)
       {
-         if(this.get('loggedInStatus') === true)
-         {
-            this.loadEditForm(args[1]);
-         }
+        this.loadEditForm(args[1]);
       },
 
       onQuickDeleteClick: function AWE_onQuickDeleteClick(e, args)
       {
-         if(this.get('loggedInStatus') === true)
-         {
-            this.confirmDeleteNode(args[1]);
-         }
+        this.confirmDeleteNode(args[1]);
       },
 
       showControls: function AWE_showControls()
@@ -843,7 +874,7 @@
       
       onShowHideClick: function AWE_onShowHideClick(e, args)
       {
-         if(this.get('loggedInStatus') === true)
+         if(this.isLoggedIn() === true)
          {
             var butImg = Dom.get(args[1]+'-button').getElementsByTagName('img')[0];
     
@@ -917,7 +948,7 @@
       
       onLoginToggleClick: function AWE_onLoginToggleClick(e, args)
       {
-         if(this.get('loggedInStatus') === false)
+         if(this.isLoggedIn() === false)
          {
             this.initEditor();
          }

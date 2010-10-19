@@ -52,7 +52,7 @@ public class AlfrescoTagUtil
         
         // Hide initially, in case we need to log in or user does not want to
         // log in
-        out.write("<span class=\"alfresco-content-marker\" style=\"opacity: 0.4\" id=\"");
+        out.write("<span class=\"alfresco-content-marker\" style=\"display: none\" id=\"");
         out.write(editMarkerId);
         out.write("\">");
 
