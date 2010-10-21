@@ -1,7 +1,7 @@
 <component>
     <name>alfrescorm</name>
     <description>Records Management</description>
-    <detailedDescription>Records Management support. This is a separately licensed component and should only be used if licensed.</detailedDescription>
+    <detailedDescription>Records Management support. This is a separately licensed component and should only be installed if licensed.</detailedDescription>
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>1</show>
