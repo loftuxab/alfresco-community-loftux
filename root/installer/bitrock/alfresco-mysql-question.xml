@@ -42,33 +42,33 @@
         </choiceParameter>
 	<parameterGroup>
 	    <name>alfrescomysqlquestion_existing</name>
-	    <title>Database configuration</title>
+	    <title>Database Configuration</title>
 	    <explanation></explanation>
 	    <parameterList>
 		<stringParameter>
 		    <name>jdbc_url</name>
-		    <description>JDBC URL</description>
+		    <description>JDBC URL:</description>
 		    <default>jdbc:mysql://localhost/alfresco</default>
 		</stringParameter>
 		<stringParameter>
 		    <name>jdbc_driver</name>
-		    <description>JDBC Driver</description>
+		    <description>JDBC Driver:</description>
 		    <default>org.gjt.mm.mysql.Driver</default>
 		</stringParameter>
 		<stringParameter>
 		    <name>jdbc_database</name>
-		    <description>Database name</description>
+		    <description>Database name:</description>
 		    <default>alfresco</default>
 		</stringParameter>
 		<stringParameter>
 		    <name>jdbc_username</name>
-		    <description>Username</description>
+		    <description>Username:</description>
 		    <default></default>
 		</stringParameter>
 		<passwordParameter>
 		    <name>jdbc_password</name>
-		    <description>Password</description>
-		    <descriptionRetype>Verify</descriptionRetype>
+		    <description>Password:</description>
+		    <descriptionRetype>Verify:</descriptionRetype>
 		    <default></default>
 		</passwordParameter>
 	    </parameterList>

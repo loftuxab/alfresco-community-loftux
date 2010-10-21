@@ -364,12 +364,12 @@ System variables provided by this component:
                 </stringParameter>
                 <passwordParameter>
                     <name>mysql_root_password</name>
-                    <explanation>Please enter your database root user password</explanation>
-                    <description>MySQL Server Root Password</description>
+                    <explanation>Please enter your database root user password.</explanation>
+                    <description>MySQL Server Root Password:</description>
                     <cliOptionName>mysql_password</cliOptionName>
                     <allowEmptyValue>1</allowEmptyValue>
                     <ask>yes</ask>
-                    <descriptionRetype>Verify password</descriptionRetype>
+                    <descriptionRetype>Verify password:</descriptionRetype>
                     <width>30</width>
                     <validationActionList>
                         <throwError>

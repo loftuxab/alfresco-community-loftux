@@ -304,7 +304,7 @@ Tomcat 5.5 is recommended.</text>
                     <default>8443</default>
                     <value/>
                     <ask>1</ask>
-                    <description>Tomcat SSL Port</description>
+                    <description>Tomcat SSL Port:</description>
                     <!--<ruleList>
                         <portTest condition="cannot_bind" port="${tomcat_server_ssl_port}"/>
                     </ruleList>-->
