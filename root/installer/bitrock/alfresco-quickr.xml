@@ -1,7 +1,7 @@
 <component>
     <name>alfrescoquickr</name>
     <description>Quickr Connector Support</description>
-    <detailedDescription>Allows Quickr and Lotus Notes to communicate with Alfresco.</detailedDescription>
+    <detailedDescription>Quickr and Lotus Notes support for communication with Alfresco.</detailedDescription>
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>1</show>
