@@ -70,7 +70,7 @@
             <name>alfresco_data_directory</name>
             <title>Alfresco data directory</title>
             <description>Select a folder</description>
-            <explanation>Alfresco data directory tend to grow in size. Please, choose where do you want to store it.</explanation>
+            <explanation>The Alfresco data directory tends to grow in size. Please choose where do you want to store it.</explanation>
             <!--default>${alfresco_base_application_directory}/data</default-->
             <value>${installdir}/alf_data</value>
             <mustBeWritable>1</mustBeWritable>
@@ -81,7 +81,7 @@
             <width>32</width>
         </directoryParameter>
 
-        <passwordParameter name="alfresco_admin_password" description="Admin Password" descriptionRetype="Repeat Password" allowEmptyValue="0" >
+        <passwordParameter name="alfresco_admin_password" description="Admin Password:" descriptionRetype="Repeat Password:" allowEmptyValue="0" >
             <explanation>Please give a password to use for the Alfresco administrator account.</explanation>
             <validationActionList>
 	        <throwError>

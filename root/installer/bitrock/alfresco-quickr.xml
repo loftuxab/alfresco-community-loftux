@@ -11,8 +11,8 @@
             <title>Quickr Content Services</title>
             <description>Please give details of the Quickr server to use.</description>
             <parameterList>
-                <stringParameter name="alfresco_quickr_host" description="Quickr Server" default="localhost" allowEmptyValue="0" />
-		<stringParameter name="alfresco_quickr_port" description="Port" default="6060" allowEmptyValue="0" />
+                <stringParameter name="alfresco_quickr_host" description="Quickr Server:" default="localhost" allowEmptyValue="0" />
+		<stringParameter name="alfresco_quickr_port" description="Port:" default="6060" allowEmptyValue="0" />
             </parameterList>
 	    <ruleEvaluationLogic>or</ruleEvaluationLogic>
 	    <ruleList>

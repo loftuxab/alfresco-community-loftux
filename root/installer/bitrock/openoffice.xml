@@ -28,7 +28,7 @@
         <stringParameter>
             <name>openoffice_port</name>
             <title>OpenOffice Server Port</title>
-            <description>OpenOffice Server port</description>
+            <description>OpenOffice Server Port:</description>
             <explanation>Please enter the port that the Openoffice server will listen to by default.</explanation>
             <value>8100</value>
             <default>8100</default>
