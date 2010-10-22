@@ -37,6 +37,9 @@
         <property name="port">
              <value>${vti.server.port}</value>
         </property>
+        <property name="headerBufferSize">
+             <value>8192</value>
+        </property>
     </bean>
 
     <bean id="vtiFilter" class="org.alfresco.module.vti.web.VtiFilter">
