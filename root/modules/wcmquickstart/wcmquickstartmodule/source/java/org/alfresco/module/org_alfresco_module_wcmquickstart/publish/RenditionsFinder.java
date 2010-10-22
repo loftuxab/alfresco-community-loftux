@@ -51,7 +51,7 @@ public class RenditionsFinder extends AbstractNodeFinder
     {
         Set<NodeRef> result = Collections.emptySet();
         if (nodeService.exists(thisNode) && 
-                nodeService.hasAspect(thisNode, RenditionModel.ASPECT_RENDITION))
+                nodeService.hasAspect(thisNode, RenditionModel.ASPECT_RENDITIONED))
         {
             result = new HashSet<NodeRef>();
             

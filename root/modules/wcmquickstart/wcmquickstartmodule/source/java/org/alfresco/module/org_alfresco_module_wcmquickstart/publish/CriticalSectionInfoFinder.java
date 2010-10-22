@@ -55,7 +55,7 @@ public class CriticalSectionInfoFinder extends AbstractNodeFinder
         if (nodeService.exists(thisNode) && 
                 dictionaryService.isSubClass(nodeService.getType(thisNode), WebSiteModel.TYPE_SECTION))
         {
-            result = new HashSet<NodeRef>(23);
+            result = new HashSet<NodeRef>();
             //From a section we want to include its index page and collections folder
             List<ChildAssociationRef> necessaryChildren = nodeService.getChildAssocs(thisNode, relevantNodeTypes);
             for (ChildAssociationRef child : necessaryChildren)
