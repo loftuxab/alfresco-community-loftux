@@ -20,7 +20,6 @@
 package org.alfresco.module.vti.web;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

@@ -257,6 +257,10 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler
                 }
                 catch (Exception e)
                 {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Exception while copying content stream to response ", e);
+                    }
                 }
             }
         }

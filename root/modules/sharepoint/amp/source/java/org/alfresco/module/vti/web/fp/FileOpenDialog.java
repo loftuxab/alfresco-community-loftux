@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.metadata.dialog.DialogMetaInfo;

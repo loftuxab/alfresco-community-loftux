@@ -18,14 +18,12 @@
 */
 package org.alfresco.module.vti.web.fp;
 
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import org.alfresco.model.ContentModel;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+
 import org.alfresco.repo.webdav.WebDAV;
-import org.alfresco.repo.webdav.WebDAVHelper;
-import org.alfresco.repo.webdav.WebDAVProperty;
-import org.alfresco.repo.webdav.WebDAVServerException;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -39,87 +37,31 @@ import org.springframework.extensions.surf.util.URLDecoder;
  */
 public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
 {
-
     private String alfrescoContext;
 
     public PropPatchMethod(String alfrescoContext)
     {
         this.alfrescoContext = alfrescoContext;
     }
-
-    protected void executeImpl() throws WebDAVServerException, Exception
-    {
-
-        m_response.setStatus(WebDAV.WEBDAV_SC_MULTI_STATUS);
-
-        FileInfo pathNodeInfo = null;
-        try
-        {
-            // Check that the path exists
-            pathNodeInfo = getDAVHelper().getNodeForPath(getRootNodeRef(), URLDecoder.decode(m_request.getRequestURI()), alfrescoContext);
-
-        }
-        catch (FileNotFoundException e)
-        {
-            // The path is not valid - send a 404 error back to the client
-            throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
-        }
-        
-        NodeRef workingCopy = getServiceRegistry().getCheckOutCheckInService().getWorkingCopy(pathNodeInfo.getNodeRef());
-        if (workingCopy != null)
-        {
-            String workingCopyOwner = getNodeService().getProperty(workingCopy, ContentModel.PROP_WORKING_COPY_OWNER).toString();
-            if (workingCopyOwner.equals(getAuthenticationService().getCurrentUserName()))
-            {
-                pathNodeInfo = getFileFolderService().getFileInfo(workingCopy);
-            }
-        }
-        checkNode(pathNodeInfo);
-
-        // Set the response content type
-        m_response.setContentType(WebDAV.XML_CONTENT_TYPE);
-
-        // Create multistatus response
-        XMLWriter xml = createXMLWriter();
-
-        xml.startDocument();
-
-        String nsdec = generateNamespaceDeclarations(m_namespaces);
-        xml.startElement(WebDAV.DAV_NS, WebDAV.XML_MULTI_STATUS + nsdec, WebDAV.XML_NS_MULTI_STATUS + nsdec, getDAVHelper().getNullAttributes());
-
-        // Create the path for the current location in the tree
-        StringBuilder baseBuild = new StringBuilder(256);
-        baseBuild.append(getPath());
-        if (baseBuild.length() == 0 || baseBuild.charAt(baseBuild.length() - 1) != WebDAVHelper.PathSeperatorChar)
-        {
-            baseBuild.append(WebDAVHelper.PathSeperatorChar);
-        }
-        String basePath = baseBuild.toString();
-
-        // Output the response for the root node, depth zero
-        generateResponse(xml, pathNodeInfo, basePath);
-
-        // Close the outer XML element
-        xml.endElement(WebDAV.DAV_NS, WebDAV.XML_MULTI_STATUS, WebDAV.XML_NS_MULTI_STATUS);
-
-    }
-
+    
     /**
-     * Generates the required response XML
-     * 
-     * @param xml XMLWriter
-     * @param node NodeRef
-     * @param path String
+     * @see org.alfresco.repo.webdav.WebDAVMethod#getNodeForPath(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String)
      */
-    protected void generateResponse(XMLWriter xml, FileInfo nodeInfo, String path) throws Exception
+    @Override
+    protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path, String servletPath) throws FileNotFoundException
     {
-        boolean isFolder = nodeInfo.isFolder();
-
-        // Output the response block for the current node
-        xml.startElement(WebDAV.DAV_NS, WebDAV.XML_RESPONSE, WebDAV.XML_NS_RESPONSE, getDAVHelper().getNullAttributes());
-
-        // Build the href string for the current node
-        String strHRef = WebDAV.getURLForPath(new HttpServletRequestWrapper(m_request)
+        FileInfo nodeInfo = super.getNodeForPath(rootNodeRef, URLDecoder.decode(path), alfrescoContext);
+        FileInfo workingCopy = getWorkingCopy(nodeInfo.getNodeRef());
+        return workingCopy != null ? workingCopy : nodeInfo;
+    }
+    
+    /**
+     * @see org.alfresco.repo.webdav.WebDAVMethod#getURLForPath(javax.servlet.http.HttpServletRequest, java.lang.String, boolean)
+     */
+    @Override
+    protected String getURLForPath(HttpServletRequest request, String path, boolean isFolder)
+    {
+        return WebDAV.getURLForPath(new HttpServletRequestWrapper(m_request)
         {
             public String getServletPath()
             {
@@ -127,68 +69,15 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
             }
 
         }, path, isFolder);
-
-        xml.startElement(WebDAV.DAV_NS, WebDAV.XML_HREF, WebDAV.XML_NS_HREF, getDAVHelper().getNullAttributes());
-        xml.write(strHRef);
-        xml.endElement(WebDAV.DAV_NS, WebDAV.XML_HREF, WebDAV.XML_NS_HREF);
-
-        boolean failed = false;
-        WebDAVProperty failedProperty = null;
-        for (PropertyAction action : m_propertyActions)
-        {
-            if (action.getProperty().isProtected())
-            {
-                generateError(xml);
-                failed = true;
-                failedProperty = action.getProperty();
-                break;
-            }
-        }
-
-        for (PropertyAction propertyAction : m_propertyActions)
-        {
-            int statusCode;
-            String statusCodeDescription;
-            WebDAVProperty property = propertyAction.getProperty();
-
-            if (!failed)
-            {
-                if (PropertyAction.SET == propertyAction.getAction())
-                {
-                    getNodeService().setProperty(nodeInfo.getNodeRef(), property.createQName(), property.getValue());
-                }
-                else if (PropertyAction.REMOVE == propertyAction.getAction())
-                {
-                    getNodeService().removeProperty(nodeInfo.getNodeRef(), property.createQName());
-                }
-                else
-                {
-                    throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
-                }
-                statusCode = HttpServletResponse.SC_OK;
-                statusCodeDescription = WebDAV.SC_OK_DESC;
-            }
-            else if (failedProperty == property)
-            {
-                statusCode = HttpServletResponse.SC_FORBIDDEN;
-                statusCodeDescription = WebDAV.SC_FORBIDDEN_DESC;
-            }
-            else
-            {
-                statusCode = WebDAV.WEBDAV_SC_FAILED_DEPENDENCY;
-                statusCodeDescription = WebDAV.WEBDAV_SC_FAILED_DEPENDENCY_DESC;
-            }
-
-            generatePropertyResponse(xml, property, statusCode, statusCodeDescription);
-        }
-
-        // Close off the response element
-        xml.endElement(WebDAV.DAV_NS, WebDAV.XML_RESPONSE, WebDAV.XML_NS_RESPONSE);
-    }
-
+    }    
+    
+    /**
+     * @see org.alfresco.repo.webdav.WebDAVMethod#flushXML(org.dom4j.io.XMLWriter)
+     */
     @Override
-    protected void parseRequestHeaders() throws WebDAVServerException
+    protected void flushXML(XMLWriter xml) throws IOException
     {
-        parseIfHeader();
+        // Do nothing, related to specific Office behaviour
     }
+    
 }
