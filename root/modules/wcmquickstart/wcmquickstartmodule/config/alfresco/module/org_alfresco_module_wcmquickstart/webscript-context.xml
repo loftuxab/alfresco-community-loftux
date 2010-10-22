@@ -69,7 +69,6 @@
         <constructor-arg>
             <map>
                 <entry key="financial" value="${wcmqs.importFileLocation.finance}"/>
-                <entry key="media" value="${wcmqs.importFileLocation.media}"/>
                 <entry key="government" value="${wcmqs.importFileLocation.government}"/>
             </map>
         </constructor-arg>
