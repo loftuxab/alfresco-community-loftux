@@ -786,7 +786,9 @@
          <fileset file="${dir.project.slingshot.src.web}/components/data-lists/actions.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
       </concat>
-
+      
+      <touch file="${dir.deploy.tomcat.application.slingshot}/modules/about-share-min.js" />
+      
       <echo>Compressing Slingshot Javascript...</echo>
       <minimize-javascript sourcedir="${dir.deploy.tomcat.application.slingshot}" 
                            destdir="${dir.deploy.tomcat.application.slingshot}" />
