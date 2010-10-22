@@ -319,7 +319,7 @@ public class SectionImpl extends ResourceBaseImpl implements Section
         if (template == null && dictionaryService.isRootType(type) == false)
         {
             // .. get the parent type name
-            String parentType = dictionaryService.getParentType(type);
+            String parentType = dictionaryService.getParentType(type, true);
             if (parentType != null)
             {
                 // .. and see if we can find a template for that
