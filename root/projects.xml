@@ -1675,6 +1675,8 @@
          <fileset file="${dir.project.slingshot.src.web}/components/data-lists/actions.js" />
          <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
       </concat>
+      
+      <touch file="${dir.project.slingshot.assemble}/modules/about-share-min.js" />
 
       <echo>Compressing Slingshot Javascript...</echo>
       <minimize-javascript sourcedir="${dir.project.slingshot.assemble}" 
