@@ -33,9 +33,9 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.repo.webdav.LockInfo;
-import org.alfresco.repo.webdav.PropFindMethod;
 import org.alfresco.repo.webdav.WebDAV;
 import org.alfresco.repo.webdav.WebDAVHelper;
+import org.alfresco.repo.webdav.WebDAVMethod;
 import org.alfresco.repo.webdav.WebDAVServerException;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
@@ -72,7 +72,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author PavelYur
  *
  */
-public class PropfindMethod extends PropFindMethod
+public class PropfindMethod extends WebDAVMethod
 {
 
     /** Logger */

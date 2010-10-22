@@ -19,8 +19,6 @@
 package org.alfresco.module.vti.web.actions;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,9 +44,9 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.FileCopyUtils;
 
 /**
 * <p>VtiIfHeaderAction is used for merging between client document version
@@ -191,17 +189,7 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
 
         resp.setContentType(content.getMimetype());
 
-        InputStream is = contentReader.getContentInputStream();
-        OutputStream os = resp.getOutputStream();
-        try
-        {
-            IOUtils.copy(is, os);
-        }
-        finally
-        {
-            try { is.close(); } catch (Exception e) {}
-            try { os.close(); } catch (Exception e) {}
-        }
+        FileCopyUtils.copy(contentReader.getContentInputStream(), resp.getOutputStream());        
     }
 
     /**

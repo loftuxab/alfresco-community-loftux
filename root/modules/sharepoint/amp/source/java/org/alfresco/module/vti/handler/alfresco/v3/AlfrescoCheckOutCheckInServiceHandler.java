@@ -123,6 +123,10 @@ public class AlfrescoCheckOutCheckInServiceHandler implements CheckOutCheckInSer
                 }
                 catch (Exception e)
                 {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Can't perform 'undo check out' operation for file '" + fileName + "'", e);
+                    }
                     return null;
                 }
 
@@ -168,6 +172,10 @@ public class AlfrescoCheckOutCheckInServiceHandler implements CheckOutCheckInSer
                 }
                 catch (Exception e)
                 {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Can't perform 'check in' operation for file '" + fileName + "'", e);
+                    }
                     return null;
                 }
             }
@@ -196,6 +204,10 @@ public class AlfrescoCheckOutCheckInServiceHandler implements CheckOutCheckInSer
                 }
                 catch (Exception e)
                 {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Can't perform 'check out' operation for file '" + fileName + "'", e);
+                    }
                     return null;
                 }
             }
