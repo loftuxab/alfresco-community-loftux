@@ -24,7 +24,7 @@
                      <control-param name="forceEditor">true
                      </control-param>
                      <control-param name="editorHeight">400</control-param>
-                     <control-param name="editorWidth">800</control-param>
+                     <control-param name="editorWidth">600</control-param>
                      <control-param name="richMimeTypes">text/html,text/xhtml</control-param>
                      <control-param name="editorAppearance">custom</control-param>
                      <control-param name="editorParameters">
@@ -38,7 +38,6 @@
                         paste_convert_middot_lists : false,
                         paste_unindented_list_class : "unindentedList",
                         paste_convert_headers_to_strong : true,
-                        paste_insert_word_content_callback : "convertWord",
                         theme_advanced_buttons1:
                         "bold,italic,separator,formatselect,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bullist,numlist,separator,link,unlink,separator,image,separator,undo,redo,separator,cut,copy,paste,pastetext,pasteword,image,help,code,fullscreen",
                         theme_advanced_buttons2: "",
@@ -77,7 +76,7 @@
                      <control-param name="forceEditor">true
                      </control-param>
                      <control-param name="editorHeight">400</control-param>
-                     <control-param name="editorWidth">800</control-param>
+                     <control-param name="editorWidth">600</control-param>
                      <control-param name="richMimeTypes">text/html,text/xhtml</control-param>
                      <control-param name="editorAppearance">custom</control-param>
                      <control-param name="editorParameters">
@@ -91,7 +90,6 @@
                         paste_convert_middot_lists : false,
                         paste_unindented_list_class : "unindentedList",
                         paste_convert_headers_to_strong : true,
-                        paste_insert_word_content_callback : "convertWord",
                         theme_advanced_buttons1:
                         "bold,italic,separator,formatselect,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bullist,numlist,separator,link,unlink,separator,image,separator,undo,redo,separator,cut,copy,paste,pastetext,pasteword,image,help,code,fullscreen",
                         theme_advanced_buttons2: "",
@@ -129,7 +127,7 @@
                      <control-param name="forceEditor">true
                      </control-param>
                      <control-param name="editorHeight">400</control-param>
-                     <control-param name="editorWidth">800</control-param>
+                     <control-param name="editorWidth">600</control-param>
                      <control-param name="richMimeTypes">text/html,text/xhtml</control-param>
                      <control-param name="editorAppearance">custom</control-param>
                      <control-param name="editorParameters">
@@ -143,7 +141,6 @@
                         paste_convert_middot_lists : false,
                         paste_unindented_list_class : "unindentedList",
                         paste_convert_headers_to_strong : true,
-                        paste_insert_word_content_callback : "convertWord",
                         theme_advanced_buttons1:
                         "bold,italic,separator,formatselect,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bullist,numlist,separator,link,unlink,separator,image,separator,undo,redo,separator,cut,copy,paste,pastetext,pasteword,image,help,code,fullscreen",
                         theme_advanced_buttons2: "",
@@ -182,7 +179,7 @@
                      <control-param name="forceEditor">true
                      </control-param>
                      <control-param name="editorHeight">400</control-param>
-                     <control-param name="editorWidth">800</control-param>
+                     <control-param name="editorWidth">600</control-param>
                      <control-param name="richMimeTypes">text/html,text/xhtml</control-param>
                      <control-param name="editorAppearance">custom</control-param>
                      <control-param name="editorParameters">
@@ -196,7 +193,6 @@
                         paste_convert_middot_lists : false,
                         paste_unindented_list_class : "unindentedList",
                         paste_convert_headers_to_strong : true,
-                        paste_insert_word_content_callback : "convertWord",
                         theme_advanced_buttons1:
                         "bold,italic,separator,formatselect,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bullist,numlist,separator,link,unlink,separator,image,separator,undo,redo,separator,cut,copy,paste,pastetext,pasteword,image,help,code,fullscreen",
                         theme_advanced_buttons2: "",
