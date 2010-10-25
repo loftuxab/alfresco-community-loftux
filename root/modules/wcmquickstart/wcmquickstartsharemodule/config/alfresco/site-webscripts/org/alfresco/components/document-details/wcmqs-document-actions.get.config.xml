@@ -29,6 +29,7 @@
          <action type="simple-link" id="onActionView" href="{viewUrl}" label="actions.document.view" />
          <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
          <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
          <action type="action-link" id="onActionCancelEditing" permission="cancel-checkout" label="actions.document.cancel-editing" />
       </actionSet>
 
@@ -37,6 +38,7 @@
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
          <action type="simple-link" id="onActionView" href="{viewUrl}" label="actions.document.view" />
          <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
+         <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
       </actionSet>
 
       <actionSet id="workingCopyOwner">
@@ -46,6 +48,7 @@
          <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
          <action type="simple-link" id="onActionView" href="{viewUrl}" label="actions.document.view" />
          <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
          <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
       </actionSet>
 
@@ -57,6 +60,7 @@
          <action type="simple-link" id="onActionView" href="{viewGoogleDocUrl}" label="actions.document.view-google-doc" />
          <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
          <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
          <action type="action-link" id="onActionCancelEditing" permission="cancel-checkout" label="actions.document.cancel-editing" />
       </actionSet>
 
@@ -65,6 +69,7 @@
          <action type="action-link" id="onActionCheckinFromGoogleDocs" permission="checkin-from-google" label="actions.document.checkin-google" />
          <action type="simple-link" id="onActionViewWorkingCopy" permission="view-working-copy" href="{workingCopyUrl}" label="actions.document.view-working-copy" />
          <action type="simple-link" id="onActionViewOriginal" permission="view-original" href="{originalUrl}" label="actions.document.view-original" />
+         <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
          <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
       </actionSet>
    </actionSets>
