@@ -25,7 +25,7 @@
       <constructor-arg value="%{wcmqs.api.alfresco.cmis}" />
       <constructor-arg value="%{wcmqs.api.user}" />
       <constructor-arg value="%{wcmqs.api.password}" />
-      <constructor-arg value="2000" /> <!-- Poll for repository every 2s -->
+      <constructor-arg value="%{wcmqs.api.repositoryPollMilliseconds}" /> <!-- Poll for repository -->
    </bean>
 
    <!-- Pool of anonymous CMIS sessions -->
@@ -44,7 +44,7 @@
 
    <!--  Section factory -->
    <bean id="sectionFactory" class="org.alfresco.wcm.client.impl.SectionFactoryCmisImpl">
-      <property name="sectionsRefreshAfter" value="60" />
+      <property name="sectionsRefreshAfter" value="%{wcmqs.api.sectionCacheSeconds}" />
       <property name="assetFactory" ref="assetFactory" />
       <property name="dictionaryService" ref="dictionaryService" />
       <property name="collectionFactory" ref="collectionFactory" />
@@ -98,7 +98,7 @@
 
    <!-- Service for fetching site data. Implements a cache. -->
    <bean id="webSiteService" class="org.alfresco.wcm.client.impl.WebSiteServiceImpl">
-      <property name="webSiteCacheRefreshAfter" value="300" />
+      <property name="webSiteCacheRefreshAfter" value="%{wcmqs.api.websiteCacheSeconds}" />
       <property name="urlUtils" ref="urlUtils" />
       <property name="sectionFactory" ref="sectionFactory" />
       <property name="assetFactory" ref="assetFactory" />
