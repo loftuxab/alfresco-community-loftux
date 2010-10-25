@@ -58,7 +58,6 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -392,7 +391,6 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     @SuppressWarnings("unchecked")
     private void processCommit(NodeRef childNode)
     {
-        @SuppressWarnings("unchecked")
         Set<NodeRef> affectedNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(AFFECTED_WEB_ASSETS);
         Set<NodeRef> affectedSections = new HashSet<NodeRef>();
         if (affectedNodeRefs != null && affectedNodeRefs.remove(childNode))
@@ -423,18 +421,6 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                             {
                                 // Make the content node an article
                                 nodeService.setType(childNode, TYPE_ARTICLE);
-                            }
-                            else if (isOfficeMimetype(reader.getMimetype()) == true)
-                            {
-                                // Get the rendition definition
-                                RenditionDefinition def = renditionService.loadRenditionDefinition(QName.createQName(
-                                        NAMESPACE, "pdfWebasset"));
-                                if (def != null)
-                                {
-                                    // Create rendition
-                                    RenditionDefinition clone = cloneRenditionDefinition(def, childNode);
-                                    childNode = renditionService.render(childNode, clone).getChildRef();
-                                }
                             }
                         }
                     }
@@ -592,17 +578,6 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     private boolean isImageMimetype(String mimetype)
     {
         return mimetype.startsWith("image");
-    }
-
-    /**
-     * Indicates whether this is an office mimetype or not.
-     * 
-     * @param mimetype
-     * @return
-     */
-    private boolean isOfficeMimetype(String mimetype)
-    {
-        return ArrayUtils.contains(OFFICE_MIMETYPES, mimetype);
     }
 
     private class SectionCommitTransactionListener extends TransactionListenerAdapter
