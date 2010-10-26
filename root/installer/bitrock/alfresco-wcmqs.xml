@@ -67,7 +67,7 @@
     </folderList>
     <postInstallationActionList>
         <substitute>
-            <files>${alfresco_shared_directory}/alfresco/*.properties</files>
+            <files>${alfresco_shared_directory}/alfresco/extension/*.properties</files>
             <type>regexp</type>
             <substitutionList>
                 <substitution>
