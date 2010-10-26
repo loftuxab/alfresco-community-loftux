@@ -45,6 +45,11 @@ public abstract class M2Class
     /*package*/ M2Class()
     {
     }
+    
+    public boolean isAspect()
+    {
+        return this instanceof M2Aspect;
+    }
 
     
     public String getName()
