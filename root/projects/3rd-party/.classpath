@@ -27,7 +27,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcr-1.0.jar" sourcepath="src/jcr_src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/freemarker-2.3.13-patched.jar" sourcepath="src/freemarker-2.3.13-patched.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/freemarker-2.3.16-patched.jar" sourcepath="src/freemarker-2.3.16-patched.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.4.jar" sourcepath="src/jid3lib-0.5.4-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar" sourcepath="src/htmlparser-1.6-src.zip"/>
