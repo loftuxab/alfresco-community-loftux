@@ -50,6 +50,7 @@
         <setInstallerVariable name="alfresco_wcmqs_war_source_file" value="${alfresco_svn_rootdir.unix}/build/assemble/wcmqs.war" />
         <setInstallerVariable name="alfresco_awe_war_source_file" value="${alfresco_svn_rootdir.unix}/build/assemble/awe.war" />
         <setInstallerVariable name="alfresco_awe_config_source_file" value="${alfresco_svn_rootdir.unix}/modules/wcmquickstart/wcmquickstartwebsite/config/alfresco" />
+        <setInstallerVariable name="alfresco_wcmqs_config_source_file" value="${alfresco_svn_rootdir.unix}/modules/wcmquickstart/wcmquickstartclientapi/config/alfresco" />
         <!-- END ALFRESCO BUILD SYSTEM-->
         </actionList>
         <ruleList>
