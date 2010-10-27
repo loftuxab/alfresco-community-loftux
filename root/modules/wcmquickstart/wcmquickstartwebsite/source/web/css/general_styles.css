@@ -75,7 +75,7 @@ blockquote {
 	float:right;
 	position:relative;
 	left:18px;
-	z-index:90;
+	z-index:1;
 }
 .jqueryslidemenu ul {
 	list-style-type:none;
