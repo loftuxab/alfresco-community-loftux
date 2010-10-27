@@ -16,8 +16,8 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/org.springframework.webmvc-3.0.0.jar" sourcepath="/3rd Party/src/org.springframework.webmvc-sources-3.0.0.RELEASE.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/j2ee/jsp.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/j2ee/servlet.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.13-patched.jar" sourcepath="/3rd Party/src/freemarker-2.3.13-patched.zip"/>
 	<classpathentry kind="lib" path="lib/rome-1.0RC2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Web Editor"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.16-patched.jar" sourcepath="/3rd Party/src/freemarker-2.3.16-patched.zip"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
