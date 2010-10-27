@@ -34,5 +34,6 @@
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/slf4j-api-1.5.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/slf4j-log4j12-1.5.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/optional/log4j-1.2.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/freemarker-2.3.16-patched.jar" sourcepath="/3rd Party/src/freemarker-2.3.16-patched.zip"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
