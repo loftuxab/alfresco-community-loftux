@@ -141,6 +141,7 @@ blockquote {
     height:281px;
     position:relative;	
 	width:960px;
+	z-index:0;
 }
 #slideshow li {
     height:281px;	
