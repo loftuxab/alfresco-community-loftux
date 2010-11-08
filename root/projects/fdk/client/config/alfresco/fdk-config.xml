@@ -315,6 +315,7 @@
                <show id="fdk:user" />
                <show id="fdk:group" />
                <show id="fdk:usergroup" />
+               <show id="fdk:aspectAssoc" />
                <show id="fdk:contentSingle" />
                <show id="fdk:contentMultiple" />
                <show id="fdk:folderSingle" />

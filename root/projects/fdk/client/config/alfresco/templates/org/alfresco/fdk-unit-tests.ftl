@@ -56,6 +56,7 @@
                               <li><a onclick="FDK.runUnitTest('field-help');">Help Text</a></li>
                               <li><a onclick="FDK.runUnitTest('field-read-only');">Read Only</a></li>
                               <li><a onclick="FDK.runUnitTest('field-mandatory');">Mandatory</a></li>
+                              <li><a onclick="FDK.runUnitTest('field-info');">Info</a></li>
                            </ul>
                         </div>
                      </div>
@@ -106,6 +107,7 @@
                               <li><a onclick="FDK.runUnitTest('textfield-parameters');">textfield.ftl</a></li>
                               <li><a onclick="FDK.runUnitTest('styleClass-parameters');">styleClass</a></li>
                               <li><a onclick="FDK.runUnitTest('style-parameters');">style</a></li>
+                              <li><a onclick="FDK.runUnitTest('startLocation-parameter');">startLocation</a></li>
                            </ul>
                         </div>
                      </div>

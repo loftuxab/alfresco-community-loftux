@@ -14,6 +14,8 @@
       <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
       <!-- Import Alfresco Content Domain Model Definitions -->
       <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+      <!-- Import Alfresco Exif Model Definitions -->
+      <import uri="http://www.alfresco.org/model/exif/1.0" prefix="exif" />
    </imports>
 
    <!-- FDK Namespace -->
@@ -130,7 +132,7 @@
             <association name="fdk:contact">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:person</class>
@@ -141,7 +143,7 @@
             <association name="fdk:reviews">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:content</class>
@@ -152,7 +154,7 @@
             <association name="fdk:company">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>fdk:company</class>
@@ -163,7 +165,7 @@
             <child-association name="fdk:pressRelease">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:content</class>
@@ -174,7 +176,7 @@
             <child-association name="fdk:images">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:content</class>
@@ -334,7 +336,7 @@
             <association name="fdk:duplicate">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:content</class>
@@ -345,7 +347,7 @@
             <association name="fdk:user">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:person</class>
@@ -356,7 +358,7 @@
             <association name="fdk:group">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:authorityContainer</class>
@@ -367,18 +369,29 @@
             <association name="fdk:usergroup">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:authority</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
-            </association> 
+            </association>
+            <association name="fdk:aspectAssoc">
+               <source>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </source>
+               <target>
+                  <class>exif:exif</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </association>
             <child-association name="fdk:contentSingle">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:content</class>
@@ -389,7 +402,7 @@
             <child-association name="fdk:contentMultiple">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:content</class>
@@ -400,7 +413,7 @@
             <child-association name="fdk:folderSingle">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:folder</class>
@@ -411,7 +424,7 @@
             <child-association name="fdk:folderMultiple">
                <source>
                   <mandatory>false</mandatory>
-                  <many>false</many>
+                  <many>true</many>
                </source>
                <target>
                   <class>cm:folder</class>

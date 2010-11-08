@@ -42,6 +42,7 @@
                <show id="fdk:user" />
                <show id="fdk:group" />
                <show id="fdk:usergroup" />
+               <show id="fdk:aspectAssoc" />
                <show id="fdk:contentSingle" />
                <show id="fdk:contentMultiple" />
                <show id="fdk:folderSingle" />
@@ -164,6 +165,29 @@
                <field id="fdk:boolean" mandatory="true" />
                <field id="fdk:period" mandatory="true" />
                <field id="fdk:contentSingle" mandatory="true" />
+            </appearance>
+         </form>
+         
+         <form id="field-info">
+            <field-visibility>
+               <show id="fdk:text" />
+               <show id="fdk:dateTime" />
+               <show id="fdk:int" />
+               <show id="fdk:boolean" />
+            </field-visibility>
+            <appearance>
+               <field id="fdk:text">
+                  <control template="/org/alfresco/components/form/controls/info.ftl" />
+               </field>
+               <field id="fdk:dateTime">
+                  <control template="/org/alfresco/components/form/controls/info.ftl" />
+               </field>
+               <field id="fdk:int">
+                  <control template="/org/alfresco/components/form/controls/info.ftl" />
+               </field>
+               <field id="fdk:boolean">
+                  <control template="/org/alfresco/components/form/controls/info.ftl" />
+               </field>
             </appearance>
          </form>
          
@@ -576,6 +600,43 @@
                <field id="encoding">
                   <control template="/org/alfresco/components/form/controls/encoding.ftl">
                      <control-param name="style">border: 2px solid red; width: 600px</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+         
+         <form id="startLocation-parameter">
+            <field-visibility>
+               <show id="fdk:aspectAssoc" />
+               <show id="fdk:contentSingle" />
+               <show id="fdk:contentMultiple" />
+               <show id="fdk:folderSingle" />
+               <show id="fdk:folderMultiple" />
+            </field-visibility>
+            <appearance>
+               <field id="fdk:aspectAssoc" label="Picker will start in the current users home folder">
+                  <control>
+                     <control-param name="startLocation">{userhome}</control-param>
+                  </control>
+               </field>
+               <field id="fdk:contentSingle" label="Picker will start in the Sites folder">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                  </control>
+               </field>
+               <field id="fdk:contentMultiple" label="Picker will start in the root of the document library of the site the item is located within">
+                  <control>
+                     <control-param name="startLocation">{doclib}</control-param>
+                  </control>
+               </field>
+               <field id="fdk:folderSingle" label="Picker will start in the parent folder">
+                  <control>
+                     <control-param name="startLocation">{parent}</control-param>
+                  </control>
+               </field>
+               <field id="fdk:folderMultiple" label="Picker will start in the Data Dictionary folder">
+                  <control>
+                     <control-param name="startLocation">/app:company_home/app:dictionary</control-param>
                   </control>
                </field>
             </appearance>
