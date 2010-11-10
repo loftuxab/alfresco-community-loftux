@@ -1219,7 +1219,7 @@
       </subant>
    </target>
 
-   <target name="assemble-sdk" 
+   <target name="assemble-sdk"
            depends="generate-docs">
       <mkdir dir="${dir.continuous.dist}" />
 
@@ -1316,6 +1316,11 @@
             file="${dir.project.core.dist}/${file.name.jar.core}"/>
       <copy todir="${dir.continuous.assemble.sdk}/lib/deployment"
             file="${dir.project.deployment.dist}/${file.name.jar.deployment}"/>
+
+      <!-- Share Libraries -->
+      <mkdir dir="${dir.continuous.assemble.sdk}/lib/share"/>
+      <copy todir="${dir.continuous.assemble.sdk}/lib/share"
+            file="${dir.project.slingshot.dist}/${file.name.jar.slingshot}"/>
 
       <!-- Package configuration as a .jar -->
       <!-- TODO: configuration should ideally live in each of the above .jars -->

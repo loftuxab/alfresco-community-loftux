@@ -265,19 +265,26 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
             {
                 public Integer execute() throws Throwable
                 {
-                    // Increment the read count property value
-                    Integer currentValue = (Integer) nodeService.getProperty(nodeRef, PROP_READ_COUNT);
-                    int newValue = currentValue.intValue() + 1;
-                    nodeService.setProperty(nodeRef, PROP_READ_COUNT, newValue);
-                    return (Integer) newValue;
+                    try
+                    {
+                        // Ensure that the policy doesn't refire for this node on this thread
+                        // This won't prevent background processes from refiring, though
+                        policyFilter.disableBehaviour(nodeRef, ASPECT_CONTENT_HITS);
+                        
+                        // Increment the read count property value
+                        Integer currentValue = (Integer) nodeService.getProperty(nodeRef, PROP_READ_COUNT);
+                        int newValue = currentValue.intValue() + 1;
+                        nodeService.setProperty(nodeRef, PROP_READ_COUNT, newValue);
+                        return (Integer) newValue;
+                    }
+                    finally
+                    {
+                        policyFilter.enableBehaviour(ASPECT_CONTENT_HITS);
+                    }
                 }
             };
             try
             {
-                // Ensure that the policy doesn't refire for this node on this thread
-                // This won't prevent background processes from refiring, though
-                policyFilter.disableBehaviour(nodeRef, ASPECT_CONTENT_HITS);
-                
                 Integer newCount = txnHelper.doInTransaction(callback, false, true);
                 // Done
                 if (logger.isDebugEnabled())
@@ -304,10 +311,6 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
                 logger.error("Failed to increment content read count on node: " + nodeRef);
                 // We are the last call on the thread
             }
-            finally
-            {
-                policyFilter.enableBehaviour(ASPECT_CONTENT_HITS);
-            }
         }
     }
     
@@ -333,19 +336,26 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
             {
                 public Integer execute() throws Throwable
                 {
-                    // Increment the read count property value
-                    Integer currentValue = (Integer) nodeService.getProperty(nodeRef, PROP_UPDATE_COUNT);
-                    int newValue = currentValue.intValue() + 1;
-                    nodeService.setProperty(nodeRef, PROP_UPDATE_COUNT, newValue);
-                    return (Integer) newValue;
+                    try
+                    {
+                        // Ensure that the policy doesn't refire for this node on this thread
+                        // This won't prevent background processes from refiring, though
+                        policyFilter.disableBehaviour(nodeRef, ASPECT_CONTENT_HITS);
+                        
+                        // Increment the read count property value
+                        Integer currentValue = (Integer) nodeService.getProperty(nodeRef, PROP_UPDATE_COUNT);
+                        int newValue = currentValue.intValue() + 1;
+                        nodeService.setProperty(nodeRef, PROP_UPDATE_COUNT, newValue);
+                        return (Integer) newValue;
+                    }
+                    finally
+                    {
+                        policyFilter.enableBehaviour(ASPECT_CONTENT_HITS);
+                    }
                 }
             };
             try
             {
-                // Ensure that the policy doesn't refire for this node on this thread
-                // This won't prevent background processes from refiring, though
-                policyFilter.disableBehaviour(nodeRef, ASPECT_CONTENT_HITS);
-                
                 Integer newCount = txnHelper.doInTransaction(callback, false, true);
                 // Done
                 if (logger.isDebugEnabled())
@@ -371,10 +381,6 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
                 }
                 logger.error("Failed to increment content write count on node: " + nodeRef);
                 // We are the last call on the thread
-            }
-            finally
-            {
-                policyFilter.enableBehaviour(ASPECT_CONTENT_HITS);
             }
         }
     }
