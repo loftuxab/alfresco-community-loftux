@@ -18,7 +18,9 @@
    
    <target name="package">
       <jar destfile="${package.file}">
-         <fileset dir="${build.dir}" excludes="**/custom*,**/*Test*"/>
+         <fileset dir="${build.dir}" excludes="**/custom*,**/*Test*,alfresco-global.properties" />
+         <zipfileset dir="${project.dir}/source/alfresco/extension" prefix="alfresco/extension" />
+         <zipfileset dir="${project.dir}/source/org/alfresco/sample/" excludes="**/*.java" prefix="org/alfresco/sample" />
       </jar>
    </target>
 	
