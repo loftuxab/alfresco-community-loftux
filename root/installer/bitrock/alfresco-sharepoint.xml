@@ -10,7 +10,7 @@
         <stringParameter>
             <name>alfresco_sharepoint_port</name>
             <title>Alfresco SharePoint Port</title>
-            <explanation>Alfresco uses port 7070 for the SharePoint protocol It seems this port is being taken by another application. Please choose an alternative port number.</explanation>
+            <explanation>Please choose a port number for the SharePoint protocol.</explanation>
             <default>7070</default>
             <value/>
             <ask>1</ask>

@@ -1,6 +1,7 @@
 <project name="alfresco"
          default="build-tomcat" >
    <dirname property="alfresco.basedir" file="${ant.file.alfresco}"/>
+   <property name="buildproperties.location" value="community"/>
 
 
    <!-- ****************************************************** -->
@@ -43,11 +44,12 @@
       <property file      = "${alfresco.user.override.properties.file}" />
 
       <property file="${alfresco.basedir}/projects/repository/config/alfresco/version.properties" />
-      <property file="${alfresco.basedir}/community.properties"/>
+      <property file="${alfresco.basedir}/${buildproperties.location}.properties"/>
       <property file="${alfresco.basedir}/build.properties" />
       <property file="${alfresco.basedir}/shared.properties" />
       
       <echo>user.home = ${user.home}</echo>
+      <echo>version.number = ${version.number}</echo>
 
       <!-- Where to get BSF/Rhino from if on Java 1.5 -->
       <condition property="classpath.bsf_javascript" else=""

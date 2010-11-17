@@ -1,18 +1,10 @@
-Alfresco Community 3.4
-======================
+Alfresco Enterprise Edition 3.4
+===============================
 
-For information on what is included in this release, refer to:
-http://wiki.alfresco.com/wiki/Alfresco_Community_3.4
+*** Unsupported prerelease ****
 
-For Release Notes, refer to:
-http://wiki.alfresco.com/wiki/Alfresco_Community_3.4_Release_Notes
+For Enterprise subscribers, refer to http://network.alfresco.com for release notes and detailed information on this release.
 
-For Installation instructions, refer to:
-Installing and Configuring Alfresco Community 3.4 in:
+For Community members, refer to the Alfresco wiki for more information on this release.
 
-share.alfresco.com
-Document Library > Documents > Documentation > Community 3.4
-
-For support, refer to:
-http://forums.alfresco.com
 

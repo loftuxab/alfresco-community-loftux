@@ -81,5 +81,15 @@
             </substitutionList>
         </substitute>
     </postInstallationActionList>
+    <postUninstallationActionList> 
+        <actionGroup>
+            <actionList>
+                <deleteFile path="${installdir}/webquickstart.log" />
+            </actionList>
+            <ruleList>
+                <compareText text="${deleteConfirm}" logic="equals" value="yes" />
+            </ruleList>
+        </actionGroup>
+    </postUninstallationActionList>
 </component>
 

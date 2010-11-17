@@ -61,7 +61,28 @@
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_OPENOFFICE_PROGRAM_DIR@@</pattern>
-                            <value>${openoffice_directory}/Contents/MacOs/soffice.bin</value>
+                            <value>${openoffice_directory}/Contents/MacOS/soffice.bin</value>
+                            <ruleList>
+                                <platformTest type="osx"/>
+                            </ruleList>
+                        </substitution>
+		        <substitution>
+                            <pattern>@@BITROCK_OPENOFFICE_JOD_DIR@@</pattern>
+                            <value>${openoffice_directory.dos.unix}</value>
+                            <ruleList>
+                                <platformTest type="windows"/>
+                            </ruleList>
+                        </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_OPENOFFICE_JOD_DIR@@</pattern>
+                            <value>${openoffice_directory}</value>
+                            <ruleList>
+                                <platformTest type="linux"/>
+                            </ruleList>
+                        </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_OPENOFFICE_JOD_DIR@@</pattern>
+                            <value>${openoffice_directory}/Contents</value>
                             <ruleList>
                                 <platformTest type="osx"/>
                             </ruleList>

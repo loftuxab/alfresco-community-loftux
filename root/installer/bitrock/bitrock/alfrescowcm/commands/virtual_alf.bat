@@ -4,7 +4,7 @@ rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
 rem set Alfresco home (includes trailing \  e.g. c:\alfresco\)
-set ALF_HOME=%~dp0
+set ALF_HOME=%~dp0..\
 
 set JAVA_HOME="@@BITROCK_JAVA_HOME_WIN@@"
 set CATALINA_HOME=%ALF_HOME%virtual-tomcat

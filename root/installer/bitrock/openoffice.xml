@@ -11,25 +11,23 @@
 	<booleanParameter name="openoffice_show_ports" value="0" ask="0" />
         <directoryParameter>
             <ask>0</ask>
-            <description>OpenOffice Installation Directory</description>
+            <description>OpenOffice installation directory</description>
             <name>openoffice_directory</name>
             <cliOptionName>openoffice_directory</cliOptionName>
         </directoryParameter>
-        <!--
-        <directoryParameter>
+        <!--directoryParameter>
             <ask>0</ask>
             <default/>
-            <description>Xvfb Installation Directory</description>
+            <description>Xvfb installation directory</description>
             <name>openoffice_xvfb_directory</name>
             <value>${installdir}/Xvfb</value>
             <cliOptionName>openoffice_xvfb_directory</cliOptionName>
-        </directoryParameter>
-        -->
+        </directoryParameter-->
         <stringParameter>
             <name>openoffice_port</name>
             <title>OpenOffice Server Port</title>
-            <description>OpenOffice Server Port:</description>
-            <explanation>Please enter the port that the Openoffice server will listen to by default.</explanation>
+            <description>OpenOffice Server port</description>
+            <explanation>Please enter the port that the Openoffice Server will listen to by default.</explanation>
             <value>8100</value>
             <default>8100</default>
             <allowEmptyValue>1</allowEmptyValue>
@@ -63,36 +61,39 @@
 	    <value>0</value>
 	    <cliOptionShow>0</cliOptionShow>
 	</booleanParameter>
-    <booleanParameter name="openoffice_installed_as_service" ask="0" default="1" />
+        <booleanParameter name="openoffice_installed_as_service" ask="0" default="1" />
     </parameterList>
     <readyToInstallActionList>
         <setInstallerVariable name="openoffice_execute_abort_action_list" value="1"/>
         <setInstallerVariable name="openoffice_directory" value="${installdir}/openoffice"/>
+        <setInstallerVariable name="openoffice_directory" value="${installdir}/openoffice.app">
+            <ruleList>
+                <platformTest type="osx" />
+            </ruleList>
+        </setInstallerVariable>
     </readyToInstallActionList>
     <folderList>
-        <!--
-        <folder>
+        <!--folder>
             <description>Xvfb</description>
             <destination>${installdir}</destination>
             <name>xvfbfiles</name>
             <distributionFileList>
                 <distributionDirectory>
-                    <origin>${xvfb_distribution_folder}</origin>
+                    <origin>Xvfb</origin>
                 </distributionDirectory>
             </distributionFileList>
             <ruleList>
                 <compareText logic="does_not_equal" text="${platform_name}" value="windows"/>
             </ruleList>
-        </folder>
-        -->
+        </folder-->
         <folder>
             <description>OpenOffice</description>
-            <destination>${installdir}</destination>
+            <destination>${openoffice_directory}</destination>
             <name>openoffice</name>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionDirectory>
-                    <origin>${openoffice_distribution_folder}</origin>
+                <distributionDirectory allowWildcards="1" >
+                    <origin>${openoffice_distribution_folder}/*</origin>
                 </distributionDirectory>
             </distributionFileList>
         </folder>
@@ -149,12 +150,10 @@
                             <pattern>@@BITROCK_OO_PORT@@</pattern>
                             <value>${openoffice_port}</value>
                         </substitution>
-                        <!--
-                        <substitution>
+                        <!--substitution>
                             <pattern>@@BITROCK_XVFB_ROOTDIR@@</pattern>
                             <value>${openoffice_xvfb_directory}</value>
-                        </substitution>
-                        -->
+                        </substitution-->
                     </substitutionList>
                 </substitute>
                 <changePermissions>
@@ -228,7 +227,7 @@
 		    </actionList>
 		    <ruleList>
 			<isFalse value="${openofficeservice_notstart}" />
-            <isTrue value="${openoffice_installed_as_service}" />
+                        <isTrue value="${openoffice_installed_as_service}" />
 		    </ruleList>
 		</actionGroup>
 		<actionGroup>
@@ -241,7 +240,7 @@
 		    </actionList>
 		    <ruleList>
 			<isTrue value="${openofficeservice_notstart}" />
-            <isTrue value="${openoffice_installed_as_service}" />
+                        <isTrue value="${openoffice_installed_as_service}" />
 		    </ruleList>
 		</actionGroup>
 		<runProgram>
@@ -252,17 +251,17 @@
 			<compareText text="${openofficeservice_startup}" logic="does_not_equal" value="auto" />
 		    </ruleList>
 		</runProgram>
-        <actionGroup>
-            <actionList>
-               <renameFile origin="${openoffice_directory}/scripts/servicerun.bat" destination="${openoffice_directory}/scripts/openoffice_servicerun.bat"/>
-               <addFilesToUninstaller files="${openoffice_directory}/scripts/openoffice_servicerun.bat" />
-               <renameFile origin="${openoffice_directory}/scripts/serviceinstall.bat" destination="${openoffice_directory}/scripts/openoffice_serviceinstall.bat"/>
-               <addFilesToUninstaller files="${openoffice_directory}/scripts/openoffice_serviceinstall.bat" />
-            </actionList>
-            <ruleList>
-                <isFalse value="${openoffice_installed_as_service}" />
-            </ruleList>
-           </actionGroup>
+                <actionGroup>
+                    <actionList>
+                        <renameFile origin="${openoffice_directory}/scripts/servicerun.bat" destination="${openoffice_directory}/scripts/openoffice_servicerun.bat"/>
+                        <addFilesToUninstaller files="${openoffice_directory}/scripts/openoffice_servicerun.bat" />
+                        <renameFile origin="${openoffice_directory}/scripts/serviceinstall.bat" destination="${openoffice_directory}/scripts/openoffice_serviceinstall.bat"/>
+                        <addFilesToUninstaller files="${openoffice_directory}/scripts/openoffice_serviceinstall.bat" />
+                    </actionList>
+                    <ruleList>
+                         <isFalse value="${openoffice_installed_as_service}" />
+                    </ruleList>
+                </actionGroup>
 	    </actionList>
             <ruleList>
                 <compareText logic="equals" text="${platform_name}" value="windows"/>
@@ -270,7 +269,7 @@
         </actionGroup>
     </postInstallationActionList>
     <postUninstallationActionList>
-        <deleteFile path="${installdir}/openoffice"/>
+        <deleteFile path="${openoffice_directory}"/>
     </postUninstallationActionList>
 </component>
 

@@ -24,7 +24,7 @@
         <stringParameter>
             <name>alfresco_ftp_port</name>
             <title>Alfresco FTP Port</title>
-            <explanation>The integrated Alfresco FTP server was unable to bind to the default port. Please check if you have enough permissions, or choose an alternative port number.</explanation>
+            <explanation>Please choose a port number to use for the integrated Alfresco FTP server.</explanation>
             <default>21</default>
             <value/>
             <ask>1</ask>
@@ -46,7 +46,7 @@
         <stringParameter>
             <name>alfresco_rmi_port</name>
             <title>Alfresco RMI Port</title>
-            <explanation>Alfresco uses port 50500 to execute remote commands. It seems this port is being taken by another application. Please choose an alternative port number.</explanation>
+            <explanation>Please choose a port number for Alfresco to use to execute remote commands.</explanation>
             <default>50500</default>
             <value/>
             <ask>1</ask>

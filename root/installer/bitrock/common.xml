@@ -55,7 +55,7 @@ Copyrighted by BitRock
         <directoryParameter>
             <ask>0</ask>
             <default/>
-            <description>Common Installation Directory</description>
+            <description>Common installation directory</description>
             <name>common_root_directory</name>
             <value>${installdir}/common</value>
         </directoryParameter>
