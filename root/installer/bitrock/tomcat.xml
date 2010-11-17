@@ -122,7 +122,7 @@ TODO LIST
         <directoryParameter>
             <name>tomcat_server_directory</name>
             <title>Tomcat Directory</title>
-            <description>Tomcat Directory:</description>
+            <description>Tomcat directory:</description>
             <explanation>Please specify the directory where Tomcat is located.</explanation>
             <allowEmptyValue>0</allowEmptyValue>
             <ask>yes</ask>
@@ -141,7 +141,7 @@ TODO LIST
                     </ruleList>
                 </throwError>
                 <showInfo>
-                    <text>Couldn't check Tomcat Version.
+                    <text>Couldn't check Apache Tomcat Version.
 Tomcat 5.5 is recommended.</text>
                     <ruleEvaluationLogic>and</ruleEvaluationLogic>
                     <ruleList>
@@ -159,7 +159,7 @@ Tomcat 5.5 is recommended.</text>
                                 <fileContentTest>
                                     <path>${tomcat_server_directory}/webapps/ROOT/RELEASE-NOTES.txt</path>
                                     <logic>does_not_contain</logic>
-                                    <text>Tomcat Version 5.5</text>
+                                    <text>Apache Tomcat Version 5.5</text>
                                 </fileContentTest>
                             </ruleList>
                         </ruleGroup>
@@ -214,7 +214,7 @@ Tomcat 5.5 is recommended.</text>
                 <stringParameter>
                     <name>tomcat_server_domain</name>
                     <title>Web Server</title>
-                    <description>Web Server Domain:</description>
+                    <description>Web Server domain:</description>
                     <value/>
                     <default>127.0.0.1</default>
                     <allowEmptyValue>1</allowEmptyValue>
@@ -304,7 +304,7 @@ Tomcat 5.5 is recommended.</text>
                     <default>8443</default>
                     <value/>
                     <ask>1</ask>
-                    <description>Tomcat SSL Port:</description>
+                    <description>Tomcat SSL Port</description>
                     <!--<ruleList>
                         <portTest condition="cannot_bind" port="${tomcat_server_ssl_port}"/>
                     </ruleList>-->

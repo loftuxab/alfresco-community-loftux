@@ -8,7 +8,7 @@
         <directoryParameter>
             <ask>0</ask>
             <default>${installdir}</default>
-            <description>README Destination</description>
+            <description>README destination</description>
             <name>base_readme_installation_directory</name>
         </directoryParameter>
     </parameterList>

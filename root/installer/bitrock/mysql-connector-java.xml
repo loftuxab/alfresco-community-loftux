@@ -11,7 +11,7 @@
             <description>MySQL Connector for Java</description>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionFile origin="apache-tomcat/common/lib/mysql-connector-java-3.1.12-bin.jar"/>
+                <distributionFile origin="apache-tomcat/common/lib/mysql-connector-java-5.1.7-bin.jar"/>
             </distributionFileList>
             <ruleList>
                 <compareText text="${component(tomcat).parameter(tomcat_installation_type).value}" logic="equals" value="existing"/>

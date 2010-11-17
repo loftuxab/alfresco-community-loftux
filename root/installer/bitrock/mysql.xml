@@ -283,7 +283,7 @@ System variables provided by this component:
                 </stringParameter>
                 <stringParameter>
                     <name>mysql_port</name>
-                    <description>MySQL Server Port</description>
+                    <description>MySQL Server port</description>
                     <value>3306</value>
                     <default>3306</default>
                     <allowEmptyValue>1</allowEmptyValue>
@@ -364,12 +364,12 @@ System variables provided by this component:
                 </stringParameter>
                 <passwordParameter>
                     <name>mysql_root_password</name>
-                    <explanation>Please enter your database root user password.</explanation>
-                    <description>MySQL Server Root Password:</description>
+                    <explanation>Please enter your database root user password</explanation>
+                    <description>MySQL Server root password</description>
                     <cliOptionName>mysql_password</cliOptionName>
                     <allowEmptyValue>1</allowEmptyValue>
                     <ask>yes</ask>
-                    <descriptionRetype>Verify password:</descriptionRetype>
+                    <descriptionRetype>Re-enter password</descriptionRetype>
                     <width>30</width>
                     <validationActionList>
                         <throwError>
@@ -396,7 +396,7 @@ System variables provided by this component:
                             </ruleList>
                         </throwError>
                         <throwError>
-                            <text>You must provide a non-empty password</text>
+                            <text>You need to provide a non-empty password</text>
                             <ruleList>
                                 <compareText text="${mysql_root_password}" logic="equals" value=""/>
                                 <compareText text="${mysql_allow_empty_root_password}" logic="equals" value="0"/>
@@ -517,7 +517,7 @@ System variables provided by this component:
                     <allowEmptyValue>1</allowEmptyValue>
                     <ask>1</ask>
                     <cliOptionName/>
-                    <descriptionRetype>Verify</descriptionRetype>
+                    <descriptionRetype>Re-enter</descriptionRetype>
                     <leftImage/>
                     <width>40</width>
                      <validationActionList>
@@ -857,7 +857,7 @@ System variables provided by this component:
         </actionGroup>
         <actionGroup>
             <actionList>
-                <runProgram progressText="Updating MySQL directory permissions">
+                <runProgram progressText="Updating mysql directory permissions">
                     <program>${mysql_root_directory}/scripts/myscript_upgrade.sh</program>
                     <programArguments>${mysql_root_directory}</programArguments>
                     <abortOnError>0</abortOnError>

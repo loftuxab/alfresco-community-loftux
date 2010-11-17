@@ -12,13 +12,24 @@
             <description>Please give details of the Quickr server to use.</description>
             <parameterList>
                 <stringParameter name="alfresco_quickr_host" description="Quickr Server:" default="localhost" allowEmptyValue="0" />
-		<stringParameter name="alfresco_quickr_port" description="Port:" default="6060" allowEmptyValue="0" />
+		<stringParameter name="alfresco_quickr_port" description="Port:" default="6060" allowEmptyValue="0" >
+                    <validationActionList>
+                        <throwError text="Please enter a port in the range 1-65535.">
+                            <ruleEvaluationLogic>or</ruleEvaluationLogic>
+                            <ruleList>
+                                <stringTest text="${alfresco_quickr_port}" type="digit" negate="yes" />
+                                <compareValues value1="${alfresco_quickr_port}" logic="less" value2="1" />
+                                <compareValues value1="${alfresco_quickr_port}" logic="greater" value2="65535" />
+                            </ruleList>
+                        </throwError>
+                    </validationActionList>
+                </stringParameter>
             </parameterList>
-	    <ruleEvaluationLogic>or</ruleEvaluationLogic>
+	    <!--ruleEvaluationLogic>or</ruleEvaluationLogic>
 	    <ruleList>
 		<compareText text="${alfresco_show_ports}" value="yes"/>
                 <portTest condition="cannot_bind" port="${alfresco_quickr_port}"/>
-	    </ruleList>
+	    </ruleList-->
         </parameterGroup>
     </parameterList>
 

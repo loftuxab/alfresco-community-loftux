@@ -3,7 +3,7 @@
     <compressionAlgorithm>lzma</compressionAlgorithm>
     <fullName>Alfresco Community Edition Stack</fullName>
     <shortName>alfresco</shortName>
-    <version>3.4.a-1</version>
+    <version>3.4.b-1</version>
     <installerFilename>${product_shortname}-community-${product_version}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <licenseFile></licenseFile>
     <readmeFile>${alfresco_readme_file}</readmeFile>
@@ -20,7 +20,7 @@
     <platformOptionsList>
         <platformOptions>
             <platform>osx</platform>
-            <height>393</height>
+            <height>430</height>
         </platformOptions>
     </platformOptionsList>
 
@@ -245,7 +245,7 @@
 		<deleteFile>
 		    <path>${installdir}/mysql/data</path>
 		</deleteFile>
-        <deleteFile path="${installdir}/mysql" />
+                <deleteFile path="${installdir}/mysql" />
 	    </actionList>
 	    <ruleList>
 		<compareText text="${deleteConfirm}" logic="equals" value="yes" />

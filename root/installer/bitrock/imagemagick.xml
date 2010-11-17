@@ -23,13 +23,13 @@ System variables provided by this component:
     <parameterList>
         <directoryParameter>
             <ask>0</ask>
-            <description>ImageMagick Installation Directory</description>
+            <description>ImageMagick installation directory</description>
             <name>imagemagick_root_directory</name>
             <cliOptionName>imagemagick_root_directory</cliOptionName>
         </directoryParameter>
         <stringParameter>
             <ask>0</ask>
-            <description>ImageMagick Version</description>
+            <description>ImageMagick version</description>
             <name>imagemagick_version</name>
             <value>6.5.1</value>
             <default>6.5.1</default>
