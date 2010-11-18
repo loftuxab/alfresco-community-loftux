@@ -221,7 +221,7 @@
          <include name="**/org/alfresco/wcm/WCMTestSuite.java" />
          <!-- Web Script Tests -->
          <exclude name="**/org/alfresco/repo/web/scripts/**/*Test.java" />
-         <include name="**/org/alfresco/repo/web/scripts/WebScritTestSuite.java" />
+         <include name="**/org/alfresco/repo/web/scripts/WebScriptTestSuite.java" />
          <include name="**/org/alfresco/repo/web/scripts/wcm/sandbox/AssetTest.java" />
          <!-- Search Tests -->
          <exclude name="**/org/alfresco/repo/search/**/*Test.java" />
