@@ -50,6 +50,7 @@ import org.springframework.extensions.surf.FrameworkUtil;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.ServletUtil;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
+import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.extensions.surf.util.StringBuilderWriter;
 import org.springframework.extensions.webscripts.AbstractMessageHelper;
 import org.springframework.extensions.webscripts.Cache;
@@ -446,7 +447,7 @@ public class FormUIGet extends DeclarativeWebScript
             String currentUserId = requestContext.getUserId();
             HttpSession currentSession = ServletUtil.getSession(true);
             Connector connector = connService.getConnector(ENDPOINT_ID, currentUserId, currentSession);
-            ConnectorContext context = new ConnectorContext(HttpMethod.POST);
+            ConnectorContext context = new ConnectorContext(HttpMethod.POST, null, buildDefaultHeaders());
             context.setContentType("application/json");
             
             // call the form service
@@ -463,6 +464,19 @@ public class FormUIGet extends DeclarativeWebScript
         }
         
         return response;
+    }
+    
+    /**
+     * Helper to build a map of the default headers for script requests - we send over
+     * the current users locale so it can be respected by any appropriate REST APIs.
+     *  
+     * @return map of headers
+     */
+    private static Map<String, String> buildDefaultHeaders()
+    {
+        Map<String, String> headers = new HashMap<String, String>(1, 1.0f);
+        headers.put("Accept-Language", I18NUtil.getLocale().toString().replace('_', '-'));
+        return headers;
     }
     
     /**
