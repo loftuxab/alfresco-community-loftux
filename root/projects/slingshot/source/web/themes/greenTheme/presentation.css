@@ -426,6 +426,11 @@ em
    background-color: #f5fff2;
 }
 
+.yui-skin-greenTheme .yui-navset .yui-content
+{
+   background: #e4f7d4;
+}
+
 select,
 input[type="text"],
 input[type="password"],

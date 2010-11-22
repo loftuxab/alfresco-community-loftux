@@ -455,6 +455,11 @@ em
    background-color: #ffffff;
 }
 
+.yui-skin-hcBlack .yui-navset .yui-content
+{
+   background: #fff;
+}
+
 select,
 input[type="text"],
 input[type="password"],

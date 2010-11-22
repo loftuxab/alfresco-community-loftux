@@ -758,7 +758,7 @@ background-image: url(picker_mask.png);
 }
 *html .yui-picker-bg {
 background-image: none;
-filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../../build/colorpicker/assets/picker_mask.png',sizingMethod='scale');
+filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='picker_mask.png',sizingMethod='scale');
 }
 .yui-picker-mask {
 position: absolute;
@@ -4353,7 +4353,7 @@ position: absolute;
 cursor: default;
 }
 .yui-skin-gdocs .yui-h-slider {
-background: url(../../bg-h.gif) no-repeat 5px 0;
+background: url(bg-h.gif) no-repeat 5px 0;
 height: 28px;
 width: 228px;
 }
@@ -4361,7 +4361,7 @@ width: 228px;
 top: 4px;
 }
 .yui-skin-gdocs .yui-v-slider {
-background: url(../../bg-v.gif) no-repeat 12px 0;
+background: url(bg-v.gif) no-repeat 12px 0;
 height: 228px;
 width: 48px;
 }

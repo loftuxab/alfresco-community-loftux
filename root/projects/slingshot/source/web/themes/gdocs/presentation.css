@@ -446,6 +446,11 @@ em
    background-color: #eff3fa;
 }
 
+.yui-skin-gdocs .yui-navset .yui-content
+{
+   background: #f4f6fe;
+}
+
 select,
 input[type="text"],
 input[type="password"],
