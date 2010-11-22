@@ -38,7 +38,8 @@
       $links = Alfresco.util.activateLinks,
       $combine = Alfresco.util.combinePaths,
       $userProfile = Alfresco.util.userProfileLink,
-      $date = function $date(date, format) { return Alfresco.util.formatDate(Alfresco.util.fromISO8601(date), format) };
+      $siteURL = Alfresco.util.siteURL,
+      $date = function $date(date, format) { return Alfresco.util.formatDate(Alfresco.util.fromISO8601(date), format); };
 
    /**
     * Preferences
@@ -167,17 +168,71 @@
          filterData: $combine(locn.path, locn.file)
       });
    };
+   
+   /**
+    * Generate URL for a file- or folder-link that may be located within a different Site
+    *
+    * @method generateFileFolderLinkMarkup
+    * @param oRecord {YAHOO.widget.Record} File record
+    * @return {string} Mark-up for use in node attribute
+    * <pre>
+    *       Folders: Navigate into the folder (ajax)
+    *       Documents: Navigate to the details page (page)
+    *    Links: Same site (or Repository mode)
+    *       Links to folders: Navigate into the folder (ajax)
+    *       Links to documents: Navigate to the details page (page)
+    *    Links: Different site
+    *       Links to folders: Navigate into the site & folder (page)
+    *       Links to documents: Navigate to the details page within the site (page)
+    * </pre>
+    */
+   Alfresco.DocumentList.generateFileFolderLinkMarkup = function DL_generateFileFolderLinkMarkup(scope, oRecord)
+   {
+      var record = oRecord.getData(),
+         html;
+
+      if (record.isLink && scope.options.workingMode === Alfresco.doclib.MODE_SITE && record.location.site !== scope.options.siteId)
+      {
+         if (record.isFolder)
+         {
+            html = $siteURL("documentlibrary?path=" + encodeURIComponent(record.location.path),
+            {
+               site: record.location.site
+            });
+         }
+         else
+         {
+            html = scope.getActionUrls(record, record.location.site).documentDetailsUrl;
+         }
+      }
+      else
+      {
+         if (record.isFolder)
+         {
+            html = '#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(record.location);
+         }
+         else
+         {
+            html = scope.getActionUrls(record).documentDetailsUrl;
+         }
+      }
+
+      return '<a href="' + html + '">';
+   };
 
    /**
     * Generate URL to thumbnail image
     *
     * @method generateThumbnailUrl
-    * @param path {YAHOO.widget.Record} File record
+    * @param oRecord {YAHOO.widget.Record} File record
     * @return {string} URL to thumbnail
     */
-   Alfresco.DocumentList.generateThumbnailUrl = function DL_generateThumbnailUrl(record)
+   Alfresco.DocumentList.generateThumbnailUrl = function DL_generateThumbnailUrl(oRecord)
    {
-      return Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "") + "/content/thumbnails/doclib?c=queue&ph=true";
+      var record = oRecord.getData(),
+         nodeRef = new Alfresco.util.NodeRef(record.isLink ? record.linkedNodeRef : record.nodeRef);
+
+      return Alfresco.constants.PROXY_URI + "api/node/" + nodeRef.uri + "/content/thumbnails/doclib?c=queue&ph=true";
    };
 
    /**
@@ -678,7 +733,7 @@
          {
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
+            
             elCell.innerHTML = '<input id="checkbox-' + oRecord.getId() + '" type="checkbox" name="fileChecked" value="'+ oData + '"' + (scope.selectedFiles[oData] ? ' checked="checked">' : '>');
          };
       },
@@ -777,9 +832,7 @@
                title = record.title,
                type = record.type,
                isLink = record.isLink,
-               locn = record.location,
-               extn = name.substring(name.lastIndexOf(".")),
-               docDetailsUrl;
+               extn = name.substring(name.lastIndexOf("."));
 
             if (scope.options.simpleView)
             {
@@ -792,13 +845,12 @@
 
                if (type == "folder")
                {
-                  elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
+                  elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + Alfresco.DocumentList.generateFileFolderLinkMarkup(scope, oRecord) + '<img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
                }
                else
                {
                   var id = scope.id + '-preview-' + oRecord.getId();
-                  docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
-                  elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
+                  elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span class="link"></span>' : '') + Alfresco.DocumentList.generateFileFolderLinkMarkup(scope, oRecord) + '<img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
 
                   // Preview tooltip
                   scope.previewTooltips.push(id);
@@ -815,12 +867,11 @@
 
                if (type == "folder")
                {
-                  elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
+                  elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + Alfresco.DocumentList.generateFileFolderLinkMarkup(scope, oRecord) + '<img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
                }
                else
                {
-                  docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
-                  elCell.innerHTML = '<span class="thumbnail">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.DocumentList.generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
+                  elCell.innerHTML = '<span class="thumbnail">' + (isLink ? '<span class="link"></span>' : '') + Alfresco.DocumentList.generateFileFolderLinkMarkup(scope, oRecord) + '<img src="' + Alfresco.DocumentList.generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
                }
             }
          };
@@ -846,32 +897,32 @@
           */
          return function DL_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var desc = "", docDetailsUrl, tags, tag, i, j;
+            var desc = "", tags, tag, i, j;
             var record = oRecord.getData(),
                type = record.type,
                isLink = record.isLink,
-               locn = record.location,
                title = "",
                description = record.description || scope.msg("details.description.none");
             
+            // Link handling
+            if (isLink)
+            {
+               oRecord.setData("linkedDisplayName", record.displayName);
+               oRecord.setData("displayName", scope.msg("details.link-to", record.displayName));
+            }
+
             // Use title property if it's available
             if (record.title && record.title !== record.displayName)
             {
                title = '<span class="title">(' + $html(record.title) + ')</span>';
             }
 
-            // Link handling
-            if (isLink)
-            {
-               oRecord.setData("displayName", scope.msg("details.link-to", record.displayName));
-            }
-            
             if (type == "folder")
             {
                /**
                 * Folders
                 */
-               desc += '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(scope, oRecord) + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
+               desc += '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(scope, oRecord) + Alfresco.DocumentList.generateFileFolderLinkMarkup(scope, oRecord);
                desc += $html(record.displayName) + '</a>' + title + '</h3>';
 
                if (scope.options.simpleView)
@@ -913,8 +964,6 @@
                /**
                 * Documents and Links
                 */
-               docDetailsUrl = scope.getActionUrls(oRecord.getData()).documentDetailsUrl;
-
                // Locked / Working Copy handling
                if (record.lockedByUser && record.lockedByUser !== "")
                {
@@ -946,7 +995,7 @@
                   }
                }
                 
-               desc += '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(scope, oRecord) + '<span id="' + scope.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">';
+               desc += '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(scope, oRecord) + '<span id="' + scope.id + '-preview-' + oRecord.getId() + '">'+ Alfresco.DocumentList.generateFileFolderLinkMarkup(scope, oRecord);
                desc += $html(record.displayName) + '</a></span>' + title + '</h3>';
                
                if (scope.options.simpleView)
@@ -1721,17 +1770,19 @@
        *
        * @method getActionUrls
        * @param recordData {object} Object literal representing the node
+       * @param siteId {string} Optional siteId override for site-based locations
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function DL_getActionUrls(recordData)
+      getActionUrls: function DL_getActionUrls(recordData, siteId)
       {
-         var nodeRef = recordData.nodeRef,
+         var nodeRef = recordData.isLink ? recordData.linkedNodeRef : recordData.nodeRef,
             nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
             contentUrl = recordData.contentUrl,
             custom = recordData.custom,
+            siteObj = YAHOO.lang.isString(siteId) ? { site: siteId } : null,
             fnPageURL = Alfresco.util.bind(function(page)
             {
-               return Alfresco.util.siteURL(page);
+               return Alfresco.util.siteURL(page, siteObj);
             }, this);
 
          return (
@@ -1764,14 +1815,12 @@
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
 
-         // var renameId = this.id + "-rename-" + oArgs.target.id;
          var elActions = Dom.get(this.id + "-actions-" + (oArgs.target.id));
 
          // Don't hide unless the More Actions drop-down is showing, or a dialog mask is present
          if (elActions && !this.showingMoreActions || Dom.hasClass(document.body, "masked"))
          {
             // Just hide the action links, rather than removing them from the DOM
-            // Dom.addClass(renameId, "hidden");
             Dom.addClass(elActions, "hidden");
             this.deferredActionsMenu = null;
          }
@@ -2072,8 +2121,7 @@
       {
          var displayName = asset.displayName,
             nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
-            path = asset.location.path,
-            fileName = asset.fileName;
+            path = asset.location.path;
 
          var progressPopup = Alfresco.util.PopupManager.displayMessage(
          {
@@ -2210,6 +2258,7 @@
       onChangeFilter: function DL_onChangeFilter(layer, args)
       {
          var obj = args[1];
+
          if ((obj !== null) && (obj.filterId !== null))
          {
             // Should be a filter in the arguments
@@ -2241,6 +2290,16 @@
             else
             {
                Alfresco.logger.debug("DL_onChangeFilter: objNav = ", objNav);
+
+               // Do we think the history state will change?
+               if (this.options.highlightFile && objNav.filter == YAHOO.util.History.getCurrentState("filter"))
+               {
+                  YAHOO.Bubbling.fire("highlightFile",
+                  {
+                     fileName: this.options.highlightFile
+                  });
+               }
+               
                YAHOO.util.History.multiNavigate(objNav);
             }
          }

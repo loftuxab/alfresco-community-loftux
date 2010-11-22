@@ -50,7 +50,7 @@
       </actionSet>
 
       <actionSet id="link">
-         <action type="action-link" id="onActionDeleteLink" permission="delete" label="actions.document.delete" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="actions.link.delete" />
       </actionSet>
 
       <actionSet id="googleDocLocked">
