@@ -142,15 +142,17 @@
        *
        * @method getActionUrls
        * @param recordData {object} Object literal representing the node
+       * @param siteId {string} Optional siteId override for site-based locations
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
-      getActionUrls: function FolderActions_getActionUrls(recordData)
+      getActionUrls: function FolderActions_getActionUrls(recordData, siteId)
       {
          var nodeRef = recordData.nodeRef,
             nodeRefUri = new Alfresco.util.NodeRef(nodeRef).uri,
+            siteObj = YAHOO.lang.isString(siteId) ? { site: siteId } : null,
             fnPageURL = Alfresco.util.bind(function(page)
             {
-               return Alfresco.util.siteURL(page);
+               return Alfresco.util.siteURL(page, siteObj);
             }, this);
 
          return (

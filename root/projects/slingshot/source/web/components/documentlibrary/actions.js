@@ -163,14 +163,27 @@
        */
       onActionLocate: function dlA_onActionLocate(asset)
       {
-         this.options.highlightFile = asset.displayName;
-
-         // Change active filter to path
-         YAHOO.Bubbling.fire("changeFilter",
+         var path = asset.isFolder ? Alfresco.util.combinePaths("/", asset.location.path.substring(0, asset.location.path.lastIndexOf("/"))) : asset.location.path,
+            file = asset.isLink ? asset.linkedDisplayName : asset.displayName;
+         
+         if (this.options.workingMode === Alfresco.doclib.MODE_SITE && asset.location.site !== this.options.siteId)
          {
-            filterId: "path",
-            filterData: asset.location.path
-         });
+            window.location = $siteURL("documentlibrary?file=" + encodeURIComponent(file) + "&path=" + encodeURIComponent(path),
+            {
+               site: asset.location.site
+            });
+         }
+         else
+         {
+            this.options.highlightFile = file;
+            
+            // Change active filter to path
+            YAHOO.Bubbling.fire("changeFilter",
+            {
+               filterId: "path",
+               filterData: path
+            });
+         }
       },
 
       /**
@@ -262,22 +275,6 @@
                }
             }
          });
-      },
-
-      /**
-       * Delete link.
-       *
-       * @method onActionDeleteLink
-       * @param asset {object} Object literal representing the filelink or folderlink to be actioned
-       */
-      onActionDeleteLink: function dlA_onActionDeleteLink(asset)
-      {
-         if (asset.custom && asset.custom.linkNodeRef)
-         {
-            var linkAsset = Alfresco.util.deepCopy(asset);
-            linkAsset.nodeRef = asset.custom.linkNodeRef;
-            this.onActionDelete(linkAsset);
-         }
       },
 
       /**

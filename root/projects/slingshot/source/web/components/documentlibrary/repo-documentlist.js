@@ -112,16 +112,17 @@
                title = "",
                description = record.description || scope.msg("details.description.none");
 
+            // Link handling
+            if (isLink)
+            {
+               oRecord.setData("linkedDisplayName", record.displayName);
+               oRecord.setData("displayName", scope.msg("details.link-to", record.displayName));
+            }
+
             // Use title property if it's available
             if (record.title && record.title !== record.displayName)
             {
                title = '<span class="title">(' + $html(record.title) + ')</span>';
-            }
-
-            // Link handling
-            if (isLink)
-            {
-               oRecord.setData("displayName", scope.msg("details.link-to", record.displayName));
             }
 
             if (type == "folder")

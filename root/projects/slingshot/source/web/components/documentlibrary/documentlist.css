@@ -261,6 +261,11 @@
 
 /* Cell Renderers */
 
+.doclist .folder
+{
+   position: relative;
+}
+
 .doclist .documents .icon32
 {
    cursor: pointer;
@@ -272,7 +277,6 @@
 .doclist .documents .folder-small span.link
 {
    background: url(images/link-16.png) no-repeat;
-   display: block;
    height: 16px;
    width: 16px;
    position: absolute;
@@ -285,6 +289,7 @@
    height: 100px;
    overflow: hidden;
    padding-top: 2px;
+   position: relative;
    width: 100px;
 }
 
@@ -292,7 +297,6 @@
 .doclist .documents .folder span.link
 {
    background: url(images/link-32.png) no-repeat;
-   display: block;
    height: 32px;
    width: 32px;
    position: absolute;
@@ -552,8 +556,7 @@
    background-image: url(images/folder-edit-metadata-16.png);
 }
 
-.doclist .onActionDelete a,
-.doclist .onActionDeleteLink a
+.doclist .onActionDelete a
 {
    background-image: url(images/remove-16.png);
 }
