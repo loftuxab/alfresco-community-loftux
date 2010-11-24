@@ -1,5 +1,5 @@
 <#assign siteActive = args.siteId?? && (siteTitle?length > 0)>
-<#assign id = args.htmlid>
+<#assign id = args.htmlid?html>
 <#assign id_js = id?js_string>
 <script type="text/javascript">//<![CDATA[
    Alfresco.util.ComponentManager.get("${id_js}").setOptions(
