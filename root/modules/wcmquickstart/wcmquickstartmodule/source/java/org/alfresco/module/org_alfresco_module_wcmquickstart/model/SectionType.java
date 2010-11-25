@@ -32,6 +32,10 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_wcmquickstart.util.contextparser.ContextParserService;
 import org.alfresco.repo.content.ContentServicePolicies;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.copy.CopyBehaviourCallback;
+import org.alfresco.repo.copy.CopyDetails;
+import org.alfresco.repo.copy.CopyServicePolicies;
+import org.alfresco.repo.copy.DefaultCopyBehaviourCallback;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
@@ -70,16 +74,8 @@ import org.apache.commons.logging.LogFactory;
 public class SectionType extends TransactionListenerAdapter implements WebSiteModel
 {
     /** Transaction key */
-    private static final String AFFECTED_WEB_ASSETS = "AFFECTED_WEB_ASSETS";
-
-    /** Array of office mimetypes */
-    private static final String[] OFFICE_MIMETYPES = new String[] { MimetypeMap.MIMETYPE_WORD,
-            MimetypeMap.MIMETYPE_EXCEL, MimetypeMap.MIMETYPE_PPT, MimetypeMap.MIMETYPE_OPENXML_WORDPROCESSING,
-            MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET, MimetypeMap.MIMETYPE_OPENXML_PRESENTATION,
-            MimetypeMap.MIMETYPE_OPENDOCUMENT_TEXT, MimetypeMap.MIMETYPE_OPENDOCUMENT_SPREADSHEET,
-            MimetypeMap.MIMETYPE_OPENDOCUMENT_PRESENTATION
-
-    };
+    private static final String AFFECTED_CHILD_ASSOCS = "AFFECTED_CHILD_ASSOCS";
+    private static final String COPY_NODES = "COPY_NODES";
 
     /** Log */
     private final static Log log = LogFactory.getLog(SectionType.class);
@@ -291,6 +287,9 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
         policyComponent.bindClassBehaviour(ContentServicePolicies.OnContentPropertyUpdatePolicy.QNAME,
                 WebSiteModel.TYPE_SECTION, new JavaBehaviour(this, "onContentPropertyUpdate"));
 
+        policyComponent.bindClassBehaviour(CopyServicePolicies.OnCopyNodePolicy.QNAME, WebSiteModel.TYPE_SECTION,
+                new JavaBehaviour(this, "getCopyCallback", NotificationFrequency.EVERY_EVENT));
+
         policyComponent.bindAssociationBehaviour(NodeServicePolicies.OnCreateChildAssociationPolicy.QNAME,
                 WebSiteModel.TYPE_SECTION, ContentModel.ASSOC_CONTAINS, new JavaBehaviour(this,
                         "onCreateChildAssociationEveryEvent", NotificationFrequency.EVERY_EVENT));
@@ -317,8 +316,7 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
     {
         if (log.isDebugEnabled())
         {
-            log.debug("onCreateChildAssociationEveryEvent: parent == " + childAssoc.getParentRef() + "; child == "
-                    + childAssoc.getChildRef() + "; newNode == " + isNewNode);
+            log.debug("onCreateChildAssociationEveryEvent: ref == " + childAssoc + "; newNode == " + isNewNode);
         }
         NodeRef childNode = childAssoc.getChildRef();
         QName childNodeType = nodeService.getType(childNode);
@@ -341,7 +339,7 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      */
     public void onCreateChildAssociationTransactionCommit(ChildAssociationRef childAssoc, boolean isNewNode)
     {
-        processCommit(childAssoc.getChildRef());
+        processCommit(childAssoc);
     }
 
     /**
@@ -359,7 +357,22 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      */
     public void onDeleteChildAssociationTransactionCommit(ChildAssociationRef childAssoc)
     {
-        processCommit(childAssoc.getChildRef());
+        processCommit(childAssoc);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public CopyBehaviourCallback getCopyCallback(QName classRef, CopyDetails copyDetails)
+    {
+        //We need to vary what behaviours we apply to a node if it is coming into existence via a copy.
+        //Therefore, we'll record the noderef of the copy node here for use later.
+        Set<NodeRef> copyNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(COPY_NODES);
+        if (copyNodeRefs == null)
+        {
+            copyNodeRefs = new HashSet<NodeRef>(89);
+            AlfrescoTransactionSupport.bindResource(COPY_NODES, copyNodeRefs);
+        }
+        copyNodeRefs.add(copyDetails.getTargetNodeRef());
+        return DefaultCopyBehaviourCallback.getInstance();
     }
 
     /**
@@ -373,15 +386,14 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
             log.debug("Recording affected child of section " + childAssoc.getParentRef() + ":  "
                     + childAssoc.getChildRef());
         }
-        NodeRef nodeRef = childAssoc.getChildRef();
         @SuppressWarnings("unchecked")
-        Set<NodeRef> affectedNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(AFFECTED_WEB_ASSETS);
-        if (affectedNodeRefs == null)
+        Set<ChildAssociationRef> affectedChildAssocs = (Set<ChildAssociationRef>) AlfrescoTransactionSupport.getResource(AFFECTED_CHILD_ASSOCS);
+        if (affectedChildAssocs == null)
         {
-            affectedNodeRefs = new HashSet<NodeRef>(5);
-            AlfrescoTransactionSupport.bindResource(AFFECTED_WEB_ASSETS, affectedNodeRefs);
+            affectedChildAssocs = new HashSet<ChildAssociationRef>();
+            AlfrescoTransactionSupport.bindResource(AFFECTED_CHILD_ASSOCS, affectedChildAssocs);
         }
-        affectedNodeRefs.add(nodeRef);
+        affectedChildAssocs.add(childAssoc);
     }
 
     /**
@@ -389,43 +401,57 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      * @param childNode
      */
     @SuppressWarnings("unchecked")
-    private void processCommit(NodeRef childNode)
+    private void processCommit(ChildAssociationRef childNodeAssoc)
     {
-        Set<NodeRef> affectedNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(AFFECTED_WEB_ASSETS);
+        Set<ChildAssociationRef> affectedNodeRefs = (Set<ChildAssociationRef>) AlfrescoTransactionSupport.getResource(AFFECTED_CHILD_ASSOCS);
+        Set<NodeRef> copyNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(COPY_NODES);
+
         Set<NodeRef> affectedSections = new HashSet<NodeRef>();
-        if (affectedNodeRefs != null && affectedNodeRefs.remove(childNode))
+        if (affectedNodeRefs != null && affectedNodeRefs.remove(childNodeAssoc))
         {
+            NodeRef childNode = childNodeAssoc.getChildRef();
+            NodeRef parentNode = childNodeAssoc.getParentRef();
             if (log.isDebugEnabled())
             {
                 log.debug("Processing commit of section child:  " + childNode);
             }
             if (nodeService.exists(childNode))
             {
-                QName childNodeType = nodeService.getType(childNode);
-                if (dictionaryService.isSubClass(childNodeType, ContentModel.TYPE_CONTENT)
-                        && !typesToIgnore.contains(childNodeType.toPrefixString(namespaceService)))
+                //Massage the content type and add the webasset aspect, but only if our parent node 
+                //isn't the target of a copy in this transaction. If it is then we can assume that this processing 
+                //has already taken place.
+                if (copyNodeRefs == null || !copyNodeRefs.contains(parentNode))
                 {
-                    // Check to see if this is an image
-                    ContentReader reader = contentService.getReader(childNode, ContentModel.PROP_CONTENT);
-                    if (reader != null && reader.exists())
+                    QName childNodeType = nodeService.getType(childNode);
+                    if (ContentModel.TYPE_CONTENT.equals(childNodeType)
+                            && !typesToIgnore.contains(childNodeType.toPrefixString(namespaceService)))
                     {
-                        String mimetype = reader.getMimetype();
-                        if (mimetype != null && mimetype.trim().length() != 0)
+                        // Check to see if this is an image
+                        ContentReader reader = contentService.getReader(childNode, ContentModel.PROP_CONTENT);
+                        if (reader != null && reader.exists())
                         {
-                            if (isImageMimetype(reader.getMimetype()) == true)
+                            String mimetype = reader.getMimetype();
+                            if (mimetype != null && mimetype.trim().length() != 0)
                             {
-                                // Make content node an image
-                                nodeService.setType(childNode, TYPE_IMAGE);
-                            }
-                            else if (mimetypeMap.isText(reader.getMimetype()) == true)
-                            {
-                                // Make the content node an article
-                                nodeService.setType(childNode, TYPE_ARTICLE);
+                                if (isImageMimetype(reader.getMimetype()) == true)
+                                {
+                                    // Make content node an image
+                                    nodeService.setType(childNode, TYPE_IMAGE);
+                                }
+                                else if (mimetypeMap.isText(reader.getMimetype()) == true)
+                                {
+                                    // Make the content node an article
+                                    nodeService.setType(childNode, TYPE_ARTICLE);
+                                }
                             }
                         }
                     }
-                    // Apply the web asset aspect
-                    nodeService.addAspect(childNode, ASPECT_WEBASSET, null);
+                    if (dictionaryService.isSubClass(childNodeType, ContentModel.TYPE_CONTENT)
+                            && !typesToIgnore.contains(childNodeType.toPrefixString(namespaceService)))
+                    {
+                        // Apply the web asset aspect
+                        nodeService.addAspect(childNode, ASPECT_WEBASSET, null);
+                    }
                 }
 
                 boolean childIsWebAsset = nodeService.hasAspect(childNode, ASPECT_WEBASSET);
@@ -444,11 +470,11 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
                     Set<NodeRef> ancestorSections = new HashSet<NodeRef>();
                     for (ChildAssociationRef assoc : parentAssocs)
                     {
-                        NodeRef parentNode = assoc.getParentRef();
-                        if (dictionaryService.isSubClass(nodeService.getType(parentNode), WebSiteModel.TYPE_SECTION))
+                        NodeRef parent = assoc.getParentRef();
+                        if (dictionaryService.isSubClass(nodeService.getType(parent), WebSiteModel.TYPE_SECTION))
                         {
-                            parentSections.add(parentNode);
-                            Collection<NodeRef> ancestors = (Collection<NodeRef>) nodeService.getProperty(parentNode,
+                            parentSections.add(parent);
+                            Collection<NodeRef> ancestors = (Collection<NodeRef>) nodeService.getProperty(parent,
                                     PROP_ANCESTOR_SECTIONS);
                             if (ancestors != null)
                             {
@@ -513,6 +539,10 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      */
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
+        if (log.isDebugEnabled())
+        {
+            log.debug("onCreateNode " + childAssocRef);
+        }
         processCreateNode(childAssocRef.getChildRef());
         recordAffectedChild(childAssocRef);
     }
@@ -523,8 +553,16 @@ public class SectionType extends TransactionListenerAdapter implements WebSiteMo
      * @param childAssocRef
      *            created child association reference
      */
+    @SuppressWarnings("unchecked")
     public void processCreateNode(NodeRef section)
     {
+        Set<NodeRef> copyNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(COPY_NODES);
+        if ((copyNodeRefs != null) && copyNodeRefs.contains(section))
+        {
+            //This node was created as a copy of another node. Assume that the index page and asset collections will
+            //come across too. No action needed.
+            return;
+        }
         // Create an index page for the section
         FileInfo indexPage = fileFolderService.create(section, sectionIndexPageName, TYPE_INDEX_PAGE);
         ContentWriter writer = fileFolderService.getWriter(indexPage.getNodeRef());
