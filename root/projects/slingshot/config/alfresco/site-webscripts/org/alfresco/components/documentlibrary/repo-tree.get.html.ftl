@@ -7,7 +7,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RepositoryDocListTree("${el}").setOptions(
    {
-      nodeRef: new Alfresco.util.NodeRef("${rootNode}"),
+      rootNode: "${rootNode}",
       evaluateChildFolders: ${evaluateChildFolders!"false"},
       maximumFolderCount: ${maximumFolderCount!"-1"}
    }).setMessages(

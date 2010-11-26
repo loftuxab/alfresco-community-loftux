@@ -4,7 +4,7 @@
    new Alfresco.RepositoryDocumentList("${args.htmlid}").setOptions(
    {
       <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}",</#if>
-      nodeRef: new Alfresco.util.NodeRef("${rootNode}"),
+      rootNode: "${rootNode}",
       usePagination: ${(args.pagination!false)?string},
       showFolders: ${(preferences.showFolders!false)?string},
       simpleView: ${(preferences.simpleView!false)?string},

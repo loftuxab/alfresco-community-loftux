@@ -3,7 +3,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RepositoryDocListToolbar("${args.htmlid?js_string}").setOptions(
    {
-      nodeRef: new Alfresco.util.NodeRef("${rootNode}"),
+      rootNode: "${rootNode}",
       hideNavBar: ${(preferences.hideNavBar!false)?string},
       googleDocsEnabled: ${(googleDocsEnabled!false)?string}
    }).setMessages(

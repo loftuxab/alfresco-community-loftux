@@ -95,7 +95,7 @@
          if (this.options.siteId == "")
          {
             // Repository mode
-            url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.nodeRef);
+            url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
          }
          Alfresco.util.Ajax.jsonGet(
          {

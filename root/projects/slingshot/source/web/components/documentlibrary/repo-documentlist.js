@@ -345,7 +345,6 @@
          // Essential defaults
          var obj = 
          {
-            nodeRef: this.options.nodeRef,
             path: this.currentPath,
             type: this.options.showFolders ? "all" : "documents",
             filter: this.currentFilter
@@ -365,10 +364,9 @@
          }
 
          // Build the URI stem
-         var params = YAHOO.lang.substitute("{type}/node/{nodeRef}" + (obj.filter.filterId == "path" || obj.filter.filterId == "category" ? "{path}" : ""),
+         var params = YAHOO.lang.substitute("{type}/node/alfresco/company/home" + (obj.filter.filterId == "path" || obj.filter.filterId == "category" ? "{path}" : ""),
          {
             type: encodeURIComponent(obj.type),
-            nodeRef: obj.nodeRef.uri,
             path: $combine("/", Alfresco.util.encodeURIPath(obj.path))
          });
 
@@ -389,7 +387,7 @@
          params += "&noCache=" + new Date().getTime();
          
          // Repository mode (don't resolve Site-based folders)
-         params += "&libraryRoot=" + encodeURIComponent(this.options.nodeRef.toString());
+         params += "&libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
 
          return params;
       }

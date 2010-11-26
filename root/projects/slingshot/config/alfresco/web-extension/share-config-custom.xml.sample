@@ -155,7 +155,9 @@
    <!-- Repository Library config section -->
    <config evaluator="string-compare" condition="RepositoryLibrary" replace="true">
       <!--
-         Root nodeRef for top-level folder.
+         Root nodeRef or xpath expression for top-level folder.
+         e.g. alfresco://user/home, /app:company_home/st:sites/cm:site1
+         If using an xpath expression, ensure it is properly ISO9075 encoded here.
       -->
       <root-node>alfresco://company/home</root-node>
 
