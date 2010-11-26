@@ -83,12 +83,12 @@
          containerId: "",
 
          /**
-          * Root nodeRef for use in non-Site mode
+          * Root node for use in non-Site mode
           * 
-          * @property nodeRef
-          * @type Alfresco.util.NodeRef
+          * @property rootNode
+          * @type string
           */
-         nodeRef: null,
+         rootNode: null,
 
          /**
           * Number of tags to show
@@ -174,7 +174,7 @@
                d: new Date().getTime(),
                m: this.options.numTags,
                s: "count",
-               n: encodeURIComponent(this.options.nodeRef)
+               n: encodeURIComponent(this.options.rootNode)
             });
          }
          

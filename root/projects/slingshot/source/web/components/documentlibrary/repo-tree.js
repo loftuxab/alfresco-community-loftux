@@ -57,10 +57,13 @@
        */
        _buildTreeNodeUrl: function DLT__buildTreeNodeUrl(path)
        {
-          var nodeRef = this.options.nodeRef,
-            uriTemplate ="slingshot/doclib/treenode/node/" + $combine(encodeURI(nodeRef.uri), Alfresco.util.encodeURIPath(path));
+          var url = $combine("slingshot/doclib/treenode/node/alfresco/company/home", Alfresco.util.encodeURIPath(path));
+          url += "?perms=false";
+          url += "&children=" + this.options.evaluateChildFolders;
+          url += "&max=" + this.options.maximumFolderCount;
+          url += "&libraryRoot=" + this.options.rootNode;
 
-          return Alfresco.constants.PROXY_URI + uriTemplate + "?perms=false&children=" + this.options.evaluateChildFolders + "&max=" + this.options.maximumFolderCount;
+          return Alfresco.constants.PROXY_URI + url;
        }
    });
 })();

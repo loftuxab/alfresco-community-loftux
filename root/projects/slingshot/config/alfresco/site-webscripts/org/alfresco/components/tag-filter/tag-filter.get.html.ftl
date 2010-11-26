@@ -3,7 +3,7 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${template.properties.container!""}",
-      nodeRef: new Alfresco.util.NodeRef("${rootNode}")
+      rootNode: "${rootNode}"
    }).setMessages(
       ${messages}
    ).setFilterIds(["tag"]);

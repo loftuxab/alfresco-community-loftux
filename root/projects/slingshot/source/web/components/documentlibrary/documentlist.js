@@ -319,12 +319,12 @@
          containerId: "documentLibrary",
 
          /**
-          * Current root nodeRef. Not used in Site working mode.
+          * Current root node. Not used in Site working mode.
           * 
-          * @property nodeRef
-          * @type Alfresco.util.NodeRef
+          * @property rootNode
+          * @type string
           */
-         nodeRef: null,
+         rootNode: null,
 
          /**
           * Initial page to show on load (otherwise taken from URL hash).

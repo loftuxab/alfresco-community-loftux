@@ -140,13 +140,13 @@
          containerType: "cm:folder",
 
          /**
-          * NodeRef representing root container in repository view mode
+          * Root node representing root container in repository view mode
           *
-          * @property nodeRef
+          * @property rootNode
           * @type string
           * @default "alfresco://company/home"
           */
-         nodeRef: "alfresco://company/home",
+         rootNode: "alfresco://company/home",
 
          /**
           * NodeRef representing root container in user home view mode
@@ -515,10 +515,10 @@
          {
             // If pathNodeRef is given the user of this component doesn't know what viewmode to display
             var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/node/" + this.options.pathNodeRef.uri + "/location";
-            if (this.options.nodeRef)
+            if (this.options.rootNode)
             {
                // Repository mode
-               url += "?libraryRoot=" + encodeURIComponent(this.options.nodeRef.toString());
+               url += "?libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
             }
             Alfresco.util.Ajax.jsonGet(
             {
@@ -655,7 +655,7 @@
          {
             Dom.addClass(this.id + "-wrapper", "repository-mode");
             // Build the TreeView widget
-            this._buildTree(viewMode == DLGF.VIEW_MODE_USERHOME ? this.options.userHome : this.options.nodeRef);
+            this._buildTree(viewMode == DLGF.VIEW_MODE_USERHOME ? this.options.userHome : this.options.rootNode);
             this.onPathChanged(this.options.path ? this.options.path : "/");
          }
       },
@@ -1214,12 +1214,14 @@
             if (this.options.viewMode == DLGF.VIEW_MODE_USERHOME)
             {
                uriTemplate += "slingshot/doclib/treenode/node/{userHome}{path}";
+               uriTemplate += "?children=" + this.options.evaluateChildFoldersRepo;
             }
             else
             {
-               uriTemplate += "slingshot/doclib/treenode/node/{nodeRef}{path}";
+               uriTemplate += "slingshot/doclib/treenode/node/alfresco/company/home{path}";
+               uriTemplate += "?children=" + this.options.evaluateChildFoldersRepo;
+               uriTemplate += "&libraryRoot=" + this.options.rootNode;
             }
-            uriTemplate += "?children=" + this.options.evaluateChildFoldersRepo;
             uriTemplate += "&max=" + this.options.maximumFolderCountRepo;
          }
 
@@ -1227,7 +1229,6 @@
          {
             site: encodeURIComponent(this.options.siteId),
             container: encodeURIComponent(this.options.containerId),
-            nodeRef: this.options.nodeRef.replace(":/", ""),
             userHome: this.options.userHome.replace(":/", ""),
             path: Alfresco.util.encodeURIPath(path)
          });

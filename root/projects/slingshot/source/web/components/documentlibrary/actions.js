@@ -716,7 +716,8 @@
             containerId: this.options.containerId,
             path: this.currentPath,
             files: asset,
-            workingMode: this.options.workingMode
+            workingMode: this.options.workingMode,
+            rootNode: this.options.rootNode
          }).showDialog();
       },
 
