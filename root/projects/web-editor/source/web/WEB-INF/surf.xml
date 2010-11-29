@@ -5,7 +5,7 @@
          <!-- Configure Surf Defaults -->
          <defaults>
             <page-mapper-factory>webframework.factory.pagemapper.awe</page-mapper-factory>
-            
+            <user-factory>webframework.factory.user.alfresco</user-factory>
             <theme>sam</theme>
             <site-configuration>awe.site.configuration</site-configuration>
             <region-chrome>awe-region-chrome</region-chrome>
