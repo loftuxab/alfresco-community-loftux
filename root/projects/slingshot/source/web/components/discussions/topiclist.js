@@ -298,7 +298,7 @@
          Alfresco.util.tags.registerTagActionHandler(this);
 
          // DataSource definition
-         var uriDiscussionsTopicList = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/site/{site}/{container}/posts",
+         var uriDiscussionsTopicList = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/forum/site/{site}/{container}/posts",
          {
             site: this.options.siteId,
             container: this.options.containerId

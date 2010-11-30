@@ -191,13 +191,19 @@
          if (!workingCopyMode)
          {
             Dom.removeClass(this.id + "-body", "hidden");
-            // Check if user has revert permissions (checkout the node & checkin on parent node)
-            if (args[1].metadata.parent.permissions.userAccess.create && args[1].documentDetails.permissions.userAccess.edit)
+            // Check if user has revert permissions
+            var roles = args[1].documentDetails.permissions.roles;
+            for (var i = 0, il = roles.length; i < il; i++)
             {
-               var revertEls = Selector.query("a.revert", this.id + "-body");
-               for (i = 0, il = revertEls.length; i < il; i++)
+               if (Alfresco.util.arrayContains(["SiteManager", "SiteCollaborator"], roles[i].split(";")[2])
+                     && roles[i].split(";")[0] == "ALLOWED")
                {
-                  Dom.removeClass(revertEls[i].parentNode, "hidden");
+                  var revertEls = Selector.query("a.revert", this.id + "-body");
+                  for (i = 0, il = revertEls.length; i < il; i++)
+                  {
+                     Dom.removeClass(revertEls[i].parentNode, "hidden");
+                  }
+                  break;
                }
             }
          }

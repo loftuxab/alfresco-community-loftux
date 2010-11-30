@@ -248,7 +248,7 @@
       _loadCommentsList: function CommentList__loadCommentsList(startIndex)
       {
          // construct the url to call
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{nodeRef}/comments",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/node/{nodeRef}/comments",
          {
             nodeRef: this.options.itemNodeRef.replace(":/", "")
          });

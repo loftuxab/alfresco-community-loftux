@@ -196,6 +196,7 @@
          this.widgets.okButton.set("disabled", true);
          this.widgets.cancelButton.set("disabled", true);
 
+         // Its ok to load the version using the proxy as long as its content isn't inserted into the Dom.
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
          {
             site: this.showConfig.siteId,

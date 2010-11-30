@@ -32,11 +32,6 @@
       Event = YAHOO.util.Event;
 
    /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML;
-   
-   /**
     * Preferences
     */
    var PREFERENCES_ACTIVITIES = "org.alfresco.share.activities",

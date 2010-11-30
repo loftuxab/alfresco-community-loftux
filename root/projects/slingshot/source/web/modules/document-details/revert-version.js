@@ -56,7 +56,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
    Alfresco.module.RevertVersion.prototype =
    {

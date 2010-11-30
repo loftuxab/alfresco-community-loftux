@@ -311,7 +311,7 @@
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-span", fnActionHandlerSpan);
          
          // DataSource definition
-         var uriBlogPostList = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/site/{site}/{container}/posts",
+         var uriBlogPostList = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/blog/site/{site}/{container}/posts",
          {
             site: this.options.siteId,
             container: this.options.containerId
