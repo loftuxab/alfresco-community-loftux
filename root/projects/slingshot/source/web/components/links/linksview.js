@@ -230,7 +230,7 @@
          html += Alfresco.util.links.generateLinksActions(this, data, 'div');
 
          // Prepare url attribute
-         var href = (data.url.substring(0, 1) === "/" || data.url.indexOf("://") !== -1 ? '' : "http://") + data.url.replace('"', encodeURIComponent('"'));
+         var href = (data.url.substring(0, 1) === "/" || data.url.indexOf("://") !== -1 ? '' : "http://") + data.url.replace(/"/g, encodeURIComponent('"'));
 
          // Link details
          html += '<div class="nodeContent">';

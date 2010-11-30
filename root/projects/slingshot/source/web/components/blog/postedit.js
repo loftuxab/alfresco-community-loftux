@@ -148,7 +148,7 @@
          };
          
          // construct the request url
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/blog/post/site/{site}/{container}/{postId}",
          {
             site : this.options.siteId,
             container: this.options.containerId,

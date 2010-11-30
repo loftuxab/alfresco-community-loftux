@@ -223,7 +223,7 @@
          };
          
          // construct url to call
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/forum/post/site/{site}/{container}/{topicId}",
          {
             site : this.options.siteId,
             container: this.options.containerId,

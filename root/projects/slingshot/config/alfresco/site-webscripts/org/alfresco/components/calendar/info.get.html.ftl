@@ -10,15 +10,15 @@
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.what")}: *</div>
-      <div class="yui-u">${result.what?html!""}</div>
+      <div class="yui-u">${result.what?html?html}</div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.location")}:</div>
-      <div class="yui-u">${result.location?html!""}</div>
+      <div class="yui-u">${result.location?html?html}</div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.description")}:</div>
-      <div class="yui-u">${result.description?html!""}</div>
+      <div class="yui-u">${result.description?html?html}</div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.tags")}:</div>
@@ -50,7 +50,7 @@
 <#if result.recurrence!=''>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.recurrence")}:</div>
-      <div class="yui-u">${result.recurrence}</div>
+      <div class="yui-u">${result.recurrence?html}</div>
    </div>
 </#if>
    <div class="yui-g">

@@ -232,7 +232,7 @@
        */
       loadDialogData: function ConfigBlog_loadDialogData()
       {
-         // Load the current blog configuration data
+         // Load the current blog configuration data (no blog post content is loaded)
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.PROXY_URI + "api/blog/site/" + this.options.siteId + "/" + this.options.containerId,

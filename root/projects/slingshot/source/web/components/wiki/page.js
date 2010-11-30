@@ -522,7 +522,7 @@
       onVersionSelectChange: function WikiPage_onVersionSelectChange(sType, aArgs, p_obj)
       {
          var versionId = aArgs[1].value;
-         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
+         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/wiki/version/{site}/{title}/{version}",
          {
             site: this.options.siteId,
             title: encodeURIComponent(this.options.pageTitle),

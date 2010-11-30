@@ -48,7 +48,7 @@
       {
          create: ${(permissions["create"]!false)?string},
          edit: ${(permissions["edit"]!false)?string},
-         "delete": ${(permissions["delete"]!false)?string}
+         delete: ${(permissions["delete"]!false)?string}
       }
    }).setMessages(
       ${messages}
@@ -141,7 +141,7 @@
          <div class="yui-g">
             <div class="yui-u first">
                <h2>
-                  ${result.title!""}
+                  ${(result.title!"")?html}
                   <#if result.versionhistory??><#list result.versionhistory as version><#if version_index == 0><span id="${args.htmlid}-version-header" class="light">${msg("label.shortVersion")}${version.version}</span></#if></#list></#if>
                </h2>
             </div>

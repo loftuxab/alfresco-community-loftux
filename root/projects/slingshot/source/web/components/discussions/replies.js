@@ -265,7 +265,7 @@
          };
          
          // construct the url to call
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}/replies?levels={levels}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/forum/post/site/{site}/{container}/{topicId}/replies?levels={levels}",
          {
             site : this.options.siteId,
             container: this.options.containerId,
