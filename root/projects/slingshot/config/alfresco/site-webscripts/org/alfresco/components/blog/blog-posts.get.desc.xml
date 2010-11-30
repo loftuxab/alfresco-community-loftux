@@ -5,5 +5,4 @@
   <url>/components/blog/site/{site}/{container}/posts</url>
   <url>/components/blog/site/{site}/{container}/posts/{filter}</url>
   <format default="json">argument</format>
-  <authentication>user</authentication>
 </webscript>
