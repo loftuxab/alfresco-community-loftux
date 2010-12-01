@@ -345,12 +345,12 @@
           */
          var renderCellActions = function Links_renderCellActions(elCell, oRecord, oColumn, oData)
          {
-            var prefix = oRecord.getData("title"),
+            var title = oRecord.getData("title"),
                permissions = oRecord.getData("permissions");
                
             elCell.style.visibility = "hidden";
-            elCell.innerHTML = "<div class='" + me.EDITEDCLASS +  "'><a id='edit-" + prefix + "'><span class='theme-color-1'>" + me.msg("links.edit") + "</a></span></div>" +
-               "<div class='" + me.DELETEDCLASS + "'><a id='delete-" + prefix + "'><span class='theme-color-1'>" + me.msg("links.delete") + "</a></span></div>";
+            elCell.innerHTML = "<div class='" + me.EDITEDCLASS +  "'><a><span class='theme-color-1'>" + me.msg("links.edit") + "</a></span></div>" +
+               "<div class='" + me.DELETEDCLASS + "'><a><span class='theme-color-1'>" + me.msg("links.delete") + "</a></span></div>";
 
             var ec = elCell.childNodes[0],
                dc = elCell.childNodes[1];
@@ -387,7 +387,7 @@
             {
                dc.onclick = function ()
                {
-                  var mes = me.msg("dialog.confirm.message.delete", prefix);
+                  var mes = me.msg("dialog.confirm.message.delete", title);
                   var callback = function()
                   {
                      me.deleteLinks([oRecord]);

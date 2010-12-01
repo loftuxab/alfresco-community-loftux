@@ -921,11 +921,11 @@ Alfresco.util.encodeHTML = function(text, justified)
    if (YAHOO.env.ua.ie > 0)
    {
       text = "" + text;
-      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />" + indent);
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />" + indent).replace(/"/g, "&quot;");
    }
    var me = arguments.callee;
    me.text.data = text;
-   return me.div.innerHTML.replace(/\n/g, "<br />" + indent).replace('"','&quot;');
+   return me.div.innerHTML.replace(/\n/g, "<br />" + indent).replace(/"/g, "&quot;");
 };
 Alfresco.util.encodeHTML.div = document.createElement("div");
 Alfresco.util.encodeHTML.text = document.createTextNode("");

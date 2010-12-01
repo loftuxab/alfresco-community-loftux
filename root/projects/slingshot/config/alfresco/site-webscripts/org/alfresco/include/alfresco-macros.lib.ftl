@@ -31,7 +31,7 @@
 <#function msgArgs msgId msgTokens>
    <#if msgTokens??>
       <#if msgTokens?is_sequence>
-         <#assign templateTokens><#list msgTokens as token>"${token?string}"<#if token_has_next>,</#if></#list></#assign>
+         <#assign templateTokens><#list msgTokens as token>"${token?j_string}"<#if token_has_next>,</#if></#list></#assign>
          <#assign templateSource = r"${msg(msgId," + templateTokens + ")}">
          <#assign inlineTemplate = [templateSource, "msgArgsTemplate"]?interpret>
          <#assign returnValue><@inlineTemplate /></#assign>

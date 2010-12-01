@@ -4,7 +4,11 @@
 <#if (action='new' || action='edit')>
 
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.admin.RMRoles("manageRoles").setOptions({'action': '${action}', 'roleId': '${roleId!""}'}).setMessages(${messages});
+   new Alfresco.admin.RMRoles("manageRoles").setOptions(
+   {
+      action: "${action?js_string}",
+      roleId: "${(roleId!"")?js_string}"
+   }).setMessages(${messages});
 //]]></script>
 
 <div id="manageRoles">
@@ -208,7 +212,10 @@
 <#else>
 
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.admin.RMViewRoles("viewRoles").setOptions({'selectedRoleId': '${roleId!""}'}).setMessages(${messages});
+   new Alfresco.admin.RMViewRoles("viewRoles").setOptions(
+   {
+      selectedRoleId: "${(roleId!"")?js_string}"
+   }).setMessages(${messages});
 //]]></script>
 
 <div id="viewRoles">
@@ -220,12 +227,12 @@
    <div class="yui-gf view-role-list">
       <div id="roleSelection" class="yui-u first">
          <div class="list-header">
-      	   <h3>${msg('label.roles')}</h3>
-      	</div>
-      	<div id="roles">
+            <h3>${msg('label.roles')}</h3>
+         </div>
+         <div id="roles">
             <ul>
             </ul>
-      	</div>
+         </div>
       </div>
       
       <div id="roleContent" class="yui-u">
@@ -236,7 +243,7 @@
             <div class="deleteRoleButton">
                <button id="deleteRole" class="action">${msg('label.delete-role')}</button>
             </div>
-         	<div class="capabilities-header">${msg('label.capabilities')}</div>
+            <div class="capabilities-header">${msg('label.capabilities')}</div>
          </div>
          <div class="roleCapabilities">
             <ul class="capabilities-list" id="capabilities-list">
