@@ -11,9 +11,9 @@
             <div class="yui-u first"><label>${msg("label.displayItems")}:</label></div>
             <div class="yui-u">
                <select id="${el}-limit" name="limit">
-                <option value="all">All</option>
+                <option value="all">${msg("label.all")}</option>
                 <#assign limits = [5, 10, 15, 20, 25]>
-                <#list limits as limit><option value="${limit}">${limit}</option></#list>
+                <#list limits as limit><option value="${limit}">${msg("label.limit."+limit)}</option></#list>
                </select>
             </div>
          </div>
