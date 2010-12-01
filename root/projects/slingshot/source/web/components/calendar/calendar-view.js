@@ -1574,7 +1574,7 @@ Alfresco.util.DialogManager = (function()
                "obj": this
             }, "focus");
             
-            form.setShowSubmitStateDynamically(true, true);
+            form.setShowSubmitStateDynamically(true, false);
             form.setSubmitElements(this.widgets.okButton);
             
             /**
