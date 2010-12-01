@@ -7,7 +7,7 @@
       <div class="photorow">
          <div class="photo">
             <#if user.properties.avatar??>
-               <img  class="photoimg" src="${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" alt="" />
+               <img  class="photoimg" src="${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')?html}/content/thumbnails/avatar?c=force" alt="" />
             <#else>
                <img class="photoimg" src="${url.context}/res/components/images/no-user-photo-64.png" alt="" />
             </#if>
