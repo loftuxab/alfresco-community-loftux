@@ -683,15 +683,7 @@
 
       <!-- Copy any required common libs -->
       <copy todir="${dir.continuous.assemble.tomcat}/lib"
-            file="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
-      <copy todir="${dir.continuous.assemble.tomcat}/lib"
             file="${dir.project.3rdparty.lib}/devenv/${file.name.jar.mysql.connector}" />
-
-      <!-- place latest Xalan jars to ensure they are used -->
-      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
-            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
-      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
-            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
 
       <!-- Add config to shared location -->
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
@@ -740,12 +732,12 @@
 
          <!-- Main Installer -->
          <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win.txt" failifexecutionfails="false">
-            <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows"'/>
+            <arg line='build project.xml windows --setvars ${installer.build.args} project.installerFilename="${file.name.dist.installer.win}" binaries_folder="${installer.build.binaries.win32}" java_distribution_directory="${installer.build.binaries.win32.java}" tomcat_distribution_directory="${installer.build.binaries.win32.tomcat}"'/>
          </exec>
       
       <!-- Main 64-bit Installer -->
          <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-win64.txt" failifexecutionfails="false">
-            <arg line='build project.xml windows --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.win64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-windows-x64"'/>
+            <arg line='build project.xml windows --setvars ${installer.build.args} project.installerFilename="${file.name.dist.installer.win64}" binaries_folder="${installer.build.binaries.win64}" java_distribution_directory="${installer.build.binaries.win64.java}" tomcat_distribution_directory="${installer.build.binaries.win64.tomcat}"'/>
          </exec>
       
       <!-- Deployment Installer -->
@@ -759,7 +751,7 @@
          <!-- Sequence installer then tarball -->
 	     <sequential>
             <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-osx.txt" failifexecutionfails="false">
-               <arg line='build project.xml osx --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.osx}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-osx-x86"'/>
+               <arg line='build project.xml osx --setvars ${installer.build.args} project.installerFilename="${file.name.dist.installer.osx}" binaries_folder="${installer.build.binaries.osx86}" java_distribution_directory="${installer.build.binaries.osx86.java}" tomcat_distribution_directory="${installer.build.binaries.osx86.tomcat}"'/>
             </exec>
             <tar destfile="${dir.continuous.dist}/${file.name.dist.installer.osx}.tar.gz"
                  longfile="gnu"
@@ -789,12 +781,12 @@
    
          <!-- Main Installer -->
          <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux.txt" failifexecutionfails="false">
-            <arg line='build project.xml linux --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux"'/>
+            <arg line='build project.xml linux --setvars ${installer.build.args} project.installerFilename="${file.name.dist.installer.linux}" binaries_folder="${installer.build.binaries.lin32}" java_distribution_directory="${installer.build.binaries.lin32.java}" tomcat_distribution_directory="${installer.build.binaries.lin32.tomcat}"'/>
          </exec>          
       
          <!-- Main 64-bit Installer -->
          <exec dir="${dir.installer.bitrock}" executable="${platformExe}" output="build/error-install-linux64.txt" failifexecutionfails="false">
-            <arg line='build project.xml linux-x64 --setvars "project.outputDirectory=${dir.continuous.dist}" "project.version=${file.name.exe.version}" "project.fullName=Alfresco ${file.name.codeline}" project.installerFilename="${file.name.dist.installer.linux64}" "alfresco_svn_rootdir=${basedir}" "alfresco_edition=${file.name.start}" "binaries_folder=${dir.name.binaries.bitrock}/binaries-linux-x64"'/>
+            <arg line='build project.xml linux-x64 --setvars ${installer.build.args} project.installerFilename="${file.name.dist.installer.linux64}" binaries_folder="${installer.build.binaries.lin64}" java_distribution_directory="${installer.build.binaries.lin64.java}" tomcat_distribution_directory="${installer.build.binaries.lin64.tomcat}"'/>
          </exec>          
 
          <!-- Deployment Installer -->

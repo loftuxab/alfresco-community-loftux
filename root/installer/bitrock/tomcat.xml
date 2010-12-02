@@ -34,6 +34,7 @@ TODO LIST
     <initializationActionList/>
     <parameterList>
 <!-- Hidden component -->
+<directoryParameter name="tomcat_distribution_folder" value="${build_project_directory}/apache-tomcat" ask="0" />
 <stringParameter>
             <name>tomcat_installation_type_options</name>
             <ask>0</ask>
@@ -499,7 +500,8 @@ export JAVA_OPTS
                         <platformTest type="osx"/>
                     </ruleList>
                 </writeFile>
-
+		<addFilesToUninstaller files="${application_server_directory}/bin/setenv.sh;${application_server_directory}/bin/setenv.bat" />
+		<addFilesToUninstaller files="${application_server_directory}/bin/setenv.sh;${application_server_directory}/shared" />
 <!--</actionList>
 		    <ruleList>
 			<compareText logic="equals" text="${java_installation_type}" value="bundled" />			
@@ -542,7 +544,7 @@ export JAVA_OPTS
                 </runProgram>
                 <deleteFile path="${tomcat_server_directory}">
                     <ruleList>
-                        <compareText text="${tomcat_installation_type}" logic="equals" value="existing"/>
+                        <compareText text="${tomcat_installation_type}" logic="equals" value="bundled"/>
                     </ruleList>
                 </deleteFile>
             </actionList>
@@ -557,7 +559,7 @@ export JAVA_OPTS
             <actionList>
                 <deleteFile path="${tomcat_server_directory}">
                     <ruleList>
-                        <compareText text="${tomcat_installation_type}" logic="equals" value="existing"/>
+                        <compareText text="${tomcat_installation_type}" logic="equals" value="bundled"/>
                     </ruleList>
                 </deleteFile>
             </actionList>

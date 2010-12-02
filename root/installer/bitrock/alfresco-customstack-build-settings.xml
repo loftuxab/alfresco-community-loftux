@@ -9,24 +9,14 @@
         <!-- AlfrescoDM build settings -->
         <!-- NOTE: licenses directory should also include the licenses provided by BitRock -->
 
-        <setInstallerVariable name="alfresco_extensions_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/tomcat/shared/classes/alfresco" />
-        <setInstallerVariable name="alfresco_endorsed_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/tomcat/endorsed" />
+        <setInstallerVariable name="alfresco_extensions_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/web-server/shared/classes" />
+        <setInstallerVariable name="alfresco_lib_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/web-server/lib" />
+        <setInstallerVariable name="alfresco_endorsed_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/web-server/endorsed" />
         <setInstallerVariable name="alfresco_war_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble/web-server/webapps" />
         <setInstallerVariable name="alfresco_extras_source_directory" value="${alfresco_svn_rootdir.unix}/projects/installer" />
         <setInstallerVariable name="alfresco_licenses_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/licenses" />
         <setInstallerVariable name="project.readmeFile" value="${alfresco_svn_rootdir.unix}/installer/bitrock/README.txt" />
         <setInstallerVariable name="alfresco_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock" />
-        <setInstallerVariable name="alfresco_on_install_settings_per_platform_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/alfresco/linux" >
-            <ruleList>
-                <compareText text="${platform_name}"  logic="does_not_equal" value="windows" />
-            </ruleList>
-        </setInstallerVariable>
-        <setInstallerVariable name="alfresco_on_install_settings_per_platform_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/alfresco/windows" >
-            <ruleList>
-                <compareText text="${platform_name}"  logic="equals" value="windows" />
-            </ruleList>
-        </setInstallerVariable>
-
 
         <setInstallerVariable name="alfrescowcm_source_directory" value="${alfresco_svn_rootdir.unix}/build/assemble" />
         <setInstallerVariable name="alfrescowcm_on_install_settings_directory" value="${alfresco_svn_rootdir.unix}/installer/bitrock/bitrock/alfrescowcm" />

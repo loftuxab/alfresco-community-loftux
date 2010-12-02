@@ -28,7 +28,7 @@
             <name>mmtjar</name>
             <destination>${alfresco_commands_directory}</destination>
             <distributionFileList>
-              <distributionFile origin="${alfresco_mmt_source_files}/*.jar" allowWildcards="1" />
+              <distributionFile origin="${alfresco_mmt_source_file}" allowWildcards="1" />
             </distributionFileList>
         </folder>
     </folderList>

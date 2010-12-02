@@ -71,7 +71,6 @@
         <include file="alfresco-linux-building-on-windows-patch.xml" />
         <include file="alfresco-osx-building-on-windows-patch.xml" />
         <include file="alfresco-linux-x64-building-on-windows-patch.xml" />
-        <include file="alfresco-apply-amps.xml" />
 
         <include file="base-java-settings.xml"/>
 	<include file="base-tomcat-settings.xml"/>
@@ -92,6 +91,7 @@
 	<include file="mysql-service.xml" />
 
     	<include file="alfrescodm.xml" />
+        <include file="alfresco-apply-amps.xml" />
     	<include file="alfrescodm-database.xml" />
         <!-- AMP extensions -->
         <include file="alfresco-sharepoint.xml" />
@@ -137,6 +137,9 @@
                 </runProgram>
 		<waitForPort port="${database_port}" timeout="10000" state="free" />
 	    </actionList>
+	    <ruleList>
+		<compareText value="${mysql_installation_type}" logic="equals" text="bundled" />
+	    </ruleList>
 	</actionGroup>
         <!--<actionGroup>
             <actionList>
@@ -229,6 +232,9 @@
 	</showInfo>
     </finalPageActionList>
     
+    <installationAbortedActionList>
+	<deleteFile path="${installdir}/tomcat" />
+    </installationAbortedActionList>
 
     <preUninstallationActionList>
         <setInstallerVariable name="deleteConfirm" value="yes" />

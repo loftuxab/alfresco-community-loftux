@@ -170,6 +170,7 @@ Copyrighted by BitRock
     </initializationActionList>
     <parameterList>
 <!-- hidden parameter -->
+<directoryParameter name="java_distribution_folder" value="${build_project_directory}/java" ask="0" />
 <stringParameter>
             <name>java_installation_type_options</name>
             <ask>0</ask>
@@ -290,12 +291,12 @@ set JAVA_HOME=${java_home_directory}
     <folderList>
         <folder>
             <description>Program Files</description>
-            <destination>${installdir}</destination>
+            <destination>${installdir}/java</destination>
             <name>programfiles</name>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionDirectory>
-                    <origin>${java_distribution_folder}</origin>
+                <distributionDirectory allowWildcards="1">
+                    <origin>${java_distribution_folder}/*</origin>
                 </distributionDirectory>
             </distributionFileList>
             <ruleList>
