@@ -21,7 +21,7 @@
 	    <cliOptionShow>0</cliOptionShow>
 	</stringParameter>
     </parameterList>
-    <postInstallationActionList>
+    <readyToInstallActionList>
         <actionGroup>
             <actionList>
                 <getUniqueWindowsServiceName>
@@ -30,6 +30,18 @@
                     <selectedServiceNameVariable>mysql_unique_service_name</selectedServiceNameVariable>
                     <selectedDisplayNameVariable>MySQLUniqueDisplayName</selectedDisplayNameVariable>
                 </getUniqueWindowsServiceName>
+            </actionList>
+            <ruleEvaluationLogic>and</ruleEvaluationLogic>
+            <ruleList>
+                <platformTest type="windows"/>
+                <compareText text="${component(mysql).parameter(mysql_installation_type).value}" logic="equals" value="bundled"/>
+                <compareText text="${component(mysql).parameter(mysql_upgrade).value}" logic="equals" value="0"/>
+            </ruleList>
+        </actionGroup>
+    </readyToInstallActionList>
+    <postInstallationActionList>
+        <actionGroup>
+            <actionList>
                 <substitute>
                     <files>${mysql_root_directory}/scripts/ctl.bat; ${mysql_root_directory}/scripts/servicerun.bat; ${mysql_root_directory}/scripts/serviceinstall.bat</files>
                     <substitutionList>

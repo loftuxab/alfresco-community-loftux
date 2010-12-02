@@ -9,6 +9,7 @@
     <parameterList>
         <directoryParameter name="alfrescowcm_base_application_directory" value="${installdir}" ask="0" />
         <directoryParameter name="alfrescowcm_virtualtomcat_location" value="${installdir}" ask="0" />
+        <directoryParameter name="alfrescowcm_virtualtomcat_commands" value="${installdir}/bin" ask="0" />
     </parameterList>
 
     <folderList>
@@ -35,7 +36,7 @@
         </folder>
         <folder>
             <description>Program Files</description>
-            <destination>${alfresco_commands_directory}</destination>
+            <destination>${alfrescowcm_virtualtomcat_commands}</destination>
             <name>virtualtomcatscript</name>
             <platforms>all</platforms>
             <distributionFileList>
@@ -45,7 +46,7 @@
                 <alfrescoConfigure alfrescoFiles="*.sh;*.bat" />
                 <actionGroup>
                     <actionList>
-                        <deleteFile path="${alfresco_commands_directory}/*.sh" />
+                        <deleteFile path="${alfrescowcm_virtualtomcat_commands}/*.sh" />
                     </actionList>
                     <ruleList>
                         <platformTest type="windows" />
@@ -53,7 +54,7 @@
                 </actionGroup>
                 <actionGroup>
                     <actionList>
-                        <deleteFile path="${alfresco_commands_directory}/*.bat" />
+                        <deleteFile path="${alfrescowcm_virtualtomcat_commands}/*.bat" />
                     </actionList>
                     <ruleList>
                         <platformTest type="unix" />

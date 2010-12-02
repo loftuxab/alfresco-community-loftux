@@ -105,6 +105,10 @@
             <description>War Files</description>
             <name>warfiles</name>
             <destination>${installdiralfresco}</destination>
+            <!-- Hack to remove old lib files before next folder -->
+            <actionList>
+                <deleteFile path="${alfresco_library_directory}/mysql-connector-java-*.jar" />
+            </actionList>
             <distributionFileList>
                 <distributionFile origin="${alfresco_war_source_directory}/*.war" allowWildcards="1" />
             </distributionFileList>
@@ -115,12 +119,12 @@
             <name>libfiles</name>
             <platforms>all</platforms>
             <distributionFileList>
-                <distributionFile origin="${alfresco_endorsed_source_directory}/*" allowWildcards="1"/>
+                <distributionFile origin="${alfresco_lib_source_directory}/*" allowWildcards="1"/>
             </distributionFileList>
         </folder>
         <folder>
             <description>Extension Files</description>
-            <destination>${alfresco_shared_directory}/alfresco</destination>
+            <destination>${alfresco_shared_directory}</destination>
             <name>extensionfiles</name>
             <platforms>all</platforms>
             <distributionFileList>
@@ -214,11 +218,6 @@
                 <actionGroup>
                     <actionList>
                         <deleteFile path="${alfresco_commands_directory}/*.sh" />
-                        <copyFile>
-                           <origin>${alfresco_commands_directory}/*.dll</origin>
-                           <destination>${tomcat_server_directory}/bin</destination>
-                        </copyFile>
-                        <deleteFile path="${alfresco_commands_directory}/*.dll" />
                     </actionList>
                     <ruleList>
                         <platformTest type="windows" />
@@ -241,6 +240,19 @@
         </folder>
     </folderList>
     <postInstallationActionList>
+        <actionGroup>
+            <actionList>
+                <copyFile>
+                    <origin>${alfresco_commands_directory}/*.dll</origin>
+                    <destination>${tomcat_server_directory}/bin</destination>
+                </copyFile>
+                <addFilesToUninstaller files="${tomcat_server_directory}/bin/*.dll" />
+                <deleteFile path="${alfresco_commands_directory}/*.dll" />
+            </actionList>
+            <ruleList>
+                <platformTest type="windows" />
+            </ruleList>
+        </actionGroup>
         <substitute>
             <files>${application_server_conf_directory}/catalina.properties</files>
             <type>regexp</type>

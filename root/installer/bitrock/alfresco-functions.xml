@@ -68,7 +68,7 @@
                         </substitution>
 		        <substitution>
                             <pattern>@@BITROCK_OPENOFFICE_JOD_DIR@@</pattern>
-                            <value>${openoffice_directory.dos.unix}</value>
+                            <value>${openoffice_directory.dos.unix}/App/openoffice</value>
                             <ruleList>
                                 <platformTest type="windows"/>
                             </ruleList>
@@ -112,9 +112,13 @@
                                 <platformTest type="unix"/>
                             </ruleList>
 			</substitution>
-		        <substitution>
+                        <substitution>
                             <pattern>@@BITROCK_MYSQL_PORT@@</pattern>
                             <value>${database_port}</value>
+                        </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_MYSQL_HOST@@</pattern>
+                            <value>${database_hostname}</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_DATA_DIR@@</pattern>
@@ -155,6 +159,10 @@
                         <substitution>
                             <pattern>@@BITROCK_TOMCAT_PORT@@</pattern>
                             <value>${application_server_port}</value>
+                        </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_TOMCAT_HOST@@</pattern>
+                            <value>${application_server_domain}</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_SHAREPOINT_PORT@@</pattern>
