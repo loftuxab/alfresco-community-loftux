@@ -30,7 +30,7 @@
 <#if isUpdated>
    <div id="${id}-updated" class="small-banner">${msg("message.updated")}</div>
    <script type="text/javascript">//<![CDATA[
-      YAHOO.lang.later(2000, this, function()
+      YAHOO.lang.later(YAHOO.env.ua.ie > 0 ? 5000 : 2000, this, function()
       {
          Alfresco.util.Anim.fadeOut("${id}-updated");
       });

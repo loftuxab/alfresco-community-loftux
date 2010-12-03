@@ -8,7 +8,7 @@
       <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
 
       <init-param>
-         <name>scriptUrl</name>
+         <name>viewScriptUrl</name>
          <value>/page/my-documentlibraries</value>
       </init-param>
 
@@ -21,6 +21,19 @@
          <title>Share: My Document Libraries</title>
          <short-title>My Document Libraries</short-title>
       </portlet-info>
+
+      <security-role-ref>
+          <role-name>administrator</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>guest</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>power-user</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>user</role-name>
+      </security-role-ref>
    </portlet>
 
    <portlet>
@@ -29,7 +42,7 @@
       <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
 
       <init-param>
-         <name>scriptUrl</name>
+         <name>viewScriptUrl</name>
          <value>/page/site/{siteId}/documentlibrary</value>
       </init-param>
 
@@ -55,6 +68,19 @@
             <value>[DEFAULT]</value>
          </preference>    
       </portlet-preferences>
+
+      <security-role-ref>
+          <role-name>administrator</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>guest</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>power-user</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>user</role-name>
+      </security-role-ref>
    </portlet>
 
    <portlet>
@@ -63,7 +89,7 @@
       <portlet-class>org.alfresco.web.portlet.ProxyPortlet</portlet-class>
 
       <init-param>
-         <name>scriptUrl</name>
+         <name>viewScriptUrl</name>
          <value>/page/repository</value>
       </init-param>
 
@@ -76,6 +102,19 @@
          <title>Share: Repository Browser</title>
          <short-title>Repository Browser</short-title>
       </portlet-info>
+
+      <security-role-ref>
+          <role-name>administrator</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>guest</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>power-user</role-name>
+      </security-role-ref>
+      <security-role-ref>
+          <role-name>user</role-name>
+      </security-role-ref>
    </portlet>
 
    <user-attribute>
