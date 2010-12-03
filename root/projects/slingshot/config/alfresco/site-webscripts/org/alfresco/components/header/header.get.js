@@ -13,7 +13,7 @@ function getTwisterPrefs()
       result,
       response;
 
-   result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_COLLAPSED_TWISTERS);
+   result = remote.call("/api/people/" + encodeURIComponent(user.name) + "/preferences?pf=" + PREF_COLLAPSED_TWISTERS);
    if (result.status == 200 && result != "{}")
    {
       response = eval('(' + result + ')');
@@ -38,7 +38,7 @@ function getSiteTitle()
    var siteId = page.url.templateArgs.site || "";
    if (siteId !== "")
    {
-      result = remote.call("/api/sites/" + stringUtils.urlEncode(siteId));
+      result = remote.call("/api/sites/" + encodeURIComponent(siteId));
       if (result.status == 200 && result != "{}")
       {
          response = eval('(' + result + ')');

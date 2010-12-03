@@ -16,7 +16,7 @@ function main()
       imapServerEnabled = false;
    
    // Call the repo for sites the user is a member of
-   var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/sites");
+   var result = remote.call("/api/people/" + encodeURIComponent(user.name) + "/sites");
    if (result.status == 200)
    {
       var site, favourites = {}, imapFavourites = {}, managers,
@@ -32,7 +32,7 @@ function main()
          imapServerEnabled = (result.status == 200 && result == "enabled");
          
          // Call the repo for the user's favourite sites
-         result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_SITES);
+         result = remote.call("/api/people/" + encodeURIComponent(user.name) + "/preferences?pf=" + PREF_SITES);
          if (result.status == 200 && result != "{}")
          {
             var prefs = eval('(' + result + ')');

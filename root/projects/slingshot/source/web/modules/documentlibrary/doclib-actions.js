@@ -308,7 +308,6 @@
        *
        * @method postActivity
        * @param siteId {string} site
-       * @param containerId {string} container
        * @param activityType {string} org.alfresco.documentlibrary.{activityType}
        * @param page {string} page to link to from activity
        * @param data {object} data attached to activity
@@ -338,6 +337,8 @@
             type: activityType,
             page: page
          }, data);
+
+         Alfresco.logger.debug("Alfresco.module.DoclibActions.postActivity: ", config.dataObj);
 
          try
          {

@@ -34,7 +34,8 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $siteURL = Alfresco.util.siteURL;
    
    /**
     * FolderActions constructor.
@@ -282,7 +283,7 @@
                {
                   fn: function FolderActions_oADC_success(data)
                   {
-                     window.location = callbackUrl + encodedPath;
+                     window.location = $siteURL(callbackUrl + encodedPath);
                   }
                }
             },

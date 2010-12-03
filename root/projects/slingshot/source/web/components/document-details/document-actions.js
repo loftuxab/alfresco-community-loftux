@@ -34,7 +34,8 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $siteURL = Alfresco.util.siteURL;
    
    /**
     * DocumentActions constructor.
@@ -530,7 +531,11 @@
          // Call the normal callback to post the activity data
          this.onNewVersionUploadComplete.call(this, complete);
          this.assetData.nodeRef = complete.successful[0].nodeRef;
-         window.location = this.getActionUrls(this.assetData).documentDetailsUrl;
+         // Delay page reloading to allow time for async requests to be transmitted
+         YAHOO.lang.later(0, this, function()
+         {
+            window.location = this.getActionUrls(this.assetData).documentDetailsUrl;
+         });
       },
 
       /**
@@ -543,7 +548,9 @@
       onActionCheckoutToGoogleDocs: function DocumentActions_onActionCheckoutToGoogleDocs(asset)
       {
          var displayName = asset.displayName,
-            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
+            path = asset.location.path,
+            fileName = asset.fileName;
 
          var progressPopup = Alfresco.util.PopupManager.displayMessage(
          {
@@ -564,6 +571,18 @@
                      window.location = this.getActionUrls(this.assetData).documentDetailsUrl + "#checkoutToGoogleDocs";
                   },
                   scope: this
+               },
+               activity:
+               {
+                  siteId: this.options.siteId,
+                  activityType: "google-docs-checkout",
+                  page: "document-details",
+                  activityData:
+                  {
+                     fileName: fileName,
+                     path: path,
+                     nodeRef: nodeRef.toString()
+                  }
                }
             },
             failure:
@@ -603,7 +622,10 @@
       onActionCheckinFromGoogleDocs: function DocumentActions_onActionCheckinFromGoogleDocs(asset)
       {
          var displayName = asset.displayName,
-            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
+            originalNodeRef = new Alfresco.util.NodeRef(asset.custom.workingCopyOriginal),
+            path = asset.location.path,
+            fileName = asset.fileName;
 
           var progressPopup = Alfresco.util.PopupManager.displayMessage(
           {
@@ -624,6 +646,18 @@
                      window.location = this.getActionUrls(this.assetData).documentDetailsUrl + "#checkinFromGoogleDocs";
                   },
                   scope: this
+               },
+               activity:
+               {
+                  siteId: this.options.siteId,
+                  activityType: "google-docs-checkin",
+                  page: "document-details",
+                  activityData:
+                  {
+                     fileName: displayName,
+                     path: path,
+                     nodeRef: originalNodeRef.toString()
+                  }
                }
             },
             failure:
@@ -679,14 +713,15 @@
                   activityData:
                   {
                      fileName: fileName,
-                     path: path
+                     path: path,
+                     nodeRef: nodeRef.toString()
                   }
                },
                callback:
                {
                   fn: function DocumentActions_oADC_success(data)
                   {
-                     window.location = callbackUrl + encodedPath;
+                     window.location = $siteURL(callbackUrl + encodedPath);
                   }
                }
             },

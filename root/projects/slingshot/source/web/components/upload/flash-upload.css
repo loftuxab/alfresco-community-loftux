@@ -89,7 +89,7 @@
 
 .flash-upload .fileUpload-filelist-table div.yui-dt-hd
 {
-   height: 0;
+   height: 1px;
    padding: 0;
 }
 

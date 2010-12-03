@@ -60,7 +60,9 @@
       
       // Initialise prototype properties
       this.dataLists = {};
+      this.dataListsLength = null;
       this.containerNodeRef = null;
+      this.listTypeTitles = null;
       
       return this;
    };
@@ -136,6 +138,14 @@
        * @type Object
        */
       containerNodeRef: null,
+
+      /**
+       * List title look-up from listType
+       *
+       * @property listTypeTitles
+       * @type Object
+       */
+      listTypeTitles: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -405,6 +415,29 @@
             listsContainer.innerHTML = '<span class="error">' + this.msg("message.error-unknown") + '</span>';
          }
       },
+      
+      /**
+       * Look-up a list title from it's type
+       *
+       * @method getListTypeTitle
+       * @param listType {string} List type
+       * @return {string} List type title
+       */
+      getListTypeTitle: function DataList_getListTitle(listType)
+      {
+         if (this.listTypeTitles === null)
+         {
+            var list;
+            this.listTypeTitles = {};
+            
+            for (var i = 0, ii = this.options.listTypes.length; i < ii; i++)
+            {
+               list = this.options.listTypes[i];
+               this.listTypeTitles[list.name] = list.title;
+            }
+         }
+         return this.listTypeTitles[listType] || "";
+      },
 
 
       /**
@@ -543,14 +576,20 @@
             {
                fn: function DataLists_onNewList_success(response)
                {
-                  var listName = response.config.dataObj["prop_cm_name"];
-                  Bubbling.fire("dataListCreated",
-                  {
-                     name: listName
-                  });
+                  var nodeRef = new Alfresco.util.NodeRef(response.json.persistedObject),
+                     listTitle = response.config.dataObj["prop_cm_title"],
+                     listTypeTitle = this.getListTypeTitle(response.config.dataObj["prop_dl_dataListItemType"]);
+
+                  Bubbling.fire("dataListCreated");
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: this.msg("message.new-list.success", listName)
+                     text: this.msg("message.new-list.success", listTitle)
+                  });
+                  // Activity post
+                  Alfresco.Share.postActivity(this.options.siteId, "org.alfresco.datalists.list-created", listTitle + " (" + listTypeTitle + ")", "data-lists?list={cm:name}",
+                  {
+                     appTool: "datalists",
+                     nodeRef: nodeRef.toString()
                   });
                },
                scope: this
@@ -617,7 +656,11 @@
             {
                fn: function DataLists_onEditList_success(response, p_obj)
                {
-                  var dataObj = response.config.dataObj;
+                  var dataObj = response.config.dataObj,
+                     nodeRef = new Alfresco.util.NodeRef(p_obj.nodeRef),
+                     oldTitle = p_obj.title,
+                     listTypeTitle = this.getListTypeTitle(p_obj.itemType);
+
                   p_obj.title = dataObj["prop_cm_title"];
                   p_obj.description = dataObj["prop_cm_description"];
                   
@@ -628,6 +671,12 @@
                   Alfresco.util.PopupManager.displayMessage(
                   {
                      text: this.msg("message.edit-list.success", p_obj.title)
+                  });
+                  // Activity post
+                  Alfresco.Share.postActivity(this.options.siteId, "org.alfresco.datalists.list-updated", p_obj.title + " (" + listTypeTitle + ")", "data-lists?list={cm:name}",
+                  {
+                     appTool: "datalists",
+                     nodeRef: nodeRef.toString()
                   });
                },
                obj: datalist,
@@ -670,6 +719,13 @@
                {
                   fn: function DataLists_onDeleteList_confirm_success(response, p_obj)
                   {
+                     // Activity post
+                     Alfresco.Share.postActivity(this.options.siteId, "org.alfresco.datalists.list-deleted", datalist.title, "data-lists",
+                     {
+                        appTool: "datalists",
+                        nodeRef: nodeRef.toString()
+                     });
+
                      // If we deleted the current list, then redirect to "data-lists"
                      if (p_obj.name == this.options.listId)
                      {

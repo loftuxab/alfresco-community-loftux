@@ -79,7 +79,7 @@
           */
          urlTokens:
          {
-            "person.username": Alfresco.constants.USERNAME,
+            "person.username": encodeURIComponent(Alfresco.constants.USERNAME),
             "url.proxy": Alfresco.constants.PROXY_URI_RELATIVE,
             "url.service": Alfresco.constants.URL_SERVICECONTEXT
          },

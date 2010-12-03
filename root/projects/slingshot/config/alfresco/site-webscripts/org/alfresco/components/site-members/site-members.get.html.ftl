@@ -2,7 +2,7 @@
    new Alfresco.SiteMembers("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      currentUser: "${user.id}",
+      currentUser: "${user.name?js_string}",
       currentUserRole: "${currentUserRole}",
       <#if error??>error: "${error}",</#if>
       roles:

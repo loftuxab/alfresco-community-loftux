@@ -2079,7 +2079,7 @@
                   {
                      fileName: fileName,
                      path: path,
-                     nodeRef: nodeRef.nodeRef
+                     nodeRef: nodeRef.toString()
                   }
                }
             },
@@ -2121,6 +2121,7 @@
       {
          var displayName = asset.displayName,
             nodeRef = new Alfresco.util.NodeRef(asset.nodeRef),
+            originalNodeRef = new Alfresco.util.NodeRef(asset.custom.workingCopyOriginal),
             path = asset.location.path;
 
          var progressPopup = Alfresco.util.PopupManager.displayMessage(
@@ -2163,9 +2164,9 @@
                   page: "document-details",
                   activityData:
                   {
-                     fileName: fileName,
+                     fileName: displayName,
                      path: path,
-                     nodeRef: nodeRef.nodeRef
+                     nodeRef: originalNodeRef.toString()
                   }
                }
             },
@@ -2272,23 +2273,23 @@
                filter: strFilter
             };
             
-            if (this.options.usePagination)
-            {
-               this.currentPage = 1;
-               objNav.page = "1";
-            }
-
             // Initial navigation won't fire the History event
             if (obj.doclistFirstTimeNav)
             {
                this._updateDocList.call(this,
                {
                   filter: filter,
-                  page: 1
+                  page: this.currentPage
                });
             }
             else
             {
+               if (this.options.usePagination)
+               {
+                  this.currentPage = 1;
+                  objNav.page = "1";
+               }
+
                Alfresco.logger.debug("DL_onChangeFilter: objNav = ", objNav);
 
                // Do we think the history state will change?

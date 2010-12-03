@@ -141,7 +141,7 @@
    top: -5px;
 }
 
-.header .user-items > span.yui-button,
+.header .user-items div.user-items-wrapper > span.yui-button,
 .header .search-box > span.yui-button
 {
    background: none;
@@ -168,6 +168,7 @@
 .header .user-items div.search-box
 {
    border: 1px solid #a0a0a0;
+   float: right;
    height: 20px;
    position: relative;
    top: -2px;

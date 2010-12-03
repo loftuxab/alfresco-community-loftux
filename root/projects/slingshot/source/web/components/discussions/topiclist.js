@@ -605,10 +605,9 @@
       onEditTopic: function DiscussionsTopicList_onEditTopic(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/discussions-createtopic?container={container}&topicId={topicId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/discussions-createtopic?topicId={topicId}",
          {
             site: this.options.siteId,
-            container: this.options.containerId,
             topicId: record.getData('name')
          });
          window.location = url;                  

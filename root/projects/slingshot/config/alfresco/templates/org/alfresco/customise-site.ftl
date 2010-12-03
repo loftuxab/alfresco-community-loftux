@@ -1,5 +1,4 @@
 <#include "include/alfresco-template.ftl" />
-<#import "import/alfresco-layout.ftl" as layout />
 <@templateHeader>
    <@link rel="stylesheet" type="text/css" href="${url.context}/res/templates/site/customise-site.css" />
 </@>
@@ -10,9 +9,11 @@
       <@region id="title" scope="template" protected=true />
       <h1 class="sub-title"><#if page.titleId??>${msg(page.titleId)!page.title}<#else>${page.title}</#if></h1>
    </div>
+   <#if access>
    <div id="bd">
       <@region id="customise-pages" scope="template" protected=true />
    </div>
+   </#if>
 </@>
 
 <@templateFooter>

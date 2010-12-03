@@ -5,26 +5,34 @@ function sortByName(membership1, membership2)
    return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
 }
 
-// Call the repo for the site memberships
-var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?size=100&authorityType=USER");
-
-var memberships = [];
-
-if (json.status == 200)
+/**
+ * Site Colleagues component GET method
+ */
+function main()
 {
-   // Create javascript objects from the repo response
-   var obj = eval('(' + json + ')');
-   if (obj)
+   // Call the repo for the site memberships
+   var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?size=100&authorityType=USER");
+   
+   var memberships = [];
+   
+   if (json.status == 200)
    {
-      memberships = obj;
-      var userObj, member;
-      for (var i = 0, j = memberships.length; i < j; i++)
+      // Create javascript objects from the repo response
+      var obj = eval('(' + json + ')');
+      if (obj)
       {
-         member = memberships[i];
+         memberships = obj;
+         var userObj, member;
+         for (var i = 0, j = memberships.length; i < j; i++)
+         {
+            member = memberships[i];
+         }
+         memberships.sort(sortByName);
       }
-      memberships.sort(sortByName);
    }
+   
+   // Prepare the model
+   model.memberships = memberships;
 }
 
-// Prepare the model
-model.memberships = memberships;
+main();

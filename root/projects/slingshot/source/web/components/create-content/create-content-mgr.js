@@ -137,6 +137,13 @@
          {
             // Grab the new nodeRef and pass it on to _navigateForward() to optionally use
             nodeRef = new Alfresco.util.NodeRef(response.json.persistedObject);
+            
+            // Activity post
+            Alfresco.Share.postActivity(this.options.siteId, "org.alfresco.documentlibrary.file-created", "{cm:name}", "document-details?nodeRef=" + nodeRef.toString(),
+            {
+               appTool: "documentlibrary",
+               nodeRef: nodeRef.toString()
+            });
          }
          this._navigateForward(nodeRef);
       },

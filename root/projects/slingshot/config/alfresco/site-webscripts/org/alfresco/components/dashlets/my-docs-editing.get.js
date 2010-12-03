@@ -31,13 +31,13 @@ function getUserContent(contentType)
                switch (item.type)
                {
                   case "blogpost":
-                     item.browseUrl = "blog-postview?container=" + item.container + "&postId=" + item.name;
+                     item.browseUrl = "blog-postview?postId=" + item.name;
                      break;
                   case "wikipage":
                      item.browseUrl = "wiki-page?title=" + item.name;
                      break;
                   case "forumpost":
-                     item.browseUrl = "discussions-topicview?container=" + item.container + "&topicId=" + item.name;
+                     item.browseUrl = "discussions-topicview?topicId=" + item.name;
                      break;
                }
             }

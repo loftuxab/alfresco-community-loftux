@@ -1,8 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <#import "import/alfresco-layout.ftl" as layout />
-<@templateHeader "transitional">
-   <@script type="text/javascript" src="${url.context}/res/js/dashlet-resizer.js"></@script>
-</@>
+<@templateHeader "transitional" />
 
 <@templateBody>
    <div id="alf-hd">

@@ -1,41 +1,53 @@
-// Call the repo for the sites profile
-var profile =
+/**
+ * Site Profile component GET method
+ */
+function main()
 {
-   title: "",
-   shortName: "",   
-   description: ""
-}
-
-var json = remote.call("/api/sites/" + page.url.templateArgs.site);
-if (json.status == 200)
-{
-   // Create javascript object from the repo response
-   var obj = eval('(' + json + ')');
-   if (obj)
+   // Call the repo for the sites profile
+   var profile =
    {
-      profile = obj;
+      title: "",
+      shortName: "",   
+      description: ""
    }
-}
-
-// Find the manager for the site
-var sitemanagers = [];
-
-json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?rf=SiteManager");
-if (json.status == 200)
-{
-   var obj = eval('(' + json + ')');
-   if (obj)
+   
+   var profile = context.properties["site-profile"];
+   if (!profile)
    {
-      var managers = [];
-      for (var x=0; x < obj.length; x++)
+      var json = remote.call("/api/sites/" + page.url.templateArgs.site);
+      if (json.status == 200)
       {
-         managers.push(obj[x]);
+         // Create javascript object from the repo response
+         var obj = eval('(' + json + ')');
+         if (obj)
+         {
+            profile = obj;
+         }
       }
-      
-      sitemanagers = managers;
    }
+   
+   // Find the manager for the site
+   var sitemanagers = [];
+   
+   json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?rf=SiteManager");
+   if (json.status == 200)
+   {
+      var obj = eval('(' + json + ')');
+      if (obj)
+      {
+         var managers = [];
+         for (var x=0; x < obj.length; x++)
+         {
+            managers.push(obj[x]);
+         }
+         
+         sitemanagers = managers;
+      }
+   }
+   
+   // Prepare the model
+   model.profile = profile;
+   model.sitemanagers = sitemanagers;
 }
 
-// Prepare the model
-model.profile = profile;
-model.sitemanagers = sitemanagers;
+main();

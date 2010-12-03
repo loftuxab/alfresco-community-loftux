@@ -39,7 +39,7 @@ function main()
       params["newpw"] = newpass1;
       var connector = remote.connect("alfresco");
       var result = connector.post(
-            "/api/person/changepassword/" + stringUtils.urlEncode(user.name),
+            "/api/person/changepassword/" + encodeURIComponent(user.name),
             jsonUtils.toJSONString(params),
             "application/json");
       var repoJSON = eval('(' + result + ')');

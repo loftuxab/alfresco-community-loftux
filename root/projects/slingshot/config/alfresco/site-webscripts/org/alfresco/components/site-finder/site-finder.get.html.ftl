@@ -2,7 +2,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.SiteFinder("${el}").setOptions(
    {
-      currentUser: "${user.id}",
+      currentUser: "${user.name?js_string}",
       minSearchTermLength: ${(args.minSearchTermLength!config.scoped['Search']['search'].getChildValue('min-search-term-length'))?js_string},
       maxSearchResults: ${(args.maxSearchResults!config.scoped['Search']['search'].getChildValue('max-search-results'))?js_string},
       inviteData: [

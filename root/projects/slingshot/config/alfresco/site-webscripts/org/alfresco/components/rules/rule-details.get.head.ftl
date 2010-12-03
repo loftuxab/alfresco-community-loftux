@@ -1,7 +1,6 @@
 <#include "../component.head.inc">
 <!-- Rule Configs -->
 <!-- Note! Needs to be imported here since they are brought in via XMLHttpRequest after page has rendered -->
-<@script type="text/javascript" src="${page.url.context}/res/js/alfresco-location.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/res/components/rules/config/rule-config-util.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/rules/config/rule-config.css" />
 <@script type="text/javascript" src="${page.url.context}/res/components/rules/config/rule-config.js"></@script>

@@ -6,9 +6,9 @@
 var userId = page.url.templateArgs["userid"];
 if (userId == null)
 {
-   userId = user.id;
+   userId = user.name;
 }
-var result = remote.call("/api/people/" + stringUtils.urlEncode(userId) + "/sites?size=100");
+var result = remote.call("/api/people/" + encodeURIComponent(userId) + "/sites?size=100");
 model.sites = [];
 if (result.status == 200)
 {
