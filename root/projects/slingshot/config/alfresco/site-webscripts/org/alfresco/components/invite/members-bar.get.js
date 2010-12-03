@@ -1,16 +1,24 @@
-model.isManager = false;
-
-// Check the role of the user - only SiteManagers are allowed to invite people/view invites
-var obj = context.properties["memberships"];
-if (!obj)
+/**
+ * Site Members component GET method
+ */
+function main()
 {
-   var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
-   if (json.status == 200)
+   model.isManager = false;
+   
+   // Check the role of the user - only SiteManagers are allowed to invite people/view invites
+   var obj = context.properties["memberships"];
+   if (!obj)
    {
-      obj = eval('(' + json + ')');
+      var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + encodeURIComponent(user.name));
+      if (json.status == 200)
+      {
+         obj = eval('(' + json + ')');
+      }
+   }
+   if (obj)
+   {
+      model.isManager = (obj.role == "SiteManager");
    }
 }
-if (obj)
-{
-   model.isManager = (obj.role == "SiteManager");
-}
+
+main();

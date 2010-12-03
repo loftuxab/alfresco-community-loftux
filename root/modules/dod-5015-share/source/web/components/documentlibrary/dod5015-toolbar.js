@@ -161,7 +161,7 @@
 
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmroles?user=" + Alfresco.constants.USERNAME,
+            url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmroles?user=" + encodeURIComponent(Alfresco.constants.USERNAME),
             successCallback:
             {
                fn: function(response)

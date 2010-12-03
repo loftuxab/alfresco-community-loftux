@@ -4177,14 +4177,6 @@ if (typeof log4javascript != "undefined")
       }, true);
    }
 }
-else if (YAHOO.lang.isObject(window.console))
-{
-   Alfresco.logger = window.console;
-   Alfresco.logger.isDebugEnabled = function()
-   {
-      return true;
-   }
-}
 else
 {
    Alfresco.logger =
@@ -4591,7 +4583,7 @@ Alfresco.service.BaseService.prototype =
        */
       _url: function Preferences_url()
       {
-         return Alfresco.constants.PROXY_URI + "api/people/" + Alfresco.constants.USERNAME + "/preferences";
+         return Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(Alfresco.constants.USERNAME) + "/preferences";
       },
 
       /**

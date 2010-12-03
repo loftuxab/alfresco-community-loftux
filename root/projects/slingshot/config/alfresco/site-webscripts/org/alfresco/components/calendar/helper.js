@@ -526,7 +526,7 @@ var CalendarScriptHelper = (function()
       },
       isUserPermittedToCreateEvents: function()
       {
-         var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
+         var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + encodeURIComponent(user.name));
          var membership = eval('(' + json + ')');
          return (membership.role !== "SiteConsumer") ? 'true' : 'false';
       },

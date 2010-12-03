@@ -16,9 +16,9 @@ if (conf["max-items"] != null)
 var userId = page.url.templateArgs["userid"];
 if (userId == null)
 {
-   userId = user.id;
+   userId = user.name;
 }
-var result = remote.call("/slingshot/profile/usercontents?user=" + stringUtils.urlEncode(userId) + "&maxResults=" + maxItems);
+var result = remote.call("/slingshot/profile/usercontents?user=" + encodeURIComponent(userId) + "&maxResults=" + maxItems);
 if (result.status == 200)
 {
    // Create javascript objects from the server response
@@ -49,13 +49,13 @@ if (result.status == 200)
                      item.browseUrl = "document-details?nodeRef=" + item.nodeRef;
                      break;
                   case "blogpost":
-                     item.browseUrl = "blog-postview?container=" + item.container + "&postId=" + item.name;
+                     item.browseUrl = "blog-postview?postId=" + item.name;
                      break;
                   case "wikipage":
                      item.browseUrl = "wiki-page?title=" + item.name;
                      break;
                   case "forumpost":
-                     item.browseUrl = "discussions-topicview?container=" + item.container + "&topicId=" + item.name;
+                     item.browseUrl = "discussions-topicview?topicId=" + item.name;
                      break;
                }
             }

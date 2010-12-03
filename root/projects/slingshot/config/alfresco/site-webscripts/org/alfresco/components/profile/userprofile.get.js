@@ -32,4 +32,4 @@ if (bio != null)
 }
 
 // editable if request profile is for the current user
-model.isEditable = (profileId == null || profileId == user.id);
+model.isEditable = (profileId == null || profileId == user.name);

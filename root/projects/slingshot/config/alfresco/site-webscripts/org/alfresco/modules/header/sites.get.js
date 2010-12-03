@@ -21,7 +21,7 @@ function main()
 
    // Call the repo for the user's favourite sites
    // TODO: Clean-up old favourites here?
-   var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
+   var result = remote.call("/api/people/" + encodeURIComponent(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
    if (result.status == 200 && result != "{}")
    {
       prefs = eval('(' + result + ')');

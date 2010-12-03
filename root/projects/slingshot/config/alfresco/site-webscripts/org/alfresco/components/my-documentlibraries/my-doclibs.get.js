@@ -24,7 +24,7 @@ function main()
    var result, mySites = [], objMySites = {}, publicSites = [], otherSites = [], i, ii;
 
    // Call the repo for sites the user is a member of
-   result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/sites?size=100");
+   result = remote.call("/api/people/" + encodeURIComponent(user.name) + "/sites?size=100");
    if (result.status == 200)
    {
       // Create javascript objects from the server response

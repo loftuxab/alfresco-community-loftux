@@ -9,7 +9,7 @@
 function hasCapability(conn, cap)
 {
    var hasCapability = false;
-   var res = conn.get("/api/rma/admin/rmroles?user=" + encodeURIComponent(user.id));
+   var res = conn.get("/api/rma/admin/rmroles?user=" + encodeURIComponent(user.name));
    if (res.status == 200)
    {
       var roles = eval('(' + res + ')').data;

@@ -11,7 +11,7 @@
    <generator>Alfresco Share DocumentLibrary</generator>
 <#assign proxyLink=absurl(url.context) + "/proxy/alfresco-feed/">
    <image>
-      <title>Alfresco - Documents</title>
+      <title>Alfresco Share - ${msg("feed.filter." + filter!"path")}</title>
       <url>${absurl(url.context)}/themes/default/images/logo.png</url>
       <link>${absurl(url.context)}/</link>
    </image>
@@ -29,10 +29,7 @@
       </description>
       <link>${proxyLink + item.contentUrl}</link>
       <guid isPermaLink="false">${item.nodeRef}</guid>
-      <#assign currentLocale=locale />
-      <#setting locale="en_US" />
-      <pubDate>${item.modifiedOn}</pubDate>
-      <#setting locale=currentLocale />
+      <pubDate>${xmldate(item.modifiedOn)}</pubDate>
       <#if isMP3><enclosure url="${proxyLink + item.contentUrl}" length="${item.size}" type="audio/mpeg" /></#if>
    </item>
    </#if>

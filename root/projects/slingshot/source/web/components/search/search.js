@@ -647,13 +647,13 @@
             
             case "blogpost":
             {
-               url = "blog-postview?container=" + record.getData("container") + "&postId=" + name;
+               url = "blog-postview?postId=" + name;
                break;
             }
             
             case "forumpost":
             {
-               url = "discussions-topicview?container=" + record.getData("container") + "&topicId=" + name;
+               url = "discussions-topicview?topicId=" + name;
                break;
             }
             

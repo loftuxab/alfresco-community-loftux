@@ -33,7 +33,9 @@
 //]]></script>
 
    <span id="${id}-userItems" class="user-items">
-      <@header.renderItems config.global.header.userItems id "user" />
+      <div class="user-items-wrapper">
+         <@header.renderItems config.global.header.userItems id "user" />
+      </div>
       <div class="search-box">
          <span id="${id}-search_more" class="yui-button yui-menu-button">
             <span class="first-child" style="background-image: url(${url.context}/res/components/images/header/search-menu.png)">

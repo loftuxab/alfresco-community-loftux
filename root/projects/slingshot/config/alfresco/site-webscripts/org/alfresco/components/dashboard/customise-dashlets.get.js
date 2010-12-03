@@ -61,7 +61,7 @@ var dashboardId, dashboardId;
 if (args.dashboardType == "user")
 {
    dashboardId = "user/" + user.name + "/dashboard";
-   dashboardUrl = "user/" + stringUtils.urlEncode(user.name) + "/dashboard";
+   dashboardUrl = "user/" + encodeURIComponent(user.name) + "/dashboard";
 }
 else if (args.dashboardType == "site")
 {

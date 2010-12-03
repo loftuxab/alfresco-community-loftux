@@ -1,6 +1,6 @@
 var connector, result, theUrl;
 
-theUrl = "/api/invitations?inviteeUserName=" + stringUtils.urlEncode(user.name);
+theUrl = "/api/invitations?inviteeUserName=" + encodeURIComponent(user.name);
 connector = remote.connect("alfresco");
 result = connector.get(theUrl);
 if (result.status !== status.STATUS_OK)

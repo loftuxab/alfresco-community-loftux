@@ -261,8 +261,9 @@
 
 /* Cell Renderers */
 
-.doclist .folder
+.doclist span.folder
 {
+   display: block;
    position: relative;
 }
 
@@ -345,8 +346,8 @@
    background-position: center;
    background-repeat: no-repeat;
    cursor: pointer;
-   margin-right: 0.5em;
-   padding: 0.5em;
+   margin-right: 8px;
+   padding: 6px;
 }
 
 .doclist .documents h3 a.favourite-document.enabled,
@@ -379,6 +380,7 @@
    clear: left;
    float: left;
    line-height: 1.8em;
+   padding-left: 24px;
 }
 
 .doclist .documents .detail em
