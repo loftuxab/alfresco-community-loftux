@@ -58,6 +58,7 @@ public class ProxyPortlet implements Portlet
     private static Log logger = LogFactory.getLog(ProxyPortlet.class);
     
     private static final String EDIT_URL     = "editScriptUrl";
+    private static final String VIEW_URL     = "viewScriptUrl";
     private static final String SCRIPT_URL   = "scriptUrl";
     private static final String PORTLET_URL  = "portletUrl";
     private static final String PORTLET_HOST = "portletHost";
@@ -82,7 +83,7 @@ public class ProxyPortlet implements Portlet
     {
         this.config = config;
         this.editScriptUrl = config.getInitParameter(EDIT_URL);
-        this.initScriptUrl = config.getInitParameter(SCRIPT_URL);
+        this.initScriptUrl = config.getInitParameter(VIEW_URL);
     }
 
     /*
@@ -92,6 +93,29 @@ public class ProxyPortlet implements Portlet
     public void processAction(ActionRequest req, ActionResponse res)
         throws PortletException, PortletSecurityException, IOException
     {
+        //
+        // Store updated preferences if any found
+        //
+        boolean foundPref = false;
+        PortletPreferences prefs = req.getPreferences();
+        Map<String, String[]> prefsMap = prefs.getMap();
+        Enumeration<String> names = req.getParameterNames();
+        while (names.hasMoreElements())
+        {
+           String name = (String)names.nextElement();
+           String value = req.getParameter(name);
+           if (prefsMap.containsKey(name) && value != null && prefsMap.get(name)[0] != value)
+           {
+               prefs.setValue(name, value);
+               foundPref = true;
+           }
+        }
+        if (foundPref)
+        {
+            prefs.store();
+            req.setAttribute(UPDATED_PARAM_NAME, true);
+        }
+        
         res.setRenderParameters(req.getParameterMap());
     }
 
@@ -136,7 +160,7 @@ public class ProxyPortlet implements Portlet
         //
         // Establish View URL
         //
-        String scriptUrl = req.getParameter(SCRIPT_URL);
+        String scriptUrl = req.getParameter(VIEW_URL);
         if (scriptUrl == null)
         {
             // retrieve initial scriptUrl as configured by Portlet
@@ -214,7 +238,7 @@ public class ProxyPortlet implements Portlet
         //
         // Establish Edit URL
         //
-        String scriptUrl = req.getParameter(SCRIPT_URL);
+        String scriptUrl = req.getParameter(VIEW_URL);
         if (scriptUrl == null)
         {
             // retrieve initial scriptUrl as configured by Portlet
@@ -226,30 +250,10 @@ public class ProxyPortlet implements Portlet
         }
         
         //
-        // Store updated preferences if any found
+        // Add prefs to request attributes.
         //
-        boolean foundPref = false;
         PortletPreferences prefs = req.getPreferences();
         Map<String, String[]> prefsMap = prefs.getMap();
-        Enumeration<String> names = req.getParameterNames();
-        while (names.hasMoreElements())
-        {
-           String name = (String)names.nextElement();
-           String value = req.getParameter(name);
-           if (prefsMap.containsKey(name) && value != null)
-           {
-               prefs.setValue(name, value);
-               foundPref = true;
-           }
-        }
-        if (foundPref)
-        {
-            prefs.store();
-            req.setAttribute(UPDATED_PARAM_NAME, true);
-            // Must re-query the prefs map
-            prefsMap = prefs.getMap();
-        }
-        // Add prefs to request attributes, names prefixed with "pref_"
         Iterator it = prefsMap.entrySet().iterator();
         while (it.hasNext())
         {
