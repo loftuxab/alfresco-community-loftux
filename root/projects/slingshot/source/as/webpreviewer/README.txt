@@ -1,27 +1,79 @@
-ABOUT THIS FOLDER
-=================
+***********************
+*                     *
+*  ABOUT THIS FOLDER  *
+*                     *
+***********************
 
-This folder contains the source code for the WebPreviewer Flash/FLEX/Actionscript component 
-and also a few test file that will make developent easier.
 
-The source files can be found in the current folder and the org/ folder.
+ 1. FILES
+==========
 
-Skinning graphics can be found in assets/ where also the folder test/ exists that has a pregenerated
-.swf file that can be used to test your changes with some real data.
+src/                     - Alfresco sources for using the org.alfresco.previewer.Previewer as a Flex component
+src/assets               - Skinning graphics: icons & cursors
+src/assets/test          - Pregenerated .swf files from pdf2swf to test against
+src/com/
+src/com/wayne_dash_marsh - Support for simulating threads in Flash Player
+src/madebypi             - Adds support for non english keyboard input on windows
+src/org
+src/org/alfresco         - The Alfresco AS3 source files
+src/org/hasseg           - Adds support for scrolling mouse wheel on mac
+copy-to-html-template    - Files to copy to flash builder project's html-template folder
 
-After you have created a Flex project in Flex Builder move the files found in
-copy-to-html-template into the html-template folder created by Flex Builder.
-Here comes a short explanation what they do:
 
-extMouseWheel.js
- - makes mouse wheel scrolling work on mac browsers.
+ 2. SETUP DEV ENV EXAMPLE
+==========================
 
-index.template.html
-- looks pretty much like the one Flex Builder created for you but its has a few WebPreviewr specifics.
-- imports the extMouseWheel.js into the test page so scrolling works
-- will put in parameters to allow fullscreen & javascript-actionscript communication
-- set the flashVars read by the WebPreviewer.mxml so you can test your changes against
-  a pre-genererated preview-swf and turn on the paging for it.
+1. Install Flash Builder
 
-If you hit a security violation its probably because you view the files on
-your local filesystem instead of on a web browser.
+2. File > Switch Workspace > Other:
+   /Users/erikwinlof/Documents/Adobe Flash Builder 4/Alfresco_HEAD
+
+3. File > New > Flex Project
+
+   Create a Flex project
+   ---------------------
+   Project Name: WebPreviewer
+   Project location: /Users/erikwinlof/Development/projects/head/code/root/projects/slingshot/source/as/webpreviewer
+   Application type: Web
+   Use a specific JDK: 3.5 (This will make it possible to use a Flash PLayer of version 9.0.124) 
+   Application server type: None/Other
+   [Next]
+
+   Configure output
+   ----------------
+   Output folder: /Users/erikwinlof/Development/projects/head/software/tomcat-app/webapps/share/WebPreviewer_Test
+   [Next]
+
+   Create a Flex project
+   ---------------------
+   Main source folder: src
+   Main application file: WebPreviewer.mxml
+   Output folder: http://localhost:8081/share/WebPreviewer_Test
+   [Finish]
+
+   Project build....
+
+4. Once buil dis finsihed copy files int "copy-to-html-template" into "html-template" folder (overwrite duplicates).
+   This will make sure extra javascript resources is imported to the test page and that we apply all WebPreviewer
+   specific input parameters when the previewer is debuggeed and displayed.
+
+5. Project > Clean
+   Run > Run > WebPreviewer (will open browser w previewer)
+
+   Note!
+   Ignore the error "ReferenceError: Error #1065: Variabeln stop_fla:MainTimeline har inte definierats."
+   Which is thrown when you load external .swf-files (the document to view) into the WebPreviewer.swf using the Flash Debug Player
+
+6. Develop... (use Run > Debug > WebPreviewer to debug)
+
+7. When satisfied, make sure to include it in Share by replacing ...
+   /Users/erikwinlof/Development/projects/head/software/tomcat-app/webapps/share/WebPreviewer_Test/WebPreviewer.swf
+   ... with ...
+   /Users/erikwinlof/Development/projects/head/software/tomcat-app/webapps/share/WebPreviewer_Test/WebPreviewer.swf
+   ... then test in Share!
+
+8. Commit and make sure you DO NOT include any Flash Builder / Eclipse project files   
+
+Note!
+If you hit a security violation its probably because you view the files on your local filesystem instead of on a web browser.
+This will not happen if you follow the instructions below.

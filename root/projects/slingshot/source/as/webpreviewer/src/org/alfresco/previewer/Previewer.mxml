@@ -55,7 +55,7 @@
 			<mx:SetProperty target="{zoomPercentageTextInput}" name="enabled" value="false"/>			
 			<mx:SetProperty target="{pageTextInput}" name="enabled" value="false"/>
 			<mx:SetProperty target="{messageLabel}" name="visible" value="false"/>
-			<mx:SetProperty target="{messageLabel}" name="includeInLayout" value="false"/>											
+			<mx:SetProperty target="{messageLabel}" name="includeInLayout" value="false"/>
 		</mx:State>
 
 		<!-- FULL WINDOW FOR MULTI PAGED DOCUMENTS -->
@@ -90,14 +90,14 @@
 			<mx:SetProperty target="{nextButton}" name="includeInLayout" value="false"/>	
 		</mx:State>
 
-		<!-- FULLSCREEN FOR SINGLE PAGED DOCUMENTS -->
+		<!-- FULL SCREEN FOR SINGLE PAGED DOCUMENTS -->
 		<mx:State name="singlePagedFullScreen" basedOn="singlePagedFullWindow">		
 			<mx:SetProperty target="{zoomPercentageTextInput}" name="enabled" value="false"/>
 			<mx:SetProperty target="{messageLabel}" name="visible" value="false"/>
 			<mx:SetProperty target="{messageLabel}" name="includeInLayout" value="false"/>								
 		</mx:State>
 
-		<!-- FULLSCREEN FOR SINGLE PAGED DOCUMENTS -->
+		<!-- FULL WINDOW FOR SINGLE PAGED DOCUMENTS -->
 		<mx:State name="singlePagedFullWindow" basedOn="singlePaged">		
 			<mx:SetProperty target="{fullScreenSeparator}" name="visible" value="false"/>
 			<mx:SetProperty target="{fullScreenSeparator}" name="includeInLayout" value="false"/>

@@ -30,7 +30,8 @@
     */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      Element = YAHOO.util.Element,
+      KeyListener = YAHOO.util.KeyListener;
 
    /**
     * Alfresco Slingshot aliases
@@ -113,7 +114,26 @@
           * @property previews
           * @type Array
           */
-         previews: []
+         previews: [],
+
+         /**
+          * Decides if the Previewer shall disable the i18n input fix shall be disabled for all browsers.
+          * If it shall be disabled for certain a certain os/browser override the disableI18nInputFix() method.
+          *
+          * Fix solves the Flash i18n input keyCode bug when "wmode" is set to "transparent"
+          * http://bugs.adobe.com/jira/browse/FP-479
+          * http://issues.alfresco.com/jira/browse/ALF-1351
+          *
+          * ...see "Browser Testing" on this page to see supported browser/language combinations for AS2 version
+          * http://analogcode.com/p/JSTextReader/
+          *
+          * ... We are using the AS3 version of the same fix
+          * http://blog.madebypi.co.uk/2009/04/21/transparent-flash-text-entry/
+          *
+          * @property disableI18nInputFix
+          * @type boolean
+          */
+         disableI18nInputFix: false
       },
 
       /**
@@ -266,7 +286,7 @@
             this.widgets.realSwfDivEl.addClass("no-content");
             this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noContent");
          }
-         else if (Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
+         else if (Alfresco.util.hasRequiredFlashPlayer(9, 0, 124))
          {
 
             // Find the url to the preview
@@ -297,6 +317,7 @@
                so.addVariable("i18n_pageOf", this.msg("preview.pageOf"));
                so.addVariable("show_fullscreen_button", true);
                so.addVariable("show_fullwindow_button", true);
+               so.addVariable("disable_i18n_input_fix", this.disableI18nInputFix());
                so.addParam("allowScriptAccess", "sameDomain");
                so.addParam("allowFullScreen", "true");
                so.addParam("wmode", "transparent");
@@ -354,6 +375,21 @@
 
          // Place the real flash preview div on top of the shadow div
          this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
+      },
+
+
+      /**
+       *
+       * Overriding this method to implement a os/browser version dependent version that decides
+       * if the i18n fix described for the disableI18nInputFix option shall be disabled or not.
+       *
+       * @method disableI18nInputFix
+       * @return false
+       */
+      disableI18nInputFix: function WP__resolvePreview(event)
+      {
+         // Override this method if you want to turn off the fix for a specific client
+         return this.options.disableI18nInputFix;
       },
 
       /**

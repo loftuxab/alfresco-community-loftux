@@ -25,15 +25,18 @@ package org.alfresco.previewer
 	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	import flash.events.IOErrorEvent;
 	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 	import flash.net.URLRequest;
 	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
 	
 	import mx.core.MovieClipAsset;
 	import mx.events.ResizeEvent;
-	
+	import mx.managers.IFocusManagerComponent;
+
 	import org.alfresco.core.Logger;
 	import org.alfresco.core.ui.SpriteZoomDisplay;
 	import org.alfresco.core.ui.SpriteZoomDisplayContext;
@@ -44,7 +47,7 @@ package org.alfresco.previewer
 	 * with pages so its possible move the sprite to display a certain page/part of the document/sprite
 	 * and to know which page that currently is displayed.
 	 */
-	public class DocumentZoomDisplay extends SpriteZoomDisplay
+	public class DocumentZoomDisplay extends SpriteZoomDisplay implements IFocusManagerComponent
 	{
 		
 		/**
@@ -160,7 +163,7 @@ package org.alfresco.previewer
 		 * Loads the content defined by url into the documentDisplay so it can be
 		 * paged, zoomed and moved.
 		 * 
-		 * @param url THe url to the content to display.
+		 * @param url The url to the content to display.
 		 */
 		public function set url(url:String):void
 		{			
@@ -211,8 +214,16 @@ package org.alfresco.previewer
 		public function set page(page:int):void
 		{			
 			// Make sure the page exist.
-			if (doc && doc.getNoOfPages() > 0 && page > 0 && page <= doc.getNoOfPages())
+			if (doc && doc.getNoOfPages() > 0)
 			{
+				if (page < 1)
+				{
+					page = 1;
+				}
+				else if (page > doc.getNoOfPages())
+				{
+					page = doc.getNoOfPages();
+				}
 				// Find the y-position of the page in the document (first page in doc is indexed with 0).
 				var yTo:Number = doc.getPageStart(page - 1) - doc.gap;
 				
@@ -516,6 +527,13 @@ package org.alfresco.previewer
 				
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 			}
+
+			// Tell other components that document is loaded and ready
+			var e:DocumentZoomDisplayEvent = new DocumentZoomDisplayEvent(DocumentZoomDisplayEvent.DOCUMENT_READY);
+			e.page = this._page;
+			e.visiblePages = this._visiblePages;
+			e.noOfPages = pages ? pages.length : 0;
+			dispatchEvent(e);
 		}
 		
 		/**
@@ -618,10 +636,10 @@ package org.alfresco.previewer
 		 * Listen for key events that can be used to navigate in the document
 		 */
         private function onKeyDown(event:KeyboardEvent):void 
-        {			        				
+        {
 			if (event.keyCode == Keyboard.HOME)
 			{
-				// Show first if HOME is clicked.
+				// Show first page if HOME is clicked.
 				page = 1;
 			} 
 			else if (event.keyCode == Keyboard.END)
@@ -641,10 +659,12 @@ package org.alfresco.previewer
 			}						 
 			else if (event.keyCode == Keyboard.UP || event.keyCode == Keyboard.DOWN)
 			{				
-				// Show previous page if UP is cliked and next page if DOWN is clicked. 
+				// Scroll a small portion of the page if UP or DOWN is clicked
 				var newScrollbarPosition:Number = vsb.scrollPosition + (vsb.lineScrollSize * 3 * (event.keyCode == Keyboard.DOWN ? 1 : -1));
 				adjustVerticalScrollbarPosition(newScrollbarPosition);	
 			}			
+			// Code to use if future support for big jumps (down) in document is added
+			// page = this._page + (Math.floor(doc.getNoOfPages() / doc.getNoOfPages() > 50 ? 10 : 5) || 1)
 		}
 		
  		/**
@@ -731,17 +751,8 @@ package org.alfresco.previewer
 			e.visiblePages = this._visiblePages;
 			e.noOfPages = pages ? pages.length : 0;			
 			dispatchEvent(e);
-
-			// Make sure current page is displayed
-			/*
-			if (pmclm)
-			{
-				pmclm.loadClipsForPage(page, visiblePages);
 			}
-			*/
 
-		}
-		
 		/**
 		 * Called when this component is resized.
 		 * Makes sure the new snapPoints for the display area are dispatched.
@@ -752,5 +763,6 @@ package org.alfresco.previewer
 		{
 			dispatchSnapPoints();
 		} 
+
 	}
 }

@@ -12,6 +12,8 @@ package
 	import org.alfresco.previewer.PreviewerEvent;
 	import org.hasseg.externalMouseWheel.ExternalMouseWheelSupport;
 
+   import madebypi.utils.transparenttextinput.JSTextReader;
+
 	/**
 	 * Wraps the Previewer component in a html/web environment, takes the supplied variables 
 	 * and loads the content defined by the url and calls javascript callbacks if something goes wrong.
@@ -73,7 +75,8 @@ package
 			var fileName:String = Application.application.parameters.fileName;
 			var showFullScreenButton:String = Application.application.parameters.show_fullscreen_button;
 			var showFullWindowButton:String = Application.application.parameters.show_fullwindow_button;			
-			
+            var disableI18nInputFix:String = Application.application.parameters.disable_i18n_input_fix;
+
 			// i18n labels
 			var i18n:Object = new Object();
 			i18n.actualSize = Application.application.parameters.i18n_actualSize;
@@ -96,14 +99,31 @@ package
 			// Respond to javascript callbacks for cursor handling.
 			ExternalInterface.addCallback("setMode", onSetMode);
 
-			// Start the loading the content in to the previewer				
+  			/**
+			  * Workaround to solve Flash i18n input keyCode bug when "wmode" is set to "transparent":
+			  * http://bugs.adobe.com/jira/browse/FP-479
+			  * http://issues.alfresco.com/jira/browse/ALF-1351
+			  *
+			  * ... see "Browser Testing" on this page to see supported browser/language combinations for AS2 version:
+			  * http://analogcode.com/p/JSTextReader/
+			  *
+			  * ... note that we are using the AS3 version of the same fix found at:
+			  * http://blog.madebypi.co.uk/2009/04/21/transparent-flash-text-entry/
+			  */
+  			if (disableI18nInputFix == null || disableI18nInputFix.toLowerCase() != "true")
+  			{
+ 				JSTextReader.getInstance().init(stage)
+ 				Logger.log("Activated flash i18n fix for FP-479.");
+  			}
+
+			// Start the loading the content in to the previewer
 			previewer.url = url;			
 		}
 		
 		/**
-		 * Disables the custom cursors such as grab and move since
-		 * FF3 and SF4 hides the browser cursor if a flashmovie uses a custom cursor 
-		 * when the flash movie is placed/hidden under a div we must turn off custom cursor
+	 	 * Disables the custom cursors such as grab and move since
+       * FF3 and SF4 hides the browser cursor, if a flashmovie uses a custom cursor
+       * when the flash movie is placed/hidden under a div, we must turn off custom cursor
 		 * when the html environment tells us to.
 		 * 
 		 * Also stops dragging   
