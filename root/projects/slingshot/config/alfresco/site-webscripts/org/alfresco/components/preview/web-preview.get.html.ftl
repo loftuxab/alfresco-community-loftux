@@ -8,7 +8,8 @@ new Alfresco.WebPreview("${el}").setOptions(
    icon: "${node.icon}",
    mimeType: "${node.mimeType}",
    previews: [<#list node.previews as p>"${p}"<#if (p_has_next)>, </#if></#list>],
-   size: "${node.size}"
+   size: "${node.size}",
+   disableI18nInputFix: ${args.disableI18nInputFix!"false"}
 }).setMessages(${messages});
 //]]></script>
 </#if>

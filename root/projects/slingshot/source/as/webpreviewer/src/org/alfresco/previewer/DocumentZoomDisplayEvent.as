@@ -54,7 +54,7 @@ package org.alfresco.previewer
 		 * Dispatched when the page property (the page being displayed in the top of the display area)
 		 * is changed inside the document zoom display.
 		 * 
-		 * Sets the following values: noOfPages, page.
+		 * Sets the following values: noOfPages, page, visiblePages.
 		 */
 		public static const DOCUMENT_PAGE_SCOPE_CHANGE:String = "documentPageScopeChange";
 
@@ -64,6 +64,13 @@ package org.alfresco.previewer
 		 * Sets the following values: documentScale.
 		 */
 		public static const DOCUMENT_SCALE_CHANGE:String = "documentScaleChange";
+
+		/**
+		 * Dispatched when the content of the document has been loaded and is displayed.
+		 *
+		 * Sets the following values: noOfPages, page, visiblePages.
+		 */
+		public static const DOCUMENT_READY:String = "documentReady";
 
 		/**
 		 * An error code representing the error that occured when trying to load the content from the url.

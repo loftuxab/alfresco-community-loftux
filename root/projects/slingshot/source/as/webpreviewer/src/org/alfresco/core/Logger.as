@@ -26,7 +26,7 @@ package org.alfresco.core
 		{
 			enabled = true;
 			javaScriptCallback = jsLogger;
-			log("Javascript logging has been enabled");
+			log("Javascript logging has been enabled.");
 		}
 		
 		/**
