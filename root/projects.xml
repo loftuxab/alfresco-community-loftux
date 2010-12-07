@@ -1934,9 +1934,9 @@
 
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
          <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages"/>
-         <mapper type="glob" 
-                 from="*.properties" 
-                 to="*_en_US.properties"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).properties$" 
+                 to="\1_en_US.properties"/>
       </copy>
 
       <mkdir dir="${dir.project.webclient.dist}" />
