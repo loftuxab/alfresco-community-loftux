@@ -93,27 +93,30 @@ public class ProxyPortlet implements Portlet
     public void processAction(ActionRequest req, ActionResponse res)
         throws PortletException, PortletSecurityException, IOException
     {
-        //
-        // Store updated preferences if any found
-        //
-        boolean foundPref = false;
-        PortletPreferences prefs = req.getPreferences();
-        Map<String, String[]> prefsMap = prefs.getMap();
-        Enumeration<String> names = req.getParameterNames();
-        while (names.hasMoreElements())
+        if (req.getPortletMode() == PortletMode.EDIT)
         {
-           String name = (String)names.nextElement();
-           String value = req.getParameter(name);
-           if (prefsMap.containsKey(name) && value != null && prefsMap.get(name)[0] != value)
-           {
-               prefs.setValue(name, value);
-               foundPref = true;
-           }
-        }
-        if (foundPref)
-        {
-            prefs.store();
-            req.setAttribute(UPDATED_PARAM_NAME, true);
+            //
+            // Store updated preferences if any found
+            //
+            boolean foundPref = false;
+            PortletPreferences prefs = req.getPreferences();
+            Map<String, String[]> prefsMap = prefs.getMap();
+            Enumeration<String> names = req.getParameterNames();
+            while (names.hasMoreElements())
+            {
+               String name = (String)names.nextElement();
+               String value = req.getParameter(name);
+               if (prefsMap.containsKey(name) && value != null && prefsMap.get(name)[0] != value)
+               {
+                   prefs.setValue(name, value);
+                   foundPref = true;
+               }
+            }
+            if (foundPref)
+            {
+                prefs.store();
+                req.setAttribute(UPDATED_PARAM_NAME, true);
+            }
         }
         
         res.setRenderParameters(req.getParameterMap());
@@ -160,8 +163,8 @@ public class ProxyPortlet implements Portlet
         //
         // Establish View URL
         //
-        String scriptUrl = req.getParameter(VIEW_URL);
-        if (scriptUrl == null)
+        String scriptUrl = req.getParameter(SCRIPT_URL);
+        if (scriptUrl == null || scriptUrl.equals(this.editScriptUrl))
         {
             // retrieve initial scriptUrl as configured by Portlet
             scriptUrl = this.initScriptUrl;
@@ -238,15 +241,10 @@ public class ProxyPortlet implements Portlet
         //
         // Establish Edit URL
         //
-        String scriptUrl = req.getParameter(VIEW_URL);
+        String scriptUrl = this.editScriptUrl;
         if (scriptUrl == null)
         {
-            // retrieve initial scriptUrl as configured by Portlet
-            scriptUrl = this.editScriptUrl;
-            if (scriptUrl == null)
-            {
-                throw new PortletException("Initial 'editScriptUrl' parameter has not been specified.");
-            }
+            throw new PortletException("Initial 'editScriptUrl' parameter has not been specified.");
         }
         
         //
