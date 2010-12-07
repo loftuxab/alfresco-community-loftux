@@ -119,26 +119,26 @@
     <postInstallationActionList>
 	<actionGroup>
 	    <actionList>
-		<runProgram>
-		    <progressText>Stopping MySQL...</progressText>
-		    <program>${installdir}/${ctlscript_unix}</program>
-		    <programArguments>stop mysql</programArguments>
-		    <ruleList>
-			<platformTest type="unix" />
-                    </ruleList>
-                </runProgram>
-		<runProgram>
-		    <progressText>Stopping MySQL...</progressText>
-		    <program>${mysql_root_directory.dos}\scripts\servicerun.bat</program>
-		    <programArguments>STOP</programArguments>
-		    <ruleList>
-			<platformTest type="windows" />
-                    </ruleList>
-                </runProgram>
-		<waitForPort port="${database_port}" timeout="10000" state="free" />
+		   <runProgram>
+		      <progressText>Stopping MySQL...</progressText>
+		      <program>${installdir}/${ctlscript_unix}</program>
+		      <programArguments>stop mysql</programArguments>
+		      <ruleList>
+                 <platformTest type="unix" />
+              </ruleList>
+           </runProgram>
+           <runProgram>
+		      <progressText>Stopping MySQL...</progressText>
+		      <program>${mysql_root_directory.dos}\scripts\servicerun.bat</program>
+		      <programArguments>STOP</programArguments>
+		      <ruleList>
+			     <platformTest type="windows" />
+              </ruleList>
+           </runProgram>
+		   <waitForPort port="${database_port}" timeout="10000" state="free" />
 	    </actionList>
 	    <ruleList>
-		<compareText value="${mysql_installation_type}" logic="equals" text="bundled" />
+            <fileTest path="${installdir}/mysql" condition="exists" />
 	    </ruleList>
 	</actionGroup>
         <!--<actionGroup>
