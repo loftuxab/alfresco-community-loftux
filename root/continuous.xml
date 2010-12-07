@@ -1335,9 +1335,9 @@
       </delete>
       <copy todir="${dir.continuous.assemble.sdk}/config/alfresco/messages">
          <fileset dir="${dir.continuous.assemble.sdk}/config/alfresco/messages"/>
-         <mapper type="glob" 
-                 from="*.properties" 
-                 to="*_en_US.properties"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).properties$" 
+                 to="\1_en_US.properties"/>
       </copy>
 
       <!-- fix for ETHREEOH-3996 add exploded config directory to SDK -->
