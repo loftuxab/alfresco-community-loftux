@@ -82,6 +82,7 @@
         </directoryParameter>
 
         <passwordParameter name="alfresco_admin_password" description="Admin Password:" descriptionRetype="Repeat Password:" allowEmptyValue="0" >
+		    <title>Admin Password</title>
             <explanation>Please give a password to use for the Alfresco administrator account.</explanation>
             <validationActionList>
 	        <throwError>
