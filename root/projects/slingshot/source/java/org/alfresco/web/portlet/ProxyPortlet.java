@@ -119,7 +119,7 @@ public class ProxyPortlet implements Portlet
             }
         }
         
-        res.setRenderParameters(req.getParameterMap());
+        res.setRenderParameter(req.getWindowID() + SCRIPT_URL, req.getParameter(SCRIPT_URL));
     }
 
     /*
@@ -163,7 +163,7 @@ public class ProxyPortlet implements Portlet
         //
         // Establish View URL
         //
-        String scriptUrl = req.getParameter(SCRIPT_URL);
+        String scriptUrl = req.getParameter(req.getWindowID() + SCRIPT_URL);
         if (scriptUrl == null || scriptUrl.equals(this.editScriptUrl))
         {
             // retrieve initial scriptUrl as configured by Portlet
