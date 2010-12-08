@@ -17,7 +17,8 @@
     <defaultUnixFilePermissions>644</defaultUnixFilePermissions>
     <allowComponentSelection>1</allowComponentSelection>
     <leftImage>images/alfresco_left.png</leftImage>
-
+    <allowedLanguages>en fr es it de ja</allowedLanguages>
+	
     <platformOptionsList>
         <platformOptions>
             <platform>osx</platform>
