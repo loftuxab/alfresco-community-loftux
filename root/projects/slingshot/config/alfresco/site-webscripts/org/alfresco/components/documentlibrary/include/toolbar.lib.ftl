@@ -13,7 +13,7 @@
                   <div class="bd">
                      <ul>
                      <#list createContent as content>
-                        <#assign href>create-content?mimeType=${content.mimetype?html}&amp;destination={nodeRef}<#if (content.formid!"") != "">&amp;formId=${content.formid?html}</#if></#assign>
+                        <#assign href>create-content?mimeType=${content.mimetype?html}&amp;destination={nodeRef}&amp;itemId=${content.itemid}<#if (content.formid!"") != "">&amp;formId=${content.formid?html}</#if></#assign>
                         <li><a href="${siteURL(href)}" rel="${content.permission!""}"><span class="${content.icon}-file">${msg(content.label)}</span></a></li>
                      </#list>
                      </ul>

@@ -67,6 +67,7 @@ function getCreateContent(myConfig)
             mimetype: xmlContent.@mimetype.toString(),
             icon: xmlContent.@icon.toString(),
             permission: xmlContent.@permission.toString(),
+            itemid: xmlContent.@itemid.toString() || "cm:content",
             formid: xmlContent.@formid.toString(),
             label: xmlContent.@label.toString()
          });
@@ -107,6 +108,7 @@ function getCreateContent(myConfig)
                         mimetype: mimetype,
                         icon: creatableType,
                         permission: "create-google-doc",
+                        itemid: "cm:content",
                         formid: "doclib-create-googledoc",
                         label: "google-docs." + creatableType
                      });
