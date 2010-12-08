@@ -260,17 +260,7 @@
             <substitutionList>
                 <substitution>
                     <pattern>shared.loader=</pattern>
-                    <value>shared.loader=${alfresco_shared_directory}</value>
-                    <ruleList>
-                        <platformTest type="unix"/>
-                    </ruleList>
-                </substitution>
-                <substitution>
-                    <pattern>shared.loader=</pattern>
-                    <value>shared.loader=${alfresco_shared_directory.dos.unix}</value>
-                    <ruleList>
-                        <platformTest type="windows"/>
-                    </ruleList>
+                    <value>shared.loader=${'${catalina.base}/shared/classes,${catalina.base}/shared/lib/*.jar'}</value>
                 </substitution>
             </substitutionList>
         </substitute>
