@@ -117,9 +117,13 @@ public class AssetCollectionGet extends DeclarativeWebScript implements WebSiteM
 		CollectionData collectionData = new CollectionData();
 		collectionData.setId(collection.toString());
 		collectionData.setName((String)collectionProps.get(ContentModel.PROP_NAME));
-		collectionData.setTitle((String)collectionProps.get(ContentModel.PROP_TITLE));
-		collectionData.setDescription((String)collectionProps.get(ContentModel.PROP_DESCRIPTION));
 		
+        String title = (String) collectionProps.get(ContentModel.PROP_TITLE);
+        collectionData.setTitle(title == null ? "" : title);
+        
+        String description = (String) collectionProps.get(ContentModel.PROP_DESCRIPTION);
+        collectionData.setDescription(description == null ? "" : description);
+
 		// Gather information about the associated
 		List<AssociationRef> assocs = nodeService.getTargetAssocs(collection, ASSOC_WEBASSETS);
 		String[] assetIds = new String[assocs.size()];

@@ -215,20 +215,23 @@
 
    <config evaluator="node-type" condition="ws:indexPage">
       <forms>
-         <!-- Default form configuration for the cm:content type -->
+         <!-- Default form configuration for the ws:indexPage type -->
          <form>
             <field-visibility>
                <show id="cm:name" />
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
-               <show id="mimetype" />
                <show id="cm:author" force="true" />
-               <show id="size" for-mode="view" />
                <show id="cm:creator" for-mode="view" />
                <show id="cm:created" for-mode="view" />
                <show id="cm:modifier" for-mode="view" />
                <show id="cm:modified" for-mode="view" />
 
+               <show id="ws:templateName" force="true" />
+
+               <show id="size" for-mode="view" />
+               <show id="mimetype" for-mode="view" />
+               
                <!-- tags and categories -->
                <show id="cm:taggable" for-mode="edit" force="true" />
                <show id="cm:categories" />
@@ -381,13 +384,16 @@
                <show id="cm:name" />
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
-               <show id="mimetype" />
                <show id="cm:author" force="true" />
-               <show id="size" for-mode="view" />
                <show id="cm:creator" for-mode="view" />
                <show id="cm:created" for-mode="view" />
                <show id="cm:modifier" for-mode="view" />
                <show id="cm:modified" for-mode="view" />
+
+               <show id="ws:templateName" force="true" />
+
+               <show id="mimetype" for-mode="view" />
+               <show id="size" for-mode="view" />
 
                <!-- tags and categories -->
                <show id="cm:taggable" for-mode="edit" force="true" />
