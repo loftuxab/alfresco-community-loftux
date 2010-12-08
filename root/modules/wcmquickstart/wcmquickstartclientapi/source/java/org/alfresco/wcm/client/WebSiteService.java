@@ -37,7 +37,7 @@ public abstract class WebSiteService
     public abstract Collection<WebSite> getWebSites();
 
     /**
-     * Gets the web site that relates to the host name and port.
+     * Gets the web site that relates to the host name and port. Assumes the root context.
      * 
      * @param hostName
      *            host name
@@ -46,6 +46,17 @@ public abstract class WebSiteService
      * @return WebSite web site, null if non found
      */
     public abstract WebSite getWebSite(String hostName, int hostPort);
+
+    /**
+     * Gets the website that relates to the specified host, port, and context path. For example, if your webapp
+     * is deployed at "http://my.web.site/wqs" then the host would be "my.web.site", the port would be 80 (the default HTTP port)
+     * and the context path would be "wqs".
+     * @param hostName
+     * @param hostPort
+     * @param contextPath
+     * @return The matching website or null if none found
+     */
+    public abstract WebSite getWebSite(String hostName, int hostPort, String contextPath);
 
     /**
      * Set the supplied website in a thread-local container to make it available

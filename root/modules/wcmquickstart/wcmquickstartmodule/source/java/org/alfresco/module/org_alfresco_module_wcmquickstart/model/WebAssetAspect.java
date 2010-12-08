@@ -189,8 +189,9 @@ public class WebAssetAspect implements WebSiteModel, CopyServicePolicies.OnCopyN
             Map<QName, Serializable> propertiesToCopy = new HashMap<QName, Serializable>(properties);
             // We don't want to copy across the original node's record of the
             // website sections it's in.
-            // This property will be calculated afresh on the copy
+            // These properties will be calculated afresh on the copy
             propertiesToCopy.remove(PROP_PARENT_SECTIONS);
+            propertiesToCopy.remove(PROP_ANCESTOR_SECTIONS);
             return propertiesToCopy;
         }
     }
@@ -202,7 +203,7 @@ public class WebAssetAspect implements WebSiteModel, CopyServicePolicies.OnCopyN
     @Override
     public void onContentUpdate(NodeRef nodeRef, boolean newContent)
     {
-        if (newContent == true)
+        if (newContent && nodeService.exists(nodeRef))
         {
             renditionHelper.createRenditions(nodeRef);
         }
@@ -215,9 +216,12 @@ public class WebAssetAspect implements WebSiteModel, CopyServicePolicies.OnCopyN
     @Override
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        nodeService.setProperty(nodeRef, PROP_AVAILABLE, Boolean.TRUE);
-        nodeService.setProperty(nodeRef, PROP_PUBLISHED_TIME, new Date());
-        renditionHelper.createRenditions(nodeRef);
+        if (nodeService.exists(nodeRef))
+        {
+            nodeService.setProperty(nodeRef, PROP_AVAILABLE, Boolean.TRUE);
+            nodeService.setProperty(nodeRef, PROP_PUBLISHED_TIME, new Date());
+            renditionHelper.createRenditions(nodeRef);
+        }
     }
 
     /**

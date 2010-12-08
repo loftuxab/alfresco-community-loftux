@@ -55,6 +55,7 @@
    <bean id="org_alfresco_module_wcmquickstart_collectionHelper" class="org.alfresco.module.org_alfresco_module_wcmquickstart.util.WebassetCollectionHelper">
       <property name="nodeService" ref="nodeService" />
       <property name="searchService" ref="searchService" />
+      <property name="namespaceService" ref="NamespaceService" />
       <property name="contextParserService" ref="wcmquickstartmodule_contextParserService" />
       <property name="searchStore" value="${wcmqs.searchstore}" />
    </bean>

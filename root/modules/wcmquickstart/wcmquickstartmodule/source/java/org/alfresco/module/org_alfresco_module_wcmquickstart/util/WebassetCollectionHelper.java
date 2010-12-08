@@ -1,5 +1,19 @@
-/**
- * 
+/*
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
+ *
+ * This file is part of the Alfresco Web Quick Start module.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.alfresco.module.org_alfresco_module_wcmquickstart.util;
 
@@ -16,24 +30,26 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.InvalidQNameException;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Roy Wetherall
+ * @author Brian Remmington
  */
 public class WebassetCollectionHelper implements WebSiteModel
 {
-    /** Node service */
+    private static final Log log = LogFactory.getLog(WebassetCollectionHelper.class);
+    
     private NodeService nodeService;
-
-    /** Search service */
     private SearchService searchService;
-
-    /** Context parser service */
+    private NamespaceService namespaceService;
     private ContextParserService contextParserService;
-
-    /** Search store */
-    private String searchStore = "workspace://SpacesStore";
-
+    private String searchStore = StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.toString();
+    
     /**
      * Set the node service
      * 
@@ -54,6 +70,11 @@ public class WebassetCollectionHelper implements WebSiteModel
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
+    }
+
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
     }
 
     /**
@@ -115,12 +136,47 @@ public class WebassetCollectionHelper implements WebSiteModel
             // Parse the query string
             query = contextParserService.parse(collection, query);
 
-            // Build the query parameters
             SearchParameters searchParameters = new SearchParameters();
+
+            if (queryLanguage.equals(SearchService.LANGUAGE_LUCENE))
+            {
+                //handle additional support for Lucene ordering with ORDER_ASC and ORDER_DESC
+                String[] queryParts = query.split("\\s");
+                for (String queryPart : queryParts)
+                {
+                    int firstColonIndex = queryPart.indexOf(':');
+                    if (firstColonIndex == -1)
+                    {
+                        continue;
+                    }
+                    String name = queryPart.substring(0, firstColonIndex);
+                    String value = (firstColonIndex < (queryPart.length() + 1)) ? queryPart.substring(firstColonIndex+1) : "";
+                    boolean orderAscending = "ORDER_ASC".equals(name) || "ORDER".equals(name);
+                    boolean orderDescending = "ORDER_DESC".equals(name);
+                    if (!orderAscending && !orderDescending)
+                    {
+                        continue;
+                    }
+                    QName property = parsePropertyName(value);
+                    if (property != null)
+                    {
+                        String sort = "@" + property.toString();
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Adding sort order: " + sort + (orderAscending ? " ASC" : " DESC"));
+                        }
+                        searchParameters.addSort(sort, orderAscending);
+                    }
+                }
+                
+            }
+
+            // Build the query parameters
             searchParameters.addStore(new StoreRef(searchStore));
             searchParameters.setLanguage(queryLanguage);
             searchParameters.setMaxItems(maxQuerySize);
             searchParameters.setQuery(query);
+            
 
             try
             {
@@ -133,7 +189,7 @@ public class WebassetCollectionHelper implements WebSiteModel
                 {
                     if (maxQuerySize < 1 || resultCount < maxQuerySize)
                     {
-                        // Only ass associations to webassets
+                        // Only add associations to webassets
                         if (nodeService.hasAspect(result, ASPECT_WEBASSET) == true)
                         {
                             nodeService.createAssociation(collection, result, ASSOC_WEBASSETS);
@@ -159,6 +215,37 @@ public class WebassetCollectionHelper implements WebSiteModel
                         e);
             }
         }
+    }
+
+    private QName parsePropertyName(String value)
+    {
+        QName result = null;
+        try
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug("Attempting to parse property name: " + value);
+            }
+            StringBuilder sb = new StringBuilder();
+            char[] valueArray = value.toCharArray();
+            for (char ch : valueArray)
+            {
+                switch (ch)
+                {
+                case '\"':
+                    break;
+                    
+                default:
+                    sb.append(ch);
+                    break;
+                }
+            }
+            result = QName.createQName(sb.toString(), namespaceService);
+        }
+        catch(InvalidQNameException ex)
+        {
+        }
+        return result;
     }
 
 }

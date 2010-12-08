@@ -35,6 +35,7 @@ public interface Asset extends Resource
     public final static String PROPERTY_COMMENT_COUNT = "ws:derivedCommentCount";
     public final static String PROPERTY_AVERAGE_RATING = "ws:derivedAverageRating";
     public final static String PROPERTY_PUBLISHED_TIME = "ws:publishedTime";
+    public final static String PROPERTY_TEMPLATE_NAME = "ws:templateName";
 
 	/** Associations */
 	public final static String RELATED_PRIMARY_IMAGE = "ws:primaryImage";

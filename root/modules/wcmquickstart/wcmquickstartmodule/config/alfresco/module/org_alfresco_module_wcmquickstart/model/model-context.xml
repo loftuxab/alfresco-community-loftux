@@ -52,6 +52,7 @@
             <bean class="org.alfresco.module.org_alfresco_module_wcmquickstart.model.AssetCollectionDefinition">
                 <property name="name" value="latest.articles" />
                 <property name="title" value="Latest Articles" />
+                <property name="queryType" value="alfrescoCmis" />
                 <property name="maxResults" value="3" />
                 <property name="query"><value>SELECT d.* FROM cmis:document AS d JOIN ws:webasset AS wa ON d.cmis:objectId = wa.cmis:objectId WHERE d.cmis:objectTypeId='D:ws:article' AND in_tree(d, '%{section:.}') ORDER BY wa.ws:publishedTime DESC</value></property>
             </bean>

@@ -56,7 +56,8 @@ public class ApplicationDataInterceptor extends HandlerInterceptorAdapter
         // Get the website object and store it in the surf request context
         String serverName = request.getServerName();
         int serverPort = request.getServerPort();
-        WebSite webSite = webSiteService.getWebSite(serverName, serverPort);
+        String contextPath = request.getContextPath();
+        WebSite webSite = webSiteService.getWebSite(serverName, serverPort, contextPath);
         
         if (webSite == null)
         {

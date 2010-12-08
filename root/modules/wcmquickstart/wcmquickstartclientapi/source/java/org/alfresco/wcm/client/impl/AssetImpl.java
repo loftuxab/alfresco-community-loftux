@@ -49,33 +49,36 @@ public class AssetImpl extends ResourceBaseImpl implements Asset
 
     private Map<String, List<String>> relationships = null;
     private Map<String, List<Asset>> relatedAssets;
-    
+
     private List<String> parentSectionIds = Collections.emptyList();
-              
 
     /**
      * @see org.alfresco.wcm.client.Asset#getRelatedAssets()
      */
     @Override
-    public Map<String,List<Asset>> getRelatedAssets() 
+    public Map<String, List<Asset>> getRelatedAssets()
     {
         /*
-         * Note: This method call is expensive if used for every asset in a collection as a
-         * query is performed. In mitigation the results are cached within the object.
+         * Note: This method call is expensive if used for every asset in a
+         * collection as a query is performed. In mitigation the results are
+         * cached within the object.
          */
-    	if (relatedAssets == null) {
-	    	Map<String, List<Asset>> assetMap = new TreeMap<String, List<Asset>>();
-	    	for (Entry<String, List<String>> entry : getRelationships().entrySet()) {
-	    		List<String> relatedAssetIds = entry.getValue();
-			    if (relatedAssetIds != null)
-			    {
-		    		List<Asset> assets = getAssetFactory().getAssetsById(relatedAssetIds);
-				    if (assets.size() > 0) assetMap.put(entry.getKey(), assets);
-			    }
-	    	}
-	    	relatedAssets = assetMap;
-    	}
-    	return relatedAssets;
+        if (relatedAssets == null)
+        {
+            Map<String, List<Asset>> assetMap = new TreeMap<String, List<Asset>>();
+            for (Entry<String, List<String>> entry : getRelationships().entrySet())
+            {
+                List<String> relatedAssetIds = entry.getValue();
+                if (relatedAssetIds != null)
+                {
+                    List<Asset> assets = getAssetFactory().getAssetsById(relatedAssetIds);
+                    if (assets.size() > 0)
+                        assetMap.put(entry.getKey(), assets);
+                }
+            }
+            relatedAssets = assetMap;
+        }
+        return relatedAssets;
     }
 
     /**
@@ -94,35 +97,37 @@ public class AssetImpl extends ResourceBaseImpl implements Asset
             return getAssetFactory().getAssetsById(relatedAssetIds);
         }
     }
-    
+
     /**
      * @see org.alfresco.wcm.client.Asset#getRelatedAsset(String)
      */
-    @Override    
+    @Override
     public Asset getRelatedAsset(String relationshipName)
     {
         Asset result = null;
         List<String> relatedAssetIds = getRelationships().get(relationshipName);
-        if (relatedAssetIds != null && ! relatedAssetIds.isEmpty())
+        if (relatedAssetIds != null && !relatedAssetIds.isEmpty())
         {
             result = getAssetFactory().getAssetById(relatedAssetIds.get(0));
         }
         return result;
     }
-    
+
     /**
      * Set the parent sections id's
-     * @param sectionIds	collection of parent section id
+     * 
+     * @param sectionIds
+     *            collection of parent section id
      */
     public void setParentSectionIds(Collection<String> sectionIds)
     {
-        this.parentSectionIds  = new ArrayList<String>(sectionIds);
+        this.parentSectionIds = new ArrayList<String>(sectionIds);
         if (sectionIds.size() > 0)
         {
             setPrimarySectionId(parentSectionIds.get(0));
         }
     }
-    
+
     /**
      * @see org.alfresco.wcm.client.Asset#getTags()
      */
@@ -148,54 +153,59 @@ public class AssetImpl extends ResourceBaseImpl implements Asset
     @Override
     public long getSize()
     {
-    	BigInteger streamLength = (BigInteger)getProperties().get(PropertyIds.CONTENT_STREAM_LENGTH);
-    	if (streamLength == null) return 0;
+        BigInteger streamLength = (BigInteger) getProperties().get(PropertyIds.CONTENT_STREAM_LENGTH);
+        if (streamLength == null)
+            return 0;
         return streamLength.longValue();
     }
 
-	/**
-	 *  @see org.alfresco.wcm.client.Asset#getContentAsInputStream()
-	 */
-	@Override
-	public ContentStream getContentAsInputStream() 
-	{
-		// Get the request thread's session
-		Session session = CmisSessionHelper.getSession();
-		
-		// Fetch the Document object for this asset
-		CmisObject object = session.getObject(new ObjectIdImpl(getId()));
-		if ( ! (object instanceof Document)) 
-		{
-			throw new IllegalArgumentException("Object referenced by the uuid is not a document");
-		}
-		Document doc = (Document)object;		
-		if (doc == null) return null;
-		
-		// Return the content as a stream
-		return new ContentStreamCmisImpl(doc.getContentStream());
-	}
+    /**
+     * @see org.alfresco.wcm.client.Asset#getContentAsInputStream()
+     */
+    @Override
+    public ContentStream getContentAsInputStream()
+    {
+        // Get the request thread's session
+        Session session = CmisSessionHelper.getSession();
 
-	/**
-	 * @see org.alfresco.wcm.client.Asset#getTemplate()
-	 */
-	@Override
-	public String getTemplate()
-	{
-		String template = null;
-		
-		// Only "text" assets have templates associated with them
-	    String mimeType = getMimeType();
-	    if ((mimeType != null) && mimeType.startsWith("text"))
-	    {
-	    	Section section = getContainingSection();
-	    	template = section.getTemplate(getType());
-	    }
-	    
-	    return template;
-	}
+        // Fetch the Document object for this asset
+        CmisObject object = session.getObject(new ObjectIdImpl(getId()));
+        if (!(object instanceof Document))
+        {
+            throw new IllegalArgumentException("Object referenced by the uuid is not a document");
+        }
+        Document doc = (Document) object;
+        if (doc == null)
+            return null;
+
+        // Return the content as a stream
+        return new ContentStreamCmisImpl(doc.getContentStream());
+    }
+
+    /**
+     * @see org.alfresco.wcm.client.Asset#getTemplate()
+     */
+    @Override
+    public String getTemplate()
+    {
+        String template = null;
+
+        // Only "text" assets have templates associated with them
+        String mimeType = getMimeType();
+        if ((mimeType != null) && mimeType.startsWith("text"))
+        {
+            template = (String)properties.get(PROPERTY_TEMPLATE_NAME);
+            if ((template == null) || template.trim().length() == 0)
+            {
+                Section section = getContainingSection();
+                template = section.getTemplate(getType());
+            }
+        }
+        return template;
+    }
 
     private Map<String, List<String>> getRelationships()
-    {    	
+    {
         if (relationships == null)
         {
             relationships = getAssetFactory().getSourceRelationships(getId());

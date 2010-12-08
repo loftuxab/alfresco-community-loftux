@@ -173,6 +173,16 @@
                     <type>d:text</type>
                     <mandatory>true</mandatory>
                     <default>cmis-alfresco</default>
+                    <constraints>
+                      <constraint type="LIST">
+                         <parameter name="allowedValues">
+                            <list>
+                               <value>cmis-alfresco</value>
+                               <value>lucene</value>
+                            </list>
+                         </parameter>
+                      </constraint>
+                    </constraints>
                 </property>
                 <property name="ws:query">
                     <title>Query</title>
@@ -181,7 +191,6 @@
                 <property name="ws:queryResultsMaxSize">
                     <title>Maximum Size</title>
                     <type>d:int</type>
-                    <mandatory>true</mandatory>
                     <!-- default>5</default-->
                 </property>
                 <property name="ws:minsToQueryRefresh">
@@ -481,6 +490,16 @@
                         <stored>false</stored>
                         <tokenised>false</tokenised>
                     </index>
+                </property>
+            </properties>
+        </aspect>
+
+        <aspect name="ws:templated">
+            <title>Templated Aspect</title>
+            <properties>
+                <property name="ws:templateName">
+                    <title>Template Name</title>
+                    <type>d:text</type>
                 </property>
             </properties>
         </aspect>

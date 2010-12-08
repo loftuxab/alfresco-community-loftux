@@ -102,7 +102,20 @@ public class WebSiteServiceImpl extends WebSiteService
      */
     public WebSite getWebSite(String hostName, int hostPort)
     {
-        String key = hostName + ":" + hostPort;
+        return getWebSite(hostName, hostPort, null);
+    }
+
+    public WebSite getWebSite(String hostName, int hostPort, String contextPath)
+    {
+        if (contextPath == null)
+        {
+            contextPath = "/";
+        } 
+        else if (!contextPath.startsWith("/"))
+        {
+            contextPath = "/" + contextPath;
+        }
+        String key = hostName + ":" + hostPort + contextPath;
         WebSite website = getWebSiteCache().get(key);
         if (website == null)
         {
@@ -159,10 +172,15 @@ public class WebSiteServiceImpl extends WebSiteService
             String id = result.getPropertyValueById(PropertyIds.OBJECT_ID);
             String hostName = result.getPropertyValueById(WebSite.PROP_HOSTNAME);
             BigInteger hostPort = result.getPropertyValueById(WebSite.PROP_HOSTPORT);
-            String key = hostName + ":" + hostPort.toString();
+            String context = result.getPropertyValueById(WebSite.PROP_CONTEXT);
+            if (context == null)
+            {
+                context = "";
+            }
+            String key = hostName + ":" + hostPort.toString() + "/" + context;
+
             String title = result.getPropertyValueById(Asset.PROPERTY_TITLE);
             String description = result.getPropertyValueById(Asset.PROPERTY_DESCRIPTION);
-            String context = result.getPropertyValueById(WebSite.PROP_CONTEXT);
             List<String> configList = result.getPropertyMultivalueById(WebSite.PROP_SITE_CONFIG);
             Map<String,String> configProperties = parseSiteConfig(configList);
 
