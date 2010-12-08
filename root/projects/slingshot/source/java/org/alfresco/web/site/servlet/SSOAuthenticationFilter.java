@@ -341,8 +341,9 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             chain.doFilter(sreq, sresp);
             return;
         }
-        if ("login".equals(req.getParameter("pt")) && "default".equals(req.getParameter("f")) &&
-                "/share/page".equals(req.getRequestURI()))
+        
+        // Login page requested directly
+        if ("login".equals(req.getParameter("pt")) && req.getRequestURI().endsWith("/page"))
         {
             redirectToLoginPage(req, res);
             return;
@@ -481,6 +482,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             {
                 // Process the type 1 NTLM message
                 Type1NTLMMessage type1Msg = new Type1NTLMMessage(ntlmByts);
+                
                 // Start with a fresh session
                 session.invalidate();
                 session = req.getSession();
@@ -635,14 +637,13 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         final PrintWriter out = res.getWriter();
         out.println("<html><head>");
         out.println("<meta http-equiv=\"Refresh\" content=\"0; url=" + 
-                req.getContextPath() + "/page?f=default&pt=login" + 
+                req.getContextPath() + "/page?pt=login" + 
                 "\">"); 
         out.println("</head><body><p>Please <a href=\"" +
-                req.getContextPath() + "/page?f=default&pt=login" + 
+                req.getContextPath() + "/page?pt=login" + 
                 "\">log in</a>.</p>");
         out.println("</body></html>");
         out.close();
-
         
         res.flushBuffer();
     }
