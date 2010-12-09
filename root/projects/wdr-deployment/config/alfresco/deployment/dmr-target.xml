@@ -3,18 +3,7 @@
 <beans>
 
    <!--  DEPLOYMENT SERVER CONFIGURATION - ALFRESCO TARGET -->
-   <bean id="dmr.properties"
-      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-      <property name="ignoreUnresolvablePlaceholders">
-         <value>true</value>
-      </property>
-      <property name="locations">
-         <list>
-            <value>classpath:alfresco/dmr.properties</value>
-         </list>
-      </property>
-   </bean>
-   
+
    <!--
       The name mapper maps names from AVM stores names to DM "root" folder
       names.

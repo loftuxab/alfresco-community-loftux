@@ -10,7 +10,7 @@
 		init-method="register">
 
 		<property name="name">
-			<value>avm</value>
+			<value>${deployment.avm.name}</value>
 		</property>
 		<property name="registry">
 			<ref bean="deploymentReceiverEngine" />
@@ -33,12 +33,12 @@
 				
 				<!-- Where should the root of the web project be stored, by default /www/avm_webapps -->
 				<property name="rootPath">
-				    <value>/www/avm_webapps</value>
+				    <value>${deployment.avm.rootPath}</value>
 				</property>
 				
 				<!-- storeName pattern mapping, by default "%storeName%-live" -->
 				<property name="storeNamePattern">
-                    <value>%storeName%-live</value>
+                    <value>${deployment.avm.storeNamePattern}</value>
                 </property>
 
 				<!--  Alfresco services -->
