@@ -215,7 +215,7 @@
             message = this.msg("workflow.no_message");
          }
                
-         var messageDesc = '<h4><a href="task-edit?taskId=' + taskId + '&referrer=tasks" class="theme-color-1" title="' + this.msg("title.editTask") + '">' + message + '</a></h4>',
+         var messageDesc = '<h4><a href="task-edit?taskId=' + taskId + '&referrer=tasks" class="theme-color-1" title="' + this.msg("title.editTask") + '">' + $html(message) + '</a></h4>',
                dateDesc = dueDate ? '<h4><span class="' + (today > dueDate ? "task-delayed" : "") + '" title="' + 
                           this.msg("title.dueOn", Alfresco.util.formatDate(dueDate, "longDate")) + '">' + Alfresco.util.formatDate(dueDate, "longDate") + '</span></h4>' : "",
                statusDesc = '<div title="' + this.msg("title.taskSummary", type, status) + '">' + this.msg("label.taskSummary", type, status) + '</div>',

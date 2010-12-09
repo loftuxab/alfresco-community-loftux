@@ -207,8 +207,7 @@
             <include name="aopalliance.jar" />
          </fileset>
          <fileset dir="${dir.project.3rdparty.lib}/spring-surf">
-            <filename name="spring-surf-core-*.jar" />
-            <filename name="spring-surf-core-configservice-*.jar" />
+            <include name="spring-surf-core-*.jar" />
          </fileset>
          <fileset dir="${dir.project.3rdparty.lib}/optional">
             <include name="log4j-*.jar" />
