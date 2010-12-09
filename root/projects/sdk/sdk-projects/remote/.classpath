@@ -11,7 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/wsdl4j-1.6.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/wss4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/wss4j-1.5.4-patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="alfresco-web-service-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xalan.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.4.1.jar"/>
