@@ -139,7 +139,7 @@
 		   <waitForPort port="${database_port}" timeout="10000" state="free" />
 	    </actionList>
 	    <ruleList>
-            <fileTest path="${installdir}/mysql" condition="exists" />
+			<isTrue value="${alfrescomysqlquestion_bundled}" /> 
 	    </ruleList>
 	</actionGroup>
         <!--<actionGroup>
@@ -235,6 +235,7 @@
     
     <installationAbortedActionList>
 	<deleteFile path="${installdir}/tomcat" />
+	<deleteFile path="${installdir}/mysql" />  
     </installationAbortedActionList>
 
     <preUninstallationActionList>
