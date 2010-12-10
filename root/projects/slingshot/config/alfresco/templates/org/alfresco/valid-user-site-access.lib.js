@@ -8,14 +8,16 @@
  */
 function isValidUserOrSite(siteManager)
 {
-   var valid = false;
+   var valid = true;
    if (page.url.templateArgs.userid != null)
    {
       // User Dashboard - user must be same user as per page view id
       valid = (user.name.toLowerCase() == page.url.templateArgs.userid.toLowerCase());
    }
-   else (page.url.templateArgs.site != null)
+   else if (page.url.templateArgs.site != null)
    {
+      valid = false;
+      
       // Site Dashboard - cannot view/enter private site pages
       var json = remote.call("/api/sites/" + page.url.templateArgs.site);
       if (json.status == 200)
