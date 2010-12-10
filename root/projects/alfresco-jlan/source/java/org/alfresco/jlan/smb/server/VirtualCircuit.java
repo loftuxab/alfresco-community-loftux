@@ -78,7 +78,7 @@ public class VirtualCircuit {
   // Active tree connections
   
   private Hashtable<Integer, TreeConnection> m_connections;
-  private int m_treeId;
+  private int m_treeId = 1;
   
   // List of active searches
   
