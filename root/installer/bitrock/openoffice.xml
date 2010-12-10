@@ -249,6 +249,7 @@
 		    <ruleList>
 			<platformTest type="windows"/>
 			<compareText text="${openofficeservice_startup}" logic="does_not_equal" value="auto" />
+                        <isTrue value="${openoffice_installed_as_service}" />
 		    </ruleList>
 		</runProgram>
                 <actionGroup>
