@@ -517,7 +517,7 @@
    </target>
    <target name="-drop-database-mysql">
       <sql driver="${db.driver}" 
-           url="${db.url}" 
+           url="jdbc:mysql:///" 
            classpathref="classpath.compile" 
            print="yes"
            userid="${db.username}" 
