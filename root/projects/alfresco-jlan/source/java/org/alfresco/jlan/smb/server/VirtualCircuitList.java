@@ -47,7 +47,7 @@ public class VirtualCircuitList {
   // Active virtual circuits
   
   private Hashtable<Integer, VirtualCircuit> m_vcircuits;
-  private int m_UID;
+  private int m_UID = 1;
   
   /**
    * Default constructor

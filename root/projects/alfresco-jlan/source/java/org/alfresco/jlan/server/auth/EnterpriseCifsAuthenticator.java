@@ -822,7 +822,7 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 		respPkt.setCommand(reqPkt.getCommand());
 		respPkt.setByteCount(0);
 
-		respPkt.setTreeId(0);
+		respPkt.setTreeId(0xFFFF);
 		respPkt.setUserId(uid);
 
 		// Set the various flags
