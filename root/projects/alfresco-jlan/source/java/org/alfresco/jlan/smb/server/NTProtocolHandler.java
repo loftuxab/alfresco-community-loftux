@@ -372,6 +372,12 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 						handledOK = true;
 					}
 				}
+				else {
+				    
+				    // Send an error response, invalid user id or tree id
+				    
+	                m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTInvalidParameter, SMBStatus.SRVNonSpecificError, SMBStatus.ErrSrv);
+				}
 				break;
 		}
 
@@ -1268,8 +1274,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			if ( shareDev.getType() == ShareType.DISK) {
 
 				// Check if the filesystem driver implements the NTFS streams interface, and streams
-				// are
-				// enabled
+				// are enabled
 
 				if ( shareDev.getInterface() instanceof NTFSStreamsInterface) {
 
@@ -1298,6 +1303,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		// Pack the filesystem type
 
+		pos = DataPacker.wordAlign( pos);
 		pos = DataPacker.putString(devType, smbPkt.getBuffer(), pos, true, smbPkt.isUnicode());
 		smbPkt.setByteCount(pos - smbPkt.getByteOffset());
 
