@@ -1,0 +1,419 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<!--
+   Configuration of shared (cross-transaction) caches. The in-transaction caches
+   are defined in tx-cache-context.xml
+-->
+<beans>
+   <!-- ===================================== -->
+   <!-- Property Values Cache                 -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Property entities -->
+   
+   <bean name="propertyValueSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <!-- <property name="cacheName">
+         <value>org.alfresco.cache.propertyValueCache</value>
+      </property>
+      -->
+      <property name="maxItems" value="${cache.propertyValueCache.maxItems}"/>      
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- ID lookup for ContentData entities    -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for ContentData -->
+   
+   <bean name="contentDataSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.contentDataSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- ID lookup for general, shared, immutable entities       -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for immutable entities -->
+   
+   <bean name="immutableEntitySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.immutableEntitySharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Root Nodes lookup                     -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Root Nodes -->
+
+   <bean name="node.rootNodesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.node.rootNodesSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- The cross-transaction shared cache for Root Nodes -->
+
+   <bean name="node.allRootNodesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.node.allRootNodesSharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ===================================== -->
+   <!-- Nodes lookup                        -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Nodes -->
+
+   <bean name="node.nodesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.node.nodesSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Node Aspect lookup                    -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Node Aspects -->
+
+   <bean name="node.aspectsSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.node.aspectsSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Node Properties lookup                -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Node Properties -->
+
+   <bean name="node.propertiesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.node.propertiesSharedCache.maxItems}"/>
+   </bean>
+
+   
+   <!-- ===================================== -->
+   <!-- Child by cm:name lookup for nodes  -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Child-by-name -->
+   
+   <bean name="node.childByNameSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.node.childByNameSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Rules lookup for nodes                -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Node Rules -->
+   
+   <bean name="nodeRulesSharedCache" class="org.alfresco.repo.cache.NullCache"/>
+   
+   <!-- ===================================== -->
+   <!-- Authority container look up for users -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for User Authorities -->
+   
+   <bean name="userToAuthoritySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.userToAuthoritySharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- The cross-transaction shared cache for User Authentication -->
+   
+   <bean name="authenticationSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.authenticationSharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ====================================== -->
+   <!-- NodeRef lookup for authority containers -->
+   <!-- ====================================== -->
+
+   <!-- The cross-transaction shared cache for authority containers -->
+   
+   <bean name="authoritySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.authoritySharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ================================================ -->
+   <!-- Authority NodeRef lookup to ChildAssociationRefs -->
+   <!-- ================================================ -->
+
+   <!-- The cross-transaction shared cache for authority containers -->
+   
+   <bean name="authorityToChildAuthoritySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.authorityToChildAuthoritySharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ================================================ -->
+   <!-- Zone lookup to ChildAssociationRefs              -->
+   <!-- ================================================ -->
+
+   <!-- The cross-transaction shared cache for authority containers -->
+   
+   <bean name="zoneToAuthoritySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.zoneToAuthoritySharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ===================================== -->
+   <!-- Permissions access cache              -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Permissions -->
+   
+   <bean name="permissionsAccessSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.permissionsAccessSharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ===================================== -->
+   <!-- ACL Readers cache                     -->
+   <!-- ===================================== -->
+
+    <!-- The cross-transaction shared cache for ACL readers -->
+   
+   <bean name="readersSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.readersSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- ACL Readers Denied cache                     -->
+   <!-- ===================================== -->
+
+    <!-- The cross-transaction shared cache for ACL denied readers -->
+   
+   <bean name="readersDeniedSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.readersDeniedSharedCache.maxItems}"/>
+   </bean>
+   
+      
+   <!-- ===================================== -->
+   <!-- Node owner cache                      -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Node Ownership -->
+   
+   <bean name="nodeOwnerSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.nodeOwnerSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Person username to NodeRef cache      -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Person -->
+   
+   <bean name="personSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.personSharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ===================================== -->
+   <!-- Authentication Ticket Cache           -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for In-Memory Tickets -->
+   
+   <bean name="ticketsCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.ticketsCache.maxItems}"/>
+   </bean>
+      
+   <!-- ===================================== -->
+   <!-- Lookup for AVM entities               -->
+   <!-- ===================================== -->
+   
+   <!-- The cross-transaction shared cache for AVM Store entities -->
+   
+   <bean name="avmStoreSharedCache" class="org.alfresco.repo.cache.NullCache"/>
+
+   
+   <!-- The cross-transaction shared cache for AVM entities (various - using cache region) -->
+   
+   <bean name="avmEntitySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.avmEntitySharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- The cross-transaction shared cache for AVM VersionRoot entities -->
+   
+   <bean name="avmVersionRootEntitySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.avmVersionRootEntitySharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- The cross-transaction shared cache for AVM Node entities -->
+   
+   <bean name="avmNodeSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.avmNodeSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- The cross-transaction shared cache for AVM Node Aspects entities -->
+   
+   <bean name="avmNodeAspectsSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.avmNodeAspectsSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- WebServices Query Session Cache       -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for WebService query sessions -->
+   
+   <bean name="webServicesQuerySessionSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+       <property name="maxItems" value="${cache.webServicesQuerySessionSharedCache.maxItems}"/>
+   </bean>
+   
+	
+   <!-- ===================================== -->
+   <!-- ACL cache                      -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Acls -->
+   
+   <bean name="aclSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.aclSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- ACL Entity cache                      -->
+   <!-- ===================================== -->
+   
+   <!-- The cross-transaction shared cache for ACL entities -->
+   
+   <bean name="aclEntitySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.aclEntitySharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Authority Entity cache                -->
+   <!-- ===================================== -->
+   
+   <!-- The cross-transaction shared cache for Authority entities -->
+   
+   <bean name="authorityEntitySharedCache" class="org.alfresco.repo.cache.NullCache"/>
+   
+   
+   <!-- ===================================== -->
+   <!-- Permission Entity cache               -->
+   <!-- ===================================== -->
+   
+   <!-- The cross-transaction shared cache for Permission entities -->
+   
+   <bean name="permissionEntitySharedCache" class="org.alfresco.repo.cache.NullCache"/>
+
+   
+   <!-- ===================================== -->
+   <!-- Messages Caches                       -->
+   <!-- ===================================== -->
+   
+   <!-- The cross-transaction shared cache for In-Memory ResourceBundleBaseNames -->
+   
+   <bean name="resourceBundleBaseNamesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.resourceBundleBaseNamesSharedCache.maxItems}"/>
+   </bean>
+
+   <!-- The cross-transaction shared cache for In-Memory LoadedResourceBundles -->
+   
+   <bean name="loadedResourceBundlesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.loadedResourceBundlesSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- The cross-transaction shared cache for In-Memory Messages -->
+   
+   <bean name="messagesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.messagesSharedCache.maxItems}"/>
+   </bean>
+   
+
+   <!-- ===================================== -->
+   <!-- Dictionary / Namespace Caches         -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Dictionary Models -->
+   
+   <bean name="compiledModelsSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.compiledModelsSharedCache.maxItems}"/>
+   </bean>
+
+   <!-- The cross-transaction shared cache for Dictionary Namespaces -->
+ 
+   <bean name="prefixesSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.prefixesSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Web Scripts Caches                    -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for In-Memory WebScripts Registry -->
+   
+   <bean name="webScriptsRegistrySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.webScriptsRegistrySharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- RoutingContentStore caches            -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for AbstractRoutingContentStore -->
+   
+   <bean name="routingContentStoreSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.routingContentStoreSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Executing Actions caches              -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Executing Actions -->
+   
+   <bean name="executingActionsCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.executingActionsCache.maxItems}"/>
+   </bean>
+
+   <!-- ===================================== -->
+   <!-- TagScope Summary caches               -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for tagscope summary properties -->
+   
+   <bean name="tagscopeSummarySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.tagscopeSummarySharedCache.maxItems}"/>
+   </bean>
+
+   <!-- ===================================== -->
+   <!-- IMAP caches                           -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for IMAP messages -->
+   
+   <bean name="imapMessageSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.imapMessageSharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Tenant Entity Cache                   -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for in-memory Tenants -->
+   
+   <bean name="tenantEntitySharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.tenantEntitySharedCache.maxItems}"/>
+   </bean>
+   
+   <!-- ===================================== -->
+   <!-- Immutable Singleton Cache             -->
+   <!-- ===================================== -->
+   
+   <!-- The cross-transaction shared cache for immutable (tenant-aware) singletons -->
+   
+   <bean name="immutableSingletonSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.immutableSingletonSharedCache.maxItems}"/>
+   </bean>
+
+   <!-- Remote Alfresco Ticket Cache, cross-transaction shared cache -->
+   <bean name="remoteAlfrescoTicketService.ticketsCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.remoteAlfrescoTicketService.ticketsCache.maxItems}"/>
+   </bean>
+   
+   
+   <bean name="contentDiskDriver.fileInfoCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.contentDiskDriver.fileInfoCache.maxItems}"/>
+   </bean>
+   
+   <bean name="globalConfigSharedCache" class="org.alfresco.repo.cache.DefaultSimpleCache">
+      <property name="maxItems" value="${cache.globalConfigSharedCache.maxItems}"/>
+   </bean>
+</beans>
