@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/manage-permissions</template-type>
+   <properties>
+      <pageFamily>documentlibrary</pageFamily>
+   </properties>
+   <components>
+
+      <!-- Title -->
+      <component>
+         <region-id>title</region-id>
+         <sub-components>
+            <sub-component id="default">
+               <evaluations>
+                  <!-- if in site: Site title -->
+                  <evaluation id="site">
+                     <evaluators>
+                        <evaluator type="site.component.evaluator"/>
+                     </evaluators>
+                     <url>/components/title/collaboration-title</url>
+                  </evaluation>
+                  <!-- otherwise: Repository title -->
+                  <evaluation id="repo">
+                     <url>/components/title/simple-title</url>
+                     <properties>
+                        <title>title.repository</title>
+                        <subtitle>title.browser</subtitle>
+                     </properties>
+                  </evaluation>
+               </evaluations>
+            </sub-component>
+         </sub-components>
+      </component>
+
+      <!-- Site Navigation -->
+      <component>
+         <region-id>navigation</region-id>
+         <sub-components>
+            <sub-component id="default">
+               <evaluations>
+                  <!-- if in site: Site navigation -->
+                  <evaluation id="site">
+                     <evaluators>
+                        <evaluator type="site.component.evaluator"/>
+                     </evaluators>
+                     <url>/components/navigation/collaboration-navigation</url>
+                  </evaluation>
+               </evaluations>
+            </sub-component>
+         </sub-components>
+      </component>
+
+      <!--Document Path -->
+      <component>
+         <region-id>path</region-id>
+         <sub-components>
+            <sub-component id="default">
+               <evaluations>
+                  <!-- if in site: Site path -->
+                  <evaluation id="site">
+                     <evaluators>
+                        <evaluator type="site.component.evaluator"/>
+                     </evaluators>
+                     <url>/components/document-details/path</url>
+                  </evaluation>
+                  <!-- otherwise: Repository path -->
+                  <evaluation id="repo">
+                     <url>/components/document-details/repo/path</url>
+                  </evaluation>
+               </evaluations>
+            </sub-component>
+         </sub-components>
+      </component>
+
+      <!-- Manage Permissions -->
+      <component>
+         <region-id>manage-permissions</region-id>
+         <url>/components/manage-permissions/manage-permissions</url>
+         <properties>
+            <pagination>true</pagination>
+            <nodeRef>{nodeRef}</nodeRef>
+         </properties>
+      </component>
+
+   </components>
+</template-instance>
