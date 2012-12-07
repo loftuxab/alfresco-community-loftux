@@ -1,0 +1,22 @@
+<alfresco-config>
+
+   <config evaluator="string-compare" condition="Edition" replace="true">
+      <footer>
+         <logo>alfresco-share-logo-enterprise.png</logo>
+         <alt-text>Alfresco Enterprise</alt-text>
+         <css-class>footer-ent</css-class>
+         <label>label.copyright.enterprise</label>
+      </footer>
+      <about>
+         <css-class>logo-ent</css-class>>
+      </about>
+   </config>
+   
+   <config evaluator="string-compare" condition="HelpPages">
+      <help-pages>
+         <share-help>http://docs.alfresco.com/3.4/topic/com.alfresco.Enterprise_3_4_0.doc/topics/sh-uh-welcome.html</share-help>
+         <share-tutorial>http://docs.alfresco.com/3.4/topic/com.alfresco.Enterprise_3_4_0.doc/concepts/gs-intro.html</share-tutorial>
+      </help-pages>
+   </config>
+
+</alfresco-config>

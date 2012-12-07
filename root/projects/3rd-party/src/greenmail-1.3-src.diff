@@ -1,0 +1,564 @@
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/commands/CommandParser.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/commands/CommandParser.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/commands/CommandParser.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/commands/CommandParser.java	2010-11-26 12:54:00.000000000 +0200
+@@ -6,21 +6,25 @@
+  */
+ package com.icegreen.greenmail.imap.commands;
+ 
+-import com.icegreen.greenmail.imap.ImapConstants;
+-import com.icegreen.greenmail.imap.ImapRequestLineReader;
+-import com.icegreen.greenmail.imap.ProtocolException;
+-import com.icegreen.greenmail.store.MessageFlags;
+-
+-import javax.mail.Flags;
+ import java.text.DateFormat;
+ import java.text.ParseException;
+ import java.text.SimpleDateFormat;
+ import java.util.ArrayList;
+ import java.util.Date;
++import java.util.Locale;
++
++import javax.mail.Flags;
++
++import org.apache.commons.logging.LogFactory;
++
++import com.icegreen.greenmail.imap.ImapConstants;
++import com.icegreen.greenmail.imap.ImapRequestLineReader;
++import com.icegreen.greenmail.imap.ProtocolException;
++import com.icegreen.greenmail.store.MessageFlags;
+ 
+ /**
+  * @author Darrell DeBoer <darrell@apache.org>
+- * @version $Revision: 109034 $
++ * @version $Revision: 109034 $ QuickFix: Additional date parsing procedures was added in the dateTime method (2009-02-04)
+  */
+ public class CommandParser {
+     private static final char[] EMPTY_CHAR_ARRAY = new char[0];
+@@ -106,13 +110,37 @@
+         } else {
+             throw new ProtocolException("DateTime values must be quoted.");
+         }
+-
++        // Quick fix for DateTime parsing.
++        // 
+         DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss zzzz");
+-        try {
+-            return dateFormat.parse(dateString);
+-        } catch (ParseException e) {
++        Date result = null;
++        try
++        {
++            result = dateFormat.parse(dateString);
++        }
++        catch (ParseException e)
++        {
++            String message = String.format("Unparseble date '%s'. Pattern used: 'dd-MMM-yyyy hh:mm:ss zzzz'", dateString);
++            LogFactory.getLog(CommandParser.class).warn(message);
++        }
++        if (result == null)
++        {
++            dateFormat = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss Z", Locale.ENGLISH);
++            try
++            {
++                result = dateFormat.parse(dateString);
++            }
++            catch (ParseException e)
++            {
++                String message = String.format("Unparseble date '%s'. Pattern used: 'dd-MMM-yyyy hh:mm:ss Z'", dateString);
++                LogFactory.getLog(CommandParser.class).warn(message);
++            }
++        }
++        if (result == null)
++        {
+             throw new ProtocolException("Invalid date format.");
+         }
++        return result;
+     }
+ 
+     /**
+@@ -200,7 +228,7 @@
+         }
+ 
+         int size = Integer.parseInt(digits.toString());
+-        byte[] buffer = new byte[size];
++        char[] buffer = new char[size];
+         request.read(buffer);
+ 
+         return new String(buffer);
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/commands/FetchCommand.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/commands/FetchCommand.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/commands/FetchCommand.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/commands/FetchCommand.java	2010-11-26 14:01:32.000000000 +0200
+@@ -6,17 +6,30 @@
+  */
+ package com.icegreen.greenmail.imap.commands;
+ 
+-import com.icegreen.greenmail.util.GreenMailUtil;
+-import com.icegreen.greenmail.imap.*;
+-import com.icegreen.greenmail.store.FolderException;
+-import com.icegreen.greenmail.store.MessageFlags;
+-import com.icegreen.greenmail.store.SimpleStoredMessage;
++import java.io.ByteArrayOutputStream;
++import java.nio.charset.Charset;
++import java.nio.charset.UnsupportedCharsetException;
++import java.util.ArrayList;
++import java.util.Collection;
++import java.util.Enumeration;
++import java.util.HashSet;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Set;
+ 
+ import javax.mail.Flags;
+ import javax.mail.internet.MimeMessage;
+ import javax.mail.internet.MimeMultipart;
+-import java.io.ByteArrayOutputStream;
+-import java.util.*;
++
++import com.icegreen.greenmail.imap.ImapRequestLineReader;
++import com.icegreen.greenmail.imap.ImapResponse;
++import com.icegreen.greenmail.imap.ImapSession;
++import com.icegreen.greenmail.imap.ImapSessionFolder;
++import com.icegreen.greenmail.imap.ProtocolException;
++import com.icegreen.greenmail.store.FolderException;
++import com.icegreen.greenmail.store.MessageFlags;
++import com.icegreen.greenmail.store.SimpleStoredMessage;
++import com.icegreen.greenmail.util.GreenMailUtil;
+ 
+ 
+ /**
+@@ -237,11 +250,13 @@
+         response.append(bytes.length);
+         response.append('}');
+         response.append("\r\n");
+-
+-        for (int i = 0; i < bytes.length; i++) {
+-            byte b = bytes[i];
+-            response.append((char) b);
++        String encodedBytes = null;
++        try {
++            encodedBytes = new String(bytes, Charset.forName(EIGHT_BIT_ENCODING));
++        } catch (UnsupportedCharsetException ex) {
++            encodedBytes = new String(bytes);
+         }
++        response.append(encodedBytes);
+     }
+ 
+     // TODO should do this at parse time.
+@@ -311,14 +326,27 @@
+             FetchRequest fetch = new FetchRequest();
+ 
+             char next = nextNonSpaceChar(request);
++            if ('(' == next)
++            {
+             consumeChar(request, '(');
+ 
+             next = nextNonSpaceChar(request);
+-            while (next != ')') {
++            }
++            boolean a = true;
++            try
++            {
++
++                while (true && next != ')')
++                {
+                 addNextElement(request, fetch);
+                 next = nextNonSpaceChar(request);
+             }
+-
++            }
++            catch (ProtocolException e)
++            {
++                a = false;
++            }
++            if (a)
+             consumeChar(request, ')');
+ 
+             return fetch;
+@@ -328,11 +356,20 @@
+                 throws ProtocolException {
+             char next = nextCharInLine(command);
+             StringBuffer element = new StringBuffer();
+-            while (next != ' ' && next != '[' && next != ')') {
++            try
++            {
++
++                while (next != ' ' && next != '[' && next != ')')
++                {
+                 element.append(next);
+                 command.consume();
+                 next = nextCharInLine(command);
+             }
++            }
++            catch (ProtocolException e)
++            {
++                next = ')';
++            }
+             String name = element.toString();
+             // Simple elements with no '[]' parameters.
+             if (next == ' ' || next == ')') {
+@@ -389,8 +426,16 @@
+                 String parameter = sectionIdentifier.toString();
+ 
+                 String partial = null;
++                try
++                {
+                 next = nextCharInLine(command);
+-                if ('<' == next) {
++                }
++                catch (ProtocolException e)
++                {
++                    next = ')';
++                }
++                if ('<' == next)
++                {
+                     partial = "";
+                     consumeChar(command, '<');
+                     next = nextCharInLine(command);
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/commands/StatusCommand.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/commands/StatusCommand.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/commands/StatusCommand.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/commands/StatusCommand.java	2009-06-01 12:56:50.000000000 +0300
+@@ -44,7 +44,8 @@
+ 
+         MailFolder folder = getMailbox(mailboxName, session, true);
+ 
+-        StringBuffer buffer = new StringBuffer(mailboxName);
++        // Quotes mailboxName, for correct representation of name with whitespaces
++        StringBuffer buffer = new StringBuffer("\"" + mailboxName + "\"");
+         buffer.append(SP);
+         buffer.append("(");
+ 
+Only in ./greenmail-new/src/java/com/icegreen/greenmail/imap/commands: .svn
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapConstants.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapConstants.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapConstants.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapConstants.java	2010-11-26 14:01:42.000000000 +0200
+@@ -20,10 +20,12 @@
+ 
+     String USER_NAMESPACE = "#mail";
+ 
+-    char HIERARCHY_DELIMITER_CHAR = '.';
++    char HIERARCHY_DELIMITER_CHAR = '/';
+     char NAMESPACE_PREFIX_CHAR = '#';
+     String HIERARCHY_DELIMITER = String.valueOf(HIERARCHY_DELIMITER_CHAR);
+     String NAMESPACE_PREFIX = String.valueOf(NAMESPACE_PREFIX_CHAR);
+ 
+     String INBOX_NAME = "INBOX";
++    
++    String EIGHT_BIT_ENCODING = "ISO-8859-1";
+ }
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapHandler.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapHandler.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapHandler.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapHandler.java	2010-11-26 14:01:52.000000000 +0200
+@@ -6,12 +6,17 @@
+ */
+ package com.icegreen.greenmail.imap;
+ 
++import java.io.BufferedOutputStream;
++import java.io.BufferedReader;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.InputStreamReader;
++import java.io.OutputStream;
++import java.net.Socket;
++
+ import com.icegreen.greenmail.user.UserManager;
+ import com.icegreen.greenmail.util.InternetPrintWriter;
+ 
+-import java.io.*;
+-import java.net.Socket;
+-
+ /**
+  * The handler class for IMAP connections.
+  * TODO: This is a quick cut-and-paste hack from POP3Handler. This, and the ImapServer
+@@ -73,7 +78,7 @@
+ 
+         try {
+             ins = socket.getInputStream();
+-            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ASCII"), 512);
++            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), EIGHT_BIT_ENCODING), 4096);
+             remoteIP = socket.getInetAddress().getHostAddress();
+             remoteHost = socket.getInetAddress().getHostName();
+         } catch (IOException e) {
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapRequestLineReader.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapRequestLineReader.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapRequestLineReader.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapRequestLineReader.java	2010-11-26 14:02:04.000000000 +0200
+@@ -8,7 +8,10 @@
+ 
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.io.InputStreamReader;
+ import java.io.OutputStream;
++import java.io.OutputStreamWriter;
++import java.io.UnsupportedEncodingException;
+ 
+ /**
+  * Wraps the client input reader with a bunch of convenience methods, allowing lookahead=1
+@@ -19,15 +22,20 @@
+  * @version $Revision: 109034 $
+  */
+ public class ImapRequestLineReader {
+-    private InputStream input;
+-    private OutputStream output;
++    private InputStreamReader input;
++    private OutputStreamWriter output;
+ 
+     private boolean nextSeen = false;
+     private char nextChar; // unknown
+ 
+     ImapRequestLineReader(InputStream input, OutputStream output) {
+-        this.input = input;
+-        this.output = output;
++        try {
++            this.input = new InputStreamReader(input, ImapConstants.EIGHT_BIT_ENCODING);
++            this.output = new OutputStreamWriter(output, ImapConstants.EIGHT_BIT_ENCODING);
++        } catch (UnsupportedEncodingException e) {
++            this.input = new InputStreamReader(input);
++            this.output = new OutputStreamWriter(output);
++        }
+     }
+ 
+     /**
+@@ -134,7 +142,7 @@
+      * @param holder A char array which will be filled with chars read from the underlying reader.
+      * @throws ProtocolException If a char can't be read into each array element.
+      */
+-    public void read(byte[] holder) throws ProtocolException {
++    public void read(char[] holder) throws ProtocolException {
+         int readTotal = 0;
+         try {
+             while (readTotal < holder.length) {
+@@ -162,6 +170,7 @@
+             throws ProtocolException {
+         try {
+             output.write('+');
++            output.write(' ');			
+             output.write('\r');
+             output.write('\n');
+             output.flush();
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapResponse.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapResponse.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapResponse.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapResponse.java	2010-11-26 14:02:14.000000000 +0200
+@@ -6,12 +6,15 @@
+  */
+ package com.icegreen.greenmail.imap;
+ 
+-import com.icegreen.greenmail.util.InternetPrintWriter;
+-import com.icegreen.greenmail.imap.commands.ImapCommand;
+-import com.icegreen.greenmail.store.MessageFlags;
++import java.io.OutputStream;
++import java.io.OutputStreamWriter;
++import java.io.UnsupportedEncodingException;
+ 
+ import javax.mail.Flags;
+-import java.io.OutputStream;
++
++import com.icegreen.greenmail.imap.commands.ImapCommand;
++import com.icegreen.greenmail.store.MessageFlags;
++import com.icegreen.greenmail.util.InternetPrintWriter;
+ 
+ /**
+  * Class providing methods to send response messages from the server
+@@ -22,7 +25,11 @@
+     private String tag = UNTAGGED;
+ 
+     public ImapResponse(OutputStream output) {
+-        this.writer = new InternetPrintWriter(output, true);
++        try {
++            this.writer = new InternetPrintWriter(new OutputStreamWriter(output, ImapConstants.EIGHT_BIT_ENCODING), true);
++        } catch (UnsupportedEncodingException e) {
++            this.writer = new InternetPrintWriter(new OutputStreamWriter(output), true);
++        }
+     }
+ 
+     public void setTag(String tag) {
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java	2007-04-06 13:33:38.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java	2009-06-01 12:56:52.000000000 +0300
+@@ -40,15 +40,9 @@
+         _folder = null;
+     }
+ 
+-    public int getMsn(long uid) throws FolderException {
+-        long[] uids = _folder.getMessageUids();
+-        for (int i = 0; i < uids.length; i++) {
+-            long messageUid = uids[i];
+-            if (uid == messageUid) {
+-                return i + 1;
+-            }
+-        }
+-        throw new FolderException("No such message.");
++    public int getMsn(long uid) throws FolderException
++    {
++        return _folder.getMsn(uid);
+     }
+ 
+     public void signalDeletion() {
+@@ -175,7 +169,8 @@
+         return _folder.getUnseenCount();
+     }
+ 
+-    public long appendMessage(MimeMessage message, Flags flags, Date internalDate) {
++    public long appendMessage(MimeMessage message, Flags flags, Date internalDate) throws FolderException
++    {
+         return _folder.appendMessage(message, flags, internalDate);
+     }
+ 
+@@ -227,7 +222,8 @@
+         _folder.replaceFlags(flags, uid, silentListener, addUid);
+     }
+ 
+-    public void deleteAllMessages() {
++    public void deleteAllMessages() throws FolderException
++    {
+         _folder.deleteAllMessages();
+     }
+ 
+Only in ./greenmail-new/src/java/com/icegreen/greenmail/imap: .svn
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/store/MailFolder.java ./greenmail-new/src/java/com/icegreen/greenmail/store/MailFolder.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/store/MailFolder.java	2007-04-06 13:33:40.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/store/MailFolder.java	2009-06-01 12:56:52.000000000 +0300
+@@ -47,9 +47,9 @@
+ 
+     long getUidNext();
+ 
+-    long appendMessage(MimeMessage message, Flags flags, Date internalDate);
++    long appendMessage(MimeMessage message, Flags flags, Date internalDate) throws FolderException;
+ 
+-    void deleteAllMessages();
++    void deleteAllMessages() throws FolderException;
+ 
+     void expunge() throws FolderException;
+ 
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/store/SimpleMessageAttributes.java ./greenmail-new/src/java/com/icegreen/greenmail/store/SimpleMessageAttributes.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/store/SimpleMessageAttributes.java	2007-05-14 15:47:22.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/store/SimpleMessageAttributes.java	2009-06-01 12:56:52.000000000 +0300
+@@ -120,10 +120,17 @@
+         size = GreenMailUtil.getBody(part).length();
+ 
+         // Section 1 - Message Headers
+-        if (part instanceof MimeMessage) {
+-            try {
+-                subject = ((MimeMessage) part).getSubject();
+-            } catch (MessagingException me) {
++        if (part instanceof MimeMessage)
++        {
++            try
++            {
++                // We need subject field with encoding information (like "=?koi8-r?B?097N097J083J?=")
++                // for multilanguage support.
++                subject = ((MimeMessage) part).getHeader("Subject")[0];
++                // subject = ((MimeMessage) part).getSubject();
++            }
++            catch (MessagingException me)
++            {
+ //                if (DEBUG) getLogger().debug("Messaging Exception for getSubject: " + me);
+             }
+         }
+@@ -411,8 +418,11 @@
+             buf.append(SP);
+             buf.append(NIL); // should add route-addr
+             buf.append(SP);
+-            try {
+-                MailAddress mailAddr = new MailAddress(netAddr.getAddress());
++            try
++            {
++                // remove quotes from address to avoid double quoating
++                String formatedAddress = netAddr.getAddress().replaceAll("\"", "");
++                MailAddress mailAddr = new MailAddress(formatedAddress);
+                 buf.append(Q + mailAddr.getUser() + Q);
+                 buf.append(SP);
+                 buf.append(Q + mailAddr.getHost() + Q);
+Only in ./greenmail-new/src/java/com/icegreen/greenmail/store: .svn
+diff -ruabB ./greenmail-old/src/java/com/icegreen/greenmail/util/GreenMailUtil.java ./greenmail-new/src/java/com/icegreen/greenmail/util/GreenMailUtil.java
+--- ./greenmail-old/src/java/com/icegreen/greenmail/util/GreenMailUtil.java	2007-10-10 03:05:42.000000000 +0300
++++ ./greenmail-new/src/java/com/icegreen/greenmail/util/GreenMailUtil.java	2010-11-26 14:02:40.000000000 +0200
+@@ -5,7 +5,15 @@
+ */
+ package com.icegreen.greenmail.util;
+ 
+-import java.io.*;
++import java.io.BufferedReader;
++import java.io.ByteArrayInputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.io.StringReader;
++import java.io.UnsupportedEncodingException;
++import java.nio.charset.Charset;
+ import java.util.Properties;
+ import java.util.Random;
+ 
+@@ -22,10 +30,12 @@
+ import javax.mail.internet.MimeMessage;
+ import javax.mail.internet.MimeMultipart;
+ 
++import com.icegreen.greenmail.imap.ImapConstants;
++
+ /**
+  * @author Wael Chatila
+  * @version $Id: $
+- * @since Jan 29, 2006
++ * @since Jan 29, 2006 Changed newMimeMessage(String param) for UTF-8 support.
+  */
+ public class GreenMailUtil {
+     /**
+@@ -74,13 +84,15 @@
+      *
+      * @throws MessagingException
+      */
+-    public static MimeMessage newMimeMessage(String mailString) throws MessagingException {
++    public static MimeMessage newMimeMessage(String mailString) throws MessagingException
++    {
++        byte[] bytes = null;
+         try {
+-            byte[] bytes = mailString.getBytes("US-ASCII");
+-            return newMimeMessage(new ByteArrayInputStream(bytes));
++            bytes = mailString.getBytes(ImapConstants.EIGHT_BIT_ENCODING);
+         } catch (UnsupportedEncodingException e) {
+-            throw new RuntimeException(e);
++            bytes = mailString.getBytes();
+         }
++        return newMimeMessage(new ByteArrayInputStream(bytes));
+     }
+ 
+     public static boolean hasNonTextAttachments(Part m) {
+@@ -144,19 +156,31 @@
+         try {
+             ByteArrayOutputStream bodyOut = new ByteArrayOutputStream();
+             msg.writeTo(bodyOut);
+-            return bodyOut.toString("US-ASCII").trim();
++            try {
++                return bodyOut.toString(ImapConstants.EIGHT_BIT_ENCODING).trim();
++            } catch (UnsupportedEncodingException e) {
++                return bodyOut.toString().trim();
++            }
+         } catch (Exception e) {
+             throw new RuntimeException(e);
+         }
+     }
+ 
+     public static byte[] getBodyAsBytes(Part msg) {
++        try {
++            return getBody(msg).getBytes(ImapConstants.EIGHT_BIT_ENCODING);
++        } catch (UnsupportedEncodingException e) {
+         return getBody(msg).getBytes();
+     }
++    }
+ 
+     public static  byte[] getHeaderAsBytes(Part part) {
++        try {
++            return getHeaders(part).getBytes(ImapConstants.EIGHT_BIT_ENCODING);
++        } catch (UnsupportedEncodingException e) {
+         return getHeaders(part).getBytes();
+     }
++    }
+ 
+     /**
+      * @return same as {@link #getWholeMessage(javax.mail.Part)} }
+@@ -296,4 +320,5 @@
+         mimeMessage.setContent(multiPart);
+         Transport.send(mimeMessage, tos);
+     }
++
+ }
+Only in ./greenmail-new/src/java/com/icegreen/greenmail/util: .svn

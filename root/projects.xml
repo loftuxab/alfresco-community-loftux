@@ -1,0 +1,3014 @@
+<project name="projects" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+   <!-- ************************************************************************** -->
+   <!-- ** This file contains the targets used to build the individual projects ** -->
+   <!-- ************************************************************************** -->
+
+   <!-- ****************** -->
+   <!-- ** Core Project ** -->
+   <!-- ****************** -->
+   
+   <target name="incremental-core" 
+           depends="package-core" />
+      
+   <target name="build-core" 
+           depends="clean-core, 
+                    incremental-core" />
+   
+   <target name="clean-core" 
+           depends="init">
+      <clean projectdir="${dir.project.core}" />
+   </target>
+   
+   <target name="compile-core" 
+           depends="init">
+      <compile-java projectdir="${dir.project.core}" />
+   </target>
+   
+   <target name="package-core"
+           depends="compile-core">
+      <mkdir dir="${dir.project.core.dist}" />
+      <jar jarfile="${dir.project.core.dist}/${file.name.jar.core}" 
+           basedir="${dir.project.core.classes}" />
+   </target>
+   
+   <target name="test-core" 
+           depends="compile-core">
+      <run-tests projectdir="${dir.project.core}" />
+   </target>
+   
+   <target name="generate-javadocs-core" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Core API ${version.number}" 
+                         windowtitle="Alfresco Core API" 
+                         projectdir="${dir.project.core}"/>
+   </target>
+   
+   <!-- *********************** -->
+   <!-- ** DataModel Project ** -->
+   <!-- *********************** -->
+   
+   <target name="incremental-datamodel" 
+           depends="package-datamodel" />
+      
+   <target name="build-datamodel" 
+           depends="clean-datamodel, 
+                    incremental-datamodel" />
+   
+   <target name="clean-datamodel" 
+           depends="init">
+      <clean projectdir="${dir.project.datamodel}" />
+   </target>
+   
+   <target name="compile-datamodel" 
+           depends="compile-datamodel-java, 
+                    compile-datamodel-jibx" />
+
+   <target name="compile-datamodel-java" 
+           depends="init">
+      <compile-java projectdir="${dir.project.datamodel}" />
+   </target>
+   
+   <target name="package-datamodel"
+           depends="compile-datamodel">
+      <mkdir dir="${dir.project.datamodel.dist}" />
+      <jar jarfile="${dir.project.datamodel.dist}/${file.name.jar.datamodel}" 
+           basedir="${dir.project.datamodel.classes}" />
+   </target>
+   
+   <target name="test-datamodel" 
+           depends="compile-datamodel">
+      <run-tests projectdir="${dir.project.datamodel}" />
+   </target>
+   
+   <target name="generate-javadocs-datamodel" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Data Model API ${version.number}" 
+                         windowtitle="Alfresco Data Model API" 
+                         projectdir="${dir.project.datamodel}"/>
+   </target>
+
+   <target name="compile-datamodel-jibx" 
+           depends="init">
+      <!-- load the JIBX task definition -->
+      <taskdef name="bind" 
+               classname="org.jibx.binding.ant.CompileTask"
+               classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
+
+      <bind verbose="false" 
+            load="true">
+         <bindingfileset dir="${dir.jibx.binding.m2}">
+            <include name="*binding.xml"/>
+         </bindingfileset>
+         <classpath>
+            <pathelement path="${dir.project.core.classes}"/>
+            <pathelement path="${dir.project.datamodel.classes}"/>
+         </classpath>
+      </bind>
+   </target>
+
+   <!-- ******************** -->
+   <!-- ** MBeans Project ** -->
+   <!-- ******************** -->
+   
+   <target name="incremental-mbeans" 
+           depends="package-mbeans" />
+      
+   <target name="build-mbeans" 
+           depends="clean-mbeans, 
+           incremental-mbeans" />
+   
+   <target name="clean-mbeans" 
+           depends="init">
+      <clean projectdir="${dir.project.mbeans}" />
+   </target>
+   
+   <target name="compile-mbeans" 
+           depends="init">
+      <compile-java projectdir="${dir.project.mbeans}" />
+   </target>
+   
+   <target name="package-mbeans"
+           depends="compile-mbeans">
+      <mkdir dir="${dir.project.mbeans.dist}" />
+      <jar jarfile="${dir.project.mbeans.dist}/${file.name.jar.mbeans}" 
+           basedir="${dir.project.mbeans.classes}" />
+   </target>
+   
+   <target name="test-mbeans" 
+           depends="compile-mbeans">
+      <run-tests projectdir="${dir.project.mbeans}" />
+   </target>
+   
+   <target name="generate-javadocs-mbeans" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Virtualization MBean ${version.number}" 
+                         windowtitle="Alfresco Virtualization MBean" 
+                         projectdir="${dir.project.mbeans}" />
+   </target>
+
+   <!-- ************************ -->
+   <!-- ** Deployment Project ** -->
+   <!-- ************************ -->
+   
+   <target name="incremental-deployment" 
+           depends="package-deployment" />
+      
+   <target name="build-deployment" 
+           depends="clean-deployment, 
+           incremental-deployment" />
+   
+   <target name="clean-deployment" 
+           depends="init">
+      <clean projectdir="${dir.project.deployment}" />
+   </target>
+   
+   <target name="compile-deployment" 
+           depends="init,
+   			compile-core">
+      <compile-java projectdir="${dir.project.deployment}" />
+   </target>
+   
+   <target name="package-deployment"
+           depends="package-deployment-jar,
+                    package-deployment-zip">
+   </target>
+         
+   <target name="package-deployment-jar"
+           depends="compile-deployment">
+      <mkdir dir="${dir.project.deployment.dist}" />
+      <jar jarfile="${dir.project.deployment.dist}/${file.name.jar.deployment}" 
+                 basedir="${dir.project.deployment.classes}" />
+   </target>
+   
+   <target name="package-deployment-zip"
+           depends="assemble-deployment">
+      <mkdir dir="${dir.project.deployment.dist}" />
+      <zip basedir="${dir.project.deployment.assemble}" compress="yes"
+           destfile="${dir.project.deployment.dist}/${file.name.zip.deployment}" />
+   </target>
+   
+   <target name="assemble-deployment" 
+           depends="
+   				package-deployment-jar, 
+   				package-repository,
+   				package-datamodel,
+   				package-core">
+      <mkdir dir="${dir.project.deployment.assemble}" />
+      <copy todir="${dir.project.deployment.assemble}">
+         <fileset dir="${dir.project.deployment.dist}">
+            <include name="${file.name.jar.deployment}" />
+         </fileset>
+         <fileset dir="${dir.project.deployment}/config">
+            <include name="**/*" />
+         	<exclude name= "**/sample*" />
+         </fileset>
+         <fileset dir="${dir.project.3rdparty.lib}">
+            <include name="org.springframework*.jar" />
+            <include name="jug-*.jar" />
+            <include name="aopalliance.jar" />
+         </fileset>
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf">
+            <include name="spring-surf-core-*.jar" />
+         </fileset>
+         <fileset dir="${dir.project.3rdparty.lib}/optional">
+            <include name="log4j-*.jar" />
+         </fileset> 
+         <fileset dir="${dir.project.3rdparty.lib}/commons">
+            <filename name="commons-logging-*.jar" />
+         </fileset>
+         <fileset dir="${dir.project.core.dist}">
+            <filename name="${file.name.jar.core}" />
+         </fileset>
+         <fileset dir="${dir.project.datamodel.dist}">
+           <filename name="${file.name.jar.datamodel}" />
+         </fileset>
+         <fileset dir="${dir.project.repository.dist}">
+           <filename name="${file.name.jar.repository}" />
+         </fileset>
+      </copy>
+   </target>
+   
+   <target name="test-deployment" 
+           depends="compile-deployment">
+      <run-tests projectdir="${dir.project.deployment}" />
+   </target>
+   
+   <target name="generate-javadocs-deployment" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Deployment Receiver ${version.number}" 
+                         windowtitle="Alfresco Deployment Receiver" 
+                         projectdir="${dir.project.deployment}" />
+   </target>
+	
+	   <!-- **************************** -->
+	   <!-- ** WDR Deployment Project ** -->
+	   <!-- **************************** -->
+	  
+	   <target name="incremental-wdrdeployment" 
+	           depends="package-wdrdeployment" />
+	      
+	   <target name="build-wdrdeployment" 
+	           depends="clean-wdrdeployment, 
+	           incremental-wdrdeployment" />
+	   
+	   <target name="clean-wdrdeployment" 
+	           depends="init">
+	      <clean projectdir="${dir.project.wdrdeployment}" />
+	   </target>
+	   
+	   <target name="compile-wdrdeployment" 
+	           depends="init">
+	      <compile-java projectdir="${dir.project.wdrdeployment}" />
+	   </target>
+	   
+	   <target name="package-wdrdeployment"
+	           depends="package-wdrdeployment-jar">
+	   </target>
+	         
+	   <target name="package-wdrdeployment-jar"
+	           depends="compile-wdrdeployment">
+	    
+	    <copy todir="${dir.project.wdrdeployment.classes}">
+	          <fileset dir="${dir.project.wdrdeployment.config}" 
+	                   includes="**/*" />
+	    </copy>
+	   	
+	   	<mkdir dir="${dir.project.wdrdeployment.dist}" />
+	   	
+	      <jar jarfile="${dir.project.wdrdeployment.dist}/${file.name.jar.wdrdeployment}" 
+	                 basedir="${dir.project.wdrdeployment.classes}" />
+	   </target>
+	   	   
+	   <target name="test-wdrdeployment" 
+	           depends="compile-wdrdeployment">
+	      <run-tests projectdir="${dir.project.wdrdeployment}" />
+	   </target>
+	   
+	   <target name="generate-javadocs-wdrdeployment" 
+	           depends="init">
+	      <generate-javadocs documenttitle="Alfresco WCM Runtime Deployment Receivers ${version.number}" 
+	                         windowtitle="Alfresco WCM Development Runtime Deployment Receiver" 
+	                         projectdir="${dir.project.wdrdeployment}" />
+	   </target>
+      
+   <!-- ************************ -->
+   <!-- ** Repository Project ** -->
+   <!-- ************************ -->
+      
+   <target name="incremental-repository" 
+           depends="package-repository" />
+      
+   <target name="build-repository" 
+           depends="clean-repository, 
+                    incremental-repository" />
+   
+   <target name="clean-repository" 
+           depends="init">
+      <clean projectdir="${dir.project.repository}" />
+   </target>
+   
+   <target name="compile-repository" 
+           depends="compile-repository-java, 
+                    compile-repository-jibx" />
+   
+   <target name="compile-repository-java" 
+           depends="init">
+      <compile-java projectdir="${dir.project.repository}" />
+   </target>
+   
+   <target name="compile-repository-jibx" 
+           depends="init">
+      <!-- load the JIBX task definition -->
+      <taskdef name="bind" 
+               classname="org.jibx.binding.ant.CompileTask"
+               classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
+
+      <bind verbose="false" 
+            load="true" 
+            binding="${file.jibx.binding.systeminfo}">
+         <classpath>
+      	    <pathelement path="${dir.project.core.classes}"/>
+      	    <pathelement path="${dir.project.datamodel.classes}"/>
+            <pathelement path="${dir.project.repository.classes}"/>
+      	 </classpath>
+     </bind>
+   </target>
+   
+   <target name="package-repository"
+           depends="compile-repository">
+      <mkdir dir="${dir.project.repository.dist}" />
+      <jar jarfile="${dir.project.repository.dist}/${file.name.jar.repository}" 
+            basedir="${dir.project.repository.classes}" />
+   </target>
+   
+   <target name="test-repository" 
+           depends="compile-repository">
+      <run-tests-startup projectdir="${dir.project.repository}" />
+      <run-tests-intermittent projectdir="${dir.project.repository}" />
+      <run-tests projectdir="${dir.project.repository}" />
+   </target>
+   
+   <target name="generate-javadocs-repository" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Repository ${version.number}" 
+                         windowtitle="Alfresco Repository" 
+                         projectdir="${dir.project.repository}" />
+   </target>
+   
+   <target name="build-single-jar" 
+           depends="package-repository">
+
+      <!-- extract the one-jar file -->
+      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.95.jar" 
+             dest="${dir.onejar}" 
+             overwrite="true" />
+
+      <!-- remove unwanted files -->
+      <delete >
+         <fileset dir="${dir.onejar}">
+            <include name="**/*.java" />
+            <include name="**/boot-manifest.mf" />
+         </fileset>
+      </delete>
+      <!-- copy required jars into lib folder -->
+      <copy todir="${dir.onejar}/lib" 
+            flatten="false">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="**/*.jar" 
+                  excludes="${dir.name.devenv}/**" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.datamodel.dist}" 
+                  includes="${file.name.jar.datamodel}" />
+         <fileset dir="${dir.project.repository.dist}" 
+                  includes="${file.name.jar.repository}" />
+         <fileset dir="${dir.project.core.src.java}" 
+                  includes="**/*log4j.properties" />
+      </copy>
+      <!-- delete target one-jar -->
+      <delete file="${dir.project.repository.dist}/${file.name.jar.onejar}" />
+      <!-- build the one-jar -->
+      <jar destfile="${dir.project.repository.dist}/${file.name.jar.onejar}" 
+           manifest="${dir.onejar}/META-INF/MANIFEST.MF"
+           update="false" >
+         <fileset dir="${dir.onejar}">
+            <include name="**/*" />
+         </fileset>
+      </jar>
+   </target>
+   
+   <!-- ********************************** -->
+   <!-- ** Repository BenchMark Project ** -->
+   <!-- ********************************** -->
+   
+   <target name="incremental-repository-bm" 
+           depends="package-repository-bm" />
+      
+   <target name="build-repository-bm" 
+           depends="clean-repository-bm, 
+                    incremental-repository-bm" />
+   
+   <target name="clean-repository-bm" 
+           depends="init">
+      <clean projectdir="${dir.project.repository-bm}" />
+   </target>
+   
+   <target name="compile-repository-bm" 
+           depends="init">
+      <compile-java projectdir="${dir.project.repository-bm}" >
+	  <addPath>
+            <path refid="classpath.compile.repository-bm" />
+         </addPath>
+		 </compile-java>
+   </target>
+   
+   <target name="package-repository-bm"
+           depends="compile-repository-bm">
+      <mkdir dir="${dir.project.repository-bm.dist}" />
+      <jar jarfile="${dir.project.repository-bm.dist}/${file.name.jar.repository-bm}" 
+            basedir="${dir.project.repository-bm.classes}" />
+   </target>
+   
+   
+   <!-- *************************************************** -->
+   <!-- ** Run System Build Tests (using embedded Jetty) ** -->
+   <!-- *************************************************** -->
+   
+   <target name="incremental-system-build-test" 
+           depends="package-system-build-test" />
+      
+   <target name="build-system-build-test" 
+           depends="clean-system-build-test, 
+                    incremental-system-build-test" />
+   
+   <target name="clean-system-build-test" 
+           depends="init">
+      <clean projectdir="${dir.project.system-build-test}" />
+   </target>
+   
+   <target name="compile-system-build-test" 
+	           depends="init, compile-repository-bm">
+      <compile-java projectdir="${dir.project.system-build-test}" >
+	  <addPath>
+            <path refid="classpath.compile.system-build-test" />
+         </addPath>
+		 </compile-java>
+   </target>
+   
+   <target name="package-system-build-test"
+           depends="compile-system-build-test">
+      <mkdir dir="${dir.project.system-build-test.dist}" />
+      <jar jarfile="${dir.project.system-build-test.dist}/${file.name.jar.system-build-test}" 
+            basedir="${dir.project.system-build-test.classes}" />
+   </target>
+   
+   <target name="test-system-build-test" 
+           depends="incremental-webclient-depends, incremental-webclient, package-repository-bm, package-webserviceclient, package-system-build-test">
+      <!-- TEMP - use Spring 3.0.5 (instead of Spring 3.0.0) - remove once Spring 3.0.5 moves into 3rd-party -->
+      
+      <path id="temp.classpath.unit.test">
+         <fileset dir="${dir.project.system-build-test.lib}">
+            <include name="**/*.jar" />
+         </fileset>
+      </path>
+      <!-- Add on all the 3rd party libs (except Spring 3.0.0) based on the eclipse project -->
+      <!-- Includes libs that are both exported and non-exported -->
+      <script language="javascript" classpath="${classpath.bsf_javascript}"> <![CDATA[
+         importClass(java.util.regex.Matcher);
+         importClass(java.util.regex.Pattern);
+         importClass(java.io.File);
+         importClass(java.io.FileInputStream);
+         importClass(java.io.InputStreamReader);
+         importClass(java.io.BufferedReader);
+
+         var path = project.getReference("temp.classpath.unit.test");
+         var projPath = project.getProperty("dir.project.3rdparty") + "/";
+
+         var is_entry = Pattern.compile("[ \t]*\<classpathentry.*?");
+         //is_exported = Pattern.compile("[ \t]*\<classpathentry.*? exported=[\"\']true[\"\'][ \/].*");
+         var is_lib = Pattern.compile(".*? kind=[\"\']lib[\"\'][ \/].*?");
+         var get_path = Pattern.compile(".*? path=[\"\'](.*?)[\"\'][ \/].*?");
+
+         var f = new BufferedReader(new InputStreamReader(
+                 new FileInputStream(new File(projPath + ".classpath"))
+         ));
+         var line;
+         while( (line = f.readLine()) != null ) {
+            if( is_entry.matcher(line).matches() &&
+                     is_lib.matcher(line).matches()) {
+               var m = get_path.matcher(line);
+               if(m.matches()) {
+                  var this_path = m.group(1);
+                  if ((! this_path.startsWith("lib/ant-1.")) &&
+                      (! this_path.startsWith("lib/org.springframework")) &&
+                      (! this_path.startsWith("lib/slf4j"))
+                     ) {
+                     var pe = path.createPathElement();
+                     pe.setLocation(new File(projPath+this_path));
+                  }
+               }
+            }
+         }
+      ]]></script>
+      
+      <path id="temp.classpath.unit.test.extension">
+          <fileset dir="${dir.project.system-build-test.dist}">
+            <include name="**/*.jar" />
+          </fileset>
+          <fileset dir="${dir.project.repository-bm.lib}">
+            <include name="**/*.jar" />
+          </fileset>
+          <fileset dir="${dir.project.repository-bm.dist}">
+            <include name="**/*.jar" />
+          </fileset>
+          <fileset dir="${dir.project.remoteapi.dist}">
+            <include name="**/*.jar" />
+          </fileset>
+          <fileset dir="${dir.project.webserviceclient.dist}">
+            <include name="**/*.jar" />
+          </fileset>
+          <pathelement location="${dir.project.webclient.dist}" />
+      </path>
+
+      <sequential>
+         <!--
+         The classpath is becoming extremely large, so we're going to create a single JAR file that references all of the
+         necessary libraries from the 3rdParty project in the Class-Path attribute of its manifest file. We then just include
+         this single JAR file on the classpath. We delete this JAR file again after we have run the tests.
+         -->
+         <manifestclasspath property="temp.manifest.classpath" jarfile="${dir.projects}/manifestclasspath.jar" >
+             <classpath refid="temp.classpath.unit.test" />
+         </manifestclasspath>
+
+         <jar destfile="${dir.projects}/manifestclasspath.jar">
+            <manifest>
+               <attribute name="Class-Path" value="${temp.manifest.classpath}" />
+            </manifest>
+         </jar>
+
+         <mkdir dir="${dir.project.system-build-test}/${dir.name.build}/${dir.name.test.results}" />
+         <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="${dir.project.system-build-test}" jvm="${env.JAVA_HOME}/bin/java">
+            <classpath>
+                <pathelement location="${user.home}" /> 
+                <pathelement location="${dir.projects}/manifestclasspath.jar"/>
+                <path refid="temp.classpath.unit.test.extension" />
+            </classpath>
+            <jvmarg value="-server"/>
+            <jvmarg value="-XX:MaxPermSize=256M"/>
+            <jvmarg value="-Dcom.sun.management.jmxremote"/>
+            <formatter type="xml" />
+            <batchtest todir="${dir.project.system-build-test}/${dir.name.build}/${dir.name.test.results}">
+               <fileset dir="${dir.project.system-build-test}/${dir.name.source}/${dir.name.java}">
+                  <patternset refid="files.tests" />
+               </fileset>
+            </batchtest>
+         </junit>
+         <delete file="${dir.projects}/manifestclasspath.jar" quiet="true" deleteonexit="true" />
+      </sequential>
+      
+      <!--
+      <run-tests-startup projectdir="${dir.project.system-build-test}" />
+      <run-tests projectdir="${dir.project.system-build-test}" />
+      -->
+      
+   </target>
+
+
+   <!-- ***************************** -->
+   <!-- ** Tomcat startup          ** -->
+   <!-- ***************************** -->
+   
+   <target name="start-tomcat-if-necessary"
+           depends="tomcat-check-status" 
+           unless="tomcat.started">
+      <tomcat-start/>
+   </target>
+
+   <target name="start-virtual-tomcat-if-necessary"
+           depends="virtual-tomcat-check-status" 
+           unless="virtual.tomcat.started">
+       <virtual-tomcat-start/>
+   </target>
+
+   <target name="tomcat-check-status">
+      <condition property="tomcat.started">
+         <socket server="localhost" port="8080"/>
+      </condition>
+   </target>
+
+   <target name="virtual-tomcat-check-status">
+      <condition property="virtual.tomcat.started">
+         <socket server="localhost" port="8180"/>
+      </condition>
+   </target>
+
+   <target name="wait-for-alfresco">
+      <waitfor maxwaitunit    = "second"
+               checkeveryunit = "second"
+               maxwait        = "20"
+               checkevery     = "2">
+         <http url="http://localhost:8080/alfresco"/>
+      </waitfor>
+   </target>
+
+   <target name="wait-for-virtual-tomcat">
+      <waitfor maxwaitunit    = "second"
+               checkeveryunit = "second"
+               maxwait        = "20"
+               checkevery     = "2">
+          <!-- Any non-existent virtual host will do for testing liveness -->
+         <http url="http://dummy-project.www--sandbox.127-0-0-1.ip.alfrescodemo.net:8180/"/>
+      </waitfor>
+    </target>
+
+   <target name="tomcat-stop-if-necessary" 
+           depends="tomcat-check-status" 
+           if="tomcat.started">
+      <antcall target="java-tomcat-stop"/>
+   </target>
+
+   <target name="virtual-tomcat-stop-if-necessary" 
+           depends="virtual-tomcat-check-status" 
+           if="virtual.tomcat.started">
+      <antcall target="java-virtual-tomcat-stop"/>
+   </target>
+
+   <target name="java-tomcat-stop"
+           unless="tomcat.previously.started">
+      <java jar="${tomcat.home}/bin/bootstrap.jar" 
+            fork="true">
+         <jvmarg value="-Dcatalina.home=${tomcat.home}"/>
+         <arg line="stop"/>
+      </java>
+      <sleep seconds="2"/>
+   </target>
+
+   <target name="java-virtual-tomcat-stop"
+           unless="virtual.tomcat.previously.started">
+      <java jar="${virtual.tomcat.home}/bin/bootstrap.jar" 
+            fork="true">
+         <jvmarg value="-Dcatalina.home=${virtual.tomcat.home}"/>
+         <arg line="stop"/>
+      </java>
+      <sleep seconds="2"/>
+   </target>
+
+   
+   <!-- ********************* -->
+   <!-- ** JCR TCK Project ** -->
+   <!-- ********************* -->
+
+   <target name="build-tck" 
+           depends="package-repository">
+      <war warfile="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
+           webxml="${dir.project.repository.src.webinf}\JCRTCK\web.xml">
+         <fileset dir="${dir.project.repository.src.web}" 
+                  excludes="WEB-INF/**" />
+         <webinf dir="${dir.project.installer}" 
+                 includes="licenses/**" />
+         <webinf dir="${dir.project.repository.src.webinf}" 
+                 excludes="web.xml"/>
+         <lib dir="${dir.project.3rdparty.lib}" 
+              includes="*.jar" 
+              excludes="${dir.name.devenv}/**,jcr-1.0.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/optional" 
+             includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/jibx" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/openoffice" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/jmagick" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/commons" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/spring-surf" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/jgroups" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/swarmcache" 
+              includes="*.jar" />
+         <lib dir="${dir.project.repository.dist}" 
+              includes="${file.name.jar.repository}" />
+         <lib dir="${dir.project.core.dist}" 
+              includes="${dir.name.jar.core}" />
+         <lib dir="${dir.project.datamodel.dist}" 
+              includes="${file.name.jar.datamodel}" />
+         <classes dir="${dir.project.datamodel.config}"/>
+         <classes dir="${dir.project.repository.config}"/>
+         <classes file="${dir.project.core.src.java}/log4j.properties" 
+                  prefix="WEB-INF/classes" />
+      </war>
+   </target>
+
+   <target name="deploy-tck" 
+           depends="build-tck">
+      <copy file="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
+            todir="${dir.deploy.jcr.tck}/bin/tck-webapp/webapps" />
+   </target>
+
+   <target name="start-tck" 
+           depends="init">
+      <exec dir="${dir.deploy.jcr.tck}/bin/tck-webapp" 
+            executable="cmd.exe" 
+            spawn="true">
+         <arg line="/k start server.bat -debug socket" />
+      </exec>
+   </target>
+   
+
+   <!-- ************************ -->
+   <!-- ** Remote API Project ** -->
+   <!-- ************************ -->
+
+   <target name="incremental-remoteapi"
+           depends="package-remoteapi" />
+      
+   <target name="build-remoteapi" 
+           depends="clean-remoteapi, 
+                    incremental-remoteapi" />
+   
+   <target name="clean-remoteapi" 
+           depends="init">
+      <clean projectdir="${dir.project.remoteapi}" />
+   </target>
+
+   <target name="clean-remoteapi-services" 
+           depends="init">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice" />
+      </delete>
+   </target>
+
+   <target name="compile-remoteapi" 
+           depends="init">
+      <compile-java-inc-generated projectdir="${dir.project.remoteapi}" />
+   </target>
+   
+   <target name="package-remoteapi" 
+           depends="compile-remoteapi">
+      <mkdir dir="${dir.project.remoteapi.dist}" />
+      <jar jarfile="${dir.project.remoteapi.dist}/${file.name.jar.remoteapi}" 
+           basedir="${dir.project.remoteapi.classes}">
+         <metainf dir="${dir.project.remoteapi.src.metainf}" />
+      </jar>
+   </target>
+   
+   <target name="test-remoteapi" 
+           depends="compile-remoteapi">
+      <run-tests projectdir="${dir.project.remoteapi}" />
+   </target>
+   
+   <target name="generate-javadocs-remoteapi" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Remote Services API ${version.number}" 
+                         windowtitle="Alfresco Remote Services API" 
+                         projectdir="${dir.project.remoteapi}" />
+   </target>
+   
+   <target name="gen-all-service-servers"
+           depends="gen-auth-service-server, 
+                    gen-repo-service-server, 
+                    gen-content-service-server, 
+                    gen-authoring-service-server, 
+                    gen-classification-service-server, 
+                    gen-action-service-server, 
+                    gen-access-control-service-server, 
+                    gen-administration-service-server, 
+                    gen-dictionary-service-server" />
+
+   <target name="init-service-gen" 
+           depends="init">
+      <!-- load the WSDL 2 Java task definition -->
+      <taskdef name="wsdl2java" 
+               classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
+         <classpath refid="classpath.compile" />
+      </taskdef>
+   </target>
+
+   <target name="gen-auth-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authentication" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0"
+                  package="org.alfresco.repo.webservice.authentication" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authentication" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-repo-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/repository" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" 
+                  package="org.alfresco.repo.webservice.repository" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/repository" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-content-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/content" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" 
+                  package="org.alfresco.repo.webservice.content" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/content" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-dictionary-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/dictionary" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" 
+                  package="org.alfresco.repo.webservice.dictionary" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/dictionary" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-classification-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/classification" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" 
+                  package="org.alfresco.repo.webservice.classification" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/classification" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-authoring-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authoring" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" 
+                  package="org.alfresco.repo.webservice.authoring" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authoring" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-action-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/action" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" 
+                  package="org.alfresco.repo.webservice.action" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/action" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-access-control-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/accesscontrol" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" 
+                  package="org.alfresco.repo.webservice.accesscontrol" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/accesscontrol" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+      </delete>
+   </target>
+
+   <target name="gen-administration-service-server" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/administration" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" 
+                  package="org.alfresco.repo.webservice.administration" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/administration" 
+                  includes="${includes.delete.remoteapi.gensrc}" />
+     </delete>
+   </target>
+
+
+   <!-- ****************** -->
+   <!-- ** JNDI Project ** -->
+   <!-- ****************** -->
+
+   <target name="incremental-jndi"
+           depends="package-jndi" />
+      
+   <target name="build-jndi" 
+           depends="clean-jndi, 
+                    incremental-jndi" />
+   
+   <target name="clean-jndi" 
+           depends="init">
+      <clean projectdir="${dir.project.jndi}" />
+   </target>
+   
+   <target name="compile-jndi" 
+           depends="init">
+      <compile-java projectdir="${dir.project.jndi}" />
+   </target>
+   
+   <target name="package-jndi" 
+           depends="compile-jndi">
+      <mkdir dir="${dir.project.jndi.dist}" />
+      <jar jarfile="${dir.project.jndi.dist}/${file.name.jar.jndi}" 
+           basedir="${dir.project.jndi.classes}" />
+   </target>
+   
+   <target name="generate-javadocs-jndi" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface) ${version.number}" 
+                         windowtitle="Alfresco JNDI" 
+                         projectdir="${dir.project.jndi}"/>
+   </target>
+
+
+
+   <!-- ****************** -->
+   <!-- ** SOLR Project ** -->
+   <!-- ****************** -->
+   
+   <target name="incremental-solr" 
+           depends="package-solr" />
+      
+   <target name="build-solr" 
+           depends="clean-solr, 
+                    incremental-solr" />
+   
+   <target name="clean-solr" 
+           depends="init">
+      <clean projectdir="${dir.project.solr}" />
+   </target>
+   
+   <target name="compile-solr" 
+           depends="compile-solr-java" />
+
+   <target name="compile-solr-java" 
+           depends="init">
+      <compile-java projectdir="${dir.project.solr}" >
+         <addPath>
+            <path refid="classpath.compile.solr" />
+         </addPath>
+      </compile-java>
+   </target>
+   
+   <target name="package-solr"
+           depends="compile-solr">
+      <mkdir dir="${dir.project.solr.dist}" />
+      <jar jarfile="${dir.project.solr.dist}/${file.name.jar.solr}" 
+           basedir="${dir.project.solr.classes}" />
+   </target>
+   
+   <target name="test-solr" 
+           depends="compile-solr">
+      <run-tests projectdir="${dir.project.solr}" />
+   </target>
+   
+   <target name="generate-javadocs-solr" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco SOLR integration ${version.number}" 
+                         windowtitle="Alfresco SOLR Integration" 
+                         projectdir="${dir.project.solr}"/>
+   </target>
+
+
+   <!-- ******************************************************************** -->
+   <!-- ** Tomcat-virtserver Project                                         -->
+   <!-- **                                                                   -->
+   <!-- **   Normally, you just want to build the various .jar files used    -->
+   <!-- **   by the virtualization server, not the virtualization server     -->
+   <!-- **   itself.   This target builds the virtualization server itself.  -->
+   <!-- **                                                                   -->
+   <!-- **   This target is only run by hand on an as-needed basis           -->
+   <!-- **   because the Tomcat build requires network access.  The build    -->
+   <!-- **   artifact created by running this project is automatically put   -->
+   <!-- **   in 3rd-party/distro/apache-tomcat-[vers]-virtserver-[vers].zip  -->
+   <!-- **   This arragement preserves the desriable quality of allowing     -->
+   <!-- **   builds to run disconnected from any network.                    -->
+   <!-- **                                                                   -->
+   <!-- **   There are only 3 things that force you to re-run this project:  -->
+   <!-- **                                                                   -->
+   <!-- **   [1]  Changing file(s) in dir.project.tomcatvirt.src.java        -->
+   <!-- **   [2]  Changing the Tomcat version used by the virt server.       -->
+   <!-- **   [3]  Changing the Tomcat build config (see replaceregexp below) -->
+   <!-- **                                                                   -->
+   <!-- **  If you do run this target, be sure to checkin its build artifact -->
+   <!-- **  (3rd-party/distro/apache-tomcat-[vers]-virtserver-[vers].zip)    -->
+   <!-- **                                                                   -->
+   <!-- **                                                                   -->
+   <!-- **   Devloper note:                                                  -->
+   <!-- **                                                                   -->
+   <!-- **       To assemble a virt server with all the libs it needs:       -->
+   <!-- **              ant -f continuous.xml  assemble-virtual              -->
+   <!-- **       Then on UNIX chmod +x all the .sh files in                  -->
+   <!-- **               build/assemble/virtual-tomcat/bin                   -->
+   <!-- **       (the real installer takes care of the chmod step).          -->
+   <!-- ******************************************************************** -->
+   <target name="tomcat-virtserver"
+           depends="init, incremental-catalinavirtual">
+
+      <property name  ="dir.name.src.tomcatvirt.custom"
+                value="${dir.project.tomcatvirt.custom.src}/${file.name.base.src.zip.tomcatvirt.apache}" />
+
+      <!-- Expand pristine tomcat source code that will be modified for virt server -->
+      <unzip src="${dir.project.tomcatvirt.apache.src}/${file.name.src.zip.tomcatvirt.apache}"
+             dest="${dir.project.tomcatvirt.custom.src}" />
+       
+
+
+      <!-- Include extras: tomcat5.exe  (which is just prunsrv.exe)           -->
+      <!--            and: tomcat5w.exe (which is just prunmgr.exe)           -->
+      <!--                                                                    -->
+      <!-- This makes it easy to configure the virt server as a daemon        --> 
+      <!-- For more details, see:  http://jakarta.apache.org/commons/daemon   -->
+      <!-- and:  "What's the proper way to start the virtualization server?"  -->
+      <!-- in:   http://wiki.alfresco.com/wiki/Virtualization_Server_FAQ      -->
+
+      <copy        todir = "${dir.name.src.tomcatvirt.custom}/build/build/bin">
+            <fileset dir = "${dir.name.src.tomcatvirt.custom}/connectors/procrun/bin"/>
+      </copy>
+ 
+      <!-- Add/override any files in Tomcat's source code with customized files -->
+      <copy        todir = "${dir.name.src.tomcatvirt.custom}">
+            <fileset dir = "${dir.project.tomcatvirt.src.java}" />
+      </copy>
+
+      <!-- Make a custom configuration file -->
+      <!-- 
+        Note:  An alternative to the following copy an 3 replaceregexp tasks 
+               would have been to just include the build.properties file in
+               the customized file tree (see: dir.name.src.tomcatvirt.custom).
+               However, as the tomcat prop file has a lot of obscure stuff
+               in it, in-place surgery was deemed preferable.   This could
+               change if the "surgery approach" gets significantly more 
+               complex over time.
+      -->
+
+      <copy   file="${dir.name.src.tomcatvirt.custom}/build/build.properties.default"
+            tofile="${dir.name.src.tomcatvirt.custom}/build/build.properties"/>
+
+      <!-- Set base.path so tomcat's build can download/cache its required libs  -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
+            match="^base\.path=.*"
+            replace="base.path=${dir.project.tomcatvirt.lib}"
+            byline="true"/>
+
+      <!-- Build everything (note: adds 10k to zip file) -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
+            match="^#full\.dist=.*"
+            replace="full\.dist=on"
+            byline="true"/>
+
+      <!-- Oddly, we need to tell the build where mail.jar is, but no other libs.  -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
+            match="^mail\.lib=.*"
+            replace="mail.lib=${dir.project.3rdparty.lib}"
+            byline="true"/>
+
+      <!-- 
+           Augment the classpath of the catatalina project within 
+           the tomcat virtserver's build so it can reference the
+           path umangling logic within AVMUrlValve. 
+
+           XML-escaped regexes are pretty darned ugly!
+           Oh well.
+       -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/container/catalina/build.xml"  
+            match="^\s*&lt;path\s+id\s*=\s*&quot;catalina\.classpath&quot;&gt;"
+            replace="  &lt;path id=&quot;catalina.classpath&quot;&gt;&#xD;&#xA;    &lt;pathelement location=&quot;${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}&quot;/&gt;"
+            byline="true"/>
+         
+
+      <!-- Comple the modified version of tomcat used as the virt server -->
+      <ant dir="${dir.name.src.tomcatvirt.custom}"
+           inheritAll="false"/>
+
+      <!-- Set +rx permissions on all the .sh files for UNIX (for testing only) -->
+      <chmod dir="${dir.name.src.tomcatvirt.custom}/build/build"
+             perm="ugo+rx"
+             includes="**/*.sh"/>
+
+
+      <!-- Get rid of stuff that the virt server does not actually need -->
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/balancer"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/jsp-examples"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/servlet-examples"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/tomcat-docs"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/webdav"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/server/webapps/admin"/>
+      <delete file="${dir.name.src.tomcatvirt.custom}/build/build/conf/Catalina/localhost/admin.xml"/>
+
+
+      <!-- Refresh cached base virtserver tomcat distro in 3rd party 
+           Note:  During the install process, other files are added/removed 
+                  from this zip file (e.g.: jndi-related stuff).  
+                  See continuous.xml for the gory details.
+      -->
+      <zip destfile="${dir.project.3rdparty}/distro/${file.name.zip.tomcatvirt.custom}">
+           <zipfileset dir="${dir.name.src.tomcatvirt.custom}/build/build"
+                       prefix="${file.name.base.zip.tomcatvirt.custom}"/>
+      </zip>
+   </target>
+
+
+   <!-- **************************** -->
+   <!-- ** Virtual Tomcat Project ** -->
+   <!-- **************************** -->
+
+   <target name="incremental-catalinavirtual" 
+           depends="package-catalinavirtual" />
+
+   <target name="build-catalinavirtual" 
+           depends="clean-catalinavirtual, 
+                    incremental-catalinavirtual" />
+
+   <target name="clean-catalinavirtual" 
+           depends="init">
+      <clean projectdir="${dir.project.catalinavirtual}" />
+   </target>
+
+   <target name="compile-catalinavirtual" 
+           depends="init">
+      <compile-java projectdir="${dir.project.catalinavirtual}" />
+   </target>
+
+   <target name="package-catalinavirtual" 
+           depends="compile-catalinavirtual">
+      <mkdir dir="${dir.project.catalinavirtual.dist}" />
+      <jar jarfile="${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}" 
+           basedir="${dir.project.catalinavirtual.classes}" />
+   </target>
+
+   <target name="test-catalinavirtual" 
+           depends="compile-catalinavirtual">
+      <run-tests projectdir="${dir.project.catalinavirtual}" />
+   </target>
+
+   <target name="generate-javadocs-catalinavirtual" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Catalina Valve ${version.number}" 
+                         windowtitle="Alfresco Catalina Valve" 
+                         projectdir="${dir.project.catalinavirtual}"/>
+   </target>
+   
+   
+   <!-- *********************************** -->
+   <!-- ** Web Framework Commons Project ** -->
+   <!-- *********************************** -->
+   
+   <target name="incremental-webframeworkcommons" 
+           depends="package-webframeworkcommons" />
+   
+   <target name="build-webframeworkcommons" 
+           depends="clean-webframeworkcommons, 
+                    incremental-webframeworkcommons" />
+   
+   <target name="clean-webframeworkcommons" 
+           depends="init">
+      <clean projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
+   <target name="compile-webframeworkcommons" 
+           depends="init">
+      <compile-java projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
+   <target name="package-webframeworkcommons"
+           depends="package-webframeworkcommons-jar" />
+   
+   <target name="package-webframeworkcommons-jar"
+              depends="compile-webframeworkcommons">
+      <mkdir dir="${dir.project.webframeworkcommons.dist}" />
+      <jar jarfile="${dir.project.webframeworkcommons.dist}/${file.name.jar.webframeworkcommons}" 
+           basedir="${dir.project.webframeworkcommons.classes}" />
+   </target>
+   
+   <target name="package-forms-client-jar"
+           depends="assemble-forms-client-jar, minimize-forms-client-javascript">
+      <mkdir dir="${dir.project.webframeworkcommons.dist}" />
+      <zip zipfile="${dir.project.webframeworkcommons.dist}/${file.name.jar.formsclient}" 
+           basedir="${dir.project.webframeworkcommons.assemble}" />
+   </target>
+   
+   <target name="assemble-forms-client-jar" depends="compile-webframeworkcommons">
+      <mkdir dir="${dir.project.webframeworkcommons.assemble}" />
+      
+      <copy todir="${dir.project.webframeworkcommons.assemble.metainf}">
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" />
+      </copy>
+      
+      <copy todir="${dir.project.webframeworkcommons.assemble}">
+         <fileset dir="${dir.project.webframeworkcommons.config}" 
+                  excludes="alfresco/site-data/**, alfresco/templates/**" />
+      </copy>
+      
+      <copy todir="${dir.project.webframeworkcommons.assemble}">
+         <fileset dir="${dir.project.webframeworkcommons.classes}" 
+                  includes="org/alfresco/web/config/**,org/alfresco/web/scripts/forms/**" />
+      </copy>
+      
+      <!-- copy the forms client context file -->
+      <copy todir="${dir.project.webframeworkcommons.assemble}/org/springframework/extensions/surf" 
+            file="${dir.project.webframeworkcommons.src}/plugin/forms-client-context.xml" />
+      
+      <!-- force overwrite copy of form.get.head.ftl so replace works correctly -->
+      <copy todir="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form" overwrite="yes"
+            file="${dir.project.webframeworkcommons.config}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" />
+      <replace file="${dir.project.webframeworkcommons.assemble}/alfresco/site-webscripts/org/alfresco/components/form/form.get.head.ftl" 
+               token="${page.url.context}/" value="${page.url.context}/res/" />
+   </target>
+   
+   <target name="minimize-forms-client-javascript" depends="init">
+      <echo>Compressing Forms Client Javascript...</echo>
+      <minimize-javascript sourcedir="${dir.project.webframeworkcommons.assemble.metainf}" 
+                           destdir="${dir.project.webframeworkcommons.assemble.metainf}" />
+   </target>
+   
+   <target name="test-webframeworkcommons" 
+           depends="compile-webframeworkcommons">
+      <run-tests projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
+   <target name="generate-javadocs-webframeworkcommons" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Framework Commons" 
+                         windowtitle="Alfresco Web Framework Commons" 
+                         projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
+   
+   <!-- ******************************* -->
+   <!-- ** Share (Slingshot) Project ** -->
+   <!-- ******************************* -->
+   
+   <target name="incremental-slingshot" 
+           depends="package-slingshot" />
+   
+   <target name="build-slingshot" 
+           depends="clean-slingshot, 
+                    incremental-slingshot" />
+   
+   <target name="clean-slingshot" 
+           depends="init">
+      <clean projectdir="${dir.project.slingshot}" />
+   </target>
+   
+   <target name="compile-slingshot" 
+           depends="init">
+      <compile-java projectdir="${dir.project.slingshot}" />
+   </target>
+   
+   <target name="package-slingshot"
+           depends="package-slingshot-war" />
+   
+   <target name="package-slingshot-jar"
+              depends="compile-slingshot">
+      <mkdir dir="${dir.project.slingshot.dist}" />
+      <jar jarfile="${dir.project.slingshot.dist}/${file.name.jar.slingshot}" 
+           basedir="${dir.project.slingshot.classes}" />
+   </target>
+
+   <target name="package-slingshot-war" 
+           depends="assemble-slingshot-war,
+                    minimize-slingshot-javascript">
+      
+      <!-- clean up previously generated properties files -->
+      <delete>
+         <fileset dir="${dir.project.slingshot.assemble}/WEB-INF/classes/alfresco/messages">
+            <include name="*_en.properties" />
+         </fileset>
+         <fileset dir="${dir.project.slingshot.assemble}/WEB-INF/classes/alfresco/site-webscripts">
+            <include name="*_en.properties" />
+         </fileset>
+      </delete>
+
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes/alfresco/messages">
+         <fileset dir="${dir.project.slingshot.assemble}/WEB-INF/classes/alfresco/messages"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).properties$" 
+                 to="\1_en.properties"/>
+      </copy>
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes/alfresco/site-webscripts">
+         <fileset dir="${dir.project.slingshot.assemble}/WEB-INF/classes/alfresco/site-webscripts"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).get.properties$" 
+                 to="\1.get_en.properties"/>
+      </copy>
+
+      <war warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" 
+           webxml="${dir.project.slingshot.src.webinf}/web.xml">
+         <fileset dir="${dir.project.slingshot.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-slingshot-war" 
+           depends="package-slingshot-jar">
+      <mkdir dir="${dir.project.slingshot.assemble}" />
+      
+      <!-- first copy all required files from slingshot project -->
+      <copy todir="${dir.project.slingshot.assemble}">
+         <fileset dir="${dir.project.slingshot.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      <!-- next copy all required files from web framework commons projects -->
+      <copy todir="${dir.project.slingshot.assemble}">
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.slingshot.config}" excludes="**/web-extension/**" />
+      </copy>
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
+      </copy>
+
+      <!-- add all JAR to WEB-INF/lib -->
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs} ${includes.slingshot.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                  includes="${file.name.jar.webframeworkcommons}" />
+         <fileset dir="${dir.project.slingshot.dist}" 
+                  includes="${file.name.jar.slingshot}" />
+      </copy>
+      
+      <!-- unzip and add 3rd party javascript library -->
+      <unzip src="${file.zip.slingshot.yui}" 
+             dest="${dir.project.slingshot.assemble}" />
+             
+      <!-- there seems to be a hidden __MACOSX folder in the YUI -->
+      <!-- distribution, remove it if present -->
+      <delete dir="${dir.project.slingshot.assemble}/__MACOSX" 
+              includeEmptyDirs="true" quiet="yes" />
+
+      <!-- Copy our yui directory to apply YUI fixes -->
+      <copy todir="${dir.project.slingshot.assemble}/yui">
+         <fileset dir="${dir.project.slingshot.src.web}/yui" />
+      </copy>
+   </target>  
+   
+   <target name="minimize-slingshot-javascript"
+           depends="init">
+
+      <echo>Merging selected Slingshot Javascript files...</echo>
+      <concat destfile="${dir.project.slingshot.assemble}/js/yui-common.js" force="no">
+         <fileset file="${dir.project.slingshot.assemble}/yui/utilities/utilities.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/button/button-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/container/container-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/menu/menu-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/json/json-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/selector/selector-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/datasource/datasource-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/autocomplete/autocomplete-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/paginator/paginator-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/datatable/datatable-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/history/history-min.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/treeview/treeview-min.js" />
+         <fileset file="${dir.project.slingshot.src.web}/yui/yui-patch.js" />
+      </concat>
+
+      <concat destfile="${dir.project.slingshot.assemble}/js/documentlibrary-actions.js" force="no">
+         <fileset file="${dir.project.slingshot.src.web}/components/documentlibrary/actions.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/global-folder.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/copy-move-to.js" />
+         <fileset file="${dir.project.slingshot.src.web}/components/people-finder/people-finder.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/permissions.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/documentlibrary/aspects.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/social-publish.js" />
+      </concat>
+
+      <concat destfile="${dir.project.slingshot.assemble}/js/datalist-actions.js" force="no">
+         <fileset file="${dir.project.slingshot.src.web}/components/data-lists/actions.js" />
+         <fileset file="${dir.project.slingshot.src.web}/modules/simple-dialog.js" />
+      </concat>
+      
+      <touch file="${dir.project.slingshot.assemble}/modules/about-share-min.js" />
+
+      <echo>Compressing Slingshot Javascript...</echo>
+      <minimize-javascript sourcedir="${dir.project.slingshot.assemble}" 
+                           destdir="${dir.project.slingshot.assemble}" />
+   </target>
+
+   <target name="test-slingshot" 
+           depends="compile-slingshot">
+      <run-tests projectdir="${dir.project.slingshot}" />
+   </target>
+   
+   <target name="generate-javadocs-slingshot" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Share ${version.number}" 
+                         windowtitle="Alfresco Share" 
+                         projectdir="${dir.project.slingshot}"/>
+   </target>
+   
+
+   <!-- ************************ -->
+   <!-- ** Web Editor Project ** -->
+   <!-- ************************ -->
+   
+   <target name="incremental-webeditor" depends="package-webeditor" />
+   
+   <target name="build-webeditor" 
+           depends="clean-webeditor, incremental-webeditor" />
+   
+   <target name="clean-webeditor" depends="init">
+      <clean projectdir="${dir.project.webeditor}" />
+   </target>
+   
+   <target name="compile-webeditor" depends="init">
+      <compile-java projectdir="${dir.project.webeditor}" />
+   </target>
+   
+   <target name="package-webeditor" depends="package-webeditor-war" />
+   
+   <target name="package-webeditor-jar" depends="assemble-webeditor-jar">
+      <mkdir dir="${dir.project.webeditor.dist}" />
+      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor}" 
+           basedir="${dir.project.webeditor.assemble.jar}" />
+   </target>
+   
+   <target name="assemble-webeditor-jar" depends="compile-webeditor">
+      <mkdir dir="${dir.project.webeditor.assemble.jar}" />
+      <copy todir="${dir.project.webeditor.assemble.jar}">
+         <fileset dir="${dir.project.webframeworkcommons.classes}" 
+                  includes="org/alfresco/web/scripts/servlet/**" />
+      </copy>
+   </target>
+
+   <target name="package-webeditor-war" depends="assemble-webeditor-war">
+      <war warfile="${dir.project.webeditor.dist}/${file.name.war.webeditor}" 
+           webxml="${dir.project.webeditor.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webeditor.assemble.war}" />
+      </war>
+   </target>
+
+   <target name="assemble-webeditor-war" 
+           depends="package-forms-client-jar, package-webeditor-jar, package-webeditor-plugin-jar">
+      <mkdir dir="${dir.project.webeditor.assemble.war}" />
+      
+      <!-- first copy all required files from webeditor project -->
+      <copy todir="${dir.project.webeditor.assemble.war}">
+         <fileset dir="${dir.project.webeditor.src.web}" 
+                  excludes="WEB-INF/web.xml, WEB-INF/awe.tld" />
+      </copy>
+      
+      <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/classes" 
+            file="${dir.project.webeditor.src.java}/log4j.properties" />
+      
+      <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/classes">
+         <fileset dir="${dir.project.webeditor.config}" />
+      </copy>
+
+      <!-- add all JAR to WEB-INF/lib -->
+      <copy todir="${dir.project.webeditor.assemble.war}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webeditor.spring-surf}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
+         <fileset dir="${dir.project.webeditor.dist}" 
+                  includes="${file.name.jar.webeditor}" />
+         <fileset dir="${dir.project.webeditorplugin.dist}" 
+                  includes="${file.name.jar.webeditor.plugin}" />
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                  includes="${file.name.jar.formsclient}" />
+         <fileset file="${file.jar.webeditor.yui}" />
+      </copy>
+   </target>
+   
+   <target name="package-webeditor-taglib-jar" depends="compile-webeditor">
+      <mkdir dir="${dir.project.webeditor.dist}" />
+      <jar jarfile="${dir.project.webeditor.dist}/${file.name.jar.webeditor.taglib}">
+         <fileset dir="${dir.project.webeditor.classes}" includes="org/alfresco/web/awe/**" />
+         <zipfileset dir="${dir.project.webeditor.src.webinf}" includes="awe.tld" prefix="META-INF" />
+      </jar>
+   </target>
+   
+   <target name="test-webeditor" depends="compile-webeditor">
+      <run-tests projectdir="${dir.project.webeditor}" />
+   </target>
+   
+   <target name="generate-javadocs-webeditor" depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Editor ${version.number}" 
+                         windowtitle="Alfresco Web Editor" 
+                         projectdir="${dir.project.webeditor}"/>
+   </target>
+   
+   <!-- ******************************* -->
+   <!-- ** Web Editor Plugin Project ** -->
+   <!-- ******************************* -->
+      
+   <target name="incremental-webeditor-plugin" 
+           depends="package-webeditor-plugin" />
+   
+   <target name="build-webeditor-plugin" 
+           depends="clean-webeditor-plugin, incremental-webeditor-plugin" />
+   
+   <target name="clean-webeditor-plugin" depends="init">
+      <clean projectdir="${dir.project.webeditorplugin}" />
+   </target>
+   
+   <target name="compile-webeditor-plugin" depends="init">
+      <compile-java projectdir="${dir.project.webeditorplugin}" />
+   </target>
+   
+   <target name="package-webeditor-plugin" depends="package-webeditor-plugin-jar" />
+   
+   <target name="package-webeditor-plugin-jar" 
+           depends="assemble-webeditor-plugin-jar, minimize-webeditor-plugin-javascript">
+      <mkdir dir="${dir.project.webeditorplugin.dist}" />
+      <jar jarfile="${dir.project.webeditorplugin.dist}/${file.name.jar.webeditor.plugin}" 
+           basedir="${dir.project.webeditorplugin.assemble}" />
+   </target>
+   
+   <target name="assemble-webeditor-plugin-jar" depends="compile-webeditor-plugin">
+      <mkdir dir="${dir.project.webeditorplugin.assemble}" />
+      <copy todir="${dir.project.webeditorplugin.assemble}">
+         <fileset dir="${dir.project.webeditorplugin.classes}" />
+         <fileset dir="${dir.project.webeditorplugin.config}" />
+      </copy>
+      <copy todir="${dir.project.webeditorplugin.assemble}/META-INF">
+         <fileset dir="${dir.project.webeditorplugin.src.web}" />
+      </copy>
+   </target>
+   
+   <target name="minimize-webeditor-plugin-javascript" depends="init">
+      <echo>Compressing Web Editor Plugin Javascript...</echo>
+      <minimize-javascript sourcedir="${dir.project.webeditorplugin.assemble}/META-INF" 
+                           destdir="${dir.project.webeditorplugin.assemble}/META-INF" />
+   </target>
+   
+   <!-- *************************************** -->
+   <!-- ** Web Editor Sample - Customer Site ** -->
+   <!-- *************************************** -->
+   
+   <target name="incremental-webeditor-customersite-sample" depends="package-webeditor-customersite-sample" />
+   
+   <target name="build-webeditor-customersite-sample" 
+           depends="clean-webeditor-customersite-sample, incremental-webeditor-customersite-sample" />
+   
+   <target name="clean-webeditor-customersite-sample" depends="init">
+      <clean projectdir="${dir.project.webeditorsamples.customersite}" />
+   </target>
+   
+   <target name="compile-webeditor-customersite-sample" depends="init">
+      <compile-java projectdir="${dir.project.webeditorsamples.customersite}" />
+   </target>
+   
+   <target name="package-webeditor-customersite-sample" depends="package-webeditor-customersite-sample-war" />
+   
+   <target name="package-webeditor-customersite-sample-jar" depends="compile-webeditor-customersite-sample">
+      <mkdir dir="${dir.project.webeditorsamples.customersite.dist}" />
+      <jar jarfile="${dir.project.webeditorsamples.customersite.dist}/${file.name.jar.webeditor.sample.customersite}">
+         <fileset dir="${dir.project.webeditorsamples.customersite.classes}" />
+         <zipfileset dir="${dir.project.webeditorsamples.customersite.src.webinf}" includes="customer.tld" 
+                     prefix="META-INF" />
+      </jar>
+   </target>
+   
+   <target name="package-webeditor-customersite-sample-war" 
+           depends="package-webeditor-taglib-jar, package-webeditor-customersite-sample-jar">
+      <war warfile="${dir.project.webeditorsamples.customersite.dist}/${file.name.war.webeditor.sample.customersite}" 
+           webxml="${dir.project.webeditorsamples.customersite.src.web}/WEB-INF/web.xml">
+         <fileset dir="${dir.project.webeditorsamples.customersite.src.web}" excludes="WEB-INF/*" />
+         <zipfileset file="${dir.project.webeditor.src.java}/log4j.properties" prefix="WEB-INF/classes" />
+         <zipfileset dir="${dir.project.webeditorsamples.customersite.dist}" prefix="WEB-INF/lib"
+                     includes="${file.name.jar.webeditor.sample.customersite}" />
+         <zipfileset dir="${dir.project.webeditor.dist}" prefix="WEB-INF/lib"
+                     includes="${file.name.jar.webeditor.taglib}" />
+         <zipfileset dir="${dir.project.3rdparty}/lib/commons" prefix="WEB-INF/lib"
+                     includes="commons-httpclient-3.1.jar, commons-logging-1.1.1.jar, commons-codec-1.3.jar" />
+         <zipfileset dir="${dir.project.3rdparty}/lib/optional" prefix="WEB-INF/lib" 
+                     includes="log4j-1.2.15.jar" />
+         <zipfileset dir="${dir.project.3rdparty}/lib/spring-surf" prefix="WEB-INF/lib"
+                     includes="spring-webeditor-client-jsp-1.0.0.jar" />
+         <zipfileset dir="${dir.project.3rdparty}/lib" prefix="WEB-INF/lib" includes="json.jar" />
+      </war>
+   </target>
+
+   <!-- ************************ -->
+   <!-- ** Web Client Project ** -->
+   <!-- ************************ -->
+
+   <target name="incremental-webclient" 
+           depends="package-webclient" />
+      
+   <target name="build-webclient" 
+           depends="clean-webclient, 
+           incremental-webclient" />
+   
+   <target name="clean-webclient" 
+           depends="init">
+      <clean projectdir="${dir.project.webclient}" />
+      <delete includeEmptyDirs="true" 
+              quiet="yes" 
+              dir="${dir.project.webclient.samplewebsite}" />
+   </target>
+   
+   <target name="compile-webclient" 
+           depends="init">
+      <compile-java projectdir="${dir.project.webclient}" />
+   </target>
+   
+   <target name="package-webclient" 
+           depends="package-webclient-war, 
+                    package-sample-website" />
+
+   <target name="package-webclient-jar" 
+           depends="compile-webclient">
+      <mkdir dir="${dir.project.webclient.dist}" />
+      <jar jarfile="${dir.project.webclient.dist}/${file.name.jar.webclient}" 
+           basedir="${dir.project.webclient.classes}" />
+   </target>
+
+   <target name="package-webclient-war" 
+           depends="assemble-webclient-war">
+      <!-- clean up previously generated properties files -->
+      <delete>
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
+            <include name="*_en_US.properties" />
+         </fileset>
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/model">
+            <include name="*_en_US.properties" />
+         </fileset>
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/workflow">
+            <include name="*_en_US.properties" />
+         </fileset>
+      </delete>
+
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).properties$" 
+                 to="\1_en_US.properties"/>
+      </copy>
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/model">
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/model"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).properties$" 
+                 to="\1_en_US.properties"/>
+      </copy>
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/workflow">
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/workflow"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).properties$" 
+                 to="\1_en_US.properties"/>
+      </copy>
+
+      <mkdir dir="${dir.project.webclient.dist}" />
+      <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" 
+           webxml="${dir.project.webclient.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webclient.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-webclient-war" 
+           depends="package-webclient-jar">
+      <mkdir dir="${dir.project.webclient.assemble}" />
+
+      <copy todir="${dir.project.webclient.assemble}">
+         <fileset dir="${dir.project.webclient.src.web}" 
+                  excludes="WEB-INF/**" />
+      </copy>
+      
+      <java classname="CommentStripper" 
+            dir="${dir.project.webclient.assemble}" 
+            fork="yes">
+         <arg line="-l -t -r .jsp" />
+         <classpath refid="classpath.compile" />
+      </java>
+
+      <copy todir="${dir.project.webclient.assemble}/wsdl">
+         <fileset dir="${dir.project.remoteapi.src.wsdl}" />
+      </copy>
+
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF">
+         <fileset dir="${dir.project.webclient.src.webinf}" 
+                  excludes="web.xml,alfresco-object.xml" />
+         <fileset dir="${dir.project.installer}" 
+                  includes="licenses/**" />
+         <fileset dir="${dir.project.remoteapi.src.webinf}"/>
+      </copy>
+      
+      <!-- for Share activity feed (email) notifier - overwrite dummy files -->
+      
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages" overwrite="true">
+         <!-- for activity messages based on activity type -->
+         <fileset dir="${dir.project.slingshot.config}/alfresco/site-webscripts/org/alfresco/components/dashlets"
+                  includes="activity-list.get*.properties" />
+         <!-- note: remove ".get" since it seems to confuse java.util.ResourceBundle.getBundle -->
+         <mapper type="regexp" from="^(.*).get(.*)\.properties$$" to="\1\2.properties"/>
+      </copy>
+
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages" overwrite="true">
+         <!-- for role.* messages -->
+         <fileset dir="${dir.project.slingshot.config}/alfresco/messages"
+                  includes="slingshot*.properties" />
+      </copy>
+      
+      <!-- add config files to WEB-INF/classes -->
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" 
+                  includes="log4j.properties" />
+         <fileset dir="${dir.project.datamodel.config}"
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.repository.config}"
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.remoteapi.config}"
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.webclient.config}"
+                  excludes="**/extension/**" />
+         <!-- 
+         Add dev-context.xml (if present) to WEB-INF/classes.
+         This allows developers doing private builds to override
+         default values in a repeatable way.  An individual's
+         dev-context.xml does not become part of the normal source
+         code tree (it's excluded from check-in automatically).
+         -->
+         <fileset dir="${dir.project.repository.config}"
+                  includes="**/extension/dev-context.xml"/>
+      </copy>
+            
+
+      <!-- Fixes to lucene FSDirectory -->
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/org/apache/lucene">
+         <fileset dir="${dir.project.repository.classes}/org/apache/lucene" 
+                  includes="**/*.class" />
+      </copy>
+
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="*.jar" 
+                  excludes="${dir.name.devenv}/**" />
+         <fileset dir="${dir.project.webclient.dist}" 
+                  includes="${file.name.jar.webclient}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jibx" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/openoffice" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jmagick" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                  includes="${includes.webscriptframework.libs.spring-surf}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jgroups" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jbpm" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/activiti" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/fop" 
+                  includes="*.jar"/>
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"
+                  includes="*.jar"/>
+         <fileset dir="${dir.project.3rdparty.lib}/gdata-1.45.0" 
+                  includes="*.jar"/>
+         <fileset dir="${dir.project.3rdparty.lib}/spring-social" 
+                  includes="*.jar"/>
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.datamodel.dist}" 
+                  includes="${file.name.jar.datamodel}" />
+         <fileset dir="${dir.project.repository.dist}" 
+                  includes="${file.name.jar.repository}" />
+         <fileset dir="${dir.project.mbeans.dist}" 
+                  includes="${file.name.jar.mbeans}" />
+         <fileset dir="${dir.project.deployment.dist}"
+                  includes="${file.name.jar.deployment}"/>
+         <fileset dir="${dir.project.wdrdeployment.dist}"
+                 includes="${file.name.jar.wdrdeployment}"/>
+         <fileset dir="${dir.project.remoteapi.dist}" 
+                  includes="${file.name.jar.remoteapi}" />
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                  includes="${file.name.jar.webframeworkcommons}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
+         <fileset dir="${dir.project.jlan}/hazelcast" 
+                  includes="hazelcast-1.9.3.1.jar"/>
+      </copy>
+   </target>
+
+   <!--
+   <target name="package-webclient-war-jboss" 
+           depends="-tomcat">
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF" 
+            verbose="true">
+         <fileset dir="${dir.project.webclient.src.webinf}" 
+                  includes="jboss*.xml,portlet*.xml,alfresco-object.xml" />
+      </copy>
+      <delete verbose="true">
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes" 
+                  includes="log4j.properties" />
+      </delete>
+      <delete verbose="true">
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/lib" 
+                  includes="log4j-1.2.15.jar,myfaces-api.jar,myfaces-impl.jar" />
+      </delete>
+
+      <delete file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+      <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" 
+           webxml="${dir.project.webclient.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webclient.assemble}" />
+      </war>
+   </target>
+   -->
+
+   <target name="package-sample-website" 
+           description="Packages the sample website" 
+           depends="compile-webclient" 
+           if="enable.webclient.samplewebsite">
+      <delete includeEmptyDirs="true"
+              quiet="yes" 
+              dir="${dir.project.webclient.samplewebsite}" />
+      <mkdir dir="${dir.project.webclient.samplewebsite}/alfresco/classes"/>
+
+      <compile-java-javac srcdir="${dir.project.webclient.test.resources}/websites/alfresco/ROOT/WEB-INF/classes"
+           classesdir="${dir.project.webclient.samplewebsite}/alfresco/classes" />
+
+      <jar basedir="${dir.project.webclient.classes}"
+           destfile="${dir.project.webclient.samplewebsite}/alfresco/alfresco-form-data-functions.jar"
+           includes="org/alfresco/web/forms/*.class"/>
+
+      <jar basedir="${dir.project.webclient.samplewebsite}/alfresco/classes"
+           destfile="${dir.project.webclient.samplewebsite}/alfresco/alfresco-sample-website.jar"
+           includes="**/*.class"/>
+
+      <mkdir dir="${dir.project.webclient.dist}"/>
+      <war destfile="${dir.project.webclient.dist}/${file.name.war.webclient.website}"
+           webxml="${dir.project.webclient.test.resources}/websites/alfresco/ROOT/WEB-INF/web.xml">
+         <lib dir="${dir.project.3rdparty.lib}">
+            <include name="standard.jar"/>
+            <include name="jstl-1.1.0.jar"/>
+         </lib>
+         <lib dir="${dir.project.webclient.samplewebsite}/alfresco" />
+         <fileset dir="${dir.project.webclient.test.resources}/websites/alfresco/ROOT">
+            <exclude name="WEB-INF/**"/>
+            <exclude name="**/.svn"/>
+         </fileset>
+         <webinf file="${dir.project.webclient.test.resources}/websites/alfresco/ROOT/WEB-INF/pr.tld"/>
+      </war>
+   </target>
+
+   <target name="test-webclient" 
+           depends="compile-webclient">
+      <run-tests projectdir="${dir.project.webclient}" />
+   </target>
+
+   <target name="generate-javadocs-webclient" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Client API Specification ${version.number}" 
+                         windowtitle="Alfresco Web Client API" 
+                         projectdir="${dir.project.webclient}"/>
+   </target>
+
+   <target name="generate-taglibdocs-webclient" 
+           depends="init">
+
+      <mkdir dir="${dir.project.webclient.docs.taglib}" />
+
+      <java jar="${dir.project.3rdparty.lib}/${dir.name.devenv}/tlddoc.jar" 
+            fork="true" 
+            failonerror="true">
+         <arg line="-d ${dir.project.webclient.docs.taglib}" />
+         <arg line="-doctitle 'Alfresco Tag Library Documentation'" />
+         <arg line="-windowtitle 'Alfresco Tag Library'" />
+         <arg value="${dir.project.webclient.src.webinf}/alfresco.tld" />
+         <arg value="${dir.project.webclient.src.webinf}/repo.tld" />
+         <arg value="${dir.project.webclient.src.webinf}/wcm.tld" />
+      </java>
+   </target>
+
+   <!-- ********************************* -->
+   <!-- ** Sharepoint Protocol Project ** -->
+   <!-- ********************************* -->
+
+   <target name="incremental-spp"
+           depends="package-spp" />
+
+   <target name="build-spp"
+           depends="clean-spp, incremental-spp" />
+
+   <target name="clean-spp"
+           depends="init">
+      <clean projectdir="${dir.module.spp}" />
+   </target>
+
+   <target name="compile-spp"
+           depends="init">
+      <compile-java projectdir="${dir.module.spp}" />
+   </target>
+
+   <target name="package-spp"
+           depends="package-spp-war, deploy-webclient-tomcat" />
+
+   <target name="package-spp-jar"
+           depends="compile-spp">
+      <mkdir dir="${dir.module.spp.dist}" />
+      <jar jarfile="${dir.module.spp.dist}/${file.name.jar.spp}"
+           basedir="${dir.module.spp.classes}" encoding="UTF-8" />
+   </target>
+
+   <target name="package-spp-war"
+           depends="package-spp-extension">
+      <echo>Installing Sharepoint (vti) into WAR...</echo>
+      <install-amp ampfile="${dir.module.spp.dist}/${file.name.amp.spp}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-spp-extension"
+           depends="package-spp-jar">
+      <zip destfile="${dir.module.spp.dist}/${file.name.amp.spp}" update="true" encoding="UTF-8">
+         <zipfileset file="${dir.module.spp.property}/module.properties"/>
+         <zipfileset file="${dir.module.spp.dist}/${file.name.jar.spp}" prefix="lib" />
+         <zipfileset dir="${dir.module.spp.lib}" prefix="lib" />
+         <zipfileset dir="${dir.module.spp.config}" prefix="config">
+            <exclude name="**/module.properties" />
+            <exclude name="**/vti-handler-alfresco2-context.xml.sample" />
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-spp"
+           depends="compile-spp">
+      <run-tests projectdir="${dir.module.spp}" />
+   </target>
+
+   <target name="generate-javadocs-spp"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Sharepoint Protocol (vti) Extension"
+                         windowtitle="Alfresco Sharepoint Protocol"
+                         projectdir="${dir.module.spp}"/>
+   </target>
+   
+      
+   <!-- ******************************** -->
+   <!-- ** DOD 5015 Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-dod5015" 
+           depends="package-dod5015" />
+
+   <target name="build-dod5015" 
+           depends="clean-dod5015, incremental-dod5015" />
+
+   <target name="clean-dod5015" 
+           depends="init">
+      <clean projectdir="${dir.module.dod5015}" />
+   </target>
+
+   <target name="compile-dod5015" 
+           depends="init">
+      <compile-java projectdir="${dir.module.dod5015}" />
+   </target>
+
+   <target name="package-dod5015"
+           depends="package-dod5015-war, deploy-webclient-tomcat" />
+
+   <target name="package-dod5015-jar"
+           depends="compile-dod5015">
+      <mkdir dir="${dir.module.dod5015.dist}" />
+      <jar jarfile="${dir.module.dod5015.dist}/${file.name.jar.dod5015}" 
+           basedir="${dir.module.dod5015.classes}" />
+   </target>
+   
+   <target name="package-tamp"
+           depends="temp-dod5015, deploy-webclient-tomcat" />
+   
+   <target name="temp-dod5015"
+           depends="init">
+    <install-amp ampfile="C:\mywork\projects\v34BugFix\code\root\modules\dod-5015\build\dist\alfresco-community-dod5015-3.4..amp" 
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-dod5015-war"
+           depends="package-dod5015-extension">
+      <echo>Installing DOD 5015 into WAR...</echo>
+      <install-amp ampfile="${dir.module.dod5015.dist}/${file.name.amp.dod5015}" 
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-dod5015-extension"
+           depends="package-dod5015-jar">
+      <zip destfile="${dir.module.dod5015.dist}/${file.name.amp.dod5015}" 
+           update="true">
+         <zipfileset file="${dir.module.dod5015.property}/module.properties"/>
+         <zipfileset file="${dir.module.dod5015.dist}/${file.name.jar.dod5015}" 
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.dod5015.config}" 
+                     prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-dod5015" depends="compile-dod5015">
+      <mkdir dir="${dir.module.dod5015}/${dir.name.build}/${dir.name.test.results}" />
+      <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="${dir.module.dod5015}">
+         <jvmarg value="-server"/>
+         <jvmarg value="-XX:MaxPermSize=256M"/>
+         <jvmarg value="-Dcom.sun.management.jmxremote"/>
+         <classpath>
+            <pathelement location="${dir.module.dod5015.classes}" />
+            <pathelement location="${dir.module.dod5015.config}" />
+            <path refid="classpath.unit.test"/>
+            <path refid="classpath.unit.test.extension"/>
+         </classpath>
+         <formatter type="xml" />
+         <batchtest todir="${dir.module.dod5015}/${dir.name.build}/${dir.name.test.results}">
+            <fileset dir="${dir.module.dod5015}/${dir.name.source}/${dir.name.java}">
+               <patternset>
+                  <include name="**/*Test.java" />
+                  <exclude name="**/Base*Test.java" />
+                  <exclude name="**/*SystemTest.java" />
+                  <exclude name="**/*RestApiTest.java" />
+                  <!-- <exclude name="**/DOD5015Test.java" /> -->
+               </patternset>
+            </fileset>
+         </batchtest>
+      </junit>
+   </target>
+
+   <target name="generate-javadocs-dod5015"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco DOD 5015 Extension"
+                         windowtitle="DOD 5015 Records Management"
+                         projectdir="${dir.module.dod5015}"/>
+   </target>
+   
+   <!-- ******************************** -->
+   <!-- ** DOD 5015 Share Project ** -->
+   <!-- ******************************** -->
+
+   <target name="clean-dod5015-share" depends="init">
+      <clean projectdir="${dir.module.dod5015.share}" />
+   </target>
+
+   <target name="build-dod5015-share"
+      depends="clean-dod5015-share, package-dod5015-share">
+   </target>
+   
+   <target name="assemble-dod5015-share" depends="init">
+      <copy todir="${dir.module.dod5015.share.assemble}/web">
+         <fileset dir="${dir.module.dod5015.share.src.web}" />
+      </copy>
+   </target>
+   
+   <target name="minimize-dod5015-share-javascript"
+           depends="init">
+     <echo>Compressing DOD5015 Share Javascript...</echo>
+     <minimize-javascript sourcedir="${dir.module.dod5015.share.assemble}" 
+                          destdir="${dir.module.dod5015.share.assemble}" />
+   </target>
+   
+   <target name="package-dod5015-share-extension" 
+           depends="assemble-dod5015-share, minimize-dod5015-share-javascript">
+      <mkdir dir="${dir.module.dod5015.share.dist}" />
+      
+      <copy todir="${dir.module.dod5015.share.assemble}/WEB-INF/classes/alfresco/messages">
+         <fileset dir="${dir.module.dod5015.share.config}/alfresco/messages"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).properties$" 
+                 to="\1_en.properties"/>
+      </copy>
+      <copy todir="${dir.module.dod5015.share.assemble}/WEB-INF/classes/alfresco/site-webscripts">
+         <fileset dir="${dir.module.dod5015.share.config}/alfresco/site-webscripts"/>
+         <mapper type="regexp" 
+                 from="^([^_]*).get.properties$" 
+                 to="\1.get_en.properties"/>
+      </copy>
+      
+      <zip destfile="${dir.module.dod5015.share.dist}/${file.name.amp.dod5015.share}" excludes="**/modules/*">
+         <zipfileset file="${dir.module.dod5015.share.config}/module/module.properties"/>
+         <zipfileset file="${dir.module.dod5015.share.config}/module/file-mapping.properties"/>
+         <zipfileset dir="${dir.module.dod5015.share.config}" prefix="WEB-INF/classes" />
+         <zipfileset dir="${dir.module.dod5015.share.assemble}/WEB-INF/classes" prefix="WEB-INF/classes"/>
+         <zipfileset dir="${dir.module.dod5015.share.assemble}/web" prefix="web"/>
+      </zip>
+   </target>
+
+   <target name="package-dod5015-share"
+           depends="package-dod5015-share-war, deploy-slingshot-tomcat" />
+
+   <target name="package-dod5015-share-war"
+           depends="package-dod5015-share-extension">
+      <echo>Installing DOD 5015 into Share WAR...</echo>
+      <install-amp ampfile="${dir.module.dod5015.share.dist}/${file.name.amp.dod5015.share}" 
+                   warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
+   </target>
+   
+   <!-- ******************************** -->
+   <!-- ** WCM Quick Start Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-wcmquickstart" 
+           depends="package-wcmquickstart" />
+
+   <target name="build-wcmquickstart" 
+           depends="clean-wcmquickstart, incremental-wcmquickstart" />
+
+   <target name="clean-wcmquickstart" 
+           depends="init">
+      <clean projectdir="${dir.module.wcmquickstart}" />
+   </target>
+
+   <target name="compile-wcmquickstart" 
+           depends="init">
+      <compile-java projectdir="${dir.module.wcmquickstart}" />
+   </target>
+
+   <target name="package-wcmquickstart"
+           depends="package-wcmquickstart-war, deploy-webclient-tomcat" />
+
+   <target name="package-wcmquickstart-jar"
+           depends="compile-wcmquickstart">
+      <mkdir dir="${dir.module.wcmquickstart.dist}" />
+      <jar jarfile="${dir.module.wcmquickstart.dist}/${file.name.jar.wcmquickstart}" 
+           basedir="${dir.module.wcmquickstart.classes}" />
+   </target>
+
+   <target name="package-wcmquickstart-war"
+           depends="package-wcmquickstart-extension">
+      <echo>Installing WCM Quick Start module into WAR...</echo>
+      <install-amp ampfile="${dir.module.wcmquickstart.dist}/${file.name.amp.wcmquickstart}" 
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-wcmquickstart-extension"
+           depends="package-wcmquickstart-jar">
+     <mkdir dir="${dir.module.wcmquickstart.dist}" />
+      <zip destfile="${dir.module.wcmquickstart.dist}/${file.name.amp.wcmquickstart}" 
+           update="true">
+         <zipfileset file="${dir.module.wcmquickstart.property}/module.properties"/>
+         <zipfileset file="${dir.module.wcmquickstart.dist}/${file.name.jar.wcmquickstart}" 
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.wcmquickstart.config}" 
+                     prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+      </zip>
+   </target>
+   
+   <!-- ******************************** -->
+   <!-- ** WCM Quick Share Start Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-wcmquickstart-share" 
+           depends="package-wcmquickstart-share" />
+
+   <target name="build-wcmquickstart-share" 
+           depends="clean-wcmquickstart-share, incremental-wcmquickstart-share" />
+
+   <target name="clean-wcmquickstart-share" 
+           depends="init">
+      <clean projectdir="${dir.module.wcmquickstart-share}" />
+   </target>
+
+   <target name="assemble-wcmquickstart-share" depends="init">
+      <copy todir="${dir.module.wcmquickstart-share.assemble}">
+         <fileset dir="${dir.module.wcmquickstart-share.src.web}" />
+      </copy>
+   </target>
+   
+   <target name="minimize-wcmquickstart-share-javascript"
+           depends="init">
+     <echo>Compressing wcmquickstart Share Javascript...</echo>
+     <minimize-javascript sourcedir="${dir.module.wcmquickstart-share.assemble}" 
+                          destdir="${dir.module.wcmquickstart-share.assemble}" />
+  </target>
+   
+   <target name="package-wcmquickstart-share"
+           depends="package-wcmquickstart-share-war, deploy-slingshot-tomcat" />
+
+   <target name="package-wcmquickstart-share-war"
+           depends="package-wcmquickstart-share-extension">
+      <echo>Installing WCM Quick Start Share module into WAR...</echo>
+      <install-amp ampfile="${dir.module.wcmquickstart-share.dist}/${file.name.amp.wcmquickstart-share}" 
+                   warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
+   </target>
+
+   <target name="package-wcmquickstart-share-extension"
+           depends="clean-wcmquickstart-share, assemble-wcmquickstart-share, minimize-wcmquickstart-share-javascript">
+     <mkdir dir="${dir.module.wcmquickstart-share.dist}" />   
+      <zip destfile="${dir.module.wcmquickstart-share.dist}/${file.name.amp.wcmquickstart-share}" 
+           update="true">
+         <zipfileset file="${dir.module.wcmquickstart-share.property}/module.properties"/>   
+         <zipfileset file="${dir.module.wcmquickstart-share.property}/file-mapping.properties"/>       
+         <zipfileset dir="${dir.module.wcmquickstart-share.config}" 
+                     prefix="config">
+            <exclude name="**/module.properties"/>
+            <exclude name="**/file-mapping.properties"/>
+         </zipfileset>
+       <zipfileset dir="${dir.module.wcmquickstart-share.assemble}" prefix="web"/>
+      </zip>
+   </target>
+   
+   <!-- *********************************** -->
+   <!-- ** WCM Quick Start Client API       ** -->
+   <!-- *********************************** -->
+   
+   <target name="incremental-wcmquickstart-clientapi" 
+           depends="package-wcmquickstart-clientapi" />
+      
+   <target name="build-wcmquickstart-clientapi" 
+           depends="clean-wcmquickstart-clientapi, 
+                    incremental-wcmquickstart-clientapi" />
+   
+   <target name="clean-wcmquickstart-clientapi" 
+           depends="init">
+      <clean projectdir="${dir.project.wcmquickstart-clientapi}" />
+   </target>
+
+   <target name="compile-wcmquickstart-clientapi" 
+           depends="init">
+      <compile-java projectdir="${dir.project.wcmquickstart-clientapi}" />
+   </target>
+   
+   <target name="package-wcmquickstart-clientapi"
+           depends="compile-wcmquickstart-clientapi">
+      <mkdir dir="${dir.project.wcmquickstart-clientapi.dist}" />
+      <jar jarfile="${dir.project.wcmquickstart-clientapi.dist}/${file.name.jar.wcmquickstart-clientapi}" 
+           basedir="${dir.project.wcmquickstart-clientapi.classes}"
+           excludes="alfresco/**" />
+   </target>
+   
+   <target name="test-wcmquickstart-clientapi" 
+           depends="compile-wcmquickstart-clientapi">
+      <run-tests projectdir="${dir.project.wcmquickstart-clientapi}" />
+   </target>
+   
+   <target name="generate-javadocs-wcmquickstart-clientapi" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco WCM Quick Start Client API ${version.number}" 
+                         windowtitle="Alfresco WCM Quick Start Client API" 
+                         projectdir="${dir.project.wcmquickstart-clientapi}"/>
+   </target>
+   
+    <!-- *********************************** -->
+    <!-- ** WCM Quick Start Web App       ** -->
+    <!-- *********************************** -->
+   
+    <target name="incremental-wcmquickstart-webapp" 
+           depends="package-wcmquickstart-webapp" />
+      
+    <target name="build-wcmquickstart-webapp" 
+           depends="clean-wcmquickstart-webapp, 
+                    incremental-wcmquickstart-webapp" />
+   
+    <target name="clean-wcmquickstart-webapp" 
+           depends="init">
+      <clean projectdir="${dir.project.wcmquickstart-webapp}" />
+    </target>
+
+    <target name="compile-wcmquickstart-webapp" 
+           depends="package-webeditor-taglib-jar">
+      <compile-java projectdir="${dir.project.wcmquickstart-webapp}" />
+    </target>
+   
+    <target name="package-wcmquickstart-webapp"
+           depends="compile-wcmquickstart-webapp">
+      <mkdir dir="${dir.project.wcmquickstart-webapp.dist}" />
+      <jar jarfile="${dir.project.wcmquickstart-webapp.dist}/${file.name.jar.wcmquickstart-webapp}" 
+           basedir="${dir.project.wcmquickstart-webapp.classes}" />
+    </target>
+   
+   <target name="assemble-wcmquickstart-webapp" 
+           depends="package-wcmquickstart-clientapi, package-wcmquickstart-webapp, package-webeditor-jar, package-webeditor-taglib-jar">
+      <mkdir dir="${dir.project.wcmquickstart-webapp.assemble}" />
+      
+      <copy todir="${dir.project.wcmquickstart-webapp.assemble}">
+         <fileset dir="${dir.project.wcmquickstart-webapp.src.web}" excludes="WEB-INF/web.xml"/>
+      </copy>
+      
+      <copy todir="${dir.project.wcmquickstart-webapp.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.wcmquickstart-webapp.config}" excludes="**/web-extension/**" />
+      </copy>
+      
+      <copy todir="${dir.project.wcmquickstart-webapp.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.wcmquickstart-clientapi.config}" excludes="**/web-extension/**" />
+      </copy>
+      
+      <!-- add all JAR to WEB-INF/lib -->
+      <copy todir="${dir.project.wcmquickstart-webapp.assemble}/WEB-INF/lib">
+        
+         <!-- 3rd Party Libs -->
+         <fileset dir="${dir.project.3rdparty.lib}" 
+            includes="${includes.wcmquickstart-webapp.libs.3rdparty}" />
+         <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
+                includes="${includes.wcmquickstart-webapp.libs.spring-surf}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                includes="${includes.wcmquickstart-webapp.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional"
+                includes="${includes.wcmquickstart-webapp.libs.optional}"/>       
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"
+            includes="${includes.wcmquickstart-webapp.libs.abdera}"/>
+
+         <!-- Web Client API Libs -->
+         <fileset dir="${dir.project.wcmquickstart-clientapi.lib}" />
+         <fileset dir="${dir.project.wcmquickstart-clientapi.dist}" 
+                includes="${file.name.jar.wcmquickstart-clientapi}" />     
+              
+         <!-- Web App Libs -->
+         <fileset dir="${dir.project.wcmquickstart-webapp.lib}" />
+         <fileset dir="${dir.project.wcmquickstart-webapp.dist}" 
+                includes="${file.name.jar.wcmquickstart-webapp}" />
+            
+         <!-- AWE Libs -->
+         <fileset dir="${dir.project.webeditor.dist}"
+                includes="${file.name.jar.webeditor}"/>
+         <fileset dir="${dir.project.webeditor.dist}"
+                includes="${file.name.jar.webeditor.taglib}"/>
+         
+      </copy>
+      
+    </target>  
+   
+    <target name="package-wcmquickstart-webapp-war" 
+            depends="assemble-wcmquickstart-webapp">
+      <war warfile="${dir.project.wcmquickstart-webapp.dist}/${file.name.war.wcmquickstart-webapp}" 
+             webxml="${dir.project.wcmquickstart-webapp.src.webinf}/web.xml">
+         <fileset dir="${dir.project.wcmquickstart-webapp.assemble}" />
+        </war>
+    </target>
+      
+   <target name="build-wcmquickstartwebapp-war"
+           depends="package-wcmquickstart-webapp-war">   
+      <copy todir="${dir.project.wcmquickstart-webapp}/target" 
+              file="${dir.project.wcmquickstart-webapp.dist}/${file.name.war.wcmquickstart-webapp}" />      
+   </target>
+   
+   <target name="deploy-wcmquickstartwebapp-tomcat" depends="package-wcmquickstart-webapp-war" 
+            description="Deploys the WCM Quick Start Web App WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.wcmquickstart-webapp}" />
+      <delete dir="${dir.deploy.tomcat.application.wcmquickstart}" 
+                includeEmptyDirs="true" quiet="yes" />
+      <copy todir="${dir.deploy.tomcat.application}" 
+              file="${dir.project.wcmquickstart-webapp.dist}/${file.name.war.wcmquickstart-webapp}" />
+   </target>
+    
+   <!-- ******************************** -->
+   <!-- ** Web Service Client Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-webserviceclient" 
+           depends="package-webserviceclient" />
+
+   <target name="build-webserviceclient" 
+           depends="clean-webserviceclient, 
+                    incremental-webserviceclient" />
+   
+   <target name="clean-webserviceclient" 
+           depends="init">
+      <clean projectdir="${dir.project.webserviceclient}" />
+   </target>
+
+   <target name="clean-webserviceclient-services" 
+           depends="init">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice" />
+      </delete>
+   </target>
+
+   <target name="compile-webserviceclient" 
+           depends="init">
+      <compile-java-inc-generated projectdir="${dir.project.webserviceclient}" />
+   </target>
+   
+   <target name="package-webserviceclient"
+           depends="compile-webserviceclient">
+      <mkdir dir="${dir.project.webserviceclient.dist}" />
+      <copy todir="${dir.project.webserviceclient.classes}" 
+            file="${dir.project.webserviceclient.src.java}/log4j.properties" />
+      <jar jarfile="${dir.project.webserviceclient.dist}/${file.name.jar.webserviceclient}" 
+           basedir="${dir.project.webserviceclient.classes}" />
+   </target>
+   
+   <target name="test-webserviceclient" 
+           depends="compile-webserviceclient">
+      <run-tests projectdir="${dir.project.webserviceclient}" />
+   </target>
+   
+   <target name="generate-javadocs-webserviceclient" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Service Client ${version.number}" 
+                         windowtitle="Alfresco Web Service Client" 
+                         projectdir="${dir.project.webserviceclient}"/>
+   	<generate-generated-javadocs documenttitle="Alfresco Web Service Client Specification" 
+   	                             windowtitle="Alfresco Web Service Client" 
+   	                             projectdir="${dir.project.webserviceclient}"/>
+   </target>
+
+   <target name="gen-all-service-clients" 
+           depends="gen-auth-service-client, 
+                    gen-repo-service-client, 
+                    gen-content-service-client, 
+                    gen-authoring-service-client, 
+                    gen-classification-service-client, 
+                    gen-action-service-client, 
+                    gen-access-control-service-client, 
+                    gen-administration-service-client, 
+                    gen-dictionary-service-client" />
+
+   <target name="gen-auth-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/authentication" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" 
+                  package="org.alfresco.webservice.authentication" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-repo-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/repository" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" 
+                  package="org.alfresco.webservice.repository" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" 
+                  package="org.alfresco.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-dictionary-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/dictionary" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" 
+                  package="org.alfresco.webservice.dictionary" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-content-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/content" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" 
+                  package="org.alfresco.webservice.content" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-classification-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/classification" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" 
+                  package="org.alfresco.webservice.classification" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-authoring-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/authoring" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" 
+                  package="org.alfresco.webservice.authoring" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-action-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/action" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" 
+                  package="org.alfresco.webservice.action" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-access-control-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/accesscontrol" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" 
+                  package="org.alfresco.webservice.accesscontrol" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+   <target name="gen-administration-service-client" 
+           depends="init-service-gen">
+      <delete>
+         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/administration" />
+      </delete>
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" 
+                  package="org.alfresco.webservice.administration" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+      </wsdl2java>
+   </target>
+
+
+   <!-- ************************** -->
+   <!-- ** Devenv Tools Project ** -->
+   <!-- ************************** -->
+
+   <target name="incremental-devenv" 
+           depends="package-devenv" />
+
+   <target name="build-devenv" 
+           depends="clean-devenv, 
+                    incremental-devenv" />
+
+   <target name="clean-devenv" 
+           depends="init">
+      <clean projectdir="${dir.project.devenv}" />
+   </target>
+
+   <target name="compile-devenv" 
+           depends="init">
+      <compile-java projectdir="${dir.project.devenv}" />
+   </target>
+
+   <target name="package-devenv" 
+           depends="compile-devenv">
+      <mkdir dir="${dir.project.devenv.dist}" />
+      <jar jarfile="${dir.project.devenv.dist}/${file.name.jar.devenv}"
+           basedir="${dir.project.devenv.classes}" />
+      <copy todir="${dir.project.3rdparty.lib}/devenv" 
+            file="${dir.project.devenv.dist}/${file.name.jar.devenv}" />
+   </target>
+
+   <!-- *************************** -->
+   <!-- ** Alfresco JLAN Project ** -->
+   <!-- *************************** -->
+   
+   <target name="incremental-jlan" 
+           depends="package-jlan" />
+      
+   <target name="build-jlan" 
+           depends="clean-jlan, 
+                    incremental-jlan" />
+   
+   <target name="clean-jlan" 
+           depends="init">
+      <clean projectdir="${dir.project.jlan}" />
+   </target>
+   
+   <target name="compile-jlan" 
+           depends="init">
+      <compile-java projectdir="${dir.project.jlan}" compileExcludes="org/alfresco/jlan/app/** org/alfresco/jlan/server/filesys/db/*/** org/alfresco/jlan/smb/util/** org/alfresco/jlan/util/db/** org/alfresco/config/*/**" />
+   </target>
+   
+   <target name="package-jlan"
+           depends="compile-jlan">
+      <mkdir dir="${dir.project.jlan.dist}" />
+      <jar jarfile="${dir.project.jlan.dist}/${file.name.jar.jlan}" 
+           basedir="${dir.project.jlan.classes}" />
+   </target>
+   
+   <target name="generate-javadocs-jlan" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco JLAN API Specification ${version.number}" 
+                         windowtitle="Alfresco JLAN API" 
+                         projectdir="${dir.project.jlan}"/>
+   </target>
+   
+      
+   <!-- *********************************** -->
+   <!-- ** Forms Development Kit Project ** -->
+   <!-- *********************************** -->
+   
+   <target name="incremental-fdk" depends="package-fdk-client, package-fdk-repo" />
+      
+   <target name="build-fdk" depends="clean-fdk, incremental-fdk" />
+   
+   <target name="clean-fdk" depends="init">
+      <clean projectdir="${dir.project.fdk.client}" />
+      <clean projectdir="${dir.project.fdk.repo}" />
+   </target>
+   
+   <!--
+   <target name="compile-fdk" depends="init">
+      <compile-java projectdir="${dir.project.fdk.client}" />
+   </target>
+   -->
+   
+   <target name="package-fdk-client" depends="assemble-fdk-client">
+      <mkdir dir="${dir.project.fdk.client.dist}" />
+      <jar jarfile="${dir.project.fdk.client.dist}/${file.name.jar.fdk}" 
+           basedir="${dir.project.fdk.client.assemble}" />
+   </target>
+   
+   <target name="assemble-fdk-client" depends="init">
+      <mkdir dir="${dir.project.fdk.client.assemble}" />
+      <copy todir="${dir.project.fdk.client.assemble}">
+         <fileset dir="${dir.project.fdk.client.config}" />
+      </copy>
+      <copy todir="${dir.project.fdk.client.assemble}/META-INF">
+         <fileset dir="${dir.project.fdk.client.src.web}" />
+      </copy>
+   </target>
+   
+   <target name="package-fdk-repo" depends="init">
+      <mkdir dir="${dir.project.fdk.repo.dist}" />
+      <zip destfile="${dir.project.fdk.repo.dist}/${file.name.amp.fdk}" update="true" encoding="UTF-8">
+         <zipfileset file="${dir.project.fdk.repo.config}/alfresco/module/org_alfresco_module_fdk/module.properties"/>
+         <zipfileset dir="${dir.project.fdk.repo.config}" prefix="config">
+            <exclude name="**/module.properties" />
+         </zipfileset>
+      </zip>
+   </target>
+   
+   <target name="install-fdk-amp" depends="package-fdk-repo">
+      <echo>Installing FDK into WAR...</echo>
+      <install-amp ampfile="${dir.project.fdk.repo.dist}/${file.name.amp.fdk}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <!-- ******************************** -->
+   <!-- ** JavaScript Library Targets ** -->
+   <!-- ******************************** -->
+   
+   <target name="minimize-mootools-javascript" depends="init">
+      <minimize-javascript-file sourcefile="${dir.project.3rdparty.src}/mootools.v1.11-src.js"
+                                destfile="${dir.project.webclient.src.web}/scripts/ajax/mootools.v1.11-min.js" />
+      <concat destfile="${dir.project.webclient.src.web}/scripts/ajax/mootools.v1.11.js">
+         <header trimleading="yes">
+            /* Generated from projects/3rd-party/src/mootools.v1.11-src.js using "ant minimize-mootools-javascript". Do not modify this file directly. */
+         </header>
+         <fileset file="${dir.project.webclient.src.web}/scripts/ajax/mootools.v1.11-min.js" />
+      </concat>
+      <delete file="${dir.project.webclient.src.web}/scripts/ajax/mootools.v1.11-min.js" />
+   </target>
+   
+   <!-- ************************************ -->
+   <!-- ** File Transfer Receiver Project ** -->
+   <!-- ************************************ -->
+
+   <target name="clean-file-transfer-receiver" depends="init">
+      <clean projectdir="${dir.project.file-transfer-receiver}" />
+   </target>
+
+   <target name="incremental-file-transfer-receiver"
+           depends="package-file-transfer-receiver" />
+      
+   <target name="build-file-transfer-receiver" 
+           depends="clean-file-transfer-receiver, 
+                    incremental-file-transfer-receiver" />
+   
+   <target name="prepare-file-transfer-receiver" 
+      depends="incremental-webclient-depends">
+      
+      <mkdir dir="${dir.project.file-transfer-receiver.classes}" />
+      <mkdir dir="${dir.project.file-transfer-receiver.dist}" />
+      <mkdir dir="${dir.project.file-transfer-receiver.assemble}" />
+      <mkdir dir="${dir.project.file-transfer-receiver.assemble}/webapps" />
+      <mkdir dir="${dir.project.file-transfer-receiver.assemble}/classes" />
+
+      <patternset id="ftr.libs.thirdparty.buildtime">
+         <include name="commons/commons-logging-1.1.1.jar" />
+         <include name="spring-surf/spring-webscripts-1.0.0.jar" />
+         <include name="spring-surf/spring-webscripts-api-1.0.0.jar" />
+         <include name="org.springframework.aop-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.asm-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.beans-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.context-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.context.support-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.core-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.expression-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.jdbc-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.orm-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.transaction-3.0.5.RELEASE.jar" />
+         <include name="json.jar" />
+         <include name="devenv/org.springframework.test-3.0.5.RELEASE.jar" />
+         <include name="junit-4.8.1.jar" />
+         <include name="jta.jar" />
+         <include name="commons/commons-dbcp-1.4-patched.jar" />
+         <include name="mybatis-3.0.4.jar" />
+         <include name="mybatis-spring-1.0.1.jar" />
+         <include name="commons/commons-io-1.4.jar" />
+         <include name="spring-surf/spring-surf-1.0.0.jar" />
+         <include name="spring-surf/spring-surf-api-1.0.0.jar" />
+         <include name="spring-surf/spring-surf-core-1.0.0.jar" />
+         <include name="spring-surf/spring-surf-core-configservice-1.0.0.jar" />
+         <include name="commons/commons-pool-1.5.5.jar" />
+         <include name="aopalliance.jar" />
+         <include name="hibernate-3.2.6-patched.jar" />
+         <include name="ehcache-core-2.0.0.jar" />
+         <include name="jug-asl-2.0.0.jar" />
+         <include name="dom4j-1.6.1.jar" />
+      </patternset>
+
+      <patternset id="ftr.libs.thirdparty.runtime">
+         <include name="commons/commons-logging-1.1.1.jar" />
+         <include name="commons/commons-fileupload-1.2.1.jar" />
+         <include name="spring-surf/spring-webscripts-1.0.0.jar" />
+         <include name="spring-surf/spring-webscripts-api-1.0.0.jar" />
+         <include name="org.springframework.aop-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.asm-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.beans-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.context-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.context.support-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.core-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.expression-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.jdbc-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.orm-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.transaction-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.web-3.0.5.RELEASE.jar" />
+         <include name="org.springframework.web.servlet-3.0.5.RELEASE.jar" />
+         <include name="json.jar" />
+         <include name="jta.jar" />
+         <include name="commons/commons-dbcp-1.4-patched.jar" />
+         <include name="mybatis-3.0.4.jar" />
+         <include name="mybatis-spring-1.0.1.jar" />
+         <include name="commons/commons-io-1.4.jar" />
+         <include name="spring-surf/spring-surf-1.0.0.jar" />
+         <include name="spring-surf/spring-surf-api-1.0.0.jar" />
+         <include name="spring-surf/spring-surf-core-1.0.0.jar" />
+         <include name="spring-surf/spring-surf-core-configservice-1.0.0.jar" />
+         <include name="commons/commons-pool-1.5.5.jar" />
+         <include name="aopalliance.jar" />
+         <include name="hibernate-3.2.6-patched.jar" />
+         <include name="ehcache-core-2.0.0.jar" />
+         <include name="jug-asl-2.0.0.jar" />
+         <include name="dom4j-1.6.1.jar" />
+         <include name="optional/log4j-1.2.15.jar" />
+         <include name="abdera/abdera-client-0.4.0-incubating.jar" />
+         <include name="abdera/abdera-core-0.4.0-incubating.jar" />
+         <include name="abdera/abdera-extensions-json-0.4.0-incubating.jar" />
+         <include name="abdera/abdera-i18n-0.4.0-incubating.jar" />
+         <include name="abdera/abdera-parser-0.4.0-incubating.jar" />
+         <include name="abdera/axiom-api-1.2.5.jar" />
+         <include name="abdera/axiom-impl-1.2.5.jar" />
+         <include name="jaxen-1.1-beta-8.jar" />
+         <include name="freemarker-2.3.18-patched.jar" />
+         <include name="rhino-js-1.6R7.jar" />
+      </patternset>
+
+      <path id="ftr.classpath">
+         <fileset dir="${dir.project.file-transfer-receiver.lib}" includes="**/*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}">
+            <patternset refid="ftr.libs.thirdparty.buildtime" />
+         </fileset>
+         <fileset dir="${dir.project.core.dist}" includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.repository.dist}" includes="${file.name.jar.repository}" />
+         <fileset dir="${dir.project.remoteapi.dist}" includes="${file.name.jar.remoteapi}" />
+         <fileset dir="${dir.project.datamodel.dist}" includes="${file.name.jar.datamodel}" />
+      </path>
+
+      <path id="ftr.launcher.classpath">
+         <fileset dir="${dir.project.file-transfer-receiver.lib}" includes="**/tomcat*.jar" />
+      </path>
+
+   </target>
+
+   <target name="compile-file-transfer-receiver" depends="prepare-file-transfer-receiver">
+      <javac destdir="${dir.project.file-transfer-receiver.classes}" fork="true"
+         srcdir="${dir.project.file-transfer-receiver.javasrc}"
+                   memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
+                   debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}"
+                   classpathref="ftr.classpath" includeAntRuntime="false">
+
+      </javac>
+   </target>
+
+   <target name="package-file-transfer-receiver" depends="compile-file-transfer-receiver">
+      <copy todir="${dir.project.file-transfer-receiver.assemble}/lib" flatten="true">
+         <fileset dir="${dir.project.file-transfer-receiver.lib}" includes="**/tomcat*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}">
+            <include name="org.springframework.aop-3.0.5.RELEASE.jar" />
+            <include name="org.springframework.asm-3.0.5.RELEASE.jar" />
+            <include name="org.springframework.beans-3.0.5.RELEASE.jar" />
+            <include name="org.springframework.context-3.0.5.RELEASE.jar" />
+            <include name="org.springframework.context.support-3.0.5.RELEASE.jar" />
+            <include name="org.springframework.core-3.0.5.RELEASE.jar" />
+            <include name="org.springframework.expression-3.0.5.RELEASE.jar" />
+            <include name="commons/commons-logging-1.1.1.jar" />
+            <include name="optional/log4j-1.2.15.jar" />
+            <include name="aopalliance.jar" />
+            <include name="json-simple-1.1.jar" />
+         </fileset>
+      </copy>
+
+      <copy todir="${dir.project.file-transfer-receiver.assemble}/classes" flatten="true">
+         <fileset dir="${dir.project.file-transfer-receiver.config}/launcher" /> 
+      </copy>
+
+      <manifestclasspath jarfile="${dir.project.file-transfer-receiver.assemble}/${file.name.jar.file-transfer-receiver}" 
+         property="ftr.manifest.classpath">
+         <classpath>
+            <pathelement location="${dir.project.file-transfer-receiver.assemble}/classes"/>
+            <fileset dir="${dir.project.file-transfer-receiver.assemble}/lib">
+               <include name="**/*.jar"/>
+            </fileset>      
+         </classpath>
+      </manifestclasspath>
+      
+      <jar destfile="${dir.project.file-transfer-receiver.assemble}/${file.name.jar.file-transfer-receiver}"> 
+         <fileset dir="${dir.project.file-transfer-receiver.classes}" 
+            includes="org/alfresco/repo/transfer/fsr/FileTransferMainEmbedded.class" />
+         <manifest>
+            <attribute name="Main-Class" value="org.alfresco.repo.transfer.fsr.FileTransferMainEmbedded" />
+               <attribute name="Class-Path" value="${ftr.manifest.classpath}" />
+         </manifest>
+         
+      </jar>
+      
+      <copy todir="${dir.project.file-transfer-receiver.build}/lib" flatten="true">
+         <fileset dir="${dir.project.3rdparty.lib}">
+            <patternset refid="ftr.libs.thirdparty.runtime" />
+         </fileset>
+      </copy>
+      
+      <war destfile="${dir.project.file-transfer-receiver.assemble}/webapps/${file.name.war.file-transfer-receiver}" 
+         webxml="${dir.project.file-transfer-receiver.websrc}/WEB-INF/web.xml">
+           <webinf dir="${dir.project.file-transfer-receiver.websrc}/WEB-INF" excludes="web.xml"/>
+         <lib dir="${dir.project.file-transfer-receiver.build}/lib" />
+         <lib dir="${dir.project.file-transfer-receiver.lib}" includes="**/derby*.jar" />
+         <lib dir="${dir.project.core.dist}" includes="${file.name.jar.core}" />
+         <lib dir="${dir.project.repository.dist}" includes="${file.name.jar.repository}" />
+         <lib dir="${dir.project.remoteapi.dist}" includes="${file.name.jar.remoteapi}" />
+         <lib dir="${dir.project.datamodel.dist}" includes="${file.name.jar.datamodel}" />
+         <classes dir="${dir.project.file-transfer-receiver.config}" >
+            <exclude name="launcher/**" />
+         </classes>
+         <classes dir="${dir.project.file-transfer-receiver.classes}" />
+      </war>
+      
+      <zip destfile="${dir.project.file-transfer-receiver.dist}/${file.name.zip.file-transfer-receiver}"
+         basedir="${dir.project.file-transfer-receiver.assemble}"
+         update="true"
+      />
+   </target>
+</project>
