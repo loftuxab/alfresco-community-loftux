@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/console</template-type>
+   <components>
+
+      <!-- Tools -->
+      <component>
+         <region-id>tools</region-id>
+         <url>/components/console/tools</url>
+      </component>
+
+      <!-- Uploaders -->
+      <component>
+         <region-id>html-upload</region-id>
+         <url>/components/upload/html-upload</url>
+      </component>
+      <component>
+         <region-id>flash-upload</region-id>
+         <url>/components/upload/flash-upload</url>
+      </component>
+      <component>
+         <region-id>file-upload</region-id>
+         <url>/components/upload/file-upload</url>
+      </component>
+   </components>
+</template-instance>
