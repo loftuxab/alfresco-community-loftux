@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- Configure a Twitter service provider -->
+    <bean id="social.connect.twitter" class="org.springframework.social.twitter.connect.TwitterServiceProvider">
+        <constructor-arg value="${twitter.consumerKey}" />
+        <constructor-arg value="${twitter.consumerSecret}" />
+    </bean>
+
+    <!-- Configure a Facebook service provider -->
+    <bean id="social.connect.facebook" class="org.springframework.social.facebook.connect.FacebookServiceProvider">
+        <constructor-arg value="${facebook.appId}" />
+        <constructor-arg value="${facebook.appSecret}" />
+    </bean>
+
+</beans>
