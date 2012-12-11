@@ -1,0 +1,78 @@
+.about-share .hd
+{
+   display: none;
+}
+
+.about-share .logo
+{
+   width: 501px;
+   height: 249px;
+   background-position: 0 1px;
+   background-repeat: no-repeat;
+}
+
+.about-share .logo-com
+{
+   background-image: url('images/about-bg.png');
+}
+
+.about-share .logo-team
+{
+   background-image: url('images/about-bg-team.png');
+}
+
+.about-share .logo-ent
+{
+   background-image: url('images/about-bg-enterprise.png');
+}
+
+.about-share .about
+{
+   color: #666;
+   padding-left: 12px;
+   padding-top: 48px;
+}
+
+.about-share .header
+{
+   font-size: 131%;
+   padding-top: 8px;
+}
+
+.about-share .copy
+{
+   color: #000;
+   padding-left: 0;
+   font-size: 77%;
+}
+
+.about-share .contributions-bg
+{
+   background: url('../components/images/about-gradient.png') no-repeat scroll 0 0;
+   position: absolute;
+   height: 70px;
+   width: 345px;
+   z-index: 1;
+}
+
+.about-share .contributions-wrapper
+{
+   color: #333;
+   font-size: 85%;
+   height: 70px;
+   overflow: hidden;
+}
+
+.about-share .contributions
+{
+   margin-top: 70px;
+   padding-bottom: 70px;
+   display: none;
+   position: relative;
+   padding-left: 2px;
+}
+
+.about-share
+{
+   box-shadow: 0 0 16px 4px #444;
+}

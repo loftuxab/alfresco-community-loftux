@@ -1,0 +1,30 @@
+<#include "include/alfresco-template.ftl" />
+<@templateHeader>
+   <!-- General Blog Assets -->
+   <@script type="text/javascript" src="${url.context}/res/components/blog/blogdiscussions-common.js"></@script>
+   <@script type="text/javascript" src="${url.context}/res/components/blog/blog-common.js"></@script>
+   <@templateHtmlEditorAssets />
+</@>
+
+<@templateBody>
+   <@markup id="alf-hd">
+   <div id="alf-hd">
+      <@region id="header" scope="global" />
+      <@region id="title" scope="template" />
+      <@region id="navigation" scope="template" />
+   </div>
+   </@>
+   <@markup id="bd">
+   <div id="bd">
+      <@region id="postedit" scope="template" />
+   </div>
+   </@>
+</@>
+
+<@templateFooter>
+   <@markup id="alf-ft">
+   <div id="alf-ft">
+      <@region id="footer" scope="global" />
+   </div>
+   </@>
+</@>
