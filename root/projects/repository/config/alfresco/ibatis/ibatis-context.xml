@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<!--
+    Beans common to iBatis infrastructure
+-->
+<beans>
+
+    <!-- Hierarchical Resource Loader -->
+    <bean id="dialectResourceLoader" class="org.alfresco.util.resource.HierarchicalResourceLoader">
+        <property name="dialectBaseClass">
+            <value>org.hibernate.dialect.Dialect</value>
+        </property>
+        <!--  Resolve the (perhaps auto detected) dialect class -->
+        <property name="dialectClass">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="dialect" />
+                <property name="propertyPath" value="class.name" />
+            </bean>
+        </property>
+    </bean>
+        
+    <!-- Activities -->
+    <bean id="activitiesSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+    <!-- MyBatis config for Alfresco (using common datasource) -->
+    <bean id="repoSqlSessionFactory" class="org.alfresco.ibatis.HierarchicalSqlSessionFactoryBean">
+        <property name="useLocalCaches" value="${mybatis.useLocalCaches}"/>
+        <property name="resourceLoader" ref="dialectResourceLoader"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation">
+            <value>classpath:alfresco/ibatis/alfresco-SqlMapConfig.xml</value>
+        </property>
+    </bean>
+    
+    
+    
+    <bean id="avmSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+    <bean id="repoSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+    <bean id="contentSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+    <bean id="locksSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+    <bean id="propertyValueSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+    <bean id="solrSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+    <bean id="auditSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
+    </bean>
+    
+</beans>

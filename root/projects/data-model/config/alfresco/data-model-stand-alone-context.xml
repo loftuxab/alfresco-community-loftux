@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<!--  ================================================================== -->
+<!--  = This context is only used to run DataModel specific tests      = -->
+<!--  = It is not, and must not, be included in the repository context = -->
+<!--  ================================================================== -->
+
+<!-- Core and miscellaneous bean definitions -->
+<beans>
+
+
+    
+  
+
+
+    <!--                        -->
+    <!-- I18N                   -->
+    <!--                        -->
+
+    <bean id="resourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.messages.dictionary-messages</value>
+            </list>
+        </property>
+    </bean> 
+
+    <!--                 -->
+    <!-- Data Dictionary -->
+    <!--                 -->
+
+    <!-- Constraint Registry -->
+    <bean id="cm:constraintRegistry" class="org.alfresco.repo.dictionary.constraint.ConstraintRegistry" />
+
+    <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.NamespaceDAOImpl">
+        <property name="tenantService">
+            <ref bean="tenantService"/>
+        </property>
+        <property name="namespaceRegistryCache">
+            <ref bean="prefixesCache"/>
+        </property>
+    </bean>
+
+    <bean name="prefixesCache" class="org.alfresco.repo.cache.MemoryCache" />
+
+    <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.DictionaryDAOImpl">
+        <constructor-arg index="0">
+            <ref bean="namespaceDAO" />
+        </constructor-arg>
+        <property name="tenantService">
+            <ref bean="tenantService"/>
+        </property>
+        <property name="dictionaryRegistryCache">
+            <ref bean="compiledModelsCache"/>
+        </property>
+        <property name="defaultAnalyserResourceBundleName">
+            <value>alfresco/model/dataTypeAnalyzers</value>
+        </property>
+    </bean>
+    
+    <bean name="compiledModelsCache" class="org.alfresco.repo.cache.MemoryCache" /> 
+ 
+    <bean name="messageLookup" class="org.alfresco.repo.i18n.StaticMessageLookup" /> 
+
+    <bean id="dictionaryService" class="org.alfresco.repo.dictionary.DictionaryComponent" depends-on="dictionaryBootstrap">
+        <property name="dictionaryDAO">
+            <ref bean="dictionaryDAO" />
+        </property>
+        <property name="messageLookup">
+            <ref bean="messageLookup" />
+        </property>
+    </bean>
+
+    <bean id="namespaceService" class="org.alfresco.repo.dictionary.DictionaryNamespaceComponent"
+        depends-on="dictionaryDAO">
+        <property name="namespaceDAO">
+            <ref bean="namespaceDAO" />
+        </property>
+    </bean>
+
+    <bean id="dictionaryModelBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap" abstract="true">
+        <property name="dictionaryDAO"><ref local="dictionaryDAO"/></property>
+        <property name="tenantService">
+            <ref bean="tenantService"/>
+        </property>
+    </bean>
+
+    <bean id="dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="resourceBundles">
+        <property name="models">
+            <list>
+                <!-- System models  -->
+                <value>alfresco/model/dictionaryModel.xml</value>
+            </list>
+        </property>
+        <property name="labels">
+            <list>
+                <value>alfresco/messages/dictionary-model</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="tenantService" class="org.alfresco.repo.tenant.SingleTServiceImpl" />
+
+    <!-- Characterset decoder -->
+    <bean id="charset.finder" class="org.alfresco.repo.content.encoding.ContentCharsetFinder">
+      <property name="defaultCharset">
+         <value>UTF-8</value>
+      </property>
+      <property name="mimetypeService">
+         <ref bean="mimetypeService"/>
+      </property>
+      <property name="charactersetFinders">
+         <list>
+            <bean class="org.alfresco.encoding.GuessEncodingCharsetFinder" />
+            <bean class="org.alfresco.encoding.TikaCharsetFinder" />
+         </list>
+      </property>
+    </bean>
+
+    <bean id="mimetypeService" class="org.alfresco.repo.content.MimetypeMap" init-method="init" >
+      <property name="configService">
+         <ref bean="mimetypeConfigService" />
+      </property>
+      <property name="contentCharsetFinder">
+         <ref bean="charset.finder"/>
+      </property>
+    </bean>  
+    
+    <bean id="mimetypeConfigService" class="org.springframework.extensions.config.xml.XMLConfigService" init-method="init">
+        <constructor-arg>
+            <bean class="org.springframework.extensions.config.source.UrlConfigSource">
+                <constructor-arg>
+                    <list>
+                        <value>classpath:alfresco/mimetype/mimetype-map.xml</value>
+                        <value>classpath:alfresco/mimetype/mimetype-map-openoffice.xml</value>
+                    </list>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+    </bean>
+    
+    <!--                      -->
+    <!-- CMIS Data Dictionary -->
+    <!--                      -->
+    
+    <bean id="OpenCMISDictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+        <property name="models">
+            <list>
+                <value>alfresco/model/cmisModel.xml</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="OpenCMISPropertyLuceneBuilderMapping" class="org.alfresco.opencmis.mapping.RuntimePropertyLuceneBuilderMapping" >
+        <property name="dictionaryService"         ref="dictionaryService" />
+        <property name="cmisDictionaryService"     ref="OpenCMISDictionaryService" />
+    </bean>
+    
+    <bean name="immutableSingletonCache" class="org.alfresco.repo.cache.MemoryCache" />
+    
+    <bean id="OpenCMISDictionaryService" class="org.alfresco.opencmis.dictionary.CMISStrictDictionaryService" >
+        <property name="cmisMapping"                  ref="OpenCMISMapping" />
+        <property name="dictionaryService"            ref="dictionaryService" />
+        <property name="dictionaryDAO"                ref="dictionaryDAO" />
+        <property name="singletonCache"               ref="immutableSingletonCache"/>
+        <property name="propertyLuceneBuilderMapping" ref="OpenCMISPropertyLuceneBuilderMapping" />
+        <!-- NOTE: The stand-alone dictionary service does not require the runtime access to property values
+             <property name="propertyAccessorMapping"      ref="OpenCMISPropertyAccessorMapping" /> -->
+    </bean>
+
+    <bean id="OpenCMISMapping" class="org.alfresco.opencmis.mapping.CMISMapping" >
+        <property name="cmisVersion"            value="CMIS_1_0" />
+        <property name="dictionaryService"      ref="dictionaryService" />
+        <property name="namespaceService"       ref="namespaceService" />
+    </bean>
+    
+</beans>
