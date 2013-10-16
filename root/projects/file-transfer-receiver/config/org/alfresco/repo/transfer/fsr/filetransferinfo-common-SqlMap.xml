@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.filetransferinfo">
+
+    <!--                -->
+    <!-- Result Maps    -->
+    <!--                -->
+
+    <resultMap id="result_FileTransferInfo" type="FileTransferInfo">
+        <result property="id" column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="nodeRef" column="nodeRef" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="parent" column="parent" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="path" column="path" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="contentName" column="contentName" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="contentUrl" column="contentUrl" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="folder" column="isFolder" jdbcType="BOOLEAN" javaType="boolean"/>
+        <result property="sourceRepoId" column="sourceRepoId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+
+    <resultMap id="result_FileTransferNodeRename" type="FileTransferNodeRename">
+        <result property="id" column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="renamedNodeRef" column="renamedNodeRef" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="transferId" column="transferId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="newName" column="newName" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+
+
+    <!--                -->
+    <!-- Parameter Maps -->
+    <!--                -->
+
+    <parameterMap id="parameter_FileTransferInfoId" type="FileTransferInfo">
+        <parameter property="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+
+    <parameterMap id="parameter_FileTransferInfoNodeRef" type="FileTransferInfo">
+        <parameter property="nodeRef" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </parameterMap>
+
+    <parameterMap id="parameter_ParentAndPath" type="FileTransferInfo">
+        <parameter property="parent" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <parameter property="path" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </parameterMap>
+
+    <parameterMap id="parameter_FileTransferNodeRenameTransferId" type="FileTransferNodeRename">
+        <parameter property="transferId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </parameterMap>
+
+    <parameterMap id="parameter_NodeRenameTransferIdAndNodeRef" type="FileTransferNodeRename">
+        <parameter property="transferId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <parameter property="renamedNodeRef" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </parameterMap>
+
+    <!-- parameterMap id="parameter_FileTransferNodeRenameTransferId" type="FileTransferNodeRename">
+        <parameter property="transferId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </parameterMap -->
+
+
+
+    <!--                -->
+    <!-- SQL Snippets   -->
+    <!--                -->
+
+    <sql id="insert_FileTransferInfo_AutoIncrement">
+        insert into alf_file_transfer_info (nodeRef, parent, path, contentName, contentUrl, isFolder, sourceRepoId)
+        values (#{nodeRef}, #{parent}, #{path}, #{contentName},#{contentUrl}, #{folder}, #{sourceRepoId})
+    </sql>
+
+    <sql id="insert_FileTransferNodeRename_AutoIncrement">
+        insert into alf_node_rename_info (renamedNodeRef, transferId, newName)
+        values (#{renamedNodeRef}, #{transferId}, #{newName})
+    </sql>
+
+
+    <!--                -->
+    <!-- Statements     -->
+    <!--                -->
+
+
+    <select id="select_FileTransferInfoByNodeRef" parameterMap="parameter_FileTransferInfoNodeRef" resultMap="result_FileTransferInfo">
+        select
+            *
+        from
+            alf_file_transfer_info
+        where
+            nodeRef = ?
+    </select>
+
+    <select id="select_FileTransferInfoByParentNodeRef" parameterMap="parameter_FileTransferInfoNodeRef" resultMap="result_FileTransferInfo">
+        select
+            *
+        from
+            alf_file_transfer_info
+        where
+            parent = ?
+    </select>
+
+    <update id="update_FileTransferInfoByNodeRef" parameterType="FileTransferInfo">
+       update
+           alf_file_transfer_info
+       set
+           parent = #{parent},
+           path = #{path},
+           contentName = #{contentName},
+           contentUrl = #{contentUrl},
+           isFolder = #{folder},
+           sourceRepoId = #{sourceRepoId}
+       where
+           nodeRef = #{nodeRef}
+    </update>
+
+    <update id="update_PathByParent" parameterMap="parameter_ParentAndPath">
+       update
+           alf_file_transfer_info
+       set
+           path = #{path}
+       where
+           parent = #{parent}
+    </update>
+
+    <delete id="delete_FileTransferInfoByNodeRef" parameterMap="parameter_FileTransferInfoNodeRef">
+        delete
+        from
+            alf_file_transfer_info
+        where
+            nodeRef = ?
+    </delete>
+
+    <delete id="delete_FileTransferNodeRenameByTransferId" parameterMap="parameter_NodeRenameTransferIdAndNodeRef">
+        delete
+        from
+            alf_node_rename_info
+        where
+            transferId = ? AND renamedNodeRef = ?
+    </delete>
+
+    <select id="select_FileTransferRenameByTransferId" parameterMap="parameter_FileTransferNodeRenameTransferId" resultMap="result_FileTransferNodeRename">
+        select
+            *
+        from
+            alf_node_rename_info
+        where
+            transferId = ?
+    </select>
+
+</mapper>

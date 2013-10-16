@@ -1,0 +1,10 @@
+<alfresco-config>
+
+   <config evaluator="string-compare" condition="HelpPages">
+      <help-pages>
+         <share-help>http://docs.alfresco.com/community/topic/com.alfresco.community.doc/concepts/sh-uh-welcome.html</share-help>
+         <share-tutorial>http://docs.alfresco.com/community/topic/com.alfresco.community.doc/topics/alfresco-video-tutorials.html</share-tutorial>
+      </help-pages>
+   </config>
+
+</alfresco-config>

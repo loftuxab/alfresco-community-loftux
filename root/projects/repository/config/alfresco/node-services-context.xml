@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<!-- Beans pertinent to node persistence and services -->
+<beans>
+
+   <bean id="mlPropertyInterceptor" class="org.alfresco.repo.node.MLPropertyInterceptor">
+      <property name="nodeService">
+         <ref bean="mlAwareNodeService" />
+      </property>
+      <property name="multilingualContentService">
+         <ref bean="multilingualContentService" />
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService" />
+      </property>
+   </bean>
+
+   <bean id="nodeRefPropertyInterceptor" class="org.alfresco.repo.node.NodeRefPropertyMethodInterceptor" init-method="init">
+      <property name="nodeService">
+         <ref bean="mlAwareNodeService" />
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService" />
+      </property>
+   </bean>
+
+   <bean id="multiTNodeServiceInterceptor" class="org.alfresco.repo.tenant.MultiTNodeServiceInterceptor">
+      <property name="tenantService">
+         <ref bean="tenantService" />
+      </property>
+   </bean>
+
+   <bean id="nodeService" class="org.springframework.aop.framework.ProxyFactoryBean" >
+      <!-- Lazy init to avoid circular dependencies -->
+      <property name="targetSource">
+         <bean class="org.alfresco.config.NonBlockingLazyInitTargetSource">
+            <property name="targetBeanName">
+               <idref bean="_nodeService" />
+            </property>
+         </bean>
+      </property> 
+      <property name="proxyInterfaces">
+         <list>
+            <value>org.alfresco.service.cmr.repository.NodeService</value>
+         </list>
+      </property>
+   </bean>
+
+   <bean id="_nodeService" class="org.springframework.aop.framework.ProxyFactoryBean" >
+      <property name="targetName">
+         <value>mlAwareNodeService</value>
+      </property>
+      <property name="proxyInterfaces">
+         <list>
+            <value>org.alfresco.service.cmr.repository.NodeService</value>
+         </list>
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <value>nodeRefPropertyInterceptor</value>
+            <value>lockableAspectInterceptor</value>
+            <value>mlPropertyInterceptor</value>
+            <value>tagscopeSummaryPropertyInterceptor</value> 
+         </list>
+      </property>
+   </bean>
+
+   <bean id="mlAwareNodeService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
+      <property name="proxyInterface">
+         <value>org.alfresco.service.cmr.repository.NodeService</value>
+      </property>
+      <property name="defaultBinding">
+         <ref bean="mtAwareNodeService"></ref>
+      </property>
+      <property name="redirectedProtocolBindings">
+         <map>
+            <entry key="workspace"><ref bean="mtAwareNodeService"></ref></entry>
+            <entry key="versionStore"><ref bean="versionNodeService"></ref></entry>
+            <entry key="avm"><ref bean="avmNodeService"/></entry>
+         </map>
+      </property>
+   </bean>
+   
+   <bean id="mtAwareNodeService" class="org.springframework.aop.framework.ProxyFactoryBean" >
+      <property name="targetName">
+         <value>dbNodeService</value>
+      </property>
+      <property name="proxyInterfaces">
+         <list>
+            <value>org.alfresco.service.cmr.repository.NodeService</value>
+         </list>
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <value>multiTNodeServiceInterceptor</value>
+         </list>
+      </property>
+   </bean>
+
+   <!-- Map stores to archive stores -->
+   <bean id="storeArchiveMap" class="org.alfresco.repo.node.StoreArchiveMap">
+      <property name="archiveMap">
+         <map>
+            <entry key="workspace://SpacesStore"><value>${spaces.archive.store}</value></entry>
+         </map>
+      </property>
+      <property name="tenantService">
+         <ref bean="tenantService" />
+      </property>
+   </bean>
+
+   <!-- Wrapper component to handle restore and purge of archived nodes -->
+   <bean id="nodeArchiveService" class="org.alfresco.repo.node.archive.NodeArchiveServiceImpl" >
+      <property name="nodeService">
+         <ref bean="NodeService"/>
+      </property>
+      <property name="permissionService">
+         <ref bean="permissionService"/>
+      </property>
+      <property name="transactionService">
+         <ref bean="transactionService"/>
+      </property>
+      <property name="jobLockService">
+         <ref bean="jobLockService"/>
+      </property>
+      <property name="cannedQueryRegistry">
+         <ref bean="archivedNodesCannedQueryRegistry"/>
+      </property>
+   </bean>
+   
+   <!-- Archived Nodes -->    
+   <bean id="archivedNodesCannedQueryRegistry" class="org.alfresco.util.registry.NamedObjectRegistry">
+        <property name="storageType" value="org.alfresco.query.CannedQueryFactory"/>
+   </bean>    
+   <bean name="archivedNodesCannedQueryFactory" class="org.alfresco.repo.node.archive.GetArchivedNodesCannedQueryFactory">
+        <property name="registry" ref="archivedNodesCannedQueryRegistry"/>
+        <property name="authorityService" ref="authorityService"/>
+        <property name="tenantService" ref="tenantService"/>
+        <property name="nodeDAO" ref="nodeDAO"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="qnameDAO" ref="qnameDAO"/>
+        <property name="cannedQueryDAO" ref="cannedQueryDAO"/>
+        <property name="methodSecurity" ref="ArchivedNodes_security_listArchivedNodes"/>
+   </bean>  
+
+   <!-- AVMNodeService -->
+   <bean id="avmNodeService" class="org.alfresco.repo.avm.AVMNodeService" init-method="init">
+      <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
+      </property>
+      <property name="avmService">
+         <ref bean="avmService"/>
+      </property>
+      <property name="policyComponent">
+         <ref bean="policyComponent"/>
+      </property>
+      <property name="tenantService">
+         <ref bean="tenantService"/>
+      </property>
+   </bean>
+
+   <!-- ensures model-compliance of node structures -->
+   <bean id="integrityChecker" class="org.alfresco.repo.node.integrity.IntegrityChecker" init-method="init">
+      <property name="policyComponent" ref="policyComponent"/>
+      <property name="dictionaryService" ref="dictionaryService" />
+      <property name="nodeService" ref="nodeService" />
+      <property name="tenantService" ref="tenantService" />
+      <property name="enabled" value="${system.integrity.enabled}" />
+      <property name="traceOn" value="${system.integrity.trace}" />
+      <property name="failOnViolation" value="${system.integrity.failOnViolation}" />
+      <property name="maxErrorsPerTransaction" value="5" />
+      <property name="storesToIgnore">
+         <list>
+            <value>${version.store.version2Store}</value>
+            <!--  <value>${version.store.deprecated.lightWeightVersionStore}</value> -->
+         </list>
+      </property>
+   </bean>
+
+   <!-- tags nodes that are incomplete w.r.t. properties-->
+   <bean id="incompleteNodeTagger" class="org.alfresco.repo.node.integrity.IncompleteNodeTagger" init-method="init">
+      <property name="policyComponent">
+         <ref bean="policyComponent"/>
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService" />
+      </property>
+      <property name="nodeService">
+         <ref bean="nodeService" />
+      </property>
+      <property name="storesToIgnore">
+         <list>
+            <value>${version.store.version2Store}</value>
+         </list>
+      </property>
+      <property name="propertiesToIgnore">
+         <list>
+            <value>{http://www.alfresco.org/model/content/1.0}source</value>
+         </list>
+      </property>	  
+   </bean>
+
+   <!-- Node cleanup -->
+   <bean id="nodeCleanupRegistry" class="org.alfresco.repo.node.cleanup.NodeCleanupRegistry" />
+   <bean id="nodeCleanupBase" abstract="true" init-method="register">
+      <property name="registry">
+         <ref bean="nodeCleanupRegistry" />
+      </property>
+      <property name="transactionService">
+         <ref bean="transactionService" />
+      </property>
+      <property name="jobLockService">
+         <ref bean="jobLockService" />
+      </property>
+      <property name="dbNodeService">
+         <ref bean="dbNodeService" />
+      </property>
+      <property name="nodeDAO">
+         <ref bean="nodeDAO" />
+      </property>
+   </bean>
+   <bean id="nodeCleanup.deletedNodeCleanup"
+         class="org.alfresco.repo.node.db.DeletedNodeCleanupWorker"
+         parent="nodeCleanupBase">
+      <property name="minPurgeAgeDays">
+         <value>${index.tracking.minRecordPurgeAgeDays}</value>
+      </property>
+      <property name="purgeSize">
+         <value>${index.tracking.purgeSize}</value>
+      </property>
+   </bean>
+
+   <bean id="storesToIgnorePolicies" class="org.springframework.beans.factory.config.SetFactoryBean">
+      <property name="sourceSet">
+         <set>
+            <value>${spaces.archive.store}</value>
+            <value>${version.store.version2Store}</value>
+         </set>
+      </property>   
+   </bean>
+
+   <alias name="dbNodeService" alias="dbNodeServiceImpl" />
+   <bean id="dbNodeService" class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
+      <property name="dictionaryService" ref="dictionaryService" />
+      <property name="transactionService" ref="transactionService" />
+      <property name="qnameDAO" ref="qnameDAO" />
+      <property name="nodeDAO" ref="nodeDAO" />
+      <property name="permissionService" ref="permissionServiceImpl" />
+      <property name="policyComponent" ref="policyComponent"/>
+      <property name="storeArchiveMap" ref="storeArchiveMap"/>
+      <property name="avmNodeService" ref="avmNodeService"/>
+      <property name="nodeIndexer" ref="nodeIndexer"/>
+      <property name="policyBehaviourFilter" ref="policyBehaviourFilter" />
+      <property name="tenantService" ref="tenantService"/>
+      <property name="storesToIgnorePolicies">
+         <ref bean="storesToIgnorePolicies"/>
+      </property>
+      <property name="enableTimestampPropagation" value="${system.enableTimestampPropagation}" />
+   </bean>
+   
+   <bean id="nodeAuditor" class="org.alfresco.repo.node.NodeAuditor">
+      <property name="policyComponent">
+         <ref bean="policyComponent"/>
+      </property>
+      <property name="auditComponent">
+         <ref bean="auditComponent"/>
+      </property>
+   </bean>
+   
+    <!-- The undeletable aspect -->
+    <bean id="undeletableAspect" class="org.alfresco.repo.node.UndeletableAspect" init-method="init">
+        <property name="nodeService" ref="NodeService"/>
+        <property name="policyComponent" ref="policyComponent"/>
+    </bean>
+
+    <!-- Encryptor for node properties -->
+    <bean id="metadataEncryptor" class="org.alfresco.repo.node.encryption.MetadataEncryptor">
+        <property name="dictionaryService" ref="dictionaryService" />
+        <property name="encryptor" ref="encryptor" />
+    </bean>
+
+    <bean id="reEncryptor" class="org.alfresco.encryption.ReEncryptor">
+        <property name="chunkSize" value="${encryption.reencryptor.chunkSize}"/>
+        <property name="numThreads" value="${encryption.reencryptor.numThreads}"/>
+        <!--
+        <property name="backupKeyProvider" ref="backupKeyProvider"/>
+        <property name="keyProvider" ref="keyProvider"/>
+        -->
+        <property name="transactionService" ref="transactionService"/>
+        <property name="nodeDAO" ref="nodeDAO"/>
+        <property name="dictionaryDAO" ref="dictionaryDAO"/>
+        <property name="qnameDAO" ref="qnameDAO"/>
+        <property name="metadataEncryptor" ref="metadataEncryptor"/>
+        <property name="jobLockService" ref="jobLockService"/>
+    </bean>
+       
+</beans>
