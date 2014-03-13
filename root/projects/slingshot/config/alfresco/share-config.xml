@@ -1,0 +1,335 @@
+<alfresco-config>
+
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="kerberos" class="org.alfresco.web.site.servlet.config.KerberosConfigElementReader"/>
+         <element-reader element-name="header" class="org.alfresco.web.config.header.HeaderElementReader"/>
+      </element-readers>
+   </plug-ins>
+
+   <!-- Global config section -->
+   <config>
+      <flags>
+         <!--
+            Developer debugging setting to turn on DEBUG mode for client scripts in the browser
+         -->
+         <client-debug>false</client-debug>
+         <!--
+            LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift).
+            This flag automatically activates logging on page load.
+         -->
+         <client-debug-autologging>false</client-debug-autologging>
+      </flags>
+      
+      <header>
+      
+         <!-- The number of sites to display in the recent history group of the sites menu -->
+         <max-recent-sites>5</max-recent-sites>
+         
+         <!--  The number of sites page links (e.g. "Dashboard", "Document Library", "Calendar", etc
+               that will be displayed on any site page for navigation. All other site pages will be
+               displayed under a "More" drop down menu. The current site page will always be displayed -->
+         <max-displayed-site-pages>3</max-displayed-site-pages>
+         
+         <!-- This indicates whether or not to use the configuration defined in this "header" element for rendering
+              the header menu bar. If this is set to "false" or it not defined then the header bar will be rendered
+              using the design implemented for 4.2 Enterprise. The header definition can be found in the associated
+              WebScript controller.
+         -->
+         <legacy-mode-enabled>false</legacy-mode-enabled>
+
+         <!-- This is the configuration that will be used to populate the header menu bar when "legacy-mode-enabled"
+              has been set to true -->
+         <app-items>
+            <!-- defaults: icon="{id}.png" label="header.{id}.label" description="header.{id}.description" -->
+            <item type="link" id="my-dashboard">{userdashboardpage}</item>
+            <item type="js" id="sites">Alfresco.module.Sites</item>
+            <item type="link" id="people">/people-finder</item>
+            <item type="link" id="repository" condition="conditionRepositoryRootNode">/repository</item>
+            <item type="container" id="more">
+               <container-group id="my">
+                  <item type="link" id="my-tasks">/my-tasks#filter=workflows|active</item>
+                  <item type="link" id="my-workflows">/my-workflows#filter=workflows|active</item>
+                  <item type="link" id="my-content">/user/user-content</item>
+                  <item type="link" id="my-sites">/user/user-sites</item>
+                  <item type="link" id="my-profile">{userprofilepage}</item>
+               </container-group>
+               <container-group id="tools" permission="admin">
+                  <item type="link" id="application">/console/admin-console/application</item>
+                  <item type="link" id="groups">/console/admin-console/groups</item>
+                  <item type="link" id="replication-jobs" condition="!conditionEditionTeam">/console/admin-console/replication-jobs</item>
+                  <item type="link" id="repository">/console/admin-console/repository</item>
+                  <item type="link" id="trashcan">/console/admin-console/trashcan</item>
+                  <item type="link" id="users">/console/admin-console/users</item>
+                  <item type="link" id="more">/console/admin-console/</item>
+               </container-group>
+            </item>
+         </app-items>
+         <user-items>
+            <item type="container" id="user" icon="" description="">
+               <container-group id="usermenu" label="">
+                  <item type="user" id="status">{userprofilepage}</item>
+                  <item type="link" id="my-profile">{userprofilepage}</item>
+                  <item type="link" id="change-password" condition="user.capabilities.isMutable">/user/change-password</item>
+                  <item type="external-link" id="help">{share-help}</item>
+                  <item type="link" id="logout" condition="!context.externalAuthentication">/dologout</item>
+               </container-group>
+            </item>
+         </user-items>
+         <dependencies>
+            <css src="/modules/create-site.css" />
+            <css src="/modules/header/sites.css" />
+            <js src="/modules/create-site.js" />
+            <js src="/modules/header/sites.js" />
+         </dependencies>
+      </header>
+   </config>
+
+   <config evaluator="string-compare" condition="WebFramework">
+      <web-framework>
+         <module-deployment>
+            <!-- Allow extension modules with <auto-deploy> set to true to be automatically deployed -->
+            <mode>manual</mode>
+            <enable-auto-deploy-modules>true</enable-auto-deploy-modules>
+         </module-deployment>
+         <use-checksum-dependencies>true</use-checksum-dependencies>
+         <generate-css-data-images>true</generate-css-data-images>
+      </web-framework>
+   </config>
+
+   <config evaluator="string-compare" condition="Edition">
+      <!-- footer logo and copyright text -->
+      <footer>
+         <logo>alfresco-share-logo.png</logo>
+         <alt-text>Alfresco Share</alt-text>
+         <css-class>footer-com</css-class>
+         <label>label.copyright</label>
+      </footer>
+      <about>
+         <css-class>logo-com</css-class>
+      </about>
+   </config>
+
+   <config evaluator="string-compare" condition="UriTemplate">
+      <!-- list of URI based page Id templates used by Share -->
+      <!-- when pages are requested from the framework, matches are attempted
+           against each uri-template, and the token values returned if matched -->
+      <uri-templates>
+
+         <!--  This is intended for use with remotely created pages -->
+         <uri-template id="remote-site-page">/site/{site}/{pageid}/p/{pagename}</uri-template>
+         <uri-template id="remote-page">/{pageid}/p/{pagename}</uri-template>
+
+         <!-- This needs to go BEFORE "sitepage" -->
+         <uri-template id="share-site-page">/site/{site}/{pageid}/ws/{webscript}</uri-template>
+         
+         <uri-template id="sitedashboardpage">/site/{site}/dashboard</uri-template>
+         <uri-template id="contextpage">/context/{pagecontext}/{pageid}</uri-template>
+         <uri-template id="sitepage">/site/{site}/{pageid}</uri-template>
+         <uri-template id="userdashboardpage">/user/{userid}/dashboard</uri-template>
+         <uri-template id="userpage">/user/{userid}/{pageid}</uri-template>
+         <uri-template id="userprofilepage">/user/{userid}/profile</uri-template>
+         <uri-template id="userdefaultpage">/user/{pageid}</uri-template>
+         <uri-template id="consoletoolpage">/console/{pageid}/{toolid}</uri-template>
+         <uri-template id="consolepage">/console/{pageid}</uri-template>
+         <uri-template id="share-page">/{pageid}/ws/{webscript}</uri-template>
+         
+      </uri-templates>
+   </config>
+
+   <config evaluator="string-compare" condition="SitePages">
+      <pages>
+         <page id="calendar">calendar</page>
+         <page id="wiki-page">wiki-page?title=Main_Page</page>
+         <page id="documentlibrary">documentlibrary</page>
+         <page id="discussions-topiclist">discussions-topiclist</page>
+         <page id="blog-postlist">blog-postlist</page>
+         <page id="links">links</page>
+         <page id="data-lists">data-lists</page>
+      </pages>
+   </config>
+
+   <config evaluator="string-compare" condition="Users">
+      <users>
+         <!-- minimum length for username and password -->
+         <username-min-length>2</username-min-length>
+         <password-min-length>3</password-min-length>
+      </users>
+   </config>
+
+   <config evaluator="string-compare" condition="Dashboard">
+      <dashboard>
+         <!-- The suggested maximum list size for summary dashlets on the dashboards.
+              If dashlets have been configured to use this value then they will restrict list sizes -->
+         <summary-list-size>100</summary-list-size>
+      </dashboard>
+   </config>
+
+   
+   <config evaluator="string-compare" condition="Console">
+      <groups>
+         <!-- maximum number of groups & users to return in the column browser for each page -->
+         <max-page-size>50</max-page-size>
+      </groups>
+   </config>
+
+   <config evaluator="string-compare" condition="Search">
+      <search>
+         <!-- default minimum length for search terms -->
+         <min-search-term-length>1</min-search-term-length>
+         
+         <!-- default maximum number of results for a search -->
+         <max-search-results>250</max-search-results>
+         
+         <!-- Repository search configuration option -->
+         <!-- 
+              The 'repository-search' config element value can be one of:
+              none - disable repository wide search option
+              context - search depending on current context, including repository, all sites, current site (default)
+              always - always search full repository no matter what the context, disables search context options
+         -->
+         <repository-search>context</repository-search>
+      </search>
+      
+      <!-- sorting fields and labels -->
+      <!--
+         The 'sort' config element contains the name of the content model field
+         to sort against and can be of the form:
+          . Short QName string e.g. "cm:name"
+          . Pseudo cm:content field starting with a "." e.g. ".size"
+          . Any other valid sortable fts-alfresco special field e.g. "TYPE"
+         The field can be optionally followed by |true or |false to indicate sort direction,
+         where true = ascending, false = descending
+         
+         The element supports the following optional attributes:
+            label = label text to display
+            labelId = I18N message id of label text to display
+      -->
+      <sorting>
+         <sort labelId="search.sort.relevance"></sort>
+         <sort labelId="label.name">cm:name</sort>
+         <sort labelId="label.title">cm:title</sort>
+         <sort labelId="label.description">cm:description</sort>
+         <sort labelId="label.author">cm:author</sort>
+         <sort labelId="label.modifier">cm:modifier</sort>
+         <sort labelId="label.modified">cm:modified|false</sort>
+         <sort labelId="label.creator">cm:creator</sort>
+         <sort labelId="label.created">cm:created|false</sort>
+         <sort labelId="search.sort.size">.size|true</sort>
+         <sort labelId="search.sort.mimetype">.mimetype</sort>
+         <sort labelId="search.sort.type">TYPE</sort>
+      </sorting>
+   </config>
+   
+   <config evaluator="string-compare" condition="AdvancedSearch">
+      <advanced-search>
+         <!-- Forms for the advanced search type list -->
+         <forms>
+            <!--
+               The 'form' config element contains the name of the model type
+               of the form to display.
+               
+               The element supports the following optional attributes:
+                  id = form id, the id of "search" will be assumed if not set
+                  label = label text to display - defaults to model type if not set
+                  labelId = I18N message id of label text to display
+                  description = description text to display
+                  descriptionId = I18N message id of description text to display
+            -->
+            <form labelId="search.form.label.cm_content" descriptionId="search.form.desc.cm_content">cm:content</form>
+            <form labelId="search.form.label.cm_folder" descriptionId="search.form.desc.cm_folder">cm:folder</form>
+         </forms>
+      </advanced-search>
+   </config>
+
+   <config evaluator="string-compare" condition="Replication">
+      <share-urls>
+         <!--
+            To discover a Repository Id, browse to the remote server's CMIS landing page at:
+              http://{server}:{port}/alfresco/service/cmis/index.html
+            The Repository Id field is found under the "CMIS Repository Information" expandable panel.
+
+            Example config entry:
+              <share-url repositoryId="622f9533-2a1e-48fe-af4e-ee9e41667ea4">http://new-york-office/share/</share-url>
+         -->
+      </share-urls>
+   </config>
+
+   <!-- Workflow config section -->
+   <config evaluator="string-compare" condition="Workflow">
+      <!-- A list of workflow definitions that are NOT displayed in Share -->
+      <hidden-workflows>
+         <!-- Hide all WCM related workflows -->
+         <workflow name="jbpm$wcmwf:*"/>
+         <workflow name="jbpm$wf:articleapproval"/>
+         <!-- Hide publishing workflows -->
+         <workflow name="activiti$publishWebContent"/>
+         <workflow name="jbpm$publishWebContent"/>
+         <!-- Hide invitation workflows -->
+         <workflow name="jbpm$inwf:invitation-nominated"/>
+         <workflow name="jbpm$imwf:invitation-moderated"/>
+         <workflow name="activiti$activitiInvitationModerated"/>
+         <workflow name="activiti$activitiInvitationNominated"/>
+      </hidden-workflows>
+
+      <!-- A list of workflow tasks that are NOT displayed in Share  -->
+      <hidden-tasks>
+         <!-- Hide all WCM related tasks -->
+         <task type="wcmwf:*"/>
+      </hidden-tasks>
+   </config>
+
+   <config evaluator="string-compare" condition="Social">
+      <!-- Alfresco QuickShare social widget - for creating public url that can be shared -->
+      <quickshare>
+         <!--
+            Will be available as Alfresco.constants.QUICKSHARE_URL using javascrip in the browser.
+            If changing this, make sure this url matches the quickshare rule in urlrewrite.xml
+         -->
+         <url>{context}/s/{sharedId}</url>
+      </quickshare>
+
+      <!-- Alfresco LinkShare social widget - share a link to social sites -->
+      <linkshare>
+         <!--
+            These actions will be available as Alfresco.constants.LINKSHARE_ACTIONS using javascript in the browser.
+            Labels will be retrieved from msg key "linkshare.action.<id>.label" unless explicitly provided as an
+            attribute to the action element.
+            Each param value accepts the following input: {shareUrl}, {displayName} or a msg key that will be prefixed.
+            I.e. {body} for the email action's href param will be retrieved using "linkshare.action.email.body".
+         -->
+         <action id="email" type="link" index="10">
+            <param name="href">mailto:?subject={subject}&amp;body={body}</param>
+            <param name="target">new</param>
+         </action>
+         <action id="facebook" type="link" index="20">
+            <param name="href">https://www.facebook.com/sharer/sharer.php?u={shareUrl}&amp;t={message}</param>
+            <param name="target">new</param>
+         </action>
+         <action id="twitter" type="link" index="30">
+            <param name="href">https://twitter.com/intent/tweet?text={message}&amp;url={shareUrl}</param>
+            <param name="target">new</param>
+         </action>
+         <action id="google-plus" type="link" index="40">
+            <param name="href">https://plus.google.com/share?url={shareUrl}</param>
+            <param name="target">new</param>
+         </action>
+      </linkshare>
+
+   </config>
+   
+   <!-- Remote section - use Surf RequestCachingConnector to improve remoting performance -->
+   <config evaluator="string-compare" condition="Remote">
+      <remote>
+         <connector>
+            <id>alfresco</id>
+            <name>Alfresco Connector</name>
+            <description>Connects to an Alfresco instance using cookie-based authentication</description>
+            <class>org.springframework.extensions.webscripts.RequestCachingConnector</class>
+            <authenticator-id>alfresco-ticket</authenticator-id>
+            <reconnect-timeout>0</reconnect-timeout>
+         </connector>
+      </remote>
+   </config>
+
+</alfresco-config>

@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.patch">
+
+    <!--                -->
+    <!-- Result Maps    -->
+    <!--                -->
+    
+    <resultMap id="result_admOldContentProp" type="java.util.HashMap">
+        <result property="nodeId" column="node_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="qnameId" column="qname_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="listIndex" column="list_index" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+        <result property="localeId" column="locale_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="stringValue" column="string_value" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+    
+    <resultMap id="result_authoritiesAndCrc" type="java.util.HashMap">
+        <result property="authority" column="authority" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="crc" column="crc" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </resultMap>
+    
+    <resultMap id="result_childAssocsForCrc" type="java.util.HashMap">
+        <result property="id" column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="typeQNameId" column="type_qname_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="qnameNamespaceId" column="qname_ns_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="qnameLocalName" column="qname_localname" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="childNodeNameCrc" column="child_node_name_crc" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="qnameCrc" column="qname_crc" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="childNodeUuid" column="child_node_uuid" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="childNodeName" column="child_node_name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+    
+    <resultMap id="result_nodeIdAndName" type="java.util.HashMap">
+        <result property="id" column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="name" column="name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+    
+    <resultMap type="java.util.HashMap" id="result_admTenant">
+        <result property="tenantDomain" column="tenantDomain" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="isEnabled" column="isEnabled" jdbcType="BIT" javaType="java.lang.Boolean"/>
+        <result property="rootDir" column="rootDir" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+    
+    <resultMap type="java.util.HashMap" id="result_avmLock">
+        <result property="wpStoreId" column="wpStoreId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="relPath" column="relPath" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="avmStore" column="avmStore" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="owner1" column="owner1" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+    
+    <resultMap type="java.util.HashMap" id="result_PBB">
+        <result property="componentName" column="componentName" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="propName" column="propName" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="propValue" column="propValue" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+    
+    <resultMap type="java.util.HashMap" id="result_ChainingURS">
+        <result property="label" column="label" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="zoneId" column="zoneId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result property="lastModified" column="lastModified" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </resultMap>
+    
+    <resultMap id="result_aclIneritanceIssue" type="java.util.HashMap">
+        <result property="childAclId" column="child_acl_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="childAclType" column="child_acl_type" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="primaryParentAclId" column="primary_parent_acl_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="primaryParentAclType" column="primary_parent_acl_type" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="childNodeId" column="child_node_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </resultMap>
+    
+    <resultMap id="result_sharedAclsThatDoNotInheritCorrectlyFromTheirDefiningAcl" type="java.util.HashMap">
+        <result property="inheritedAclId" column="inherited_acl_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="inheritedAclType" column="inherited_acl_type" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="aclId" column="acl_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="aclType" column="acl_type" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </resultMap>
+    
+    <!--                -->
+    <!-- Parameter Maps -->
+    <!--                -->
+    
+    <parameterMap id="parameter_IdMap" type="map">
+        <parameter property="id" jdbcType="BIGINT" javaType="long"/>
+    </parameterMap>
+
+    <parameterMap id="parameter_admNewContentProp" type="map">
+        <parameter property="longValue" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="nodeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="qnameId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="listIndex" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+        <parameter property="localeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+    
+    <parameterMap id="parameter_contentMimetype" type="map">
+        <parameter property="newMimetypeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="oldMimetypeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+    
+    <parameterMap id="parameter_childAssocCrcs" type="map">
+        <parameter property="childNodeNameCrc" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="qnameCrc" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+    
+    <parameterMap id="parameter_nodeTypeAndNamePattern" type="map">
+        <parameter property="typeQNameId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="propQNameId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="namePattern" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </parameterMap>
+    
+    <parameterMap id="parameter_qnameIdAndMinMaxNodeId" type="map">
+        <parameter property="qnameId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="minNodeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="maxNodeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+    
+    <parameterMap id="parameter_nsIdAndMinMaxNodeId" type="map">
+        <parameter property="nsId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="minNodeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="maxNodeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+    
+    <parameterMap id="parameter_mimetypeIdAndMinMaxNodeId" type="map">
+        <parameter property="mimetypeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="minNodeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <parameter property="maxNodeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+    
+    <!--                -->
+    <!-- Selects        -->
+    <!--                -->
+
+    <select id="select_avmMaxNodeId" resultType="java.lang.Long">
+        select max(id) from avm_nodes
+    </select>
+
+    <select id="select_admMaxNodeId" resultType="java.lang.Long">
+        select max(id) from alf_node
+    </select>
+    
+    <select id="select_avmNodesWithOldContentProperties" parameterType="Ids" resultType="java.lang.Long">
+        select
+            id
+        from
+            avm_nodes
+        where
+            id &gt;= #{idOne}
+            and id &lt; #{idTwo}
+            and class_type = 'plainfile'
+            and content_url is not null
+            and content_url not like 'id:%' <include refid="alfresco.util.escape"/>
+        order by
+            id ASC
+    </select>
+
+    <select id="select_admOldContentProperties" parameterType="Ids" resultMap="result_admOldContentProp">
+        <![CDATA[
+        select
+            node_id,
+            qname_id,
+            list_index,
+            locale_id,
+            string_value
+        from
+            alf_node_properties
+        where
+            node_id >= #{idOne}
+            and node_id < #{idTwo}
+            and actual_type_n = 11
+        order by
+            node_id ASC
+        ]]>
+    </select>
+
+    <select id="select_authoritiesAndCrc" resultMap="result_authoritiesAndCrc">
+        select
+            authority,
+            crc
+        from
+            alf_authority
+    </select>
+
+    <select id="select_allChildAssocsCount" resultType="java.lang.Integer">
+        select count(*) from alf_child_assoc
+    </select>
+
+    <select id="select_maxChildAssocId" resultType="java.lang.Long">
+        select max(id) from alf_child_assoc
+    </select>
+
+    <select id="select_allChildAssocsForCrcs" parameterType="Ids" resultMap="result_childAssocsForCrc">
+        <![CDATA[
+        select
+            ca.id,
+            ca.type_qname_id,
+            ca.qname_ns_id,
+            ca.qname_localname,
+            ca.child_node_name_crc,
+            ca.qname_crc,
+            cn.uuid as child_node_uuid,
+            cnp.string_value as child_node_name
+        from
+            alf_child_assoc ca
+            join alf_node cn on (cn.id = ca.child_node_id)
+            left join alf_node_properties cnp on (cnp.node_id = cn.id and cnp.qname_id = #{idOne})
+        where
+            ca.id >= #{idTwo} and
+            ca.id < #{idThree}
+        order by 
+            ca.id ASC
+        ]]>
+    </select>
+
+    <select id="select_nodesByTypeAndNamePattern" parameterMap="parameter_nodeTypeAndNamePattern" resultMap="result_nodeIdAndName">
+        select
+            s.protocol,
+            s.identifier,
+            n.uuid,
+            np.string_value as name
+        from
+            alf_node n
+            join alf_store s on (s.id = n.store_id)
+            join alf_node_properties np on (np.node_id = n.id)
+        where
+            n.type_qname_id = #{typeQNameId} and
+            np.qname_id = #{propQNameId} and
+            np.string_value like #{namePattern} <include refid="alfresco.util.escape"/>
+    </select>
+    
+    <select id="select_oldAttrTenants" resultMap="result_admTenant">
+        select
+            ma.mkey         as tenantDomain,
+            a2.bool_value   as isEnabled,
+            a3.string_value as rootDir
+        from 
+            alf_global_attributes ga
+            join alf_map_attribute_entries ma on (ma.map_id = ga.attribute)
+            join alf_map_attribute_entries ma2 on (ma2.map_id = ma.attribute_id and ma2.mkey = 'enabled')
+            join alf_attributes a2 on (a2.id = ma2.attribute_id)
+            join alf_map_attribute_entries ma3 on (ma3.map_id = ma.attribute_id and ma3.mkey = 'rootContentStoreDir')
+            join alf_attributes a3 on (a3.id = ma3.attribute_id)
+        where 
+            ga.name = 'alfresco-tenants'
+    </select>
+    
+    <select id="select_oldAttrAVMLocks" resultMap="result_avmLock">
+        select
+            ma2.mkey        as wpStoreId,
+            a4.string_value as relPath,
+            a5.string_value as avmStore,
+            a6.string_value as owner1
+        from 
+            alf_global_attributes ga
+            join alf_map_attribute_entries ma on (ma.map_id = ga.attribute)
+            join alf_map_attribute_entries ma2 on (ma2.map_id = ma.attribute_id)
+            join alf_map_attribute_entries ma3 on (ma3.map_id = ma2.attribute_id)
+            join alf_map_attribute_entries ma4 on (ma4.map_id = ma3.attribute_id and ma4.mkey = 'path')
+            join alf_attributes a4 on (a4.id = ma4.attribute_id)
+            join alf_map_attribute_entries ma5 on (ma5.map_id = ma3.attribute_id and ma5.mkey = 'store')
+            join alf_attributes a5 on (a5.id = ma5.attribute_id)
+            join alf_map_attribute_entries ma6 on (ma6.map_id = ma3.attribute_id and ma6.mkey = 'owners')
+            join alf_list_attribute_entries la6 on (la6.list_id = ma6.attribute_id and la6.mindex = 0)
+            join alf_attributes a6 on (a6.id = la6.attribute_id)
+        where 
+            ga.name = '.avm_lock_table'
+    </select>
+    
+    <select id="select_oldAttrPropertyBackedBeans" resultMap="result_PBB">
+         select
+            ma.mkey         as componentName,
+            ma2.mkey        as propName,
+            a2.string_value as propValue
+        from 
+            alf_global_attributes ga
+            join alf_map_attribute_entries ma on (ma.map_id = ga.attribute)
+            join alf_map_attribute_entries ma2 on (ma2.map_id = ma.attribute_id)
+            join alf_attributes a2 on (a2.id = ma2.attribute_id)
+        where 
+            ga.name = '.PropertyBackedBeans'
+    </select>
+    
+    <select id="select_oldAttrChainingURS" resultMap="result_ChainingURS">
+         select
+            ma.mkey       as label,
+            ma2.mkey      as zoneId,
+            a2.long_value as lastModified
+        from 
+            alf_global_attributes ga
+            join alf_map_attribute_entries ma on (ma.map_id = ga.attribute)
+            join alf_map_attribute_entries ma2 on (ma2.map_id = ma.attribute_id)
+            join alf_attributes a2 on (a2.id = ma2.attribute_id)
+        where 
+            ga.name = '.ChainingUserRegistrySynchronizer'
+    </select>
+    
+    <select id="select_oldAttrCustomNames" resultType="string">
+        select
+            ga.name as name
+        from
+            alf_global_attributes ga
+        where
+            name not in ('alfresco-tenants', '.href', '.avm_lock_table', '.PropertyBackedBeans', '.ChainingUserRegistrySynchronizer')
+    </select>
+    
+    <select id="select_AllAclIds" resultType="long">
+        select
+            id
+        from
+            alf_access_control_list
+    </select>
+    
+    <!-- for patch -->
+    <select id="select_UsedAclIds" resultType="long">
+        select acl_id from avm_nodes where acl_id is not null
+        union select acl_id from avm_stores where acl_id is not null
+        union select acl_id from alf_node where acl_id is not null
+        union select acl_id from alf_attributes where acl_id is not null
+    </select>
+    
+    <!-- for patch -->
+    <select id="select_MaxAclId" resultType="long">
+        select
+            max(acl.id)
+        from
+            alf_access_control_list acl
+    </select>
+    
+    <!-- for patch -->
+    <select id="select_DmNodeCount" resultType="long">
+        select
+            count(*)
+        from
+            alf_node
+    </select>
+    
+    <!-- for patch -->
+    <select id="select_DmNodeCountWherePermissionsHaveChanged" parameterMap="parameter_IdMap" resultType="long">
+        select
+            count(*)
+        from
+            alf_node
+        where
+            acl_id > ?
+    </select>
+    
+    <select id="select_sharedAclsThatDoNotInheritCorrectlyFromThePrimaryParent" parameterType="boolean" resultMap="result_aclIneritanceIssue">
+        <![CDATA[
+        select distinct
+       		childAcl.id as child_acl_id,
+        	childAcl.type as child_acl_type,
+        	acl.id      as primary_parent_acl_id, 
+        	acl.type    as primary_parent_acl_type,
+        	child.id    as child_node_id
+        from 
+        	alf_access_control_list acl 
+      		join alf_acl_member mem on mem.acl_id = acl.id
+			join alf_node node on node.acl_id = acl.id
+			join alf_child_assoc priChild on priChild.parent_node_id = node.id and is_primary = #{trueOrFalse}
+			join alf_node child on priChild.child_node_id = child.id
+			join alf_access_control_list childAcl on childAcl.id = child.acl_id AND childAcl.inherits = #{trueOrFalse} AND childAcl.type = 2
+      	where 	   
+      	(
+      	            acl.id = childAcl.inherits_from
+           	 	AND NOT EXISTS (   
+           		 				select 1 
+           		                from alf_acl_member childMem
+           	    	            where 
+           	                     	  	childMem.acl_id = childAcl.id
+           	                    	and childMem.ace_id = mem.ace_id
+           	                    	and childMem.pos  = mem.pos +1
+                   	           )
+      	)
+        ]]>
+    </select>
+   
+    <select id="select_definingAclsThatDoNotInheritCorrectlyFromThePrimaryParent" parameterType="boolean" resultMap="result_aclIneritanceIssue">
+        <![CDATA[
+        select distinct
+       		childAcl.id as child_acl_id,
+        	childAcl.type as child_acl_type,
+        	acl.id      as primary_parent_acl_id, 
+        	acl.type    as primary_parent_acl_type,
+        	child.id    as child_node_id
+        from 
+        	alf_access_control_list acl 
+      		join alf_acl_member mem on mem.acl_id = acl.id
+			join alf_node node on node.acl_id = acl.id
+			join alf_child_assoc priChild on priChild.parent_node_id = node.id and is_primary = #{trueOrFalse}
+			join alf_node child on priChild.child_node_id = child.id
+			join alf_access_control_list childAcl on childAcl.id = child.acl_id AND childAcl.inherits = #{trueOrFalse} AND childAcl.type = 1
+      	where 	   
+      	(
+      	            acl.inherited_acl = childAcl.inherits_from
+            	AND acl.id <> childAcl.inherits_from
+            	AND NOT EXISTS (
+               			    	select 1 from alf_acl_member childMem
+                            	where 
+                              	    	childMem.acl_id = childAcl.id
+                                	and childMem.ace_id = mem.ace_id
+                             		and childMem.pos = mem.pos + 2
+                           	   )
+      	)
+        ]]>
+    </select>
+   
+    <select id="select_aclsThatInheritFromNonPrimaryParent" parameterType="boolean" resultMap="result_aclIneritanceIssue">
+        <![CDATA[
+       select distinct
+       		childAcl.id as child_acl_id,
+        	childAcl.type as child_acl_type,
+        	acl.id      as primary_parent_acl_id, 
+        	acl.type    as primary_parent_acl_type,
+        	child.id    as child_node_id
+        from 
+        	alf_access_control_list acl 
+      		join alf_acl_member mem on mem.acl_id = acl.id
+			join alf_node node on node.acl_id = acl.id
+			join alf_child_assoc priChild on priChild.parent_node_id = node.id and is_primary = #{trueOrFalse}
+			join alf_node child on priChild.child_node_id = child.id
+			join alf_access_control_list childAcl on childAcl.id = child.acl_id AND childAcl.inherits = #{trueOrFalse}
+      	where 	   
+      	(
+      	            childAcl.id is not null
+        		AND acl.id <> childAcl.id 
+            	AND acl.id <> childAcl.inherits_from 
+            	AND acl.inherited_acl <> childAcl.inherits_from
+      	)
+        ]]>
+    </select>
+    
+    <select id="select_aclsThatInheritWithInheritanceUnset" parameterType="boolean" resultMap="result_aclIneritanceIssue">
+        <![CDATA[
+        select distinct
+       		childAcl.id as child_acl_id,
+        	childAcl.type as child_acl_type,
+        	acl.id      as primary_parent_acl_id, 
+        	acl.type    as primary_parent_acl_type,
+        	child.id    as child_node_id
+        from 
+        	alf_access_control_list acl 
+      		join alf_acl_member mem on mem.acl_id = acl.id
+			join alf_node node on node.acl_id = acl.id
+			join alf_child_assoc priChild on priChild.parent_node_id = node.id and is_primary = #{trueOrFalse}
+			join alf_node child on priChild.child_node_id = child.id
+			join alf_access_control_list childAcl on childAcl.id = child.acl_id AND childAcl.inherits = #{trueOrFalse}
+      	where 	   
+        (
+                    childAcl.id is not null
+            	AND childAcl.inherits_from is null
+            	AND childAcl.id <> acl.id
+        )	
+       ]]>
+    </select>
+    
+    <select id="select_sharedAclsThatDoNotInheritCorrectlyFromTheirDefiningAcl" parameterType="boolean" resultMap="result_sharedAclsThatDoNotInheritCorrectlyFromTheirDefiningAcl">
+        <![CDATA[
+        select distinct
+          	inheritedAcl.id as inherited_acl_id,
+        	inheritedAcl.type as inherited_acl_type,
+        	acl.id      as acl_id, 
+          	acl.type    as acl_type
+        from 
+        	alf_access_control_list acl 
+      		join alf_acl_member mem on mem.acl_id = acl.id
+      		join alf_access_control_list inheritedAcl on inheritedAcl.inherits_from = acl.id AND inheritedAcl.inherits = #{trueOrFalse} AND inheritedAcl.type = 1
+      	where 	acl.id = inheritedAcl.inherits_from
+                AND NOT EXISTS (
+                				select 1 
+                               	from alf_acl_member childMem
+                               	where 
+                                      childMem.acl_id = inheritedAcl.id
+                                  and childMem.ace_id = mem.ace_id
+                                  and childMem.pos  = mem.pos +1
+                               )
+       ]]>
+    </select>
+    
+    <select id="select_CountNodesWithAspectIds" parameterType="Ids" resultType="long" >
+        select
+            count(*)
+        from
+            alf_node_aspects na
+        where
+            na.qname_id in
+                <foreach item="item" index="i" collection="ids" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+    
+    <!-- Find nodes by type qname -->
+    
+    <select id="select_NodesByTypeQName" parameterMap="parameter_qnameIdAndMinMaxNodeId" resultType="java.lang.Long" >
+        select
+            n.id
+        from
+            alf_node n
+        where
+            n.type_qname_id = #{qnameId}
+            and n.id &gt;= #{minNodeId}
+            and n.id &lt; #{maxNodeId}
+    </select>
+    
+     <select id="select_NodesByTypeUriId" parameterMap="parameter_nsIdAndMinMaxNodeId" resultType="java.lang.Long" >
+        select
+            n.id
+        from
+            alf_node n
+            join alf_qname q on q.id = n.type_qname_id
+        where
+            q.ns_id = #{nsId}
+            and n.id &gt;= #{minNodeId}
+            and n.id &lt; #{maxNodeId}
+    </select>
+    
+    <!-- Find nodes by aspect qname -->
+    
+    <select id="select_NodesByAspectQName" parameterMap="parameter_qnameIdAndMinMaxNodeId" resultType="java.lang.Long" >
+        select
+            n.id
+        from
+            alf_node n
+            join alf_node_aspects a on n.id = a.node_id
+        where
+            a.qname_id = #{qnameId}
+            and n.id &gt;= #{minNodeId}
+            and n.id &lt; #{maxNodeId}
+    </select>
+    
+    <!-- Find nodes by content mimetype -->
+    
+    <select id="select_NodesByContentMimetype" parameterMap="parameter_mimetypeIdAndMinMaxNodeId" resultType="long">
+        select
+            np.node_id
+        from
+            alf_node_properties np
+            join alf_content_data cd on np.long_value = cd.id
+        where
+            cd.content_mimetype_id = #{mimetypeId}
+            and (np.actual_type_n = 3 or np.actual_type_n = 21)
+            and np.node_id &gt;= #{minNodeId}
+            and np.node_id &lt; #{maxNodeId}
+    </select>
+    
+    <!--                -->
+    <!-- Updates        -->
+    <!--                -->
+    
+    <update id="update_admOldContentProperty" parameterMap="parameter_admNewContentProp">
+        update
+            alf_node_properties
+        set
+            actual_type_n = 21,
+            persisted_type_n = 3,
+            long_value = ?,
+            string_value = null
+        where
+            node_id = ?
+            and qname_id = ?
+            and list_index = ?
+            and locale_id = ?
+    </update>
+    
+    <update id="update_contentMimetypeId" parameterMap="parameter_contentMimetype">
+        update
+            alf_content_data
+        set
+            content_mimetype_id = ?
+        where
+            content_mimetype_id = ?
+    </update>
+    
+    <update id="update_childAssocCrc" parameterMap="parameter_childAssocCrcs">
+        update
+            alf_child_assoc
+        set
+            child_node_name_crc = ?,
+            qname_crc = ?
+        where
+            id = ?
+    </update>
+    
+    <update id="update_CreateSizeCurrentProperty" parameterType="SizeCurrentParams" >
+        INSERT INTO alf_node_properties
+        (
+           node_id, actual_type_n, persisted_type_n,
+           boolean_value,
+           long_value,
+           double_value,
+           float_value,
+           string_value,
+           serializable_value,
+           qname_id, list_index, locale_id)
+        SELECT
+            n.id, 0, 0,
+            #{false},
+            0,
+            0,
+            0,
+            null,
+            null,
+            #{sizeCurrentQNameId}, -1, #{defaultLocaleId}
+        FROM
+            alf_node n
+        WHERE
+            n.type_qname_id = #{personTypeQNameId}
+            AND NOT EXISTS
+            (
+                SELECT 1 FROM alf_node_properties np
+                WHERE np.node_id = n.id
+                AND np.qname_id = #{sizeCurrentQNameId}
+            )
+    </update>
+    
+    <update id="drop_oldAttrAlfListAttributeEntries">
+        drop table alf_list_attribute_entries
+    </update>
+    
+    <update id="drop_oldAttrAlfMapAttributeEntries">
+        drop table alf_map_attribute_entries
+    </update>
+    
+    <update id="drop_oldAttrAlfGlobalAttributes">
+        drop table alf_global_attributes
+    </update>
+    
+    <update id="drop_oldAttrAlfAttributes">
+        drop table alf_attributes
+    </update>
+    
+    <update id="drop_oldAttrAlfAttributes_seq">
+        drop sequence alf_attributes_seq
+    </update>
+    
+    <!--                -->
+    <!-- Deletes        -->
+    <!--                -->
+    
+</mapper>
