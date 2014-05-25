@@ -146,6 +146,26 @@ public class DefaultUrlHelper implements UrlHelper, InitializingBean
         this.externalContextPath = externalContextPath;
     }
 
+    @Override
+    public String getExternalProtocol() {
+        return externalProtocol;
+    }
+
+    @Override
+    public String getExternalHost() {
+        return externalHost;
+    }
+
+    @Override
+    public int getExternalPort() {
+        return externalPort;
+    }
+
+    @Override
+    public String getExternalContextPath() {
+        return externalContextPath;
+    }
+
     /**
      * Must be called after setting properties and before using provided services.
      */

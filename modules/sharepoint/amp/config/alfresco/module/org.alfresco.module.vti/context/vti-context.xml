@@ -92,6 +92,12 @@
         <property name="headerBufferSize">
              <value>32768</value>
         </property>
+       <property name="host">
+          <value>${vti.server.bind}</value>
+       </property>
+       <property name="forwarded">
+          <value type="java.lang.Boolean">${vti.server.forwarded}</value>
+       </property>
     </bean>
 
     <!-- Use this Connector instead for SSL communications -->
@@ -530,6 +536,7 @@
         <property name="vtiHandler">
             <ref bean="vtiHandler"/>
         </property>
+        <property name="urlHelper" ref="vtiUrlHelper"/>
         <property name="lockService" ref="webDAVLockService"/>
     </bean>
 

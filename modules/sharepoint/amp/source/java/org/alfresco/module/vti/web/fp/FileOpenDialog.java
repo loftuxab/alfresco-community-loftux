@@ -77,6 +77,12 @@ public class FileOpenDialog extends AbstractMethod
         }
         String location = request.getNotEncodedParameter("location");
         String site = getSiteUrl(request);
+        String scheme = this.urlHelper.getExternalProtocol();
+
+        if(!scheme.toLowerCase().contains("http"))
+        {
+            scheme = request.getScheme();
+        }
         
         List<String> fileDialogFilterValue = Arrays.asList(request.getParameter("FileDialogFilterValue").split(";"));
         String rootFolder = request.getParameter("RootFolder", "");
@@ -101,7 +107,7 @@ public class FileOpenDialog extends AbstractMethod
         freeMarkerMap.put("sortField", sortField);
         freeMarkerMap.put("sort", sort);
         freeMarkerMap.put("context", request.getAlfrescoContextName());
-        freeMarkerMap.put("scheme", request.getScheme());
+        freeMarkerMap.put("scheme", scheme);
         freeMarkerMap.put("host", request.getHeader("Host"));
         freeMarkerMap.put("items", items);
         freeMarkerMap.put("alfContext", (String) request.getAttribute(VtiRequestDispatcher.VTI_ALFRESCO_CONTEXT));

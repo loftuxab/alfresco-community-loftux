@@ -70,4 +70,48 @@ public interface UrlHelper
      * @return URL
      */
     String getExternalURLHostOnly();
+
+    /**
+     * Get the protocol only.
+     * For example
+     * <pre>
+     *     https
+     * </pre>
+     *
+     * @return protocol
+     */
+    String getExternalProtocol();
+
+    /**
+     * Get hostname only.
+     * For Example
+     * <pre>
+     *     sp.example.com
+     * </pre>
+     *
+     * @return hostname
+     */
+    String getExternalHost();
+
+    /**
+     * Get port number only.
+     * For example
+     * <pre>
+     *     7070
+     * </pre>
+     *
+     * @return port
+     */
+    int getExternalPort();
+
+    /**
+     * Get the context path only.
+     * For example
+     * <pre>
+     *     alfresco
+     * </pre>
+     *
+     * @return context
+     */
+    String getExternalContextPath();
 }
