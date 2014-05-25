@@ -142,3 +142,46 @@
       <div class="help-text" id="${fieldHtmlId}-help"><#if field.helpEncodeHtml>${field.help?html}<#else>${stringUtils.stripUnsafeHTML(field.help)}</#if></div>
    </#if>
 </#macro>
+
+<#macro renderLocaleImage field>
+  <#if field.dataType?exists && field.dataType == "mltext">
+  	<#assign localeshort=locale>
+  		<#switch localeshort>
+			<#case "sv">
+				<#assign localeshort="sv-se">
+			<#break>
+			<#case "ch">
+				<#assign localeshort="ch-cn">
+			<#break>
+			<#case "ar">
+				<#assign localeshort="ar-eg">
+			<#break>
+			<#case "en">
+				<#assign localeshort="en-GB">
+			<#break>
+			<#case "nb">
+				<#assign localeshort="no-no">
+			<#break>
+			<#case "nn">
+				<#assign localeshort="no-no">
+			<#break>
+			<#case "smj">
+				<#assign localeshort="no-no">
+			<#break>
+			<#case "sma">
+				<#assign localeshort="no-no">
+			<#break>
+			<#case "smn">
+				<#assign localeshort="fi-fi">
+			<#break>
+			<#case "sms">
+				<#assign localeshort="fi-fi">
+			<#break>
+			<#case "da">
+				<#assign localeshort="da-dk">
+			<#break>
+		</#switch>
+    <#assign localeshort = localeshort?left_pad(5)?substring(3,5)?lower_case >
+<img src="${url.context}/res/components/images/flags/${localeshort}.png" width="16px" height="11px" tabindex="-1"/>
+  </#if>
+</#macro>
