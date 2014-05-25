@@ -562,7 +562,7 @@ public class MultiTServiceImpl implements TenantService
     public boolean isTenantUser(String username)
     {
         // can be null (e.g. for System user / during app ctx init)
-        if (username != null) 
+        if ((username != null) && (AuthenticationUtil.isMtEnabled()))
         {
             int idx = username.lastIndexOf(SEPARATOR);
             if ((idx > 0) && (idx < (username.length()-1)))
@@ -600,7 +600,7 @@ public class MultiTServiceImpl implements TenantService
     public String getUserDomain(String username)
     {
         // can be null (e.g. for System user / during app ctx init)
-        if ((username != null) && AuthenticationUtil.isMtEnabled())
+        if ((username != null) && (AuthenticationUtil.isMtEnabled()))
         {
             int idx = username.lastIndexOf(SEPARATOR);
             if ((idx > 0) && (idx < (username.length()-1)))
@@ -628,9 +628,9 @@ public class MultiTServiceImpl implements TenantService
      */
     @Override public String getPrimaryDomain(String username)
     {
-    	String result = null;
+    	String result = DEFAULT_DOMAIN;
         // can be null (e.g. for System user / during app ctx init)
-        if (username != null) 
+        if ((username != null) && (AuthenticationUtil.isMtEnabled())) 
         {
             int idx = username.lastIndexOf(SEPARATOR);
             if ((idx > 0) && (idx < (username.length()-1)))
@@ -641,10 +641,6 @@ public class MultiTServiceImpl implements TenantService
                {
             	   result = tenantDomain;
                }
-            }
-            else
-            {
-            	result = DEFAULT_DOMAIN;
             }
         }
         
