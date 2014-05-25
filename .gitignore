@@ -1,0 +1,8 @@
+alfresco.war
+share.war
+wcmqs.war
+build
+**/build
+target
+**/target
+projects/solr/source/solr/instance/lib/

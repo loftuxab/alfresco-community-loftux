@@ -1,0 +1,118 @@
+<project name="LoftuxBuild" default="distribute"
+    xmlns:jacoco="antlib:org.jacoco.ant">
+
+<import file="${basedir}/continuous.xml" />
+<import file="${basedir}/maven.xml" />
+<property file="${alfresco.basedir}/projects/repository/config/alfresco/version.properties" />
+<property file="${basedir}/loftux.properties" />
+
+<!-- Overrride existing tarkets, remove distribute-installers and distribute-wcm -->
+
+  <target name="init" depends="alfresco.init">
+      <echo message="Creating empty folders needed for build"/>
+
+      <mkdir dir="${alfresco.basedir}/projects/remote-api/source/META-INF" />
+      <mkdir dir="${alfresco.basedir}/projects/wdr-deployment/source/test-java" />
+      <mkdir dir="${alfresco.basedir}/modules/auto-apply-amps-repo" />
+      <mkdir dir="${alfresco.basedir}/modules/auto-apply-amps-share" />
+      <mkdir dir="${alfresco.basedir}/projects/data-model/config/alfresco/extension" />
+      <mkdir dir="${alfresco.basedir}/projects/installer/messages" />
+      <mkdir dir="${alfresco.basedir}/projects/solr/source/solr/instance/lib" />
+      
+  </target>
+
+  <!-- Removed depends target distribute-installers -->
+  <target name="distribute-non-core" 
+          description="Creates the distribution files for all platforms"
+          depends="set-build-number,
+                  incremental,
+                  distribute-amps,
+                  distribute-sdk, 
+                  distribute-extras,
+                  distribute-fdk,
+                  distribute-docs" />
+
+   <!-- Removed depends target distribute-wcm -->
+   <target name="distribute-core" 
+          description="Creates the patch distribution files for all platforms"
+          depends="set-build-number,
+                  incremental,
+                  assemble-commands,
+                  distribute-amps,
+                  assemble-tomcat,
+                  distribute-war, 
+                  distribute-webserviceclient,
+                  distribute-deployment,
+                  distribute-webeditor,
+                  distribute-wcmqs-extension,
+                  distribute-solr,
+                  distribute-file-transfer-receiver" />
+
+   <target name="check-scm-type">
+      <available file="${alfresco.basedir}/.svn" type="dir" property="scm.svn.available"/>
+      <available file="${alfresco.basedir}/.git" type="dir" property="scm.git.available"/>
+   </target>
+
+   <target name="set-revision-number-git" depends="check-scm-type" if="scm.git.available">
+      <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+        <arg value="describe"/>
+        <arg value="--tags"/>
+        <arg value="--always"/>
+        <arg value="HEAD"/>
+      </exec>
+      <exec executable="git" outputproperty="git.info.url" failifexecutionfails="false" errorproperty="">
+           <arg value="config"/>
+           <arg value="--get"/>
+           <arg value="remote.origin.url"/>
+      </exec>
+      <condition property="svn.info.rev" value="${git.revision}" else="unknown">
+         <and>
+            <isset property="git.revision"/>
+            <length string="${git.revision}" trim="yes" length="0" when="greater"/>
+         </and>
+      </condition>
+      <condition property="svn.info.url" value="${git.info.url}" else="unknown">
+         <and>
+            <isset property="git.info.url"/>
+            <length string="${git.info.url}" trim="yes" length="0" when="greater"/>
+         </and>
+      </condition>
+   </target>
+
+   <target name="set-revision-number-svn" depends="check-scm-type" if="scm.svn.available">
+         <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask">
+            <classpath refid="classpath.compile" />
+         </taskdef>
+
+         <svn failonerror="false">
+            <info target="${basedir}"/>
+         </svn>
+   </target>
+
+   <!-- Set versionsnumber differently --> 
+   <target name="set-revision-number" depends="init,set-revision-number-git,set-revision-number-svn">
+
+      <condition property="display.build.number" value="${alf.build.number}" else="">
+          <isset property="alf.build.number" />
+      </condition>
+
+      <echo message="SCM Url: ${svn.info.url} Revision: ${svn.info.rev} Build number: ${display.build.number} Edition: ${file.name.codeline}"/>
+
+      <copy file="${dir.project.repository.config}/alfresco/version.properties"
+          toDir="${dir.project.repository.dist}/alfresco" overwrite="true" />
+      <replace file="${dir.project.repository.dist}/alfresco/version.properties" summary="yes">
+          <replacefilter token="@scm-path@" value="${svn.info.url}" />
+          <replacefilter token="@scm-revision@" value="${svn.info.rev}" />
+          <replacefilter token="@build-number@" value="${display.build.number}" />
+          <replacefilter token="@version-edition@" value="${file.name.codeline}" />
+      </replace>
+
+      <manifest file="${dir.project.repository.dist}/MANIFEST.MF">
+         <attribute name="Specification-Version" value="${version.major}.${version.minor}.${version.revision}"/>
+         <attribute name="Implementation-Version" value="${version.number}${display.build.number}"/>
+         <attribute name="Implementation-Edition" value="${file.name.codeline}"/>
+         <attribute name="Build-Date" value="${DSTAMP}-${TSTAMP}"/>
+      </manifest>
+
+   </target>
+</project>
