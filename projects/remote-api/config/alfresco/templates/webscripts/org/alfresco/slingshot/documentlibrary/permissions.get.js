@@ -27,13 +27,17 @@ function getPermissions()
    }
 
    // Get array of settable permissions
-   var settable = node.getSettablePermissions(),
+   var settable = [],
       location = Common.getLocation(node);
    
    // If this node lives within a Site, then append the Site-specific roles
    if (location.siteNode != null)
    {
       settable = settable.concat(location.siteNode.getNode().getSettablePermissions());
+   }
+   else
+   {
+      settable = settable.concat(node.getSettablePermissions());
    }
 
    // Get full permission set, including inherited
@@ -108,13 +112,19 @@ function parsePermissions(p_permissions, p_settable)
       
          if (authority != null)
          {
+            //Use more user friendly display name for site groups
+            var displayName = authority["displayName"];
+            if (authorityId.indexOf("GROUP_site") === 0){
+               displayName = authorityId.substr(11).replace("_"," ");
+            }
+
             results.push(
             {
                authority:
                {
                   avatar: authority.avatar || null,
                   name: authorityId,
-                  displayName: authority["displayName"]
+                  displayName: displayName
                },
                role: role
             });
