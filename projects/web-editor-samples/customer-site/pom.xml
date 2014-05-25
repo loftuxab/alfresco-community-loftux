@@ -8,15 +8,15 @@
     <name>Alfresco Web Editor Samples</name>
     <parent>
         <artifactId>alfresco-parent</artifactId>
-        <groupId>org.alfresco</groupId>
-        <version>4.3.0-SNAPSHOT</version>
+        <groupId>se.loftux.alfresco</groupId>
+        <version>4.3.a.LX60</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <packaging>war</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-web-editor</artifactId>
             <version>${project.version}</version>
             <classifier>classes</classifier>

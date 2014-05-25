@@ -8,14 +8,14 @@
     <name>Alfresco Sharepoint Protocol</name>
     <parent>
         <artifactId>alfresco-parent</artifactId>
-        <groupId>org.alfresco</groupId>
-        <version>4.3.0-SNAPSHOT</version>
+        <groupId>se.loftux.alfresco</groupId>
+        <version>4.3.a.LX60</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-remote-api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -43,7 +43,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-repository</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>

@@ -11,16 +11,16 @@
     <url>${project.artifactId}</url>
 
     <parent>
-        <groupId>org.alfresco</groupId>
+        <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.a.LX60</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <!-- Intra alfresco deps -->
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-core</artifactId>
             <version>${project.version}</version>
         </dependency>

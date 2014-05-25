@@ -2,9 +2,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.alfresco</groupId>
+        <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-packaging</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.a.LX60</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-installer</artifactId>
@@ -18,7 +18,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-distribution</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
@@ -39,14 +39,14 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.alfresco</groupId>
+                                    <groupId>se.loftux.alfresco</groupId>
                                     <artifactId>alfresco-distribution</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}/distribution</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.alfresco</groupId>
+                                    <groupId>se.loftux.alfresco</groupId>
                                     <artifactId>alfresco-solr</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>config</classifier>

@@ -1,14 +1,14 @@
-<!--  
+<!--
     | maven.xml files
     | _______________
-    | The maven.xml scripts are NOT maven1 build files,  while they are Ant scripts used to deploy Alfresco artifacts 
+    | The maven.xml scripts are NOT maven1 build files,  while they are Ant scripts used to deploy Alfresco artifacts
     | to a Maven repository (by default maven.alfresco.com).
     |
-    | This file deploys main Community artifacts to a Maven repository. 
-    |  
+    | This file deploys main Community artifacts to a Maven repository.
+    |
     | Accepted properties:
     | ____________________
-    | -Dmaven.isRelease=[true|false] ==> Switches between a RELEASE and SNAPSHOT deployment (default: SNAPSHOT) 
+    | -Dmaven.isRelease=[true|false] ==> Switches between a RELEASE and SNAPSHOT deployment (default: SNAPSHOT)
     | -Dmaven.custom.label=customLabel ==> Adds a suffix to artifacts, e.g. for branch deployment
     | -Dmaven.dryRun ==> calls install instead of deploy, to test before uploading
     |
@@ -20,19 +20,19 @@
     |
     | This script deploys Community packages and depends already on all required build targets to produce artifacts:
     |
-    | NOTE: maven-deploy assumes artifacts have already been build. Use the maven-build-deploy target instead to build and deploy in a single execution. 
+    | NOTE: maven-deploy assumes artifacts have already been build. Use the maven-build-deploy target instead to build and deploy in a single execution.
     |
     | - For a Community SNAPSHOT deploy you can run it with: ant -f continuous.xml maven-deploy
     | - For a Community RELEASE deploy you can run it with: ant -f continuous.xml maven-deploy -Dmaven.isRelease=true
-    | 
+    |
     | Branch releases:
     | ________________
     | It's also possible to use a custom suffix to label special artifacts (e.g. deployed from a branch), by passing the following property -Dmaven.custom.label=mylabel
     | to the build command line. This will append this suffix to the version of all deployed artifacts.
-    | 
+    |
     | Prerequisites:
     | ______________
-    | - Needs to be run in continous.xml environment, so run your build with -f continuous.xml 
+    | - Needs to be run in continous.xml environment, so run your build with -f continuous.xml
     | - Does NOT need Maven installed. Will download Maven 2.1.10 embedded
     | - export ANT_OPTS="-XX:MaxPermSize=128m" otherwise you'll get OOM/PermGen
     | - check the "maven-prerequisites" target in root/maven.xml to see which standard build targets maven-deploy depends to
@@ -42,12 +42,12 @@
 <project name="maven" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <dirname property="alfresco.basedir" file="${ant.file.alfresco}"/>
-    <!-- 
-        | Allows to deploy custom labeled artifacts (e.g. from a branch). 
-        | By default no custom label is specified. 
-        | Specify one by passing the command line switch: -Dmaven.custom.label=mybranch 
+    <!--
+        | Allows to deploy custom labeled artifacts (e.g. from a branch).
+        | By default no custom label is specified.
+        | Specify one by passing the command line switch: -Dmaven.custom.label=mybranch
         | Artifacts will be deployed with that custom label appended
-        --> 
+        -->
     <target name="configure-custom-version" if="maven.custom.label">
        <property name="maven.version.suffix" value="-${maven.custom.label}"/>
     </target>
@@ -55,7 +55,7 @@
     <target name="configure-empty-custom-version" unless="maven.custom.label">
         <property name="maven.version.suffix" value=""/>
     </target>
-	
+
     <!-- Aggregator target putting together all configs/tasks needed for maven-deploy. Fails if build number is unset, requires continous.xml -->
     <target name="maven-env-prerequisites" depends="fail-if-build-number-is-unset,configure-snapshot-deployment,configure-release-deployment">
 	    <!-- Defining the maven ant tasks at runtime -->
@@ -75,10 +75,10 @@
             <isset property="maven.dryRun"/>
         </condition>
     </target>
-	
+
     <!-- Conditionally calls set-build-number. Fails if not in continuous.xml environment -->
     <target name="fail-if-build-number-is-unset" unless="version.number">
-        <echo>Maven deployment targets need to be run in continuous.xml environment, as they depend on set-build-number. Failing...</echo> 
+        <echo>Maven deployment targets need to be run in continuous.xml environment, as they depend on set-build-number. Failing...</echo>
         <fail message="Maven deployment needs to be run in continuous environment. Try calling set-build-number first or directly running ant -f continuous.xml maven-build-deploy [-Dbuild.script=enterpriseprojects/build.xml]"/>
     </target>
 
@@ -99,13 +99,13 @@
         <property name="maven.version.number" value="${version.number}${maven.version.suffix}"/>
     	<echo>Configured Release deployment of Alfresco ${file.name.edition} ${version.number} to ${maven.repo.url} as ${maven.group.id} alfresco-* ${maven.version.number}</echo>
     </target>
-	
+
     <!--
         | Deploys projects/*/build/dist JARs/WARs/ZIPs to a Maven repository configured via properties.
         | NOTE: This goal assumes the artifacts have already been built at an earlier stage. Use maven-build-deploy to build and deploy at once.
-        | See beginning of this file for full usage instructions. 
+        | See beginning of this file for full usage instructions.
         -->
-    <target name="maven-deploy" description="Deploys JAR/WAR/ZIP dist artifacts to the Alfresco Maven Repository" depends="maven-env-prerequisites, maven-deploy-webclient, maven-deploy-slingshot, maven-deploy-solr, maven-deploy-amps, maven-deploy-extras, maven-deploy-platform-distribution-pom" /> 
+    <target name="maven-deploy" description="Deploys JAR/WAR/ZIP dist artifacts to the Alfresco Maven Repository" depends="maven-env-prerequisites, maven-deploy-webclient, maven-deploy-slingshot, maven-deploy-solr, maven-deploy-amps, maven-deploy-extras, maven-deploy-platform-distribution-pom" />
 
     <target name="maven-deploy-webclient" description="Deploys Alfresco Explorer related JARs/WARs to a Maven repository" depends="maven-deploy-webclient-jars, maven-deploy-webclient-webapp" />
 
@@ -211,10 +211,10 @@
 
         <!-- Legacy Lucene -->
         <mvndeploypom file="${dir.project.legacylucene.dist}/${file.name.jar.legacylucene}"
-            artifactId="legacy-lucene"
+            artifactId="alfresco-legacy-lucene"
             classifiers="sources,javadoc,config,tests"
             types="jar,jar,jar,jar"
-            files="${dir.continuous.assemble.config}/alfresco-legacylucene-sources.zip,${dir.continuous.assemble.sdk}/doc/alfresco-legacylucene-doc.zip,${dir.continuous.assemble.config}/alfresco-legacylucene-config.zip,${dir.continuous.assemble.config}/alfresco-legacylucene-test-resources.zip"
+            files="${dir.continuous.assemble.config}/alfresco-legacylucene-sources.zip,${dir.continuous.assemble.sdk}/doc/alfresco-legacylucene-doc.zip,${dir.continuous.assemble.config}/alfresco-legacylucene-test-resources.zip"
             pomFile="${dir.project.legacylucene}/pom.xml" />
 
         <!-- Deployment -->
@@ -275,7 +275,7 @@
             files="${dir.continuous.assemble.config}/alfresco-web-framework-commons-sources.zip,${dir.continuous.assemble.sdk}/doc/alfresco-web-framework-commons-doc.zip,${dir.continuous.assemble.config}/alfresco-web-framework-commons-config.zip,${dir.continuous.assemble.config}/alfresco-web-framework-commons-test-resources.zip,${dir.project.webframeworkcommons.dist}/${file.name.jar.webframeworkcommons}"
             pomFile="${dir.project.webframeworkcommons}/pom.xml" />
     </target>
-            
+
     <target name="maven-deploy-webclient-webapp" description="Deploys Alfresco Explorer related WAR to a Maven repository">
         <mvndeploypom file="${dir.project.webclient.dist}/${file.name.war.webclient}"
             classifiers="sources,javadoc,classes,config,tests"
@@ -447,7 +447,7 @@
             <property name="fileabsolute" location="@{file}" />
 
             <!-- Remove SNAPSHOT in POM version if necessary -->
-            <condition property="pomVersion" value="${maven.version.number}-SNAPSHOT" else="${maven.version.number}">
+            <condition property="pomVersion" value="${maven.version.number}" else="${maven.version.number}-SNAPSHOT">
                 <istrue value="${maven.isRelease}" />
             </condition>
             <replace file="@{file}" summary="true" token="${pomVersion}" value="${maven.version.number}" >
@@ -498,7 +498,7 @@
             </condition>
 
             <!-- Remove SNAPSHOT in POM version if necessary -->
-            <condition property="pomVersion" value="${maven.version.number}-SNAPSHOT" else="${maven.version.number}">
+            <condition property="pomVersion" value="${maven.version.number}" else="${maven.version.number}-SNAPSHOT">
                 <istrue value="${maven.isRelease}" />
             </condition>
             <replace file="@{pomFile}" summary="true" token="${pomVersion}" value="${maven.version.number}" >
