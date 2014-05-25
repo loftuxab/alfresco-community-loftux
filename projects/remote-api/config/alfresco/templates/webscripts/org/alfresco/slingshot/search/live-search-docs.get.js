@@ -11,7 +11,7 @@ function main()
    var params =
    {
       type: "documents",
-      term: args.t,
+      term: (args.t.indexOf('*') > 1) ? args.t : args.t.replace(/\s/g, '* ')+'*',
       rootNode: (args.rootNode !== null) ? args.rootNode : null,
       maxResults: (args.maxResults !== null) ? parseInt(args.maxResults, 10) : DEFAULT_MAX_RESULTS,
       startIndex: (args.startIndex !== null) ? parseInt(args.startIndex, 10) : 0
