@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -85,7 +85,10 @@ public class MessageServiceImpl implements MessageService
     private ContentService contentService;
     private NamespaceService namespaceService;
     private NodeService nodeService;        
-    
+
+    // Try lock timeout (MNT-11371)
+    private long tryLockTimeout;
+
     /**
      * List of registered bundles
      */
@@ -138,7 +141,12 @@ public class MessageServiceImpl implements MessageService
     {
         this.messagesCache = messagesCache;
     }
-    
+
+    public void setTryLockTimeout(long tryLockTimeout)
+    {
+        this.tryLockTimeout = tryLockTimeout;
+    }
+
     public void setLocale(Locale locale)
     {
         I18NUtil.setLocale(locale);
@@ -173,17 +181,17 @@ public class MessageServiceImpl implements MessageService
     {
         String tenantDomain = getTenantDomain(); 
         Set<String> tenantResourceBundleBaseNames = null;
-        LockHelper.tryLock(readLock, 100);
+        LockHelper.tryLock(readLock, tryLockTimeout, "getting resource bundle base names in 'MessageServiceImpl.registerResourceBundle()'");
         try
         {
-            tenantResourceBundleBaseNames = getResourceBundleBaseNames(tenantDomain);  
+            tenantResourceBundleBaseNames = getResourceBundleBaseNames(tenantDomain, false);  
         }
         finally
         {
             readLock.unlock();
         }
         
-        LockHelper.tryLock(writeLock, 100);
+        LockHelper.tryLock(writeLock, tryLockTimeout, "adding new resource bundle path and clearing loaded resource bundles in 'MessageServiceImpl.registerResourceBundle()'");
         try
         {
             if (! tenantResourceBundleBaseNames.contains(resBundlePath))
@@ -273,20 +281,20 @@ public class MessageServiceImpl implements MessageService
         Set<String> resourceBundleBaseNamesForAllLocales;
         
         String tenantDomain = getTenantDomain();
-        LockHelper.tryLock(readLock, 100);
+        LockHelper.tryLock(readLock, tryLockTimeout, "getting loaded resource bundles, messages and base names in 'MessageServiceImpl.unregisterResourceBundle()'");
         try
         {
             // all locales
             loadedResourceBundlesForAllLocales = getLoadedResourceBundles(tenantDomain);
             cachedMessagesForAllLocales = getMessages(tenantDomain);
-            resourceBundleBaseNamesForAllLocales = getResourceBundleBaseNames(tenantDomain);
+            resourceBundleBaseNamesForAllLocales = getResourceBundleBaseNames(tenantDomain, false);
         }    
         finally
         {
             readLock.unlock();
         }
         
-        LockHelper.tryLock(writeLock, 100);
+        LockHelper.tryLock(writeLock, tryLockTimeout, "removing resource bundle by path in 'MessageServiceImpl.unregisterResourceBundle()'");
         try
         {
             // unload resource bundles for each locale (by tenant, if applicable)        
@@ -388,7 +396,7 @@ public class MessageServiceImpl implements MessageService
         Map<Locale, Map<String, String>> tenantCachedMessages = null;
         Set<String> tenantResourceBundleBaseNames = null;
 
-        LockHelper.tryLock(readLock, 100);
+        LockHelper.tryLock(readLock, tryLockTimeout, "getting loaded resource bundles, messages and base names in 'MessageServiceImpl.getLocaleProperties()'");
         try
         {
             tenantLoadedResourceBundles = getLoadedResourceBundles(tenantDomain);
@@ -397,7 +405,7 @@ public class MessageServiceImpl implements MessageService
             tenantCachedMessages = getMessages(tenantDomain);
             props = tenantCachedMessages.get(locale);
 
-            tenantResourceBundleBaseNames = getResourceBundleBaseNames(tenantDomain);
+            tenantResourceBundleBaseNames = getResourceBundleBaseNames(tenantDomain, false);
             loadedBundleCount = tenantResourceBundleBaseNames.size();
         }
         finally
@@ -407,7 +415,7 @@ public class MessageServiceImpl implements MessageService
 
         if (loadedBundles == null)
         {
-            LockHelper.tryLock(writeLock, 100);
+            LockHelper.tryLock(writeLock, tryLockTimeout, "adding resource bundle for locale in 'MessageServiceImpl.getLocaleProperties()'");
             try
             {
                 loadedBundles = new HashSet<String>();
@@ -422,7 +430,8 @@ public class MessageServiceImpl implements MessageService
 
         if (props == null)
         {
-            LockHelper.tryLock(writeLock, 100);
+            LockHelper.tryLock(writeLock, tryLockTimeout,
+                    "adding resource bundle properties into the cache (because properties are not cached) in 'MessageServiceImpl.getLocaleProperties()'");
             try
             {
                 props = new HashMap<String, String>();
@@ -437,11 +446,12 @@ public class MessageServiceImpl implements MessageService
 
         if ((loadedBundles.size() != loadedBundleCount) || (init == true))
         {
-            LockHelper.tryLock(writeLock, 100);
+            LockHelper.tryLock(writeLock, tryLockTimeout,
+                    "searching resource bundle and adding new resource bundle for locale if the bundle is not found in 'MessageServiceImpl.getLocaleProperties()'");
             try
             {
                 // get registered resource bundles               
-                Set<String> resBundleBaseNames = getResourceBundleBaseNames(tenantDomain);
+                Set<String> resBundleBaseNames = getResourceBundleBaseNames(tenantDomain, true);
 
                 int count = 0;
                 
@@ -582,10 +592,10 @@ public class MessageServiceImpl implements MessageService
     
     public Set<String> getRegisteredBundles()
     {
-        LockHelper.tryLock(readLock, 100);
+        LockHelper.tryLock(readLock, tryLockTimeout, "getting resource bundle base names in 'MessageServiceImpl.getRegisteredBundles()'");
         try
         {
-            return getResourceBundleBaseNames(getTenantDomain());
+            return getResourceBundleBaseNames(getTenantDomain(), false);
         }
         finally
         {
@@ -593,7 +603,7 @@ public class MessageServiceImpl implements MessageService
         }
     }  
     
-    private Set<String> getResourceBundleBaseNames(String tenantDomain)
+    private Set<String> getResourceBundleBaseNames(String tenantDomain, boolean haveWriteLock)
     {
         // Assume a read lock is present
         Set<String> resourceBundleBaseNames = resourceBundleBaseNamesCache.get(tenantDomain);
@@ -601,10 +611,14 @@ public class MessageServiceImpl implements MessageService
         {
             return resourceBundleBaseNames;
         }
-        
-        // They are not there.  Upgrade to the write lock.
-        readLock.unlock();
-        LockHelper.tryLock(writeLock, 100);
+
+        if (!haveWriteLock)
+        {
+            // They are not there. Upgrade to the write lock.
+            readLock.unlock();
+            LockHelper.tryLock(writeLock, tryLockTimeout, "getting cached resource bundle base names by tenant domain in 'MessageServiceImpl.getRegisteredBundles()'");
+        }
+
         try
         {
             resourceBundleBaseNames = resourceBundleBaseNamesCache.get(tenantDomain);
@@ -617,8 +631,11 @@ public class MessageServiceImpl implements MessageService
         }
         finally
         {
-            writeLock.unlock();
-            LockHelper.tryLock(readLock, 100);
+            if (!haveWriteLock)
+            {
+                writeLock.unlock();
+                LockHelper.tryLock(readLock, tryLockTimeout, "upgrading to read lock in MessageServiceImpl.getResourceBundleBaseNames()");
+            }
         }
         
         if (resourceBundleBaseNames == null)
@@ -655,7 +672,7 @@ public class MessageServiceImpl implements MessageService
         
         // Not present.  Upgrade to write lock.
         readLock.unlock();
-        LockHelper.tryLock(writeLock, 100);
+        LockHelper.tryLock(writeLock, tryLockTimeout, "getting cached resource bundle by tenant domain in 'MessageServiceImpl.getLoadedResourceBundles()'");
         try
         {
             loadedResourceBundles = loadedResourceBundlesCache.get(tenantDomain);
@@ -669,7 +686,7 @@ public class MessageServiceImpl implements MessageService
         finally
         {
             writeLock.unlock();
-            LockHelper.tryLock(readLock, 100);
+            LockHelper.tryLock(readLock, tryLockTimeout, "upgrading to read lock in MessageServiceImpl.getLoadedResourceBundles()");
         }
         
         if (loadedResourceBundles == null)
@@ -714,7 +731,7 @@ public class MessageServiceImpl implements MessageService
         
         // Need to create it.  Upgrade to write lock.
         readLock.unlock();
-        LockHelper.tryLock(writeLock, 100);
+        LockHelper.tryLock(writeLock, tryLockTimeout, "getting messages by tenant domain from the cache in 'MessageServiceImpl.getMessages()'");
         try
         {
             messages = messagesCache.get(tenantDomain);
@@ -728,7 +745,7 @@ public class MessageServiceImpl implements MessageService
         finally
         {
             writeLock.unlock();
-            LockHelper.tryLock(readLock, 100);
+            LockHelper.tryLock(readLock, tryLockTimeout, "upgrading to read lock in MessageServiceImpl.getMessages()");
         }
         
         if (messages == null)
@@ -807,22 +824,24 @@ public class MessageServiceImpl implements MessageService
     
     /**
      * Message Resource Bundle
-     * 
-     * Custom message property resource bundle, to overcome known limitation of JDK 5.0 (and lower).
-     *
+     * <p/>
+     * Custom message property resource bundle, to overcome known limitation of JDK 5.0 (and lower).<br/>
      * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6204853
-     * 
+     * <p/>
      * Note: JDK 6.0 provides the ability to construct a PropertyResourceBundle from a Reader.
      */
     private class MessagePropertyResourceBundle extends ResourceBundle
     {   
         private Properties properties = new Properties();
-        
+
+        /**
+         * @param reader            the source of the properties, which will be closed after use
+         */
         public MessagePropertyResourceBundle(Reader reader) throws IOException
         {
+            BufferedReader br = new BufferedReader(reader);
             try
             {
-                BufferedReader br = new BufferedReader(reader);
                 String line = br.readLine();
                 while (line != null)
                 {
@@ -849,7 +868,8 @@ public class MessageServiceImpl implements MessageService
             }
             finally
             {
-                reader.close();
+                try {br.close();} catch (IOException e) {}
+                try {reader.close();} catch (IOException e) {}
             }
         }
         

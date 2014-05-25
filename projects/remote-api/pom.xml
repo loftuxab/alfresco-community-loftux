@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.alfresco.cmis.client</groupId>
             <artifactId>alfresco-opencmis-extension</artifactId>
-            <version>0.8</version>
+            <version>0.9</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.schema</groupId>
@@ -175,9 +175,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -244,7 +243,7 @@
                 <executions>
                     <execution>
                         <id>wipe-database</id>
-                        <phase>process-test-resources</phase>
+                        <phase>pre-clean</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -254,7 +253,7 @@
                     </execution>
                     <execution>
                         <id>create-database</id>
-                        <phase>process-test-resources</phase>
+                        <phase>pre-clean</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>

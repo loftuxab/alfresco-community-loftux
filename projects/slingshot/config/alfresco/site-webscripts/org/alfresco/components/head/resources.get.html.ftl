@@ -86,6 +86,9 @@
             <#if viewMode.name?js_string == "mode">"${viewMode.value?js_string}"<#if viewMode_has_next>,</#if></#if>
          </#list>
       ];
+      
+      Alfresco.constants.MENU_ARROW_SYMBOL = "&#9662";
+      
       <#if PORTLET>
       document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=";
       </#if>
@@ -101,7 +104,7 @@
    <@link rel="stylesheet" type="text/css" href="${url.context}/res/css/yui-layout.css" group="template-common" />
    <@script type="text/javascript" src="${url.context}/res/js/flash/AC_OETags.js" group="template-common"/>
    <@script type="text/javascript" src="${url.context}/res/js/alfresco.js" group="template-common"/>
-   <script type="text/javascript" src="<@checksumResource src="${url.context}/res/modules/editors/tiny_mce/tiny_mce.js" parameter="checksum"/>"></script>
+   <script type="text/javascript" src="<@checksumResource src="${url.context}/res/modules/editors/tinymce/tinymce.js" parameter="checksum"/>"></script>
    <@script type="text/javascript" src="${url.context}/res/modules/editors/tiny_mce.js" group="template-common"/>
    <@script type="text/javascript" src="${url.context}/res/modules/editors/yui_editor.js" group="template-common"/>
    <@script type="text/javascript" src="${url.context}/res/js/forms-runtime.js" group="template-common"/>

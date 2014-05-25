@@ -41,9 +41,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -87,7 +86,7 @@
                         <executions>
                             <execution>
                                 <id>wipe-database</id>
-                                <phase>process-test-resources</phase>
+                                <phase>pre-clean</phase>
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
@@ -97,7 +96,7 @@
                             </execution>
                             <execution>
                                 <id>create-database</id>
-                                <phase>process-test-resources</phase>
+                                <phase>pre-clean</phase>
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>

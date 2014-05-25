@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,11 +18,15 @@
  */
 package org.alfresco.repo.domain.solr.ibatis;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.node.Node;
 import org.alfresco.repo.domain.qname.QNameDAO;
+import org.alfresco.repo.domain.solr.AclEntity;
 import org.alfresco.repo.domain.solr.NodeParametersEntity;
 import org.alfresco.repo.domain.solr.SOLRDAO;
 import org.alfresco.repo.domain.solr.SOLRTrackingParameters;
@@ -120,15 +124,41 @@ public class SOLRDAOImpl implements SOLRDAO
         params.setIds(aclChangeSetIds);
         params.setFromIdInclusive(minAclId);
 
+        List<Acl> source;
         if (maxResults <= 0 || maxResults == Integer.MAX_VALUE)
         {
-            return (List<Acl>) template.selectList(SELECT_ACLS_BY_CHANGESET_IDS, params);
+            source = (List<Acl>) template.selectList(SELECT_ACLS_BY_CHANGESET_IDS, params);
         }
         else
         {
-            return (List<Acl>) template.selectList(SELECT_ACLS_BY_CHANGESET_IDS, params, new RowBounds(0, maxResults));
+            source = (List<Acl>) template.selectList(SELECT_ACLS_BY_CHANGESET_IDS, params, new RowBounds(0, maxResults));
         }
-       
+        // Add any unlinked shared ACLs from defining nodes to index them now
+        TreeSet<Acl> sorted = new TreeSet<Acl>(source);
+        HashSet<Long> found = new HashSet<Long>();
+        for(Acl acl : source)
+        {
+            found.add(acl.getId());
+        }
+        
+        for(Acl acl : source)
+        {
+            if(acl.getInheritedId() != null)
+            {
+                if(!found.contains(acl.getInheritedId()))
+                {
+                    AclEntity shared = new AclEntity();
+                    shared.setId(acl.getInheritedId());
+                    shared.setAclChangeSetId(acl.getAclChangeSetId());
+                    shared.setInheritedId(acl.getInheritedId());
+                    sorted.add(shared);
+                }
+            }
+        }
+
+        ArrayList<Acl> answer = new ArrayList<Acl>();
+        answer.addAll(sorted);
+        return answer;
     }
 
     /**
