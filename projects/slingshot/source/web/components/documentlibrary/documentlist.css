@@ -374,6 +374,14 @@ body .doclist tr.yui-dt-highlighted
    width: 100px;
 }
 
+.doclist .documents .thumbnail img
+{
+	box-shadow: 3px 3px 5px #888;
+	max-height: 96%;
+	max-width: 90%;
+	background-color: #FFFFFF
+}
+
 .doclist .documents .thumbnail span.link,
 .doclist .documents .folder span.link
 {
