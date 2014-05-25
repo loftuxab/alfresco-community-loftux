@@ -34,6 +34,7 @@ import org.alfresco.po.share.search.AdvanceSearchContentPage;
 import org.alfresco.po.share.search.AdvanceSearchFolderPage;
 import org.alfresco.po.share.search.AdvanceSearchPage;
 import org.alfresco.po.share.search.AllSitesResultsPage;
+import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.search.RepositoryResultsPage;
 import org.alfresco.po.share.search.SiteResultsPage;
 import org.alfresco.po.share.site.AddGroupsPage;
@@ -187,6 +188,7 @@ public class FactorySharePage implements PageFactory
         pages.put("links", LinksPage.class);
         pages.put("pending-invites", PendingInvitesPage.class);
         pages.put("edit-profile", EditProfilePage.class);
+        pages.put("faceted-search", FacetedSearchPage.class);
     }
 
     public HtmlPage getPage(WebDrone drone)

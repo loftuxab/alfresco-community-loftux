@@ -35,11 +35,21 @@ define(["dojo/_base/declare",
         "alfresco/core/CoreWidgetProcessing",
         "dojo/text!./templates/ProcessWidgets.html",
         "dojo/dom-construct",
+        "dojo/dom-class",
         "dojo/_base/array"], 
-        function(declare, _Widget, _Templated, AlfCore, CoreWidgetProcessing, template, domConstruct, array) {
+        function(declare, _Widget, _Templated, AlfCore, CoreWidgetProcessing, template, domConstruct, domClass, array) {
    
    return declare([_Widget, _Templated, AlfCore, CoreWidgetProcessing], {
       
+      /**
+       * An array of the CSS files to use with this widget.
+       * 
+       * @instance
+       * @type {object[]}
+       * @default [{cssFile:"./css/ProcessWidgets.css"}]
+       */
+      cssRequirements: [{cssFile:"./css/ProcessWidgets.css"}],
+
       /**
        * The HTML template to use for the widget.
        * @instance
@@ -74,6 +84,7 @@ define(["dojo/_base/declare",
        * @instance postCreate
        */
       postCreate: function alfresco_core_ProcessWidgets__postCreate() {
+         domClass.add(this.domNode, (this.additionalCssClasses != null ? this.additionalCssClasses : ""));
          if (this.widgets)
          {
             this.processWidgets(this.widgets, this.containerNode);

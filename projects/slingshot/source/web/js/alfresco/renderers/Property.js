@@ -136,32 +136,6 @@ define(["dojo/_base/declare",
       renderedValueSuffix: "",
       
       /**
-       * By default this is the empty string but will be converted to the HTML for opening an anchor
-       * when the property is to be used as a link to access the item
-       * @instance
-       * @type {string}
-       * @default ""
-       */
-      anchorOpen: "",
-      
-      /**
-       * By default this is the empty string but will be converted to the HTML for closing an anchor
-       * when the property is to be used as a link to access the item
-       * @instance
-       * @type {string}
-       * @default ""
-       */
-      anchorClose: "",
-      
-      /**
-       * Indicates whether or not to render this property as a link
-       * @instance
-       * @type {boolean}
-       * @default false 
-       */
-      renderAsLink: false,
-      
-      /**
        * Indicates whether or not to hide the property if is not available or not set
        * @instance
        * @type {boolean}
@@ -229,15 +203,6 @@ define(["dojo/_base/declare",
             this.label = "";
          }
          
-         // if (this.renderAsLink)
-         // {
-         //    // var linkDetails = this.generateFileFolderLink();
-         //    // var itemLinkHref = linkDetails.itemLinkHref + linkDetails.itemLinkRelative;
-         //    // this.anchorOpen = "<a href='" + itemLinkHref + "'>"
-         //    // this.anchorClose = "</a>"
-         //    this.createItemLinnk(this.domNode);
-         // }
-         
          if (ObjectTypeUtils.isString(this.propertyToRender) && 
              ObjectTypeUtils.isObject(this.currentItem) && 
              lang.exists(this.propertyToRender, this.currentItem))
@@ -258,7 +223,7 @@ define(["dojo/_base/declare",
          }
 
          // If the renderedValue is not set then display a warning message if requested...
-         if (this.renderedValue == null && this.warnIfNotAvailable)
+         if ((this.renderedValue == null || this.renderedValue == "") && this.warnIfNotAvailable)
          {
             // Get appropriate message
             // Check message based on propertyToRender otherwise default to sensible alternative
@@ -268,7 +233,7 @@ define(["dojo/_base/declare",
             {
                warningKey = "no." + this.propertyToRender + ".message";
                warningMessage = this.message(warningKey);
-               if (warning == warningKey)
+               if (warningMessage == warningKey)
                {
                   warningMessage = this.message("no.property.message", {0:this.propertyToRender});
                }
@@ -280,7 +245,7 @@ define(["dojo/_base/declare",
             this.renderedValue = warningMessage;
             this.renderedValueClass += " faded";
          }
-         else if (this.renderedValue == "" && !this.warnIfNotAvailable)
+         else if ((this.renderedValue == null || this.renderedValue == "") && !this.warnIfNotAvailable)
          {
             // Reset the prefix and suffix if there's no data to display
             this.requestedValuePrefix = this.renderedValuePrefix;
@@ -303,11 +268,6 @@ define(["dojo/_base/declare",
          else
          {
             // No action
-         }
-
-         if (this.renderAsLink)
-         {
-            this.createItemLink(this.renderedValueNode);
          }
       },
       
@@ -351,6 +311,7 @@ define(["dojo/_base/declare",
          }
          else if (ObjectTypeUtils.isObject(property))
          {
+            // TODO: This should probably be moved out into a Node specific sub-class
             if (property.hasOwnProperty("iso8601"))
             {
                value =  this.renderDate(property.iso8601);

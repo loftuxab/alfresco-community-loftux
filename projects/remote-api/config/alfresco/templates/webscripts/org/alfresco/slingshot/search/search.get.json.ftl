@@ -3,6 +3,23 @@
 	"totalRecords": ${data.paging.totalRecords?c},
 	"totalRecordsUpper": ${data.paging.totalRecordsUpper?c},
 	"startIndex": ${data.paging.startIndex?c},
+	"numberFound": ${(data.paging.numberFound!-1)?c},
+	"facets":
+	{
+		<#if data.facets??><#list data.facets?keys as field>
+		"${field}":
+		[
+			<#assign facets=data.facets[field]><#list facets as f>
+			{
+			"label": "${f.facetLabel}",
+			"value": "${f.facetValue}",
+			"hits": ${f.hits?c},
+			"index": ${f.facetLabelIndex?c}
+			}<#if f_has_next>,</#if>
+			</#list>
+		]<#if field_has_next>,</#if>
+		</#list></#if>
+	},
 	"items":
 	[
 		<#list data.items as item>

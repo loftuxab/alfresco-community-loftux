@@ -29,12 +29,12 @@ define(["intern/dojo/node!fs",
 
       /**
        * This is the path to use to bootstrap tests. It should ONLY be defined here so that
-	   * pervasive changes can be made in this one file.
-	   *
-	   * @instance
-	   * @type {string}
-	   * @default "/share/page/tp/ws/unit-test-bootstrap"
-	   */
+       * pervasive changes can be made in this one file.
+       *
+       * @instance
+       * @type {string}
+       * @default "/share/page/tp/ws/unit-test-bootstrap"
+       */
       bootstrapPath: "/share/page/tp/ws/unit-test-bootstrap",
 
       /**
@@ -46,7 +46,7 @@ define(["intern/dojo/node!fs",
        * @default Config.bootstrapBaseUrl + this.bootstrapPath
        */
       bootstrapUrl: function bootstrapUrl(){
-    	  return Config.bootstrapBaseUrl + this.bootstrapPath;
+         return Config.bootstrapBaseUrl + this.bootstrapPath;
       },
 
       /**
@@ -85,13 +85,18 @@ define(["intern/dojo/node!fs",
        * the JSON definition of the page to test.
        * @returns {promise} The promise for continuing the unit test.
        */
-      bootstrapTest: function(browser, testPageDefinitionFile) {
+      bootstrapTest: function(browser, testPageDefinitionFile, testname) {
 
-         // Set an implicit timeout of 10 seconds
+         // Set browser timeouts - refer to Config files
          // This allows us to use "elementBy..." calls rather than a "waitForElementBy..." which is more efficient...
-         browser.setImplicitWaitTimeout(1000);
-         browser.setPageLoadTimeout(10000);
-         browser.setAsyncScriptTimeout(10000);
+         browser.setImplicitWaitTimeout(Config.timeout.implicitWait);
+         browser.setPageLoadTimeout(Config.timeout.pageLoad);
+         browser.setAsyncScriptTimeout(Config.timeout.asyncScript);
+
+         if(testname && browser.environmentType.browserName)
+         {
+            console.log(">> Starting '" + testname + "' on " + browser.environmentType.browserName);
+         }
 
          // Load the model definition file
          // It's necessary to remove any carriage returns and new line characters from the page model otherwise the eval statement will cause an error...
@@ -112,10 +117,10 @@ define(["intern/dojo/node!fs",
 
          return browser.get(this.bootstrapUrl())
 
-         .elementByCss('.alfresco-core-Page.allWidgetsProcessed')
+         .waitForElementByCss('.alfresco-core-Page.allWidgetsProcessed')
          .safeEval("dijit.registry.byId('UNIT_TEST_MODEL_FIELD').setValue('" + pageModel + "');'set';")
          .end()
-            
+
          // It's necessary to type an additional space into the text area to ensure that the 
          // text area field validates and populates the form model with the data to be published...
          .elementByCss('#UNIT_TEST_MODEL_FIELD > DIV.control > TEXTAREA')
@@ -129,7 +134,7 @@ define(["intern/dojo/node!fs",
          .click()
          .sleep(500) // This sleep appears to be needed to prevent errors, but ideally it woudn't be here :(
          .end()
-         .elementByCss('.alfresco-core-Page.allWidgetsProcessed', 5000)
+         .waitForElementByCss('.alfresco-core-Page.allWidgetsProcessed')
       },
 
       /**
@@ -146,6 +151,27 @@ define(["intern/dojo/node!fs",
             row = "nth-child(" + expectedRow + ")"
          };
          return row;
+      },
+
+      /**
+       * This generates a CSS selector that attempts to select a publication payload entry from the SubscriptionLog
+       * widget. It's looking for a specific publish topic so could return multiple results.
+       *
+       * @instance
+       * @param {string} publishTopic The topic published on
+       * @param {string} key The key for the data
+       * @param {string} value The value for the data
+       * @returns {string} The CSS selector
+       */
+      pubDataCssSelector: function(publishTopic, key, value) {
+
+         var selector = "td[data-publish-topic='" + publishTopic + "'] + " +
+                        "td.sl-data tr.sl-object-row " +
+                        "td[data-pubsub-object-key=" + 
+                        key + 
+                        "]+td[data-pubsub-object-value='" + 
+                        value + "']";
+         return selector;
       },
 
       /**
@@ -202,10 +228,11 @@ define(["intern/dojo/node!fs",
        * @instance
        * @param {string} topic The topic to search
        * @param {string} type (optional) The topic action (e.g. "publish" or "subscribe") defaults to "subscribe"
-       * @param {string} expectedRow (optional) A specific row to check for ("last" is an accepted option)
+       * @param {string} expectedRow (optional) A specific row to check for ("last" is an accepted option). Negative numbers trigger a backwards count.
+       * @param {string} [matchType="exact"] Choose between a partial, prefix, suffix or exact match on topic.
        * @returns {string} The CSS selector
        */
-      topicSelector: function(topic, type, expectedRow) {
+      topicSelector: function(topic, type, expectedRow, matchType) {
 
          if (type == null)
          {
@@ -213,16 +240,45 @@ define(["intern/dojo/node!fs",
          }
 
          var row = "";
-         if (expectedRow == "last")
+         if (expectedRow == "any")
+         {
+            // Don't specify a row
+         }
+         else if (expectedRow == "last")
          {
             row = ":last-child"
          }
          else if (expectedRow != null)
          {
-            row = ":nth-child(" + expectedRow + ")"
+            var rowSelector = "nth-child";
+            if (expectedRow.indexOf("-") !== -1)
+            {
+               // If the expected row contains a negative number, count backwards. -1 is last, -2 is penultimate, etc.
+               rowSelector = "nth-last-child";
+               expectedRow = expectedRow.slice(1, expectedRow.length);
+            }
+            row = ":" + rowSelector + "(" + expectedRow + ")";
          }
 
-         var selector = ".alfresco-testing-SubscriptionLog tr.sl-row" + row + " td[data-" + type + "-topic=" + topic + "]";
+         // Allow partial matching, match prefix or suffix.
+         matchType = matchType || "exact";
+         var comparison = "=";
+
+         switch (matchType) {
+            case "partial":
+               comparison = "*=";
+               break;
+            case "prefix":
+               comparison = "$=";
+               break;
+            case "suffix":
+               comparison = "^=";
+               break;
+            default:
+               comparison = "=";
+         }
+
+         var selector = ".alfresco-testing-SubscriptionLog tr.sl-row" + row + " td[data-" + type + "-topic" + comparison + topic + "]";
          // console.log("Topic selector: " + selector);
          return selector;
       },
@@ -264,6 +320,11 @@ define(["intern/dojo/node!fs",
       log: function(test, line, desc) {
          console.log(">> " + test + " [" + line + "]: " + desc);
       }
+
+      /**
+       * Counts the number of results from the CSS selector that is passed in.
+       *
+       */
    };
 
 });

@@ -38,25 +38,30 @@ function getLicenseUsage() {
  * @returns {object} The group information for the current user
  */
 function getUserGroupData() {
-   var userData = null;
-   var json = remote.call("/api/people/" + encodeURIComponent(user.name) + "?groups=true");
-   if (json.status == 200)
+   var userData = {};
+   var groups = user.properties["alfUserGroups"];
+   if (groups != null)
    {
-      // Create javascript objects from the repo response
-      userData = JSON.parse(json);
-      if (userData != null && userData.groups != null)
+      groups = groups.split(",");
+      var processedGroups = {};
+      for (var i=0; i<groups.length; i++)
       {
-         // Convert the array of groups into a object for easier access...
-         var processedGroups = {};
-         for (var i=0; i<userData.groups.length; i++)
-         {
-            processedGroups[userData.groups[i].itemName] = true;
-         }
-         userData.groups = processedGroups;
+         processedGroups[groups[i]] = true;
       }
+      userData.groups = processedGroups;
    }
+   userData.isNetworkAdmin = user.properties["isNetworkAdmin"];
+   if (userData.isNetworkAdmin == null)
+   {
+      userData.isNetworkAdmin = false;
+   }
+
    return userData;
 }
+
+// Process the user group data and assign to a variable so that it easily
+// accessible to any controller importing this lib file...
+var _processedUserData = getUserGroupData();
 
 
 /* *********************************************************************************
@@ -1763,7 +1768,7 @@ function getHeaderServices() {
    return services;
 }
 
-function getHeaderModel() {
+function getHeaderModel(pageTitle) {
 
    var headerMenus = getHeaderMenus();
 
@@ -1907,6 +1912,7 @@ function getHeaderModel() {
                config: {
                   id: "HEADER_SEARCH_BOX",
                   site: page.url.templateArgs.site,
+                  linkToFacetedSearch: false,
                   repository: (page.id == "repository" || page.id == "myfiles" || page.id == "sharedfiles")
                }
             }
@@ -1945,7 +1951,7 @@ function getHeaderModel() {
                align: "left",
                config: {
                   targetUrl: page.url.templateArgs.site != null ? "site/" + page.url.templateArgs.site + "/dashboard" : null,
-                  label: getPageTitle()
+                  label: (pageTitle != null) ? pageTitle : getPageTitle()
                }
             },
             {

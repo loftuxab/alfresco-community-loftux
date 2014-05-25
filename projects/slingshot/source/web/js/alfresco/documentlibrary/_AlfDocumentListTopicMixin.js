@@ -246,7 +246,42 @@ define(["dojo/_base/declare"],
        * @type {string}
        * @default "ALF_UNSYNC_CURRENT_LOCATION"
        */
-      unsyncLocationTopic: "ALF_UNSYNC_CURRENT_LOCATION"
-      
+      unsyncLocationTopic: "ALF_UNSYNC_CURRENT_LOCATION",
+
+      /**
+       * Used by infinite scroll to let other widgets know that the bottom of the page has been reached.
+       *
+       * @instance
+       * @type {string}
+       * @default "ALF_DOCLIST_INSERT_MORE"
+       */
+      scrollNearBottom: "ALF_SCROLL_NEAR_BOTTOM",
+
+      /**
+       * Used to clear the currentData object in the view.
+       *
+       */
+      clearDocDataTopic: "ALF_DOCLIST_CLEAR_DATA",
+
+      /**
+       * Indicates that a document request has started. Usually used in conjunction with requestFinishedTopic.
+       * e.g. by code to prevent duplicate submission of requests.
+       *
+       * @instance
+       * @type {string}
+       * @default ALF_DOCLIST_REQUEST_IN_PROGRESS
+       */
+      requestInProgressTopic: "ALF_DOCLIST_REQUEST_IN_PROGRESS",
+
+      /**
+       * Indicates that a document request finished. Usually used in conjunction with requestInProgressTopic.
+       * e.g. by code to prevent duplicate submission of requests.
+       *
+       * @instance
+       * @type {string}
+       * @default ALF_DOCLIST_REQUEST_FINISHED
+       */
+      requestFinishedTopic: "ALF_DOCLIST_REQUEST_FINISHED"
+
    });
 });

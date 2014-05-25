@@ -46,7 +46,8 @@ define(["dojo/_base/declare",
        */
       constructor: function alfresco_services_SearchService__constructor(args) {
          lang.mixin(this, args);
-         this.alfSubscribe("ALF_SEARCH_REQUEST", lang.hitch(this, "onSearchRequest"));
+         this.alfSubscribe("ALF_SEARCH_REQUEST", lang.hitch(this, this.onSearchRequest));
+         this.alfSubscribe("ALF_STOP_SEARCH_REQUEST", lang.hitch(this, this.onStopRequest));
       },
       
       /**
@@ -65,9 +66,9 @@ define(["dojo/_base/declare",
        * 
        * @instance
        * @type {number}
-       * @default 50
+       * @default 25
        */
-      pageSize: 50,
+      pageSize: 25,
 
       /**
        * This is the default query to use if one isn't supplied in a search request. 
@@ -115,6 +116,15 @@ define(["dojo/_base/declare",
        * @default ""
        */
       sort: "",
+
+      /**
+       * This is the default sort direction to use. This value will be used if a specific value isn't supplied in the search request.
+       * 
+       * @instance
+       * @type {boolean}
+       * @default true
+       */
+      sortAscending: true,
 
       /**
        * This is the default page index to use for multiple pages of search results. This value will be used if
@@ -172,6 +182,9 @@ define(["dojo/_base/declare",
                      case "maxResults":
                      case "facetFields":
                      case "filters":
+                     case "sortAscending":
+                     case "sortField":
+                     case "requestId":
                         break;
                      default:
                         queryAttributes[key] = payload[key];
@@ -185,7 +198,18 @@ define(["dojo/_base/declare",
             }
             else
             {
-               query = payload.query
+               query = payload.query;
+            }
+
+            var sort = "";
+            if (payload.sortField != null && payload.sortField == "")
+            {
+               // No action required - leave as the empty string which is relevance - no direction can be applied
+            }
+            else
+            {
+               sort = ((payload.sortField != null) ? payload.sortField : this.sort) + "|" + 
+                      ((payload.sortAscending != null) ? payload.sortAscending : this.sortAscending);
             }
 
             var data = {
@@ -194,18 +218,17 @@ define(["dojo/_base/declare",
                term: payload.term,
                tag: (payload.tag != null) ? payload.tag : this.tag,
                startIndex: (payload.startIndex != null) ? payload.startIndex : this.startIndex,
-               sort: (payload.sort != null) ? payload.sort : this.sort,
-               // site: (payload.site != null) ? payload.site : this.site,
-               site: "",
-               // rootNode: (payload.rootNode != null) ? payload.rootNode : this.rootNode,
-               rootNode: "alfresco://company/home",
-               // repo: (payload.repo != null) ? payload.repo : this.repo,
-               repo: false,
+               sort: sort,
+               site: (payload.site != null) ? payload.site : this.site,
+               rootNode: (payload.rootNode != null) ? payload.rootNode : this.rootNode,
+               repo: (payload.repo != null) ? payload.repo : this.repo,
                query: query,
                pageSize: (payload.pageSize != null) ? payload.pageSize : this.pageSize,
-               maxResults: (payload.maxResults != null) ? payload.maxResults : this.maxResults
+               maxResults: (payload.maxResults != null) ? payload.maxResults : this.maxResults,
+               noCache: new Date().getTime()
             };
             var config = {
+               requestId: payload.requestId,
                alfTopic: alfTopic,
                url: url,
                query: data,

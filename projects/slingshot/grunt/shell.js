@@ -30,6 +30,18 @@ module.exports = function (grunt, alf) {
       // @see: https://github.com/sindresorhus/grunt-shell
       shell: {
 
+         antClean: {
+            command: 'ant clean',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  cwd: alf.rootDir
+               }
+            }
+         },
+
          // Generate JSDocs
          jsdoc: {
             command: 'jsdoc ../../' + alf.jsdocFiles + ' -c ../../conf.json', // TODO: Make this work with defined paths.
@@ -51,7 +63,8 @@ module.exports = function (grunt, alf) {
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.testResourcesDir + "/selenium"
+                  cwd: alf.testResourcesDir + "/selenium",
+                  maxBuffer: "Infinite"
                }
             }
          },
@@ -66,6 +79,14 @@ module.exports = function (grunt, alf) {
             }
          },
          startShare: {
+            command: 's -e && s -t',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true
+            }
+         },
+         startShareInc: {
             command: 's -ie && s -t',
             options: {
                stdout: true,
@@ -74,7 +95,7 @@ module.exports = function (grunt, alf) {
             }
          },
          killRepo: {
-            command: 'kill -9 `lsof -t -i :8080`',
+            command: 'kill `lsof -t -i :8080 -sTCP:LISTEN`',
             options: {
                stdout: true,
                stderr: true,
@@ -82,13 +103,26 @@ module.exports = function (grunt, alf) {
             }
          },
          killShare: {
-            command: 'kill -9 `lsof -t -i :8081`',
+            command: 'kill `lsof -t -i :8081 -sTCP:LISTEN`',
             options: {
                stdout: true,
                stderr: true,
                failOnError: false
             }
          },
+
+         svnUp: {
+            command: 'pwd;svn up',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  cwd: alf.codeDir
+               }
+            }
+         },
+
          // See also vagrant.js
          // Start the vagrant VM
          vagrantUp: {

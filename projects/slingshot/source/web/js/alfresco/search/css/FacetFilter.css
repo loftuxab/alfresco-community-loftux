@@ -1,9 +1,10 @@
 .alfresco-search-FacetFilter {
    overflow: hidden;
-   width: 300px;
-   margin-left: 25px;
-   line-height: 15px;
-   margin-bottom: 15px;
+   line-height: ceil(@small-font-size/@standard-line-height) * @standard-line-height;
+   font-size: @small-font-size;
+   list-style-type: none;
+   padding-bottom: @standard-line-height - 4;
+   margin-left: -2px;
 }
 
 .alfresco-search-FacetFilter:last-child {
@@ -12,7 +13,14 @@
 
 .alfresco-search-FacetFilter .status {
    display: inline-block;
-   width: 20px;
+   width: @standard-column-width + @standard-column-spacing - 4;
+   float: left;
+}
+
+.alfresco-search-FacetFilter .details {
+   display: block;
+   margin-left: @standard-column-width + @standard-column-spacing - 4;
+   word-break: break-all;
 }
 
 .alfresco-search-FacetFilter .filterLabel {
@@ -20,14 +28,12 @@
 }
 
 .alfresco-search-FacetFilter .filterLabel.applied {
-   font-family: Open Sans Bold;
-   color: #000000;
-   font-size: 110%;
+   .emphasized-font;
 }
 
 .alfresco-search-FacetFilter .hits {
-   color: #B3B3B3;
-   margin-left: 5px;
+   .de-emphasized-font;
+   margin-left: @standard-column-spacing;
 }
 
 .alfresco-search-FacetFilter .status .remove {

@@ -34,7 +34,9 @@
  *       checked: true,
  *       onConfig: {
  *          label: "Turned On",
+ *          title: "Click to turn off",
  *          iconClass: "on-icon",
+ *          iconAltText: "Toggle is on",
  *          publishTopic: "toggle_changed",
  *          publishPayload: {
  *             value: "ON"
@@ -42,7 +44,9 @@
  *       },
  *       offConfig: {
  *          label: "Turned Off",
+ *          title: "Click to turn on",
  *          iconClass: "off-icon",
+ *          iconAltText: "Toggle is off",
  *          publishTopic: "toggle_changed",
  *          publishPayload: {
  *             value: "OFF"
@@ -58,8 +62,10 @@
 define(["dojo/_base/declare",
         "alfresco/menus/AlfMenuBarItem",
         "dojo/dom-construct",
-        "dojo/dom-class"], 
-        function(declare, AlfMenuBarItem, domConstruct, domClass) {
+        "dojo/dom-class",
+        "dojo/dom-attr",
+        "dojo/_base/lang"], 
+        function(declare, AlfMenuBarItem, domConstruct, domClass, domAttr, lang) {
    
    
    return declare([AlfMenuBarItem], {
@@ -136,7 +142,16 @@ define(["dojo/_base/declare",
             }
          }
       },
-      
+
+      /**
+       * Subscribe the document list topics.
+       * 
+       * @instance
+       */
+      postMixInProperties: function alfresco_menus_AlfMenuBarToggle__postMixInProperties() {
+         this.alfSubscribe("ALF_DOCLIST_SORT_FIELD_SELECTION", lang.hitch(this, "setState"));
+      },
+
       /**
        * Sets up the initial state of the widget based on the [onConfig]{@link module:alfresco/menus/AlfMenuBarToggle#onConfig}
        * and [offConfig]{@link module:alfresco/menus/AlfMenuBarToggle#offConfig} attributes. The
@@ -180,27 +195,48 @@ define(["dojo/_base/declare",
        * @param {object} oldConfig The old configuration being removed from the toggle button.
        */
       renderToggle: function alfresco_menus_AlfMenuBarToggle__renderToggle(newConfig, oldConfig) {
+
+         // New config has a label - set it
          if (newConfig && newConfig.label)
          {
             this.label = newConfig.label;
             this.set('label', this.message(newConfig.label));
+            this.title = newConfig.title;
          }
+
+         // New config has a title - set it
+         if (newConfig && newConfig.title)
+         {
+            this.title = newConfig.title;
+            this.set('title', this.message(newConfig.title));
+         }
+
+         // New config has iconAltText - set it on the iconNode
+         if (newConfig && newConfig.iconAltText)
+         {
+            this.iconAltText = newConfig.iconAltText;
+            domAttr.set(this.iconNode, "alt", newConfig.iconAltText);
+         }
+
+         // Remove old iconClass
          if (oldConfig && oldConfig.iconClass)
          {
             domClass.remove(this.iconNode, oldConfig.iconClass);
          }
+
+         // New config has an iconClass - add it
          if (newConfig && newConfig.iconClass)
          {
             this.iconClass = newConfig.iconClass;
             domClass.add(this.iconNode, newConfig.iconClass);
          }
-         
+
          // Clicking on the check cell will result in the menu item being marked as selected
          // but we want to ensure that this is not the case so always remove the class that 
          // indicates selection...
          domClass.remove(this.domNode, "dijitMenuItemSelected");
       },
-      
+
       /**
        * This handles the user clicking on the toggle. The state is changed (e.g. from OFF on ON)
        * and any data associated with the new state is published on the configured topic. 
@@ -224,6 +260,28 @@ define(["dojo/_base/declare",
             if (this.offConfig.publishTopic)
             {
                this.alfPublish(this.offConfig.publishTopic, this.offConfig.publishPayload);
+            }
+         }
+      },
+
+      /**
+       * This handles the toggle being set by a 3rd party widget. It does not publish but just 
+       * changes the display.
+       *
+       * @instance
+       */
+      setState: function alfresco_menus_AlfMenuBarToggle__setState(payload) {
+         if (payload && payload.direction != null)
+         {
+            this.alfLog("log", "Setting state");
+            this.checked = payload.direction == "ascending";
+            if (this.checked)
+            {
+               this.renderToggle(this.onConfig, this.offConfig);
+            }
+            else
+            {
+               this.renderToggle(this.offConfig, this.onConfig);
             }
          }
       }

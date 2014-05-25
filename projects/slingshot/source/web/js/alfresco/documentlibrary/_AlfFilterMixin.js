@@ -33,8 +33,9 @@
 define(["dojo/_base/declare",
         "alfresco/core/Core",
         "dojo/_base/lang",
+        "dojo/_base/array",
         "dojo/io-query"], 
-        function(declare, AlfCore, lang, ioQuery) {
+        function(declare, AlfCore, lang, array, ioQuery) {
    
    return declare([AlfCore], {
 
@@ -48,32 +49,11 @@ define(["dojo/_base/declare",
        */
       processFilter: function alfresco_documentlibrary__AlfFilterMixin__processFilter(data) {
          var filterObj = ioQuery.queryToObject(data);
-         if (filterObj != null && filterObj.filter != null)
+         if (filterObj == null)
          {
-            // The filter attribute will be divided up into up to 3 parts by the "bar" character (|)
-            // Part 1 = filterId (e.g. "path")
-            // Part 2 = filterData (e.g. "/some/folder/location")
-            // Part 3 = filterDisplay (?? don't actually know where this is used - but it can be provided!)
-            var splitFilter = filterObj.filter.split("|");
-            if (typeof splitFilter[0] !== "undefined")
-            {
-               filterObj.filterId = splitFilter[0];
-            }
-            if (typeof splitFilter[1] !== "undefined")
-            {
-               filterObj.filterData = splitFilter[1];
-            }
-            if (typeof splitFilter[2] !== "undefined")
-            {
-               filterObj.filterDisplay = splitFilter[2];
-            }
-         }
-         else
-         {
+            // The default filter is root location in a document lib...
             filterObj = {
-               filterId: "path",
-               filterData: "/",
-               filterDisplay: ""
+               path: "/"
             };
          }
          return filterObj;

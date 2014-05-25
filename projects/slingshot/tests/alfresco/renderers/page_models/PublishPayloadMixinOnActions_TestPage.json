@@ -14,6 +14,7 @@
       {
          "name": "alfresco/documentlibrary/views/AlfDocumentListWithHeaderView",
          "config": {
+            "subscribeToDocRequests": true,
             "currentData": {
                "items": [
                   {"col1":"Test1", "variable1":"red", "variable2":"orange"},
@@ -61,6 +62,7 @@
                                  {
                                     "name": "alfresco/renderers/Actions",
                                     "config": {
+                                       "filterActions": false,
                                        "customActions": [
                                           {
                                              "label": "Delete action",
@@ -74,6 +76,7 @@
                                              "icon": "folder-manage-permissions",
                                              "index": "10",
                                              "publishTopic": "MANAGE_ACTION_TOPIC",
+                                             "publishPayloadType": "BUILD",
                                              "publishPayload": {
                                                 "payloadVariable1": {
                                                    "alfType": "item",

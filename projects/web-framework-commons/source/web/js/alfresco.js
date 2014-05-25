@@ -2225,7 +2225,14 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
    if (Alfresco.util.createTwister.collapsed === undefined)
    {
       var preferences = new Alfresco.service.Preferences();
-      Alfresco.util.createTwister.collapsed = Alfresco.util.findValueByDotNotation(preferences.get(), Alfresco.service.Preferences.COLLAPSED_TWISTERS) || "";
+      if (Alfresco.service.Preferences.COLLAPSED_TWISTERS)
+      {
+         Alfresco.util.createTwister.collapsed = Alfresco.util.findValueByDotNotation(preferences.get(), Alfresco.service.Preferences.COLLAPSED_TWISTERS) || "";
+      }
+      else
+      {
+         Alfresco.util.createTwister.collapsed = "";
+      }
    }
 
    // See if panel should be collapsed via value stored in preferences
@@ -2237,37 +2244,52 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
    YUIDom.addClass(elController, isCollapsed ? config.CLASS_CLOSED : config.CLASS_OPEN);
    YUIDom.setStyle(elPanel, "display", isCollapsed ? "none" : "block");
 
-   YUIEvent.addListener(elController, "click", function(p_event, p_obj)
+   var twistFun = function(p_event, p_obj)
+   {
+      var type = p_event.type;
+      if(type && type === "keypress")
+      {
+         var keyCode = p_event.keyCode;
+         if(keyCode && keyCode !== YUIKeyListener.KEY.ENTER && keyCode !== YUIKeyListener.KEY.SPACE)
          {
-            // Only expand/collapse if actual twister element is clicked (not for inner elements, i.e. twister actions)
-            if (YUIEvent.getTarget(p_event) == elController)
-            {
-               // Update UI to new state
-               var collapse = YUIDom.hasClass(p_obj.controller, config.CLASS_OPEN);
-               if (collapse)
-               {
-                  YUIDom.replaceClass(p_obj.controller, config.CLASS_OPEN, config.CLASS_CLOSED);
-               }
-               else
-               {
-                  YUIDom.replaceClass(p_obj.controller, config.CLASS_CLOSED, config.CLASS_OPEN);
-               }
-               YUIDom.setStyle(p_obj.panel, "display", collapse ? "none" : "block");
+            return;
+         }
+      }
 
-               if (p_obj.filterName)
-               {
-                  // Save to preferences
-                  var fnPref = collapse ? "add" : "remove",
-                        preferences = new Alfresco.service.Preferences();
-                  preferences[fnPref].call(preferences, Alfresco.service.Preferences.COLLAPSED_TWISTERS, p_obj.filterName);
-               }
-            }
-         },
+      // Only expand/collapse if actual twister element is clicked (not for inner elements, i.e. twister actions)
+      if (YUIEvent.getTarget(p_event) == elController)
+      {
+         // Update UI to new state
+         var collapse = YUIDom.hasClass(p_obj.controller, config.CLASS_OPEN);
+         if (collapse)
          {
-            controller: elController,
-            panel: elPanel,
-            filterName: p_filterName
-         });
+            YUIDom.replaceClass(p_obj.controller, config.CLASS_OPEN, config.CLASS_CLOSED);
+         }
+         else
+         {
+            YUIDom.replaceClass(p_obj.controller, config.CLASS_CLOSED, config.CLASS_OPEN);
+         }
+         YUIDom.setStyle(p_obj.panel, "display", collapse ? "none" : "block");
+
+         if (p_obj.filterName)
+         {
+            // Save to preferences
+            var fnPref = collapse ? "add" : "remove",
+                  preferences = new Alfresco.service.Preferences();
+            preferences[fnPref].call(preferences, Alfresco.service.Preferences.COLLAPSED_TWISTERS, p_obj.filterName);
+         }
+      }
+   };
+
+   var twistObj = {
+      controller: elController,
+      panel: elPanel,
+      filterName: p_filterName
+   };
+
+   YUIEvent.addListener(elController, "click", twistFun, twistObj);
+   YUIEvent.addListener(elController, "keypress", twistFun, twistObj);
+
 };
 
 /**

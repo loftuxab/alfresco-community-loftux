@@ -59,7 +59,7 @@ define(["dojo/_base/declare",
        *
        * @instance
        * @type {number}
-       * @default
+       * @default null
        */
       maxFilters: null,
 
@@ -73,6 +73,16 @@ define(["dojo/_base/declare",
       hitThreshold: null,
 
       /**
+       * The length (in number of characters) that a filter should have in order for it to be shown. This is particularly
+       * relevant for facets similar to description where lots of short meaningless filters might be returned.
+       *
+       * @instance
+       * @type {number}
+       * @default null
+       */
+      minFilterValueLength: null,
+
+      /**
        * How the filters are ordered. The options are:
        * <ul><li>ALPHABETICALLY (sort alphabetically by label)</li>
        * <li>ASCENDING (ascending number of hits)</li>
@@ -83,7 +93,16 @@ define(["dojo/_base/declare",
        * @default "ALPHABETICALLY"
        */
       sortBy: "ALPHABETICALLY",
-      
+
+      /**
+       * Pass through setting for useHash on initialised FacetFilter widgets
+       *
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      useHash: false,
+
       /**
        * Processes any widgets defined in the configuration for this instance.
        * 
@@ -97,20 +116,37 @@ define(["dojo/_base/declare",
 
          // TODO: Commented out and published because it's being developed against QuaddsWidgets...
          this.alfSubscribe("ALF_WIDGETS_READY", lang.hitch(this, "publishFacets"), true);
-         this.publishFacets();
+         // this.publishFacets();
       },
       
+      /**
+       * This has been added to support the initial implementation of date and size faceting against
+       * Solr 1.4. The search service will always include modification/creation date and file size
+       * filter data in all search responses as these are hard-coded into the Search API as facet queries
+       * and so requesting those as filters will generate unnecessary and confusing response data
+       *
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      blockIncludeFacetRequest: false,
+
+      /**
+       * 
+       * @instance
+       */
       publishFacets: function alfresco_search_FacetFilters__publishFacets() {
          if (this.facetQName != null && this.facetQName != "")
          {
             // Publish the details of the facet for the SearchService to log for inclusion in search requests
-            // TODO: Update SearchService to subscribe to this topic...
-            this.alfPublish("ALF_INCLUDE_FACET", {
-               qname: this.facetQName
-            }, true);
+            if (this.blockIncludeFacetRequest == false)
+            {
+               this.alfPublish("ALF_INCLUDE_FACET", {
+                  qname: this.facetQName
+               }, true);
+            }
 
             // Subscribe to facet property results to add facet properties...
-            // TODO: Update SearchService to publish on this topic when search results come in...
             this.alfSubscribe("ALF_FACET_RESULTS_@" + this.facetQName, lang.hitch(this, "processFacetFilters"));
          }
          else
@@ -129,6 +165,11 @@ define(["dojo/_base/declare",
       processFacetFilters: function alfresco_search_FacetFilters__processFacetFilters(payload) {
          this.alfLog("log", "Facet Results received!", payload, this);
 
+         // Reset the more/less options...
+         this.moreFiltersList = null;
+         domClass.add(this.showMoreNode, "hidden");
+         domClass.add(this.showLessNode, "hidden");
+
          // Remove all previous filters...
          var widgets = registry.findWidgets(this.filtersNode);
          array.forEach(widgets, function(widget, i) {
@@ -146,9 +187,12 @@ define(["dojo/_base/declare",
          var filters = [];
          for (var key in payload.facetResults)
          {
+            var currFilter = payload.facetResults[key];
             filters.push({
-               value: key,
-               hits: payload.facetResults[key]
+               label: currFilter.label,
+               value: currFilter.value,
+               hits: currFilter.hits,
+               index: currFilter.index
             });
             
          }
@@ -162,39 +206,54 @@ define(["dojo/_base/declare",
          // Create widgets for each filter...
          array.forEach(filters, function(filter, index) {
 
-            if (this.hitThreshold == null || this.hitThreshold <= filter.hits)
+            if (this.minFilterValueLength != null && filter.value.length < this.minFilterValueLength)
             {
-               if (filtersToAdd == null || filtersToAdd > 0)
-               {
-                  // Check to see if this is an active filter...
-                  var applied = array.some(activeFilters, function(activeFilter, index) {
-                     return activeFilter == this.facetQName.replace(/\.__/g, "") + "|" + filter.value;
-                  }, this);
-
-                  // Keeping adding (visible) filters until we've hit the maximum number...
-                  var filterWidget = new FacetFilter({
-                     label: filter.value,
-                     hits: filter.hits,
-                     filter: filter.value,
-                     facet: this.facetQName,
-                     applied: applied
-                  });
-                  filterWidget.placeAt(this.filtersNode);
-
-                  // Decrement the filter count...
-                  if (filtersToAdd != null) filtersToAdd--;
-               }
-               else
-               {
-                  // TODO: Support the ability to show more...
-               }
+               // Don't add filters that have a value shorter than the minimum specified length
             }
-            else
+            else if (this.hitThreshold == null || this.hitThreshold <= filter.hits)
             {
+               // Check to see if this is an active filter...
+               var applied = array.some(activeFilters, function(activeFilter, index) {
+                  return activeFilter == this.facetQName.replace(/\.__.u/g, "").replace(/\.__/g, "") + "|" + filter.value;
+               }, this);
 
+               // Keeping adding (visible) filters until we've hit the maximum number...
+               var filterWidget = new FacetFilter({
+                  label: filter.label,
+                  hits: filter.hits,
+                  filter: filter.value,
+                  facet: this.facetQName,
+                  applied: applied,
+                  useHash: this.useHash,
+                  pubSubScope: this.pubSubScope
+               });
+
+               if (filtersToAdd != null && filtersToAdd <= 0 && !applied)
+               {
+                  this.addMoreFilter(filterWidget);
+               }
+
+               filterWidget.placeAt(this.showMoreNode, "before");
+
+               // Decrement the filter count...
+               if (filtersToAdd != null) filtersToAdd--;
             }
 
          }, this);
+
+         if (this.moreFiltersList != null)
+         {
+            domClass.remove(this.showMoreNode, "hidden");
+         }
+
+         if (filters.length == 0)
+         {
+            domClass.add(this.domNode, "hidden");
+         }
+         else
+         {
+            domClass.remove(this.domNode, "hidden");
+         }
       },
 
       /**
@@ -205,17 +264,21 @@ define(["dojo/_base/declare",
        * @returns {array} The sorted filters
        */
       sortFacetFilters: function alfresco_search_FacetFilters__sortFacetFilters(filters) {
-         if (this.sortBy == null || this.sortBy.trim() == "ALPHABETICALLY")
+         if (this.sortBy == null || this.sortBy.trim() === "ALPHABETICALLY")
          {
             return filters.sort(this._alphaSort);
          }
-         else if (this.sortBy.trim() == "ASCENDING")
+         else if (this.sortBy.trim() === "ASCENDING")
          {
             return filters.sort(this._ascSort);
          }
-         else if (this.sortBy.trim() == "DESCENDING")
+         else if (this.sortBy.trim() === "DESCENDING")
          {
             return filters.sort(this._descSort);
+         }
+         else if (this.sortBy.trim() === "INDEX")
+         {
+            return filters.sort(this._indexSort);
          }
          else
          {
@@ -232,8 +295,8 @@ define(["dojo/_base/declare",
        * @returns {number} -1, 0 or 1 according to standard array sorting conventions
        */
       _alphaSort: function alfresco_search_FacetFilters___alphaSort(a,b) {
-         var alc = a.value.toLowerCase();
-         var blc = b.value.toLowerCase();
+         var alc = a.label.toLowerCase();
+         var blc = b.label.toLowerCase();
          if(alc < blc) return -1;
          if(alc > blc) return 1;
          return 0;
@@ -261,6 +324,20 @@ define(["dojo/_base/declare",
        */
       _descSort: function alfresco_search_FacetFilter___descSort(a, b) {
          return b.hits - a.hits;
+      },
+
+      /**
+       * A function for sorting the facet filter value index. The index is a special
+       * attribute that is only included on custom facet query fields. These are
+       * the created, modified and size properties.
+       *
+       * @instance
+       * @param {object} a The first filter value object
+       * @param {object} b The second filter value object
+       * @returns {number} -1, 0 or 1 according to standard array sorting conventions
+       */
+      _indexSort: function alfresco_search_FacetFilter___indexSort(a, b) {
+         return a.index - b.index;
       }
    });
 });

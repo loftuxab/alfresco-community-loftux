@@ -43,7 +43,7 @@ define(["dojo/_base/declare",
        * 
        * @instance
        * @type {object[]}
-       * @default [{i18nFile: "./i18n/ActionService.properties"}]
+       * @default [{i18nFile: "./i18n/PageService.properties"}]
        */
       i18nRequirements: [{i18nFile: "./i18n/PageService.properties"}],
       
@@ -71,31 +71,44 @@ define(["dojo/_base/declare",
       exportPageModel: function alfresco_services_PageService__exportPageModel(payload) {
 
          var pageDef = this.getPageDefinitionFromPayload(payload);
-         
-         function cleanUpModel(obj) {
-            for (var key in obj) {
-               if (key == "widgetsForDisplay" || key == "widgetsForConfig" || key == "widgetDisplayName")
-               {
-                  delete obj[key];
-               }
-               if (obj[key] !== null && typeof(obj[key])=="object") {
-                  cleanUpModel(obj[key]);
-               }
-            }
-         }
 
-         // Remove all the "widgetsForDisplay" attributes from the model...
-         cleanUpModel(pageDef.publishOnReady);
-         cleanUpModel(pageDef.services);
-         cleanUpModel(pageDef.widgets);
+         delete pageDef.publishOnReadyEditorConfig;
+         delete pageDef.servicesEditorConfig;
+         delete pageDef.widgetsEditorConfig;
 
          // Stringify the model in a nice format...
          var exportString = "model.jsonModel = " + JSON.stringify(pageDef, null, "   ");
 
-         // Create the content as a download link and click it to trigger the download...
+         // Remove the quotes from the attributes (to make more consistent with WebScript controller style)...
+         exportString = exportString.replace(/\"([^\"]*)\":/g, "$1:");
+         this.generateWsDownload(payload.pageName + ".get.js", exportString);
+
+         // Generate the desc.xml file...
+         // TODO: Maybe we should be launching a dialog to collect the additional data, e.g. the URL, etc
+         var descXmlString = 
+         "<webscript>\n" + 
+         "  <shortname></shortname>\n" + 
+         "  <description></description>\n" + 
+         "  <family></family>\n" + 
+         "  <url></url>\n " + 
+         "</webscript>";
+         this.generateWsDownload(payload.pageName + ".get.desc.xml", descXmlString);
+
+         // Generate the HTML template...
+         var htmlString = "<@processJsonModel group=\"share\"/>";
+         this.generateWsDownload(payload.pageName + ".get.html.ftl", htmlString);
+      },
+
+      /**
+       * 
+       * @instance
+       * @param {string} fileName The name of the file to create
+       * @param {string} content The file contents to create
+       */
+      generateWsDownload: function alfresco_services_PageService__generateWsDownload(fileName, content) {
          var downloadLink = domConstruct.create("a", {
-            href: 'data:text/plain;charset=utf-8,' + encodeURIComponent(exportString),
-            download: payload.pageName + ".get.js"
+            href: 'data:text/plain;charset=utf-8,' + encodeURIComponent(content),
+            download: fileName
          });
          downloadLink.click();
       },
@@ -220,13 +233,14 @@ define(["dojo/_base/declare",
          var pageDefinition = {};
          if (payload.pageDefinition == null)
          {
-
             pageDefinition = {
-               publishOnReady: payload.publishOnReady,
-               services: payload.services,
-               widgets: payload.widgets
+               publishOnReady: payload.publishOnReady.widgetsConfig,
+               publishOnReadyEditorConfig: payload.publishOnReady.editorConfig,
+               services: payload.services.widgetsConfig,
+               servicesEditorConfig: payload.services.editorConfig,
+               widgets: payload.widgets.widgetsConfig,
+               widgetsEditorConfig: payload.widgets.editorConfig
             };
-            // pageDefinition = dojoJson.stringify(pageDefinition);
          }
          else
          {

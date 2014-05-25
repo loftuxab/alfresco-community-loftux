@@ -25,6 +25,7 @@
  * @mixes dijit/_TemplatedMixin
  * @mixes module:alfresco/core/Core
  * @mixes module:alfresco/core/CoreWidgetProcessing
+ * @mixes module:alfresco/documentlibrary/_AlfHashMixin
  * @author Dave Draper
  */
 define(["dojo/_base/declare",
@@ -34,15 +35,19 @@ define(["dojo/_base/declare",
         "dojo/_base/xhr",
         "alfresco/core/Core",
         "alfresco/core/CoreWidgetProcessing",
+        "alfresco/documentlibrary/_AlfHashMixin",
         "dojo/text!./templates/Form.html",
+        "dojo/io-query",
         "dojo/_base/lang",
         "alfresco/buttons/AlfButton",
         "dojo/_base/array",
         "dojo/json",
-        "dijit/registry"], 
-        function(declare, _Widget, _Templated, Form, xhr, AlfCore, CoreWidgetProcessing, template, lang, AlfButton, array, json, registry) {
+        "dijit/registry",
+        "dojo/hash"], 
+        function(declare, _Widget, _Templated, Form, xhr, AlfCore, CoreWidgetProcessing, _AlfHashMixin, template, 
+                 ioQuery, lang, AlfButton, array, json, registry, hash) {
    
-   return declare([_Widget, _Templated, AlfCore, CoreWidgetProcessing], {
+   return declare([_Widget, _Templated, AlfCore, CoreWidgetProcessing, _AlfHashMixin], {
       
       /**
        * An array of the i18n files to use with this widget.
@@ -163,18 +168,18 @@ define(["dojo/_base/declare",
          this.alfSubscribe("ALF_INVALID_CONTROL", lang.hitch(this, "onInvalidField"));
          this.alfSubscribe("ALF_VALID_CONTROL", lang.hitch(this, "onValidField"));
 
+         if (this.displayButtons == true)
+         {
+            // Create the buttons for the form...
+            this.createButtons();
+         }
+
          // Add the widgets to the form...
          // The widgets should automatically inherit the pubSubScope from the form to scope communication
          // to this widget. However, this widget will need to be assigned with a pubSubScope... 
          if (this.widgets)
          {
             this.processWidgets(this.widgets, this._form.domNode);
-         }
-
-         if (this.displayButtons == true)
-         {
-            // Create the buttons for the form...
-            this.createButtons();
          }
       },
       
@@ -322,6 +327,10 @@ define(["dojo/_base/declare",
       widgetsAdditionalButtons: null,
       
       /**
+       * If more than just "OK" and "Cancel" buttons are required then this can be configured to be 
+       * an array of configurations for extra buttons to be displayed. The payload of these buttons will
+       * always be augmented with the form values.
+       *
        * @instance
        * @type {object[]}
        * @default null
@@ -329,22 +338,96 @@ define(["dojo/_base/declare",
       additionalButtons: null,
       
       /**
+       * When this is set to true the current URL hash fragment will be used to initialise the form value
+       * and when the form is submitted the hash fragment will be updated with the form value. If you intend
+       * to use hashing it is recommended that the [okButtonPublishTopic]{@link module:alfresco/forms/Form#okButtonPublishTopic}
+       * does not directly result in submission of data, but rather submission of data is triggered by changes
+       * to the hash.
+       *
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      useHash: false,
+
+      /**
+       * When this is set to true the URL hash fragment will be updated when the form is published.
+       *
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      setHash: false,
+      
+      /**
+       * This function is called when [useHash]{@link module:alfresco/forms/Form#useHash} is set to true
+       * and the OK button is clicked to publish the form data. It will take the value of the form and
+       * use it to set a hash fragment.
+       * 
+       * @instance
+       * @param {object} payload The form data to set
+       */
+      setHashFragment: function alfresco_forms_Form__setHashFragment(payload) {
+         // Make sure to remove the alfTopic from the payload (this will always be assigned on publications
+         // but is not actually part of the form data)...
+         delete payload.alfTopic;
+         var hash = ioQuery.objectToQuery(payload);
+         
+         // Publish so that the NavigationService can set the hash fragment...
+         this.alfPublish("ALF_NAVIGATE_TO_PAGE", {
+            url: hash,
+            type: "HASH"
+         }, true);
+      },
+
+      /**
+       * Overrides the implementation from [_AlfHashMixin]{@link module:alfresco/documentlibrary/_AlfHashMixin}
+       * which was written to publish Document Library specific topics. This version responds to the hash change
+       * by setting the form value.
+       * 
+       * @instance
+       * @param {object} payload The publication topic.
+       */
+      onHashChange: function alfresco_forms_Form__onHashChange(payload) {
+         if (this.useHash == true)
+         {
+            var hashData = this.processFilter(payload);
+            this.setValue(hashData);
+         }
+      },
+
+      /**
        * Creates the buttons for the form. This can be overridden to change the buttons that are displayed.
        * 
        * @instance
        */
       createButtons: function alfresco_forms_Form__createButtons() {
-         
          if (this.showOkButton == true)
          {
             this.okButton = new AlfButton({
                pubSubScope: this.pubSubScope,
                label: this.message(this.okButtonLabel),
-               additionalCssClasses: "confirmationButton",
+               additionalCssClasses: "confirmationButton " + ((this.okButtonClass != null) ? this.okButtonClass : ""),
                publishTopic: this.okButtonPublishTopic,
                publishPayload: this.okButtonPublishPayload,
-               publishGlobal: this.okButtonPublishGlobal
+               publishGlobal: this.okButtonPublishGlobal,
+               iconClass: this.okButtonIconClass
             }, this.okButtonNode);
+
+            // If useHash is set to true then set up a subcription on the publish topic for the OK button which will
+            // set the hash fragment with the form contents...
+            if (this.setHash == true)
+            {
+               if (this.okButtonPublishTopic != null &&
+                   this.okButtonPublishTopic.trim() != null)
+               {
+                  this.alfSubscribe(this.okButtonPublishTopic, lang.hitch(this, "setHashFragment"), this.okButtonPublishGlobal);
+               }
+               else
+               {
+                  this.alfLog("warn", "A form is configured to use the browser hash fragment, but has no okButtonPublishTopic set", this);
+               }
+            }
          }
          if (this.showCancelButton == true)
          {
@@ -354,7 +437,8 @@ define(["dojo/_base/declare",
                additionalCssClasses: "cancelButton",
                publishTopic: this.cancelButtonPublishTopic,
                publishPayload: this.cancelButtonPublishPayload,
-               publishGlobal: this.cancelButtonPublishGlobal
+               publishGlobal: this.cancelButtonPublishGlobal,
+               iconClass: this.cancelButtonIconClass
             }, this.cancelButtonNode);
          }
          
@@ -362,6 +446,7 @@ define(["dojo/_base/declare",
          if (this.widgetsAdditionalButtons != null)
          {
             this.additionalButtons = [];
+            this.__creatingButtons = true;
             this.processWidgets(this.widgetsAdditionalButtons, this.buttonsNode);
          }
          else
@@ -378,18 +463,30 @@ define(["dojo/_base/declare",
        */
       allWidgetsProcessed: function alfresco_forms_Form__allWidgetsProcessed(widgets) {
          // If additional button configuration has been processed, then get a reference to ALL the buttons...
-         if (this.widgetsAdditionalButtons != null && 
-            this.additionalButtons != null &&
-            this.additionalButtons.length == 0)
+         if (this.__creatingButtons === true)
          {
             this.additionalButtons = registry.findWidgets(this.buttonsNode);
+            this.__creatingButtons = false;
          }
-         array.forEach(widgets, function(widget, i) {
-            if (widget.publishValue && typeof widget.publishValue == "function")
+         else
+         {
+            // Called only when processing the form controls, not when there are additional buttons...
+            if (this.useHash)
             {
-               widget.publishValue();
+               var currHash = ioQuery.queryToObject(hash());
+               this.setValue(currHash);
             }
-         });
+            
+            array.forEach(widgets, function(widget, i) {
+               if (widget.publishValue && typeof widget.publishValue == "function")
+               {
+                  widget.publishValue();
+               }
+            });
+         }
+
+         
+
          this.validate();
       },
       
@@ -399,6 +496,10 @@ define(["dojo/_base/declare",
        */
       updateButtonPayloads: function alfresco_forms_Form__updateButtonPayloads(values) {
          array.forEach(this.additionalButtons, function(button, i) {
+            if (button.payload == null)
+            {
+               button.payload = {};
+            }
             lang.mixin(button.payload, values);
          });
       },

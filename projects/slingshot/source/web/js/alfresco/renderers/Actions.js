@@ -18,6 +18,14 @@
  */
 
 /**
+ * <p>This renderer generates a [menu bar]{@link module:alfresco/menus/AlfMenuBar} containing a 
+ * [drop-down menu]{@link module:alfresco/menus/AlfMenuBarPopup} of [menu items]{@link module:alfresco/menus/AlfMenuItem}
+ * representing an action set.</p>
+ * 
+ * <p>This module was written to intially support Alfresco document and folder actions as generated for a 
+ * individual nodes but has since been expanded to support custom actions. The majority of the action handling
+ * code is done by the [_ActionsMixin]{@link module:alfresco/renderers/_ActionsMixin}</p>
+ * 
  * @module alfresco/renderers/Actions
  * @extends module:alfresco/menus/AlfMenuBar
  * @mixes module:alfresco/documentlibrary/_AlfDocumentListTopicMixin
@@ -25,19 +33,35 @@
  */
 define(["dojo/_base/declare",
         "alfresco/menus/AlfMenuBar",
-        "alfresco/documentlibrary/_AlfDocumentListTopicMixin",
+        "alfresco/renderers/_ActionsMixin",
         "alfresco/menus/AlfMenuBarPopup",
         "alfresco/menus/AlfMenuGroup",
         "alfresco/menus/AlfMenuItem",
-        "dojo/_base/array",
-        "dojo/_base/lang",
-        "service/constants/Default",
-        "alfresco/core/ObjectTypeUtils",
-        "alfresco/renderers/_PublishPayloadMixin"], 
-        function(declare, AlfMenuBar, _AlfDocumentListTopicMixin, AlfMenuBarPopup, AlfMenuGroup, AlfMenuItem, array, lang, AlfConstants, ObjectTypeUtils, _PublishPayloadMixin) {
+        "dojo/dom-class"],
+        function(declare, AlfMenuBar, _ActionsMixin, AlfMenuBarPopup, AlfMenuGroup, AlfMenuItem, domClass) {
 
-   return declare([AlfMenuBar, _AlfDocumentListTopicMixin, _PublishPayloadMixin], {
+   return declare([AlfMenuBar, _ActionsMixin], {
+
       
+      /**
+       * An array of the CSS files to use with this widget.
+       * 
+       * @instance
+       * @type {object[]}
+       * @default [{cssFile:"./css/Actions.css"}]
+       */
+      cssRequirements: [{cssFile:"./css/Actions.css"}],
+
+      /**
+       * Indicates that this should only be displayed when the item (note: NOT the renderer) is
+       * hovered over.
+       * 
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      onlyShowOnHover: false,
+
       /**
        * Overrides the default to create a popup containing a group containing all the actions
        * for the current item.
@@ -46,48 +70,34 @@ define(["dojo/_base/declare",
        */
       postCreate: function alfresco_renderers_Actions__postCreate() {
          this.inherited(arguments);
-         
+
+         // Add a class to tie this to the CSS selectors for this widget...
+         domClass.add(this.domNode, "alfresco-renderers-Actions");
+
+         // Handle display on hover configuration...
+         if (this.onlyShowOnHover == true)
+         {
+            domClass.add(this.domNode, "hover-only");
+         }
+         else
+         {
+            // No action
+         }
+
          // Create a group to hold all the actions...
-         this.actionsGroup = new AlfMenuGroup({
-            
-         });
-
-         if (this.customActions != null && this.customActions.length > 0)
-         {
-            array.forEach(this.customActions, lang.hitch(this, "addAction"));
-         }
-         else if (this.currentItem.actions && this.currentItem.actions.length > 0)
-         {
-            // Iterate over the actions to create a menu item for each of them...
-            array.forEach(this.currentItem.actions, lang.hitch(this, "addAction"));
-         }
-
+         this.actionsGroup = new AlfMenuGroup({});
+         
          // Create a menu popup to hold the group...
          this.actionsMenu = new AlfMenuBarPopup({
             label: "Actions"
          });
          this.actionsMenu.popup.addChild(this.actionsGroup);
+         
+         // Add all the actions...
+         this.addActions();
+
          this._menuBar.addChild(this.actionsMenu);
          this._menuBar.placeAt(this.containerNode);
-      },
-      
-      /**
-       * 
-       * @instance
-       * @param {object} action The configuration for the action to add
-       * @param (integer} index The index of the action
-       */
-      addAction: function alfresco_renderers_Actions__addAction(action, index) {
-         this.alfLog("log", "Adding action", action);
-         var menuItem = new AlfMenuItem({
-            label: action.label,
-            iconImage: AlfConstants.URL_RESCONTEXT + "components/documentlibrary/actions/" + action.icon + "-16.png",
-            type: action.type,
-            pubSubScope: this.pubSubScope,
-            publishTopic: (action.publishTopic != null) ? action.publishTopic : this.singleDocumentActionTopic,
-            publishPayload: this.generatePayload(action, this.currentItem, null, {document: this.currentItem, action: action})
-         });
-         this.actionsGroup.addChild(menuItem);
       }
    });
 });

@@ -67,7 +67,7 @@ public abstract class AbstractSiteNavigation extends HtmlElement
     {
         super(drone);
         alfrescoVersion = drone.getProperties().getVersion();
-        siteNavPlaceHolder = alfrescoVersion.isDojoSupported() ? "div[id*='LeftAndRight']" : "div#alf-hd";
+        siteNavPlaceHolder = "div#alf-hd";
         setWebElement(drone.findAndWait(By.cssSelector(siteNavPlaceHolder)));
         dashboardLink = alfrescoVersion.isDojoSupported() ? "div#HEADER_SITE_DASHBOARD" : String.format(SITE_LINK_NAV_PLACEHOLER, 1);
     }

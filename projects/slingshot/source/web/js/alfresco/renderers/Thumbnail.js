@@ -75,10 +75,6 @@ define(["dojo/_base/declare",
        */
       postMixInProperties: function alfresco_renderers_Thumbnail__postMixInProperties() {
          
-         // TODO: These defaults should probably be instance variables?
-         this.itemLinkHref = "";
-         this.itemLinkClass = "";
-         this.itemLinkRelative = "";
          this.imgId = "";
          this.thumbnailUrl = "";
          this.imgAltText = "";
@@ -101,16 +97,29 @@ define(["dojo/_base/declare",
             // Fallback to just having a nodeRef available... this has been added to handle rendering of 
             // thumbnails in search results where full node information may not be available...
             var nodeRef = NodeUtils.processNodeRef(this.currentItem.nodeRef);
-            if (this.currentItem.type == "folder")
+            if (this.currentItem.type === "folder")
             {
                this.thumbnailUrl =  AlfConstants.URL_RESCONTEXT + "components/search/images/folder.png";
             }
-            else
+            else if (this.currentItem.type === "document")
             {
                this.thumbnailUrl = AlfConstants.PROXY_URI + "api/node/" + nodeRef.uri + "/content/thumbnails/doclib/?c=queue&ph=true&lastModified=" + this.currentItem.modifiedOn;
             }
-            
+            else
+            {
+               this.thumbnailUrl = this.generateFallbackThumbnailUrl();
+            }
          }
+      },
+
+      /**
+       * If a thumbnail URL cannot be determined then fallback to a standard image.
+       *
+       * @instance
+       * @returns {string} The URL for the thumbnail.
+       */
+      generateFallbackThumbnailUrl: function alfresco_renderers_Thumbnail__generateFallbackThumbnailUrl() {
+         return this.thumbnailUrl = AlfConstants.URL_RESCONTEXT + "components/search/images/generic-result.png";
       },
       
       /**
@@ -186,7 +195,7 @@ define(["dojo/_base/declare",
             this.addUploadDragAndDrop(this.imgNode);
             this.addNodeDropTarget(this.imgNode);
          }
-         this.createItemLink(this.domNode);
+         // this.createItemLink(this.domNode);
       }
    });
 });

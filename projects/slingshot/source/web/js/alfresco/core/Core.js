@@ -29,11 +29,12 @@ define(["dojo/_base/declare",
         "alfresco/core/PubSubLog",
         "service/constants/Default",
         "dojo/topic",
+        "alfresco/core/PubQueue",
         "dojo/_base/array",
         "dojo/_base/lang",
         "dojox/uuid/generateRandomUuid",
         "dojox/html/entities"], 
-        function(declare, CoreData, PubSubLog, AlfConstants, pubSub, array, lang, uuid, htmlEntities) {
+        function(declare, CoreData, PubSubLog, AlfConstants, pubSub, PubQueue, array, lang, uuid, htmlEntities) {
    
    return declare(null, {
       
@@ -372,22 +373,30 @@ define(["dojo/_base/declare",
        * @param {string} topic The topic on which to publish
        * @param {object} payload The payload to publish on the supplied topic
        * @param {boolean} global Indicates that the pub/sub scope should not be applied
+       * @param {boolean} parentScope Indicates that the pub/sub scope inherited from the parent should be applied
        */
-      alfPublish: function alfresco_core_Core__alfPublish(topic, payload, global) {
-         var scopedTopic = (global ? "" : this.pubSubScope) + topic;
+      alfPublish: function alfresco_core_Core__alfPublish(topic, payload, global, parentScope) {
+         var scopedTopic = topic;
+         if (global != null && global == true)
+         {
+            // No action required - use global scope
+         }
+         else if (parentScope != null && parentScope == true)
+         {
+            scopedTopic = this.parentPubSubScope + topic;
+         }
+         else
+         {
+            scopedTopic = this.pubSubScope + topic;
+         }
          if (payload == null)
          {
             payload = {};
          }
          payload.alfTopic = scopedTopic;
 
-         if (AlfConstants.DEBUG == true)
-         {
-            PubSubLog.getSingleton().pub(scopedTopic, payload, this);
-         }
-
          // Publish...
-         pubSub.publish(scopedTopic, payload);
+         PubQueue.getSingleton().publish(scopedTopic, payload, this);
       },
       
       /**
@@ -400,10 +409,23 @@ define(["dojo/_base/declare",
        * @param {string} topic The topic on which to subscribe
        * @param {function} callback The callback function to call when the topic is published on.
        * @param {boolean} global Indicates that the pub/sub scope should not be applied
+       * @param {boolean} parentScope Indicates that the pub/sub scope inherited from the parent should be applied
        * @returns {object} A handle to the subscription
        */
-      alfSubscribe: function alfresco_core_Core__alfSubscribe(topic, callback, global) {
-         var scopedTopic = (global ? "" : this.pubSubScope) + topic;
+      alfSubscribe: function alfresco_core_Core__alfSubscribe(topic, callback, global, parentScope) {
+         var scopedTopic = topic;
+         if (global != null && global == true)
+         {
+            // No action required - use global scope
+         }
+         else if (parentScope != null && parentScope == true)
+         {
+            scopedTopic = this.parentPubSubScope + topic;
+         }
+         else
+         {
+            scopedTopic = this.pubSubScope + topic;
+         }
 
          if (AlfConstants.DEBUG == true)
          {
@@ -448,10 +470,6 @@ define(["dojo/_base/declare",
        * @param {boolean} preserveDom
        */
       destroy: function alfresco_core_Core__destroy(preserveDom) {
-         if (typeof this.inherited === "function")
-         {
-            this.inherited(arguments);
-         }
          if (this.alfSubscriptions != null)
          {
             array.forEach(this.alfSubscriptions, function(handle, i) {
@@ -486,6 +504,10 @@ define(["dojo/_base/declare",
                   widget.destroy();
                }
             }, this);
+         }
+         if (typeof this.inherited === "function")
+         {
+            this.inherited(arguments);
          }
       },
 

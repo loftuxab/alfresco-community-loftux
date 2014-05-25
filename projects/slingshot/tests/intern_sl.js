@@ -25,7 +25,7 @@ define(["./config/Suites"],
       // OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
       // capabilities options specified for an environment will be copied as-is
       environments: [
-         { browserName: 'chrome', platform: [ 'Linux'] },
+         //{ browserName: 'chrome', platform: [ 'Linux'] },
          { browserName: 'firefox', platform: [ 'Linux'] }
          // { browserName: 'internet explorer', version: '11', platform: 'Windows 8.1' },
          // { browserName: 'internet explorer', version: '10', platform: 'Windows 8' },

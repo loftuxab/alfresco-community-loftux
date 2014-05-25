@@ -4,27 +4,22 @@
 // occurring. It is not possible to simply omit this SiteService and rely on the one provided by the
 // share-header.get WebScript as race conditions come into play...
 
-/**
- *
- * @returns {object} The group information for the current user
- */
-var userData = null;
-var json = remote.call("/api/people/" + encodeURIComponent(user.name) + "?groups=true");
-if (json.status == 200)
+// Get the user data (this replicates a function in share-header.lib.js which ideally we wouldn't do,
+// however, this is required due to the limitation of this being part of the Admin Console and the lib
+// not being imported)...
+var userData = {};
+var groups = user.properties["alfUserGroups"];
+if (groups != null)
 {
-   // Create javascript objects from the repo response
-   userData = JSON.parse(json);
-   if (userData != null && userData.groups != null)
+   groups = groups.split(",");
+   var processedGroups = {};
+   for (var i=0; i<groups.length; i++)
    {
-      // Convert the array of groups into a object for easier access...
-      var processedGroups = {};
-      for (var i=0; i<userData.groups.length; i++)
-      {
-         processedGroups[userData.groups[i].itemName] = true;
-      }
-      userData.groups = processedGroups;
+      processedGroups[groups[i]] = true;
    }
+   userData.groups = processedGroups;
 }
+userData.isNetworkAdmin = user.properties["isNetworkAdmin"];
 
 var siteServiceScope = "MANAGE_SITES_SITE_SERVICE_";
 
@@ -106,12 +101,12 @@ model.jsonModel = {
                                        label: msg.get("message.visibility-header-label")
                                     }
                                  },
-//                                 {
-//                                    name: "alfresco/documentlibrary/views/layouts/HeaderCell",
-//                                    config: {
-//                                       label: msg.get("message.manager-header-label")
-//                                    }
-//                                 },
+                                 {
+                                    name: "alfresco/documentlibrary/views/layouts/HeaderCell",
+                                    config: {
+                                       label: msg.get("message.manager-header-label")
+                                    }
+                                 },
                                  {
                                     name: "alfresco/documentlibrary/views/layouts/HeaderCell",
                                     config: {
@@ -128,13 +123,22 @@ model.jsonModel = {
                                           {
                                              name: "alfresco/documentlibrary/views/layouts/Cell",
                                              config: {
-                                                class: "siteName",
+                                                class: "siteName mediumpad",
                                                 widgets: [
                                                    {
-                                                      name: "alfresco/renderers/Property",
+                                                      name: "alfresco/renderers/PropertyLink",
                                                       config: {
+                                                         renderedValueClass: "alfresco-renderers-Property pointer",
+                                                         publishGlobal: true,
                                                          propertyToRender: "title",
-                                                         renderAsLink: false
+                                                         publishTopic: "ALF_NAVIGATE_TO_PAGE",
+                                                         useCurrentItemAsPayload: false,
+                                                         publishPayloadType: "PROCESS",
+                                                         publishPayloadModifiers: ["processCurrentItemTokens"],
+                                                         payload: {
+                                                            url: "site/{shortName}/site-members",
+                                                            type: "SHARE_PAGE_RELATIVE"
+                                                         }
                                                       }
                                                    }
                                                 ]
@@ -143,7 +147,7 @@ model.jsonModel = {
                                           {
                                              name: "alfresco/documentlibrary/views/layouts/Cell",
                                              config: {
-                                                class: "siteDescription",
+                                                class: "siteDescription mediumpad",
                                                 widgets: [
                                                    {
                                                       name: "alfresco/renderers/Property",
@@ -165,6 +169,7 @@ model.jsonModel = {
                                                       config: {
                                                          class: "unmargined",
                                                          publishTopic: "ALF_UPDATE_SITE_DETAILS",
+                                                         publishPayloadType: "BUILD",
                                                          publishPayload: {
                                                             shortName: {
                                                                alfType: "item",
@@ -188,21 +193,21 @@ model.jsonModel = {
                                                 ]
                                              }
                                           },
-//                                          {
-//                                             name: "alfresco/documentlibrary/views/layouts/Cell",
-//                                             config: {
-//                                                class: "siteManager",
-//                                                widgets: [
-//                                                   {
-//                                                      name: "alfresco/renderers/Boolean",
-//                                                      config: {
-//                                                         propertyToRender: "userIsSiteManager",
-//                                                         renderAsLink: false
-//                                                      }
-//                                                   }
-//                                                ]
-//                                             }
-//                                          },
+                                          {
+                                             name: "alfresco/documentlibrary/views/layouts/Cell",
+                                             config: {
+                                                class: "siteManager mediumpad",
+                                                widgets: [
+                                                   {
+                                                      name: "alfresco/renderers/Boolean",
+                                                      config: {
+                                                         propertyToRender: "userIsSiteManager",
+                                                         renderAsLink: false
+                                                      }
+                                                   }
+                                                ]
+                                             }
+                                          },
                                           {
                                              name: "alfresco/documentlibrary/views/layouts/Cell",
                                              config: {
@@ -237,6 +242,7 @@ model.jsonModel = {
                                                                                     label: msg.get("button.site-manage.label"),
                                                                                     iconClass: "alf-password-icon",
                                                                                     publishTopic: "ALF_BECOME_SITE_MANAGER",
+                                                                                    publishPayloadType: "BUILD",
                                                                                     publishPayload: {
                                                                                        site: {
                                                                                           alfType: "item",

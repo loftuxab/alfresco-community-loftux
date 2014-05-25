@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -20,16 +20,22 @@ package org.alfresco.repo.jscript;
 
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.management.subsystems.SwitchableApplicationContextFactory;
 import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.search.impl.solr.facet.SolrFacetHelper;
+import org.alfresco.repo.search.impl.solr.facet.SolrFacetHelper.FacetLabel;
+import org.alfresco.repo.search.impl.solr.facet.SolrFacetHelper.FacetLabelDisplayHandler;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -39,11 +45,14 @@ import org.alfresco.service.cmr.search.LimitBy;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchParameters;
+import org.alfresco.service.cmr.search.SearchParameters.FieldFacet;
 import org.alfresco.service.cmr.search.SearchParameters.Operator;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.util.ISO9075;
+import org.alfresco.util.Pair;
+import org.alfresco.util.PropertyCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -52,6 +61,7 @@ import org.dom4j.io.SAXReader;
 import org.jaxen.saxpath.base.XPathReader;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.surf.util.ParameterCheck;
 
 /**
@@ -67,7 +77,7 @@ import org.springframework.extensions.surf.util.ParameterCheck;
  * 
  * @author Kevin Roast
  */
-public class Search extends BaseScopableProcessorExtension
+public class Search extends BaseScopableProcessorExtension implements InitializingBean
 {
     private static Log logger = LogFactory.getLog(Search.class);
     
@@ -81,7 +91,18 @@ public class Search extends BaseScopableProcessorExtension
     protected Repository repository;
 
     private SwitchableApplicationContextFactory searchSubsystem;
+    
+    /** Solr facet helper */
+    private SolrFacetHelper solrFacetHelper;
+    
 
+    @Override
+    public void afterPropertiesSet() throws Exception
+    {
+        PropertyCheck.mandatory(this, "services", services);
+        
+        this.solrFacetHelper = new SolrFacetHelper(services);
+    }
     /**
      * Set the default store reference
      * 
@@ -501,6 +522,7 @@ public class Search extends BaseScopableProcessorExtension
      *    namespace: string,      optional, the default namespace for properties
      *    defaultField: string,   optional, the default field for query elements when not explicit in the query
      *    defaultOperator: string,optional, the default operator for query elements when they are not explicit in the query AND or OR
+     *    fieldFacets: [],        optional, Array of fields (as full QName strings) to facet against
      *    onerror: string         optional, result on error - one of: exception, no-results - defaults to 'exception'
      * }
      * 
@@ -533,7 +555,13 @@ public class Search extends BaseScopableProcessorExtension
      */
     public Scriptable query(Object search)
     {
+        return (Scriptable)queryResultSet(search).get("nodes", getScope());
+    }
+    
+    public Scriptable queryResultSet(Object search)
+    {
         Object[] results = null;
+        Map<String,Object> meta = null;
         
         // convert values from JS to Java - may contain native JS object such as ConsString etc.
         search = new ValueConverter().convertValueForJava(search);
@@ -556,6 +584,7 @@ public class Search extends BaseScopableProcessorExtension
                 String language = (String)def.get("language");
                 List<Map<Serializable, Serializable>> sort = (List<Map<Serializable, Serializable>>)def.get("sort");
                 Map<Serializable, Serializable> page = (Map<Serializable, Serializable>)def.get("page");
+                List<String> facets = (List<String>)def.get("fieldFacets");
                 String namespace = (String)def.get("namespace");
                 String onerror = (String)def.get("onerror");
                 String defaultField = (String)def.get("defaultField");
@@ -676,6 +705,27 @@ public class Search extends BaseScopableProcessorExtension
                         sp.addQueryTemplate(field, queryTemplates.get(field));
                     }
                 }
+                if (facets != null)
+                {
+                    for (String field: facets)
+                    {
+                        sp.addFieldFacet(new FieldFacet("@" + field));
+                    }
+                    List<String> facetQueries = null;
+                    // Workaround for ACE-1605
+                    if (query.indexOf("created:") < 0 && query.indexOf("modified:") < 0)
+                    {
+                        facetQueries = solrFacetHelper.getDefaultFacetQueries();
+                    }
+                    else
+                    {
+                        facetQueries = solrFacetHelper.createFacetQueriesFromSearchQuery(query);
+                    }
+                    for (String fq : facetQueries)
+                    {
+                        sp.addFacetQuery(fq);
+                    }
+                }
                 
                 // error handling opions
                 boolean exceptionOnError = true;
@@ -696,7 +746,9 @@ public class Search extends BaseScopableProcessorExtension
                 }
                 
                 // execute search based on search definition
-                results = query(sp, exceptionOnError);
+                Pair<Object[], Map<String,Object>> r = queryResultMeta(sp, exceptionOnError);
+                results = r.getFirst();
+                meta = r.getSecond();
             }
         }
         
@@ -705,7 +757,25 @@ public class Search extends BaseScopableProcessorExtension
             results = new Object[0];
         }
         
-        return Context.getCurrentContext().newArray(getScope(), results);
+        // construct a JS return object
+        // {
+        //    nodes: [],                // Array of ScriptNode results
+        //    meta: {
+        //       numberFound: long,     // total number found in index, or -1 if not known or not supported by this resultset
+        //       facets: {              // facets are returned for each field as requested in the SearchParameters fieldfacets 
+        //          field: {            // each field contains a map of facet to value
+        //              facet: value,
+        //              ...
+        //          },
+        //          ...
+        //       }
+        //    }
+        // }
+        Scriptable scope = getScope();
+        Scriptable res = Context.getCurrentContext().newObject(scope);
+        res.put("nodes", res, Context.getCurrentContext().newArray(scope, results));
+        res.put("meta", res, meta);
+        return res;
     }
     
     /**
@@ -803,8 +873,25 @@ public class Search extends BaseScopableProcessorExtension
      * @return Array of Node objects
      */
     protected Object[] query(SearchParameters sp, boolean exceptionOnError)
-    {   
+    {
+        return queryResultMeta(sp, exceptionOnError).getFirst();
+    }
+    
+    /**
+     * Execute the query
+     * 
+     * Removes any duplicates that may be present (ID search can cause duplicates -
+     * it is better to remove them here)
+     * 
+     * @param sp                SearchParameters describing the search to execute.
+     * @param exceptionOnError  True to throw a runtime exception on error, false to return empty resultset
+     * 
+     * @return Pair containing Object[] of Node objects, and the ResultSet metadata hash.
+     */
+    protected Pair<Object[], Map<String,Object>> queryResultMeta(SearchParameters sp, boolean exceptionOnError)
+    {
         Collection<ScriptNode> set = null;
+        Map<String, Object> meta = new HashMap<>(8);
         
         long time = 0L;
         if (logger.isDebugEnabled())
@@ -819,6 +906,7 @@ public class Search extends BaseScopableProcessorExtension
         {
             results = this.services.getSearchService().query(sp);
             
+            // results nodes
             if (results.length() != 0)
             {
                 NodeService nodeService = this.services.getNodeService();
@@ -832,6 +920,68 @@ public class Search extends BaseScopableProcessorExtension
                     }
                 }
             }
+            // results metadata
+            meta.put("numberFound", results.getNumberFound());
+            meta.put("hasMore", results.hasMore());
+            // results facets
+            Map<String, List<ScriptFacetResult>> facetMeta = new HashMap<>();
+            for (FieldFacet ff: sp.getFieldFacets())
+            {
+                // for each field facet, get the facet results
+                List<Pair<String, Integer>> fs = results.getFieldFacet(ff.getField());
+                List<ScriptFacetResult> facets = new ArrayList<>();
+                for (Pair<String, Integer> f : fs)
+                {
+                    // ignore zero hit fields
+                    if (f.getSecond() > 0)
+                    {
+                        String facetValue = f.getFirst();
+                        FacetLabelDisplayHandler handler = solrFacetHelper.getDisplayHandler(ff.getField());
+                        String label = (handler == null) ? facetValue : handler.getDisplayLabel(facetValue).getLabel();
+                        
+                        facets.add(new ScriptFacetResult(facetValue, label, -1, f.getSecond()));
+                    }
+                }
+                // store facet results per field
+                facetMeta.put(ff.getField(), facets);
+            } 
+            
+            // Start of bucketing
+            // ACE-1615: Populate the facetMeta map with empty lists. If there is a
+            // facet query with >0 hits, the relevant list will be populated
+            // with the results, otherwise the list remains empty.
+            for(String bucketedField : solrFacetHelper.getBucketedFieldFacets())
+            {
+                facetMeta.put(bucketedField, new ArrayList<ScriptFacetResult>());
+            }
+            Set<Entry<String, Integer>> facetQueries = results.getFacetQueries().entrySet();
+            for(Entry<String, Integer> entry : facetQueries)
+            {
+                // ignore zero hit facet queries
+                if (entry.getValue() > 0)
+                {
+                    String key = entry.getKey();
+                    // for example the key could be: {!afts}@{http://www.alfresco.org/model/content/1.0}created:[2013-10-29 TO 2014-04-29]
+                    // qName => @{http://www.alfresco.org/model/content/1.0}created
+                    // 7 => {!afts}
+                    String qName = key.substring(7, key.lastIndexOf(':'));
+
+                    // Retrieve the previous facet queries
+                    List<ScriptFacetResult> fqs = facetMeta.get(qName);
+                    if (fqs == null)
+                    {
+                        // Shouldn't be here
+                        throw new AlfrescoRuntimeException("Field facet [" + qName + "] has"
+                                    + " not been registered with SolrFacetHelper.BUCKETED_FIELD_FACETS.");
+                    }
+                    FacetLabelDisplayHandler handler = solrFacetHelper.getDisplayHandler(qName);
+                    FacetLabel facetLabel = (handler == null) ? new FacetLabel(qName, key.substring(qName.length(),
+                                key.length()), -1) : handler.getDisplayLabel(key);
+                    
+                    fqs.add(new ScriptFacetResult(facetLabel.getValue(), facetLabel.getLabel(), facetLabel.getLabelIndex(), entry.getValue()));
+                }
+            }// End of bucketing
+            meta.put("facets", facetMeta);
         }
         catch (Throwable err)
         {
@@ -854,7 +1004,8 @@ public class Search extends BaseScopableProcessorExtension
                 logger.debug("query time: " + (System.currentTimeMillis()-time) + "ms");
         }
         
-        return set != null ? set.toArray(new Object[(set.size())]) : new Object[0];
+        Object[] res = set != null ? set.toArray(new Object[(set.size())]) : new Object[0];
+        return new Pair<Object[], Map<String,Object>>(res, meta);
     }
     
     

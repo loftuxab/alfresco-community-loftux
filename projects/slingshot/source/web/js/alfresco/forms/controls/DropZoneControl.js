@@ -27,8 +27,9 @@ define(["alfresco/forms/controls/BaseFormControl",
         "alfresco/creation/DropZone",
         "dojo/json",
         "dojo/on",
-        "dojo/_base/lang"], 
-        function(BaseFormControl, declare, DropZone, dojoJSON, on, lang) {
+        "dojo/_base/lang",
+        "dojo/_base/array"], 
+        function(BaseFormControl, declare, DropZone, dojoJSON, on, lang, array) {
    
    return declare([BaseFormControl], {
       
@@ -51,6 +52,7 @@ define(["alfresco/forms/controls/BaseFormControl",
             name: this.name,
             value: this.value,
             pubSubScope: this.pubSubScope,
+            parentPubSubScope: this.pubSubScope,
             acceptTypes: this.acceptTypes
          };
       },
@@ -59,6 +61,9 @@ define(["alfresco/forms/controls/BaseFormControl",
        * @instance
        */
       createFormControl: function alfresco_forms_controls_DropZoneControl__createFormControl(config, domNode) {
+         // Set the value in the data model (this is so that it can be updated with dropped child references)
+         // ...see DropZone.creator() function...
+         this.alfSetData(config.id, (config.value != null) ? config.value : {});
          return new DropZone(config);
       },
       
@@ -66,23 +71,76 @@ define(["alfresco/forms/controls/BaseFormControl",
        * @instance
        */
       setupChangeEvents: function alfresco_forms_controls_DropZoneControl__setupChangeEvents() {
-         on(this.domNode, "onWidgetUpdate", lang.hitch(this, "validate"));
+         // Initialise the current value...
+         this.onUpdateValue();
+         on(this.domNode, "onWidgetUpdate", lang.hitch(this, "onUpdateValue"));
       },
       
       /**
-       * Overrides the [inherited function]{@link module:alfresco/forms/controls/BaseFormControl#getValue} to
-       * call the getValue function of the wrapped DropAndPreview control
        * 
        * @instance
        * @returns {string} The widgets defined in the preview pane
        */
-      getValue: function alfresco_forms_controls_DropZoneControl__getValue() {
-         var value = "";
-         if (this.wrappedWidget != null)
+      onUpdateValue: function alfresco_forms_controls_DropZoneControl__onUpdateValue() {
+         this.alfLog("log", "Updating DropZoneControl value...");
+         var value = {
+            editorConfig: "",
+            widgetsConfig: ""
+         };
+         var childData = [];
+         var config = this.alfGetData(this.wrappedWidget.id);
+         if (config != null)
          {
-            value = this.wrappedWidget.getWidgetDefinitions();
+            if (config.widgetsForDisplay != null)
+            {
+               var items = lang.getObject("widgetsForDisplay.0.config.initialItems", false, config);
+               if (items != null)
+               {
+                  value.editorConfig = items;
+               }
+               // get config.initialItems
+               // value.editorConfig = config.widgetsForDisplay;
+            }
+            if (config.children != null)
+            {
+               array.forEach(config.children, lang.hitch(this, "processChildren", childData));
+               value.widgetsConfig = childData;
+            }
          }
-         return value;
+         this.value = value;
+         this.validate();
+      },
+
+      /**
+       * Overrides the [inherited function]{@link module:alfresco/forms/controls/BaseFormControl#getValue} to
+       * call the getValue function of the wrapped [DropZone]{@link module:alfresc/creation/DropZone} control
+       *
+       * @instance
+       * @returns {object} Returns the current value
+       */
+      getValue: function alfresco_forms_controls_DropZoneControl__getValue() {
+         return this.value;
+      },
+
+      /**
+       * Retrieves the configuration for the provide child UUID and adds the processed configuration 
+       * to the supplied array.
+       *
+       * @instance
+       * @param {array} childData An array to add the processed child configuration to
+       * @param {string} child The UUID of the child to retrieve the configuration for
+       * @param {number} index The index of the child in the parent array
+       */
+      processChildren: function alfresco_forms_controls_DropZoneControl__processChildren(childData, child, index) {
+         var childConfig = this.alfGetData(child);
+         var subChildData = [];
+         array.forEach(childConfig.children, lang.hitch(this, "processChildren", subChildData));
+         if (childConfig.widgetConfig != null)
+         {
+            var itemConfigKey = (childConfig.itemConfigKey != null) ? childConfig.itemConfigKey : "config";
+            childConfig.widgetConfig[itemConfigKey].widgets = subChildData;
+            childData.push(childConfig.widgetConfig);
+         }
       }
    });
 });

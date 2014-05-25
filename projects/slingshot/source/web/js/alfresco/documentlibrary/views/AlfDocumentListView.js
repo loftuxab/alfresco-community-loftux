@@ -43,9 +43,10 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/dom-construct",
         "dojo/dom-class",
+        "dojo/query",
         "dijit/registry"], 
         function(declare, _WidgetBase, _TemplatedMixin, template, _MultiItemRendererMixin, _AlfDndDocumentUploadMixin, DocumentListRenderer, 
-                 AlfCore, JsNode, lang, array, domConstruct, domClass, registry) {
+                 AlfCore, JsNode, lang, array, domConstruct, domClass, query, registry) {
    
    return declare([_WidgetBase, _TemplatedMixin, _MultiItemRendererMixin, AlfCore, _AlfDndDocumentUploadMixin], {
       
@@ -94,6 +95,16 @@ define(["dojo/_base/declare",
       noItemsMessage: null,
 
       /**
+       * Should the widget subscribe to events triggered by the documents request?
+       * This should be set to true in the widget config for standalone/isolated usage.
+       *
+       * @instance
+       * @type Boolean
+       * @default true
+       */
+      subscribeToDocRequests: false,
+
+      /**
        * Implements the widget life-cycle method to add drag-and-drop upload capabilities to the root DOM node.
        * This allows files to be dragged and dropped from the operating system directly into the browser
        * and uploaded to the location represented by the document list. 
@@ -102,6 +113,9 @@ define(["dojo/_base/declare",
        */
       postCreate: function alfresco_documentlibrary_views_AlfDocumentListView__postCreate() {
          this.inherited(arguments);
+
+         // Add in any additional CSS classes...
+         domClass.add(this.domNode, (this.additionalCssClasses != null ? this.additionalCssClasses : ""));
 
          // Allow custom messages to be displayed when no items are available for display...
          if (this.noItemsMessage == null)
@@ -114,12 +128,19 @@ define(["dojo/_base/declare",
          }
 
          this.addUploadDragAndDrop(this.domNode);
-         this.alfSubscribe(this.filterChangeTopic, lang.hitch(this, "onFilterChange"));
-         this.alfSubscribe("ALF_RETRIEVE_DOCUMENTS_REQUEST_SUCCESS", lang.hitch(this, "onDocumentsLoaded"));
+
+         if (this.subscribeToDocRequests)
+         {
+            this.alfSubscribe(this.filterChangeTopic, lang.hitch(this, "onFilterChange"));
+            this.alfSubscribe("ALF_RETRIEVE_DOCUMENTS_REQUEST_SUCCESS", lang.hitch(this, "onDocumentsLoaded"));
+         }
          if (this.currentData != null)
          {
-            this.renderView();
+            // Render the initial data - make sure any previous data is cleared (not that there should be any!)
+            this.renderView(false);
          }
+
+         this.alfSubscribe(this.clearDocDataTopic, lang.hitch(this, "clearOldView"));
       },
       
       /**
@@ -134,8 +155,9 @@ define(["dojo/_base/declare",
             {
                items[i].jsNode = new JsNode(items[i].node);
             }
+
             this.setData(payload.response);
-            this.renderView();
+            this.renderView(false);
          }
          else
          {
@@ -171,7 +193,8 @@ define(["dojo/_base/declare",
        * @default {}
        */
       viewSelectionConfig: {
-         label: "Abstract"
+         label: "Abstract",
+         value: "Abstract"
       },
       
       /**
@@ -183,7 +206,7 @@ define(["dojo/_base/declare",
        * @returns {string} "Abstract"
        */
       getViewName: function alfresco_documentlibrary_views_AlfDocumentListView__getViewName() {
-         return "Abstract";
+         return this.viewSelectionConfig.value;
       },
       
       /**
@@ -214,30 +237,58 @@ define(["dojo/_base/declare",
       },
       
       /**
+       * Extends the inherited function to also update the docListRenderer if it exists with the data.
+       *
+       * @instance
+       * @param {object} newData The additional data to add.
+       */
+      augmentData: function alfresco_documentlibrary_views_AlfDocumentListView__augmentData(newData) {
+         this.inherited(arguments);
+         if (this.docListRenderer != null)
+         {
+            this.docListRenderer.augmentData(newData);
+         }
+      },
+
+      /**
        * Calls the [renderData]{@link module:alfresco/documentlibrary/views/layouts/_MultiItemRendererMixin#renderData}
        * function if the [currentData]{@link module:alfresco/documentlibrary/views/layouts/_MultiItemRendererMixin#currentData}
        * attribute has been set to an object with an "items" attribute that is an array of objects.
        * 
        * @instance
+       * @param {boolean} preserveCurrentData This should be set to true when you don't want to clear the old data, the
+       * most common example of this is when infinite scroll is being used.
        */
-      renderView: function alfresco_documentlibrary_views_AlfDocumentListView__renderView() {
-         this.clearOldView();
+      renderView: function alfresco_documentlibrary_views_AlfDocumentListView__renderView(preserveCurrentData) {
          if (this.currentData && this.currentData.items && this.currentData.items.length > 0)
          {
             try
             {
-               if (this.docListRenderer != null)
+               // If we don't want to preserve the current data (e.g. if infinite scroll isn't being used)
+               // then we should destroy the previous renderer...
+               if (preserveCurrentData === false && this.docListRenderer != null)
                {
-                  this.docListRenderer.destroy(true);
+                  this.docListRenderer.destroy();
+
+                  // TODO: Concerned about this - it needs further investigation as to why anything is being left behind!
+                  this.docListRenderer = null;
                }
-               this.alfLog("log", "Rendering items", this);
-               this.docListRenderer = new DocumentListRenderer({
-                  id: this.id + "_ITEMS",
-                  widgets: this.widgets,
-                  currentData: this.currentData,
-                  pubSubScope: this.pubSubScope
-               });
-               this.docListRenderer.placeAt(this.tableNode, "last");
+
+               // If the renderer is null we need to create one (this typically wouldn't be expected to happen)
+               // when rendering additional infinite scroll data...
+               if (this.docListRenderer == null)
+               {
+                  this.docListRenderer = new DocumentListRenderer({
+                     id: this.id + "_ITEMS",
+                     widgets: this.widgets,
+                     currentData: this.currentData,
+                     pubSubScope: this.pubSubScope,
+                     parentPubSubScope: this.parentPubSubScope
+                  });
+                  this.docListRenderer.placeAt(this.tableNode, "last");
+               } 
+
+               // Finally, render the current data (when using infinite scroll the data should have been augmented)
                this.docListRenderer.renderData();
             }
             catch(e)
@@ -262,11 +313,17 @@ define(["dojo/_base/declare",
          if (this.docListRenderer != null)
          {
             this.docListRenderer.destroy();
+
+            // TODO: Concerned about this - it needs further investigation as to why anything is being left behind!
+            this.docListRenderer = null;
          }
          if (this.messageNode != null)
          {
             domConstruct.destroy(this.messageNode);
          }
+         // Remove all table body elements. (preserves headers)
+         query("tbody", this.tableNode).forEach(domConstruct.destroy);
+         this.clearData();
       },
       
       /**
