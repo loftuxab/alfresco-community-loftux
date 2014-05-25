@@ -13,11 +13,14 @@
  *  items - Array of objects containing the search results
  */
 
-const DEFAULT_MAX_RESULTS = 5;
-const SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/";
-const DISCUSSION_QNAMEPATH = "/fm:discussion";
-const COMMENT_QNAMEPATH = DISCUSSION_QNAMEPATH + "/cm:Comments";
-const SURF_CONFIG_QNAMEPATH = "/cm:surf-config/";
+var DEFAULT_MAX_RESULTS = 5,
+   SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/",
+   DOCUMENTLIBRARY_QNAME_PATH = "/cm:documentLibrary/",
+   DISCUSSIONS_QNAMEPATH = "/cm:discussions",
+   DISCUSSION_QNAMEPATH = "/fm:discussion",
+   COMMENT_QNAMEPATH = DISCUSSION_QNAMEPATH + "/cm:Comments",
+   SURF_CONFIG_QNAMEPATH = "/cm:surf-config/",
+   APP_DICTIONARY_QNAMEPATH = "/app:dictionary/";
 
 /**
  * Returns site information data structure.
@@ -69,40 +72,50 @@ function getDocumentItem(container, node)
 {
    // check whether this is a valid folder or a file
    var item = null;
-   if (node.qnamePath.indexOf(COMMENT_QNAMEPATH) === -1 &&
-       !(node.qnamePath.match(DISCUSSION_QNAMEPATH+"$") == DISCUSSION_QNAMEPATH) &&
-       node.qnamePath.indexOf(SURF_CONFIG_QNAMEPATH) === -1)
+
+   if(node.qnamePath.indexOf(SURF_CONFIG_QNAMEPATH) > -1 ||
+   node.qnamePath.indexOf(APP_DICTIONARY_QNAMEPATH) > -1 ||
+   node.qnamePath.indexOf(DISCUSSIONS_QNAMEPATH) > -1 ||
+   node.qnamePath.indexOf(DISCUSSION_QNAMEPATH) > -1 ||
+   node.qnamePath.indexOf(COMMENT_QNAMEPATH) > -1 ) 
    {
-      if (node.isDocument)
+      return item;
+   }
+   if(node.qnamePath.indexOf(SITES_SPACE_QNAME_PATH) > -1 &&
+   node.qnamePath.indexOf(DOCUMENTLIBRARY_QNAME_PATH) === -1 )
+   {
+      return item;
+   }
+
+   if (node.isDocument)
+   {
+      item =
       {
-         item =
+         nodeRef: node.nodeRef.toString(),
+         name: node.name,
+         title: node.properties["cm:title"],
+         description: node.properties["cm:description"],
+         modifiedOn: node.properties["cm:modified"],
+         modifiedBy: node.properties["cm:modifier"],
+         createdOn: node.properties["cm:created"],
+         createdBy: node.properties["cm:creator"],
+         mimetype: node.mimetype,
+         size: node.size
+      };
+      if (container.siteId !== null)
+      {
+         item.site = getSiteData(container.siteId);
+         item.container = container.containerId;
+      }
+      if (node.hasAspect("{http://www.alfresco.org/model/content/1.0}thumbnailModification"))
+      {
+         var dates = node.properties["lastThumbnailModification"];
+         for (var i=0; i<dates.length; i++)
          {
-            nodeRef: node.nodeRef.toString(),
-            name: node.name,
-            title: node.properties["cm:title"],
-            description: node.properties["cm:description"],
-            modifiedOn: node.properties["cm:modified"],
-            modifiedBy: node.properties["cm:modifier"],
-            createdOn: node.properties["cm:created"],
-            createdBy: node.properties["cm:creator"],
-            mimetype: node.mimetype,
-            size: node.size
-         };
-         if (container.siteId !== null)
-         {
-            item.site = getSiteData(container.siteId);
-            item.container = container.containerId;
-         }
-         if (node.hasAspect("{http://www.alfresco.org/model/content/1.0}thumbnailModification"))
-         {
-            var dates = node.properties["lastThumbnailModification"];
-            for (var i=0; i<dates.length; i++)
+            if (dates[i].indexOf("doclib") !== -1)
             {
-               if (dates[i].indexOf("doclib") !== -1)
-               {
-                  item.lastThumbnailModification = dates[i];
-                  break;
-               }
+               item.lastThumbnailModification = dates[i];
+               break;
             }
          }
       }
