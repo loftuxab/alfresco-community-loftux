@@ -157,6 +157,14 @@
          <username-min-length>2</username-min-length>
          <password-min-length>3</password-min-length>
       </users>
+   </config>   
+   
+   <config evaluator="string-compare" condition="Notifications">
+      <settings>
+         <!-- Should user opt in for Email notifications.
+         Should be same as setting activities.feed.optin in alfresco-global.properties -->
+         <optin>true</optin>
+      </settings>
    </config>
 
    <config evaluator="string-compare" condition="Dashboard">

@@ -13,7 +13,27 @@ function main()
       // we are interested in the "cm:emailFeedDisabled" property
       emailFeedDisabled = person.emailFeedDisabled;
    }
-   model.emailFeedDisabled = emailFeedDisabled;
+   
+    // User may not have set preference, set default according to optin policy
+   if(!emailFeedDisabled)
+   {
+      var settings = config.scoped["Notifications"]["settings"], optIn='true';
+      if(settings)
+      {
+         optIn = (settings.getChild("optin").value + '').toLowerCase();
+      }
+
+      if (optIn === 'false')
+      {
+         emailFeedDisabled = false;
+      }
+      else
+      {
+         emailFeedDisabled = true;
+      }
+   }
+   
+   model.emailFeedDisabled = (emailFeedDisabled === true) ? true : false;
    
    // Widget instantiation metadata...
    var userNotification = {

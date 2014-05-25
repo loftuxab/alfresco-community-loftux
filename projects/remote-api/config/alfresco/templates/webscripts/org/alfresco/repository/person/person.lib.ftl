@@ -30,7 +30,7 @@
 	"googleusername": <#if p.googleusername??>"${p.googleusername}"<#else>null</#if>,
 	"quota": <#if p.sizeQuota??>${p.sizeQuota?c}<#else>-1</#if>,
 	"sizeCurrent": <#if p.sizeCurrent??>${p.sizeCurrent?c}<#else>0</#if>,
-	"emailFeedDisabled": <#if p.emailFeedDisabled??>${p.emailFeedDisabled?string("true","false")}<#else>false</#if>,
+	"emailFeedDisabled": <#if p.emailFeedDisabled??>${p.emailFeedDisabled?string("true","false")}<#else>null</#if>,
 	"persondescription": <#if p.persondescription??>"${stringUtils.stripUnsafeHTML(p.persondescription.content)}"<#else>null</#if>
 </#escape>
 </#macro>

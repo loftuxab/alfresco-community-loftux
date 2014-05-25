@@ -144,6 +144,9 @@
               <value>admin@alfresco.com</value>
           </list>
       </property>
+      <property name="optIn">
+         <value>${activities.feed.optin}</value>
+      </property>
    </bean>
    
    <bean id="feedModelBuilderFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
