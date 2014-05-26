@@ -17,7 +17,7 @@
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>4.3.a.LX61</version>
+  <version>4.3.a.LX62</version>
   <name>Alfresco Project</name>
 
   <url>http://www.alfresco.org/</url>
