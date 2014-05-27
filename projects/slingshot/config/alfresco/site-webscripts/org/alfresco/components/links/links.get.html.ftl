@@ -18,7 +18,7 @@
    <@uniqueIdDiv>
       <#assign el=args.htmlid?html>
       <div id="${el}-links-header" class="links-header" style="visibility:hidden">
-         
+
          <div id="${el}-linksBar" class="toolbar links-toolbar flat-button theme-bg-color-1">
             <div>
                <div id="${el}-create-link-container" class="createLink">
@@ -26,7 +26,7 @@
                   <div class="separator hideable"> </div>
                </div>
                <div style="float:left" class="btn-selected-items">
-                  <button id="${el}-selected-i-dd" name="linklist-create-link-button">${msg("header.selectedItems")}</button>
+                  <button id="${el}-selected-i-dd" name="linklist-create-link-button">${msg("header.selectedItems")}&nbsp;&#9662;</button>
                   <div id="${el}-selectedItems-menu" class="yuimenu">
                      <div class="bd">
                         <ul>
@@ -38,11 +38,11 @@
             </div>
             <div class="rss-feed"><button id="${el}-rss-feed" name="rss-feed">${msg("header.rssFeed")}</button></div>
          </div>
-         
+
          <div id="${el}-links-titleBar" class="links-titlebar theme-bg-color-2">
             <div id="${el}-listTitle" class="list-title">${msg("title.generic")}</div>
          </div>
-         
+
          <div id="${el}-links-infoBar" class="links-infobar flat-button" >
             <div class="vm-button-container">
                <button id="${el}-viewMode-button"
@@ -64,7 +64,7 @@
             </div>
          </div>
       </div>
-      
+
       <div id="${el}-body" class="links-body" style="visibility:hidden">
          <div  id="${el}-links"> </div>
       </div>

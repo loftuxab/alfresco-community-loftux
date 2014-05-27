@@ -29,7 +29,7 @@ position: absolute;
 width: 100%;
 border: 1px solid #808080;
 background: #fff;
-overflow: hidden;	
+overflow: hidden;
 z-index: 9050;
 }
 .yui-skin-yellowTheme .yui-ac-shadow {
@@ -189,9 +189,9 @@ border-color: #ccc;
 color: #A6A6A6;
 cursor: default;
 }
-.yui-skin-yellowTheme .yui-menu-button-disabled button {
+/*.yui-skin-yellowTheme .yui-menu-button-disabled button {
 background-image: url(menu-button-arrow-disabled.png);
-}
+}*/
 .yui-skin-yellowTheme .yui-split-button-disabled button {
 background-image: url(split-button-arrow-disabled.png);
 }
@@ -4721,4 +4721,3 @@ display: none;
 text-align: right;
 margin: auto;
 }
-

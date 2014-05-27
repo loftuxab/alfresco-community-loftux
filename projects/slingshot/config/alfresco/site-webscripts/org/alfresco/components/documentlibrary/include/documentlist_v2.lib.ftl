@@ -22,7 +22,7 @@
                      <#-- FILE SELECT -->
                      <@markup id="fileSelect">
                         <div class="file-select">
-                           <button id="${id}-fileSelect-button" name="doclist-fileSelect-button">${msg("menu.select")}</button>
+                           <button id="${id}-fileSelect-button" name="doclist-fileSelect-button">${msg("menu.select")}&nbsp;&#9662;</button>
                            <div id="${id}-fileSelect-menu" class="yuimenu">
                               <div class="bd">
                                  <ul>
@@ -51,9 +51,9 @@
                         </#if>
                      </div>
                      </@markup>
-         
+
                   </div>
-                  
+
                   <#-- UPLOAD BUTTON -->
                   <@markup id="uploadButton">
                      <#if uploadable>
@@ -68,7 +68,7 @@
                         </div>
                      </#if>
                   </@>
-                  
+
                   <#-- CLOUD SYNC BUTTONS -->
                   <@markup id="cloudSyncButtons">
                      <div class="hideable toolbar-hidden DocListTree">
@@ -90,11 +90,11 @@
                         </div>
                      </div>
                   </@>
-                  
+
                   <#-- SELECTED ITEMS MENU -->
                   <@markup id="selectedItems">
                      <div class="selected-items hideable toolbar-hidden DocListTree DocListFilter TagFilter DocListCategories">
-                        <button class="no-access-check" id="${id}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
+                        <button class="no-access-check" id="${id}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}&nbsp;&#9662;</button>
                         <div id="${id}-selectedItems-menu" class="yuimenu">
                            <div class="bd">
                               <ul>
@@ -114,7 +114,7 @@
             <@markup id="toolbarRight">
                <div class="right">
                   <div class="options-select">
-                     <button id="${id}-options-button" name="doclist-options-button">${msg("button.options")}</button>
+                     <button id="${id}-options-button" name="doclist-options-button">${msg("button.options")}&nbsp;&#9662;</button>
                      <div id="${id}-options-menu" class="yuimenu" style="display:none;">
                         <div class="bd">
                            <ul>
@@ -166,7 +166,7 @@
                        <!-- <span class="separator">&nbsp;</span> -->
                        <select id="${id}-sortField-menu">
                        <#list sortOptions as sort>
-                          <option value="${(sort.value!"")?html}" <#if sort.direction??>title="${sort.direction?string}"</#if>>${msg(sort.label)}</option>
+                          <option value="${(sort.value!"")?html}" <#if sort.direction??>title="${sort.direction?string}"</#if>>${msg(sort.label)}&nbsp;&#9662;</option>
                        </#list>
                        </select>
                     </div>
@@ -181,8 +181,8 @@
                   <@markup id="galleryViewSlider">
                     <div id="${id}-gallery-slider" class="alf-gallery-slider hidden">
                        <div class="alf-gallery-slider-small"><img src="${url.context}/res/components/documentlibrary/images/gallery-size-small-16.png"></div>
-                       <div id="${id}-gallery-slider-bg" class="yui-h-slider alf-gallery-slider-bg"> 
-                       <div id="${id}-gallery-slider-thumb" class="yui-slider-thumb alf-gallery-slider-thumb"><img src="${url.context}/res/components/documentlibrary/images/thumb-n.png"></div> 
+                       <div id="${id}-gallery-slider-bg" class="yui-h-slider alf-gallery-slider-bg">
+                       <div id="${id}-gallery-slider-thumb" class="yui-slider-thumb alf-gallery-slider-thumb"><img src="${url.context}/res/components/documentlibrary/images/thumb-n.png"></div>
                     </div>
                     <div class="alf-gallery-slider-large"><img src="${url.context}/res/components/documentlibrary/images/gallery-size-large-16.png"></div>
                     </div>
@@ -191,7 +191,7 @@
             </@>
          </div>
       </@>
-      
+
       <@markup id="navigationBar">
          <div id="${id}-navBar" class="nav-bar flat-button theme-bg-2">
             <div class="hideable toolbar-hidden DocListTree DocListCategories">
@@ -208,7 +208,7 @@
             <div id="${id}-description" class="description hideable toolbar-hidden DocListFilter TagFilter"></div>
          </div>
       </@>
-   
+
    </div>
    <!--[if IE]>
       <iframe id="yui-history-iframe" src="${url.context}/res/yui/history/assets/blank.html"></iframe>
@@ -223,12 +223,12 @@
          <div>
          </div>
       </div>
-   
+
       <#-- No items message -->
       <div id="${id}-no-items-template" class="hidden">
          <div class="docListInstructionTitle">${msg("no.items.title")}</div>
       </div>
-   
+
       <#-- Hidden sub-folders message -->
       <div id="${id}-hidden-subfolders-template" class="hidden">
          <div class="docListInstructionTitle">${msg("no.items.title")}</div>
@@ -237,7 +237,7 @@
             <a class="docListInstructionTextSmall docListLinkedInstruction"><#-- We don't know the number of hidden subfolders at this point so this needs to be inserted --></a>
          </div>
       </div>
-   
+
       <#-- HTML 5 drag and drop instructions -->
       <div id="${id}-dnd-instructions-template" class="hidden">
          <div id="${id}-dnd-instructions">
@@ -255,7 +255,7 @@
             </div>
          </div>
       </div>
-   
+
       <#-- Standard upload instructions -->
       <div id="${id}-upload-instructions-template" class="hidden">
          <div class="docListInstructionTitle">${msg("standard.upload.title")}</div>
@@ -264,18 +264,18 @@
             <span class="docListInstructionText"><a class="docListLinkedInstruction">${msg("standard.upload.description")}</a></span>
          </div>
       </div>
-   
+
       <#-- Other options? -->
       <div id="${id}-other-options-template" class="hidden">
          <div class="docListOtherOptions">${msg("other.options")}</div>
       </div>
-   
+
       <#-- The following DOM structures should be editing with respect to documentlist.js function
            fired by the Doclists "tableMsgShowEvent" as it uses this structure to associate the
            image and anchor with the appropriate actions. NOTE: This is only a template that will
            be cloned, during the cloning the id will be appended with "-instance" to ensure uniqueness
            within the page, this allows us to locate each DOM node individually. -->
-   
+
       <#-- Standard upload (when user has create access) -->
       <div id="${id}-standard-upload-template" class="hidden">
         <div id="${id}-standard-upload-link-template">
@@ -283,7 +283,7 @@
            <span class="docListOtherOptionsText"><a class="docListLinkedInstruction">${msg("dnd.upload.description")}</a></span>
         </div>
       </div>
-   
+
       <#-- New Folder (when user has create access) -->
       <div id="${id}-new-folder-template" class="hidden">
         <div id="${id}-new-folder-link-template">
@@ -291,7 +291,7 @@
            <span class="docListOtherOptionsText"><a class="docListLinkedInstruction">${msg("dnd.newfolder.description")}</a></span>
         </div>
       </div>
-   
+
       <#-- Hidden sub-folders message -->
       <div id="${id}-show-folders-template" class="hidden">
          <img class="docListOtherOptionsImage docListLinkedInstruction" src="${url.context}/res/components/documentlibrary/images/help-folder-48.png">
@@ -300,7 +300,7 @@
       <#--
          END OF INFORMATION TEMPLATES
       -->
-   
+
       <#-- Top Bar: Select, Pagination, Sorting & View controls -->
       <div id="${id}-doclistBar" class="yui-gc doclist-bar flat-button no-check-bg"></div>
       <div class="alf-fullscreen-exit-button" class="hidden">
@@ -310,7 +310,7 @@
             </span>
          </span>
       </div>
-   
+
       <#-- Main Panel: Document List -->
       <@markup id="documentListContainer">
       <div id="${id}-documents" class="documents"></div>
@@ -342,7 +342,7 @@
             </div>
        </div>
       </@>
-   
+
       <#-- Bottom Bar: Paginator -->
       <div id="${id}-doclistBarBottom" class="yui-gc doclist-bar doclist-bar-bottom flat-button">
          <div class="yui-u first">
@@ -350,18 +350,18 @@
             <div id="${id}-paginatorBottom" class="paginator"></div>
          </div>
       </div>
-   
+
       <#--
          RENDERING TEMPLATES
       -->
       <div style="display: none">
-   
+
          <#-- Action Set "More" template -->
          <div id="${id}-moreActions">
             <div class="internal-show-more" id="onActionShowMore"><a href="#" class="show-more" alt="${msg("actions.more")}"><span>${msg("actions.more")}</span></a></div>
             <div class="more-actions hidden"></div>
          </div>
-   
+
          <#-- Document List Gallery View Templates-->
          <div id="${id}-gallery-item-template" class="alf-gallery-item hidden">
             <div class="alf-gallery-item-thumbnail">
@@ -381,7 +381,7 @@
                </div>
             </div>
          </div>
-         
+
          <#-- Document List Filmstrip View Templates -->
            <div id="${args.htmlid}-filmstrip-nav-item-template" class="alf-filmstrip-nav-item hidden">
               <div class="alf-filmstrip-nav-item-thumbnail">
@@ -405,8 +405,8 @@
                   </div>
               </div>
            </div>
-   
+
       </div>
-   
+
    </div>
 </#macro>

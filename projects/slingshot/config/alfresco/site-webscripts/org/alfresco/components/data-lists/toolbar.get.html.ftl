@@ -26,7 +26,7 @@
                   </span>
                </div>
                <div class="selected-items">
-                  <button class="no-access-check" id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
+                  <button class="no-access-check" id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}&nbsp;&#9662;</button>
                   <div id="${args.htmlid}-selectedItems-menu" class="yuimenu">
                      <div class="bd">
                         <ul>
