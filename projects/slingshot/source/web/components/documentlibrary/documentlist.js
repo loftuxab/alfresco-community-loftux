@@ -2924,6 +2924,14 @@
             // Only perform a file upload if the user has *actually* dropped some files!
             if (e.dataTransfer.files !== undefined && e.dataTransfer.files !== null && e.dataTransfer.files.length > 0)
             {
+
+               // Use alt-key as modifier for overwrite
+               var overwrite = false;
+               if(e.altKey)
+               {
+                  overwrite = true;
+               }
+
                // We need to get the upload progress dialog widget so that we can display it.
                // The function called has been added to file-upload.js and ensures the dialog is a singleton.
                var progressDialog = Alfresco.getDNDUploadProgressInstance();
@@ -3027,7 +3035,8 @@
                      {
                         fn: this.onFileUploadComplete,
                         scope: this
-                     }
+                     },
+                     overwrite: overwrite
                   };
 
                   // Extra parameters depending on current mode
