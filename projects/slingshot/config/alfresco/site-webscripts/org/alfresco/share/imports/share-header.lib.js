@@ -1912,7 +1912,7 @@ function getHeaderModel(pageTitle) {
                config: {
                   id: "HEADER_SEARCH_BOX",
                   site: page.url.templateArgs.site,
-                  linkToFacetedSearch: false,
+                  linkToFacetedSearch: true,
                   repository: (page.id == "repository" || page.id == "myfiles" || page.id == "sharedfiles")
                }
             }
@@ -1951,7 +1951,8 @@ function getHeaderModel(pageTitle) {
                align: "left",
                config: {
                   targetUrl: page.url.templateArgs.site != null ? "site/" + page.url.templateArgs.site + "/dashboard" : null,
-                  label: (pageTitle != null) ? pageTitle : getPageTitle()
+                  label: (pageTitle != null) ? pageTitle : getPageTitle(),
+                  setBrowserTitle: (pageTitle != null)
                }
             },
             {

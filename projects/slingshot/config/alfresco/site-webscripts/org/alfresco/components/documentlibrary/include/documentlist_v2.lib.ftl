@@ -42,7 +42,7 @@
                         <#if createContent?size != 0 || createContentByTemplateEnabled>
                            <span id="${id}-createContent-button" class="yui-button yui-push-button">
                               <span class="first-child">
-                                 <button name="createContent">${msg("button.create-content")}</button>
+                                 <button name="createContent">${msg("button.create-content")}&nbsp;&#9662;</button>
                               </span>
                            </span>
                            <div id="${id}-createContent-menu" class="yuimenu">

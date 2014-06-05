@@ -19,7 +19,7 @@
 
 /**
  * Advanced Search component.
- *
+ * 
  * @namespace Alfresco
  * @class Alfresco.AdvancedSearch
  */
@@ -39,7 +39,7 @@
 
    /**
     * Advanced Search constructor.
-    *
+    * 
     * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.AdvancedSearch} The new AdvancedSearch instance
     * @constructor
@@ -47,13 +47,13 @@
    Alfresco.AdvancedSearch = function(htmlId)
    {
       Alfresco.AdvancedSearch.superclass.constructor.call(this, "Alfresco.AdvancedSearch", htmlId, ["button", "container"]);
-
+      
       Bubbling.on("beforeFormRuntimeInit", this.onBeforeFormRuntimeInit, this);
       Bubbling.on("afterFormRuntimeInit", this.onAfterFormRuntimeInit, this);
-
+      
       return this;
    };
-
+   
    YAHOO.extend(Alfresco.AdvancedSearch, Alfresco.component.Base,
    {
       /**
@@ -66,12 +66,12 @@
       {
          /**
           * Current siteId
-          *
+          * 
           * @property siteId
           * @type string
           */
          siteId: "",
-
+         
          /**
           * Search Form objects, for example:
           * {
@@ -80,34 +80,34 @@
           *    label: "Content",
           *    description: "All types of content"
           * }
-          *
+          * 
           * @property searchForms
           * @type Array
           */
          searchForms: [],
-
+         
          /**
           * Previously saved query, if any
-          *
+          * 
           * @property savedQuery
           * @type string
           */
          savedQuery: "",
-
+         
          /**
           * It is possible to disable searching entire repo via config
-          *
+          * 
           * @property searchRepo
           * @type boolean
           */
          searchRepo: true
       },
-
+      
       /**
        * Currently visible Search Form object
        */
       currentForm: null,
-
+      
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -119,7 +119,7 @@
          var me = this,
             domId = this.id + "-form-list",
             elList = Dom.get(domId);
-
+         
          // see if a saved query json string is provided
          var defaultForm = this.options.searchForms[0];
          if (this.options.savedQuery.length !== 0)
@@ -139,7 +139,7 @@
                }
             }
          }
-
+         
          // search YUI button and menus
          this.widgets.searchButton1 = Alfresco.util.createYUIButton(this, "search-button-1", this.onSearchClick);
          this.widgets.searchButton2 = Alfresco.util.createYUIButton(this, "search-button-2", this.onSearchClick);
@@ -148,7 +148,7 @@
          {
             // update selected item menu button label
             var form = this.options.searchForms[p_aArgs[1].index];
-            this.widgets.formButton.set("label", form.label  + " " + Alfresco.constants.MENU_ARROW_SYMBOL);
+            this.widgets.formButton.set("label", form.label + " " + Alfresco.constants.MENU_ARROW_SYMBOL);
             this.widgets.formButton.set("title", form.description);
 
             // render the appropriate form template
@@ -163,19 +163,19 @@
 
          // render initial form template
          this.renderFormTemplate(defaultForm, true);
-
+         
          // register the "enter" event on the search text field
          var queryInput = Dom.get(this.id + "-search-text");
-         this.widgets.enterListener = new YAHOO.util.KeyListener(queryInput,
+         this.widgets.enterListener = new YAHOO.util.KeyListener(queryInput, 
          {
             keys: YAHOO.util.KeyListener.KEY.ENTER
-         },
+         }, 
          {
             fn: me._searchEnterHandler,
             scope: this,
             correctScope: true
          }, "keydown").enable();
-
+         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -184,10 +184,10 @@
        * DEFAULT ACTION EVENT HANDLERS
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
-
+      
       /**
        * Loads or retrieves from cache the Form template for a given content type
-       *
+       * 
        * @method renderFormTemplate
        * @param form {Object} Form descriptor to render template for
        * @param repopulate {boolean} If true, repopulate form instance based on supplied data
@@ -197,9 +197,9 @@
          // update current form state
          this.currentForm = form;
          this.currentForm.repopulate = repopulate;
-
+         
          var containerDiv = Dom.get(this.id + "-forms");
-
+         
          var visibleFormFn = function()
          {
             // hide visible form if any
@@ -211,14 +211,14 @@
                   break;
                }
             }
-
+            
             // display cached form element
             Dom.removeClass(form.htmlid, "hidden");
-
+            
             // reset focus to search input textbox
             Dom.get(this.id + "-search-text").focus();
          };
-
+         
          if (!form.htmlid)
          {
             // generate child container div for this form
@@ -227,10 +227,10 @@
             formDiv.id = htmlid;
             Dom.addClass(formDiv, "hidden");
             Dom.addClass(formDiv, "share-form");
-
+            
             // cache htmlid so we know the form is present on the form
             form.htmlid = htmlid;
-
+            
             // load the form component for the appropriate type
             var formUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind=type&itemId={itemId}&formId={formId}&mode=edit&showSubmitButton=false&showCancelButton=false",
             {
@@ -252,7 +252,7 @@
                      // Inject the template from the XHR request into the child container div
                      formDiv.innerHTML = response.serverResponse.responseText;
                      containerDiv.appendChild(formDiv);
-
+                     
                      visibleFormFn.call(this);
                   },
                   scope: this
@@ -267,7 +267,7 @@
             visibleFormFn.call(this);
          }
       },
-
+      
       /**
        * Repopulate currently displayed Form fields based on saved query data
        *
@@ -279,7 +279,7 @@
          {
             var savedQuery = YAHOO.lang.JSON.parse(this.options.savedQuery);
             var elForm = Dom.get(this.currentForm.runtime.formId);
-
+            
             for (var i = 0, j = elForm.elements.length; i < j; i++)
             {
                var element = elForm.elements[i];
@@ -305,7 +305,7 @@
                            cntrl.value = savedValue.substring(savedValue.indexOf("|") + 1, savedValue.length);
                            // set range value to the input hidden field
                            cntrl = Dom.get(element.id);
-                           cntrl.value = savedValue;
+                           cntrl.value = savedValue;                           
                         }
                         else
                         {
@@ -318,8 +318,8 @@
                         // standard html control
                         element.value = savedValue;
                      }
-
-                     // reverse value setting doesn't work with checkboxes or multi-select boxes because of the
+                     
+                     // reverse value setting doesn't work with checkboxes or multi-select boxes because of the 
                      // hidden field used to store the underlying field value
                      if (element.type === "hidden")
                      {
@@ -342,11 +342,11 @@
                   }
                }
             }
-
+            
             Bubbling.fire("formContentsUpdated");
          }
       },
-
+      
       /**
        * Event handler that gets fired when user clicks the Search button.
        *
@@ -358,10 +358,10 @@
       {
          // retrieve form data structure directly from the runtime
          var formData = this.currentForm.runtime.getFormData();
-
+         
          // add DD type to form data structure
          formData.datatype = this.currentForm.type;
-
+         
          // build and execute url for search page
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "{site}search?t={terms}&q={query}&r={repo}",
          {
@@ -370,10 +370,10 @@
             query: encodeURIComponent(YAHOO.lang.JSON.stringify(formData)),
             repo: this.options.searchRepo.toString()
          });
-
+         
          window.location.href = url;
       },
-
+      
       /**
        * Event handler called when the "beforeFormRuntimeInit" event is received
        */
@@ -381,12 +381,12 @@
       {
          // extract the current form runtime - so we can reference it later
          this.currentForm.runtime = args[1].runtime;
-
+         
          // remove Forms Runtime validators on the advanced search form
          this.currentForm.runtime.validations = {};
          var nodes = this.currentForm.runtime.getFieldsByType("select");
          for (var i = 0, ii = nodes.length; i < ii; i++)
-         {
+         {	    
             if (nodes[i].classList.contains("non-tokenised"))
             {
                var options = nodes[i].options;
@@ -399,7 +399,7 @@
                }
             }
          }
-
+         
          // Repopulate current form from url query data?
          if (this.currentForm.repopulate)
          {
@@ -422,7 +422,7 @@
 
       /**
        * Search text box ENTER key event handler
-       *
+       * 
        * @method _searchEnterHandler
        */
       _searchEnterHandler: function ADVSearch__searchEnterHandler(e, args)

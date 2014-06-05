@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -30,10 +30,13 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.CrcHelper;
 import org.alfresco.repo.domain.avm.AVMNodeEntity;
 import org.alfresco.repo.domain.locale.LocaleDAO;
+import org.alfresco.repo.domain.node.ChildAssocEntity;
 import org.alfresco.repo.domain.patch.AbstractPatchDAOImpl;
 import org.alfresco.repo.domain.qname.QNameDAO;
+import org.alfresco.repo.site.SiteModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
 import org.alfresco.util.ParameterCheck;
@@ -108,6 +111,9 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     private static final String SELECT_NODES_BY_TYPE_URI = "alfresco.patch.select_NodesByTypeUriId";
     private static final String SELECT_NODES_BY_ASPECT_QNAME = "alfresco.patch.select_NodesByAspectQName";
     private static final String SELECT_NODES_BY_CONTENT_MIMETYPE = "alfresco.patch.select_NodesByContentMimetype";
+    
+    private static final String SELECT_COUNT_NODES_WITH_TYPE_ID = "alfresco.patch.select_CountNodesWithTypeId";
+    private static final String SELECT_CHILDREN_OF_THE_SHARED_SURFCONFIG_FOLDER = "alfresco.patch.select_ChildrenOfTheSharedSurfConfigFolder";
 
     private LocaleDAO localeDAO;
     
@@ -702,5 +708,71 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         params.put("minNodeId", minNodeId);
         params.put("maxNodeId", maxNodeId);
         return (List<Long>) template.selectList(SELECT_NODES_BY_CONTENT_MIMETYPE, params);
+    }
+
+    @Override
+    public long getCountNodesWithTypId(QName typeQName)
+    {
+        // Resolve the QName
+        Pair<Long, QName> qnameId = qnameDAO.getQName(typeQName);
+        if (qnameId == null)
+        {
+            return 0L;
+        }
+        IdsEntity params = new IdsEntity();
+        params.setIdOne(qnameId.getFirst());
+        Long count = (Long) template.selectOne(SELECT_COUNT_NODES_WITH_TYPE_ID, params);
+        if (count == null)
+        {
+            return 0L;
+        }
+        else
+        {
+            return count;
+        }
+    }
+
+
+    @Override
+    public List<NodeRef> getChildrenOfTheSharedSurfConfigFolder(Long minNodeId, Long maxNodeId)
+    {
+        Pair<Long, QName> containsAssocQNamePair = qnameDAO.getQName(ContentModel.ASSOC_CONTAINS);
+        if (containsAssocQNamePair == null)
+        {
+            return Collections.emptyList();
+        }
+        
+        Map<String, Object> params = new HashMap<String, Object>(7);
+        
+        // Get qname CRC
+        Long qnameCrcSites = ChildAssocEntity.getQNameCrc(QName.createQName(SiteModel.SITE_MODEL_URL, "sites"));
+        Long qnameCrcSurfConfig = ChildAssocEntity.getQNameCrc(QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "surf-config"));
+        Long qnameCrcPages = ChildAssocEntity.getQNameCrc(QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "pages"));
+        Long qnameCrcUser = ChildAssocEntity.getQNameCrc(QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "user"));
+        
+        params.put("qnameCrcSites", qnameCrcSites);
+        params.put("qnameCrcSurfConfig", qnameCrcSurfConfig);
+        params.put("qnameCrcPages", qnameCrcPages);
+        params.put("qnameCrcUser", qnameCrcUser);
+        params.put("qnameTypeIdContains", containsAssocQNamePair.getFirst());
+        params.put("minNodeId", minNodeId);
+        params.put("maxNodeId", maxNodeId);
+
+        final List<NodeRef> results = new ArrayList<NodeRef>(1000);
+        ResultHandler resultHandler = new ResultHandler()
+        {
+            @SuppressWarnings("unchecked")
+            public void handleResult(ResultContext context)
+            {
+                Map<String, Object> row = (Map<String, Object>) context.getResultObject();
+                String protocol = (String) row.get("protocol");
+                String identifier = (String) row.get("identifier");
+                String uuid = (String) row.get("uuid");
+                NodeRef nodeRef = new NodeRef(new StoreRef(protocol, identifier), uuid);
+                results.add(nodeRef);
+            }
+        };
+        template.select(SELECT_CHILDREN_OF_THE_SHARED_SURFCONFIG_FOLDER, params, resultHandler);
+        return results;
     }
 }

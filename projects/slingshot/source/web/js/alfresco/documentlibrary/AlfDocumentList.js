@@ -1085,11 +1085,15 @@ define(["dojo/_base/declare",
        */
       onScrollNearBottom: function alfresco_documentlibrary_AlfDocumentList__onInsertMoreDocumentsRequest(payload) {
          // Process Infinite Scroll, if enabled & if we've not hit the end of the results
-         if(this.useInfiniteScroll && this._currentData.totalRecords < this._currentData.totalRecordsUpper)
+         if(this.useInfiniteScroll && this._currentData.totalRecords < this._currentData.numberFound)
          {
             this.currentPage++;
 
             this.loadData();
+         }
+         else
+         {
+            this.alfPublish(this.eventsScrollReturnTopic);
          }
       },
 

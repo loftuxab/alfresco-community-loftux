@@ -22,8 +22,36 @@
    </#if>
 
    <#if DEBUG>
-   <#-- Loftux - temporary workaround for debug mode issue ACE-1147 -->
-   <@script type="text/javascript" src="${url.context}/res/js/yui-common.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/js/log4javascript.v1.4.1.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/yahoo/yahoo-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/event/event-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/dom/dom-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/dragdrop/dragdrop-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/animation/animation-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/logger/logger-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/connection/connection-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/element/element-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/get/get-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/yuiloader/yuiloader-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/button/button-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/container/container-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/menu/menu-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/json/json-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/selector/selector-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/datasource/datasource-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/autocomplete/autocomplete-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/paginator/paginator-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/datatable/datatable-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/history/history-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/treeview/treeview-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/cookie/cookie-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/uploader/uploader-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/calendar/calendar-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/resize/resize-debug.js" group="template-common"/>
+   <@script type="text/javascript" src="${url.context}/res/yui/yui-patch.js" group="template-common"/>
+   <@inlineScript group="template-common">
+      YAHOO.util.Event.throwErrors = true;
+   </@>
    <#else>
    <@script type="text/javascript" src="${url.context}/res/js/yui-common.js" group="template-common"/>
    </#if>
@@ -80,15 +108,15 @@
             "${c.value?js_string}"<#if c_has_next>,</#if>
          </#list>]
       };
-
+      
       Alfresco.constants.HIDDEN_PICKER_VIEW_MODES = [
          <#list config.scoped["DocumentLibrary"]["hidden-picker-view-modes"].children as viewMode>
             <#if viewMode.name?js_string == "mode">"${viewMode.value?js_string}"<#if viewMode_has_next>,</#if></#if>
          </#list>
       ];
-
+      
       Alfresco.constants.MENU_ARROW_SYMBOL = "&#9662;";
-
+      
       <#if PORTLET>
       document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=";
       </#if>

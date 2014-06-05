@@ -1287,7 +1287,7 @@
                   {
                      if (menuItems[index].value === this.options.sortField)
                      {
-                        this.widgets.sortField.set("label", menuItems[index].cfg.getProperty("text"));
+                        this.widgets.sortField.set("label", menuItems[index].cfg.getProperty("text") + " " + Alfresco.constants.MENU_ARROW_SYMBOL);
                         break;
                      }
                   }
@@ -3281,7 +3281,7 @@
          {
             var me = this;
             this.options.sortField = eventTarget.value;
-            this.widgets.sortField.set("label", eventTarget.cfg.getProperty("text"));
+            this.widgets.sortField.set("label", eventTarget.cfg.getProperty("text") + " " + Alfresco.constants.MENU_ARROW_SYMBOL);
             this.services.preferences.set(PREF_SORT_FIELD, this.options.sortField, {
                successCallback:
                {
@@ -4010,7 +4010,7 @@
             };
 
             // Initial navigation won't fire the History event. Fix for ALF-19161: reload doclist when user click on currently selected filter.
-            if (obj.doclistFirstTimeNav || this.currentFilter.filterData == filter.filterData)
+            if (obj.doclistFirstTimeNav || (typeof this.currentFilter.filterId !== "undefined" && this.currentFilter.filterId == filter.filterId))
             {
                this._updateDocList.call(this,
                {

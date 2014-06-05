@@ -613,6 +613,7 @@ span.navigation-separator-alt
    border: 1px solid #ccc !important;
    background-color: #fff;
    margin-left: 10px;
+   width: 800px;
 }
 
 .form-container textarea,
@@ -701,7 +702,7 @@ span.navigation-separator-alt
 
 .yui-skin-lightTheme .yui-navset .yui-content
 {
-   background: #eee;
+   background: #F6F6F6;
 }
 
 /* same as theme-color-2 */

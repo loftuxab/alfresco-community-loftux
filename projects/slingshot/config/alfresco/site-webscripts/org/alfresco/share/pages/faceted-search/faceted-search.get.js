@@ -129,7 +129,7 @@ var facets = [
          facetQName: "{http://www.alfresco.org/model/content/1.0}content.mimetype",
          sortBy: "DESCENDING",
          maxFilters: 6,
-         useHash: true
+         useHash: false
       }
    },
    {
@@ -140,7 +140,7 @@ var facets = [
          facetQName: "{http://www.alfresco.org/model/content/1.0}creator.__.u",
          sortBy: "ALPHABETICALLY",
          maxFilters: 6,
-         useHash: true
+         useHash: false
       }
    },
    {
@@ -151,7 +151,7 @@ var facets = [
          facetQName: "{http://www.alfresco.org/model/content/1.0}modifier.__.u",
          sortBy: "ALPHABETICALLY",
          maxFilters: 6,
-         useHash: true
+         useHash: false
       }
    },
    {
@@ -163,7 +163,7 @@ var facets = [
          blockIncludeFacetRequest: true,
          sortBy: "INDEX",
          maxFilters: 6,
-         useHash: true
+         useHash: false
       }
    },
    {
@@ -175,7 +175,7 @@ var facets = [
          blockIncludeFacetRequest: true,
          sortBy: "INDEX",
          maxFilters: 6,
-         useHash: true
+         useHash: false
       }
    },
    {
@@ -188,7 +188,7 @@ var facets = [
          hitThreshold: 1,
          minFilterValueLength: 5,
          maxFilters: 6,
-         useHash: true
+         useHash: false
       }
    },
    {
@@ -200,7 +200,7 @@ var facets = [
          blockIncludeFacetRequest: true,
          sortBy: "INDEX",
          maxFilters: 6,
-         useHash: true
+         useHash: false
       }
    }
 ];
@@ -358,7 +358,7 @@ var searchDocLib = {
       ],
       selectedScope: "REPO",
       useInfiniteScroll: true,
-      siteId: "$$site$$", // Get the current site context from the URL template (if set)
+      siteId: null, // Don't set the siteId initially (we don't want to do a site search on first load)
       rootNode: null,
       repo: true,
       widgets: [

@@ -373,12 +373,10 @@ define(["dojo/_base/declare",
          {
             case 13:
             {
-               if (terms.length === 0)
+               if (terms.length > 0)
                {
+                  // ACE-1798 - always close the live search drop-down on enter keypress..
                   this.clearResults();
-               }
-               else
-               {
                   this.alfLog("log", "Search request for: ", terms);
                   var url = this.generateSearchPageLink(terms);
                   this.alfPublish("ALF_NAVIGATE_TO_PAGE", { 
