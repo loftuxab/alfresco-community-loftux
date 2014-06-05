@@ -347,4 +347,14 @@
          </list>
       </property>
    </bean>
+
+   <!-- ALF-20982 -->
+   <bean id="dependency.aggregator" parent="dependency.aggregator.abstract" class="org.springframework.extensions.surf.DependencyAggregator">
+      <property name="compressionExclusions">
+         <list>
+            <value>components/preview/pdfjs/*.js</value>
+         </list>
+      </property>
+   </bean>
+
 </beans>
