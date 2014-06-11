@@ -239,7 +239,7 @@ function getDocResults(params)
       logger.log("Processing resultset of length: " + nodes.length);
 
    var processedItems = 0; // Count the processed items
-   for (var i=0, item; i<nodes.length && i<params.maxResults; i++)
+   for (var i=0, item; i<nodes.length; i++)
    {
       // For each node we extract the site/container qname path and then
       // let the per-container helper function decide what to do.
