@@ -56,6 +56,9 @@
         <constructor-arg name="licenseShare" value="${share.license}" />
         <property name="cloudUserName" value="${test.hybrid.username}" />
         <property name="cloudUserPassword" value="${test.hybrid.password}" />
+        <property name="blogUrl" value="${blog.url}" />
+        <property name="blogUsername" value="${blog.username}" />
+        <property name="blogPassword" value="${blog.password}" />
     </bean>
 
     <!-- Initiating another user that will be required for unit tests.  -->
@@ -78,24 +81,22 @@
         <constructor-arg name="downloadDirectory" value="${download.hybrid.directory}" />
         <constructor-arg name="licenseShare" value="${share.license}" />
         <constructor-arg name="hybridEnabled" value="${hrbrid.enabled}" />
+        <property name="blogUrl" value="${blog.url}" />
+        <property name="blogUsername" value="${blog.username}" />
+        <property name="blogPassword" value="${blog.password}" />
     </bean>
 
     <bean id="hybridWebDroneFactoryBean" class="org.alfresco.webdrone.WebDroneFactory" lazy-init="true">
         <constructor-arg name="defaultWaitTime" value="${webdrone.hybrid.element.wait.time}" />
-        <constructor-arg name="browser" value="${webdrone.hybrid.browser}" />
         <constructor-arg name="maxPageRenderWaitTime" value="${webdrone.hybrid.page.render.wait.time}" />
-        <constructor-arg name="factoryPage" ref="factoryPage" />
+        <constructor-arg name="browser" value="${webdrone.hybrid.browser}" />
         <constructor-arg name="properties" ref="hybridProperties" />
-                <constructor-arg name="preferences">
+        <constructor-arg name="factoryPage" ref="factoryPage" />
+        <constructor-arg name="preferences">
             <util:map key-type="org.alfresco.webdrone.BrowserPreference" value-type="java.lang.Object">
                 <entry key-ref="language" value-ref="englishLocale" />
             </util:map>
         </constructor-arg>
-        <constructor-arg name="localGrid">
-            <value type="java.lang.Boolean">false</value>
-        </constructor-arg>
-        <constructor-arg name="grid" ref="grid" />
-        <constructor-arg name="node" ref="node" />
         <property name="gridUrl" value="${webdrone.grid.url}" />
         <property name="chromeServerPath" value="${webdrone.chrome.server.path}" />
         <property name="ieServerPath" value="${webdrone.ie.server.path}" />

@@ -13,31 +13,32 @@ var rootWidgetId = "FCTSRCH_";
 
 // TODO: Currently commented out until we roll-out faceted search configuration...
 // Insert a configuration page link if the user has the appropriate permissions...
-// if (_processedUserData.groups["GROUP_ALFRESCO_ADMINISTRATORS"] == true ||
-//     _processedUserData.groups["GROUP_SEARCH_ADMINISTRATORS"] == true ||
-//     _processedUserData.isNetworkAdmin == true)
-// {
-   var titleMenu = widgetUtils.findObject(widgets, "id", "HEADER_TITLE_MENU");
-   var searchConfigMenuItem = {
-      id: "FCTSRCH_CONFIG_PAGE_LINK",
-      name: "alfresco/menus/AlfMenuBarItem",
-      config: {
-         label: "",
-         title: msg.get("faceted-search.config.link"),
-         iconAltText: msg.get("faceted-search.config.link"),
-         iconClass: "alf-configure-icon",
-         targetUrl: "dp/ws/faceted-search-config",
-         renderFilter: [
-            {
-               target: "groupMemberships",
-               property: "GROUP_ALFRESCO_ADMINISTRATORS",
-               values: [true]
-            }
-         ]
-      }
-   };
-   titleMenu.config.widgets.push(searchConfigMenuItem);
-// }
+// var titleMenu = widgetUtils.findObject(widgets, "id", "HEADER_TITLE_MENU");
+// var searchConfigMenuItem = {
+//    id: "FCTSRCH_CONFIG_PAGE_LINK",
+//    name: "alfresco/menus/AlfMenuBarItem",
+//    config: {
+//       label: "",
+//       title: msg.get("faceted-search.config.link"),
+//       iconAltText: msg.get("faceted-search.config.link"),
+//       iconClass: "alf-configure-icon",
+//       targetUrl: "dp/ws/faceted-search-config",
+//       renderFilterMethod: "ANY",
+//       renderFilter: [
+//          {
+//             target: "groupMemberships",
+//             property: "GROUP_ALFRESCO_ADMINISTRATORS",
+//             values: [true]
+//          },
+//          {
+//             target: "groupMemberships",
+//             property: "GROUP_SEARCH_ADMINISTRATORS",
+//             values: [true]
+//          }
+//       ]
+//    }
+// };
+// titleMenu.config.widgets.push(searchConfigMenuItem);
 
 // Accessibility menu
 var accessMenu = {
@@ -217,20 +218,33 @@ function getSortFieldsFromConfig()
    // Iterate over configuration sort fields
    for(var i=0; i < configSortFields.size(); i+=1)
    {
-      // Extract sort properties from configuration
-      var configSortField = configSortFields.get(i),
-          label = String(configSortField.attributes["labelId"]),
-          sortable = String(configSortField.attributes["isSortable"]) == "true" ? true : false,
-          valueTokens = String(configSortField.value).split("|"),
-          value = valueTokens[0],
-          direction = "ascending",
-          checked = (i==0 ? true : false);
-
-      // The value may contain 2 pieces of data - the optional 2nd is for sort direction
-      if(valueTokens instanceof Array && valueTokens.length > 1 && valueTokens[1] === "false")
+      var direction = "ascending";
+      var value = null;
+      var configSortField = configSortFields.get(i);
+      if (configSortField.value != null)
       {
-         direction = "descending";
+         valueTokens = String(configSortField.value).split("|"),
+         value = valueTokens[0];
+
+         // The value may contain 2 pieces of data - the optional 2nd is for sort direction
+         if(valueTokens instanceof Array && valueTokens.length > 1 && valueTokens[1] === "false")
+         {
+            direction = "descending";
+         }
       }
+      else
+      {
+         // It's important that some value is set for Relevance (e.g. which is assumed when the
+         // configSortField.value is null). This is done so that the browser hash can be updated
+         // and in turn the hash can be used on page load. The SearchService is written to handle
+         // the value of "Relevance" to mean that no specific sort is required.
+         value = "Relevance";
+      }
+
+      // Extract sort properties from configuration
+      var label = String(configSortField.attributes["labelId"]),
+          sortable = String(configSortField.attributes["isSortable"]) == "true" ? true : false,
+          checked = (i==0 ? true : false);
 
       // Create a new sort widget
       var labelMsg = msg.get(label);
@@ -240,6 +254,7 @@ function getSortFieldsFromConfig()
             label: labelMsg,
             title: msg.get("faceted-search.sort-by.title", [labelMsg]),
             value: value,
+            hashName: "sortField",
             group: "DOCUMENT_LIBRARY_SORT_FIELD",
             publishTopic: "ALF_DOCLIST_SORT_FIELD_SELECTION",
             checked: checked,
@@ -311,8 +326,11 @@ var searchResultsMenuBar = {
                      name: "alfresco/menus/AlfMenuBarToggle",
                      config: {
                         visibilityConfig: hideOnNotSortableConfig,
+                        hashName: "sortAscending",
                         checked: true,
+                        subscriptionAttribute: "sortAscending",
                         onConfig: {
+                           value: "ascending",
                            title: msg.get("faceted-search.sort-order-desc.title"),
                            iconClass: "alf-sort-ascending-icon",
                            iconAltText: msg.get("faceted-search.sorted-as-asc.title"),
@@ -322,6 +340,7 @@ var searchResultsMenuBar = {
                            }
                         },
                         offConfig: {
+                           value: "descending",
                            title: msg.get("faceted-search.sort-order-asc.title"),
                            iconClass: "alf-sort-descending-icon",
                            iconAltText: msg.get("faceted-search.sorted-as-desc.title"),
