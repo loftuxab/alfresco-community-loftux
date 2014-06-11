@@ -228,7 +228,7 @@ function getDocResults(params)
       defaultOperator: operator,
       onerror: "no-results",
       page: {
-         maxItems: params.maxResults + 1,
+         maxItems: params.maxResults + 10,
          skipCount: params.startIndex
       }
    };
@@ -237,7 +237,8 @@ function getDocResults(params)
    
    if (logger.isLoggingEnabled())
       logger.log("Processing resultset of length: " + nodes.length);
-   
+
+   var processedItems = 0; // Count the processed items
    for (var i=0, item; i<nodes.length && i<params.maxResults; i++)
    {
       // For each node we extract the site/container qname path and then
@@ -248,6 +249,10 @@ function getDocResults(params)
          if (item !== null)
          {
             results.push(item);
+            processedItems++;
+            // Have we reached the number of requested items?
+            if( processedItems === params.maxResults)
+               break;
          }
       }
       catch (e)
