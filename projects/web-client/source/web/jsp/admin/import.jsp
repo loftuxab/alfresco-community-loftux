@@ -58,6 +58,13 @@
       <td class="paddingRow"></td>
    </tr>
    <tr>
+      <td></f:verbatim><h:outputText id="text12" value="#{msg.encoding}: " /><f:verbatim>
+         </f:verbatim><h:selectOneMenu id="encoding" value="#{ImportDialog.encoding}">
+         <f:selectItems value="#{ImportDialog.encodings}" />
+         </h:selectOneMenu><f:verbatim>
+      </td>
+   </tr>
+   <tr>
       <td></f:verbatim><h:selectBooleanCheckbox value="#{DialogManager.bean.runInBackground}" /><f:verbatim>&nbsp; <span style="vertical-align: 20%"> </f:verbatim><h:outputText value="#{msg.run_import_in_background}" /><f:verbatim></span></td>
    </tr>
    <tr>

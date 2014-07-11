@@ -10,7 +10,6 @@
 
    <import file="${alfresco.basedir}/macros.xml" />
    <import file="${alfresco.basedir}/projects.xml" />
-   <import file="${alfresco.basedir}/maven.xml" />
 
    <!-- For support of the script tag (Ant 1.6 fails to load the BSF or -->
    <!-- JSR-223 jars from anywhere other than the ant lib directory) -->
@@ -95,6 +94,7 @@
          <pathelement location="${dir.project.datamodel.classes}" />
          <pathelement location="${dir.project.datamodel.classes.test}" />
          <pathelement location="${dir.project.datamodel.test.resources}" />
+         <pathelement location="${dir.project.events.classes}" />
          <pathelement location="${dir.project.legacylucene.classes}" />
          <pathelement location="${dir.project.legacylucene.classes.test}" />
          <pathelement location="${dir.project.jlan.classes}" />
@@ -226,12 +226,6 @@
          <exclude name="**/org/alfresco/filesys/repo/ContentDiskDriverTest.java" />
          <exclude name="**/org/alfresco/filesys/repo/LockKeeperImplTest.java" />
          <exclude name="**/org/alfresco/filesys/repo/rules/ShuffleTest.java" />
-         <exclude name="**/org/alfresco/jcr/importer/ImportTest.java" />
-         <exclude name="**/org/alfresco/jcr/item/Alf1791Test.java" />
-         <exclude name="**/org/alfresco/jcr/item/ItemTest.java" />
-         <exclude name="**/org/alfresco/jcr/query/QueryManagerImplTest.java" />
-         <exclude name="**/org/alfresco/jcr/repository/RepositoryImplTest.java" />
-         <exclude name="**/org/alfresco/jcr/session/SessionImplTest.java" />
          <exclude name="**/org/alfresco/opencmis/CMISTest.java" />
          <exclude name="**/org/alfresco/opencmis/OpenCmisLocalTest.java" />
          <exclude name="**/org/alfresco/opencmis/search/OpenCmisQueryTest.java" />
@@ -363,6 +357,7 @@
          <exclude name="**/org/alfresco/repo/template/TemplateServiceImplTest.java" />
          <exclude name="**/org/alfresco/repo/template/XSLTProcessorTest.java" />
          <exclude name="**/org/alfresco/repo/tenant/MultiTDemoTest.java" />
+         <exclude name="**/org/alfresco/repo/tenant/MultiTServiceImplTest.java" />
          <exclude name="**/org/alfresco/repo/tenant/MultiTNodeServiceInterceptorTest.java" />
          <exclude name="**/org/alfresco/repo/thumbnail/ThumbnailServiceImplParameterTest.java" />
          <exclude name="**/org/alfresco/repo/thumbnail/ThumbnailServiceImplTest.java" />
@@ -371,6 +366,7 @@
          <exclude name="**/org/alfresco/repo/transaction/RetryingTransactionHelperTest.java" />
          <exclude name="**/org/alfresco/repo/transaction/TransactionAwareSingletonTest.java" />
          <exclude name="**/org/alfresco/repo/transaction/TransactionServiceImplTest.java" />
+         <exclude name="**/org/alfresco/repo/transaction/ConnectionPoolOverloadTest.java" />
          <exclude name="**/org/alfresco/repo/transfer/ContentChunkerImplTest.java" />
          <exclude name="**/org/alfresco/repo/transfer/HttpClientTransmitterImplTest.java" />
          <exclude name="**/org/alfresco/repo/transfer/NodeCrawlerTest.java" />
@@ -567,7 +563,6 @@
          <exclude name="**/org/alfresco/cmis/search/*.java" if="minimal.testing" />
          <exclude name="**/org/alfresco/filesys/FTPServerTest.java" if="minimal.testing" />
          <exclude name="**/org/alfresco/filesys/repo/*.java" if="minimal.testing" />
-         <exclude name="**/org/alfresco/jcr/**/*.java" if="minimal.testing" />
          <exclude name="**/org/alfresco/opencmis/search/*.java" if="minimal.testing" />
          <exclude name="**/org/alfresco/util/schemacomp/DbToXMLTest.java" if="minimal.testing" />
          <exclude name="**/org/alfresco/util/schemacomp/ExportDbTest.java" if="minimal.testing" />
@@ -626,6 +621,7 @@
            description="Performs an incremental build of the dependencies of the Alfresco WAR"
            depends="incremental-core,
                     incremental-datamodel,
+                    incremental-events,
                     incremental-legacylucene,
                     incremental-jlan,
                     incremental-mbeans,
@@ -776,6 +772,7 @@
            description="Cleans all projects related to the webclient project" 
            depends="clean-core,
                     clean-datamodel,
+                    clean-events,
                     clean-legacylucene,
                     clean-jlan, 
                     clean-mbeans,
@@ -925,6 +922,7 @@
          <!-- copy class files -->
          <fileset dir="${dir.project.core.classes}" />
          <fileset dir="${dir.project.datamodel.classes}" />
+         <fileset dir="${dir.project.events.classes}" />
          <fileset dir="${dir.project.legacylucene.classes}" />
          <fileset dir="${dir.project.mbeans.classes}" />
          <fileset dir="${dir.project.deployment.classes}" />
@@ -1168,8 +1166,9 @@
    </target>
 
    <target name="minimize-slingshot-deployed-javascript" depends="init">
+      <!-- ACE-1147, create yui-common for both production and debug YUI libs -->
       <echo>Merging selected Slingshot Javascript files...</echo>
-      <concat destfile="${dir.deploy.tomcat.application.slingshot}/js/yui-common.js" force="no">
+      <concat destfile="${dir.deploy.tomcat.application.slingshot}/js/yui-common-min.js" force="no">
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/utilities/utilities.js" />
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/button/button-min.js" />
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/container/container-min.js" />
@@ -1182,10 +1181,38 @@
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/datatable/datatable-min.js" />
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/history/history-min.js" />
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/treeview/treeview-min.js" />
-		   <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/cookie/cookie-min.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/cookie/cookie-min.js" />
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/uploader/uploader-min.js" />
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/calendar/calendar-min.js" />
          <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/resize/resize-min.js" />
+         <fileset file="${dir.project.slingshot.src.web}/yui/yui-patch.js" />
+      </concat>
+      <concat destfile="${dir.deploy.tomcat.application.slingshot}/js/yui-common.js" force="no">
+         <fileset file="${dir.project.slingshot.src.web}/js/log4javascript.v1.4.1.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/yahoo/yahoo-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/event/event-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/dom/dom-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/dragdrop/dragdrop-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/animation/animation-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/logger/logger-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/connection/connection-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/element/element-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/get/get-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/yuiloader/yuiloader-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/button/button-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/container/container-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/menu/menu-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/json/json-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/selector/selector-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/datasource/datasource-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/autocomplete/autocomplete-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/paginator/paginator-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/datatable/datatable-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/treeview/treeview-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/cookie/cookie-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/uploader/uploader-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/calendar/calendar-debug.js" />
+         <fileset file="${dir.deploy.tomcat.application.slingshot}/yui/resize/resize-debug.js" />
          <fileset file="${dir.project.slingshot.src.web}/yui/yui-patch.js" />
       </concat>
 
@@ -1741,7 +1768,5 @@
    <target name="distribute-extras" description="Build distribution targets for enterprise projects" />
 
    <target name="assemble-command-extras" description="Assemble commands" />
-
-   <target name="sdk-extras" description="Community additions for the SDK" />
 
 </project>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,6 +18,8 @@
  */
 package org.alfresco.repo.domain.propval;
 
+import static org.junit.Assert.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,8 +33,6 @@ import java.util.Random;
 
 import javax.naming.CompositeName;
 
-import junit.framework.TestCase;
-
 import org.alfresco.repo.domain.propval.PropertyValueDAO.PropertyFinderCallback;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -43,7 +43,11 @@ import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.GUID;
 import org.alfresco.util.Pair;
 import org.junit.experimental.categories.Category;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.extensions.surf.util.ISO8601DateFormat;
 
 /**
@@ -53,7 +57,7 @@ import org.springframework.extensions.surf.util.ISO8601DateFormat;
  * @since 3.2
  */
 @Category(OwnJVMTestsCategory.class)
-public class PropertyValueDAOTest extends TestCase
+public class PropertyValueDAOTest
 {
     private ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
@@ -61,7 +65,7 @@ public class PropertyValueDAOTest extends TestCase
     private RetryingTransactionHelper txnHelper;
     private PropertyValueDAO propertyValueDAO;
     
-    @Override
+    @Before
     public void setUp() throws Exception
     {
         ServiceRegistry serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
@@ -84,6 +88,7 @@ public class PropertyValueDAOTest extends TestCase
         ((AbstractPropertyValueDAOImpl)propertyValueDAO).setPropertyValueCache(null);
     }
     
+    @Test
     public void testPropertyClass() throws Exception
     {
         final Class<?> clazz = this.getClass();
@@ -145,6 +150,7 @@ public class PropertyValueDAOTest extends TestCase
         txnHelper.doInTransaction(noHitCallback, false);
     }
     
+    @Test
     public void testPropertyDateValue() throws Exception
     {
         final Date dateValue = ISO8601DateFormat.parse("1936-08-04T23:37:25.793Z");
@@ -172,6 +178,7 @@ public class PropertyValueDAOTest extends TestCase
         assertEquals(entityPair, entityPairCheck);
     }
     
+    @Test
     public void testPropertyStringValue() throws Exception
     {
         final String stringValue = "One Two Three - àâæçéèêëîïôœùûüÿñ - " + System.currentTimeMillis();
@@ -223,6 +230,7 @@ public class PropertyValueDAOTest extends TestCase
     /**
      * Try to catch Oracle out
      */
+    @Test
     public void testPropertyStringValue_EmptyAndNull() throws Exception
     {
         // Check empty string
@@ -242,6 +250,7 @@ public class PropertyValueDAOTest extends TestCase
         txnHelper.doInTransaction(emptyStringCallback, false);
     }
     
+    @Test
     public void testPropertyDoubleValue() throws Exception
     {
         final Double doubleValue = Double.valueOf(1.7976931348623E+125);
@@ -268,6 +277,7 @@ public class PropertyValueDAOTest extends TestCase
         assertEquals(entityPair, entityPairCheck);
     }
     
+    @Test
     public void testPropertySerializableValue() throws Exception
     {
         final Serializable serializableValue = new CompositeName("123");
@@ -366,17 +376,20 @@ public class PropertyValueDAOTest extends TestCase
         assertEquals(entityPair, entityPairCheck2);
     }
     
+    @Test
     public void testPropertyValue_Null() throws Exception
     {
         runPropertyValueTest(null);
     }
     
+    @Test
     public void testPropertyValue_Boolean() throws Exception
     {
         runPropertyValueTest(Boolean.TRUE);
         runPropertyValueTest(Boolean.FALSE);
     }
     
+    @Test
     public void testPropertyValue_Short() throws Exception
     {
         for (short i = 0; i < 100; i++)
@@ -385,6 +398,7 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_Integer() throws Exception
     {
         for (int i = 0; i < 100; i++)
@@ -393,6 +407,7 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_Long() throws Exception
     {
         for (long i = 0; i < 100; i++)
@@ -401,6 +416,7 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_Float() throws Exception
     {
         for (long i = 0; i < 100; i++)
@@ -409,6 +425,7 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_Double() throws Exception
     {
         for (long i = 0; i < 100; i++)
@@ -417,6 +434,7 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_Date() throws Exception
     {
         Random rand = new Random();
@@ -426,6 +444,7 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_String() throws Exception
     {
         for (long i = 0; i < 100; i++)
@@ -434,6 +453,7 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_Serializable() throws Exception
     {
         for (int i = 0; i < 100; i++)
@@ -448,6 +468,7 @@ public class PropertyValueDAOTest extends TestCase
         ONE, TWO, THREE;
     }
     
+    @Test
     public void testPropertyValue_Enum() throws Exception
     {
         for (int i = 0; i < 3; i++)
@@ -457,24 +478,28 @@ public class PropertyValueDAOTest extends TestCase
         }
     }
     
+    @Test
     public void testPropertyValue_EmptyHashMap() throws Exception
     {
         final HashMap<String, String> map = new HashMap<String, String>(15);
         runPropertyValueTest(map, true);
     }
     
+    @Test
     public void testPropertyValue_EmptyArrayList() throws Exception
     {
         final ArrayList<String> list = new ArrayList<String>(20);
         runPropertyValueTest(list, true);
     }
     
+    @Test
     public void testPropertyValue_EmptyHashSet() throws Exception
     {
         final HashSet<String> set = new HashSet<String>(20);
         runPropertyValueTest(set, true);
     }
     
+    @Test
     public void testPropertyValue_MapOfStrings() throws Exception
     {
         final HashMap<String, String> map = new HashMap<String, String>(15);
@@ -537,6 +562,7 @@ public class PropertyValueDAOTest extends TestCase
         return entityId;
     }
 
+    @Test
     public void testProperty_MapOfStrings() throws Exception
     {
         final HashMap<String, String> map = new HashMap<String, String>(15);
@@ -549,6 +575,7 @@ public class PropertyValueDAOTest extends TestCase
         runPropertyTest(map);
     }
     
+    @Test
     public void testProperty_MapOfMapOfSerializables() throws Exception
     {
         final HashMap<String, Serializable> mapInner = new HashMap<String, Serializable>(15);
@@ -567,6 +594,7 @@ public class PropertyValueDAOTest extends TestCase
         runPropertyTest(mapOuter);
     }
     
+    @Test
     public void testProperty_MapOfMapOfStrings() throws Exception
     {
         final HashMap<String, String> mapInner = new HashMap<String, String>(15);
@@ -585,6 +613,7 @@ public class PropertyValueDAOTest extends TestCase
         runPropertyTest(mapOuter);
     }
     
+    @Test
     public void testProperty_CollectionOfStrings() throws Exception
     {
         final ArrayList<String> list = new ArrayList<String>(20);
@@ -596,6 +625,7 @@ public class PropertyValueDAOTest extends TestCase
         runPropertyTest(list);
     }
     
+    @Test
     public void testProperty_UpdateCollection() throws Exception
     {
         final ArrayList<String> list = new ArrayList<String>(20);
@@ -646,7 +676,8 @@ public class PropertyValueDAOTest extends TestCase
 //            txnHelper.doInTransaction(updateThousandsCallback, false);
 //        }
 //    }
-//    
+//
+    @Test
     public void testProperty_Delete() throws Exception
     {
         final ArrayList<String> list = new ArrayList<String>(20);
@@ -686,37 +717,42 @@ public class PropertyValueDAOTest extends TestCase
     /*
      * Switch off caches and rerun some of the tests
      */
-    
+    @Test
     public void testPropertyClass_NoCache() throws Exception
     {
         removeCaches();
         testPropertyClass();
     }
 
+    @Test
     public void testPropertyDateValue_NoCache() throws Exception
     {
         removeCaches();
         testPropertyDateValue();
     }
     
+    @Test
     public void testPropertyStringValue_NoCache() throws Exception
     {
         removeCaches();
         testPropertyStringValue();
     }
 
+    @Test
     public void testPropertyDoubleValue_NoCache() throws Exception
     {
         removeCaches();
         testPropertyDoubleValue();
     }
 
+    @Test
     public void testPropertySerializableValue_NoCache() throws Exception
     {
         removeCaches();
         testPropertySerializableValue();
     }
     
+    @Test
     public void testPropertyUniqueContext() throws Exception
     {
         final String aaa = GUID.generate();
@@ -807,6 +843,7 @@ public class PropertyValueDAOTest extends TestCase
         }, false);
     }
     
+    @Test
     public void testPropertyUniqueContextValue() throws Exception
     {
         final String aaa = GUID.generate();
@@ -873,5 +910,87 @@ public class PropertyValueDAOTest extends TestCase
             }
         }, false);
         assertEquals("ID-value pair incorrect", v2Pair, pair);
+    }
+    
+    /**
+     * MNT-10067: use a script to delete the orphaned property values.
+     */
+    @Test
+    @Ignore("The functionality is not ready, yet")
+    public void testScriptCanDeleteUnusedProps()
+    {
+        PropValGenerator valueGen = new PropValGenerator(propertyValueDAO);
+        
+        // Find some values to use in the test that aren't already in the property tables.
+        final String stringValue = valueGen.createUniqueString();
+        final Double doubleValue = valueGen.createUniqueDouble();
+        final Date dateValue = valueGen.createUniqueDate();
+        final Serializable serValue = valueGen.createUniqueSerializable();
+        // We'll keep a list of the DB IDs of the persisted values so we can later check they've been deleted.
+        final Map<Object, Long> persistedIDs = new HashMap<Object, Long>();
+        
+        txnHelper.doInTransaction(new RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                persistedIDs.put(stringValue, propertyValueDAO.getOrCreatePropertyStringValue(stringValue).getFirst());
+                persistedIDs.put(doubleValue, propertyValueDAO.getOrCreatePropertyDoubleValue(doubleValue).getFirst());
+                persistedIDs.put(dateValue, propertyValueDAO.getOrCreatePropertyDateValue(dateValue).getFirst());
+                persistedIDs.put(serValue, propertyValueDAO.getOrCreatePropertyValue(serValue).getFirst());
+                return null;
+            }
+        });
+        
+        // Run the clean-up script.
+        txnHelper.doInTransaction(new RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                // Check there are some persisted values to delete.
+                assertEquals(stringValue, propertyValueDAO.getPropertyStringValue(stringValue).getSecond());
+                assertEquals(doubleValue, propertyValueDAO.getPropertyDoubleValue(doubleValue).getSecond());
+                assertEquals(dateValue, propertyValueDAO.getPropertyDateValue(dateValue).getSecond());
+                // Serializable values are the odd-one-out; we can't query for them by value
+                // and no de-duplication is used during storage.
+                assertEquals(serValue, propertyValueDAO.getPropertyValueById(persistedIDs.get(serValue)).getSecond());
+                
+                propertyValueDAO.cleanupUnusedValues();
+                return null;
+            }
+        });
+
+        // Check all the properties have been deleted.
+        txnHelper.doInTransaction(new RetryingTransactionCallback<Void>()
+        {   
+            public Void execute() throws Throwable
+            {                
+                assertPropDeleted(propertyValueDAO.getPropertyStringValue(stringValue));
+                assertPropDeleted(propertyValueDAO.getPropertyDoubleValue(doubleValue));
+                // TODO: fix date deletion, not currently handled by CleanAlfPropTables.sql
+//                assertPropDeleted(propertyValueDAO.getPropertyDateValue(dateValue));
+                // Serializable values cannot be queried by value
+                try
+                {
+                    propertyValueDAO.getPropertyValueById(persistedIDs.get(serValue));
+                    fail(String.format("Persisted %s was not deleted, but should have been.",
+                                serValue.getClass().getSimpleName()));
+                }
+                catch (DataIntegrityViolationException e)
+                {
+                    // Good - it was deleted.
+                }
+                return null;
+            }
+        });
+    }
+    
+    private void assertPropDeleted(Pair<Long, ?> value)
+    {
+        if (value != null)
+        {
+            String msg = String.format("Property value [%s=%s] should have been deleted by cleanup script.",
+                        value.getSecond().getClass().getSimpleName(), value.getSecond());
+            fail(msg);
+        }
     }
 }

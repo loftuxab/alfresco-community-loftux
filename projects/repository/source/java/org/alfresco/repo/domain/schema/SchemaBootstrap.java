@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -160,6 +160,8 @@ public class SchemaBootstrap extends AbstractLifecycleBean
     private static final String ERR_STATEMENT_VAR_ASSIGNMENT_BEFORE_SQL = "schema.update.err.statement_var_assignment_before_sql";
     private static final String ERR_STATEMENT_VAR_ASSIGNMENT_FORMAT = "schema.update.err.statement_var_assignment_format";
     private static final String ERR_STATEMENT_TERMINATOR = "schema.update.err.statement_terminator";
+    private static final String ERR_DELIMITER_SET_BEFORE_SQL = "schema.update.err.delimiter_set_before_sql";
+    private static final String ERR_DELIMITER_INVALID = "schema.update.err.delimiter_invalid";
     private static final String DEBUG_SCHEMA_COMP_NO_REF_FILE = "system.schema_comp.debug.no_ref_file";
     private static final String INFO_SCHEMA_COMP_ALL_OK = "system.schema_comp.info.all_ok";
     private static final String WARN_SCHEMA_COMP_PROBLEMS_FOUND = "system.schema_comp.warn.problems_found";
@@ -229,6 +231,17 @@ public class SchemaBootstrap extends AbstractLifecycleBean
         this.descriptorService = descriptorService;
     }
 
+
+    /**
+     * Defines the DatabaseMetaDataHelper to be used
+     * 
+     * @param databaseMetaDataHelper
+     */
+    public void setDatabaseMetaDataHelper(DatabaseMetaDataHelper databaseMetaDataHelper)
+    {
+        this.databaseMetaDataHelper = databaseMetaDataHelper;
+    }
+
     /**
      * Sets the previously auto-detected Hibernate dialect.
      * 
@@ -260,6 +273,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
     private int maximumStringLength;
     private Properties globalProperties;
     private String dbSchemaName;
+    private DatabaseMetaDataHelper databaseMetaDataHelper;
 
     private ThreadLocal<StringBuilder> executedStatementsThreadLocal = new ThreadLocal<StringBuilder>();
 
@@ -563,7 +577,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
      */
     private int countAppliedPatches(Configuration cfg, Connection connection) throws Exception
     {
-        String defaultSchema = dbSchemaName != null ? dbSchemaName : DatabaseMetaDataHelper.getSchema(connection);
+        String defaultSchema = dbSchemaName != null ? dbSchemaName : databaseMetaDataHelper.getSchema(connection);
 
         if (defaultSchema != null && defaultSchema.length() == 0)
         {
@@ -1021,7 +1035,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                 setJobExecutorActivate(false).
                 buildProcessEngine();
 
-            String schemaName = dbSchemaName != null ? dbSchemaName : DatabaseMetaDataHelper.getSchema(connection);
+            String schemaName = dbSchemaName != null ? dbSchemaName : databaseMetaDataHelper.getSchema(connection);
             // create or upgrade the DB schema
             engine.getManagementService().databaseSchemaUpgrade(connection, null, schemaName);
         }
@@ -1245,6 +1259,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
             int batchUpperLimit = 0;
             int batchSize = 1;
             Map<String, Object> varAssignments = new HashMap<String, Object>(13);
+            String delimiter = ";";
             // Special variable assignments:
             if (dialect instanceof PostgreSQLDialect)
             {
@@ -1348,6 +1363,22 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                    connection.setAutoCommit(true);
                    continue;
                 }
+                else if (sql.startsWith("--SET-DELIMITER:"))
+                {
+                    if (sb.length() > 0)
+                    {
+                        // This can only be set before a new SQL statement
+                        throw AlfrescoRuntimeException.create(ERR_DELIMITER_SET_BEFORE_SQL, (line - 1), scriptUrl);
+                    }
+
+                    // We're good...so set the new delimiter
+                    String newDelim = sql.substring(16).trim();
+                    if (newDelim.length() == 0)
+                    {
+                        throw AlfrescoRuntimeException.create(ERR_DELIMITER_INVALID, (line - 1), scriptUrl);
+                    }
+                    delimiter = newDelim;
+                }
 
                 // Check for comments
                 if (sql.length() == 0 ||
@@ -1358,7 +1389,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                     if (sb.length() > 0)
                     {
                         // we have an unterminated statement
-                        throw AlfrescoRuntimeException.create(ERR_STATEMENT_TERMINATOR, (line - 1), scriptUrl);
+                        throw AlfrescoRuntimeException.create(ERR_STATEMENT_TERMINATOR, delimiter, (line - 1), scriptUrl);
                     }
                     // there has not been anything to execute - it's just a comment line
                     continue;
@@ -1366,7 +1397,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                 // have we reached the end of a statement?
                 boolean execute = false;
                 boolean optional = false;
-                if (sql.endsWith(";"))
+                if (sql.endsWith(delimiter))
                 {
                     sql = sql.substring(0, sql.length() - 1);
                     execute = true;
@@ -1375,7 +1406,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                 else if (sql.endsWith("(optional)") || sql.endsWith("(OPTIONAL)"))
                 {
                     // Get the end of statement
-                    int endIndex = sql.lastIndexOf(';');
+                    int endIndex = sql.lastIndexOf(delimiter);
                     if (endIndex > -1)
                     {
                         sql = sql.substring(0, endIndex);
@@ -1774,6 +1805,17 @@ public class SchemaBootstrap extends AbstractLifecycleBean
             {
                 logger.warn("Error closing DB connection: " + e.getMessage());
             }
+            try
+            {
+                if (session != null)
+                {
+                    session.close();
+                }
+            }
+            catch (Throwable e)
+            {
+                logger.warn("Error closing Hibernate session: " + e.getMessage());
+            }
             // Remove the connection reference from the threadlocal boostrap
             SchemaBootstrapConnectionProvider.setBootstrapConnection(null);
             
@@ -1866,7 +1908,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
         XMLToSchema xmlToSchema = new XMLToSchema(is);
         xmlToSchema.parse();
         Schema reference = xmlToSchema.getSchema();
-        ExportDb exporter = new ExportDb(dataSource, dialect, descriptorService);
+        ExportDb exporter = new ExportDb(dataSource, dialect, descriptorService, databaseMetaDataHelper);
         exporter.setDbSchemaName(dbSchemaName);
         // Ensure that the database objects we're validating are filtered
         // by the same prefix as the reference file.  

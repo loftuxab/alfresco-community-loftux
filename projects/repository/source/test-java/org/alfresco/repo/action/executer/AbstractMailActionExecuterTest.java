@@ -20,20 +20,22 @@ package org.alfresco.repo.action.executer;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.management.subsystems.ApplicationContextFactory;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.tenant.TenantUtil.TenantRunAsWork;
@@ -333,10 +335,10 @@ public abstract class AbstractMailActionExecuterTest
     public void testPrepareEmailForDisabledUsers() throws MessagingException
     {
     	String groupName = null;
+        final String USER1 = "test_user1";
+        final String USER2 = "test_user2";
     	try
     	{
-            final String USER1 = "test_user1";
-            final String USER2 = "test_user2";
             createUser(USER1, null);
             NodeRef userNode = createUser(USER2, null);
             groupName = AUTHORITY_SERVICE.createAuthority(AuthorityType.GROUP, "testgroup1");
@@ -371,6 +373,8 @@ public abstract class AbstractMailActionExecuterTest
     		{
                 AUTHORITY_SERVICE.deleteAuthority(groupName, true);
     		}
+            PERSON_SERVICE.deletePerson(USER1);
+            PERSON_SERVICE.deletePerson(USER2);
     	}
     }
 
@@ -408,25 +412,119 @@ public abstract class AbstractMailActionExecuterTest
     {
         final String USER_WITH_NON_EXISTING_TENANT = "test_user_non_tenant@non_existing_tenant.com";
         
-        createUser(USER_WITH_NON_EXISTING_TENANT, USER_WITH_NON_EXISTING_TENANT);
-        
-        final Action mailAction = ACTION_SERVICE.createAction(MailActionExecuter.NAME);
-        mailAction.setParameterValue(MailActionExecuter.PARAM_TO, USER_WITH_NON_EXISTING_TENANT);
-        mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, "Testing");
-        mailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, "This is a test message.");
-
-        // run as non admin and non system
-        AuthenticationUtil.setFullyAuthenticatedUser(BRITISH_USER.getUsername());
-        TRANSACTION_SERVICE.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>()
+        try
         {
-            @Override
-            public Void execute() throws Throwable
-            {
-                ACTION_EXECUTER.executeImpl(mailAction, null);
-                return null;
-            }
-        });
+            createUser(USER_WITH_NON_EXISTING_TENANT, USER_WITH_NON_EXISTING_TENANT);
         
-        AuthenticationUtil.clearCurrentSecurityContext();
+            final Action mailAction = ACTION_SERVICE.createAction(MailActionExecuter.NAME);
+            mailAction.setParameterValue(MailActionExecuter.PARAM_TO, USER_WITH_NON_EXISTING_TENANT);
+            mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, "Testing");
+            mailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, "This is a test message.");
+
+            // run as non admin and non system
+            AuthenticationUtil.setFullyAuthenticatedUser(BRITISH_USER.getUsername());
+            TRANSACTION_SERVICE.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>()
+            {
+                @Override
+                public Void execute() throws Throwable
+                {
+                    ACTION_EXECUTER.executeImpl(mailAction, null);
+                    return null;
+                }
+            });
+        }
+        finally
+        {
+            // restore system user as current user
+            AuthenticationUtil.setRunAsUserSystem();
+            // tidy up
+            PERSON_SERVICE.deletePerson(USER_WITH_NON_EXISTING_TENANT);
+            AuthenticationUtil.clearCurrentSecurityContext();
+        }
     }
+    
+    /**
+     * Test for MNT-11488
+     * @throws Exception 
+     */
+    @Test
+    public void testSendingToMultipleUsers() throws IOException, MessagingException
+    {
+        final String USER_1 = "recipient1";
+        final String USER_2 = "recipient2";
+        final String[] recipientsArray = { USER_1 + "@email.com", USER_2 + "@email.com" };
+        final List<String> recipientsResult = new ArrayList<String>(Arrays.asList(recipientsArray)) ;
+
+        try
+        {
+            createUser(USER_1, null);
+            createUser(USER_2, null);
+            ArrayList<String> recipients = new ArrayList<String>(2);
+            recipients.add(USER_1);
+            recipients.add(USER_2);
+
+            Action mailAction = ACTION_SERVICE.createAction(MailActionExecuter.NAME);
+            mailAction.setParameterValue(MailActionExecuter.PARAM_FROM, "sender@example.com");
+            mailAction.setParameterValue(MailActionExecuter.PARAM_TO_MANY, recipients);
+            mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, "Testing");
+            mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE_MODEL, (Serializable) getModel());
+
+            ACTION_EXECUTER.resetTestSentCount();
+
+            ACTION_SERVICE.executeAction(mailAction, null);
+
+            MimeMessage message = ACTION_EXECUTER.retrieveLastTestMessage();
+            Assert.assertNotNull(message);
+            Assert.assertEquals("One email should be sent", 1, ACTION_EXECUTER.getTestSentCount());
+            Assert.assertEquals("All recipients should receive single message", 2, message.getAllRecipients().length);
+            
+            Assert.assertTrue("Both users should receive message", recipientsResult.contains(((InternetAddress) message.getAllRecipients()[0]).getAddress()));
+            Assert.assertTrue("Both users should receive message", recipientsResult.contains(((InternetAddress) message.getAllRecipients()[1]).getAddress()));
+        }
+        finally
+        {
+            // tidy up
+            PERSON_SERVICE.deletePerson(USER_1);
+            PERSON_SERVICE.deletePerson(USER_2);
+        }
+    }
+
+    /**
+     * Test for MNT-11079
+     */
+    @Test
+    public void testSendingToUserWithMailAlikeName() throws IOException, MessagingException
+    {
+        final String USER_1 = "user1@namelookslikeemail";
+        final String USER_1_EMAIL = "user1@trueemail.com";
+
+        try
+        {
+            createUser(USER_1, USER_1_EMAIL);
+
+            Action mailAction = ACTION_SERVICE.createAction(MailActionExecuter.NAME);
+            mailAction.setParameterValue(MailActionExecuter.PARAM_FROM, "some.body@example.com");
+            mailAction.setParameterValue(MailActionExecuter.PARAM_TO_MANY, USER_1);
+
+            mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, "Testing");
+            mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE, "alfresco/templates/mail/test.txt.ftl");
+
+            mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE_MODEL, (Serializable) getModel());
+
+            ACTION_SERVICE.executeAction(mailAction, null);
+
+            MimeMessage message = ACTION_EXECUTER.retrieveLastTestMessage();
+            Assert.assertNotNull(message);
+            Assert.assertEquals("Hello Jan 1, 1970", (String) message.getContent());
+            Assert.assertEquals(1, message.getAllRecipients().length);
+            javax.mail.internet.InternetAddress address = (InternetAddress) message.getAllRecipients()[0];
+            Assert.assertEquals(USER_1_EMAIL, address.getAddress());
+        }
+        finally
+        {
+            // tidy up
+            PERSON_SERVICE.deletePerson(USER_1);
+        }
+    }
+
 }

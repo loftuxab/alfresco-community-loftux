@@ -71,16 +71,6 @@ public class Repository01TestSuite extends TestSuite
         suite.addTestSuite(org.alfresco.filesys.repo.LockKeeperImplTest.class);
     }
     
-    static void tests5(TestSuite suite) // tests="19" time="12.852"
-    {
-        suite.addTestSuite(org.alfresco.jcr.importer.ImportTest.class);
-        suite.addTestSuite(org.alfresco.jcr.item.Alf1791Test.class);
-        suite.addTestSuite(org.alfresco.jcr.item.ItemTest.class);
-        suite.addTestSuite(org.alfresco.jcr.query.QueryManagerImplTest.class);
-        suite.addTestSuite(org.alfresco.jcr.repository.RepositoryImplTest.class);
-        suite.addTestSuite(org.alfresco.jcr.session.SessionImplTest.class);
-    }
-    
     static void tests6(TestSuite suite)
     {
         suite.addTest(new JUnit4TestAdapter(org.alfresco.opencmis.CMISTest.class));
@@ -354,6 +344,7 @@ public class Repository01TestSuite extends TestSuite
     static void tests53(TestSuite suite)
     {
         suite.addTestSuite(org.alfresco.repo.tagging.TaggingServiceImplTest.class);
+        suite.addTestSuite(org.alfresco.repo.tagging.UpdateTagScopesActionExecuterTest.class);
     }
     
     static void tests55(TestSuite suite)
@@ -363,6 +354,7 @@ public class Repository01TestSuite extends TestSuite
     
     static void tests56(TestSuite suite)
     {
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.tenant.MultiTServiceImplTest.class));
         suite.addTestSuite(org.alfresco.repo.tenant.MultiTDemoTest.class);
     }
     
@@ -376,6 +368,7 @@ public class Repository01TestSuite extends TestSuite
         suite.addTestSuite(org.alfresco.repo.transaction.RetryingTransactionHelperTest.class);
         suite.addTestSuite(org.alfresco.repo.transaction.TransactionAwareSingletonTest.class);
         suite.addTestSuite(org.alfresco.repo.transaction.TransactionServiceImplTest.class);
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.transaction.ConnectionPoolOverloadTest.class));       
         suite.addTestSuite(org.alfresco.repo.transfer.NodeCrawlerTest.class);
         suite.addTestSuite(org.alfresco.repo.transfer.RepoTransferReceiverImplTest.class);
         suite.addTestSuite(org.alfresco.repo.transfer.TransferServiceCallbackTest.class);
@@ -419,10 +412,15 @@ public class Repository01TestSuite extends TestSuite
         suite.addTest(new JUnit4TestAdapter(org.alfresco.util.CronTriggerBeanSystemTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.filesys.auth.cifs.CifsAuthenticatorKerberosTest.class));		
         suite.addTest(new JUnit4TestAdapter(org.alfresco.filesys.auth.cifs.CifsAuthenticatorPassthruTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.domain.schema.script.ScriptExecutorImplIntegrationTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.domain.schema.script.ScriptBundleExecutorImplIntegrationTest.class));
     }
 
     static void tests65(TestSuite suite)
     {
         suite.addTestSuite(org.alfresco.repo.content.transform.DifferrentMimeTypeTest.class);
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.attributes.PropTablesCleanupJobIntegrationTest.class));
+        suite.addTestSuite(org.alfresco.repo.dictionary.DictionaryModelTypeTest.class);
+        suite.addTestSuite(org.alfresco.repo.tagging.UpdateTagScopesActionExecuterTest.class);
     }
 }

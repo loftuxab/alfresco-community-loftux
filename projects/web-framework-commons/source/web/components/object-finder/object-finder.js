@@ -1291,11 +1291,11 @@
             var template;
             if (scope.options.compactMode)
             {
-               template = '<h3 class="name">{name}</h3>';
+               template = '<h3 class="name">' + scope.options.objectRenderer.resolveName(oRecord) + '</h3>';
             }
             else
             {
-               template = '<h3 class="name">{name}</h3><div class="description">{description}</div>';
+               template = '<h3 class="name">' + scope.options.objectRenderer.resolveName(oRecord) + '</h3><div class="description">{description}</div>';
             }
 
             elCell.innerHTML = scope.options.objectRenderer.renderItem(oRecord.getData(), 0, template);
@@ -1369,7 +1369,7 @@
                      site : item.site
                   });
                }
-               title = '<a href="' + link + '">' + $html(item.name) + '</a>';
+               title = '<a href="' + link + '">' + $html(item.displayName?item.displayName:item.name) + '</a>';
             }
             var template = '<h3 class="name">' + title + '</h3>';
             template += '<div class="description">' + scope.msg("form.control.object-picker.description") + ': ' + description + '</div>';
@@ -2541,15 +2541,14 @@
                return;
             }
 
-            var value = oRecord.getData("type") == "st:site" ? "{title}" : "{name}";
             if (oRecord.getData("isContainer") ||
                 (!oRecord.getData("isContainer") && (scope.options.allowNavigationToContentChildren || oRecord.getData("type") == "cm:category")))
             {
-               template += '<h3 class="item-name"><a href="#" class="theme-color-1 parent-' + scope.eventGroup + '">' + value + '</a></h3>';
+               template += '<h3 class="item-name"><a href="#" class="theme-color-1 parent-' + scope.eventGroup + '">' + scope.resolveName(oRecord) + '</a></h3>';
             }
             else
             {
-               template += '<h3 class="item-name">' + value + '</h3>';
+               template += '<h3 class="item-name">' + scope.resolveName(oRecord) + '</h3>';
             }
 
             if (!scope.options.compactMode)
@@ -2684,6 +2683,40 @@
                failureMessage: this.msg("form.control.object-picker.create-new.failure")
             });
          }
+      },
+
+      /**
+       * Resolves {name} or {title} should be used to display of the given item.
+       * 
+       * @method _resolveName
+       * @param oRecord
+       * @return {name} or {title}
+       */
+      resolveName: function ObjectRenderer_resolveName(oRecord)
+      {
+         var value;
+         if (oRecord.getData("container") && oRecord.getData("title"))
+         {
+            switch(oRecord.getData("container")){
+              case 'wiki': oRecord._oData.title = oRecord._oData.title.replace(/_/g, " ");
+              case 'blog':
+              case 'discussions':
+              case 'calendar':
+              case 'links': value = "{title}"; break;
+              default: value = "{name}";
+            }
+         }
+         else
+         {
+            switch(oRecord.getData("type")){
+              case 'dl:dataList':
+              case 'fm:topic':
+              case 'st:site': value = "{title}"; break;
+              default: value = "{name}";
+            }
+         }
+         
+         return value;
       },
 
       /**

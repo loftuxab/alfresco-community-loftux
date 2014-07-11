@@ -206,8 +206,8 @@
             The I18N label is created from the "type" attribute, e.g. google-docs.doc=Google Docs&trade; Document
          -->
          <creatable-types>
-            <creatable type="doc">application/msword</creatable>
-            <creatable type="xls">application/vnd.ms-excel</creatable>
+            <creatable type="doc">application/vnd.openxmlformats-officedocument.wordprocessingml.document</creatable>
+            <creatable type="xls">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</creatable>
             <creatable type="ppt">application/vnd.ms-powerpoint</creatable>
          </creatable-types>
       </google-docs>
@@ -354,6 +354,16 @@
             <basic-auth>true</basic-auth>
             <identity>user</identity>
          </endpoint>
+         <!-- 
+         <endpoint>
+            <id>activiti-admin</id>
+            <name>Activiti Admin UI - user access</name>
+            <description>Access to Activiti Admin UI, that requires user authentication</description>
+            <connector-id>activiti-admin-connector</connector-id>
+            <endpoint-url>http://localhost:8080/alfresco/activiti-admin</endpoint-url>
+            <identity>user</identity>
+         </endpoint>
+         -->
       </remote>
    </config>
 

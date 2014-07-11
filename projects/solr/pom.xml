@@ -11,7 +11,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>4.3.a.LX65</version>
+        <version>5.0.a-LX66</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
@@ -94,7 +94,7 @@
         <dependency>
           <groupId>org.apache.solr</groupId>
           <artifactId>apache-solr</artifactId>
-          <version>1.4.1-alfresco-patched</version>
+          <version>1.4.1-alfrescopatched-20140430</version>
           <type>war</type>
         </dependency>
 
@@ -173,22 +173,28 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <inherited>false</inherited>
                 <executions>
                     <execution>
-                        <id>package-config-jar</id>
-                        <configuration>
-                            <classesDirectory>${solr.instance.target.folder}</classesDirectory>
-                            <classifier>config</classifier>
-                        </configuration>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
+                        <id>package-config-zip</id>
                         <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <attach>true</attach>
+                            <descriptors>
+                                <descriptor>
+                                    source/assembly/solr-instance-zip.xml
+                                </descriptor>
+                            </descriptors>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+        
     </build>
     
     <profiles>
@@ -340,24 +346,30 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin> 
+                    </plugin>
+
 
                     <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <inherited>false</inherited>
                         <executions>
                             <execution>
-                                <id>package-config-nossl-jar</id>
-                                <configuration>
-                                    <classesDirectory>${solr.config.folder}</classesDirectory>
-                                    <classifier>config-nossl</classifier>
-                                </configuration>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
+                                <id>package-config-zip-nossl</id>
                                 <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                    <descriptors>
+                                        <descriptor>
+                                            source/assembly/solr-instance-zip-nossl.xml
+                                        </descriptor>
+                                    </descriptors>
+                                </configuration>
                             </execution>
                         </executions>
-                    </plugin>               
+                    </plugin>             
                 </plugins>
             </build>
         </profile>

@@ -21,12 +21,12 @@
       <@link rel="stylesheet" type="text/css" href="${url.context}/res/themes/${theme}/yui/assets/skin.css" group="template-common" />
    </#if>
 
-   <#if DEBUG>
-   <#-- Loftux - temporary workaround for debug mode issue ACE-1147 -->
+   <#--
+      ACE-1147: Debug and Production files are combined into a yui-common.js and yui-common-min.js
+                Surf automatically selects the correct one depending on config mode.
+   -->
    <@script type="text/javascript" src="${url.context}/res/js/yui-common.js" group="template-common"/>
-   <#else>
-   <@script type="text/javascript" src="${url.context}/res/js/yui-common.js" group="template-common"/>
-   </#if>
+
    <@script type="text/javascript" src="${url.context}/res/js/bubbling.v2.1.js" group="template-common"/>
    <@inlineScript group="template-common">
       YAHOO.Bubbling.unsubscribe = function(layer, handler, scope)

@@ -27,10 +27,8 @@
           depends="set-build-number,
                   incremental,
                   distribute-amps,
-                  distribute-sdk, 
                   distribute-extras,
-                  distribute-fdk,
-                  distribute-docs" />
+                  distribute-fdk" />
 
    <!-- Removed depends target distribute-wcm -->
    <target name="distribute-core" 

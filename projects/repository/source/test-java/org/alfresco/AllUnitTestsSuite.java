@@ -31,6 +31,7 @@ public class AllUnitTestsSuite extends TestSuite
         suite.addTestSuite(org.alfresco.filesys.repo.CIFSContentComparatorTest.class);
         suite.addTestSuite(org.alfresco.filesys.repo.rules.ShuffleTest.class);
         suite.addTestSuite(org.alfresco.repo.admin.Log4JHierarchyInitTest.class);
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.attributes.PropTablesCleanupJobTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.cache.DefaultCacheFactoryTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.cache.DefaultSimpleCacheTest.class));
         suite.addTestSuite(org.alfresco.repo.cache.lookup.EntityLookupCacheTest.class);
@@ -94,5 +95,7 @@ public class AllUnitTestsSuite extends TestSuite
         suite.addTest(new JUnit4TestAdapter(org.alfresco.util.schemacomp.validator.SchemaVersionValidatorTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.util.schemacomp.validator.TypeNameOnlyValidatorTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.util.test.junitrules.TemporaryMockOverrideTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.SolrQueryHTTPClientTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.SolrStatsResultTest.class));
     }
 }

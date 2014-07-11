@@ -201,6 +201,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
      */
     private boolean testMode = false;
     private MimeMessage lastTestMessage;
+    private int testSentCount;
 
     private TemplateImageResolver imageResolver;
 
@@ -487,7 +488,10 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
             else 
             {
                     for (MimeMessageHelper message : finalMessages) {
+                    if (message != null)
+                    {
                         sendEmail(ruleAction, message);
+                    }
                     }
             }
         }
@@ -519,6 +523,16 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
     
     private MimeMessageHelper[] prepareEmails(final Action ruleAction, final NodeRef actionedUponNodeRef)
     {
+        Serializable ref = ruleAction.getParameterValue(PARAM_TEMPLATE);
+        String templateRef = (ref instanceof NodeRef ? ((NodeRef)ref).toString() : (String)ref);
+        if (templateRef == null)
+        {
+            // send as bulk message if there is no template
+            MimeMessageHelper[] messages = new MimeMessageHelper[1];
+            messages[0] = prepareEmail(ruleAction, actionedUponNodeRef, null, null);
+            return messages;
+        }
+        
         List<Pair<String, Locale>> recipients = getRecipients(ruleAction);
         
         Pair<InternetAddress, Locale> from = getFrom(ruleAction);
@@ -612,6 +626,12 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                                 if (personService.personExists(authority) == true)
                                 {
                                     NodeRef person = personService.getPerson(authority);
+                                    
+                                    if (!personService.isEnabled(authority) && !nodeService.hasAspect(person, ContentModel.ASPECT_ANULLABLE))
+                                    {
+                                        continue;
+                                    }
+                                    
                                     String address = (String)nodeService.getProperty(person, ContentModel.PROP_EMAIL);
                                     if (address != null && address.length() != 0 && validateAddress(address))
                                     {
@@ -916,6 +936,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
             {
                 logger.warn("Unable to prepare mail message. Skipping.", e);
             }
+            return null;
         }
         
         return messageRef[0];
@@ -935,6 +956,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
             else
             {
                 lastTestMessage = preparedMessage.getMimeMessage();
+                testSentCount++;
             }
         }
         catch (MailException e)
@@ -1147,19 +1169,19 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                         {
                             if (personExists(authority))
                             {
-                                EmailValidator emailValidator = EmailValidator.getInstance(true);
-                                if (validateAddresses && emailValidator.isValid(authority))
+                                String address = getPersonEmail(authority);
+                                if (address != null && address.length() != 0 && validateAddress(address))
                                 {
                                     Locale locale = getLocaleForUser(authority);
-                                    recipients.add(new Pair<String, Locale>(authority, locale));
+                                    recipients.add(new Pair<String, Locale>(address, locale));
                                 }
                                 else
                                 {
-                                    String address = getPersonEmail(authority);
-                                    if (address != null && address.length() != 0 && validateAddress(address))
+                                    EmailValidator emailValidator = EmailValidator.getInstance(true);
+                                    if (validateAddresses && emailValidator.isValid(authority))
                                     {
                                         Locale locale = getLocaleForUser(authority);
-                                        recipients.add(new Pair<String, Locale>(address, locale));
+                                        recipients.add(new Pair<String, Locale>(authority, locale));
                                     }
                                 }
                             }
@@ -1189,22 +1211,22 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                                 // Check the user name to be a valid email and we don't need to log an error in this case
                                 // ALF-19231
                                 // Validate the email, allowing for local email addresses
-                                EmailValidator emailValidator = EmailValidator.getInstance(true);
-                                if (validateAddresses && emailValidator.isValid(userAuth))
+                                String address = getPersonEmail(userAuth);
+                                if (address != null && address.length() != 0 && validateAddress(address))
                                 {
-                                    if (userAuth != null && userAuth.length() != 0)
-                                    {
-                                        Locale locale = getLocaleForUser(userAuth);
-                                        recipients.add(new Pair<String, Locale>(userAuth, locale));
-                                    }
+                                    Locale locale = getLocaleForUser(userAuth);
+                                    recipients.add(new Pair<String, Locale>(address, locale));
                                 }
                                 else
                                 {
-                                    String address = getPersonEmail(userAuth);
-                                    if (address != null && address.length() != 0 && validateAddress(address))
+                                    EmailValidator emailValidator = EmailValidator.getInstance(true);
+                                    if (validateAddresses && emailValidator.isValid(userAuth))
                                     {
-                                        Locale locale = getLocaleForUser(userAuth);
-                                        recipients.add(new Pair<String, Locale>(address, locale));
+                                        if (userAuth != null && userAuth.length() != 0)
+                                        {
+                                            Locale locale = getLocaleForUser(userAuth);
+                                            recipients.add(new Pair<String, Locale>(userAuth, locale));
+                                        }
                                     }
                                 }
                             }
@@ -1471,6 +1493,16 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
     public MimeMessage retrieveLastTestMessage()
     {
         return lastTestMessage; 
+    }
+    
+    public int getTestSentCount()
+    {
+        return testSentCount; 
+    }
+    
+    public int resetTestSentCount()
+    {
+        return testSentCount = 0; 
     }
     
     /**

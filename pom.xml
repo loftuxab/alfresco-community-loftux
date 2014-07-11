@@ -7,17 +7,16 @@
 <!-- ** against Alfresco with Maven. POMs, dependencies and ** -->
 <!-- ** projects information are up to date and released    ** -->
 <!-- ** together with the official Alfresco artifacts at    ** -->
-<!---**          https://artifacts.alfresco.com.            ** -->  
-<!---** Fox the SDK and Maven project samples check         ** -->
-<!---** http://code.google.com/p/maven-alfresco-archetypes/ ** -->  
+<!-- **          https://artifacts.alfresco.com.            ** -->  
+<!-- ** Fox the SDK and Maven project samples check         ** -->
+<!-- ** http://code.google.com/p/maven-alfresco-archetypes/ ** -->  
 <!-- ********************************************************* -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>4.3.a.LX65</version>
+  <version>5.0.a-LX66</version>
   <name>Alfresco Project</name>
 
   <url>http://www.alfresco.org/</url>
@@ -75,11 +74,6 @@
           <id>alfresco-internal-snapshots</id>
           <url>${maven.distributionManagement.snapshot.url}</url>
       </snapshotRepository>      
-      <site>      
-          <id>alfresco-site</id>
-          <name>Alfresco Maven site</name>
-          <url>http://localhost/</url>
-      </site>      
   </distributionManagement>
 
   <modules>
@@ -87,6 +81,7 @@
     <module>projects/data-model</module>
     <module>projects/legacy-lucene</module>
     <module>projects/alfresco-jlan</module>
+    <module>projects/alfresco-events</module>
     <module>projects/mbeans</module>
     <module>projects/deployment</module>
     <module>projects/repository</module>
@@ -111,6 +106,8 @@
     <module>modules/wcmquickstart/wcmquickstartclientapi</module>
     <module>modules/wcmquickstart/wcmquickstartwebsite</module>
     <module>projects/web-editor-samples/customer-site</module>
+    <module>projects/mmt</module>
+    <module>projects/sdk/alfresco-platform-distribution</module>
   </modules>
 
   <properties>
@@ -137,13 +134,13 @@
 
     <!-- Sonar specific properties -->
     <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
-    <sonar.exclusions></sonar.exclusions>
-    <sonar.skippedModules></sonar.skippedModules>
+    <sonar.exclusions />
+    <sonar.skippedModules />
     <sonar.branch>HEAD-BUG-FIX</sonar.branch>
 
     <!-- Community build specific properties -->
-    <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD-BUG-FIX</maven.scm.connection>
-    <maven.scm.developerConnection>scm:svn:https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/HEAD-BUG-FIX</maven.scm.developerConnection>
+    <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
+    <maven.scm.developerConnection>scm:svn:https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/HEAD</maven.scm.developerConnection>
     <maven.scm.url>https://fisheye.alfresco.com/changelog/alfresco-enterprise</maven.scm.url>
     <maven.repository.url>https://artifacts.alfresco.com/nexus/content/groups/public</maven.repository.url>
     <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/snapshots</maven.distributionManagement.snapshot.url>
@@ -152,6 +149,8 @@
     <maven.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</maven.license.url>
 
     <alfresco.googledocs.version>2.0.7</alfresco.googledocs.version>
+    <!-- Default location of the root of the checkout. To be overrided if project is deeper than 2 levels -->
+    <highest.basedir>${basedir}/../..</highest.basedir>
 
     <!-- Centralized dependency versions -->
     <dependency.lucene.version>2.4.1</dependency.lucene.version>
@@ -166,6 +165,9 @@
     <dependency.poi.version>3.10-FINAL</dependency.poi.version>
     <dependency.dojo.version>1.8.3</dependency.dojo.version>
     
+    <manifest.major.version>5</manifest.major.version>
+    <manifest.minor.version>0</manifest.minor.version>
+    <manifest.servicepack.version>0</manifest.servicepack.version>
     <manifest.implementation.version>${project.version}</manifest.implementation.version>
   </properties>
   
@@ -376,39 +378,19 @@
 				</execution>
 			</executions>
 		</plugin>
-		<!-- Create a jar of test classes, to be reused later in remote-api -->
+
+		<!-- Create jar of test classes -->
 		<plugin>
 			<artifactId>maven-jar-plugin</artifactId>
 			<executions>
 				<execution>
 					<id>create-test-jar</id>
-					<!-- Usually bound to package phase, but set earlier so that we can trigger it in sonar.phase -->
-					<!-- That's because this jar is used later in enterprise-repository, and Sonar hits MDEP-98 -->
-                    <!-- <phase>process-test-classes</phase> -->
 					<goals>
 						<goal>test-jar</goal>
 					</goals>
 				</execution>
 			</executions>
 		</plugin>
-
-        <!-- Parse project.version and produces version properties out of it -->
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>1.8</version>
-            <executions>
-                <execution>
-                    <id>parse-version</id>
-                    <goals>
-                        <goal>parse-version</goal>
-                    </goals>
-                    <configuration>
-                        <propertyPrefix>parsedVersion</propertyPrefix>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
     </plugins>
 
     <!-- Defining version and some configuration of Maven plugins -->
@@ -460,6 +442,12 @@
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <tagBase>https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/TAGS/CLOUD</tagBase>
+                    <tagNameFormat>V@{project.version}</tagNameFormat>
+                    <stagingRepository>alfresco-internal::default::https://artifacts.alfresco.com/nexus/content/repositories/internal-staging/</stagingRepository>
+                </configuration>        
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
@@ -521,13 +509,14 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
+                    <skipIfEmpty>true</skipIfEmpty>
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</Specification-Version>
+                            <Specification-Version>${manifest.major.version}.${manifest.minor.version}.${manifest.servicepack.version}</Specification-Version>
                             <Implementation-Version>${manifest.implementation.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
                         </manifestEntries>
@@ -544,7 +533,7 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</Specification-Version>
+                            <Specification-Version>${manifest.major.version}.${manifest.minor.version}.${manifest.servicepack.version}</Specification-Version>
                             <Implementation-Version>${manifest.implementation.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
                         </manifestEntries>
@@ -626,7 +615,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.3.1</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -637,6 +626,11 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9</version>
             </plugin>
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -663,7 +657,7 @@
 									</goals>
 								</pluginExecutionFilter>
 								<action>
-									<ignore></ignore>
+									<ignore />
 								</action>
 							</pluginExecution>
 							<pluginExecution>
@@ -677,7 +671,7 @@
 									</goals>
 								</pluginExecutionFilter>
 								<action>
-									<ignore></ignore>
+									<ignore />
 								</action>
 							</pluginExecution>
 							<pluginExecution>
@@ -714,6 +708,19 @@
                                 </action>
                                 <comment>source: </comment>
                             </pluginExecution>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-enforcer-plugin</artifactId>
+									<versionRange>[1.3.0,)</versionRange>
+									<goals>
+										<goal>enforce</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore />
+								</action>
+							</pluginExecution>
 						</pluginExecutions>
 					</lifecycleMappingMetadata>
 				</configuration>
@@ -769,7 +776,7 @@
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>findbugs-maven-plugin</artifactId>
-            <version>2.5.3</version>
+            <version>2.5.4</version>
         </plugin>
     </plugins>
   </reporting>
@@ -785,8 +792,8 @@
         </modules>
         <properties>
             <!-- Enterprise specific properties -->
-            <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-enterprise-mirror/alfresco/HEAD-BUG-FIX</maven.scm.connection>
-            <maven.scm.developerConnection>scm:svn:https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/HEAD-BUG-FIX</maven.scm.developerConnection>
+            <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-enterprise-mirror/alfresco/HEAD</maven.scm.connection>
+            <maven.scm.developerConnection>scm:svn:https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/HEAD</maven.scm.developerConnection>
             <maven.scm.url>https://fisheye.alfresco.com/changelog/alfresco-enterprise</maven.scm.url>
             <maven.repository.url>https://artifacts.alfresco.com/nexus/content/groups/private</maven.repository.url>
             <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/internal-snapshots</maven.distributionManagement.snapshot.url>
@@ -809,13 +816,33 @@
         <id>allprojects</id>
         <modules>
             <module>packaging</module>
-            <module>privatemodules/funtests</module>
-            <module>privatemodules/packaging</module>
             <module>projects/qa-share</module>
             <module>projects/share-po</module>
             <module>projects/share</module>
             <module>projects/system-build-test</module>
         </modules>
+
+        <build>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>2.0-1588784</version>
+                    <executions>
+                        <execution>
+                            <id>default-cli</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <reactorModuleConvergence />
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
     </profile>
 
 	<!-- Behavioral profiles inherited by all modules -->

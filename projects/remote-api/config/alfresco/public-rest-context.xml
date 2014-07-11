@@ -87,6 +87,9 @@
             <constructor-arg type="java.lang.String" value="${alfresco.authentication.gateway.outboundHeaders}"/>
          </bean>
       </property>
+      <property name="remoteUserMapper">
+         <ref bean="RemoteUserMapper" />
+      </property>
    </bean>
 
     <bean id="apiBootstrapBean" class="org.alfresco.rest.framework.core.ApiBootstrap">
@@ -885,6 +888,7 @@
         <property name="restVariableHelper" ref="restVariableHelper" />
         <property name="messageService" ref="messageService" />
         <property name="personService" ref="PersonService" />
+        <property name="propertyConverter" ref="activitiPropertyConverter" />
     </bean>
 
     <bean id="Tasks" class="org.springframework.aop.framework.ProxyFactoryBean">

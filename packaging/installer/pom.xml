@@ -4,16 +4,17 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-packaging</artifactId>
-        <version>4.3.a.LX65</version>
+        <version>5.0.a-LX66</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-installer</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <name>Alfresco Installers</name>
 
     <properties>
         <binaries.folder>${user.home}/binaries</binaries.folder>
         <bitrock.folder>${binaries.folder}/bitrock/bitrock-8.5.1-20121129</bitrock.folder>
+        <signing.key.location>${binaries.folder}/build-classpath/alfresco-code-sign</signing.key.location>
         <bitrock.arguments>
            --license
            ${binaries.folder}/build-classpath/license.xml
@@ -26,12 +27,17 @@
            alfresco_edition=community
            distribution_folder=${project.build.directory}/distribution/alfresco-community-${project.version}
            solr_folder=${project.build.directory}/solr
-           alfresco_googledocs_source_file=${project.build.directory}/dependency/alfresco-googledocs-repo-${alfresco.googledocs.version}.amp
-           alfresco_googledocs_share_source_file=${project.build.directory}/dependency/alfresco-googledocs-share-${alfresco.googledocs.version}.amp
+           alfresco_amps_source_directory=${project.build.directory}/dependency
         </bitrock.arguments>
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -56,6 +62,7 @@
                                     <artifactId>alfresco-solr</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>config</classifier>
+                                    <type>zip</type>
                                     <outputDirectory>${project.build.directory}/solr</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
@@ -105,6 +112,7 @@
                                     <artifactId>alfresco-spp</artifactId>
                                     <version>${project.version}</version>
                                     <type>amp</type>
+                                    <destFileName>alfresco-spp.amp</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -133,7 +141,7 @@
                                windows
                                ${bitrock.arguments}
                                binaries_folder=${binaries.folder}/bitrock/binaries-windows
-                               project.installerFilename=alfresco-community-${project.version}-win-x32.exe
+                               project.installerFilename=alfresco-community-${project.version}-installer-win-x32.exe
                             </commandlineArgs>
                         </configuration>
                     </execution>
@@ -151,7 +159,7 @@
                                windows
                                ${bitrock.arguments}
                                binaries_folder=${binaries.folder}/bitrock/binaries-windows-x64
-                               project.installerFilename=alfresco-community-${project.version}-win-x64.exe
+                               project.installerFilename=alfresco-community-${project.version}-installer-win-x64.exe
                             </commandlineArgs>
                         </configuration>
                     </execution>
@@ -169,7 +177,7 @@
                                linux-x64
                                ${bitrock.arguments}
                                binaries_folder=${binaries.folder}/bitrock/binaries-linux-x64
-                               project.installerFilename=alfresco-community-${project.version}-linux-x64.bin
+                               project.installerFilename=alfresco-community-${project.version}-installer-linux-x64.bin
                             </commandlineArgs>
                         </configuration>
                     </execution>
@@ -187,7 +195,7 @@
                                osx
                                ${bitrock.arguments}
                                binaries_folder=${binaries.folder}/bitrock/binaries-osx-x64
-                               project.installerFilename=alfresco-community-${project.version}-osx-x64.app
+                               project.installerFilename=alfresco-community-${project.version}-installer-osx-x64.app
                             </commandlineArgs>
                         </configuration>
                     </execution>
@@ -219,6 +227,37 @@
             <properties>
                 <bitrock.executable>${bitrock.folder}/linux/bin/builder</bitrock.executable>
             </properties>
+        </profile>
+
+        <!-- Signing Windows installers -->
+        <profile>
+            <id>sign</id>
+            <activation>
+                <file>
+                    <exists>${user.home}/binaries/build-classpath/alfresco-code-sign.der</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-windows-installers</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <target>
+                            	<ant antfile="sign.xml" />
+                            </target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

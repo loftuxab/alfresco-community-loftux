@@ -532,6 +532,7 @@
         <property name="searchService" ref="admSearchService" />
         <property name="behaviourFilter" ref="policyBehaviourFilter" />
         <property name="nodeIndexer" ref="nodeIndexer"/>      
+        <property name="authorityService" ref="authorityService"/>
     </bean>
 
     <!--                               -->
@@ -970,6 +971,12 @@
         </property>
     </bean>
 
+    <bean id="serverMode" class="org.alfresco.repo.mode.ServerModeImpl" >
+        <property name="serverModeAsString">
+            <value>${system.serverMode}</value>
+        </property>
+    </bean>
+    
     <bean id="serverDescriptorDAO" class="org.alfresco.repo.descriptor.ServerDescriptorDAOImpl">
        <property name="repositoryName">
            <value>${repository.name}</value>
@@ -1083,9 +1090,10 @@
     <!-- Replacement for Spring's multicaster, that queues up events until the application is started -->
     <bean id="applicationEventMulticaster" class="org.alfresco.repo.management.SafeApplicationEventMulticaster"/>
    
-   
-   
    <bean id="repositoryState" class="org.alfresco.repo.admin.RepositoryState" />
+   
+   <!-- Alfresco Events Publisher -->
+   <bean id="eventPublisher" class="org.alfresco.repo.events.NoOpEventPublisher" />
    
    <!-- index subsystem proxies -->
    
@@ -1402,6 +1410,20 @@
       <property name="interfaces">
          <list>
             <value>org.alfresco.repo.admin.IndexConfigurationChecker</value>
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="statsService" class="org.alfresco.repo.management.subsystems.SubsystemProxyFactory">
+      <property name="sourceApplicationContextFactory">
+         <ref bean="Search" />
+      </property>
+      <property name="sourceBeanName">
+         <value>search.statsService</value>
+      </property>
+      <property name="interfaces">
+         <list>
+            <value>org.alfresco.service.cmr.search.StatsService</value>
          </list>
       </property>
    </bean>

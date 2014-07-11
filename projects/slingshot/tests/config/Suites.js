@@ -44,6 +44,8 @@ define({
    baseFunctionalSuites: [
       'tests/alfresco/accessibility/AccessibilityMenuTest',
 
+      'tests/alfresco/charts/ccc/PieChartTest',
+
       'tests/alfresco/core/PublishPayloadMixinTest',
       'tests/alfresco/core/RenderFilterTest',
       'tests/alfresco/core/VisibilityConfigTest',
@@ -60,6 +62,7 @@ define({
       'tests/alfresco/forms/SingleTextFieldFormTest',
       'tests/alfresco/forms/controls/DocumentPickerTest',
       'tests/alfresco/forms/controls/DojoSelectTest',
+      'tests/alfresco/forms/controls/DojoDateTextBoxTest',
       'tests/alfresco/forms/controls/DojoValidationTextBoxTest',
       'tests/alfresco/forms/controls/FormButtonDialogTest',
 

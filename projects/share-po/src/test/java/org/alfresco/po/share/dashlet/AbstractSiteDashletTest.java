@@ -57,7 +57,7 @@ public class AbstractSiteDashletTest extends AbstractDocumentTest
             logger.error("Problem deleting site", pe);
         }
     }
-    
+   
     protected void navigateToSiteDashboard()
     {
         if(logger.isTraceEnabled())
@@ -88,4 +88,5 @@ public class AbstractSiteDashletTest extends AbstractDocumentTest
             logger.error("Problem deleting site", e);
         }
     }
+    
 }

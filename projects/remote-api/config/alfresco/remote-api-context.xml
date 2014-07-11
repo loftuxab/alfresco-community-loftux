@@ -77,6 +77,7 @@
       <property name="urlPathPrefix">
          <value>${system.webdav.url.path.prefix}</value>
       </property>
+      <property name="eventPublisher" ref="eventPublisher" />
     </bean>   
    
    <bean id="defaultImageResolver" class="org.alfresco.repo.utils.FacesImageResolver" />
@@ -88,5 +89,7 @@
       <property name="nodeService" ref="NodeService" />
       <property name="mimetypeService" ref="MimetypeService" />
       <property name="contentService" ref="ContentService" />
+      <property name="eventPublisher" ref="eventPublisher" />
+      <property name="siteService" ref="SiteService" />
    </bean>
 </beans>

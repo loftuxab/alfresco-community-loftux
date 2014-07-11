@@ -358,6 +358,7 @@
       <property name="mimetypeService" ref="MimetypeService" />
       <property name="CMISRenditionService" ref="CMISRenditionService" />
       <property name="delegate" ref="webscript.content.streamer" />
+      <property name="contentService" ref="contentService" />
    </bean>
    
    <!--  Content Info -->
@@ -427,10 +428,12 @@
    <!--  Authentication APIs -->
    <bean id="webscript.org.alfresco.repository.login.get" class="org.alfresco.repo.web.scripts.bean.Login" parent="webscript">
       <property name="authenticationService" ref="AuthenticationService" />
+      <property name="eventPublisher" ref="eventPublisher" />
    </bean>
    
    <bean id="webscript.org.alfresco.repository.login.post" class="org.alfresco.repo.web.scripts.bean.LoginPost" parent="webscript">
       <property name="authenticationService" ref="AuthenticationService" />
+      <property name="eventPublisher" ref="eventPublisher" />
    </bean>
    
    <bean id="webscript.org.alfresco.repository.loginticket.get" class="org.alfresco.repo.web.scripts.bean.LoginTicket" parent="webscript">
@@ -1547,6 +1550,45 @@
       <property name="solrTrackingComponent" ref="solrTrackingComponent"/>
    </bean>
 
+   <bean id="webscript.org.alfresco.repository.solr.stats.get"
+         class="org.alfresco.repo.web.scripts.solr.StatsGet" parent="webscript">
+      <property name="stats" ref="statsService"/>
+      <property name="siteService" ref="SiteService" />
+      <property name="facets">
+          <map>
+            <entry key="content.mimetype" value="{http://www.alfresco.org/model/content/1.0}content.mimetype" />
+            <entry key="content.creator" value="{http://www.alfresco.org/model/content/1.0}creator.__" />
+            <entry key="content.modifier" value="{http://www.alfresco.org/model/content/1.0}modifier.__" />
+            <entry key="content.created.datetime" value="{http://www.alfresco.org/model/content/1.0}created" />
+            <entry key="content.modified.datetime" value="{http://www.alfresco.org/model/content/1.0}modified" />     
+            <entry key="content.encoding" value="{http://www.alfresco.org/model/content/1.0}content.encoding" />
+            <entry key="content.locale" value="{http://www.alfresco.org/model/content/1.0}content.locale" />
+            <entry key="content.versionLabel" value="{http://www.alfresco.org/model/content/1.0}versionLabel.__" />
+            
+            <entry key="exif.model" value="{http://www.alfresco.org/model/exif/1.0}model.__" />
+            <entry key="exif.manufacturer" value="{http://www.alfresco.org/model/exif/1.0}manufacturer.__" />
+            <entry key="exif.iso" value="{http://www.alfresco.org/model/exif/1.0}isoSpeedRatings.__" />
+            <entry key="exif.focalLength" value="{http://www.alfresco.org/model/exif/1.0}focalLength" />
+            <entry key="exif.software" value="{http://www.alfresco.org/model/exif/1.0}software.__" />
+          </map>
+      </property>     
+      <property name="postProcessors">
+         <map>
+           <entry key="content.mimetype">
+              <bean class="org.alfresco.service.cmr.search.StatsProcessorUsingMap">
+                 <constructor-arg value="#{MimetypeService.getDisplaysByMimetype()}" />
+              </bean>
+           </entry>
+        </map>
+      </property>  
+   </bean>
+   
+  <bean id="webscript.org.alfresco.repository.events.raiseevent.post" class="org.alfresco.repo.web.scripts.events.RaiseBrowserEventPost"
+         parent="webscript">
+      <property name="siteService" ref="SiteService" />
+      <property name="eventPublisher" ref="eventPublisher" />
+   </bean>
+   
    <bean id="webscript.org.alfresco.repository.solr.nodes.post"
          class="org.alfresco.repo.web.scripts.solr.NodesGet"
          parent="webscript">

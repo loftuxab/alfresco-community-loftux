@@ -30,7 +30,7 @@ import org.alfresco.service.namespace.QName;
 public interface LockDAO
 {
     /**
-     * Aquire a given exclusive lock, assigning it (and any implicitly shared locks) a
+     * Acquire a given exclusive lock, assigning it (and any implicitly shared locks) a
      * timeout.  All shared locks are implicitly taken as well.
      * <p>
      * A lock can be re-taken if it has expired and if the lock token has not changed
@@ -71,9 +71,9 @@ public interface LockDAO
      * @param lockToken             the current lock token
      * @param optimistic            <tt>true</tt> if the release attempt is enough even
      *                              if the number of released locks was incorrect.
-     * @return                      <tt>true</tt> if the lock was successfully (and completely)
-     *                              released or <tt>false</tt> if the lock was no longer valid
-     *                              <b>and the method was being called optimistically.</b>
+     * @return                      Returns <tt>true</tt> if all the required locks were
+     *                              (still) held under the lock token and were
+     *                              valid at the time of release, otherwise <tt>false</tt>
      * @throws LockAcquisitionException     if the number of locks released was incorrect
      *                              and pessimistic release is requested.
      */

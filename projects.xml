@@ -117,6 +117,34 @@
       </bind>
    </target>
 
+   <!-- *********************** -->
+   <!-- ** Events Project ** -->
+   <!-- *********************** -->
+   
+   <target name="incremental-events" 
+           depends="package-events" />
+      
+   <target name="build-events" 
+           depends="clean-events, 
+                    incremental-events" />
+   
+   <target name="clean-events" 
+           depends="init">
+      <clean projectdir="${dir.project.events}" />
+   </target>
+   
+   <target name="compile-events" 
+           depends="init">
+      <compile-java projectdir="${dir.project.events}" />
+   </target>
+   
+   <target name="package-events"
+           depends="compile-events">
+      <mkdir dir="${dir.project.events.dist}" />
+      <jar jarfile="${dir.project.events.dist}/${file.name.jar.events}" 
+           basedir="${dir.project.events.classes}" />
+   </target>
+
 
    <!-- *************************** -->
    <!-- ** Legacy Lucene Project ** -->
@@ -710,75 +738,6 @@
    </target>
 
    
-   <!-- ********************* -->
-   <!-- ** JCR TCK Project ** -->
-   <!-- ********************* -->
-
-   <target name="build-tck" 
-           depends="package-repository">
-      <war warfile="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
-           manifest="${dir.project.repository.dist}/MANIFEST.MF"
-           webxml="${dir.project.repository.src.webinf}\JCRTCK\web.xml">
-         <fileset dir="${dir.project.repository.src.web}" 
-                  excludes="WEB-INF/**" />
-         <webinf dir="${dir.project.installer}" 
-                 includes="licenses/**" />
-         <webinf dir="${dir.project.repository.src.webinf}" 
-                 excludes="web.xml"/>
-         <lib dir="${dir.project.3rdparty.lib}" 
-              includes="*.jar" 
-              excludes="${dir.name.devenv}/**,jcr-1.0.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/optional" 
-             includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/openoffice" 
-              includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/jmagick" 
-              includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/commons" 
-              includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/spring-surf" 
-              includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/swarmcache" 
-              includes="*.jar" />
-         <lib dir="${dir.project.repository.dist}" 
-              includes="${file.name.jar.repository}" />
-         <lib dir="${dir.project.core.dist}" 
-              includes="${dir.name.jar.core}" />
-         <lib dir="${dir.project.datamodel.dist}" 
-              includes="${file.name.jar.datamodel}" />
-         <classes dir="${dir.project.datamodel.config}"/>
-         <lib dir="${dir.project.legacylucene.dist}" 
-              includes="${file.name.jar.legacylucene}" />
-         <classes dir="${dir.project.repository.config}"
-              excludes="alfresco/version.properties" />
-         <classes file="${dir.project.core.src.java}/log4j.properties" 
-                  prefix="WEB-INF/classes" />
-         <!-- Override version.properties with modified one -->
-         <classes dir="${dir.project.repository.dist}"
-                  includes="alfresco/version.properties"/>
-         <manifest>
-             <attribute name="Specification-Title" value="Alfresco JCR TCK"/>
-             <attribute name="Implementation-Title" value="Alfresco JCR TCK ${file.name.codeline}"/>
-         </manifest>
-      </war>
-   </target>
-
-   <target name="deploy-tck" 
-           depends="build-tck">
-      <copy file="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
-            todir="${dir.deploy.jcr.tck}/bin/tck-webapp/webapps" />
-   </target>
-
-   <target name="start-tck" 
-           depends="init">
-      <exec dir="${dir.deploy.jcr.tck}/bin/tck-webapp" 
-            executable="cmd.exe" 
-            spawn="true">
-         <arg line="/k start server.bat -debug socket" />
-      </exec>
-   </target>
-   
-
    <!-- ************************ -->
    <!-- ** Remote API Project ** -->
    <!-- ************************ -->
@@ -1650,7 +1609,8 @@
    <target name="minimize-slingshot-javascript"
            depends="init">
       <echo>Merging selected Slingshot Javascript files...</echo>
-      <concat destfile="${dir.project.slingshot.assemble}/js/yui-common.js" force="no">
+      <!-- ACE-1147, create yui-common for both production and debug YUI libs -->
+      <concat destfile="${dir.project.slingshot.assemble}/js/yui-common-min.js" force="no">
          <fileset file="${dir.project.slingshot.assemble}/yui/utilities/utilities.js" />
          <fileset file="${dir.project.slingshot.assemble}/yui/button/button-min.js" />
          <fileset file="${dir.project.slingshot.assemble}/yui/container/container-min.js" />
@@ -1666,7 +1626,34 @@
          <fileset file="${dir.project.slingshot.assemble}/yui/cookie/cookie-min.js" />
          <fileset file="${dir.project.slingshot.src.web}/yui/yui-patch.js" />
       </concat>
-
+      <concat destfile="${dir.project.slingshot.assemble}/js/yui-common.js" force="no">
+         <fileset file="${dir.project.slingshot.src.web}/js/log4javascript.v1.4.1.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/yahoo/yahoo-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/event/event-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/dom/dom-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/dragdrop/dragdrop-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/animation/animation-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/logger/logger-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/connection/connection-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/element/element-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/get/get-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/yuiloader/yuiloader-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/button/button-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/container/container-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/menu/menu-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/json/json-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/selector/selector-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/datasource/datasource-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/autocomplete/autocomplete-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/paginator/paginator-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/datatable/datatable-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/treeview/treeview-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/cookie/cookie-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/uploader/uploader-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/calendar/calendar-debug.js" />
+         <fileset file="${dir.project.slingshot.assemble}/yui/resize/resize-debug.js" />
+         <fileset file="${dir.project.slingshot.src.web}/yui/yui-patch.js" />
+      </concat>
       <!-- Note: This is manually duplicated from the build.xml file
            Note: disabled currently - no longer used - SpringSurf will automatically concat related files in future release
                  since the addition of far future expire time CRC based URLs for resources, multiple scripts not an issue.
@@ -2123,6 +2110,8 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.datamodel.dist}" 
                   includes="${file.name.jar.datamodel}" />
+         <fileset dir="${dir.project.events.dist}" 
+                  includes="${file.name.jar.events}" />
          <fileset dir="${dir.project.legacylucene.dist}" 
                   includes="${file.name.jar.legacylucene}" />
          <fileset dir="${dir.project.repository.dist}" 

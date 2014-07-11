@@ -9,7 +9,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>4.3.a.LX65</version>
+        <version>5.0.a-LX66</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -35,9 +35,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4</version>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-events</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.icegreen</groupId>
@@ -101,11 +106,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20090211</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.jcr</groupId>
-            <artifactId>jcr</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jbpm</groupId>
@@ -836,7 +836,6 @@
                               </goals>
                               <configuration>
                                   <forkMode>always</forkMode>
-                                  <enableAssertions>false</enableAssertions> <!-- Failed assertion in AVMServiceTest.testDiffOrder() -->
                                   <includes combine.self="override">
                                       <include>**/org/alfresco/Repository*TestSuite.java</include>
                                   </includes>
@@ -936,7 +935,7 @@
     									</goals>
     								</pluginExecutionFilter>
     								<action>
-    									<ignore></ignore>
+    									<ignore />
     								</action>
     							</pluginExecution>
     						</pluginExecutions>

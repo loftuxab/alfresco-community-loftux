@@ -175,6 +175,8 @@ public abstract class AbstractUtils
     protected static final String SITE_ACTIVITIES = "site-activities";
     protected static final String SITE_NOTICE = "site-notice";
     protected static final String MY_DISCUSSIONS = "my-discussions";
+    protected static final String TOP_SITE_CONTRIBUTOR_REPORT = "top-site-contributor-report";
+    protected static final String SITE_CONTENT_BREAKDOWN_REPORT = "site-content-report";
     protected static final String IMAGE_PREVIEW = "image-preview";
     protected static final String WIKI = "wiki";
     protected static final String WEB_VIEW = "web-view";
@@ -216,6 +218,7 @@ public abstract class AbstractUtils
     protected static String DOMAIN_FREE;
     protected static String DOMAIN_PREMIUM;
     protected static String DOMAIN_HYBRID;
+    protected static String DOMAIN_LIVE_SEARCH;
     protected static String SUPERADMIN_USERNAME;
     protected static String SUPERADMIN_PASSWORD;
     protected static String ADMIN_USERNAME;
@@ -266,6 +269,7 @@ public abstract class AbstractUtils
         DOMAIN_FREE = testProperties.getdomainFree();
         DOMAIN_PREMIUM = testProperties.getdomainPremium();
         DOMAIN_HYBRID = testProperties.getdomainHybrid();
+        DOMAIN_LIVE_SEARCH = testProperties.getdomainLiveSearch();
         DEFAULT_USER = testProperties.getdefaultUser();
         UNIQUE_TESTDATA_STRING = testProperties.getuniqueTestDataString();
         SUPERADMIN_USERNAME = testProperties.getSuperadminUsername();

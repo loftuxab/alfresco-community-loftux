@@ -27,6 +27,7 @@ import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.user.AccountSettingsPage;
 import org.alfresco.po.share.user.MyProfilePage;
+import org.alfresco.po.share.user.UserSitesPage;
 import org.alfresco.po.share.util.FailedTestListener;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -53,12 +54,24 @@ public class NavigationBarTest extends AbstractTest
     }
     
     /**
+     * Selects My Sites from Sites menu and checks that User Sites List is Displayed
+     * @throws Exception
+     */
+    @Test(groups={"alfresco-one"})
+    public void navigateToMySites() throws Exception
+    {
+        UserSitesPage userSitesPage = page.getNav().selectMySites().render();
+        Assert.assertEquals(userSitesPage.getPageTitle(), "User Sites List");
+    }  
+    
+   
+    /**
      * Navigate to people finder from the dashboard page
      * and back to dash board page by selecting the 
      * navigation icons.
      * @throws Exception if error
      */
-    @Test(groups={"alfresco-one"})
+    @Test(dependsOnMethods = "navigateToMySites",groups={"alfresco-one"})
     public void navigateToPeopleFinder() throws Exception
     {
         PeopleFinderPage peoplePage = page.getNav().selectPeople().render();
@@ -145,7 +158,7 @@ public class NavigationBarTest extends AbstractTest
      * Note supported in cloud.
      * @throws Exception if error
      */
-    @Test(dependsOnMethods= "navigateToRepository",groups= "Enterprise-only", enabled = false)
+    @Test(dependsOnMethods= "navigateToRepository",groups= "Enterprise-only")
     public void advanceSearch() throws Exception
     {
     	AlfrescoVersion version = drone.getProperties().getVersion();
@@ -157,13 +170,13 @@ public class NavigationBarTest extends AbstractTest
         Assert.assertEquals(searchPage.getPageTitle(), "Advanced Search");
     }
 
-    @Test(dependsOnMethods = "advanceSearch", groups = {"Enterprise-only"}, expectedExceptions = UnsupportedOperationException.class, enabled = false)
+    @Test(dependsOnMethods = "advanceSearch", groups = {"Enterprise-only"}, expectedExceptions = UnsupportedOperationException.class)
     public void testSelectNetworkDropdownInEnterprise() throws Exception
     {
         page.getNav().selectNetworkDropdown();
     }
     
-    @Test(dependsOnMethods = "testSelectNetworkDropdownInEnterprise", groups = {"Enterprise-only"}, expectedExceptions = UnsupportedOperationException.class, enabled = false)
+    @Test(dependsOnMethods = "testSelectNetworkDropdownInEnterprise", groups = {"Enterprise-only"}, expectedExceptions = UnsupportedOperationException.class)
     public void testSelectNetworkInEnterprise() throws Exception
     {
         String strInvitedUser = username.substring(username.lastIndexOf("@") + 1, username.length());
@@ -223,7 +236,7 @@ public class NavigationBarTest extends AbstractTest
     public void navigateToAdminTools() throws Exception
     {
         AdminConsolePage adminConsolePage = page.getNav().selectAdminTools().render();
-        Assert.assertEquals(adminConsolePage.getPageTitle(), "Admin Console");
+        Assert.assertEquals(adminConsolePage.getPageTitle(), "Admin Tools");
     }
 
     /**

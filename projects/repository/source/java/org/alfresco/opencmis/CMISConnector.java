@@ -49,6 +49,10 @@ import javax.xml.datatype.DatatypeFactory;
 
 import org.alfresco.cmis.CMISDictionaryModel;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.events.types.ContentEvent;
+import org.alfresco.events.types.ContentEventImpl;
+import org.alfresco.events.types.ContentReadRangeEvent;
+import org.alfresco.events.types.Event;
 import org.alfresco.model.ContentModel;
 import org.alfresco.opencmis.ActivityPosterImpl.ActivityInfo;
 import org.alfresco.opencmis.dictionary.CMISActionEvaluator;
@@ -71,6 +75,8 @@ import org.alfresco.opencmis.search.CMISResultSetColumn;
 import org.alfresco.opencmis.search.CMISResultSetRow;
 import org.alfresco.repo.action.executer.ContentMetadataExtracter;
 import org.alfresco.repo.cache.SimpleCache;
+import org.alfresco.repo.events.EventPreparator;
+import org.alfresco.repo.events.EventPublisher;
 import org.alfresco.repo.model.filefolder.GetChildrenCannedQuery;
 import org.alfresco.repo.model.filefolder.HiddenAspect;
 import org.alfresco.repo.model.filefolder.HiddenAspect.Visibility;
@@ -224,6 +230,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.extensions.surf.util.AbstractLifecycleBean;
+import org.springframework.util.StringUtils;
 
 /**
  * Bridge connecting Alfresco and OpenCMIS.
@@ -238,7 +245,7 @@ import org.springframework.extensions.surf.util.AbstractLifecycleBean;
 public class CMISConnector implements ApplicationContextAware, ApplicationListener<ApplicationContextEvent>, TenantDeployer
 {
     private static Log logger = LogFactory.getLog(CMISConnector.class);
-    
+
     // mappings from cmis property names to their Alfresco property name counterparts (used by getChildren)
     private static Map<String, QName> SORT_PROPERTY_MAPPINGS = new HashMap<String, QName>();
     
@@ -312,6 +319,7 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
     private ActionService actionService;
     private ThumbnailService thumbnailService;
     private ServiceRegistry serviceRegistry;
+    private EventPublisher eventPublisher;
 
     private ActivityPoster activityPoster;
 
@@ -555,7 +563,15 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
     {
         return contentService;
     }
-
+    
+    /**
+     * Sets the event publisher
+     */
+    public void setEventPublisher(EventPublisher eventPublisher)
+    {
+        this.eventPublisher = eventPublisher;
+    }
+    
     /**
      * Sets the rendition service.
      */
@@ -1640,23 +1656,26 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
             }
 
             result.setMimeType(contentReader.getMimetype());
-
+            long contentSize = contentReader.getSize();
+            
             if ((offset == null) && (length == null))
             {
                 result.setStream(contentReader.getContentInputStream());
-                result.setLength(BigInteger.valueOf(contentReader.getSize()));
+                result.setLength(BigInteger.valueOf(contentSize));
+                publishReadEvent(streamNodeRef, info.getName(), result.getMimeType(), contentSize, contentReader.getEncoding(), null);
             }
             else
             {
                 long off = (offset == null ? 0 : offset.longValue());
-                long len = (length == null ? contentReader.getSize() : length.longValue());
-                if (off + len > contentReader.getSize())
+                long len = (length == null ? contentSize : length.longValue());
+                if (off + len > contentSize)
                 {
                     len = contentReader.getSize() - off;
                 }
 
                 result.setStream(new RangeInputStream(contentReader.getContentInputStream(), off, len));
                 result.setLength(BigInteger.valueOf(len));
+                publishReadEvent(streamNodeRef, info.getName(), result.getMimeType(), contentSize, contentReader.getEncoding(), off+" - "+len);
             }
         }
         catch (Exception e)
@@ -1680,6 +1699,40 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
         }
 
         return result;
+    }
+
+    /**
+     * Notifies listeners that a read has taken place.
+     * 
+     * @param streamNodeRef
+     * @param type
+     * @param mimeType
+     * @param contentSize
+     * @param encoding
+     * @param string
+     */
+    protected void publishReadEvent(final NodeRef nodeRef, final String name, final String mimeType, final long contentSize, final String encoding, final String range)
+    {
+        final QName nodeType = nodeRef==null?null:nodeService.getType(nodeRef);
+        
+        eventPublisher.publishEvent(new EventPreparator(){
+            @Override
+            public Event prepareEvent(String user, String networkId, String transactionId)
+            {
+                if (StringUtils.hasText(range))
+                {
+                    return new ContentReadRangeEvent(user, networkId, transactionId,
+                                nodeRef.getId(), null, nodeType.toString(), Client.cmis, name, mimeType, contentSize, encoding, range); 
+                } 
+                else 
+                {
+                    return new ContentEventImpl(ContentEvent.DOWNLOAD, user, networkId, transactionId,
+                                nodeRef.getId(), null, nodeType.toString(), Client.cmis, name, mimeType, contentSize, encoding);            
+                }
+            }
+        });
+        
+
     }
 
     public void appendContent(CMISNodeInfo nodeInfo, ContentStream contentStream, boolean isLastChunk) throws IOException
@@ -1895,6 +1948,7 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
     {
         List<CmisExtensionElement> extensions = new ArrayList<CmisExtensionElement>();
         Set<String> propertyIds = new HashSet<String>(alreadySetProperties);
+        List<CmisExtensionElement> propertyExtensionList = new ArrayList<CmisExtensionElement>();
         Set<String> filterSet = splitFilter(filter);
 
         Set<QName> aspects = nodeService.getAspects(info.getNodeRef());
@@ -1909,7 +1963,6 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
             extensions.add(new CmisExtensionElementImpl(ALFRESCO_EXTENSION_NAMESPACE, APPLIED_ASPECTS, null, aspectType
                     .getTypeId()));
 
-            List<CmisExtensionElement> propertyExtensionList = new ArrayList<CmisExtensionElement>();
             for (PropertyDefinitionWrapper propDef : aspectType.getProperties())
             {
                 if (propertyIds.contains(propDef.getPropertyId()))
@@ -1930,13 +1983,13 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
                 // mark property as 'added'
                 propertyIds.add(propDef.getPropertyId());
             }
+        }
 
-            if (!propertyExtensionList.isEmpty())
-            {
-                CmisExtensionElementImpl propertiesExtension = new CmisExtensionElementImpl(
-                        ALFRESCO_EXTENSION_NAMESPACE, "properties", null, propertyExtensionList);
-                extensions.addAll(Collections.singletonList(propertiesExtension));
-            }
+        if (!propertyExtensionList.isEmpty())
+        {
+            CmisExtensionElementImpl propertiesExtension = new CmisExtensionElementImpl(
+                    ALFRESCO_EXTENSION_NAMESPACE, "properties", null, propertyExtensionList);
+            extensions.addAll(Collections.singletonList(propertiesExtension));
         }
 
         return extensions;
@@ -2641,6 +2694,7 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
         }
 
         Set<AccessPermission> currentAces = permissionService.getAllSetPermissions(nodeRef);
+        Acl currentACL = getACL(nodeRef, false);
 
         // remove all permissions
         permissionService.deletePermissions(nodeRef);
@@ -2654,11 +2708,45 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
                 principalId = AuthenticationUtil.getFullyAuthenticatedUser();
             }
 
-            List<String> permissions = translatePermissionsFromCMIS(ace.getPermissions());
+            List<String> acePermissions = ace.getPermissions();
+            normaliseAcePermissions(currentACL, ace, acePermissions);
+            List<String> permissions = translatePermissionsFromCMIS(acePermissions);
             normalisePermissions(currentAces, permissions);
             for (String permission : permissions)
             {
                 permissionService.setPermission(nodeRef, principalId, permission, true);
+            }
+        }
+    }
+
+    /*
+     * MNT-10165: CMIS 1.1 API: Impossible to remove ACL through Atom binding
+     * 
+     * Detect permission to delete for principal and 
+     * also delete all the concomitant basic permissions
+     */
+    private void normaliseAcePermissions(Acl currentACL, Ace newAce, List<String> acePermissions)
+    {
+        for (Ace oldAce : currentACL.getAces())
+        {
+            if (oldAce.getPrincipalId().equals(newAce.getPrincipalId()))
+            {
+                // detect what permissions were deleted for principal
+                Set<String> permissionsDeletedForPrincipal = new HashSet<String>(oldAce.getPermissions());
+                Set<String> newPermissions = new HashSet<String>(newAce.getPermissions());
+                permissionsDeletedForPrincipal.removeAll(newPermissions);
+                for (String permissionDeleted : permissionsDeletedForPrincipal)
+                {
+                    // for deleted permission also delete all attendant basic permissions
+                    List<String> onePermissionList = new ArrayList<String>();
+                    onePermissionList.add(permissionDeleted);
+
+                    List<String> cmisPermissions = translatePermmissionsToCMIS(onePermissionList, false);
+                    for (String cmisPermission : cmisPermissions)
+                    {
+                        acePermissions.remove(cmisPermission);
+                    }
+                }
             }
         }
     }
