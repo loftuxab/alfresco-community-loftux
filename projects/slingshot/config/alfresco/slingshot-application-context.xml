@@ -13,28 +13,28 @@
             <value>classpath:org/springframework/extensions/webscripts/spring-webscripts-config.xml</value>
             <value>classpath:META-INF/spring-webscripts-config-custom.xml</value>
             <value>jar:*!/META-INF/spring-webscripts-config-custom.xml</value>
-            
+
             <!-- Spring Surf -->
             <value>classpath:org/springframework/extensions/surf/spring-surf-config.xml</value>
             <value>classpath:org/springframework/extensions/surf/spring-surf-config-remote.xml</value>
             <value>classpath:META-INF/spring-surf-config-custom.xml</value>
             <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
-            
+
             <!-- Surf Autowire Support -->
             <value>webapp:WEB-INF/surf.xml</value>
 
             <!-- Common form config -->
             <value>classpath:alfresco/form-config.xml</value>
-            
+
             <!-- Share default config -->
             <value>classpath:alfresco/share-config.xml</value>
-            
+
             <!-- Share help url config -->
             <value>classpath:alfresco/share-help-config.xml</value>
-            
+
             <!-- Share form config -->
             <value>classpath:alfresco/share-form-config.xml</value>
-            
+
             <!-- Share Document Library config -->
             <value>classpath:alfresco/share-documentlibrary-config.xml</value>
 
@@ -43,7 +43,7 @@
 
             <!-- Share workflow form config -->
             <value>classpath:alfresco/share-workflow-form-config.xml</value>
-            
+
             <!-- Share CMIS config -->
             <value>classpath:alfresco/share-cmis-config.xml</value>
 
@@ -58,7 +58,7 @@
          </list>
       </constructor-arg>
    </bean>
-   
+
    <!-- Override WebScript Messages - add slingshot application messages -->
    <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
@@ -69,7 +69,7 @@
          </list>
       </property>
    </bean>
-   
+
    <!-- Override Web Framework Abstract Handler Mappings -->
    <bean id="webframeworkHandlerMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" abstract="true">
       <property name="urlPathHelper" ref="urlPathHelper" />
@@ -92,7 +92,7 @@
          </value>
       </property>
    </bean>
-   
+
    <!-- Override Login Controller - get users group membership -->
    <bean id="loginController" class="org.alfresco.web.site.servlet.SlingshotLoginController">
         <property name="cacheSeconds" value="-1" />
@@ -100,7 +100,7 @@
         <property name="useCacheControlHeader"><value>true</value></property>
         <property name="userFactory" ref="user.factory"></property>
     </bean>
-    
+
    <!-- Override Logout Controller - to expire Alfresco tickets -->
    <bean id="logoutController" class="org.alfresco.web.site.servlet.SlingshotLogoutController">
       <property name="cacheSeconds" value="-1" />
@@ -120,7 +120,7 @@
       <property name="supportedMethods"><null/></property>
       <property name="proxyControllerInterceptor" ref="slingshotProxyControllerInterceptor" />
    </bean>
-   
+
    <!-- Override FeedController and connector provider so we can manipulate the authentication for SSO if needed -->
    <bean id="feedController" class="org.alfresco.web.site.servlet.SlingshotFeedController">
       <property name="cacheSeconds" value="-1" />
@@ -132,7 +132,7 @@
    <bean id="webframework.connector.provider" class="org.alfresco.web.site.servlet.SlingshotConnectorProvider">
       <property name="connectorService" ref="connector.service" />
    </bean>
-   
+
    <!-- Override RemoteClient to add additional security processing for HTML responses to content APIs -->
    <bean id="connector.remoteclient" parent="connector.remoteclient.abstract"
          class="org.alfresco.web.scripts.SlingshotRemoteClient" scope="prototype">
@@ -140,7 +140,7 @@
          <value>false</value>
       </property>
    </bean>
-   
+
    <!-- Override and configure the remote store for Slingshot -->
    <!-- Point to a specific store on the Alfresco instance -->
    <bean id="webframework.store.remote.abstract" parent="webscripts.remotestore" abstract="true" init-method="init">
@@ -159,12 +159,12 @@
       <property name="connectorService" ref="connector.service" />
       <property name="connectorProvider" ref="webframework.connector.provider" />
    </bean>
-   
+
    <bean id="webframework.slingshot.persister.remote" class="org.springframework.extensions.surf.persister.PathStoreObjectPersister" parent="webframework.sitedata.persister.abstract">
       <property name="store" ref="webframework.webapp.store.remote" />
       <property name="pathPrefix"><value>alfresco/site-data/${objectTypeIds}</value></property>
    </bean>
-   
+
    <!-- Surf Model Object Persisters -->
    <bean id="webframework.objects.persister" class="org.springframework.extensions.surf.persister.MultiObjectPersister">
       <property name="serviceRegistry" ref="webframework.service.registry" />
@@ -172,11 +172,11 @@
          <list>
             <!-- Slingshot remote store persisters -->
             <ref bean="webframework.slingshot.persister.remote" />
-            
+
             <!-- Alfresco Legacy Persisters -->
             <ref bean="webframework.sitedata.persister.classpath.alfresco-custom" />
             <ref bean="webframework.sitedata.persister.alfresco-classpath" />
-            
+
             <!-- Classpath Persister -->
             <ref bean="webframework.sitedata.persister.classpath" />
          </list>
@@ -185,13 +185,13 @@
          <ref bean="webframework.slingshot.persister.remote" />
       </property>
    </bean>
-   
+
    <!-- Slingshot Factory beans -->
    <bean id="webframework.factory.user.slingshot" class="org.alfresco.web.site.SlingshotUserFactory" parent="webframework.factory.base" />
-   
+
    <!-- "no-component" processor -->
    <bean id="webframework.rendition.processor.nocomponent" class="org.springframework.extensions.surf.site.EmptyRegionRenderer" />
-   
+
    <!-- Override WebScript View Resolver - authenticated for admin webscripts via alfresco-feed connector -->
    <bean id="slingshot.webscripts.authenticator.basic" class="org.alfresco.web.site.servlet.SlingshotBasicHttpAuthenticatorFactory">
       <property name="connectorService" ref="connector.service" />
@@ -201,14 +201,14 @@
       <property name="container" ref="webscripts.container" />
       <property name="authenticatorFactory" ref="slingshot.webscripts.authenticator.basic" />
    </bean>
-   
+
    <!-- Override Page View Resolver - to provide access to http req for MT auth support during view name resolution -->
    <bean id="pageViewResolver" class="org.alfresco.web.site.SlingshotPageViewResolver" parent="abstractWebFrameworkViewResolver" />
-   
+
    <!-- Interceptors -->
    <bean id="editionInterceptor" class="org.alfresco.web.site.EditionInterceptor" parent="abstractWebFrameworkInterceptor" />
    <bean id="userDashboardInterceptor" class="org.alfresco.web.site.UserDashboardInterceptor" parent="abstractWebFrameworkInterceptor" />
-   
+
    <!-- CSS image data handler - override max image size to be 10K - anything larger is left as a resource url -->
    <bean id="css.data.image.handler" parent="css.data.image.handler.abstract" class="org.springframework.extensions.surf.CssImageDataHandler">
       <property name="maximumImageSize" value="10240" />
@@ -221,11 +221,11 @@
           </list>
        </property>
    </bean>
-   
+
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
-   
+
    <!--  I18N resources and messages Web Script -->
    <bean id="webscript.org.springframework.extensions.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript">
       <property name="webFrameworkConfigElement" ref="webframework.config.element"/>
@@ -242,11 +242,11 @@
    <bean id="slingshot.scriptprocessor.preferences" parent="baseScriptExtension" class="org.alfresco.web.scripts.UserPreferences">
       <property name="extensionName" value="preferences" />
    </bean>
-   
+
    <bean id="slingshot.scriptprocessor.googleDocsStatus" parent="baseScriptExtension" class="org.alfresco.web.scripts.GoogleDocsStatus">
       <property name="extensionName" value="googleDocsStatus" />
    </bean>
-   
+
    <bean id="slingshot.scriptprocessor.imapServerStatus" parent="baseScriptExtension" class="org.alfresco.web.scripts.ImapServerStatus">
       <property name="extensionName" value="imapServerStatus" />
    </bean>
@@ -270,7 +270,7 @@
    <bean id="slingshot.templateprocessor.mimetypesQuery" parent="baseTemplateExtension" class="org.alfresco.web.scripts.MimetypesQuery">
       <property name="extensionName" value="mimetypes" />
    </bean>
-   
+
      <bean id="slingshot.templateprocessor.multiValueEscapeHelper" parent="baseTemplateExtension" class="org.alfresco.web.scripts.MultiValueEscapeHelper">
       <property name="extensionName" value="multiValue" />
    </bean>
@@ -301,7 +301,7 @@
       <bean id="pagecontext.component.evaluator" class="org.alfresco.web.extensibility.SlingshotPageContextComponentElementEvaluator">
       <property name="slingshotEvaluatorUtil" ref="slingshot.evaluator.utility" />
    </bean>
-   
+
    <bean id="preset.component.evaluator" class="org.alfresco.web.extensibility.SlingshotPresetComponentElementEvaluator">
       <property name="slingshotEvaluatorUtil" ref="slingshot.evaluator.utility" />
    </bean>
@@ -320,7 +320,7 @@
       <property name="slingshotEvaluatorUtil" ref="slingshot.evaluator.utility" />
    </bean>
 
-   <!-- 
+   <!--
       CMIS beans
    -->
    <bean id="cmis.script" class="org.alfresco.web.cmis.SlingshotCMISScriptParameterFactory" init-method="init">
@@ -332,7 +332,7 @@
    <bean id="webscript.org.springframework.extensions.cmis.content.get" class="org.springframework.extensions.cmis.CMISContentStreamWebScript" parent="webscript">
       <property name="ScriptParameterFactory" ref="cmis.script" />
    </bean>
-   
+
    <!-- XHR Authentication -->
    <bean id="webscript.org.alfresco.modules.authenticated.get" class="org.alfresco.web.scripts.bean.Authenticated" parent="webscript" />
 
@@ -347,14 +347,4 @@
          </list>
       </property>
    </bean>
-
-   <!-- ALF-20982 -->
-   <bean id="dependency.aggregator" parent="dependency.aggregator.abstract" class="org.springframework.extensions.surf.DependencyAggregator">
-      <property name="compressionExclusions">
-         <list>
-            <value>components/preview/pdfjs/*.js</value>
-         </list>
-      </property>
-   </bean>
-
 </beans>
