@@ -398,12 +398,15 @@ public class MultiTServiceImpl implements TenantService
     public String getBaseNameUser(String name)
     {
         // can be null (e.g. for System user / during app ctx init)
-        if (name != null)
+        // We only bother with MT username@domain format if MT is enabled
+        if (name != null && isEnabled())
         {
             int idx = name.lastIndexOf(SEPARATOR);
             if (idx != -1)
             {
                 return name.substring(0, idx);
+                    // tenant domain doesn't exists but we are allowed to create
+                    // no base name can be resolved for such users -> return
             }
         }
         return name;

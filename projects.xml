@@ -333,64 +333,7 @@
                          windowtitle="Alfresco Deployment Receiver" 
                          projectdir="${dir.project.deployment}" />
    </target>
-	
-	   <!-- **************************** -->
-	   <!-- ** WDR Deployment Project ** -->
-	   <!-- **************************** -->
-	  
-	   <target name="incremental-wdrdeployment" 
-	           depends="package-wdrdeployment" />
-	      
-	   <target name="build-wdrdeployment" 
-	           depends="clean-wdrdeployment, 
-	           incremental-wdrdeployment" />
-	   
-	   <target name="clean-wdrdeployment" 
-	           depends="init">
-	      <clean projectdir="${dir.project.wdrdeployment}" />
-	   </target>
-	   
-	   <target name="compile-wdrdeployment" 
-	           depends="init">
-	      <compile-java projectdir="${dir.project.wdrdeployment}" />
-          <compile-java-javac srcdir="${dir.project.wdrdeployment.src.test}" classesdir="${dir.project.wdrdeployment.classes.test}">
-            <addPath2>
-                <pathelement location="${dir.project.wdrdeployment.classes}" />
-                <pathelement location="${dir.project.repository.classes.test}" />
-            </addPath2>
-          </compile-java-javac>
-	   </target>
-	   
-	   <target name="package-wdrdeployment"
-	           depends="package-wdrdeployment-jar">
-	   </target>
-	         
-	   <target name="package-wdrdeployment-jar"
-	           depends="compile-wdrdeployment">
-	    
-	    <copy todir="${dir.project.wdrdeployment.classes}">
-	          <fileset dir="${dir.project.wdrdeployment.config}" 
-	                   includes="**/*" />
-	    </copy>
-	   	
-	   	<mkdir dir="${dir.project.wdrdeployment.dist}" />
-	   	
-	      <jar jarfile="${dir.project.wdrdeployment.dist}/${file.name.jar.wdrdeployment}" 
-	                 basedir="${dir.project.wdrdeployment.classes}" />
-	   </target>
-	   	   
-	   <target name="test-wdrdeployment" 
-	           depends="compile-wdrdeployment">
-	      <run-tests projectdir="${dir.project.wdrdeployment}" additionalclasspath="classpath.unit.test.beyondrepo" />
-	   </target>
-	   
-	   <target name="generate-javadocs-wdrdeployment" 
-	           depends="init">
-	      <generate-javadocs documenttitle="Alfresco WCM Runtime Deployment Receivers ${version.number}" 
-	                         windowtitle="Alfresco WCM Development Runtime Deployment Receiver" 
-	                         projectdir="${dir.project.wdrdeployment}" />
-	   </target>
-      
+
    <!-- ************************ -->
    <!-- ** Repository Project ** -->
    <!-- ************************ -->
@@ -529,7 +472,6 @@
             <path refid="classpath.compile.system-build-test" />
             <pathelement location="${dir.project.solrclient.classes.test}" />
             <pathelement location="${dir.project.solr.classes.test}" />
-            <pathelement location="${dir.project.webserviceclient.classes.test}" />
          </addPath>
 		 </compile-java>
    </target>
@@ -542,7 +484,7 @@
    </target>
    
    <target name="test-system-build-test" 
-           depends="incremental-webclient-depends, incremental-webclient, package-webserviceclient, deploy-solr, package-system-build-test">
+           depends="incremental-webclient-depends, incremental-webclient, deploy-solr, package-system-build-test">
 
       <antcall target="-reset-database" />
 
@@ -600,15 +542,12 @@
                 <pathelement location="${dir.project.webclient.dist}" />
                 <pathelement location="${dir.project.remoteapi.classes}" />
                 <pathelement location="${dir.project.remoteapi.classes.test}" />
-                <pathelement location="${dir.project.webserviceclient.classes}" />
-                <pathelement location="${dir.project.webserviceclient.classes.test}" />
                 <pathelement location="${dir.project.datamodel.classes}" />
                 <pathelement location="${dir.project.legacylucene.classes}" />
                 <pathelement location="${dir.project.core.classes}" />
 
                 <pathelement location="${dir.project.repository.config}" />
                 <pathelement location="${dir.project.repository.test.resources}" />
-                <pathelement location="${dir.project.webserviceclient.test.resources}" />
 
                 <pathelement location="${dir.project.system-build-test}/config" />
                 <pathelement location="${dir.project.system-build-test}/keystore" />
@@ -668,21 +607,9 @@
       <tomcat-start/>
    </target>
 
-   <target name="start-virtual-tomcat-if-necessary"
-           depends="virtual-tomcat-check-status" 
-           unless="virtual.tomcat.started">
-       <virtual-tomcat-start/>
-   </target>
-
    <target name="tomcat-check-status">
       <condition property="tomcat.started">
          <socket server="localhost" port="8080"/>
-      </condition>
-   </target>
-
-   <target name="virtual-tomcat-check-status">
-      <condition property="virtual.tomcat.started">
-         <socket server="localhost" port="8180"/>
       </condition>
    </target>
 
@@ -695,26 +622,10 @@
       </waitfor>
    </target>
 
-   <target name="wait-for-virtual-tomcat">
-      <waitfor maxwaitunit    = "second"
-               checkeveryunit = "second"
-               maxwait        = "20"
-               checkevery     = "2">
-          <!-- Any non-existent virtual host will do for testing liveness -->
-         <http url="http://dummy-project.www--sandbox.127-0-0-1.ip.alfrescodemo.net:8180/"/>
-      </waitfor>
-    </target>
-
    <target name="tomcat-stop-if-necessary" 
            depends="tomcat-check-status" 
            if="tomcat.started">
       <antcall target="java-tomcat-stop"/>
-   </target>
-
-   <target name="virtual-tomcat-stop-if-necessary" 
-           depends="virtual-tomcat-check-status" 
-           if="virtual.tomcat.started">
-      <antcall target="java-virtual-tomcat-stop"/>
    </target>
 
    <target name="java-tomcat-stop"
@@ -726,17 +637,6 @@
       </java>
       <sleep seconds="2"/>
    </target>
-
-   <target name="java-virtual-tomcat-stop"
-           unless="virtual.tomcat.previously.started">
-      <java jar="${virtual.tomcat.home}/bin/bootstrap.jar" 
-            fork="true">
-         <jvmarg value="-Dcatalina.home=${virtual.tomcat.home}"/>
-         <arg line="stop"/>
-      </java>
-      <sleep seconds="2"/>
-   </target>
-
    
    <!-- ************************ -->
    <!-- ** Remote API Project ** -->
@@ -752,13 +652,6 @@
    <target name="clean-remoteapi" 
            depends="init">
       <clean projectdir="${dir.project.remoteapi}" />
-   </target>
-
-   <target name="clean-remoteapi-services" 
-           depends="init">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice" />
-      </delete>
    </target>
 
    <target name="compile-remoteapi" 
@@ -797,257 +690,6 @@
                          projectdir="${dir.project.remoteapi}" />
    </target>
    
-   <target name="gen-all-service-servers"
-           depends="gen-auth-service-server, 
-                    gen-repo-service-server, 
-                    gen-content-service-server, 
-                    gen-authoring-service-server, 
-                    gen-classification-service-server, 
-                    gen-action-service-server, 
-                    gen-access-control-service-server, 
-                    gen-administration-service-server, 
-                    gen-dictionary-service-server" />
-
-   <target name="init-service-gen" 
-           depends="init">
-      <!-- load the WSDL 2 Java task definition -->
-      <taskdef name="wsdl2java" 
-               classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
-         <classpath refid="classpath.compile" />
-      </taskdef>
-   </target>
-
-   <target name="gen-auth-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authentication" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0"
-                  package="org.alfresco.repo.webservice.authentication" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authentication" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-repo-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/repository" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" 
-                  package="org.alfresco.repo.webservice.repository" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/repository" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-content-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/content" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" 
-                  package="org.alfresco.repo.webservice.content" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/content" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-dictionary-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/dictionary" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" 
-                  package="org.alfresco.repo.webservice.dictionary" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/dictionary" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-classification-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/classification" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" 
-                  package="org.alfresco.repo.webservice.classification" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/classification" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-authoring-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authoring" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" 
-                  package="org.alfresco.repo.webservice.authoring" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authoring" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-action-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/action" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" 
-                  package="org.alfresco.repo.webservice.action" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/action" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-access-control-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/accesscontrol" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" 
-                  package="org.alfresco.repo.webservice.accesscontrol" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/accesscontrol" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-      </delete>
-   </target>
-
-   <target name="gen-administration-service-server" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/administration" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" 
-                 output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" 
-                 skeletondeploy="false" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" 
-                  package="org.alfresco.repo.webservice.administration" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.repo.webservice.types" />
-      </wsdl2java>
-      <delete>
-         <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/administration" 
-                  includes="${includes.delete.remoteapi.gensrc}" />
-     </delete>
-   </target>
-
-
-   <!-- ****************** -->
-   <!-- ** JNDI Project ** -->
-   <!-- ****************** -->
-
-   <target name="incremental-jndi"
-           depends="package-jndi" />
-      
-   <target name="build-jndi" 
-           depends="clean-jndi, 
-                    incremental-jndi" />
-   
-   <target name="clean-jndi" 
-           depends="init">
-      <clean projectdir="${dir.project.jndi}" />
-   </target>
-   
-   <target name="compile-jndi" 
-           depends="init">
-      <compile-java projectdir="${dir.project.jndi}" />
-   </target>
-   
-   <target name="package-jndi" 
-           depends="compile-jndi">
-      <mkdir dir="${dir.project.jndi.dist}" />
-      <jar jarfile="${dir.project.jndi.dist}/${file.name.jar.jndi}" 
-           basedir="${dir.project.jndi.classes}" />
-   </target>
-   
-   <target name="generate-javadocs-jndi" 
-           depends="init">
-      <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface) ${version.number}" 
-                         windowtitle="Alfresco JNDI" 
-                         projectdir="${dir.project.jndi}"/>
-   </target>
-
-
-
    <!-- ****************** -->
    <!-- ** SOLR Project ** -->
    <!-- ****************** -->
@@ -1159,186 +801,6 @@
             projectdir="${dir.project.solrclient}"/>
    </target>
 
-
-   <!-- ******************************************************************** -->
-   <!-- ** Tomcat-virtserver Project                                         -->
-   <!-- **                                                                   -->
-   <!-- **   Normally, you just want to build the various .jar files used    -->
-   <!-- **   by the virtualization server, not the virtualization server     -->
-   <!-- **   itself.   This target builds the virtualization server itself.  -->
-   <!-- **                                                                   -->
-   <!-- **   This target is only run by hand on an as-needed basis           -->
-   <!-- **   because the Tomcat build requires network access.  The build    -->
-   <!-- **   artifact created by running this project is automatically put   -->
-   <!-- **   in 3rd-party/distro/apache-tomcat-[vers]-virtserver-[vers].zip  -->
-   <!-- **   This arragement preserves the desriable quality of allowing     -->
-   <!-- **   builds to run disconnected from any network.                    -->
-   <!-- **                                                                   -->
-   <!-- **   There are only 3 things that force you to re-run this project:  -->
-   <!-- **                                                                   -->
-   <!-- **   [1]  Changing file(s) in dir.project.tomcatvirt.src.java        -->
-   <!-- **   [2]  Changing the Tomcat version used by the virt server.       -->
-   <!-- **   [3]  Changing the Tomcat build config (see replaceregexp below) -->
-   <!-- **                                                                   -->
-   <!-- **  If you do run this target, be sure to checkin its build artifact -->
-   <!-- **  (3rd-party/distro/apache-tomcat-[vers]-virtserver-[vers].zip)    -->
-   <!-- **                                                                   -->
-   <!-- **                                                                   -->
-   <!-- **   Devloper note:                                                  -->
-   <!-- **                                                                   -->
-   <!-- **       To assemble a virt server with all the libs it needs:       -->
-   <!-- **              ant -f continuous.xml  assemble-virtual              -->
-   <!-- **       Then on UNIX chmod +x all the .sh files in                  -->
-   <!-- **               build/assemble/virtual-tomcat/bin                   -->
-   <!-- **       (the real installer takes care of the chmod step).          -->
-   <!-- ******************************************************************** -->
-   <target name="tomcat-virtserver"
-           depends="init, incremental-catalinavirtual">
-
-      <property name  ="dir.name.src.tomcatvirt.custom"
-                value="${dir.project.tomcatvirt.custom.src}/${file.name.base.src.zip.tomcatvirt.apache}" />
-
-      <!-- Expand pristine tomcat source code that will be modified for virt server -->
-      <unzip src="${dir.project.tomcatvirt.apache.src}/${file.name.src.zip.tomcatvirt.apache}"
-             dest="${dir.project.tomcatvirt.custom.src}" />
-       
-
-
-      <!-- Include extras: tomcat5.exe  (which is just prunsrv.exe)           -->
-      <!--            and: tomcat5w.exe (which is just prunmgr.exe)           -->
-      <!--                                                                    -->
-      <!-- This makes it easy to configure the virt server as a daemon        --> 
-      <!-- For more details, see:  http://jakarta.apache.org/commons/daemon   -->
-      <!-- and:  "What's the proper way to start the virtualization server?"  -->
-      <!-- in:   http://wiki.alfresco.com/wiki/Virtualization_Server_FAQ      -->
-
-      <copy        todir = "${dir.name.src.tomcatvirt.custom}/build/build/bin">
-            <fileset dir = "${dir.name.src.tomcatvirt.custom}/connectors/procrun/bin"/>
-      </copy>
- 
-      <!-- Add/override any files in Tomcat's source code with customized files -->
-      <copy        todir = "${dir.name.src.tomcatvirt.custom}">
-            <fileset dir = "${dir.project.tomcatvirt.src.java}" />
-      </copy>
-
-      <!-- Make a custom configuration file -->
-      <!-- 
-        Note:  An alternative to the following copy an 3 replaceregexp tasks 
-               would have been to just include the build.properties file in
-               the customized file tree (see: dir.name.src.tomcatvirt.custom).
-               However, as the tomcat prop file has a lot of obscure stuff
-               in it, in-place surgery was deemed preferable.   This could
-               change if the "surgery approach" gets significantly more 
-               complex over time.
-      -->
-
-      <copy   file="${dir.name.src.tomcatvirt.custom}/build/build.properties.default"
-            tofile="${dir.name.src.tomcatvirt.custom}/build/build.properties"/>
-
-      <!-- Set base.path so tomcat's build can download/cache its required libs  -->
-      <replaceregexp
-            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
-            match="^base\.path=.*"
-            replace="base.path=${dir.project.tomcatvirt.lib}"
-            byline="true"/>
-
-      <!-- Build everything (note: adds 10k to zip file) -->
-      <replaceregexp
-            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
-            match="^#full\.dist=.*"
-            replace="full\.dist=on"
-            byline="true"/>
-
-      <!-- Oddly, we need to tell the build where mail.jar is, but no other libs.  -->
-      <replaceregexp
-            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
-            match="^mail\.lib=.*"
-            replace="mail.lib=${dir.project.3rdparty.lib}"
-            byline="true"/>
-
-      <!-- 
-           Augment the classpath of the catatalina project within 
-           the tomcat virtserver's build so it can reference the
-           path umangling logic within AVMUrlValve. 
-
-           XML-escaped regexes are pretty darned ugly!
-           Oh well.
-       -->
-      <replaceregexp
-            file="${dir.name.src.tomcatvirt.custom}/container/catalina/build.xml"  
-            match="^\s*&lt;path\s+id\s*=\s*&quot;catalina\.classpath&quot;&gt;"
-            replace="  &lt;path id=&quot;catalina.classpath&quot;&gt;&#xD;&#xA;    &lt;pathelement location=&quot;${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}&quot;/&gt;"
-            byline="true"/>
-         
-
-      <!-- Comple the modified version of tomcat used as the virt server -->
-      <ant dir="${dir.name.src.tomcatvirt.custom}"
-           inheritAll="false"/>
-
-      <!-- Set +rx permissions on all the .sh files for UNIX (for testing only) -->
-      <chmod dir="${dir.name.src.tomcatvirt.custom}/build/build"
-             perm="ugo+rx"
-             includes="**/*.sh"/>
-
-
-      <!-- Get rid of stuff that the virt server does not actually need -->
-      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/balancer"/>
-      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/jsp-examples"/>
-      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/servlet-examples"/>
-      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/tomcat-docs"/>
-      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/webdav"/>
-      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/server/webapps/admin"/>
-      <delete file="${dir.name.src.tomcatvirt.custom}/build/build/conf/Catalina/localhost/admin.xml"/>
-
-
-      <!-- Refresh cached base virtserver tomcat distro in 3rd party 
-           Note:  During the install process, other files are added/removed 
-                  from this zip file (e.g.: jndi-related stuff).  
-                  See continuous.xml for the gory details.
-      -->
-      <zip destfile="${dir.project.3rdparty}/distro/${file.name.zip.tomcatvirt.custom}">
-           <zipfileset dir="${dir.name.src.tomcatvirt.custom}/build/build"
-                       prefix="${file.name.base.zip.tomcatvirt.custom}"/>
-      </zip>
-   </target>
-
-
-   <!-- **************************** -->
-   <!-- ** Virtual Tomcat Project ** -->
-   <!-- **************************** -->
-
-   <target name="incremental-catalinavirtual" 
-           depends="package-catalinavirtual" />
-
-   <target name="build-catalinavirtual" 
-           depends="clean-catalinavirtual, 
-                    incremental-catalinavirtual" />
-
-   <target name="clean-catalinavirtual" 
-           depends="init">
-      <clean projectdir="${dir.project.catalinavirtual}" />
-   </target>
-
-   <target name="compile-catalinavirtual" 
-           depends="init">
-      <compile-java projectdir="${dir.project.catalinavirtual}" />
-   </target>
-
-   <target name="package-catalinavirtual" 
-           depends="compile-catalinavirtual">
-      <mkdir dir="${dir.project.catalinavirtual.dist}" />
-      <jar jarfile="${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}" 
-           basedir="${dir.project.catalinavirtual.classes}" />
-   </target>
-
-   <target name="generate-javadocs-catalinavirtual" 
-           depends="init">
-      <generate-javadocs documenttitle="Alfresco Catalina Valve ${version.number}" 
-                         windowtitle="Alfresco Catalina Valve" 
-                         projectdir="${dir.project.catalinavirtual}"/>
-   </target>
-   
-   
    <!-- *********************************** -->
    <!-- ** Web Framework Commons Project ** -->
    <!-- *********************************** -->
@@ -1541,8 +1003,6 @@
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
-                  includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.jlan.dist}" 
@@ -1772,8 +1232,6 @@
                   includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
-                  includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.jlan.dist}" 
@@ -2100,8 +1558,6 @@
                   includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/fop" 
                   includes="*.jar"/>
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"
-                  includes="*.jar"/>
          <fileset dir="${dir.project.3rdparty.lib}/gdata-1.47.1" 
                   includes="*.jar"/>
          <fileset dir="${dir.project.3rdparty.lib}/spring-social" 
@@ -2120,8 +1576,6 @@
                   includes="${file.name.jar.mbeans}" />
          <fileset dir="${dir.project.deployment.dist}"
                   includes="${file.name.jar.deployment}"/>
-         <fileset dir="${dir.project.wdrdeployment.dist}"
-                 includes="${file.name.jar.wdrdeployment}"/>
          <fileset dir="${dir.project.remoteapi.dist}" 
                   includes="${file.name.jar.remoteapi}" />
          <fileset dir="${dir.project.webframeworkcommons.dist}" 
@@ -2167,9 +1621,6 @@
               quiet="yes" 
               dir="${dir.project.webclient.samplewebsite}" />
       <mkdir dir="${dir.project.webclient.samplewebsite}/alfresco/classes"/>
-
-      <compile-java-javac srcdir="${dir.project.webclient.test.resources}/websites/alfresco/ROOT/WEB-INF/classes"
-           classesdir="${dir.project.webclient.samplewebsite}/alfresco/classes" />
 
       <jar basedir="${dir.project.webclient.classes}"
            destfile="${dir.project.webclient.samplewebsite}/alfresco/alfresco-form-data-functions.jar"
@@ -2565,8 +2016,6 @@
                 includes="${includes.wcmquickstart-webapp.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional"
                 includes="${includes.wcmquickstart-webapp.libs.optional}"/>       
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"
-            includes="${includes.wcmquickstart-webapp.libs.abdera}"/>
 
          <!-- Web Client API Libs -->
          <fileset dir="${dir.project.wcmquickstart-clientapi.lib}" />
@@ -2616,223 +2065,6 @@
               file="${dir.project.wcmquickstart-webapp.dist}/${file.name.war.wcmquickstart-webapp}" />
    </target>
     
-   <!-- ******************************** -->
-   <!-- ** Web Service Client Project ** -->
-   <!-- ******************************** -->
-
-   <target name="incremental-webserviceclient" 
-           depends="package-webserviceclient" />
-
-   <target name="build-webserviceclient" 
-           depends="clean-webserviceclient, 
-                    incremental-webserviceclient" />
-   
-   <target name="clean-webserviceclient" 
-           depends="init">
-      <clean projectdir="${dir.project.webserviceclient}" />
-   </target>
-
-   <target name="clean-webserviceclient-services" 
-           depends="init">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice" />
-      </delete>
-   </target>
-
-   <target name="compile-webserviceclient" 
-           depends="init">
-      <compile-java-inc-generated projectdir="${dir.project.webserviceclient}" />
-      <compile-java-javac srcdir="${dir.project.webserviceclient.src.test}" classesdir="${dir.project.webserviceclient.classes.test}">
-        <addPath2>
-            <pathelement location="${dir.project.webserviceclient.classes}" />
-        </addPath2>
-      </compile-java-javac>
-   </target>
-   
-   <target name="package-webserviceclient"
-           depends="compile-webserviceclient">
-      <mkdir dir="${dir.project.webserviceclient.dist}" />
-      <copy todir="${dir.project.webserviceclient.classes}" 
-            file="${dir.project.webserviceclient.src.java}/log4j.properties" />
-      <jar jarfile="${dir.project.webserviceclient.dist}/${file.name.jar.webserviceclient}" 
-           basedir="${dir.project.webserviceclient.classes}" />
-   </target>
-   
-   <target name="test-webserviceclient" 
-           depends="compile-webserviceclient">
-      <run-tests projectdir="${dir.project.webserviceclient}" additionalclasspath="classpath.unit.test.beyondrepo" />
-   </target>
-   
-   <target name="generate-javadocs-webserviceclient" 
-           depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Service Client ${version.number}" 
-                         windowtitle="Alfresco Web Service Client" 
-                         projectdir="${dir.project.webserviceclient}"/>
-   	<generate-generated-javadocs documenttitle="Alfresco Web Service Client Specification" 
-   	                             windowtitle="Alfresco Web Service Client" 
-   	                             projectdir="${dir.project.webserviceclient}"/>
-   </target>
-
-   <target name="gen-all-service-clients" 
-           depends="gen-auth-service-client, 
-                    gen-repo-service-client, 
-                    gen-content-service-client, 
-                    gen-authoring-service-client, 
-                    gen-classification-service-client, 
-                    gen-action-service-client, 
-                    gen-access-control-service-client, 
-                    gen-administration-service-client, 
-                    gen-dictionary-service-client" />
-
-   <target name="gen-auth-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/authentication" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" 
-                  package="org.alfresco.webservice.authentication" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-repo-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/repository" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" 
-                  package="org.alfresco.webservice.repository" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" 
-                  package="org.alfresco.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-dictionary-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/dictionary" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" 
-                  package="org.alfresco.webservice.dictionary" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-content-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/content" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" 
-                  package="org.alfresco.webservice.content" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-classification-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/classification" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" 
-                  package="org.alfresco.webservice.classification" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-authoring-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/authoring" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" 
-                  package="org.alfresco.webservice.authoring" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-action-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/action" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" 
-                  package="org.alfresco.webservice.action" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-access-control-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/accesscontrol" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" 
-                  package="org.alfresco.webservice.accesscontrol" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-   <target name="gen-administration-service-client" 
-           depends="init-service-gen">
-      <delete>
-         <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/administration" />
-      </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" 
-                 testcase="no" 
-                 all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" 
-                  package="org.alfresco.webservice.administration" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
-                  package="org.alfresco.webservice.types" />
-      </wsdl2java>
-   </target>
-
-
    <!-- ************************** -->
    <!-- ** Devenv Tools Project ** -->
    <!-- ************************** -->
@@ -2896,58 +2128,6 @@
       <generate-javadocs documenttitle="Alfresco JLAN API Specification ${version.number}" 
                          windowtitle="Alfresco JLAN API" 
                          projectdir="${dir.project.jlan}"/>
-   </target>
-   
-      
-   <!-- *********************************** -->
-   <!-- ** Forms Development Kit Project ** -->
-   <!-- *********************************** -->
-   
-   <target name="incremental-fdk" depends="package-fdk-client, package-fdk-repo" />
-      
-   <target name="build-fdk" depends="clean-fdk, incremental-fdk" />
-   
-   <target name="clean-fdk" depends="init">
-      <clean projectdir="${dir.project.fdk.client}" />
-      <clean projectdir="${dir.project.fdk.repo}" />
-   </target>
-   
-   <!--
-   <target name="compile-fdk" depends="init">
-      <compile-java projectdir="${dir.project.fdk.client}" />
-   </target>
-   -->
-   
-   <target name="package-fdk-client" depends="assemble-fdk-client">
-      <mkdir dir="${dir.project.fdk.client.dist}" />
-      <jar jarfile="${dir.project.fdk.client.dist}/${file.name.jar.fdk}" 
-           basedir="${dir.project.fdk.client.assemble}" />
-   </target>
-   
-   <target name="assemble-fdk-client" depends="init">
-      <mkdir dir="${dir.project.fdk.client.assemble}" />
-      <copy todir="${dir.project.fdk.client.assemble}">
-         <fileset dir="${dir.project.fdk.client.config}" />
-      </copy>
-      <copy todir="${dir.project.fdk.client.assemble}/META-INF">
-         <fileset dir="${dir.project.fdk.client.src.web}" />
-      </copy>
-   </target>
-   
-   <target name="package-fdk-repo" depends="init">
-      <mkdir dir="${dir.project.fdk.repo.dist}" />
-      <zip destfile="${dir.project.fdk.repo.dist}/${file.name.amp.fdk}" update="true" encoding="UTF-8">
-         <zipfileset file="${dir.project.fdk.repo.config}/alfresco/module/org_alfresco_module_fdk/module.properties"/>
-         <zipfileset dir="${dir.project.fdk.repo.config}" prefix="config">
-            <exclude name="**/module.properties" />
-         </zipfileset>
-      </zip>
-   </target>
-   
-   <target name="install-fdk-amp" depends="package-fdk-repo">
-      <echo>Installing FDK into WAR...</echo>
-      <install-amp ampfile="${dir.project.fdk.repo.dist}/${file.name.amp.fdk}"
-                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
    <!-- ******************************** -->
@@ -3058,13 +2238,6 @@
          <include name="jug-asl-2.0.0.jar" />
          <include name="dom4j-1.6.1.jar" />
          <include name="optional/log4j-1.2.17.jar" />
-         <include name="abdera/abdera-client-0.4.0-incubating.jar" />
-         <include name="abdera/abdera-core-0.4.0-incubating.jar" />
-         <include name="abdera/abdera-extensions-json-0.4.0-incubating.jar" />
-         <include name="abdera/abdera-i18n-0.4.0-incubating.jar" />
-         <include name="abdera/abdera-parser-0.4.0-incubating.jar" />
-         <include name="abdera/axiom-api-1.2.5.jar" />
-         <include name="abdera/axiom-impl-1.2.5.jar" />
          <include name="jaxen-1.1.6.jar" />
          <include name="freemarker-2.3.20-patched.jar" />
          <include name="rhino-js-1.7R4.jar" />

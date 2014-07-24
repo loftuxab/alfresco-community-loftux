@@ -32,19 +32,6 @@
              <name>Alfresco Public Snapshots Repository</name>
              <url>https://artifacts.alfresco.com/nexus/content/repositories/public-snapshots/</url>
         </repository>
-        <repository>
-            <id>alfresco-public</id>
-            <releases>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-             </snapshots>
-             <name>Alfresco Public Releases Repository</name>
-             <url>https://artifacts.alfresco.com/nexus/content/groups/public/</url>
-        </repository>
     </repositories>
     
     <dependencies>
@@ -138,7 +125,7 @@
         </dependency>
     </dependencies>
     
-    <!-- Pacakge Application into a standalone  -->
+    <!-- Package Application into a standalone  -->
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
@@ -154,20 +141,6 @@
         </testResources> 
         <plugins>
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagNameFormat>V@{project.version}</tagNameFormat>
-                    <tagBase>https://svn.alfresco.com/repos/alfresco-enterprise/benchmark/webdrone/share-po/tags</tagBase>
-                </configuration>
-            </plugin>
-            <plugin>
-               <artifactId>maven-compiler-plugin</artifactId>
-               <configuration>
-                  <source>1.7</source>
-                  <target>1.7</target>
-               </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.1</version>
                 <executions>
@@ -180,17 +153,6 @@
                 <configuration>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -233,14 +195,6 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagNameFormat>V@{project.version}</tagNameFormat>
-                    <tagBase>https://svn.alfresco.com/repos/alfresco-enterprise/benchmark/webdrone/share-po/tags</tagBase>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <!-- Configuration triggered by mvn antrun:run, used by Bamboo to stop server -->
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -277,14 +231,22 @@
                                 </goals>
                                 <configuration>
                                     <target>
+                                        <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
                                         <echo>Recreating database...</echo>
                                         <sql driver="org.postgresql.Driver" url="jdbc:postgresql:template1" userid="alfresco" password="alfresco" autocommit="true">drop database if exists alfresco; create database alfresco</sql>
-                                        <echo>Downloading Alfresco installer...</echo>
-                                        <sshexec username="tomcat" host="pbld01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' " />
-                                        <scp remoteFile="tomcat@pbld01.alfresco.com:${installerPath}" localTofile="target/alf-installer.bin" keyfile="${user.home}/.ssh/id_rsa" />
-                                        <chmod file="target/alf-installer.bin" perm="a+x" verbose="true" />
+                                        <if>
+                                            <not> <isset property="installer.location"/> </not>
+                                            <then>
+                                                <property name="installer.location" location="${basedir}/target/alf-installer.bin" />
+                                                <echo>Downloading Alfresco installer to ${installer.location}...</echo>
+                                                <sshexec username="tomcat" host="pbld01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' " />
+                                                <scp file="tomcat@pbld01.alfresco.com:${installerPath}" localTofile="${installer.location}" keyfile="${user.home}/.ssh/id_rsa" />
+                                            </then>
+                                        </if>
+                                        <chmod file="${installer.location}" perm="a+x" verbose="true" />
                                         <echo>Installing Alfresco...</echo>
-                                        <exec executable="${basedir}/target/alf-installer.bin" dir="target" failonerror="true">
+                                        <exec executable="${installer.location}" dir="target" failonerror="true">
                                             <arg line="--mode unattended --alfresco_admin_password admin --disable-components postgres,alfrescowcmqs --jdbc_username alfresco --jdbc_password alfresco --prefix ${basedir}/target/alf-installation --tomcat_server_domain ${HOSTNAME}" />
                                         </exec>
                                     </target>
@@ -296,6 +258,17 @@
                                 <groupId>org.apache.ant</groupId>
                                 <artifactId>ant-jsch</artifactId>
                                 <version>1.8.2</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>ant-contrib</groupId>
+                                <artifactId>ant-contrib</artifactId>
+                                <version>1.0b3</version>
+                                <exclusions>
+                                    <exclusion>
+                                        <groupId>ant</groupId>
+                                        <artifactId>ant</artifactId>
+                                    </exclusion>
+                                </exclusions>
                             </dependency>
                             <dependency>
                                 <groupId>org.postgresql</groupId>

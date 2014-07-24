@@ -217,4 +217,21 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertNotNull(facetedSearchPage);
      }
     
+    @Test(groups = { "Enterprise-only"})
+    public void getResultCount()
+    {
+        SearchBox search = dashBoard.getSearch();
+        FacetedSearchPage facetedSearchPage = search.search("ipsum").render();
+        Assert.assertEquals(facetedSearchPage.getResultCount(),6);
+        facetedSearchPage = facetedSearchPage.getSearch().search("yyyxxxxz").render();
+        Assert.assertEquals(facetedSearchPage.getResultCount(),0);
+    }
+    public void selectFacet()
+    {
+        SearchBox search = dashBoard.getSearch();
+        FacetedSearchPage facetedSearchPage = search.search("ipsum").render();
+        FacetedSearchPage filteredResults = facetedSearchPage.selectFacet("Microsoft Word").render();
+        Assert.assertEquals(filteredResults.getResultCount(), 3);
+    }
+    
 }

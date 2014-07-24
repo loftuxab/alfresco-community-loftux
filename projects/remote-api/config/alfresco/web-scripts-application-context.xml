@@ -11,10 +11,7 @@
       <constructor-arg>
          <list>
             <value>classpath:alfresco/web-scripts-config.xml</value>
-            <value>classpath:alfresco/web-scripts-cmis-config.xml</value>
-            <value>classpath:alfresco/extension/web-api-config-custom.xml</value>  <!--  for backwards compatibility -->
             <value>classpath:alfresco/extension/web-scripts-config-custom.xml</value>
-            <value>classpath:alfresco/extension/web-scripts-cmis-config.xml</value>
          </list>
       </constructor-arg>
    </bean>
@@ -30,12 +27,12 @@
    <!--  Web Script Storage -->
    <!--                     -->
 
-    <!-- Get bulk node metadata -->
-    <bean id="webscript.org.alfresco.repository.metadata.bulkmetadata.post"
-          class="org.alfresco.repo.web.scripts.metadata.BulkMetadataGet"
-          parent="webscript">
-        <property name="serviceRegistry" ref="ServiceRegistry"/>
-    </bean>
+   <!-- Get bulk node metadata -->
+   <bean id="webscript.org.alfresco.repository.metadata.bulkmetadata.post"
+         class="org.alfresco.repo.web.scripts.metadata.BulkMetadataGet"
+         parent="webscript">
+       <property name="serviceRegistry" ref="ServiceRegistry"/>
+   </bean>
 
    <bean id="webscripts.repostore" class="org.alfresco.repo.web.scripts.RepoStore" abstract="true" init-method="init">
       <property name="transactionHelper" ref="retryingTransactionHelper" />
@@ -145,65 +142,6 @@
            <entry key="paging">
               <ref bean="webscripts.js.paging"/>
            </entry>
-           <entry key="cmis">
-              <ref bean="webscripts.js.cmis.client" />
-           </entry>
-         </map>
-      </property>
-      <property name="templateObjects">
-         <map merge="true">
-           <entry key="cmisconstants">
-              <bean class="org.alfresco.repo.cmis.rest.CMISConstantsFactory"/>
-           </entry>
-           <entry key="cmistype">
-              <bean class="org.alfresco.repo.cmis.rest.CMISTypeDefinitionMethod">
-                 <constructor-arg><ref bean="CMISDictionaryService"/></constructor-arg>
-              </bean>
-           </entry>
-           <entry key="cmisproperty">
-              <bean class="org.alfresco.repo.cmis.rest.CMISPropertyValueMethod">
-                 <constructor-arg><ref bean="CMISService"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.templateprocessor"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.imageresolver"/></constructor-arg>
-              </bean>
-           </entry>
-           <entry key="cmisresultset">
-              <bean class="org.alfresco.repo.cmis.rest.CMISResultSetMethod">
-                 <constructor-arg><ref bean="ServiceRegistry"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.imageresolver"/></constructor-arg>
-              </bean>
-           </entry>
-           <entry key="cmischildren">
-              <bean class="org.alfresco.repo.cmis.rest.CMISChildrenMethod">
-                 <constructor-arg><ref bean="CMISService"/></constructor-arg>
-                 <constructor-arg><ref bean="ServiceRegistry"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.imageresolver"/></constructor-arg>
-              </bean>
-           </entry>
-           <entry key="cmisacl">
-              <bean class="org.alfresco.repo.cmis.rest.CMISAclMethod">
-                 <constructor-arg><ref bean="CMISAccessControlService"/></constructor-arg>
-              </bean>
-           </entry>
-           <entry key="cmisrenditions">
-              <bean class="org.alfresco.repo.cmis.rest.CMISRenditionsMethod">
-                 <constructor-arg><ref bean="CMISService"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.templateprocessor"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.imageresolver"/></constructor-arg>
-              </bean>
-           </entry>
-           <entry key="cmisassocs">
-              <bean class="org.alfresco.repo.cmis.rest.CMISAssocsMethod">
-                 <constructor-arg><ref bean="CMISService"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.templateprocessor"/></constructor-arg>
-                 <constructor-arg><ref bean="webscripts.repo.imageresolver"/></constructor-arg>
-              </bean>
-           </entry>
-           <entry key="cmisaspects">
-              <bean class="org.alfresco.repo.cmis.rest.CMISAspectsMethod">
-                 <constructor-arg><ref bean="CMISService"/></constructor-arg>
-              </bean>
-           </entry>
          </map>
       </property>
       <property name="webScriptsRegistryCache" ref="webScriptsRegistryCache"/>
@@ -263,159 +201,31 @@
       <property name="transactionService" ref="TransactionService" />
    </bean>
 
-   <!--  Facebook Authenticator -->
-   <bean id="webscripts.authenticator.facebook" class="org.alfresco.repo.web.scripts.facebook.FacebookAuthenticatorFactory" />
-
-
-   <!--                   -->
-   <!--  Facebook Runtime -->
-   <!--                   -->
-
-   <bean id="facebook.service" class="org.alfresco.repo.web.scripts.facebook.FacebookService">
-      <property name="container" ref="webscripts.container" />
-   </bean>
-
-
-   <!--          -->
-   <!-- CMIS API -->
-   <!--          -->
-
-   <!-- CMIS Abdera Extension -->
-   <bean id="webscripts.cmis.atom.extension" class="org.springframework.extensions.webscripts.atom.AbderaExtension">
-      <property name="abderaService" ref="webscripts.abdera"/>
-      <property name="QNames">
-         <props>
-            <prop key="cmisra_object">{http://docs.oasis-open.org/ns/cmis/restatom/200908/}object</prop>
-            <prop key="cmisra_content">{http://docs.oasis-open.org/ns/cmis/restatom/200908/}content</prop>
-            <prop key="cmisra_repositoryInfo">{http://docs.oasis-open.org/ns/cmis/restatom/200908/}repositoryInfo</prop>
-            <prop key="alf_setAspects">{http://www.alfresco.org}setAspects</prop>
-         </props>
-      </property>
-      <property name="extensionFactories">
-         <list>
-           <bean class="org.alfresco.repo.cmis.rest.AlfrescoCMISExtensionFactory"/>
-         </list>
-      </property>
-   </bean>
-
-   <!-- CMIS custom mimetypes -->
-   <bean id="webscripts.cmis.adaptors" parent="webscripts.adaptorset">
-      <property name="readers">
-         <list>
-           <bean class="org.alfresco.repo.cmis.rest.CMISQueryReader" />
-         </list>
-      </property>
-   </bean>
-
-   <!--  Default Formats -->
-   <bean id="webscripts.cmis.formats" parent="webscripts.formatmap">
-      <property name="formats">
-         <props>
-            <prop key="cmisquery">application/cmisquery+xml</prop>
-            <prop key="cmisallowableactions">application/cmisallowableactions+xml</prop>
-            <prop key="cmisacl">application/cmisacl+xml</prop>
-         </props>
-      </property>
-      <property name="mimetypes">
-         <props>
-            <prop key="application/cmisquery+xml">cmisquery</prop>
-            <prop key="application/cmisallowableactions+xml">application/cmisallowableactions+xml</prop>
-            <prop key="application/cmisacl+xml">cmisacl</prop>
-         </props>
-      </property>
-   </bean>
-
-   <!-- CMIS Javsascript API -->
-   <bean id="CMISReferenceFactory" class="org.alfresco.repo.cmis.reference.ReferenceFactory">
-      <property name="CMISService" ref="CMISService" />
-   </bean>
-
-   <bean id="webscripts.js.cmisserver" parent="baseJavaScriptExtension" class="org.alfresco.repo.cmis.rest.CMISScript">
-      <property name="extensionName"><value>cmisserver</value></property>
-      <property name="serviceRegistry" ref="ServiceRegistry" />
-      <property name="CMISService" ref="CMISService" />
-      <property name="CMISDictionaryService" ref="CMISDictionaryService" />
-      <property name="CMISQueryService" ref="CMISQueryService" />
-      <property name="CMISAccessControlService" ref="CMISAccessControlService" />
-      <property name="CMISChangeLogService" ref="CMISChangeLogService" />
-      <property name="CMISReferenceFactory" ref="CMISReferenceFactory" />
-      <property name="paging" ref="webscripts.js.paging" />
-   </bean>
-
-   <!-- CMIS Web Script Kind -->
-   <bean id="webscript.org.alfresco.cmiskind" class="org.alfresco.repo.cmis.rest.CMISWebScript" parent="webscript" scope="prototype" />
-
-   <!-- CMIS Test Runner Web Script -->
-   <bean id="webscript.org.alfresco.cmis.test.post" class="org.alfresco.repo.cmis.rest.test.CMISTestRunnerWebScript" parent="webscript" />
-
-   <!--  Content Retrieval -->
-   <bean id="webscript.org.alfresco.cmis.content.get" class="org.alfresco.repo.web.scripts.content.ContentGet" parent="webscript">
-      <property name="referenceFactory" ref="CMISReferenceFactory" />
-      <property name="namespaceService" ref="NamespaceService" />
-      <property name="permissionService" ref="PermissionService" />
-      <property name="nodeService" ref="NodeService" />
-      <property name="dictionaryService" ref="DictionaryService" />
-      <property name="mimetypeService" ref="MimetypeService" />
-      <property name="CMISRenditionService" ref="CMISRenditionService" />
-      <property name="delegate" ref="webscript.content.streamer" />
-      <property name="contentService" ref="contentService" />
-   </bean>
-   
-   <!--  Content Info -->
-   <bean id="webscript.org.alfresco.cmis.content.head" class="org.alfresco.repo.web.scripts.content.ContentInfo" parent="webscript">
-      <property name="referenceFactory" ref="CMISReferenceFactory" />
-      <property name="permissionService" ref="PermissionService" />
-      <property name="nodeService" ref="NodeService" />
-      <property name="mimetypeService" ref="MimetypeService" />
-      <property name="delegate" ref="webscript.content.streamer" />
-   </bean>
-   
-   <!--  Content Write -->
-   <bean id="webscript.org.alfresco.cmis.content.put" class="org.alfresco.repo.web.scripts.content.ContentSet" parent="webscript">
-      <property name="referenceFactory" ref="CMISReferenceFactory" />
-      <property name="dictionaryService" ref="DictionaryService" />
-      <property name="namespaceService" ref="NamespaceService" />
-      <property name="cmisService" ref="CMISService" />
-      <property name="mimetypeService" ref="MimetypeService" />
-   </bean>
-
-   <!--  Content Delete -->
-   <bean id="webscript.org.alfresco.cmis.content.delete" class="org.alfresco.repo.web.scripts.content.ContentDelete" parent="webscript">
-      <property name="referenceFactory" ref="CMISReferenceFactory" />
-      <property name="namespaceService" ref="NamespaceService" />
-      <property name="nodeService" ref="NodeService" />
-   </bean>
-
-   <!--  CMIS Query -->
-   <bean id="webscript.org.alfresco.cmis.queries.post" class="org.alfresco.repo.cmis.rest.CMISQueryWebScript" parent="webscript" />
-
-   <!--  CMIS Query -->
-   <bean id="webscript.org.alfresco.cmis.query.get" class="org.alfresco.repo.cmis.rest.CMISQueryWebScript" parent="webscript" />
-
-   <!--              -->
-   <!--  CMIS Client -->
-   <!--              -->
-
-   <bean id="webscript.org.alfresco.cmis.client.content.get" class="org.alfresco.repo.cmis.client.CMISContentStreamWebScript" parent="webscript">
-      <property name="connectionManager" ref="webscripts.js.cmis.client" />
-   </bean>
-   
-   <bean id="webscripts.js.cmis.client" class="org.alfresco.repo.cmis.client.CMISLocalConnectionManagerImpl" init-method="init">
-      <property name="authenticationService" ref="AuthenticationService" />
-      <property name="configService" ref="webscripts.config" />
-      <property name="cmisConnector" ref="CMISConnector" />
-   </bean>
-
-   <!--   
-   <bean id="webscripts.js.cmis.client" class="org.alfresco.repo.cmis.client.CMISRemoteConnectionManagerImpl" init-method="init">
-      <property name="authenticationService" ref="AuthenticationService" />
-      <property name="configService" ref="webscripts.config" />
-   </bean>
-   -->
 
    <!--            -->
    <!--  API Beans -->
    <!--            -->
+   
+   <!--  Content Retrieval -->
+   <bean id="webscript.org.alfresco.content.content.get" class="org.alfresco.repo.web.scripts.content.ContentGet" parent="webscript">
+      <property name="namespaceService" ref="NamespaceService" />
+      <property name="permissionService" ref="PermissionService" />
+      <property name="nodeService" ref="NodeService" />
+      <property name="dictionaryService" ref="DictionaryService" />
+      <property name="mimetypeService" ref="MimetypeService" />
+      <property name="delegate" ref="webscript.content.streamer" />
+      <property name="contentService" ref="contentService" />
+      <property name="repository" ref="repositoryHelper" />
+   </bean>
+   
+   <!--  Content Info -->
+   <bean id="webscript.org.alfresco.content.content.head" class="org.alfresco.repo.web.scripts.content.ContentInfo" parent="webscript">
+      <property name="permissionService" ref="PermissionService" />
+      <property name="nodeService" ref="NodeService" />
+      <property name="mimetypeService" ref="MimetypeService" />
+      <property name="delegate" ref="webscript.content.streamer" />
+      <property name="repository" ref="repositoryHelper" />
+   </bean>
 
    <!--  Javascript APIs -->
    <bean id="webscript.org.alfresco.jsdebugger.get" class="org.springframework.extensions.webscripts.bean.JavascriptDebugger" parent="webscript">
@@ -473,15 +283,6 @@
       <property name="nodeService" ref="NodeService" />
       <property name="mimetypeService" ref="MimetypeService" />
       <property name="delegate" ref="webscript.content.streamer" />
-   </bean>
-   
-   <!--  Content Write -->
-   <bean id="webscript.org.alfresco.repository.store.content.put" class="org.alfresco.repo.web.scripts.content.ContentSet" parent="webscript">
-      <property name="referenceFactory" ref="CMISReferenceFactory" />
-      <property name="dictionaryService" ref="DictionaryService" />
-      <property name="namespaceService" ref="NamespaceService" />
-      <property name="cmisService" ref="CMISService" />
-      <property name="mimetypeService" ref="MimetypeService" />
    </bean>
    
    <!--  Remote Store service - AVM -->
@@ -1970,13 +1771,10 @@
     
     <!-- unauthenticated (note: equivalent to authenticated "content.get") -->
     <bean id="webscript.org.alfresco.repository.quickshare.content-noauth.get" class="org.alfresco.repo.web.scripts.quickshare.QuickShareContentGet" parent="webscript">
-        <property name="referenceFactory" ref="CMISReferenceFactory" />
         <property name="namespaceService" ref="NamespaceService" />
         <property name="permissionService" ref="PermissionService" />
         <property name="nodeService" ref="NodeService" />
-        <property name="dictionaryService" ref="DictionaryService" />
         <property name="mimetypeService" ref="MimetypeService" />
-        <property name="CMISRenditionService" ref="CMISRenditionService" />
         <property name="quickShareService" ref="QuickShareService"/>
         <property name="enabled" value="${system.quickshare.enabled}" />
         <property name="delegate" ref="webscript.content.streamer" />
@@ -2058,6 +1856,41 @@
              <prop key="opensearchdescription">text/xml</prop>
           </props>
        </property>
+    </bean>
+    
+    <!-- Share Content Download - post of an Activity before performing a Site download action -->
+    <bean id="webscript.org.alfresco.slingshot.download.get" class="org.alfresco.slingshot.web.scripts.SlingshotContentGet" parent="webscript.org.alfresco.content.content.get">
+        <property name="siteService" ref="SiteService" />
+        <property name="activityService" ref="activityService" />
+    </bean>
+    
+    <!-- Node browser web script -->
+    <bean id="webscript.org.alfresco.slingshot.node-browser.node-browser.get" parent="webscript"
+   	class="org.alfresco.slingshot.web.scripts.NodeBrowserScript">
+      <property name="transactionService">
+         <ref bean="TransactionService" />
+      </property>
+      <property name="nodeService">
+         <ref bean="NodeService" />
+      </property>
+      <property name="dictionaryService">
+         <ref bean="DictionaryService" />
+      </property>
+      <property name="searchService">
+         <ref bean="SearchService" />
+      </property>
+      <property name="namespaceService">
+         <ref bean="NamespaceService" />
+      </property>
+      <property name="permissionService">
+         <ref bean="PermissionService" />
+      </property>
+      <property name="ownableService">
+         <ref bean="OwnableService" />
+      </property>
+      <property name="AVMService">
+         <ref bean="AVMService" />
+      </property>
     </bean>
     
 </beans>

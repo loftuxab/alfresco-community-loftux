@@ -60,7 +60,11 @@
 
                <#-- PAGINATION -->
                <@markup id="toolbar-pagination">
-                ${msg("pagination.template", 1, memberships?size, totalResults?string)}
+               <#if totalResults <= maxResults>
+                   ${msg("pagination.template", 1, memberships?size, totalResults?string)}
+               <#else>
+                   ${msg("pagination.template2", memberships?size)}
+               </#if>
                </@markup>
 
                </div>

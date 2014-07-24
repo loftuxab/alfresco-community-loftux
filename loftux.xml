@@ -27,8 +27,7 @@
           depends="set-build-number,
                   incremental,
                   distribute-amps,
-                  distribute-extras,
-                  distribute-fdk" />
+                  distribute-extras" />
 
    <!-- Removed depends target distribute-wcm -->
    <target name="distribute-core" 
@@ -39,7 +38,6 @@
                   distribute-amps,
                   assemble-tomcat,
                   distribute-war, 
-                  distribute-webserviceclient,
                   distribute-deployment,
                   distribute-webeditor,
                   distribute-wcmqs-extension,

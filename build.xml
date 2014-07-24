@@ -103,8 +103,6 @@
          <pathelement location="${dir.project.deployment.classes.test}" />
          <pathelement location="${dir.project.repository.classes}" />
          <pathelement location="${dir.project.repository.classes.test}" />
-         <pathelement location="${dir.project.wdrdeployment.classes}" />
-         <pathelement location="${dir.project.wdrdeployment.classes.test}" />
          <pathelement location="${dir.project.3rdparty.lib}/junit-dep-4.11.jar" />
          
          <pathelement location="${dir.project.datamodel.config}" />
@@ -113,12 +111,9 @@
          
          <pathelement location="${dir.project.core}/${dir.name.source}/${dir.name.test.resources}" />
          <pathelement location="${dir.project.repository}/${dir.name.source}/${dir.name.test.resources}" />
-         <pathelement location="${dir.project.wdrdeployment}/${dir.name.source}/${dir.name.test.resources}" />
       </path>
 
       <path id="classpath.unit.test.beyondrepo">
-         <pathelement location="${dir.project.jndi.classes}" />
-         <pathelement location="${dir.project.catalinavirtual.classes}" />
          <pathelement location="${dir.project.remoteapi.classes}" />
          <pathelement location="${dir.project.remoteapi.classes.test}" />
          <pathelement location="${dir.project.solrclient.classes}" />
@@ -128,15 +123,12 @@
          <pathelement location="${dir.project.webframeworkcommons.classes.test}" />
          <pathelement location="${dir.project.webclient.classes}" />
          <pathelement location="${dir.project.webclient.classes.test}" />
-         <pathelement location="${dir.project.webserviceclient.classes}" />
-         <pathelement location="${dir.project.webserviceclient.classes.test}" />
 
          <pathelement location="${dir.project.remoteapi.config}" />
          <pathelement location="${dir.project.webclient.config}" />
 
          <pathelement location="${dir.project.remoteapi}/${dir.name.source}/${dir.name.test.resources}" />
          <pathelement location="${dir.project.webclient}/${dir.name.source}/${dir.name.test.resources}" />
-         <pathelement location="${dir.project.webserviceclient}/${dir.name.source}/${dir.name.test.resources}" />
       </path>
 
       <!-- Add on all the 3rd party libs based on the eclipse project -->
@@ -210,12 +202,6 @@
          <include name="**/org/alfresco/Repository*TestSuite.java" />
 		 <!-- Exclude all the test classes that are run one by one -->
          <exclude name="**/org/alfresco/RepositoryStartStopTest.java" />
-         <exclude name="**/org/alfresco/cmis/PropertyFilterTest.java" />
-         <exclude name="**/org/alfresco/cmis/acl/CMISAccessControlServiceTest.java" />
-         <exclude name="**/org/alfresco/cmis/dictionary/CMISDictionaryTest.java" />
-         <exclude name="**/org/alfresco/cmis/mapping/CMISPropertyServiceTest.java" />
-         <exclude name="**/org/alfresco/cmis/renditions/CMISRenditionServiceTest.java" />
-         <exclude name="**/org/alfresco/cmis/search/QueryTest.java" />
          <exclude name="**/org/alfresco/email/server/EmailServiceImplTest.java" />
          <exclude name="**/org/alfresco/encryption/EncryptorTest.java" />
          <exclude name="**/org/alfresco/encryption/KeyStoreKeyProviderTest.java" />
@@ -435,16 +421,12 @@
          <exclude name="**/org/alfresco/repo/web/util/paging/PagingTest.java" />
          <exclude name="**/org/alfresco/repo/management/subsystems/test/SubsystemsTest.java" />
          <exclude name="**/org/alfresco/rest/api/tests/ApiTest.java" />
-         <exclude name="**/org/alfresco/repo/cmis/rest/test/PolicyTest.java" />
          <exclude name="**/org/alfresco/repo/remoteticket/RemoteAlfrescoTicketServiceTest.java" />
          <exclude name="**/org/alfresco/repo/webdav/RenameShuffleDetectionTest.java" />
          <exclude name="**/org/alfresco/repo/webdav/MoveMethodTest.java" />
          <exclude name="**/org/alfresco/rest/api/tests/TestCMISAPI.java" />
          <exclude name="**/org/alfresco/repo/webdav/GetMethodTest.java" />
-         <exclude name="**/org/alfresco/repo/webservice/CMLUtilTest.java" />
-         <exclude name="**/org/alfresco/cmis/changelog/CMISChangeLogServiceTest.java" />
          <exclude name="**/org/alfresco/rest/workflow/api/tests/ProcessDefinitionWorkflowApiTest.java" />
-         <exclude name="**/org/alfresco/repo/cmis/rest/test/AspectTest.java" />
          <exclude name="**/org/alfresco/rest/workflow/api/tests/ProcessWorkflowApiTest.java" />
          <exclude name="**/org/alfresco/repo/webdav/WebDAVMethodTest.java" />
          <exclude name="**/org/alfresco/repo/webdav/WebDAVHelperTest.java" />
@@ -453,7 +435,6 @@
          <exclude name="**/org/alfresco/rest/workflow/api/tests/DeploymentWorkflowApiTest.java" />
          <exclude name="**/org/alfresco/repo/web/scripts/WebScriptTestSuite.java" />
          <exclude name="**/org/alfresco/repo/webdav/UnlockMethodTest.java" />
-         <exclude name="**/org/alfresco/repo/cmis/rest/test/CMISAtomTemplatesTest.java" />
          <exclude name="**/org/alfresco/rest/workflow/api/tests/TaskWorkflowApiTest.java" />
          <exclude name="**/org/alfresco/repo/webdav/LockInfoImplTest.java" />
 
@@ -544,7 +525,7 @@
          <exclude name="**/org/alfresco/repo/usage/**/*Test.java" />
          <!-- System Build Tests (runs using embedded Jetty) -->
          <exclude name="**/org/alfresco/repo/RepoJetty*Test.java" />
-         <!-- embeds: SiteActivitySystemTest,WebServiceSuiteSystemTest, ... -->
+         <!-- embeds: SiteActivitySystemTest, ... -->
          <exclude name="**/org/alfresco/repo/transfer/fsr/**/*Test.java" />
          <!-- Messaging facade -->
          <exclude name="**/org/alfresco/repo/cluster/**/*Test.java"/> 
@@ -627,17 +608,13 @@
                     incremental-mbeans,
                     incremental-deployment,
                     incremental-repository,
-                    incremental-wdrdeployment,
                     incremental-remoteapi,
-                    incremental-webframeworkcommons,
-                    incremental-jndi,
-                    incremental-catalinavirtual" />
+                    incremental-webframeworkcommons" />
    
    <target name="incremental" 
            description="Performs an incremental build of all projects"
            depends="incremental-webclient-depends,
                     incremental-webclient,  
-                    incremental-webserviceclient,
                     incremental-slingshot,
                     incremental-webeditor,
                     incremental-webeditor-plugin,
@@ -736,13 +713,9 @@
                     generate-javadocs-mbeans,
                     generate-javadocs-deployment,
                     generate-javadocs-repository, 
-                    generate-javadocs-wdrdeployment,
                     generate-javadocs-remoteapi, 
-                    generate-javadocs-jndi,
-                    generate-javadocs-catalinavirtual, 
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
-                    generate-javadocs-webserviceclient,
                     generate-javadocs-jlan,
                     generate-javadocs-slingshot,
                     generate-javadocs-solrclient,
@@ -763,7 +736,6 @@
            depends="clean-webclient-projects,
                     clean-slingshot-projects,
                     clean-webeditor-projects,
-                    clean-webserviceclient,
                     clean-solrclient,
                     clean-solr,
                     clean-file-transfer-receiver" />
@@ -778,10 +750,7 @@
                     clean-mbeans,
                     clean-deployment, 
                     clean-repository, 
-                    clean-wdrdeployment,
                     clean-remoteapi,
-                    clean-jndi, 
-                    clean-catalinavirtual, 
                     clean-webframeworkcommons,
                     clean-webclient,
                     clean-system-build-test" />
@@ -809,8 +778,7 @@
    <target name ="clean-tomcat-deployments" 
            description="Cleans all Tomcat server deployments"
            depends="clean-webclient-tomcat-deploy,
-                    clean-application-tomcat-deploy,
-                    clean-virtual-tomcat-deploy" />
+                    clean-application-tomcat-deploy" />
    
    <target name="clean-webclient-tomcat-deploy" 
            description="Cleans the Alfresco WAR from the Tomcat server" 
@@ -835,35 +803,9 @@
               includeEmptyDirs="true" quiet="yes" />
    </target>
 
-   <target name="clean-virtual-tomcat-deploy"
-           description="Cleans the Virtual Tomcat deployment" 
-           depends="init">
-       <delete failonerror="no">
-           <!-- Remove old spring jar files lingering in common/lib, if any -->
-           <fileset dir="${home.tomcat.virtual}/common/lib" includes="spring*.jar,org.springframework*.jar"/>
-
-           <!-- Get rid of old config files -->
-           <fileset dir="${home.tomcat.virtual}/conf" includes="alfresco-*"/>
-       </delete>
-   </target>
-   
-   <!--
-   <target name="clean-jboss-deploy" 
-           description="Cleans the Alfresco application from JBoss" 
-           depends="init">
-      <delete file="${dir.deploy.jboss}/${file.name.war.webclient}" />
-   </target>
-   -->
-
    <!-- ****************************************************** -->
    <!-- **************** Deployment targets ****************** -->
    <!-- ****************************************************** -->
-   
-   <target name="deploy-virtual-tomcat" 
-           description="Deploys to Virtual Tomcat (the virtualization server)" 
-           depends="init, clean-virtual-tomcat-deploy">
-      <deploy-virtual-tomcat location="${home.tomcat.virtual}" />
-   </target>
    
    <target name="-deploy-tomcat-common" depends="init">
 
@@ -892,15 +834,11 @@
 
       <copy todir="${home.tomcat}/endorsed" 
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
-
-      <!-- enable WCM functionality -->
-      <copy todir="${home.tomcat}/shared/classes/alfresco/extension" 
-            file="${file.name.wcm.bootstrap}" />
    </target>
    
    <target name="deploy-webclient-tomcat" 
            description="Deploys the Alfresco WAR to Tomcat" 
-           depends="clean-webclient-tomcat-deploy, -deploy-tomcat-common, deploy-virtual-tomcat">
+           depends="clean-webclient-tomcat-deploy, -deploy-tomcat-common">
       <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
       <delete dir="${dir.deploy.tomcat.webclient}" 
               includeEmptyDirs="true" quiet="yes" />
@@ -928,9 +866,7 @@
          <fileset dir="${dir.project.deployment.classes}" />
          <fileset dir="${dir.project.repository.classes}" 
                   excludes="**/extension/**" />
-         <fileset dir="${dir.project.wdrdeployment.classes}" />
          <fileset dir="${dir.project.remoteapi.classes}" />
-         <fileset dir="${dir.project.catalinavirtual.classes}" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" />
          <fileset dir="${dir.project.webclient.classes}" 
                   excludes="**/extension/**" />
@@ -993,20 +929,11 @@
          <fileset dir="${dir.project.3rdparty.lib}/jbpm" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/activiti" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/fop" includes="*.jar"/>
-         <fileset dir="${dir.project.3rdparty.lib}/abdera" includes="*.jar"/>
          <fileset dir="${dir.project.3rdparty.lib}/gdata-1.47.1" includes="*.jar"/>
          <fileset dir="${dir.project.3rdparty.lib}/spring-social" includes="*.jar"/>
 		 <fileset dir="${dir.project.3rdparty.lib}/opensaml" includes="*.jar"/>
       </copy>
       
-      <!-- copy webservices files -->
-      <copy todir="${dir.deploy.tomcat.webclient}/wsdl" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.remoteapi.src.wsdl}" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes/META-INF" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.remoteapi.src.metainf}"/>
-      </copy>
-
       <!-- Installing auto apply repository AMPs into repository WAR -->
       <install-amps-in-dir ampfilesdir="${dir.modules.autoapplyamps.repo}"
                                warfile="${dir.deploy.tomcat.webclient}" />
@@ -1072,8 +999,6 @@
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
                   includes="${includes.webscriptframework.libs.spring-surf}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
-                  includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
 
       <!-- unzip and add 3rd party javascript library -->
@@ -1296,8 +1221,6 @@
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/spring-surf" 
                   includes="${includes.webeditor.spring-surf}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
-                  includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
 
       <!-- unzip and add YUI library -->
@@ -1337,47 +1260,11 @@
       <minimize-javascript sourcedir="${dir.deploy.tomcat.application.webeditor}" 
                            destdir="${dir.deploy.tomcat.application.webeditor}" />
    </target>
-      
-   <target name="deploy-fdk" depends="deploy-share-fdk, deploy-repo-fdk-exploded" />
-   
-   <target name="deploy-share-fdk" depends="package-fdk-client">
-      <copy todir="${home.tomcat.application}/shared/lib" 
-            file="${dir.project.fdk.client.dist}/${file.name.jar.fdk}" />
-   </target>
-      
-   <target name="deploy-share-fdk-exploded" depends="init">
-      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.fdk.client.src.web}" />
-      </copy>
-      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.fdk.client.config}" />
-      </copy>
-   </target>
-   
-   <target name="deploy-repo-fdk-exploded" depends="init">
-      <copy todir="${home.tomcat}/shared/classes" verbose="${copy.verbose}" overwrite="yes">
-         <fileset dir="${dir.project.fdk.repo.config}" includes="**/fdk-*.*" excludes="**/fdk-context.xml" />
-      </copy>
-      <copy todir="${home.tomcat}/shared/classes/alfresco/extension" verbose="${copy.verbose}" overwrite="yes">
-         <fileset dir="${dir.project.fdk.repo.config}/alfresco/module/org_alfresco_module_fdk" 
-                  includes="fdk-context.xml" />
-      </copy>
-   </target>
 
    <target name="start-tomcat-webclient" 
            description="Starts the Alfresco Tomcat server on Windows" 
            depends="init">
       <exec dir="${home.tomcat}/bin" 
-            executable="cmd.exe" 
-            spawn="true">
-         <arg line="/k startup.bat" />
-      </exec>
-   </target>
-
-   <target name="start-tomcat-virtual" 
-           description="Starts the virtual Tomcat server on Windows" 
-           depends="init">
-      <exec dir="${home.tomcat.virtual}/bin" 
             executable="cmd.exe" 
             spawn="true">
          <arg line="/k startup.bat" />
@@ -1505,7 +1392,6 @@
             <include name="acegi-security-*.jar"/>
             <include name="alfresco-xmlfactory-*.jar"/>
             <include name="antlr-*.jar"/>
-            <include name="chemistry-abdera-*.jar"/>
             <include name="chemistry-opencmis-client-api-*.jar"/>
             <include name="chemistry-opencmis-client-bindings-*.jar"/>
             <include name="chemistry-opencmis-client-impl-*.jar"/>
@@ -1573,10 +1459,8 @@
                     test-deployment, 
                     test-repository,
                     test-remoteapi,
-                    test-wdrdeployment,
                     test-webframeworkcommons, 
                     test-webclient, 
-                    test-webserviceclient,
                     test-system-build-test" />
 
    <target name="run-junit-test" 
@@ -1701,7 +1585,6 @@
       <echo level="info">ant.home = ${ant.home}</echo>
       <echo level="info">home.tomcat = ${home.tomcat}</echo>
       <echo level="info">home.tomcat.application = ${home.tomcat.application}</echo>
-      <echo level="info">home.tomcat.virtual = ${home.tomcat.virtual}</echo>
       <echo level="info">home.jboss = ${home.jboss}</echo>
       <echo level="info">home.findbugs = ${home.findbugs}</echo>
    </target>

@@ -37,8 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.cmis.CMISAccessControlService;
-import org.alfresco.cmis.CMISDictionaryModel;
 import org.alfresco.model.ContentModel;
 import org.alfresco.opencmis.search.CMISQueryOptions;
 import org.alfresco.opencmis.search.CMISQueryOptions.CMISQueryMode;
@@ -74,6 +72,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.Pair;
+import org.apache.chemistry.opencmis.commons.BasicPermissions;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.AllowableActions;
@@ -393,15 +392,15 @@ public class CMISTest
         PropertyData<?> propIsLatestMajorVersion = null;
         for (PropertyData<?> property : properties)
         {
-            if (property.getId().equals(CMISDictionaryModel.PROP_IS_LATEST_MAJOR_VERSION))
+            if (property.getId().equals(PropertyIds.IS_LATEST_MAJOR_VERSION))
             {
                 found = true;
                 propIsLatestMajorVersion = property;
                 break;
             }
         }
-        //properties..contains(CMISDictionaryModel.PROP_IS_LATEST_MAJOR_VERSION);
-        assertTrue("The CMISDictionaryModel.PROP_IS_LATEST_MAJOR_VERSION property was not found", found);
+        //properties..contains(PropertyIds.IS_LATEST_MAJOR_VERSION);
+        assertTrue("The PropertyIds.IS_LATEST_MAJOR_VERSION property was not found", found);
         if (found)
         {
             return propIsLatestMajorVersion;
@@ -1656,7 +1655,7 @@ public class CMISTest
                 PropertyData<?> propIsLatestMajorVersion = null;
                 for (PropertyData<?> property : properties)
                 {
-                    if (property.getId().equals(CMISDictionaryModel.PROP_IS_LATEST_MAJOR_VERSION))
+                    if (property.getId().equals(PropertyIds.IS_LATEST_MAJOR_VERSION))
                     {
                         found = true;
                         propIsLatestMajorVersion = property;
@@ -1705,6 +1704,110 @@ public class CMISTest
             };
         }, CmisVersion.CMIS_1_1);
     	
+    }
+    
+    /**
+     * MNT-11339 related test :
+     * Unable to create relationship between cmis:document and cmis:item
+     */
+    @Test
+    public void testItemRelations() 
+    {
+        AuthenticationUtil.pushAuthentication();
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        final String TEST_NAME = "testItemRelations-";
+        final String FOLDER_NAME = TEST_NAME + "FOLDER" + GUID.generate();
+        final String DOCUMENT_NAME = TEST_NAME + "DOCUMENT" + GUID.generate();
+        final String CLIENT_NAME = "Some Test Client " + GUID.generate();
+        
+        try
+        {
+            transactionService.getRetryingTransactionHelper().doInTransaction(
+                    new RetryingTransactionCallback<Void>()
+                    {
+                        @Override
+                        public Void execute() throws Throwable
+                        {
+                            NodeRef companyHomeNodeRef = repositoryHelper.getCompanyHome();
+                            
+                            /* Create folder within companyHome */
+                            FileInfo folderInfo = fileFolderService.create(companyHomeNodeRef, FOLDER_NAME, ContentModel.TYPE_FOLDER);
+                            nodeService.setProperty(folderInfo.getNodeRef(), ContentModel.PROP_NAME, FOLDER_NAME);
+                            assertNotNull(folderInfo);
+                            
+                            // and document
+                            FileInfo document = fileFolderService.create(folderInfo.getNodeRef(), DOCUMENT_NAME, ContentModel.TYPE_CONTENT);
+                            assertNotNull(document);
+                            nodeService.setProperty(document.getNodeRef(), ContentModel.PROP_NAME, DOCUMENT_NAME);
+                            
+                            return null;
+                        }
+                    });
+            
+            withCmisService(new CmisServiceCallback<String>() {
+                @SuppressWarnings("unchecked")
+                @Override
+                public String execute(CmisService cmisService) {
+                    List<RepositoryInfo> repositories = cmisService.getRepositoryInfos(null);
+                    assertTrue(repositories.size() > 0);
+                    RepositoryInfo repo = repositories.get(0);
+                    String repositoryId = repo.getId();
+                    
+                    // ensure there are custom type, aspect and association defined
+                    TypeDefinition tpdfn = cmisService.getTypeDefinition(repositoryId, "I:sctst:client", null);
+                    assertNotNull("the I:sctst:client type is not defined", tpdfn);
+                    TypeDefinition aspectDfn = cmisService.getTypeDefinition(repositoryId, "P:sctst:clientRelated", null);
+                    assertNotNull("the P:sctst:clientRelated aspect is not defined", aspectDfn);
+                    TypeDefinition relDfn = cmisService.getTypeDefinition(repositoryId, "R:sctst:relatedClients", null);
+                    assertNotNull("the R:sctst:relatedClients association is not defined", relDfn);
+                    
+                    // create cmis:item within test folder
+                    PropertiesImpl properties = new PropertiesImpl();
+                    properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, tpdfn.getId()));
+                    properties.addProperty(new PropertyStringImpl(PropertyIds.NAME, CLIENT_NAME));
+                    properties.addProperty(new PropertyStringImpl("sctst:clientId", "id" + GUID.generate()));
+                    properties.addProperty(new PropertyStringImpl("sctst:clientName", CLIENT_NAME));
+                    
+                    ObjectData folderData = cmisService.getObjectByPath(repositoryId, "/" + FOLDER_NAME, null, null, null, null, null, null, null);
+                    
+                    cmisService.createItem(repositoryId, properties, folderData.getId(), null, null, null, null);
+                    
+                    ObjectData contentData = cmisService.getObjectByPath(repositoryId, "/" + FOLDER_NAME + "/" + DOCUMENT_NAME, null, null, null, null, null, null, null);
+                    
+                    // add test aspect sctst:clientRelated to document
+                    Properties props = cmisService.getProperties(repositoryId, contentData.getId(), null, null);
+                    
+                    PropertyData<?> propAspects = props.getProperties().get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
+                    
+                    @SuppressWarnings("rawtypes")
+                    List aspects = propAspects.getValues();
+                    aspects.add("P:sctst:clientRelated");
+                    
+                    properties = new PropertiesImpl();
+                    properties.addProperty(new PropertyStringImpl(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects));
+                    cmisService.updateProperties(repositoryId, new Holder<String>(contentData.getId()), null, properties, null);
+                    // ensure document has sctst:clientRelated aspect applied
+                    aspects = cmisService.getProperties(repositoryId, contentData.getId(), null, null).getProperties().get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).getValues();
+                    assertTrue("P:sctst:clientRelated excpected", aspects.contains("P:sctst:clientRelated"));
+                    
+                    ObjectData itemData = cmisService.getObjectByPath(repositoryId, "/" + FOLDER_NAME + "/" + CLIENT_NAME, null, null, null, null, null, null, null);
+                    // create relationship between cmis:document and cmis:item 
+                    properties = new PropertiesImpl();
+                    properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, "R:sctst:relatedClients"));
+                    properties.addProperty(new PropertyIdImpl(PropertyIds.SOURCE_ID, contentData.getId()));
+                    properties.addProperty(new PropertyIdImpl(PropertyIds.TARGET_ID, itemData.getId()));
+                    cmisService.createRelationship(repositoryId, properties, null, null, null, null);
+                    
+                    return "";
+            
+                };
+            }, CmisVersion.CMIS_1_1);
+        }
+        finally
+        {
+            AuthenticationUtil.popAuthentication();
+        }
     }
 
     @Test
@@ -2111,9 +2214,9 @@ public class CMISTest
                     AccessControlEntryImpl ace = new AccessControlEntryImpl();
                     ace.setPrincipal(new AccessControlPrincipalDataImpl(testGroup));
                     List<String> putPermissions = new ArrayList<String>();
-                    putPermissions.add(CMISAccessControlService.CMIS_ALL_PERMISSION);
-                    putPermissions.add(CMISAccessControlService.CMIS_READ_PERMISSION);
-                    putPermissions.add(CMISAccessControlService.CMIS_WRITE_PERMISSION);
+                    putPermissions.add(BasicPermissions.ALL);
+                    putPermissions.add(BasicPermissions.READ);
+                    putPermissions.add(BasicPermissions.WRITE);
                     ace.setPermissions(putPermissions);
                     ace.setDirect(true);
                     acesList.add(ace);

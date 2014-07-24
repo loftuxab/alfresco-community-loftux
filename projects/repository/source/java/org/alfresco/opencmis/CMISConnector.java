@@ -47,7 +47,6 @@ import java.util.TreeSet;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
-import org.alfresco.cmis.CMISDictionaryModel;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.events.types.ContentEvent;
 import org.alfresco.events.types.ContentEventImpl;
@@ -860,7 +859,7 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
         PropertyDefinitionWrapper propDef = getOpenCMISDictionaryService().findPropertyByQueryName(cmisPropertyName);
         if (propDef != null)
         {
-	        if (propDef.getPropertyId().equals(CMISDictionaryModel.PROP_BASE_TYPE_ID))
+	        if (propDef.getPropertyId().equals(PropertyIds.BASE_TYPE_ID))
 	        {
 	            // special-case (see also ALF-13968) - for getChildren, using "cmis:baseTypeId" allows sorting of folders first and vice-versa (cmis:folder <-> cmis:document)
 	        	sortPropName = GetChildrenCannedQuery.SORT_QNAME_NODE_IS_FOLDER;
@@ -1171,8 +1170,13 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
      */
     public String constructObjectId(AssociationRef assocRef, String versionLabel)
     {
+        return constructObjectId(assocRef, versionLabel, isPublicApi());
+    }
+    
+    public String constructObjectId(AssociationRef assocRef, String versionLabel, boolean dropStoreRef)
+    {
     	StringBuilder sb = new StringBuilder(CMISConnector.ASSOC_ID_PREFIX);
-    	if(isPublicApi())
+    	if(dropStoreRef)
     	{
     		// always return the guid
     		sb.append(assocRef.getId());
@@ -1205,8 +1209,13 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
      */
     public String constructObjectId(String incomingNodeId, String versionLabel)
     {
+        return constructObjectId(incomingNodeId, versionLabel, isPublicApi());
+    }
+    
+    public String constructObjectId(String incomingNodeId, String versionLabel, boolean dropStoreRef)
+    {
     	StringBuilder sb = new StringBuilder();
-    	if(isPublicApi())
+    	if(dropStoreRef)
     	{
     		// always return the guid
     		sb.append(getGuid(incomingNodeId));
@@ -1265,8 +1274,13 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
      */
     public String constructObjectId(NodeRef incomingNodeRef, String versionLabel)
     {
+        return constructObjectId(incomingNodeRef, versionLabel, isPublicApi());
+    }
+    
+    public String constructObjectId(NodeRef incomingNodeRef, String versionLabel, boolean dropStoreRef)
+    {
     	StringBuilder sb = new StringBuilder();
-    	sb.append(isPublicApi() ? incomingNodeRef.getId() : incomingNodeRef.toString());
+    	sb.append(dropStoreRef ? incomingNodeRef.getId() : incomingNodeRef.toString());
     	if(versionLabel != null)
     	{
     		sb.append(CMISConnector.ID_SEPERATOR);
@@ -1278,29 +1292,39 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
     /**
      * Compiles a CMIS object if for a live node.
      */
-    public String createObjectId(NodeRef currentVersionNodeRef)
+    public String createObjectId(NodeRef nodeRef)
     {
-    	QName typeQName = nodeService.getType(currentVersionNodeRef);
+        return createObjectId(nodeRef, isPublicApi());
+    }
+    
+    public String createObjectId(NodeRef nodeRef, boolean dropStoreRef)
+    {
+    	QName typeQName = nodeService.getType(nodeRef);
         TypeDefinitionWrapper type = getOpenCMISDictionaryService().findNodeType(typeQName);
     
     	if(type instanceof ItemTypeDefinitionWrapper)
     	{
-    		return constructObjectId(currentVersionNodeRef, null);
+    		return constructObjectId(nodeRef, null);
     	}
     	
         if(type instanceof FolderTypeDefintionWrapper)
         {
-            return constructObjectId(currentVersionNodeRef, null);
+            return constructObjectId(nodeRef, null, dropStoreRef);
         }
         
         Serializable versionLabel = getNodeService()
-                .getProperty(currentVersionNodeRef, ContentModel.PROP_VERSION_LABEL);
+                .getProperty(nodeRef, ContentModel.PROP_VERSION_LABEL);
         if (versionLabel == null)
         {
         	versionLabel = CMISConnector.UNVERSIONED_VERSION_LABEL;
         }
 
-        return constructObjectId(currentVersionNodeRef, (String)versionLabel);
+        return constructObjectId(nodeRef, (String)versionLabel, dropStoreRef);
+    }
+    
+    private boolean isFolder(NodeRef nodeRef)
+    {
+        return getType(nodeRef) instanceof FolderTypeDefintionWrapper;
     }
 
     /**

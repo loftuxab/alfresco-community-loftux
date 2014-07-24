@@ -4,6 +4,15 @@
 <beans>
     <import resource="classpath:alfresco/opencmis-qnamefilter-context.xml" />
 
+    <bean id="CMIS.DictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+        <property name="models">
+            <list>
+                <value>alfresco/model/cmisModel.xml</value>
+                <value>alfresco/model/cmisTestModel.xml</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="OpenCMISPropertyAccessorMapping" class="org.alfresco.opencmis.mapping.RuntimePropertyAccessorMapping" init-method="init">
         <property name="serviceRegistry"           ref="ServiceRegistry" />
         <property name="cmisConnector"             ref="CMISConnector" />
@@ -208,11 +217,13 @@
         <property name="nodeService"            ref="NodeService" />    
         <property name="OpenCMISDictionaryService" ref="OpenCMISDictionaryService" />
         <property name="registry"               ref="auditModel.extractorRegistry" />        
+        <property name="cmisConnector"          ref="CMISConnector" />
     </bean>
 
     <bean id="CMISChangeLogDataExtractor1.1" class="org.alfresco.opencmis.CMISChangeLogDataExtractor">
         <property name="nodeService"            ref="NodeService" />    
         <property name="OpenCMISDictionaryService" ref="OpenCMISDictionaryService1.1" />
         <property name="registry"               ref="auditModel.extractorRegistry" />        
+        <property name="cmisConnector"          ref="CMISConnector" />
     </bean>
 </beans>

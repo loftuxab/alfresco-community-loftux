@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.sf.acegisecurity.Authentication;
 
-import org.alfresco.cmis.CMISInvalidArgumentException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.opencmis.dictionary.CMISNodeInfo;
 import org.alfresco.opencmis.dictionary.CMISObjectVariant;
@@ -1306,9 +1305,9 @@ public class AlfrescoCmisServiceImpl extends AbstractCmisService implements Alfr
         String sourceId = connector.getSourceIdProperty(properties);
         CMISNodeInfo sourceInfo = getOrCreateNodeInfo(sourceId, "Source");
 
-        if (!sourceInfo.isVariant(CMISObjectVariant.CURRENT_VERSION) && !sourceInfo.isVariant(CMISObjectVariant.FOLDER))
+        if (!sourceInfo.isVariant(CMISObjectVariant.CURRENT_VERSION) && !sourceInfo.isVariant(CMISObjectVariant.FOLDER) && !sourceInfo.isVariant(CMISObjectVariant.ITEM))
         {
-            throw new CmisInvalidArgumentException("Source is not the latest version of a document or a folder object!");
+            throw new CmisInvalidArgumentException("Source is not the latest version of a document, a folder or an item object!");
         }
 
         final NodeRef sourceNodeRef = sourceInfo.getNodeRef();
@@ -1317,10 +1316,10 @@ public class AlfrescoCmisServiceImpl extends AbstractCmisService implements Alfr
         String targetId = connector.getTargetIdProperty(properties);
         CMISNodeInfo targetInfo = getOrCreateNodeInfo(targetId, "Target");
 
-        if (!targetInfo.isVariant(CMISObjectVariant.CURRENT_VERSION) && !targetInfo.isVariant(CMISObjectVariant.FOLDER))
+        if (!targetInfo.isVariant(CMISObjectVariant.CURRENT_VERSION) && !targetInfo.isVariant(CMISObjectVariant.FOLDER) && !targetInfo.isVariant(CMISObjectVariant.ITEM))
         {
             throw new CmisInvalidArgumentException(
-                    "Target is not the latest version of a document or a folder object!!");
+                    "Target is not the latest version of a document, a folder or an item object!!");
         }
 
         final NodeRef targetNodeRef = targetInfo.getNodeRef();
@@ -1523,7 +1522,7 @@ public class AlfrescoCmisServiceImpl extends AbstractCmisService implements Alfr
             if (!found)
             {
                 throw new IllegalArgumentException(
-                        new CMISInvalidArgumentException(
+                        new CmisInvalidArgumentException(
                                 "Document is not a child of the source folder that was specified!"));
             }
         }

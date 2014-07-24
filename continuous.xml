@@ -106,8 +106,7 @@
            description="Creates the distribution files for all platforms"
            depends="distribute-amps,
                     distribute-installers,
-                    distribute-extras,
-                    distribute-fdk" />
+                    distribute-extras" />
 
    <target name="distribute-core" 
            description="Creates the patch distribution files for all platforms"
@@ -115,8 +114,6 @@
                     distribute-amps,
                     assemble-tomcat,
                     distribute-war,
-                    distribute-wcm,
-                    distribute-webserviceclient,
                     distribute-deployment,
                     distribute-webeditor,
                     distribute-wcmqs-extension,
@@ -498,53 +495,6 @@
        </exec>
    </target>
 
-
-   <!-- ***************** -->
-   <!-- ** WCM targets ** -->
-   <!-- ***************** -->
-
-   <target name="distribute-wcm" 
-           description="Creates the distibution files for WCM"
-           depends="assemble-virtual">
-      <tar destfile="${dir.continuous.assemble}/temp.tar" 
-           longfile="gnu">
-         <tarfileset dir="${dir.continuous.assemble.virtualtomcat}" 
-                     prefix="virtual-tomcat"
-                     excludes="**/bin/*.sh" />
-         <tarfileset dir="${dir.continuous.assemble.virtualtomcat}/bin"
-                     prefix="virtual-tomcat/bin"
-                     includes="*.sh" 
-                     mode="755" />
-         <tarfileset file="${file.name.wcm.bootstrap}"/>
-         <tarfileset dir="${dir.project.installer}/wcm-commands"
-                     prefix="bin" 
-                     mode="755"/>
-         <tarfileset dir="${dir.project.webclient.xforms.examples}"
-                     prefix="wcm-examples"
-                     excludes="unit-tests/**" />
-      </tar>
-	  <zip destfile="${dir.continuous.dist}/${file.name.dist.wcm}.zip">
-        <tarfileset src="${dir.continuous.assemble}/temp.tar"/>
-      </zip>
-      <delete quiet="yes" file="${dir.continuous.assemble}/temp.tar" />
-   </target>
-
-   <target name="assemble-virtual"
-           depends="continuous-init">
-      <mkdir dir="${dir.continuous.dist}" />
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.continuous.assemble.virtualtomcat}" />
-      <unzip src="${dir.name.binaries}/tomcat/${file.name.zip.tomcatvirt.custom}"
-             dest="${dir.continuous.assemble}" />
-      <move file="${dir.continuous.assemble}/${file.name.base.zip.tomcatvirt.custom}"
-            tofile="${dir.continuous.assemble.virtualtomcat}" />
-      <move file="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.renametojar" 
-            tofile="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.jar" />
-      <deploy-virtual-tomcat location="${dir.continuous.assemble.virtualtomcat}" />
-   </target>
-
-
    <target name="assemble-commands"
            depends="package-mmt, assemble-commands-init, assemble-command-extras"/>
 
@@ -781,25 +731,6 @@
    </target>
 
 
-   <!-- ******************************** -->
-   <!-- ** Web Service Client targets ** -->
-   <!-- ******************************** -->
-
-   <target name="distribute-webserviceclient"
-           description="Creates the web service client distribution file for all platforms"
-           depends="continuous-init">
-      <mkdir dir="${dir.continuous.dist}" />
-
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.webserviceclient}.zip">
-         <zipfileset dir="${dir.project.webserviceclient.dist}" />
-         <zipfileset dir="${dir.project.webserviceclient.config}/alfresco" 
-                     prefix="alfresco"/>
-         <fileset file="${dir.project.webserviceclient}/README_ws_client.txt" />
-      </zip>
-
-   </target>
-
-
    <!-- ************************ -->
    <!-- ** Quick Start Bundle ** -->
    <!-- ************************ -->
@@ -978,20 +909,6 @@
          <zipfileset file="${file.jar.webeditor.yui}" />
       </zip>
       <copy todir="${dir.continuous.assemble}" file="${dir.project.webeditor.dist}/${file.name.war.webeditor}" />
-   </target>
-   
-   <!-- ***************** -->
-   <!-- ** FDK targets ** -->
-   <!-- ***************** -->
-   
-   <target name="distribute-fdk" depends="set-build-number, continuous-init, incremental-fdk"
-           description="Distributes the Forms Development Kit (FDK) files">
-      <mkdir dir="${dir.continuous.dist}" />
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.fdk}.zip">
-         <fileset dir="${dir.project.fdk.client.dist}" includes="${file.name.jar.fdk}" />
-         <fileset dir="${dir.project.fdk.repo.dist}" includes="${file.name.amp.fdk}" />
-         <fileset file="${dir.project.fdk}/README_fdk.txt" />
-      </zip>
    </target>
 
    <!-- ************************************ -->

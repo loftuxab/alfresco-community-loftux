@@ -25,9 +25,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.cmis.CMISObjectReference;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.cmis.reference.ReferenceFactory;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -44,14 +42,6 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
  */
 public class ContentInfo extends StreamContent
 {
-
-    private ReferenceFactory referenceFactory;
-    
-    public void setReferenceFactory(ReferenceFactory referenceFactory)
-    {
-        this.referenceFactory = referenceFactory;
-    }
-
     @Override
     public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException
     {
@@ -60,7 +50,7 @@ public class ContentInfo extends StreamContent
         // create map of template vars
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
         // create object reference from url
-        CMISObjectReference reference = referenceFactory.createObjectReferenceFromUrl(args, templateVars);
+        ObjectReference reference = createObjectReferenceFromUrl(args, templateVars);
         NodeRef nodeRef = reference.getNodeRef();
         if (nodeRef == null)
         {
@@ -109,5 +99,4 @@ public class ContentInfo extends StreamContent
         cache.setETag(eTag);
         res.setCache(cache);
     }
-
 }
