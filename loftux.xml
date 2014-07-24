@@ -18,11 +18,11 @@
       <mkdir dir="${alfresco.basedir}/projects/data-model/config/alfresco/extension" />
       <mkdir dir="${alfresco.basedir}/projects/installer/messages" />
       <mkdir dir="${alfresco.basedir}/projects/solr/source/solr/instance/lib" />
-      
+
   </target>
 
   <!-- Removed depends target distribute-installers -->
-  <target name="distribute-non-core" 
+  <target name="distribute-non-core"
           description="Creates the distribution files for all platforms"
           depends="set-build-number,
                   incremental,
@@ -30,14 +30,14 @@
                   distribute-extras" />
 
    <!-- Removed depends target distribute-wcm -->
-   <target name="distribute-core" 
+   <target name="distribute-core"
           description="Creates the patch distribution files for all platforms"
           depends="set-build-number,
                   incremental,
                   assemble-commands,
                   distribute-amps,
                   assemble-tomcat,
-                  distribute-war, 
+                  distribute-war,
                   distribute-deployment,
                   distribute-webeditor,
                   distribute-wcmqs-extension,
@@ -85,7 +85,7 @@
          </svn>
    </target>
 
-   <!-- Set versionsnumber differently --> 
+   <!-- Set versionsnumber differently -->
    <target name="set-revision-number" depends="init,set-revision-number-git,set-revision-number-svn">
 
       <condition property="display.build.number" value="${alf.build.number}" else="">
@@ -111,4 +111,12 @@
       </manifest>
 
    </target>
+
+  <!-- Aggregator target putting together all build targets to build artifacts prior to maven-deploy -->
+  <target name="maven-build-prerequisites" depends="set-build-number, incremental, distribute-core, distribute-amps, distribute-sdk"/>
+
+  <!-- Builds all necessary artifacts and delegates deployment to the Maven repository to the maven-deploy target. -->
+  <target name="maven-build-deploy" description="Deploys JAR/WAR/ZIP dist artifacts to the Alfresco Maven Repository" depends="maven-build-prerequisites, maven-deploy" />
+
+
 </project>
