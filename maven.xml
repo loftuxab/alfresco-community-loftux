@@ -64,7 +64,7 @@
         <!-- Configuring the settings location -->
         <property name="maven.settings.file" value="${dir.name.binaries}/build-classpath/settings.xml"/>
     	<!-- Configuring the platform distribution pom location -->
-    	<property name="dir.project.sdk.maven.platform" value="${dir.project.sdk}/alfresco-platform-distribution"/>
+    	<property name="dir.project.sdk.maven.platform" value="${dir.projects}/sdk/alfresco-platform-distribution"/>
     	<property name="maven.platform.pom.file" value="${dir.project.sdk.maven.platform}/pom.xml"/>
         <condition property="maven.isRelease">
             <istrue value="${env.bamboo_deploy_as_release}"/>

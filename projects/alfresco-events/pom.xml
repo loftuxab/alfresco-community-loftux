@@ -4,17 +4,17 @@
     <name>Alfresco Events</name>
     <parent>
         <artifactId>alfresco-parent</artifactId>
-        <groupId>org.alfresco</groupId>
-        <version>5.0.a-LX66</version>
+        <groupId>se.loftux.alfresco</groupId>
+        <version>5.0.a.LX66</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    
+
     <artifactId>alfresco-events</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -25,5 +25,5 @@
            <classifier>asl</classifier>
         </dependency>
     </dependencies>
-    
+
 </project>

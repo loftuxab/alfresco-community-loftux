@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.a-LX66</version>
+        <version>5.0.a.LX66</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -36,7 +36,7 @@
             <version>1.5.2</version>
         </dependency>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-events</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -941,5 +941,5 @@
     		</plugins>
     	</pluginManagement>
     </build>
-    
+
 </project>

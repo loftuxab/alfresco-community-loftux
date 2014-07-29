@@ -6,7 +6,7 @@
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>5.0.a-LX66</version>
+  <version>5.0.a.LX66</version>
   <name>Alfresco</name>
 
   <url>http://www.alfresco.org/</url>
@@ -42,28 +42,28 @@
   <repositories>
     <!-- Pointing to Alfresco repository group. Value is switched between community and enterprise -->
     <repository>
-      <id>alfresco-public</id>
-      <url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
+      <id>loftux-public</id>
+      <url>http://artifacts.loftux.net/nexus/content/repositories/alfresco-public-group</url>
     </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
-      <id>alfresco-public</id>
-      <url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
+      <id>loftux-public</id>
+      <url>http://artifacts.loftux.net/nexus/content/repositories/alfresco-public-group</url>
     </pluginRepository>
   </pluginRepositories>
 
   <distributionManagement>
       <!-- For now internal releases repositories -->
       <repository>
-          <id>alfresco-internal</id>
+          <id>loftux</id>
           <url>${maven.distributionManagement.url}</url>
       </repository>
       <!-- For now internal snapshot repositories -->
       <snapshotRepository>
-          <id>alfresco-internal-snapshots</id>
+          <id>loftux-snapshots</id>
           <url>${maven.distributionManagement.snapshot.url}</url>
-      </snapshotRepository>      
+      </snapshotRepository>
   </distributionManagement>
 
   <modules>
@@ -100,7 +100,7 @@
     <tomcat.default.alfresco.port>8080</tomcat.default.alfresco.port>
     <tomcat.default.share.port>8081</tomcat.default.share.port>
     <tomcat.default.solr.port>8082</tomcat.default.solr.port>
-    
+
     <!-- Database properties - default values to be overridden in settings.xml -->
     <db.skip>true</db.skip>
     <db.driver>org.postgresql.Driver</db.driver>
@@ -129,8 +129,8 @@
     <maven.scm.developerConnection>scm:svn:https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/HEAD</maven.scm.developerConnection>
     <maven.scm.url>https://fisheye.alfresco.com/changelog/alfresco-enterprise</maven.scm.url>
     <maven.repository.url>https://artifacts.alfresco.com/nexus/content/groups/public</maven.repository.url>
-    <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/snapshots</maven.distributionManagement.snapshot.url>
-    <maven.distributionManagement.url>https://artifacts.alfresco.com/nexus/content/repositories/releases</maven.distributionManagement.url>
+    <maven.distributionManagement.snapshot.url>http://artifacts.loftux.net/nexus/content/repositories/snapshots/</maven.distributionManagement.snapshot.url>
+    <maven.distributionManagement.url>http://artifacts.loftux.net/nexus/content/repositories/releases/</maven.distributionManagement.url>
     <maven.license.name>GNU Lesser General Public License v3.0 or later</maven.license.name>
     <maven.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</maven.license.url>
 
@@ -150,13 +150,13 @@
     <dependency.activiti.version>5.13-alf-20140107</dependency.activiti.version>
     <dependency.poi.version>3.10-FINAL</dependency.poi.version>
     <dependency.dojo.version>1.8.3</dependency.dojo.version>
-    
+
     <manifest.major.version>5</manifest.major.version>
     <manifest.minor.version>0</manifest.minor.version>
     <manifest.servicepack.version>0</manifest.servicepack.version>
     <manifest.implementation.version>${project.version}</manifest.implementation.version>
   </properties>
-  
+
   <!-- Define versions of very common components -->
   <dependencyManagement>
     <dependencies>
@@ -164,7 +164,7 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -179,7 +179,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -230,87 +230,87 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.1</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.8</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
             <version>1.8.1</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.4-DBCP330</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.5</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.3.1</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-jxpath</groupId>
             <artifactId>commons-jxpath</artifactId>
             <version>1.3</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.3</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-modeler</groupId>
             <artifactId>commons-modeler</artifactId>
             <version>1.1</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>3.3</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.6</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.4.0</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -319,7 +319,7 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>                  
+  <build>
     <!-- Non standard folder layout -->
     <sourceDirectory>source/java</sourceDirectory>
     <testSourceDirectory>source/test-java</testSourceDirectory>
@@ -330,7 +330,7 @@
     </resources>
     <testResources>
         <testResource>
-             <directory>source/test-resources</directory> 
+             <directory>source/test-resources</directory>
         </testResource>
     </testResources>
 
@@ -392,7 +392,7 @@
                 <configuration>
                     <source>${maven.build.sourceVersion}</source>
                     <target>${maven.build.sourceVersion}</target>
-                </configuration>        
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
@@ -407,7 +407,7 @@
                 <version>2.6</version>
                 <configuration>
                     <includeEmptyDirs>true</includeEmptyDirs>
-                </configuration>        
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
@@ -433,7 +433,7 @@
                     <tagBase>https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/TAGS/CLOUD</tagBase>
                     <tagNameFormat>V@{project.version}</tagNameFormat>
                     <stagingRepository>alfresco-internal::default::https://artifacts.alfresco.com/nexus/content/repositories/internal-staging/</stagingRepository>
-                </configuration>        
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
