@@ -1424,12 +1424,16 @@ public class FormUIGet extends DeclarativeWebScript
         if (fieldConfig == null || 
                fieldConfig.getControl() == null || 
                fieldConfig.getControl().getTemplate() == null || 
-               fieldConfig.getAttributes() == null || 
-               (fieldConfig.getAttributes().get("set") != null && !fieldConfig.getAttributes().get("set").isEmpty()))
+               fieldConfig.getAttributes() == null)
         {
             return null;
         }
-        
+
+        if(fieldConfig.getAttributes().get("set") != null && fieldConfig.getAttributes().get("set").isEmpty())
+        {
+            return null;
+        }
+
         if (logger.isDebugEnabled())
             logger.debug("Generating transient field for \"" + fieldName + "\"");
         
