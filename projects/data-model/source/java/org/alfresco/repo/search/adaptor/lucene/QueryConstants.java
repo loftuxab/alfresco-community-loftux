@@ -102,12 +102,16 @@ public interface QueryConstants
 
     public static final String FIELD_READER = "READER";
 
+    public static final String FIELD_DENIED = "DENIED";
+    
     public static final String FIELD_AUTHORITY = "AUTHORITY";
 
     public static final String FIELD_OWNERSET = "OWNERSET";
 
     public static final String FIELD_READERSET = "READERSET";
 
+    public static final String FIELD_DENYSET = "DENYSET";
+    
     public static final String FIELD_AUTHORITYSET = "AUTHSET";
 
     public static final String FIELD_TXID = "TXID";
@@ -149,5 +153,15 @@ public interface QueryConstants
     public static final String FIELD_EXCEPTION_MESSAGE = "EXCEPTIONMESSAGE";
 
     public static final String FIELD_EXCEPTION_STACK = "EXCEPTIONSTACK";
+    
+    public static final String FIELD_SOLR4_ID = "id";
+    
+    public static final String FIELD_DOC_TYPE = "DOC_TYPE";
+    
+    public static final String FIELD_SOLR_LOCALISED_UNTOKENISED_SUFFIX = ".u";
+    
+    public static final String FIELD_SOLR_NOLOCALE_UNTOKENISED_SUFFIX = ".__.u";
+    
+    public static final String FIELD_SOLR_NOLOCALE_TOKENISED_SUFFIX = ".__";
     
 }

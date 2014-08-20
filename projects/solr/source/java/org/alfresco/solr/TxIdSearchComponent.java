@@ -3,6 +3,7 @@ package org.alfresco.solr;
 import java.io.IOException;
 
 import org.alfresco.solr.tracker.CoreTracker;
+import org.alfresco.solr.tracker.Tracker;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.request.SolrQueryRequest;
@@ -24,9 +25,12 @@ public class TxIdSearchComponent extends SearchComponent
                     getCoreDescriptor().
                     getCoreContainer().
                     getMultiCoreHandler();
-        CoreTracker tracker = adminHandler.getTrackers().get(req.getCore().getName());
-        long lastIndexedTx = tracker.getLastIndexedTxId();
-        rb.rsp.add("lastIndexedTx", lastIndexedTx);
+        InformationServer infoSrv = adminHandler.getInformationServers().get(req.getCore().getName());
+        if(infoSrv != null)
+        {
+            Long lastIndexedTx = infoSrv.getTrackerState().getLastIndexedTxId();
+            rb.rsp.add("lastIndexedTx", lastIndexedTx);
+        }
     }
 
     @Override

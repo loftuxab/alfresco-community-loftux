@@ -36,6 +36,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.i18n.MessageService;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.tenant.TenantAdminService;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -50,7 +51,6 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.test_category.BaseSpringTestsCategory;
-import org.alfresco.test_category.OwnJVMTestsCategory;
 import org.alfresco.util.BaseAlfrescoSpringTest;
 import org.alfresco.util.PropertyMap;
 import org.junit.experimental.categories.Category;
@@ -350,6 +350,7 @@ public class DictionaryModelTypeTest extends BaseAlfrescoSpringTest
     private NamespaceService namespaceService;
     private CheckOutCheckInService cociService;
     private DictionaryDAO dictionaryDAO;
+    private PolicyComponent policyComponent;
     
     /**
      * On setup in transaction override
@@ -366,15 +367,16 @@ public class DictionaryModelTypeTest extends BaseAlfrescoSpringTest
         this.cociService = (CheckOutCheckInService)this.applicationContext.getBean("checkOutCheckInService");
         this.dictionaryDAO = (DictionaryDAO)this.applicationContext.getBean("dictionaryDAO");
         this.nodeService = (NodeService)this.applicationContext.getBean("NodeService");
+        this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
         
         TenantAdminService tenantAdminService = (TenantAdminService)this.applicationContext.getBean("tenantAdminService");
         MessageService messageService = (MessageService)this.applicationContext.getBean("messageService");
         
         List<String> storeUrlsToValidate = new ArrayList<String>(1);
         storeUrlsToValidate.add(this.storeRef.toString());
-        DictionaryModelType dictionaryModelType = (DictionaryModelType)this.applicationContext.getBean("dictionaryModelType");
-        dictionaryModelType.setStoreUrls(storeUrlsToValidate);
-        
+        ModelValidatorImpl modelValidator = (ModelValidatorImpl)this.applicationContext.getBean("modelValidator");
+        modelValidator.setStoreUrls(storeUrlsToValidate);
+
         DictionaryRepositoryBootstrap bootstrap = new DictionaryRepositoryBootstrap();
         bootstrap.setContentService(this.contentService);
         bootstrap.setDictionaryDAO(this.dictionaryDAO);
@@ -383,6 +385,7 @@ public class DictionaryModelTypeTest extends BaseAlfrescoSpringTest
         bootstrap.setNodeService(this.nodeService);
         bootstrap.setNamespaceService(this.namespaceService);
         bootstrap.setMessageService(messageService);
+        bootstrap.setPolicyComponent(policyComponent);
         
         RepositoryLocation location = new RepositoryLocation();
         location.setStoreProtocol(this.storeRef.getProtocol());

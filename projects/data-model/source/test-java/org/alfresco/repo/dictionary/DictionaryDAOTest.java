@@ -18,17 +18,22 @@
  */
 package org.alfresco.repo.dictionary;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
-
-import org.alfresco.repo.cache.MemoryCache;
-import org.alfresco.repo.dictionary.DictionaryDAOImpl.DictionaryRegistry;
-import org.alfresco.repo.dictionary.NamespaceDAOImpl.NamespaceRegistry;
 import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
 import org.alfresco.repo.dictionary.constraint.RegexConstraint;
 import org.alfresco.repo.dictionary.constraint.RegisteredConstraint;
@@ -47,10 +52,19 @@ import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
+import org.alfresco.util.TraceableThreadFactory;
+import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.extensions.surf.util.I18NUtil;
 
-
-public class DictionaryDAOTest extends TestCase
+/**
+ * 
+ * @author sglover
+ *
+ */
+public class DictionaryDAOTest
 {
     public static final String TEST_RESOURCE_MESSAGES = "alfresco/messages/dictionary-messages";
 
@@ -60,24 +74,22 @@ public class DictionaryDAOTest extends TestCase
     private static final String TEST_BUNDLE = "org/alfresco/repo/dictionary/dictionarydaotest_model";
     private static final String TEST_COMMON_NS_PARENT_MODEL = "org/alfresco/repo/dictionary/commonpropertynsparent_model.xml";
     private static final String TEST_COMMON_NS_CHILD_MODEL = "org/alfresco/repo/dictionary/commonpropertynschild_model.xml";
+
     private DictionaryService service;
-    
-    
-    @Override
-    public void setUp()
+    private DictionaryDAOImpl dictionaryDAO ;
+
+    @Before
+    public void setUp() throws Exception
     {   
         // register resource bundles for messages
         I18NUtil.registerResourceBundle(TEST_RESOURCE_MESSAGES);
-        
+
         // Instantiate Dictionary Service
-        TenantService tenantService = new SingleTServiceImpl();   
-        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
-        initNamespaceCaches(namespaceDAO);
-        
-        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+        TenantService tenantService = new SingleTServiceImpl();
+
+        this.dictionaryDAO = new DictionaryDAOImpl();
         dictionaryDAO.setTenantService(tenantService);
-        initDictionaryCaches(dictionaryDAO);
+        initDictionaryCaches(dictionaryDAO, tenantService);
 
         // Populate with appropriate models
         DictionaryBootstrap bootstrap = new DictionaryBootstrap();
@@ -91,34 +103,38 @@ public class DictionaryDAOTest extends TestCase
         bootstrap.setDictionaryDAO(dictionaryDAO);
         bootstrap.setTenantService(tenantService);
         bootstrap.bootstrap();
-        
+
         DictionaryComponent component = new DictionaryComponent();
         component.setDictionaryDAO(dictionaryDAO);
         component.setMessageLookup(new StaticMessageLookup());
         service = component;
     }
     
-    private void initDictionaryCaches(DictionaryDAOImpl dictionaryDAO)
+    private void initDictionaryCaches(DictionaryDAOImpl dictionaryDAO, TenantService tenantService)
     {
-        dictionaryDAO.setDictionaryRegistryCache(new MemoryCache<String, DictionaryRegistry>());
-    }
-    
-    private void initNamespaceCaches(NamespaceDAOImpl namespaceDAO)
-    {
-        namespaceDAO.setNamespaceRegistryCache(new MemoryCache<String, NamespaceRegistry>());
-    }
-    
+        CompiledModelsCache compiledModelsCache = new CompiledModelsCache();
+        compiledModelsCache.setDictionaryDAO(dictionaryDAO);
+        compiledModelsCache.setTenantService(tenantService);
+        compiledModelsCache.setRegistry(new DefaultAsynchronouslyRefreshedCacheRegistry());
+        TraceableThreadFactory threadFactory = new TraceableThreadFactory();
+        threadFactory.setThreadDaemon(true);
+        threadFactory.setThreadPriority(Thread.NORM_PRIORITY);
 
+        ThreadPoolExecutor threadPoolExecutor = new DynamicallySizedThreadPoolExecutor(20, 20, 90, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory,
+                new ThreadPoolExecutor.CallerRunsPolicy());
+        compiledModelsCache.setThreadPoolExecutor(threadPoolExecutor);
+        dictionaryDAO.setDictionaryRegistryCache(compiledModelsCache);
+        dictionaryDAO.init();
+    }
+
+    @Test
     public void testBootstrap()
     {
         TenantService tenantService = new SingleTServiceImpl();   
-        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
-        initNamespaceCaches(namespaceDAO);
-        
-        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
         dictionaryDAO.setTenantService(tenantService);
-        initDictionaryCaches(dictionaryDAO);
+        initDictionaryCaches(dictionaryDAO, tenantService);
         
         DictionaryBootstrap bootstrap = new DictionaryBootstrap();
         List<String> bootstrapModels = new ArrayList<String>();
@@ -131,16 +147,14 @@ public class DictionaryDAOTest extends TestCase
         bootstrap.bootstrap();
     }
 
+    @Test
     public void testUseImportedNamespaces()
     {
         TenantService tenantService = new SingleTServiceImpl();
-        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
-        initNamespaceCaches(namespaceDAO);
-        
-        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
         dictionaryDAO.setTenantService(tenantService);
-        initDictionaryCaches(dictionaryDAO);
+        initDictionaryCaches(dictionaryDAO, tenantService);
         
         DictionaryBootstrap bootstrap = new DictionaryBootstrap();
         List<String> bootstrapModels = new ArrayList<String>();
@@ -155,6 +169,7 @@ public class DictionaryDAOTest extends TestCase
         bootstrap.bootstrap();
     }
 
+    @Test
     public void testLabels()
     {
         QName model = QName.createQName(TEST_URL, "dictionarydaotest");
@@ -209,7 +224,8 @@ public class DictionaryDAOTest extends TestCase
         
         // Localisation of unnamed LoV defined within a specific property are not supported.
     }
-    
+
+    @Test
     public void testConstraints()
     {   
         QName model = QName.createQName(TEST_URL, "dictionarydaotest");
@@ -274,7 +290,8 @@ public class DictionaryDAOTest extends TestCase
         Constraint constraint = constraintDef.getConstraint();
         assertNotNull("Reference constraint has no implementation", constraint);
     }
-    
+
+    @Test
     public void testConstraintsOverrideInheritance()
     {
         QName baseQName = QName.createQName(TEST_URL, "base");
@@ -309,7 +326,8 @@ public class DictionaryDAOTest extends TestCase
         assertTrue("Constraint instance incorrect", prop1Constraints.get(1).getConstraint() instanceof RegexConstraint);
         assertTrue("Constraint instance incorrect", prop1Constraints.get(2).getConstraint() instanceof RegisteredConstraint);
     }
-    
+
+    @Test
     public void testConstraintsOverrideInheritanceOnAspects()
     {
         QName aspectBaseQName = QName.createQName(TEST_URL, "aspect-base");
@@ -372,6 +390,7 @@ public class DictionaryDAOTest extends TestCase
         assertEquals("XYZ", allowedValues.get(0));
     }
 
+    @Test
     public void testArchive()
     {
         QName testFileQName = QName.createQName(TEST_URL, "file");
@@ -391,7 +410,8 @@ public class DictionaryDAOTest extends TestCase
         ClassDefinition folderClassDef = service.getClass(testFolderQName);
         assertNull("Folder type should not have the archive flag", folderClassDef.getArchive());
     }
-    
+
+    @Test
     public void testMandatoryEnforced()
     {
         // get the properties for the test type
@@ -428,7 +448,8 @@ public class DictionaryDAOTest extends TestCase
         assertFalse("Expected property to be mandatory-not-enforced: " + testMandatoryDefaultEnforcedQName,
                 propertyDef.isMandatoryEnforced());
     }
-    
+
+    @Test
     public void testSubClassOf()
     {
         QName invalid = QName.createQName(TEST_URL, "invalid");
@@ -461,7 +482,7 @@ public class DictionaryDAOTest extends TestCase
         assertFalse(test5);
     }
     
-
+    @Test
     public void testPropertyOverride()
     {
         TypeDefinition type1 = service.getType(QName.createQName(TEST_URL, "overridetype1"));
@@ -483,6 +504,7 @@ public class DictionaryDAOTest extends TestCase
         assertEquals("three", def3);
     }
 
+    @Test
     public void testChildAssocPropagate()
     {
         // Check the default value
@@ -500,18 +522,16 @@ public class DictionaryDAOTest extends TestCase
         assertTrue("Expected 'true' for timestamp propagation", childAssocDef.getPropagateTimestamps());
     }
     
+    @Test
     public void testDataTypeAnlyserResolution()
     {
         // Stuff to configure/
         
-        TenantService tenantService = new SingleTServiceImpl();   
-        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
-        initNamespaceCaches(namespaceDAO);
+        TenantService tenantService = new SingleTServiceImpl();
         
-        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
         dictionaryDAO.setTenantService(tenantService);
-        initDictionaryCaches(dictionaryDAO);
+        initDictionaryCaches(dictionaryDAO, tenantService);
       
         ModelDefinition modelDefinition;
         DataTypeDefinition dataTypeDefinition;
@@ -519,8 +539,8 @@ public class DictionaryDAOTest extends TestCase
         //
         
         dictionaryDAO.putModel(createModel(dictionaryDAO, false, false, false));
-        QName modeQName = QName.createQName("test:analyzerModel", namespaceDAO);
-        QName dataTypeQName =  QName.createQName("test:analyzerDataType", namespaceDAO);
+        QName modeQName = QName.createQName("test:analyzerModel", dictionaryDAO);
+        QName dataTypeQName =  QName.createQName("test:analyzerDataType", dictionaryDAO);
         
         modelDefinition = dictionaryDAO.getModel(modeQName);
         assertEquals(modelDefinition.getAnalyserResourceBundleName(), null);
@@ -633,9 +653,6 @@ public class DictionaryDAOTest extends TestCase
         
         dictionaryDAO.setDefaultAnalyserResourceBundleName(null);
         dictionaryDAO.removeModel(modeQName);
-       
-        
-//
         
         dictionaryDAO.putModel(createModel(dictionaryDAO, true, false, false));
      
@@ -767,9 +784,8 @@ public class DictionaryDAOTest extends TestCase
         
         dictionaryDAO.setDefaultAnalyserResourceBundleName(null);
         dictionaryDAO.removeModel(modeQName);
-        
     }
-    
+
     private M2Model createModel(DictionaryDAO dictionaryDAO, boolean withModelBundle, boolean withDataTypeBundle, boolean withTypeAnalyserClss)
     {
         String testNamespace = "http://www.alfresco.org/test/analyserResolution";
@@ -793,18 +809,16 @@ public class DictionaryDAOTest extends TestCase
         return model;
     }
     
+    @Test
     public void testTypeAnalyserResolution()
     {
         // Stuff to configure/
         
-        TenantService tenantService = new SingleTServiceImpl();   
-        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
-        initNamespaceCaches(namespaceDAO);
+        TenantService tenantService = new SingleTServiceImpl();
         
-        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
         dictionaryDAO.setTenantService(tenantService);
-        initDictionaryCaches(dictionaryDAO);
+        initDictionaryCaches(dictionaryDAO, tenantService);
         
         // build data model - typical settings
         dictionaryDAO.putModel(createModel(dictionaryDAO, true, false, true));
@@ -818,10 +832,10 @@ public class DictionaryDAOTest extends TestCase
         
         dictionaryDAO.putModel(createTypeModel(dictionaryDAO, true, true, true, true));
         
-        QName modelQName = QName.createQName("test2:analyzerClassModel", namespaceDAO);
-        QName superQName = QName.createQName("test2:analyzerSuperType", namespaceDAO);
-        QName typeQName = QName.createQName("test2:analyzerType", namespaceDAO);
-        QName propertyQName = QName.createQName("test2:analyzerProperty", namespaceDAO);
+        QName modelQName = QName.createQName("test2:analyzerClassModel", dictionaryDAO);
+        QName superQName = QName.createQName("test2:analyzerSuperType", dictionaryDAO);
+        QName typeQName = QName.createQName("test2:analyzerType", dictionaryDAO);
+        QName propertyQName = QName.createQName("test2:analyzerProperty", dictionaryDAO);
         
         modelDefinition = dictionaryDAO.getModel(modelQName);
         assertEquals(modelDefinition.getAnalyserResourceBundleName(), "typeModelResourceBundle");
@@ -1043,5 +1057,4 @@ public class DictionaryDAOTest extends TestCase
         }
         return model;
     }
-
 }

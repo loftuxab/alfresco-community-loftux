@@ -55,6 +55,7 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeRef.Status;
 import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.Path.ChildAssocElement;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -257,10 +258,12 @@ public class SOLRTrackingComponentImpl implements SOLRTrackingComponent
             List<AclReaders> aclsReaders = new ArrayList<AclReaders>(aclIds.size() * 10);
             for (Long aclId : aclIds)
             {
-                Set<String> readersSet = permissionService.getReaders(aclId);
                 AclReaders readers = new AclReaders();
                 readers.setAclId(aclId);
+                Set<String> readersSet = permissionService.getReaders(aclId);
                 readers.setReaders(readersSet);
+                Set<String> deniedSet = permissionService.getReadersDenied(aclId);
+                readers.setDenied(deniedSet);
                 
                 Long aclChangeSetId = aclDAO.getAccessControlList(aclId).getProperties().getAclChangeSetId();
                 readers.setAclChangeSetId(aclChangeSetId);
@@ -839,6 +842,50 @@ public class SOLRTrackingComponentImpl implements SOLRTrackingComponent
                 }
 
                 nodeMetaData.setPaths(paths);
+                
+                // Calculate name path
+                Collection<Collection<String>> namePaths = new ArrayList<Collection<String>>(2);
+                nodeMetaData.setNamePaths(namePaths);
+                for (Path path : directPaths)
+                {
+                    boolean added = false;
+                    List<String> namePath = new ArrayList<String>(path.size());
+                    for (Path.Element pathElement : path)
+                    {
+                        if (!(pathElement instanceof ChildAssocElement))
+                        {
+                            // This is some path element that is terminal to a cm:name path
+                            break;
+                        }
+                        ChildAssocElement pathChildAssocElement = (ChildAssocElement) pathElement;
+                        NodeRef childNodeRef = pathChildAssocElement.getRef().getChildRef();
+                        Pair<Long, NodeRef> childNodePair = nodeDAO.getNodePair(childNodeRef);
+                        if (childNodePair == null)
+                        {
+                            // Gone
+                            break;
+                        }
+                        Long childNodeId = childNodePair.getFirst();
+                        String childNodeName = (String) nodeDAO.getNodeProperty(childNodeId, ContentModel.PROP_NAME);
+                        if (childNodeName == null)
+                        {
+                            // We have hit a non-name node, which acts as a root for cm:name
+                            // DH: There is no particular constraint here.  This is just a decision made.
+                            namePath.clear();
+                            // We have to continue down the path as there could be a name path lower down
+                            continue;
+                        }
+                        // We can finally add the name to the path
+                        namePath.add(childNodeName);
+                        // Add the path if this is the first entry in the name path
+                        if (!added)
+                        {
+                            namePaths.add(namePath);
+                            added = true;
+                        }
+                    }
+                }
+                
             }
          
             nodeMetaData.setTenantDomain(tenantService.getDomain(nodeRef.getStoreRef().getIdentifier()));

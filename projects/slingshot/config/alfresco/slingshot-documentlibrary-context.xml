@@ -57,9 +57,6 @@
       <property name="negateOutput" value="true" />
    </bean>
 
-   <bean id="evaluator.doclib.indicator.googleDocsEditing" class="org.alfresco.web.evaluator.doclib.indicator.GoogleDocsEditingEvaluator" />
-   <bean id="evaluator.doclib.indicator.googleDocsOwner" class="org.alfresco.web.evaluator.doclib.indicator.GoogleDocsOwnerEvaluator" />
-   <bean id="evaluator.doclib.indicator.googleDocsLocked" class="org.alfresco.web.evaluator.doclib.indicator.GoogleDocsLockedEvaluator" />
    <bean id="evaluator.doclib.indicator.activeWorkflows" class="org.alfresco.web.evaluator.doclib.indicator.ActiveWorkflowsEvaluator" />
    <bean id="evaluator.doclib.indicator.simpleWorkflow" class="org.alfresco.web.evaluator.doclib.indicator.SimpleWorkflowEvaluator" />
    <bean id="evaluator.doclib.indicator.rules" class="org.alfresco.web.evaluator.doclib.indicator.RulesEvaluator" />
@@ -326,6 +323,64 @@
          </list>
       </property>
    </bean>
+
+   <!-- Edit Online AOS -->
+   <bean id="evaluator.doclib.action.isMimetypeEditableAos" parent="evaluator.doclib.action.isMimetype">
+      <property name="mimetypes">
+         <list>
+            <value>application/msword</value>
+            <value>application/vnd.ms-word</value>
+            <value>application/vnd.openxmlformats-officedocument.wordprocessingml.document</value>
+            <value>application/vnd.ms-word.document.macroenabled.12</value>
+            <value>application/vnd.openxmlformats-officedocument.wordprocessingml.template</value>
+            <value>application/vnd.ms-word.template.macroenabled.12</value>
+            <value>application/msexcel</value>
+            <value>application/vnd.ms-excel</value>
+            <value>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</value>
+            <value>application/vnd.openxmlformats-officedocument.spreadsheetml.template</value>
+            <value>application/vnd.ms-excel.sheet.macroenabled.12</value>
+            <value>application/vnd.ms-excel.template.macroenabled.12</value>
+            <value>application/vnd.ms-excel.addin.macroenabled.12</value>
+            <value>application/vnd.ms-excel.sheet.binary.macroenabled.12</value>
+            <value>application/mspowerpoint</value>
+            <value>application/vnd.ms-powerpoint</value>
+            <value>application/vnd.openxmlformats-officedocument.presentationml.presentation</value>
+            <value>application/vnd.ms-powerpoint.presentation.macroenabled.12</value>
+            <value>application/vnd.openxmlformats-officedocument.presentationml.slideshow</value>
+            <value>application/vnd.ms-powerpoint.slideshow.macroenabled.12</value>
+            <value>application/vnd.openxmlformats-officedocument.presentationml.template</value>
+            <value>application/vnd.ms-powerpoint.template.macroenabled.12</value>
+            <value>application/vnd.ms-powerpoint.addin.macroenabled.12</value>
+            <value>application/vnd.openxmlformats-officedocument.presentationml.slide</value>
+            <value>application/vnd.ms-powerpoint.slide.macroEnabled.12</value>
+            <value>application/vnd.visio</value>
+         </list>
+      </property>
+   </bean>
+   <bean id="evaluator.doclib.action.isLockedForAos" parent="evaluator.doclib.action.chainedMatchOne">
+      <property name="evaluators">
+         <list>
+            <ref bean="evaluator.doclib.indicator.locked" />
+            <ref bean="evaluator.doclib.action.isNotWorkingCopyAndLocked" />
+         </list>
+      </property>
+   </bean>
+   <bean id="evaluator.doclib.action.isNotWorkingCopyAndLocked" parent="evaluator.doclib.action.chainedMatchAll">
+      <property name="evaluators">
+         <list>
+            <ref bean="evaluator.doclib.action.isLocked" />
+            <ref bean="evaluator.doclib.action.isNotWorkingCopy" />
+         </list>
+      </property>
+   </bean>
+   <bean id="evaluator.doclib.action.isAosOnlineEditAvailable" parent="evaluator.doclib.action.metadataValue">
+      <property name="accessor" value="custom.aos" />
+      <property name="comparator">
+         <bean class="org.alfresco.web.evaluator.NullValueComparator">
+            <property name="value" value="false" />
+         </bean>
+      </property>
+   </bean>
    
    <!-- Edit Offline -->
    <bean id="evaluator.doclib.action.offlineEdit" parent="evaluator.doclib.action.notEditBrowser" />
@@ -349,7 +404,6 @@
    <bean id="evaluator.doclib.action.cancelLockedBlacklist" parent="evaluator.doclib.action.hasAnyAspect">
       <property name="aspects">
          <list>
-            <value>gd2:editingInGoogle</value>
             <value>xam:archive</value>
          </list>
       </property>
@@ -469,67 +523,6 @@
    -->
    <bean id="evaluator.doclib.action.viewInExplorer" class="org.alfresco.web.evaluator.doclib.action.ViewInExplorerEvaluator">
       <property name="configService" ref="web.config" />
-   </bean>
-
-   <!--
-      Google Docs
-   -->
-   <bean id="evaluator.doclib.action.googleDocsEnabled" parent="evaluator.doclib.action.metadataValue">
-      <property name="accessor" value="custom.googleDocs.enabled" />
-      <property name="comparator">
-         <bean class="org.alfresco.web.evaluator.StringEqualsComparator">
-            <property name="value" value="true" />
-         </bean>
-      </property>
-   </bean>
-
-   <bean id="evaluator.doclib.action.googleDocsEditableAspect" parent="evaluator.doclib.action.hasAspect">
-      <property name="aspects">
-         <list>
-            <value>gd:googleEditable</value>
-         </list>
-      </property>
-   </bean>
-
-   <bean id="evaluator.doclib.action.googleDocsResourceAspect" parent="evaluator.doclib.action.hasAspect">
-      <property name="aspects">
-         <list>
-            <value>gd:googleResource</value>
-         </list>
-      </property>
-   </bean>
-
-   <bean id="evaluator.doclib.action.googleDocsCheckOut" parent="evaluator.doclib.action.chainedMatchAll">
-      <property name="evaluators">
-         <list>
-            <ref bean="evaluator.doclib.action.isNotIE8" />
-            <ref bean="evaluator.doclib.action.googleDocsEnabled" />
-            <ref bean="evaluator.doclib.action.googleDocsEditableAspect" />
-            <ref bean="evaluator.doclib.action.isNotWorkingCopy" />
-            <ref bean="evaluator.doclib.action.notCheckedOutAspect" />
-         </list>
-      </property>
-   </bean>
-
-   <bean id="evaluator.doclib.action.googleDocsView" parent="evaluator.doclib.action.chainedMatchAll">
-      <property name="evaluators">
-         <list>
-            <ref bean="evaluator.doclib.action.isNotIE8" />
-            <ref bean="evaluator.doclib.action.googleDocsEnabled" />
-            <ref bean="evaluator.doclib.action.googleDocsResourceAspect" />
-         </list>
-      </property>
-   </bean>
-
-   <bean id="evaluator.doclib.action.googleDocsCheckInCustom" class="org.alfresco.web.evaluator.doclib.action.GoogleDocsCheckInEvaluator" />
-   <bean id="evaluator.doclib.action.googleDocsCheckIn" parent="evaluator.doclib.action.chainedMatchAll">
-      <property name="evaluators">
-         <list>
-            <ref bean="evaluator.doclib.action.isNotIE8" />
-            <ref bean="evaluator.doclib.action.googleDocsEnabled" />
-            <ref bean="evaluator.doclib.action.googleDocsCheckInCustom" />
-         </list>
-      </property>
    </bean>
 
    <!--
@@ -653,6 +646,15 @@
             <value>hwf:hybridWorkflow</value>
          </list>
       </property>
+   </bean>
+   
+   <bean id="evaluator.doclib.action.isDeletable" parent="evaluator.doclib.action.hasAspect">
+      <property name="aspects">
+         <list>
+            <value>sys:undeletable</value>
+         </list>
+      </property>
+      <property name="negateOutput" value="true" />
    </bean>
    
    <bean id="evaluator.doclib.action.isNotPartOfHybridWorklfow" parent="evaluator.doclib.action.hasAspect">

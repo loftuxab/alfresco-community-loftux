@@ -42,8 +42,8 @@ import org.alfresco.query.CannedQueryResults;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.cache.AsynchronouslyRefreshedCache;
-import org.alfresco.repo.cache.RefreshableCacheEvent;
-import org.alfresco.repo.cache.RefreshableCacheListener;
+import org.alfresco.util.cache.RefreshableCacheEvent;
+import org.alfresco.util.cache.RefreshableCacheListener;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.cache.TransactionalCache;
 import org.alfresco.repo.domain.permissions.AclDAO;
@@ -86,6 +86,7 @@ import org.alfresco.util.ParameterCheck;
 import org.alfresco.util.PropertyCheck;
 import org.alfresco.util.SearchLanguageConversion;
 import org.alfresco.util.registry.NamedObjectRegistry;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -120,7 +121,7 @@ public class AuthorityDAOImpl implements AuthorityDAO, NodeServicePolicies.Befor
     private SimpleCache<String, Set<String>> userAuthorityCache;
     private SimpleCache<Pair<String, String>, List<ChildAssociationRef>> zoneAuthorityCache;
     private SimpleCache<NodeRef, Pair<Map<NodeRef,String>, List<NodeRef>>> childAuthorityCache;
-    private AsynchronouslyRefreshedCache<BridgeTable<String>> authorityBridgeTableCache;
+    private AuthorityBridgeTableAsynchronouslyRefreshedCache authorityBridgeTableCache;
     private SimpleCache<String, Object> singletonCache; // eg. for system container nodeRefs (authorityContainer and zoneContainer)
     private final String KEY_SYSTEMCONTAINER_NODEREF = "key.systemcontainer.noderef";
     /** Limit the number of copies of authority names floating about by keeping them in a pool **/
@@ -367,6 +368,8 @@ public class AuthorityDAOImpl implements AuthorityDAO, NodeServicePolicies.Befor
     public void createAuthority(String name, String authorityDisplayName, Set<String> authorityZones)
     {
         HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
+        /* MNT-11749 : Alfresco allows to create authorities with different char cases, but disallow duplicates */
+        props.put(ContentModel.PROP_NAME, DigestUtils.md5Hex(name));
         props.put(ContentModel.PROP_AUTHORITY_NAME, name);
         props.put(ContentModel.PROP_AUTHORITY_DISPLAY_NAME, authorityDisplayName);
         NodeRef childRef;

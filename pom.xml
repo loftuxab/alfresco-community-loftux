@@ -6,7 +6,7 @@
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>5.0.a.LX66</version>
+  <version>5.0.b.LX67-SNAPSHOT</version>
   <name>Alfresco</name>
 
   <url>http://www.alfresco.org/</url>
@@ -67,6 +67,7 @@
   </distributionManagement>
 
   <modules>
+    <module>projects/surf</module>
     <module>projects/core</module>
     <module>projects/data-model</module>
     <module>projects/legacy-lucene</module>
@@ -82,6 +83,7 @@
     <module>projects/web-editor</module>
     <module>projects/web-editor-plugin</module>
     <module>projects/solr-client</module>
+    <module>projects/solr4</module>
     <module>projects/solr</module>
     <module>projects/file-transfer-receiver</module>
     <!-- Currently being worked out... see BDE-118
@@ -98,8 +100,13 @@
 
   <properties>
     <tomcat.default.alfresco.port>8080</tomcat.default.alfresco.port>
+    <tomcat.default.alfresco.ssl.port>8443</tomcat.default.alfresco.ssl.port>
     <tomcat.default.share.port>8081</tomcat.default.share.port>
+    <tomcat.default.share.ssl.port>8444</tomcat.default.share.ssl.port>
     <tomcat.default.solr.port>8082</tomcat.default.solr.port>
+    <tomcat.default.solr.ssl.port>8445</tomcat.default.solr.ssl.port>
+    <tomcat.default.solr4.port>8083</tomcat.default.solr4.port>
+    <tomcat.default.solr4.ssl.port>8446</tomcat.default.solr4.ssl.port>
 
     <!-- Database properties - default values to be overridden in settings.xml -->
     <db.skip>true</db.skip>
@@ -144,10 +151,9 @@
     <dependency.tika.version>1.6-20140428-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
     <dependency.opencmis.version>0.10.0</dependency.opencmis.version>
-    <dependency.antlr.version>3.4</dependency.antlr.version>
+    <dependency.antlr.version>3.5.2</dependency.antlr.version>
     <dependency.spring.version>3.0.5.RELEASE</dependency.spring.version>
-    <dependency.surf.version>1.2.1-M21</dependency.surf.version>
-    <dependency.activiti.version>5.13-alf-20140107</dependency.activiti.version>
+    <dependency.activiti.version>5.13-alf-20140708</dependency.activiti.version>
     <dependency.poi.version>3.10-FINAL</dependency.poi.version>
     <dependency.dojo.version>1.8.3</dependency.dojo.version>
 
@@ -365,7 +371,7 @@
 			</executions>
 		</plugin>
 
-		<!-- Create jar of test classes -->
+		<!-- Create a jar of test classes, to be reused later in remote-api -->
 		<plugin>
 			<artifactId>maven-jar-plugin</artifactId>
 			<executions>
@@ -567,6 +573,13 @@
                         <db.password>${db.password}</db.password>
                         <dir.root>${dir.root}</dir.root>
                     </systemProperties>
+                    <keystoreFile>${highest.basedir}/projects/system-build-test/keystore/ssl.keystore</keystoreFile>
+                    <keystorePass>kT9X6oe68t</keystorePass>
+                    <keystoreType>JCEKS</keystoreType>
+                    <truststoreFile>${highest.basedir}/projects/system-build-test/keystore/ssl.truststore</truststoreFile>
+                    <truststorePass>kT9X6oe68t</truststorePass>
+                    <truststoreType>JCEKS</truststoreType>
+                    <tomcatUsers>${highest.basedir}/packaging/installer/src/main/resources/bitrock/bitrock/alfresco/shared/tomcat-users.xml</tomcatUsers>
                 </configuration>
             </plugin>
             <plugin>
@@ -654,6 +667,7 @@
 									<versionRange>[2.7,)</versionRange>
 									<goals>
 										<goal>unpack</goal>
+       									<goal>copy</goal>
 										<goal>copy-dependencies</goal>
 									</goals>
 								</pluginExecutionFilter>
@@ -661,40 +675,6 @@
 									<ignore />
 								</action>
 							</pluginExecution>
-							<pluginExecution>
-								<pluginExecutionFilter>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>
-										maven-war-plugin
-									</artifactId>
-									<versionRange>[2.3,)</versionRange>
-									<goals>
-										<goal>exploded</goal>
-									</goals>
-								</pluginExecutionFilter>
-								<action>
-									<execute>
-										<runOnConfiguration>true</runOnConfiguration>
-									</execute>
-								</action>
-							</pluginExecution>
-                            <pluginExecution>
-                                <pluginExecutionFilter>
-                                    <groupId>com.google.code.maven-replacer-plugin</groupId>
-                                    <artifactId>replacer</artifactId>
-                                    <versionRange>1.5.0</versionRange>
-                                    <goals>
-                                        <goal>replace</goal>
-                                    </goals>
-                                </pluginExecutionFilter>
-                                <action>
-                                    <execute>
-                                    	<runOnIncremental>true</runOnIncremental>
-                                    	<runOnConfiguration>true</runOnConfiguration>
-                                    </execute>
-                                </action>
-                                <comment>source: </comment>
-                            </pluginExecution>
 							<pluginExecution>
 								<pluginExecutionFilter>
 									<groupId>org.apache.maven.plugins</groupId>
@@ -708,6 +688,33 @@
 									<ignore />
 								</action>
 							</pluginExecution>
+
+        					<pluginExecution>
+        						<pluginExecutionFilter>
+        							<groupId>org.apache.maven.plugins</groupId>
+        							<artifactId>maven-antrun-plugin</artifactId>
+        							<versionRange>[1.7,)</versionRange>
+        							<goals>
+        								<goal>run</goal>
+        							</goals>
+        						</pluginExecutionFilter>
+        						<action>
+        							<ignore/>
+        						</action>
+        					</pluginExecution>
+       						<pluginExecution>
+       							<pluginExecutionFilter>
+       								<groupId>org.alfresco.maven.plugin</groupId>
+       								<artifactId>alfresco-maven-plugin</artifactId>
+       								<versionRange>[0,)</versionRange>
+       								<goals>
+       									<goal>set-version</goal>
+       								</goals>
+       							</pluginExecutionFilter>
+       							<action>
+       								<ignore/>
+       							</action>
+       						</pluginExecution>
 						</pluginExecutions>
 					</lifecycleMappingMetadata>
 				</configuration>
@@ -780,10 +787,19 @@
     <!-- Profile to build alfresco-enterprise -->
     <profile>
         <id>enterprise</id>
+        <repositories>
+            <repository>
+                <id>alfresco-internal</id>
+                <url>https://artifacts.alfresco.com/nexus/content/groups/internal</url>
+            </repository>
+        </repositories>
         <modules>
-            <module>enterpriseprojects/repository</module>
+			<module>enterpriseprojects/repository</module>
             <module>enterpriseprojects/remote-api</module>
             <module>enterpriseprojects/overlays</module>
+            <module>enterpriseprojects/spring-encryptor</module>
+            <module>enterpriseprojects/server-root</module>
+            <module>enterpriseprojects/vti-bin</module>
         </modules>
         <properties>
             <!-- Enterprise specific properties -->
@@ -956,5 +972,26 @@
 			</plugins>
 		</build>
 	</profile>
+	  <profile>
+        <id>solr4-ssl</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <configuration>
+                        <systemProperties>
+                            <index.subsystem.name>solr4</index.subsystem.name>
+                            <solr.host>localhost</solr.host>
+                            <solr.port>${tomcat.default.solr4.ssl.port}</solr.port>
+                            <solr.secureComms>https</solr.secureComms>
+                            <solr.backup.alfresco.numberToKeep>0</solr.backup.alfresco.numberToKeep>
+                            <solr.backup.archive.numberToKeep>0</solr.backup.archive.numberToKeep>
+                        </systemProperties>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
   </profiles>
 </project>

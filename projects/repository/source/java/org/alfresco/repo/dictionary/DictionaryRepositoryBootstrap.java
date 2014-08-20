@@ -33,6 +33,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.EmptyContentReader;
 import org.alfresco.repo.i18n.MessageDeployer;
 import org.alfresco.repo.i18n.MessageService;
+import org.alfresco.repo.policy.ClassPolicyDelegate;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.tenant.TenantAdminService;
 import org.alfresco.repo.tenant.TenantDeployer;
 import org.alfresco.repo.tenant.TenantService;
@@ -51,18 +53,21 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.Pair;
+import org.alfresco.util.PropertyCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.extensions.surf.util.AbstractLifecycleBean;
+import org.alfresco.repo.dictionary.DynamicModelPolicies.OnLoadDynamicModel;
 
 /**
  * Bootstrap the dictionary from specified locations within the repository
  * 
- * @author Roy Wetherall, JanV
+ * @author Roy Wetherall, JanV, sglover
  */
-public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean implements TenantDeployer, DictionaryListener, MessageDeployer
+public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean
+implements TenantDeployer, DictionaryListener, /*TenantDictionaryListener, */MessageDeployer
 {
     // Logging support
     private static Log logger = LogFactory.getLog(DictionaryRepositoryBootstrap.class);
@@ -93,6 +98,10 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
 
     /** The transaction service */
     private TransactionService transactionService;
+    
+    /** The policy component */
+    private PolicyComponent policyComponent;
+    
       
     /**
      * Sets the Dictionary DAO
@@ -123,7 +132,17 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
     {
         this.nodeService = nodeService;
     }
-    
+
+	public PolicyComponent getPolicyComponent()
+	{
+		return policyComponent;
+	}
+
+	public void setPolicyComponent(PolicyComponent policyComponent)
+	{
+		this.policyComponent = policyComponent;
+	}
+
     /**
      * Set the tenant admin service
      * 
@@ -186,12 +205,27 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
         this.repositoryMessagesLocations = repositoryLocations;
     }
 
-
+    private ClassPolicyDelegate<OnLoadDynamicModel> onLoadDynamicModelDelegate;
+    
     /**
      * Initialise - after bootstrap of schema and tenant admin service
      */
     public void init()
     {
+    	PropertyCheck.mandatory(this, "dictionaryDAO", dictionaryDAO);
+        PropertyCheck.mandatory(this, "contentService", contentService);
+        PropertyCheck.mandatory(this, "nodeService", nodeService);
+        PropertyCheck.mandatory(this, "tenantAdminService", tenantAdminService);
+    	PropertyCheck.mandatory(this, "namespaceService", namespaceService);
+    	PropertyCheck.mandatory(this, "messageService", messageService);
+    	PropertyCheck.mandatory(this, "transactionService", transactionService);
+    	PropertyCheck.mandatory(this, "policyComponent", policyComponent);
+    	
+    	if(onLoadDynamicModelDelegate == null)
+    	{
+    		onLoadDynamicModelDelegate = policyComponent.registerClassPolicy(DynamicModelPolicies.OnLoadDynamicModel.class);
+    	}
+    	
         transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Object>()
         {
             public Object execute() throws Exception
@@ -208,25 +242,7 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
     {    
         // NOOP - will be destroyed directly via DictionaryComponent
     }
-    
-    /**
-     * Initialise the dictionary, ensuring that a transaction is available
-     */
-    @Override
-    public void onDictionaryInit()
-    {
-        RetryingTransactionCallback<Void> initCallback = new RetryingTransactionCallback<Void>()
-        {
-            @Override
-            public Void execute() throws Throwable
-            {
-                onDictionaryInitInTxn();
-                return null;
-            }
-        };
-        transactionService.getRetryingTransactionHelper().doInTransaction(initCallback, true, false);
-    }
-    
+
     /**
      * Perform the actual repository access, checking for the existence of a valid transaction
      */
@@ -245,14 +261,15 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
             logger.trace("onDictionaryInit: ["+Thread.currentThread()+"]"+(tenantDomain.equals(TenantService.DEFAULT_DOMAIN) ? "" : " (Tenant: "+tenantDomain+")"));
         }
         
-        Collection<QName> modelsBefore = dictionaryDAO.getModels(); // note: re-entrant
+        Collection<QName> modelsBefore = dictionaryDAO.getModels(true); // note: re-entrant
         int modelsBeforeCnt = (modelsBefore != null ? modelsBefore.size() : 0);
         
         List<String> loadedModels = new ArrayList<String>();
         
         if (this.repositoryModelsLocations != null)
         {
-            Map<String, Pair<RepositoryLocation, M2Model>> modelMap = new HashMap<String, Pair<RepositoryLocation, M2Model>>();
+        	// URI to model map
+            Map<String, DynamicModelInfo> modelMap = new HashMap<String, DynamicModelInfo>();
             
             if (logger.isTraceEnabled())
             {
@@ -284,7 +301,8 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
                             try
                             {
                                 // Ignore if the node is a working copy or archived, or if its inactive
-                                if (! (nodeService.hasAspect(dictionaryModel, ContentModel.ASPECT_WORKING_COPY) || nodeService.hasAspect(dictionaryModel, ContentModel.ASPECT_ARCHIVED))) 
+                                if (! (nodeService.hasAspect(dictionaryModel, ContentModel.ASPECT_WORKING_COPY) ||
+                                		nodeService.hasAspect(dictionaryModel, ContentModel.ASPECT_ARCHIVED))) 
                                 {
                                     Boolean isActive = (Boolean)nodeService.getProperty(dictionaryModel, ContentModel.PROP_MODEL_ACTIVE);
                                     
@@ -300,7 +318,7 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
                                             
                                             for (M2Namespace namespace : model.getNamespaces())
                                             {
-                                                modelMap.put(namespace.getUri(), new Pair<RepositoryLocation, M2Model>(repositoryLocation, model));
+                                                modelMap.put(namespace.getUri(), new DynamicModelInfo(repositoryLocation, model, dictionaryModel));
                                             }
                                         }
                                     }
@@ -326,16 +344,16 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
             }
             
             // Load the models ensuring that they are loaded in the correct order
-            for (Map.Entry<String, Pair<RepositoryLocation, M2Model>> entry : modelMap.entrySet())
+            for (Map.Entry<String, DynamicModelInfo> entry : modelMap.entrySet())
             {
-                RepositoryLocation importedLocation = entry.getValue().getFirst();
-                M2Model importedModel = entry.getValue().getSecond();
-                
+                RepositoryLocation importedLocation = entry.getValue().location;
+                M2Model importedModel = entry.getValue().model;
                 loadModel(modelMap, loadedModels, importedModel, importedLocation);
+                notifyDynamicModelLoaded(entry.getValue());
             }
         }
         
-        Collection<QName> modelsAfter = dictionaryDAO.getModels();
+        Collection<QName> modelsAfter = dictionaryDAO.getModels(true);
         int modelsAfterCnt = (modelsAfter != null ? modelsAfter.size() : 0);
         
         if (logger.isDebugEnabled())
@@ -345,22 +363,17 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
         }
     }
     
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.repo.dictionary.DictionaryListener#afterInit()
-     */
-    public void afterDictionaryInit()
+    public void notifyDynamicModelLoaded(DynamicModelInfo entry)
     {
+       	if(onLoadDynamicModelDelegate == null)
+    	{
+    		onLoadDynamicModelDelegate = policyComponent.registerClassPolicy(DynamicModelPolicies.OnLoadDynamicModel.class);
+    	}
+ 
+    	DynamicModelPolicies.OnLoadDynamicModel policy = onLoadDynamicModelDelegate.get(ContentModel.TYPE_CONTENT);
+    	policy.onLoadDynamicModel(entry.model, entry.nodeRef);
     }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.repo.dictionary.DictionaryListener#onDictionaryDestroy()
-     */
-    public void afterDictionaryDestroy()
-    {
-    }
-    
+
     public void initMessages()
     {
         if (this.repositoryMessagesLocations != null)
@@ -457,14 +470,26 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
         
         return modelRefs;
     }
-    
-    protected List<NodeRef> getNodes(StoreRef storeRef, RepositoryLocation repositoryLocation, QName nodeType)
+
+	protected List<NodeRef> getNodes(StoreRef storeRef, RepositoryLocation repositoryLocation, QName nodeType)
     {
         List<NodeRef> nodeRefs = new ArrayList<NodeRef>();
-        
+
         NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
+        if(nodeService.exists(rootNodeRef) == false)
+        {
+            //Tenant is deleted. But cache refresh was called to inform another cluster nodes
+            //Should be reworked when MNT-11638 will be implemented
+            return nodeRefs;
+        }
+		
+        if(repositoryLocation instanceof DynamicCreateRepositoryLocation)
+        {
+        	((DynamicCreateRepositoryLocation)repositoryLocation).checkAndCreate(rootNodeRef);
+        }
+
         String[] pathElements = repositoryLocation.getPathElements();
-        
+
         NodeRef folderNodeRef = rootNodeRef;
         if (pathElements.length > 0)
         {
@@ -490,6 +515,21 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
         return nodeRefs;
     }
     
+    private class DynamicModelInfo
+    {
+    	RepositoryLocation location;
+    	M2Model model;
+    	NodeRef nodeRef;
+    	
+    	
+    	DynamicModelInfo(RepositoryLocation location, M2Model model, NodeRef nodeRef)
+    	{
+    		this.location = location;
+    		this.model = model;
+    		this.nodeRef = nodeRef;
+    	}
+    }
+    
     /**
      * Loads a model (and its dependents) if it does not exist in the list of loaded models.
      * 
@@ -497,18 +537,18 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
      * @param loadedModels      the list of models already loaded
      * @param model             the model to try and load
      */
-    private void loadModel(Map<String, Pair<RepositoryLocation, M2Model>> modelMap, List<String> loadedModels, M2Model model, RepositoryLocation modelLocation)
+    private void loadModel(Map<String, DynamicModelInfo> modelMap, List<String> loadedModels, M2Model model, RepositoryLocation modelLocation)
     {
         String modelName = model.getName();
         if (loadedModels.contains(modelName) == false)
         {
             for (M2Namespace importNamespace : model.getImports())
             {
-                Pair<RepositoryLocation, M2Model> entry = modelMap.get(importNamespace.getUri());
+                DynamicModelInfo entry = modelMap.get(importNamespace.getUri());
                 if (entry != null)
                 {
-                    RepositoryLocation importedLocation = entry.getFirst();
-                    M2Model importedModel = entry.getSecond();
+                    RepositoryLocation importedLocation = entry.location;
+                    M2Model importedModel = entry.model;
                     
                     // Ensure that the imported model is loaded first
                     loadModel(modelMap, loadedModels, importedModel, importedLocation);
@@ -521,10 +561,12 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Loading model: " + modelName + " (from ["+ modelLocation.getStoreRef() + "]"+ modelLocation.getPath() + ")");
+                    logger.debug("Loading model: " + modelName
+                    		+ " (from ["+ modelLocation.getStoreRef() + "]"+ modelLocation.getPath() + ")");
                 }
-                
+
                 dictionaryDAO.putModel(model);
+
                 loadedModels.add(modelName);
             }
             catch (AlfrescoRuntimeException e)
@@ -612,8 +654,8 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
         dictionaryDAO.destroy();
         
         // register with Dictionary Service to allow (re-)init
-        dictionaryDAO.register(this);
-        
+        dictionaryDAO.registerListener(this);
+
         // register with Message Service to allow (re-)init
         messageService.register(this);
         
@@ -688,4 +730,36 @@ public class DictionaryRepositoryBootstrap extends AbstractLifecycleBean impleme
         }
         return parentNodeRef;
     }
+
+    /**
+     * Initialise the dictionary, ensuring that a transaction is available
+     */
+    @Override
+    public void onDictionaryInit()
+    {
+    	if(onLoadDynamicModelDelegate == null)
+    	{
+    		onLoadDynamicModelDelegate = policyComponent.registerClassPolicy(DynamicModelPolicies.OnLoadDynamicModel.class);
+    	}
+        RetryingTransactionCallback<Void> initCallback = new RetryingTransactionCallback<Void>()
+        {
+            @Override
+            public Void execute() throws Throwable
+            {
+                onDictionaryInitInTxn();
+                return null;
+            }
+        };
+        transactionService.getRetryingTransactionHelper().doInTransaction(initCallback, true, false);
+    }
+
+	@Override
+	public void afterDictionaryDestroy()
+	{
+	}
+
+	@Override
+	public void afterDictionaryInit()
+	{
+	}
 }

@@ -26,10 +26,10 @@
       <property name="threadPriority" value="5" />
     </bean>
 
-   <bean name="asynchronouslyRefreshedCacheRegistry" class="org.alfresco.repo.cache.DefaultAsynchronouslyRefreshedCacheRegistry" >
+   <bean name="asynchronouslyRefreshedCacheRegistry" class="org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry" >
    </bean>
 
-   <bean name="abstractAsynchronouslyRefreshedCache" class="org.alfresco.repo.cache.AbstractAsynchronouslyRefreshedCache" abstract="true">
+   <bean name="abstractAsynchronouslyRefreshedCache" class="org.alfresco.util.cache.AbstractAsynchronouslyRefreshedCache" abstract="true">
       <property name="threadPoolExecutor" ref="asynchronouslyRefreshedCacheThreadPoolExecutor" />
       <property name="tenantService" ref="tenantService" />
       <property name="registry" ref="asynchronouslyRefreshedCacheRegistry" />
@@ -55,6 +55,16 @@
       <constructor-arg value="cache.propertyValueCache"/>      
    </bean>
    
+   <!-- ===================================== -->
+   <!-- Property Class Cache                  -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Property Class entities -->
+   
+   <bean name="propertyClassSharedCache" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.propertyClassCache"/>
+   </bean>
+
    <!-- ===================================== -->
    <!-- Property Unique Context Cache         -->
    <!-- ===================================== -->
@@ -368,8 +378,8 @@
 
    <!-- The cross-transaction shared cache for Dictionary Models -->
    
-   <bean name="compiledModelsCache" factory-bean="cacheFactory" factory-method="createCache">
-      <constructor-arg value="cache.compiledModelsSharedCache"/>
+   <bean name="compiledModelsCache" class="org.alfresco.repo.dictionary.CompiledModelsCache" parent="abstractAsynchronouslyRefreshedCache">
+	  <property name="dictionaryDAO" ref="dictionaryDAO" /> 	
    </bean>
 
    <!-- The cross-transaction shared cache for Dictionary Namespaces [Must be non-clustered, non-txn and UNLIMITED IN SIZE]-->
@@ -473,6 +483,11 @@
    
    <bean name="samlTrustEngineSharedCache" factory-bean="cacheFactory" factory-method="createCache">
       <constructor-arg value="cache.samlTrustEngineSharedCache"/>
+   </bean>
+   
+   <!--  Temp Deleted Pseudo File Cache With TTL -->
+   <bean name="deletePseudoFileCache" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.deletePseudoFileCache"/>
    </bean>
 
    

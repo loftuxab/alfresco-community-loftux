@@ -50,6 +50,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Derek Hulley
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractWritableContentStoreTest extends AbstractReadOnlyContentStoreTest
 {
     private static Log logger = LogFactory.getLog(AbstractWritableContentStoreTest.class);
@@ -96,15 +97,6 @@ public abstract class AbstractWritableContentStoreTest extends AbstractReadOnlyC
     {
         ContentStore store = getStore();
         assertTrue("The store cannot be read-only", store.isWriteSupported());
-    }
-    
-    /**
-     * Just check that the method doesn't blow up
-     */
-    public void testSpaceUsed() throws Exception
-    {
-        ContentStore store = getStore();
-        store.getSpaceUsed();
     }
     
     /**
@@ -382,17 +374,7 @@ public abstract class AbstractWritableContentStoreTest extends AbstractReadOnlyC
         getStore().getUrls(from, to, handler);
         return found[0];
     }
-    
-    public void testGetUrls()
-    {
-        ContentWriter writer = getWriter();
-        writer.putContent("Content for " + getName());
-        final String contentUrl = writer.getContentUrl();
-        ContentStore store = getStore();
-        boolean inStore = searchForUrl(store, contentUrl, null, null);
-        assertTrue("New content not found in URL set", inStore);
-    }
-    
+
     public void testDeleteSimple() throws Exception
     {
         ContentStore store = getStore();

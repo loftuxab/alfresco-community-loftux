@@ -437,6 +437,7 @@
          <exclude name="**/org/alfresco/repo/webdav/UnlockMethodTest.java" />
          <exclude name="**/org/alfresco/rest/workflow/api/tests/TaskWorkflowApiTest.java" />
          <exclude name="**/org/alfresco/repo/webdav/LockInfoImplTest.java" />
+         <exclude name="**/org/alfresco/rest/test/workflow/api/impl/ProcessesImplTest.java" />
 
          <!-- Enterprise Repo Tests -->
          <include name="**/org/alfresco/enterprise/EnterpriseRepository*TestSuite.java" />
@@ -589,6 +590,15 @@
 
    </target>
 
+    <!-- **************************** -->
+    <!-- ** Prepare Maven Ant Task ** -->
+    <!-- **************************** -->
+    
+    <target name="init-maven-ant-task" depends="init">
+        <path id="maven-ant-tasks.classpath" path="${dir.project.3rdparty.lib}/devenv/maven-ant-tasks-2.1.3.jar" />
+        <typedef resource="org/apache/maven/artifact/ant/antlib.xml"  uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
+    </target>
+
 
    <!-- ****************************************************** -->
    <!-- ***************** Entry point targets **************** -->
@@ -619,6 +629,7 @@
                     incremental-webeditor,
                     incremental-webeditor-plugin,
                     incremental-solrclient,
+                    incremental-solr4,
                     incremental-solr,
                     incremental-file-transfer-receiver" />
 
@@ -737,6 +748,7 @@
                     clean-slingshot-projects,
                     clean-webeditor-projects,
                     clean-solrclient,
+                    clean-solr4,
                     clean-solr,
                     clean-file-transfer-receiver" />
                     
@@ -853,6 +865,8 @@
       
       <!-- remove the WAR, if necessary -->
       <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
+      <delete dir="${dir.deploy.tomcat.webclient}" 
+              includeEmptyDirs="true" quiet="yes" />
       
       <!-- copy the class files from each project to the WEB-INF/classes folder -->
       <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes" verbose="${copy.verbose}">
@@ -1333,6 +1347,33 @@
                    warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
+   <target name="deploy-solr4" description="Add the repository specific files to the SOLR4 instance" depends="package-core, package-datamodel, package-legacylucene, package-solrclient, package-solr4" >
+      <delete includeemptydirs="true">
+         <fileset dir="${dir.project.solr4.instance.lib}" includes="**/*"/>
+      </delete>
+
+      <copy todir="${dir.project.solr4.instance.lib}" 
+            file="${dir.project.core.dist}/${file.name.jar.core}" />
+      <copy todir="${dir.project.solr4.instance.lib}" 
+            file="${dir.project.datamodel.dist}/${file.name.jar.datamodel}" />
+      <copy todir="${dir.project.solr4.instance.lib}" 
+            file="${dir.project.legacylucene.dist}/${file.name.jar.legacylucene}" />
+      <copy todir="${dir.project.solr4.instance.lib}" 
+            file="${dir.project.solrclient.dist}/${file.name.jar.solrclient}" />
+      <copy todir="${dir.project.solr4.instance.lib}"
+            file="${dir.project.solr4.dist}/${file.name.jar.solr4}" />
+
+      <taskdef name="copy-libs-from-classpath"
+               classname="org.alfresco.devenv.ant.CopyLibrariesFromEclipseClasspath">
+         <classpath refid="classpath.compile" />
+      </taskdef>
+
+      <copy-libs-from-classpath destdir="${dir.project.solr4.instance.lib}" projectdir="${dir.project.core}" libdir="${dir.project.3rdparty}" />
+      <copy-libs-from-classpath destdir="${dir.project.solr4.instance.lib}" projectdir="${dir.project.datamodel}" libdir="${dir.project.3rdparty}" />
+      <copy-libs-from-classpath destdir="${dir.project.solr4.instance.lib}" projectdir="${dir.project.legacylucene}" libdir="${dir.project.3rdparty}" />
+      <copy-libs-from-classpath destdir="${dir.project.solr4.instance.lib}" projectdir="${dir.project.solrclient}" libdir="${dir.project.3rdparty}" />
+   </target>
+
    <target name="deploy-solr" description="Add the repository specific files to the SOLR instance" depends="package-core, package-datamodel, package-legacylucene, package-solrclient, package-solr" >
       <delete includeemptydirs="true">
          <fileset dir="${dir.project.solr.instance.lib}" includes="**/*"/>
@@ -1652,4 +1693,7 @@
 
    <target name="assemble-command-extras" description="Assemble commands" />
 
+   <target name="assemble-tomcat-extras" description="Assemble distribution war" />
+
+ 
 </project>

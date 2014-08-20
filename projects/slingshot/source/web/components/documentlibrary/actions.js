@@ -222,7 +222,6 @@
                manageTranslationsUrl: fnPageURL("manage-translations?nodeRef=" + strNodeRef),
                workingCopyUrl: fnPageURL("document-details?nodeRef=" + (workingCopy.workingCopyNodeRef || strNodeRef)),
                workingCopySourceUrl: fnPageURL("document-details?nodeRef=" + (workingCopy.sourceNodeRef || strNodeRef)),
-               viewGoogleDocUrl: workingCopy.googleDocUrl + "\" target=\"_blank",
                explorerViewUrl: $combine(this.options.repositoryUrl, "/n/showSpaceDetails/", nodeRefUri) + "\" target=\"_blank",
                cloudViewUrl: $combine(Alfresco.constants.URL_SERVICECONTEXT, "cloud/cloudUrl?nodeRef=" +strNodeRef)
             };
@@ -501,11 +500,18 @@
          {
             if (isCloud)
             {
-               displayPromptText += this.msg("actions.synced.cloud." + content + ".delete", displayName);
+        	   if (jsNode.hasAspect("sync:deleteOnPrem"))
+               {
+          	      displayPromptText += this.msg("actions.synced.cloud." + content + ".delete.on.prem", displayName);
+               }
+               else
+               {
+          	      displayPromptText += this.msg("actions.synced.cloud." + content + ".delete", displayName);
+               }
             }
             else
             {
-               displayPromptText += this.msg("actions.synced." + content + ".delete", displayName);
+                displayPromptText += this.msg("actions.synced." + content + ".delete", displayName);
             }
          }
 
@@ -948,27 +954,207 @@
       },
 
       /**
-       * Checkout to Google Docs.
-       * NOTE: Placeholder only, clients MUST implement their own checkoutToGoogleDocs action
+       * Edit Online with AOS.
        *
-       * @method onActionCheckoutToGoogleDocs
-       * @param record {object} Object literal representing the file or folder to be actioned
+       * @method onActionEditOnlineAos
+       * @param record {object} Object literal representing file or folder to be actioned
        */
-      onActionCheckoutToGoogleDocs: function dlA_onActionCheckoutToGoogleDocs(record)
+      onActionEditOnlineAos: function dlA_onActionEditOnlineAos(record)
       {
-         Alfresco.logger.error("onActionCheckoutToGoogleDocs", "Abstract implementation not overridden");
+         if (!$isValueSet(record.onlineEditUrlAos))
+         {
+            record.onlineEditUrlAos = Alfresco.util.onlineEditUrlAos(this.doclistMetadata.custom.aos, record);
+         }
+         
+         var fileExtension = Alfresco.util.getFileExtension(record.location.file);
+         var protocolHandler = this.getProtocolForFileExtension(fileExtension);
+         
+         if(protocolHandler === undefined)
+         {
+            Alfresco.logger.error("onActionEditOnlineAos", "No protocol handler available for file extension.");
+            return;
+         }
+         
+         var officeLauncher = new EmbeddedOfficeLauncher();
+         
+         if(officeLauncher.isIOS())
+         {
+            this._aos_launchOfficeOnIos(officeLauncher, protocolHandler, record.onlineEditUrlAos);
+            return;
+         }
+
+         // detect if we are on a supported operating system
+         if(!officeLauncher.isWin() && !officeLauncher.isMac())
+         {
+             Alfresco.util.PopupManager.displayMessage(
+             {
+                text: this.msg('message.edit-online-aos.no_supported_environment')
+             });
+             return;
+         }
+
+         // if we have a working PlugIn (ActiveX or NPAPI), use it. Otherwise we use the protocol handler (e.g. Chrome w/o PlugIn)
+         if(officeLauncher.isAvailable())
+         {
+             this._aos_launchOfficeByPlugin(officeLauncher, record.onlineEditUrlAos);
+         }
+         else
+         {
+             this._aos_tryToLaunchOfficeByMsProtocolHandler(officeLauncher, protocolHandler, record.onlineEditUrlAos);
+         }
+        
+         return;
+      },
+      
+      _aos_launchOfficeByPlugin: function dlA__aos_launchOfficeByPlugin(officeLauncher, url)
+      {
+         var checker, dlg;
+         var isNotIE = (officeLauncher.isFirefox() || officeLauncher.isChrome() || officeLauncher.isSafari());
+         if (!officeLauncher.EditDocument(url))
+         {
+            // check if the Plug-In has been blocked
+            if (officeLauncher.isControlNotActivated() && isNotIE)
+            {
+               checker = window.setInterval(function()
+               {
+                  if (officeLauncher.isControlActivated())
+                  {
+                     window.clearInterval(checker);
+                     dlg.destroy();
+                     window.setTimeout(function()
+                     {
+                        if (!officeLauncher.EditDocument(url))
+                        {
+                           if (officeLauncher.getLastControlResult() !== -2)
+                           {
+                              var errorDetails = officeLauncher.getLastControlResult() !== false ? ' (Error code: ' + officeLauncher.getLastControlResult() + ')' : '';
+                              Alfresco.util.PopupManager.displayMessage(
+                              {
+                                          text: this.msg('message.edit-online-aos.starting_office_failed') + errorDetails
+                              });
+                           }
+                        }
+                        else
+                        {
+                           YAHOO.Bubbling.fire("metadataRefresh");
+                        }
+                     }, 50);
+                  }
+               }, 250);
+               var dlg = new YAHOO.widget.SimpleDialog('prompt',
+               {
+                        close: false,
+                        constraintoviewport: true,
+                        draggable: false,
+                        effect: null,
+                        modal: true,
+                        visible: true,
+                        zIndex: 9999
+               });
+               // TODO: Properly format message
+               dlg.setHeader(this.msg('message.edit-online-aos.plugin_blocked.caption'));
+               dlg.setBody(this.msg('message.edit-online-aos.plugin_blocked.body'));
+               dlg.cfg.queueProperty('buttons', [ {
+                     text: this.msg('message.edit-online-aos.plugin_blocked.button_dismiss'),
+                     handler: function() {
+                        window.clearInterval(checker);
+                        this.destroy();
+                     },
+                     isDefault: true
+               }]);
+               dlg.render(document.body);
+               dlg.center();
+               dlg.show();
+            }
+            else
+            {
+               if (officeLauncher.getLastControlResult() !== -2)
+               {
+                  // error message only required if user did not cancel (result === -2)
+                  var errorDetails = officeLauncher.getLastControlResult() !== false ? ' (Error code: ' + officeLauncher.getLastControlResult() + ')' : '';
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg('message.edit-online-aos.starting_office_failed') + errorDetails
+                  });
+               }
+            }
+         }
+         else
+         {
+            YAHOO.Bubbling.fire("metadataRefresh");
+         }
       },
 
-      /**
-       * Check in a new version from Google Docs.
-       * NOTE: Placeholder only, clients MUST implement their own checkinFromGoogleDocs action
-       *
-       * @method onActionCheckinFromGoogleDocs
-       * @param record {object} Object literal representing the file or folder to be actioned
-       */
-      onActionCheckinFromGoogleDocs: function dlA_onActionCheckinFromGoogleDocs(record)
+      _aos_tryToLaunchOfficeByMsProtocolHandler: function dlA__aos_tryToLaunchOfficeByMsProtocolHandler(officeLauncher, protocolHandler, url)
       {
-         Alfresco.logger.error("onActionCheckinFromGoogleDocs", "Abstract implementation not overridden");
+          var protocolUrl = protocolHandler + ':ofe%7Cu%7C' + officeLauncher.encodeUrl(url);
+          var protocolHandlerPresent = false;
+
+          var input = document.createElement('input');
+          var inputTop = document.body.scrollTop + 10;
+          input.setAttribute('style', 'z-index: 1000; background-color: rgba(0, 0, 0, 0); border: none; outline: none; position: absolute; left: 10px; top: '+inputTop+'px;');
+          document.getElementsByTagName("body")[0].appendChild(input);
+          input.focus();
+          input.onblur = function() {
+              protocolHandlerPresent = true;
+          };
+          location.href = protocolUrl;
+          setTimeout(function()
+          {
+              input.onblur = null;
+              input.remove();
+              if(!protocolHandlerPresent)
+              {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                      text: this.msg('message.edit-online-aos.supported_office_version_required')
+                  });
+              }
+          }, 500);
+      },
+      
+      _aos_launchOfficeOnIos: function dlA__aos_launchOfficeOnIos(officeLauncher, protocolHandler, url)
+      {
+         var protocolUrl = protocolHandler + ':ofe%7Cu%7C' + officeLauncher.encodeUrl(url);
+         var iframe = document.createElement('iframe');
+         iframe.setAttribute('style', 'display: none; height: 0; width: 0;');
+         document.getElementsByTagName('body')[0].appendChild(iframe);
+         iframe.src = protocolUrl;
+      },
+      
+      getProtocolForFileExtension: function(fileExtension)
+      {
+         var msProtocolNames =
+         {
+            'doc'  : 'ms-word',
+            'docx' : 'ms-word',
+            'docm' : 'ms-word',
+            'dot'  : 'ms-word',
+            'dotx' : 'ms-word',
+            'dotm' : 'ms-word',
+            'xls'  : 'ms-excel',
+            'xlsx' : 'ms-excel',
+            'xlsb' : 'ms-excel',
+            'xlsm' : 'ms-excel',
+            'xlt'  : 'ms-excel',
+            'xltx' : 'ms-excel',
+            'xltm' : 'ms-excel',
+            'xlsm' : 'ms-excel',
+            'ppt'  : 'ms-powerpoint',
+            'pptx' : 'ms-powerpoint',
+            'pot'  : 'ms-powerpoint',
+            'potx' : 'ms-powerpoint',
+            'potm' : 'ms-powerpoint',
+            'pptm' : 'ms-powerpoint',
+            'potm' : 'ms-powerpoint',
+            'pps'  : 'ms-powerpoint',
+            'ppsx' : 'ms-powerpoint',
+            'ppam' : 'ms-powerpoint',
+            'ppsm' : 'ms-powerpoint',
+            'sldx' : 'ms-powerpoint',
+            'sldm' : 'ms-powerpoint',
+         };
+         return msProtocolNames[fileExtension];
       },
 
       /**

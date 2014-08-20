@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.a.LX66</version>
+        <version>5.0.b.LX67-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.jbpm</groupId>
             <artifactId>jbpm-jpdl</artifactId>
-            <version>3.3.1</version>
+            <version>3.3.1-patched</version>
         </dependency>
         <dependency>
             <groupId>com.ibm.icu</groupId>
@@ -330,11 +330,6 @@
             <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf</artifactId>
-            <version>2.2.2-patched</version>
-        </dependency>
-        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
@@ -539,12 +534,12 @@
         <dependency>
             <groupId>org.springframework.extensions.surf</groupId>
             <artifactId>spring-surf-core-configservice</artifactId>
-            <version>${dependency.surf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.extensions.surf</groupId>
             <artifactId>spring-webscripts</artifactId>
-            <version>${dependency.surf.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.sun</groupId>
@@ -559,7 +554,7 @@
         <dependency>
             <groupId>org.springframework.extensions.surf</groupId>
             <artifactId>spring-webscripts-api</artifactId>
-            <version>${dependency.surf.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Social -->

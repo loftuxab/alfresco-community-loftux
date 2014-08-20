@@ -55,7 +55,6 @@ import org.alfresco.httpclient.AuthenticationException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.search.adaptor.lucene.QueryConstants;
-import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.search.impl.lucene.MultiReader;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -68,16 +67,16 @@ import org.alfresco.service.cmr.repository.datatype.Duration;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.solr.adapters.IOpenBitSet;
 import org.alfresco.solr.client.ContentPropertyValue;
 import org.alfresco.solr.client.MLTextPropertyValue;
 import org.alfresco.solr.client.MultiPropertyValue;
 import org.alfresco.solr.client.Node;
 import org.alfresco.solr.client.PropertyValue;
 import org.alfresco.solr.client.StringPropertyValue;
-import org.alfresco.solr.query.SolrQueryParser;
-import org.alfresco.solr.tracker.CoreTracker;
 import org.alfresco.solr.tracker.CoreWatcherJob;
 import org.alfresco.solr.tracker.IndexHealthReport;
+import org.alfresco.solr.tracker.Tracker;
 import org.alfresco.util.CachingDateFormat;
 import org.alfresco.util.CachingDateFormat.SimpleDateFormatAndResolution;
 import org.alfresco.util.GUID;
@@ -89,7 +88,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.util.OpenBitSet;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CoreAdminParams;
@@ -270,7 +268,9 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
     Scheduler scheduler = null;
 
-    ConcurrentHashMap<String, CoreTracker> trackers = new ConcurrentHashMap<String, CoreTracker>();
+    // Maps keyed on core name
+    private ConcurrentHashMap<String, Tracker> trackers = new ConcurrentHashMap<String, Tracker>();
+    private ConcurrentHashMap<String, InformationServer> informationServers = new ConcurrentHashMap<String, InformationServer>();
 
     private Date orderDate = new Date();
 
@@ -379,7 +379,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         {
            return;
         }
-        catch (Throwable e)
+        catch (Exception e)
         {
             log.info("Failed to load "+resource, e);
         }
@@ -424,9 +424,14 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     /**
      * @return the trackers
      */
-    public ConcurrentHashMap<String, CoreTracker> getTrackers()
+    public ConcurrentHashMap<String, Tracker> getTrackers()
     {
         return trackers;
+    }
+    
+    public ConcurrentHashMap<String, InformationServer> getInformationServers() 
+    {
+        return this.informationServers;
     }
 
     protected boolean handleCustomAction(SolrQueryRequest req, SolrQueryResponse rsp)
@@ -467,18 +472,17 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
-                    if (tracker != null)
+                    InformationServer srv = this.informationServers.get(cname);
+                    if (srv != null)
                     {
-                        tracker.setCheck(true);
+                        srv.getTrackerState().setCheck(true);
                     }
                 }
                 else
                 {
-                    for (String trackerName : trackers.keySet())
+                    for (InformationServer srv : this.informationServers.values())
                     {
-                        CoreTracker tracker = trackers.get(trackerName);
-                        tracker.setCheck(true);
+                        srv.getTrackerState().setCheck(true);
                     }
                 }
                 return false;
@@ -487,7 +491,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     Long dbid = null;
                     if (params.get(ARG_NODEID) != null)
                     {
@@ -509,10 +513,10 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     {
                         dbid = Long.valueOf(params.get(ARG_NODEID));
                         NamedList<Object> report = new SimpleOrderedMap<Object>();
-                        for (String trackerName : trackers.keySet())
+                        for (String coreName : trackers.keySet())
                         {
-                            CoreTracker tracker = trackers.get(trackerName);
-                            report.add(trackerName, buildNodeReport(tracker, dbid));
+                            Tracker tracker = trackers.get(coreName);
+                            report.add(coreName, buildNodeReport(tracker, dbid));
                         }
                         rsp.add("report", report);
                     }
@@ -528,7 +532,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     Long aclid = null;
                     if (params.get(ARG_ACLID) != null)
                     {
@@ -550,10 +554,10 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     {
                         aclid = Long.valueOf(params.get(ARG_ACLID));
                         NamedList<Object> report = new SimpleOrderedMap<Object>();
-                        for (String trackerName : trackers.keySet())
+                        for (String coreName : trackers.keySet())
                         {
-                            CoreTracker tracker = trackers.get(trackerName);
-                            report.add(trackerName, buildAclReport(tracker, aclid));
+                            Tracker tracker = trackers.get(coreName);
+                            report.add(coreName, buildAclReport(tracker, aclid));
                         }
                         rsp.add("report", report);
                     }
@@ -569,7 +573,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     Long txid = null;
                     if (params.get(ARG_TXID) != null)
                     {
@@ -591,10 +595,10 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     {
                         txid = Long.valueOf(params.get(ARG_TXID));
                         NamedList<Object> report = new SimpleOrderedMap<Object>();
-                        for (String trackerName : trackers.keySet())
+                        for (String coreName : trackers.keySet())
                         {
-                            CoreTracker tracker = trackers.get(trackerName);
-                            report.add(trackerName, buildTxReport(tracker, txid));
+                            Tracker tracker = trackers.get(coreName);
+                            report.add(coreName, buildTxReport(tracker, txid));
                         }
                         rsp.add("report", report);
                     }
@@ -610,7 +614,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     Long acltxid = null;
                     if (params.get(ARG_ACLTXID) != null)
                     {
@@ -632,10 +636,10 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     {
                         acltxid = Long.valueOf(params.get(ARG_ACLTXID));
                         NamedList<Object> report = new SimpleOrderedMap<Object>();
-                        for (String trackerName : trackers.keySet())
+                        for (String coreName : trackers.keySet())
                         {
-                            CoreTracker tracker = trackers.get(trackerName);
-                            report.add(trackerName, buildAclTxReport(tracker, acltxid));
+                            Tracker tracker = trackers.get(coreName);
+                            report.add(coreName, buildAclTxReport(tracker, acltxid));
                         }
                         rsp.add("report", report);
                     }
@@ -682,7 +686,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                         toAclTx = Long.valueOf(params.get("toAclTx"));
                     }
 
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
 
                     NamedList<Object> report = new SimpleOrderedMap<Object>();
                     if (tracker != null)
@@ -731,7 +735,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     NamedList<Object> report = new SimpleOrderedMap<Object>();
                     for (String coreName : trackers.keySet())
                     {
-                        CoreTracker tracker = trackers.get(coreName);
+                        Tracker tracker = trackers.get(coreName);
                         report.add(coreName, buildTrackerReport(tracker, fromTx, toTx, fromAclTx, toAclTx, fromTime, toTime));
                     }
                     rsp.add("report", report);
@@ -743,7 +747,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     if (params.get(ARG_TXID) != null)
                     {
                         Long txid = Long.valueOf(params.get(ARG_TXID));
@@ -770,7 +774,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                 {
                     for (String coreName : trackers.keySet())
                     {
-                        CoreTracker tracker = trackers.get(coreName);
+                        Tracker tracker = trackers.get(coreName);
                         if (params.get(ARG_TXID) != null)
                         {
                             Long txid = Long.valueOf(params.get(ARG_TXID));
@@ -799,7 +803,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     if (params.get(ARG_TXID) != null)
                     {
                         Long txid = Long.valueOf(params.get(ARG_TXID));
@@ -826,7 +830,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                 {
                     for (String coreName : trackers.keySet())
                     {
-                        CoreTracker tracker = trackers.get(coreName);
+                        Tracker tracker = trackers.get(coreName);
                         if (params.get(ARG_TXID) != null)
                         {
                             Long txid = Long.valueOf(params.get(ARG_TXID));
@@ -855,21 +859,22 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
-                    Set<Long> errorDocIds = tracker.getErrorDocIds();
+                    Tracker tracker = trackers.get(cname);
+                    InformationServer srv = this.informationServers.get(cname);
+                    Set<Long> errorDocIds = srv.getErrorDocIds();
                     for(Long nodeid : errorDocIds)
                     {
                         tracker.addNodeToReindex(nodeid);
                     }
                     rsp.add(cname, errorDocIds);
-
                 }
                 else
                 {
                     for (String coreName : trackers.keySet())
                     {
-                        CoreTracker tracker = trackers.get(coreName);
-                        Set<Long> errorDocIds = tracker.getErrorDocIds();
+                        Tracker tracker = trackers.get(coreName);
+                        InformationServer srv = this.informationServers.get(coreName);
+                        Set<Long> errorDocIds = srv.getErrorDocIds();
                         for(Long nodeid : errorDocIds)
                         {
                             tracker.addNodeToReindex(nodeid);
@@ -883,7 +888,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     if (params.get(ARG_TXID) != null)
                     {
                         Long txid = Long.valueOf(params.get(ARG_TXID));
@@ -910,7 +915,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                 {
                     for (String coreName : trackers.keySet())
                     {
-                        CoreTracker tracker = trackers.get(coreName);
+                        Tracker tracker = trackers.get(coreName);
                         if (params.get(ARG_TXID) != null)
                         {
                             Long txid = Long.valueOf(params.get(ARG_TXID));
@@ -939,9 +944,9 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
                     IndexHealthReport indexHealthReport = tracker.checkIndex(null, null, null, null, null, null);
-                    OpenBitSet toReindex = indexHealthReport.getTxInIndexButNotInDb();
+                    IOpenBitSet toReindex = indexHealthReport.getTxInIndexButNotInDb();
                     toReindex.or(indexHealthReport.getDuplicatedTxInIndex());
                     toReindex.or(indexHealthReport.getMissingTxFromIndex());
                     long current = -1;
@@ -963,9 +968,9 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                 {
                     for (String coreName : trackers.keySet())
                     {
-                        CoreTracker tracker = trackers.get(coreName);
+                        Tracker tracker = trackers.get(coreName);
                         IndexHealthReport indexHealthReport = tracker.checkIndex(null, null, null, null, null, null);
-                        OpenBitSet toReindex = indexHealthReport.getTxInIndexButNotInDb();
+                        IOpenBitSet toReindex = indexHealthReport.getTxInIndexButNotInDb();
                         toReindex.or(indexHealthReport.getDuplicatedTxInIndex());
                         toReindex.or(indexHealthReport.getMissingTxFromIndex());
                         long current = -1;
@@ -1010,12 +1015,13 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
                 if (cname != null)
                 {
-                    CoreTracker tracker = trackers.get(cname);
+                    Tracker tracker = trackers.get(cname);
+                    InformationServer srv = this.informationServers.get(cname);
 
                     NamedList<Object> report = new SimpleOrderedMap<Object>();
-                    if (tracker != null)
+                    if (tracker != null && srv != null)
                     {
-                        addCoreSummary(cname, detail, hist, values, tracker, report);
+                        addCoreSummary(cname, detail, hist, values, tracker, srv, report);
 
                         if (reset)
                         {
@@ -1034,10 +1040,11 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     NamedList<Object> report = new SimpleOrderedMap<Object>();
                     for (String coreName : trackers.keySet())
                     {
-                        CoreTracker tracker = trackers.get(coreName);
-                        if (tracker != null)
+                        Tracker tracker = trackers.get(coreName);
+                        InformationServer srv = this.informationServers.get(coreName);
+                        if (tracker != null && srv != null)
                         {
-                            addCoreSummary(coreName, detail, hist, values, tracker, report);
+                            addCoreSummary(coreName, detail, hist, values, tracker, srv, report);
 
                             if (reset)
                             {
@@ -1219,7 +1226,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             list_1.addValue(new StringPropertyValue("anyValueAsString"));
             properties04.put(QName.createQName(TEST_NAMESPACE, "any-many-ista"), list_1);
             MultiPropertyValue list_2 = new MultiPropertyValue();
-            list_2.addValue(new ContentPropertyValue(Locale.ENGLISH, 12L, "UTF-16", "text/plain"));
+            list_2.addValue(new ContentPropertyValue(Locale.ENGLISH, 12L, "UTF-16", "text/plain", null));
             properties04.put(QName.createQName(TEST_NAMESPACE, "content-many-ista"), list_2);
             content04.put(QName.createQName(TEST_NAMESPACE, "content-many-ista"), "multicontent");
 
@@ -1349,7 +1356,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                 e.printStackTrace();
             }
 
-            properties14.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 298L, "UTF-8", "text/plain"));
+            properties14.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 298L, "UTF-8", "text/plain", null));
             content14.put(ContentModel.PROP_CONTENT,
                     "The quick brown fox jumped over the lazy dog and ate the Alfresco Tutorial, in pdf format, along with the following stop words;  a an and are"
                             + " as at be but by for if in into is it no not of on or such that the their then there these they this to was will with: "
@@ -1835,6 +1842,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
                 HashMap<QName, PropertyValue> baseFolderProperties = new HashMap<QName, PropertyValue>();
                 baseFolderProperties.put(ContentModel.PROP_NAME, new StringPropertyValue("Base Folder"));
+// TODO: This variable is never used.  Please verify that it is not needed.
                 HashMap<QName, String> baseFolderContent = new HashMap<QName, String>();
                 NodeRef baseFolderNodeRef = new NodeRef(new StoreRef("workspace", "SpacesStore"), createGUID());
                 QName baseFolderQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "baseFolder");
@@ -1846,6 +1854,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
                 HashMap<QName, PropertyValue> folder00Properties = new HashMap<QName, PropertyValue>();
                 folder00Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("Folder 0"));
+// TODO: This variable is never used.  Please see if we even need it.
                 HashMap<QName, String> folder00Content = new HashMap<QName, String>();
                 NodeRef folder00NodeRef = new NodeRef(new StoreRef("workspace", "SpacesStore"), createGUID());
                 QName folder00QName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Folder 0");
@@ -1863,7 +1872,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     desc00.addValue(Locale.US, "Doc " + i);
                     content00Properties.put(ContentModel.PROP_DESCRIPTION, desc00);
                     content00Properties.put(ContentModel.PROP_TITLE, desc00);
-                    content00Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+                    content00Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
                     content00Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("Doc " + i));
                     content00Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("Test"));
                     content00Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("Test"));
@@ -2061,6 +2070,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
             HashMap<QName, PropertyValue> baseFolderProperties = new HashMap<QName, PropertyValue>();
             baseFolderProperties.put(ContentModel.PROP_NAME, new StringPropertyValue("Base Folder"));
+// This variable is never used.  What was it meant to be used for?
             HashMap<QName, String> baseFolderContent = new HashMap<QName, String>();
             NodeRef baseFolderNodeRef = new NodeRef(new StoreRef("workspace", "SpacesStore"), createGUID());
             QName baseFolderQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "baseFolder");
@@ -2210,7 +2220,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc00.addValue(Locale.US, "Alfresco tutorial");
             content00Properties.put(ContentModel.PROP_DESCRIPTION, desc00);
             content00Properties.put(ContentModel.PROP_TITLE, desc00);
-            content00Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content00Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content00Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("Alfresco Tutorial"));
             content00Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content00Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2237,7 +2247,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc01.addValue(Locale.US, "One");
             content01Properties.put(ContentModel.PROP_DESCRIPTION, desc01);
             content01Properties.put(ContentModel.PROP_TITLE, desc01);
-            content01Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content01Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content01Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("AA%"));
             content01Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content01Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2259,7 +2269,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc02.addValue(Locale.US, "Two");
             content02Properties.put(ContentModel.PROP_DESCRIPTION, desc02);
             content02Properties.put(ContentModel.PROP_TITLE, desc02);
-            content02Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content02Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content02Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("BB_"));
             content02Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content02Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2281,7 +2291,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc03.addValue(Locale.US, "Three");
             content03Properties.put(ContentModel.PROP_DESCRIPTION, desc03);
             content03Properties.put(ContentModel.PROP_TITLE, desc03);
-            content03Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content03Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content03Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("CC\\"));
             content03Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content03Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2303,7 +2313,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc04.addValue(Locale.US, "Four");
             content04Properties.put(ContentModel.PROP_DESCRIPTION, desc04);
             content04Properties.put(ContentModel.PROP_TITLE, desc04);
-            content04Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content04Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content04Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("DD\'"));
             content04Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content04Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2326,7 +2336,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc05.addValue(Locale.US, "Five");
             content05Properties.put(ContentModel.PROP_DESCRIPTION, desc05);
             content05Properties.put(ContentModel.PROP_TITLE, desc05);
-            content05Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content05Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content05Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("EE.aa"));
             content05Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content05Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2352,7 +2362,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc06.addValue(Locale.US, "Six");
             content06Properties.put(ContentModel.PROP_DESCRIPTION, desc06);
             content06Properties.put(ContentModel.PROP_TITLE, desc06);
-            content06Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content06Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content06Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("FF.EE"));
             content06Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content06Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2386,7 +2396,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc07.addValue(Locale.US, "Seven");
             content07Properties.put(ContentModel.PROP_DESCRIPTION, desc07);
             content07Properties.put(ContentModel.PROP_TITLE, desc07);
-            content07Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content07Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content07Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("GG*GG"));
             content07Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content07Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2420,7 +2430,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc08.addValue(Locale.US, "Eight");
             content08Properties.put(ContentModel.PROP_DESCRIPTION, desc08);
             content08Properties.put(ContentModel.PROP_TITLE, desc08);
-            content08Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain"));
+            content08Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-8", "text/plain", null));
             content08Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("HH?HH"));
             content08Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content08Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2454,7 +2464,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc09.addValue(Locale.US, "Nine");
             content09Properties.put(ContentModel.PROP_DESCRIPTION, desc09);
             content09Properties.put(ContentModel.PROP_TITLE, desc09);
-            content09Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-9", "text/plain"));
+            content09Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-9", "text/plain", null));
             content09Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("aa"));
             content09Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content09Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -2490,7 +2500,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             desc10.addValue(Locale.US, "Ten");
             content10Properties.put(ContentModel.PROP_DESCRIPTION, desc10);
             content10Properties.put(ContentModel.PROP_TITLE, desc10);
-            content10Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-9", "text/plain"));
+            content10Properties.put(ContentModel.PROP_CONTENT, new ContentPropertyValue(Locale.UK, 0l, "UTF-9", "text/plain", null));
             content10Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("aa-thumb"));
             content10Properties.put(ContentModel.PROP_CREATOR, new StringPropertyValue("System"));
             content10Properties.put(ContentModel.PROP_MODIFIER, new StringPropertyValue("System"));
@@ -3682,6 +3692,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         Date date0 = cal.getTime();
         cal.add(Calendar.DAY_OF_MONTH, 2);
         Date date2 = cal.getTime();
+// TODO: This variable is never used.  Please see if we even need it.
         StringPropertyValue d0 = new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, date0));
         StringPropertyValue d1 = new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, date1));
         StringPropertyValue d2 = new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, date2));
@@ -3804,6 +3815,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         Date date0 = cal.getTime();
         cal.add(Calendar.DAY_OF_MONTH, 2);
         Date date2 = cal.getTime();
+// TODO: This variable is never used.  Please see if we even need it.
         StringPropertyValue d0 = new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, date0));
         StringPropertyValue d1 = new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, newdate1));
         StringPropertyValue d2 = new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, date2));
@@ -5570,6 +5582,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         }
         // newParams.set("fq", "AUTHORITY_FILTER_FROM_JSON");
         solrReq.setParams(newParams);
+// TODO: This variable is never used.  Please see if we even need it.
         ArrayList<ContentStream> streams = new ArrayList<ContentStream>();
         // streams.add(new ContentStreamBase.StringStream("json"));
         // solrReq.setContentStreams(streams);
@@ -5699,7 +5712,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         }
     }
 
-    public Map<QName, PropertyValue> getOrderProperties()
+    private Map<QName, PropertyValue> getOrderProperties()
     {
         double orderDoubleCount = -0.11d + orderTextCount * ((orderTextCount % 2 == 0) ? 0.1d : -0.1d);
         float orderFloatCount = -3.5556f + orderTextCount * ((orderTextCount % 2 == 0) ? 0.82f : -0.82f);
@@ -6827,13 +6840,13 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         leafDocCmd.overwriteCommitted = true;
         leafDocCmd.overwritePending = true;
         leafDocCmd.solrDoc = createLeafDocument(dataModel, txid, dbid, nodeRef, type, aspects, properties, content);
-        leafDocCmd.doc = CoreTracker.toDocument(leafDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
+        leafDocCmd.doc = LegacySolrInformationServer.toDocument(leafDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
 
         AddUpdateCommand auxDocCmd = new AddUpdateCommand();
         auxDocCmd.overwriteCommitted = true;
         auxDocCmd.overwritePending = true;
         auxDocCmd.solrDoc = createAuxDocument(txid, dbid, aclid, paths, owner, parentAssocs, ancestors);
-        auxDocCmd.doc = CoreTracker.toDocument(auxDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
+        auxDocCmd.doc = LegacySolrInformationServer.toDocument(auxDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
 
         if (leafDocCmd.doc != null)
         {
@@ -6863,7 +6876,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         aclTxSol.addField(QueryConstants.FIELD_INACLTXID, acltxid);
         aclTxSol.addField(QueryConstants.FIELD_ACLTXCOMMITTIME, (new Date()).getTime());
         aclTxCmd.solrDoc = aclTxSol;
-        aclTxCmd.doc = CoreTracker.toDocument(aclTxCmd.getSolrInputDocument(), core.getSchema(), dataModel);
+        aclTxCmd.doc = LegacySolrInformationServer.toDocument(aclTxCmd.getSolrInputDocument(), core.getSchema(), dataModel);
         core.getUpdateHandler().addDoc(aclTxCmd);
 
         AddUpdateCommand aclCmd = new AddUpdateCommand();
@@ -6880,7 +6893,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             aclSol.addField(QueryConstants.FIELD_READER, "READER-" + (totalReader - i));
         }
         aclCmd.solrDoc = aclSol;
-        aclCmd.doc = CoreTracker.toDocument(aclCmd.getSolrInputDocument(), core.getSchema(), dataModel);
+        aclCmd.doc = LegacySolrInformationServer.toDocument(aclCmd.getSolrInputDocument(), core.getSchema(), dataModel);
         core.getUpdateHandler().addDoc(aclCmd);
 
     }
@@ -6896,13 +6909,13 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         leafDocCmd.overwriteCommitted = true;
         leafDocCmd.overwritePending = true;
         leafDocCmd.solrDoc = createLeafDocument(dataModel, txid, dbid, rootNodeRef, ContentModel.TYPE_STOREROOT, new QName[] { ContentModel.ASPECT_ROOT }, null, null);
-        leafDocCmd.doc = CoreTracker.toDocument(leafDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
+        leafDocCmd.doc = LegacySolrInformationServer.toDocument(leafDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
 
         AddUpdateCommand auxDocCmd = new AddUpdateCommand();
         auxDocCmd.overwriteCommitted = true;
         auxDocCmd.overwritePending = true;
         auxDocCmd.solrDoc = createAuxDocument(txid, dbid, aclid, new String[] { "/" }, "system", null, null);
-        auxDocCmd.doc = CoreTracker.toDocument(auxDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
+        auxDocCmd.doc = LegacySolrInformationServer.toDocument(auxDocCmd.getSolrInputDocument(), core.getSchema(), dataModel);
 
         if (leafDocCmd.doc != null)
         {
@@ -6924,13 +6937,13 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         input.addField(QueryConstants.FIELD_INTXID, txid);
         input.addField(QueryConstants.FIELD_TXCOMMITTIME, (new Date()).getTime());
         txCmd.solrDoc = input;
-        txCmd.doc = CoreTracker.toDocument(txCmd.getSolrInputDocument(), core.getSchema(), dataModel);
+        txCmd.doc = LegacySolrInformationServer.toDocument(txCmd.getSolrInputDocument(), core.getSchema(), dataModel);
         core.getUpdateHandler().addDoc(txCmd);
 
         core.getUpdateHandler().commit(new CommitUpdateCommand(false));
     }
 
-    public SolrInputDocument createLeafDocument(AlfrescoSolrDataModel dataModel, int txid, int dbid, NodeRef nodeRef, QName type, QName[] aspects,
+    private SolrInputDocument createLeafDocument(AlfrescoSolrDataModel dataModel, int txid, int dbid, NodeRef nodeRef, QName type, QName[] aspects,
             Map<QName, PropertyValue> properties, Map<QName, String> content) throws IOException
     {
         SolrInputDocument doc = new SolrInputDocument();
@@ -6941,11 +6954,12 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
         if (properties != null)
         {
-            for (QName propertyQname : properties.keySet())
+            for (Map.Entry<QName, PropertyValue> entry : properties.entrySet())
             {
+                QName propertyQname = entry.getKey();
                 if (dataModel.isIndexedOrStored(propertyQname))
                 {
-                    PropertyValue value = properties.get(propertyQname);
+                    PropertyValue value = entry.getValue();
                     if (value != null)
                     {
                         if (value instanceof ContentPropertyValue)
@@ -7201,7 +7215,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return aux;
     }
 
-    public static SolrInputDocument createRootAclDocument()
+    private static SolrInputDocument createRootAclDocument()
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("ACLID", "1");
@@ -7220,14 +7234,15 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
      * @param report
      * @throws IOException 
      */
-    private void addCoreSummary(String cname, boolean detail, boolean hist, boolean values, CoreTracker tracker, NamedList<Object> report) throws IOException
+    private void addCoreSummary(String cname, boolean detail, boolean hist, boolean values, Tracker tracker, 
+                InformationServer srv, NamedList<Object> report) throws IOException
     {
         NamedList<Object> coreSummary = new SimpleOrderedMap<Object>();
-        coreSummary.addAll(tracker.getCoreStats());
-        long lastIndexTxCommitTime = tracker.getLastIndexedTxCommitTime();
-        long lastIndexedTxId = tracker.getLastIndexedTxId();
-        long lastTxCommitTimeOnServer = tracker.getLastTxCommitTimeOnServer();
-        long lastTxIdOnServer = tracker.getLastTxIdOnServer();
+        coreSummary.addAll((SimpleOrderedMap<Object>) srv.getCoreStats());
+        long lastIndexTxCommitTime = srv.getTrackerState().getLastIndexedTxCommitTime();
+        long lastIndexedTxId = srv.getTrackerState().getLastIndexedTxId();
+        long lastTxCommitTimeOnServer = srv.getTrackerState().getLastTxCommitTimeOnServer();
+        long lastTxIdOnServer = srv.getTrackerState().getLastTxIdOnServer();
         Date lastIndexTxCommitDate = new Date(lastIndexTxCommitTime);
         Date lastTxOnServerDate = new Date(lastTxCommitTimeOnServer);
         long transactionsToDo = lastTxIdOnServer - lastIndexedTxId;
@@ -7236,10 +7251,10 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             transactionsToDo = 0;
         }
         
-        long lastIndexChangeSetCommitTime = tracker.getLastIndexedChangeSetCommitTime();
-        long lastIndexedChangeSetId = tracker.getLastIndexedChangeSetId();
-        long lastChangeSetCommitTimeOnServer = tracker.getLastChangeSetCommitTimeOnServer();
-        long lastChangeSetIdOnServer = tracker.getLastChangeSetIdOnServer();
+        long lastIndexChangeSetCommitTime = srv.getTrackerState().getLastIndexedChangeSetCommitTime();
+        long lastIndexedChangeSetId = srv.getTrackerState().getLastIndexedChangeSetId();
+        long lastChangeSetCommitTimeOnServer = srv.getTrackerState().getLastChangeSetCommitTimeOnServer();
+        long lastChangeSetIdOnServer = srv.getTrackerState().getLastChangeSetIdOnServer();
         Date lastIndexChangeSetCommitDate = new Date(lastIndexChangeSetCommitTime);
         Date lastChangeSetOnServerDate = new Date(lastChangeSetCommitTimeOnServer);
         long changeSetsToDo = lastChangeSetIdOnServer - lastIndexedChangeSetId;
@@ -7282,7 +7297,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             txLagSeconds = 0;
         }
 
-        coreSummary.add("Active", tracker.isRunning());
+        coreSummary.add("Active", srv.getTrackerState().isRunning());
 
         // TX
 
@@ -7320,14 +7335,13 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
         // Modela
 
-        Map<String, Set<String>> modelErrors = tracker.getModelErrors();
+        Map<String, Set<String>> modelErrors = srv.getModelErrors();
         if (modelErrors.size() > 0)
         {
             NamedList<Object> errorList = new SimpleOrderedMap<Object>();
-            for (String modelName : modelErrors.keySet())
+            for (Map.Entry<String, Set<String>> modelNameToErrors : modelErrors.entrySet())
             {
-                Set<String> errors = modelErrors.get(modelName);
-                errorList.add(modelName, errors);
+                errorList.add(modelNameToErrors.getKey(), modelNameToErrors.getValue());
             }
             coreSummary.add("Model changes are not compatible with the existing data model and have not been applied", errorList);
         }
@@ -7335,7 +7349,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         report.add(cname, coreSummary);
     }
 
-    private NamedList<Object> buildAclTxReport(CoreTracker tracker, Long acltxid) throws AuthenticationException, IOException, JSONException
+    private NamedList<Object> buildAclTxReport(Tracker tracker, Long acltxid) throws AuthenticationException, IOException, JSONException
     {
         NamedList<Object> nr = new SimpleOrderedMap<Object>();
         nr.add("TXID", acltxid);
@@ -7352,7 +7366,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return nr;
     }
 
-    private NamedList<Object> buildAclReport(CoreTracker tracker, Long aclid) throws IOException, JSONException
+    private NamedList<Object> buildAclReport(Tracker tracker, Long aclid) throws IOException, JSONException
     {
         AclReport aclReport = tracker.checkAcl(aclid);
 
@@ -7367,7 +7381,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return nr;
     }
 
-    private NamedList<Object> buildTxReport(CoreTracker tracker, Long txid) throws AuthenticationException, IOException, JSONException
+    private NamedList<Object> buildTxReport(Tracker tracker, Long txid) throws AuthenticationException, IOException, JSONException
     {
         NamedList<Object> nr = new SimpleOrderedMap<Object>();
         nr.add("TXID", txid);
@@ -7385,7 +7399,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return nr;
     }
 
-    private NamedList<Object> buildNodeReport(CoreTracker tracker, Node node) throws IOException, JSONException
+    private NamedList<Object> buildNodeReport(Tracker tracker, Node node) throws IOException, JSONException
     {
         NodeReport nodeReport = tracker.checkNode(node);
 
@@ -7406,7 +7420,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return nr;
     }
 
-    private NamedList<Object> buildNodeReport(CoreTracker tracker, Long dbid) throws IOException, JSONException
+    private NamedList<Object> buildNodeReport(Tracker tracker, Long dbid) throws IOException, JSONException
     {
         NodeReport nodeReport = tracker.checkNode(dbid);
 
@@ -7427,7 +7441,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return nr;
     }
 
-    private NamedList<Object> buildTrackerReport(CoreTracker tracker, Long fromTx, Long toTx, Long fromAclTx, Long toAclTx, Long fromTime, Long toTime) throws IOException,
+    private NamedList<Object> buildTrackerReport(Tracker tracker, Long fromTx, Long toTx, Long fromAclTx, Long toAclTx, Long fromTime, Long toTime) throws IOException,
             JSONException, AuthenticationException
     {
         IndexHealthReport indexHealthReport = tracker.checkIndex(fromTx, toTx, fromAclTx, toAclTx, fromTime, toTime);
@@ -7529,7 +7543,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         }
         if (!destDir.canWrite())
         {
-            throw new IOException("No acces to destination directory" + destDir);
+            throw new IOException("No access to destination directory" + destDir);
         }
 
         File[] files = srcDir.listFiles();
@@ -7607,7 +7621,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         }
     }
 
-    public int copy(InputStream input, OutputStream output) throws IOException
+    private int copy(InputStream input, OutputStream output) throws IOException
     {
         byte[] buffer = new byte[2048 * 4];
         int count = 0;
@@ -7620,7 +7634,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return count;
     }
 
-    public void deleteDirectory(File directory) throws IOException
+    private void deleteDirectory(File directory) throws IOException
     {
         if (!directory.exists())
         {

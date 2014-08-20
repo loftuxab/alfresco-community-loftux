@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.opencmis.dictionary.CMISAbstractDictionaryService.DictionaryRegistry;
 import org.alfresco.opencmis.mapping.CMISMapping;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
@@ -79,9 +78,17 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
     protected AbstractTypeDefinition typeDefInclProperties;
 
     protected TypeDefinitionWrapper parent;
-    protected List<TypeDefinitionWrapper> children;
+//    protected List<TypeDefinitionWrapper> children;
 
-    protected QName alfrescoName = null;
+    private String tenantId;
+
+    @Override
+    public String getTenantId()
+    {
+		return tenantId;
+	}
+
+	protected QName alfrescoName = null;
     protected QName alfrescoClass = null;
     protected Map<Action, CMISActionEvaluator> actionEvaluators;
 
@@ -144,11 +151,11 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
         return parent;
     }
 
-    @Override
-    public List<TypeDefinitionWrapper> getChildren()
-    {
-        return children;
-    }
+//    @Override
+//    public List<TypeDefinitionWrapper> getChildren()
+//    {
+//        return children;
+//    }
 
     @Override
     public Map<Action, CMISActionEvaluator> getActionEvaluators()
@@ -182,10 +189,10 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
 
     // create
 
-    public abstract void connectParentAndSubTypes(CMISMapping cmisMapping, DictionaryRegistry registry,
+    public abstract List<TypeDefinitionWrapper> connectParentAndSubTypes(CMISMapping cmisMapping, CMISDictionaryRegistry registry,
             DictionaryService dictionaryService);
 
-    public abstract void resolveInheritance(CMISMapping cmisMapping, DictionaryRegistry registry,
+    public abstract void resolveInheritance(CMISMapping cmisMapping, CMISDictionaryRegistry registry,
             DictionaryService dictionaryService);
 
     public void assertComplete()
@@ -355,8 +362,8 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
         result.setId(id);
         result.setLocalName(alfrescoPropName.getLocalName());
         result.setLocalNamespace(alfrescoPropName.getNamespaceURI());
-        result.setDisplayName(propDef.getTitle(dictionaryService) != null ? propDef.getTitle(dictionaryService) : id);
-        result.setDescription(propDef.getDescription(dictionaryService) != null ? propDef.getDescription(dictionaryService) : result.getDisplayName());
+        result.setDisplayName(id);
+        result.setDescription(result.getDisplayName());
         result.setPropertyType(datatype);
         result.setCardinality(propDef.isMultiValued() ? Cardinality.MULTI : Cardinality.SINGLE);
         result.setIsInherited(inherited);
@@ -403,6 +410,7 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
         }
 
         // MNT-9089 fix, set min/max values for numeric properties
+        // MNT-11304 fix, use default boundaries only for numeric types
         if (result instanceof PropertyIntegerDefinitionImpl)
         {
             if (propDef.getDataType().getName().equals(DataTypeDefinition.INT))
@@ -414,20 +422,6 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
             {
                 ((PropertyIntegerDefinitionImpl) result).setMinValue(BigInteger.valueOf(Long.MIN_VALUE));
                 ((PropertyIntegerDefinitionImpl) result).setMaxValue(BigInteger.valueOf(Long.MAX_VALUE));
-            }
-        }
-        
-        if (result instanceof PropertyDecimalDefinitionImpl)
-        {
-            if (propDef.getDataType().getName().equals(DataTypeDefinition.FLOAT))
-            {
-                ((PropertyDecimalDefinitionImpl) result).setMinValue(BigDecimal.valueOf(Float.MIN_VALUE));
-                ((PropertyDecimalDefinitionImpl) result).setMaxValue(BigDecimal.valueOf(Float.MAX_VALUE));
-            }
-            if (propDef.getDataType().getName().equals(DataTypeDefinition.DOUBLE))
-            {
-                ((PropertyDecimalDefinitionImpl) result).setMinValue(BigDecimal.valueOf(Double.MIN_VALUE));
-                ((PropertyDecimalDefinitionImpl) result).setMaxValue(BigDecimal.valueOf(Double.MAX_VALUE));
             }
         }
         // end MNT-9089
