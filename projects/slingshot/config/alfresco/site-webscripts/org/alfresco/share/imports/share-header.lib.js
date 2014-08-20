@@ -1913,7 +1913,7 @@ function getHeaderModel(pageTitle) {
                config: {
                   id: "HEADER_SEARCH_BOX",
                   site: page.url.templateArgs.site,
-                  linkToFacetedSearch: true,
+                  linkToFacetedSearch: false,
                   repository: (page.id == "repository" || page.id == "myfiles" || page.id == "sharedfiles")
                }
             }
