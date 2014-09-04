@@ -757,6 +757,39 @@
 
 
    <!-- ****************** -->
+   <!-- ** SOLR4 Project ** -->
+   <!-- ****************** -->
+   
+   <target name="incremental-solr4" 
+           depends="package-solr4" />
+      
+   <target name="build-solr4" 
+           depends="clean-solr4, 
+                    incremental-solr4" />
+   
+   <target name="clean-solr4" 
+           depends="init-maven-ant-task">
+       <artifact:mvn pom="${dir.project.solr4}/pom.xml" mavenVersion="3.0.5">
+           <arg value="clean"/>
+       </artifact:mvn>
+   </target>
+   
+   <target name="package-solr4"
+           depends="init-maven-ant-task">
+       <artifact:mvn pom="${dir.project.solr4}/pom.xml" mavenVersion="3.0.5">
+           <arg value="package"/>
+           <arg value="-DskipTests"/>
+       </artifact:mvn>
+   </target>
+
+   <target name="test-solr4"
+            depends="init-maven-ant-task">
+       <artifact:mvn pom="${dir.project.solr4}/pom.xml" mavenVersion="3.0.5">
+           <arg value="test"/>
+       </artifact:mvn>
+   </target>
+
+   <!-- ****************** -->
    <!-- ** SOLR Client Project ** -->
    <!-- ****************** -->
 
@@ -1439,8 +1472,8 @@
 
       <mkdir dir="${dir.project.webclient.dist}" />
       <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" 
-           manifest="${dir.project.repository.dist}/MANIFEST.MF"
-           webxml="${dir.project.webclient.src.webinf}/web.xml">
+           manifest="${dir.project.repository.dist}/MANIFEST.MF">
+           <!-- NOTE: web.xml file is contained in assembled source set -->
          <fileset dir="${dir.project.webclient.assemble}" />
          <manifest>
              <attribute name="Specification-Title" value="Alfresco Repository"/>
@@ -1475,7 +1508,7 @@
 
       <copy todir="${dir.project.webclient.assemble}/WEB-INF">
          <fileset dir="${dir.project.webclient.src.webinf}" 
-                  excludes="web.xml,alfresco-object.xml" />
+                  excludes="alfresco-object.xml" />
          <fileset dir="${dir.project.installer}" 
                   includes="licenses/**" />
       </copy>

@@ -21,16 +21,19 @@ package org.alfresco.repo.dictionary;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.cache.MemoryCache;
-import org.alfresco.repo.dictionary.DictionaryDAOImpl.DictionaryRegistry;
-import org.alfresco.repo.dictionary.NamespaceDAOImpl.NamespaceRegistry;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
+import org.alfresco.util.TraceableThreadFactory;
+import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 
 public class DiffModelTest extends TestCase
 {
@@ -915,15 +918,14 @@ public class DiffModelTest extends TestCase
     	// Initialise the Dictionary
         TenantService tenantService = new SingleTServiceImpl();
         
-        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
+//        NamespaceDAOImpl namespaceDAO = new NamespaceDAOImpl();
+//        namespaceDAO.setTenantService(tenantService);
+//        initNamespaceCaches(namespaceDAO);
         
-        initNamespaceCaches(namespaceDAO);
-        
-        dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+        dictionaryDAO = new DictionaryDAOImpl();
         dictionaryDAO.setTenantService(tenantService);
         
-        initDictionaryCaches(dictionaryDAO);
+        initDictionaryCaches(dictionaryDAO, tenantService);
         
         
         // include Alfresco dictionary model
@@ -936,15 +938,27 @@ public class DiffModelTest extends TestCase
         bootstrap.bootstrap();
     }
 
-    private void initDictionaryCaches(DictionaryDAOImpl dictionaryDAO)
+    private void initDictionaryCaches(DictionaryDAOImpl dictionaryDAO, TenantService tenantService)
     {
-        dictionaryDAO.setDictionaryRegistryCache(new MemoryCache<String, DictionaryRegistry>());
+        CompiledModelsCache compiledModelsCache = new CompiledModelsCache();
+        compiledModelsCache.setDictionaryDAO(dictionaryDAO);
+        compiledModelsCache.setTenantService(tenantService);
+        compiledModelsCache.setRegistry(new DefaultAsynchronouslyRefreshedCacheRegistry());
+        TraceableThreadFactory threadFactory = new TraceableThreadFactory();
+        threadFactory.setThreadDaemon(true);
+        threadFactory.setThreadPriority(Thread.NORM_PRIORITY);
+
+        ThreadPoolExecutor threadPoolExecutor = new DynamicallySizedThreadPoolExecutor(20, 20, 90, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory,
+                new ThreadPoolExecutor.CallerRunsPolicy());
+        compiledModelsCache.setThreadPoolExecutor(threadPoolExecutor);
+        dictionaryDAO.setDictionaryRegistryCache(compiledModelsCache);
+        dictionaryDAO.init();
     }
     
-    private void initNamespaceCaches(NamespaceDAOImpl namespaceDAO)
-    {
-        namespaceDAO.setNamespaceRegistryCache(new MemoryCache<String, NamespaceRegistry>());
-    }
+//    private void initNamespaceCaches(NamespaceDAOImpl namespaceDAO)
+//    {
+//        namespaceDAO.setNamespaceRegistryCache(new MemoryCache<String, NamespaceRegistry>());
+//    }
     
     public void testDeleteModel()
     {

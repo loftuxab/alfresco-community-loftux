@@ -3,7 +3,7 @@
 
 #Set the name and build number
 versionedition="Community by Loftux AB"
-buildnumber="5.0.a.LX66"
+buildnumber="5.0.b.LX67"
 
 # SCM Revision number -Fetch automatically
 
@@ -23,4 +23,4 @@ echo "Press any other key to continue."
 read KEY
 echo "Starting build..."
 
-mvn clean $1 -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"
+mvn clean source:jar javadoc:jar $1 -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"

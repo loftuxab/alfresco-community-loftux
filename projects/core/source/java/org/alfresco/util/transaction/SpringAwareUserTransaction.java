@@ -84,8 +84,9 @@ public class SpringAwareUserTransaction
      * thread coming into the begin() method is the same as the thread forcing commit() or
      * rollback().
      */
-    
+	    
     private static final long serialVersionUID = 3762538897183224373L;
+
 
     private static final String NAME = "UserTransaction";
     
@@ -181,7 +182,7 @@ public class SpringAwareUserTransaction
      * 
      * @return Return <code>this</code> instance
      */
-    public TransactionAttribute getTransactionAttribute(Method method, Class targetClass)
+    public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass)
     {
         return this;
     }        
@@ -411,15 +412,15 @@ public class SpringAwareUserTransaction
         // begin a transaction
         try
         {
-            internalTxnInfo = createTransactionIfNecessary(
-                    (Method) null,
-                    (Class) null);  // super class will just pass nulls back to us
+        	internalTxnInfo = createTransactionIfNecessary(
+                (Method) null,
+                (Class<?>) null);  // super class will just pass nulls back to us
         }
         catch (CannotCreateTransactionException e)
         {
             throw new ConnectionPoolException("The DB connection pool is depleted.", e);
         }
-
+        
         internalStatus = Status.STATUS_ACTIVE;
         threadId = Thread.currentThread().getId();
         

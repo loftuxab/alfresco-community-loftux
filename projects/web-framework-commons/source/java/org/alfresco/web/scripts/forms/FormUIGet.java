@@ -1421,12 +1421,19 @@ public class FormUIGet extends DeclarativeWebScript
                 JSONObject fieldDefinition, FormField fieldConfig) throws JSONException
     {
         // we can't continue without at least a control template
-        if (fieldConfig == null || fieldConfig.getControl() == null || 
-            fieldConfig.getControl().getTemplate() == null || fieldConfig.getAttributes() == null || fieldConfig.getAttributes().get("set") != null || !fieldConfig.getAttributes().get("set").isEmpty())
+        if (fieldConfig == null || 
+               fieldConfig.getControl() == null || 
+               fieldConfig.getControl().getTemplate() == null || 
+               fieldConfig.getAttributes() == null)
         {
             return null;
         }
-        
+
+        if(fieldConfig.getAttributes().get("set") != null && fieldConfig.getAttributes().get("set").isEmpty())
+        {
+            return null;
+        }
+
         if (logger.isDebugEnabled())
             logger.debug("Generating transient field for \"" + fieldName + "\"");
         

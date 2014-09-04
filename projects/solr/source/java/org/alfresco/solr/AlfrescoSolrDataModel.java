@@ -36,6 +36,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -49,15 +53,14 @@ import org.alfresco.opencmis.search.CMISQueryOptions.CMISQueryMode;
 import org.alfresco.opencmis.search.CMISQueryParser;
 import org.alfresco.opencmis.search.CmisFunctionEvaluationContext;
 import org.alfresco.repo.cache.MemoryCache;
+import org.alfresco.repo.dictionary.CompiledModelsCache;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAOImpl;
-import org.alfresco.repo.dictionary.DictionaryDAOImpl.DictionaryRegistry;
+import org.alfresco.repo.dictionary.DictionaryRegistry;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2ModelDiff;
 import org.alfresco.repo.dictionary.NamespaceDAO;
-import org.alfresco.repo.dictionary.NamespaceDAOImpl;
-import org.alfresco.repo.dictionary.NamespaceDAOImpl.NamespaceRegistry;
 import org.alfresco.repo.i18n.StaticMessageLookup;
 import org.alfresco.repo.search.MLAnalysisMode;
 import org.alfresco.repo.search.adaptor.lucene.AnalysisMode;
@@ -87,12 +90,15 @@ import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.solr.AlfrescoSolrDataModelServicesFactory.DictionaryKey;
+import org.alfresco.solr.AlfrescoClientDataModelServicesFactory.DictionaryKey;
 import org.alfresco.solr.client.AlfrescoModel;
 import org.alfresco.solr.query.LuceneQueryBuilderContextSolrImpl;
 import org.alfresco.solr.query.SolrQueryParser;
+import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.ISO9075;
 import org.alfresco.util.Pair;
+import org.alfresco.util.TraceableThreadFactory;
+import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.CapabilityJoin;
 import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
@@ -138,7 +144,7 @@ public class AlfrescoSolrDataModel
 
     private TenantService tenantService;
 
-    private NamespaceDAOImpl namespaceDAO;
+    private NamespaceDAO namespaceDAO;
 
     private DictionaryDAOImpl dictionaryDAO;
 
@@ -276,55 +282,93 @@ public class AlfrescoSolrDataModel
         this.id = id;
 
         tenantService = new SingleTServiceImpl();
-        namespaceDAO = new NamespaceDAOImpl();
-        namespaceDAO.setTenantService(tenantService);
-        namespaceDAO.setNamespaceRegistryCache(new MemoryCache<String, NamespaceRegistry>());
 
-        dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+        dictionaryDAO = new DictionaryDAOImpl(/*namespaceDAO*/);
+        namespaceDAO = dictionaryDAO;
         dictionaryDAO.setTenantService(tenantService);
-        dictionaryDAO.setDictionaryRegistryCache(new MemoryCache<String, DictionaryRegistry>());
         
-        // MNT-11618 "Failed to get lock ReadLock for getting dictionary registry from cache..." error during strartup on Linux (intermittently)
-        File config = new File(id, "conf/solrcore.properties");
-        Properties properties = new Properties();
-        long lockTimeout = 4000;
         try
         {
-            properties.load(new FileInputStream(config));
+           CompiledModelsCache compiledModelsCache = new CompiledModelsCache();
+           compiledModelsCache.setDictionaryDAO(dictionaryDAO);
+           compiledModelsCache.setTenantService(tenantService);
+           compiledModelsCache.setRegistry(new DefaultAsynchronouslyRefreshedCacheRegistry());
+           compiledModelsCache.setThreadPoolExecutor(getThreadPoolExecutor());
+           
+           
+           // MNT-11618 "Failed to get lock ReadLock for getting dictionary registry from cache..." error during strartup on Linux (intermittently)
+           File config = new File(id, "conf/solrcore.properties");
+           Properties properties = new Properties();
+           long lockTimeout = 4000;
+           try
+           {
+               properties.load(new FileInputStream(config));
 
-            String lockProperty = properties.getProperty("system.lockTryTimeout.AlfrescoSolrDataModel.DictionaryDAOImpl");
+               String lockProperty = properties.getProperty("system.lockTryTimeout.AlfrescoSolrDataModel.DictionaryDAOImpl");
 
-            if (lockProperty != null)
-            {
-                lockTimeout = Long.valueOf(lockProperty);
-            }
-        }
-        catch (FileNotFoundException e1)
-        {
-            // TODO Auto-generated catch block
-        }
-        catch (IOException e1)
-        {
-            // TODO Auto-generated catch block
-        }
-        catch (NumberFormatException e)
-        {
-            // TODO Auto-generated catch block
-        }
+               if (lockProperty != null)
+               {
+                   lockTimeout = Long.valueOf(lockProperty);
+               }
+           }
+           catch (FileNotFoundException e1)
+           {
+               // TODO Auto-generated catch block
+           }
+           catch (IOException e1)
+           {
+               // TODO Auto-generated catch block
+           }
+           catch (NumberFormatException e)
+           {
+               // TODO Auto-generated catch block
+           }
 
-        dictionaryDAO.setTryLockTimeout(lockTimeout);
-        
-        // TODO: use config ....
-        dictionaryDAO.setDefaultAnalyserResourceBundleName("alfresco/model/dataTypeAnalyzers");
-        dictionaryDAO.setResourceClassLoader(getResourceClassLoader());
+           // TODO: use config ....
+           dictionaryDAO.setDefaultAnalyserResourceBundleName("alfresco/model/dataTypeAnalyzers");
+           dictionaryDAO.setResourceClassLoader(getResourceClassLoader());
+           dictionaryDAO.setDictionaryRegistryCache(compiledModelsCache);
+           // TODO: use config ....
+           dictionaryDAO.setDefaultAnalyserResourceBundleName("alfresco/model/dataTypeAnalyzers");
+           dictionaryDAO.setResourceClassLoader(getResourceClassLoader());
+           dictionaryDAO.init();
+        }
+        catch (Exception e) 
+        {
+            throw new AlfrescoRuntimeException("Failed to create dictionaryDAO ", e);
+        }
 
         QNameFilter qnameFilter = getQNameFilter();
-        dictionaryServices = AlfrescoSolrDataModelServicesFactory.constructDictionaryServices(qnameFilter, dictionaryDAO);
+        dictionaryServices = AlfrescoClientDataModelServicesFactory.constructDictionaryServices(qnameFilter, dictionaryDAO);
         DictionaryComponent dictionaryComponent = getDictionaryService(CMISStrictDictionaryService.DEFAULT);
         dictionaryComponent.setMessageLookup(new StaticMessageLookup());
 
-        cmisDictionaryServices = AlfrescoSolrDataModelServicesFactory.constructDictionaries(qnameFilter, namespaceDAO, dictionaryComponent, dictionaryDAO);
+        cmisDictionaryServices = AlfrescoClientDataModelServicesFactory.constructDictionaries(qnameFilter, namespaceDAO, dictionaryComponent, dictionaryDAO);
 
+    }
+    
+    private DynamicallySizedThreadPoolExecutor getThreadPoolExecutor()
+    {
+        String poolName = "Dictionary-Pool";
+
+        // We need a thread factory
+        TraceableThreadFactory threadFactory = new TraceableThreadFactory();
+        threadFactory.setThreadDaemon(true);
+        threadFactory.setThreadPriority(Thread.NORM_PRIORITY);
+
+        if (poolName.length() > 0)
+        {
+            threadFactory.setNamePrefix(poolName);
+        }
+
+        BlockingQueue<Runnable> workQueue;
+      
+            workQueue = new LinkedBlockingQueue<Runnable>();
+       
+
+        // construct the instance
+        DynamicallySizedThreadPoolExecutor threadPool = new DynamicallySizedThreadPoolExecutor(4, 4, 120, TimeUnit.SECONDS, workQueue, threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
+        return threadPool;
     }
 
     private QNameFilter getQNameFilter()

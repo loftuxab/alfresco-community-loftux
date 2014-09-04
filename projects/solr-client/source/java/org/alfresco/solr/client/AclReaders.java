@@ -30,15 +30,18 @@ public class AclReaders
     private final long id;
 
     private final List<String> readers;
+    
+    private final List<String> denied;
 
     private final long aclChangeSetId;
     
     private final String tenantDomain;
 
-    public AclReaders(long id, List<String> readers, long aclChangeSetId, String tenantDomain)
+    public AclReaders(long id, List<String> readers, List<String> denied, long aclChangeSetId, String tenantDomain)
     {
         this.id = id;
         this.readers = readers;
+        this.denied = denied;
         this.aclChangeSetId = aclChangeSetId;
         this.tenantDomain = tenantDomain;
     }
@@ -46,20 +49,24 @@ public class AclReaders
     @Override
     public String toString()
     {
-        return "AclReaders [id=" + id + ", readers=" + readers + ", tenantDomain=" + tenantDomain + "]";
+        return "AclReaders [id=" + id + ", readers=" + readers + ", denied=" + denied + ", tenantDomain=" + tenantDomain + "]";
     }
 
+    /**
+     * ID should be enough for hashCode() and equals().
+     */
     @Override
     public int hashCode()
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (aclChangeSetId ^ (aclChangeSetId >>> 32));
         result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((readers == null) ? 0 : readers.hashCode());
         return result;
     }
 
+    /**
+     * ID should be enough for hashCode() and equals().
+     */
     @Override
     public boolean equals(Object obj)
     {
@@ -70,16 +77,7 @@ public class AclReaders
         if (getClass() != obj.getClass())
             return false;
         AclReaders other = (AclReaders) obj;
-        if (aclChangeSetId != other.aclChangeSetId)
-            return false;
         if (id != other.id)
-            return false;
-        if (readers == null)
-        {
-            if (other.readers != null)
-                return false;
-        }
-        else if (!readers.equals(other.readers))
             return false;
         return true;
     }
@@ -92,6 +90,11 @@ public class AclReaders
     public List<String> getReaders()
     {
         return readers;
+    }
+
+    public List<String> getDenied()
+    {
+        return denied;
     }
 
     public long getAclChangeSetId()

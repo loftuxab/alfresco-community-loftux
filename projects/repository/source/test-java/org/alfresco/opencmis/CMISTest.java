@@ -22,11 +22,14 @@ package org.alfresco.opencmis;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,14 +41,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.opencmis.dictionary.CMISDictionaryService;
+import org.alfresco.opencmis.dictionary.TypeDefinitionWrapper;
 import org.alfresco.opencmis.search.CMISQueryOptions;
 import org.alfresco.opencmis.search.CMISQueryOptions.CMISQueryMode;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.dictionary.DictionaryDAO;
+import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.domain.node.NodeDAO;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.tenant.TenantUtil;
+import org.alfresco.repo.tenant.TenantUtil.TenantRunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
@@ -100,6 +109,7 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.CmisExtensionEleme
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ExtensionDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyDecimalDefinitionImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIntegerDefinitionImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIntegerImpl;
@@ -134,6 +144,8 @@ public class CMISTest
     private NamespaceService namespaceService;
     private AuthorityService authorityService;
     private PermissionService permissionService;
+	private DictionaryDAO dictionaryDAO;
+    private CMISDictionaryService cmisDictionaryService;
 
 	private AlfrescoCmisServiceFactory factory;
 
@@ -198,7 +210,7 @@ public class CMISTest
         }
     }
 
-    private static class SimpleCallContext implements CallContext
+    public static class SimpleCallContext implements CallContext
     {
     	private final Map<String, Object> contextMap = new HashMap<String, Object>();
     	private CmisVersion cmisVersion;
@@ -302,6 +314,8 @@ public class CMISTest
         this.nodeDAO = (NodeDAO) ctx.getBean("nodeDAO");
         this.authorityService = (AuthorityService)ctx.getBean("AuthorityService");
         this.permissionService = (PermissionService) ctx.getBean("permissionService");
+    	this.dictionaryDAO = (DictionaryDAO)ctx.getBean("dictionaryDAO");
+    	this.cmisDictionaryService = (CMISDictionaryService)ctx.getBean("OpenCMISDictionaryService1.1");
     }
     
     /**
@@ -2249,6 +2263,97 @@ public class CMISTest
             {
                 authorityService.deleteAuthority(testGroup);
             }
+            AuthenticationUtil.popAuthentication();
+        }
+    }
+
+	@Test
+	public void dictionaryTest()
+	{
+        TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
+        {
+			@Override
+			public Void doWork() throws Exception
+			{
+				M2Model customModel = M2Model.createModel(
+						Thread.currentThread().getContextClassLoader().
+						getResourceAsStream("dictionary/dictionarydaotest_model1.xml"));
+				dictionaryDAO.putModel(customModel);
+				assertNotNull(cmisDictionaryService.findType("P:cm:dublincore"));
+				TypeDefinitionWrapper td = cmisDictionaryService.findType("D:daotest1:type1");
+				assertNotNull(td);
+				return null;
+			}
+		}, "user1", "tenant1");
+
+        TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
+        {
+			@Override
+			public Void doWork() throws Exception
+			{
+				assertNotNull(cmisDictionaryService.findType("P:cm:dublincore"));
+				TypeDefinitionWrapper td = cmisDictionaryService.findType("D:daotest1:type1");
+				assertNull(td);
+				return null;
+			}
+		}, "user2", "tenant2");
+	}
+    
+    /**
+     * MNT-11304: Test that Alfresco has no default boundaries for decimals
+     * @throws Exception
+     */
+    @Test
+    public void testDecimalDefaultBoundaries() throws Exception
+    {
+        AuthenticationUtil.pushAuthentication();
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        try
+        {
+            withCmisService(new CmisServiceCallback<Void>()
+            {
+                @Override
+                public Void execute(CmisService cmisService)
+                {
+                    List<RepositoryInfo> repositories = cmisService.getRepositoryInfos(null);
+                    assertTrue(repositories.size() > 0);
+                    RepositoryInfo repo = repositories.get(0);
+                    String repositoryId = repo.getId();
+                    
+                    TypeDefinition decimalTypeDef = cmisService.getTypeDefinition(repositoryId, "D:tcdm:testdecimalstype", null);
+                    
+                    PropertyDecimalDefinitionImpl floatNoBoundsTypeDef = 
+                            (PropertyDecimalDefinitionImpl)decimalTypeDef.getPropertyDefinitions().get("tcdm:float");
+                    PropertyDecimalDefinitionImpl doubleNoBoundsTypeDef = 
+                            (PropertyDecimalDefinitionImpl)decimalTypeDef.getPropertyDefinitions().get("tcdm:double");
+                    
+                    PropertyDecimalDefinitionImpl floatWithBoundsTypeDef = 
+                            (PropertyDecimalDefinitionImpl)decimalTypeDef.getPropertyDefinitions().get("tcdm:floatwithbounds");
+                    PropertyDecimalDefinitionImpl doubleWithBoundsTypeDef = 
+                            (PropertyDecimalDefinitionImpl)decimalTypeDef.getPropertyDefinitions().get("tcdm:doublewithbounds");
+                    
+                    // test that there is not default boundaries for decimals
+                    assertNull(floatNoBoundsTypeDef.getMinValue());
+                    assertNull(floatNoBoundsTypeDef.getMaxValue());
+                    
+                    assertNull(doubleNoBoundsTypeDef.getMinValue());
+                    assertNull(doubleNoBoundsTypeDef.getMaxValue());
+                    
+                    // test for pre-defined boundaries
+                    assertTrue(floatWithBoundsTypeDef.getMinValue().equals(BigDecimal.valueOf(-10f)));
+                    assertTrue(floatWithBoundsTypeDef.getMaxValue().equals(BigDecimal.valueOf(10f)));
+                    
+                    assertTrue(doubleWithBoundsTypeDef.getMinValue().equals(BigDecimal.valueOf(-10d)));
+                    assertTrue(doubleWithBoundsTypeDef.getMaxValue().equals(BigDecimal.valueOf(10d)));
+
+                    return null;
+                }
+            }, CmisVersion.CMIS_1_1);
+            
+        }
+        finally
+        {
             AuthenticationUtil.popAuthentication();
         }
     }

@@ -1,7 +1,8 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
-
-<beans>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
     <bean id="doclibCustomVtiProperties" parent="common-placeholder-configurer">
         <property name="locations">
@@ -40,23 +41,25 @@
             <value>${vti.server.external.contextPath}</value>
         </property>
     </bean>
-
-    <bean id="doclibCustomGoogleDocs" class="org.alfresco.repo.jscript.app.GoogleDocsCustomResponse"/>
+    
+    <util:map id="slingshotDocLibCustomResponsesMap">
+        <entry key="vtiServer">
+            <ref bean="doclibCustomVtiServer"/>
+        </entry>
+    </util:map>
 
     <bean id="slingshotDocLibCustomResponse" parent="baseJavaScriptExtension" class="org.alfresco.repo.jscript.SlingshotDocLibCustomResponse">
         <property name="extensionName">
             <value>slingshotDocLib</value>
        </property>
-       <property name="customResponses">
-            <map>
-                <entry key="vtiServer">
-                   <ref bean="doclibCustomVtiServer"/>
-                </entry>
-               <entry key="googleDocs">
-                  <ref bean="doclibCustomGoogleDocs"/>
-               </entry>
-            </map>
-        </property>
+       <property name="customResponses" ref="slingshotDocLibCustomResponsesMap" />
+    </bean>
+
+    <bean name="registerSlingshotCustomResponse" class="org.alfresco.repo.jscript.SlingshotDocLibCustomResponseRegistrar"
+           init-method="addCustomResponse" abstract="true">
+       <property name="responsesMap">
+           <ref bean="slingshotDocLibCustomResponsesMap" />
+       </property>
     </bean>
 
 </beans>

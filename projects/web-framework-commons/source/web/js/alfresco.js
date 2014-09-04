@@ -283,6 +283,27 @@ Alfresco.util.onlineEditUrl = function(vtiServer, location)
 };
 
 /**
+ * Creates a url for online editing with the AOS sharepoint implementation.
+ *
+ * @method Alfresco.util.onlineEditUrlAos
+ * @param aos {Object} (Required) AOS Server config object
+ * @param aos.baseUrl {String} (Required) The base URL where the AOS implementation is available
+ * @param record {Object} (Required) Object describing the file to edit
+ * @param record.webdav {String} The relative webdav path of the file
+ * @return {String} The url to where the document can be edited online
+ * @throws {Error}
+ */
+Alfresco.util.onlineEditUrlAos = function(aos, record)
+{
+   // sanity checks
+   if (!Alfresco.util.isValueSet(aos) || !Alfresco.util.isValueSet(aos.baseUrl) || !Alfresco.util.isValueSet(record.webdavUrl) || (record.webdavUrl.substring(0,8) != '/webdav/') )
+   {
+      throw new Error("Alfresco.util.onlineEditUrlAos: Sanity checks failed.");
+   }
+   return Alfresco.util.combinePaths(aos.baseUrl, record.webdavUrl.substring(7));
+};
+
+/**
  * Appends an array onto an object
  *
  * @method Alfresco.util.appendArrayToObject
@@ -856,6 +877,76 @@ Alfresco.util.getFileIcon = function(p_fileName, p_fileType, p_iconSize, p_fileP
       }
    }
    return prefix + "-" + type + "-" + iconSize + ".png";
+};
+Alfresco.util.getFileIconByMimetype = function(mimetype, p_iconSize)
+{
+   var extns = 
+   {
+      "text/css": "css",
+      "application/vnd.ms-excel": "xls",
+      "image/tiff": "tiff",
+      "audio/x-aiff": "aiff",
+      "application/vnd.ms-powerpoint": "ppt",
+      "application/illustrator": "ai",
+      "image/gif": "gif",
+      "audio/mpeg": "mp3",
+      "message/rfc822": "eml",
+      "application/vnd.oasis.opendocument.graphics": "odg",
+      "application/x-indesign": "indd",
+      "application/rtf": "rtf",
+      "audio/x-wav": "wav",
+      "application/x-fla": "fla",
+      "video/x-ms-wmv": "wmv",
+      "application/msword": "doc",
+      "video/x-msvideo": "avi",
+      "video/mpeg2": "mpeg2",
+      "video/x-flv": "flv",
+      "application/x-shockwave-flash": "swf",
+      "audio/vnd.adobe.soundbooth": "asnd",
+      "image/svg+xml": "svg",
+      "application/vnd.apple.pages": "pages",
+      "text/plain": "txt",
+      "video/quicktime": "mov",
+      "image/bmp": "bmp",
+      "video/x-m4v": "m4v",
+      "application/pdf": "pdf",
+      "application/vnd.adobe.aftereffects.project": "aep",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+      "text/xml": "xml",
+      "application/zip": "zip",
+      "video/webm": "webm",
+      "image/png": "png",
+      "text/html": "html",
+      "image/vnd.adobe.photoshop": "psd",
+      "video/ogg": "ogv",
+      "image/jpeg": "jpg",
+      "application/x-zip": "fxp",
+      "video/mp4": "mp4",
+      "image/x-xbitmap": "xbm",
+      "video/x-rad-screenplay": "avx",
+      "video/x-sgi-movie": "movie",
+      "audio/x-ms-wma": "wma",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+      "application/vnd.oasis.opendocument.presentation": "odp",
+      "video/x-ms-asf": "asf",
+      "application/vnd.oasis.opendocument.spreadsheet": "ods",
+      "application/vnd.oasis.opendocument.text": "odt",
+      "application/vnd.apple.keynote": "key",
+      "image/vnd.adobe.premiere": "ppj",
+      "application/vnd.apple.numbers": "numbers",
+      "application/eps": "eps",
+      "audio/basic": "au"
+   };
+
+   var prefix = "generic",
+   iconSize = typeof p_iconSize === "number" ? p_iconSize : 32;
+   if (mimetype in extns)
+   {
+      prefix = extns[mimetype];
+   }
+   
+   return prefix + "-file-" + iconSize + ".png";
 };
 Alfresco.util.getFileIcon.types =
 {

@@ -3,7 +3,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>5.0.a.LX66</version>
+        <version>5.0.b.LX67</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-web-framework-commons</artifactId>
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.springframework.extensions.surf</groupId>
             <artifactId>spring-surf</artifactId>
-            <version>${dependency.surf.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
