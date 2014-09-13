@@ -6,7 +6,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX67</version>
+        <version>5.0.b.LX68-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 

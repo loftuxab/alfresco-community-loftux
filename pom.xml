@@ -6,7 +6,7 @@
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>5.0.b.LX67</version>
+  <version>5.0.b.LX68-SNAPSHOT</version>
   <name>Alfresco</name>
 
   <url>http://www.alfresco.org/</url>
