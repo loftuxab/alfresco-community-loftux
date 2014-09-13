@@ -45,7 +45,7 @@ define(["dojo/_base/declare",
        * @property {string|null} iconClass The class to place next to the label
        */
       viewSelectionConfig: {
-         label: "Detailed View",
+         label: "doclist.view.detailed.label",
          iconClass: "alf-detailedlist-icon"
       },
       
@@ -126,12 +126,11 @@ define(["dojo/_base/declare",
                                        config: {
                                           widgets: [
                                              {
-                                                name: "alfresco/renderers/PropertyLink",
+                                                name: "alfresco/renderers/InlineEditPropertyLink",
                                                 config: {
                                                    propertyToRender: "node.properties.cm:name",
                                                    postParam: "prop_cm_name",
-                                                   renderSize: "large",
-                                                   publishTopic: ""
+                                                   renderSize: "large"
                                                 }
                                              },
                                              {

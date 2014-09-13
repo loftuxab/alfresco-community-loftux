@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.alfresco.po.share.FactorySharePage;
+import org.alfresco.po.share.admin.ActionsSet;
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
@@ -33,22 +36,26 @@ import org.openqa.selenium.WebElement;
 /**
  * Holds the information of a search result item.
  * When completing a search the resulting page yields results
- * which each indivdual row is represented by SearchResultItem class.
+ * which each individual row is represented by SearchResultItem class.
  * 
  * @author Michael Suzuki
  * @since 1.3
  */
-public class SearchResultItem
+public class SearchResultItem implements SearchResult
 {
-    private WebDrone drone;
-    private static final String ITEM_NAME_CSS_HOLDER = "h3.itemname a";
+    private WebDrone drone;    
+    private static final String ITEM_NAME_CSS_HOLDER = "div.nameAndTitleCell span.alfresco-renderers-Property:first-of-type span.inner a";
     private static final String DOWNLOAD_LINK = "div>a>img[title='Download']";
-    private static final String THUMBNAIL_LINK = "div.thumbnail-cell";
+    private static final String THUMBNAIL_LINK = "div.thumbnail-cell";    
     private static final String VIEW_IN_BROWSER_LINK = "a>img[title='View In Browser']";
     private static final String FOLDER_CSS = "img[src$='folder.png']";
     private static final String FOLDER_PATH_CSS = "a";
     private static final String CONTENT_DETAILS_CSS = "div.details";
+    private static final String DATE = "div.dateCell span.inner";
+    private static final String SITE = "div.siteCell span.inner";
+    private static final String IMAGE = "tbody[id=FCTSRCH_SEARCH_ADVICE_NO_RESULTS_ITEMS] td.thumbnailCell img";
 
+   
     private WebElement webElement;
     private String title;
 
@@ -85,16 +92,6 @@ public class SearchResultItem
         return title;
     }
 
-    /**
-     * Select the link of the search result item.
-     * 
-     * @return true if link found and selected
-     */
-    public void click()
-    {
-        WebElement link = webElement.findElement(By.cssSelector(ITEM_NAME_CSS_HOLDER));
-        link.click();
-    }
 
     /**
      * Method to Click on Download link of result item present on search results.
@@ -251,4 +248,79 @@ public class SearchResultItem
         }
         return Collections.emptyList();
     }
-}
+
+    @Override
+    public HtmlPage clickLink()
+    {
+        WebElement link = webElement.findElement(By.cssSelector(ITEM_NAME_CSS_HOLDER));
+        link.click();
+        return FactorySharePage.resolvePage(drone);
+    }
+
+    @Override
+    /**
+     * The name and title are treated the same up till version 5.0
+     * @return String title
+     */
+    public String getName()
+    {
+        return getTitle();
+    }    
+
+    @Override
+    /**
+     * The site are treated the same up till version 5.0
+     * @return String Site
+     */
+    public String getSite()
+    {
+        return getSite();
+    }
+    
+    @Override
+    /**
+     * The date are treated the same up till version 5.0
+     * @return String Date
+     */
+    public String getDate()
+    {
+        return getDate();
+    }
+    
+    @Override
+    /**
+     * The ActionsSet are treated the same up till version 5.0
+     * @return ActionsSet
+     */
+    public ActionsSet getActions()
+    {
+        return getActions();
+    }
+    
+    @Override
+    public HtmlPage clickDateLink()
+    {
+        WebElement link = webElement.findElement(By.cssSelector(DATE));
+        link.click();
+        return FactorySharePage.resolvePage(drone);
+    }
+    
+    @Override
+    public HtmlPage clickSiteLink()
+    {
+        WebElement link = webElement.findElement(By.cssSelector(SITE));
+        link.click();
+        return FactorySharePage.resolvePage(drone);
+    }
+    
+    @Override
+    public PreViewPopUpPage clickImageLink()
+    {
+        WebElement link = webElement.findElement(By.cssSelector(IMAGE));
+        link.click();
+        return new PreViewPopUpPage(drone);
+    }   
+
+    
+
+   }

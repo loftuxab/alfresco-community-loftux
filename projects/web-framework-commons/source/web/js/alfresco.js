@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -1531,7 +1531,7 @@ Alfresco.util.relativeTime = function(from, to)
          minutes_ago = Math.floor(seconds_ago / 60),
          fnTime = function relativeTime_fnTime()
          {
-            return '<span title="' + Alfresco.util.formatDate(from) + '">' + $msg.apply(this, arguments) + '</span>';
+            return "<span title='" + Alfresco.util.formatDate(from) + "'>" + $msg.apply(this, arguments) + "</span>";
          };
 
    if (minutes_ago <= 0)
@@ -2283,8 +2283,8 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
       CLASS_CLOSED: "alfresco-twister-closed"
    };
 
-   var elController, elPanel,
-         config = YAHOO.lang.merge(defaultConfig, p_config || {});
+   var elController, elControllerChildren, elPanel,
+      config = YAHOO.lang.merge(defaultConfig, p_config || {});
 
    // Controller element
    elController = YUIDom.get(p_controller);
@@ -2292,6 +2292,9 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
    {
       return false;
    }
+
+   // Controller element children
+   elControllerChildren = YUIDom.getChildren(p_controller);
 
    // Panel element - next sibling or specified in configuration
    if (config.panel && YUIDom.get(config.panel))
@@ -2328,7 +2331,7 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
 
    // See if panel should be collapsed via value stored in preferences
    var collapsedPrefs = Alfresco.util.arrayToObject(Alfresco.util.createTwister.collapsed.split(",")),
-         isCollapsed = !!collapsedPrefs[p_filterName];
+      isCollapsed = !!collapsedPrefs[p_filterName];
 
    // Initial State
    YUIDom.addClass(elController, config.CLASS_BASE);
@@ -2348,7 +2351,20 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
       }
 
       // Only expand/collapse if actual twister element is clicked (not for inner elements, i.e. twister actions)
-      if (YUIEvent.getTarget(p_event) == elController)
+      var isControllerOrChild = false;
+      if(YUIEvent.getTarget(p_event) == elController)
+      {
+         isControllerOrChild = true;
+      }
+      for(var i=0; i < elControllerChildren.length; i++)
+      {
+         if(YUIEvent.getTarget(p_event) == elControllerChildren[i])
+         {
+            isControllerOrChild = true;
+         }
+      }
+
+      if (isControllerOrChild)
       {
          // Update UI to new state
          var collapse = YUIDom.hasClass(p_obj.controller, config.CLASS_OPEN);
@@ -2366,20 +2382,36 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
          {
             // Save to preferences
             var fnPref = collapse ? "add" : "remove",
-                  preferences = new Alfresco.service.Preferences();
+               preferences = new Alfresco.service.Preferences();
             preferences[fnPref].call(preferences, Alfresco.service.Preferences.COLLAPSED_TWISTERS, p_obj.filterName);
          }
+
+         // Stop the event propogating any further (ie into the parent element)
+         p_event.stopPropagation();
       }
+      
    };
 
-   var twistObj = {
+   var twistObj = 
+   {
       controller: elController,
       panel: elPanel,
       filterName: p_filterName
    };
 
-   YUIEvent.addListener(elController, "click", twistFun, twistObj);
-   YUIEvent.addListener(elController, "keypress", twistFun, twistObj);
+   var addListener = function(controller) {
+      YUIEvent.addListener(controller, "click", twistFun, twistObj);
+      YUIEvent.addListener(controller, "keypress", twistFun, twistObj);
+   };
+
+   // Add event listeners for the main control
+   addListener(elController);
+
+   // Add event listeners to children if found
+   for(var i=0; i < elControllerChildren.length; i++)
+   {
+      addListener(elControllerChildren[i]);
+   }
 
 };
 
@@ -5225,11 +5257,12 @@ Alfresco.util.createInsituEditor = function(p_context, p_params, p_callback)
                 *
                 * This section of code deals with setting up the auto-complete widget for the new tag
                 * input field. We need to set up a data source for retrieving the existing tags and
-                * which we will need to filter on the client.
+                * which we will need to filter on the server.
                 *
                 **************************************************************************************/
-               var oDS = new YAHOO.util.XHRDataSource(Alfresco.constants.PROXY_URI + "api/forms/picker/category/workspace/SpacesStore/tag:tag-root/children?selectableType=cm:category&searchTerm=&size=100&aspect=cm:taggable&");
+               var oDS = new YAHOO.util.XHRDataSource(Alfresco.constants.PROXY_URI + "api/forms/picker/category/workspace/SpacesStore/tag:tag-root/children?selectableType=cm:category&size=100&aspect=cm:taggable&searchTerm=");
                oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
+               oDS.connXhrMode = "cancelStaleRequests";
                // This schema indicates where to find the tag name in the JSON response
                oDS.responseSchema =
                {
@@ -5237,8 +5270,11 @@ Alfresco.util.createInsituEditor = function(p_context, p_params, p_callback)
                   fields : ["name", "nodeRef"]
                };
                this.tagAutoComplete = new YAHOO.widget.AutoComplete(this.newTagInput, eAutoComplete, oDS);
-               this.tagAutoComplete.questionMark = false;     // Removes the question mark on the query string (this will be ignored anyway)
-               this.tagAutoComplete.applyLocalFilter = true;  // Filter the results on the client
+               // force using 'searchTerm' parameter
+               this.tagAutoComplete.generateRequest = function(sQuery)
+               {
+                  return sQuery;
+               };
                this.tagAutoComplete.queryDelay = 0.1           // Throttle requests sent
                this.tagAutoComplete.animSpeed = 0.08;
                this.tagAutoComplete.itemSelectEvent.subscribe(function(type, args)
@@ -8180,8 +8216,17 @@ Alfresco.util.Ajax = function()
          if ((serverResponse.status == 401 || (serverResponse.status == 302 && (/(text\/html)/).test(contentType)))
                && !config.noReloadOnAuthFailure)
          {
-            window.location.reload(true);
-            return;
+            var redirect = serverResponse.getResponseHeader["Location"];
+            if (redirect)
+            {
+               window.location.href = window.location.protocol + "//" + window.location.host + redirect;
+               return;
+            }
+            else
+            {
+               window.location.reload(true);
+               return;
+            }
          }
 
          // Invoke the callback
@@ -10097,7 +10142,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
          // Check we can support the requested language
          if (config.language)
          {
-            var langs = Alfresco.util.message("tinymce_languages").split(","),
+            var langs = Alfresco.constants.TINY_MCE_SUPPORTED_LOCALES.split(","),
                   lang = "en";
             for (var i = 0, j = langs.length; i < j; i++)
             {
@@ -11966,4 +12011,22 @@ Alfresco.util.generateThumbnailUrl = function(jsNode, thumbnailName)
       url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRef.uri + "/content/thumbnails/" + thumbnailName + "?c=queue&ph=true&lastModified=1";
    }
    return url;
+};
+
+Alfresco.util.getCalendarControlConfiguration = function()
+{
+   var navConfig =
+   {
+      strings :
+      {
+         month : Alfresco.util.message("calendar.widget_control_config.label_month"),
+         year : Alfresco.util.message("calendar.widget_control_config.label_year"),
+         submit : Alfresco.util.message("button.ok"),
+         cancel : Alfresco.util.message("button.cancel"),
+         invalidYear : Alfresco.util.message("calendar.widget_control_config.label_invalid_year")
+      },
+      monthFormat : YAHOO.widget.Calendar.SHORT,
+      initialFocus : "year"
+   };
+   return navConfig;
 };

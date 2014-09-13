@@ -9,7 +9,8 @@ th.alfresco-documentlibrary-views-layouts-HeaderCell {
    text-align: left;
 }
 
-th.alfresco-documentlibrary-views-layouts-HeaderCell.last {
+th.alfresco-documentlibrary-views-layouts-HeaderCell.last,
+th.alfresco-documentlibrary-views-layouts-HeaderCell:last-of-type {
    border-right: none;
 }
 
@@ -29,4 +30,9 @@ th.alfresco-documentlibrary-views-layouts-HeaderCell.last {
 
 .alfresco-documentlibrary-views-layouts-HeaderCell img.descendingSort {
    background-image: url(./images/sort-descending-16.png);
+}
+
+th.alfresco-documentlibrary-views-layouts-HeaderCell.hiddenAccessible {
+   position: absolute;
+   left: -99999px;
 }

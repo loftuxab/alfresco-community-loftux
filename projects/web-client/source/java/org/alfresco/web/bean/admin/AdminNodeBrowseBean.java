@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +32,7 @@ import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-import org.alfresco.service.cmr.avm.AVMService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -105,7 +102,6 @@ public class AdminNodeBrowseBean implements Serializable
     transient private DataModel assocs = null;
     transient private DataModel permissions = null;
     transient private DataModel permissionMasks = null;
-    transient private DataModel avmStoreProps = null;
 
     // supporting repository services
     transient private TransactionService transactionService;
@@ -114,7 +110,6 @@ public class AdminNodeBrowseBean implements Serializable
     transient private SearchService searchService;
     transient private NamespaceService namespaceService;
     transient private PermissionService permissionService;
-    transient private AVMService avmService;
 
     /**
      * @param transactionService        transaction service
@@ -216,23 +211,6 @@ public class AdminNodeBrowseBean implements Serializable
             permissionService = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getPermissionService();
         }
         return permissionService;
-    }
-
-    /**
-     * @param avmService AVM service
-     */
-    public void setAVMService(AVMService avmService)
-    {
-        this.avmService = avmService;
-    }
-
-    private AVMService getAVMService()
-    {
-        if (avmService == null)
-        {
-            avmService = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getAVMService();
-        }
-        return avmService;
     }
 
     /**
@@ -425,17 +403,9 @@ public class AdminNodeBrowseBean implements Serializable
     {
         if (permissionMasks == null)
         {
-            if (nodeRef.getStoreRef().getProtocol().equals(StoreRef.PROTOCOL_AVM))
-            {
-                List<AccessPermission> nodePermissions = new ArrayList<AccessPermission>(getPermissionService().getAllSetPermissions(nodeRef.getStoreRef()));
-                permissionMasks = new ListDataModel(nodePermissions);
-            }
-            else
-            {
-                List<NoStoreMask> noReadPermissions = new ArrayList<NoStoreMask>(1);
-                noReadPermissions.add(new NoStoreMask());
-                permissionMasks = new ListDataModel(noReadPermissions);
-            }
+            List<NoStoreMask> noReadPermissions = new ArrayList<NoStoreMask>(1);
+            noReadPermissions.add(new NoStoreMask());
+            permissionMasks = new ListDataModel(noReadPermissions);
         }
         return permissionMasks;
     }
@@ -475,41 +445,6 @@ public class AdminNodeBrowseBean implements Serializable
             }
         }
         return assocs;
-    }
-
-    public boolean getInAVMStore()
-    {
-        return nodeRef.getStoreRef().getProtocol().equals(StoreRef.PROTOCOL_AVM);
-    }
-
-    public DataModel getAVMStoreProperties()
-    {
-        if (avmStoreProps == null)
-        {
-            // work out the store name from current nodeRef
-            String store = nodeRef.getStoreRef().getIdentifier();
-            Map<QName, PropertyValue> props = getAVMService().getStoreProperties(store);
-            List<Map<String, String>> storeProperties = new ArrayList<Map<String, String>>();
-
-            for (Map.Entry<QName, PropertyValue> property : props.entrySet())
-            {
-                Map<String, String> map = new HashMap<String, String>(2);
-                map.put("name", property.getKey().toString());
-                map.put("type", property.getValue().getActualTypeString());
-                String val = property.getValue().getStringValue();
-                if (val == null)
-                {
-                    val = "null";
-                }
-                map.put("value", val);
-
-                storeProperties.add(map);
-            }
-
-            avmStoreProps = new ListDataModel(storeProperties);
-        }
-
-        return avmStoreProps;
     }
 
     /**
@@ -582,8 +517,6 @@ public class AdminNodeBrowseBean implements Serializable
         StoreRef storeRef = (StoreRef) getStores().getRowData();
         NodeRef rootNode = getNodeService().getRootNode(storeRef);
         setNodeRef(rootNode);
-
-        this.avmStoreProps = null;
 
         return "success";
     }

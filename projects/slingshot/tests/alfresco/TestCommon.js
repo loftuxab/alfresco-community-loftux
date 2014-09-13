@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -23,30 +23,52 @@
  * @author Dave Draper
  */
 define(["intern/dojo/node!fs",
-        "config/Config"], 
-       function(fs, Config) {
+        "config/Config",
+        "intern/dojo/node!leadfoot/helpers/pollUntil",
+        "intern/lib/args"], 
+       function(fs, Config, pollUntil, args) {
    return {
 
       /**
-       * This is the path to use to bootstrap tests. It should ONLY be defined here so that
-       * pervasive changes can be made in this one file.
-       *
-       * @instance
-       * @type {string}
-       * @default "/share/page/tp/ws/unit-test-bootstrap"
+       * Path configurations.
        */
-      bootstrapPath: "/share/page/tp/ws/unit-test-bootstrap",
+      paths: {
+         bootstrapPath: "/share/page/tp/ws/unit-test-bootstrap",
+         moduleDeploymentPath: "/share/page/modules/deploy"
+      },
 
       /**
-       * This is the URL to use to bootstrap tests. It is composed of the bootstrapPath and
-       * the Config.bootstrapUrl which is provided in the config package.
+       * This is the URL to use to bootstrap tests. It is composed of the paths.bootstrapPath and the 
+       * Config.urls.bootstrapBaseUrl which is provided in the config package.
        *
        * @instance
        * @type {string}
-       * @default Config.bootstrapBaseUrl + this.bootstrapPath
+       * @default Config.url.bootstrapBaseUrl + this.paths.bootstrapPath
        */
       bootstrapUrl: function bootstrapUrl(){
-         return Config.bootstrapBaseUrl + this.bootstrapPath;
+         return Config.urls.bootstrapBaseUrl + this.paths.bootstrapPath;
+      },
+
+      /**
+       * Generates the URL to use for loading unit test WebScripts
+       *
+       * @instance
+       * @param {string} webScriptURL The WebScript URL
+       */
+      testWebScriptURL: function (webScriptURL) {
+         return Config.urls.unitTestAppBaseUrl + "/aikau/page/tp/ws" + webScriptURL;
+      },
+
+      /**
+       * This is the URL to use to access the module deployment screen. It is composed of the 
+       * paths.moduleDeploymentPath and the Config.urls.bootstrapBaseUrl which is provided in the config package.
+       *
+       * @instance
+       * @type {string}
+       * @default Config.url.bootstrapBaseUrl + this.paths.moduleDeploymentPath
+       */
+      moduleDeploymentUrl: function moduleDeploymentUrl(){
+         return Config.urls.moduleDeploymentBaseUrl + this.paths.moduleDeploymentPath;
       },
 
       /**
@@ -75,6 +97,28 @@ define(["intern/dojo/node!fs",
       },
 
       /**
+       *
+       *
+       * @instance
+       * @param {object} browser The browser context to use
+       * @param {string} testWebScriptURL The URL of the test WebScript
+       * @param {string} testName The name of the test to run
+       */
+      loadTestWebScript: function (browser, testWebScriptURL, testName) {
+         this._applyTimeouts(browser);
+         this._maxWindow(browser);
+         this._cancelModifierKeys(browser);
+         if(testName && browser.environmentType.browserName)
+         {
+            console.log(">> Starting '" + testName + "' on " + browser.environmentType.browserName);
+         }
+         return browser.get(this.testWebScriptURL(testWebScriptURL))
+            .then(pollUntil('return document.getElementsByClassName("allWidgetsProcessed");'))
+            .then(function (element) {}, function (error) {})
+            .end();
+      },
+
+      /**
        * This function should be called at the start of each unit test. It calls the bootstrap test page
        * and enters the test data into the textarea and clicks the "Test" button which will load the 
        * test model in a new page. The unit test can then run against that page.
@@ -87,11 +131,9 @@ define(["intern/dojo/node!fs",
        */
       bootstrapTest: function(browser, testPageDefinitionFile, testname) {
 
-         // Set browser timeouts - refer to Config files
-         // This allows us to use "elementBy..." calls rather than a "waitForElementBy..." which is more efficient...
-         browser.setImplicitWaitTimeout(Config.timeout.implicitWait);
-         browser.setPageLoadTimeout(Config.timeout.pageLoad);
-         browser.setAsyncScriptTimeout(Config.timeout.asyncScript);
+         this._applyTimeouts(browser);
+         this._maxWindow(browser);
+         this._cancelModifierKeys(browser);
 
          if(testname && browser.environmentType.browserName)
          {
@@ -115,26 +157,144 @@ define(["intern/dojo/node!fs",
             console.log(e);
          }
 
-         return browser.get(this.bootstrapUrl())
+         return browser
 
-         .waitForElementByCss('.alfresco-core-Page.allWidgetsProcessed')
-         .safeEval("dijit.registry.byId('UNIT_TEST_MODEL_FIELD').setValue('" + pageModel + "');'set';")
-         .end()
+         .get(this.bootstrapUrl())
+            .then(pollUntil('return document.getElementsByClassName("allWidgetsProcessed");'))
+            .then(function (element) {}, function (error) {})
+            .end()
 
-         // It's necessary to type an additional space into the text area to ensure that the 
-         // text area field validates and populates the form model with the data to be published...
-         .elementByCss('#UNIT_TEST_MODEL_FIELD > DIV.control > TEXTAREA')
-         .type(" ")
-         .end()
+         .execute("dijit.registry.byId('UNIT_TEST_MODEL_FIELD').setValue('" + pageModel + "');'set';")
+            .findByCssSelector('#UNIT_TEST_MODEL_FIELD TEXTAREA')
+            .type(" ")
+            .end()
 
-         // Find and click on the test button to load the test page...
-         .elementByCss("#LOAD_TEST_BUTTON")
-         .moveTo()
-         .sleep(500)
-         .click()
-         .sleep(500) // This sleep appears to be needed to prevent errors, but ideally it woudn't be here :(
-         .end()
-         .waitForElementByCss('.alfresco-core-Page.allWidgetsProcessed')
+         .findById("LOAD_TEST_BUTTON")
+            .click()
+            .end()
+
+         .then(pollUntil('return document.getElementsByClassName("aikau-reveal");'))
+            .then(function (element) {}, function (error) {})
+            .end();
+      },
+
+      /**
+       * This function enables the debug module on the server to make sure debug logging is available for
+       * use in functional test.
+       *
+       * @instance
+       * @param {object} browser This should be the the "remote" attribute from the unit test
+       * @returns {promise} The promise for continuing the unit test.
+       */
+      enableDebugModule: function(browser) {
+
+         this._applyTimeouts(browser);
+         this._cancelModifierKeys(browser);
+
+         console.log(">> Enabling debug via Debug Enabler Extension");
+
+         return browser.get(this.moduleDeploymentUrl())
+            .end()
+
+         .findByCssSelector("select[name='undeployedModules'] > option[value*='Debug Enabler Extension']")
+            .click()
+            .end()
+
+         .findByCssSelector("td > input[value='Add']")
+            .click()
+            .end()
+
+         .findByCssSelector("input[value='Apply Changes']")
+            .click()
+            .end();
+         
+//       this._applyTimeouts(browser);
+//       this._maxWindow(browser);
+//       console.log(">> Enabling debug via Debug Enabler Extension");
+//
+//       browser.get(this.moduleDeploymentUrl()).end();
+//
+//       var hasEnabler = true;
+//       browser.hasElementByCssSelector("select[name='undeployedModules'] > option[value*='Debug Enabler Extension']")
+//       .then(function(has){
+//          console.log(has);
+//       })
+//       .end();
+//
+//       if(hasEnabler)
+//       {
+//          browser.findByCssSelector("select[name='undeployedModules'] > option[value*='Debug Enabler Extension']").click().end();
+//          browser.findByCssSelector("td > input[value='Add']").click().end();
+//          browser.findByCssSelector("input[value='Apply Changes']").click().end();
+//       }
+//
+//       return browser;
+
+      },
+
+      /**
+       * This function disables the debug module on the server.
+       *
+       * @instance
+       * @param {object} browser This should be the the "remote" attribute from the unit test
+       * @returns {promise} The promise for continuing the unit test.
+       */
+      disableDebugModule: function(browser) {
+
+         this._applyTimeouts(browser);
+         this._cancelModifierKeys(browser);
+
+         console.log(">> Disabling debug via Debug Enabler Extension");
+
+         return browser.get(this.moduleDeploymentUrl())
+            .end()
+
+         .findByCssSelector("select[name='deployedModules'] > option[value*='Debug Enabler Extension']")
+            .click()
+            .end()
+
+         .findByCssSelector("td > input[value='Remove']")
+            .click()
+            .end()
+
+         .findByCssSelector("input[value='Apply Changes']")
+            .click()
+            .end();
+      },
+
+      /**
+       * Set browser timeouts - refer to Config files
+       *
+       * @instance
+       * @param {browser}
+       */
+      _applyTimeouts: function(browser) {
+         browser.setTimeout("script", Config.timeout.base);
+         browser.setTimeout("implicit", Config.timeout.base);
+         browser.setFindTimeout(Config.timeout.find);
+         browser.setPageLoadTimeout(Config.timeout.pageLoad);
+         browser.setExecuteAsyncTimeout(Config.timeout.executeAsync);
+      },
+
+      /**
+       * Maximises the browser window if not already maximised
+       *
+       * @instance
+       * @param {browser}
+       */
+      _maxWindow: function(browser) {
+         // browser.maximizeWindow();
+         browser.setWindowSize(null, 1024, 768);
+      },
+
+      /**
+       * Cancels modifier keys
+       *
+       * @instance
+       * @param {browser}
+       */
+      _cancelModifierKeys: function(browser) {
+         browser.pressKeys(null);
       },
 
       /**
@@ -145,11 +305,11 @@ define(["intern/dojo/node!fs",
        * @returns {string} The pseudo selector to use
        */
       _determineRow: function(expectedRow) {
-         var row = "last-child"
+         var row = "last-child";
          if (expectedRow != "last")
          {
-            row = "nth-child(" + expectedRow + ")"
-         };
+            row = "nth-child(" + expectedRow + ")";
+         }
          return row;
       },
 
@@ -164,13 +324,52 @@ define(["intern/dojo/node!fs",
        * @returns {string} The CSS selector
        */
       pubDataCssSelector: function(publishTopic, key, value) {
+         var selector = "" +
+            "td[data-publish-topic='" + publishTopic + "'] + " +
+            "td.sl-data tr.sl-object-row " +
+            "td[data-pubsub-object-key=" + key + 
+            "]+td[data-pubsub-object-value='" + value + "']";
+         return selector;
+      },
 
-         var selector = "td[data-publish-topic='" + publishTopic + "'] + " +
-                        "td.sl-data tr.sl-object-row " +
-                        "td[data-pubsub-object-key=" + 
-                        key + 
-                        "]+td[data-pubsub-object-value='" + 
-                        value + "']";
+      /**
+       * This generates a CSS selector that attempts to select a publication payload entry from the SubscriptionLOg
+       * widget where the payload contains a nested key/value pair that is the value of a key
+       *
+       * @instance
+       * @param {string} publishTopic The topic published on
+       * @param {string} key The key for the data
+       * @param {string} nestedKey The key nested as the value for the data
+       * @param {string} nestedValue The value of the nested data.
+       * @returns {string} The CSS selector
+       */
+      pubDataNestedValueCssSelector: function(publishTopic, key, nestedKey, nestedValue) {
+         var selector = "" +
+            "td[data-publish-topic='" + publishTopic + "'] + " +
+            "td.sl-data tr.sl-object-row " +
+            "td[data-pubsub-object-key=" + key + 
+            "]+ td td[data-pubsub-object-key='" + nestedKey + "'] " + 
+            "+ td[data-pubsub-object-value='" + nestedValue + "']";
+         return selector;
+      },
+
+      /**
+       * This generates a CSS selector that attempts to select a publication payload entry from the SubscriptionLOg
+       * widget where the payload contains a nested array that is the value of a key
+       *
+       * @instance
+       * @param {string} publishTopic The topic published on
+       * @param {string} key The key for the data
+       * @param {string} arrayIndex The index of the nested array
+       * @param {string} value The expected value of the nested data.
+       * @returns {string} The CSS selector
+       */
+      pubDataNestedArrayValueCssSelector: function(publishTopic, key, arrayIndex, value) {
+         var selector = "" +
+            "td[data-publish-topic='" + publishTopic + "'] + " +
+            "td.sl-data tr.sl-object-row " +
+            "td[data-pubsub-object-key=" + key +
+            "]+ td td[data-pubsub-object-value='" + value + "']:nth-child(" + arrayIndex + ")";
          return selector;
       },
 
@@ -188,17 +387,24 @@ define(["intern/dojo/node!fs",
        */
       pubSubDataCssSelector: function(expectedRow, key, value) {
 
-         var row = "last-child"
-         if (expectedRow != "last")
+         var row = "";
+         if (expectedRow == "any")
          {
-            row = "nth-child(" + expectedRow + ")"
-         };
+            // Don't specify a row
+         }
+         else if (expectedRow == "last")
+         {
+            row = ":last-child";
+         }
+         else if (expectedRow != "last")
+         {
+            row = ":nth-child(" + expectedRow + ")";
+         }
 
-         var selector = ".alfresco-testing-SubscriptionLog tr.sl-row:" + row +
-            " td[data-pubsub-object-key=" + 
-            key + 
-            "]+td[data-pubsub-object-value='" + 
-            value + "']";
+         var selector = "" +
+            ".alfresco-testing-SubscriptionLog tr.sl-row" + row +
+            " td[data-pubsub-object-key=" + key + 
+            "]+td[data-pubsub-object-value='" + value + "']";
          // console.log("Topic selector: " + selector);
 
          return selector;
@@ -212,13 +418,10 @@ define(["intern/dojo/node!fs",
        * @param {number} expectedRow The row to get the topic for
        */
       nthTopicSelector: function(expectedRow) {
-
          var row = this._determineRow(expectedRow);
          var selector = ".alfresco-testing-SubscriptionLog tr.sl-row:" + row + " td.sl-topic";
          // console.log("Selector: " + selector);
-
          return selector;
-
       },
 
       /**
@@ -246,7 +449,7 @@ define(["intern/dojo/node!fs",
          }
          else if (expectedRow == "last")
          {
-            row = ":last-child"
+            row = ":last-child";
          }
          else if (expectedRow != null)
          {
@@ -284,29 +487,69 @@ define(["intern/dojo/node!fs",
       },
 
       /**
+       * This generates an xpath selector that matches the supplied value in the console log.
+       *
+       * @instance
+       * @param {string} value The value to search for
+       * @returns {string} The XPATH selector
+       */
+      consoleXpathSelector: function(value) {
+         return "//table[@class=\"log\"]/tbody/tr[@class=\"cl-row\"]/td[contains(.,'" + value + "')]";
+      },
+
+      /**
        * This function searches for the button to post test coverage results to the "node-coverage"
        * server. It should be called at the end of each unit test
        *
        * @instance
        * @param {object} browser This should be set to a reference to "this.remote" from the unit test
+       * @param {boolean} loadCoverageForm Choose to optionally navigate to the JustCoverage model before posting coverage data
        */
-      postCoverageResults: function(browser) {
-         if(Config.doCoverageReport)
+      postCoverageResults: function(browser, loadCoverageForm) {
+         if(args.doCoverage === "true")
          {
-            browser
-            .end()
-            .elementByCss('.alfresco-testing-TestCoverageResults input[type=submit]')
-            .moveTo()
-            .sleep(500)
-            .click()
-            .end();
+            
+            if(loadCoverageForm)
+            {
+               this.bootstrapCoverageForm(browser);
+               console.log(">> Coverage form loaded");
+            }
 
-            console.log(">> Coverage ~~>");
+            return browser.end()
+
+            .findByCssSelector('.alfresco-testing-TestCoverageResults input[type=submit]')
+               .click()
+               .end()
+            
+            .then(function() {
+               console.log(">> Waiting for coverage submission to complete...");
+            })
+            .sleep(1000).end();
+            
+            // .then(pollUntil('return document.querySelector("body > pre");'))
+            //    .then(function (element) {}, function (error) {})
+            //    .end();
+            
          }
          else
          {
-            browser.end();
+            return browser.end();
          }
+      },
+
+      /**
+       * This function loads the JustCoverage model to provide a code coverage submission form. This can be 
+       * used when a test navigates away from the test framework and an already rendered coverage form is 
+       * now missing.
+       *
+       * @instance
+       * @param {object} browser This should be the the "remote" attribute from the unit test
+       * @returns {promise} The promise for continuing the unit test.
+       */
+      bootstrapCoverageForm: function(browser) {
+         return this.bootstrapTest(browser, "./tests/alfresco/page_models/JustCoverage.json", "JustCoverage")
+            .sleep(1000)
+            .end();
       },
 
       /**
@@ -314,17 +557,10 @@ define(["intern/dojo/node!fs",
        *
        * @instance
        * @param {string} test The name of the test running
-       * @param {string} line The line number
        * @param {string} desc The test description
        */
-      log: function(test, line, desc) {
-         console.log(">> " + test + " [" + line + "]: " + desc);
+      log: function(test, desc) {
+         console.log(">> " + test + ": " + desc);
       }
-
-      /**
-       * Counts the number of results from the CSS selector that is passed in.
-       *
-       */
    };
-
 });

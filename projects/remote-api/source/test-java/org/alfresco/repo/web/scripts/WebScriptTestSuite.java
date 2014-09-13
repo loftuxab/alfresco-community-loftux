@@ -28,6 +28,7 @@ import org.alfresco.repo.web.scripts.audit.AuditWebScriptTest;
 import org.alfresco.repo.web.scripts.blogs.BlogServiceTest;
 import org.alfresco.repo.web.scripts.dictionary.DictionaryRestApiTest;
 import org.alfresco.repo.web.scripts.discussion.DiscussionRestApiTest;
+import org.alfresco.repo.web.scripts.facet.FacetRestApiTest;
 import org.alfresco.repo.web.scripts.forms.FormRestApiGet_Test;
 import org.alfresco.repo.web.scripts.forms.FormRestApiJsonPost_Test;
 import org.alfresco.repo.web.scripts.groups.GroupsTest;
@@ -95,6 +96,7 @@ public class WebScriptTestSuite extends TestSuite
         suite.addTestSuite( PublishingRestApiTest.class );
         suite.addTestSuite( SOLRWebScriptTest.class );
         suite.addTestSuite( SubscriptionServiceRestApiTest.class );
+        suite.addTestSuite( FacetRestApiTest.class );
         
         // This uses a slightly different context
         // As such, we can't run it in the same suite as the others,

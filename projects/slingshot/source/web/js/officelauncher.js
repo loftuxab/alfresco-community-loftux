@@ -148,8 +148,6 @@ function EmbeddedOfficeLauncher()
         var control = getControl();
         if(control)
         {
-            var encodedUrl = encodeUrl(url);
-            log().log('encodedUrl = ',encodedUrl);
             try
             {
                 var result;
@@ -161,7 +159,7 @@ function EmbeddedOfficeLauncher()
                     }
                     else
                     {
-                        result = control.ViewDocument(encodedUrl);
+                        result = control.ViewDocument(url);
                     }
                 }
                 else
@@ -172,7 +170,7 @@ function EmbeddedOfficeLauncher()
                     }
                     else
                     {
-                        result = control.EditDocument(encodedUrl);
+                        result = control.EditDocument(url);
                     }
                 }
                 m_lastControlResult = result;
@@ -467,8 +465,7 @@ function EmbeddedOfficeLauncher()
         return navigator && navigator.mimeTypes && navigator.mimeTypes[mimeType] && navigator.mimeTypes[mimeType].enabledPlugin;
     }
     
-    // ACE-2310: We need to make sure that all characters are encoded properly but we need to prevent double encoding. Removed percent character from URL_ESCAPE_CHARS
-    var URL_ESCAPE_CHARS = '<>\'\"?#@&`';
+    var URL_ESCAPE_CHARS = '<>\'\"?#@%&`';
     
     function encodeUrl(url)
     {

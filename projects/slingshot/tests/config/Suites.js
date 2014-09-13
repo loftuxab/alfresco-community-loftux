@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -33,7 +33,7 @@ define({
    baseNonFunctionalSuites: null,
 
    // Uncomment and add specific tests as necessary during development!
-   // baseFunctionalSuites: ['tests/alfresco/menus/AlfContextMenuTest'],
+   // baseFunctionalSuites: ['tests/alfresco/accessibility/AccessibilityMenuTest'],
 
    /**
     * This is the base array of functional test suites
@@ -43,34 +43,54 @@ define({
     */
    baseFunctionalSuites: [
       'tests/alfresco/accessibility/AccessibilityMenuTest',
+      'tests/alfresco/accessibility/SemanticWrapperMixinTest',
 
       'tests/alfresco/charts/ccc/PieChartTest',
 
       'tests/alfresco/core/PublishPayloadMixinTest',
       'tests/alfresco/core/RenderFilterTest',
+      'tests/alfresco/core/CoreRwdTest',
       'tests/alfresco/core/VisibilityConfigTest',
       'tests/alfresco/core/WidgetCreationTest',
 
+      'tests/alfresco/creation/WidgetConfigTest',
+
+      'tests/alfresco/documentlibrary/BreadcrumbTrailTest',
+      'tests/alfresco/documentlibrary/CreateContentTest',
       'tests/alfresco/documentlibrary/DocumentListTest',
+      'tests/alfresco/documentlibrary/DocumentSelectorTest',
+      'tests/alfresco/documentlibrary/PaginationTest',
       'tests/alfresco/documentlibrary/SearchListTest',
       'tests/alfresco/documentlibrary/SearchListScrollTest',
       'tests/alfresco/documentlibrary/views/AlfDocumentListWithHeaderTest',
+      'tests/alfresco/documentlibrary/views/FilmStripViewTest',
+      'tests/alfresco/documentlibrary/views/GalleryViewTest',
 
       'tests/alfresco/footer/FooterTest',
 
+      'tests/alfresco/forms/CrudFormTest',
+      'tests/alfresco/forms/DynamicFormTest',
       'tests/alfresco/forms/FormsTest',
       'tests/alfresco/forms/SingleTextFieldFormTest',
+      'tests/alfresco/forms/controls/AutoSetTest',
+      'tests/alfresco/forms/controls/ComboBoxTest',
       'tests/alfresco/forms/controls/DocumentPickerTest',
       'tests/alfresco/forms/controls/DojoSelectTest',
-      'tests/alfresco/forms/controls/DojoDateTextBoxTest',
+      // 'tests/alfresco/forms/controls/DojoDateTextBoxTest',  // TODO: NEEDS FIXING
       'tests/alfresco/forms/controls/DojoValidationTextBoxTest',
       'tests/alfresco/forms/controls/FormButtonDialogTest',
+      'tests/alfresco/forms/controls/MultipleEntryFormControlTest',
+      'tests/alfresco/forms/controls/ValidationTest', 
 
+      'tests/alfresco/header/HeaderWidgetsTest',
       'tests/alfresco/header/WarningTest',
 
       'tests/alfresco/html/LabelTest',
 
+      'tests/alfresco/layout/AlfSideBarContainerTest',
       'tests/alfresco/layout/BasicLayoutTest',
+      'tests/alfresco/layout/FullScreenWidgetsTest',
+      'tests/alfresco/layout/TwisterTest',
 
       'tests/alfresco/menus/AlfCheckableMenuItemTest',
       'tests/alfresco/menus/AlfContextMenuTest',
@@ -83,19 +103,38 @@ define({
       'tests/alfresco/menus/AlfVerticalMenuBarTest',
       'tests/alfresco/menus/MenuTests',
 
-      'tests/alfresco/misc/AlfTooltipTest',
+      // 'tests/alfresco/misc/AlfTooltipTest', - COMMENTED OUT - THE TOOLTIP ITSELF NEEDS REWRITING
+      'tests/alfresco/misc/TableAndFormDialogTest',
 
+      'tests/alfresco/preview/ImagePreviewTest',
+
+      'tests/alfresco/renderers/BannerTest',
       'tests/alfresco/renderers/BooleanTest',
+      'tests/alfresco/renderers/CategoryTest',
       'tests/alfresco/renderers/DateTest',
       'tests/alfresco/renderers/DateLinkTest',
+      'tests/alfresco/renderers/FileTypeTest',
+      'tests/alfresco/renderers/IndicatorsTest',
+      'tests/alfresco/renderers/InlineEditPropertyTest',
       'tests/alfresco/renderers/PropertyTest',
       'tests/alfresco/renderers/PropertyLinkTest',
       'tests/alfresco/renderers/PublishingDropDownMenuTest',
       'tests/alfresco/renderers/PublishPayloadMixinOnActionsTest',
+      'tests/alfresco/renderers/ReorderTest',
       'tests/alfresco/renderers/SearchResultPropertyLinkTest',
+      'tests/alfresco/renderers/SocialRenderersTest',
+      'tests/alfresco/renderers/TagsTest',
+      'tests/alfresco/renderers/ThumbnailTest',
       'tests/alfresco/renderers/XhrActionsTest',
 
-      'tests/alfresco/search/FacetFiltersTest'
+      'tests/alfresco/services/SearchServiceTest',
+      'tests/alfresco/services/SiteServiceTest',
+      'tests/alfresco/services/UserServiceTest',
+
+      'tests/alfresco/search/FacetFiltersTest',
+      'tests/alfresco/search/AlfSearchResultTest',
+
+      'tests/alfresco/upload/UploadTest'
    ],
 
    /**
@@ -113,7 +152,13 @@ define({
     * @type [string]
     */
    localFunctionalSuites: function localFunctionalSuites(){
-      return this.baseFunctionalSuites.concat(this.localOnlyFunctionalSuites);
+      return this.setupFunctionalSuites.concat(
+         this.baseFunctionalSuites.concat(
+            this.localOnlyFunctionalSuites.concat(
+               this.teardownFunctionalSuites
+            )
+         )
+      );
    },
 
    /**
@@ -131,7 +176,13 @@ define({
     * @type [string]
     */
    vmFunctionalSuites: function vmFunctionalSuites(){
-      return this.baseFunctionalSuites.concat(this.vmOnlyFunctionalSuites);
+      return this.setupFunctionalSuites.concat(
+         this.baseFunctionalSuites.concat(
+            this.vmOnlyFunctionalSuites.concat(
+               this.teardownFunctionalSuites
+            )
+         )
+      );
    },
 
    /**
@@ -149,7 +200,13 @@ define({
     * @type [string]
     */
    slFunctionalSuites: function slFunctionalSuites(){
-      return this.baseFunctionalSuites.concat(this.slOnlyFunctionalSuites);
+      return this.setupFunctionalSuites.concat(
+         this.baseFunctionalSuites.concat(
+            this.slOnlyFunctionalSuites.concat(
+               this.teardownFunctionalSuites
+            )
+         )
+      );
    },
 
    /**
@@ -167,7 +224,29 @@ define({
     * @type [string]
     */
    gridFunctionalSuites: function gridFunctionalSuites(){
-      return this.baseFunctionalSuites.concat(this.gridOnlyFunctionalSuites);
-   }
+      return this.setupFunctionalSuites.concat(
+         this.baseFunctionalSuites.concat(
+            this.gridOnlyFunctionalSuites.concat(
+               this.teardownFunctionalSuites
+            )
+         )
+      );
+   },
+
+   /**
+    * This is the array of functional test suites for setup purposes
+    *
+    * @instance
+    * @type [string]
+    */
+   setupFunctionalSuites: [],//['tests/alfresco/DebugEnable'],
+
+   /**
+    * This is the array of functional test suites for teardown purposes
+    *
+    * @instance
+    * @type [string]
+    */
+   teardownFunctionalSuites: []//['tests/alfresco/DebugDisable']
 
 });

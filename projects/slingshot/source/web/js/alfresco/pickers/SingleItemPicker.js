@@ -23,29 +23,29 @@
  * @mixes dijit/_TemplatedMixin
  * @mixes module:alfresco/core/Core
  * @mixes module:alfresco/core/CoreWidgetProcessing
- * @author Dave Draper
+ * @author Dave Draper & David Webster
  */
 define(["dojo/_base/declare",
-        "dijit/_WidgetBase", 
+        "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dojo/text!./templates/SingleItemPicker.html",
         "alfresco/core/Core",
         "alfresco/core/CoreWidgetProcessing",
         "dojo/_base/lang",
-        "dojo/_base/array"], 
+        "dojo/_base/array"],
         function(declare, _WidgetBase, _TemplatedMixin, template, AlfCore, CoreWidgetProcessing, lang, array) {
-   
+
    return declare([_WidgetBase, _TemplatedMixin, AlfCore, CoreWidgetProcessing], {
 
       /**
        * An array of the CSS files to use with this widget.
-       * 
+       *
        * @instance
        * @type {object[]}
        * @default [{cssFile:"./css/SingleItemPicker.css"}]
        */
       cssRequirements: [{cssFile:"./css/SingleItemPicker.css"}],
-      
+
       /**
        * The HTML template to use for the widget.
        * @instance
@@ -54,7 +54,16 @@ define(["dojo/_base/declare",
       templateString: template,
 
       /**
-       * 
+       * Which picker shall we call to display the results of this picking?
+       *
+       * @instance
+       * @type {String}
+       * @default "alfresco/pickers/DocumentListPicker"
+       */
+      subPicker: "alfresco/pickers/DocumentListPicker",
+
+      /**
+       *
        *
        * @instance
        */
@@ -95,9 +104,9 @@ define(["dojo/_base/declare",
          }
          else
          {
-            // Iterate of the items and convert each item into a widget definition and add it to the 
+            // Iterate of the items and convert each item into a widget definition and add it to the
             var widgets = [];
-            array.forEach(payload.response, lang.hitch(this, "addItemWidgetConfig", widgets));
+            array.forEach(payload.response, lang.hitch(this, this.addItemWidgetConfig, widgets));
 
             var config = [
                {
@@ -114,7 +123,7 @@ define(["dojo/_base/declare",
 
       /**
        * Creates the configuration for a single item to be added to the overall AlfVerticalMenuBar item. Currently
-       * this is incorrectly coded to assume that site data has been provided (whereas this should actually be a 
+       * this is incorrectly coded to assume that site data has been provided (whereas this should actually be a
        * much more abstract method and there should be a "SingleSitePicker" that extends this instance). This
        * will create an AlfMenuBarItem for the site that will publish a request to display an Explorer picker
        * when selected.
@@ -123,6 +132,7 @@ define(["dojo/_base/declare",
        * @param {object[]} widgets The array of widgets to add the item widget to
        * @param {object} item The item to convert into a widget
        * @param {number} index The index of the item to add
+       * @todo Hard coded to site data. See comment in method description about generalising code.
        */
       addItemWidgetConfig: function alfresco_pickers_SingleItemPicker__addItemWidgetConfig(widgets, item, index) {
 
@@ -131,11 +141,12 @@ define(["dojo/_base/declare",
             name: "alfresco/menus/AlfMenuBarItem",
             config: {
                label: item.title,
+               iconClass: "alf-sites-icon", // hard-coded sites Icon.
                publishTopic: "ALF_ADD_PICKER",
                publishPayload: {
                   currentPickerDepth: this.currentPickerDepth,
                   picker: {
-                     name: "alfresco/pickers/DocumentListPicker",
+                     name: this.subPicker,
                      config: {
                         libraryRoot: siteNodeRef,
                         nodeRef: siteNodeRef,
@@ -144,7 +155,7 @@ define(["dojo/_base/declare",
                   }
                }
             }
-         }
+         };
          widgets.push(config);
       },
 
@@ -160,7 +171,7 @@ define(["dojo/_base/declare",
 
       /**
        * Handles the user clicking on a specific item.
-       * 
+       *
        * @instance
        */
       onItemSelected: function alfresco_pickers_SingleItemPicker__onItemSelected() {

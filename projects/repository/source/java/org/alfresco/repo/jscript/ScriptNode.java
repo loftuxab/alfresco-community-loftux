@@ -85,7 +85,6 @@ import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.TemplateImageResolver;
 import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
@@ -479,11 +478,19 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      * childByNamePath returns the Node at the specified 'cm:name' based Path walking the children of this Node.
      *         So a valid call might be:
      *         <code>mynode.childByNamePath("/QA/Testing/Docs");</code>
-     * 
-     * @return The ScriptNode or null if the node is not found.
+     *         
+     * @param path the relative path of the descendant node to find e.g. {@code "/QA/Testing/Docs"}
+     * @return The ScriptNode or {@code null} if the node is not found.
+     *         {@code null} if the specified path is {@code ""}.
+     * @throws NullPointerException if the provided path is {@code null}.
      */
     public ScriptNode childByNamePath(String path)
     {
+        // Ensure that paths that do not represent descendants are not needlessly tokenised. See ALF-20896.
+        if (path == null)        { throw new NullPointerException("Illegal null path"); }
+        else if (path.isEmpty()) { return null; }
+        
+        // We have a path worth looking at...
         ScriptNode child = null;
         
         if (this.services.getDictionaryService().isSubClass(getQNameType(), ContentModel.TYPE_FOLDER))
@@ -2033,19 +2040,9 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     {
         ParameterCheck.mandatory("Destination Node", destination);
         
-        ScriptNode copy = null;
-        
-        if (destination.getNodeRef().getStoreRef().getProtocol().equals(StoreRef.PROTOCOL_WORKSPACE))
-        {
-            NodeRef copyRef = this.services.getCopyService().copyAndRename(this.nodeRef, destination.getNodeRef(),
-                    ContentModel.ASSOC_CONTAINS, null, deepCopy);
-            copy = newInstance(copyRef, this.services, this.scope);
-        }
-        else
-        {
-            // NOTE: the deepCopy flag is not respected for this copy mechanism
-            copy = getCrossRepositoryCopyHelper().copy(this, destination, getName());
-        }
+        NodeRef copyRef = this.services.getCopyService().copyAndRename(this.nodeRef, destination.getNodeRef(),
+                ContentModel.ASSOC_CONTAINS, null, deepCopy);
+        ScriptNode copy = newInstance(copyRef, this.services, this.scope);
         
         return copy;
     }
@@ -3500,15 +3497,6 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         this.activeWorkflows = null;
         this.siteName = null;
         this.siteNameResolved = false;
-    }
-    
-    /**
-     * @return helper object to perform cross repository copy of JavaScript Node objects
-     */
-    protected CrossRepositoryCopy getCrossRepositoryCopyHelper()
-    {
-        return (CrossRepositoryCopy)this.services.getService(
-                QName.createQName("", CrossRepositoryCopy.BEAN_NAME));
     }
     
     /**

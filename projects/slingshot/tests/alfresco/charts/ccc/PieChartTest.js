@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,20 +25,20 @@ define(["intern!object",
    "intern/chai!assert",
    "require",
    "alfresco/TestCommon",
-   "intern/dojo/node!wd/lib/special-keys"],
-      function (registerSuite, assert, require, TestCommon, specialKeys) {
+   "intern/dojo/node!leadfoot/keys"],
+      function (registerSuite, assert, require, TestCommon, keys) {
 
          registerSuite({
             name: 'PieChart Test',
             'alfresco/charts/ccc/PieChart': function () {
 
                var browser = this.remote;
-               return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/charts/ccc/page_models/PieChart_TestPage.json")
-                     .end()
+               var testName = "Pie Chart Test";
+               return TestCommon.loadTestWebScript(this.remote, "/PieChart", testName)
 
                   // Test #1
                   // Check pie slices
-                     .elementsByCss("#PIECHART_1 svg text")
+                     .findAllByCssSelector("#PIECHART_1 svg text")
                      .then(function(elements) {
                         assert(elements.length == 2, "Expected to find 2 items in the chart, but found " + elements.length);
                      })
@@ -46,8 +46,8 @@ define(["intern!object",
 
                   // Test #2
                   // Check labels
-                     .elementByCss("#PIECHART_1 svg g g g g g:nth-child(2) text")
-                     .text()
+                     .findByCssSelector("#PIECHART_1 svg g g g g g:nth-child(2) text")
+                     .getVisibleText()
                      .then(function(text) {
                         assert(text == "one-hundred-100", "Expected to find label 'one-hundred-100', but found '" + text + "'");
                      })
@@ -55,8 +55,8 @@ define(["intern!object",
 
                   // Test #3
                   // Check labels
-                     .elementByCss("#PIECHART_1 svg g g g g g:nth-child(4) text")
-                     .text()
+                     .findByCssSelector("#PIECHART_1 svg g g g g g:nth-child(4) text")
+                     .getVisibleText()
                      .then(function(text) {
                         assert(text == "two-hundred-200", "Expected to find label 'two-hundred-200', but found '" + text + "'");
                      })

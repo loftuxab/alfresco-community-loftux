@@ -9,7 +9,7 @@
  ***********************************************************************************/
 function getUserPreferences() {
    var userPreferences = {};
-   var prefs = jsonUtils.toObject(preferences.value);
+   var prefs = JSON.parse(preferences.value);
    return prefs
 }
 
@@ -678,12 +678,15 @@ function getPathTree(siteId, containerId, rootNode) {
    return tree;
 }
 
-function getTags() {
+function getTags(siteId, containerId, rootNode) {
    var tags = {
       id: "DOCLIB_TAGS",
       name: "alfresco/documentlibrary/AlfTagFilters",
       config: {
-         label: "filter.label.tags"
+         label: "filter.label.tags",
+         siteId: siteId,
+         containerId: containerId,
+         rootNode: rootNode
       }
    };
    return tags;
@@ -814,14 +817,14 @@ function getDocumentLibraryModel(siteId, containerId, rootNode) {
                   widgets: [
                      getFilters(),
                      getPathTree(siteId, containerId, rootNode),
-                     getTags(),
+                     getTags(siteId, containerId, rootNode),
                      getCategories()
                   ]
                }
             },
             {
                id: "DOCLIB_SIDEBAR_MAIN",
-               name: "alfresco/layout/VerticalWidgets",
+               name: "alfresco/layout/FullScreenWidgets",
                config: 
                {
                   widgets: 
@@ -931,11 +934,44 @@ function getDocumentLibraryModel(siteId, containerId, rootNode) {
                                                    id: "DOCLIB_CONFIG_MENU_VIEW_SELECT_GROUP",
                                                    name: "alfresco/documentlibrary/AlfViewSelectionGroup"
                                                 },
+                                                // The actions to toggle full-screen and full-window have been left in place
+                                                // for the time being, however the function is not working correctly due to
+                                                // issues with absolutely positioned popups used for menus that are not shown.
+                                                // Theses issues need to be resolved before this can be released.
+                                                {
+                                                   id: "DOCLIB_CONFIG_MENU_VIEW_MODE_GROUP",
+                                                   name: "alfresco/menus/AlfMenuGroup",
+                                                   config: {
+                                                      label: msg.get("doclib.viewModes.label"),
+                                                      widgets: [
+                                                         {
+                                                            id: "DOCLIB_FULL_WINDOW_OPTION",
+                                                            name: "alfresco/menus/AlfCheckableMenuItem",
+                                                            config: {
+                                                               label: msg.get("doclib.fullwindow.label"),
+                                                               iconClass: "alf-fullscreen-icon",
+                                                               checked: false,
+                                                               publishTopic: "ALF_FULL_WINDOW"
+                                                            }
+                                                         },
+                                                         {
+                                                            id: "DOCLIB_FULL_SCREEN_OPTION",
+                                                            name: "alfresco/menus/AlfCheckableMenuItem",
+                                                            config: {
+                                                               label: msg.get("doclib.fullscreen.label"),
+                                                               iconClass: "alf-fullscreen-icon",
+                                                               checked: false,
+                                                               publishTopic: "ALF_FULL_SCREEN"
+                                                            }
+                                                         }
+                                                      ]
+                                                   }
+                                                },
                                                 {
                                                    id: "DOCLIB_CONFIG_MENU_OPTIONS_GROUP",
                                                    name: "alfresco/menus/AlfMenuGroup",
                                                    config: {
-                                                      label: "Options",
+                                                      label: msg.get("doclib.options.label"),
                                                       widgets: [
                                                          {
                                                             id: "DOCLIB_SHOW_FOLDERS_OPTION",
@@ -1011,6 +1047,15 @@ function getDocumentLibraryModel(siteId, containerId, rootNode) {
                               },
                               {
                                  name: "alfresco/documentlibrary/views/AlfDetailedView"
+                              },
+                              {
+                                 name: "alfresco/documentlibrary/views/AlfGalleryView"
+                              },
+                              {
+                                 name: "alfresco/documentlibrary/views/AlfTableView"
+                              },
+                              {
+                                 name: "alfresco/documentlibrary/views/AlfFilmStripView"
                               }
                            ]
                         }

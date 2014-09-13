@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -181,9 +181,16 @@ define(["dojo/_base/declare",
             // Set current Index to previousItemCount (so rendering starts at new items)
             this.currentIndex = this.currentData.previousItemCount || 0;
             this.currentItem = this.currentData.items[this.currentIndex];
+            
+            // Add in the index...
+            if (this.currentItem.index == null)
+            {
+               this.currentItem.index = this.currentIndex;
+            }
+
             var itemsToRender = (this.currentIndex)? this.currentData.items.slice(this.currentIndex): this.currentData.items;
             
-            array.forEach(itemsToRender, lang.hitch(this, "renderNextItem"));
+            array.forEach(itemsToRender, lang.hitch(this, this.renderNextItem));
             this.allItemsRendered();
          }
          else
@@ -211,6 +218,10 @@ define(["dojo/_base/declare",
          // Process the widgets defined using the current item as the data to go into those widgets...
          this.alfLog("log", "Rendering item", this.currentData.items[this.currentIndex]);
          
+         // Mark the current item with an attribute indicating that it is the last item.
+         // This is done for the benefit of renderers that need to know if they are the last item.
+         this.currentData.items[this.currentIndex].isLastItem = (this.currentItem.index === this.currentData.items.length -1);
+
          // Set a width if provided...
          if (this.width != null)
          {
@@ -230,6 +241,18 @@ define(["dojo/_base/declare",
       },
       
       /**
+       * Records all the widgets that are processed for each item. This differs from the 
+       * [_processedWidgets]{@link module:alfresco/core/CoreWidgetProcessing#_processedWidgets}
+       * attribute because that captures the widgets processed for the last item (i.e. the 
+       * data is replaced on each item iteration)
+       *
+       * @instance
+       * @type {array}
+       * @default null
+       */
+      _renderedItemWidgets: null,
+
+      /**
        * Overrides the default implementation to start the rendering of the next item.
        * 
        * @instance
@@ -237,6 +260,13 @@ define(["dojo/_base/declare",
        */
       allWidgetsProcessed: function alfresco_documentlibrary_views_layout__MultiItemRendererMixin__allWidgetsProcessed(widgets) {
          
+         // Push the processed widgets for the last item into the array of rendered widgets...
+         if (this._renderedItemWidgets == null)
+         {
+            this._renderedItemWidgets = [];
+         }
+         this._renderedItemWidgets.push(widgets);
+
          // Increment the current index and check to see if there are more items to render...
          // Only the root widget(s) will have the currentData object set so we don't start rendering the next item
          // on nested widgets...
@@ -250,6 +280,12 @@ define(["dojo/_base/declare",
             {
                // Render the next item...
                this.currentItem = this.currentData.items[this.currentIndex];
+
+               // Add in the index...
+               if (this.currentItem.index == null)
+               {
+                  this.currentItem.index = this.currentIndex;
+               }
             }
          }
          else

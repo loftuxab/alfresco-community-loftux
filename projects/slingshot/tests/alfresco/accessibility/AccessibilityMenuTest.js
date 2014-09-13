@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -24,8 +24,8 @@ define(["intern!object",
         "intern/chai!expect",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, expect, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, expect, require, TestCommon, keys) {
 
    registerSuite({
       name: 'AccessibilityMenu Test',
@@ -33,76 +33,74 @@ define(["intern!object",
 
          var browser = this.remote;
          var testname = "AccessibilityMenuTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/accessibility/page_models/AccessibilityMenu_TestPage.json", testname)
-
-         .end()
+         return TestCommon.loadTestWebScript(this.remote, "/AccessibilityMenu", testname)
 
          // Find the menu element
-         .elementById("AccessibilityMenu")
-         .then(function (el) {
-            TestCommon.log(testname,43,"Find the menu element");
-            expect(el).to.be.an("object", "The Accessibility Menu could not be found");
-         })
-         .end()
+         .findById("AccessibilityMenu")
+            .then(function (el) {
+               TestCommon.log(testname,"Find the menu element");
+               expect(el).to.be.an("object", "The Accessibility Menu could not be found");
+            })
+            .end()
 
          // Find the heading text
-         .elementByCss("#AccessibilityMenu > p")
-         .text()
-         .then(function(headingText) {
-            TestCommon.log(testname,52,"Find the heading text");
-            expect(headingText).to.equal("Access key links:", "The heading text is wrong");
-         })
-         .end()
+         .findByCssSelector("#AccessibilityMenu > p")
+            .getVisibleText()
+            .then(function(headingText) {
+               TestCommon.log(testname,"Find the heading text");
+               expect(headingText).to.equal("Access key links:", "The heading text is wrong");
+            })
+            .end()
 
          // Find the menu items
-         .elementsByCssSelector("#AccessibilityMenu > ul > li")
-         .then(function (menuitems) {
-            TestCommon.log(testname,60,"Find the menu items");
-            expect(menuitems).to.have.length(8, "The Accessibility Menu does not contain 8 <li> items");
-         })
-         .end()
+         .findAllByCssSelector("#AccessibilityMenu > ul > li")
+            .then(function (menuitems) {
+               TestCommon.log(testname,"Find the menu items");
+               expect(menuitems).to.have.length(8, "The Accessibility Menu does not contain 8 <li> items");
+            })
+            .end()
 
          // Find the first target
-         .elementByCss("a#accesskey-skip")
-         .then(function (el) {
-            TestCommon.log(testname,68,"Find the first target");
-            expect(el).to.be.an("object", "The accesskey-skip target is missing");
-         })
-         .end()
+         .findByCssSelector("a#accesskey-skip")
+            .then(function (el) {
+               TestCommon.log(testname,"Find the first target");
+               expect(el).to.be.an("object", "The accesskey-skip target is missing");
+            })
+            .end()
 
          // Find the second target
-         .elementById("accesskey-foot")
-         .then(function (el) {
-            TestCommon.log(testname,76,"Find the second target");
-            expect(el).to.be.an("object", "The accesskey-foot target is missing");
-         })
-         .end()
+         .findById("accesskey-foot")
+            .then(function (el) {
+               TestCommon.log(testname,"Find the second target");
+               expect(el).to.be.an("object", "The accesskey-foot target is missing");
+            })
+            .end()
 
          // Find the first menu link - which links the first target
-         .elementByCss("#AccessibilityMenu > ul > li:nth-of-type(1) > a ")
-         .then(function (el) {
-            TestCommon.log(testname,84,"Find the first menu link - which links the first target");
-            expect(el).to.be.an("object", "The first link is missing");
-         })
-         .end()
+         .findByCssSelector("#AccessibilityMenu > ul > li:nth-of-type(1) > a ")
+            .then(function (el) {
+               TestCommon.log(testname,"Find the first menu link - which links the first target");
+               expect(el).to.be.an("object", "The first link is missing");
+            })
+            .end()
 
          // Hit the browser with a sequence of different accesskey combinations and the letter 's' for a nav skip
-         .keys([specialKeys["Shift"], "s"])
-         .keys([specialKeys["Shift"]])
-         .keys([specialKeys["Alt"], specialKeys["Shift"], "s"])
-         .keys([specialKeys["Alt"], specialKeys["Shift"]])
+         .pressKeys([keys.SHIFT, "s"])
+         .pressKeys([keys.SHIFT])
+         .pressKeys([keys.ALT, keys.SHIFT, "s"])
+         .pressKeys([keys.ALT, keys.SHIFT])
 //       Can't do this because of a conflict in FF on Windows that calls up a dialogue
-//         .keys([specialKeys["Control"], specialKeys["Command"], "s"])
-//         .keys([specialKeys["Control"], specialKeys["Command"]])
-         .url()
+//         .pressKeys([keys["Control"], keys["Command"], "s"])
+//         .pressKeys([keys["Control"], keys["Command"]])
+         .getCurrentUrl()
          .then(function (page) {
             // Only check the test if this isn't a Mac because of key combo conflicts.
             if(browser.environmentType.platform !== "MAC") {
-               TestCommon.log(testname,101,"Hit the browser with a sequence of different accesskey combinations and the letter 's' for a nav skip");
+               TestCommon.log(testname,"Hit the browser with a sequence of different accesskey combinations and the letter 's' for a nav skip");
                expect(page).to.contain("#accesskey-skip", "Accesskey target not linked to");
             }
             else {
-               TestCommon.log(testname,105,"Skipping key combo test due to Mac compatibility issues.");
+               TestCommon.log(testname,"Skipping key combo test due to Mac compatibility issues.");
             }
          })
          .end()
@@ -110,8 +108,7 @@ define(["intern!object",
          // Post the coverage results...
          .then(function() {
             TestCommon.postCoverageResults(browser);
-         })
-         .end();
+         });
       }
    });
 });

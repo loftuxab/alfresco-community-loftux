@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,33 +18,56 @@
  */
 
 /**
- * Extends the standard (read-only) [property renderer]{@link module:alfresco/renderers/Property} to provide
- * the ability to edit and save changes to the property. Currently the implementation performs its own 
- * XHR post to save the date but it may be updated to use services to handle this action at some point in the
- * future.
+ * <p>Extends the standard (read-only) [property renderer]{@link module:alfresco/renderers/Property} to provide
+ * the ability to edit and save changes to the property. The edit view is rendered by a
+ * [DojoValidationTextBox widget]{@link module:alfresco/forms/controls/DojoValidationTextBox} and this module accepts the same 
+ * [validationConfig]{@link module:alfresco/forms/controls/BaseFormControl#validationConfig} as it does.</p>
+ * <p>When an edit is completed and saved a publication will be made and that should be defined using the standard
+ * "publishTopic", "publishPayload" and related publication attributes. However, for convenience it is assumed that the typical
+ * use case will be for editing the properties of nodes and so if the "publishTopic" attribute is configured as null then
+ * the publication will automatically be set up to result in saving node properties (however, it will be necessary to make
+ * sure that the [CrudService]{@link module:alfresco/services/CrudService} is included on the page to service those requests).</p> 
  * 
  * @module alfresco/renderers/InlineEditProperty
  * @extends module:alfresco/renderers/Property
  * @mixes dijit/_OnDijitClickMixin
- * @mixes module:alfresco/core/CoreXhr
+ * @mixes module:alfresco/core/CoreWidgetProcessing
+ * @mixes module:alfresco/renderers/_PublishPayloadMixin
  * @author Dave Draper
  */
 define(["dojo/_base/declare",
         "alfresco/renderers/Property", 
         "dijit/_OnDijitClickMixin",
-        "alfresco/core/CoreXhr",
+        "alfresco/core/CoreWidgetProcessing",
+        "alfresco/renderers/_PublishPayloadMixin",
         "dojo/text!./templates/InlineEditProperty.html",
+        "dojo/_base/lang",
+        "dojo/_base/array",
+        "dojo/on",
         "dojo/dom-class",
         "dojo/html",
         "dojo/dom-attr",
         "dojo/_base/fx",
         "dojo/keys",
         "dojo/_base/event",
-        "service/constants/Default"], 
-        function(declare, Property, _OnDijitClickMixin, CoreXhr, template, domClass, html, domAttr, fx, keys, event, AlfConstants) {
+        "service/constants/Default",
+        "alfresco/forms/Form",
+        "alfresco/forms/controls/DojoValidationTextBox",
+        "alfresco/forms/controls/HiddenValue"], 
+        function(declare, Property, _OnDijitClickMixin, CoreWidgetProcessing, _PublishPayloadMixin, 
+                 template, lang, array, on, domClass, html, domAttr, fx, keys, event, AlfConstants, Form, DojoValidationTextBox) {
 
-   return declare([Property, _OnDijitClickMixin, CoreXhr], {
+   return declare([Property, _OnDijitClickMixin, CoreWidgetProcessing, _PublishPayloadMixin], {
       
+      /**
+       * The array of file(s) containing internationalised strings.
+       *
+       * @instance
+       * @type {object}
+       * @default [{i18nFile: "./i18n/InlineEditProperty.properties"}]
+       */
+      i18nRequirements: [{i18nFile: "./i18n/InlineEditProperty.properties"}],
+
       /**
        * An array of the CSS files to use with this widget.
        * 
@@ -69,6 +92,64 @@ define(["dojo/_base/declare",
        */
       postParam: null,
       
+       /**
+       * This is the message or message key that will be used for save link text.
+       *
+       * @instance
+       * @type {string}
+       * @default "inline-edit.save.label"
+       */
+      saveLabel: "inline-edit.save.label",
+
+       /**
+       * This is the message or message key that will be used for the cancel link text.
+       *
+       * @instance
+       * @type {string}
+       * @default "inline-edit.cancel.label"
+       */
+      cancelLabel: "inline-edit.cancel.label",
+
+      /**
+       * This is the message or message key that will be used for the alt text attribute on the edit icon
+       *
+       * @instance
+       * @type {string}
+       * @default "inline-edit.edit.altText"
+       */
+      editAltText: "inline-edit.edit.altText",
+
+      /**
+       * This is the message or message key that will be used for the label attribute on the edit label
+       *
+       * @instance
+       * @type {string}
+       * @default "inline-edit.edit.label"
+       */
+      editLabel: "inline-edit.edit.label",
+
+      /**
+       * The topic to publish when a property edit should be persisted. For convenience it is assumed that document
+       * or folder properties are being edited so this function is called whenever a 'publishTopic' attribute
+       * has not been set. The defaults are to publish on the "ALF_CRUD_CREATE" topic which will publish a payload
+       * to be processed by the [CrudService]{@link module:alfresco/services/CrudService} that should result in a
+       * POST a request being made to the Repository form processor.
+       *
+       * @instance
+       * @type {string}
+       * @default "ALF_CRUD_CREATE"
+       */
+      setDefaultPublicationData: function alfresco_renderers_InlineEditProperty__setDefaultPublicationData() {
+         this.publishTopic = "ALF_CRUD_CREATE";
+         this.publishPayloadType = "PROCESS";
+         this.publishPayloadModifiers = ["processCurrentItemTokens"];
+         this.publishPayloadItemMixin = false;
+         this.publishPayload = {
+            url: "api/node/{jsNode.nodeRef.uri}/formprocessor",
+            noRefresh: true
+         };
+      },
+
       /**
        * This extends the inherited function to set the [postParam]{@link module:alfresco/renderers/InlineEditProperty#postParam]
        * attribute based on the [propertyToRender]{@link module:alfresco/renderers/InlineEditProperty#propertyToRender] if 
@@ -81,12 +162,174 @@ define(["dojo/_base/declare",
       postMixInProperties: function alfresco_renderers_InlineEditProperty__postMixInProperties() {
          this.inherited(arguments);
          
-         if (this.postParam == null && this.propertyToRender != null)
+         // If no topic has been provided then assume the default behaviour of editing document/folder properties
+         if (this.publishTopic == null)
          {
-            this.postParam = "prop_" + this.propertyToRender.replace(/:/g, "_");
+            this.setDefaultPublicationData();
          }
+
+         if (this.propertyToRender != null)
+         {
+            if (this.postParam == null && this.propertyToRender != null)
+            {
+               this.postParam = this.propertyToRender;
+            }
+         }
+         else
+         {
+            this.alfLog("warn", "Property to render attribute has not been set", this);
+         }
+
+         if (this.editIconImageSrc == null || this.editIconImageSrc == "")
+         {
+            this.editIconImageSrc = require.toUrl("alfresco/renderers") + "/css/images/edit-16.png";
+         }
+
+         // Localize the labels and alt-text...
+         this.saveLabel = this.message(this.saveLabel);
+         this.cancelLabel = this.message(this.cancelLabel);
+         this.editAltText = this.message(this.editAltText, {
+            0: this.renderedValue
+         });
       },
-      
+
+      /**
+       * Emits a custom event to notify any containers that use keyboard navigation that handling
+       * keyboard events needs to be suppressed whilst editing is taking place. If the argument
+       * is passed as false then it emits a custom event that indicates to containers that keyboard
+       * navigation can resume.
+       *
+       * @instance
+       * @param {boolean} suppress Whether or not to suppress keyboard navigation
+       */
+      suppressContainerKeyboardNavigation: function alfresco_renderers_InlineEditProperty__suppressContainerKeyboardNavigation(suppress) {
+         on.emit(this.domNode, "onSuppressKeyNavigation", {
+            bubbles: true,
+            cancelable: true,
+            suppress: suppress
+         });
+      },
+
+      /**
+       * References the widget used for editing. Created by calling the 
+       * [getFormWidget]{@link module:alfresco/renderers/InlineEditProperty#getFormWidget}
+       * for the first time.
+       * 
+       * @instance
+       * @type {object}
+       * @default null
+       */
+      formWidget: null,
+
+      /**
+       * <p>In certain circimstances it may be necessary to submit additional data along with that
+       * provided by the main edit control. This configuration property should take the form:</p>
+       * <p><pre>hiddenDataRules: [
+       *   {
+       *     name: "customProperties",
+       *     rulePassValue: "hiddenData",
+       *     ruleFailValue: "",
+       *     is: ["includeHiddenData"]
+       *   }
+       * ]</pre></p>
+       *
+       * @instance
+       * @type {array}
+       * @default null
+       */
+      hiddenDataRules: null,
+
+      /**
+       * Gets the form widget that will be rendered as the edit field. By default this will 
+       * return a [validation textbox]{@link module:alfresco/forms/controls/DojoValidationTextBox}
+       * but can be overridden to return alternative form controls.
+       * 
+       * @instance
+       */
+      getPrimaryFormWidget: function alfresco_renderers_InlineEditProperty__getPrimaryFormWidget() {
+         return {
+            name: "alfresco/forms/controls/DojoValidationTextBox",
+            config: {
+               name: this.postParam,
+               validationConfig: this.validationConfig,
+               additionalCssClasses: "hiddenlabel",
+               label: this.message(this.editLabel)
+            }
+         };
+      },
+
+      /**
+       * In certain circimstances it may be necessary to submit additional data along with that
+       * provided by the main edit control. This function processes configurable hidden data rules
+       * that generates an array of [hidden form controls]{@link module:alfresco/forms/controls/HiddenValue}
+       * that are configured with [autoSetConfig]{@link module:alfresco/forms/controls/BaseFormControl#autoSetConfig}
+       * that is derived from the [hiddenDataRules]{@link module:alfresco/renderers/InlineEditProperty#hiddenDataRules}.
+       * 
+       * @instance
+       */
+      processHiddenDataRules: function alfresco_renderers_InlineEditProperty__processHiddenDataRules() {
+         var additionalFormWidgets = []
+         if (this.hiddenDataRules != null)
+         {
+            array.forEach(this.hiddenDataRules, lang.hitch(this, this.processHiddenDataRule, additionalFormWidgets));
+         }
+         return additionalFormWidgets;
+      },
+
+      /**
+       * Called for each entry in the [hiddenDataRules]{@link module:alfresco/renderers/InlineEditProperty#hiddenDataRules}
+       * configuration to add a new [hidden form control]{@link module:alfresco/forms/controls/HiddenValue} definition
+       * into the supplied array.
+       * 
+       * @instance
+       * @param {array} additionalFormWidgets The array to add additional form widgets into
+       * @param {object} rule The current hidden data rule to process.
+       */
+      processHiddenDataRule: function alfresco_renderers_InlineEditProperty__processHiddenDataRule(additionalFormWidgets, rule) {
+         additionalFormWidgets.push({
+            name: "alfresco/forms/controls/HiddenValue",
+            config: {
+               name: rule.name,
+               value: "",
+               autoSetConfig: [
+                  {
+                     rulePassValue: rule.rulePassValue,
+                     ruleFailValue: rule.ruleFailValue,
+                     rules: [{
+                        targetId: "PRIMARY_FIELD",
+                        is: rule.is,
+                        isNot: rule.isNot
+                     }]
+                  }
+               ]
+            }
+         });
+      },
+
+      /**
+       * Gets the edit widget (creating it the first time it is requested).
+       *
+       * @instance
+       * @returns {object} The widget for editing.
+       */
+      getFormWidget: function alfresco_renderers_InlineEditProperty__getFormWidget() {
+         if (this.formWidget === null)
+         {
+            var primaryFormWidget = this.getPrimaryFormWidget();
+            var autoSetFields = this.processHiddenDataRules();
+            lang.setObject("config.fieldId", "PRIMARY_FIELD", primaryFormWidget);
+            this.formWidget = this.createWidget({
+               name: "alfresco/forms/Form",
+               config: {
+                  showOkButton: false,
+                  showCancelButton: false,
+                  widgets: [primaryFormWidget].concat(autoSetFields)
+               }
+            }, this.formWidgetNode);
+         }
+         return this.formWidget;
+      },
+
       /**
        * This function is called whenever the user clicks on the edit icon. It hides the display DOM node
        * and shows the edit DOM nodes.
@@ -94,13 +337,15 @@ define(["dojo/_base/declare",
        * @instance
        */
       onEditClick: function alfresco_renderers_InlineEditProperty__onEditClick(evt) {
-         if (this.renderPropertyNotFound)
-         {
-            domAttr.set(this.editInputNode, "value", "");
-         }
+         this.suppressContainerKeyboardNavigation(true);
+         var formWidget = this.getFormWidget();
+         var o = new Object();
+         var o = {};
+         lang.setObject(this.postParam, this.originalRenderedValue, o);
+         formWidget.setValue(o);
          domClass.toggle(this.renderedValueNode, "hidden");
          domClass.toggle(this.editNode, "hidden");
-         this.editInputNode.focus(); // Focus on the input node so typing can occur straight away
+         formWidget.focus() // Focus on the input node so typing can occur straight away
          if (evt != undefined) event.stop(evt);
       },
       
@@ -133,66 +378,52 @@ define(["dojo/_base/declare",
             event.stop(e);
             this.onCancel();
          }
+         // NOTE: This isn't currently working because Dojo form controls suppress certain keys, including ENTER...
          else if(e.charOrCode == keys.ENTER)
          {
             event.stop(e);
             this.onSave();
          }
       },
-      
+
       /**
        * @instance
        */
       onSave: function alfresco_renderers_InlineEditProperty__onSave(evt) {
-         // TODO: There's an argument to suggest that this should be handled via a pub/sub event ?
-         if (this.postParam != null)
-         {
-            var config = {
-               url: this.getSaveUrl(),
-               method: "POST",
-               data: this.getSaveData(),
-               successCallback: this.onPropertyUpdate,
-               failureCallback: this.onPropertyUpdateFailure,
-               callbackScope: this
-            }
-            this.serviceXhr(config);
-         }
+         var responseTopic = this.generateUuid();
+         var payload = lang.clone(this.getGeneratedPayload(false, null));
+         payload.alfResponseTopic = responseTopic;
+         this._saveSuccessHandle = this.alfSubscribe(responseTopic + "_SUCCESS", lang.hitch(this, this.onSaveSuccess), true);
+         this._saveFailureHandle = this.alfSubscribe(responseTopic + "_FAILURE", lang.hitch(this, this.onSaveFailure), true);
+         this.updateSaveData(payload);
+         this.alfPublish(this.publishTopic, payload, true);
          
          // TODO: Set some sort of indicator to show that a save operation is in flight?
       },
-      
+
       /**
-       * Retrieves a URL to use to perform a save by posting to.
-       * 
+       * Updates the supplied payload with the current form value.
+       *
        * @instance
-       * @returns {string} The URL to perform an XHR post to save the data.
+       * @param {object} payload The save payload to update.
        */
-      getSaveUrl: function alfresco_renderers_InlineEditProperty__getSaveUrl() {
-         var nodeRef = new Alfresco.util.NodeRef(this.currentItem.nodeRef);
-         var url = AlfConstants.PROXY_URI + "api/node/" + nodeRef.uri + "/formprocessor";
-         return url;
+      updateSaveData: function alfresco_renderers_InlineEditProperty__getSaveData(payload) {
+         lang.mixin(payload, this.getFormWidget().getValue());
       },
-      
+
       /**
-       * Gets the data object to post.
+       * Called following successful save attempts. This will update the read-only display using the requested save
+       * data.
        * 
        * @instance
-       * @returns {object} The data object to post.
+       * @param {object} payload The success payload
        */
-      getSaveData: function alfresco_renderers_InlineEditProperty__getSaveData() {
-         var data = {};
-         data[this.postParam] = domAttr.get(this.editInputNode, "value");
-         return data;
-      },
-      
-      /**
-       * This function is called following a successful request to update the value of the rendered property.
-       * 
-       * @instance
-       */
-      onPropertyUpdate: function alfresco_renderers_InlineEditProperty__onSaveSuccess(response, originalConfig) {
+      onSaveSuccess: function alfresco_renderers_InlineEditProperty__onSaveSuccess(payload) {
+         this.alfUnsubscribeSaveHandles([this._saveSuccessHandle, this._saveFailureHandle]);
+
          this.alfLog("log", "Property '" + this.propertyToRender + "' successfully updated for node: ", this.currentItem);
-         this.renderedValue = originalConfig.data[this.postParam];
+         this.originalRenderedValue = this.getFormWidget().getValue()[this.postParam];
+         this.renderedValue = this.mapValueToDisplayValue(this.originalRenderedValue);
          
          // This is a bit ugly... there will be better ways to handle this...
          // Basically it's handling the situation where the prefix/suffix for cleared when data wasn't originally available...
@@ -204,31 +435,39 @@ define(["dojo/_base/declare",
          domClass.add(this.editNode, "hidden");
          this.renderedValueNode.focus();
       },
-      
+
       /**
-       * This function is called following a failed request to update the value of the rendered property. It delegates
-       * handling the reset to the "onCancel" function.
+       * Called following a failed save attempt. Cancels the edit mode.
+       * TODO: Issues an error message
        * 
        * @instance
+       * @param {object} payload The success payload
        */
-      onPropertyUpdateFailure: function alfresco_renderers_InlineEditProperty__onPropertyUpdateFailure(response, originalConfig) {
+      onSaveFailure: function alfresco_renderers_InlineEditProperty__onSaveFailure(payload) {
+         this.alfUnsubscribeSaveHandles([this._saveSuccessHandle, this._saveFailureHandle]);
          this.alfLog("warn", "Property '" + this.propertyToRender + "' was not updated for node: ", this.currentItem);
          this.onCancel();
       },
       
       /**
+       * Called when a user cancels out of edit mode. Returns the read-only display to its original state
+       * before editing began.
+       *
        * @instance
        */
       onCancel: function alfresco_renderers_InlineEditProperty__onCancel() {
+         this.suppressContainerKeyboardNavigation(false);
+
          domClass.remove(this.renderedValueNode, "hidden");
          domClass.add(this.editNode, "hidden");
          
          // Reset the input field...
-         domAttr.set(this.editInputNode, "value", this.renderedValue);
+         this.getFormWidget().setValue(this.renderedValue);
          this.renderedValueNode.focus();
       },
       
       /**
+       * TODO: Replace with CSS3
        * @instance
        */
       showEditIcon: function alfresco_renderers_InlineEditProperty__showEditIcon() {
@@ -236,6 +475,7 @@ define(["dojo/_base/declare",
       },
       
       /**
+       * TODO: Replace with CSS3
        * @instance
        */
       hideEditIcon: function alfresco_renderers_InlineEditProperty__hideEditIcon() {

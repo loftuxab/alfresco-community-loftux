@@ -36,6 +36,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.extensions.config.WebFrameworkConfigElement;
 import org.springframework.extensions.directives.AnchorFreeMarkerDirective;
+import org.springframework.extensions.directives.AutoComponentRegionDirective;
 import org.springframework.extensions.directives.ChromeIncludeFreeMarkerDirective;
 import org.springframework.extensions.directives.ComponentFreemarkerTagDirective;
 import org.springframework.extensions.directives.CreateComponentDirective;
@@ -784,7 +785,8 @@ public final class ProcessorModelHelper implements ApplicationContextAware
             // If Dojo support has been enabled then we'll create the createDojoPage directive...
             if (this.webFrameworkConfigElement.isDojoEnabled())
             {
-                model.put(ProcessJsonModelDirective.DIRECTIVE_NAME, this.directiveFactory.createProcessJsonModelDirective(ProcessJsonModelDirective.DIRECTIVE_NAME, object, extensibilityModel, context));
+                model.put(ProcessJsonModelDirective.DIRECTIVE_NAME, this.directiveFactory.createProcessJsonModelDirective(ProcessJsonModelDirective.DIRECTIVE_NAME, object, extensibilityModel, context, null));
+                model.put(AutoComponentRegionDirective.DIRECTIVE_NAME, this.directiveFactory.createAutoComponentRegionDirective(AutoComponentRegionDirective.DIRECTIVE_NAME, context, this.webFrameworkRenderService));
             }
         }
         else

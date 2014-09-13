@@ -24,12 +24,6 @@
             <artifactId>alfresco-web-framework-commons</artifactId>
             <version>${project.version}</version>
             <classifier>classes</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>jsp-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -75,7 +69,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -147,7 +140,6 @@
         <dependency>
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
-            <version>4.0.4</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -195,23 +187,20 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
-            <version>1.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.myfaces.core</groupId>
             <artifactId>myfaces-api</artifactId>
-            <version>1.1.8</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>jstl</artifactId>
                     <groupId>javax.servlet</groupId>
+                    <artifactId>jstl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.myfaces.core</groupId>
             <artifactId>myfaces-impl</artifactId>
-            <version>1.1.8</version>
         </dependency>
         <!-- Dependency on Dojo ZIP -->
         <dependency>
@@ -253,7 +242,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
     </dependencies>
 
     <build>
@@ -325,6 +314,7 @@
                     </includes>
                     <!-- We don't need to re-minify YUI or 3rd party libs -->
                     <excludes>
+                        <exclude>**/sinon-1.10.3/**</exclude>
                         <exclude>**/*-min.js</exclude>
                         <exclude>**/WEB-INF/**</exclude>
                         <exclude>**/tiny_mce/**</exclude>
@@ -406,6 +396,67 @@
                     </aggregations>
                 </configuration>
             </plugin>
+            
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <configuration>
+                  <!-- Set up an interval to scan for changes -->
+                  <!--
+                  <scanIntervalSeconds>10</scanIntervalSeconds>
+                  <scanTargetPatterns>
+                     <scanTargetPattern>
+                        <directory>${project.build.directory}/${project.build.finalName}/js/alfresco</directory>
+                        <includes>
+                          <include>**/*.js</include>
+                          <include>**/*.css</include>
+                          <include>**/*.html</include>
+                          <include>**/*.properties</include>
+                        </includes>
+                    </scanTargetPattern>
+                    <scanTargetPattern>
+                        <directory>tests/testApp</directory>
+                        <includes>
+                          <include>js/aikau/**/*.js</include>
+                          <include>js/aikau/**/*.css</include>
+                          <include>js/aikau/**/*.html</include>
+                          <include>js/aikau/**/*.properties</include>
+                          <include>WEB-INF/classes/alfresco/site-webscripts/**</include>
+                        </includes>
+                    </scanTargetPattern>
+                 </scanTargetPatterns> -->
+                  
+                  <!-- Sets the port when using mvn jetty:run-forked -->
+                  <jvmArgs>-Djetty.port=8089</jvmArgs>
+                  <!-- Override the system properties to set a port that *should* be unused -->
+                   <systemProperties>
+                     <force>true</force>
+                     <systemProperty>
+                        <name>jetty.port</name>
+                        <value>8089</value>
+                      </systemProperty>
+                   </systemProperties>
+                   <!--  The following 3 settings allow us to execute a mvn jetty:stop command to shutdown the test application -->
+                   <stopPort>9966</stopPort>
+                   <stopKey>foo</stopKey>
+                   <stopWait>20</stopWait>
+                   <!-- Configure the application, this will essentially be Share but overlaid with the test resources -->
+                   <webApp>
+                     <!--  <descriptor>${project.build.directory}/${project.build.finalName}/WEB-INF/web.xml</descriptor> -->
+                     <descriptor>tests/testApp/WEB-INF/web.xml</descriptor>
+                     <!--  <descriptor>tests/testApp/WEB-INF/web.xml</descriptor> -->
+                     <contextPath>/aikau</contextPath>
+                     <resourceBases>
+                        <resourceBase>tests/testApp</resourceBase>
+                        <resourceBase>${project.build.directory}/${project.build.finalName}</resourceBase>
+                     </resourceBases>
+                     <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames> 
+                   </webApp>
+                   <webAppSourceDirectory>tests/testApp</webAppSourceDirectory>
+                   <classesDirectory>tests/testApp/WEB-INF/classes</classesDirectory>
+                   <baseAppFirst>false</baseAppFirst>
+                </configuration>
+         </plugin>
         </plugins>
     </build>
 

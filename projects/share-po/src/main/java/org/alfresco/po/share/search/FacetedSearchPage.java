@@ -3,13 +3,22 @@ package org.alfresco.po.share.search;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.WebDroneUtil;
+import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
 
 /**
  * The Class FacetedSearchPage.
@@ -17,20 +26,23 @@ import org.openqa.selenium.WebElement;
  * @author Richard Smith
  */
 @SuppressWarnings("unchecked")
-public class FacetedSearchPage extends SharePage
+public class FacetedSearchPage extends SharePage implements SearchResultPage
 {
 
     /** Constants */
     private static final By SEARCH_INFO_DIV = By.cssSelector("div.info");
     private static final By FACET_GROUP = By.cssSelector("div.alfresco-documentlibrary-AlfDocumentFilters:not(.hidden)");
     private static final By RESULT = By.cssSelector("tr.alfresco-search-AlfSearchResult");
-
+    private static final By CONFIGURE_SEARCH = By.cssSelector("div[id=FCTSRCH_CONFIG_PAGE_LINK]");    
+    private static final Log logger = LogFactory.getLog(FacetedSearchPage.class);
+    
     private FacetedSearchHeaderSearchForm headerSearchForm;
     private FacetedSearchScopeMenu scopeMenu;
     private FacetedSearchForm searchForm;
     private List<FacetedSearchFacetGroup> facetGroups;
     private FacetedSearchSort sort;
-    private List<FacetedSearchResult> results;
+    private FacetedSearchView view;
+    private List<SearchResult> results;
 
     /**
      * Instantiates a new faceted search page.
@@ -153,11 +165,21 @@ public class FacetedSearchPage extends SharePage
     }
 
     /**
+     * Gets the view.
+     * 
+     * @return {@link FacetedSearchView}
+     */
+    public FacetedSearchView getView()
+    {
+        return view;
+    }
+
+    /**
      * Gets the results.
      * 
      * @return List<{@link FacetedSearchResult}>
      */
-    public List<FacetedSearchResult> getResults()
+    public List<SearchResult> getResults()
     {
         return this.results;
     }
@@ -168,17 +190,26 @@ public class FacetedSearchPage extends SharePage
      * @param title
      * @return the result
      */
-    public FacetedSearchResult getResultByTitle(String title)
-    {
-        for(FacetedSearchResult facetedSearchResult : this.getResults())
-        {
-            if(facetedSearchResult.getTitle().equals(title))
-            {
-                return facetedSearchResult;
-            }
-        }
-        return null;
-    }
+	public SearchResult getResultByTitle(String title) 
+	{
+		try
+		{
+			for (SearchResult facetedSearchResult : getResults())
+			{
+				if (facetedSearchResult.getTitle().equals(title)) 
+				{
+					return facetedSearchResult;
+				}
+			}
+		} 
+		catch (TimeoutException e)
+		{
+			logger.error("Unable to get the title : ", e);
+		}
+
+		throw new PageOperationException("Unable to get the title  : ");
+
+	}
 
     /**
      * Gets a result by its name if it exists.
@@ -186,16 +217,24 @@ public class FacetedSearchPage extends SharePage
      * @param name
      * @return the result
      */
-    public FacetedSearchResult getResultByName(String name)
+    public SearchResult getResultByName(String name)
     {
-        for(FacetedSearchResult facetedSearchResult : this.getResults())
+        try {
+			for(SearchResult facetedSearchResult : getResults())
+			{
+			    if(facetedSearchResult.getName().equals(name))
+			    {
+			        return facetedSearchResult;
+			    }
+			}
+		} 
+		catch (TimeoutException e)
         {
-            if(facetedSearchResult.getName().equals(name))
-            {
-                return facetedSearchResult;
-            }
+            logger.error("Unable to get the name : ", e);
         }
-        return null;
+
+        throw new PageOperationException("Unable to get the name  : ");			
+        
     }
 
     /**
@@ -256,10 +295,13 @@ public class FacetedSearchPage extends SharePage
 
         // Initialise the faceted search sort
         this.sort = new FacetedSearchSort(drone);
+        
+        // Initialise the faceted search view
+        this.view = new FacetedSearchView(drone);
 
         // Initialise the faceted search results
         List<WebElement> results = drone.findAll(RESULT);
-        this.results = new ArrayList<FacetedSearchResult>();
+        this.results = new ArrayList<SearchResult>();
         for (WebElement result : results)
         {
             this.results.add(new FacetedSearchResult(drone, result));
@@ -286,5 +328,101 @@ public class FacetedSearchPage extends SharePage
         WebElement facet = drone.find(By.xpath(String.format("//span[@class = 'filterLabel'][contains(., '%s')]",title)));
         facet.click();
         return this;
+    }
+    
+    /**
+     * Click on configure search Link.     *
+     * @return the FacetedSearchConfigpage
+     */
+    public FacetedSearchConfigPage clickConfigureSearchLink()
+    {
+        try {
+			WebElement configure_search = drone.find(CONFIGURE_SEARCH);
+			if (configure_search.isDisplayed())
+			{
+			    configure_search.click();        
+			}
+			return new FacetedSearchConfigPage(drone);
+		} catch (TimeoutException e)
+        {
+            logger.error("Unable to find the link : " + e.getMessage());
+        }
+
+        throw new PageException("Unable to find the link : " );
+    }   
+         
+    /**
+     * verify configureSearchlink is displayed
+     * @param driver
+     * @return Boolean
+     */
+    public Boolean isConfigureSearchDisplayed(WebDrone driver)
+    {
+        try
+        {
+            WebElement configure_search = drone.find(CONFIGURE_SEARCH);
+            if (configure_search.isDisplayed())
+            {
+                return true;
+            }
+
+        }
+
+        catch (NoSuchElementException te)
+        {
+        	if (logger.isTraceEnabled())
+            {
+                logger.trace("Unable to find configure search link");
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean hasResults()
+    {
+        return !getResults().isEmpty();
+    }
+
+    @Override
+    public HtmlPage selectItem(String name)
+    {
+        if (name == null || name.isEmpty())
+        {
+            throw new IllegalArgumentException("Search row name is required");
+        }
+        try
+        {
+            String selector = String.format("//span[@class = 'value'][contains(., '%s')]", name);
+            drone.find(By.xpath(selector)).click();
+        }
+        catch (NoSuchElementException e)
+        {
+            throw new PageException(String.format("Search result %s item not found", name), e);
+        }
+        
+        return FactorySharePage.getUnknownPage(drone);
+    }
+
+    @Override
+    public HtmlPage selectItem(int number)
+    {
+        if (number < 0)
+        {
+            throw new IllegalArgumentException("Value can not be negative");
+        }
+        number += 1;
+        try
+        {
+            String selector = String.format("tr.alfresco-search-AlfSearchResult:nth-of-type(%d) a", number);
+            WebElement row = drone.find(By.cssSelector(selector));
+            row.click();
+        }
+        catch (NoSuchElementException e)
+        {
+            throw new PageException(String.format("Search result %d item not found", number), e);
+        }
+
+        return FactorySharePage.getUnknownPage(drone);
     }
 }

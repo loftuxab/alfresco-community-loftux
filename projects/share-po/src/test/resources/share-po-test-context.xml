@@ -59,6 +59,7 @@
         <property name="blogUrl" value="${blog.url}" />
         <property name="blogUsername" value="${blog.username}" />
         <property name="blogPassword" value="${blog.password}" />
+        <property name="pentahoUserConsoleUrl" value="${pentaho.user.console.target}" />
     </bean>
 
     <!-- Initiating another user that will be required for unit tests.  -->

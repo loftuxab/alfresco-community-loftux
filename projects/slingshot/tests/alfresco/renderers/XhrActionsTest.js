@@ -33,28 +33,28 @@ define(["intern!object",
 
             var browser = this.remote;
             var testname = "XhrActionsTest";
-            return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/renderers/page_models/XhrActions_TestPage.json", testname)
+            return TestCommon.loadTestWebScript(this.remote, "/XhrActions", testname)
 
                // Test spec:
                // 1: Check dropdown element exists
 
-               .elementByCss(".alfresco-menus-AlfMenuBar span:first-child")
-               .text()
-               .then(function(resultText) {
-                  TestCommon.log(testname, null,"Check Actions menu was rendered");
-                  assert(resultText == "Actions", "Test #1- Actions should be rendered as a menu: " + resultText);
-               })
+               .findByCssSelector(".alfresco-menus-AlfMenuBar span:first-child")
+                  .getVisibleText()
+                  .then(function(resultText) {
+                     TestCommon.log(testname,"Check Actions menu was rendered");
+                     assert(resultText == "Actions", "Test #1- Actions should be rendered as a menu: " + resultText);
+                  })
 
                // 2: Click on it. Check event triggered: ALF_RETRIEVE_SINGLE_DOCUMENT_REQUEST
 
-               .click()
-               .end()
-               .elementsByCss(TestCommon.topicSelector("ALF_RETRIEVE_SINGLE_DOCUMENT_REQUEST", "publish", "any"))
-               .then(function(elements) {
-                  TestCommon.log(testname, null,"Check that document request event was triggered");
-                  assert(elements.length == 1, "Test #2 - Retrieve single doc request not triggered");
-               })
-               .end()
+                  .click()
+                  .end()
+               .findAllByCssSelector(TestCommon.topicSelector("ALF_RETRIEVE_SINGLE_DOCUMENT_REQUEST", "publish", "any"))
+                  .then(function(elements) {
+                     TestCommon.log(testname,"Check that document request event was triggered");
+                     assert(elements.length == 1, "Test #2 - Retrieve single doc request not triggered");
+                  })
+                  .end()
 
                // TODO: 3: Trigger response event with data
                // TODO: 4: See if response is rendered

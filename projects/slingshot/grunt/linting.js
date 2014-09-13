@@ -41,7 +41,8 @@ module.exports = function (grunt, alf) {
          }
       },
 
-      // TODO: Configure this plugin!
-      jshint: {}
-   }
-}
+      jshint: {
+         all: ['**/.js', '**/.json']
+      }
+   };
+};

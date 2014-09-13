@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -33,6 +33,8 @@
 define(["dojo/_base/declare",
         "dijit/_WidgetBase", 
         "dijit/_TemplatedMixin",
+        "alfresco/core/ResizeMixin",
+        "dijit/_KeyNavContainer",
         "dojo/text!./templates/Grid.html",
         "alfresco/documentlibrary/views/layouts/_MultiItemRendererMixin",
         "alfresco/core/Core",
@@ -47,9 +49,9 @@ define(["dojo/_base/declare",
         "dijit/registry",
         "dojo/dom",
         "dojo/on"], 
-        function(declare, _WidgetBase, _TemplatedMixin, template, _MultiItemRendererMixin, AlfCore, CoreWidgetProcessing, keys, lang, array, domConstruct, domGeom, query, domStyle, registry, dom, on) {
+        function(declare, _WidgetBase, _TemplatedMixin, ResizeMixin, _KeyNavContainer, template, _MultiItemRendererMixin, AlfCore, CoreWidgetProcessing, keys, lang, array, domConstruct, domGeom, query, domStyle, registry, dom, on) {
 
-   return declare([_WidgetBase, _TemplatedMixin, _MultiItemRendererMixin, AlfCore, CoreWidgetProcessing], {
+   return declare([_WidgetBase, _TemplatedMixin, ResizeMixin, _KeyNavContainer, _MultiItemRendererMixin, AlfCore, CoreWidgetProcessing], {
       
       /**
        * An array of the CSS files to use with this widget.
@@ -84,13 +86,18 @@ define(["dojo/_base/declare",
        */
       postCreate: function alfresco_documentlibrary_views_layouts_Grid__postCreate() {
          this.inherited(arguments);
-         if (this.widgets)
+         if (this.currentItem)
          {
-            this.processWidgets(this.widgets, this.containerNode);
+            if (this.widgets)
+            {
+               this.processWidgets(this.widgets, this.containerNode);
+            }
          }
+
+         this.setupKeyboardNavigation();
+
          // Update the grid as the window changes...
-         on(window, "resize", lang.hitch(this, "resizeCells"));
-         this.alfSubscribe("ALF_NODE_RESIZED", lang.hitch(this, "onNodeResized"));
+         this.alfSetupResizeSubscriptions(this.resizeCells, this);
       },
       
       /**
@@ -109,18 +116,31 @@ define(["dojo/_base/declare",
       },
 
       /**
+       * This is called whenever focus leaves a child widget. It will call the blur function
+       * of the currently focused widget if it has one.
+       *
+       * @instance
+       */
+      _onChildBlur: function alfresco_documentlibrary_views_layouts_Grid___onChildBlur(focusedChild) {
+         if (typeof focusedChild.blur === "function")
+         {
+            focusedChild.blur();
+         }
+      },
+
+      /**
        *
        *
        * @instance
        */
       focusOnCellLeft: function alfresco_documentlibrary_views_layouts_Grid__focusOnCellLeft() {
-         var target = null;
+         var target = null,
              focusIndex = this.getIndexOfChild(this.focusedChild),
              allChildren = this.getChildren(),
              childCount = this.getChildren().length;
          if (focusIndex > 0)
          {
-            target = allChildren[focusIndex-1]
+            target = allChildren[focusIndex-1];
          }
          else
          {
@@ -135,13 +155,13 @@ define(["dojo/_base/declare",
        * @instance
        */
       focusOnCellRight: function alfresco_documentlibrary_views_layouts_Grid__focusOnCellLeft() {
-         var target = null;
+         var target = null,
              focusIndex = this.getIndexOfChild(this.focusedChild),
              allChildren = this.getChildren(),
              childCount = this.getChildren().length;
          if (focusIndex < childCount-1)
          {
-            target = allChildren[focusIndex+1]
+            target = allChildren[focusIndex+1];
          }
          else
          {
@@ -158,7 +178,7 @@ define(["dojo/_base/declare",
        * @instance
        */
       focusOnCellAbove: function alfresco_documentlibrary_views_layouts_Grid__focusOnCellAbove() {
-         var target = null;
+         var target = null,
              focusIndex = this.getIndexOfChild(this.focusedChild),
              focusColumn = (focusIndex % this.columns) + 1,
              allChildren = this.getChildren(),
@@ -167,7 +187,7 @@ define(["dojo/_base/declare",
          {
             // Go to last row
             var rem = childCount % this.columns;
-            if (rem == 0 || rem >= focusColumn)
+            if (rem === 0 || rem >= focusColumn)
             {
                // Get the matching column on the last row...
                target = allChildren[childCount - (this.columns - focusColumn) + 1];
@@ -192,7 +212,7 @@ define(["dojo/_base/declare",
        * @instance
        */
       focusOnCellBelow: function alfresco_documentlibrary_views_layouts_Grid__focusOnCellBelow() {
-         var target = null;
+         var target = null,
              focusIndex = this.getIndexOfChild(this.focusedChild),
              focusColumn = (focusIndex % this.columns),
              allChildren = this.getChildren(),
@@ -209,21 +229,6 @@ define(["dojo/_base/declare",
       },
       
       /**
-       * This is the handler for node resize events. If the resized node is an ancestor of the DOM node
-       * then the [resizeCells]{@link module:alfresco/documentlibrary/views/layouts/Grid#resizeCells] function
-       * will be called.
-       * 
-       * @instance
-       * @param {object} payload The details of the node that has been resized.
-       */
-      onNodeResized: function alfresco_documentlibrary_views_layouts_Grid__onNodeResized(payload) {
-         if (dom.isDescendant(this.domNode, payload.node))
-         {
-            this.resizeCells();
-         }
-      },
-      
-      /**
        * Gets the content box of the containing DOM node of the grid and then iterates over all the cells in the grid calling
        * the [resizeCell]{@link module:alfresco/documentlibrary/views/layouts/Grid#resizeCell] function for each with the desired width. 
        * The width to set is the available width divided by the number of columns to display.
@@ -232,11 +237,12 @@ define(["dojo/_base/declare",
        */
       resizeCells: function alfresco_documentlibrary_views_layouts_Grid__resizeCells() {
          this.alfLog("info", "Resizing");
-         if (lang.exists("containerNode.parentNode", this) && this.containerNode.parentNode != null)
+         var node = lang.getObject("containerNode.parentNode", false, this);
+         if (node)
          {
-            var marginBox = domGeom.getContentBox(this.containerNode.parentNode); // NOTE: Get the parent node for the size because the table will grow outside of its allotted area
+            var marginBox = domGeom.getContentBox(node); // NOTE: Get the parent node for the size because the table will grow outside of its allotted area
             var widthToSet = (Math.floor(marginBox.w / this.columns) - 4) + "px";
-            query("tr > td", this.containerNode).forEach(lang.hitch(this, "resizeCell", marginBox, widthToSet));
+            query("tr > td", node).forEach(lang.hitch(this, "resizeCell", marginBox, widthToSet));
          }
       },
       
@@ -286,7 +292,7 @@ define(["dojo/_base/declare",
       createWidgetDomNode: function alfresco_documentlibrary_views_layouts_Grid__createWidgetDomNode(widget, rootNode, rootClassName) {
          
          var nodeToAdd = rootNode;
-         if (this.currentIndex % this.columns == 0)
+         if (this.currentIndex % this.columns === 0)
          {
             // Create a new row if the maximum number of columns has been exceeded...
             var newRow = domConstruct.create("TR", {}, rootNode);
@@ -300,6 +306,89 @@ define(["dojo/_base/declare",
          
          // Add a new cell...
          return domConstruct.create("DIV", {}, nodeToAdd);
+      },
+
+      /**
+       * Extends the [inherited function]{@link module:alfresco/documentlibrary/views/layouts/_MultiItemRendererMixin#renderNextItem}
+       * to ensure that any DOM elements added for allowing the user to retrieve more items is destroyed. These will
+       * have been created by the [allItemsRendered function]{@link module:alfresco/documentlibrary/views/layouts/Grid#allItemsRendered}
+       * when more data is available.
+       *
+       * @instance
+       */
+      renderNextItem: function alfresco_documentlibrary_views_layout__MultiItemRendererMixin__renderNextItem() {
+         if (this.nextLinkDisplay)
+         {
+            var cell = this.nextLinkDisplay.domNode.parentNode;
+            var row = cell.parentNode;
+            row.removeChild(cell);
+            this.nextLinkDisplay.destroy();
+            this.nextLinkDisplay = null;
+         }
+         this.inherited(arguments);
+      },
+
+      /**
+       * When set to true this will show a link for requesting more data (if available). This should be used when
+       * the grid is rendering data in an infinite scroll view. It is required because when the grid cells are small
+       * the data may not be sufficient to allow the scrolling events to occur that will request more data.
+       * 
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      showNextLink: false,
+
+      /**
+       * The label to use for the next link. This defaults to null, so MUST be set for the next link to be displayed.
+       * 
+       * @instance
+       * @type {string}
+       * @default null
+       */
+      nextLinkLabel: null,
+
+      /**
+       * The topic to publish when the next link is clicked.
+       * 
+       * @instance
+       * @type {string}
+       * @default null
+       */
+      nextLinkPublishTopic: null,
+
+      /**
+       * Overrides the [inherited function]{@link module:alfresco/documentlibrary/views/layouts/_MultiItemRendererMixin#allItemsRendered}
+       * to create a link for retrieving more data when 
+       * 
+       * @instance
+       */
+      allItemsRendered: function alfresco_documentlibrary_views_layouts_Grid__allItemsRendered() {
+         if(this.showNextLink && this.currentData.totalRecords < this.currentData.numberFound)
+         {
+            this.processWidgets([{
+               name: "alfresco/layout/VerticalWidgets",
+               assignTo: "nextLinkDisplay",
+               config: {
+                  widgets: [
+                     {
+                        name: "alfresco/renderers/PropertyLink",
+                        config: {
+                           currentItem: {
+                              label: this.nextLinkLabel
+                           },
+                           propertyToRender: "label",
+                           renderSize: "small",
+                           useCurrentItemAsPayload: false,
+                           publishTopic: this.nextLinkPublishTopic,
+                           publishPayloadType: "CONFIGURED",
+                           publishPayload: {}
+                        }
+                     }
+                  ]
+               }
+            }], this.containerNode);
+         }
       }
    });
 });

@@ -72,9 +72,7 @@
     <module>projects/data-model</module>
     <module>projects/legacy-lucene</module>
     <module>projects/alfresco-jlan</module>
-    <module>projects/alfresco-events</module>
     <module>projects/mbeans</module>
-    <module>projects/deployment</module>
     <module>projects/repository</module>
     <module>projects/remote-api</module>
     <module>projects/web-framework-commons</module>
@@ -152,11 +150,12 @@
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
     <dependency.opencmis.version>0.10.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
-    <dependency.spring.version>3.0.5.RELEASE</dependency.spring.version>
-    <dependency.activiti.version>5.13-alf-20140708</dependency.activiti.version>
+    <dependency.spring.version>3.2.10.RELEASE</dependency.spring.version>
+    <dependency.activiti.version>5.16.2</dependency.activiti.version>
+    <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
     <dependency.poi.version>3.10-FINAL</dependency.poi.version>
     <dependency.dojo.version>1.8.3</dependency.dojo.version>
-
+    <dependency.mysql.version>5.1.31</dependency.mysql.version>
     <manifest.major.version>5</manifest.major.version>
     <manifest.minor.version>0</manifest.minor.version>
     <manifest.servicepack.version>0</manifest.servicepack.version>
@@ -211,6 +210,11 @@
             <artifactId>jaxen</artifactId>
             <version>1.1.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
+        </dependency>
         <!-- Use patched FreeMarker to fix ALF-10188 -->
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -255,7 +259,7 @@
         <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
-            <version>1.8.1</version>
+            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -276,6 +280,11 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-el</groupId>
+            <artifactId>commons-el</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -300,7 +309,7 @@
         <dependency>
             <groupId>commons-modeler</groupId>
             <artifactId>commons-modeler</artifactId>
-            <version>1.1</version>
+            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
@@ -318,9 +327,50 @@
             <version>1.4.0</version>
         </dependency>
         <dependency>
+            <groupId>org.tuckey</groupId>
+            <artifactId>urlrewritefilter</artifactId>
+            <version>4.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.myfaces.core</groupId>
+            <artifactId>myfaces-api</artifactId>
+            <version>1.1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.myfaces.core</groupId>
+            <artifactId>myfaces-impl</artifactId>
+            <version>1.1.8</version>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.3-1101-jdbc41</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${dependency.mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.180</version>
         </dependency>
     </dependencies>
   </dependencyManagement>
@@ -608,14 +658,14 @@
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
-                        <version>5.1.14</version>
+                        <version>${dependency.mysql.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.3.1</version>
+                <version>1.3.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -770,7 +820,7 @@
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>findbugs-maven-plugin</artifactId>
-            <version>2.5.4</version>
+            <version>3.0.0</version>
         </plugin>
     </plugins>
   </reporting>
@@ -890,7 +940,7 @@
 			            <dependency>
 			                <groupId>mysql</groupId>
 			                <artifactId>mysql-connector-java</artifactId>
-			                <version>5.1.14</version>
+                         <version>${dependency.mysql.version}</version>
 			            </dependency>
 					</dependencies>
 				</plugin>
@@ -900,7 +950,6 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.14</version>
 			</dependency>
 		</dependencies>
 	</profile>
@@ -932,7 +981,7 @@
                         <dependency>
                             <groupId>com.h2database</groupId>
                             <artifactId>h2</artifactId>
-                            <version>1.3.173</version>
+                            <version>1.4.180</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -947,7 +996,6 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.3.176</version>
             </dependency>
         </dependencies>
     </profile>

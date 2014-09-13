@@ -49,15 +49,6 @@ define(["dojo/_base/declare",
       i18nRequirements: [{i18nFile: "./i18n/Indicators.properties"}],
       
       /**
-       * An array of the CSS files to use with this widget.
-       * 
-       * @instance
-       * @type {object[]}
-       * @default [{cssFile:"./css/Indicators.css"}]
-       */
-      cssRequirements: [{cssFile:"./css/Indicators.css"}],
-      
-      /**
        * The HTML template to use for the widget.
        * @instance
        * @type {string}
@@ -94,7 +85,7 @@ define(["dojo/_base/declare",
        * @instance
        */
       postCreate: function alfresco_renderers_Indicators__postCreate() {
-         if (this.currentItem.indicators && this.currentItem.indicators.length > 0)
+         if (this.currentItem && this.currentItem.indicators && this.currentItem.indicators.length > 0)
          {
             array.forEach(this.currentItem.indicators, lang.hitch(this, "addIndicator"));
          }

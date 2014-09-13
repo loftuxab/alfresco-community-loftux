@@ -51,10 +51,11 @@ import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.deployer.BpmnDeployer;
-import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
+import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.form.DefaultTaskFormHandler;
 import org.activiti.engine.impl.form.TaskFormHandler;
 import org.activiti.engine.impl.identity.Authentication;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TimerEntity;
@@ -69,6 +70,8 @@ import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.activiti.image.ProcessDiagramGenerator;
+import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.i18n.MessageService;
 import org.alfresco.repo.model.Repository;
@@ -985,16 +988,35 @@ public class ActivitiWorkflowEngine extends BPMEngine implements WorkflowEngine
             }
             
             // Start the process-instance
-            ProcessInstance instance = runtimeService.startProcessInstanceById(processDefId, variables);
-            if(instance.isEnded()) 
+            CommandContext context = Context.getCommandContext();
+            boolean isContextSuspended = false;
+            if (context != null && context.getException() == null)
             {
-                return typeConverter.buildCompletedPath(instance.getId(), instance.getId());
-            } 
-            else
+                // MNT-11926: push null context to stack to avoid context reusage when new instance is not flushed
+                Context.setCommandContext(null);
+                isContextSuspended = true;
+            }
+            try
             {
-                WorkflowPath path = typeConverter.convert((Execution)instance);        
-                endStartTaskAutomatically(path, instance);
-                return path;
+                ProcessInstance instance = runtimeService.startProcessInstanceById(processDefId, variables);
+                if (instance.isEnded())
+                {
+                    return typeConverter.buildCompletedPath(instance.getId(), instance.getId());
+                }
+                else
+                {
+                    WorkflowPath path = typeConverter.convert((Execution) instance);
+                    endStartTaskAutomatically(path, instance);
+                    return path;
+                }
+            }
+            finally
+            {
+                if (isContextSuspended)
+                {
+                    // pop null context out of stack
+                    Context.removeCommandContext();
+                }
             }
         }
         catch (ActivitiException ae)
@@ -1088,11 +1110,11 @@ public class ActivitiWorkflowEngine extends BPMEngine implements WorkflowEngine
             BpmnModel model = repoService.getBpmnModel(pi.getProcessDefinitionId());
 
             if (model != null && model.getLocationMap().size() > 0) 
-            { 
-                return ProcessDiagramGenerator
-                        .generateDiagram(model,
-                                    ActivitiConstants.PROCESS_INSTANCE_IMAGE_FORMAT,
-                                    runtimeService.getActiveActivityIds(processInstanceId)); 
+            {              
+                ProcessDiagramGenerator generator = new DefaultProcessDiagramGenerator();
+                return generator.generateDiagram(model,
+                      ActivitiConstants.PROCESS_INSTANCE_IMAGE_FORMAT,
+                      runtimeService.getActiveActivityIds(processInstanceId)); 
             }
         }
         return null;

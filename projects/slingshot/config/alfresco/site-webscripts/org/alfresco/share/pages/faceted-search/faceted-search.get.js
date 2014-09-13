@@ -1,6 +1,28 @@
 <import resource="classpath:/alfresco/site-webscripts/org/alfresco/share/imports/share-header.lib.js">
 <import resource="classpath:/alfresco/site-webscripts/org/alfresco/share/imports/share-footer.lib.js">
 
+/* *********************************************************************************
+ *                                                                                 *
+ * GET ALL USER PREFERENCES                                                        *
+ *                                                                                 *
+ ***********************************************************************************/
+function getUserPreferences() {
+   var userPreferences = {};
+   var prefs = JSON.parse(preferences.value);
+   return prefs
+}
+
+var userPreferences = getUserPreferences();
+var viewRendererName =  "simple";
+try
+{
+   viewRendererName = userPreferences.org.alfresco.share.searchList.viewRendererName;
+}
+catch(e)
+{
+   // No action. Ignore when view preference hasn't been set-up
+}
+
 // Get Search sorting configuration from share-config
 var sortConfig = config.scoped["Search"]["sorting"];
 
@@ -11,34 +33,23 @@ var services = getHeaderServices(),
 // Scope the model IDs
 var rootWidgetId = "FCTSRCH_";
 
-// TODO: Currently commented out until we roll-out faceted search configuration...
 // Insert a configuration page link if the user has the appropriate permissions...
-// var titleMenu = widgetUtils.findObject(widgets, "id", "HEADER_TITLE_MENU");
-// var searchConfigMenuItem = {
-//    id: "FCTSRCH_CONFIG_PAGE_LINK",
-//    name: "alfresco/menus/AlfMenuBarItem",
-//    config: {
-//       label: "",
-//       title: msg.get("faceted-search.config.link"),
-//       iconAltText: msg.get("faceted-search.config.link"),
-//       iconClass: "alf-configure-icon",
-//       targetUrl: "dp/ws/faceted-search-config",
-//       renderFilterMethod: "ANY",
-//       renderFilter: [
-//          {
-//             target: "groupMemberships",
-//             property: "GROUP_ALFRESCO_ADMINISTRATORS",
-//             values: [true]
-//          },
-//          {
-//             target: "groupMemberships",
-//             property: "GROUP_SEARCH_ADMINISTRATORS",
-//             values: [true]
-//          }
-//       ]
-//    }
-// };
-// titleMenu.config.widgets.push(searchConfigMenuItem);
+if (_processedUserData.groups["GROUP_ALFRESCO_ADMINISTRATORS"] == true ||
+    _processedUserData.groups["GROUP_ALFRESCO_SEARCH_ADMINISTRATORS"] == true ||
+    _processedUserData.isNetworkAdmin == true)
+{
+   var titleMenu = widgetUtils.findObject(widgets, "id", "HEADER_TITLE_MENU");
+   var searchConfigMenuItem = {
+      id: "FCTSRCH_CONFIG_PAGE_LINK",
+      name: "alfresco/menus/AlfMenuBarItem",
+      config: {
+         label: msg.get("faceted-search-config.label"),
+         title: msg.get("faceted-search.config.link"),
+         targetUrl: "dp/ws/faceted-search-config"
+      }
+   };
+   titleMenu.config.widgets.splice(0, 0, searchConfigMenuItem);
+}
 
 // Accessibility menu
 var accessMenu = {
@@ -55,6 +66,40 @@ var accessMenu = {
    }
 };
 
+// Headings
+var headingForSearchForm = {
+   name: "alfresco/html/Heading",
+   config: {
+      level: 2,
+      label: msg.get("faceted-search.heading.search-form"),
+      isHidden: true
+   }
+};
+var headingForFacetMenu = {
+   name: "alfresco/html/Heading",
+   config: {
+      level: 2,
+      label: msg.get("faceted-search.heading.facet-menu"),
+      isHidden: true
+   }
+};
+var headingForSortMenu = {
+   name: "alfresco/html/Heading",
+   config: {
+      level: 2,
+      label: msg.get("faceted-search.heading.sort-menu"),
+      isHidden: true
+   }
+};
+var headingForResultsList = {
+   name: "alfresco/html/Heading",
+   config: {
+      level: 2,
+      label: msg.get("faceted-search.heading.search-results-list"),
+      isHidden: true
+   }
+};
+
 // Compose the search form model
 var searchForm = {
    id: "FCTSRCH_SEARCH_FORM",
@@ -68,11 +113,12 @@ var searchForm = {
       okButtonClass: "call-to-action",
       textFieldName: "searchTerm",
       textBoxIconClass: "alf-search-icon",
-      textBoxCssClasses: "long"
+      textBoxCssClasses: "long hiddenlabel",
+      textBoxLabel: msg.get("faceted-search.search-form.search-field-label")
    }
 };
 
-// TODO: The following code describes two different visibilityConfig behaviours. Initially they were bundled together 
+// TODO: The following code describes two different visibilityConfig behaviours. Initially they were bundled together
 // but it was found that this did not work as each rule fires independently. One rule would apply a condition and then
 // the other would overrule it. A workaround was found within this example, but a more solid solution might be to
 // create a multiple topic listener service that would gather payloads from configured topic publishes, concatenate
@@ -83,9 +129,9 @@ var hideOnZeroResultsConfig = {
    initialValue: false,
    rules: [
       {
-         topic: "ALF_SEARCH_RESULTS_COUNT",
-         attribute: "count",
-         isNot: [0]
+         topic: "ALF_HIDE_FACETS",
+         attribute: "hide",
+         isNot: [true]
       }
    ]
 };
@@ -120,93 +166,70 @@ var sideBarMenu = {
    }
 };
 
-// Compose the individual facets
-var facets = [
+// Make a request to the Repository to get the configured facets to use in search...
+var rawFacets = [];
+var result = remote.call("/api/facet/facet-config");
+if (result.status.code == status.STATUS_OK)
+{
+   rawFacets = JSON.parse(result).facets;
+}
+
+// Iterate over the list of facets and create an array of widgets for each one.
+// Only the enableincludeFacetd facets will be included and if any are scoped this will be
+// taken into account...
+var facets = [];
+rawFacets.forEach(function(facet, index, rawFacets) {
+
+   if (facet.isEnabled === true)
    {
-      id: "FCTSRCH_FACET_FORMATS",
-      name: "alfresco/search/FacetFilters",
-      config: {
-         label: msg.get("faceted-search.facet-menu.facet.formats"),
-         facetQName: "{http://www.alfresco.org/model/content/1.0}content.mimetype",
-         sortBy: "DESCENDING",
-         maxFilters: 6,
-         useHash: false
+      var includeFacet = true;
+
+      // If we're in the context of a site and there is site scoping defined for
+      // the current facet then we need to check that the current site is within
+      // the list of scoped sites...
+      if (facet.scope === "SCOPED_SITES")
+      {
+         includeFacet = false;
+         var siteId = page.url.templateArgs.site;
+         if (siteId != null && facet.scopedSites != null && facet.scopedSites.length != null)
+         {
+            for (var i=0; i<facet.scopedSites.length; i++)
+            {
+               if (facet.scopedSites[i] === siteId)
+               {
+                  includeFacet = true;
+                  break;
+               }
+            }
+         }
       }
-   },
-   {
-      id: "FCTSRCH_FACET_CREATOR",
-      name: "alfresco/search/FacetFilters",
-      config: {
-         label: msg.get("faceted-search.facet-menu.facet.creator"),
-         facetQName: "{http://www.alfresco.org/model/content/1.0}creator.__.u",
-         sortBy: "ALPHABETICALLY",
-         maxFilters: 6,
-         useHash: false
-      }
-   },
-   {
-      id: "FCTSRCH_FACET_MODIFIER",
-      name: "alfresco/search/FacetFilters",
-      config: {
-         label: msg.get("faceted-search.facet-menu.facet.modifier"),
-         facetQName: "{http://www.alfresco.org/model/content/1.0}modifier.__.u",
-         sortBy: "ALPHABETICALLY",
-         maxFilters: 6,
-         useHash: false
-      }
-   },
-   {
-      id: "FCTSRCH_FACET_CREATED",
-      name: "alfresco/search/FacetFilters",
-      config: {
-         label: msg.get("faceted-search.facet-menu.facet.created"),
-         facetQName: "{http://www.alfresco.org/model/content/1.0}created",
-         blockIncludeFacetRequest: true,
-         sortBy: "INDEX",
-         maxFilters: 6,
-         useHash: false
-      }
-   },
-   {
-      id: "FCTSRCH_FACET_MODIFIED",
-      name: "alfresco/search/FacetFilters",
-      config: {
-         label: msg.get("faceted-search.facet-menu.facet.modified"),
-         facetQName: "{http://www.alfresco.org/model/content/1.0}modified",
-         blockIncludeFacetRequest: true,
-         sortBy: "INDEX",
-         maxFilters: 6,
-         useHash: false
-      }
-   },
-/* see ACE-2131
-   {
-      id: "FCTSRCH_FACET_DESCRIPTION",
-      name: "alfresco/search/FacetFilters",
-      config: {
-         label: msg.get("faceted-search.facet-menu.facet.description"),
-         facetQName: "{http://www.alfresco.org/model/content/1.0}description.__",
-         sortBy: "DESCENDING",
-         hitThreshold: 1,
-         minFilterValueLength: 5,
-         maxFilters: 6,
-         useHash: false
-      }
-   },
-*/
-   {
-      id: "FCTSRCH_FACET_SIZE",
-      name: "alfresco/search/FacetFilters",
-      config: {
-         label: msg.get("faceted-search.facet-menu.facet.size"),
-         facetQName: "{http://www.alfresco.org/model/content/1.0}content.size",
-         blockIncludeFacetRequest: true,
-         sortBy: "INDEX",
-         maxFilters: 6,
-         useHash: false
+
+      // If the facet passes all scoping criteria then it should be included...
+      if (includeFacet === true)
+      {
+         var blockIncludeFacetRequest = (facet.customProperties != null &&
+                                         facet.customProperties.blockIncludeFacetRequest != null &&
+                                         facet.customProperties.blockIncludeFacetRequest.value === "true");
+
+         var facet = {
+            id: "FCTSRCH_" + facet.filterID,
+            name: facet.displayControl,
+            config: {
+               label: msg.get(facet.displayName),
+               facetQName: facet.facetQName,
+               sortBy: facet.sortBy,
+               maxFilters: facet.maxFilters,
+               hitThreshold: facet.hitThreshold,
+               minFilterValueLength: facet.minFilterValueLength,
+               useHash: false,
+               headingLevel: 3,
+               blockIncludeFacetRequest: blockIncludeFacetRequest
+            }
+         };
+         facets.push(facet);
       }
    }
-];
+});
 
 // Function to compose the sort fields from share-config
 function getSortFieldsFromConfig()
@@ -220,33 +243,20 @@ function getSortFieldsFromConfig()
    // Iterate over configuration sort fields
    for(var i=0; i < configSortFields.size(); i+=1)
    {
-      var direction = "ascending";
-      var value = null;
-      var configSortField = configSortFields.get(i);
-      if (configSortField.value != null)
-      {
-         valueTokens = String(configSortField.value).split("|"),
-         value = valueTokens[0];
-
-         // The value may contain 2 pieces of data - the optional 2nd is for sort direction
-         if(valueTokens instanceof Array && valueTokens.length > 1 && valueTokens[1] === "false")
-         {
-            direction = "descending";
-         }
-      }
-      else
-      {
-         // It's important that some value is set for Relevance (e.g. which is assumed when the
-         // configSortField.value is null). This is done so that the browser hash can be updated
-         // and in turn the hash can be used on page load. The SearchService is written to handle
-         // the value of "Relevance" to mean that no specific sort is required.
-         value = "Relevance";
-      }
-
       // Extract sort properties from configuration
-      var label = String(configSortField.attributes["labelId"]),
+      var configSortField = configSortFields.get(i),
+          label = String(configSortField.attributes["labelId"]),
           sortable = String(configSortField.attributes["isSortable"]) == "true" ? true : false,
+          valueTokens = String(configSortField.value).split("|"),
+          value = valueTokens[0],
+          direction = "ascending",
           checked = (i==0 ? true : false);
+
+      // The value may contain 2 pieces of data - the optional 2nd is for sort direction
+      if(valueTokens instanceof Array && valueTokens.length > 1 && valueTokens[1] === "false")
+      {
+         direction = "descending";
+      }
 
       // Create a new sort widget
       var labelMsg = msg.get(label);
@@ -256,7 +266,6 @@ function getSortFieldsFromConfig()
             label: labelMsg,
             title: msg.get("faceted-search.sort-by.title", [labelMsg]),
             value: value,
-            hashName: "sortField",
             group: "DOCUMENT_LIBRARY_SORT_FIELD",
             publishTopic: "ALF_DOCLIST_SORT_FIELD_SELECTION",
             checked: checked,
@@ -298,7 +307,7 @@ var sortMenu = {
 // Compose result menu bar
 var searchResultsMenuBar = {
    id: "FCTSRCH_RESULTS_MENU_BAR",
-   name: "alfresco/layout/LeftAndRight",
+   name: "alfresco/documentlibrary/AlfToolbar",
    config: {
       widgets: [
          {
@@ -317,9 +326,11 @@ var searchResultsMenuBar = {
                label: msg.get("faceted-search.results-menu.results-found")
             }
          },
+         headingForSortMenu,
          {
             name: "alfresco/menus/AlfMenuBar",
             align: "right",
+            id: "FCTSRCH_SEARCH_LIST_MENU_BAR",
             config: {
                visibilityConfig: hideOnZeroResultsConfig,
                widgets: [
@@ -328,11 +339,8 @@ var searchResultsMenuBar = {
                      name: "alfresco/menus/AlfMenuBarToggle",
                      config: {
                         visibilityConfig: hideOnNotSortableConfig,
-                        hashName: "sortAscending",
                         checked: true,
-                        subscriptionAttribute: "sortAscending",
                         onConfig: {
-                           value: "ascending",
                            title: msg.get("faceted-search.sort-order-desc.title"),
                            iconClass: "alf-sort-ascending-icon",
                            iconAltText: msg.get("faceted-search.sorted-as-asc.title"),
@@ -342,7 +350,6 @@ var searchResultsMenuBar = {
                            }
                         },
                         offConfig: {
-                           value: "descending",
                            title: msg.get("faceted-search.sort-order-asc.title"),
                            iconClass: "alf-sort-descending-icon",
                            iconAltText: msg.get("faceted-search.sorted-as-desc.title"),
@@ -353,7 +360,20 @@ var searchResultsMenuBar = {
                         }
                      }
                   },
-                  sortMenu
+                  sortMenu,
+                  {
+                     id: "FCTSRCH_VIEWS_MENU",
+                     name: "alfresco/menus/AlfMenuBarPopup",
+                     config: {
+                        iconClass: "alf-configure-icon",
+                        widgets: [
+                           {
+                              id: "DOCLIB_CONFIG_MENU_VIEW_SELECT_GROUP",
+                              name: "alfresco/documentlibrary/AlfViewSelectionGroup"
+                           }
+                        ]
+                     }
+                  }
                ]
             }
          }
@@ -366,6 +386,8 @@ var searchDocLib = {
    id: "FCTSRCH_SEARCH_RESULTS_LIST",
    name: "alfresco/documentlibrary/AlfSearchList",
    config: {
+      viewPreferenceProperty: "org.alfresco.share.searchList.viewRendererName",
+      view: viewRendererName,
       waitForPageWidgets: true,
       useHash: true,
       hashVarsForUpdate: [
@@ -375,26 +397,16 @@ var searchDocLib = {
          "sortAscending",
          "allSites",
          "repo",
-         "searchScope"
+         "searchScope",
+         "query"
       ],
       selectedScope: "REPO",
       useInfiniteScroll: true,
       siteId: null, // Don't set the siteId initially (we don't want to do a site search on first load)
       rootNode: null,
       repo: true,
+      additionalControlsTarget: "FCTSRCH_RESULTS_MENU_BAR",
       widgets: [
-//         {
-//            id: "FCTSRCH_SEARCH_ADVICE_LANDING",
-//            name: "alfresco/documentlibrary/views/AlfSearchListView",
-//            config: {
-//               searchAdviceTitle: "faceted-search.landing.title",
-//               searchAdvice: [
-//                  "faceted-search.landing.suggestion1",
-//                  "faceted-search.landing.suggestion2",
-//                  "faceted-search.landing.suggestion3"
-//               ]
-//            }
-//         },
          {
             id: "FCTSRCH_SEARCH_ADVICE_NO_RESULTS",
             name: "alfresco/documentlibrary/views/AlfSearchListView",
@@ -404,6 +416,67 @@ var searchDocLib = {
                   "faceted-search.advice.suggestion1",
                   "faceted-search.advice.suggestion2",
                   "faceted-search.advice.suggestion3"
+               ],
+               a11yCaption: msg.get("faceted-search.results.caption"),
+               a11yCaptionClass: "hiddenAccessible",
+               widgetsForHeader: [
+                  {
+                     name: "alfresco/documentlibrary/views/layouts/HeaderCell",
+                     config: {
+                        label: msg.get("faceted-search.results.heading.thumbnail"),
+                        class: "hiddenAccessible",
+                        a11yScope: "col"
+                     }
+                  },
+                  {
+                     name: "alfresco/documentlibrary/views/layouts/HeaderCell",
+                     config: {
+                        label: msg.get("faceted-search.results.heading.details"),
+                        class: "hiddenAccessible",
+                        a11yScope: "col"
+                     }
+                  },
+                  {
+                     name: "alfresco/documentlibrary/views/layouts/HeaderCell",
+                     config: {
+                        label: msg.get("faceted-search.results.heading.actions"),
+                        class: "hiddenAccessible",
+                        a11yScope: "col"
+                     }
+                  }
+               ],
+               widgets: [
+                  {
+                     id: "FCTSRCH_SEARCH_RESULT",
+                     name: "alfresco/search/AlfSearchResult",
+                     config: {
+                        enableContextMenu: false
+                     }
+                  }
+               ]
+            }
+         },
+         {
+            name: "alfresco/documentlibrary/views/AlfGalleryView",
+            config: {
+               showNextLink: true,
+               nextLinkLabel: msg.get("faceted-search.show-more-results.label"),
+               widgets: [
+                  {
+                     name: "alfresco/search/SearchGalleryThumbnail",
+                     config: {
+                        widgetsForSelectBar: [
+                           {
+                              name: "alfresco/renderers/MoreInfo",
+                              align: "right",
+                              config: {
+                                 xhrRequired: true
+                              }
+                           }
+                        ],
+                        publishTopic: "ALF_NAVIGATE_TO_PAGE"
+                     }
+                  }
                ]
             }
          },
@@ -416,17 +489,18 @@ var searchDocLib = {
 
 // Put all components together
 var main = {
+   id: "FCTSRCH_MAIN_VERTICAL_STACK",
    name: "alfresco/layout/VerticalWidgets",
    config: {
       baseClass: "side-margins",
       widgets: [
-         accessMenu,
          {
             name: "alfresco/html/Spacer",
             config: {
                height: "4px"
             }
          },
+         headingForSearchForm,
          searchForm,
          {
             name: "alfresco/layout/HorizontalWidgets",
@@ -454,11 +528,13 @@ var main = {
                ]
             }
          },
+         headingForFacetMenu,
          {
             name: "alfresco/layout/HorizontalWidgets",
             config: {
                widgets: [
                   {
+                     id: "FCTSRCH_SEARCH_FACET_LIST",
                      name: "alfresco/layout/VerticalWidgets",
                      align: "sidebar",
                      widthPx: 340,
@@ -471,6 +547,7 @@ var main = {
                      name: "alfresco/layout/VerticalWidgets",
                      config: {
                         widgets: [
+                           headingForResultsList,
                            searchDocLib
                         ]
                      }
@@ -483,7 +560,7 @@ var main = {
 };
 
 // Add a checkable menu for switching between Repository, All Sites and current site as necessary...
-// If we're in a site, make sure add in the site as an option in the menu 
+// If we're in a site, make sure add in the site as an option in the menu
 // Always add in "All Sites" and "Repository" options...
 // Cloud will need to remove the "Repository" option via an extension...
 // Need links rather than drop-down?
@@ -586,10 +663,16 @@ services.push("alfresco/services/NavigationService",
               "alfresco/services/SearchService",
               "alfresco/services/ActionService",
               "alfresco/services/DocumentService",
-              "alfresco/dialogs/AlfDialogService"
-              );
+              "alfresco/dialogs/AlfDialogService",
+              "alfresco/services/PreferenceService",
+              "alfresco/services/QuickShareService",
+              "alfresco/services/RatingsService",
+              "alfresco/services/CrudService",
+              "alfresco/services/NotificationService",
+              "alfresco/services/ContentService");
 
 // Add in the search form and search doc lib...
+widgets.unshift(accessMenu);
 widgets.push(main);
 
 // Push services and widgets into the getFooterModel to return with a sticky footer wrapper

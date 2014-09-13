@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -26,43 +26,40 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'AlfContextMenu Test',
       'alfresco/menus/AlfContextMenu': function () {
 
          var browser = this.remote;
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/menus/page_models/AlfContextMenu_TestPage.json")
+         var testName = "Context Menu Test";
+         return TestCommon.loadTestWebScript(this.remote, "/AlfContextMenu", testName)
 
             // TESTS COMMENTED OUT PENDING ANSWER POSTED HERE: https://github.com/theintern/intern/issues/191
-            // .elementByCss("#LOGO")
-            //    .moveTo()
+            // .findByCssSelector("#LOGO")
             //    .click("2")
             //    .end()
-            // .elementByCss("#MI3")
-            //    .moveTo()
+            // .findByCssSelector("#MI3")
             //    .click()
             //    .end()
-            // .elementsByCss(TestCommon.pubSubDataCssSelector("last", "key3", "value3"))
+            // .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "key3", "value3"))
             //    .then(function(elements) {
-            //       TestCommon.log(testname,50,"Check targeted node context menu works");
+            //       TestCommon.log(testname,"Check targeted node context menu works");
             //       assert(elements.length == 1, "Test #1 - Targeted node context menu failure");
             //    })
             //    .end()
 
-            // .elementByCss("#CLASSIC_WINDOW div.content")
-            //    .moveTo()
+            // .findByCssSelector("#CLASSIC_WINDOW div.content")
             //    .click("2")
             //    .end()
-            // .elementByCss("#MI1")
-            //    .moveTo()
+            // .findByCssSelector("#MI1")
             //    .click()
             //    .end()
-            // .elementsByCss(TestCommon.pubSubDataCssSelector("last", "key1", "value1"))
+            // .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "key1", "value1"))
             //    .then(function(elements) {
-            //       TestCommon.log(testname,50,"Check inherited node context menu works");
+            //       TestCommon.log(testname,"Check inherited node context menu works");
             //       assert(elements.length == 1, "Test #2 - Inherited node context menu failure");
             //    })
             //    .end()

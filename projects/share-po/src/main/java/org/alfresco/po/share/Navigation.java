@@ -24,10 +24,11 @@ import java.util.List;
 import org.alfresco.po.share.ShareUtil.RequiredAlfrescoVersion;
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.adminconsole.CategoryManagerPage;
-import org.alfresco.po.share.adminconsole.ChannelManagerPage;
 import org.alfresco.po.share.adminconsole.NodeBrowserPage;
 import org.alfresco.po.share.adminconsole.TagManagerPage;
+import org.alfresco.po.share.reports.AdhocAnalyzerPage;
 import org.alfresco.po.share.search.AdvanceSearchContentPage;
+import org.alfresco.po.share.search.FacetedSearchConfigPage;
 import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
@@ -77,6 +78,7 @@ public class Navigation extends SharePage
     private static final String LINK_FAVOURITES= "#HEADER_SITES_MENU_FAVOURITES_text";
     private static final String SHARED_FILES_LINK = "//span[@id='HEADER_SHARED_FILES_text']/a";
     private static final String MY_FILES_LINK = "div#HEADER_MY_FILES";
+    private static final String REPORTING = "div#HEADER_PENTAHO";
 
     /**
      * Constructor
@@ -86,7 +88,7 @@ public class Navigation extends SharePage
     public Navigation(WebDrone drone)
     {
         super(drone);
-        userNameDropDown = drone.getElement("user.dropdown");
+        userNameDropDown = drone.getElement("user.dropdown");       
       
     }
 
@@ -196,6 +198,62 @@ public class Navigation extends SharePage
         }
     }
 
+    /**
+     * Selects the "Reporting" icon on main navigation. As this link is created by
+     * Java script, a wait is implemented to ensure the link is rendered.
+     */
+    public void selectReportingDropdown()
+    {
+        try
+        {
+            WebElement reportingButton = drone.findAndWait(By.cssSelector(REPORTING));
+            reportingButton.click();
+        }
+        catch (TimeoutException te)
+        {
+            throw new PageOperationException("Exceeded time to find the Reporting dropdown css.", te);
+        }
+    }
+
+    /**
+     * Checks if Reporting is displayed
+     * 
+     * @return
+     */
+    public boolean isReportingVisible()
+    {
+        try
+        {
+            WebElement documentTitle = drone.find(By.cssSelector(REPORTING));
+            return documentTitle.isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+            logger.error("No Reporting menu in the header " + nse);
+            throw new PageException("Unable to find Reporting menu in the header.", nse);
+        }
+    }
+    
+    /**
+     * Select Analyze from Reporting dropdown.
+     * @return
+     */
+    public AdhocAnalyzerPage selectAnalyze()
+    {
+        try
+        {
+            selectReportingDropdown(); 
+            drone.findAndWait(By.cssSelector("td#HEADER_PENTAHO_ANALYZE_text a")).click();
+            return new AdhocAnalyzerPage(drone);
+        }
+        catch(TimeoutException toe)
+        {
+            logger.error("Analyze option is not found in the Reporting options", toe);
+        }
+        throw new PageOperationException("Analyze option is not found in the Reporting options");
+    }
+      
+       
     /**
      * Selects the user link on main navigation. As this link is created by Java
      * script, a wait is implemented to ensure the link is rendered.
@@ -505,31 +563,7 @@ public class Navigation extends SharePage
         List<org.openqa.selenium.WebElement> elements = drone.findAll(By.cssSelector(SITE_ADMIN_MANAGE_SITE_LINK_SELECTOR));
         return (elements.size() != 0);
     }
-
-    /**
-     * Select Channel Manager link as Admin.
-     *
-     * @return the html page
-     */
-
-    public ChannelManagerPage getChannelManagerPage()
-    {
-            if (alfrescoVersion.isCloud())
-            {
-                throw new UnsupportedOperationException("This option is Enterprise only, not available for cloud");
-            }
-            // TODO To be implemented by using UI once JIRA: https://issues.alfresco.com/jira/browse/ALF-18909 is resolved
-            String usersPageURL = "/page/console/admin-console/channel-admin";
-            String currentUrl = drone.getCurrentUrl();
-            if (currentUrl != null)
-            {
-                String url = currentUrl.replaceFirst("^*/page.*", usersPageURL);
-                drone.navigateTo(url);
-            }
-            return new ChannelManagerPage(drone).render();
-
-    }
-
+    
     /**
      * Select manage sites link as Admin.
      *
@@ -922,6 +956,23 @@ public class Navigation extends SharePage
             drone.navigateTo(url);
         }
         return new FacetedSearchPage(drone);
+    }
+
+    /**
+     * Navigates to the faceted search config page.
+     * 
+     * @return {@link FacetedSearchConfigPage} Instance of FacetedSearchConfigPage
+     */
+    public HtmlPage getFacetedSearchConfigPage()
+    {
+        String facetedSearchConfigPageURL = "/page/dp/ws/faceted-search-config";
+        String currentUrl = drone.getCurrentUrl();
+        if (currentUrl != null)
+        {
+            String url = currentUrl.replaceFirst("^*/page.*", facetedSearchConfigPageURL);
+            drone.navigateTo(url);
+        }
+        return new FacetedSearchConfigPage(drone);
     }
 
     /**

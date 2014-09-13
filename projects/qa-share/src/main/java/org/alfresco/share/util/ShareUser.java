@@ -139,6 +139,19 @@ public class ShareUser extends AbstractUtils
         }
         return currentPage;
     }
+    
+    /**
+     * Opens any page
+     * 
+     * @param driver
+     * @param url
+     * @return
+     */
+    public static HtmlPage navigateToPage(WebDrone driver, String url)
+    {
+        driver.navigateTo(url);
+        return driver.getCurrentPage();        
+    }    
 
     /**
      * User Log out followed by deletion of session cookies Assumes User is
@@ -957,7 +970,7 @@ public class ShareUser extends AbstractUtils
      * @param taskName
      * @return {@link MyTasksDashlet}
      */
-    public static MyTasksDashlet selectTaskByTaskName(WebDrone driver, String taskName)
+    public static HtmlPage selectTaskByTaskName(WebDrone driver, String taskName)
     {
         MyTasksDashlet sites = ShareUser.openUserDashboard(driver).getDashlet(USER_TASKS).render();
 

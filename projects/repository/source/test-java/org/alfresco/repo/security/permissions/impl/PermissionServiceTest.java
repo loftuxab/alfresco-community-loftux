@@ -27,6 +27,7 @@ import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.domain.permissions.ADMAccessControlListDAO;
 import org.alfresco.repo.model.filefolder.FileFolderServiceImpl;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.ACLType;
@@ -1686,7 +1687,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testGetSettablePermissionsForType()
     {
         Set<String> answer = permissionService.getSettablePermissions(QName.createQName("sys", "base", namespacePrefixResolver));
-        assertEquals(38, answer.size());
+        assertEquals(36, answer.size());
 
         answer = permissionService.getSettablePermissions(QName.createQName("cm", "ownable", namespacePrefixResolver));
         assertEquals(0, answer.size());
@@ -1706,22 +1707,22 @@ public class PermissionServiceTest extends AbstractPermissionTest
         QName ownable = QName.createQName("cm", "ownable", namespacePrefixResolver);
 
         Set<String> answer = permissionService.getSettablePermissions(rootNodeRef);
-        assertEquals(38, answer.size());
+        assertEquals(36, answer.size());
 
         nodeService.addAspect(rootNodeRef, ownable, null);
         answer = permissionService.getSettablePermissions(rootNodeRef);
-        assertEquals(38, answer.size());
+        assertEquals(36, answer.size());
 
         nodeService.removeAspect(rootNodeRef, ownable);
         answer = permissionService.getSettablePermissions(rootNodeRef);
-        assertEquals(38, answer.size());
+        assertEquals(36, answer.size());
     }
 
     public void testSimplePermissionOnRoot()
     {
         runAs("andy");
 
-        assertEquals(38, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(36, permissionService.getPermissions(rootNodeRef).size());
         assertEquals(0, countGranted(permissionService.getPermissions(rootNodeRef)));
         assertEquals(0, permissionService.getAllSetPermissions(rootNodeRef).size());
 
@@ -1733,7 +1734,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertEquals(1, permissionService.getAllSetPermissions(rootNodeRef).size());
         runAs("andy");
 
-        assertEquals(38, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(36, permissionService.getPermissions(rootNodeRef).size());
         assertEquals(2, countGranted(permissionService.getPermissions(rootNodeRef)));
 
         assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
@@ -1838,7 +1839,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         permissionService.setPermission(allowAndyRead);
         runAs("andy");
 
-        assertEquals(38, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(36, permissionService.getPermissions(rootNodeRef).size());
         assertEquals(7, countGranted(permissionService.getPermissions(rootNodeRef)));
         assertEquals(1, permissionService.getAllSetPermissions(rootNodeRef).size());
 
@@ -3382,6 +3383,47 @@ public class PermissionServiceTest extends AbstractPermissionTest
         long end = System.nanoTime();
 
         //assertTrue("Time was "+(end - start)/1000000000.0f, end == start);
+    }
+    
+    public void testPreserveAuditableData()
+    {
+        ADMAccessControlListDAO accessControlListDao = (ADMAccessControlListDAO) applicationContext.getBean("admNodeACLDAO");
+        boolean preserveAuditableData = accessControlListDao.isPreserveAuditableData();
+        
+        runAs("admin");
+        
+        personService.getPerson("andy");
+        personService.getPerson("userTwo");
+        
+        NodeRef folder = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}Folder"), ContentModel.TYPE_FOLDER).getChildRef();;
+        NodeRef content1 = nodeService.createNode(folder, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}content1"), ContentModel.TYPE_CONTENT).getChildRef();;
+        NodeRef content2 = nodeService.createNode(folder, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}content2"), ContentModel.TYPE_CONTENT).getChildRef();;
+        
+        try
+        {
+            permissionService.setPermission(folder, "andy", PermissionService.COORDINATOR, true);
+            
+            assertEquals("admin", nodeService.getProperty(content1, ContentModel.PROP_MODIFIER));
+        
+            accessControlListDao.setPreserveAuditableData(true);
+        
+            runAs("andy");
+            permissionService.setPermission(content1, "userTwo", PermissionService.COORDINATOR, true);
+            assertEquals("admin", nodeService.getProperty(content1, ContentModel.PROP_MODIFIER));
+        
+            accessControlListDao.setPreserveAuditableData(false);
+        
+            permissionService.setPermission(content2, "userTwo", PermissionService.COORDINATOR, true);
+            assertEquals("andy", nodeService.getProperty(content2, ContentModel.PROP_MODIFIER));
+        }
+        finally
+        {
+            accessControlListDao.setPreserveAuditableData(preserveAuditableData);
+            if (folder != null)
+            {
+                nodeService.deleteNode(folder);
+            }
+        }
     }
 
 

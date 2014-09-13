@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -20,16 +20,19 @@
 /**
  * @module alfresco/layouts/LeftAndRight
  * @extends module:alfresco/core/ProcessWidgets
+ * @mixes module:alfresco/accessibility/_SemanticWrapperMixin
  * @author Dave Draper
+ * @author Richard Smith
  */
 define(["dojo/_base/declare",
         "alfresco/core/ProcessWidgets",
+        "alfresco/accessibility/_SemanticWrapperMixin",
         "dojo/text!./templates/LeftAndRight.html",
         "dojo/dom-construct",
         "dojo/_base/array"], 
-        function(declare, ProcessWidgets, template, domConstruct, array) {
+        function(declare, ProcessWidgets, _SemanticWrapperMixin, template, domConstruct, array) {
    
-   return declare([ProcessWidgets], {
+   return declare([ProcessWidgets, _SemanticWrapperMixin], {
       
       /**
        * An array of the CSS files to use with this widget.
@@ -47,7 +50,7 @@ define(["dojo/_base/declare",
        * @type {string}
        */
       templateString: template,
-      
+
       /**
        * Iterates through the array of widgets to be created and creates the appropriate DOM node based
        * on the "align" attribute of the widget configuration. 
@@ -55,22 +58,29 @@ define(["dojo/_base/declare",
        * @instance
        */
       postCreate: function alfresco_layout_LeftAndRight__postCreate() {
-         var _this = this;
          if (this.widgets)
          {
+            this._processedWidgets = [];
+            
             // Iterate over all the widgets in the configuration object and add them...
             array.forEach(this.widgets, function(entry, i) {
                var domNode = null;
                if (entry.align == "right")
                {
-                  domNode = _this.createWidgetDomNode(entry, _this.rightWidgets, entry.className);
+                  domNode = this.createWidgetDomNode(entry, this.rightWidgets, entry.className);
                }
                else
                {
-                  domNode = _this.createWidgetDomNode(entry, _this.leftWidgets, entry.className);
+                  domNode = this.createWidgetDomNode(entry, this.leftWidgets, entry.className);
                }
-               _this.createWidget(entry, domNode);
-            });
+               this.createWidget(entry, domNode, this._registerProcessedWidget, this, i);
+            }, this);
+         }
+
+         // Create a semantic wrapper if required
+         if(this.semanticWrapper)
+         {
+            this.generateSemanticWrapper(this.parentNode, this.containerNode);
          }
       },
       

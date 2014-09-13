@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -30,64 +30,64 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'AlfMenuTextForClipboard Test',
       'alfresco/menus/AlfMenuTextForClipboard': function () {
 
          var browser = this.remote;
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/menus/page_models/AlfMenuTextForClipboard_TestPage.json")
+         var testName = "Menu Text For Clipboard Test";
+         return TestCommon.loadTestWebScript(this.remote, "/AlfMenuTextForClipboard", testName)
 
             // Test #1
             // Check the initial labels...
-            .keys(specialKeys["Tab"])
-            .keys(specialKeys["Down arrow"])
-            .keys(specialKeys["Right arrow"])
-            // .elementByCss("#TEXT1 span.label")
-            //    .text()
+            .pressKeys(keys.TAB)
+            .pressKeys(keys.ARROW_DOWN)
+            .pressKeys(keys.ARROW_RIGHT)
+            // .findByCssSelector("#TEXT1 span.label")
+            //    .getVisibleText()
             //    .then(function(resultText) {
             //       assert(resultText == "", "Test #1a - The inital label of TEXT1 has been set incorrectly: " + resultText);
             //    })
             //    .end()
-            .keys(specialKeys["Left arrow"])
-            .keys(specialKeys["Down arrow"])
-            .keys(specialKeys["Right arrow"])
-            // .elementByCss("#TEXT2 span.label")
-            //    .text()
+            .pressKeys(keys.ARROW_LEFT)
+            .pressKeys(keys.ARROW_DOWN)
+            .pressKeys(keys.ARROW_RIGHT)
+            // .findByCssSelector("#TEXT2 span.label")
+            //    .getVisibleText()
             //    .then(function(resultText) {
             //       assert(resultText == "", "Test #1b - The inital label of TEXT2 has been set incorrectly: " + resultText);
             //    })
             // .end()
-            .keys(specialKeys["Left arrow"])
-            .keys(specialKeys["Down arrow"])
-            .keys(specialKeys["Right arrow"])
+            .pressKeys(keys.ARROW_LEFT)
+            .pressKeys(keys.ARROW_DOWN)
+            .pressKeys(keys.ARROW_RIGHT)
 
-            // .elementByCss("#TEXT3 span.text")
+            // .findByCssSelector("#TEXT3 span.text")
             // .addValue(['Control','x','NULL'],function(err) {
             //             expect(err).to.be.null;
             //         })
             // .sleep(2000)
-            // .type([specialKeys["Control"],"c"])
+            // .type([keys["Control"],"c"])
 
 
-            .keys(specialKeys["Tab"])
-            .keys(specialKeys["Tab"])
-            // .keys(specialKeys["Tab"])
-            // .elementByCss("#TEXTAREA textarea")
-            //    .moveTo()
+            .pressKeys(keys.TAB)
+            .pressKeys(keys.TAB)
+            // .pressKeys(keys.TAB)
+            // .findByCssSelector("#TEXTAREA textarea")
             //    .click()
             //    // .type("hello")
             //    // .sleep(1000)
             // .sleep(2000)
-            // .type([specialKeys["Control"],"v"])
+            // .type([keys["Control"],"v"])
                // .end()
                // .sleep(2000)
 
 
-            // .elementByCss("#TEXT3 span.label")
-            //    .text()
+            // .findByCssSelector("#TEXT3 span.label")
+            //    .getVisibleText()
             //    .then(function(resultText) {
             //       assert(resultText == "Copy me!", "Test #1c - The inital label of TEXT3 has been set incorrectly: " + resultText);
             //    })

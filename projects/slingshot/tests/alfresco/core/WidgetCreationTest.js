@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,15 +25,15 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, expect, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, expect, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'Widget Creation Test',
       'WidgetCreation': function () {
          var browser = this.remote;
          var testname = "WidgetCreationTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/core/page_models/WidgetCreation_TestPage.json", testname)
+         return TestCommon.loadTestWebScript(this.remote, "/WidgetCreation", testname)
 
          .end()
 
@@ -42,22 +42,22 @@ define(["intern!object",
          // chaining of promises - this test should be sufficient but it would be nice to update at some
          // point in the future!
 
-         .elementsByCssSelector(".alfresco-logo-Logo")
+         .findAllByCssSelector(".alfresco-logo-Logo")
             .then(function (els) {
-               TestCommon.log(testname,46,"Count the number of Logo widgets");
+               TestCommon.log(testname,"Count the number of Logo widgets");
                assert(els.length == 3, "An unexpected number of logo widgets found", els.length);
             })
             .end()
 
-         .elementsByCssSelector("#SPECIFIC_DOM_ID")
+         .findAllByCssSelector("#SPECIFIC_DOM_ID")
             .then(function (els) {
-               TestCommon.log(testname,53,"Check for the Logo with the specific ID");
+               TestCommon.log(testname,"Check for the Logo with the specific ID");
                assert(els.length == 1, "Couldn't find Logo with specific DOM id", els.length);
             })
             .end()
-         .elementsByCssSelector("#SPECIFIC_DOM_ID")
+         .findAllByCssSelector("#SPECIFIC_DOM_ID")
             .then(function (els) {
-               TestCommon.log(testname,59,"Check for the Logo with the overridden ID");
+               TestCommon.log(testname,"Check for the Logo with the overridden ID");
                assert(els.length == 1, "Couldn't find Logo with overridden DOM id", els.length);
             })
             .end()

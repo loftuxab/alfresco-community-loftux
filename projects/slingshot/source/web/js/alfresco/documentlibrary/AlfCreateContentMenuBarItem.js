@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -42,13 +42,13 @@ define(["dojo/_base/declare",
        * Extends the [superclass function]{@link module:alfresco/menus/AlfMenuBarItem#postCreate} to subscribe to
        * the [userAccessChangeTopic]{@link module:alfresco/documentlibrary/_AlfDocumentListTopicMixin#userAccessChangeTopic}
        * topic which is handled by [onUserAcess]{@link module:alfresco/documentlibrary/_AlfCreateContentPermissionsMixin#onUserAcess}
-       * and [filterChangeTopic]{@link module:alfresco/documentlibrary/_AlfDocumentListTopicMixin#filterChangeTopic} which is
+       * and [hashChangeTopic]{@link module:alfresco/documentlibrary/_AlfDocumentListTopicMixin#hashChangeTopic} which is
        * handled by [onFilterChange]{@link module:alfresco/documentlibrary/_AlfCreateContentPermissionsMixin#onFilterChange}
        * @instance
        */
       postCreate: function alfresco_documentlibrary_AlfCreateContentMenuBarItem__postCreate() {
-         this.alfSubscribe(this.userAccessChangeTopic, lang.hitch(this, "onUserAcess"));
-         this.alfSubscribe(this.filterChangeTopic, lang.hitch(this, "onFilterChange"));
+         this.alfSubscribe(this.userAccessChangeTopic, lang.hitch(this, this.onUserAcess));
+         this.alfSubscribe(this.hashChangeTopic, lang.hitch(this, this.onFilterChange));
          this.inherited(arguments);
       }
    });

@@ -33,8 +33,9 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/dom-class",
         "dojo/query",
-        "alfresco/misc/AlfTooltip"], 
-        function(declare, _WidgetBase, _TemplatedMixin, template, AlfCore, lang, domClass, query, AlfTooltip) {
+        "alfresco/misc/AlfTooltip",
+        "dojo/dom-attr"], 
+        function(declare, _WidgetBase, _TemplatedMixin, template, AlfCore, lang, domClass, query, AlfTooltip, domAttr) {
 
    return declare([_WidgetBase, _TemplatedMixin, AlfCore], {
 
@@ -103,9 +104,36 @@ define(["dojo/_base/declare",
       toolTipMsg: null,
 
       /**
+       * Optional accessibility scope.
+       *
+       * @instance
+       * @type {string}
+       * @default null
+       */
+      a11yScope: null,
+
+      /**
+       * Optional alt text for the sort ascending icon
+       *
+       * @instance
+       * @type {string}
+       * @default null
+       */
+      sortAscAlt: null,
+
+      /**
+       * Optional alt text for the sort descending icon
+       *
+       * @instance
+       * @type {string}
+       * @default null
+       */
+      sortDescAlt: null,
+
+      /**
        * @instance
        */
-      postMixinProperties: function alfresco_documentlibrary_views_layouts_HeaderCell__postMixinProperties() {
+      postMixInProperties: function alfresco_documentlibrary_views_layouts_HeaderCell__postMixInProperties() {
          if (this.label != null)
          {
             this.label = this.message(this.label);
@@ -123,6 +151,9 @@ define(["dojo/_base/declare",
          this.alfSubscribe("ALF_DOCLIST_SORT", lang.hitch(this, "onExternalSortRequest"));
          this.alfSubscribe("ALF_DOCLIST_SORT_FIELD_SELECTION", lang.hitch(this, "onExternalSortRequest"));
 
+         domAttr.set(this.ascendingSortNode, "alt", this.sortAscAlt ? this.sortAscAlt : "");
+         domAttr.set(this.descendingSortNode, "alt", this.sortDescAlt ? this.sortDescAlt : "");
+
          if (this.sortable == false || this.usedForSort == false)
          {
             this.sortIcon("nil");
@@ -132,9 +163,19 @@ define(["dojo/_base/declare",
             this.sortIcon(this.sortedAscending == false ? "desc" : "asc");
          }
 
-         if (this.toolTipMsg != null)
+         if(this.additionalCssClasses)
+         {
+            domClass.add(this.domNode, this.additionalCssClasses);
+         }
+
+         if (this.toolTipMsg)
          {
             this.addToolTipMsg();
+         }
+
+         if(this.a11yScope)
+         {
+            this.addA11yScope(this.a11yScope);
          }
       },
 
@@ -267,7 +308,7 @@ define(["dojo/_base/declare",
       },
 
       /**
-       * This controls the display of a tool tip against the header cell label.
+       * Controls the display of a tool tip against the header cell label.
        *
        * @instance
        */
@@ -279,6 +320,18 @@ define(["dojo/_base/declare",
             label: this.message(this.toolTipMsg)
          });
          this.alfLog("log", "Created HeaderCell tooltip with label '" + tip.label + "' for item '" + this.domNode + "'", this);
+      },
+
+      /**
+       * Adds a scope attribute to the header cell if provided.
+       *
+       * @instance
+       */
+      addA11yScope: function alfresco_documentlibrary_views_layouts_HeaderCell__addA11yScope(scopeStr) {
+         if(scopeStr)
+         {
+            domAttr.set(this.containerNode, "scope", scopeStr);
+         }
       }
 
    });

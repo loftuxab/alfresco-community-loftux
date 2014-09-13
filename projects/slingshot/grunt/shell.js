@@ -24,33 +24,198 @@
  */
 
 module.exports = function (grunt, alf) {
-   // Return the config. This gets pushed into the grunt.init.config method in Gruntfile.
-   return {
-      // Shell Commands run by grunt
-      // @see: https://github.com/sindresorhus/grunt-shell
-      shell: {
-         antClean: {
-            command: 'ant clean',
+
+   var _ = require('lodash'), // Add the lodash util library
+      extend = _.extend;
+
+   // Shell Commands run by grunt
+   // @see: https://github.com/sindresorhus/grunt-shell
+   // Community Config to support the community who don't have access to our Dev Env.
+   // Alfresco Config makes use of Dev Env commands that allow us to build Enterprise as well
+
+   var communityConfig = {
+         // Reset Share's Caches:
+         resetCaches: {
+            command: 'curl -s -d "reset=on" --header "Accept-Charset:ISO-8859-1,utf-8" --header "Accept-Language:en" -u admin:admin http://localhost:8081/share/service/index ;  curl -s "http://localhost:8081/share/page/caches/dependency/clear" -H "Content-Type: application/x-www-form-urlencoded" --data "submit=Clear+Dependency+Caches" -u admin:admin',
             options: {
                stdout: true,
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.rootDir
+                  maxBuffer: "Infinite"
                }
             }
          },
-         mvnClean: {
-            command: 'mvn clean',
+
+         // start share & alfresco
+         // Assumes script called "start-tomcat" and "start-app-tomcat" exist.
+         startRepo: {
+            command: 'mvn install -pl projects/web-client,projects/solr -Psolr-http -DskipTests && start-tomcat',
             options: {
                stdout: true,
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.rootDir
+                  maxBuffer: "Infinite"
                }
             }
          },
+         startRepoExistingBuild: {
+            command: 'start-tomcat',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         se: {
+            command: 'mvn prepare-package -pl projects/slingshot -DskipTests -Dmaven.yuicompressor.skip --offline',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         startShare: {
+            command: 'mvn prepare-package -pl projects/slingshot -DskipTests -Dmaven.yuicompressor.skip && start-app-tomcat',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         startShareInc: {
+            command: 'mvn install -pl projects/slingshot -DskipTests && start-app-tomcat',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         }
+      },
+      alfrescoConfig = {
+         // Reset Share's Caches:
+         resetCaches: {
+            command: 'ws -s; ds -s',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+
+         // start share & alfresco
+         startRepo: {
+            command: 'm r -ie -t',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         startRepoFull: {
+            command: 'm r -be -t',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         startRepoExistingBuild: {
+            command: 'm r -t',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         scb: {
+            command: 'm s -be',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOption: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         se: {
+            // Note: always do an offline build for this use-case, we want it fast.
+            command: 'm s -e -o',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         startShare: {
+            command: 'm s -e && m s -t',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         startShareInc: {
+            command: 'm s -ie && m s -t',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
+            }
+         }
+      },
+      sharedConfig = {
+
+         // Starts the Aikau unit test application
+         startTestApp: {
+            command: 'mvn jetty:run',
+            options: {
+               stdout: true,
+               stderr: false,
+               async: true
+            }
+         },
+
+         // Stops the Aikau unit test application
+         stopTestApp: {
+            command: 'mvn jetty:stop'
+         },
+
          // Generate JSDocs
          jsdoc: {
             command: 'jsdoc ../../' + alf.jsdocFiles + ' -c ../../conf.json', // TODO: Make this work with defined paths.
@@ -71,18 +236,35 @@ module.exports = function (grunt, alf) {
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.docsDir
+                  cwd: alf.docsDir,
+                  maxBuffer: "Infinite"
                }
             }
          },
 
-         // Reset Share's Caches:
-         resetCaches: {
-            command: 'ws -s; ds -s',
+         mvnClean: {
+            command: 'mvn clean',
             options: {
                stdout: true,
                stderr: true,
-               failOnError: true
+               failOnError: true,
+               execOptions: {
+                  cwd: alf.rootDir,
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+
+         // Update NPM dependencies:
+         npmInstall: {
+            command: 'npm install',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: false,
+               execOptions: {
+                  maxBuffer: "Infinite"
+               }
             }
          },
 
@@ -100,47 +282,7 @@ module.exports = function (grunt, alf) {
             }
          },
 
-         // start share & alfresco
-         startRepo: {
-            command: 'r -ie && r -t',
-            options: {
-               stdout: true,
-               stderr: true,
-               failOnError: true
-            }
-         },
-         startRepoExistingBuild: {
-            command: 'r -t',
-            options: {
-               stdout: true,
-               stderr: true,
-               failOnError: true
-            }
-         },
-         se: {
-            command: 's -e',
-            options: {
-               stdout: true,
-               stderr: true,
-               failOnError: true
-            }
-         },
-         startShare: {
-            command: 's -e && s -t',
-            options: {
-               stdout: true,
-               stderr: true,
-               failOnError: true
-            }
-         },
-         startShareInc: {
-            command: 's -ie && s -t',
-            options: {
-               stdout: true,
-               stderr: true,
-               failOnError: true
-            }
-         },
+         // Stop running servers (I don't know of a more friendly but equally effective than this).
          killRepo: {
             command: 'kill `lsof -t -i :8080 -sTCP:LISTEN`',
             options: {
@@ -159,13 +301,15 @@ module.exports = function (grunt, alf) {
          },
 
          svnUp: {
-            command: 'pwd;svn up',
+            // Force Interactive to enable conflict resolution inline.
+            command: 'pwd;svn up --force-interactive',
             options: {
                stdout: true,
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.codeDir
+                  cwd: alf.codeDir,
+                  maxBuffer: "Infinite"
                }
             }
          },
@@ -179,11 +323,12 @@ module.exports = function (grunt, alf) {
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.testResourcesDir
+                  cwd: alf.testResourcesDir,
+                  maxBuffer: "Infinite"
                }
             }
          },
-         // Reset the vagrant VM 
+         // Reset the vagrant VM
          vagrantDestroy: {
             command: 'vagrant destroy -f',
             options: {
@@ -191,11 +336,11 @@ module.exports = function (grunt, alf) {
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.testResourcesDir
+                  cwd: alf.testResourcesDir,
+                  maxBuffer: "Infinite"
                }
             }
          },
-
          // Set up an already running Vagrant VM instance
          vagrantProvision: {
             command: 'vagrant provision',
@@ -204,7 +349,8 @@ module.exports = function (grunt, alf) {
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.testResourcesDir
+                  cwd: alf.testResourcesDir,
+                  maxBuffer: "Infinite"
                }
             }
          },
@@ -217,10 +363,31 @@ module.exports = function (grunt, alf) {
                stderr: true,
                failOnError: true,
                execOptions: {
-                  cwd: alf.testResourcesDir
+                  cwd: alf.testResourcesDir,
+                  maxBuffer: "Infinite"
+               }
+            }
+         },
+         // See also vagrant.js
+         // Start the vagrant VM
+         vagrantReload: {
+            command: 'vagrant reload',
+            options: {
+               stdout: true,
+               stderr: true,
+               failOnError: true,
+               execOptions: {
+                  cwd: alf.testResourcesDir,
+                  maxBuffer: "Infinite"
                }
             }
          }
-      }
+      },
+      configToMerge = (process.env.CURRENT_PROJECT)? alfrescoConfig : communityConfig,
+      shellConfig = extend(sharedConfig, configToMerge);
+
+   // Return the config. This gets pushed into the grunt.init.config method in Gruntfile.
+   return {
+      shell: shellConfig
    };
 };

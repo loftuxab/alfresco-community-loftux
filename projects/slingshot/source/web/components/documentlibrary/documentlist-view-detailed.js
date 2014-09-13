@@ -254,7 +254,8 @@
          if (jsNode.isLink)
          {
             // Link handling
-            oRecord.setData("displayName", scope.msg("details.link-to", record.location.file));
+            // MNT-11988: Renaming links is not working correctly
+            oRecord.setData("displayName", record.fileName.replace(/(.url)$/,""));
          }
          else if (properties.title && properties.title !== record.displayName && scope.options.useTitle)
          {
@@ -772,29 +773,27 @@
          // Get the pop-up div, sibling of the "More Actions" link
          var elMoreActions = Dom.getNextSibling(elMore);
          
-         // MNT-11703 Menus disappearing off bottom of screen when clicking on more in list view
-         Dom.setStyle(elMoreActions , "height" , "" );
-         
+         // MNT-11703, MNT-12137 Menus disappearing off bottom of screen when clicking on more in list view
          var scrollY = window.scrollY;
          if (scrollY === undefined)
          {
             scrollY = document.documentElement.scrollTop;
          }
          
-         var result = Dom.getViewportHeight() - (Dom.getY(elMore) - scrollY + elMore.offsetHeight);	
+         var visibleHeight = Dom.getViewportHeight() - (Dom.getY(elMore) - scrollY + elMore.offsetHeight);
          
          Dom.removeClass(elMoreActions, "hidden");
          
-         if (elMoreActions.offsetHeight > result)
+         if (elMoreActions.offsetHeight > visibleHeight)
          {
-            Dom.setStyle(elMoreActions , "overflowY" , "auto" );
-            Dom.setStyle(elMoreActions , "height" , result + "px" );
+            Dom.setStyle(elMoreActions , "margin-top" , - (elMore.offsetHeight + elMoreActions.offsetHeight + 1) + "px" );
          }
          
          scope.hideMoreActionsFn = function DL_oASM_fnHidePopup()
          {
             scope.hideMoreActionsFn = null;
             
+            Dom.setStyle(elMoreActions , "margin-top" , "" );
             Dom.removeClass(elMore.firstChild, "highlighted");
             Dom.addClass(elMoreActions, "hidden");
          };

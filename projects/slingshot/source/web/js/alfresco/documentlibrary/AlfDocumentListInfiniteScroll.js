@@ -51,7 +51,7 @@ define(["dojo/_base/declare",
        * How close to the bottom of the page do we want to get before we request the next items?
        *
        * @instance
-       * @type {number}
+       * @type {int}
        * @default 500
        */
       scrollTolerance: 500,

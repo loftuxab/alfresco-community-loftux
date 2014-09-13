@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -35,18 +35,22 @@ define(["dojo/_base/declare",
         "dijit/Dialog",
         "alfresco/core/Core",
         "alfresco/core/CoreWidgetProcessing",
+        "alfresco/core/ResizeMixin",
+        "dijit/_FocusMixin",
         "dojo/_base/lang",
         "dojo/sniff",
         "dojo/_base/array",
         "dojo/dom-construct",
         "dojo/dom-class",
         "dojo/dom-style",
+        "dojo/dom-geometry",
         "dojo/html",
         "dojo/aspect",
         "dijit/registry"], 
-        function(declare, Dialog, AlfCore, CoreWidgetProcessing, lang, sniff, array, domConstruct, domClass, domStyle, html, aspect, registry) {
+        function(declare, Dialog, AlfCore, CoreWidgetProcessing, ResizeMixin, _FocusMixin, lang, sniff, array, 
+                 domConstruct, domClass, domStyle, domGeom, html, aspect, registry) {
    
-   return declare([Dialog, AlfCore, CoreWidgetProcessing], {
+   return declare([Dialog, AlfCore, CoreWidgetProcessing, ResizeMixin, _FocusMixin], {
       
       /**
        * An array of the CSS files to use with this widget.
@@ -92,6 +96,18 @@ define(["dojo/_base/declare",
        * @default null 
        */
       widgetsButtons: null,
+
+      /**
+       * In some cases the content placed within the dialog will handle overflow itself, in that
+       * case this should be set to false. However, in most cases the dialog will want to manage
+       * overflow itself. Effectively this means that scroll bars will be added as necessary to 
+       * ensure that the user can see all of the dialog content.
+       *
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      handleOverflow: true,
 
       /**
        * Extends the superclass implementation to set the dialog as not closeable (by clicking an "X"
@@ -155,7 +171,39 @@ define(["dojo/_base/declare",
             html.set(this.bodyNode, this.encodeHTML(this.textContent));
          }
       },
-      
+
+      /**
+       * This is called once the dialog gets focus and at that point it is necessary to resize 
+       * it's contents as this is the final function that is called after the dialog is displayed
+       * and therefore we know it will have dimensions to size against.
+       *
+       * @instance
+       */
+      _onFocus: function alfresco_dialogs_AlfDialog___onFocus() {
+         this.inherited(arguments);
+
+         var computedStyle = domStyle.getComputedStyle(this.containerNode);
+         var output = domGeom.getMarginBox(this.containerNode, computedStyle);
+
+         if (this.widgetsButtons != null && this.widgetsButtons.length > 0)
+         {
+            domStyle.set(this.bodyNode, "height", (output.h - 56) + "px");
+         }
+         else
+         {
+            domStyle.set(this.bodyNode, "height", "100%");
+         }
+         
+         if (this.handleOverflow === true)
+         {
+            domStyle.set(this.bodyNode, "overflow", "auto");
+         }
+
+         this.alfLog("info", "Resizing dialog...");
+         this.alfPublishResizeEvent(this.domNode);
+         // TODO: We could optionally reveal the dialog after resizing to prevent any resizing jumping?
+      },
+
       /**
        * Calls the resize() function
        *
@@ -164,7 +212,10 @@ define(["dojo/_base/declare",
        */
       onResizeRequest: function alfresco_dialogs_AlfDialog__onResizeRequest(payload) {
          this.alfLog("log", "Resizing dialog");
-         this.resize();
+         if (this.domNode != null)
+         {
+            this.resize();
+         }
       },
 
       /**
@@ -176,7 +227,7 @@ define(["dojo/_base/declare",
        * @param {Object[]}
        */
       allWidgetsProcessed: function alfresco_dialogs_AlfDialog__allWidgetsProcessed(widgets) {
-         if (this.creatingButtons == true)
+         if (this.creatingButtons === true)
          {
             // When creating the buttons, attach the handler to each created...
             this._buttons = [];
@@ -202,7 +253,7 @@ define(["dojo/_base/declare",
        * This field is used to keep track of the buttons that are created.
        * 
        * @instance
-       * @type {object[]
+       * @type {object[]}
        * @default null
        */
       _buttons: null,

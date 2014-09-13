@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -28,14 +28,22 @@
  */
 define(["dojo/_base/declare",
         "alfresco/documentlibrary/views/AlfDocumentListView",
+        "dojo/text!./templates/AlfGalleryView.html",
         "alfresco/documentlibrary/views/layouts/Grid",
         "alfresco/documentlibrary/AlfGalleryViewSlider",
         "dojo/_base/lang",
         "dojo/dom-construct"], 
-        function(declare, AlfDocumentListView, Grid, AlfGalleryViewSlider, lang, domConstruct) {
+        function(declare, AlfDocumentListView, template, Grid, AlfGalleryViewSlider, lang, domConstruct) {
    
-   return declare([AlfDocumentListView, Grid], {
+   return declare([AlfDocumentListView], {
       
+      /**
+       * The HTML template to use for the widget.
+       * @instance
+       * @type {String}
+       */
+      templateString: template,
+
       /**
        * Returns the name of the view that is used when saving user view preferences.
        * 
@@ -54,7 +62,7 @@ define(["dojo/_base/declare",
        * @property {string|null} iconClass The class to place next to the label
        */
       viewSelectionConfig: {
-         label: "Gallery View",
+         label: "doclist.view.gallery.label",
          iconClass: "alf-gallery-icon"
       },
       
@@ -70,6 +78,15 @@ define(["dojo/_base/declare",
       },
       
       /**
+       * This is the number of columns to use in the grid.
+       * 
+       * @instance
+       * @type {number}
+       * @default 4
+       */
+      columns: 4,
+
+      /**
        * This function updates the [columns]{@link module:alfresco/documentlibrary/views/AlfGalleryView#columns}
        * attribute with the value attribute of the payload argument and then calls the
        * [renderView]{@link module:alfresco/documentlibrary/views/AlfGalleryView#renderView} function followed by the
@@ -79,14 +96,22 @@ define(["dojo/_base/declare",
        * @param {object}
        */
       updateColumns: function alfresco_documentlibrary_views_AlfGalleryView__updateColumns(payload) {
-         if (payload != null && 
+         if (this.docListRenderer != null && 
+             payload != null && 
              payload.value != null &&
              !isNaN(payload.value) &&
              this.columns != payload.value)
          {
             this.alfLog("log", "Update column count to: ", payload.value);
             this.columns = payload.value;
-            this.renderView();
+
+            // In the case of infinite scroll, we need to ensure that we reset the count for rendering
+            // data so that all the items are re-rendered and sized appropriately...
+            if (lang.exists("docListRenderer.currentData.previousItemCount"), this)
+            {
+               this.docListRenderer.currentData.previousItemCount = 0;
+            }
+            this.renderView(false);
          }
       },
       
@@ -107,33 +132,79 @@ define(["dojo/_base/declare",
        * Extends the default implementation to resize the cells in the gallery.
        * 
        * @instance
+       * @param {boolean} preserveCurrentData This should be set to true when you don't want to clear the old data, the
+       * most common example of this is when infinite scroll is being used.
        */
-      renderView: function alfresco_documentlibrary_views_AlfGalleryView__renderView() {
+      renderView: function alfresco_documentlibrary_views_AlfGalleryView__renderView(preserveCurrentData) {
          this.inherited(arguments);
-         this.resizeCells();
+         if (this.docListRenderer != null)
+         {
+            this.docListRenderer.resizeCells();
+         }
       },
       
+      /**
+       * When set to true this will show a link for requesting more data (if available). This should be used when
+       * the grid is rendering data in an infinite scroll view. It is required because when the grid cells are small
+       * the data may not be sufficient to allow the scrolling events to occur that will request more data.
+       * 
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      showNextLink: false,
+
+      /**
+       * The label to use for the next link. This defaults to null, so MUST be set for the next link to be displayed.
+       * 
+       * @instance
+       * @type {string}
+       * @default null
+       */
+      nextLinkLabel: null,
+
+      /**
+       * The topic to publish when the next link is clicked.
+       * 
+       * @instance
+       * @type {string}
+       * @default "ALF_SCROLL_NEAR_BOTTOM"
+       */
+      nextLinkPublishTopic: "ALF_SCROLL_NEAR_BOTTOM",
+
+      /**
+       * Creates a new [DocumentListRenderer]{@link module:alfresco/documentlibrary/views/DocumentListRenderer}
+       * which is used to render the actual items in the view. This function can be overridden by extending views
+       * (such as the [Film Strip View]{@link module:alfresco/documentlibrary/views/AlfFilmStripView}) to create
+       * alternative widgets applicable to that view.
+       * 
+       * @instance
+       * @returns {object} A new [DocumentListRenderer]{@link module:alfresco/documentlibrary/views/DocumentListRenderer}
+       */
+      createDocumentListRenderer: function alfresco_documentlibrary_views_AlfGalleryView__createDocumentListRenderer() {
+         var dlr = new Grid({
+            id: this.id + "_ITEMS",
+            widgets: lang.clone(this.widgets),
+            currentData: this.currentData,
+            pubSubScope: this.pubSubScope,
+            parentPubSubScope: this.parentPubSubScope,
+            columns: this.columns,
+            showNextLink: this.showNextLink,
+            nextLinkLabel: this.nextLinkLabel,
+            nextLinkPublishTopic: this.nextLinkPublishTopic
+         });
+         return dlr;
+      },
+
       /**
        * Called after the view has been shown (note that [renderView]{@link module:alfresco/documentlibrary/views/AlfDocumentListView#renderView}
        * does not mean that the view has been displayed, just that it has been rendered. 
        * @instance
        */
       onViewShown: function alfresco_documentlibrary_views_AlfGalleryView__onViewShown() {
-         this.resizeCells();
-      },
-      
-      /**
-       * @instance
-       */
-      allItemsRendered: function alfresco_documentlibrary_views_AlfGalleryView__allItemsRendered() {
-         var rem = this.currentData.items.length % this.columns;
-         if (rem != 0)
+         if (this.docListRenderer != null)
          {
-            var lastNode = this.containerNode.children[this.containerNode.children.length-1];
-            for (var i=0; i<rem; i++)
-            {
-               domConstruct.create("TD", {}, lastNode);
-            }
+            this.docListRenderer.resizeCells();
          }
       },
       

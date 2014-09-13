@@ -31,6 +31,7 @@ public class ShareTestProperty
     private final AlfrescoVersion alfrescoVersion;
     private final String shareUrl;
     private final String gridUrl;
+    private String pentahoUserConsoleUrl;
     private final String username;
     private final String password;
     private final String googleUserName;
@@ -46,7 +47,7 @@ public class ShareTestProperty
     private String blogPassword;
     
     public ShareTestProperty (final String shareUrl,
-                              final String gridUrl, 
+                              final String gridUrl,
                               final String username,
                               final String password,
                               final String googleUserName,
@@ -86,6 +87,16 @@ public class ShareTestProperty
     public String getGridUrl()
     {
         return gridUrl;
+    }
+    
+    public String getPentahoUserConsoleUrl()
+    {
+        return pentahoUserConsoleUrl;
+    }
+    
+    public void setPentahoUserConsoleUrl(String pentahoUserConsoleUrl)
+    {
+        this.pentahoUserConsoleUrl = pentahoUserConsoleUrl;
     }
 
     public String getUsername()

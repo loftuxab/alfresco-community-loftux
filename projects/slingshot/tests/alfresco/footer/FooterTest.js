@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,34 +25,32 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, expect, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, expect, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'Footer Test',
       'FooterTest': function () {
          var browser = this.remote;
          var testname = "FooterTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/footer/page_models/Footer_TestPage.json", testname)
-
-         .end()
+         return TestCommon.loadTestWebScript(this.remote, "/TestFooter", testname)
 
          // This isn't the most comprehenive set of tests...
          // 1) It's not obvious how to test that the footer is stuck to the bottom without visually checking
          // 2) Some of the config could be further tested
          // It's good enough as a starting point though.
-         .elementByCss(".alfresco-footer-AlfShareFooter span.copyright span:last-child")
-            .text()
+         .findByCssSelector(".alfresco-footer-AlfShareFooter span.copyright span:last-child")
+            .getVisibleText()
             .then(function (text) {
-               TestCommon.log(testname,43,"Check copyright text");
+               TestCommon.log(testname,"Check copyright text");
                expect(text).to.equal("SOME COPYRIGHT LABEL", "The copyright has not been set correctly");
             })
             .end()
 
-         .elementByCss(".alfresco-footer-AlfShareFooter .licenseHolder")
-            .text()
+         .findByCssSelector(".alfresco-footer-AlfShareFooter .licenseHolder")
+            .getVisibleText()
             .then(function (text) {
-               TestCommon.log(testname,51,"Check license text");
+               TestCommon.log(testname,"Check license text");
                expect(text).to.equal("Licensed To: SOME LICENSE LABEL", "The license label was not set correctly");
             })
             .end()

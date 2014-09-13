@@ -1,9 +1,9 @@
-<span class="alfresco_renderers_InlineEditProperty ${renderedValueClass}" data-dojo-attach-event="onmouseover:showEditIcon,onmouseout:hideEditIcon">
-   <span class="editIcon" data-dojo-attach-point="editIconNode" data-dojo-attach-event="ondijitclick:onEditClick">&nbsp;</span>
+<span class="alfresco-renderers-InlineEditProperty ${renderedValueClass}" data-dojo-attach-event="onmouseover:showEditIcon,onmouseout:hideEditIcon">
    <span data-dojo-attach-point="renderedValueNode" data-dojo-attach-event="onkeypress:onKeyPress" class="${renderedValueClass}" tabindex="0">${renderedValuePrefix}${renderedValue}${renderedValueSuffix}</span>
-   <span data-dojo-attach-point="editNode" class="hidden">
-      <input data-dojo-attach-point="editInputNode" data-dojo-attach-event="onkeypress: onValueEntryKeyPress" type="text" value="${renderedValue}"></input>
-      <span class="action" data-dojo-attach-event="ondijitclick:onSave">Save</span>
-      <span class="action" data-dojo-attach-event="ondijitclick:onCancel">Cancel</span>
+   <span data-dojo-attach-point="editNode" class="editor hidden" data-dojo-attach-event="onkeypress:onValueEntryKeyPress">
+      <span data-dojo-attach-point="formWidgetNode"></span>
+      <span class="action save" data-dojo-attach-event="ondijitclick:onSave" tabindex="0">${saveLabel}</span>
+      <span class="action cancel" data-dojo-attach-event="ondijitclick:onCancel" tabindex="0">${cancelLabel}</span>
    </span>
+   <img class="editIcon" src="${editIconImageSrc}" alt="${editAltText}" title="${editAltText}" data-dojo-attach-point="editIconNode" data-dojo-attach-event="ondijitclick:onEditClick"/>
 </span>

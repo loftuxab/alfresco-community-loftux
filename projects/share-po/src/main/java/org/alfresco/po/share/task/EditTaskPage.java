@@ -59,12 +59,14 @@ public class EditTaskPage extends SharePage
     private static final By ITEM_ROW = By.cssSelector("div[id$='assoc_packageItems-cntrl'] table>tbody.yui-dt-data>tr");
     private static final boolean isViewMoreActionDisplayed = true;
 
-    private static final RenderElement TITLE_ELEMENT = getVisibleRenderElement(By.cssSelector(".alf-menu-title-text"));
+    private static final RenderElement TITLE_ELEMENT = getVisibleRenderElement(By.cssSelector(".alfresco-header-Title"));
     private static final RenderElement EDIT_TASK_HEADER_ELEMENT = getVisibleRenderElement(By.cssSelector("div.task-edit-header h1"));
     // private static final RenderElement TASK_STATUS_ELEMENT = getVisibleRenderElement(By.cssSelector(TASK_STATUS));
     // private static final RenderElement COMMENT_ELEMENT = getVisibleRenderElement(By.cssSelector(COMMENT_TEXTAREA));
     private static final RenderElement SAVE_BUTTON_ELEMENT = getVisibleRenderElement(By.cssSelector(SAVE_BUTTON));
     private static final RenderElement CANCEL_BUTTON_ELEMENT = getVisibleRenderElement(By.cssSelector(CANCEL_BUTTON));
+    
+    private static final String ACCEPT_BUTTON = "button[id*='accept-button']";
 
     /**
      * @param drone
@@ -392,6 +394,28 @@ public class EditTaskPage extends SharePage
         {
         }
         return false;
+    }
+    
+    /**
+     * Mimics the action of clicking the Accept Button.
+     * 
+     * @return the Current Share Page.
+     */
+    public HtmlPage selectAcceptButton()
+    {
+        try
+        {
+            WebElement approveButton = drone.find(By.cssSelector(ACCEPT_BUTTON));
+            String id = approveButton.getAttribute("id");
+            drone.mouseOverOnElement(approveButton);
+            approveButton.click();
+            drone.waitUntilElementDisappears(By.id(id), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+            return FactorySharePage.resolvePage(drone);
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageOperationException("Unable to find Approve button", nse);
+        }
     }
 
 }

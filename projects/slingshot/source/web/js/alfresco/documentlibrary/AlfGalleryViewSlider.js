@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,9 +18,14 @@
  */
 
 /**
+ * This module was created to support the [Gallery View]{@link module:alfresco/documentlibrary/views/AlfGalleryView}
+ * to allow thumbnails to be resized.
+ * 
  * @module alfresco/documentlibrary/AlfGalleryViewSlider
  * @extends dijit/form/HorizontalSlider
  * @mixes module:alfresco/core/Core
+ * @mixes module:alfresco/documentlibrary/views/_AlfAdditionalViewControlMixin
+ * @mixed module:alfresco/services/_PreferenceServiceTopicMixin
  * @author Dave Draper
  */
 define(["dojo/_base/declare",
@@ -81,7 +86,8 @@ define(["dojo/_base/declare",
        */
       postCreate: function alfresco_documentlibrary_AlfGalleryViewSlider__postCreate() {
          this.inherited(arguments);
-         domClass.add(this.domNode, "alf-gallery-view-slider");
+         domClass.add(this.domNode, "alfresco-documentlibrary-AlfGalleryViewSlider");
+         this.set("value", this.getSliderValueFromColumns(this.columns));
          this.alfPublish(this.getPreferenceTopic, {
             preference: "org.alfresco.share.documentList.galleryColumns",
             callback: this.setColumns,
@@ -89,6 +95,15 @@ define(["dojo/_base/declare",
          });
       },
       
+      /**
+       * The number of columns to be represented by the slider.
+       *
+       * @instance
+       * @type {number}
+       * @default 4
+       */
+      columns: 4,
+
       /**
        * @instance
        * @param {number} value The number of columns to set.

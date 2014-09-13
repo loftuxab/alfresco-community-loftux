@@ -18,27 +18,27 @@ define(["./config/Suites"],
       // Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
       // automatically
       capabilities: {
-         'selenium-version': '2.39.0'
+         'selenium-version': '2.42.0'
       },
 
       // Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
       // OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
       // capabilities options specified for an environment will be copied as-is
       environments: [
-         { browserName: 'chrome' },
+         // { browserName: 'chrome' },
          { browserName: 'firefox' }
 //         ,{ browserName: 'phantomjs' }
       ],
 
       // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
-      maxConcurrency: 3,
+      maxConcurrency: 1,
 
-      // Whether or not to start Sauce Connect before running tests
-      useSauceConnect: false,
+      // Dig Dug tunnel handler
+      tunnel: 'NullTunnel',
 
-      // Connection information for the remote WebDriver service.
-      webdriver: {
-         host: '192.168.56.4',
+      // Dig Dug tunnel options
+      tunnelOptions: {
+         hostname: '192.168.56.4',
          port: 4444
       },
 
@@ -46,10 +46,11 @@ define(["./config/Suites"],
       // used here
       loader: {
          // Packages that should be registered with the loader in each testing environment
-	     // Note: the config package is specifically for virtual machine (vm)
+         // Note: the config package is specifically for virtual machine (vm)
          packages: [
             { name: 'alfresco', location: './tests/alfresco' },
-            { name: 'config', location: './tests/config/vm' }
+            { name: 'config', location: './tests/config/vm' },
+            { name: 'reporters', location: './tests/reporters'}
          ]
       },
 
@@ -64,8 +65,9 @@ define(["./config/Suites"],
    
       // An array of code coverage reporters to invoke
       reporters: [
-         'console',
-         'runner'
+         // 'console',
+         // 'runner',
+         'reporters/TestSummary'
       ]
 
    };

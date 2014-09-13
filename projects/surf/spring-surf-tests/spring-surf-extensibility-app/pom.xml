@@ -39,33 +39,31 @@
                   As of version 7.x the plugin was renamed to adapt to standard maven plugin naming.       
             -->
          <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${plugin.jetty.version}</version>
-            <configuration>
+             <groupId>org.mortbay.jetty</groupId>
+             <artifactId>jetty-maven-plugin</artifactId>
+             <version>${plugin.jetty.version}</version>
+             <configuration>
                <scanIntervalSeconds>0</scanIntervalSeconds>
                <scanTargets>
                   <scanTarget>src/main/webapp</scanTarget>
                </scanTargets>
-            </configuration>
-            </plugin>
-            
-            <!--  SureFire plug-in configuration TestNG. This overrides the default SureFire settings
-                  to set the FVT application to test using TestNG rather than JUnit. The reason for this
-                  is so that we can execute the same tests for different configurations of the FVT application
-                  (e.g. with caching switched on/off). -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/cachingEnabledSuite.xml</suiteXmlFile>
-                        <suiteXmlFile>src/test/resources/cachingDisabledSuite.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                </configuration>
-            </plugin>
-            
+             </configuration>
+         </plugin>
+         <!--  SureFire plug-in configuration TestNG. This overrides the default SureFire settings
+               to set the FVT application to test using TestNG rather than JUnit. The reason for this
+               is so that we can execute the same tests for different configurations of the FVT application
+               (e.g. with caching switched on/off). -->
+         <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-surefire-plugin</artifactId>
+             <version>2.6</version>
+             <configuration>
+                 <suiteXmlFiles>
+                     <suiteXmlFile>src/test/resources/cachingEnabledSuite.xml</suiteXmlFile>
+                     <suiteXmlFile>src/test/resources/cachingDisabledSuite.xml</suiteXmlFile>
+                 </suiteXmlFiles>
+             </configuration>
+         </plugin>
       </plugins>
    </build>
    <dependencies>
@@ -73,15 +71,8 @@
       <dependency>
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>jetty</artifactId>
-          <version>6.1.5</version>
-          <type>jar</type>
+          <version>6.1.26</version>
           <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1</artifactId>
-            <version>6.1.5</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- TestNG (used for testing multiple configurations of FVT application -->
@@ -98,81 +89,62 @@
          <artifactId>spring-surf</artifactId>
          <version>${project.version}</version>
       </dependency>
-        <dependency>
-            <groupId>org.springframework.extensions.surf</groupId>
-            <artifactId>spring-webscripts-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
+      <dependency>
+         <groupId>org.springframework.extensions.surf</groupId>
+         <artifactId>spring-webscripts-api</artifactId>
+         <version>${project.version}</version>
+      </dependency>
         
       <!-- Java Servlet -->
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>jstl</artifactId>
-         <version>1.2</version>
       </dependency>
 
       <!-- Log4j -->
       <dependency>
          <groupId>log4j</groupId>
          <artifactId>log4j</artifactId>
-         <version>1.2.14</version>
       </dependency>
 
       <!-- Commons -->
       <dependency>
          <groupId>commons-beanutils</groupId>
          <artifactId>commons-beanutils</artifactId>
-         <version>1.7.0</version>
       </dependency>
       <dependency>
          <groupId>commons-codec</groupId>
          <artifactId>commons-codec</artifactId>
-         <version>1.3</version>
       </dependency>
       <dependency>
          <groupId>commons-collections</groupId>
          <artifactId>commons-collections</artifactId>
-         <version>3.1</version>
       </dependency>
       <dependency>
          <groupId>commons-digester</groupId>
          <artifactId>commons-digester</artifactId>
-         <version>1.6</version>
       </dependency>
       <dependency>
          <groupId>commons-el</groupId>
          <artifactId>commons-el</artifactId>
-         <version>1.0</version>
       </dependency>
       <dependency>
          <groupId>commons-fileupload</groupId>
          <artifactId>commons-fileupload</artifactId>
-         <version>1.3.1</version>
       </dependency>
       <dependency>
          <groupId>commons-io</groupId>
          <artifactId>commons-io</artifactId>
-         <version>2.4</version>
       </dependency>
       <dependency>
          <groupId>commons-logging</groupId>
          <artifactId>commons-logging</artifactId>
-         <version>1.1</version>
-      </dependency>
-
-      <!-- Embedded database -->
-      <dependency>
-         <groupId>hsqldb</groupId>
-         <artifactId>hsqldb</artifactId>
-         <version>1.8.0.7</version>
       </dependency>
 
       <!-- Clean URLs with JSPs -->
       <dependency>
          <groupId>org.tuckey</groupId>
          <artifactId>urlrewritefilter</artifactId>
-         <version>3.1.0</version>
       </dependency>
 
       <!-- Spring Framework Project libraries -->
@@ -190,17 +162,6 @@
          <groupId>org.springframework</groupId>
          <artifactId>spring-context</artifactId>
          <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-         <groupId>org.springframework</groupId>
-         <artifactId>spring-orm</artifactId>
-         <version>${spring.version}</version>
-          <exclusions>
-            <exclusion>
-               <groupId>org.slf4j</groupId>
-               <artifactId>slf4j-jdk14</artifactId>
-            </exclusion>
-          </exclusions>
       </dependency>
       <dependency>
          <groupId>org.springframework</groupId>
@@ -233,37 +194,17 @@
          <artifactId>spring-js</artifactId>
          <version>2.0.7.RELEASE</version>
       </dependency>
-      <!-- Hibernate Project dependencies -->
-      <dependency>
-         <groupId>org.hibernate</groupId>
-         <artifactId>hibernate-entitymanager</artifactId>
-         <version>3.4.0.GA</version>
-         <exclusions>
-            <exclusion>
-               <groupId>xml-apis</groupId>
-               <artifactId>xml-apis</artifactId>
-            </exclusion>
-         </exclusions>
-      </dependency>
-      <!-- Slf4j to Commons Logging Bridge, needed because hibernate uses slf4j -->
-      <dependency>
-         <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jcl</artifactId>
-            <version>1.4.2</version>
-      </dependency>
 
       <!-- Container-provided dependencies-->
       <dependency>
          <groupId>javax.servlet.jsp</groupId>
          <artifactId>jsp-api</artifactId>
-         <version>2.1</version>
          <scope>provided</scope>
       </dependency>
       <!-- Test dependencies -->
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
-         <version>4.7</version>
          <scope>test</scope>
       </dependency>
       <dependency>

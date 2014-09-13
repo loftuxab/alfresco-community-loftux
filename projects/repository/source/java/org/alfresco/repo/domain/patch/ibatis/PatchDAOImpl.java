@@ -28,7 +28,6 @@ import java.util.Set;
 import org.alfresco.ibatis.IdsEntity;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.CrcHelper;
-import org.alfresco.repo.domain.avm.AVMNodeEntity;
 import org.alfresco.repo.domain.locale.LocaleDAO;
 import org.alfresco.repo.domain.node.ChildAssocEntity;
 import org.alfresco.repo.domain.patch.AbstractPatchDAOImpl;
@@ -48,7 +47,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.mybatis.spring.SqlSessionTemplate;
 
 /**
- * iBatis-specific implementation of the AVMPatch DAO.
+ * iBatis-specific implementation of the PatchDAO.
  * 
  * @author janv
  * @since 3.2
@@ -57,17 +56,9 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
 {
     private static Log logger = LogFactory.getLog(PatchDAOImpl.class);
     
-    private static final String SELECT_AVM_NODE_ENTITIES_COUNT_WHERE_NEW_IN_STORE = "alfresco.avm.select_AVMNodeEntitiesCountWhereNewInStore";
-    private static final String SELECT_AVM_NODE_ENTITIES_WITH_EMPTY_GUID = "alfresco.avm.select_AVMNodesWithEmptyGUID";
-    private static final String SELECT_AVM_LD_NODE_ENTITIES_NULL_VERSION = "alfresco.avm.select_AVMNodes_nullVersionLayeredDirectories";
-    private static final String SELECT_AVM_LF_NODE_ENTITIES_NULL_VERSION = "alfresco.avm.select_AVMNodes_nullVersionLayeredFiles";
-    private static final String SELECT_AVM_MAX_NODE_ID = "alfresco.patch.select_avmMaxNodeId";
     private static final String SELECT_ADM_MAX_NODE_ID = "alfresco.patch.select_admMaxNodeId";
-    private static final String SELECT_AVM_NODES_WITH_OLD_CONTENT_PROPERTIES = "alfresco.patch.select_avmNodesWithOldContentProperties";
     private static final String SELECT_ADM_OLD_CONTENT_PROPERTIES = "alfresco.patch.select_admOldContentProperties";
     private static final String SELECT_AUTHORITIES_AND_CRC = "alfresco.patch.select_authoritiesAndCrc";
-    private static final String SELECT_PERMISSIONS_ALL_ACL_IDS = "alfresco.patch.select_AllAclIds";
-    private static final String SELECT_PERMISSIONS_USED_ACL_IDS = "alfresco.patch.select_UsedAclIds";
     private static final String SELECT_PERMISSIONS_MAX_ACL_ID = "alfresco.patch.select_MaxAclId";
     private static final String SELECT_PERMISSIONS_DM_NODE_COUNT = "alfresco.patch.select_DmNodeCount";
     private static final String SELECT_PERMISSIONS_DM_NODE_COUNT_WITH_NEW_ACLS = "alfresco.patch.select_DmNodeCountWherePermissionsHaveChanged";
@@ -78,17 +69,10 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     
     private static final String UPDATE_ADM_OLD_CONTENT_PROPERTY = "alfresco.patch.update_admOldContentProperty";
     private static final String UPDATE_CONTENT_MIMETYPE_ID = "alfresco.patch.update_contentMimetypeId";
-    private static final String UPDATE_AVM_NODE_LIST_NULLIFY_ACL = "alfresco.avm.update_AVMNodeList_nullifyAcl";
-    private static final String UPDATE_AVM_NODE_LIST_SET_ACL = "alfresco.avm.update_AVMNodeList_setAcl";
     private static final String UPDATE_CHILD_ASSOC_CRC = "alfresco.patch.update_childAssocCrc";
     private static final String UPDATE_CREATE_SIZE_CURRENT_PROPERTY = "alfresco.patch.update_CreateSizeCurrentProperty";
     
-    private static final String DELETE_PERMISSIONS_UNUSED_ACES = "alfresco.permissions.delete_UnusedAces";
-    private static final String DELETE_PERMISSIONS_ACL_LIST = "alfresco.permissions.delete_AclList";
-    private static final String DELETE_PERMISSIONS_ACL_MEMBERS_FOR_ACL_LIST = "alfresco.permissions.delete_AclMembersForAclList";
-    
     private static final String SELECT_OLD_ATTR_TENANTS = "alfresco.patch.select_oldAttrTenants";
-    private static final String SELECT_OLD_ATTR_AVM_LOCKS= "alfresco.patch.select_oldAttrAVMLocks";
     private static final String SELECT_OLD_ATTR_PBBS = "alfresco.patch.select_oldAttrPropertyBackedBeans";
     private static final String SELECT_OLD_ATTR_CHAINING_URS = "alfresco.patch.select_oldAttrChainingURS";
     private static final String SELECT_OLD_ATTR_CUSTOM_NAMES = "alfresco.patch.select_oldAttrCustomNames";
@@ -167,67 +151,9 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         */
     }
 
-    @Override
-    protected long getAVMNodeEntitiesCountWhereNewInStore()
-    {
-        Long count = (Long) template.selectOne(SELECT_AVM_NODE_ENTITIES_COUNT_WHERE_NEW_IN_STORE);
-        return count == null ? 0L : count;
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    protected List<AVMNodeEntity> getAVMNodeEntitiesWithEmptyGUID(int maxResults)
-    {
-        if (maxResults < 0)
-        {
-            maxResults = RowBounds.NO_ROW_LIMIT;
-        }
-        
-        return (List<AVMNodeEntity>) template.selectList(SELECT_AVM_NODE_ENTITIES_WITH_EMPTY_GUID, new RowBounds(0, maxResults));
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    protected List<AVMNodeEntity> getNullVersionLayeredDirectoryNodeEntities(int maxResults)
-    {
-        if (maxResults < 0)
-        {
-            maxResults = RowBounds.NO_ROW_LIMIT;
-        }
-        
-        return (List<AVMNodeEntity>) template.selectList(SELECT_AVM_LD_NODE_ENTITIES_NULL_VERSION, new RowBounds(0, maxResults));
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    protected List<AVMNodeEntity> getNullVersionLayeredFileNodeEntities(int maxResults)
-    {
-        if (maxResults < 0)
-        {
-            maxResults = RowBounds.NO_ROW_LIMIT;
-        }
-        
-        return (List<AVMNodeEntity>) template.selectList(SELECT_AVM_LF_NODE_ENTITIES_NULL_VERSION, new RowBounds(0, maxResults));
-    }
-
-    public long getMaxAvmNodeID()
-    {
-        Long count = (Long) template.selectOne(SELECT_AVM_MAX_NODE_ID);
-        return count == null ? 0L : count;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<Long> getAvmNodesWithOldContentProperties(Long minNodeId, Long maxNodeId)
-    {
-        IdsEntity ids = new IdsEntity();
-        ids.setIdOne(minNodeId);
-        ids.setIdTwo(maxNodeId);
-        return (List<Long>) template.selectList(SELECT_AVM_NODES_WITH_OLD_CONTENT_PROPERTIES, ids);
-    }
-
     public long getMaxAdmNodeID()
     {
-        Long count = (Long) template.selectOne(SELECT_ADM_MAX_NODE_ID);
+        Long count = template.selectOne(SELECT_ADM_MAX_NODE_ID);
         return count == null ? 0L : count;
     }
 
@@ -238,7 +164,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         IdsEntity ids = new IdsEntity();
         ids.setIdOne(minNodeId);
         ids.setIdTwo(maxNodeId);
-        return (List<Map<String, Object>>) template.selectList(SELECT_ADM_OLD_CONTENT_PROPERTIES, ids);
+        return template.selectList(SELECT_ADM_OLD_CONTENT_PROPERTIES, ids);
     }
     
     @Override
@@ -282,32 +208,16 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     }
     
     @Override
-    protected int updateAVMNodeEntitiesNullifyAcl(List<Long> nodeIds)
-    {
-        return template.update(UPDATE_AVM_NODE_LIST_NULLIFY_ACL, nodeIds);
-    }
-    
-    @Override
-    protected int updateAVMNodeEntitiesSetAcl(long aclId, List<Long> nodeIds)
-    {
-        IdListOfIdsParam params = new IdListOfIdsParam();
-        params.setId(aclId);
-        params.setListOfIds(nodeIds);
-        
-        return template.update(UPDATE_AVM_NODE_LIST_SET_ACL, params);
-    }
-    
-    @Override
     protected long getMaxAclEntityId()
     {
-        Long count = (Long) template.selectOne(SELECT_PERMISSIONS_MAX_ACL_ID, null);
+        Long count = template.selectOne(SELECT_PERMISSIONS_MAX_ACL_ID, null);
         return count == null ? 0L : count;
     }
     
     @Override
     protected long getDmNodeEntitiesCount()
     {
-        Long count = (Long) template.selectOne(SELECT_PERMISSIONS_DM_NODE_COUNT, null);
+        Long count = template.selectOne(SELECT_PERMISSIONS_DM_NODE_COUNT, null);
         return count == null ? 0L : count;
     }
     
@@ -316,42 +226,10 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     {
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", above);
-        Long count = (Long) template.selectOne(SELECT_PERMISSIONS_DM_NODE_COUNT_WITH_NEW_ACLS, params);
+        Long count = template.selectOne(SELECT_PERMISSIONS_DM_NODE_COUNT_WITH_NEW_ACLS, params);
         return count == null ? 0L : count;
     }
     
-    @SuppressWarnings("unchecked")
-    @Override
-    protected List<Long> selectAllAclEntityIds()
-    {
-        return (List<Long>) template.selectList(SELECT_PERMISSIONS_ALL_ACL_IDS);
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    protected List<Long> selectNonDanglingAclEntityIds()
-    {
-        return (List<Long>) template.selectList(SELECT_PERMISSIONS_USED_ACL_IDS);
-    }
-    
-    @Override
-    protected int deleteDanglingAceEntities()
-    {
-        return template.delete(DELETE_PERMISSIONS_UNUSED_ACES);
-    }
-    
-    @Override
-    protected int deleteAclEntities(List<Long> aclIds)
-    {
-        return template.delete(DELETE_PERMISSIONS_ACL_LIST, aclIds);
-    }
-    
-    @Override
-    protected int deleteAclMemberEntitiesForAcls(List<Long> aclIds)
-    {
-        return template.delete(DELETE_PERMISSIONS_ACL_MEMBERS_FOR_ACL_LIST, aclIds);
-    }
-
     public List<String> getAuthoritiesWithNonUtf8Crcs()
     {
         final List<String> results = new ArrayList<String>(1000);
@@ -378,13 +256,13 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     
     public int getChildAssocCount()
     {
-        return (Integer) template.selectOne(SELECT_CHILD_ASSOCS_COUNT);
+        return template.selectOne(SELECT_CHILD_ASSOCS_COUNT);
     }
     
     @Override
     public Long getMaxChildAssocId()
     {
-        Long maxAssocId = (Long) template.selectOne(SELECT_CHILD_ASSOCS_MAX_ID);
+        Long maxAssocId = template.selectOne(SELECT_CHILD_ASSOCS_MAX_ID);
         return maxAssocId == null ? 0L : maxAssocId;
     }
 
@@ -423,7 +301,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
             
             try
             {
-                List<Map<String, Object>> rows = (List<Map<String, Object>>) template.selectList(SELECT_CHILD_ASSOCS_FOR_CRCS, entity, new RowBounds(0, queryMaxResults));
+                List<Map<String, Object>> rows = template.selectList(SELECT_CHILD_ASSOCS_FOR_CRCS, entity, new RowBounds(0, queryMaxResults));
                 if (results.size() == 0 && rows.size() >= maxResults)
                 {
                     // We have all we need
@@ -528,12 +406,6 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     }
     
     @Override
-    protected void getOldAttrAVMLocksImpl(ResultHandler resultHandler)
-    {
-        template.select(SELECT_OLD_ATTR_AVM_LOCKS, resultHandler);
-    }
-    
-    @Override
     protected void getOldAttrPropertyBackedBeansImpl(ResultHandler resultHandler)
     {
         template.select(SELECT_OLD_ATTR_PBBS, resultHandler);
@@ -549,7 +421,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     @Override
     protected List<String> getOldAttrCustomNamesImpl()
     {
-        return (List<String>)template.selectList(SELECT_OLD_ATTR_CUSTOM_NAMES);
+        return template.selectList(SELECT_OLD_ATTR_CUSTOM_NAMES);
     }
     
     @Override
@@ -597,7 +469,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     @Override
     public List<Map<String, Object>> getAclsThatInheritFromNonPrimaryParent()
     {
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) template.selectList(
+        List<Map<String, Object>> rows = template.selectList(
                 SELECT_ACLS_THAT_INHERIT_FROM_NON_PRIMARY_PARENT,
                 Boolean.TRUE);
         return rows;
@@ -607,7 +479,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     @Override
     public List<Map<String, Object>> getAclsThatInheritWithInheritanceUnset()
     {
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) template.selectList(
+        List<Map<String, Object>> rows = template.selectList(
                 SELECT_ACLS_THAT_INHERIT_WITH_INHERITANCE_UNSET,
                 Boolean.TRUE);
         return rows;
@@ -617,7 +489,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     @Override
     public List<Map<String, Object>> getDefiningAclsThatDoNotInheritCorrectlyFromThePrimaryParent()
     {
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) template.selectList(
+        List<Map<String, Object>> rows = template.selectList(
                 SELECT_DEFINING_ACLS_THAT_DO_NOT_INHERIT_CORRECTLY_FROM_THE_PRIMARY_PARENT,
                 Boolean.TRUE);
         return rows;
@@ -627,7 +499,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     @Override
     public List<Map<String, Object>> getSharedAclsThatDoNotInheritCorrectlyFromThePrimaryParent()
     {
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) template.selectList(
+        List<Map<String, Object>> rows = template.selectList(
                 SELECT_SHARED_ACLS_THAT_DO_NOT_INHERIT_CORRECTLY_FROM_THE_PRIMARY_PARENT,
                 Boolean.TRUE);
         return rows;
@@ -637,7 +509,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     @Override
     public List<Map<String, Object>> getSharedAclsThatDoNotInheritCorrectlyFromTheirDefiningAcl()
     {
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) template.selectList(
+        List<Map<String, Object>> rows = template.selectList(
                 SELECT_SHARED_ACLS_THAT_DO_NOT_INHERIT_CORRECTLY_FROM_THEIR_DEFINING_ACL,
                 Boolean.TRUE);
         return rows;
@@ -654,7 +526,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         }
         IdsEntity params = new IdsEntity();
         params.setIds(new ArrayList<Long>(qnameIds));
-        Long count = (Long) template.selectOne(SELECT_COUNT_NODES_WITH_ASPECTS, params);
+        Long count = template.selectOne(SELECT_COUNT_NODES_WITH_ASPECTS, params);
         if (count == null)
         {
             return 0L;
@@ -674,7 +546,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         params.put("qnameId", typeQNameId);
         params.put("minNodeId", minNodeId);
         params.put("maxNodeId", maxNodeId);
-        return (List<Long>) template.selectList(SELECT_NODES_BY_TYPE_QNAME, params);
+        return template.selectList(SELECT_NODES_BY_TYPE_QNAME, params);
     }
   
     @SuppressWarnings("unchecked")
@@ -685,7 +557,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         params.put("nsId", nsId);
         params.put("minNodeId", minNodeId);
         params.put("maxNodeId", maxNodeId);
-        return (List<Long>) template.selectList(SELECT_NODES_BY_TYPE_URI, params);
+        return template.selectList(SELECT_NODES_BY_TYPE_URI, params);
     }
   
     @SuppressWarnings("unchecked")
@@ -696,7 +568,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         params.put("qnameId", aspectQNameId);
         params.put("minNodeId", minNodeId);
         params.put("maxNodeId", maxNodeId);
-        return (List<Long>) template.selectList(SELECT_NODES_BY_ASPECT_QNAME, params);
+        return template.selectList(SELECT_NODES_BY_ASPECT_QNAME, params);
     }
 
     @SuppressWarnings("unchecked")
@@ -707,7 +579,7 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         params.put("mimetypeId", mimetypeId);
         params.put("minNodeId", minNodeId);
         params.put("maxNodeId", maxNodeId);
-        return (List<Long>) template.selectList(SELECT_NODES_BY_CONTENT_MIMETYPE, params);
+        return template.selectList(SELECT_NODES_BY_CONTENT_MIMETYPE, params);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -79,6 +79,21 @@ define(["dojo/_base/declare",
          this.alfSubscribe("ALF_RETRIEVE_SINGLE_DOCUMENT_REQUEST_SUCCESS", lang.hitch(this, "onDocumentLoaded"));
       },
       
+      /**
+       * If no current item is set but a nodeRef has been provided then publish a request to get the document
+       * with that nodeRef.
+       *
+       * @instance
+       */
+      postCreate: function alfresco_documentlibrary_AlfDocument_postCreate() {
+         if (this.currentItem == null && this.nodeRef != null)
+         {
+            this.alfPublish("ALF_RETRIEVE_SINGLE_DOCUMENT_REQUEST", {
+               nodeRef: this.nodeRef
+            });
+         }
+      },
+
       /**
        * @instance
        * @param {object} payload The details of the document that have been provided.

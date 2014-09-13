@@ -103,15 +103,21 @@ define(["dojo/_base/declare",
        * @instance
        */
       postCreate: function alfresco_documentlibrary_AlfBreadcrumbTrail__postCreate() {
-         this.alfSubscribe(this.metadataChangeTopic, lang.hitch(this, "handleCurrentNodeChange"));
-         this.alfSubscribe(this.filterChangeTopic, lang.hitch(this, "onPathChanged"));
-         this.alfSubscribe(this.showPathTopic, lang.hitch(this, "onShowBreadcrumb"));
-         this.alfSubscribe(this.filterSelectionTopic, lang.hitch(this, "onFilterSelection"));
+         this.alfSubscribe(this.metadataChangeTopic, lang.hitch(this, this.handleCurrentNodeChange));
+         this.alfSubscribe(this.hashChangeTopic, lang.hitch(this, this.onPathChanged));
+         this.alfSubscribe(this.showPathTopic, lang.hitch(this, this.onShowBreadcrumb));
+         this.alfSubscribe(this.filterSelectionTopic, lang.hitch(this, this.onFilterSelection));
+         this.alfSubscribe("ALF_DOCUMENTLIST_CATEGORY_CHANGED", lang.hitch(this, this.onFilterSelection));
+         this.alfSubscribe("ALF_DOCUMENTLIST_TAG_CHANGED", lang.hitch(this, this.onFilterSelection));
 
-         if (this._currentNode != null && this.currentPath != null)
+         if (this.currentPath != null)
          {
-            this._currentFolderUrl = "folder-details?nodeRef=" + this._currentNode.parent.nodeRef;
             this.renderBreadcrumbTrail();
+         }
+         var currentFolderNodeRef = lang.getObject("_currentNode.parent.nodeRef", false, this);
+         if (currentFolderNodeRef != null)
+         {
+            this._currentFolderUrl = "folder-details?nodeRef=" + currentFolderNodeRef;
          }
       },
 
@@ -150,6 +156,7 @@ define(["dojo/_base/declare",
             if (payload.node.parent && payload.node.parent.nodeRef)
             {
                this._currentFolderUrl = "folder-details?nodeRef=" + payload.node.parent.nodeRef;
+               this.renderBreadcrumbTrail();
             }
          }
          else
@@ -169,7 +176,7 @@ define(["dojo/_base/declare",
       currentPath: "",
       
       /**
-       * This handles publications on the [filterChangeTopic]{@link module:alfresco/documentlibrary/_AlfDocumentListTopicMixin#filterChangeTopic}
+       * This handles publications on the [hashChangeTopic]{@link module:alfresco/documentlibrary/_AlfDocumentListTopicMixin#hashChangeTopic}
        * topic and updates the [currentPath]P{@link module:alfresco/documentlibrary/AlfBreadcrumbTrail#currentPath} attribute and calls the
        * [renderBreadcrumbTrail]{@link module:alfresco/documentlibrary/AlfBreadcrumbTrail#renderBreadcrumbTrail} function to re-render the
        * breadcrumb trail.

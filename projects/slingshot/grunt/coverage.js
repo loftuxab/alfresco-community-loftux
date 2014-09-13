@@ -26,39 +26,80 @@
  */
 
 module.exports = function (grunt, alf) {
+
    // Generate a coverage report using the local machine
    grunt.registerTask('coverage-report', 'A task for collecting code coverage reports', function() {
       grunt.option('force', true);
+      grunt.task.run('generate-require-everything');
       grunt.task.run('instrument-code');
       grunt.task.run('copy:instrumentedJs');
-      grunt.task.run('http:clearDependencyCaches');
+      grunt.task.run('hideExistingCoverageReports');
       grunt.task.run('start-node-coverage-server');
-      grunt.task.run('intern:local');
+      grunt.task.run('startUnitTestApp');
+      grunt.task.run('waitServer');
+      grunt.task.run('intern:local_coverage');
       grunt.task.run('merge-reports');
       grunt.task.run('clean-reports');
+      grunt.task.run('showExistingCoverageReports');
       grunt.task.run('copy:uninstrumentedJs');
-      grunt.task.run('http:clearDependencyCaches');
+      // grunt.task.run('http:clearDependencyCaches');
+      grunt.task.run('clean:instrumentedCode');
+      grunt.task.run('shell:stopTestApp');
    });
 
    // Generate a coverage report using a vagrant initialised VM
    // The VM is run up by the task
    grunt.registerTask('vm-coverage-report', 'A task for collecting code coverage reports using a vagrant VM', function() {
+      grunt.task.run('shell:stopTestApp');
       grunt.option('force', true);
+      grunt.task.run('generate-require-everything');
       grunt.task.run('instrument-code');
       grunt.task.run('copy:instrumentedJs');
-      grunt.task.run('http:clearDependencyCaches');
+      grunt.task.run('hideExistingCoverageReports');
       grunt.task.run('start-node-coverage-server');
-      grunt.task.run('intern:dev');
+      grunt.task.run('startUnitTestApp');
+      grunt.task.run('waitServer');
+      grunt.task.run('intern:dev_coverage');
       grunt.task.run('merge-reports');
       grunt.task.run('clean-reports');
+      grunt.task.run('showExistingCoverageReports');
       grunt.task.run('copy:uninstrumentedJs');
-      grunt.task.run('http:clearDependencyCaches');
+      // grunt.task.run('http:clearDependencyCaches');
+      grunt.task.run('clean:instrumentedCode');
    });
-
 
    /* Register additional helper functions 
     * These are used in the above tasks.
     */
+
+   // Generate the RequireEverything widget - a widget listing task, a file write and then a clean of the listing file
+   grunt.registerTask('generate-require-everything', 'A task for listing widgets and then generating the RequireEverything widget from the list', function() {
+      grunt.task.run('folder_list:alf_widgets');
+      grunt.task.run('write-require-everything');
+      grunt.task.run('clean:requireEverythingWidgetsList');
+   });
+
+   // Generate the RequireEverything widget
+   // Should always be run after a 'folder_list:alf_widgets' task
+   grunt.registerTask('write-require-everything', 'A task for writing the RequireEverything widget file', function() {
+
+      var template = grunt.file.read(alf.testResourcesDir + "/" + alf.requireEverythingTemplate),
+          widgetFiles = grunt.file.readJSON(alf.testResourcesDir + "/" + alf.alfWidgetsList),
+          fileList = [];
+
+      // Iterate over widgetFiles, removing unwanted files and topping and tailing the file paths accordingly
+      for (var i=0; i<widgetFiles.length; i++)
+      {
+         var filePath = ((widgetFiles[i].location).replace(alf.requireEverythingWidgetsPrefix, "")).replace(alf.requireEverythingWidgetsSuffix, "");
+         if(alf.requireEverythingExclusions.indexOf(filePath) === -1)
+         {
+            fileList.push("\n\t\"" + filePath + "\"");
+         }
+      }
+
+      grunt.file.write(alf.requireEverythingWidget, template.replace("{0}", fileList.toString()));
+      grunt.log.writeln("Finished writing RequireEverything widget");
+   });
 
    // Merge individual coverage reports in the node coverage server
    // TODO: Give the report a sensible name (e.g. with a timestamp)
@@ -125,19 +166,33 @@ module.exports = function (grunt, alf) {
       {
          grunt.file.mkdir(alf.coverageDirectory);
       }
-      var nodeCoverage = grunt.util.spawn({
-         cmd: 'node',
-         args: ['node_modules/node-coverage/server.js',
-                '--port',
-                '8082',
-                '--report-dir',
-                alf.coverageDirectory],
-         opts: {
-            detached: 'true',
-            stdio : 'inherit'
+      
+      var tcpPortUsed = require('tcp-port-used');
+      tcpPortUsed.check(8082, 'localhost')
+      .then(function(inUse) {
+         if(!inUse)
+         {
+            var nodeCoverage = grunt.util.spawn({
+               cmd: 'node',
+               args: ['node_modules/node-coverage/server.js',
+                      '--port',
+                      '8082',
+                      '--report-dir',
+                      alf.coverageDirectory],
+               opts: {
+                  detached: 'true',
+                  stdio : 'inherit'
+               }
+            }, function(error, result, code) {
+               grunt.log.writeln("Finished spawning node-coverage server...");
+            });
          }
-      }, function(error, result, code) {
-         grunt.log.writeln("Finished spawning node-coverage server...");
+         else
+         {
+            grunt.log.writeln("Node coverage server appears to be running already...");
+         }
+      }, function(err) {
+         console.error('Unknown if coverage server is already running:', err.message);
       });
    });
 }

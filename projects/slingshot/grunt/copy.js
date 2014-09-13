@@ -37,7 +37,7 @@ module.exports = function (grunt, alf) {
                   dest: '',
                   rename: function(dest, src) {
                      var src = src.substring(src.indexOf("source/web/js/alfresco/") + 23);
-                     var newDest = '../../../../software/tomcat-app/webapps/share/js/alfresco/' + src;
+                     var newDest = './target/share/js/alfresco/' + src;
                      return newDest;
                   }
                }
@@ -52,7 +52,7 @@ module.exports = function (grunt, alf) {
                   dest: '',
                   rename: function(dest, src) {
                      var src = src.substring(src.indexOf("source/web/js/alfrescoInst/") + 27);
-                     var newDest = '../../../../software/tomcat-app/webapps/share/js/alfresco/' + src;
+                     var newDest = './target/share/js/alfresco/' + src;
                      return newDest;
                   }
                }
@@ -70,6 +70,30 @@ module.exports = function (grunt, alf) {
                      var newDest = 'node_modules/jsdoc/templates/alfresco/' + src;
                      return newDest;
                   }
+               }
+            ]
+         },
+         // Used for hiding existing coverage reports
+         coverageReportsToTemp: {
+            files: [
+               {
+                  expand: true,
+                  flatten: true,
+                  src: ['code-coverage-reports/*'],
+                  dest: 'code-coverage-reports/temp/',
+                  filter: 'isFile'
+               }
+            ]
+         },
+         // Used for showing existing coverage reports
+         coverageReportsFromTemp: {
+            files: [
+               {
+                  expand: true,
+                  flatten: true,
+                  src: ['code-coverage-reports/temp/*'],
+                  dest: 'code-coverage-reports/',
+                  filter: 'isFile'
                }
             ]
          }

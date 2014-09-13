@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -22,10 +22,11 @@
  */
 define(["intern!object",
         "intern/chai!expect",
+        "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, expect, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, expect, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'PublishPayloadMixinOnActions Test',
@@ -33,92 +34,91 @@ define(["intern!object",
 
          var browser = this.remote;
          var testname = "PublishPayloadMixinOnActionsTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/renderers/page_models/PublishPayloadMixinOnActions_TestPage.json", testname)
-
-         .end()
+         return TestCommon.loadTestWebScript(this.remote, "/PublishPayloadMixinOnActions", testname)
 
          // Check there are 3 action menus as described in the model
-         .elementsByCssSelector("div.alfresco-menus-AlfMenuBar")
-         .then(function (actionmenus) {
-            TestCommon.log(testname,43,"Check there are 3 action menus as described in the model");
-            expect(actionmenus).to.have.length(3, "There should be 3 action menus rendered");
-         })
-         .end()
+         .findAllByCssSelector("div.alfresco-menus-AlfMenuBar")
+            .then(function (actionmenus) {
+               TestCommon.log(testname,"Check there are 3 action menus as described in the model");
+               expect(actionmenus).to.have.length(3, "There should be 3 action menus rendered");
+            })
+            .end()
 
          // Open the first action menu by mouse click
-         .elementByCss("div.dijitMenuItemLabel:nth-of-type(1)")
-         .moveTo()
-         .sleep(500)
-         .click()
-         .sleep(500)
-         .hasElementByCss(".dijitPopup")
-         .then(function(result1) {
-            TestCommon.log(testname,56,"Open the action menu by mouse click");
-            expect(result1).to.equal(true, "The action menu did not appear on mouse clicks");
-         })
-         .end()
+         .findByCssSelector("div.dijitMenuItemLabel:nth-of-type(1)")
+            .click()
+            .end()
+         .findByCssSelector(".dijitPopup")
+            .then(
+               null,
+               function() { assert(false,"The action menu did not appear on mouse clicks")}
+            )
+            .end()
 
-         // Check the menu has appeared
-         .elementByCss(".dijitPopup")
-         .isDisplayed()
-         .then(function(result2) {
-            TestCommon.log(testname,65,"Check the action menu has appeared");
-            expect(result2).to.equal(true, "The action menu should be visible on mouse clicks");
-          })
-         .end()
+         //Check the menu has appeared
+         .findByCssSelector(".dijitPopup")
+            .isDisplayed()
+            .then(function(result2) {
+               TestCommon.log(testname,"Check the action menu has appeared");
+               expect(result2).to.equal(true, "The action menu should be visible on mouse clicks");
+            })
+            .end()
 
          // Click the first button in the action menu
-         .elementByCss(".dijitPopup .dijitMenuItem:nth-of-type(1) .dijitMenuItemLabel")
-         .moveTo()
-         .sleep(500)
-         .click()
-         .sleep(500)
-         .hasElementByCss(TestCommon.pubSubDataCssSelector("last", "alfTopic", "DELETE_ACTION_TOPIC"))
-         .then(function(result3) {
-            TestCommon.log(testname,78,"Check the action selection published as expected after mouse clicks");
-            expect(result3).to.equal(true, "The action menu did not publish on 'DELETE_ACTION_TOPIC' after mouse clicks");
-         })
-         .hasElementByCss(TestCommon.pubSubDataCssSelector("last", "variable1", "red"))
-         .then(function(result4) {
-            TestCommon.log(testname,83,"Check the action selection published the payload as expected after mouse clicks");
-            expect(result4).to.equal(true, "The action menu did not publish the payload with 'variable1' as 'red' after mouse clicks");
-         })
-         .hasElementByCss(TestCommon.pubSubDataCssSelector("last", "variable2", "orange"))
-         .then(function(result5) {
-            TestCommon.log(testname,88,"Check the action selection published the payload as expected after mouse clicks");
-            expect(result5).to.equal(true, "The action menu did not publish the payload with 'variable2' as 'orange' after mouse clicks");
-         })
-         .end()
+         .findByCssSelector(".dijitPopup .dijitMenuItem:nth-of-type(1) .dijitMenuItemLabel")
+            .click()
+            .end()
+         .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "alfTopic", "DELETE_ACTION_TOPIC"))
+            .then(
+               function() {},
+               function() { assert(false,"The action menu did not publish on 'DELETE_ACTION_TOPIC' after mouse clicks")}
+            )
+            .end()
+         .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "variable1", "red"))
+            .then(
+               function() {},
+               function() { assert(false,"The action menu did not publish the payload with 'variable1' as 'red' after mouse clicks") }
+            )
+            .end()
+         .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "variable2", "orange"))
+            .then(
+               function() {},
+               function() { assert(false,"The action menu did not publish the payload with 'variable2' as 'orange' after mouse clicks") }
+            )
+            .end()
 
          // Open the first action menu again
-         .elementByCss("div.dijitMenuItemLabel:nth-of-type(1)")
-         .moveTo()
-         .sleep(500)
-         .click()
-         .end()
+         .findByCssSelector("div.dijitMenuItemLabel:nth-of-type(1)")
+            .click()
+            .end()
 
          // Click the second button in the action menu
-         .elementByCss(".dijitPopup .dijitMenuItem:nth-of-type(2) .dijitMenuItemLabel")
-         .moveTo()
-         .sleep(500)
-         .click()
-         .sleep(500)
-         .hasElementByCss(TestCommon.pubSubDataCssSelector("last", "alfTopic", "MANAGE_ACTION_TOPIC"))
-         .then(function(result6) {
-            TestCommon.log(testname,108,"Check the action selection published as expected after mouse clicks");
-            expect(result6).to.equal(true, "The action menu did not publish on 'MANAGE_ACTION_TOPIC' after mouse clicks");
-         })
-         .hasElementByCss(TestCommon.pubSubDataCssSelector("last", "payloadVariable1", "orange"))
-         .then(function(result7) {
-            TestCommon.log(testname,113,"Check the action selection published the payload as expected after mouse clicks");
-            expect(result7).to.equal(true, "The action menu did not publish the payload with 'payloadVariable1' as 'red' after mouse clicks");
-         })
-         .hasElementByCss(TestCommon.pubSubDataCssSelector("last", "payloadVariable2", "red"))
-         .then(function(result8) {
-            TestCommon.log(testname,118,"Check the action selection published the payload as expected after mouse clicks");
-            expect(result8).to.equal(true, "The action menu did not publish the payload with 'payloadVariable2' as 'orange' after mouse clicks");
-         })
-         .end()
+         .findByCssSelector(".dijitPopup .dijitMenuItem:nth-of-type(2) .dijitMenuItemLabel")
+            .click()
+            .end()
+
+         .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "alfTopic", "MANAGE_ACTION_TOPIC"))
+            .then(
+               null,
+               function() { 
+                  assert(false, "The action menu did not publish the payload with 'payloadVariable1' as 'red' after mouse clicks");
+               }
+            )
+            .end()
+
+         .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "payloadVariable1", "orange"))
+            .then(
+               null,
+               function() {
+                  assert(false,"The action menu did not publish the payload with 'payloadVariable1' as 'red' after mouse clicks");
+               })
+               .end()
+
+         .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "payloadVariable2", "red"))
+            .then(null, function() {
+               assert(false,"The action menu did not publish the payload with 'payloadVariable2' as 'orange' after mouse clicks");
+            })
+            .end()
 
          // Post the coverage results...
          .then(function() {

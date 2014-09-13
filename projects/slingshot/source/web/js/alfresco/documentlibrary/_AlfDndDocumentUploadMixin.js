@@ -77,7 +77,7 @@ define(["dojo/_base/declare",
        * @instance
        */
       constructor: function alfresco_documentlibrary__AlfDndDocumentUploadMixin__constructor() {
-         this.dndUploadCapable = ('draggable' in document.createElement('span')) && YAHOO.env.ua.mobile === null;
+         this.dndUploadCapable = ('draggable' in document.createElement('span'));
       },
       
       /**
@@ -436,14 +436,7 @@ define(["dojo/_base/declare",
        */
       onFileUploadComplete: function alfresco_documentlibrary__AlfDndDocumentUploadMixin__onFileUploadComplete() {
          this.alfLog("log", "Upload complete");
-         if (this._uploadSubHandle != null)
-         {
-            this.alfUnsubscribe(this._uploadSubHandle);
-         }
-         else
-         {
-            this.alfLog("warn", "A subscription handle was not found for processing file upload completion - this could be a potential memory leak", this);
-         }
+         this.alfUnsubscribeSaveHandles([this._uploadSubHandle]);
          this.alfPublish(this.reloadDataTopic, {});
       }
    });

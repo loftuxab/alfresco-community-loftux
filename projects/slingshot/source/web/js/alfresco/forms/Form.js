@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,7 +18,10 @@
  */
 
 /**
- * This is a work-in-progress widget... use with caution.
+ * This is the root module for all Aikau forms. It is intended to work with widgets that extend the
+ * [BaseFormControl]{@link module:alfresco/forms/controls/BaseFormControl} and handles setting and 
+ * getting there values as well as creating and controlling the behaviour of buttons that can be
+ * used to publish the overall value of the controls that the form contains.
  * 
  * @module alfresco/forms/Form
  * @extends dijit/_WidgetBase
@@ -32,20 +35,18 @@ define(["dojo/_base/declare",
         "dijit/_WidgetBase", 
         "dijit/_TemplatedMixin",
         "dijit/form/Form",
-        "dojo/_base/xhr",
         "alfresco/core/Core",
         "alfresco/core/CoreWidgetProcessing",
         "alfresco/documentlibrary/_AlfHashMixin",
         "dojo/text!./templates/Form.html",
         "dojo/io-query",
+        "dojo/hash",
         "dojo/_base/lang",
         "alfresco/buttons/AlfButton",
         "dojo/_base/array",
-        "dojo/json",
-        "dijit/registry",
-        "dojo/hash"], 
-        function(declare, _Widget, _Templated, Form, xhr, AlfCore, CoreWidgetProcessing, _AlfHashMixin, template, 
-                 ioQuery, lang, AlfButton, array, json, registry, hash) {
+        "dijit/registry"], 
+        function(declare, _Widget, _Templated, Form, AlfCore, CoreWidgetProcessing, _AlfHashMixin, template, 
+                 ioQuery, hash, lang, AlfButton, array, registry) {
    
    return declare([_Widget, _Templated, AlfCore, CoreWidgetProcessing, _AlfHashMixin], {
       
@@ -516,6 +517,10 @@ define(["dojo/_base/declare",
                var currHash = ioQuery.queryToObject(hash());
                this.setValue(currHash);
             }
+            else
+            {
+               this.setValue(this.value);
+            }
             
             array.forEach(widgets, function(widget, i) {
                if (widget.publishValue && typeof widget.publishValue == "function")
@@ -524,9 +529,6 @@ define(["dojo/_base/declare",
                }
             });
          }
-
-         
-
 
          this.validate();
 
@@ -551,6 +553,22 @@ define(["dojo/_base/declare",
       },
 
       /**
+       * Focuses on the first field in the form.
+       *
+       * @instance
+       */
+      focus: function alfresco_forms_Form__focus() {
+         if (this._form)
+         {
+            var children = this._form.getChildren();
+            if (children.length > 0 && children[0].wrappedWidget && typeof children[0].wrappedWidget.focus === "function")
+            {
+               children[0].wrappedWidget.focus();
+            }
+         }
+      },
+
+      /**
        * @instance
        * @return {object}
        */
@@ -559,22 +577,9 @@ define(["dojo/_base/declare",
          if (this._form)
          {
             array.forEach(this._form.getChildren(), function(entry, i) {
-
-               // Only include field values if the control is NOT hidden or disabled
-               // unless specifically requested by the configuration. This allows
-               // multiple controls to represent a single field but also allows intentionally
-               // hidden fields to still have data submitted
-               if (((entry._visible !== undefined && entry._visible == false) ||
-                    (entry._disabled !== undefined && entry._disabled == true)) &&
-                   (entry.postWhenHiddenOrDisabled !== undefined && entry.postWhenHiddenOrDisabled == false))
+               if (typeof entry.addFormControlValue === "function")
                {
-                  // Don't set the value (line below is just to allow debug point to be set)
-               }
-               else
-               {
-                  // values[entry.get("name")] = entry.getValue();
-                  // Process dot-notation property names...
-                  lang.setObject(entry.get("name"), entry.getValue(), values);
+                  entry.addFormControlValue(values);
                }
             });
          }
@@ -594,18 +599,13 @@ define(["dojo/_base/declare",
             if (this._form)
             {
                array.forEach(this._form.getChildren(), function(entry, i) {
-                  if (((entry._visible !== undefined && entry._visible == false) ||
-                       (entry._disabled !== undefined && entry._disabled == true)) &&
-                      (entry.noValueUpdateWhenHiddenOrDisabled !== undefined && entry.noValueUpdateWhenHiddenOrDisabled == true))
+                  if (typeof entry.updateFormControlValue === "function")
                   {
-                     // Don't set the value as the field is hidden or disabled and has requested that it not be updated
-                     // in these circumstances. The typical reason for this is that multiple controls represent a single
-                     // field and it is not the displayed control so shouldn't be updated to preserve its default value.
+                     entry.updateFormControlValue(values);
                   }
-                  else
+                  if (typeof entry.publishValue == "function")
                   {
-                     // entry.setValue(values[entry.get("name")]);
-                     entry.setValue(lang.getObject(entry.get("name"), false, values));
+                     entry.publishValue();
                   }
                });
             }
@@ -622,9 +622,9 @@ define(["dojo/_base/declare",
          this.alfLog("log", "Validating form", this._form);
          
          array.forEach(this._processedWidgets, function(widget, i) {
-            if (widget.publishValue && typeof widget.publishValue == "function")
+            if (typeof widget.validateFormControlValue === "function")
             {
-               widget.validate();
+               widget.validateFormControlValue();
             }
          });
 

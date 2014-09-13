@@ -75,39 +75,26 @@ define(["dojo/_base/declare",
       },
       
       /**
-       * Overrides the inherited value to set the "category" filterId.
+       * Overrides the inherited value to set the "ALF_DOCUMENTlIST_CATEGORY_CHANGED" topic.
        * 
        * @instance
        * @type {string}
-       * @default "category"
+       * @default "ALF_DOCUMENTLIST_CATEGORY_CHANGED"
        */
-      onClickFilterId: "category",
-      
+      onClickTopic: "ALF_DOCUMENTLIST_CATEGORY_CHANGED",
+
       /**
        * @instance
+       * @param {object} item The store item represented by the clicked node
+       * @param {object} node The node on the tree that was clicked
+       * @param {object} evt The click event
        */
-      postMixInProperties: function alfresco_navigation_Tree__postMixInProperties() {
-         this.inherited(arguments);
-         
-         // Subscribe to filter change events - in particular we're looking for category filter changes because
-         // they won't be represented by an individual filter object
-         this.alfSubscribe(this.filterChangeTopic, lang.hitch(this, "onFilterChange"));
-      },
-      
-      /**
-       * Provides special case handling for category filtering.
-       * 
-       * @instance onClick
-       * @param {object} payload 
-       */
-      onFilterChange: function alfresco_navigation_Tree__onFilterChange(payload) {
-         if (payload != null && payload.filterId == "category")
-         {
-            this.alfPublish(this.filterSelectionTopic, {
-               value: payload.filterData,
-               description: this.message("filter.classified.label", {"0":payload.filterData})
-            });
-         }
+      onClick: function alfresco_navigation_Tree__onClick(item, node, evt) {
+         this.alfLog("log", "Tree Node clicked", item, node, evt);
+         this.alfPublish(this.onClickTopic, {
+            path: item.path,
+            description: this.message("filter.classified.label", {"0":item.path})
+         });
       }
    });
 });

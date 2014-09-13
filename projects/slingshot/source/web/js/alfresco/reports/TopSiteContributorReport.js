@@ -36,8 +36,36 @@ define(["dojo/_base/declare",
       function(declare, AlfCore, I18nUtils, Report, _NavigationServiceTopicMixin, lang, date, stamp) {
 
          // Lets default the report to show data from the last month
+         var timePeriod = "30D";
          var startDate = stamp.toISOString(date.add(new Date(), "month", -1), { selector: "date" });
          var endDate = stamp.toISOString(new Date(), { selector: "date" });
+         var now = stamp.toISOString(new Date(), { selector: "date" });
+
+         var getStartDate = function() {
+            switch (timePeriod)
+            {
+               case "TODAY":
+                  return now;
+               case "7D":
+                   return stamp.toISOString(date.add(new Date(), "day", -7), { selector: "date" });
+               case "30D":
+                   return stamp.toISOString(date.add(new Date(), "day", -30), { selector: "date" });
+               case "YEAR":
+                   return stamp.toISOString(date.add(new Date(), "year", -1), { selector: "date" });
+               case "CUSTOM":
+                   return startDate;
+               default:
+                  break;
+            }
+             return startDate;
+         };
+         var getEndDate = function() {
+            if (timePeriod == "CUSTOM") {
+               return endDate;
+            } else {
+               return now;
+            }
+         };
 
          var i18nScope = "alfresco.reports.TopSiteContributorReport";
 
@@ -102,28 +130,90 @@ define(["dojo/_base/declare",
              */
             widgets: [
                {
-                  name: "alfresco/forms/Form",
+                  name: "alfresco/layout/VerticalWidgets",
                   config: {
-                     displayButtons: false,
-                     validFormValuesPublishTopic: "SHOW_CONTRIBUTORS_BY_DATE",
-                     validFormValuesPublishOnInit: false,
+                     additionalCssClasses: "bottom-border",
                      widgets: [
-                        {
-                           name: "alfresco/forms/controls/DojoDateTextBox",
-                           config: {
-                              name: "startDate",
-                              value: startDate,
-                              label: I18nUtils.msg(i18nScope, "startDate")
-                           }
-                        },
-                        {
-                           name: "alfresco/forms/controls/DojoDateTextBox",
-                           config: {
-                              name: "endDate",
-                              value: endDate,
-                              label: I18nUtils.msg(i18nScope, "endDate")
-                           }
-                        }
+                         {
+                            name: "alfresco/forms/Form",
+                            config: {
+                               displayButtons: false,
+                               validFormValuesPublishTopic: "SHOW_CONTRIBUTORS_BY_DATE",
+                               validFormValuesPublishOnInit: false,
+                               widgets: [
+                                  {
+                                      name: "alfresco/forms/controls/DojoSelect",
+                                      config: {
+                                         fieldId: "TIME_PERIOD",
+                                         name: "timePeriod",
+                                         value: timePeriod,
+                                         label: "",
+                                         description: I18nUtils.msg(i18nScope, "timePeriod"),
+                                         optionsConfig: {
+                                            fixed: [
+                                               {
+                                                  label: I18nUtils.msg(i18nScope, "timePeriod-today"),
+                                                  value: "TODAY"
+                                               },
+                                               {
+                                                  label: I18nUtils.msg(i18nScope, "timePeriod-7d"),
+                                                  value: "7D"
+                                               },
+                                               {
+                                                  label: I18nUtils.msg(i18nScope, "timePeriod-30d"),
+                                                   value: "30D"
+                                               },
+                                               {
+                                                  label: I18nUtils.msg(i18nScope, "timePeriod-year"),
+                                                  value: "YEAR"
+                                               },
+                                               {
+                                                  label: I18nUtils.msg(i18nScope, "timePeriod-custom"),
+                                                  value: "CUSTOM"
+                                               }
+                                            ]
+                                         }
+                                      }
+                                  },
+                                  {
+                                     name: "alfresco/forms/controls/DojoDateTextBox",
+                                     config: {
+                                        name: "startDate",
+                                        value: startDate,
+                                        label: "",
+                                        description: I18nUtils.msg(i18nScope, "startDate"),
+                                        visibilityConfig: {
+                                           initialValue: false,
+                                           rules: [
+                                              {
+                                                 targetId: "TIME_PERIOD",
+                                                 is: ["CUSTOM"]
+                                              }
+                                           ]
+                                        }
+                                     }
+                                  },
+                                  {
+                                     name: "alfresco/forms/controls/DojoDateTextBox",
+                                     config: {
+                                        name: "endDate",
+                                        value: endDate,
+                                        label: "-",
+                                        description: I18nUtils.msg(i18nScope, "endDate"),
+                                        visibilityConfig: {
+                                           initialValue: false,
+                                           rules: [
+                                              {
+                                                 targetId: "TIME_PERIOD",
+                                                 is: ["CUSTOM"]
+                                              }
+                                           ]
+                                        }
+                                     }
+                                  }
+                               ]
+                            }
+                         }
                      ]
                   }
                },
@@ -134,20 +224,25 @@ define(["dojo/_base/declare",
                      dataRequestTopic: "ALF_RETRIEVE_TOP_SITE_CONTRIBUTOR_REPORT",
                      dataRequestPayload: {
                         site: Alfresco.constants.SITE,
-                        startDate: startDate,
-                        endDate: endDate
+                        startDate: getStartDate(),
+                        endDate: getEndDate()
                      },
                      subscriptionTopic: "SHOW_CONTRIBUTORS_BY_DATE",
                      widgets: [
                         {
-                           name: "alfresco/charts/ccc/DonutChart",
+                           name: "alfresco/charts/ccc/PieChart",
                            config: {
                               readers: [
                                  { names: 'category', indexes: 0 },
                                  { names: 'value', indexes: 2 }
                               ],
-                              selectable: true,
+                              explodedSliceRadius: null,
+                              selectable: false,
                               hoverable:  true,
+                              extensionPoints: {
+                                 slice_innerRadiusEx: '55%',
+                                 slice_strokeStyle: 'white'
+                              },
                               clickTopic: "REPORT_ITEM_CLICKED",
                               tooltip: {
                                  format: function(scene){

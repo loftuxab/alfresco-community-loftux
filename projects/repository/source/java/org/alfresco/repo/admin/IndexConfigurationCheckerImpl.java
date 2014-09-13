@@ -23,8 +23,6 @@ import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.node.index.FullIndexRecoveryComponent.RecoveryMode;
-import org.alfresco.repo.search.AVMSnapShotTriggeredIndexingMethodInterceptor;
-import org.alfresco.repo.search.IndexMode;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidStoreRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -51,7 +49,6 @@ public class IndexConfigurationCheckerImpl implements IndexConfigurationChecker
     private RecoveryMode indexRecoveryMode;
     private NodeService nodeService;
     private SearchService searchService;
-    private AVMSnapShotTriggeredIndexingMethodInterceptor avmSnapShotTriggeredIndexingMethodInterceptor;
     
     /**
      * Set the index recovert mode
@@ -83,20 +80,6 @@ public class IndexConfigurationCheckerImpl implements IndexConfigurationChecker
         this.searchService = searchService;
     }
 
-    /**
-     * avm trigger 
-     * @param avmSnapShotTriggeredIndexingMethodInterceptor
-     */
-    public void setAvmSnapShotTriggeredIndexingMethodInterceptor(AVMSnapShotTriggeredIndexingMethodInterceptor avmSnapShotTriggeredIndexingMethodInterceptor)
-    {
-        this.avmSnapShotTriggeredIndexingMethodInterceptor = avmSnapShotTriggeredIndexingMethodInterceptor;
-    }
-
-
-
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.admin.IndexConfigurationChecker#checkIndexConfiguration()
-     */
     @Override
     public List<StoreRef> checkIndexConfiguration()
     {
@@ -105,7 +88,6 @@ public class IndexConfigurationCheckerImpl implements IndexConfigurationChecker
         List<StoreRef> missingIndexStoreRefs = new ArrayList<StoreRef>(0);
         for (StoreRef storeRef : storeRefs)
         {
-            @SuppressWarnings("unused")
             NodeRef rootNodeRef = null;
             try
             {
@@ -127,30 +109,6 @@ public class IndexConfigurationCheckerImpl implements IndexConfigurationChecker
             
             if (indexRecoveryMode != RecoveryMode.FULL)
             {
-                if (storeRef.getProtocol().equals(StoreRef.PROTOCOL_AVM))
-                {
-                    if (avmSnapShotTriggeredIndexingMethodInterceptor.isIndexingEnabled())
-                    {
-                        IndexMode storeIndexMode = avmSnapShotTriggeredIndexingMethodInterceptor.getIndexMode(storeRef.getIdentifier());
-                        if (storeIndexMode.equals(IndexMode.UNINDEXED))
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Skipping index check for store: " + storeRef + " (unindexed AVM store)");
-                            }
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Skipping index check for store: " + storeRef + " (AVM indexing is disabled)");
-                        }
-                        continue;
-                    }
-                }
-                
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Checking index for store: " + storeRef);

@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -31,6 +32,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.events.types.Event;
+import org.alfresco.events.types.UserManagementEvent;
 import org.alfresco.model.ContentModel;
 import org.alfresco.query.CannedQueryFactory;
 import org.alfresco.query.CannedQueryResults;
@@ -40,6 +43,8 @@ import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.cache.TransactionalCache;
 import org.alfresco.repo.domain.permissions.AclDAO;
+import org.alfresco.repo.events.EventPreparator;
+import org.alfresco.repo.events.EventPublisher;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
@@ -148,6 +153,7 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
     private String duplicateMode = LEAVE;
     private boolean lastIsBest = true;
     private boolean includeAutoCreated = false;
+    private EventPublisher eventPublisher;
     
     private NamedObjectRegistry<CannedQueryFactory<NodeRef>> cannedQueryRegistry;
     
@@ -972,7 +978,7 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
                     getPeopleContainer(),
                     ContentModel.ASSOC_CHILDREN,
                     getChildNameLower(userName), // Lowercase:
-                    ContentModel.TYPE_PERSON, properties).getChildRef();
+                    ContentModel.TYPE_PERSON, properties).getChildRef();         
         }
         finally
         {
@@ -990,6 +996,8 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
         }
         
         removeFromCache(userName, false);
+        
+        publishEvent("user.create", this.nodeService.getProperties(personRef));
         
         return personRef;
     }
@@ -1752,6 +1760,7 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
         {
             makeHomeFolderAsSystem(childAssocRef);
         }
+
     }
     
     private QName getChildNameLower(String userName)
@@ -1982,6 +1991,59 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
                 throw new UnsupportedOperationException("The user name on a person can not be changed");
             }
         }
+        
+        
+        if(validUserUpdateEvent(before, after))
+        {
+        	publishEvent("user.update", after);
+        }
+      
+    }
+    
+    /**
+     * Determine if the updated properties constitute a valid user update.
+     * Currently we only check for updates to the user firstname, lastname
+     * 
+     * @param before
+     * @param after
+     * @return
+     */
+    private boolean validUserUpdateEvent(Map<QName, Serializable> before, Map<QName, Serializable> after)
+    {
+    	final String firstnameBefore = (String)before.get(ContentModel.PROP_FIRSTNAME);
+        final String lastnameBefore  = (String)before.get(ContentModel.PROP_LASTNAME);
+        final String firstnameAfter  = (String)after.get(ContentModel.PROP_FIRSTNAME);
+        final String lastnameAfter   = (String)after.get(ContentModel.PROP_LASTNAME);
+        
+        boolean updatedFirstName = !EqualsHelper.nullSafeEquals(firstnameBefore, firstnameAfter);
+        boolean updatedLastName  = !EqualsHelper.nullSafeEquals(lastnameBefore, lastnameAfter);
+        
+        return updatedFirstName || updatedLastName;
+    }
+    
+    /**
+     * Publish new user event
+     * 
+     * @param eventType
+     * @param properties
+     */
+    private void publishEvent(String eventType,  Map<QName, Serializable> properties)
+    {
+    	if(properties == null)	return;
+    	
+   	 	final String managedUsername  = (String)properties.get(ContentModel.PROP_USERNAME);
+        final String managedFirstname = (String)properties.get(ContentModel.PROP_FIRSTNAME);
+        final String managedLastname  = (String)properties.get(ContentModel.PROP_LASTNAME);
+        final String eventTType 	  = eventType;
+        
+        eventPublisher.publishEvent(new EventPreparator(){
+            @Override
+            public Event prepareEvent(String user, String networkId, String transactionId)
+            {         
+            	return new UserManagementEvent(eventTType , transactionId, networkId,new Date().getTime(), 
+            			user, managedUsername,managedFirstname,managedLastname);
+            }
+        });
     }
     
     /**
@@ -2141,4 +2203,11 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
 
         return true;
     }
+
+	public void setEventPublisher(EventPublisher eventPublisher) 
+	{
+		this.eventPublisher = eventPublisher;
+	}
+    
+    
 }

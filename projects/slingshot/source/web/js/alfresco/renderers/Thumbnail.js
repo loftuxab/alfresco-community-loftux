@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -24,6 +24,10 @@
  * @extends dijit/_WidgetBase
  * @mixes dijit/_TemplatedMixin
  * @mixes module:alfresco/renderers/_JsNodeMixin
+ * @mixes module:alfresco/node/DraggableNodeMixin
+ * @mixes module:alfresco/renderers/_PublishPayloadMixin
+ * @mixes module:alfresco/node/NodeDropTargetMixin
+ * @mixes module:dijit/_OnDijitClickMixin
  * @author Dave Draper
  */
 define(["dojo/_base/declare",
@@ -32,6 +36,7 @@ define(["dojo/_base/declare",
         "alfresco/renderers/_JsNodeMixin",
         "alfresco/node/DraggableNodeMixin",
         "alfresco/node/NodeDropTargetMixin",
+        "alfresco/renderers/_PublishPayloadMixin",
         "dijit/_OnDijitClickMixin",
         "dojo/text!./templates/Thumbnail.html",
         "alfresco/core/Core",
@@ -40,11 +45,13 @@ define(["dojo/_base/declare",
         "service/constants/Default",
         "dojo/_base/lang",
         "dojo/_base/event",
+        "dojo/dom-style",
         "alfresco/core/NodeUtils"], 
-        function(declare, _WidgetBase, _TemplatedMixin, _JsNodeMixin, DraggableNodeMixin, NodeDropTargetMixin, _OnDijitClickMixin, template, AlfCore, 
-                 _ItemLinkMixin, _AlfDndDocumentUploadMixin, AlfConstants, lang, event, NodeUtils) {
+        function(declare, _WidgetBase, _TemplatedMixin, _JsNodeMixin, DraggableNodeMixin, NodeDropTargetMixin, 
+                 _PublishPayloadMixin, _OnDijitClickMixin, template, AlfCore, _ItemLinkMixin, _AlfDndDocumentUploadMixin, 
+                 AlfConstants, lang, event, domStyle, NodeUtils) {
 
-   return declare([_WidgetBase, _TemplatedMixin, _OnDijitClickMixin, _JsNodeMixin, DraggableNodeMixin, NodeDropTargetMixin, AlfCore, _ItemLinkMixin, _AlfDndDocumentUploadMixin], {
+   return declare([_WidgetBase, _TemplatedMixin, _OnDijitClickMixin, _JsNodeMixin, DraggableNodeMixin, NodeDropTargetMixin, AlfCore, _ItemLinkMixin, _AlfDndDocumentUploadMixin, _PublishPayloadMixin], {
       
       /**
        * An array of the CSS files to use with this widget.
@@ -82,7 +89,7 @@ define(["dojo/_base/declare",
          this.imgAltText = "";
          this.imgTitle = "";
 
-         if (this.currentItem != null && this.currentItem.node)
+         if (this.currentItem != null && this.currentItem.jsNode)
          {
             var jsNode = this.currentItem.jsNode;
             this.thumbnailUrl = this.generateThumbnailUrl();
@@ -90,12 +97,13 @@ define(["dojo/_base/declare",
             {
                this.currentItem.displayName = jsNode.properties["cm:name"];
             }
-            this.imgTitle = this.encodeHTML(this.currentItem.displayName);
-            this.imgAltText = (this.currentItem.displayName != null) ? this.currentItem.displayName.substring(this.currentItem.displayName.lastIndexOf(".")) : "";
-            this.imgId = jsNode.nodeRef.nodeRef;
+            this.setImageTitle();
          }
          else if (this.currentItem != null && this.currentItem.nodeRef != null)
          {
+            this.imageIdProperty = "nodeRef";
+            this.setImageTitle();
+
             // Fallback to just having a nodeRef available... this has been added to handle rendering of 
             // thumbnails in search results where full node information may not be available...
             var nodeRef = NodeUtils.processNodeRef(this.currentItem.nodeRef);
@@ -105,12 +113,53 @@ define(["dojo/_base/declare",
             }
             else if (this.currentItem.type === "document")
             {
-               this.thumbnailUrl = AlfConstants.PROXY_URI + "api/node/" + nodeRef.uri + "/content/thumbnails/doclib/?c=queue&ph=true&lastModified=" + this.currentItem.modifiedOn;
+               this.thumbnailUrl = this.generateRenditionSpecificThumbnailUrl(nodeRef.uri);
+               if (this.thumbnailUrl === null)
+               {
+                  this.thumbnailUrl = AlfConstants.PROXY_URI + "api/node/" + nodeRef.uri + "/content/thumbnails/" + this.renditionName + "/?c=queue&ph=true&lastModified=" + this.currentItem.modifiedOn;
+               }
             }
             else
             {
                this.thumbnailUrl = this.generateFallbackThumbnailUrl();
             }
+         }
+      },
+
+      /**
+       * The property to use for the image title. Defaults to "displayName"
+       *
+       * @instance
+       * @type {string}
+       * @default "displayName"
+       */
+      imageTitleProperty: "displayName",
+
+      /**
+       * The property to use for the image id. Defaults to "jsNode.nodeRef.nodeRef"
+       * 
+       * @instance
+       * @type {string}
+       * @default "jsNode.nodeRef.nodeRef"
+       */
+      imageIdProperty: "jsNode.nodeRef.nodeRef",
+
+      /**
+       * Sets the title to display over the thumbnail
+       *
+       * @instance
+       */
+      setImageTitle: function alfresco_renderers_Thumbnail__setImageTitle() {
+         var title = this.currentItem[this.imageTitleProperty];
+         if (title)
+         {
+            this.imgTitle = this.encodeHTML(title);
+            this.imgAltText = (title != null) ? title.substring(title.lastIndexOf(".")) : "";
+         }
+         var id = this.currentItem[this.imageIdProperty];
+         if (id)
+         {
+            this.imgId = id;
          }
       },
 
@@ -121,16 +170,26 @@ define(["dojo/_base/declare",
        * @returns {string} The URL for the thumbnail.
        */
       generateFallbackThumbnailUrl: function alfresco_renderers_Thumbnail__generateFallbackThumbnailUrl() {
-         return this.thumbnailUrl = AlfConstants.URL_RESCONTEXT + "components/search/images/generic-result.png";
+         return AlfConstants.URL_RESCONTEXT + "components/search/images/generic-result.png";
       },
       
+      /**
+       * The name of the folder image to use. Valid options are: "folder-32.png", "folder-48.png", "folder-64.png"
+       * and "folder-256.png". The default is "folder-64.png".
+       *
+       * @instance
+       * @type {string}
+       * @default "folder-64.png"
+       */
+      folderImage: "folder-64.png",
+
       /**
        * Returns a URL to the image to use when rendering a folder
        * 
        * @instance
        */
       getFolderImage: function alfresco_renderers_Thumbnail__getDefaultFolderImage() {
-         return AlfConstants.URL_RESCONTEXT + "components/documentlibrary/images/folder-64.png";
+         return require.toUrl("alfresco/renderers") + "/css/images/" + this.folderImage;
       },
       
       /**
@@ -141,6 +200,15 @@ define(["dojo/_base/declare",
        */
       renditionName: "doclib",
       
+      /**
+       * 
+       *
+       * @instance
+       * @type {string}
+       * @default
+       */
+      lastThumbnailModificationProperty: "currentItem.jsNode.properties.cm:lastThumbnailModification",
+
       /**
        * Generates the URL to use as the source of the thumbnail.
        * 
@@ -154,7 +222,7 @@ define(["dojo/_base/declare",
          {
             this.renditionName = "doclib";
          }
-         if (this.currentItem != null && this.currentItem.node)
+         if (this.currentItem != null && this.currentItem.jsNode)
          {
             var jsNode = this.currentItem.jsNode;
             if (jsNode.isContainer || (jsNode.isLink && jsNode.linkedNode.isContainer))
@@ -164,18 +232,7 @@ define(["dojo/_base/declare",
             else
             {
                var nodeRef = jsNode.isLink ? jsNode.linkedNode.nodeRef : jsNode.nodeRef;
-               if (jsNode.properties["cm:lastThumbnailModification"])
-               {
-                  var thumbnailModData = jsNode.properties["cm:lastThumbnailModification"];
-                  for (var i = 0; i < thumbnailModData.length; i++)
-                  {
-                     if (thumbnailModData[i].indexOf(this.renditionName) != -1)
-                     {
-                        url = AlfConstants.PROXY_URI + "api/node/" + nodeRef.uri + "/content/thumbnails/" + this.renditionName + "?c=queue&ph=true&lastModified=" + thumbnailModData[i];
-                        break;
-                     }
-                  }
-               }
+               url = this.generateRenditionSpecificThumbnailUrl(nodeRef.uri);
             }
          }
          if (url == null)
@@ -186,18 +243,56 @@ define(["dojo/_base/declare",
       },
       
       /**
+       * Attempts to retrieve a thumbnail URL for a specific rendition. It ensures that the rendition has been
+       * generated by inspecting that there is a timestamp for the [renditionName]{@link module:alfresco/renderers/Thumbnail#renditionName}
+       * in the [modification property]{@link module:alfresco/renderers/Thumbnail#lastThumbnailModificationProperty}
+       *
+       * @instance
+       * @param {string} nodeRefUri The URI compatible nodeRef value
+       * @returns {string} The URL of the thumbnail if available
+       */
+      generateRenditionSpecificThumbnailUrl: function alfresco_renderers_Thumbnail__generateRenditionSpecificThumbnailUrl(nodeRefUri) {
+         var url = null;
+         var thumbnailModData = lang.getObject(this.lastThumbnailModificationProperty, false, this);
+         if (thumbnailModData)
+         {
+            for (var i = 0; i < thumbnailModData.length; i++)
+            {
+               if (thumbnailModData[i].indexOf(this.renditionName) != -1)
+               {
+                  url = AlfConstants.PROXY_URI + "api/node/" + nodeRefUri + "/content/thumbnails/" + this.renditionName + "?c=queue&ph=true&lastModified=" + thumbnailModData[i];
+                  break;
+               }
+            }
+         }
+         return url;
+      },
+
+      /**
        * 
        * @instance
        */
       postCreate: function alfresco_renderers_Thumbnail__postCreate() {
          this.inherited(arguments);
          var isContainer = lang.getObject("currentItem.jsNode.isContainer", false, this);
-         if (isContainer == true)
+         if (isContainer === true)
          {
             this.addUploadDragAndDrop(this.imgNode);
             this.addNodeDropTarget(this.imgNode);
          }
-         // this.createItemLink(this.domNode);
+
+         // If no topic has been provided then set up a default one (presumed to be for use
+         // in a document library)...
+         if (this.publishTopic == null)
+         {
+            this.publishPayload = {};
+            this.publishTopic = this.generateFileFolderLink(this.publishPayload);
+            this.publishGlobal = true;
+         }
+         else if (this.publishPayload != null)
+         {
+            this.publishPayload = this.getGeneratedPayload(false, null);
+         }
       },
 
       /**
@@ -211,7 +306,7 @@ define(["dojo/_base/declare",
       onLinkClick: function alfresco_renderers_Thumbnail__onLinkClick(evt) {
          event.stop(evt);
          // var publishTopic = this.getPublishTopic();
-         if (this.publishTopic == null || lang.trim(this.publishTopic) == "")
+         if (this.publishTopic == null || lang.trim(this.publishTopic) === "")
          {
             this.alfLog("warn", "No publishTopic provided for PropertyLink", this);
          }
@@ -219,21 +314,8 @@ define(["dojo/_base/declare",
          {
             var publishGlobal = (this.publishGlobal != null) ? this.publishGlobal : false;
             var publishToParent = (this.publishToParent != null) ? this.publishToParent : false;
-            this.alfPublish(this.publishTopic, this.getPublishPayload(), publishGlobal, publishToParent);
+            this.alfPublish(this.publishTopic, this.publishPayload, publishGlobal, publishToParent);
          }
-      },
-
-      /**
-       * This function currently returns the configured payload. It needs to be updated to 
-       * actually return something contextually relevant to the current item. It has been added
-       * to support extending modules.
-       *
-       * @instance
-       * @returns {object} The payload to publish when the thumbnail is clicked.
-       */
-      getPublishPayload: function alfresco_renderers_Thumbnail__getPublishPayload() {
-         // TODO: This needs to be implemented to handle links for the Document Library.
-         return this.publishPayload;
       }
    });
 });

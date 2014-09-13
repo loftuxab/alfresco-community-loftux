@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,36 +25,34 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, expect, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, expect, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'SingleTextFieldFormTest',
       'Forms': function () {
          var browser = this.remote;
          var testname = "SingleTextFieldFormTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/forms/page_models/SingleTextFieldForm_TestPage.json", testname)
-
-         .end()
+         return TestCommon.loadTestWebScript(this.remote, "/SingleTextFieldForm", testname)
 
          // 1. Test that enter won't submit without any data in the field...
-         .elementByCss("#STFF1 .dijitInputContainer input")
-            .keys(specialKeys["Return"])
-            .elementsByCss(TestCommon.topicSelector("TEST_PUBLISH", "publish", "any"))
-               .then(function(elements) {
-                  TestCommon.log(testname,45,"Check enter key cannot be used to submit data if field is empty");
-                  assert(elements.length == 0, "Test #1 - enter key submitted data on empty field");
-               })
+         .findByCssSelector("#STFF1 .dijitInputContainer input")
+            .pressKeys(keys.RETURN)
+            .end()
+
+         .findAllByCssSelector(TestCommon.topicSelector("TEST_PUBLISH", "publish", "any"))
+            .then(function(elements) {
+               assert(elements.length == 0, "Test #1 - enter key submitted data on empty field");
+            })
             .end()
 
          // 2. Test entering some text and hitting enter (rather than the OK button)...
-         .elementByCss("#STFF1 .dijitInputContainer input")
+         .findByCssSelector("#STFF1 .dijitInputContainer input")
             .type("test")
-            .keys(specialKeys["Return"])
+            .pressKeys(keys.RETURN)
             .end()
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "search", "test"))
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "search", "test"))
             .then(function(elements) {
-               TestCommon.log(testname,47,"Check enter key can be used to submit data");
                assert(elements.length == 1, "Test #2 - enter key doesn't submit data");
             })
             .end()

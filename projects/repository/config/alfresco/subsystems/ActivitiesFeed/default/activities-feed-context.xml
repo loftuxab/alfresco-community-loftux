@@ -26,6 +26,10 @@
       <property name="maxFeedItems" value="${activities.feed.max.size}"/>
    </bean>
    
+   <bean id="ffActivitiesPoster" class="org.alfresco.service.cmr.activities.FileFolderActivityPosterImpl">
+      <property name="activityService" ref="activityService" />
+   </bean>
+   
    <!-- cleans out-of-date feed entries -->
    <bean id="feedCleaner" class="org.alfresco.repo.activities.feed.cleanup.FeedCleaner" init-method="init">
       <property name="feedDAO" ref="feedDAO"/>
@@ -85,7 +89,7 @@
    <!-- Local (non-grid-based) Feed Generator -->
    
    <bean id="feedGenerator" class="org.alfresco.repo.activities.feed.local.LocalFeedGenerator" parent="baseFeedGenerator">
-      <property name="feedTaskProcessor" ref="feedTaskProcessor"/>
+      <property name="feedTaskProcessor" ref="FeedTaskProcessor"/>
    </bean>
    
    <bean id="feedTaskProcessor" class="org.alfresco.repo.activities.feed.local.LocalFeedTaskProcessor">
@@ -113,6 +117,20 @@
       
    </bean>
    
+   <bean id="FeedTaskProcessor" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyTargetClass">
+            <value>true</value>
+        </property>
+        <property name="target">
+            <ref bean="feedTaskProcessor"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="checkTxnAdvisor" />
+            </list>
+        </property>
+    </bean>
+
    <bean id="feedNotifier" class="org.alfresco.repo.activities.feed.FeedNotifierImpl">
       <property name="personService" ref="PersonService"/>
       <property name="nodeService" ref="NodeService"/>

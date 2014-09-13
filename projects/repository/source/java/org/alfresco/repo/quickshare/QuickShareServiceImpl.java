@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -28,6 +28,8 @@ import org.alfresco.events.types.ActivityEvent;
 import org.alfresco.events.types.Event;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.QuickShareModel;
+import org.alfresco.repo.Client;
+import org.alfresco.repo.Client.ClientType;
 import org.alfresco.repo.copy.CopyBehaviourCallback;
 import org.alfresco.repo.copy.CopyDetails;
 import org.alfresco.repo.copy.CopyServicePolicies;
@@ -35,6 +37,7 @@ import org.alfresco.repo.copy.DoNothingCopyBehaviourCallback;
 import org.alfresco.repo.events.EventPreparator;
 import org.alfresco.repo.events.EventPublisher;
 import org.alfresco.repo.node.NodeServicePolicies;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -62,7 +65,6 @@ import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
-import org.alfresco.util.FileFilterMode.Client;
 import org.alfresco.util.Pair;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -96,6 +98,19 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
     private TenantService tenantService;
     private ThumbnailService thumbnailService;
     private EventPublisher eventPublisher;
+    
+    /** Component to determine which behaviours are active and which not */
+    private BehaviourFilter behaviourFilter;
+    
+    /**
+     * Spring configuration
+     * 
+     * @param behaviourFilter the behaviourFilter to set
+     */
+    public void setBehaviourFilter(BehaviourFilter behaviourFilter)
+    {
+        this.behaviourFilter = behaviourFilter;
+    }
     
     /**
      * Enable or disable this service.
@@ -221,16 +236,26 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
             props.put(QuickShareModel.PROP_QSHARE_SHAREDID, sharedId);
             props.put(QuickShareModel.PROP_QSHARE_SHAREDBY, AuthenticationUtil.getRunAsUser());
             
-            // consumer/contributor should be able to add "shared" aspect (MNT-10366)
-            AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
+            // Disable audit to preserve modifier and modified date
+            // see MNT-11960
+            behaviourFilter.disableBehaviour(nodeRef, ContentModel.ASPECT_AUDITABLE);
+            try
             {
-                public Void doWork()
+                // consumer/contributor should be able to add "shared" aspect (MNT-10366)
+                AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
                 {
-                    nodeService.addAspect(nodeRef, QuickShareModel.ASPECT_QSHARE, props);
-                    return null;
-                }
-            });
-            
+                    public Void doWork()
+                    {
+                        nodeService.addAspect(nodeRef, QuickShareModel.ASPECT_QSHARE, props);
+                        return null;
+                    }
+                });
+            }
+            finally
+            {
+                behaviourFilter.enableBehaviour(nodeRef, ContentModel.ASPECT_AUDITABLE);
+            }
+
             final NodeRef tenantNodeRef = tenantService.getName(nodeRef);
             
             TenantUtil.runAsDefaultTenant(new TenantRunAsWork<Void>()
@@ -250,7 +275,7 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
                 public Event prepareEvent(String user, String networkId, String transactionId)
                 {            
                     return new ActivityEvent("quickshare", transactionId, networkId, user, nodeRef.getId(),
-                                null, typeQName.toString(), Client.webclient, sb.toString(),
+                                null, typeQName.toString(),  Client.asType(ClientType.webclient), sb.toString(),
                                 null, null, 0l, null);
                 }
             });

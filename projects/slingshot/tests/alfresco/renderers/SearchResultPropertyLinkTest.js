@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,115 +25,109 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, expect, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, expect, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'SearchResultPropertyLink Test',
       'SearchResultPropertyLinkTest': function () {
          var browser = this.remote;
          var testname = "SearchResultPropertyLinkTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/renderers/page_models/SearchResultPropertyLink_TestPage.json", testname)
-
-         .end()
+         return TestCommon.loadTestWebScript(this.remote, "/SearchResultPropertyLink", testname)
 
          // 1. Check that there are 4 anchors
-         .elementsByCss("a.alfresco-navigation-_HtmlAnchorMixin")
+         .findAllByCssSelector("a.alfresco-navigation-_HtmlAnchorMixin")
             .then(function(elements) {
-               TestCommon.log(testname,43,"Check that all 4 links have anchors");
+               TestCommon.log(testname,"Check that all 4 links have anchors");
                assert(elements.length == 4, "Test #1 - 'path' not initialised correctly");
             })
             .end()
 
          // 2. Use the keyboard to click each in turn
-         .keys(specialKeys["Tab"])
-         .keys(specialKeys["Return"])
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "type", "SHARE_PAGE_RELATIVE"))
+         .pressKeys(keys.TAB)
+         .pressKeys(keys.RETURN)
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "type", "SHARE_PAGE_RELATIVE"))
             .then(function(elements) {
-               TestCommon.log(testname,53,"Check that 'SHARE_PAGE_RELATIVE' is set as the type");
+               TestCommon.log(testname,"Check that 'SHARE_PAGE_RELATIVE' is set as the type");
                assert(elements.length == 1, "Test #2a - 'SHARE_PAGE_RELATIVE' was not set as the navigation type");
             })
             .end()
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "target", "CURRENT"))
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "target", "CURRENT"))
             .then(function(elements) {
-               TestCommon.log(testname,59,"Check that 'CURRENT' is set as the target");
+               TestCommon.log(testname,"Check that 'CURRENT' is set as the target");
                assert(elements.length == 1, "Test #2b - 'SHARE_PAGE_RELATIVE' was not set as the navigation target");
             })
             .end()
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
             .then(function(elements) {
-               TestCommon.log(testname,65,"Check that url is correct for site document");
+               TestCommon.log(testname,"Check that url is correct for site document");
                assert(elements.length == 1, "Test #2c - site document search result URL was incorrect");
             })
             .end()
 
-         .keys(specialKeys["Tab"])
-         .keys(specialKeys["Return"])
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/documentlibrary?path=/folder1/folder2/folder3"))
+         .pressKeys(keys.TAB)
+         .pressKeys(keys.RETURN)
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/documentlibrary?path=/folder1/folder2/folder3"))
             .then(function(elements) {
-               TestCommon.log(testname,74,"Check that url is correct for site folder");
+               TestCommon.log(testname,"Check that url is correct for site folder");
                assert(elements.length == 1, "Test #2d - site folder search result URL was incorrect");
             })
             .end()
 
-         .keys(specialKeys["Tab"])
-         .keys(specialKeys["Return"])
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
+         .pressKeys(keys.TAB)
+         .pressKeys(keys.RETURN)
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
             .then(function(elements) {
-               TestCommon.log(testname,83,"Check that url is correct for repo document");
+               TestCommon.log(testname,"Check that url is correct for repo document");
                assert(elements.length == 1, "Test #2e - repo document search result URL was incorrect");
             })
             .end()
 
-         .keys(specialKeys["Tab"])
-         .keys(specialKeys["Return"])
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "repository?path=/folder1/folder2/folder3"))
+         .pressKeys(keys.TAB)
+         .pressKeys(keys.RETURN)
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "repository?path=/folder2/folder3"))
             .then(function(elements) {
-               TestCommon.log(testname,92,"Check that url is correct for repo document");
+               TestCommon.log(testname,"Check that url is correct for repo document");
                assert(elements.length == 1, "Test #2f - repo document search result URL was incorrect");
             })
             .end()
 
          // 3. Use the mouse to click each in turn
-         .elementByCss("#SITE_DOC_LINK span.inner a")
-            .moveTo()
+         .findByCssSelector("#SITE_DOC_LINK span.inner a")
             .click()
             .end()
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
             .then(function(elements) {
-               TestCommon.log(testname,104,"Check that url is correct for site document");
+               TestCommon.log(testname,"Check that url is correct for site document");
                assert(elements.length == 1, "Test #3a - site document search result URL was incorrect");
             })
             .end()
-         .elementByCss("#SITE_FOLDER_LINK span.inner a")
-            .moveTo()
+         .findByCssSelector("#SITE_FOLDER_LINK span.inner a")
             .click()
             .end()
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/documentlibrary?path=/folder1/folder2/folder3"))
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "site/site1/documentlibrary?path=/folder1/folder2/folder3"))
             .then(function(elements) {
-               TestCommon.log(testname,74,"Check that url is correct for site folder");
+               TestCommon.log(testname,"Check that url is correct for site folder");
                assert(elements.length == 1, "Test #3b - site folder search result URL was incorrect");
             })
             .end()
 
-         .elementByCss("#REPO_DOC_LINK span.inner a")
-            .moveTo()
+         .findByCssSelector("#REPO_DOC_LINK span.inner a")
             .click()
             .end()
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "document-details?nodeRef=workspace://SpacesStore/some-fake-uuid"))
             .then(function(elements) {
-               TestCommon.log(testname,83,"Check that url is correct for repo document");
+               TestCommon.log(testname,"Check that url is correct for repo document");
                assert(elements.length == 1, "Test #3c - repo document search result URL was incorrect");
             })
             .end()
 
-         .elementByCss("#REPO_FOLDER_LINK span.inner a")
-            .moveTo()
+         .findByCssSelector("#REPO_FOLDER_LINK span.inner a")
             .click()
             .end()
-         .elementsByCss(TestCommon.pubSubDataCssSelector("last", "url", "repository?path=/folder1/folder2/folder3"))
+         .findAllByCssSelector(TestCommon.pubSubDataCssSelector("last", "url", "repository?path=/folder2/folder3"))
             .then(function(elements) {
-               TestCommon.log(testname,92,"Check that url is correct for repo document");
+               TestCommon.log(testname,"Check that url is correct for repo document");
                assert(elements.length == 1, "Test #3d - repo document search result URL was incorrect");
             })
             .end()

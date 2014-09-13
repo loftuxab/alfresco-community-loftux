@@ -18,15 +18,15 @@
  */
 
 /**
- * Extends the default [AlfDocumentList]{@link module:alfresco/documentlibrary/AlfDocumentList} to 
- * make search specific requests.
+ * Extends the [sortable paginated list]{@link module:alfresco/lists/AlfSortablePaginatedList} to 
+ * handle search specific data.
  * 
  * @module alfresco/documentlibrary/AlfSearchList
- * @extends alfresco/documentlibrary/AlfDocumentList
+ * @extends alfresco/lists/AlfSortablePaginatedList
  * @author Dave Draper
  */
 define(["dojo/_base/declare",
-        "alfresco/documentlibrary/AlfDocumentList", 
+        "alfresco/lists/AlfSortablePaginatedList", 
         "alfresco/core/PathUtils",
         "dojo/_base/array",
         "dojo/_base/lang",
@@ -35,9 +35,9 @@ define(["dojo/_base/declare",
         "dojo/hash",
         "dojo/io-query",
         "alfresco/core/ArrayUtils"], 
-        function(declare, AlfDocumentList, PathUtils, array, lang, domConstruct, domClass, hash, ioQuery, arrayUtils) {
+        function(declare, AlfSortablePaginatedList, PathUtils, array, lang, domConstruct, domClass, hash, ioQuery, arrayUtils) {
    
-   return declare([AlfDocumentList], {
+   return declare([AlfSortablePaginatedList], {
       
       /**
        * An array of the i18n files to use with this widget.
@@ -56,46 +56,47 @@ define(["dojo/_base/declare",
        * @default [{cssFile:"./css/AlfSearchList.css"}]
        */
       cssRequirements: [{cssFile:"./css/AlfSearchList.css"}],
-      
+
       /**
-       * Subscribe the document list topics.
-       * 
+       * Extends the [inherited function]{@link module:alfresco/lists/AlfSortablePaginatedList#setupSubscriptions}
+       * to subscribe to search specific topics.
+       *
        * @instance
        */
-      postMixInProperties: function alfresco_documentlibrary_AlfSearchList__postMixInProperties() {
-         
-         this.alfSubscribe("ALF_DOCLIST_SORT", lang.hitch(this, "onSortRequest"));
-         this.alfSubscribe("ALF_DOCLIST_SORT_FIELD_SELECTION", lang.hitch(this, "onSortFieldSelection"));
-         
-         // Subscribe to the topics that will be published on by the DocumentService when retrieving documents
-         // that this widget requests...
-         this.alfSubscribe("ALF_RETRIEVE_DOCUMENTS_REQUEST_SUCCESS", lang.hitch(this, "onSearchLoadSuccess"));
-         this.alfSubscribe("ALF_RETRIEVE_DOCUMENTS_REQUEST_FAILURE", lang.hitch(this, "onDataLoadFailure"));
-
-         // Subscribe to the topics that address specific search updates...
+      setupSubscriptions: function alfrescdo_documentlibrary_AlfSearchList__setupSubscriptions() {
+         this.inherited(arguments);
          this.alfSubscribe("ALF_SET_SEARCH_TERM", lang.hitch(this, "onSearchTermRequest"));
          this.alfSubscribe("ALF_INCLUDE_FACET", lang.hitch(this, "onIncludeFacetRequest"));
          this.alfSubscribe("ALF_APPLY_FACET_FILTER", lang.hitch(this, "onApplyFacetFilter"));
          this.alfSubscribe("ALF_REMOVE_FACET_FILTER", lang.hitch(this, "onRemoveFacetFilter"));
          this.alfSubscribe("ALF_SEARCHLIST_SCOPE_SELECTION", lang.hitch(this, "onScopeSelection"));
+         this.alfSubscribe("ALF_ADVANCED_SEARCH", lang.hitch(this, this.onAdvancedSearch));
          this.alfSubscribe(this.reloadDataTopic, lang.hitch(this, this.reloadData));
+      },
 
-         // Infinite scroll handling
-         this.alfSubscribe(this.scrollNearBottom, lang.hitch(this, "onScrollNearBottom"));
-
-         // Listen for updates on request processing...
-         this.alfSubscribe(this.requestInProgressTopic, lang.hitch(this, "onRequestInProgress"));
-         this.alfSubscribe(this.requestFinishedTopic, lang.hitch(this, "onRequestFinished"));
-
-         // Get the messages for the template...
+      /**
+       * Overrides the [inherited function]{@link module:alfresco/lists/AlfList#setDisplayMessages}
+       * to set search specific messages.
+       *
+       * @instance
+       */
+      setDisplayMessages: function alfrescdo_documentlibrary_AlfSearchList__setDisplayMessages() {
          this.noViewSelectedMessage = this.message("searchlist.no.view.message");
          this.noDataMessage = this.message("searchlist.no.data.message");
          this.fetchingDataMessage = this.message("searchlist.loading.data.message");
          this.renderingViewMessage = this.message("searchlist.rendering.data.message");
          this.fetchingMoreDataMessage = this.message("searchlist.loading.data.message");
          this.dataFailureMessage = this.message("searchlist.data.failure.message");
+      },
 
-         this.facetFilters = {};
+      /**
+       * Extends the 
+       * 
+       * @instance
+       */
+      postMixInProperties: function alfresco_documentlibrary_AlfSearchList__postMixInProperties() {
+         this.inherited(arguments);
+         this._cleanResettableVars();
       },
 
       /**
@@ -145,16 +146,14 @@ define(["dojo/_base/declare",
             }
             else
             {
-               // If a request is NOT in progress then we need to manually request a new search, 
-               // because re-setting the hash will not trigger the changeFilter function....
+               // If a request is NOT in progress then we need to manually request a new search, because re-setting 
+               // the hash will not trigger the changeFilter function....
+               // If the current hash includes a term from the resetHashTerms array, we need to clear those terms before 
+               // setting a search term (even if it is the same), in this case updating the hash will trigger the search...
                var currHash = ioQuery.queryToObject(hash());
-               if (currHash.facetFilters != null && currHash.facetFilters !== "")
+               if (this._cleanResettableHashTerms(currHash))
                {
-                  // The current hash includes facet filters, we need to clear filters when 
-                  // setting a search term (even if it is the same), in this case updating the
-                  // hash will trigger the search...
                   currHash.searchTerm = this.searchTerm;
-                  delete currHash.facetFilters;
                   this.alfPublish("ALF_NAVIGATE_TO_PAGE", {
                      url: ioQuery.objectToQuery(currHash),
                      type: "HASH"
@@ -162,7 +161,7 @@ define(["dojo/_base/declare",
                }
                else
                {
-                  // The current hash has no facet filters so we need to trigger a manual search...
+                  // The current hash has no resettable terms so we need to trigger a manual search...
                   this.resetResultsList();
                   this.loadData();
                }
@@ -173,13 +172,28 @@ define(["dojo/_base/declare",
             // The requested search term is new, so updating the hash will result in a new search...
             this.searchTerm = searchTerm;
             var currHash = ioQuery.queryToObject(hash());
+            this._cleanResettableHashTerms(currHash);
             currHash.searchTerm = this.searchTerm;
-            delete currHash.facetFilters;
             this.alfPublish("ALF_NAVIGATE_TO_PAGE", {
                url: ioQuery.objectToQuery(currHash),
                type: "HASH"
             }, true);
          }
+      },
+
+      /**
+       * Handle advanced search requests.
+       *
+       * @instance
+       * @param {object} payload The details of what to search for.
+       */
+      onAdvancedSearch: function alfresco_documentlibrary_AlfSearchList__onAdvancedSearch(payload) {
+         // TODO: This needs some serious work...
+         this.resetResultsList();
+         this.searchTerm = payload.searchTerm;
+         delete payload.searchTerm;
+         this.query = payload;
+         this.loadData();
       },
 
       /**
@@ -236,8 +250,8 @@ define(["dojo/_base/declare",
                this.siteId = scope;
             }
 
-            // Remove any facet filters...
-            delete currHash.facetFilters;
+            // Remove any resettable terms...
+            this._cleanResettableHashTerms(currHash);
 
             // Update the hash to trigger a search...
             this.alfPublish("ALF_NAVIGATE_TO_PAGE", {
@@ -257,6 +271,17 @@ define(["dojo/_base/declare",
       facetFields: "",
 
       /**
+       * This indicates whether or not to hide or display the included facets details when
+       * results are loaded. This is initialised to true, but will be changed to false if 
+       * any facets are requested to be included in the page.
+       * 
+       * @instance
+       * @type {boolean}
+       * @default true
+       */
+      hideFacets: true,
+
+      /**
        * 
        * @instance
        * @param {object} payload The details of the facet to include
@@ -264,13 +289,34 @@ define(["dojo/_base/declare",
       onIncludeFacetRequest: function alfresco_documentlibrary_AlfSearchList__onIncludeFacetRequest(payload) {
          this.alfLog("log", "Adding facet filter", payload, this);
          var qname = lang.getObject("qname", false, payload);
+         var blockIncludeFacetRequest = lang.getObject("blockIncludeFacetRequest", false, payload);
          if (qname == null)
          {
             this.alfLog("warn", "No qname provided when adding facet field", payload, this);
          }
+         else if (blockIncludeFacetRequest != null && blockIncludeFacetRequest === true)
+         {
+            // Don't include the facet in the facet fields, however indicate that facet
+            this.hideFacets = false;
+         }
          else
          {
-            this.facetFields = (this.facetFields != "") ? this.facetFields + "," + qname : qname;
+            // Make sure each facet is only included once (the search API is not tolerant of duplicates)...
+            // Even if multiple widgets want to include the same facet, they will all receive the same
+            // publication on search results...
+            this.hideFacets = false;
+            var f = this.facetFields.split(",");
+            var alreadyAdded = array.some(f, function(currQName, i) {
+               return currQName === qname;
+            });
+            if (alreadyAdded)
+            {
+               // No action required - the request QName has already been included
+            }
+            else
+            {
+               this.facetFields = (this.facetFields !== "") ? this.facetFields + "," + qname : qname;
+            }
          }
       },
 
@@ -360,15 +406,15 @@ define(["dojo/_base/declare",
       },
 
       /**
-       * If [useHash]{@link module:alfresco/documentlibrary/AlfDocumentList#useHash} has been set to true
+       * If [useHash]{@link module:alfresco/lists/AlfHashList#useHash} has been set to true
        * then this function will be called whenever the browser hash fragment is modified. It will update
        * the attributes of this instance with the values provided in the fragment.
        * 
        * @instance
        * @param {object} payload
        */
-      onChangeFilter: function alfresco_documentlibrary_AlfSearchList__onChangeFilter(payload) {
-         this.alfLog("log", "Filter change detected", payload, this);
+      onHashChanged: function alfresco_documentlibrary_AlfSearchList__onHashChanged(payload) {
+         this.alfLog("log", "Hash change detected", payload, this);
 
          // Only update if the payload contains one of the variables we care about
          if(this._payloadContainsUpdateableVar(payload))
@@ -378,7 +424,7 @@ define(["dojo/_base/declare",
             var newSearchTerm = lang.getObject("searchTerm", false, payload);
             if (newSearchTerm != this.searchTerm)
             {
-               this.facetFilters = {};
+               this._cleanResettableVars();
             }
    
             // The facet filters need to be handled directly because they are NOT just passed as 
@@ -395,7 +441,7 @@ define(["dojo/_base/declare",
             }
             else
             {
-               this.facetFilters = {};
+               this._cleanResettableVars();
             }
 
             lang.mixin(this, payload);
@@ -452,6 +498,21 @@ define(["dojo/_base/declare",
                requestId: this.currentRequestId
             };
 
+            if (this.query)
+            {
+               delete this.query.alfTopic;
+
+               if(typeof this.query === "string")
+               {
+                  this.query = JSON.parse(this.query);
+               }
+
+               for (var key in this.query)
+               {
+                  searchPayload[key] = this.query[key];
+               }
+            }
+
             // InfiniteScroll uses pagination under the covers.
             if (this.useInfiniteScroll)
             {
@@ -462,7 +523,6 @@ define(["dojo/_base/declare",
 
             // Set a response topic that is scoped to this widget...
             searchPayload.alfResponseTopic = this.pubSubScope + "ALF_RETRIEVE_DOCUMENTS_REQUEST";
-
             this.alfPublish("ALF_SEARCH_REQUEST", searchPayload, true);
          }
       },
@@ -474,11 +534,11 @@ define(["dojo/_base/declare",
        * @param {object} response The response object
        * @param {object} originalRequestConfig The configuration that was passed to the the [serviceXhr]{@link module:alfresco/core/CoreXhr#serviceXhr} function
        */
-      onSearchLoadSuccess: function alfresco_documentlibrary_AlfSearchList__onSearchLoadSuccess(payload) {
+      onDataLoadSuccess: function alfresco_documentlibrary_AlfSearchList__onDataLoadSuccess(payload) {
          this.alfLog("log", "Search Results Loaded", payload, this);
          
          var newData = payload.response;
-         this._currentData = newData; // Some code below expects this even if the view is null.
+         this.currentData = newData; // Some code below expects this even if the view is null.
 
          // Re-render the current view with the new data...
          var view = this.viewMap[this._currentlySelectedView];
@@ -489,7 +549,7 @@ define(["dojo/_base/declare",
             if (this.useInfiniteScroll)
             {
                view.augmentData(newData);
-               this._currentData = view.getData();
+               this.currentData = view.getData();
             }
             else
             {
@@ -498,7 +558,6 @@ define(["dojo/_base/declare",
 
             view.renderView(this.useInfiniteScroll);
             this.showView(view);
-
          }
 
          // TODO: This should probably be in the SearchService... but will leave here for now...
@@ -515,7 +574,7 @@ define(["dojo/_base/declare",
             }
          }
 
-         var resultsCount = this._currentData.numberFound != -1 ? this._currentData.numberFound : 0;
+         var resultsCount = this.currentData.numberFound != -1 ? this.currentData.numberFound : 0;
          if (resultsCount != null)
          {
             // Publish the number of search results found...
@@ -524,6 +583,10 @@ define(["dojo/_base/declare",
                label: resultsCount
             });
          }
+
+         this.alfPublish("ALF_HIDE_FACETS", {
+            hide: (this.hideFacets === true || resultsCount === 0)
+         });
       
          // This request has finished, allow another one to be triggered.
          this.alfPublish(this.requestFinishedTopic, {});
@@ -542,6 +605,45 @@ define(["dojo/_base/declare",
          this.currentPage = 1;
          this.hideChildren(this.domNode);
          this.alfPublish(this.clearDocDataTopic);
+      },
+
+      /**
+       * The vars and terms showing on the url hash that should be reset for a new search.
+       * 
+       * @instance
+       * @type {string[]}
+       * @default ["facetFilters", "query"]
+       */
+      _resetVars: ["facetFilters", "query"],
+
+      /**
+       * Clean resettable variables based on resetVars array.
+       * 
+       * @instance
+       */
+      _cleanResettableVars: function alfresco_documentlibrary_AlfSearchList___cleanResettableVars() {
+         for (var i = 0; i < this._resetVars.length; i++) {
+            this[this._resetVars[i]] = {};
+         }
+      },
+
+      /**
+       * Clean resettable hash terms based on resetVars array.
+       * 
+       * @instance
+       * @param {object} currHash An object containing current hash values
+       * @return boolean
+       */
+      _cleanResettableHashTerms: function alfresco_documentlibrary_AlfSearchList___cleanResettableHashTerms(currHash) {
+         var hasTerm = false;
+         for (var term in currHash) {
+            if(this._resetVars.indexOf(term) != -1 && currHash[term] != null && currHash[term] !== "")
+            {
+               hasTerm = true;
+               delete currHash[term];
+            }
+         }
+         return hasTerm;
       }
 
    });

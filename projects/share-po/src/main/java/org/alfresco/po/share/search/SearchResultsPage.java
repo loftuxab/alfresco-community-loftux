@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.Pagination;
 import org.alfresco.po.share.ShareLink;
@@ -40,7 +41,7 @@ import org.openqa.selenium.WebElement;
  * @author Michael Suzuki, Subashni Prasanna
  * @since 1.0
  */
-public abstract class SearchResultsPage extends SharePage
+public abstract class SearchResultsPage extends SharePage implements SearchResultPage
 {
     private static final String SEARCH_INFO_DIV = "div.search-info";
     private static final String SEARCH_ON_SITE = "search.site.link";
@@ -402,11 +403,11 @@ public abstract class SearchResultsPage extends SharePage
     /**
      * Gets the search results as a collection of SearResultItems.
      * 
-     * @return Collections of serach result
+     * @return Collections of search result
      */
-    public List<SearchResultItem> getResults()
+    public List<SearchResult> getResults()
     {
-        List<SearchResultItem> results = new ArrayList<SearchResultItem>();
+        List<SearchResult> results = new ArrayList<SearchResult>();
         if (hasResults())
         {
             try
@@ -455,9 +456,12 @@ public abstract class SearchResultsPage extends SharePage
             throw new IllegalArgumentException("Value can not be negative");
         }
         number += 1;
+        String selector = AlfrescoVersion.Enterprise43.equals(alfrescoVersion) || alfrescoVersion.isCloud() ?
+                "tr.alfresco-search-AlfSearchResult:nth-of-type(%d) td.thumbnailCell a" :
+                    "tbody.yui-dt-data tr:nth-of-type(%d) > td div span a ";
         try
         {
-            drone.find(By.cssSelector(String.format("tbody.yui-dt-data tr:nth-of-type(%d) > td div span a ", number))).click();
+            drone.find(By.cssSelector(String.format(selector, number))).click();
         }
         catch (NoSuchElementException e)
         {

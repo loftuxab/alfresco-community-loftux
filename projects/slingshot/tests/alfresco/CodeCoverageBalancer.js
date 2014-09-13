@@ -26,23 +26,34 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, assert, require, TestCommon, specialKeys) {
+        "intern/lib/args"], 
+        function (registerSuite, assert, require, TestCommon, args) {
 
    registerSuite({
       name: 'Code Coverage Balancer',
-      'Menus Test': function () {
+      'Balance': function () {
 
          var browser = this.remote;
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/page_models/RequireEverything.json")
+         if(args.doCoverage === "true")
+         {
+            return TestCommon.loadTestWebScript(this.remote, "/RequireEverything")
 
-            .end()
+               .findByCssSelector("#LABEL")
+                  .getVisibleText()
+                  .then(function(text) {
+                     assert(text === "Coverage Balanced!", "Code Coverage Balancer Didn't Load - coverage results will be invalid");
+                  })
+                  .end()
 
-            // Post the coverage results...
-            .then(function() {
-               TestCommon.postCoverageResults(browser);
-            })
-            .end();
+               // Post the coverage results...
+               .then(function() {
+                  TestCommon.postCoverageResults(browser);
+               })
+          }
+          else
+          {
+            return browser.end();
+          }
       }
    });
 });

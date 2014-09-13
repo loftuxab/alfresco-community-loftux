@@ -18,9 +18,9 @@
  */
 
 /**
- * This should be mixed into all Alfresco widgets as it provides the essential functions that they will 
- * undoubtedly required, e.g. logging, publication/subscription handling, i18n message handling, etc. 
- * 
+ * This should be mixed into all Alfresco widgets as it provides the essential functions that they will
+ * undoubtedly required, e.g. logging, publication/subscription handling, i18n message handling, etc.
+ *
  * @module alfresco/core/Core
  * @author Dave Draper
  */
@@ -33,17 +33,26 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/_base/lang",
         "dojox/uuid/generateRandomUuid",
-        "dojox/html/entities"], 
+        "dojox/html/entities"],
         function(declare, CoreData, PubSubLog, AlfConstants, pubSub, PubQueue, array, lang, uuid, htmlEntities) {
-   
+
    return declare(null, {
-      
+
       /**
-       * This has been added purely to prevent any object that inherits from this mixin from being 
+       * An array of the CSS files to use with this widget.
+       *
+       * @instance
+       * @type {object[]}
+       * @default [{cssFile:"./css/Core.css"}]
+       */
+      cssRequirements: [{cssFile:"./css/Core.css"}],
+
+      /**
+       * This has been added purely to prevent any object that inherits from this mixin from being
        * iterated over in the pub/sub log. It aims to prevent infinite loops (although there is protection
-       * for this in the [SubscriptionLog]{@link module:alfresco/testing/SubscriptionLog}) module). It should
+       * for this in the [SubscriptionLog]{@link module:alfresco/logging/SubscriptionLog}) module). It should
        * also ensure that only useful information is displayed in the log.
-       * 
+       *
        * @instance
        * @type {boolean}
        * @default true
@@ -53,24 +62,25 @@ define(["dojo/_base/declare",
       /**
        * Creates and returns a new UUID (universally unique identifier). The UUID is generated using the
        * dojox/uuid/generateRandomUuid module
-       * 
+       *
        * @instance
        * @returns {string} A new UUID
        */
       generateUuid: function alfresco_core_Core__generateUuid() {
          return uuid();
       },
-      
+
       /**
        * This function is based on the version that can be found in alfresco.js. It searches through all of
        * the available scopes for the widget and for all of the widgets inherited from.
-       * 
+       *
        * @instance
        * @param {string} p_messageId The id of the message to be displayed.
        * @returns {string} A localized form of the supplied message
        */
       message: function alfresco_core_Core__message(p_messageId) {
 
+         var scopeMsg;
          if (typeof p_messageId != "string")
          {
             throw new Error("Missing or invalid argument: messageId");
@@ -102,7 +112,7 @@ define(["dojo/_base/declare",
          // Overwrite page scope with default scope...
          if (typeof Alfresco.messages.scope[Alfresco.messages.defaultScope] === "object")
          {
-            var scopeMsg = Alfresco.messages.scope[Alfresco.messages.defaultScope][p_messageId];
+            scopeMsg = Alfresco.messages.scope[Alfresco.messages.defaultScope][p_messageId];
             if (typeof scopeMsg == "string")
             {
                msg = scopeMsg;
@@ -112,7 +122,7 @@ define(["dojo/_base/declare",
          // Work through the base classes and use their i18nScope property (if available) as a scope to
          // check. This allows a widget to check its class hierarchy for message scopes.
          if (this.constructor && this.constructor._meta) {
-            array.forEach(this.constructor._meta.parents, function(entry, i) {
+            array.forEach(this.constructor._meta.parents, function(entry) {
 
                // PLEASE NOTE: Use of the constructor _meta property is used at risk. It is the recognised
                //              way of accessing parent classes (for example it is used in the .isInstanceOf()
@@ -134,13 +144,13 @@ define(["dojo/_base/declare",
          // This will either be the i18nScope or the default message scope if i18nScope is not defined
          if (typeof this.i18nScope != "undefined" && typeof Alfresco.messages.scope[this.i18nScope] === "object")
          {
-            var scopeMsg = Alfresco.messages.scope[this.i18nScope][p_messageId];
+            scopeMsg = Alfresco.messages.scope[this.i18nScope][p_messageId];
             if (typeof scopeMsg == "string")
             {
                msg = scopeMsg;
             }
          }
-         
+
          // Search/replace tokens
          var tokens = [];
          if ((arguments.length == 2) && (typeof arguments[1] == "object"))
@@ -151,23 +161,23 @@ define(["dojo/_base/declare",
          {
             tokens = Array.prototype.slice.call(arguments).slice(2);
          }
-         
+
          // Emulate server-side I18NUtils implementation
          if (tokens instanceof Array && tokens.length > 0)
          {
             msg = msg.replace(/''/g, "'");
          }
-         
+
          // TODO: Need to check this works with old Share strings...
          msg = lang.replace(msg, tokens);
          return msg;
       },
-      
+
       /**
        * Use this function to ensure that all text added to the HTML page is encoded to prevent XSS style
        * attacks. This wraps the dojox/html/entities encode function. It is intentionally wrapped so that
        * if we need to make a change (e.g. change the encoding handling) we can make it in one place
-       * 
+       *
        * @instance
        * @returns The encoded input string
        */
@@ -178,33 +188,33 @@ define(["dojo/_base/declare",
       /**
        * This is the scope to use within the data model. If this is not initiated during instantiation then
        * it will be assigned to the root scope of the data model the first time any of the data API functions
-       * are used. 
-       * 
+       * are used.
+       *
        * @instance
        * @type {object}
        * @default null
        */
       dataScope: null,
-      
+
       /**
        * This will be used to keep track of all the data event callbacks that are registered for the instance.
        * These will be iterated over and removed when the instance is destroyed.
-       * 
+       *
        * @instance
        * @type {function[]}
        * @default null
        */
       dataBindingCallbacks: null,
-      
+
       alfProcessDataDotNotation: function alfresco_core_Core__alfProcessDataDotNotation(dotNotation) {
          var re = /(\.|\[)/g;
-         return dotNotation.replace(re, "._alfValue$1")
+         return dotNotation.replace(re, "._alfValue$1");
       },
-      
+
       /**
-       * This both sets data and registers the widget of as the owner of the data. This is done so that 
+       * This both sets data and registers the widget of as the owner of the data. This is done so that
        * when the widget is destroyed the data it owned will be removed from the data model
-       * 
+       *
        * @instance
        * @param {string} dotNotation A dot notation representation of the location within the data model to set.
        * @param {object} value The value to set
@@ -222,11 +232,11 @@ define(["dojo/_base/declare",
          {
             scope = this.dataScope;
          }
-         
+
          // Process the dotNotation...
          // Adds in the additional "_alfValue" objects...
          dotNotation = this.alfProcessDataDotNotation(dotNotation);
-         
+
          var data = lang.getObject(dotNotation, false, scope);
          if (data == null)
          {
@@ -234,10 +244,11 @@ define(["dojo/_base/declare",
             // as the owner. Not sure if this is necessary, we can't tell if the widget is destroyed
          }
          // Set the new data...
+         // Variable reuse here is correct.
          data = lang.getObject(dotNotation, true, scope);
          var oldValue = data._alfValue;
          lang.setObject(dotNotation + "._alfValue", value, scope);
-         
+
          if (data._alfCallbacks != null)
          {
             // Move all the pending callbacks into the callback property
@@ -251,11 +262,11 @@ define(["dojo/_base/declare",
          }
          return dataOwnerBinding;
       },
-      
+
       /**
        * This gets the data from the location in the model defined by the scope. If no explicit scope
        * is provided then the instance scope will be used.
-       * 
+       *
        * @instance
        * @param {string} dotNotation A dot notation representation of the location within the data model to get
        * @param {object} scope The scope to get the data from. If null then then instance scope will be used.
@@ -276,18 +287,18 @@ define(["dojo/_base/declare",
          this.alfLog("log", "Getting data", dotNotation, scope, data, this);
          return data;
       },
-      
+
       /**
        * Binds a callback function to an entry in the data model so that when the data is changed the callback
-       * will be executed. This allows widgets to respond to data changes dynamically. A reference to the 
+       * will be executed. This allows widgets to respond to data changes dynamically. A reference to the
        * call back will be returned and it is important that these callbacks are deleted when the widget
        * is destroyed to prevent memory leaks.
-       * 
+       *
        * @instance
        * @param {string} dotNotation A dot notation representation of the location with the data model to bind to
        * @param {object} scope The scope to look for the dot notated data at
        * @param {function} callback The function to call when the data is changed
-       * @returns {object} A reference to the callback so that it can be removed when the caller is destroyed 
+       * @returns {object} A reference to the callback so that it can be removed when the caller is destroyed
        */
       alfBindDataListener: function alfresco_core_Core__alfBindDataListener(dotNotation, scope, callback) {
          if (dotNotation)
@@ -303,11 +314,11 @@ define(["dojo/_base/declare",
             }
             // TODO: Validate the dotNotation??
             dotNotation = this.alfProcessDataDotNotation(dotNotation);
-            
+
             var callbacks = lang.getObject(dotNotation + "._alfCallbacks", true, scope);
             var callbackId = this.generateUuid(); // Create a uuid for the callback
             callbacks[callbackId] = callback;     // Set the callback
-            
+
             // Create and return the binding (this should provide enough information to delete the callback
             // from the data model when the owning widget is destroyed)
             var binding = {
@@ -323,10 +334,10 @@ define(["dojo/_base/declare",
             return binding;
          }
       },
-      
+
       /**
        * @instance
-       * @param {object} The binding object
+       * @param {object} binding The binding object
        */
       alfRemoveDataListener: function alfresco_core_Core__alfRemoveDataListener(binding) {
          // Need to check my logic here (!?)
@@ -344,82 +355,108 @@ define(["dojo/_base/declare",
             this.alfLog("error", "Could not delete data listener binding", binding);
          }
       },
-      
+
       /**
        * A String that is used to prefix all pub/sub communications to ensure that only relevant
        * publications are handled and issued.
-       * 
+       *
        * @instance
        * @type {string}
        * @default ""
        */
       pubSubScope: "",
-      
+
       /**
-       * Used to track of any subscriptions that are made. They will be all be unsubscribed when the 
+       * Used to track of any subscriptions that are made. They will be all be unsubscribed when the
        * [destroy]{@link module:alfresco/core/Core#destroy} function is called.
-       * 
+       *
        * @instance
-       * @type {array}
-       * @default null 
+       * @type {Array}
+       * @default null
        */
       alfSubscriptions: null,
-      
+
       /**
        * This function wraps the standard Dojo publish function. It should always be used rather than
        * calling the Dojo implementation directly to allow us to make changes to the implementation or
        * to introduce additional features (such as scoping) or updates to the payload.
-       * 
+       *
        * @instance
-       * @param {string} topic The topic on which to publish
+       * @param {String | Array} topics The topic(s) on which to publish
        * @param {object} payload The payload to publish on the supplied topic
-       * @param {boolean} global Indicates that the pub/sub scope should not be applied
-       * @param {boolean} parentScope Indicates that the pub/sub scope inherited from the parent should be applied
+       * @param {boolean} [global] Indicates that the pub/sub scope should not be applied
+       * @param {boolean} [parentScope] Indicates that the pub/sub scope inherited from the parent should be applied
        */
-      alfPublish: function alfresco_core_Core__alfPublish(topic, payload, global, parentScope) {
-         var scopedTopic = topic;
-         if (global != null && global == true)
-         {
-            // No action required - use global scope
-         }
-         else if (parentScope != null && parentScope == true)
-         {
-            scopedTopic = this.parentPubSubScope + topic;
-         }
-         else
-         {
-            scopedTopic = this.pubSubScope + topic;
-         }
-         if (payload == null)
-         {
-            payload = {};
-         }
-         payload.alfTopic = scopedTopic;
+      alfPublish: function alfresco_core_Core__alfPublish(topics, payload, global, parentScope) {
 
-         // Publish...
-         PubQueue.getSingleton().publish(scopedTopic, payload, this);
+         // Allow an array of topics so we can publish multiple ones.
+         if (!lang.isArray(topics))
+         {
+            topics = [topics];
+         }
+
+         array.forEach(topics, function(topic) {
+            var scopedTopic = topic;
+            if (global != null && global === true)
+            {
+               // No action required - use global scope
+            }
+            else if (parentScope != null && parentScope === true)
+            {
+               scopedTopic = this.parentPubSubScope + topic;
+            }
+            else
+            {
+               scopedTopic = this.pubSubScope + topic;
+            }
+            if (payload == null)
+            {
+               payload = {};
+            }
+            payload.alfTopic = scopedTopic;
+
+            // Publish...
+            PubQueue.getSingleton().publish(scopedTopic, payload, this);
+         }, this);
       },
-      
+
+      /**
+       * Publish an event after waiting for the specified delay.
+       *
+       * @param topic {String} topic to publish
+       * @param payload {Object} the payload to be pushed to the publish event
+       * @param delay {Number} ms delay in how long to wait before publishing the event
+       */
+      alfPublishDelayed: function alfresco_core_Core__alfPublishDelayed(topic, payload, delay) {
+         this._delayedPublishPayload = payload;
+         window.setTimeout(lang.hitch(this, function(){
+            // due to lang.hitch, usage of 'this' below is correct.
+            this.alfPublish(topic, this._delayedPublishPayload);
+         }), delay);
+      },
+
+      // TODO: Create alfSubscribeOnce that removes the event listener after it fires once.
+
       /**
        * This function wraps the standard Dojo subscribe function. It should always be used rather than
        * calling the Dojo implementation directly to allow us to make changes to the implementation or
        * to introduce additional features (such as scoping) or updates to the callback. The subscription
        * handle that gets created is add to [alfSubscriptions]{@link module:alfresco/core/Core#alfSubscriptions}
-       * 
+       *
        * @instance
        * @param {string} topic The topic on which to subscribe
        * @param {function} callback The callback function to call when the topic is published on.
-       * @param {boolean} global Indicates that the pub/sub scope should not be applied
-       * @param {boolean} parentScope Indicates that the pub/sub scope inherited from the parent should be applied
+       * @param {boolean} [global] Indicates that the pub/sub scope should not be applied
+       * @param {boolean} [parentScope] Indicates that the pub/sub scope inherited from the parent should be applied
        * @returns {object} A handle to the subscription
        */
       alfSubscribe: function alfresco_core_Core__alfSubscribe(topic, callback, global, parentScope) {
          var scopedTopic = topic;
-         if (global != null && global == true)
+         if (global != null && global === true)
          {
             // No action required - use global scope
          }
-         else if (parentScope != null && parentScope == true)
+         else if (parentScope != null && parentScope === true)
          {
             scopedTopic = this.parentPubSubScope + topic;
          }
@@ -428,7 +465,7 @@ define(["dojo/_base/declare",
             scopedTopic = this.pubSubScope + topic;
          }
 
-         if (AlfConstants.DEBUG == true)
+         if (AlfConstants.DEBUG)
          {
             PubSubLog.getSingleton().sub(scopedTopic, callback, this);
          }
@@ -441,39 +478,70 @@ define(["dojo/_base/declare",
          this.alfSubscriptions.push(handle);
          return handle;
       },
-      
+
       /**
        * This function wraps the standard unsubscribe function. It should always be used rather than call
        * the Dojo implementation directly.
-       * 
+       *
        * @instance
-       * @param {object} The subscription handle to unsubscribe
+       * @param {object|array} handle The subscription handle to unsubscribe
        */
       alfUnsubscribe: function alfresco_core_Core__alfUnsubscribe(handle) {
-         if (handle) 
+         if (!handle)
          {
-            if (AlfConstants.DEBUG == true)
-            {
-               PubSubLog.getSingleton().unsub(handle, this);
-            }
-            handle.remove();
+            this.alfLog("warn", "No subscription handles to unsubscribe from");
          }
+         else
+         {
+            if (!lang.isArray(handle))
+            {
+               handle = [handle];
+            }
+            array.forEach(handle, function(individualHandle){
+               if (AlfConstants.DEBUG === true)
+               {
+                  PubSubLog.getSingleton().unsub(individualHandle, this);
+               }
+
+               individualHandle.remove();
+            }, this);
+         }
+      },
+
+      /**
+       * This is a helper function for unsubscribing from subscription handles that are set-up with unique
+       * topics to guarantee recipients.
+       *
+       * @instance
+       * @param {array} handles The handles to unsubscribe
+       */
+      alfUnsubscribeSaveHandles: function alfresco_core_Core__alfUnsubscribeSaveHandles(handles) {
+         array.forEach(handles, function(handle) {
+            if (handle != null)
+            {
+               this.alfUnsubscribe(handle);
+            }
+            else
+            {
+               this.alfLog("warn", "A subscription handle was not found - this could be a potential memory leak", this);
+            }
+         }, this);
       },
 
       /**
        * This function will override a destroy method if available (e.g. if this has been mixed into a
        * widget instance) so that any subscriptions that have been made can be removed. This is necessary
        * because subscriptions are not automatically cleaned up when the widget is destroyed.
-       * 
+       *
        * This also removes any data binding listeners that have been registered.
-       * 
+       *
        * @instance
        * @param {boolean} preserveDom
        */
       destroy: function alfresco_core_Core__destroy(preserveDom) {
          if (this.alfSubscriptions != null)
          {
-            array.forEach(this.alfSubscriptions, function(handle, i) {
+            array.forEach(this.alfSubscriptions, function(handle) {
                if (typeof handle.remove === "function")
                {
                   handle.remove();
@@ -482,14 +550,14 @@ define(["dojo/_base/declare",
          }
          if (this.dataBindingCallbacks != null)
          {
-            array.forEach(this.dataBindingCallbacks, function(binding, i) {
+            array.forEach(this.dataBindingCallbacks, function(binding) {
                this.alfRemoveDataListener(binding);
             }, this);
          }
 
          if (this.servicesToDestroy != null)
          {
-            array.forEach(this.servicesToDestroy, function(service, i) {
+            array.forEach(this.servicesToDestroy, function(service) {
                if (service != null && typeof service.destroy === "function")
                {
                   service.destroy();
@@ -499,7 +567,7 @@ define(["dojo/_base/declare",
 
          if (this.widgetsToDestroy != null)
          {
-            array.forEach(this.widgetsToDestroy, function(widget, i) {
+            array.forEach(this.widgetsToDestroy, function(widget) {
                if (widget != null && typeof widget.destroy === "function")
                {
                   widget.destroy();
@@ -538,22 +606,25 @@ define(["dojo/_base/declare",
        * @default "ALF_LOG_REQUEST"
        */
       alfLoggingTopic: "ALF_LOG_REQUEST",
-      
+
       /**
-       * This function is intended to provide the entry point to all client-side logging from the application. By 
+       * This function is intended to provide the entry point to all client-side logging from the application. By
        * default it simply delegates to the standard browser console object but could optionally be overridden or
        * extended to provide advanced capabilities like posting client-side logs back to the server, etc.
-       * 
+       *
        * @instance
        * @param {string} severity The severity of the message to be logged
        * @param {string} message The message to be logged
        */
       alfLog: function alfresco_core_Core__alfLog(severity, message) {
+         // arguments.callee is deprecated, but there's no alternative to it, so ignore errors.
+         /* jshint -W059 */
          this.alfPublish(this.alfLoggingTopic, {
             callerName: arguments.callee.caller.name,
             severity: severity,
             messageArgs: Array.prototype.slice.call(arguments, 1)
          }, true);
+         /* jshint +W059 */
       }
    });
 });

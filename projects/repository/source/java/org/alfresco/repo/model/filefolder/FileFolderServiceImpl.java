@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -136,7 +137,7 @@ public class FileFolderServiceImpl extends AbstractBaseCopyService implements Fi
     private BehaviourFilter behaviourFilter;
     private NamedObjectRegistry<CannedQueryFactory<NodeRef>> cannedQueryRegistry;
 
-    private boolean preserveModificationData = true;
+    private boolean preserveAuditableData = true;
 
     // TODO: Replace this with a more formal means of identifying "system" folders (i.e. aspect or UUID)
     private List<String> systemPaths;
@@ -216,14 +217,14 @@ public class FileFolderServiceImpl extends AbstractBaseCopyService implements Fi
         this.behaviourFilter = behaviourFilter;
     }
 
-    public void setPreserveModificationData(boolean preserveModificationData)
+    public void setPreserveAuditableData(boolean preserveAuditableData)
     {
-        this.preserveModificationData = preserveModificationData;
+        this.preserveAuditableData = preserveAuditableData;
     }
 
-    public boolean isPreserveModificationData()
+    public boolean isPreserveAuditableData()
     {
-        return preserveModificationData;
+        return preserveAuditableData;
     }
 
 
@@ -283,6 +284,21 @@ public class FileFolderServiceImpl extends AbstractBaseCopyService implements Fi
 
         // Done
         return fileInfo;
+    }
+
+    public List<FileInfo> toFileInfoList(List<NodeRef> nodeRefs)
+    {
+        List<FileInfo> fileInfos = new LinkedList<FileInfo>();
+        for (NodeRef nodeRef : nodeRefs)
+        {
+            // Use service proxy
+            FileInfo fileInfo = this.getFileInfo(nodeRef);
+            if (fileInfo != null)
+            {
+                fileInfos.add(fileInfo);
+            }
+        }
+        return fileInfos;
     }
 
     /**
@@ -1084,7 +1100,7 @@ public class FileFolderServiceImpl extends AbstractBaseCopyService implements Fi
                     if (isPrimaryParent)
                     {
                         // move the node so that the association moves as well
-                        boolean auditableBehaviorWasDisabled = preserveModificationData && behaviourFilter.isEnabled(ContentModel.ASPECT_AUDITABLE);
+                        boolean auditableBehaviorWasDisabled = preserveAuditableData && behaviourFilter.isEnabled(ContentModel.ASPECT_AUDITABLE);
                         if (auditableBehaviorWasDisabled)
                         {
                             behaviourFilter.disableBehaviour(ContentModel.ASPECT_AUDITABLE);

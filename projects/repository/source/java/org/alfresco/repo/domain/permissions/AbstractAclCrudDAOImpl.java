@@ -53,9 +53,9 @@ import org.springframework.extensions.surf.util.ParameterCheck;
  *     <b>alf_access_control_entry</b>
  *     <b>alf_permission</b>
  *     <b>alf_authority</b>
- *     
- * Also, following are currently unused:
- * 
+ *     <b/>
+ * Also, following are currently unused:<b/>
+ *     <b/>
  *     <b>alf_ace_context</b>
  *     <b>alf_authority_alias</b>
  *     
@@ -261,11 +261,6 @@ public abstract class AbstractAclCrudDAOImpl implements AclCrudDAO
         return getADMNodeEntityIdsByAcl(aclEntityId, maxResults);
     }
     
-    public List<Long> getAVMNodesByAcl(long aclEntityId, int maxResults)
-    {
-        return getAVMNodeEntityIdsByAcl(aclEntityId, maxResults);
-    }
-    
     public void updateAcl(AclUpdateEntity entity)
     {
         ParameterCheck.mandatory("entity", entity);
@@ -365,7 +360,6 @@ public abstract class AbstractAclCrudDAOImpl implements AclCrudDAO
     protected abstract int deleteAclEntity(long id);
     
     protected abstract List<Long> getADMNodeEntityIdsByAcl(long aclEntityId, int maxResults);
-    protected abstract List<Long> getAVMNodeEntityIdsByAcl(long aclEntityId, int maxResults);
     
     //
     // ACL Member

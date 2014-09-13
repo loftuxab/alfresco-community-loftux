@@ -65,7 +65,7 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
     
     private static final String JPEG_TYPE = "JPEG Image";
     private static final String TXT_TYPE =  "Plain Text"; 
-    private static final String DOCX_TYPE = "Microsoft Word";
+    private static final String DOCX_TYPE = "Microsoft Word 2007";
     private static final String HTML_TYPE = "HTML";
     private static final String PDF_TYPE =  "Adobe PDF Document";
 
@@ -92,7 +92,7 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
      * 4) Test user logs out
      */
     @Test(groups = { "DataPrepSiteContentBreakdownReport" })
-    public void dataPrep_SiteContentBreakdownReport_ALF_1056() throws Exception
+    public void dataPrep_SiteContentBreakdownReport_AONE_15999() throws Exception
     {
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
@@ -128,7 +128,7 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
      * 3) Checks the mime types and mime type's counts
      */
     @Test(groups = { "SiteContentBreakdownReport" })
-    public void ALF_1056()
+    public void AONE_15999() throws Exception
     {
         //test user (site creator) logs in
         String testName = getTestName();
@@ -140,55 +140,26 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
         ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SITE_CONTENT_REPORT);
         SiteContentBreakdownDashlet siteContentBreakdownDashlet = ShareUserDashboard.getSiteContentBreakdownDashlet(drone, siteName);
         
-        List<String> mimeTypes = siteContentBreakdownDashlet.getTooltipFileTypes();
-        Assert.assertTrue(mimeTypes.contains(TXT_TYPE));
-        Assert.assertTrue(mimeTypes.contains(JPEG_TYPE));
-        //Assert.assertTrue(mimeTypes.contains(DOCX_TYPE));
-        Assert.assertTrue(mimeTypes.contains(PDF_TYPE));
-        Assert.assertTrue(mimeTypes.contains(HTML_TYPE));   
+        verifyDashletData(siteContentBreakdownDashlet, testName, 1);
+   
+        //remove dashlet
+        SiteDashboardPage siteDashBoard = ShareUserDashboard.removeDashlet(drone, Dashlets.SITE_CONTENT_REPORT, siteName);
+        
+        //upload files
+        DocumentLibraryPage docPage = siteDashBoard.getSiteNav().selectSiteDocumentLibrary().render();
+        uploadFiles(docPage, numberOfTxtFiles, ".txt");
+        uploadFiles(docPage, numberOfDocxFiles, ".docx");
+        uploadFiles(docPage, numberOfHtmlFiles, ".html");
+        uploadFiles(docPage, numberOfJpgFiles, ".jpg");
+        uploadFiles(docPage, numberOfPdfFiles, ".pdf");
         
         
-        List<String> mimeTypesData = siteContentBreakdownDashlet.getTooltipFileData();
-        Assert.assertEquals(mimeTypesData.size(), 5);
-        
-        for(String mimeType : mimeTypesData)
-        {
-           String [] counts = mimeType.split("-");
-           String fileCount = counts[1];
-            
-           if (mimeType.trim().startsWith(TXT_TYPE))
-           {
-                //System.out.println("TYPE-COUNT ++++ " + mimeType);
-                //System.out.println("TXT COUNT **** " + fileCount); 
-                Assert.assertEquals(fileCount, numberOfTxtFiles);
-           }
-           if (mimeType.trim().startsWith(JPEG_TYPE))
-           {
-                //System.out.println("TYPE-COUNT ++++ " + mimeType);
-                //System.out.println("JPEG COUNT **** " + fileCount);
-                Assert.assertEquals(fileCount, numberOfJpgFiles);
-           }
-           if (mimeType.trim().startsWith(DOCX_TYPE))
-           {
-                //System.out.println("TYPE-COUNT ++++ " + mimeType);
-                //System.out.println("DOCX COUNT **** " + fileCount);
-                Assert.assertEquals(fileCount, numberOfDocxFiles);
-           }
-           if (mimeType.trim().startsWith(PDF_TYPE))
-           {
-                //System.out.println("TYPE-COUNT ++++ " + mimeType);
-                //System.out.println("PDF COUNT **** " + fileCount);
-                Assert.assertEquals(fileCount, numberOfPdfFiles);
-           }
-           if (mimeType.trim().startsWith(HTML_TYPE))
-           {
-                //System.out.println("TYPE-COUNT ++++ " + mimeType);
-                //System.out.println("HTML COUNT **** " + fileCount);
-                Assert.assertEquals(fileCount, numberOfHtmlFiles);
-           }
-            
-        }
-        
+        //add dashlet
+        ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SITE_CONTENT_REPORT);
+        siteContentBreakdownDashlet = ShareUserDashboard.getSiteContentBreakdownDashlet(drone, siteName);
+ 
+        verifyDashletData(siteContentBreakdownDashlet, testName, 2);
+ 
     }
     
     /**
@@ -202,7 +173,7 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
      * @throws Exception
      */
     @Test(groups = { "DataPrepSiteContentBreakdownReport" })
-    public void dataPrep_SiteContentBreakdownReport_ALF_1057() throws Exception
+    public void dataPrep_SiteContentBreakdownReport_AONE_16000() throws Exception
     {
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
@@ -225,6 +196,9 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
         String[] testUserInfo1 = new String[] { testUser1 };
 
         CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, testUserInfo1);
+        
+        // Login as created user
+        ShareUser.login(drone, testUser, testPassword);
 
         // add user with write permissions to write to the site
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUser1, siteName, UserRole.COLLABORATOR);
@@ -234,8 +208,7 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
 
         // Invited User logs in
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
-
-     
+  
         // first user uploads files
         ShareUser.openSiteDashboard(drone, siteName);
         DocumentLibraryPage docPage = siteDashboard.getSiteNav().selectSiteDocumentLibrary().render();
@@ -256,7 +229,7 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
      * 3) Verify user can't customize the site dasboard 
      */
     @Test(groups = { "SiteContentBreakdownReport" })
-    public void ALF_1057()
+    public void AONE_16000()
     {
         //created logs in
         String testName = getTestName();
@@ -282,6 +255,135 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
         
     }
     
+    /**
+     * 1) Create test user
+     * 2) Login as test user
+     * 3) Create site
+     * 4) test user logs out
+     * 
+     * @throws Exception
+     */
+    @Test(groups = { "DataPrepSiteContentBreakdownReport" })
+    public void dataPrep_TopSiteContributor_AONE_16016() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
+        String[] testUserInfo = new String[] { testUser };
+        String siteName = getSiteName(testName);
+ 
+        // Create test user
+        CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, testUserInfo);
+
+        // Login as created user
+        ShareUser.login(drone, testUser, testPassword);
+
+        // Create site
+        SiteUtil.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PRIVATE);
+
+        //test user logs out
+        ShareUser.logout(drone);
+
+    }
+    
+    /**
+     * 1) Test user (site creator) logs in
+     * 2) Test user (site creator) adds Top Site Contributor Dashlet to site's dashboard
+     * 3) Verifies for each calendar option that the chart is not displayed and No data found message is shown     
+     */
+    @Test(groups = { "SiteContentBreakdownReport" })
+    public void AONE_16016()
+    {
+        // test user (site creator) logs in
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
+        String siteName = getSiteName(testName);
+        ShareUser.login(drone, testUser, testPassword);
+
+        // test user (site creator) adds Top Site Contributor Dashlet to site's dashboard
+        ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SITE_CONTENT_REPORT);
+        SiteContentBreakdownDashlet siteContentBreakdownDashlet = ShareUserDashboard.getSiteContentBreakdownDashlet(drone, siteName);
+      
+        //Verify chart is not displayed and No data found message is shown 
+        siteContentBreakdownDashlet.clickOnChart();
+        Assert.assertTrue(siteContentBreakdownDashlet.isNoDataFoundDisplayed());
+
+    }   
+    
+    
+    /**
+     * 1) Test user is created
+     * 2) Test user creates a private site
+     * 3) Test user uploads 5 txt files, 4 docx files, 2 html files, 3 jpg files and 9 pdf files
+     * 4) Test user logs out
+     */
+    @Test(groups = { "DataPrepSiteContentBreakdownReport" })
+    public void dataPrep_SiteContentBreakdownReport_AONE_16017() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
+        String[] testUserInfo = new String[] { testUser };
+        String siteName = getSiteName(testName);
+        
+        // Create test user
+        CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, testUserInfo);
+
+        // Login as created user
+        ShareUser.login(drone, testUser, testPassword);
+
+        // Create site
+        SiteDashboardPage siteDashboard = ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PRIVATE);
+
+        //upload files
+        DocumentLibraryPage docPage = siteDashboard.getSiteNav().selectSiteDocumentLibrary().render();
+        uploadFiles(docPage, numberOfTxtFiles, ".txt");
+        uploadFiles(docPage, numberOfDocxFiles, ".docx");
+        uploadFiles(docPage, numberOfHtmlFiles, ".html");
+        uploadFiles(docPage, numberOfJpgFiles, ".jpg");
+        uploadFiles(docPage, numberOfPdfFiles, ".pdf");
+        
+        ShareUser.logout(drone);
+        
+             
+    }
+    
+    /**
+     * 1) Test user (site creator) logs in
+     * 2) Test user (site creator) adds Top Site Contributor Dashlet to site's dashboard
+     * 
+     * 
+     * 3) Verifies for each calendar option that the chart is not displayed and No data found message is shown     
+     */
+    @Test(groups = { "SiteContentBreakdownReport" })
+    public void AONE_16017() throws Exception
+    {
+        // test user (site creator) logs in
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
+        String siteName = getSiteName(testName);
+        ShareUser.login(drone, testUser, testPassword);
+
+        // test user (site creator) adds Top Site Contributor Dashlet to site's dashboard
+        ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SITE_CONTENT_REPORT);
+        SiteContentBreakdownDashlet siteContentBreakdownDashlet = ShareUserDashboard.getSiteContentBreakdownDashlet(drone, siteName);
+       
+        //verify files are displayed correctly
+        verifyDashletData(siteContentBreakdownDashlet, testName, 1);
+  
+        //remove dashlet from the dashboard
+        ShareUserDashboard.removeDashlet(drone, Dashlets.SITE_CONTENT_REPORT, siteName);
+        ShareUser.openDocumentLibrary(drone);
+        //delete all the files from site's document library
+        ShareUser.deleteAllContentFromDocumentLibrary(drone);
+         
+        //add the dashlet to the site's document library
+        ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SITE_CONTENT_REPORT);
+        siteContentBreakdownDashlet = ShareUserDashboard.getSiteContentBreakdownDashlet(drone, siteName);
+        
+        //Verify chart is not displayed and No data found message is shown 
+        siteContentBreakdownDashlet.clickOnChart();
+        Assert.assertTrue(siteContentBreakdownDashlet.isNoDataFoundDisplayed());
+
+    }   
     
     /**
      * 
@@ -304,6 +406,54 @@ public class SiteContentBreakdownReportTest extends AbstractUtils
         }        
     }
     
-    
+    /**
+     * Verifies that dashlat displays correct data
+     * 
+     * @param siteContentBreakdownDashlet
+     * @param testName
+     * @throws Exception
+     */
+    private void verifyDashletData(SiteContentBreakdownDashlet siteContentBreakdownDashlet, String testName, int nuberOfFiles) throws Exception
+    {
+        List<String> mimeTypes = siteContentBreakdownDashlet.getTooltipFileTypes();
+        List<String> mimeTypesData = siteContentBreakdownDashlet.getTooltipFileData();
+        
+        Assert.assertTrue(mimeTypes.contains(TXT_TYPE));
+        Assert.assertTrue(mimeTypes.contains(JPEG_TYPE));
+        Assert.assertTrue(mimeTypes.contains(DOCX_TYPE));
+        Assert.assertTrue(mimeTypes.contains(PDF_TYPE));
+        Assert.assertTrue(mimeTypes.contains(HTML_TYPE));   
+        
+        Assert.assertEquals(mimeTypesData.size(), 5);
+        
+        for(String mimeType : mimeTypesData)
+        {
+           String [] counts = mimeType.split("-");
+           String fileCount = counts[1];
+            
+           if (mimeType.trim().startsWith(TXT_TYPE))
+           {
+                Assert.assertEquals(Integer.parseInt(fileCount), (nuberOfFiles * numberOfTxtFiles));
+           }
+           if (mimeType.trim().startsWith(JPEG_TYPE))
+           {
+                Assert.assertEquals(Integer.parseInt(fileCount), (nuberOfFiles * numberOfJpgFiles));
+           }
+           if (mimeType.trim().startsWith(DOCX_TYPE))
+           {
+                Assert.assertEquals(Integer.parseInt(fileCount), (nuberOfFiles * numberOfDocxFiles));
+           }
+           if (mimeType.trim().startsWith(PDF_TYPE))
+           {
+                Assert.assertEquals(Integer.parseInt(fileCount), (nuberOfFiles * numberOfPdfFiles));
+           }
+           if (mimeType.trim().startsWith(HTML_TYPE))
+           {
+                Assert.assertEquals(Integer.parseInt(fileCount), (nuberOfFiles * numberOfHtmlFiles));
+           }
+            
+        }
+        
+    }
     
 }

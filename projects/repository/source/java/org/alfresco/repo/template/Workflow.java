@@ -27,14 +27,11 @@ import java.util.Map;
 
 import org.alfresco.model.ApplicationModel;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.avm.AVMNodeConverter;
-import org.alfresco.repo.forms.processor.workflow.ExtendedFieldBuilder;
 import org.alfresco.repo.workflow.WorkflowModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.TemplateImageResolver;
 import org.alfresco.service.cmr.workflow.WorkflowService;
 import org.alfresco.service.cmr.workflow.WorkflowTask;
@@ -44,7 +41,6 @@ import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolverProvider;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNameMap;
-import org.alfresco.util.Pair;
 
 /**
  * Workflow and task support in FreeMarker templates.
@@ -53,9 +49,6 @@ import org.alfresco.util.Pair;
  */
 public class Workflow extends BaseTemplateProcessorExtension
 {
-    private static final String WCM_WF_MODEL_1_0_URI = "http://www.alfresco.org/model/wcmworkflow/1.0";
-    private static final QName PROP_FROM_PATH = QName.createQName(WCM_WF_MODEL_1_0_URI, "fromPath");
-    
     private ServiceRegistry services;
 
     /**
@@ -263,27 +256,17 @@ public class Workflow extends BaseTemplateProcessorExtension
             
             for(NodeRef nodeRef : contents)
             {
-                if (nodeRef.getStoreRef().getProtocol().equals(StoreRef.PROTOCOL_AVM))
-                {
-                    Pair<Integer, String> vp = AVMNodeConverter.ToAVMVersionPath(nodeRef);
-                    resources.add(new AVMTemplateNode(
-                            vp.getSecond(), vp.getFirst(), this.services, this.resolver));
-               
-                }
-                else
-                {
-                    QName type = nodeService.getType(nodeRef);
+                QName type = nodeService.getType(nodeRef);
 
-                    // make sure the type is defined in the data dictionary
-                    if (ddService.getType(type) != null)
+                // make sure the type is defined in the data dictionary
+                if (ddService.getType(type) != null)
+                {
+                    // look for content nodes or links to content
+                    // NOTE: folders within workflow packages are ignored for now
+                    if (ddService.isSubClass(type, ContentModel.TYPE_CONTENT) || 
+                            ApplicationModel.TYPE_FILELINK.equals(type))
                     {
-                        // look for content nodes or links to content
-                        // NOTE: folders within workflow packages are ignored for now
-                        if (ddService.isSubClass(type, ContentModel.TYPE_CONTENT) || 
-                                ApplicationModel.TYPE_FILELINK.equals(type))
-                        {
-                            resources.add(new TemplateNode(nodeRef, this.services, this.resolver));
-                        }
+                        resources.add(new TemplateNode(nodeRef, this.services, this.resolver));
                     }
                 }
             }

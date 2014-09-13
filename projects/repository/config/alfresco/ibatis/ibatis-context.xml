@@ -27,18 +27,11 @@
     
     <!-- MyBatis config for Alfresco (using common datasource) -->
     <bean id="repoSqlSessionFactory" class="org.alfresco.ibatis.HierarchicalSqlSessionFactoryBean">
-        <property name="useLocalCaches" value="${mybatis.useLocalCaches}"/>
         <property name="resourceLoader" ref="dialectResourceLoader"/>
         <property name="dataSource" ref="dataSource"/>
         <property name="configLocation">
             <value>classpath:alfresco/ibatis/alfresco-SqlMapConfig.xml</value>
         </property>
-    </bean>
-    
-    
-    
-    <bean id="avmSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-        <constructor-arg index="0" ref="repoSqlSessionFactory"/>
     </bean>
     
     <bean id="repoSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">

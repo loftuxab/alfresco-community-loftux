@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,135 +25,88 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, expect, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, expect, assert, require, TestCommon, keys) {
 
    registerSuite({
-      name: 'AlfSearchListScroll Test',
-      'AlfSearchListTest': function () {
+      name: 'SearchList Scroll Test',
+      'Basic Test': function () {
          var browser = this.remote,
-             testname = "AlfSearchListTest",
-             document,
-             countResults = function(expected) {
-                /* TODO: Mock Search service doesn't work, so no results are returned.
-                TestCommon.log(testname, null, "Checking that result count is correct");
-                // Get all result rows from DOM
-                browser.elementsByCss(".alfresco-search-AlfSearchResult")
-                   .then(function(elements) {
-                      assert(elements.length === expected, "Counting Result, expected: " + expected + ", found: " + elements.length);
-                   })
-                   .end();
-                */
-             },
+             testname = "Search List Scroll Test",
+
+            countResults = function(expected) {
+               TestCommon.log(testname, "Checking for " +  expected + " results...");
+               browser.findAllByCssSelector(".alfresco-search-AlfSearchResult")
+                  .then(function(elements) {
+                     assert(elements.length === expected, "Counting Result, expected: " + expected + ", found: " + elements.length);
+                  })
+                  .end();
+            },
             scrollToBottom = function() {
-               browser.eval("window.scrollTo(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,document.documentElement.clientHeight))")
+               TestCommon.log(testname, "Scrolling to bottom...");
+               browser.execute("return window.scrollTo(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,document.documentElement.clientHeight))")
+               .sleep(2000)
+               .end();
             },
             scrollToTop = function() {
-               browser.eval("window.scrollTo(0,0)");
+               TestCommon.log(testname, "Scrolling to top...");
+               browser.execute("return window.scrollTo(0,0)")
+               .sleep(2000)
+               .end();
             };
 
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/documentlibrary/page_models/SearchListScroll_TestPage.json", testname)
+         return TestCommon.loadTestWebScript(this.remote, "/SearchListScroll", testname)
 
-         .end()
+            // Check for the search request being made...
+            .findByCssSelector(TestCommon.topicSelector("ALF_SEARCH_REQUEST", "publish", "any"))
+               .then(null, function() {
+                  TestCommon.log(testname, "Looking for search request...");
+                  assert(false, "Test #1a - Search request not made");
+               })
+               .end()
 
-         // Click the button to set the search term via the hash...
-         .then(function(){
-         TestCommon.log(testname, null, "Setting search data");
-         })
-         .elementByCss("#SET_MULTIPLE_SEARCH_DATA")
-         .moveTo()
-         .click()
-         .end()
+            // Check for the search results being returned...
+            .findByCssSelector(TestCommon.topicSelector("ALF_SEARCH_RESULTS_COUNT", "publish", "any"))
+               .then(null, function() {
+                  TestCommon.log(testname, "Looking for first search response...");
+                  assert(false, "Test #1b - Search results not returned");
+               })
+               .end()
 
-         // Check search term has been set.
-         .elementsByCss(TestCommon.topicSelector("ALF_SET_SEARCH_TERM", "publish", "any"))
-         .then(function(elements) {
-            TestCommon.log(testname,65,"Check that search request triggered");
-            assert(elements.length === 0, "Search not triggered.");
-         })
-         .end()
+            // Count number of results - there should be 25 (Request 1)
+            .then(function(){
+               countResults(25);
+            })
 
-         // Count number of results - there should be 25 (Request 1)
-         .then(function(){
-         countResults(25);
-         })
+            .sleep(1000)
 
-         // Trigger Infinite Scroll.
-         .then(function(){
-            scrollToBottom();
-            scrollToTop();
-            scrollToBottom();
-         })
+            // Trigger Infinite Scroll.
+            .then(function(){
+               scrollToBottom();
+               scrollToTop();
+               scrollToBottom();
+            })
 
-         // Check Trottled Scroll event
-         .elementsByCss(TestCommon.topicSelector("ALF_EVENTS_SCROLL", "publish", "any"))
-         .then(function(elements) {
-            TestCommon.log(testname,74,"Checking that ALF scroll event fired.");
-            assert(elements.length == 1, "Scroll event didn't fire");
-         })
-         .end()
+            // Count Results. there should be 50. (Request 2)
+            .then(function(){
+               countResults(50);
+            })
 
-         // Check Infinite Scroll Event fired.
-         .elementsByCss(TestCommon.topicSelector("ALF_SCROLL_NEAR_BOTTOM", "publish", "any"))
-         .then(function(elements) {
-            TestCommon.log(testname,74,"Checking that ALF scroll near bottom event fired.");
-            assert(elements.length == 1, "Scroll near bottom event didn't fire");
-         })
-         .end()
+            // Scroll Again.
+            .then(function(){
+               scrollToBottom();
+            })
 
-         // Count Results. there should be 50. (Request 2)
-         .then(function(){
-            countResults(50);
-         })
+            // Count Results there should be 75 (Request 3)
+            .then(function(){
+               countResults(75);
+            })
 
-
-         // Scroll Again.
-         .then(function(){
-            scrollToBottom();
-         })
-
-         // Count Results there should be 75 (Request 3)
-         .then(function(){
-            countResults(75);
-         })
-
-         // Facet Results. Check Facet Event
-         .elementByCss("#APPLY_FACET_FILTER")
-         .moveTo()
-         .click()
-         .end()
-
-         // Count Results there should be 6 (Request 4)
-         .then(function(){
-            countResults(6);
-         })
-
-         // Scroll to bottom
-         .then(function(){
-            scrollToBottom();
-         })
-
-         // Check no scroll event is triggered.
-         .then(function(){
-            countResults(6);
-         })
-
-         // Retrigger Search results
-         .elementByCss("#SET_MULTIPLE_SEARCH_DATA")
-         .moveTo()
-         .click()
-         .end()
-
-         // Count Results. Check 25 Exist.
-         .then(function(){
-            countResults(25);
-         })
-
-         // Post the coverage results...
-         .then(function() {
-            TestCommon.postCoverageResults(browser);
-         })
-         .end();
+            // Post the coverage results...
+            .then(function() {
+               TestCommon.postCoverageResults(browser);
+            })
+            .end();
       }
    });
 });

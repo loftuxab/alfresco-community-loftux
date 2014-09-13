@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -88,19 +88,26 @@ define(["dojo/_base/declare",
        * @param {object} payload The details of the widgets and buttons for the dialog
        */
       onCreateDialogRequest: function alfresco_dialogs_AlfDialogService__onCreateDialogRequest(payload) {
+         if (this.dialog != null)
+         {
+            this.dialog.destroyRecursive();
+         }
+
+         // TODO: Update this and other function with scoll setting...
          var dialogConfig = {
             title: this.message(payload.dialogTitle),
+            textContent: payload.textContent,
             widgetsContent: payload.widgetsContent,
             widgetsButtons: payload.widgetsButtons,
             contentWidth: payload.contentWidth ? payload.contentWidth : null,
-            contentHeight: payload.contentHeight ? payload.contentHeight : null
+            contentHeight: payload.contentHeight ? payload.contentHeight : null,
+            handleOverflow: (payload.handleOverflow != null) ? payload.handleOverflow: true
          };
          this.dialog = new AlfDialog(dialogConfig);
-         
 
          if (payload.publishOnShow)
          {
-            array.forEach(payload.publishOnShow, lang.hitch(this, this.publishOnShow))
+            array.forEach(payload.publishOnShow, lang.hitch(this, this.publishOnShow));
          }
          this.dialog.show();
       },
@@ -134,10 +141,10 @@ define(["dojo/_base/declare",
        */ 
       onCreateFormDialogRequest: function alfresco_dialogs_AlfDialogService__onCreateFormDialogRequest(payload) {
          // Destroy any previously created dialog...
-         // if (this.dialog != null)
-         // {
-         //    this.dialog.destroyRecursive();
-         // }
+         if (this.dialog != null)
+         {
+            this.dialog.destroyRecursive();
+         }
 
          if (payload.widgets == null)
          {
@@ -154,7 +161,7 @@ define(["dojo/_base/declare",
                // Create a new pubSubScope just for this request (to allow multiple dialogs to behave independently)...
                var pubSubScope = this.generateUuid();
                var subcriptionTopic =  pubSubScope + this._formConfirmationTopic;
-               this.alfSubscribe(subcriptionTopic, lang.hitch(this, "onDialogConfirmation"));
+               this.alfSubscribe(subcriptionTopic, lang.hitch(this, this.onFormDialogConfirmation));
 
                // Take a copy of the default configuration and mixin in the supplied config to override defaults
                // as appropriate...
@@ -165,7 +172,8 @@ define(["dojo/_base/declare",
                config.subcriptionTopic = subcriptionTopic; // Include the subcriptionTopic in the configuration the subscription can be cleaned up
 
                // Construct the form widgets and then construct the dialog using that configuration...
-               var formConfig = this.createFormConfig(config.widgets);
+               var formValue = (config.formValue != null) ? config.formValue: {};
+               var formConfig = this.createFormConfig(config.widgets, formValue);
                var dialogConfig = this.createDialogConfig(config, formConfig);
                this.dialog = new AlfDialog(dialogConfig);
                this.dialog.show();
@@ -187,7 +195,8 @@ define(["dojo/_base/declare",
       createDialogConfig: function alfresco_dialogs_AlfDialogService__createDialogConfig(config, formConfig) {
          var dialogConfig = {
             title: this.message(config.dialogTitle),
-            pubSubScope: config.pubSubScope, // Scope the dialog content so that it doesn't pollute any other widgets,
+            pubSubScope: config.pubSubScope, // Scope the dialog content so that it doesn't pollute any other widgets,,
+            handleOverflow: (config.handleOverflow != null) ? config.handleOverflow: true,
             parentPubSubScope: config.parentPubSubScope,
             widgetsContent: [formConfig],
             widgetsButtons: [
@@ -219,14 +228,16 @@ define(["dojo/_base/declare",
        *
        * @instance
        * @param {object} widgets This is the configuration of the fields to be included in the form.
+       * @param {object} formValue The initial value to set in the form.
        * @returns {object} The configuration for the form to add to the dialog
        */
-      createFormConfig: function alfresco_dialogs_AlfDialogService__createFormConfig(widgets) {
+      createFormConfig: function alfresco_dialogs_AlfDialogService__createFormConfig(widgets, formValue) {
          var formConfig = {
             name: "alfresco/forms/Form",
             config: {
                displayButtons: false,
-               widgets: widgets
+               widgets: widgets,
+               value: formValue
             }
          };
          return formConfig;
@@ -249,7 +260,7 @@ define(["dojo/_base/declare",
        * @instance
        * @param {object} payload The dialog content
        */
-      onDialogConfirmation: function alfresco_dialogs_AlfDialogService__onDialogConfirmation(payload) {
+      onFormDialogConfirmation: function alfresco_dialogs_AlfDialogService__onFormDialogConfirmation(payload) {
          if (payload != null && 
              payload.dialogContent != null &&
              payload.dialogContent.length == 1 &&

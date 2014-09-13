@@ -52,7 +52,6 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
     private static final String SELECT_ACLS_THAT_INHERIT_FROM_ACL = "alfresco.permissions.select_AclsThatInheritFromAcl";
     private static final String SELECT_LATEST_ACL_BY_GUID = "alfresco.permissions.select_LatestAclByGuid";
     private static final String SELECT_ADM_NODES_BY_ACL = "alfresco.permissions.select_ADMNodesByAclId";
-    private static final String SELECT_AVM_NODES_BY_ACL = "alfresco.permissions.select_AVMNodesByAclId";
     private static final String UPDATE_ACL = "alfresco.permissions.update_Acl";
     private static final String DELETE_ACL = "alfresco.permissions.delete_Acl";
     
@@ -122,7 +121,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", aclEntityId);
         
-        return (AclEntity)template.selectOne(SELECT_ACL_BY_ID, params);
+        return template.selectOne(SELECT_ACL_BY_ID, params);
     }
     
     @SuppressWarnings("unchecked")
@@ -133,7 +132,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         params.put("id", aclEntityId);
         params.put("bool", true);
         
-        return (List<Long>)template.selectList(SELECT_ACLS_THAT_INHERIT_FROM_ACL, params);
+        return template.selectList(SELECT_ACLS_THAT_INHERIT_FROM_ACL, params);
     }
     
     @Override
@@ -143,7 +142,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         params.put("name", aclGuid);
         params.put("bool", true);
         
-        return (Long)template.selectOne(SELECT_LATEST_ACL_BY_GUID, params);
+        return template.selectOne(SELECT_LATEST_ACL_BY_GUID, params);
     }
     
     @SuppressWarnings("unchecked")
@@ -158,22 +157,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", aclEntityId);
         
-        return (List<Long>)template.selectList(SELECT_ADM_NODES_BY_ACL, params, new RowBounds(0 , maxResults));
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    protected List<Long> getAVMNodeEntityIdsByAcl(long aclEntityId, int maxResults)
-    {
-        if (maxResults < 0)
-        {
-            maxResults = RowBounds.NO_ROW_LIMIT;
-        }
-        
-        Map<String, Object> params = new HashMap<String, Object>(1);
-        params.put("id", aclEntityId);
-        
-        return (List<Long>)template.selectList(SELECT_AVM_NODES_BY_ACL, params, new RowBounds(0 , maxResults));
+        return template.selectList(SELECT_ADM_NODES_BY_ACL, params, new RowBounds(0 , maxResults));
     }
     
     @Override
@@ -227,7 +211,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", aclEntityId);
         
-        return (List<AclMemberEntity>) template.selectList(SELECT_ACL_MEMBERS_BY_ACL, params);
+        return template.selectList(SELECT_ACL_MEMBERS_BY_ACL, params);
     }
     
     @SuppressWarnings("unchecked")
@@ -237,7 +221,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("name", authorityName);
         
-        return (List<AclMemberEntity>) template.selectList(SELECT_ACL_MEMBERS_BY_AUTHORITY, params);
+        return template.selectList(SELECT_ACL_MEMBERS_BY_AUTHORITY, params);
     }
     
     @Override
@@ -282,7 +266,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", aclChangeSetEntityId);
         
-        return (AclChangeSetEntity)template.selectOne(SELECT_ACL_CHANGESET_BY_ID, params);
+        return template.selectOne(SELECT_ACL_CHANGESET_BY_ID, params);
     }
     
     @Override
@@ -319,7 +303,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", aceEntityId);
         
-        return (AceEntity)template.selectOne(SELECT_ACE_BY_ID, params);
+        return template.selectOne(SELECT_ACE_BY_ID, params);
     }
     
     @Override
@@ -331,7 +315,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         params.put("bool", allowed);
         params.put("int", type.getId());
         
-        return (AceEntity)template.selectOne(SELECT_ACE_WITH_NO_CONTEXT, params);
+        return template.selectOne(SELECT_ACE_WITH_NO_CONTEXT, params);
     }
     
     
@@ -353,7 +337,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", authorityEntityId);
         
-        return (List<Ace>) template.selectList(SELECT_ACES_BY_AUTHORITY, params);
+        return template.selectList(SELECT_ACES_BY_AUTHORITY, params);
     }
     
     @SuppressWarnings("unchecked")
@@ -363,7 +347,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", aclEntityId);
         
-        return (List<Map<String, Object>>) template.selectList(SELECT_ACES_AND_AUTHORIES_BY_ACL, params);
+        return template.selectList(SELECT_ACES_AND_AUTHORIES_BY_ACL, params);
     }
     
     @Override
@@ -387,7 +371,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", aceContextEntityId);
         
-        return (AceContextEntity)template.selectOne(SELECT_ACE_CONTEXT_BY_ID, params);
+        return template.selectOne(SELECT_ACE_CONTEXT_BY_ID, params);
     }
     
     @Override
@@ -413,7 +397,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", permissionEntityId);
         
-        return (PermissionEntity)template.selectOne(SELECT_PERMISSION_BY_ID, params);
+        return template.selectOne(SELECT_PERMISSION_BY_ID, params);
     }
     
     @Override
@@ -423,7 +407,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         params.put("id", qnameId);
         params.put("name", name);
         
-        return (PermissionEntity)template.selectOne(SELECT_PERMISSION_BY_TYPE_AND_NAME, params);
+        return template.selectOne(SELECT_PERMISSION_BY_TYPE_AND_NAME, params);
     }
     
     @Override
@@ -457,7 +441,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("id", authorityEntityId);
         
-        return (AuthorityEntity)template.selectOne(SELECT_AUTHORITY_BY_ID, params);
+        return template.selectOne(SELECT_AUTHORITY_BY_ID, params);
     }
     
     @SuppressWarnings("unchecked")
@@ -470,7 +454,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         
         // note: allow for list (non-unique name) in case of upgrade of old schemas
         AuthorityEntity result = null;
-        List<AuthorityEntity> authorities = (List<AuthorityEntity>)template.selectList(SELECT_AUTHORITY_BY_NAME, params);
+        List<AuthorityEntity> authorities = template.selectList(SELECT_AUTHORITY_BY_NAME, params);
         for (AuthorityEntity found : authorities)
         {
             if (found.getAuthority().equals(authorityName))
@@ -536,7 +520,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
     @Override
     protected Long selectMaxChangeSetCommitTime()
     {
-        return (Long) template.selectOne(SELECT_CHANGE_SET_MAX_COMMIT_TIME);
+        return template.selectOne(SELECT_CHANGE_SET_MAX_COMMIT_TIME);
     }
 
 
@@ -551,7 +535,7 @@ public class AclCrudDAOImpl extends AbstractAclCrudDAOImpl
         Map<String, Object> params = new HashMap<String, Object>(1);
         params.put("commit_time_ms", maxCommitTime);
         
-        List<Long> sets = (List<Long>) template.selectList(SELECT_CHANGE_SET_LAST, params, new RowBounds(0, 1));
+        List<Long> sets = template.selectList(SELECT_CHANGE_SET_LAST, params, new RowBounds(0, 1));
         if (sets.size() > 0)
         {
             return sets.get(0);

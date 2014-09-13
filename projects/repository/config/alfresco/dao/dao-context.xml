@@ -213,6 +213,7 @@
       <property name="propertyUniqueContextCache" ref="propertyUniqueContextCache"/>
       
       <property name="scriptExecutor" ref="scriptExecutor"/>
+      <property name="uniquenessCheckEnabled" value="${system.propval.uniquenessCheck.enabled}"/>
       
    </bean>
    
@@ -221,40 +222,6 @@
       <property name="contentService" ref="contentService"/>
       <property name="contentDataDAO" ref="contentDataDAO"/>
       <property name="propertyValueDAO" ref="propertyValueDAO"/>
-   </bean>
-   
-   <!-- AVM -->
-   
-   <bean id="newAvmStoreDAO" class="org.alfresco.repo.domain.avm.ibatis.AVMStoreDAOImpl">
-      <property name="sqlSessionTemplate" ref="avmSqlSessionTemplate"/>
-      <property name="qnameDAO" ref="qnameDAO"/>
-      <property name="avmStoreCache" ref="avmStoreCache"/>
-      <property name="avmStorePropertyCache" ref="avmEntityCache"/>
-   </bean>
-   
-   <bean id="newAvmNodeDAO" class="org.alfresco.repo.domain.avm.ibatis.AVMNodeDAOImpl">
-      <property name="sqlSessionTemplate" ref="avmSqlSessionTemplate"/>
-      <property name="qnameDAO" ref="qnameDAO"/>
-      <property name="avmNodeCache" ref="avmNodeCache"/>
-      <property name="avmNodePropertyCache" ref="avmEntityCache"/>
-      <property name="avmNodeAspectsCache" ref="avmNodeAspectsCache"/>
-   </bean>
-   
-   <bean id="newAvmNodeLinksDAO" class="org.alfresco.repo.domain.avm.ibatis.AVMNodeLinksDAOImpl">
-      <property name="sqlSessionTemplate" ref="avmSqlSessionTemplate"/>
-      <property name="avmChildEntryCache" ref="avmEntityCache"/>
-      <property name="avmHistoryLinkCache" ref="avmEntityCache"/>
-   </bean>
-   
-   <bean id="newAvmVersionRootDAO" class="org.alfresco.repo.domain.avm.ibatis.AVMVersionRootDAOImpl">
-      <property name="sqlSessionTemplate" ref="avmSqlSessionTemplate"/>
-      <property name="versionRootEntityCache" ref="avmVersionRootEntityCache"/>
-   </bean>
-   
-   <bean id="avmLockDAO" class="org.alfresco.repo.domain.avm.ibatis.AVMLockDAOImpl">
-      <property name="sqlSessionTemplate" ref="avmSqlSessionTemplate"/>
-      <property name="propertyValueDAO" ref="propertyValueDAO"/>
-      <property name="propertyUniqueContextCache" ref="propertyUniqueContextCache"/>
    </bean>
    
    <!-- Permissions (including ACLs / ACEs) -->
@@ -270,24 +237,8 @@
          <map>
             <entry key="workspace"><ref bean="admPermissionsDaoComponent"></ref></entry>
             <entry key="versionStore"><ref bean="admPermissionsDaoComponent"></ref></entry>
-            <entry key="avm"><ref bean="avmPermissionsDaoComponent"/></entry>
          </map>
       </property>
-   </bean>
-   
-   <bean id="avmPermissionsDaoComponent" class="org.alfresco.repo.domain.permissions.AVMPermissionsDaoComponentImpl">
-      <property name="aclDAO">
-         <ref bean="aclDAO"/>
-      </property>
-      <property name="protocolToACLDAO">
-         <map>
-            <entry key="workspace"><ref bean="admNodeACLDAO"></ref></entry>
-            <entry key="avm"><ref bean="avmNodeACLDAO"/></entry>
-         </map>
-      </property>
-      <property name="defaultACLDAO">
-          <ref bean="admNodeACLDAO"/>
-       </property>
    </bean>
    
    <bean id="admPermissionsDaoComponent" class="org.alfresco.repo.domain.permissions.ADMPermissionsDaoComponentImpl">
@@ -297,7 +248,6 @@
       <property name="protocolToACLDAO">
          <map>
             <entry key="workspace"><ref bean="admNodeACLDAO"></ref></entry>
-            <entry key="avm"><ref bean="avmNodeACLDAO"/></entry>
          </map>
       </property>
       <property name="defaultACLDAO">
@@ -308,15 +258,10 @@
    <bean id="admNodeACLDAO" class="org.alfresco.repo.domain.permissions.ADMAccessControlListDAO">
       <property name="nodeDAO" ref="nodeDAO"/>
       <property name="aclDAO" ref="aclDAO"/>
+      <property name="behaviourFilter" ref="policyBehaviourFilter" />
+      <property name="preserveAuditableData" value="${system.auditableData.ACLs}"></property>
    </bean>
     
-   <bean id="avmNodeACLDAO" class="org.alfresco.repo.domain.permissions.AVMAccessControlListDAO">
-      <property name="avmRepository" ref="avmRepository"/>
-      <property name="avmService" ref="avmService"/>
-      <property name="aclDAO" ref="aclDAO"/>
-      <property name="avmNodeDAO" ref="newAvmNodeDAO"/>
-    </bean>
-   
    <bean id="aclCrudDAO" class="org.alfresco.repo.domain.permissions.ibatis.AclCrudDAOImpl">
       <property name="sqlSessionTemplate" ref="repoSqlSessionTemplate"/>
       <property name="qnameDAO" ref="qnameDAO"/>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,23 +25,17 @@
 define({
 
    /**
-    * This is the base URL to use to bootstrap tests. It should ONLY be defined here so that
+    * This is a selection of urls for test purposes. They should ONLY be defined here so that
     * pervasive changes can be made in this one file.
     *
     * @instance
-    * @type {string}
-    * @default "http://localhost:8081"
+    * @type {object}
     */
-   bootstrapBaseUrl: "http://localhost:8081",
-
-   /**
-    * Should this process run the coverage report submission?
-    *
-    * @instance
-    * @type {boolean}
-    * @default true
-    */
-   doCoverageReport: false,
+   urls: {
+      bootstrapBaseUrl: "http://localhost:8081",
+      moduleDeploymentBaseUrl: "http://admin:admin@localhost:8081",
+      unitTestAppBaseUrl: "http://localhost:8089"
+   },
 
    /**
     * A selection of timeouts
@@ -50,9 +44,10 @@ define({
     * @type {object}
     */
    timeout: {
-      implicitWait: 1000,
-      pageLoad: 10000,
-      asyncScript: 10000
+      base: 1000,
+      find: 250,
+      pageLoad: 2000,
+      executeAsync: 250
    }
 
 });

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -33,77 +33,87 @@ define(["intern!object",
 
          var browser = this.remote;
          var testname = "PropertyTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/renderers/page_models/Property_TestPage.json", testname)
+         return TestCommon.loadTestWebScript(this.remote, "/Property", testname)
 
-         .end()
+         .moveMouseTo(null, 0, 0)
+            .end()
 
-         .elementByCss("#BASIC .value")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,43,"Check standard property is rendered correctly");
-            assert(resultText == "Test", "Standard property not rendered correctly: " + resultText);
-         })
-         .end()
+         .findByCssSelector("#BASIC .value")
+            .getVisibleText()
+            .then(function(resultText) {
+               TestCommon.log(testname,"Check standard property is rendered correctly");
+               assert(resultText == "Test", "Standard property not rendered correctly: " + resultText);
+            })
+            .end()
 
-         .elementByCss("#PREFIX_SUFFIX .value")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,51,"Check prefixed/suffixed property is rendered correctly");
-            assert(resultText == "(Test)", "Prefix and suffix not rendered correctly: " + resultText);
-         })
-         .end()
+         .findByCssSelector("#PREFIX_SUFFIX .value")
+            .getVisibleText()
+            .then(function(resultText) {
+               TestCommon.log(testname,"Check prefixed/suffixed property is rendered correctly");
+               assert(resultText == "(Test)", "Prefix and suffix not rendered correctly: " + resultText);
+            })
+            .end()
 
-         .elementByCss("#NEW_LINE")
-         .getComputedCss("display")
-         .then(function(result) {
-            TestCommon.log(testname,59,"Check new line property is rendered correctly");
-            assert(result == "block", "New line not applied");
-         })
-         .end()
+         .findByCssSelector("#NEW_LINE")
+            .getComputedStyle("display")
+            .then(function(result) {
+               TestCommon.log(testname,"Check new line property is rendered correctly");
+               assert(result == "block", "New line not applied");
+            })
+            .end()
 
-         .elementByCss("#WARN1 .value")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,67,"Check standard warning is rendered correctly");
-            assert(resultText == "No property for: \"missing\"", "Standard warning not rendered correctly: " + resultText);
-         })
-         .end()
+         .findByCssSelector("#WARN1 .value")
+            .getVisibleText()
+            .then(function(resultText) {
+               TestCommon.log(testname,"Check standard warning is rendered correctly");
+               assert(resultText == "No property for: \"missing\"", "Standard warning not rendered correctly: " + resultText);
+            })
+            .end()
 
-         .elementByCss("#WARN2 .value")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,75,"Check explicit warning is rendered correctly");
-            assert(resultText == "No description", "Explicit warning not rendered correctly: " + resultText);
-         })
-         .end()
+         .findByCssSelector("#WARN2 .value")
+            .getVisibleText()
+            .then(function(resultText) {
+               TestCommon.log(testname,"Check explicit warning is rendered correctly");
+               assert(resultText == "No description", "Explicit warning not rendered correctly: " + resultText);
+            })
+            .end()
 
-         .elementByCss("#HOVER .inner")
-         .getComputedCss("visibility")
-         .then(function(result) {
-            TestCommon.log(testname,83,"Check hover property is hidden");
-            assert(result == "hidden", "Hover displayed unexpectedly");
-         })
-         .end()
+         // Position the mouse over the SubscriptionLog to make sure the hover only property isn't displayed...
+         .findByCssSelector(".alfresco-testing-SubscriptionLog")
+            .then(function(element) {
+               browser.moveMouseTo(element);
+            })
+            .end()
 
-         .elementByCss("#LIST_ITEMS tr")
-         .moveTo()
-         .end()
+         .findByCssSelector("#HOVER .inner")
+           .isDisplayed()
+            .then(function(result) {
+               TestCommon.log(testname,"Check hover property is hidden");
+               assert(result === false, "Hover displayed unexpectedly");
+            })
+            .end()
 
-         .elementByCss("#HOVER .value")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,95,"Check hover property is shown on hover");
-            assert(resultText == "Test", "Hover not displayed: " + resultText);
-         })
-         .end()
+         .findByCssSelector("#LIST table tbody tr td")
+            .then(function(element) {
+               browser.moveMouseTo(element);
+            })
+            .end()
 
-         .elementByCss("#LABEL .label")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,103,"Check label is rendered correctly");
-            assert(resultText == "Label:", "Label not rendered correctly: " + resultText);
-         })
-         .end()
+        .findByCssSelector("#HOVER .value")
+           .isDisplayed()
+           .then(function(result) {
+               TestCommon.log(testname,"Check hover property is displayed");
+               assert(result === true, "Hover displayed unexpectedly");
+            })
+           .end()
+
+         .findByCssSelector("#LABEL .label")
+            .getVisibleText()
+            .then(function(resultText) {
+               TestCommon.log(testname,"Check label is rendered correctly");
+               assert(resultText == "Label:", "Label not rendered correctly: " + resultText);
+            })
+            .end()
 
          // Post the coverage results...
          .then(function() {

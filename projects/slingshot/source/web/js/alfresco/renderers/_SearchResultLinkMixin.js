@@ -38,7 +38,7 @@ define(["dojo/_base/declare",
        * @instance
        * @return {object} The generated payload
        */
-      generatePayload: function alfresco_renderers__SearchResultLinkMixin__generatePayload() {
+      generateSearchLinkPayload: function alfresco_renderers__SearchResultLinkMixin__generateSearchLinkPayload() {
          var payload = {
             type: "SHARE_PAGE_RELATIVE",
             target: "CURRENT",
@@ -57,8 +57,9 @@ define(["dojo/_base/declare",
                {
                   payload.url = "site/" + site + "/documentlibrary?path=" + path + "/" + name;
                }
-               else
+               else if (path != null)
                {
+                  path = '/' + path.split('/').slice(2).join('/');
                   payload.url = "repository?path=" + path + "/" + name;
                }
                break;
@@ -98,7 +99,26 @@ define(["dojo/_base/declare",
                   payload.url = "site/" + site + "/links-view?linkId=" + linkid;
                }
                break;
-            
+
+            case "datalist":
+
+               var listid = lang.getObject("name", false, this.currentItem);
+               if (site != null)
+               {
+                  payload.url = "site/" + site + "/data-lists?list=" + listid;
+               }
+               break;
+
+            case "calendarevent":
+
+               //var eventdate = lang.getObject("name", false, this.currentItem);
+               if (site != null)
+               {
+                  //payload.url = "site/" + site + "/calendar?date=" + eventdate; //2014-06-04
+                  payload.url = "site/" + site + "/calendar";
+               }
+               break;
+
             case "datalist":
 
                var listid = lang.getObject("name", false, this.currentItem);

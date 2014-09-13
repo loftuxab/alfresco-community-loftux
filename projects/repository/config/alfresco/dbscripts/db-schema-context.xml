@@ -25,15 +25,6 @@
         </property>
     </bean>
 
-    <bean id="schema.create.avm" class="org.alfresco.repo.domain.schema.SchemaBootstrapRegistration" init-method="register">
-        <property name="schemaBootstrap" ref="schemaBootstrap" />
-        <property name="preCreateScriptUrls">
-            <list>
-                <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/AlfrescoCreate-AvmTables.sql</value>
-            </list>
-        </property>
-    </bean>
-
     <bean id="schema.create.jbpm" class="org.alfresco.repo.domain.schema.SchemaBootstrapRegistration" init-method="register">
         <property name="schemaBootstrap" ref="schemaBootstrap" />
         <property name="postCreateScriptUrls">
@@ -98,22 +89,6 @@
         </property>
     </bean>
 
-    <bean id="schema.upgrade.avm" class="org.alfresco.repo.domain.schema.SchemaBootstrapRegistration" init-method="register">
-        <property name="schemaBootstrap" ref="schemaBootstrap" />
-        <property name="postUpdateScriptPatches">
-            <list>
-                <ref bean="patch.db-V3.2-Remove-AVM-Issuer" />
-                <ref bean="patch.db-V3.2-Modify-AVM-MimeType" />
-                <ref bean="patch.db-V3.3-Fix-AVM-Seqs" />
-                <ref bean="patch.db-V3.4-RemovingLinkValidationMetadata" />
-                <ref bean="patch.db-V3.4-AVM-rename-dupes" />
-                <ref bean="patch.db-V3.4-AVM-index-child-entries-lower" />
-                <ref bean="patch.db-V4.1-fix-AVM-seqs-order" />
-                <ref bean="patch.db-V4.2-drop-AVM-index" />
-            </list>
-        </property>
-    </bean>
-
     <bean id="schema.upgrade.activiti" class="org.alfresco.repo.domain.schema.SchemaBootstrapRegistration" init-method="register">
         <property name="schemaBootstrap" ref="schemaBootstrap" />
         <property name="preUpdateScriptPatches">
@@ -132,6 +107,7 @@
                 <ref bean="patch.db-V4.2-upgrade-to-activiti-5.11" />
                 <ref bean="patch.db-V4.2-remove-old-index-act" />
                 <ref bean="patch.db-V4.2-upgrade-to-activiti-5.13" />
+                <ref bean="patch.db-V5.0-upgrade-to-activiti-5.16.2" />
             </list>
         </property>
     </bean>

@@ -102,7 +102,6 @@
        <property name="schemaReferenceUrls">
           <list>
              <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/Schema-Reference-ALF.xml</value>
-             <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/Schema-Reference-AVM.xml</value>
              <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/Schema-Reference-JBPM.xml</value>
              <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/Schema-Reference-ACT.xml</value>
           </list>
@@ -119,22 +118,6 @@
         <property name="disabled">
             <value>${index.tracking.disableInTransactionIndexing}</value>
         </property>
-    </bean>
-
-    <!-- Bootstrap the AVM -->
-    <bean id="avmBootstrap" class="org.alfresco.repo.avm.AvmBootstrap" >
-       <property name="avmLockingAwareService">
-            <ref bean="avmLockingAwareService"/>
-       </property>
-       <property name="avmRepository">
-         <ref bean="avmRepository"/>
-       </property>
-       <property name="permissionService">
-         <ref bean="permissionService"/>
-       </property>
-       <property name="avmSyncService">
-            <ref bean="avmSyncService"/>
-       </property>
     </bean>
 
     <!-- Load models -->
@@ -186,8 +169,7 @@
     -->
     <bean id="siteLoadBootstrap-Spaces" parent="spacesStoreImporter" singleton="true" />
     <bean id="siteLoadBootstrap-Users" parent="userStoreImporter" singleton="true" />
-    <bean id="siteLoadBootstrap-AVM" parent="sitesAVMZipBootstrap-base" singleton="true" />
-   
+    
     <bean id="workflowBootstrap" parent="workflowDeployer">
         <property name="workflowDefinitions">
             <list>
@@ -225,26 +207,6 @@
                     <prop key="redeploy">false</prop>
                 </props>
                 
-                <!-- WCM workflow definitions -->
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/submit_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-               </props>
-               <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/changerequest_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-               </props>
-               <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/submitdirect_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-            
                 <!-- Invitation service workflow definition -->
                 <props>
                     <prop key="engineId">jbpm</prop>
@@ -321,7 +283,6 @@
         <property name="models">
             <list>
                <value>alfresco/workflow/workflowModel.xml</value>
-               <value>alfresco/workflow/wcmWorkflowModel.xml</value>
                <value>alfresco/workflow/invitation-nominated-workflow-model.xml</value>
                <value>alfresco/workflow/invitation-moderated-workflow-model.xml</value>
                <value>alfresco/workflow/publishingWorkflowModel.xml</value>
@@ -330,7 +291,6 @@
         <property name="labels">
             <list>
                <value>alfresco/workflow/workflow-messages</value>
-               <value>alfresco/workflow/wcm-workflow-messages</value>
                <value>alfresco/workflow/invitation-nominated-workflow-messages</value>
                <value>alfresco/workflow/invitation-moderated-workflow-messages</value>
             </list>
@@ -717,7 +677,6 @@
       <property name="personService" ref="personService" />
       <property name="fileFolderService" ref="fileFolderService" />
       <property name="searchService" ref="searchService" />
-      <property name="avmService" ref="AVMService" />
       <property name="companyHomeStore"><value>${spaces.store}</value></property>
       <property name="companyHomePath"><value>/${spaces.company_home.childname}</value></property>
       <property name="singletonCache" ref="immutableSingletonCache" />

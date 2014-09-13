@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -68,6 +68,28 @@ define(["dojo/_base/declare",
    });
 
    return declare([AlfDocumentListView], {
+      
+      /**
+       * The configuration for selecting the view (configured the menu item)
+       * @instance
+       * @type {object}
+       * @property {string|null} label The label or message key for the view (as appears in the menus)
+       * @property {string|null} iconClass The class to place next to the label
+       */
+      viewSelectionConfig: {
+         label: "doclist.view.simple.label",
+         iconClass: "alf-detailedlist-icon"
+      },
+      
+      /**
+       * Returns the name of the view that is used when saving user view preferences.
+       * 
+       * @instance
+       * @returns {string} "detailed"
+       */
+      getViewName: function alfresco_documentlibrary_views_AlfDocumentListView__getViewName() {
+         return "simple";
+      },
       
       /**
        * An array of the CSS files to use with this widget.

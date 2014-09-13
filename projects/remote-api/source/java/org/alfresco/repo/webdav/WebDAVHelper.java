@@ -34,10 +34,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.events.types.ContentEvent;
 import org.alfresco.events.types.ContentEventImpl;
-import org.alfresco.events.types.ContentReadRangeEvent;
 import org.alfresco.events.types.Event;
 import org.alfresco.jlan.util.IPAddress;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.Client;
+import org.alfresco.repo.Client.ClientType;
 import org.alfresco.repo.events.EventPreparator;
 import org.alfresco.repo.events.EventPublisher;
 import org.alfresco.repo.lock.LockUtils;
@@ -46,6 +47,7 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.activities.ActivityPoster;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -62,7 +64,6 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.EqualsHelper;
-import org.alfresco.util.FileFilterMode.Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.surf.util.URLDecoder;
@@ -111,6 +112,7 @@ public class WebDAVHelper
     private TenantService m_tenantService;
     private HiddenAspect m_hiddenAspect;
     private EventPublisher eventPublisher;
+    private ActivityPoster poster;
     
     // pattern is tested against full path after it has been lower cased.
     private Pattern m_renameShufflePattern = Pattern.compile("(.*/\\..*)|(.*[a-f0-9]{8}+$)|(.*\\.tmp$)|(.*\\.wbk$)|(.*\\.bak$)|(.*\\~$)|(.*backup.*\\.do[ct]{1}[x]?[m]?$)|(.*\\.sb\\-\\w{8}\\-\\w{6}$)");
@@ -332,6 +334,15 @@ public class WebDAVHelper
     public void setEventPublisher(EventPublisher eventPublisher)
     {
         this.eventPublisher = eventPublisher;
+    }
+    
+
+    /**
+     * @param poster
+     */
+    public void setPoster(ActivityPoster poster)
+    {
+        this.poster = poster;
     }
     
     /**
@@ -1090,26 +1101,21 @@ public class WebDAVHelper
     protected void publishReadEvent(final FileInfo realNodeInfo, final String mimetype, final Long size, final String contentEncoding, final String range)
     {
      
-        eventPublisher.publishEvent(new EventPreparator(){
-            @Override
-            public Event prepareEvent(String user, String networkId, String transactionId)
+        if (!StringUtils.hasText(range))
+        {
+            // Its not a range request
+            eventPublisher.publishEvent(new EventPreparator()
             {
-//                SiteService siteService = getServiceRegistry().getSiteService();
-//                final String siteId = siteService.getSiteShortName(realNodeInfo.getNodeRef());
-                
-                if (StringUtils.hasText(range))
-                { 
-                    return new ContentReadRangeEvent(user, networkId, transactionId, realNodeInfo.getNodeRef().getId(),
-                                null, realNodeInfo.getType().toString(), Client.webdav, realNodeInfo.getName(), mimetype, size, contentEncoding, range); 
-                } 
-                else 
+                @Override
+                public Event prepareEvent(String user, String networkId, String transactionId)
                 {
-                    return new ContentEventImpl(ContentEvent.DOWNLOAD, user, networkId, transactionId, realNodeInfo.getNodeRef().getId(),
-                                null, realNodeInfo.getType().toString(), Client.webdav, realNodeInfo.getName(), mimetype, size, contentEncoding);            
+                    return new ContentEventImpl(ContentEvent.DOWNLOAD, user, networkId, transactionId, realNodeInfo.getNodeRef().getId(), null,
+                                realNodeInfo.getType().toString(), Client.asType(ClientType.webdav), realNodeInfo.getName(), mimetype,
+                                size, contentEncoding);
                 }
-            }
-        });
+            });
 
+        }
     }
     
     public String getRepositoryPath(HttpServletRequest request)

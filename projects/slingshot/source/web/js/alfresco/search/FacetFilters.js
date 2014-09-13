@@ -109,16 +109,13 @@ define(["dojo/_base/declare",
        * @instance
        */
       postCreate: function alfresco_search_FacetFilters__postCreate() {
-         if (this.label != null && this.label != "")
-         {
-            Alfresco.util.createTwister(this.labelNode, this.filterPrefsName);
-         }
+         this.inherited(arguments);
 
          // TODO: Commented out and published because it's being developed against QuaddsWidgets...
          this.alfSubscribe("ALF_WIDGETS_READY", lang.hitch(this, "publishFacets"), true);
          // this.publishFacets();
       },
-      
+
       /**
        * This has been added to support the initial implementation of date and size faceting against
        * Solr 1.4. The search service will always include modification/creation date and file size
@@ -136,15 +133,13 @@ define(["dojo/_base/declare",
        * @instance
        */
       publishFacets: function alfresco_search_FacetFilters__publishFacets() {
-         if (this.facetQName != null && this.facetQName != "")
+         if (this.facetQName != null && this.facetQName !== "")
          {
             // Publish the details of the facet for the SearchService to log for inclusion in search requests
-            if (this.blockIncludeFacetRequest == false)
-            {
-               this.alfPublish("ALF_INCLUDE_FACET", {
-                  qname: this.facetQName
-               }, true);
-            }
+            this.alfPublish("ALF_INCLUDE_FACET", {
+               qname: this.facetQName,
+               blockIncludeFacetRequest: this.blockIncludeFacetRequest
+            }, true);
 
             // Subscribe to facet property results to add facet properties...
             this.alfSubscribe("ALF_FACET_RESULTS_@" + this.facetQName, lang.hitch(this, "processFacetFilters"));
@@ -246,7 +241,7 @@ define(["dojo/_base/declare",
             domClass.remove(this.showMoreNode, "hidden");
          }
 
-         if (filters.length == 0)
+         if (filters.length === 0)
          {
             domClass.add(this.domNode, "hidden");
          }

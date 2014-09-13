@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,6 +18,11 @@
  */
 
 /**
+ * <p>The default picker widget for use in [picker form controls]{@link module:alfresco/forms/controls/Picker} and can be
+ * extended as necessary to customize the initial set of "root pickers" by overriding the [widgetsForRootPicker attribute]
+ * {@link module:alfresco/pickers/Picker#widgetsForRootPicker}. The picked items display can also be customized by
+ * overriding the [widgetsForPickedItems attribute]{@link module:alfresco/pickers/Picker#widgetsForPickedItems}.</p>
+ *
  * @module alfresco/pickers/Picker
  * @extends dijit/_WidgetBase
  * @mixes dijit/_TemplatedMixin
@@ -26,25 +31,33 @@
  * @author Dave Draper
  */
 define(["dojo/_base/declare",
-        "dijit/_WidgetBase", 
+        "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
         "dojo/text!./templates/Picker.html",
         "alfresco/core/Core",
         "alfresco/core/CoreWidgetProcessing",
-        "dojo/_base/lang"], 
+        "dojo/_base/lang"],
         function(declare, _WidgetBase, _TemplatedMixin, template, AlfCore, CoreWidgetProcessing, lang) {
-   
+
    return declare([_WidgetBase, _TemplatedMixin, AlfCore, CoreWidgetProcessing], {
 
       /**
+       * An array of the i18n files to use with this widget.
+       *
+       * @instance
+       * @type {Array}
+       */
+      i18nRequirements: [{i18nFile: "./i18n/Picker.properties"}],
+
+      /**
        * An array of the CSS files to use with this widget.
-       * 
+       *
        * @instance
        * @type {object[]}
        * @default [{cssFile:"./css/Picker.css"}]
        */
       cssRequirements: [{cssFile:"./css/Picker.css"}],
-      
+
       /**
        * The HTML template to use for the widget.
        * @instance
@@ -54,8 +67,7 @@ define(["dojo/_base/declare",
 
       /**
        * Keeps track of the current picker depth. When a new picker is added it will be given the current depth
-       * which will then be incremented. When a picker requests a another picker be added (e.g. selecting "Repository"
-       * requests that an "alfresco/pickers/Explorer" rooted at Company Home be added) it should include the depth
+       * which will then be incremented. When a picker requests a another picker be added it should include the depth
        * within the request so that deeper pickers (that are no longer relevant) are removed.
        *
        * @instance
@@ -66,7 +78,7 @@ define(["dojo/_base/declare",
 
       /**
        * Used to keep track of the current pickers that are displayed. When a new picker is added it will be added at
-       * a depth that is greater than the requesting picker. This means that "deeper" pickers must be destroyed and 
+       * a depth that is greater than the requesting picker. This means that "deeper" pickers must be destroyed and
        * this is the object that will be referenced to determine which pickers are destroyed
        *
        * @instance
@@ -99,26 +111,31 @@ define(["dojo/_base/declare",
       _processsingPickedItems: false,
 
       /**
-       * 
+       *
        *
        * @instance
        */
       postCreate: function alfresco_pickers_Picker__postCreate() {
-
+         this.pubSubScope = this.generateUuid() + "_";
          this.currentPickers = [];
-
-         this.alfSubscribe("ALF_ADD_PICKER", lang.hitch(this, "addPicker"));
+         this.alfSubscribe("ALF_ADD_PICKER", lang.hitch(this, this.addPicker));
 
          // If requested, show picked items...
-         if (this.showPickedItems == true)
+         if (this.showPickedItems === true)
          {
             this._processsingPickedItems = true;
             this.processWidgets(lang.clone(this.widgetsForPickedItems), this.pickedItemsNode);
+            if (this.pickedItemsLabel) {
+               this.pickedItemsLabelNode.innerHTML = this.message(this.pickedItemsLabel);
+            }
          }
 
          if (this.widgetsForRootPicker != null)
          {
             this.processWidgets(lang.clone(this.widgetsForRootPicker), this.subPickersNode);
+            if (this.subPickersLabel) {
+               this.subPickersLabelNode.innerHTML = this.message(this.subPickersLabel);
+            }
          }
       },
 
@@ -162,6 +179,10 @@ define(["dojo/_base/declare",
             this.processWidgets([payload.picker], this.subPickersNode);
             this.currentPickerDepth++;
          }
+         else
+         {
+            this.alfLog("error", "Error creating a picker: the payload picker is missing a picker object: ", payload);
+         }
       },
 
       /**
@@ -174,9 +195,9 @@ define(["dojo/_base/declare",
        */
       allWidgetsProcessed: function alfresco_pickers_Picker__allWidgetsProcessed(widgets) {
 
-         if (this._processsingPickedItems ==true)
+         if (this._processsingPickedItems === true)
          {
-            // Reset the _processsingPickedItems flag now that the picked items model has 
+            // Reset the _processsingPickedItems flag now that the picked items model has
             // been rendered...
             this._processsingPickedItems = false;
             this.pickedItemsWidget.setPickedItems(this.value);
@@ -212,7 +233,7 @@ define(["dojo/_base/declare",
        */
       getValue: function alfresco_pickers_Picker__getValue() {
          var value = [];
-         if (this.showPickedItems == true)
+         if (this.showPickedItems === true)
          {
             if (this.pickedItemsWidget != null)
             {
@@ -223,7 +244,7 @@ define(["dojo/_base/declare",
       },
 
       /**
-       * The default widgets for the picker. This can be overridden at instantiation based on what is required to be 
+       * The default widgets for the picker. This can be overridden at instantiation based on what is required to be
        * displayed in the picker.
        *
        * @instance
@@ -237,8 +258,8 @@ define(["dojo/_base/declare",
                   {
                      name: "alfresco/menus/AlfMenuBarItem",
                      config: {
-                        label: "My Files",
-                        publishTopic: "ALF_ADD_PICKER",
+                        label: "picker.myFiles.label",
+                        publishOnRender: true, // Topic will be published when the item is rendered.
                         publishPayload: {
                            currentPickerDepth: 0,
                            picker: {
@@ -254,7 +275,7 @@ define(["dojo/_base/declare",
                   {
                      name: "alfresco/menus/AlfMenuBarItem",
                      config: {
-                        label: "Shared Files",
+                        label: "picker.sharedFiles.label",
                         publishTopic: "ALF_ADD_PICKER",
                         publishPayload: {
                            currentPickerDepth: 0,
@@ -262,7 +283,9 @@ define(["dojo/_base/declare",
                               name: "alfresco/pickers/DocumentListPicker",
                               config: {
                                  nodeRef: "alfresco://company/shared",
-                                 path: "/"
+                                 filter: {
+                                    path: "/"
+                                 }
                               }
                            }
                         }
@@ -271,7 +294,7 @@ define(["dojo/_base/declare",
                   {
                      name: "alfresco/menus/AlfMenuBarItem",
                      config: {
-                        label: "Repository",
+                        label: "picker.repository.label",
                         publishTopic: "ALF_ADD_PICKER",
                         publishPayload: {
                            currentPickerDepth: 0,
@@ -288,7 +311,7 @@ define(["dojo/_base/declare",
                   {
                      name: "alfresco/menus/AlfMenuBarItem",
                      config: {
-                        label: "Recent Sites",
+                        label: "picker.recentSites.label",
                         publishTopic: "ALF_ADD_PICKER",
                         publishPayload: {
                            currentPickerDepth: 0,
@@ -305,7 +328,7 @@ define(["dojo/_base/declare",
                   {
                      name: "alfresco/menus/AlfMenuBarItem",
                      config: {
-                        label: "Favorite Sites",
+                        label: "picker.favouriteSites.label",
                         publishTopic: "ALF_ADD_PICKER",
                         publishPayload: {
                            currentPickerDepth: 0,
@@ -337,6 +360,9 @@ define(["dojo/_base/declare",
             name: "alfresco/pickers/PickedItems",
             assignTo: "pickedItemsWidget"
          }
-      ]
+      ],
+
+      subPickersLabel: "Path",
+      pickedItemsLabel: "Picked Items"
    });
 });

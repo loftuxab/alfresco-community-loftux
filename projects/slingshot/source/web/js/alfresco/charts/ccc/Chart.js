@@ -64,6 +64,16 @@ define(["dojo/_base/declare",
             pvcChartType: null,
 
             /**
+             * Any additional configuration attributes for the chart can be set here
+             * 
+             * <p>Options set here will override anything set via another named property.</p>
+             *
+             * @instance
+             * @type {object}
+             */
+            chartConfig: null,
+
+            /**
              * The charts container element (will be set by dojo)
              * @instance
              * @type {HTMLElement}
@@ -77,6 +87,13 @@ define(["dojo/_base/declare",
              * @type {string}
              */
             dataTopic: null,
+
+            /**
+             * The initial payload of the [dataTopic]{@link module:alfresco/charts/ccc/Chart#dataTopic}.
+             *
+             * @instance
+             */
+            dataTopicPayload: {},
 
             /**
              * The topic to publish when chart data item has been clicked.
@@ -294,8 +311,7 @@ define(["dojo/_base/declare",
                if (this.dimensions) {
                   config.dimensions = this.dimensions;
                }
-               if (this.extensionPoints)
-               {
+               if (this.extensionPoints) {
                   config.extensionPoints = this.extensionPoints;
                }
 
@@ -307,10 +323,20 @@ define(["dojo/_base/declare",
 
                config.tooltip = this.tooltip;
 
-               var styles = this.resolveCssStyles(this.baseClass + "--color", [1,2,3,4,5,6,7,8], {
+               var styles = this.resolveCssStyles(this.baseClass + "--color", [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], {
                   backgroundColor: ["rgba(0, 0, 0, 0)", "transparent"]
                });
                config.colors = styles.backgroundColor;
+
+               // Set any additional chart options
+               if (typeof this.chartConfig == "object")
+               {
+                  for (var p in this.chartConfig)
+                  {
+                     config[p] = this.chartConfig[p];
+                  }
+               }
+
                return config;
             },
 
@@ -341,7 +367,7 @@ define(["dojo/_base/declare",
             postCreate: function alfresco_charts_ccc_Chart__postCreate() {
                if (this.dataTopic) {
                   // Set a response topic that is scoped to this widget...
-                  var dataTopicPayload = {};
+                  var dataTopicPayload = this.dataTopicPayload || {};
                   dataTopicPayload.alfResponseTopic = this.dataTopic;
                   this.alfPublish(this.dataTopic, dataTopicPayload);
                }

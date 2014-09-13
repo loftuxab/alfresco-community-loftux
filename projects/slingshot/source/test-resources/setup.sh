@@ -1,4 +1,10 @@
 #!/bin/sh
+
+SELENIUM_VERSION="selenium-server-standalone-2.42.2.jar"
+SELENIUM_VERSION_NUMBER="2.42"
+PHANTOMJS_VERSION="phantomjs-1.9.7-linux-x86_64" #don't include .tar.bz2 ext.
+CHROMEDRIVER_VERSION="2.10"
+
 set -e
 
 if [ -e /.installed ]; then
@@ -24,23 +30,18 @@ else
    cd /tmp
 
    # Download and copy the ChromeDriver to /usr/local/bin
-   # wget "https://chromedriver.googlecode.com/files/chromedriver_linux64_2.3.zip"
-   # unzip chromedriver_linux64_2.3.zip
-   wget "http://chromedriver.storage.googleapis.com/2.9/chromedriver_linux64.zip"
+   wget "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
    unzip chromedriver_linux64.zip
    mv chromedriver /usr/local/bin
 
    # Download and copy Phantomjs to /usr/local/bin
-   # wget "http://phantomjs.googlecode.com/files/phantomjs-1.9.2-linux-x86_64.tar.bz2"
-   # tar -xjvf phantomjs-1.9.2-linux-x86_64.tar.bz2
-   # mv phantomjs-1.9.2-linux-x86_64/bin/phantomjs /usr/local/bin
-   wget "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2"
-   tar -xjvf phantomjs-1.9.7-linux-x86_64.tar.bz2
-   mv phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin
+   wget "https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOMJS_VERSION.tar.bz2"
+   tar -xjvf $PHANTOMJS_VERSION.tar.bz2
+   mv $PHANTOMJS_VERSION/bin/phantomjs /usr/local/bin
 
    # Download and copy Selenium to /usr/local/bin
-   wget "https://selenium.googlecode.com/files/selenium-server-standalone-2.39.0.jar"
-   mv selenium-server-standalone-2.39.0.jar /usr/local/bin
+   wget "http://selenium-release.storage.googleapis.com/$SELENIUM_VERSION_NUMBER/$SELENIUM_VERSION"
+   mv $SELENIUM_VERSION /usr/local/bin
 
    # So that running `vagrant provision` doesn't redownload everything
    touch /.installed
@@ -50,18 +51,18 @@ fi
 export DISPLAY=:10
 cd /vagrant
 
-echo "Starting Xvfb ..."
+echo "Starting Xvfb (v`dpkg -s xvfb| grep Version|cut -d: -f2`)..."
 Xvfb :10 -screen 0 1366x768x24 -ac &
 
-echo "Starting Google Chrome ..."
+echo "Starting Google Chrome (v`dpkg -s google-chrome-stable| grep Version|cut -d: -f2` w/ Chrome Driver v$CHROMEDRIVER_VERSION)..."
 google-chrome --remote-debugging-port=9222 &
 
-echo "Starting Firefox ..."
+echo "Starting Firefox (v`dpkg -s firefox| grep Version|cut -d: -f2`)..."
 firefox &
 
-echo "Starting Phantomjs ..."
+echo "Starting Phantomjs ($PHANTOMJS_VERSION)..."
 phantomjs --ignore-ssl-errors=true --web-security=false --webdriver=192.168.56.4:4444 &
 
-echo "Starting Selenium ..."
+echo "Starting Selenium (v$SELENIUM_VERSION_NUMBER)..."
 cd /usr/local/bin
-nohup java -jar ./selenium-server-standalone-2.39.0.jar &
+nohup java -jar ./$SELENIUM_VERSION &

@@ -12,8 +12,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <webdrone.version>2.5</webdrone.version>
+        <webdrone.version>2.6</webdrone.version>
         <share-po.version>${project.version}</share-po.version>
         <office.component>libreofficecomponent</office.component>
         <enable.hybrid>false</enable.hybrid>
@@ -84,7 +83,95 @@
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>   
+        <dependency>
+                <groupId>org.alfresco.services</groupId>
+	        <artifactId>alfresco-events</artifactId>
+                <version>1.1-SNAPSHOT</version>
+        </dependency>      
+        <dependency>
+	        <groupId>org.apache.camel</groupId>
+	        <artifactId>camel-core</artifactId>
+	        <version>2.12.0</version>
+        </dependency>        
+	        <dependency>
+	            <groupId>org.apache.activemq</groupId>
+	            <artifactId>activemq-client</artifactId>
+	            <version>5.9.0</version>
+	            <exclusions>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-api</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-log4j12</artifactId>
+	                </exclusion>
+	            </exclusions>
+	        </dependency>
+	        <dependency>
+	            <groupId>org.apache.activemq</groupId>
+	            <artifactId>activemq-broker</artifactId>
+	            <version>5.9.0</version>
+	        </dependency>
+	        <dependency>
+	            <groupId>org.apache.activemq</groupId>
+	            <artifactId>activemq-camel</artifactId>
+	            <version>5.9.0</version>
+	            <exclusions>
+	                <exclusion>
+	                    <groupId>org.springframework</groupId>
+	                    <artifactId>spring-beans</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>commons-logging</groupId>
+	                    <artifactId>commons-logging</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>commons-pool</groupId>
+	                    <artifactId>commons-pool</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-api</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-log4j12</artifactId>
+	                </exclusion>
+	            </exclusions>
+	        </dependency>
+	        <dependency>
+	            <groupId>org.apache.activemq</groupId>
+	            <artifactId>activemq-amqp</artifactId>
+	            <version>5.9.0</version>
+	            <exclusions>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-api</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-log4j12</artifactId>
+	                </exclusion>
+	            </exclusions>
+	        </dependency>
+	        <dependency>
+	            <groupId>org.apache.activemq</groupId>
+	            <artifactId>activemq-pool</artifactId>
+	            <version>5.9.0</version>
+	            <exclusions>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-api</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>org.slf4j</groupId>
+	                    <artifactId>slf4j-log4j12</artifactId>
+	                </exclusion>
+	            </exclusions>
+	        </dependency>
+        
         <!-- Selenium -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -94,7 +181,6 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -109,7 +195,6 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -119,7 +204,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
-            <version>3.1.2.RELEASE</version>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${dependency.spring.version}</version>
         </dependency>
         <dependency>
 	    <groupId>se.loftux.alfresco</groupId>
@@ -148,7 +238,6 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
         </dependency>
 
         <dependency>

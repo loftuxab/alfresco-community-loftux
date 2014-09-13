@@ -32,7 +32,7 @@ define(["./config/Suites"],
       ],
 
       // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
-      maxConcurrency: 2,
+      maxConcurrency: 1,
 
       // Whether or not to start Sauce Connect before running tests
       useSauceConnect: false,
@@ -40,8 +40,8 @@ define(["./config/Suites"],
       // Connection information for the remote WebDriver service. If using Sauce Labs, keep your username and password
       // in the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables unless you are sure you will NEVER be
       // publishing this configuration file somewhere
-      webdriver: {
-         host: 'localhost',
+      tunnelOptions: {
+         hostname: 'localhost',
          port: 4444
       },
 
@@ -49,7 +49,7 @@ define(["./config/Suites"],
       // used here
       loader: {
          // Packages that should be registered with the loader in each testing environment
-	     // Note: the config package is specifically for virtual machine (vm)
+         // Note: the config package is specifically for grid machine (grid)
          packages: [
             { name: 'alfresco', location: './tests/alfresco' },
             { name: 'config', location: './tests/config/grid' }

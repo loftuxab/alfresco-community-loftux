@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.ibatis.BatchingDAO;
-import org.alfresco.repo.domain.avm.AVMNodeEntity;
 import org.alfresco.repo.domain.contentdata.ContentDataDAO;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.apache.ibatis.session.ResultHandler;
@@ -51,84 +50,22 @@ public abstract class AbstractPatchDAOImpl implements PatchDAO, BatchingDAO
         this.contentDataDAO = contentDataDAO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public long getAVMNodesCountWhereNewInStore()
-    {
-        return getAVMNodeEntitiesCountWhereNewInStore();
-    }
-    
-    public List<AVMNodeEntity> getEmptyGUIDS(int count)
-    {
-        return getAVMNodeEntitiesWithEmptyGUID(count);
-    }
-    
-    public List<AVMNodeEntity> getNullVersionLayeredDirectories(int count)
-    {
-        return getNullVersionLayeredDirectoryNodeEntities(count);
-    }
-    
-    public List<AVMNodeEntity> getNullVersionLayeredFiles(int count)
-    {
-        return getNullVersionLayeredFileNodeEntities(count);
-    }
-    
-    public int updateAVMNodesNullifyAcl(List<Long> nodeIds)
-    {
-        return updateAVMNodeEntitiesNullifyAcl(nodeIds);
-    }
-    
-    public int updateAVMNodesSetAcl(long aclId, List<Long> nodeIds)
-    {
-        return updateAVMNodeEntitiesSetAcl(aclId, nodeIds);
-    }
-    
-    protected abstract long getAVMNodeEntitiesCountWhereNewInStore();
-    protected abstract List<AVMNodeEntity> getAVMNodeEntitiesWithEmptyGUID(int maxResults);
-    protected abstract List<AVMNodeEntity> getNullVersionLayeredDirectoryNodeEntities(int maxResults);
-    protected abstract List<AVMNodeEntity> getNullVersionLayeredFileNodeEntities(int maxResults);
-    protected abstract int updateAVMNodeEntitiesNullifyAcl(List<Long> nodeIds);
-    protected abstract int updateAVMNodeEntitiesSetAcl(long aclId, List<Long> nodeIds);
-    
+    @Override
     public long getMaxAclId()
     {
         return getMaxAclEntityId();
     }
     
+    @Override
     public long getDmNodeCount()
     {
         return getDmNodeEntitiesCount();
     }
     
+    @Override
     public long getDmNodeCountWithNewACLs(Long above)
     {
         return getDmNodeEntitiesCountWithNewACLs(above);
-    }
-    
-    public List<Long> selectAllAclIds()
-    {
-        return selectAllAclEntityIds();
-    }
-    
-    public List<Long> selectNonDanglingAclIds()
-    {
-        return selectNonDanglingAclEntityIds();
-    }
-    
-    public int deleteDanglingAces()
-    {
-        return deleteDanglingAceEntities();
-    }
-    
-    public int deleteAcls(List<Long> aclIds)
-    {
-        return deleteAclEntities(aclIds);
-    }
-    
-    public int deleteAclMembersForAcls(List<Long> aclIds)
-    {
-        return deleteAclMemberEntitiesForAcls(aclIds);
     }
     
     /**
@@ -136,6 +73,7 @@ public abstract class AbstractPatchDAOImpl implements PatchDAO, BatchingDAO
      * <p>
      * @see #getAdmOldContentProperties(Long, Long)
      */
+    @Override
     public void updateAdmV31ContentProperties(Long minNodeId, Long maxNodeId)
     {
         List<Map<String, Object>> props = getAdmOldContentProperties(minNodeId, maxNodeId);
@@ -209,11 +147,6 @@ public abstract class AbstractPatchDAOImpl implements PatchDAO, BatchingDAO
     protected abstract long getMaxAclEntityId();
     protected abstract long getDmNodeEntitiesCount();
     protected abstract long getDmNodeEntitiesCountWithNewACLs(Long above);
-    protected abstract List<Long> selectAllAclEntityIds();
-    protected abstract List<Long> selectNonDanglingAclEntityIds();
-    protected abstract int deleteDanglingAceEntities();
-    protected abstract int deleteAclEntities(List<Long> aclIds);
-    protected abstract int deleteAclMemberEntitiesForAcls(List<Long> aclIds);
     
     // note: caller's row handler is expected to migrate the attrs
     @Override
@@ -223,15 +156,6 @@ public abstract class AbstractPatchDAOImpl implements PatchDAO, BatchingDAO
     }
     
     protected abstract void getOldAttrTenantsImpl(ResultHandler resultHandler);
-    
-    // note: caller's row handler is expected to migrate the attrs
-    @Override
-    public void migrateOldAttrAVMLocks(ResultHandler resultHandler)
-    {
-        getOldAttrAVMLocksImpl(resultHandler);
-    }
-    
-    protected abstract void getOldAttrAVMLocksImpl(ResultHandler resultHandler);
     
     // note: caller's row handler is expected to migrate the attrs
     @Override

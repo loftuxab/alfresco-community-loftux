@@ -28,6 +28,7 @@
  * @extends dijit/_WidgetBase
  * @mixes dijit/_TemplatedMixin
  * @mixes dijit/_FocusMixin
+ * @mixes module:alfresco/forms/controls/FormControlValidationMixin
  * @mixes module:alfresco/core/Core
  * @author Dave Draper
  */
@@ -35,20 +36,22 @@ define(["dojo/_base/declare",
         "dijit/_WidgetBase", 
         "dijit/_TemplatedMixin",
         "dijit/_FocusMixin",
-        "dojo/text!./templates/BaseFormControl.html",
-        "dojo/dom-construct",
         "alfresco/core/Core",
+        "alfresco/forms/controls/FormControlValidationMixin",
+        "dojo/text!./templates/BaseFormControl.html",
         "alfresco/core/ObjectTypeUtils",
-        "dojo/_base/xhr",
+        "alfresco/core/ArrayUtils",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/dom-style",
         "dojo/dom-class",
-        "dijit/focus",
-        "dijit/Tooltip"], 
-        function(declare, _Widget, _Templated, _FocusMixin, template, domConstruct, AlfCore, ObjectTypeUtils, xhr, lang, array, domStyle, domClass, focusUtil, Tooltip) {
-   
-   return declare([_Widget, _Templated, _FocusMixin, AlfCore], {
+        "dijit/Tooltip",
+        "dojo/dom-attr",
+        "dojo/query",
+        "dojo/dom-construct"], 
+        function(declare, _Widget, _Templated, _FocusMixin, AlfCore, FormControlValidationMixin, template, ObjectTypeUtils, arrayUtils, lang, array, domStyle, domClass, Tooltip, domAttr, query, domConstruct) {
+
+   return declare([_Widget, _Templated, _FocusMixin, AlfCore, FormControlValidationMixin], {
       
       /**
        * An array of the CSS files to use with this widget.
@@ -189,9 +192,26 @@ define(["dojo/_base/declare",
        * will be the case when multiple fields are being used to represent the same data but through progressive disclosure
        * only one field is displayed at a time. By overriding this variable a field can request not to have it's value updated
        * when it is hidden or disabled.
+       * 
+       * @instance
+       * @type {boolean}
+       * @default false
        */
       noValueUpdateWhenHiddenOrDisabled: false,
       
+      /**
+       * Sometimes multiple form controls might be used to represent a single post parameter. For example a set of radio
+       * buttons might present a set of options for a parameter where the last radio button progressively reveals a 
+       * text box for entering a custom value. In that case the radio buttons form control is superceded by the revealed
+       * text box. By setting this attribute to an array containing the values that prevent the form control value being
+       * included in the form post it is possible to define that behaviour
+       *
+       * @instance
+       * @type {array}
+       * @default null
+       */
+      noPostWhenValueIs: null,
+
       /**
        * The default visibility status is always true (this can be overridden by extending controls).
        * 
@@ -212,7 +232,7 @@ define(["dojo/_base/declare",
          this._visible = status;
          if (this.containerNode)
          {
-            var display = status ? "block" : "none";
+            var display = status ? "" : "none";
             domStyle.set(this.containerNode, {
                display: display
             });
@@ -239,7 +259,7 @@ define(["dojo/_base/declare",
          this._required = status;
          if (this._requirementIndicator)
          {
-            if (this._required == true)
+            if (this._required === true)
             {
                domClass.add(this._requirementIndicator, "required");
             }
@@ -310,12 +330,28 @@ define(["dojo/_base/declare",
       disablementConfig: null,
       
       /**
+       * Defines an array of rules for auto-setting the value of the widget. Each element in the array is configured
+       * in the same way as the [visibilityConfig]{@link module:alfresco/forms/controls/BaseFormControl#visibilityConfig},
+       * [requirementConfig]{@link module:alfresco/forms/controls/BaseFormControl#requirementConfig} or 
+       * [disablementConfig]{@link module:alfresco/forms/controls/BaseFormControl#disablementConfig} in that it should
+       * declare a "targetId" attribute (that maps to the "fieldId" of another widget in the same form) and
+       * either a "is" or "isNot" array of values of that field to evaluate against. In addition it also needs to 
+       * set "rulePassValue" and "ruleFailValue" attributes that are the values that will be set on successful or
+       * unsuccessful evaluation of the rule.
+       *
+       * @instance
+       * @type {array}
+       * @default null
+       */
+      autoSetConfig: null,
+
+      /**
        * @instance
        */
       constructor: function alfresco_forms_controls_BaseFormControl__constructor(args) {
          declare.safeMixin(this, args);
          
-         if (this.fieldId == null || this.fieldId == "")
+         if (this.fieldId == null || this.fieldId === "")
          {
             this.fieldId = this.generateUuid();
          }
@@ -327,13 +363,61 @@ define(["dojo/_base/declare",
          this.processConfig("alfVisible", this.visibilityConfig);
          this.processConfig("alfRequired", this.requirementConfig);
          this.processConfig("alfDisabled", this.disablementConfig);
-         
+
+         // Iterate over the autoSetConfig rules...
+         array.forEach(this.autoSetConfig, lang.hitch(this, this.processAutoSetConfiguration));
+
          // Setup the options handling...
          this.processOptionsConfig(this.optionsConfig);
          
          if (this.validationConfig != null && typeof this.validationConfig.regex == "string")
          {
             this.validationConfig.regExObj = new RegExp(this.validationConfig.regex);
+         }
+      },
+
+      /**
+       * Called for each entry in the [autoSetConfig]{@link module:alfresco/forms/controls/BaseFormControl#autoSetConfig}
+       * array. The [autoSetValue]{@link module:alfresco/forms/controls/BaseFormControl#autoSetValue}
+       * function will be passed each time the rules are evaluated with the evaluation result and the 
+       * pass and fail evaluation values to set.
+       *
+       * @instance
+       * @param {object} config The configuration for the current autoset value
+       * @param {number} index The index of the configuration in the original array
+       */
+      processAutoSetConfiguration: function alfresco_forms_controls_BaseFormControl__processAutoSetConfiguration(config, index) {
+         if (config.rulePassValue == null || config.ruleFailValue == null)
+         {
+            this.alfLog("warn", "An autoset configuration element was provided without both 'rulePassValue' and 'ruleFailValue' attribute", config, this);
+         }
+         else
+         {
+            var instanceVar = "alfAutoSet___" + index;
+            this[instanceVar] = lang.hitch(this, this.autoSetValue, config.rulePassValue, config.ruleFailValue);
+
+            // Process the configuration...
+            this.processConfig(instanceVar, config);
+         }
+      },
+
+      /**
+       * This function is called whenever an autoset configuration rules array is evaluated. It
+       * sets the widget value depending upon whether or not the rule evaluated successfully or not.
+       *
+       * @instance
+       * @param {object} passValue The value to set if hasPassedRule is true
+       * @param {object} failValue The value to set if hasPassedRule is false
+       * @param {boolean} hasPassedRule Indicated whether or not evaluation of the rules were successful
+       */
+      autoSetValue: function alfresco_forms_controls_BaseFormControl__autoSetValue(passValue, failValue, hasPassedRule) {
+         if (hasPassedRule === true)
+         {
+            this.setValue(passValue);
+         }
+         else
+         {
+            this.setValue(failValue);
          }
       },
       
@@ -351,7 +435,13 @@ define(["dojo/_base/declare",
        *          "global": true
        *       }
        *    ],
-       *    "requestTopic": "TOPIC",
+       *    "publishTopic": "ALF_GET_FORM_CONTROL_OPTIONS",
+       *    "publishPayload": {
+       *       "url": AlfConstants.PROXY_URI + "api/groups",
+       *       "itemsAttribute": "data",
+       *       "labelAttribute": "displayName",
+       *       "valueAttribute": "fullName"
+       *    },
        *    "callback": "functionName",
        *    "fixed": [
        *       { "label": "Option1", "value": "Value1"},
@@ -404,16 +494,15 @@ define(["dojo/_base/declare",
             }
             
             // Generate the initial set of options in the following precedence...
-            // 1) Request Topic
-            // 2) XHR request
-            // 3) Callback function
-            // 4) Fixed options
-            var requestTopic = lang.getObject("requestTopic", false, config),
+            // 1) PubSub Config
+            // 2) Callback function
+            // 3) Fixed options
+            var pubSub = lang.getObject("publishTopic", false, config),
                 callback = lang.getObject("callback", false, config),
                 fixed = lang.getObject("fixed", false, config);
-            if (requestTopic != null)
+            if (pubSub != null)
             {
-               this.getPubSubOptions(requestTopic);
+               this.getPubSubOptions(config);
             }
             else if (callback != null)
             {
@@ -443,6 +532,7 @@ define(["dojo/_base/declare",
                {
                   this.options = fixed;
                   array.forEach(this.options, lang.hitch(this, "processOptionLabel"));
+                  this.setOptionsValue(this.options);
                }
                else
                {
@@ -538,7 +628,7 @@ define(["dojo/_base/declare",
          }
          else
          {
-            return []
+            return [];
          }
       },
 
@@ -552,9 +642,9 @@ define(["dojo/_base/declare",
        */
       updateOptions: function alfresco_forms_controls_BaseFormControl__onUpdateOptions(optionsConfig, payload) {
          this.alfLog("log", "OPTIONS CONFIG: Field '" + this.fieldId + "' is handling value change of field'" + payload.name);
-         if (optionsConfig.requestTopic != null)
+         if (optionsConfig.publishTopic != null)
          {
-            this.getPubSubOptions(optionsConfig.requestTopic);
+            this.getPubSubOptions(optionsConfig);
          }
          else if (optionsConfig.callback != null)
          {
@@ -591,15 +681,26 @@ define(["dojo/_base/declare",
        * Sets up a new subscription for options changes and then publishes a request to get those options.
        *
        * @instance
-       * @param {string} topic The topic to publish to retrieve options
+       * @param {string} config The configuration to use for retrieving options via Pub/Sub
        */
-      getPubSubOptions: function alfresco_forms_controls_BaseFormControl__getPubSubOptions(topic) {
+      getPubSubOptions: function alfresco_forms_controls_BaseFormControl__getPubSubOptions(config) {
          // Publish a topic to get the currently available options based on the current value...
-         var responseTopic = this.generateUuid();
-         this._pubSubOptionsHandle = this.alfSubscribe(responseTopic, lang.hitch(this, "onPubSubOptions"), true);
-         this.alfPublish(topic, {
-            responseTopic: responseTopic,
-         }, true);
+         if (config.publishTopic != null)
+         {
+            var responseTopic = this.generateUuid();
+            var payload = config.publishPayload;
+            if (payload == null)
+            {
+               payload = {};
+            }
+            payload.responseTopic = responseTopic;
+            this._pubSubOptionsHandle = this.alfSubscribe(responseTopic, lang.hitch(this, "onPubSubOptions"), true);
+            this.alfPublish(config.publishTopic, payload, true);
+         }
+         else
+         {
+            this.alfLog("warn", "A request was made to obtain form control options via PubSub, but no 'publishTopic' attribute was provided", config, this);
+         }
       },
 
       /**
@@ -610,14 +711,7 @@ define(["dojo/_base/declare",
        * @param {object} payload The published information
        */
       onPubSubOptions: function alfresco_forms_controls_BaseFormControl__onPubSubOptions(payload) {
-         if (this._pubSubOptionsHandle != null)
-         {
-            this.alfUnsubscribe(this._pubSubOptionsHandle);
-         }
-         else
-         {
-            this.alfLog("warn", "A subscription handle was not found for processing pubSubOptions - this could be a potential memory leak", this);
-         }
+         this.alfUnsubscribeSaveHandles([this._pubSubOptionsHandle]);
          if (payload.options != null)
          {
             this.setOptions(payload.options);
@@ -638,9 +732,6 @@ define(["dojo/_base/declare",
          
          this.alfLog("log", "Setting options for field '" + this.fieldId + "'", options);
          
-         // Get the current value so that we can attempt to reset it when the options are refreshed...
-         var currentValue = this.getValue();
-         
          this.options = options;
          if (this.wrappedWidget)
          {
@@ -656,9 +747,32 @@ define(["dojo/_base/declare",
                array.forEach(options, lang.hitch(this, "addOption"));
             }
          }
+         this.setOptionsValue(options);
+      },
+
+      /**
+       * Sets the value if there are options to select from
+       *
+       * @instance
+       * @param {array} options The options to choose from
+       */
+      setOptionsValue: function alfresco_forms_controls_BaseFormControl__setOptionsValue(options) {
+         var currentValue = this.getValue();
+         var optionsContainsValue = array.some(options, function(option, index) {
+            return option.value == currentValue;
+         });
          
-         // Reset the option...
-         this.setValue(currentValue);
+         if (optionsContainsValue)
+         {
+            // Reset the option...
+            this.setValue(currentValue);
+            this.value = currentValue;
+         }
+         else if (options.length > 0)
+         {
+            this.setValue(options[0].value);
+            this.value = options[0].value;
+         }
       },
       
       /**
@@ -668,7 +782,7 @@ define(["dojo/_base/declare",
        * @param {object} option The option to remove
        * @param {number} index The index of the option to remove
        */
-      removeOption: function alfrecso_forms_controls_BaseFormControl__removeOption(option, index) {
+      removeOption: function alfresco_forms_controls_BaseFormControl__removeOption(option, index) {
          this.wrappedWidget.removeOption(option);
       },
       
@@ -722,7 +836,7 @@ define(["dojo/_base/declare",
             // Process the rule subscriptions...
             if (typeof config.rules != "undefined")
             {
-               this.processRulesConfig(attribute, config.rules)
+               this.processRulesConfig(attribute, config.rules);
             }
             else if (typeof config.rules != "undefined")
             {
@@ -734,7 +848,7 @@ define(["dojo/_base/declare",
             // Process the callback subscriptions...
             if (typeof config.callbacks == "object")
             {
-               this._processCallbacksConfig(attribute, config.callbacks)
+               this._processCallbacksConfig(attribute, config.callbacks);
             }
             else if (typeof config.callbacks != "undefined")
             {
@@ -852,7 +966,7 @@ define(["dojo/_base/declare",
                
                // Assume that its NOT valid value (we'll only do the actual test if its not set to an INVALID value)...
                // UNLESS there are no valid values specified (in which case any value is valid apart form those in the invalid list)
-               var isValidValue = (typeof validValues == "undefined" || validValues.length == 0);
+               var isValidValue = (typeof validValues == "undefined" || validValues.length === 0);
 
                // Initialise the invalid value to be false if no invalid values have been declared (and only check values if defined)...
                var isInvalidValue = (typeof invalidValues != "undefined" && invalidValues.length > 0);
@@ -951,18 +1065,46 @@ define(["dojo/_base/declare",
       },
       
       /**
+       * The local image to use for a validation in progress indicator.
+       * 
+       * @instance
+       * @type {string}
+       * @default "ajax_anim.gif"
+       */
+      validationInProgressImg: "ajax_anim.gif",
+
+      /**
+       * The alt-text label to use for the validation in progress indicator
+       * 
+       * @instance
+       * @type {string}
+       * @default "validation.inprogress.alttext"
+       */
+      validationInProgressAltText: "validation.inprogress.alttext",
+
+      /**
+       * Processes the image source for indicating validation is in progress and its alt-text label.
+       *
+       * @instance
+       */
+      postMixInProperties: function alfresco_renderers_Reorder__postMixInProperties() {
+         if (this.validationInProgressImgSrc == null || this.validationInProgressImgSrc === "")
+         {
+            this.validationInProgressImgSrc = require.toUrl("alfresco/forms/controls") + "/css/images/" + this.validationInProgressImg;
+         }
+         this.validationInProgressAltText = this.message(this.validationInProgressAltText);
+      },
+
+      /**
        * 
        * @instance
        */
       postCreate: function alfresco_forms_controls_BaseFormControl__postCreate() {
-         
-         var _this = this;
-         
          /*
           * These are the types of attributes we expect a form to have...
-          * Field label (e.g. �Name�)
+          * Field label (e.g. Name)
           * Description (e.g. hover help)
-            Units (e.g. �milliseconds�, etc)
+            Units (e.g. milliseconds, etc)
             User control (e.g. text box, drop-down menu, radio buttons, etc)
             Validation - regex expression
             Validation - callback function reference
@@ -1036,7 +1178,7 @@ define(["dojo/_base/declare",
          }
          else
          {
-            this.alfLog("error", "The wrapped widget has no 'placeAt' function - perhaps the 'placeWidget' function should be overridden?", this);
+            this.alfLog("warn", "The wrapped widget has no 'placeAt' function - perhaps the 'placeWidget' function should be overridden?", this);
          }
       },
       
@@ -1057,9 +1199,11 @@ define(["dojo/_base/declare",
          this.alfDisabled(this._disabled);
          
          // Set the label...
-         if (this.label != null && lang.trim(this.label) != "")
+         var widgetId = lang.getObject("id", false, this.wrappedWidget);
+         if (this.label != null && lang.trim(this.label) !== "" && widgetId != null)
          {
             this._labelNode.innerHTML = this.encodeHTML(this.message(this.label));
+            domAttr.set(this._labelNode, "for", this.wrappedWidget.id);
          }
          else
          {
@@ -1067,7 +1211,7 @@ define(["dojo/_base/declare",
          }
 
          // Set the description...
-         if (this.description != null && lang.trim(this.description) != "")
+         if (this.description != null && lang.trim(this.description) !== "")
          {
             this._descriptionNode.innerHTML = this.encodeHTML(this.message(this.description));
          }
@@ -1077,7 +1221,7 @@ define(["dojo/_base/declare",
          }
          
          // Set the units label...
-         if (this.unitsLabel != null && this.unitsLabel != "")
+         if (this.unitsLabel != null && this.unitsLabel !== "")
          {
             this._unitsNode.innerHTML = this.encodeHTML(this.message(this.unitsLabel));
          }
@@ -1093,8 +1237,26 @@ define(["dojo/_base/declare",
             // TODO: This message might not make much sense if it is just missing data for a required field...
             this._validationMessage.innerHTML = this.encodeHTML(this.message(this.validationConfig.errorMessage));
          }
+
+         // Fix for missing label on validation input
+         var validationInput = query("input.dijitValidationIcon.dijitValidationInner", this._controlNode);
+         if(validationInput && validationInput.length > 0 && widgetId != null)
+         {
+            var validationInputId = this.wrappedWidget.id + "_validationInput";
+
+            // Add 'id' to the input
+            domAttr.set(validationInput[0], "id", validationInputId);
+
+            // Create a label for the input
+            domConstruct.create("label", {
+               innerHTML: this.message("validation.control.invalid"),
+               "for": validationInputId,
+               "class": "hiddenAccessible"
+            }, validationInput[0], "before");
+         }
+         
       },
-      
+
       /**
        * Whenever a widgets value changes we need to publish the details out to the other form controls (that exist in the
        * same scope) so that they can modify their appearance/behaviour as necessary). This function sets up the default events 
@@ -1107,7 +1269,7 @@ define(["dojo/_base/declare",
          if (this.wrappedWidget)
          {
             // TODO: Do we need to do anything with the watch handle when the widget is destroyed?
-            var watchHandle = this.wrappedWidget.watch("value", lang.hitch(this, "onValueChangeEvent"));
+            this.wrappedWidget.watch("value", lang.hitch(this, "onValueChangeEvent"));
          }
       },
       
@@ -1146,6 +1308,19 @@ define(["dojo/_base/declare",
                this.alfLog("log", "An exception was thrown retrieving the value for field: '" + this.fieldId + "'");
             }
          }
+
+         if (this._convertStringValuesToBooleans === true && ObjectTypeUtils.isString(value))
+         {
+            if (value.toLowerCase() === "true")
+            {
+               value = true;
+            }
+            else if (value.toLowerCase() === "false")
+            {
+               value = false;
+            }
+         }
+
          // Commented out because it does make the logging quite verbose
          // this.alfLog("log", "Returning value for field: '" + this.fieldId + "': ", value);
          return value;
@@ -1160,6 +1335,10 @@ define(["dojo/_base/declare",
          this.alfLog("log", "Setting field: '" + this.fieldId + "' with value: ", value);
          if (this.wrappedWidget)
          {
+            if (this._convertStringValuesToBooleans === true && typeof value === "boolean")
+            {
+               value = value.toString();
+            }
             this.wrappedWidget.setValue(value);
          }
       },
@@ -1246,26 +1425,30 @@ define(["dojo/_base/declare",
        */
       validate: function alfresco_forms_controls_BaseFormControl__validate() {
          
-         var isValid = this.processValidationRules();
-         
-         // Publish the results (this topic is provided primarily of an enclosing form)...
-         if (isValid)
+         if (this.validationConfig != null && ObjectTypeUtils.isArray(this.validationConfig))
          {
-            this.alfPublish("ALF_VALID_CONTROL", {
-               name: this.name,
-               fieldId: this.fieldId
-            });
-            this.hideValidationFailure();
+            this.startValidation();
          }
          else
          {
-            this.alfPublish("ALF_INVALID_CONTROL", {
-               name: this.name,
-               fieldId: this.fieldId
-            });
-            this.showValidationFailure();
+            var isValid = this.processValidationRules();
+            if (isValid)
+            {
+               this.alfPublish("ALF_VALID_CONTROL", {
+                  name: this.name,
+                  fieldId: this.fieldId
+               });
+               this.hideValidationFailure();
+            }
+            else
+            {
+               this.alfPublish("ALF_INVALID_CONTROL", {
+                  name: this.name,
+                  fieldId: this.fieldId
+               });
+               this.showValidationFailure();
+            }
          }
-         return isValid;
       },
       
       /**
@@ -1282,7 +1465,6 @@ define(["dojo/_base/declare",
        * @returns {boolean} Indicates whether or not the validation rules were passed successfully
        */
       processValidationRules: function alfresco_forms_controls_BaseFormControl__processValidationRules() {
-
          var valid = true;
          if (this._visible && !this._disabled)
          {
@@ -1296,7 +1478,7 @@ define(["dojo/_base/declare",
                 passedRegExpTest = true; // Assume valid starting point.
             
             // Check that a value has been specified if this is a required field...
-            passedRequiredTest = !(this._required && (value == null || value == ""));
+            passedRequiredTest = !(this._required && (value == null || value === ""));
             
             // Check if any specified regular expression is passed...
             if (this.validationConfig != null)
@@ -1344,6 +1526,75 @@ define(["dojo/_base/declare",
       hideValidationFailure: function alfresco_forms_controls_BaseFormControl__hideValidationFailure() {
          domClass.remove(this._validationIndicator, "validation-error");
          domClass.remove(this._validationMessage, "display");
+      },
+
+      /**
+       * This function is called from a [form]{@link module:alfresco/forms/Form} when it needs to get the 
+       * values from all the controls that it contains. The current control will only add its value to the
+       * supplied object if appropriate.
+       *
+       * @instance
+       * @param {object} values The object to update with the current value of the control
+       */
+      addFormControlValue: function alfresco_forms_controls_BaseFormControl__addFormControlValue(values) {
+         // Only include field values if the control is NOT hidden or disabled
+         // unless specifically requested by the configuration. This allows
+         // multiple controls to represent a single field but also allows intentionally
+         // hidden fields to still have data submitted
+         if (((this._visible !== undefined && this._visible === false) ||
+              (this._disabled !== undefined && this._disabled === true)) &&
+             (this.postWhenHiddenOrDisabled !== undefined && this.postWhenHiddenOrDisabled === false))
+         {
+            // Don't set the value (line below is just to allow debug point to be set)
+         }
+         else if (this.noPostWhenValueIs && arrayUtils.arrayContains(this.noPostWhenValueIs, this.getValue()))
+         {
+            // Don't set the value if the noPostIfValueIs array contains the current value.
+         }
+         else
+         {
+            // Process dot-notation property names...
+            lang.setObject(this.get("name"), this.getValue(), values);
+         }
+      },
+
+      /**
+       * This function is called from a [form]{@link module:alfresco/forms/Form} when it needs to set the 
+       * values from all the controls that it contains. The current control will be updated if appropriate.
+       *
+       * @instance
+       * @param {object} values The object to set the each form control value from
+       */
+      updateFormControlValue: function alfresco_forms_controls_BaseFormControl__addFormControlValue(values) {
+         if (((this._visible !== undefined && this._visible === false) ||
+              (this._disabled !== undefined && this._disabled === true)) &&
+             (this.noValueUpdateWhenHiddenOrDisabled !== undefined && this.noValueUpdateWhenHiddenOrDisabled === true))
+         {
+            // Don't set the value as the field is hidden or disabled and has requested that it not be updated
+            // in these circumstances. The typical reason for this is that multiple controls represent a single
+            // field and it is not the displayed control so shouldn't be updated to preserve its default value.
+         }
+         else
+         {
+            var v = lang.getObject(this.get("name"), false, values);
+            if (v !== undefined)
+            {
+               this.setValue(v);
+            }
+         }
+      },
+
+      /**
+       * This function is called from a [form]{@link module:alfresco/forms/Form} when it needs to validate the 
+       * all the controls that it contains.
+       *
+       * @instance
+       */
+      validateFormControlValue: function alfresco_forms_controls_BaseFormControl__validateFormControlValue() {
+         if (this.publishValue && typeof this.publishValue == "function")
+         {
+            this.validate();
+         }
       }
    });
 });

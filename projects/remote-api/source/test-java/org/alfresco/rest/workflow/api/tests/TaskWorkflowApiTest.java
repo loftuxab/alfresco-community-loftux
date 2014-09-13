@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.util.ClockUtil;
+import org.activiti.engine.runtime.Clock;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.IdentityLinkType;
@@ -86,8 +86,9 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
         // Alter current engine date
         Calendar createdCal = Calendar.getInstance();
         createdCal.set(Calendar.MILLISECOND, 0);
-        ClockUtil.setCurrentTime(createdCal.getTime());
-        
+        Clock actiClock = activitiProcessEngine.getProcessEngineConfiguration().getClock();
+        actiClock.setCurrentTime(createdCal.getTime());
+           
         ProcessInstance processInstance = startAdhocProcess(requestContext.getRunAsUser(), requestContext.getNetworkId(), null);
         
         try
@@ -1133,7 +1134,8 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
         // Alter current engine date
         Calendar createdCal = Calendar.getInstance();
         createdCal.set(Calendar.MILLISECOND, 0);
-        ClockUtil.setCurrentTime(createdCal.getTime());
+        Clock actiClock = activitiProcessEngine.getProcessEngineConfiguration().getClock();
+        actiClock.setCurrentTime(createdCal.getTime());
         
         RequestContext requestContext = initApiClientWithTestUser();
         
@@ -1177,6 +1179,8 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             assertEquals(requestContext.getRunAsUser(), taskJSONObject.get("assignee"));
             assertEquals("john", taskJSONObject.get("owner"));
             assertEquals(dueDate, parseDate(taskJSONObject, "dueAt"));
+            // experiment
+            assertEquals(createdCal.getTime().toString(), parseDate(taskJSONObject, "startedAt").toString());
             assertEquals(createdCal.getTime(), parseDate(taskJSONObject, "startedAt"));
             assertEquals(2l, taskJSONObject.get("priority"));
             assertEquals("wf:adhocTask", taskJSONObject.get("formResourceKey"));
@@ -1222,7 +1226,6 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
         
         Calendar taskCreated = Calendar.getInstance();
         taskCreated.set(Calendar.MILLISECOND, 0);
-        ClockUtil.setCurrentTime(taskCreated.getTime());
         String businessKey = UUID.randomUUID().toString();
         ProcessInstance processInstance = startAdhocProcess(requestContext.getRunAsUser(), requestContext.getNetworkId(), businessKey);
         
@@ -1235,6 +1238,14 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
                 .processInstanceId(processInstance.getId()).singleResult();
             
             assertNotNull(completedTask);
+            
+            // Find the review pooled task
+            final Task reviewPooledTask = activitiProcessEngine.getTaskService().createTaskQuery()
+                .processInstanceId(otherInstance.getId()).singleResult();
+            
+            assertNotNull(reviewPooledTask);
+            // MNT-12221 case, due date should be set as task property, not as variable!!!
+            assertNotNull("Due date was not set for review pooled task.", reviewPooledTask.getDueDate());
             
             String anotherUserId = UUID.randomUUID().toString();
             
@@ -1266,7 +1277,8 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             assertNotNull(activeTask);
         
             Calendar activeTaskDue = Calendar.getInstance();
-            
+
+            activeTaskDue.add(Calendar.HOUR, 2);
             activeTaskDue.set(Calendar.MILLISECOND, 0);
             activeTask.setDueDate(activeTaskDue.getTime());
             activeTask.setName("Task name");
@@ -1598,6 +1610,11 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             
             params.clear();
             params.put("where", "(variables/bpm_dueDate > 'd:datetime 2013-09-15T12:22:31.866+0000')");
+            // MNT-12221 fix, due date is not saved as variable for review pooled workflow, so nothing should be found
+            assertEquals(0, getResultSizeForTaskQuery(params, tasksClient));
+            
+            params.clear();
+            params.put("where", "(dueAt = '" + ISO8601DateFormat.format(reviewPooledTask.getDueDate()) + "')");
             assertEquals(1, getResultSizeForTaskQuery(params, tasksClient));
             
             params.clear();

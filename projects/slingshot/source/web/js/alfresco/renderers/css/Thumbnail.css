@@ -11,6 +11,11 @@
    position: absolute;
 }
 
+.alfresco-renderers-Thumbnail span.link.hidden
+{
+   display: none;
+}
+
 .alfresco-renderers-Thumbnail span.droppable
 {
    background: url(./images/drop-arrow-left-large.png) no-repeat;
@@ -24,12 +29,6 @@
 
 .alfresco-renderers-Thumbnail > span.inner {
    cursor: pointer;
-}
-
-.alfresco-renderers-Thumbnail img {
-   display: block;
-   float: right;
-   box-shadow: 0 1px 3px #ccc;
 }
 
 /* Drag and Drop */

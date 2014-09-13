@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -21,25 +21,25 @@
  * This is used as the standard search result template used to control the layout of search results.
  * It is more efficient to use a single widget to control the layout than to build a complex model
  * control the layout than to build a complex model out of smaller widgets,
- * out of smaller widgets, however this widget can still be easily replaced by other widgets to 
+ * out of smaller widgets, however this widget can still be easily replaced by other widgets to
  * provide a completely custom rendering.
- * 
+ *
  * @module alfresco/search/AlfSearchResult
- * @extends alfresco/documentlibrary/views/layouts/Row
- * @author Dave Draper
+ * @extends "alfresco/documentlibrary/views/layouts/Row"
+ * @author Dave Draper & David Webster
  */
-define(["dojo/_base/declare", 
-        "alfresco/documentlibrary/views/layouts/Row", 
-        "dojo/text!./templates/AlfSearchResult.html", 
+define(["dojo/_base/declare",
+        "alfresco/documentlibrary/views/layouts/Row",
+        "dojo/text!./templates/AlfSearchResult.html",
         "alfresco/renderers/SearchThumbnail",
-        "alfresco/renderers/SearchResultPropertyLink", 
-        "alfresco/renderers/PropertyLink", 
-        "alfresco/renderers/Property", 
+        "alfresco/renderers/SearchResultPropertyLink",
+        "alfresco/renderers/PropertyLink",
+        "alfresco/renderers/Property",
         "alfresco/renderers/DateLink",
-        "alfresco/renderers/XhrActions", 
-        "dojo/_base/lang", 
-        "dojo/dom-class", 
-        "alfresco/renderers/XhrContextActions", 
+        "alfresco/renderers/XhrActions",
+        "dojo/_base/lang",
+        "dojo/dom-class",
+        "alfresco/renderers/XhrContextActions",
         "alfresco/renderers/Size" ],
         function(declare, Row, template, SearchThumbnail, SearchResultPropertyLink, PropertyLink, Property, DateLink, XhrActions, lang, domClass, XhrContextActions, Size) {
 
@@ -47,7 +47,7 @@ define(["dojo/_base/declare",
 
       /**
        * An array of the CSS files to use with this widget.
-       * 
+       *
        * @instance
        * @type {object[]}
        * @default [{cssFile:"./css/AlfSearchResult.css"}]
@@ -56,17 +56,26 @@ define(["dojo/_base/declare",
 
       /**
        * The HTML template to use for the widget.
-       * 
+       *
        * @instance
        * @type {String}
        */
       templateString: template,
 
       /**
+       * Indicates whether or not to enable the context menu to show the actions with a right-click.
+       *
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      enableContextMenu: false,
+
+      /**
        * Creates the renderers to display for a search result and adds them into the template. Renderers
        * will only be created if there is data for them. This is done to further improve the performance
        * of the search rendering.
-       * 
+       *
        * @instance postCreate
        */
       postCreate: function alfresco_search_AlfSearchResult__postCreate() {
@@ -91,18 +100,32 @@ define(["dojo/_base/declare",
             "document-view-in-source-repository",
             "document-view-in-cloud",
             "document-delete",
-            "document-edit-offline" // TODO: Works, but Working copy handling isn't quite correct.
-            // TODO: Fix Document Picker scoping issues.
-            //  "document-copy-to",
-            //  "document-move-to",
+            "document-edit-offline",
+            "folder-download",
+            "document-copy-to",
+            "document-move-to",
+            "document-upload-new-version",
+            "document-locate",
 
-            // TODO: Dialog Service not read for property edits.
-            // "document-edit-properties",
-
-            // TODO: Not implemented yet.
-            // "document-upload-new-version",
-            // "document-assign-workflow",
-            // "document-publish"
+//            TODO: ContentService needs updates to work (or alfresco_services_ActionService__onActionDetailsSuccess needs to publish different payload.
+            "document-edit-properties"
+//
+//            TODO: Not implemented yet.
+//            "document-assign-workflow",
+//            "folder-view-details"
+//            "document-approve"
+//            "document-reject"
+//            "document-manage-aspects"
+//            "document-cloud-sync"
+//            "document-cloud-unsync"
+//            "document-view-in-cloud"
+//            "document-request-sync"
+//            "document-edit-online"
+//            "document-checkout-to-googledocs"
+//            "document-checkin-from-googledocs"
+//            "document-assign-workflow"
+//            "document-cancel-editing"
+//            "document-cancel-editing-unlock"
          ];
 
          // For actions other than folders and documents we want to further restrict what are displayed
@@ -114,7 +137,7 @@ define(["dojo/_base/declare",
          new SearchThumbnail({
             currentItem: this.currentItem,
             pubSubScope: this.pubSubScope,
-            showDocumentPreview: false,
+            showDocumentPreview: true,
             publishTopic: "ALF_NAVIGATE_TO_PAGE"
          }, this.thumbnailNode);
 
@@ -207,7 +230,7 @@ define(["dojo/_base/declare",
          else
          {
             // Create processed path as pathLink on this.currentItem
-            this.currentItem.pathLink = repo ? 
+            this.currentItem.pathLink = repo ?
                encodeURIComponent('/' + this.currentItem.path.split('/').slice(2).join('/')) :
                encodeURIComponent('/' + this.currentItem.path);
 
@@ -241,7 +264,7 @@ define(["dojo/_base/declare",
                pubSubScope : this.pubSubScope,
                label : this.message("faceted-search.doc-lib.value-prefix.size"),
                renderSize: "small",
-               sizeProperty : "size",
+               sizeProperty : "size"
             }, this.sizeNode);
          }
 
@@ -253,18 +276,23 @@ define(["dojo/_base/declare",
             allowedActions: (this.currentItem.type === "document" || this.currentItem.type === "folder") ? documentAndFolderActions : otherNodeActions
          }, this.actionsNode);
 
-         // TEMPORARILY DISABLING CONTEXT-MENU ACTIONS
-         // try
-         // {
-         //    new XhrContextActions({
-         //       targetNodeIds: [this.domNode],
-         //       currentItem: this.currentItem
-         //    });
-         // }
-         // catch (e)
-         // {
-         //    this.alfLog("error", "An error occurred creating context menu", e);
-         // }
+         if (this.enableContextMenu)
+         {
+            try
+            {
+               new XhrContextActions({
+                  targetNodeIds: [this.domNode],
+                  currentItem: this.currentItem,
+                  pubSubScope: this.pubSubScope,
+                  filterActions: true,
+                  allowedActions: (this.currentItem.type === "document" || this.currentItem.type === "folder") ? documentAndFolderActions : otherNodeActions
+               });
+            }
+            catch (e)
+            {
+               this.alfLog("error", "An error occurred creating context menu", e);
+            }
+         }
       }
    });
 });

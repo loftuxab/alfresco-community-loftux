@@ -363,7 +363,8 @@
          formData.datatype = this.currentForm.type;
          
          // build and execute url for search page
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "{site}search?t={terms}&q={query}&r={repo}",
+         // 'this.options.searchPath' contains {variable} replacement points for substitution
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + this.options.searchPath,
          {
             site: (this.options.siteId.length !== 0 ? ("site/" + this.options.siteId + "/") : ""),
             terms: encodeURIComponent(Dom.get(this.id + "-search-text").value),

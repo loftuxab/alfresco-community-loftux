@@ -26,7 +26,6 @@
             <list>
                 <ref bean="search.admLuceneIndexerAndSearcherFactory" />
                 <ref bean="search.admLuceneUnIndexedIndexerAndSearcherFactory" />
-                <ref bean="search.avmLuceneIndexerAndSearcherFactory" />
             </list>
         </property>
     </bean>
@@ -39,7 +38,6 @@
             <list>
                 <ref bean="search.admLuceneIndexerAndSearcherFactory" />
                 <ref bean="search.admLuceneUnIndexedIndexerAndSearcherFactory" />
-                <ref bean="search.avmLuceneIndexerAndSearcherFactory" />
             </list>
         </property>
     </bean>

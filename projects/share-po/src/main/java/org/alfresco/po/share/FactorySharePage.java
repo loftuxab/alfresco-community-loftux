@@ -17,7 +17,6 @@ package org.alfresco.po.share;
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.admin.ManageSitesPage;
 import org.alfresco.po.share.adminconsole.CategoryManagerPage;
-import org.alfresco.po.share.adminconsole.ChannelManagerPage;
 import org.alfresco.po.share.adminconsole.NodeBrowserPage;
 import org.alfresco.po.share.adminconsole.TagManagerPage;
 import org.alfresco.po.share.bulkimport.BulkImportPage;
@@ -27,6 +26,7 @@ import org.alfresco.po.share.dashlet.ConfigureSiteNoticeDialogBoxPage;
 import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.mydiscussions.CreateNewTopicPage;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
+import org.alfresco.po.share.reports.AdhocAnalyzerPage;
 import org.alfresco.po.share.search.*;
 import org.alfresco.po.share.site.*;
 import org.alfresco.po.share.site.blog.BlogPage;
@@ -47,11 +47,10 @@ import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetailsPage;
 import org.alfresco.po.share.user.*;
-import org.alfresco.po.share.user.UserSitesPage;
-import org.alfresco.po.share.user.NotificationPage;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
+import org.alfresco.po.thirdparty.pentaho.PentahoUserConsolePage;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.PageFactory;
 import org.alfresco.webdrone.WebDrone;
@@ -144,8 +143,7 @@ public class FactorySharePage implements PageFactory
         pages.put("search", SiteResultsPage.class);
         pages.put("start-workflow", StartWorkFlowPage.class);
         pages.put("user-cloud-auth", CloudSyncPage.class);
-        pages.put("node-browser", NodeBrowserPage.class);
-        pages.put("channel-admin", ChannelManagerPage.class);
+        pages.put("node-browser", NodeBrowserPage.class);        
         pages.put("category-manager", CategoryManagerPage.class);
         pages.put("admin-console", AdminConsolePage.class);
         pages.put("manage-sites", ManageSitesPage.class);
@@ -167,10 +165,13 @@ public class FactorySharePage implements PageFactory
         pages.put("user-sites", UserSitesPage.class);
         pages.put("tag-management", TagManagerPage.class);
         pages.put("faceted-search", FacetedSearchPage.class);
+        pages.put("faceted-search-config", FacetedSearchConfigPage.class);
         pages.put("user-sites", UserSitesPage.class);
         pages.put("bulkfsimport", BulkImportPage.class);
         pages.put("status", StatusBulkImportPage.class);
         pages.put("inplace", InPlaceBulkImportPage.class);
+        pages.put("Home", PentahoUserConsolePage.class);
+        pages.put("analyze", AdhocAnalyzerPage.class);
     }
 
     public HtmlPage getPage(WebDrone drone)

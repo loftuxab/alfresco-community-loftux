@@ -9,9 +9,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
         <webdrone.page.render.wait.time>6000</webdrone.page.render.wait.time>
         <testng.xml>src/test/resources/testng.xml</testng.xml>
         <test.exclude>nonEnterprise</test.exclude>
@@ -53,12 +51,11 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.10.0-alfresco-patched</version>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>webdrone</artifactId>
-            <version>2.5</version>
+            <version>2.6</version>
             <exclusions>
                 <exclusion>
                     <artifactId>xercesImpl</artifactId>
@@ -100,7 +97,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.8.4</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -110,17 +107,16 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>${dependency.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>${dependency.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.3</version>
         </dependency>
     </dependencies>
     
@@ -141,7 +137,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -157,7 +152,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <suiteXmlFiles>
-						<suiteXmlFile>src/test/resources/SearchSuite.xml</suiteXmlFile>
+			<suiteXmlFile>src/test/resources/SearchSuite.xml</suiteXmlFile>
                         <suiteXmlFile>src/test/resources/DashletSuite.xml</suiteXmlFile>
                         <suiteXmlFile>src/test/resources/DocumentSuite.xml</suiteXmlFile>
                         <suiteXmlFile>src/test/resources/DownloadSuite.xml</suiteXmlFile>
@@ -169,13 +164,13 @@
                         <suiteXmlFile>src/test/resources/ShareSuite.xml</suiteXmlFile>
                         <suiteXmlFile>src/test/resources/AdminConsoleSuite.xml</suiteXmlFile>
                         <suiteXmlFile>src/test/resources/ContentRulesSuite.xml</suiteXmlFile>
-						<suiteXmlFile>src/test/resources/BlogPageSuite.xml</suiteXmlFile>
-						<suiteXmlFile>src/test/resources/DataListPageSuite.xml</suiteXmlFile>
-						<suiteXmlFile>src/test/resources/DiscussionsPageSuite.xml</suiteXmlFile>
-						<suiteXmlFile>src/test/resources/LinksPageSuite.xml</suiteXmlFile>						
-						<suiteXmlFile>src/test/resources/CalendarPageSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/BlogPageSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/DataListPageSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/DiscussionsPageSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/LinksPageSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/CalendarPageSuite.xml</suiteXmlFile>
                         <suiteXmlFile>src/test/resources/MyProfileSuite.xml</suiteXmlFile>
-                        <suiteXmlFile>src/test/resources/AlfrescoTestSuite.xml</suiteXmlFile>
+
                     </suiteXmlFiles>
                     <argLine>-Xms512m -Xmx1024m</argLine>
                     <excludedGroups>

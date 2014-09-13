@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -66,16 +66,53 @@ define(["dojo/_base/declare",
        * @instance 
        * @param {array} args The constructor arguments.
        */
-      constructor: function alf_services_TagService__constructor(args) {
+      constructor: function alfresco_services_TagService__constructor(args) {
          lang.mixin(this, args);
-         this.alfSubscribe(_TagServiceTopics.tagQueryTopic, lang.hitch(this, "onTagQuery"));
+         this.alfSubscribe("ALF_RETRIEVE_CURRENT_TAGS", lang.hitch(this, this.onTagListRequest));
+         this.alfSubscribe(_TagServiceTopics.tagQueryTopic, lang.hitch(this, this.onTagQuery));
+         this.alfSubscribe("ALF_CREATE_TAG", lang.hitch(this, this.createTag));
       },
       
+      /**
+       * Handles requests to retrieve the list of tags, optionally filtered by a search term.
+       *
+       * @instance
+       * @param {object} payload The payload containing the details of the tags to search for
+       */
+      onTagListRequest: function alfresco_services_TagService__onTagListRequest(payload) {
+
+         // Create the root URL...
+         var url = AlfConstants.PROXY_URI + "api/forms/picker/category/workspace/SpacesStore/tag:tag-root/children";
+
+         // Generate some default options...
+         // TODO: Consider making this configurable on the service?
+         var options = {
+            selectableType: "cm:category",
+            size: "100",
+            aspect: "cm:taggable"
+         };
+
+         // Update the options with a query if provided...
+         if (payload.query != null)
+         {
+            options.searchTerm = payload.query;
+         }
+
+         if (url !== null)
+         {
+            this.serviceXhr({url: url,
+                             query: options,
+                             alfTopic: (payload.alfResponseTopic ? payload.alfResponseTopic : null),
+                             method: "GET"});
+         }
+      },
+
+
       /**
        * @instance
        * @param {object} payload
        */
-      onTagQuery: function alf_services_TagService__onTagQuery(payload) {
+      onTagQuery: function alfresco_services_TagService__onTagQuery(payload) {
          if (payload == null ||
              typeof payload.callback !== "function" ||
              payload.callbackScope == null)
@@ -87,17 +124,17 @@ define(["dojo/_base/declare",
            var maxTags = (payload.maxTags != null) ? payload.maxTags : 100;
            var d = new Date().getTime();
            var url = null;
-           if (this.siteId != null && this.containerId != null)
+           if (payload.siteId != null && payload.containerId != null)
            {
-              url = AlfConstants.PROXY_URI + "api/tagscopes/site/" + this.siteId + "/" + this.containerId + "/tags?d=" + d + "&topN=" + maxTags;
+              url = AlfConstants.PROXY_URI + "api/tagscopes/site/" + payload.siteId + "/" + payload.containerId + "/tags?d=" + d + "&topN=" + maxTags;
            }
-           else if (this.rootNode != null)
+           else if (payload.rootNode != null)
            {
-              AlfConstants.PROXY_URI + "collaboration/tagQuery?d=" + d + "&m=" + maxTags + "&s=count&n=" + encodeURIComponent(this.rootNode);
+              url = AlfConstants.PROXY_URI + "collaboration/tagQuery?d=" + d + "&m=" + maxTags + "&s=count&n=" + encodeURIComponent(payload.rootNode);
            }
            else
            {
-              this.alfLog("warn", "It is not possible to retrieve tags without a 'siteId' and 'containerId' or a 'rootNode' attribute set on the tag service", this);
+              this.alfLog("warn", "It is not possible to retrieve tags without a 'siteId' and 'containerId' or a 'rootNode' attribute provided in payload", this);
            }
            
            if (url != null)
@@ -111,6 +148,33 @@ define(["dojo/_base/declare",
               this.serviceXhr(config);
            }
         }
-      }
+      },
+
+      /**
+       * Creates a tag at the remote store (the same location from which available tags are retrieved). 
+       * 
+       * @instance
+       * @param {string} tagName The name of the tag to create.
+       * @return {object} The created tag details
+       */
+      createTag: function alfresco_services_TagService__createTag(payload) {
+         var tagName = lang.getObject("tagName", false, payload);
+         if (tagName != null && lang.trim(tagName) !== "")
+         {
+            var config = {
+               url: AlfConstants.PROXY_URI + "api/tag/workspace/SpacesStore",
+               method: "POST",
+               alfTopic: (payload.alfResponseTopic ? payload.alfResponseTopic : null),
+               data: {
+                  name: tagName
+               }
+            };
+            this.serviceXhr(config);
+         }
+         else
+         {
+            this.alfLog("warn", "A request was made to create a tag but no 'tagName' attribute was provided", this, payload);
+         }
+      },
    });
 });

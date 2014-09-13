@@ -311,6 +311,15 @@
                text: this.msg("message.edit-cancel.success", displayName)
             });
          }
+	 
+         if (window.location.hash == "#newVersionUpload")
+         {
+            window.location.hash = "";
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.new-version-upload.success")
+            });
+         }
       },
 
       /**
@@ -478,7 +487,7 @@
       onNewVersionUploadCompleteCustom: function DocumentActions_onNewVersionUploadCompleteCustom(complete)
       {
         this.recordData.jsNode.setNodeRef(complete.successful[0].nodeRef);
-        var mydocumentDetailsUrl = this.getActionUrls(this.recordData).documentDetailsUrl;
+        var mydocumentDetailsUrl = this.getActionUrls(this.recordData).documentDetailsUrl + "#newVersionUpload";
         
         Alfresco.Share.postActivity(this.options.siteId, "org.alfresco.documentlibrary.file-updated", complete.successful[0].fileName, "document-details?nodeRef="+complete.successful[0].nodeRef, 
         {
@@ -486,7 +495,8 @@
             nodeRef: complete.successful[0].nodeRef
 
         }, function() {
-        	window.location = mydocumentDetailsUrl;
+            window.location = mydocumentDetailsUrl;
+            window.location.reload();
         }); 
 
       },

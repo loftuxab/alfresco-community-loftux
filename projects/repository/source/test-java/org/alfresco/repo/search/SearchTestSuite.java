@@ -61,10 +61,7 @@ public class SearchTestSuite extends TestSuite
         suite.addTestSuite(CMIS_FTSTest.class);
         suite.addTestSuite(CMISTest.class);
         suite.addTestSuite(FTSTest.class);
-    
-        
-        
-       
+
         return suite;
     }
 }

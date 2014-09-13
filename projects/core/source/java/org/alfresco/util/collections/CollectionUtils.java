@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -24,13 +24,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.alfresco.util.Pair;
 
@@ -501,5 +505,101 @@ public abstract class CollectionUtils
         result.retainAll(set2);
         
         return result;
+    }
+
+    /**
+     * Creates a new sorted map, based on the values from the given map and Comparator.
+     * 
+     * @param map the map which needs to be sorted
+     * @param valueComparator the Comparator
+     * @return a new sorted map
+     */
+    public static <K, V> Map<K, V> sortMapByValue(Map<K, V> map, Comparator<Entry<K, V>> valueComparator)
+    {
+        if (map == null)
+        {
+            return Collections.emptyMap();
+        }
+
+        List<Entry<K, V>> entriesList = new LinkedList<Entry<K, V>>(map.entrySet());
+
+        // Sort based on the map's values
+        Collections.sort(entriesList, valueComparator);
+
+        Map<K, V> orderedMap = new LinkedHashMap<K, V>(entriesList.size());
+        for (Entry<K, V> entry : entriesList)
+        {
+            orderedMap.put(entry.getKey(), entry.getValue());
+        }
+        return orderedMap;
+    }
+    
+    /**
+     * This method offers convenient conversion from value-based comparators to entry-based comparators
+     * for use with {@link #sortMapByValue(Map, Comparator)} above.
+     * <p/>
+     * Call it like so: {@code CollectionUtils.<String, Integer>toEntryComparator(valueComparator);}
+     * 
+     * @param entryComparator a comparator which compares the value types from a Map.
+     * @return a comparator which takes Map.Entry objects from that Map and compares their values.
+     */
+    public static <K, V> Comparator<Entry<K, V>> toEntryComparator(final Comparator<V> valueComparator)
+    {
+        return new Comparator<Entry<K, V>>()
+        {
+            @Override public int compare(Entry<K, V> e1, Entry<K, V> e2)
+            {
+                return valueComparator.compare(e1.getValue(), e2.getValue());
+            }
+        };
+    }
+    
+    /**
+     * This method returns a new List instance containing the same element objects as the provided
+     * list, but with the specified element having been moved left by the specified offset.
+     * <p/>
+     * If the offset would mean that the element would move beyond the start or end of the list, it will
+     * move only to the end.
+     * 
+     * @param offset the number of places over which to move the specified element.
+     * @param element the element to be moved.
+     * @param list the list to be reordered.
+     * @return a new List instance containing the ordered elements.
+     * @throws NoSuchElementException if the list does not contain an element equal to the one specified.
+     */
+    public static <T> List<T> moveLeft(int offset, T element, List<T> list)
+    {
+        return moveRight(-offset, element, list);
+    }
+    
+    /**
+     * This method does the same as {@link #moveLeft(int, Object, List)} but it moves the specified element
+     * to the right instead of the left.
+     */
+    public static <T> List<T> moveRight(int offset, T element, List<T> list)
+    {
+        final int elementIndex = list.indexOf(element);
+        
+        if (elementIndex == -1) { throw new NoSuchElementException("Element not found in provided list."); }
+        
+        if (offset == 0)
+        {
+            return list;
+        }
+        else
+        {
+            int newElementIndex = elementIndex + offset;
+            
+            // Ensure that the element will not move off the end of the list.
+            if      (newElementIndex >= list.size()) { newElementIndex = list.size() - 1; }
+            else if (newElementIndex < 0)            { newElementIndex = 0; }
+            
+            List<T> result = new ArrayList<>(list);
+            result.remove(element);
+            
+            result.add(newElementIndex, element);
+            
+            return result;
+        }
     }
 }

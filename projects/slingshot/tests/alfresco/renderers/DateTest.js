@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -33,28 +33,26 @@ define(["intern!object",
 
          var browser = this.remote;
          var testname = "DateTest";
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/renderers/page_models/Date_TestPage.json", testname)
-
-         .end()
+         return TestCommon.loadTestWebScript(this.remote, "/Date", testname)
 
          // Test that the dates are rendered as expected. The model uses a very old ISO date which should ensure
          // that we get a relative date in the form "Modified over X years ago" so we're going to use a regular
          // expression that should continue to work in the future as the date gets further into the past
-         .elementByCss("#CUSTOM_PROPS .value")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,46,"Check custom property is rendered correctly");
-            assert(/(Modified over \d+ years ago by Brian Griffin)/g.test(resultText), "Custom property not rendered correctly: " + resultText);
-         })
-         .end()
+         .findByCssSelector("#CUSTOM_PROPS .value")
+            .getVisibleText()
+            .then(function(resultText) {
+               TestCommon.log(testname,"Check custom property is rendered correctly");
+               assert(/(Modified over \d+ years ago by Brian Griffin)/g.test(resultText), "Custom property not rendered correctly: " + resultText);
+            })
+            .end()
 
-         .elementByCss("#STANDARD_PROPS .value")
-         .text()
-         .then(function(resultText) {
-            TestCommon.log(testname,54,"Check standard property is rendered correctly");
-            assert(/(Modified over \d+ years ago by Chris Griffin)/g.test(resultText), "Standard property not rendered correctly: " + resultText);
-         })
-         .end()
+         .findByCssSelector("#STANDARD_PROPS .value")
+            .getVisibleText()
+            .then(function(resultText) {
+               TestCommon.log(testname,"Check standard property is rendered correctly");
+               assert(/(Modified over \d+ years ago by Chris Griffin)/g.test(resultText), "Standard property not rendered correctly: " + resultText);
+            })
+            .end()
 
          // Post the coverage results...
          .then(function() {

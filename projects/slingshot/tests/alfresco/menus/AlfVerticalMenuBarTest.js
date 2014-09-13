@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -26,17 +26,16 @@ define(["intern!object",
         "intern/chai!assert",
         "require",
         "alfresco/TestCommon",
-        "intern/dojo/node!wd/lib/special-keys"], 
-        function (registerSuite, assert, require, TestCommon, specialKeys) {
+        "intern/dojo/node!leadfoot/keys"], 
+        function (registerSuite, assert, require, TestCommon, keys) {
 
    registerSuite({
       name: 'AlfVerticalMenuBar Test',
       'alfresco/menus/AlfVerticalMenuBar': function () {
 
          var browser = this.remote;
-         return TestCommon.bootstrapTest(this.remote, "./tests/alfresco/menus/page_models/AlfVerticalMenuBar_TestPage.json")
-
-            .end()
+         var testName = "Vertical Menu Bar Test";
+         return TestCommon.loadTestWebScript(this.remote, "/AlfVerticalMenuBar", testName)
 
             // TODO: This test has not yet been written because the vertical menu bar is still in beta and needs to be completed
 

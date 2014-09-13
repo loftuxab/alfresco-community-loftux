@@ -26,6 +26,8 @@
                 Surf automatically selects the correct one depending on config mode.
    -->
    <@script type="text/javascript" src="${url.context}/res/js/yui-common.js" group="template-common"/>
+   
+   <@script type="text/javascript" src="${url.context}/res/yui/history/history.js" group="template-common"/>
 
    <@script type="text/javascript" src="${url.context}/res/js/bubbling.v2.1.js" group="template-common"/>
    <@inlineScript group="template-common">
@@ -88,6 +90,8 @@
       ];
       
       Alfresco.constants.MENU_ARROW_SYMBOL = "&#9662;";
+
+      Alfresco.constants.TINY_MCE_SUPPORTED_LOCALES = "${config.global["I18N"].getChildValue("tiny-mce-supported-locales")}";
       
       <#if PORTLET>
       document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=";

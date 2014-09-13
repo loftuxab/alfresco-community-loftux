@@ -26,11 +26,13 @@
             <class name="org.alfresco.po.share.dashlet.MySiteDashletTest" />
         </classes>
     </test>
+    <!-- WEBDRONE-746 FIXME
     <test name="MyTasksDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.MyTasksDashletTest" />
         </classes>
     </test>
+    -->
     <test name="RssFeedDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.RssFeedDashletTest" />
@@ -101,7 +103,6 @@
             <class name="org.alfresco.po.share.dashlet.WikiDashletTest" />
         </classes>
     </test>
-    <!-- 
     <test name="SiteContentBreakdownDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.SiteContentBreakdownDashletTest" />
@@ -112,5 +113,4 @@
             <class name="org.alfresco.po.share.dashlet.TopSiteContributorDashletTest" />
         </classes>
     </test>
-     -->
 </suite>

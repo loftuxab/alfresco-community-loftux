@@ -33,6 +33,16 @@
             <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-legacy-lucene</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.lucene</groupId>
+                    <artifactId>lucene-analyzers</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.lucene</groupId>
+                    <artifactId>lucene-snowball</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>se.loftux.alfresco</groupId>
@@ -43,12 +53,16 @@
             <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
+            <version>2.9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-regex</artifactId>
             <version>2.9.3</version>
         </dependency>
         <dependency>
@@ -118,6 +132,17 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <archiveClasses>true</archiveClasses>
+                    <overlays>
+                        <overlay>
+                            <groupId>org.apache.solr</groupId>
+                            <artifactId>apache-solr</artifactId>
+                            <excludes>
+                                <exclude>WEB-INF/lib/commons-codec-*.jar</exclude>
+                                <exclude>WEB-INF/lib/slf4j-*.jar</exclude>
+                                <exclude>WEB-INF/lib/log4j-*.jar</exclude>
+                            </excludes>
+                        </overlay>
+                    </overlays>
                 </configuration>
                 <!-- This allows overlays to be prepared on the FS for minification and faster run -->
                 <executions>
