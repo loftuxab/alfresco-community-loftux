@@ -20,6 +20,7 @@ package org.alfresco.repo.activities;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -64,8 +65,10 @@ public class ActivityPostServiceImpl implements ActivityPostService
     
     private boolean userNamesAreCaseSensitive = false;
 
-    public void setIgnoredActivityTypes(List<String> ignoredActivityTypes) {
-        this.ignoredActivityTypes = ignoredActivityTypes;
+    public void setIgnoredActivityTypes(String ignoredActivityTypes) {
+        if(ignoredActivityTypes!= null && ignoredActivityTypes.length() > 0){
+            this.ignoredActivityTypes = Arrays.asList(ignoredActivityTypes.split(","));
+        }
     }
 
     private List<String> ignoredActivityTypes = new ArrayList<>();
