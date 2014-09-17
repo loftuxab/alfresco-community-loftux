@@ -6,3 +6,7 @@ build
 target
 **/target
 projects/solr/source/solr/instance/lib/
+*.iml
+.idea
+projects/solr4/overlays
+projects/solr/overlays
